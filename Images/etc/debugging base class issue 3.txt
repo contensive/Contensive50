@@ -1,0 +1,85 @@
+"8/11/2013 8:50:09 AM"
+,"root"
+,""
+,""
+,""
+,"No DLL files where found in the collection folder [C:\Program Files (x86)\kma\Contensive\addons]
+,hint=[enter
+,Get AssemblyFilenames]"
+,"Log Entry"
+,"Resume after logging"
+,""
+,"0"
+,""
+,""
+
+"8/11/2013 8:50:09 AM"
+,"root"
+,""
+,""
+,""
+,"A valid Dot Net DLL could not be found for this addon [Tool Panel] in filePath [ & TestFilePathname & ]
+,hint=[enter
+,Get AssemblyFilenames]"
+,"Log Entry"
+,"Resume after logging"
+,""
+,"0"
+,""
+,""
+
+"8/11/2013 8:50:09 AM"
+,"root"
+,""
+,""
+,""
+,"Tool Panel could not be executed because there was an error executing the addon DLL [C:\Program Files (x86)\kma\Contensive\addons\tool panel_374e2b8cb29d470bbd1b41caa5bcedcb\20130810_171851\ToolPanel.dll]
+, in class [contensive.addons.toolpanelclass]. The error was [System.Exception: Cannot create ActiveX component.    at Microsoft.VisualBasic.Interaction.CreateObject(String ProgId, String ServerName)    at Contensive.Processor.CPBlockClass..ctor(comMainCsvClass cmcObj, CPClass& CPParent)    at Contensive.Processor.CPClass.BlockNew()    at Contensive.Addons.toolPanelClass.Execute(CPBaseClass cp)    at Contensive.Processor.CPClass.ExecuteAddonAssemblyFromCmc_ByFilePath(Int32 AddonID, String AddonDisplayName, String filePath, String TypeFullName, Boolean IsDebugFolder, String& returnValue, Boolean& AddonFound, String& userErrorMessage)]
+,hint=[enter
+,Get AssemblyFilenames
+,interate AssemblyFilenames
+,load assembly from  C:\Program Files (x86)\kma\Contensive\addons\tool panel_374e2b8cb29d470bbd1b41caa5bcedcb\20130810_171851\ToolPanel.dll
+,interate types in C:\Program Files (x86)\kma\Contensive\addons\tool panel_374e2b8cb29d470bbd1b41caa5bcedcb\20130810_171851\ToolPanel.dll
+,test type contensive.addons.aotoolpanel.panelregistrationformclass
+,test type contensive.addons.aotoolpanel.defaultregistrationformclass
+,test type contensive.addons.aotoolpanel.defaultregistrationformhandlerclass
+,test type contensive.addons.aotoolpanel.panelaccountformclass
+,test type contensive.addons.aotoolpanel.defaultaccountformclass
+,test type contensive.addons.aotoolpanel.defaultaccountformhandlerclass
+,test type contensive.addons.aotoolpanel.panelloginformclass
+,test type contensive.addons.aotoolpanel.defaultloginformclass
+,test type contensive.addons.aotoolpanel.defaultloginformhandlerclass
+,test type contensive.addons.toolpanelclass
+,type found
+, create instance for Contensive.Addons.toolPanelClass
+,attempt execute on Contensive.Addons.toolPanelClass] [Microsoft.VisualBasic
+, System.Exception: Cannot create ActiveX component.    at Microsoft.VisualBasic.Interaction.CreateObject(String ProgId
+, String ServerName)    at Contensive.Processor.CPBlockClass..ctor(comMainCsvClass cmcObj
+, CPClass& CPParent)    at Contensive.Processor.CPClass.BlockNew()    at Contensive.Addons.toolPanelClass.Execute(CPBaseClass cp)    at Contensive.Processor.CPClass.ExecuteAddonAssemblyFromCmc_ByFilePath(Int32 AddonID
+, String AddonDisplayName
+, String filePath
+, String TypeFullName
+, Boolean IsDebugFolder
+, String& returnValue
+, Boolean& AddonFound
+, String& userErrorMessage)]"
+,"Log Entry"
+,"Resume after logging"
+,""
+,"0"
+,""
+,""
+
+"8/11/2013 8:50:09 AM"
+,"root"
+,"ContentServerClass.ExecuteAddon_internal"
+,""
+,""
+,"Error during cmc.csv_ExecuteAssembly [There was an error returned from the Add-on assembly [Tool Panel]
+, [There was an error executing the addon's Dot Net DLL.].]"
+,"Log Entry"
+,"Resume after logging"
+,""
+,"0"
+,""
+,""

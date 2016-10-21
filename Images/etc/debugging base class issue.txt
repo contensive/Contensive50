@@ -1,0 +1,75 @@
+"8/10/2013 11:47:18 AM"
+,"root"
+,""
+,""
+,""
+,"ExecuteAddon trap
+,hint=[enter
+,Get AssemblyFilenames
+,interate AssemblyFilenames
+,load assembly from  C:\Program Files (x86)\kma\Contensive\addons\ToolPanel.dll
+,interate types in C:\Program Files (x86)\kma\Contensive\addons\ToolPanel.dll] [Processor
+, System.NullReferenceException: Object reference not set to an instance of an object.    at Contensive.Processor.CPClass.ExecuteAddonAssemblyFromCmc_ByFilePath(Int32 AddonID
+, String AddonDisplayName
+, String filePath
+, String TypeFullName
+, Boolean IsDebugFolder
+, String& returnValue
+, Boolean& AddonFound
+, String& userErrorMessage)]"
+,"Log Entry"
+,"Resume after logging"
+,""
+,"0"
+,""
+,""
+"8/10/2013 11:47:18 AM"
+,"root"
+,""
+,""
+,""
+,"ExecuteAddon trap
+,hint=[enter
+,Get AssemblyFilenames
+,interate AssemblyFilenames
+,load assembly from  C:\Program Files (x86)\kma\Contensive\addons\tool panel_374e2b8cb29d470bbd1b41caa5bcedcb\20130810_114647\ToolPanel.dll
+,interate types in C:\Program Files (x86)\kma\Contensive\addons\tool panel_374e2b8cb29d470bbd1b41caa5bcedcb\20130810_114647\ToolPanel.dll] [Processor
+, System.NullReferenceException: Object reference not set to an instance of an object.    at Contensive.Processor.CPClass.ExecuteAddonAssemblyFromCmc_ByFilePath(Int32 AddonID
+, String AddonDisplayName
+, String filePath
+, String TypeFullName
+, Boolean IsDebugFolder
+, String& returnValue
+, Boolean& AddonFound
+, String& userErrorMessage)]"
+,"Log Entry"
+,"Resume after logging"
+,""
+,"0"
+,""
+,""
+"8/10/2013 11:47:18 AM"
+,"root"
+,""
+,""
+,""
+,"Tool Panel could not be executed because no addons were found with Dot Net Namespace [Contensive.Addons.toolPanelClass] based on [Contensive.BaseClasses.AddonBaseClass]."
+,"Log Entry"
+,"Resume after logging"
+,""
+,"0"
+,""
+,""
+"8/10/2013 11:47:19 AM"
+,"root"
+,"ContentServerClass.ExecuteAddon_internal"
+,""
+,""
+,"Error during cmc.csv_ExecuteAssembly [There was an error returned from the Add-on assembly [Tool Panel]
+, [The addon's Dot Net DLL does not appear to be valid [C:\Program Files (x86)\kma\Contensive\addons\tool panel_374e2b8cb29d470bbd1b41caa5bcedcb\20130810_114647\ToolPanel.dll].].]"
+,"Log Entry"
+,"Resume after logging"
+,""
+,"0"
+,""
+,""

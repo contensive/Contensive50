@@ -1,0 +1,28 @@
+"8/11/2013 9:08:29 AM"
+,"root"
+,""
+,""
+,""
+,"error in Contensive.Addons.aoAccountBilling.adminClass.execute [Microsoft.VisualBasic
+, System.Exception: Cannot create ActiveX component.    at Microsoft.VisualBasic.Interaction.CreateObject(String ProgId
+, String ServerName)    at Contensive.Processor.CPBlockClass..ctor(comMainCsvClass cmcObj
+, CPClass& CPParent)    at Contensive.Processor.CPClass.BlockNew()    at Contensive.Addons.aoAccountBilling.adminClass.Execute(CPBaseClass CP)]"
+,"Log Entry"
+,"Resume after logging"
+,""
+,"0"
+,""
+,""
+"8/11/2013 9:08:29 AM"
+,"root"
+,"ContentServerClass.ExecuteAddon_internal"
+,""
+,""
+,"Error during cmc.csv_ExecuteAssembly [There was an error returned from the Add-on assembly [Invoice Manager]
+, [A valid Dot Net DLL could not be found for this addon [Invoice Manager].].]"
+,"Log Entry"
+,"Resume after logging"
+,""
+,"0"
+,""
+,""

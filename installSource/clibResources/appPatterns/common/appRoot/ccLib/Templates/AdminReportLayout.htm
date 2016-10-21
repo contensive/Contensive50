@@ -1,0 +1,82 @@
+
+<html>
+<head>
+<style>
+body,table,tr,td,th,tbody {padding:0;margin:0;border:0}
+p,div,td {FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif;}
+#pagetable {background-color:#e0e0e0;width:100%}
+#bodytable {background-color:#e0e0e0;width:100%}
+#bodytableinner {background-color:#e0e0e0;width:100%}
+#buttonbottom {height:3px;BACKGROUND-COLOR:#e0e0e0;Border-Top:1px solid #808080;Border-Left:1px solid #808080;Border-Bottom:1px solid #f8f8f8;Border-right:1px solid #f8f8f8;}
+
+#pageheader {width:100%;COLOR:black;Background-color:#C3D9FF;FONT-WEIGHT:bold;FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif;TEXT-DECORATION:none;Padding:10px}
+#tools {width:200px;background-color:#f0f0f0;padding:0px;border:1px solid black}
+#buttons {COLOR:black;Background-color:#567694;Padding:5px}
+@media print {#buttons { display:none; }}
+#bodyheader {COLOR:black;Background-color:#C3D9FF;FONT-WEIGHT:bold;FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif;Padding:10px;}
+#body {BACKGROUND-COLOR:#C3D9FF;padding:10px;height:400px;}
+#criteriatable {margin-top:20px;}
+#criteriasubhead {padding-top:15px;padding-bottom:5px;COLOR:black;FONT-WEIGHT:bold;FONT-SIZE:11px;}
+#criteriadescription {padding-top:15px;padding-bottom:5px;COLOR:black;FONT-SIZE:11px;}
+.criteriarow .caption {padding-top:2px;COLOR:black;FONT-SIZE:11px;text-align:left;width:100%;padding-left:4px;}
+.criteriarow .input {padding-top:2px;COLOR:black;FONT-SIZE:11px;text-align:right;width:200px}
+.reportcaptionrow {background-color:#669ACC;COLOR:white;}
+.reportcaptionrow A {COLOR:white;TEXT-DECORATION:none;}
+.reportcaptionrow A:visited {COLOR:white;TEXT-DECORATION:none;}
+.reportcaptionrow A:hover {COLOR:white;TEXT-DECORATION:none;}
+.reportcaptioncell {padding:4px;FONT-WEIGHT:normal;FONT-SIZE:11px;FONT-FAMILY:verdana,arial,sans-serif;border-right:1px solid white;border-bottom:1px solid black;border-top:0px solid white;Text-Decoration:none ! important;}
+.reportrow {BACKGROUND-COLOR:#E8EEF7}
+.reportrow:hover {BACKGROUND-COLOR:#f0fEFf}
+.reportcell {FONT-FAMILY:verdana,arial,sans-serif;BACKGROUND-COLOR:#E8EEF7;padding:4px;border:0px;border-right:1px solid white;border-bottom:1px solid #c8cEd7;FONT-SIZE:9px;FONT-FAMILY:verdana,arial,sans-serif;}
+#bodyfooter {}
+#reporttable {}
+#chart_div {margin-bottom:50px;margin-top:50px;text-align:center;}
+
+</style>
+</head>
+<body>
+<table border=0 cellpadding=0 cellspacing=0 width=100%id="pagetable">
+<!-- <tr><td align=left valign=top id="pageheader">Page Header</td></tr> -->
+<tr><td align=left valign=top id="pagebody">
+<table border=0 cellpadding=0 cellspacing=0 width=100% id="bodytable">
+<tr><td align=left valign=top id="bodytableright">
+<table border=0 cellpadding=0 cellspacing=0 width=100% id="bodytableinner">
+<tr><td align=left valign=top id="buttons">[buttons] [buttons] [buttons]</td></tr>
+<tr><td align=left valign=top id="buttonbottom"><img src="/cclib/images/spacer.gif" width=1 height=1></td></tr>
+<tr><td align=left valign=top id="bodyheader">Body Header</td></tr>
+<tr><td align=left valign=top id="body">
+<div id="chart_div"></div>
+<!-- the reporttable must have at least one TR with at least one reportcaptioncell, the actual TD will be replaced, but will still include the same class -->
+<!-- the reportcell is the same -->
+      <table border="0" cellspacing="0" cellpadding="0" width="100%" id="reporttable">
+        <TR class="reportcaptionrow">
+          <TD style="VERTICAL-ALIGN:bottom;TEXT-ALIGN:Right;width:50;" class="reportcaptioncell"><a href="#">Row<img src="/cclib/images/arrowdown.gif" width=8 height=8 border=0></a><img src="/cclib/images/spacer.gif" width="50" height=1 border=0></TD>
+          <TD style="VERTICAL-ALIGN:bottom;TEXT-ALIGN:right;width:10%;" class="reportcaptioncell"><a href="#">Visits</a></TD>
+          <TD style="VERTICAL-ALIGN:bottom;TEXT-ALIGN:right;width:10%;" class="reportcaptioncell"><a href="#">Pages</a></TD>
+          <TD style="VERTICAL-ALIGN:bottom;TEXT-ALIGN:center;width:20%;" class="reportcaptioncell"><a href="#">Blocked</a></TD>
+          <TD style="VERTICAL-ALIGN:bottom;TEXT-ALIGN:left;width:60%;" class="reportcaptioncell"><a href="#">Browser</a></TD>
+        </TR>
+        <TR class="reportrow">
+          <TD valign="middle" align="right" class="reportcell">1</span></TD>
+          <TD valign="middle" align="right" class="reportcell">15</TD>
+          <TD valign="middle" align="right" class="reportcell">290</TD>
+          <TD valign="middle" align="center" class="reportcell"><B>NO</B>/<A href="index.asp?aa=0&af=12&asf=12&rid=8&ReportTimeout=180&DateTo=2/5/2009&DateFrom=1/30/2009&VisitID=0&VisitorID=0&MemberID=0&ExcludeBrowsers=True&ExcludeIP=True&IPAddress=&ExcludeNewVisitors=False&ExcludeOldVisitors=False&VisitReferer=&RecordID=0&PageNumber=1&PageSize=50&depth=0&BlockBrowser=Mozilla/4.0+(compatible%3B+MSIE+7.0%3B+Windows+NT+6.0%3B+SLCC1%3B+.NET+CLR+2.0.50727%3B+.NET+CLR+3.0.04506)">YES</A></TD>
+          <TD valign="middle" align="left" class="reportcell">Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; SLCC1; .NET CLR 2.0.50727; .NET CLR 3.0.04506)</TD>
+        </TR>
+      </table >
+<div id="reportpagelinks">Page 2 (Row 6 of 7)<br>Go to Page 1 2</div>
+<TABLE border="0" cellpadding="0" cellspacing="0" width="100%" id=criteriatable>
+<TR><TD colspan=2 align="left" id="criteriasubhead">Report Controls</TD></TR>
+<TR><TD colspan=2 align="left" id="criteriadescription">Use this section to request specific report criteria.</TD></TR>
+<TR class=criteriarow><TD class=input><INPUT TYPE="Text" NAME="SetReportTimeout" SIZE="10" VALUE="180"></TD><TD class=caption>Maximum time for database activity (seconds)</TD></TR>
+</TABLE>
+
+</td></tr>
+<tr><td align=left valign=top id="buttons">[buttons] [buttons] [buttons]</td></tr>
+</table id="bodytableinner-end">
+</td align=left valign=top id="bodytablebody-end"></tr>
+</table>
+</td id="pagebody-end"></tr>
+</table>
+</body>
+</html>

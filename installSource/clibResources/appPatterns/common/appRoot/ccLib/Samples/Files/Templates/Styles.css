@@ -1,0 +1,23 @@
+/*
+basic styles
+*/
+
+body,div,p,td,ul,ol,li {font-size:16px;line-height:20px;font-family:arial,verdana,sans-serif;}
+body,div {padding:0;margin:0}
+p {padding:0; margin: 1.12em 0}
+h1,h2,h3,h4,h5,h6 {margin: 0;padding:0;font-weight:bold;font-family:arial,verdana,sans-serif;}
+h1 {FONT-SIZE:20px; padding: 15px 0 5px 0;margin: 0}
+h2 {FONT-SIZE:18px;padding: 10px 0 3px 0;margin: 0}
+h3 {FONT-SIZE:17px;padding: 5px 0 2px 0;margin: 0}
+h4 {FONT-SIZE:16px;padding: 3px 0 0 0;}
+h5,h6 {FONT-SIZE:16px;padding: 0 0 0 0;}
+a {}
+a:link {TEXT-DECORATION:underline;}
+a:visited {TEXT-DECORATION:underline;}
+a:hover {TEXT-DECORATION:underline;}
+.ccBodyWeb {padding: 0px; margin: 0px;}
+.ccBodyEmail {padding: 0px; margin: 0px;}
+/*
+Add custom styles here. All those starting with a '.' will appear for use in the wysiwyg editor
+*/
+.greyTextSample {color:#888;}

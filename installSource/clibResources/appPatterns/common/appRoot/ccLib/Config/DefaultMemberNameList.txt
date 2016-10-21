@@ -1,0 +1,12 @@
+
+//
+// Default Member Name list
+// This file is maintained by the server. On the first hit,
+// if the browserstring is in the Visitors Browser, the name matches
+// format:  name -tab- browserstring -tab- reserved
+//
+Google-Bot	googlebot
+MSN-Bot	msnbot
+Yahoo-Bot	slurp
+Bot	robot
+Bot	crawl

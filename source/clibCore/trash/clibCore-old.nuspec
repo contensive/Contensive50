@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Contensive.clib</id>
+    <version>5.0.0</version>
+    <title>$title$</title>
+    <authors>Contensive</authors>
+    <owners>$author$</owners>
+    <licenseUrl>http://clib.io</licenseUrl>
+    <projectUrl>http://clib.io</projectUrl>
+    <iconUrl>http://clib.io/img/ContensiveLogo2-385x60.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>This is an initial NuGet test for - The Contensive Library provides a simple set of dotnet objects to develop robust, scalable online applications.</description>
+    <releaseNotes>Initial public release of the Contensive application library.</releaseNotes>
+    <copyright>Copyright 2016</copyright>
+    <tags>Contensive,dotnet,clib,cclib</tags>
+  </metadata>
+  <files>
+    <file src="readme.txt" target="" />
+  </files>
+</package>

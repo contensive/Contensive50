@@ -1,0 +1,89 @@
+"8/10/2013 11:56:20 AM"
+,"root"
+,""
+,""
+,""
+,"ExecuteAddon trap
+,hint=[enter
+,Get AssemblyFilenames
+,interate AssemblyFilenames
+,load assembly from  C:\Program Files (x86)\kma\Contensive\addons\ToolPanel.dll
+,interate types in C:\Program Files (x86)\kma\Contensive\addons\ToolPanel.dll] [Processor
+, System.NullReferenceException: Object reference not set to an instance of an object.    at Contensive.Processor.CPClass.ExecuteAddonAssemblyFromCmc_ByFilePath(Int32 AddonID
+, String AddonDisplayName
+, String filePath
+, String TypeFullName
+, Boolean IsDebugFolder
+, String& returnValue
+, Boolean& AddonFound
+, String& userErrorMessage)]"
+,"Log Entry"
+,"Resume after logging"
+,""
+,"0"
+,""
+,""
+
+"8/10/2013 11:56:20 AM"
+,"root"
+,""
+,""
+,""
+,"Invoice Manager could not be executed because there was an error creating an object from the assembly
+, DLL [Contensive.Addons.aoAccountBilling.adminClass]. The error was [System.InvalidCastException: Unable to cast object of type 'Contensive.Addons.aoAccountBilling.adminClass' to type 'Contensive.BaseClasses.AddonBaseClass'.    at Contensive.Processor.CPClass.ExecuteAddonAssemblyFromCmc_ByFilePath(Int32 AddonID
+, String AddonDisplayName
+, String filePath
+, String TypeFullName
+, Boolean IsDebugFolder
+, String& returnValue
+, Boolean& AddonFound
+, String& userErrorMessage)]
+,hint=[enter
+,Get AssemblyFilenames
+,interate AssemblyFilenames
+,load assembly from  C:\Program Files (x86)\kma\Contensive\addons\ecommerce_8dbe6b5518db44eb9a4a5cbba84df35a\20130810_115508\accountBilling2.dll
+,interate types in C:\Program Files (x86)\kma\Contensive\addons\ecommerce_8dbe6b5518db44eb9a4a5cbba84df35a\20130810_115508\accountBilling2.dll
+,test type my.myapplication
+,test type my.mycomputer
+,test type my.myproject
+,test type my.myproject+mywebservices
+,test type my.myproject+threadsafeobjectprovider`1
+,test type contensive.addons.aoaccountbilling.adminaccountdetailsclass
+,test type contensive.addons.aoaccountbilling.adminaccountmessagesclass
+,test type contensive.addons.aoaccountbilling.adminaccountordersclass
+,test type contensive.addons.aoaccountbilling.adminaccountrecurringclass
+,test type contensive.addons.aoaccountbilling.adminaccountsclass
+,test type contensive.addons.aoaccountbilling.adminaccountlistclass
+,test type contensive.addons.aoaccountbilling.adminaccounttransclass
+,test type contensive.addons.aoaccountbilling.adminclass
+,type found
+, create instance for Contensive.Addons.aoAccountBilling.adminClass] [Processor
+, System.InvalidCastException: Unable to cast object of type 'Contensive.Addons.aoAccountBilling.adminClass' to type 'Contensive.BaseClasses.AddonBaseClass'.
+    at Contensive.Processor.CPClass.ExecuteAddonAssemblyFromCmc_ByFilePath(Int32 AddonID
+, String AddonDisplayName
+, String filePath
+, String TypeFullName
+, Boolean IsDebugFolder
+, String& returnValue
+, Boolean& AddonFound
+, String& userErrorMessage)]"
+,"Log Entry"
+,"Resume after logging"
+,""
+,"0"
+,""
+,""
+
+"8/10/2013 11:56:20 AM"
+,"root"
+,"ContentServerClass.ExecuteAddon_internal"
+,""
+,""
+,"Error during cmc.csv_ExecuteAssembly [There was an error returned from the Add-on assembly [Invoice Manager]
+, [There was an error initializing the addon's Dot Net DLL.].]"
+,"Log Entry"
+,"Resume after logging"
+,""
+,"0"
+,""
+,""
