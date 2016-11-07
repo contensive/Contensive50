@@ -1,7 +1,4 @@
 ﻿
-'Imports Contensive.Core
-Imports Contensive.Core
-
 Namespace Contensive.Core
     Public Class processEmailClass
         '

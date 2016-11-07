@@ -1,21 +1,10 @@
 ﻿
 Option Explicit On
 Option Strict On
-
+'
 Imports Contensive.Core.ccCommonModule
-'Imports Contensive.Core
 Imports System.Xml
 Imports Contensive.Core
-
-'
-' findReplace as integer to as integer
-' just the document -- replace out 
-' if 'Imports Interop.adodb, replace in ObjectStateEnum.adState...
-' findreplace encode to encode
-' findreplace ''DoEvents to '''DoEvents
-' runProcess becomes runProcess
-' Sleep becomes Threading.Thread.Sleep(
-' as object to as object
 '
 Namespace Contensive.Addons
     '
@@ -23,8 +12,8 @@ Namespace Contensive.Addons
         Inherits Contensive.BaseClasses.AddonBaseClass
         '
         '====================================================================================================
-        ' addon values passed in - do not dispose
-        '   sets cp from argument For use In calls To other objects, Then cpCore because cp cannot be uses since that would be a circular depenancy
+        ' objects passed in - do not dispose
+        '   sets cp from argument For use In calls To other objects, Then cpCore because cp cannot be used since that would be a circular depenancy
         '====================================================================================================
         '
         Private cp As CPClass                   ' local cp set in constructor
@@ -32,492 +21,47 @@ Namespace Contensive.Addons
         '
         '====================================================================================================
         ''' <summary>
-        ''' addon method
+        ''' addon method, deliver complete Html admin site
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <returns></returns>
         Public Overrides Function execute(cp As Contensive.BaseClasses.CPBaseClass) As Object
-            Me.cp = DirectCast(cp, CPClass)
-            cpCore = Me.cp.core
-            Return addonToBe_admin("")
-        End Function
-        '
-        '====================================================================================================
-        ' This is the header file controls the online forums architecture
-        ' This file and its contents are copyright by Kidwell McGowan Associates.
-        '========================================================================
-        '
-        ' ----- ccGroupRules storage for list of Content that a group can author
-        '
-        Private Structure ContentGroupRuleType
-            Dim ContentID As Integer
-            Dim GroupID As Integer
-            Dim AllowAdd As Boolean
-            Dim AllowDelete As Boolean
-        End Structure
-        '
-        ' -----
-        '
-        Private Structure StorageType
-            Dim Id As Integer
-            Dim Name As String
-        End Structure
-        '
-        ' ----- Group Rules
-        '
-        Private Structure GroupRuleType
-            Dim GroupID As Integer
-            Dim AllowAdd As Boolean
-            Dim AllowDelete As Boolean
-        End Structure
-        '
-        ' ----- Used within Admin site to create fancyBox popups
-        '
-        Private includeFancyBox As Boolean
-        Private fancyBoxPtr As Integer
-        Private fancyBoxHeadJS As String
-        Private ClassInitialized As Boolean        ' if true, the module has been
-        Private Const allowSaveBeforeDuplicate = False
-        '
-        ' To interigate Add-on Collections to check for re-use
-        '
-        Private Structure DeleteType
-            Dim Name As String
-            Dim ParentID As Integer
-        End Structure
-        Private Structure NavigatorType
-            Dim Name As String
-            Dim menuNameSpace As String
-        End Structure
-        Private Structure Collection2Type
-            Dim AddOnCnt As Integer
-            Dim AddonGuid() As String
-            Dim AddonName() As String
-            Dim MenuCnt As Integer
-            Dim Menus() As String
-            Dim NavigatorCnt As Integer
-            Dim Navigators() As NavigatorType
-        End Structure
-        Private CollectionCnt As Integer
-        Private Collections() As Collection2Type
-        '
-        '========================================================================
-        ' ----- Target Data Storage
-        '========================================================================
-        '
-        Private requestedContentId As Integer
-        Private requestedRecordId As Integer
-        Private AdminContentWorkflowAuthoring As Boolean  ' set if content and site support workflow authoring
-        '
-        Private BlockEditForm As Boolean          ' true if there was an error loading the edit record - use to block the edit form
-        '
-        '========================================================================
-        ' ----- Storage for current EditRecord, loaded in LoadEditRecord
-        '========================================================================
-        '
-        Public Class editRecordFieldClass
-            Public dbValue As Object
-            Public value As Object
-        End Class
-        '
-        Public Class editRecordClass
-            Public fieldsLc As New Dictionary(Of String, editRecordFieldClass)
-            'Public valuesObject As Dictionary(Of String, Object) ' Storage for Edit Record values
-            'Public DbValues As Dictionary(Of String, Object)   ' Storage for last values read from Defaults+Db, added b/c file fields need Db value to display
-            '
-            Public id As Integer                    ' ID field of edit record (Record to be edited)
-            Public parentID As Integer              ' ParentID field of edit record (Record to be edited)
-            Public nameLc As String                ' name field of edit record
-            Public active As Boolean             ' active field of the edit record
-            Public contentControlId As Integer             ' ContentControlID of the edit record
-            Public contentControlId_Name As String         '
-            Public menuHeadline As String        ' Used for Content Watch Link Label if default
-            Public modifiedDate As Date          ' Used for control section display
-            Public modifiedByMemberID As Integer    '   =
-            Public dateAdded As Date             '   =
-            Public createByMemberId As Integer       '   =
-            Public contentCategoryID As Integer
-            Public RootPageID As Integer
-            Public SetPageNotFoundPageID As Boolean
-            Public SetLandingPageID As Boolean
-
-            '
-            Public Loaded As Boolean            ' true/false - set true when the field array values are loaded
-            Public Saved As Boolean              ' true if edit record was saved during this page
-            Public Read_Only As Boolean           ' set if this record can not be edited, for various reasons
-            '
-            ' From cpCore.main_GetAuthoringStatus
-            '
-            Public IsDeleted As Boolean          ' true means the edit record has been deleted
-            Public IsInserted As Boolean         ' set if Workflow authoring insert
-            Public IsModified As Boolean         ' record has been modified since last published
-            Public LockModifiedName As String        ' member who first edited the record
-            Public LockModifiedDate As Date          ' Date when member modified record
-            Public SubmitLock As Boolean         ' set if a submit Lock, even if the current user is admin
-            Public SubmittedName As String       ' member who submitted the record
-            Public SubmittedDate As Date         ' Date when record was submitted
-            Public ApproveLock As Boolean        ' set if an approve Lock
-            Public ApprovedName As String        ' member who approved the record
-            Public ApprovedDate As Date          ' Date when record was approved
-            '
-            ' From cpCore.main_GetAuthoringPermissions
-            '
-            Public AllowInsert As Boolean
-            Public AllowCancel As Boolean
-            Public AllowSave As Boolean
-            Public AllowDelete As Boolean
-            Public AllowPublish As Boolean
-            Public AllowAbort As Boolean
-            Public AllowSubmit As Boolean
-            Public AllowApprove As Boolean
-            '
-            ' From cpCore.main_GetEditLock
-            '
-            Public EditLock As Boolean           ' set if an edit Lock by anyone else besides the current user
-            Public EditLockMemberID As Integer      ' Member who edit locked the record
-            Public EditLockMemberName As String  ' Member who edit locked the record
-            Public EditLockExpires As Date       ' Time when the edit lock expires
-
-        End Class
-        'Private EditRecordValuesObject() As Object      ' Storage for Edit Record values
-        'Private EditRecordDbValues() As Object         ' Storage for last values read from Defaults+Db, added b/c file fields need Db value to display
-        'Private EditRecord.ID As Integer                    ' ID field of edit record (Record to be edited)
-        'Private EditRecord.ParentID As Integer              ' ParentID field of edit record (Record to be edited)
-        'Private EditRecord.Name As String                ' name field of edit record
-        'Private EditRecord.Active As Boolean             ' active field of the edit record
-        'Private EditRecord.ContentID As Integer             ' ContentControlID of the edit record
-        'Private EditRecord.ContentName As String         '
-        'Private EditRecord.MenuHeadline As String        ' Used for Content Watch Link Label if default
-        'Private EditRecord.ModifiedDate As Date          ' Used for control section display
-        'Private EditRecord.ModifiedByMemberID As Integer    '   =
-        'Private EditRecord.AddedDate As Date             '   =
-        'Private EditRecord.AddedByMemberID As Integer       '   =
-        'Private EditRecord.ContentCategoryID As Integer
-        'Private EditRecordRootPageID As Integer
-        'Private EditRecord.SetPageNotFoundPageID As Boolean
-        'Private EditRecord.SetLandingPageID As Boolean
-
-        ''
-        'Private EditRecord.Loaded As Boolean            ' true/false - set true when the field array values are loaded
-        'Private EditRecord.Saved As Boolean              ' true if edit record was saved during this page
-        'Private editrecord.read_only As Boolean           ' set if this record can not be edited, for various reasons
-        ''
-        '' From cpCore.main_GetAuthoringStatus
-        ''
-        'Private EditRecord.IsDeleted As Boolean          ' true means the edit record has been deleted
-        'Private EditRecord.IsInserted As Boolean         ' set if Workflow authoring insert
-        'Private EditRecord.IsModified As Boolean         ' record has been modified since last published
-        'Private EditRecord.LockModifiedName As String        ' member who first edited the record
-        'Private EditRecord.LockModifiedDate As Date          ' Date when member modified record
-        'Private EditRecord.SubmitLock As Boolean         ' set if a submit Lock, even if the current user is admin
-        'Private EditRecord.SubmittedName As String       ' member who submitted the record
-        'Private EditRecordSubmittedDate As Date         ' Date when record was submitted
-        'Private EditRecord.ApproveLock As Boolean        ' set if an approve Lock
-        'Private EditRecord.ApprovedName As String        ' member who approved the record
-        'Private EditRecordApprovedDate As Date          ' Date when record was approved
-        ''
-        '' From cpCore.main_GetAuthoringPermissions
-        ''
-        'Private EditRecord.AllowInsert As Boolean
-        'Private EditRecord.AllowCancel As Boolean
-        'Private EditRecord.AllowSave As Boolean
-        'Private EditRecord.AllowDelete As Boolean
-        'Private EditRecord.AllowPublish As Boolean
-        'Private EditRecord.AllowAbort As Boolean
-        'Private EditRecord.AllowSubmit As Boolean
-        'Private EditRecord.AllowApprove As Boolean
-        ''
-        '' From cpCore.main_GetEditLock
-        ''
-        'Private EditRecord.EditLock As Boolean           ' set if an edit Lock by anyone else besides the current user
-        'Private EditRecord.EditLockMemberID As Integer      ' Member who edit locked the record
-        'Private EditRecord.EditLockMemberName As String  ' Member who edit locked the record
-        'Private EditRecord.EditLockExpires As Date       ' Time when the edit lock expires
-        ''
-        '
-        '=============================================================================
-        ' ----- Control Response
-        '=============================================================================
-        '
-        Private AdminButton As String                ' Value returned from a submit button, process into action/form
-        Private AdminAction As Integer                 ' The action to be performed before the next form
-        Private AdminForm As Integer                   ' The next form to print
-        Private AdminSourceForm As Integer             ' The form that submitted that the button to process
-        Private WherePair(2, 10) As String                ' for passing where clause values from page to page
-        Private WherePairCount As Integer                 ' the current number of WherePairCount in use
-        'Private OrderByFieldPointer as integer
-        Private Const OrderByFieldPointerDefault = -1
-        'Private Direction as integer
-        Private RecordTop As Integer
-        Private RecordsPerPage As Integer
-        Private Const RecordsPerPageDefault = 50
-        'Private InputFieldName As String   ' Input FieldName used for DHTMLEdit
-
-        Private MenuDepth As Integer                   ' The number of windows open (below this one)
-        Private TitleExtension As String              ' String that adds on to the end of the title
-        'Private Findstring(50) As String                ' Value to search for each index column
-        '
-        ' SpellCheck Features
-        '
-        Private SpellCheckSupported As Boolean      ' if true, spell checking is supported
-        Private SpellCheckRequest As Boolean        ' If true, send the spell check form to the browser
-        Private SpellCheckResponse As Boolean       ' if true, the user is sending the spell check back to process
-        Private SpellCheckWhiteCharacterList As String
-        Private SpellCheckDictionaryFilename As String  ' Full path to user dictionary
-        Private SpellCheckIgnoreList As String      ' List of ignore words (used to verify the file is there)
-        '
-        '=============================================================================
-        ' preferences
-        '=============================================================================
-        '
-        Private AdminMenuModeID As Integer         ' Controls the menu mode, set from cpCore.main_MemberAdminMenuModeID
-        Private allowAdminTabs As Boolean       ' true uses tab system
-        Private fieldEditorPreference As String     ' this is a hidden on the edit form. The popup editor preferences sets this hidden and submits
-        '
-        '=============================================================================
-        '   Content Tracking Editing
-        '
-        '   These values are read from Edit form response, and are used to populate then
-        '   ContentWatch and ContentWatchListRules records.
-        '
-        '   They are read in before the current record is processed, then processed and
-        '   Saved back to ContentWatch and ContentWatchRules after the current record is
-        '   processed, so changes to the record can be reflected in the ContentWatch records.
-        '   For instance, if the record is marked inactive, the ContentWatchLink is cleared
-        '   and all ContentWatchListRules are deleted.
-        '
-        '=============================================================================
-        '
-        Private ContentWatchLoaded As Boolean               ' flag set that shows the rest are valid
-        '
-        Private ContentWatchRecordID As Integer
-        Private ContentWatchLink As String
-        Private ContentWatchClicks As Integer
-        Private ContentWatchLinkLabel As String
-        Private ContentWatchExpires As Date
-        Private ContentWatchListID() As Integer            ' list of all ContentWatchLists for this Content, read from response, then later saved to Rules
-        Private ContentWatchListIDSize As Integer          ' size of ContentWatchListID() array
-        Private ContentWatchListIDCount As Integer         ' number of valid entries in ContentWatchListID()
-        ''
-        ''=============================================================================
-        ''   Calendar Event Editing
-        ''=============================================================================
-        ''
-        'Private CalendarEventName As String
-        'Private CalendarEventStartDate As Date
-        'Private CalendarEventEndDate As Date
-        '
-        '=============================================================================
-        ' Other
-        '=============================================================================
-        '
-        Private ObjectCount As Integer            ' Convert the following objects to this one
-        Private ButtonObjectCount As Integer           ' Count of Buttons in use
-        Private ImagePreloadCount As Integer           ' Number of images preloaded
-        Private ImagePreloads(2, 100) As String       ' names of all gifs already preloaded
-        '                       (0,x) = imagename
-        '                       (1,x) = ImageObject name for the image
-        Private JavaScriptString As String            ' Collected string of Javascript functions to print at end
-        Private AdminFormBottom As String   ' the HTML needed to complete the Admin Form after contents
-        Private UserAllowContentEdit As Boolean         ' set on load - checked within each edit/index page
-        Private UserAllowContentAdd As Boolean
-        Private UserAllowContentDelete As Boolean
-        Private TabStopCount As Integer                ' used to generate TabStop values
-        Private FormInputCount As Integer              ' used to generate labels for form input
-        Private EditSectionPanelCount As Integer
-
-        Const OpenLiveWindowTable = "<div ID=""LiveWindowTable"">"
-        Const CloseLiveWindowTable = "</div>"
-        'Const OpenLiveWindowTable = "<table ID=""LiveWindowTable"" border=0 cellpadding=0 cellspacing=0 width=""100%""><tr><td>"
-        'Const CloseLiveWindowTable = "</td></tr></table>"
-        '
-        'Const adminui.EditTableClose = "<tr>" _
-        '        & "<td width=20%><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""100%"" height=""1"" ></td>" _
-        '        & "<td width=""70%""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""100%"" height=""1"" ></td>" _
-        '        & "<td width=""10%""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""100%"" height=""1"" ></td>" _
-        '        & "</tr>" _
-        '        & "</table>"
-        Const AdminFormErrorOpen = "<table border=""0"" cellpadding=""20"" cellspacing=""0"" width=""100%""><tr><td align=""left"">"
-        Const AdminFormErrorClose = "</td></tr></table>"
-        '
-        ' these were defined different in csv
-        '
-        'Private Const ContentTypeMember = 1
-        'Private Const ContentTypePaths = 2
-        'Private Const csv_contenttypeenum.contentTypeEmail = 3
-        'Private Const ContentTypeContent = 4
-        'Private Const ContentTypeSystem = 5
-        'Private Const ContentTypeNormal = 6
-        '
-        '
-        '
-        Private Const RequestNameAdminDepth = "ad"
-        Private Const RequestNameAdminForm = "af"
-        Private Const RequestNameAdminSourceForm = "asf"
-        Private Const RequestNameAdminAction = "aa"
-        'Private Const RequestNameFieldName = "fn"
-        Private Const RequestNameTitleExtension = "tx"
-        '
-        '
-        ''
-        ''Private AdminContentCellBackgroundColor As String
-        ''
-        Public Enum NodeTypeEnum
-            NodeTypeEntry = 0
-            NodeTypeCollection = 1
-            NodeTypeAddon = 2
-            NodeTypeContent = 3
-        End Enum
-        '
-        Private Const IndexConfigPrefix = "IndexConfig:"
-        '
-        Public Enum FindWordMatchEnum
-            MatchIgnore = 0
-            MatchEmpty = 1
-            MatchNotEmpty = 2
-            MatchGreaterThan = 3
-            MatchLessThan = 4
-            matchincludes = 5
-            MatchEquals = 6
-            MatchTrue = 7
-            MatchFalse = 8
-        End Enum
-        '
-        '
-        '
-        Public Class indexConfigSortClass
-            'Dim FieldPtr As Integer
-            Public fieldName As String
-            Public Forward As Boolean
-        End Class
-        '
-        Public Class indexConfigFindWordClass
-            Public Name As String
-            Public Value As String
-            Public Type As Integer
-            Public MatchOption As FindWordMatchEnum
-        End Class
-        '
-        Public Class indexConfigColumnClass
-            Public Name As String
-            'Public FieldId As Integer
-            Public Width As Integer
-            Public SortPriority As Integer
-            Public SortDirection As Integer
-        End Class
-        '
-        Public Class indexConfigClass
-            Public Loaded As Boolean
-            Public ContentID As Integer
-            Public PageNumber As Integer
-            Public RecordsPerPage As Integer
-            Public RecordTop As Integer
-            Public ContentCategoryID As Integer
-            'FindWordList As String
-            Public FindWords As New Dictionary(Of String, indexConfigFindWordClass)
-            'Public FindWordCnt As Integer
-            Public ActiveOnly As Boolean
-            Public LastEditedByMe As Boolean
-            Public LastEditedToday As Boolean
-            Public LastEditedPast7Days As Boolean
-            Public LastEditedPast30Days As Boolean
-            Public Open As Boolean
-            'public SortCnt As Integer
-            Public Sorts As New Dictionary(Of String, indexConfigSortClass)
-            Public GroupListCnt As Integer
-            Public GroupList() As String
-            'public ColumnCnt As Integer
-            Public Columns As New Dictionary(Of String, indexConfigColumnClass)
-            'SubCDefs() as integer
-            'SubCDefCnt as integer
-            Public SubCDefID As Integer
-        End Class
-        '
-        ' Temp
-        '
-        Const ToolsActionMenuMove = 1
-        Const ToolsActionAddField = 2            ' Add a field to the Index page
-        Const ToolsActionRemoveField = 3
-        Const ToolsActionMoveFieldRight = 4
-        Const ToolsActionMoveFieldLeft = 5
-        Const ToolsActionSetAZ = 6
-        Const ToolsActionSetZA = 7
-        Const ToolsActionExpand = 8
-        Const ToolsActionContract = 9
-        Const ToolsActionEditMove = 10
-        Const ToolsActionRunQuery = 11
-        Const ToolsActionDuplicateDataSource = 12
-        Const ToolsActionDefineContentFieldFromTableFieldsFromTable = 13
-        Const ToolsActionFindAndReplace = 14
-        '
-        Private AllowAdminFieldCheck_Local As Boolean
-        Private AllowAdminFieldCheck_LocalLoaded As Boolean
-        '
-        Private Const AddonGuidPreferences = "{D9C2D64E-9004-4DBE-806F-60635B9F52C8}"
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Constructor for addon instances. Until refactoring, calls into other methods must be constructed with (cpCoreClass) variation.
-        ''' </summary>
-        ''' <param name="cp"></param>
-        ''' <remarks></remarks>
-        Public Sub New()
-            MyBase.New()
-            ClassInitialized = False
-        End Sub
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Constructor for non-addon instances. (work-around for pre-refactoring of admin remote methods)
-        ''' </summary>
-        ''' <param name="cpCore"></param>
-        Public Sub New(cp As Contensive.Core.CPClass)
-            MyBase.New()
-            Me.cp = cp
-            cpCore = Me.cp.core
-            ClassInitialized = False
-        End Sub
-        '
-        '=============================================================================
-        '   main_Get the Admin Page (form with the HTML trimmings)
-        '=============================================================================
-        '
-        Private Function addonToBe_admin(Optional ByVal Content As String = "") As String
             Dim returnHtml As String = ""
             Try
                 Dim PageOpen As String
                 Dim AdminContent As String
-                'Dim Admin As New adminClass(cpCore)
                 Dim SaveContent As String
-                'Dim main_SaveFilename As String
                 Dim BinaryHeader() As Byte
                 Dim BinaryHeaderString As String
                 Dim rightNow As Date = Now
                 '
+                Me.cp = DirectCast(cp, CPClass)
+                cpCore = Me.cp.core
+                '
                 ' log request
                 '
                 SaveContent = "" _
-                & Now() _
-                & vbCrLf & "member.name:" & cpCore.userName _
-                & vbCrLf & "member.id:" & cpCore.userId _
-                & vbCrLf & "visit.id:" & cpCore.main_VisitId _
-                & vbCrLf & "url:" & cpCore.main_ServerLink _
-                & vbCrLf & "url source:" & cpCore.main_ServerLinkSource
+                    & Now() _
+                    & vbCrLf & "member.name:" & cpCore.userName _
+                    & vbCrLf & "member.id:" & cpCore.userId _
+                    & vbCrLf & "visit.id:" & cpCore.main_VisitId _
+                    & vbCrLf & "url:" & cpCore.main_ServerLink _
+                    & vbCrLf & "url source:" & cpCore.main_ServerLinkSource
                 If cpCore.requestForm <> "" Then
-                    SaveContent = SaveContent _
-                    & vbCrLf & "----------" _
-                    & vbCrLf & "form post:" _
-                    & vbCrLf & cpCore.requestForm _
-                    & vbCrLf
+                    SaveContent &= "" _
+                        & vbCrLf & "----------" _
+                        & vbCrLf & "form post:" _
+                        & vbCrLf & cpCore.requestForm _
+                        & vbCrLf
                 End If
                 If Not IsNothing(cpCore.requestFormBinaryHeader) Then
                     BinaryHeader = cpCore.requestFormBinaryHeader
                     BinaryHeaderString = kmaByteArrayToString(BinaryHeader)
-                    SaveContent = SaveContent _
-                    & vbCrLf & "----------" _
-                    & vbCrLf & "binary header:" _
-                    & vbCrLf & BinaryHeaderString _
-                    & vbCrLf
+                    SaveContent &= "" _
+                        & vbCrLf & "----------" _
+                        & vbCrLf & "binary header:" _
+                        & vbCrLf & BinaryHeaderString _
+                        & vbCrLf
                 End If
                 cpCore.appendLog(SaveContent, "admin", cpCore.app.config.name & "-request-")
                 '
@@ -526,8 +70,7 @@ Namespace Contensive.Addons
                 cpCore.main_SQLCommandTimeout = 300
                 Call cpCore.main_SetMetaContent(0, 0)
                 '
-                ' 6/27/2010 - this appears to be deprecated - admin styles are in admin1.css or inline.
-                AdminContent = execute_getContent(EncodeText(Content))
+                AdminContent = execute_getContent("")    ' REFACTOR - passing the inner container's content is deprecated. We now execute addons within the admin addon
                 If Not cpCore.docOpen Then
                     '
                     ' stream closed, don't both
@@ -560,23 +103,58 @@ Namespace Contensive.Addons
                 '
                 ' Log response
                 '
-                SaveContent = "" _
-                & Now() _
-                & vbCrLf & "member.name:" & cpCore.userName _
-                & vbCrLf & "member.id:" & cpCore.userId _
-                & vbCrLf & "visit.id:" & cpCore.main_VisitId _
-                & vbCrLf & "url:" & cpCore.main_ServerLink _
-                & vbCrLf & "url source:" & cpCore.main_ServerLinkSource _
-                & vbCrLf & "----------" _
-                & vbCrLf & "response:" _
-                & vbCrLf & returnHtml
-                'main_SaveFilename = App.Path & "\logs\Admin\" & CStr(Now * 86400) & "-" & main_PageHandle
+                SaveContent &= "" _
+                    & Now() _
+                    & vbCrLf & "member.name:" & cpCore.userName _
+                    & vbCrLf & "member.id:" & cpCore.userId _
+                    & vbCrLf & "visit.id:" & cpCore.main_VisitId _
+                    & vbCrLf & "url:" & cpCore.main_ServerLink _
+                    & vbCrLf & "url source:" & cpCore.main_ServerLinkSource _
+                    & vbCrLf & "----------" _
+                    & vbCrLf & "response:" _
+                    & vbCrLf & returnHtml
                 Call cpCore.appendLog(SaveContent, "admin", rightNow.Year & rightNow.Month.ToString("00") & rightNow.Day.ToString("00") & rightNow.Hour.ToString("00") & rightNow.Minute.ToString("00") & rightNow.Second.ToString("00"))
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cp.Site.ErrorReport(ex)
             End Try
             Return returnHtml
         End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' REFACTOR - Constructor for addon instances. Until refactoring, calls into other methods must be constructed with (cpCoreClass) variation.
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <remarks></remarks>
+        Public Sub New()
+            MyBase.New()
+            ClassInitialized = False
+        End Sub
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' REFACTOR - Constructor for non-addon instances. (REFACTOR - work-around for pre-refactoring of admin remote methods currently in core classes)
+        ''' </summary>
+        ''' <param name="cpCore"></param>
+        Public Sub New(cp As Contensive.Core.CPClass)
+            MyBase.New()
+            Me.cp = cp
+            cpCore = Me.cp.core
+            ClassInitialized = False
+        End Sub
+        ''
+        ''=============================================================================
+        ''   main_Get the Admin Page (form with the HTML trimmings)
+        ''=============================================================================
+        ''
+        'Private Function addonToBe_admin(Optional ByVal Content As String = "") As String
+        '    Dim returnHtml As String = ""
+        '    Try
+        '    Catch ex As Exception
+        '        cpCore.handleException(ex)
+        '    End Try
+        '    Return returnHtml
+        'End Function
         '
         '========================================================================
         '   initialization and print page
@@ -18126,5 +17704,409 @@ ErrorTrap:
                 '
             Next
         End Sub
+        '
+        '====================================================================================================
+        ' properties
+        '====================================================================================================
+        '
+        ' ----- ccGroupRules storage for list of Content that a group can author
+        '
+        Private Structure ContentGroupRuleType
+            Dim ContentID As Integer
+            Dim GroupID As Integer
+            Dim AllowAdd As Boolean
+            Dim AllowDelete As Boolean
+        End Structure
+        '
+        ' ----- generic id/name dictionary
+        '
+        Private Structure StorageType
+            Dim Id As Integer
+            Dim Name As String
+        End Structure
+        '
+        ' ----- Group Rules
+        '
+        Private Structure GroupRuleType
+            Dim GroupID As Integer
+            Dim AllowAdd As Boolean
+            Dim AllowDelete As Boolean
+        End Structure
+        '
+        ' ----- Used within Admin site to create fancyBox popups
+        '
+        Private includeFancyBox As Boolean
+        Private fancyBoxPtr As Integer
+        Private fancyBoxHeadJS As String
+        Private ClassInitialized As Boolean        ' if true, the module has been
+        Private Const allowSaveBeforeDuplicate = False
+        '
+        ' ----- To interigate Add-on Collections to check for re-use
+        '
+        Private Structure DeleteType
+            Dim Name As String
+            Dim ParentID As Integer
+        End Structure
+        Private Structure NavigatorType
+            Dim Name As String
+            Dim menuNameSpace As String
+        End Structure
+        Private Structure Collection2Type
+            Dim AddOnCnt As Integer
+            Dim AddonGuid() As String
+            Dim AddonName() As String
+            Dim MenuCnt As Integer
+            Dim Menus() As String
+            Dim NavigatorCnt As Integer
+            Dim Navigators() As NavigatorType
+        End Structure
+        Private CollectionCnt As Integer
+        Private Collections() As Collection2Type
+        '
+        ' ----- Target Data Storage
+        '
+        Private requestedContentId As Integer
+        Private requestedRecordId As Integer
+        Private AdminContentWorkflowAuthoring As Boolean    ' set if content and site support workflow authoring
+        Private BlockEditForm As Boolean                    ' true if there was an error loading the edit record - use to block the edit form
+        '
+        ' ----- Storage for current EditRecord, loaded in LoadEditRecord
+        '
+        Public Class editRecordFieldClass
+            Public dbValue As Object
+            Public value As Object
+        End Class
+        '
+        Public Class editRecordClass
+            Public fieldsLc As New Dictionary(Of String, editRecordFieldClass)
+            Public id As Integer                            ' ID field of edit record (Record to be edited)
+            Public parentID As Integer                      ' ParentID field of edit record (Record to be edited)
+            Public nameLc As String                         ' name field of edit record
+            Public active As Boolean                        ' active field of the edit record
+            Public contentControlId As Integer              ' ContentControlID of the edit record
+            Public contentControlId_Name As String          '
+            Public menuHeadline As String                   ' Used for Content Watch Link Label if default
+            Public modifiedDate As Date                     ' Used for control section display
+            Public modifiedByMemberID As Integer            '   =
+            Public dateAdded As Date                        '   =
+            Public createByMemberId As Integer              '   =
+            Public contentCategoryID As Integer
+            Public RootPageID As Integer
+            Public SetPageNotFoundPageID As Boolean
+            Public SetLandingPageID As Boolean
+
+            '
+            Public Loaded As Boolean            ' true/false - set true when the field array values are loaded
+            Public Saved As Boolean              ' true if edit record was saved during this page
+            Public Read_Only As Boolean           ' set if this record can not be edited, for various reasons
+            '
+            ' From cpCore.main_GetAuthoringStatus
+            '
+            Public IsDeleted As Boolean          ' true means the edit record has been deleted
+            Public IsInserted As Boolean         ' set if Workflow authoring insert
+            Public IsModified As Boolean         ' record has been modified since last published
+            Public LockModifiedName As String        ' member who first edited the record
+            Public LockModifiedDate As Date          ' Date when member modified record
+            Public SubmitLock As Boolean         ' set if a submit Lock, even if the current user is admin
+            Public SubmittedName As String       ' member who submitted the record
+            Public SubmittedDate As Date         ' Date when record was submitted
+            Public ApproveLock As Boolean        ' set if an approve Lock
+            Public ApprovedName As String        ' member who approved the record
+            Public ApprovedDate As Date          ' Date when record was approved
+            '
+            ' From cpCore.main_GetAuthoringPermissions
+            '
+            Public AllowInsert As Boolean
+            Public AllowCancel As Boolean
+            Public AllowSave As Boolean
+            Public AllowDelete As Boolean
+            Public AllowPublish As Boolean
+            Public AllowAbort As Boolean
+            Public AllowSubmit As Boolean
+            Public AllowApprove As Boolean
+            '
+            ' From cpCore.main_GetEditLock
+            '
+            Public EditLock As Boolean           ' set if an edit Lock by anyone else besides the current user
+            Public EditLockMemberID As Integer      ' Member who edit locked the record
+            Public EditLockMemberName As String  ' Member who edit locked the record
+            Public EditLockExpires As Date       ' Time when the edit lock expires
+
+        End Class
+        'Private EditRecordValuesObject() As Object      ' Storage for Edit Record values
+        'Private EditRecordDbValues() As Object         ' Storage for last values read from Defaults+Db, added b/c file fields need Db value to display
+        'Private EditRecord.ID As Integer                    ' ID field of edit record (Record to be edited)
+        'Private EditRecord.ParentID As Integer              ' ParentID field of edit record (Record to be edited)
+        'Private EditRecord.Name As String                ' name field of edit record
+        'Private EditRecord.Active As Boolean             ' active field of the edit record
+        'Private EditRecord.ContentID As Integer             ' ContentControlID of the edit record
+        'Private EditRecord.ContentName As String         '
+        'Private EditRecord.MenuHeadline As String        ' Used for Content Watch Link Label if default
+        'Private EditRecord.ModifiedDate As Date          ' Used for control section display
+        'Private EditRecord.ModifiedByMemberID As Integer    '   =
+        'Private EditRecord.AddedDate As Date             '   =
+        'Private EditRecord.AddedByMemberID As Integer       '   =
+        'Private EditRecord.ContentCategoryID As Integer
+        'Private EditRecordRootPageID As Integer
+        'Private EditRecord.SetPageNotFoundPageID As Boolean
+        'Private EditRecord.SetLandingPageID As Boolean
+
+        ''
+        'Private EditRecord.Loaded As Boolean            ' true/false - set true when the field array values are loaded
+        'Private EditRecord.Saved As Boolean              ' true if edit record was saved during this page
+        'Private editrecord.read_only As Boolean           ' set if this record can not be edited, for various reasons
+        ''
+        '' From cpCore.main_GetAuthoringStatus
+        ''
+        'Private EditRecord.IsDeleted As Boolean          ' true means the edit record has been deleted
+        'Private EditRecord.IsInserted As Boolean         ' set if Workflow authoring insert
+        'Private EditRecord.IsModified As Boolean         ' record has been modified since last published
+        'Private EditRecord.LockModifiedName As String        ' member who first edited the record
+        'Private EditRecord.LockModifiedDate As Date          ' Date when member modified record
+        'Private EditRecord.SubmitLock As Boolean         ' set if a submit Lock, even if the current user is admin
+        'Private EditRecord.SubmittedName As String       ' member who submitted the record
+        'Private EditRecordSubmittedDate As Date         ' Date when record was submitted
+        'Private EditRecord.ApproveLock As Boolean        ' set if an approve Lock
+        'Private EditRecord.ApprovedName As String        ' member who approved the record
+        'Private EditRecordApprovedDate As Date          ' Date when record was approved
+        ''
+        '' From cpCore.main_GetAuthoringPermissions
+        ''
+        'Private EditRecord.AllowInsert As Boolean
+        'Private EditRecord.AllowCancel As Boolean
+        'Private EditRecord.AllowSave As Boolean
+        'Private EditRecord.AllowDelete As Boolean
+        'Private EditRecord.AllowPublish As Boolean
+        'Private EditRecord.AllowAbort As Boolean
+        'Private EditRecord.AllowSubmit As Boolean
+        'Private EditRecord.AllowApprove As Boolean
+        ''
+        '' From cpCore.main_GetEditLock
+        ''
+        'Private EditRecord.EditLock As Boolean           ' set if an edit Lock by anyone else besides the current user
+        'Private EditRecord.EditLockMemberID As Integer      ' Member who edit locked the record
+        'Private EditRecord.EditLockMemberName As String  ' Member who edit locked the record
+        'Private EditRecord.EditLockExpires As Date       ' Time when the edit lock expires
+        ''
+        '
+        '=============================================================================
+        ' ----- Control Response
+        '=============================================================================
+        '
+        Private AdminButton As String                ' Value returned from a submit button, process into action/form
+        Private AdminAction As Integer                 ' The action to be performed before the next form
+        Private AdminForm As Integer                   ' The next form to print
+        Private AdminSourceForm As Integer             ' The form that submitted that the button to process
+        Private WherePair(2, 10) As String                ' for passing where clause values from page to page
+        Private WherePairCount As Integer                 ' the current number of WherePairCount in use
+        'Private OrderByFieldPointer as integer
+        Private Const OrderByFieldPointerDefault = -1
+        'Private Direction as integer
+        Private RecordTop As Integer
+        Private RecordsPerPage As Integer
+        Private Const RecordsPerPageDefault = 50
+        'Private InputFieldName As String   ' Input FieldName used for DHTMLEdit
+
+        Private MenuDepth As Integer                   ' The number of windows open (below this one)
+        Private TitleExtension As String              ' String that adds on to the end of the title
+        'Private Findstring(50) As String                ' Value to search for each index column
+        '
+        ' SpellCheck Features
+        '
+        Private SpellCheckSupported As Boolean      ' if true, spell checking is supported
+        Private SpellCheckRequest As Boolean        ' If true, send the spell check form to the browser
+        Private SpellCheckResponse As Boolean       ' if true, the user is sending the spell check back to process
+        Private SpellCheckWhiteCharacterList As String
+        Private SpellCheckDictionaryFilename As String  ' Full path to user dictionary
+        Private SpellCheckIgnoreList As String      ' List of ignore words (used to verify the file is there)
+        '
+        '=============================================================================
+        ' preferences
+        '=============================================================================
+        '
+        Private AdminMenuModeID As Integer         ' Controls the menu mode, set from cpCore.main_MemberAdminMenuModeID
+        Private allowAdminTabs As Boolean       ' true uses tab system
+        Private fieldEditorPreference As String     ' this is a hidden on the edit form. The popup editor preferences sets this hidden and submits
+        '
+        '=============================================================================
+        '   Content Tracking Editing
+        '
+        '   These values are read from Edit form response, and are used to populate then
+        '   ContentWatch and ContentWatchListRules records.
+        '
+        '   They are read in before the current record is processed, then processed and
+        '   Saved back to ContentWatch and ContentWatchRules after the current record is
+        '   processed, so changes to the record can be reflected in the ContentWatch records.
+        '   For instance, if the record is marked inactive, the ContentWatchLink is cleared
+        '   and all ContentWatchListRules are deleted.
+        '
+        '=============================================================================
+        '
+        Private ContentWatchLoaded As Boolean               ' flag set that shows the rest are valid
+        '
+        Private ContentWatchRecordID As Integer
+        Private ContentWatchLink As String
+        Private ContentWatchClicks As Integer
+        Private ContentWatchLinkLabel As String
+        Private ContentWatchExpires As Date
+        Private ContentWatchListID() As Integer            ' list of all ContentWatchLists for this Content, read from response, then later saved to Rules
+        Private ContentWatchListIDSize As Integer          ' size of ContentWatchListID() array
+        Private ContentWatchListIDCount As Integer         ' number of valid entries in ContentWatchListID()
+        ''
+        ''=============================================================================
+        ''   Calendar Event Editing
+        ''=============================================================================
+        ''
+        'Private CalendarEventName As String
+        'Private CalendarEventStartDate As Date
+        'Private CalendarEventEndDate As Date
+        '
+        '=============================================================================
+        ' Other
+        '=============================================================================
+        '
+        Private ObjectCount As Integer            ' Convert the following objects to this one
+        Private ButtonObjectCount As Integer           ' Count of Buttons in use
+        Private ImagePreloadCount As Integer           ' Number of images preloaded
+        Private ImagePreloads(2, 100) As String       ' names of all gifs already preloaded
+        '                       (0,x) = imagename
+        '                       (1,x) = ImageObject name for the image
+        Private JavaScriptString As String            ' Collected string of Javascript functions to print at end
+        Private AdminFormBottom As String   ' the HTML needed to complete the Admin Form after contents
+        Private UserAllowContentEdit As Boolean         ' set on load - checked within each edit/index page
+        Private UserAllowContentAdd As Boolean
+        Private UserAllowContentDelete As Boolean
+        Private TabStopCount As Integer                ' used to generate TabStop values
+        Private FormInputCount As Integer              ' used to generate labels for form input
+        Private EditSectionPanelCount As Integer
+
+        Const OpenLiveWindowTable = "<div ID=""LiveWindowTable"">"
+        Const CloseLiveWindowTable = "</div>"
+        'Const OpenLiveWindowTable = "<table ID=""LiveWindowTable"" border=0 cellpadding=0 cellspacing=0 width=""100%""><tr><td>"
+        'Const CloseLiveWindowTable = "</td></tr></table>"
+        '
+        'Const adminui.EditTableClose = "<tr>" _
+        '        & "<td width=20%><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""100%"" height=""1"" ></td>" _
+        '        & "<td width=""70%""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""100%"" height=""1"" ></td>" _
+        '        & "<td width=""10%""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""100%"" height=""1"" ></td>" _
+        '        & "</tr>" _
+        '        & "</table>"
+        Const AdminFormErrorOpen = "<table border=""0"" cellpadding=""20"" cellspacing=""0"" width=""100%""><tr><td align=""left"">"
+        Const AdminFormErrorClose = "</td></tr></table>"
+        '
+        ' these were defined different in csv
+        '
+        'Private Const ContentTypeMember = 1
+        'Private Const ContentTypePaths = 2
+        'Private Const csv_contenttypeenum.contentTypeEmail = 3
+        'Private Const ContentTypeContent = 4
+        'Private Const ContentTypeSystem = 5
+        'Private Const ContentTypeNormal = 6
+        '
+        '
+        '
+        Private Const RequestNameAdminDepth = "ad"
+        Private Const RequestNameAdminForm = "af"
+        Private Const RequestNameAdminSourceForm = "asf"
+        Private Const RequestNameAdminAction = "aa"
+        'Private Const RequestNameFieldName = "fn"
+        Private Const RequestNameTitleExtension = "tx"
+        '
+        '
+        ''
+        ''Private AdminContentCellBackgroundColor As String
+        ''
+        Public Enum NodeTypeEnum
+            NodeTypeEntry = 0
+            NodeTypeCollection = 1
+            NodeTypeAddon = 2
+            NodeTypeContent = 3
+        End Enum
+        '
+        Private Const IndexConfigPrefix = "IndexConfig:"
+        '
+        Public Enum FindWordMatchEnum
+            MatchIgnore = 0
+            MatchEmpty = 1
+            MatchNotEmpty = 2
+            MatchGreaterThan = 3
+            MatchLessThan = 4
+            matchincludes = 5
+            MatchEquals = 6
+            MatchTrue = 7
+            MatchFalse = 8
+        End Enum
+        '
+        '
+        '
+        Public Class indexConfigSortClass
+            'Dim FieldPtr As Integer
+            Public fieldName As String
+            Public Forward As Boolean
+        End Class
+        '
+        Public Class indexConfigFindWordClass
+            Public Name As String
+            Public Value As String
+            Public Type As Integer
+            Public MatchOption As FindWordMatchEnum
+        End Class
+        '
+        Public Class indexConfigColumnClass
+            Public Name As String
+            'Public FieldId As Integer
+            Public Width As Integer
+            Public SortPriority As Integer
+            Public SortDirection As Integer
+        End Class
+        '
+        Public Class indexConfigClass
+            Public Loaded As Boolean
+            Public ContentID As Integer
+            Public PageNumber As Integer
+            Public RecordsPerPage As Integer
+            Public RecordTop As Integer
+            Public ContentCategoryID As Integer
+            'FindWordList As String
+            Public FindWords As New Dictionary(Of String, indexConfigFindWordClass)
+            'Public FindWordCnt As Integer
+            Public ActiveOnly As Boolean
+            Public LastEditedByMe As Boolean
+            Public LastEditedToday As Boolean
+            Public LastEditedPast7Days As Boolean
+            Public LastEditedPast30Days As Boolean
+            Public Open As Boolean
+            'public SortCnt As Integer
+            Public Sorts As New Dictionary(Of String, indexConfigSortClass)
+            Public GroupListCnt As Integer
+            Public GroupList() As String
+            'public ColumnCnt As Integer
+            Public Columns As New Dictionary(Of String, indexConfigColumnClass)
+            'SubCDefs() as integer
+            'SubCDefCnt as integer
+            Public SubCDefID As Integer
+        End Class
+        '
+        ' Temp
+        '
+        Const ToolsActionMenuMove = 1
+        Const ToolsActionAddField = 2            ' Add a field to the Index page
+        Const ToolsActionRemoveField = 3
+        Const ToolsActionMoveFieldRight = 4
+        Const ToolsActionMoveFieldLeft = 5
+        Const ToolsActionSetAZ = 6
+        Const ToolsActionSetZA = 7
+        Const ToolsActionExpand = 8
+        Const ToolsActionContract = 9
+        Const ToolsActionEditMove = 10
+        Const ToolsActionRunQuery = 11
+        Const ToolsActionDuplicateDataSource = 12
+        Const ToolsActionDefineContentFieldFromTableFieldsFromTable = 13
+        Const ToolsActionFindAndReplace = 14
+        '
+        Private AllowAdminFieldCheck_Local As Boolean
+        Private AllowAdminFieldCheck_LocalLoaded As Boolean
+        '
+        Private Const AddonGuidPreferences = "{D9C2D64E-9004-4DBE-806F-60635B9F52C8}"
     End Class
 End Namespace
