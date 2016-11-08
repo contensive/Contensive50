@@ -239,7 +239,7 @@ Namespace Contensive.Core
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
         Public Overrides Function fileList(ByVal folderName As String, Optional ByVal pageSize As Integer = 0, Optional ByVal pageNumber As Integer = 1) As String
             Dim fi As IO.FileInfo() = serverFiles.fileList(folderName)
-            Return core.cluster.files.convertFileINfoArrayToParseString(fi)
+            Return core.cluster.clusterFiles.convertFileINfoArrayToParseString(fi)
         End Function
         '
         '==========================================================================================
@@ -251,7 +251,7 @@ Namespace Contensive.Core
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
         Public Overrides Function folderList(ByVal folderName As String) As String
             Dim di As IO.DirectoryInfo() = serverFiles.folderList(folderName)
-            Return core.cluster.files.convertDirectoryInfoArrayToParseString(di)
+            Return core.cluster.clusterFiles.convertDirectoryInfoArrayToParseString(di)
         End Function
         '
         '==========================================================================================

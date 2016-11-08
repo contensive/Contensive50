@@ -16163,7 +16163,7 @@ ErrorTrap:
                         '
                         FeatureList = cpCore.app.cdnFiles.ReadFile(InnovaEditorFeaturefilename)
                         If FeatureList = "" Then
-                            FeatureList = cpCore.cluster.files.ReadFile("ccLib\" & "Config\DefaultEditorConfig.txt")
+                            FeatureList = cpCore.cluster.clusterFiles.ReadFile("ccLib\" & "Config\DefaultEditorConfig.txt")
                             Call cpCore.app.privateFiles.SaveFile(InnovaEditorFeaturefilename, FeatureList)
                         End If
                         If FeatureList = "" Then

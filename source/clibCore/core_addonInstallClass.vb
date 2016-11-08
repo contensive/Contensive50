@@ -4128,7 +4128,7 @@ ErrorTrap:
                     Dim ignoreRefactor As Boolean
                     '
                     If True Then
-                        baseCollectionXml = cpCore.cluster.files.ReadFile("clibResources\baseCollection.xml")
+                        baseCollectionXml = cpCore.cluster.clusterFiles.ReadFile("clibResources\baseCollection.xml")
                         Call installCollection_LoadXmlToMiniCollection(baseCollectionXml, CollectionNew, True, True, isNewBuild, CollectionWorking)
                         Call installCollection_BuildDbFromMiniCollection(CollectionNew, ignoreRefactor, cpCore.app.dataBuildVersion, isNewBuild)
                         Call cpCore.app.executeSql("update ccfields set IsBaseField=1")
@@ -4139,7 +4139,7 @@ ErrorTrap:
                 ' now treat as a regular collection and install - to pickup everything else 
                 '
                 cpCore.app.privateFiles.createPath(tmpFolderPath)
-                cpCore.cluster.files.copyFile("clibResources\baseCollection.xml", tmpFolderPath & "baseCollection.xml", cpCore.app.privateFiles)
+                cpCore.cluster.clusterFiles.copyFile("clibResources\baseCollection.xml", tmpFolderPath & "baseCollection.xml", cpCore.app.privateFiles)
                 If Not InstallCollectionFromPrivateFolder(builder, ignoreString, tmpFolderPath, ignoreBoolean, cpCore.app.config.name, returnErrorMessage, ignoreString, isNewBuild) Then
                     Throw New ApplicationException(returnErrorMessage)
                 End If

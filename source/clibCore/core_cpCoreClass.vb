@@ -9479,7 +9479,7 @@ ErrorTrap:
             '
             If Not csv_EmailBlockList_LocalLoaded Then
                 Filename = "Config\SMTPBlockList_" & app.config.name & ".txt"
-                csv_EmailBlockList_Local = cluster.files.ReadFile(Filename)
+                csv_EmailBlockList_Local = cluster.clusterFiles.ReadFile(Filename)
                 csv_EmailBlockList_LocalLoaded = True
             End If
             getEmailBlockList_InternalOnly = csv_EmailBlockList_Local
@@ -9507,7 +9507,7 @@ ErrorTrap:
                 ' add them to the list
                 '
                 csv_EmailBlockList_Local = getEmailBlockList_InternalOnly() & vbCrLf & EmailAddress & vbTab & Now()
-                Call cluster.files.SaveFile("Config\SMTPBlockList_" & app.config.name & ".txt", csv_EmailBlockList_Local)
+                Call cluster.clusterFiles.SaveFile("Config\SMTPBlockList_" & app.config.name & ".txt", csv_EmailBlockList_Local)
                 csv_EmailBlockList_LocalLoaded = False
             End If
         End Sub
@@ -27592,7 +27592,7 @@ ErrorTrap:
                 End If
                 If BotList = "" Then
                     Filename = "config\VisitNameList.txt"
-                    BotList = cluster.files.ReadFile(Filename)
+                    BotList = cluster.clusterFiles.ReadFile(Filename)
                     If BotList = "" Then
                         BotList = "" _
                             & vbCrLf & "//" _
@@ -27615,7 +27615,7 @@ ErrorTrap:
                             & vbCrLf & "Unknown Bot" & vbTab & "robot" & vbTab & vbTab & "r" _
                             & vbCrLf & "Unknown Bot" & vbTab & "crawl" & vbTab & vbTab & "r" _
                             & ""
-                        Call cluster.files.SaveFile(Filename, BotList)
+                        Call cluster.clusterFiles.SaveFile(Filename, BotList)
                     End If
                     DateExpires = main_PageStartTime.AddHours(1)
                     Call app.cache_saveRaw("DefaultBotNameList", CStr(DateExpires) & vbCrLf & BotList)
@@ -36601,7 +36601,7 @@ ErrorTrap:
             End If
             If main_GetMobileBrowserList = "" Then
                 Filename = "config\MobileBrowserList.txt"
-                main_GetMobileBrowserList = cluster.files.ReadFile(Filename)
+                main_GetMobileBrowserList = cluster.clusterFiles.ReadFile(Filename)
                 If main_GetMobileBrowserList = "" Then
                     main_GetMobileBrowserList = "midp,j2me,avantg,docomo,novarra,palmos,palmsource,240x320,opwv,chtml,pda,windows ce,mmp/,blackberry,mib/,symbian,wireless,nokia,hand,mobi,phone,cdm,up.b,audio,SIE-,SEC-,samsung,HTC,mot-,mitsu,sagem,sony,alcatel,lg,erics,vx,NEC,philips,mmm,xx,panasonic,sharp,wap,sch,rover,pocket,benq,java,pt,pg,vox,amoi,bird,compal,kg,voda,sany,kdd,dbt,sendo,sgh,gradi,jb,moto"
                     main_GetMobileBrowserList = Replace(main_GetMobileBrowserList, ",", vbCrLf)
@@ -37489,7 +37489,7 @@ ErrorTrap:
         '
         Public Function main_GetPleaseWaitStart() As String
             '
-            main_GetPleaseWaitStart = cluster.files.ReadFile("ccLib\Popup\WaitPageOpen.htm")
+            main_GetPleaseWaitStart = cluster.clusterFiles.ReadFile("ccLib\Popup\WaitPageOpen.htm")
             '
         End Function
         '
@@ -37509,7 +37509,7 @@ ErrorTrap:
         '
         Public Function main_GetPleaseWaitEnd() As String
             '
-            main_GetPleaseWaitEnd = cluster.files.ReadFile("ccLib\Popup\WaitPageClose.htm")
+            main_GetPleaseWaitEnd = cluster.clusterFiles.ReadFile("ccLib\Popup\WaitPageClose.htm")
             '
         End Function
         '
@@ -43489,7 +43489,7 @@ ErrorTrap:
                     '
                     ' cclibCommonAssemblies
                     '
-                    addonAssemblyPath = cluster.files.joinPath(cluster.files.rootLocalFolderPath, "clibCommonAssemblies\")
+                    addonAssemblyPath = cluster.clusterFiles.joinPath(cluster.clusterFiles.rootLocalFolderPath, "clibCommonAssemblies\")
                     result = executeAddon_executeAssembly_byFilePath(addonId, AddonCaption, addonAssemblyPath, AssemblyClassFullName, True, AddonFound, return_ErrorMessageForAdmin)
                     If Not AddonFound Then
                         '
@@ -51093,7 +51093,7 @@ ErrorTrap:
                 ' dependant on app.privateFiles
                 '
                 If Not (_cluster Is Nothing) Then
-                    If Not (cluster.files Is Nothing) Then
+                    If Not (cluster.clusterFiles Is Nothing) Then
                         Dim iLogFolder As String
                         Dim MonthNumber As Integer
                         Dim DayNumber As Integer
@@ -51121,10 +51121,10 @@ ErrorTrap:
                         ' eliminate filesystem object
                         '
                         ' find-replace app.privateFiles. for cluster.files.
-                        If Not cluster.files.checkPath(iLogFolder) Then
-                            Call cluster.files.createPath(iLogFolder)
+                        If Not cluster.clusterFiles.checkPath(iLogFolder) Then
+                            Call cluster.clusterFiles.createPath(iLogFolder)
                         Else
-                            Dim logFiles As IO.FileInfo() = cluster.files.GetFolderFiles(iLogFolder)
+                            Dim logFiles As IO.FileInfo() = cluster.clusterFiles.GetFolderFiles(iLogFolder)
                             For Each fileInfo As IO.FileInfo In logFiles
                                 If fileInfo.Name.ToLower = FilenameNoExt.ToLower & ".log" Then
                                     FileSize = CInt(fileInfo.Length)
@@ -51140,7 +51140,7 @@ ErrorTrap:
                             Do While (Not SaveOK) And (RetryCnt < 10)
                                 SaveOK = True
                                 Try
-                                    Dim absFile As String = LCase(cluster.files.rootLocalFolderPath & PathFilenameNoExt & FileSuffix & ".log")
+                                    Dim absFile As String = LCase(cluster.clusterFiles.rootLocalFolderPath & PathFilenameNoExt & FileSuffix & ".log")
                                     Dim absContent As String = LogFileCopyPrep(FormatDateTime(Now(), vbGeneralDate)) & vbTab & threadName & vbTab & LogLine & vbCrLf
                                     '
                                     System.IO.File.AppendAllText(absFile, absContent)

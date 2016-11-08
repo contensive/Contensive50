@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OptionExplicit>On</OptionExplicit>
     <ProjectGuid>{45AB15C4-00B1-46D6-9C5B-650A0551CE95}</ProjectGuid>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup>

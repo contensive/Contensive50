@@ -2308,7 +2308,7 @@ ErrorTrap:
             '
             LogDate = Now.AddDays(-30)
             Call AppendClassLog("", "HouseKeep", "Deleting Logs [" & FolderName & "] older than 30 days")
-            FileList = cp.core.cluster.files.GetFolderFiles(FolderName)
+            FileList = cp.core.cluster.clusterFiles.GetFolderFiles(FolderName)
             For Each file As IO.FileInfo In FileList
                 If file.CreationTime < LogDate Then
                     cp.core.app.privateFiles.DeleteFile(FolderName & "\" & file.Name)

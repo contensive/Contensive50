@@ -630,15 +630,15 @@ Namespace Contensive
                                 ' ----- Set shared Mail out folder
                                 '
                                 EmailFolder = "\EmailOut"
-                                If Not cpCore.cluster.files.checkPath(EmailFolder) Then
-                                    Call cpCore.cluster.files.createPath(EmailFolder)
+                                If Not cpCore.cluster.clusterFiles.checkPath(EmailFolder) Then
+                                    Call cpCore.cluster.clusterFiles.createPath(EmailFolder)
                                 End If
                                 '
                                 ' ----- Set shared log folder
                                 '
                                 LogFolder = "\Logs"
-                                If Not cpCore.cluster.files.checkPath(LogFolder) Then
-                                    Call cpCore.cluster.files.createPath(LogFolder)
+                                If Not cpCore.cluster.clusterFiles.checkPath(LogFolder) Then
+                                    Call cpCore.cluster.clusterFiles.createPath(LogFolder)
                                 End If
                                 '
                                 ' ----- Create ServerConfig object

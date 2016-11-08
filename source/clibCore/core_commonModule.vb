@@ -7262,9 +7262,9 @@ ErrorTrap:
         '   -- path means no trailing slash
         '====================================================================================================
         '
-        Public Function getAppDataFolder() As String
-            Return "c:\inetpub"
-            'Return Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) & "\cfw"
+        Public Function getProgramDataFolder() As String
+            'Return "c:\inetpub"
+            Return Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) & "\clib"
         End Function
         '
         '====================================================================================================

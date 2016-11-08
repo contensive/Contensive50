@@ -119,7 +119,7 @@ namespace Contensive.Core
                 context.Response.Clear();
                 context.Response.StatusCode = (int)HttpStatusCode.OK;
                 //context.Response.Redirect("http://michiel.vanotegem.nl/");
-                context.Response.Write("<div>" + version() + ", EndRequest-return cfw5 html render here</div>");
+                context.Response.Write("<div>" + version() + ", EndRequest-return clib5 html render here</div>");
             }
             
         }

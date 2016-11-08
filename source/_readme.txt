@@ -1,5 +1,5 @@
 ﻿
-updated: 20161020
+updated: 20161107
 
 debug
 ---- all bug logs in github
@@ -38,21 +38,20 @@ Short Term Goals: 20160930
 ------------ has all the configuration for the cluster and for all the apps in the cluster
 ------------ to update it, all applications should check it's modification time and call for a refresh if > ?1 minute old
 ---- File Locations
--------- Program Files\clib (programFilesFolder)
------------- .\resources - files used for buildig new sites (might move to program files)
+-------- Program Files\clib (programFilesFolder - DO NOT STORE ANYTHING HERE THAT NEEDS TO BE REACHED DURING EXECUTION)
+------------ .\resources - files used for building new sites
 ------------ cli.exe
 ------------ clibService.exe, windows service not installed automatically, install with 'installUtil clibService.exe'
------------- DLLs needed for exes
+------------ all executables needed for all modes.
 ------------ no need to backup, no app data
 -------- ProgramData\clib (programDataFolder)
+------------ .\serverConfig.json
+---------------- contains the file path to the cluster folder
 ------------ .\commonAssemblies, installed empty.
 ---------------- developers can copy addon assemblies here. Add addon assembly execution tries this first. Keep it empty in production
 ------------ .\logs
------------- config.json, cluster configuration file
------------- if missing, cli creates it
--------- d:\inetpub (clusterFolder)
+-------- d:\inetpub (clusterFolder - default location)
 ------------ where all application data is stored (this folder is backed up)
------------- initialization sets these folders up here. It can be repointer.
 ------------ read/write files with cp.core.cluster.files Object
 ------------ cluserConfig.json - in scale mode, this is a mirror of the cluster data retrieved from and stored to an S3 bucket somewhere
 -------- d:\inetPub\apps - all applications are setup here.

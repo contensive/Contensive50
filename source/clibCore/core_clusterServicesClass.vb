@@ -33,6 +33,15 @@ Namespace Contensive.Core
     '
     '====================================================================================================
     ''' <summary>
+    ''' Holds location on the server of the clusterConfig file. Physically stored at programDataFolder/clib/serverConfig.json
+    ''' </summary>
+    Public Class serverConfigClass
+        Public clusterPath As String
+    End Class
+
+    '
+    '====================================================================================================
+    ''' <summary>
     ''' cluster configuration class - deserialized configration file
     ''' </summary>
     ''' <remarks></remarks>
@@ -78,7 +87,7 @@ Namespace Contensive.Core
         Public username As String = ""
         Public password As String = ""
         '
-        ' This is the root path to the localCluster files, typically getLocalDataFolder (d:\cfw)
+        ' This is the root path to the localCluster files, typically getLocalDataFolder (d:\inetpub)
         '   if isLocal, the cluster runs from these files
         '   if not, this is the local mirror of the cluster files
         '
@@ -105,7 +114,7 @@ Namespace Contensive.Core
         Private cpCore As cpCoreClass
         '
         Public config As clusterConfigClass
-        Public files As fileSystemClass
+        Public clusterFiles As fileSystemClass
         Private mc As Enyim.Caching.MemcachedClient
         '
         '========================================================================
@@ -126,67 +135,59 @@ Namespace Contensive.Core
                 Dim cacheConfig As Amazon.ElastiCacheCluster.ElastiCacheClusterConfig
                 Dim serverPortSplit As String()
                 Dim port As Integer = 11211
+                Dim serverConfig As serverConfigClass
+                Dim programDataFiles As fileSystemClass
+                Dim tmpPath As String = ""
                 '
-                ' setup programData\cfw to bootstrap clusterConfig file
+                ' setup programData\clib to bootstrap clusterConfig file
                 '
                 config = New clusterConfigClass()
                 config.isLocal = True
-                config.clusterPhysicalPath = getAppDataFolder() & "\"
+                config.clusterPhysicalPath = getProgramDataFolder() & "\"
                 _ok = False
-                files = New fileSystemClass(cpCore, config, fileSystemClass.fileSyncModeEnum.activeSync, getAppDataFolder())
-                If False Then
-                    '
-                    ' dotnet app config
-                    '
-                    'config.appPattern = ConfigurationManager.AppSettings("appPattern")
-                    'config.awsElastiCacheConfigurationEndpoint = ConfigurationManager.AppSettings("awsElastiCacheConfigurationEndpoint")
-                    'config.clusterFilesEndpoint = ConfigurationManager.AppSettings("clusterFilesEndpoint")
-                    'config.defaultDataSourceAddress = ConfigurationManager.AppSettings("defaultDataSourceAddress")
-                    'config.defaultDataSourceODBCConnectionString = ConfigurationManager.AppSettings("defaultDataSourceODBCConnectionString")
-                    'config.defaultDataSourcePassword = ConfigurationManager.AppSettings("defaultDataSourcePassword")
-                    'config.defaultDataSourceType = ConfigurationManager.AppSettings("defaultDataSourceType")
-                    'config.defaultDataSourceUsername = ConfigurationManager.AppSettings("defaultDataSourceUsername")
-                    ''config.domainRoutes = ConfigurationManager.AppSettings("domainRoutes").Split(",")
-                    'config.isLocal = ConfigurationManager.AppSettings("isLocal")
-                    'config.isLocalCache = ConfigurationManager.AppSettings("isLocalCache")
-                    'config.clusterPhysicalPath = ConfigurationManager.AppSettings("localDataPath")
-                    'config.maxCmdInstances = ConfigurationManager.AppSettings("maxCmdInstances")
-                    'config.name = ConfigurationManager.AppSettings("clusterName")
-                    'config.password = ConfigurationManager.AppSettings("password")
-                    'config.serverListenerPort = ConfigurationManager.AppSettings("serverListenerPort")
-                    'config.username = ConfigurationManager.AppSettings("username")
-                Else
-                    '
-                    ' generic json file
-                    '
-                    JSONTemp = files.ReadFile("clusterConfig.json")
-                    If JSONTemp = "" Then
-                        '
-                        ' for now it fails, maybe later let it autobuild a local cluster
-                        '
-                        'config = New clusterConfigClass
-                        ''config.isLocal = True
-                        'JSONTemp = json_serializer.Serialize(config)
-                        'Call files.SaveFile("clusterConfig.json", JSONTemp)
-                    Else
-                        config = json_serializer.Deserialize(Of clusterConfigClass)(JSONTemp)
-                        _ok = True
+                '
+                ' load server config
+                '
+                programDataFiles = New fileSystemClass(cpCore, config, fileSystemClass.fileSyncModeEnum.noSync, getProgramDataFolder)
+                JSONTemp = programDataFiles.ReadFile("serverConfig.json")
+                If String.IsNullOrEmpty(JSONTemp) Then
+                    serverConfig = New serverConfigClass
+                    serverConfig.clusterPath = "d:\"
+                    If (Not System.IO.Directory.Exists(serverConfig.clusterPath)) Then
+                        serverConfig.clusterPath = "c:\"
                     End If
+                    serverConfig.clusterPath &= "inetPub"
+                    If Not (System.IO.Directory.Exists(serverConfig.clusterPath)) Then
+                        System.IO.Directory.CreateDirectory(serverConfig.clusterPath)
+                    End If
+                    programDataFiles.SaveFile("serverConfig.json", json_serializer.Serialize(serverConfig))
+                Else
+                    serverConfig = json_serializer.Deserialize(Of serverConfigClass)(JSONTemp)
+                End If
+                clusterFiles = New fileSystemClass(cpCore, config, fileSystemClass.fileSyncModeEnum.activeSync, serverConfig.clusterPath)
+                JSONTemp = clusterFiles.ReadFile("clusterConfig.json")
+                If String.IsNullOrEmpty(JSONTemp) Then
+                    '
+                    ' for now it fails, maybe later let it autobuild a local cluster
+                    '
+                Else
+                    config = json_serializer.Deserialize(Of clusterConfigClass)(JSONTemp)
+                    _ok = True
                 End If
                 '
                 ' backfill with default in case it was set blank
                 '
-                If config.clusterPhysicalPath = "" Then
-                    config.clusterPhysicalPath = ccCommonModule.getAppDataFolder & "\"
+                If String.IsNullOrEmpty(config.clusterPhysicalPath) Then
+                    config.clusterPhysicalPath = serverConfig.clusterPath
                 End If
                 '
                 ' init file system
                 '
                 If _ok Then
                     If Not config.isLocal Then
-                        files = New fileSystemClass(cpCore, config, fileSystemClass.fileSyncModeEnum.noSync, localDataPath, "")
+                        clusterFiles = New fileSystemClass(cpCore, config, fileSystemClass.fileSyncModeEnum.noSync, localDataPath, "")
                     Else
-                        files = New fileSystemClass(cpCore, config, fileSystemClass.fileSyncModeEnum.activeSync, localDataPath, config.clusterFilesEndpoint)
+                        clusterFiles = New fileSystemClass(cpCore, config, fileSystemClass.fileSyncModeEnum.activeSync, localDataPath, config.clusterFilesEndpoint)
                     End If
                 End If
                 '
@@ -393,7 +394,7 @@ Namespace Contensive.Core
         Public Sub saveConfig()
             Dim json As New System.Web.Script.Serialization.JavaScriptSerializer
             Dim jsonTemp As String = json.Serialize(config)
-            files.SaveFile("clusterConfig.json", jsonTemp)
+            clusterFiles.SaveFile("clusterConfig.json", jsonTemp)
         End Sub
         '
         '====================================================================================================
