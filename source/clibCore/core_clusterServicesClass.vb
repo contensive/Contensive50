@@ -339,18 +339,40 @@ Namespace Contensive.Core
             Return appList
         End Function
         '
+        '====================================================================================================
+        ''' <summary>
+        ''' return the correctly formated connection string for this datasource
+        ''' </summary>
+        ''' <returns></returns>
+        Friend Function getConnectionString(catalogName As String) As String
+            Dim returnString As String = ""
+            Try
+                Dim dataSourceUrl As String
+                dataSourceUrl = config.defaultDataSourceAddress
+                If (dataSourceUrl.IndexOf(":") > 0) Then
+                    dataSourceUrl = dataSourceUrl.Substring(0, dataSourceUrl.IndexOf(":"))
+                End If
+                '
+                returnString = "" _
+                    & "data source=" & dataSourceUrl & ";" _
+                    & "UID=" & config.defaultDataSourceUsername & ";" _
+                    & "PWD=" & config.defaultDataSourcePassword & ";" _
+                    & ""
+                If Not String.IsNullOrEmpty(catalogName) Then
+                    returnString &= "initial catalog=" & catalogName & ";"
+                End If
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
+            Return returnString
+        End Function
+        '
         ' execute sql on default connection and return datatable
         '
         Public Function executeMasterSql(ByVal sql As String, Optional ByVal startRecord As Integer = 0, Optional ByVal maxRecords As Integer = 9999) As DataTable
             Dim returnData As New DataTable
             Try
-                Dim connString As String
-                '
-                connString = "" _
-                    & "data source=" & config.defaultDataSourceAddress & ";" _
-                    & "UID=" & config.defaultDataSourceUsername & ";" _
-                    & "PWD=" & config.defaultDataSourcePassword & ";" _
-                    & ""
+                Dim connString As String = getConnectionString("")
                 Using connSQL As New SqlConnection(connString)
                     connSQL.Open()
                     Using cmdSQL As New SqlCommand()

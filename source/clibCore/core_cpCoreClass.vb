@@ -448,25 +448,23 @@ Namespace Contensive.Core
         '
         ' Tracing - Debugging
         '
-        Public allowProfileLog As Boolean = False
+        Public allowDebugLog As Boolean = False                             ' turn on in script -- use to write /debug.log in content files for whatever is needed
         Private profileLogIsOpen As Boolean = False
-        'Private profileLogFilename As String = ""
-        Private profileLogEntryCnt As Integer = 0
-        Private profileLogStoreSize As Integer = 0
-        Private Const profileLogStoreChunk = 100
-        Private profileLogStore As String()
+        'Private profileLogEntryCnt As Integer = 0
+        'Private profileLogStoreSize As Integer = 0
+        'Private Const profileLogStoreChunk = 100
+        'Private profileLogStore As String()
         '
-        Public main_allowDebugLog As Boolean = False               ' turn on in script -- use to write /debug.log in content files for whatever is needed
-        Public main_BlockNotAvailableMessage As Boolean = False     ' if false and contensive has an error, a Site Not Available message is presented
-        Public main_PageStartTime As Date = New Date().MinValue                   ' set in constructor
-        Public blockExceptionReporting As Boolean = False     ' used so error reporting can not call itself
-        Public main_LoadFault As Boolean = False            ' An error preventing operation
-        Public main_ForceUpgrade As Boolean = False         ' no longer supported
-        Public main_ForceTrap As Boolean = False          ' if true, causes a main_ReportError when page closes
-        Public main_PageErrorCount As Integer = 0           ' Read Only, set by CSv main_ClosePage
-        Private main_SqlPageStartTime As String = ""             ' set in constructor
-        Private main_iPage_ErrorCount As Integer = 0         ' Total error count on this page (used as a flag to call IncrementError)
-        Private main_iUserError As String = ""            ' User Error String
+        Public main_BlockNotAvailableMessage As Boolean = False             ' if false and contensive has an error, a Site Not Available message is presented
+        Public main_PageStartTime As Date                                   ' set in constructor
+        Public blockExceptionReporting As Boolean = False                   ' used so error reporting can not call itself
+        Public main_LoadFault As Boolean = False                            ' An error preventing operation
+        Public main_ForceUpgrade As Boolean = False                         ' no longer supported
+        Public main_ForceTrap As Boolean = False                            ' if true, causes a main_ReportError when page closes
+        Public main_PageErrorCount As Integer = 0                           ' Read Only, set by CSv main_ClosePage
+        Private main_SqlPageStartTime As String = ""                        ' set in constructor
+        Private main_iPage_ErrorCount As Integer = 0                        ' Total error count on this page (used as a flag to call IncrementError)
+        Private main_iUserError As String = ""                              ' User Error String
         Private main_PageErrorWithoutCsv As Boolean = False  ' if true, the error occurred before Csv was available and main_TrapLogMessage needs to be saved and popedup
         'Private main_TrapLogFilename As String = ""       ' Filename for current traplog
         Private main_TrapLogMessage As String = ""        ' The content of the current traplog (keep for popups if no Csv)
@@ -9572,7 +9570,7 @@ ErrorTrap:
         '       AddonOptionExpandedConstructor = pass this to the bubble editor to create the the selectr
         '===================================================================================================
         '
-        Public Sub csv_BuildAddonOptionLists(OptionString_ForObjectCall As String, AddonOptionExpandedConstructor As String, AddonOptionConstructor As String, addonOptionString As String, InstanceID As String, IncludeSettingsBubbleOptions As Boolean)
+        Public Sub csv_BuildAddonOptionLists(ByRef OptionString_ForObjectCall As String, ByRef AddonOptionExpandedConstructor As String, AddonOptionConstructor As String, addonOptionString As String, InstanceID As String, IncludeSettingsBubbleOptions As Boolean)
             On Error GoTo ErrorTrap 'Const Tn = "BuildAddonOptionLists": 'Dim th as integer: th = profileLogMethodEnter(Tn)
             '
             Dim SavePtr As Integer
@@ -41136,17 +41134,13 @@ ErrorTrap:
                 Dim styleId As Integer
                 Dim inlineScriptContent As String
                 Dim inlineScript As String
-                Dim isadminFromWebCall As Boolean
                 Dim blockJavascriptAndCss As Boolean
                 Dim JSOnLoad As String
                 Dim JSBodyEnd As String
                 Dim JSFilename As String
-                '
                 Dim DefaultStylesFilename As String
                 Dim CustomStylesFilename As String
-                '
                 Dim TestString As String
-                Dim AllowAddonSimpleNameReplacement As Boolean
                 Dim addon_IncludedAddonIDList As String
                 Dim includedAddonId As Integer
                 Dim includedAddonIds() As String
@@ -41156,11 +41150,9 @@ ErrorTrap:
                 Dim SiteStylesEditIcon As String
                 Dim DialogList As String
                 Dim ToolBar As String
-                Dim LayoutEngineOptionString As String
                 Dim ScriptingTimeout As Integer
                 Dim ScriptCallbackContent As String
                 Dim errorMessageForAdmin As String
-                Dim AddonPath As String
                 Dim CollectionGuid As String
                 Dim DotNetClassFullName As String
                 Dim CodeFilename As String
@@ -49879,6 +49871,8 @@ ErrorTrap:
                 Dim AjaxFastFunction As String = main_GetStreamText2(RequestNameAjaxFastFunction)
                 Dim RemoteMethodFromQueryString As String = main_GetStreamText2(RequestNameRemoteMethodAddon)
                 '
+                debugLog("executeRoute, enter")
+                '
                 ' determine route from either url or querystring 
                 '
                 If (Not String.IsNullOrEmpty(route)) Then
@@ -50525,6 +50519,8 @@ ErrorTrap:
                     '
                     If (workingRoute = normalizeRoute(adminRoute)) Then
                         '
+                        debugLog("executeRoute, route is admin")
+                        '
                         '--------------------------------------------------------------------------
                         ' route is admin
                         '   If the Then admin route Is taken -- the login panel processing Is bypassed. those methods need To be a different kind Of route, Or it should be an addon
@@ -50545,6 +50541,8 @@ ErrorTrap:
                         '
                         '--------------------------------------------------------------------------
                         '
+                        debugLog("executeRoute, route is Default Route AddonId")
+                        '
                         Dim defaultAddonId As Integer = cp.Site.GetInteger("Default Route AddonId")
                         If defaultAddonId <> 0 Then
                             Dim addonStatusOk As Boolean = False
@@ -50553,7 +50551,13 @@ ErrorTrap:
                         'returnResult = addonToBe_pageManager()
                     End If
                 End If
+                '
+                debugLog("executeRoute, exit")
+                '
             Catch ex As Exception
+                '
+                debugLog("executeRoute, exception")
+                '
                 handleExceptionLegacyRow2(ex, "cpCoreClass", System.Reflection.MethodInfo.GetCurrentMethod.Name, "Unexpected Exception")
             End Try
             Return returnResult
@@ -50576,7 +50580,7 @@ ErrorTrap:
             main_PageStartTickCount = GetTickCount
             main_InitCounter = 0
             main_ClosePageCounter = 0
-            main_allowDebugLog = False '
+            allowDebugLog = True
             main_PageStartTime = Now()
             main_SqlPageStartTime = EncodeSQLDate(main_PageStartTime)
             main_PageTestPointPrinting = True
@@ -51023,7 +51027,9 @@ ErrorTrap:
         ''' </summary>
         ''' <param name="copy"></param>
         Private Sub debugLog(copy As String)
-            Console.WriteLine("cpCoreClass-" & copy)
+            If allowDebugLog Then
+                Console.WriteLine("cpCoreClass-" & copy)
+            End If
         End Sub
         '
         '====================================================================================================

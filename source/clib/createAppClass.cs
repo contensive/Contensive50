@@ -66,7 +66,7 @@ namespace  Contensive.Core {
                 else {
                     //
                     // ----------------------------------------------------------------------------------------------------
-                    // create cluster
+                    // create cluster - Name
                     //
                     Console.WriteLine("The Cluster Configuration file [c:\\ProgramData\\Clib\\clusterConfig.json] was not found.");
                     Console.WriteLine("This server's cluster configuration will be initialized. If this is not correct, use Ctrl-C to stop this initialization.");
@@ -76,6 +76,10 @@ namespace  Contensive.Core {
                     //
                     do
                     {
+                        //
+                        // ----------------------------------------------------------------------------------------------------
+                        // local or multiserver mode
+                        //
                         Console.WriteLine("\n\nSingle-Server or Multi-Server Mode");
                         Console.WriteLine("Single server installations run applications from a single server and store their data on that machine. Multi-server configurations run on multiple servers and require outside resources to store their data.");
                         Console.Write("Single-Server Application (y/n)?");
@@ -84,6 +88,10 @@ namespace  Contensive.Core {
                     //
                     do
                     {
+                        //
+                        // ----------------------------------------------------------------------------------------------------
+                        // files
+                        //
                         Console.WriteLine("\n\nData Storage Location");
                         Console.WriteLine("Data will be stored on the server in the \\InetPub folder. This folder must be backed up regularly.");
                         Console.Write("Enter the Drive letter for data storage (c/d/etc)?");
@@ -100,24 +108,33 @@ namespace  Contensive.Core {
                     {
                         case "y":
                             //
-                            // create local cluster
+                            // ----------------------------------------------------------------------------------------------------
+                            // LOCAL MODE Data Source Location
                             //
                             isLocalCluster = true;
                             cp.cluster.config.isLocal = true;
-                            Console.WriteLine("\n\nDataSource type (1=odbcSqlServer, 2=nativeSqlServer):");
+                            Console.WriteLine("\n\nDataSource type (1=odbc Sql Server, 2=native Sql Server):");
                             dataSource = Console.ReadLine();
                             switch (dataSource)
                             {
                                 case "1":
+                                    //
+                                    // ----------------------------------------------------------------------------------------------------
+                                    // ODBC
+                                    //
                                     cp.cluster.config.defaultDataSourceType = Contensive.Core.dataSourceTypeEnum.sqlServerOdbc;
                                     //
                                     Console.Write("\n\nodbc sqlserver connectionstring:");
                                     cp.cluster.config.defaultDataSourceODBCConnectionString = Console.ReadLine();
                                     break;
                                 case "2":
+                                    //
+                                    // ----------------------------------------------------------------------------------------------------
+                                    // Native Sql Server Driver
+                                    //
                                     cp.cluster.config.defaultDataSourceType = dataSourceTypeEnum.sqlServerNative;
                                     //
-                                    Console.Write("\n\nnative sqlserver endpoint:");
+                                    Console.Write("\n\nSql Server endpoint. Use (local) for Sql Server on this machine, or the AWS RDS endpoint (url:port):");
                                     cp.cluster.config.defaultDataSourceAddress = Console.ReadLine();
                                     //
                                     Console.Write("native sqlserver userId:");
@@ -129,10 +146,14 @@ namespace  Contensive.Core {
                             }
                             break;
                         case "n":
+                            //
+                            // ----------------------------------------------------------------------------------------------------
+                            // non-LOCAL MODE Data Source Location
+                            //
                             isLocalCluster = false;
                             cp.cluster.config.defaultDataSourceType = dataSourceTypeEnum.sqlServerNative;
                             //
-                            Console.Write("\n\nnative sqlserver address:");
+                            Console.Write("\n\nSql Server endpoint. Use the AWS RDS endpoint (url:port):");
                             cp.cluster.config.defaultDataSourceAddress = Console.ReadLine();
                             //
                             Console.Write("native sqlserver userId:");
@@ -145,6 +166,7 @@ namespace  Contensive.Core {
                     do
                     {
                         Console.WriteLine("\n\nThe server requires a caching service. You can choose either the systems local cache or an AWS Elasticache (memCacheD).");
+                        Console.WriteLine("NOTE: local cache is not yet implemented. if you select local cache will be disabled.");
                         Console.Write("Use (l)ocal cache or (m)emcached (l/m)?");
                         isLocalClusterText = Console.ReadLine().ToLower();
                     } while ((isLocalClusterText != "l") && (isLocalClusterText != "m"));
@@ -152,33 +174,39 @@ namespace  Contensive.Core {
                     //
                     // if memcached, get servers
                     //
-                    do
+                    if ((isLocalClusterText == "m"))
                     {
-                        Console.Write("\n\nEnter the ElasticCache Configuration Endpoint (server:port):");
-                        cacheNode = Console.ReadLine().ToLower();
-                        cp.cluster.config.awsElastiCacheConfigurationEndpoint = cacheNode;
-                    } while (string.IsNullOrEmpty(cacheNode));
+                        do
+                        {
+                            Console.Write("\n\nEnter the ElasticCache Configuration Endpoint (server:port):");
+                            cacheNode = Console.ReadLine().ToLower();
+                            cp.cluster.config.awsElastiCacheConfigurationEndpoint = cacheNode;
+                        } while (string.IsNullOrEmpty(cacheNode));
+                    }
                     //
                     // determine app pattern
                     //
                     //
                     fileSystemClass installFiles = new fileSystemClass(cp.core, cp.core.cluster.config, fileSystemClass.fileSyncModeEnum.noSync, System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
+                    if (!cp.core.cluster.clusterFiles.checkPath("clibCommonAssemblies\\"))
+                    {
+                        cp.core.cluster.clusterFiles.createPath("clibCommonAssemblies\\");
+                    }
                     int appPatternPtr;
                     List<string> appPatterns = new List<string>();
                     int appPatternCnt;
                     string appPatternsSrc = "clibResources\\appPatterns";
-                    //
-                    // check if installation zip has not been unpacked
-                    //
-                    if (installFiles.checkFile("clibresources.zip"))
+                    if (!cp.core.cluster.clusterFiles.checkPath( appPatternsSrc))
                     {
-                        installFiles.UnzipFile("clibresources.zip");
-                        installFiles.DeleteFile("clibresources.zip");
-                    }
-                    if (!installFiles.checkPath( appPatternsSrc))
-                    {
-                        Console.WriteLine("\n\nThe application patterns can't be found in the installation directory [" + appPatternsSrc + "]. Please check the installation and re-run the initialization.");
-                        return;
+                        //
+                        // unpack the install resources
+                        //
+                        if (installFiles.checkFile("clibresources.zip"))
+                        {
+                            installFiles.copyFile("clibresources.zip", "clibresources.zip", cp.core.cluster.clusterFiles);
+                            cp.core.cluster.clusterFiles.UnzipFile("clibresources.zip");
+                            cp.core.cluster.clusterFiles.DeleteFile("clibresources.zip");
+                        };
                     }
                     do
                     {
@@ -187,7 +215,7 @@ namespace  Contensive.Core {
                         Console.WriteLine("Select one of the application patterns setup in the installation folder:");
                         appPatternCnt = 1;
                         appPatterns.Add("");
-                        foreach (System.IO.DirectoryInfo di in installFiles.getFolders(appPatternsSrc))
+                        foreach (System.IO.DirectoryInfo di in cp.core.cluster.clusterFiles.getFolders(appPatternsSrc))
                         {
                             appPatterns.Add(di.Name);
                             Console.Write("\n" + appPatternCnt.ToString() + ") " + di.Name);

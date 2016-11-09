@@ -1666,15 +1666,20 @@ ErrorTrap:
         '
         Public Function executeSql(ByVal sql As String, Optional ByVal dataSourceName As String = "", Optional ByVal startRecord As Integer = 0, Optional ByVal maxRecords As Integer = 9999) As DataTable
             Dim returnData As New DataTable
-            Dim connString As String
+            Dim connString As String = cpCore.cluster.getConnectionString(config.name)
             Try
                 If dbEnabled Then
-                    connString = "" _
-                        & "data source=" & cpCore.cluster.config.defaultDataSourceAddress & ";" _
-                        & "initial catalog=" & config.name & ";" _
-                        & "UID=" & cpCore.cluster.config.defaultDataSourceUsername & ";" _
-                        & "PWD=" & cpCore.cluster.config.defaultDataSourcePassword & ";" _
-                        & ""
+                    'Dim dataSourceUrl As String
+                    'dataSourceUrl = cpCore.cluster.config.defaultDataSourceAddress
+                    'If (dataSourceUrl.IndexOf(":") > 0) Then
+                    '    dataSourceUrl = dataSourceUrl.Substring(0, dataSourceUrl.IndexOf(":"))
+                    'End If
+                    'connString = "" _
+                    '    & "data source=" & dataSourceUrl & ";" _
+                    '    & "initial catalog=" & config.name & ";" _
+                    '    & "UID=" & cpCore.cluster.config.defaultDataSourceUsername & ";" _
+                    '    & "PWD=" & cpCore.cluster.config.defaultDataSourcePassword & ";" _
+                    '    & ""
                     Using connSQL As New SqlConnection(connString)
                         connSQL.Open()
                         Using cmdSQL As New SqlCommand()
@@ -8921,14 +8926,19 @@ ErrorTrap:
         Public Function getTableSchemaData(tableName As String) As DataTable
             Dim returnDt As New DataTable
             Try
-                Dim connString As String
-                '
-                connString = "" _
-                    & "data source=" & cpCore.cluster.config.defaultDataSourceAddress & ";" _
-                    & "initial catalog=" & config.name & ";" _
-                    & "UID=" & cpCore.cluster.config.defaultDataSourceUsername & ";" _
-                    & "PWD=" & cpCore.cluster.config.defaultDataSourcePassword & ";" _
-                    & ""
+                Dim connString As String = cpCore.cluster.getConnectionString(config.name)
+                'Dim dataSourceUrl As String
+                'dataSourceUrl = cpCore.cluster.config.defaultDataSourceAddress
+                'If (dataSourceUrl.IndexOf(":") > 0) Then
+                '    dataSourceUrl = dataSourceUrl.Substring(0, dataSourceUrl.IndexOf(":"))
+                'End If
+                ''
+                'connString = "" _
+                '    & "data source=" & dataSourceUrl & ";" _
+                '    & "initial catalog=" & config.name & ";" _
+                '    & "UID=" & cpCore.cluster.config.defaultDataSourceUsername & ";" _
+                '    & "PWD=" & cpCore.cluster.config.defaultDataSourcePassword & ";" _
+                '    & ""
                 Using connSQL As New SqlConnection(connString)
                     connSQL.Open()
                     returnDt = connSQL.GetSchema("Tables", {config.name, Nothing, tableName, Nothing})
@@ -8944,14 +8954,19 @@ ErrorTrap:
         Public Function getColumnSchemaData(tableName As String) As DataTable
             Dim returnDt As New DataTable
             Try
-                Dim connString As String
-                '
-                connString = "" _
-                    & "data source=" & cpCore.cluster.config.defaultDataSourceAddress & ";" _
-                    & "initial catalog=" & config.name & ";" _
-                    & "UID=" & cpCore.cluster.config.defaultDataSourceUsername & ";" _
-                    & "PWD=" & cpCore.cluster.config.defaultDataSourcePassword & ";" _
-                    & ""
+                Dim connString As String = cpCore.cluster.getConnectionString(config.name)
+                'Dim dataSourceUrl As String
+                'dataSourceUrl = cpCore.cluster.config.defaultDataSourceAddress
+                'If (dataSourceUrl.IndexOf(":") > 0) Then
+                '    dataSourceUrl = dataSourceUrl.Substring(0, dataSourceUrl.IndexOf(":"))
+                'End If
+                ''
+                'connString = "" _
+                '    & "data source=" & dataSourceUrl & ";" _
+                '    & "initial catalog=" & config.name & ";" _
+                '    & "UID=" & cpCore.cluster.config.defaultDataSourceUsername & ";" _
+                '    & "PWD=" & cpCore.cluster.config.defaultDataSourcePassword & ";" _
+                '    & ""
                 Using connSQL As New SqlConnection(connString)
                     connSQL.Open()
                     returnDt = connSQL.GetSchema("Columns", {config.name, Nothing, tableName, Nothing})
@@ -8967,14 +8982,19 @@ ErrorTrap:
         Public Function getIndexSchemaData(tableName As String) As DataTable
             Dim returnDt As New DataTable
             Try
-                Dim connString As String
-                '
-                connString = "" _
-                    & "data source=" & cpCore.cluster.config.defaultDataSourceAddress & ";" _
-                    & "initial catalog=" & config.name & ";" _
-                    & "UID=" & cpCore.cluster.config.defaultDataSourceUsername & ";" _
-                    & "PWD=" & cpCore.cluster.config.defaultDataSourcePassword & ";" _
-                    & ""
+                Dim connString As String = cpCore.cluster.getConnectionString(config.name)
+                'Dim dataSourceUrl As String
+                'dataSourceUrl = cpCore.cluster.config.defaultDataSourceAddress
+                'If (dataSourceUrl.IndexOf(":") > 0) Then
+                '    dataSourceUrl = dataSourceUrl.Substring(0, dataSourceUrl.IndexOf(":"))
+                'End If
+                ''
+                'connString = "" _
+                '    & "data source=" & dataSourceUrl & ";" _
+                '    & "initial catalog=" & cpCore.app.config.name & ";" _
+                '    & "UID=" & cpCore.cluster.config.defaultDataSourceUsername & ";" _
+                '    & "PWD=" & cpCore.cluster.config.defaultDataSourcePassword & ";" _
+                '    & ""
                 Using connSQL As New SqlConnection(connString)
                     connSQL.Open()
                     returnDt = connSQL.GetSchema("Indexes", {config.name, Nothing, tableName, Nothing})

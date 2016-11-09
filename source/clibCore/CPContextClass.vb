@@ -54,12 +54,12 @@ Namespace Contensive.Core
         End Sub
         '
         '
-        Public Property allowProfileLog() As Boolean
+        Public Property allowDebugLog() As Boolean
             Get
-                Return cp.core.allowProfileLog
+                Return cp.core.allowDebugLog
             End Get
             Set(ByVal value As Boolean)
-                cp.core.allowProfileLog = value
+                cp.core.allowDebugLog = value
             End Set
         End Property
         ''
