@@ -82,7 +82,7 @@ Namespace Contensive.Core
         ' configuration of async command listener on render machines (not sure if used still)
         '
         Public serverListenerPort As Integer = Port_ContentServerControlDefault
-        Public maxCmdInstances As Integer = 5
+        Public maxConcurrentTasksPerServer As Integer = 5
         ' ayncCmd server authentication -- change this to a key later
         Public username As String = ""
         Public password As String = ""
@@ -325,18 +325,6 @@ Namespace Contensive.Core
             returnKey = Regex.Replace(key, "0x[a-fA-F\d]{2}", "_")
             returnKey = returnKey.Replace(" ", "_")
             Return returnKey
-        End Function
-        '
-        ' return as list all appNames with applications on this cluster
-        '
-        Public Function getAppNameList() As List(Of String)
-            Dim appList As List(Of String) = New List(Of String)
-            Try
-                Throw New NotImplementedException()
-            Catch ex As Exception
-                cpCore.handleException(ex)
-            End Try
-            Return appList
         End Function
         '
         '====================================================================================================

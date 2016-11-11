@@ -10615,22 +10615,36 @@ ErrorTrap:
             handleException(New Exception("Unexpected exception"))
         End Function
         '
-        '=======================================================================================================
-        '   parse a JSON string into an object
-        '       a collection if the JSON string is a object
-        '       an array if it is an array
-        '=======================================================================================================
+        '====================================================================================================
+        ''' <summary>
+        ''' Serialize an object into a JSON string
+        ''' </summary>
+        ''' <param name="source"></param>
+        ''' <returns></returns>
+        Public Function jsonSerialize(source As Object) As String
+            Try
+                Dim json As New System.Web.Script.Serialization.JavaScriptSerializer
+                Return json.Serialize(source)
+            Catch ex As Exception
+                handleException(ex)
+                Return ""
+            End Try
+        End Function
         '
+        '====================================================================================================
+        ''' <summary>
+        ''' Deserialize as JSON string into a generic object
+        ''' </summary>
+        ''' <param name="Source"></param>
+        ''' <returns></returns>
         Public Function jsonDeserialize(Source As String) As Object
-            On Error GoTo ErrorTrap 'Const Tn = "parseJSON": 'Dim th as integer: th = profileLogMethodEnter(Tn)
-            '
-            Dim json As System.Web.Script.Serialization.JavaScriptSerializer
-            jsonDeserialize = json.Deserialize(Of Object)(Source)
-            'csv_parseJSON = Newtonsoft.Json.JsonConvert.DeserializeObject(Source)
-            '
-            Exit Function
-ErrorTrap:
-            handleException(New Exception("Unexpected exception"))
+            Try
+                Dim json As New System.Web.Script.Serialization.JavaScriptSerializer
+                Return json.Deserialize(Of Object)(Source)
+            Catch ex As Exception
+                handleException(ex)
+                Return Nothing
+            End Try
         End Function
         '
         '=======================================================================================================
@@ -37058,7 +37072,7 @@ ErrorTrap:
                 Do While app.db_csOk(CS)
                     addonId = app.db_GetCSInteger(CS, "Addonid")
                     'hint = hint & ",210 addonid=[" & addonId & "]"
-                    Call executeAddonAsProcess(CStr(addonId), Option_String, Nothing, False)
+                    Call executeAddonAsProcess(CStr(addonId), Option_String)
                     Call app.db_csGoNext(CS)
                 Loop
                 Call app.db_csClose(CS)
@@ -43717,7 +43731,7 @@ ErrorTrap:
         '       if false, the server is called remotely, which starts a cccmd process, gets the command and calls this routine with true
         '====================================================================================================================
         '
-        Public Function executeAddonAsProcess(ByVal AddonIDGuidOrName As String, Optional ByVal OptionString As String = "", Optional ByVal nothingObject As Object = Nothing, Optional ByVal WaitForResults As Boolean = False) As String
+        Public Function executeAddonAsProcess(ByVal AddonIDGuidOrName As String, Optional ByVal OptionString As String = "") As String
             On Error GoTo ErrorTrap 'Const Tn = "ExecuteAddonAsProcess" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
             Dim StatusOK As Boolean
@@ -43772,6 +43786,7 @@ ErrorTrap:
             Dim ReplaceValues() As String
             Dim SQLName As String
             Dim addonPtr As Integer
+            Dim taskScheduler As New taskSchedulerClass(Me)
             '
             'hint = "csv_executeAddonAsProcess, enter"
             '
@@ -43782,51 +43797,24 @@ ErrorTrap:
                 AddonName = EncodeText(cache_addons.addonList(addonPtr).addonCache_name)
                 'hint = hint & ",020 addonname=[" & AddonName & "] addonid=[" & addonId & "]"
             End If
-            If Not WaitForResults Then
-                '
-                '-----------------------------------------------------------------
-                '   Add to background process queue
-                '-----------------------------------------------------------------
-                '
-                'hint = hint & ",030"
-                appendLogWithLegacyRow(app.config.name, "start: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
-                '
-                runAtServer = New runAtServerClass(Me)
-                ' must nva encode because that is what the server-execute command expects
-                cmdQueryString = "" _
+            '
+            '-----------------------------------------------------------------
+            '   Add to background process queue
+            '-----------------------------------------------------------------
+            '
+            'hint = hint & ",030"
+            appendLogWithLegacyRow(app.config.name, "start: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
+            '
+            runAtServer = New runAtServerClass(Me)
+            ' must nva encode because that is what the server-execute command expects
+            cmdQueryString = "" _
                     & "appname=" & csv_encodeNvaArgument(EncodeRequestVariable(app.config.name)) _
                     & "&AddonID=" & CStr(addonId) _
                     & "&OptionString=" & csv_encodeNvaArgument(EncodeRequestVariable(OptionString))
-                'hint = hint & ",035"
-                Call runAtServer.executeCmd("RunProcess", cmdQueryString)
-                '
-                appendLogWithLegacyRow(app.config.name, "end: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
-                '
-            Else
-                '
-                '-----------------------------------------------------------------
-                '   Execute Now
-                '-----------------------------------------------------------------
-                '
-                ' Log a hit in the process log
-                '
-                'hint = hint & ",040"
-                appendLogWithLegacyRow(app.config.name, "start: execute now, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
-                '
-                ' use common addon processesing
-                '
-                'hint = hint & ",045"
-                executeAddonAsProcess = executeAddon(addonId, AddonName, OptionString, addonContextEnum.ContextSimple, "", 0, "", "", False, 0, "", StatusOK, Nothing, "", Nothing, "", 0, False)
-                'csv_ExecuteAddonAsProcess = executeAddon(addonId, AddonGuidOrName, OptionString, addonContextEnum.ContextSimple, "", 0, "", "", False, 0, "", statusOK, Nothing, "", Nothing, "", 0, False)
-                If Not StatusOK Then
-                    '
-                    ' returned issue
-                    '
-                    appendLogWithLegacyRow(app.config.name, "error returned from csv_ExecuteAddon during process from, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
-                End If
-                '
-                appendLogWithLegacyRow(app.config.name, "end(" & (GetTickCount - ProcessStartTick) & " msec): execute now, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
-            End If
+            'hint = hint & ",035"
+            Call runAtServer.executeCmd("RunProcess", cmdQueryString)
+            '
+            appendLogWithLegacyRow(app.config.name, "end: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
             '
             Exit Function
 ErrorTrap:
@@ -49871,7 +49859,7 @@ ErrorTrap:
                 Dim AjaxFastFunction As String = main_GetStreamText2(RequestNameAjaxFastFunction)
                 Dim RemoteMethodFromQueryString As String = main_GetStreamText2(RequestNameRemoteMethodAddon)
                 '
-                debugLog("executeRoute, enter")
+                'debugLog("executeRoute, enter")
                 '
                 ' determine route from either url or querystring 
                 '
@@ -50519,7 +50507,7 @@ ErrorTrap:
                     '
                     If (workingRoute = normalizeRoute(adminRoute)) Then
                         '
-                        debugLog("executeRoute, route is admin")
+                        'debugLog("executeRoute, route is admin")
                         '
                         '--------------------------------------------------------------------------
                         ' route is admin
@@ -50541,7 +50529,7 @@ ErrorTrap:
                         '
                         '--------------------------------------------------------------------------
                         '
-                        debugLog("executeRoute, route is Default Route AddonId")
+                        'debugLog("executeRoute, route is Default Route AddonId")
                         '
                         Dim defaultAddonId As Integer = cp.Site.GetInteger("Default Route AddonId")
                         If defaultAddonId <> 0 Then
@@ -50552,11 +50540,11 @@ ErrorTrap:
                     End If
                 End If
                 '
-                debugLog("executeRoute, exit")
+                'debugLog("executeRoute, exit")
                 '
             Catch ex As Exception
                 '
-                debugLog("executeRoute, exception")
+                'debugLog("executeRoute, exception")
                 '
                 handleExceptionLegacyRow2(ex, "cpCoreClass", System.Reflection.MethodInfo.GetCurrentMethod.Name, "Unexpected Exception")
             End Try
@@ -50904,7 +50892,7 @@ ErrorTrap:
         '=============================================================================================================
         '
         Public Sub dispose()
-            debugLog("dispose, enter-pre-try")
+            'debugLog("dispose, enter-pre-try")
             Try
                 '
                 ' test - see header
@@ -50926,10 +50914,10 @@ ErrorTrap:
                 Dim hint As String
                 '
                 ''hint = "enter"
-                debugLog("dispose, enter")
+                'debugLog("dispose, enter")
                 If Not _isDisposed Then
                     ''hint = "close stream"
-                    debugLog("dispose, not isDisposed")
+                    'debugLog("dispose, not isDisposed")
                     '
                     ' delete tmp files
                     '
@@ -50951,7 +50939,7 @@ ErrorTrap:
                         '
                         ' If visit tracking, save the viewing record
                         '
-                        debugLog("dispose, update viewing record")
+                        'debugLog("dispose, update viewing record")
                         ''hint = "insert viewing-1"
                         ViewingName = Left(main_VisitId & "." & main_VisitPages, 10)
                         PageID = main_RenderedPageID
@@ -51014,9 +51002,9 @@ ErrorTrap:
                     _isDisposed = True
                     ''hint = "done"
                 End If
-                debugLog("dispose, exit")
+                'debugLog("dispose, exit")
             Catch ex As Exception
-                debugLog("dispose, unexpected error [" & ex.ToString & "]")
+                'debugLog("dispose, unexpected error [" & ex.ToString & "]")
             End Try
         End Sub
         Private _isDisposed As Boolean = False                        ' true after disposed is called, means the page is closed and nothing more can happen

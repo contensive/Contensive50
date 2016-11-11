@@ -266,11 +266,7 @@ Namespace Contensive.Core
             '
             MyDoc = CP.Doc
             LegacyOptionString = MyDoc.getLegacyOptionStringFromVar()
-            If True Then
-                Return CP.core.executeAddon_legacy3(IdGuidOrName, LegacyOptionString, 0, Nothing)
-            Else
-                Return CP.core.executeAddonAsProcess(IdGuidOrName, LegacyOptionString, Nothing, True)
-            End If
+            Return CP.core.executeAddon_legacy3(IdGuidOrName, LegacyOptionString, 0, Nothing)
         End Function
         '
         '
@@ -282,11 +278,7 @@ Namespace Contensive.Core
             '
             MyDoc = CP.Doc
             LegacyOptionString = MyDoc.getLegacyOptionStringFromVar()
-            If True Then
-                Return CP.core.executeAddon_legacy3(IdGuidOrName, LegacyOptionString, WrapperId, Nothing)
-            Else
-                Return CP.core.executeAddonAsProcess(IdGuidOrName, LegacyOptionString, Nothing, True)
-            End If
+            Return CP.core.executeAddon_legacy3(IdGuidOrName, LegacyOptionString, WrapperId, Nothing)
         End Function
         '
         '
@@ -298,11 +290,7 @@ Namespace Contensive.Core
             '
             MyDoc = CP.Doc
             LegacyOptionString = MyDoc.getLegacyOptionStringFromVar()
-            If True Then
-                Return CP.core.executeAddon_legacy4(IdGuidOrName, LegacyOptionString, context, Nothing)
-            Else
-                Return CP.core.executeAddonAsProcess(IdGuidOrName, LegacyOptionString, Nothing, True)
-            End If
+            Return CP.core.executeAddon_legacy4(IdGuidOrName, LegacyOptionString, context, Nothing)
         End Function
 
         Public Overrides Function ExecuteAddonAsProcess(ByVal IdGuidOrName As String) As String
@@ -312,7 +300,7 @@ Namespace Contensive.Core
             '
             MyDoc = CP.Doc
             LegacyOptionString = MyDoc.getLegacyOptionStringFromVar()
-            Return CP.core.executeAddonAsProcess(IdGuidOrName, LegacyOptionString, Nothing)
+            Return CP.core.executeAddonAsProcess(IdGuidOrName, LegacyOptionString)
         End Function
 
 

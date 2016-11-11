@@ -1,5 +1,5 @@
 ﻿
-updated: 20161107
+updated: 20161110
 
 debug
 ---- all bug logs in github
@@ -14,7 +14,9 @@ Why do this / use this
 Short Term Goals: 20160930
 ---- process addons
 -------- save to task table with serialized doc properties
--------- create service, polls task table each minute and runs addon if found
+-------- create service
+------------ task Scheduling pushes on ccTasks, enabled or disabled in serverConfig.json
+------------ taskRunner pops and executes, enabled or disabled in serverConfig.json
 ---- Write "wiki" - that thing -someone- said means you have established software
 /------- clib.io is the domain
 -------- find a sample software project like this that I want to model after (to start, simple clean styles)

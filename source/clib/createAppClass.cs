@@ -195,19 +195,11 @@ namespace  Contensive.Core {
                     int appPatternPtr;
                     List<string> appPatterns = new List<string>();
                     int appPatternCnt;
+                    //
+                    // upgrade the cluster resources folder from the installation
+                    //
+                    upgradeResources(cp, installFiles);
                     string appPatternsSrc = "clibResources\\appPatterns";
-                    if (!cp.core.cluster.clusterFiles.checkPath( appPatternsSrc))
-                    {
-                        //
-                        // unpack the install resources
-                        //
-                        if (installFiles.checkFile("clibresources.zip"))
-                        {
-                            installFiles.copyFile("clibresources.zip", "clibresources.zip", cp.core.cluster.clusterFiles);
-                            cp.core.cluster.clusterFiles.UnzipFile("clibresources.zip");
-                            cp.core.cluster.clusterFiles.DeleteFile("clibresources.zip");
-                        };
-                    }
                     do
                     {
                         Console.WriteLine("\n\nApplication pattern for this server.");
@@ -416,6 +408,30 @@ namespace  Contensive.Core {
             {
                 Console.WriteLine("Error: [" + ex.ToString() + "]");
             }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// refresh the clibResources in the cluster folder from the files installed
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="installFiles"></param>
+        public void upgradeResources(CPClass cp, fileSystemClass installFiles)
+        {
+            string appPatternsSrc = "clibResources\\appPatterns";
+            //if (!cp.core.cluster.clusterFiles.checkPath(appPatternsSrc))
+            //{
+                //
+                // unpack the install resources
+                //
+                if (installFiles.checkFile("clibresources.zip"))
+                {
+                    installFiles.copyFile("clibresources.zip", "clibresources.zip", cp.core.cluster.clusterFiles);
+                    cp.core.cluster.clusterFiles.UnzipFile("clibresources.zip");
+                    cp.core.cluster.clusterFiles.DeleteFile("clibresources.zip");
+                };
+            //}
+
         }
     }
 }

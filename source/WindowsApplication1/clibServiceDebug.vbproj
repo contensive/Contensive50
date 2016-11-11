@@ -167,9 +167,9 @@
       <Name>clibCore</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\clibWorker\clibWorker.vbproj">
+    <ProjectReference Include="..\clibWorker\legacyWorker.vbproj">
       <Project>{31EDC921-CD8E-4AE8-B74D-0E1B238192B6}</Project>
-      <Name>clibWorker</Name>
+      <Name>legacyWorker</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>

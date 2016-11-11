@@ -470,7 +470,7 @@ ErrorTrap:
                                         '
                                         ' for now, there is nothing to return
                                         '
-                                        Call cpCore.executeAddonAsProcess(AddonIdGuidOrName, Optionstring, Nothing, True)
+                                        Call cpCore.executeAddonAsProcess(AddonIdGuidOrName, Optionstring)
                                     End If
                                     'cmc = Nothing
                                 End If

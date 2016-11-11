@@ -245,9 +245,8 @@ Namespace Contensive.Core
             '
             ' Housekeep each application
             '
-            ' !!!!! THIS WILL BE AN ADDON THAT RUNS WITHIN EACH APPLICATION
-            appList = cp.Core.cluster.getAppNameList
-            For Each appName In appList
+            For Each kvp As KeyValuePair(Of String, appConfigClass) In cpCore.cluster.config.apps
+                appName = kvp.Value.name
                 If True Then
                     'End If
                     ''20151109 - removed but unsure what in initContext can/must be moved to cp constructor
@@ -294,17 +293,17 @@ Namespace Contensive.Core
                                 '
                                 '
                                 '
-                                DomainNameList = cp.Core.domainList
+                                DomainNameList = cp.core.domainList
                                 DomainNamePrimary = DomainNameList
                                 Pos = InStr(1, DomainNamePrimary, ",")
                                 If Pos > 1 Then
                                     DomainNamePrimary = Mid(DomainNamePrimary, 1, Pos - 1)
                                 End If
                                 'dataBuildVersion = cp.Core.app.getSiteProperty("BuildVersion", "0")
-                                DataSourceType = cp.Core.csv_GetDataSourceType("default")
+                                DataSourceType = cp.core.csv_GetDataSourceType("default")
                                 '
                                 DefaultMemberName = ""
-                                PeopleCID = cp.Core.csv_GetContentID("people")
+                                PeopleCID = cp.core.csv_GetContentID("people")
                                 SQL = "select defaultvalue from ccfields where name='name' and contentid=(" & PeopleCID & ")"
                                 CS = cp.core.app.db_openCsSql_rev("default", SQL)
                                 If cp.core.app.db_csOk(CS) Then

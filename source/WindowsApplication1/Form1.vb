@@ -9,7 +9,7 @@ Namespace Contensive.serverDebugger
         '
         '
         Private cp As cpclass
-        Private server As workerClass
+        Private server As legacyWorkerClass
         '
         ' form close - stop the server
         '
@@ -156,7 +156,7 @@ Namespace Contensive.serverDebugger
             InitializeComponent()
             ' Add any initialization after the InitializeComponent() call.
             cp = New CPClass("cluster-mode-not-implemented-yet")
-            server = New workerClass(cp.core)
+            server = New legacyWorkerClass(cp.core)
         End Sub
     End Class
 End Namespace

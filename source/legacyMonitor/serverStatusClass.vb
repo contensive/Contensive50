@@ -233,161 +233,152 @@ Namespace Contensive.Core
                             'hint = "Getting application list for Kernel"
                             Content = Content & StatusLine(0, "")
                             Content = Content & StatusLine(0, "Applications")
-                            AppNameList = cpCore.cluster.getAppNameList()
-                            If AppNameList.Count = 0 Then
-                                '
-                                ' Problem
-                                '
-                                Content = Content & StatusLine(1, "No Applications were found")
-                                Call appendMonitorLog("GetApplicationList call returned empty.")
-                            Else
-                                Throw New NotImplementedException
-                                For Each AppName In AppNameList
-                                    cpApp = New CPClass(AppName)
-                                    If cpApp.core.app.config.allowSiteMonitor Then
+
+                            For Each kvp As KeyValuePair(Of String, appConfigClass) In cpCore.cluster.config.apps
+                                AppName = kvp.Value.name
+                                cpApp = New CPClass(AppName)
+                                If cpApp.core.app.config.allowSiteMonitor Then
 
 
-                                        'hint = "Checking status for application [" & AppName & "]"
-                                        Select Case cpApp.core.app.status
-                                            Case ccCommonModule.applicationStatusEnum.ApplicationStatusConnectionObjectFailure
-                                                ReDim Preserve errors(ErrorCount)
-                                                errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Connection Object failure")
-                                                Content = Content & StatusLine(2, errors(ErrorCount))
-                                                ErrorCount = ErrorCount + 1
-                                            Case ccCommonModule.applicationStatusEnum.ApplicationStatusConnectionStringFailure
-                                                ReDim Preserve errors(ErrorCount)
-                                                errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Connection String Failure")
-                                                Content = Content & StatusLine(2, errors(ErrorCount))
-                                                ErrorCount = ErrorCount + 1
-                                            Case ccCommonModule.applicationStatusEnum.ApplicationStatusDataSourceFailure
-                                                ReDim Preserve errors(ErrorCount)
-                                                errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Data Source Failure")
-                                                Content = Content & StatusLine(2, errors(ErrorCount))
-                                                ErrorCount = ErrorCount + 1
-                                            Case ccCommonModule.applicationStatusEnum.ApplicationStatusDbBad
-                                                ReDim Preserve errors(ErrorCount)
-                                                errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Bad Database")
-                                                Content = Content & StatusLine(2, errors(ErrorCount))
-                                                ErrorCount = ErrorCount + 1
-                                            Case ccCommonModule.applicationStatusEnum.ApplicationStatusDbNotFound
-                                                ReDim Preserve errors(ErrorCount)
-                                                errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Database Failure")
-                                                Content = Content & StatusLine(2, errors(ErrorCount))
-                                                ErrorCount = ErrorCount + 1
-                                            Case ccCommonModule.applicationStatusEnum.ApplicationStatusKernelFailure
-                                                ReDim Preserve errors(ErrorCount)
-                                                errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Kernel Failure")
-                                                Content = Content & StatusLine(2, errors(ErrorCount))
-                                                ErrorCount = ErrorCount + 1
-                                            Case ccCommonModule.applicationStatusEnum.ApplicationStatusLicenseFailure
-                                                ReDim Preserve errors(ErrorCount)
-                                                errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned License Failure")
-                                                Content = Content & StatusLine(2, errors(ErrorCount))
-                                                ErrorCount = ErrorCount + 1
-                                            Case ccCommonModule.applicationStatusEnum.ApplicationStatusNoHostService
-                                                ReDim Preserve errors(ErrorCount)
-                                                errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned ccServer Service is not running")
-                                                Content = Content & StatusLine(2, errors(ErrorCount))
-                                                ErrorCount = ErrorCount + 1
-                                            Case ccCommonModule.applicationStatusEnum.ApplicationStatusNotFound
-                                                ReDim Preserve errors(ErrorCount)
-                                                errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned application not found")
-                                                Content = Content & StatusLine(2, errors(ErrorCount))
-                                                ErrorCount = ErrorCount + 1
-                                            Case ccCommonModule.applicationStatusEnum.ApplicationStatusNotEnabled
-                                                ReDim Preserve errors(ErrorCount)
-                                                errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned application not running")
-                                                Content = Content & StatusLine(2, errors(ErrorCount))
-                                                ErrorCount = ErrorCount + 1
+                                    'hint = "Checking status for application [" & AppName & "]"
+                                    Select Case cpApp.core.app.status
+                                        Case ccCommonModule.applicationStatusEnum.ApplicationStatusConnectionObjectFailure
+                                            ReDim Preserve errors(ErrorCount)
+                                            errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Connection Object failure")
+                                            Content = Content & StatusLine(2, errors(ErrorCount))
+                                            ErrorCount = ErrorCount + 1
+                                        Case ccCommonModule.applicationStatusEnum.ApplicationStatusConnectionStringFailure
+                                            ReDim Preserve errors(ErrorCount)
+                                            errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Connection String Failure")
+                                            Content = Content & StatusLine(2, errors(ErrorCount))
+                                            ErrorCount = ErrorCount + 1
+                                        Case ccCommonModule.applicationStatusEnum.ApplicationStatusDataSourceFailure
+                                            ReDim Preserve errors(ErrorCount)
+                                            errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Data Source Failure")
+                                            Content = Content & StatusLine(2, errors(ErrorCount))
+                                            ErrorCount = ErrorCount + 1
+                                        Case ccCommonModule.applicationStatusEnum.ApplicationStatusDbBad
+                                            ReDim Preserve errors(ErrorCount)
+                                            errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Bad Database")
+                                            Content = Content & StatusLine(2, errors(ErrorCount))
+                                            ErrorCount = ErrorCount + 1
+                                        Case ccCommonModule.applicationStatusEnum.ApplicationStatusDbNotFound
+                                            ReDim Preserve errors(ErrorCount)
+                                            errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Database Failure")
+                                            Content = Content & StatusLine(2, errors(ErrorCount))
+                                            ErrorCount = ErrorCount + 1
+                                        Case ccCommonModule.applicationStatusEnum.ApplicationStatusKernelFailure
+                                            ReDim Preserve errors(ErrorCount)
+                                            errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Kernel Failure")
+                                            Content = Content & StatusLine(2, errors(ErrorCount))
+                                            ErrorCount = ErrorCount + 1
+                                        Case ccCommonModule.applicationStatusEnum.ApplicationStatusLicenseFailure
+                                            ReDim Preserve errors(ErrorCount)
+                                            errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned License Failure")
+                                            Content = Content & StatusLine(2, errors(ErrorCount))
+                                            ErrorCount = ErrorCount + 1
+                                        Case ccCommonModule.applicationStatusEnum.ApplicationStatusNoHostService
+                                            ReDim Preserve errors(ErrorCount)
+                                            errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned ccServer Service is not running")
+                                            Content = Content & StatusLine(2, errors(ErrorCount))
+                                            ErrorCount = ErrorCount + 1
+                                        Case ccCommonModule.applicationStatusEnum.ApplicationStatusNotFound
+                                            ReDim Preserve errors(ErrorCount)
+                                            errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned application not found")
+                                            Content = Content & StatusLine(2, errors(ErrorCount))
+                                            ErrorCount = ErrorCount + 1
+                                        Case ccCommonModule.applicationStatusEnum.ApplicationStatusNotEnabled
+                                            ReDim Preserve errors(ErrorCount)
+                                            errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned application not running")
+                                            Content = Content & StatusLine(2, errors(ErrorCount))
+                                            ErrorCount = ErrorCount + 1
                                                 'Case ccCommonModule.applicationStatusEnum.ApplicationStatusStarting
                                                 '    ReDim Preserve errors(ErrorCount)
                                                 '    errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned application starting")
                                                 '    Content = Content & StatusLine(2, errors(ErrorCount))
                                                 '    ErrorCount = ErrorCount + 1
-                                            Case ccCommonModule.applicationStatusEnum.ApplicationStatusUpgrading
-                                                ReDim Preserve errors(ErrorCount)
-                                                errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned application upgrading")
-                                                Content = Content & StatusLine(2, errors(ErrorCount))
-                                                ErrorCount = ErrorCount + 1
-                                            Case ccCommonModule.applicationStatusEnum.ApplicationStatusReady
+                                        Case ccCommonModule.applicationStatusEnum.ApplicationStatusUpgrading
+                                            ReDim Preserve errors(ErrorCount)
+                                            errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned application upgrading")
+                                            Content = Content & StatusLine(2, errors(ErrorCount))
+                                            ErrorCount = ErrorCount + 1
+                                        Case ccCommonModule.applicationStatusEnum.ApplicationStatusReady
+                                            If True Then
+                                                '
+                                                ' access content server for this application
+                                                '
                                                 If True Then
-                                                    '
-                                                    ' access content server for this application
-                                                    '
-                                                    If True Then
-                                                        Dim link As String
-                                                        'hint = "Returning monitor log entry for application [" & AppName & "]"
-                                                        link = AppLog(AppLogPtr).SiteLink
-                                                        Content = Content & StatusLine(2, "Link [<a target=_blank href=""" & link & """>" & link & "</a>]")
-                                                        link = AppLog(AppLogPtr).StatusLink
-                                                        Content = Content & StatusLine(2, "status Link [<a target=_blank href=""" & link & """>" & link & "</a>]")
-                                                        Content = Content & StatusLine(2, "status Checks [" & AppLog(AppLogPtr).StatusCheckCount & "]")
-                                                        Content = Content & StatusLine(2, "status Response [" & AppLog(AppLogPtr).LastStatusResponse & "]")
-                                                        If Not AppLog(AppLogPtr).LastCheckOK Then
-                                                            ReDim Preserve errors(ErrorCount)
-                                                            errors(ErrorCount) = ("[" & AppName & "] ERROR - Last status check returned [" & AppLog(AppLogPtr).LastStatusResponse & "]")
-                                                            ErrorCount = ErrorCount + 1
-                                                        End If
-                                                        If AppLog(AppLogPtr).ErrorCount <> 0 Then
-                                                            If monitorConfig.ClearErrorsOnMonitorHit Then
-                                                                Content = Content & StatusLine(2, "errors detected since last monitor hit [" & AppLog(AppLogPtr).ErrorCount & "]")
-                                                                AppLog(AppLogPtr).ErrorCount = 0
-                                                                AppLog(AppLogPtr).LastCheckOK = True
-                                                            Else
-                                                                Content = Content & StatusLine(2, "errors detected since monitor started [" & AppLog(AppLogPtr).ErrorCount & "]")
-                                                            End If
-                                                        Else
-                                                            Content = Content & StatusLine(2, "no monitor errors detected")
-                                                        End If
-                                                    End If
-                                                    '
-                                                    ' Check Last Email drop
-                                                    '
-                                                    Dim EmailServicelastCheck As Date
-                                                    EmailServicelastCheck = cp.Site.GetDate("EmailServicelastCheck")
-                                                    If EmailServicelastCheck < (Now().AddDays(-1)) Then
-                                                        '
-                                                        ' Email has not sent in a day
-                                                        '
+                                                    Dim link As String
+                                                    'hint = "Returning monitor log entry for application [" & AppName & "]"
+                                                    link = AppLog(AppLogPtr).SiteLink
+                                                    Content = Content & StatusLine(2, "Link [<a target=_blank href=""" & link & """>" & link & "</a>]")
+                                                    link = AppLog(AppLogPtr).StatusLink
+                                                    Content = Content & StatusLine(2, "status Link [<a target=_blank href=""" & link & """>" & link & "</a>]")
+                                                    Content = Content & StatusLine(2, "status Checks [" & AppLog(AppLogPtr).StatusCheckCount & "]")
+                                                    Content = Content & StatusLine(2, "status Response [" & AppLog(AppLogPtr).LastStatusResponse & "]")
+                                                    If Not AppLog(AppLogPtr).LastCheckOK Then
                                                         ReDim Preserve errors(ErrorCount)
-                                                        errors(ErrorCount) = ("[" & AppName & "] ERROR - Group email drop has not sent in the last 24 hours")
-                                                        Content = Content & StatusLine(2, errors(ErrorCount))
+                                                        errors(ErrorCount) = ("[" & AppName & "] ERROR - Last status check returned [" & AppLog(AppLogPtr).LastStatusResponse & "]")
                                                         ErrorCount = ErrorCount + 1
-                                                    Else
-                                                        '
-                                                        ' Email send is OK
-                                                        '
-                                                        Content = Content & StatusLine(2, "Group email drop OK [" & EmailServicelastCheck & "]")
                                                     End If
-                                                    '
-                                                    ' Get Misc properties
-                                                    '
-                                                    'hint = "Get AppServices object for [" & AppName & "]"
-                                                    Content = Content & StatusLine(2, "Contensive Version [" & cp.Version & "]")
-                                                    Content = Content & StatusLine(2, "Data Build Version [" & cpCore.app.dataBuildVersion & "]")
-                                                    Content = Content & StatusLine(2, "Active Connections [" & "AppServices.ConnectionsActive" & "]")
-                                                    Content = Content & StatusLine(2, "Started [" & "AppServices.DateStarted" & "]")
-                                                    Content = Content & StatusLine(2, "Hits [" & "AppServices.HitCounter" & "]")
-                                                    Content = Content & StatusLine(2, "Errors [" & "AppServices.ErrorCount" & "]")
-                                                    '
-                                                    Call cp.Dispose()
-                                                    cp = Nothing
+                                                    If AppLog(AppLogPtr).ErrorCount <> 0 Then
+                                                        If monitorConfig.ClearErrorsOnMonitorHit Then
+                                                            Content = Content & StatusLine(2, "errors detected since last monitor hit [" & AppLog(AppLogPtr).ErrorCount & "]")
+                                                            AppLog(AppLogPtr).ErrorCount = 0
+                                                            AppLog(AppLogPtr).LastCheckOK = True
+                                                        Else
+                                                            Content = Content & StatusLine(2, "errors detected since monitor started [" & AppLog(AppLogPtr).ErrorCount & "]")
+                                                        End If
+                                                    Else
+                                                        Content = Content & StatusLine(2, "no monitor errors detected")
+                                                    End If
                                                 End If
-                                                'Case ccCommonModule.applicationStatusEnum.ApplicationStatusPaused
-                                                '    '
-                                                '    ' Paused
-                                                '    '
-                                                '    Content = Content & StatusLine(2, "Application is paused")
-                                            Case Else
-                                                ReDim Preserve errors(ErrorCount)
-                                                errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned unknown error")
-                                                Content = Content & StatusLine(2, errors(ErrorCount))
-                                                ErrorCount = ErrorCount + 1
-                                        End Select
-                                    End If
-                                Next
-                            End If
-                            'hint = "Creating return page and exiting"
+                                                '
+                                                ' Check Last Email drop
+                                                '
+                                                Dim EmailServicelastCheck As Date
+                                                EmailServicelastCheck = cp.Site.GetDate("EmailServicelastCheck")
+                                                If EmailServicelastCheck < (Now().AddDays(-1)) Then
+                                                    '
+                                                    ' Email has not sent in a day
+                                                    '
+                                                    ReDim Preserve errors(ErrorCount)
+                                                    errors(ErrorCount) = ("[" & AppName & "] ERROR - Group email drop has not sent in the last 24 hours")
+                                                    Content = Content & StatusLine(2, errors(ErrorCount))
+                                                    ErrorCount = ErrorCount + 1
+                                                Else
+                                                    '
+                                                    ' Email send is OK
+                                                    '
+                                                    Content = Content & StatusLine(2, "Group email drop OK [" & EmailServicelastCheck & "]")
+                                                End If
+                                                '
+                                                ' Get Misc properties
+                                                '
+                                                'hint = "Get AppServices object for [" & AppName & "]"
+                                                Content = Content & StatusLine(2, "Contensive Version [" & cp.Version & "]")
+                                                Content = Content & StatusLine(2, "Data Build Version [" & cpCore.app.dataBuildVersion & "]")
+                                                Content = Content & StatusLine(2, "Active Connections [" & "AppServices.ConnectionsActive" & "]")
+                                                Content = Content & StatusLine(2, "Started [" & "AppServices.DateStarted" & "]")
+                                                Content = Content & StatusLine(2, "Hits [" & "AppServices.HitCounter" & "]")
+                                                Content = Content & StatusLine(2, "Errors [" & "AppServices.ErrorCount" & "]")
+                                                '
+                                                Call cp.Dispose()
+                                                cp = Nothing
+                                            End If
+                                            'Case ccCommonModule.applicationStatusEnum.ApplicationStatusPaused
+                                            '    '
+                                            '    ' Paused
+                                            '    '
+                                            '    Content = Content & StatusLine(2, "Application is paused")
+                                        Case Else
+                                            ReDim Preserve errors(ErrorCount)
+                                            errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned unknown error")
+                                            Content = Content & StatusLine(2, errors(ErrorCount))
+                                            ErrorCount = ErrorCount + 1
+                                    End Select
+                                End If
+                            Next
                         End If
                         '
                         ' Return page

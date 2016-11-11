@@ -95,7 +95,7 @@ Namespace Contensive.Core
                     '
                     ' call .dispose for managed objects
                     '
-                    Call appendDebugLog("protected dispose, calling dispose on internal objects")
+                    'Call appendDebugLog("protected dispose, calling dispose on internal objects")
                     If Not (AddonObj Is Nothing) Then AddonObj.Dispose()
                     If Not (CacheObj Is Nothing) Then CacheObj.Dispose()
                     If Not (ContentObj Is Nothing) Then ContentObj.Dispose()
@@ -126,7 +126,7 @@ Namespace Contensive.Core
                 End If
                 '
                 GC.Collect()
-                appendDebugLog("CPCLASS.Dispose, exit")
+                'appendDebugLog("CPCLASS.Dispose, exit")
             End If
         End Sub
         '
@@ -239,7 +239,7 @@ Namespace Contensive.Core
         Public Sub AddVar(ByVal OptionName As String, ByVal OptionValue As String)
             Try
                 If OptionName <> "" Then
-                    Call appendDebugLog("addVar, calling doc.var to save [" & OptionName & "] as [" & OptionValue & "]")
+                    'Call appendDebugLog("addVar, calling doc.var to save [" & OptionName & "] as [" & OptionValue & "]")
                     Me.Doc.Var(OptionName) = OptionValue
                 End If
             Catch ex As Exception
@@ -508,12 +508,12 @@ Namespace Contensive.Core
         ' Do not change or add Overridable to these methods.
         ' Put cleanup code in Dispose(ByVal disposing As Boolean).
         Public Overloads Sub Dispose() Implements IDisposable.Dispose
-            appendDebugLog("public dispose")
+            'appendDebugLog("public dispose")
             Dispose(True)
             GC.SuppressFinalize(Me)
         End Sub
         Protected Overrides Sub Finalize()
-            appendDebugLog("finalize")
+            'appendDebugLog("finalize")
             Dispose(False)
             MyBase.Finalize()
         End Sub

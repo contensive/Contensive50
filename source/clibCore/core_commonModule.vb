@@ -10,6 +10,16 @@ Imports System.Threading
 
 Namespace Contensive.Core
     '
+    Public Module taskQueueCommandEnumModule
+        Public Const runAddon As String = "runaddon"
+    End Module
+    '
+    Public Class cmdDetailClass
+        Public addonId As String
+        Public addonName As String
+        Public docProperties As Dictionary(Of String, String)
+    End Class
+    '
     '
     '
     '
@@ -25,7 +35,6 @@ Namespace Contensive.Core
         '
         Public isBaseCollection As Boolean                     ' true only for the one collection created from the base file. This property does not transfer during addSrcToDst
         Public CDef As New Dictionary(Of String, metaDataClass.CDefClass)
-        '
         Public SQLIndexCnt As Integer
         Public SQLIndexes() As SQLIndexType
         Public Structure SQLIndexType

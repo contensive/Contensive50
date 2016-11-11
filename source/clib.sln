@@ -18,11 +18,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "httpModule", "httpModule\ht
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "cpBase", "cpBase\cpBase.vbproj", "{E873F18E-47EF-46A9-AEA1-5A8B0F8BEB01}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "clibWorker", "clibWorker\clibWorker.vbproj", "{31EDC921-CD8E-4AE8-B74D-0E1B238192B6}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "legacyWorker", "clibWorker\legacyWorker.vbproj", "{31EDC921-CD8E-4AE8-B74D-0E1B238192B6}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "clibService", "clibService\clibService.vbproj", "{11A00FD7-5DAF-46CA-A8DF-7C8426AC4226}"
-EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "clibServiceDebug", "WindowsApplication1\clibServiceDebug.vbproj", "{D5953420-5051-4133-B6CE-16E3AE9FEDCE}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "monitor", "legacyMonitor\monitor.vbproj", "{45AB15C4-00B1-46D6-9C5B-650A0551CE95}"
 EndProject
@@ -145,21 +143,6 @@ Global
 		{11A00FD7-5DAF-46CA-A8DF-7C8426AC4226}.Release|x64.ActiveCfg = Release|x86
 		{11A00FD7-5DAF-46CA-A8DF-7C8426AC4226}.Release|x86.ActiveCfg = Release|x86
 		{11A00FD7-5DAF-46CA-A8DF-7C8426AC4226}.Release|x86.Build.0 = Release|x86
-		{D5953420-5051-4133-B6CE-16E3AE9FEDCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D5953420-5051-4133-B6CE-16E3AE9FEDCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D5953420-5051-4133-B6CE-16E3AE9FEDCE}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{D5953420-5051-4133-B6CE-16E3AE9FEDCE}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{D5953420-5051-4133-B6CE-16E3AE9FEDCE}.Debug|x64.ActiveCfg = Debug|x64
-		{D5953420-5051-4133-B6CE-16E3AE9FEDCE}.Debug|x64.Build.0 = Debug|x64
-		{D5953420-5051-4133-B6CE-16E3AE9FEDCE}.Debug|x86.ActiveCfg = Debug|x86
-		{D5953420-5051-4133-B6CE-16E3AE9FEDCE}.Debug|x86.Build.0 = Debug|x86
-		{D5953420-5051-4133-B6CE-16E3AE9FEDCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D5953420-5051-4133-B6CE-16E3AE9FEDCE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D5953420-5051-4133-B6CE-16E3AE9FEDCE}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{D5953420-5051-4133-B6CE-16E3AE9FEDCE}.Release|Mixed Platforms.Build.0 = Release|x86
-		{D5953420-5051-4133-B6CE-16E3AE9FEDCE}.Release|x64.ActiveCfg = Release|x86
-		{D5953420-5051-4133-B6CE-16E3AE9FEDCE}.Release|x86.ActiveCfg = Release|x86
-		{D5953420-5051-4133-B6CE-16E3AE9FEDCE}.Release|x86.Build.0 = Release|x86
 		{45AB15C4-00B1-46D6-9C5B-650A0551CE95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{45AB15C4-00B1-46D6-9C5B-650A0551CE95}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{45AB15C4-00B1-46D6-9C5B-650A0551CE95}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
