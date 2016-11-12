@@ -4,8 +4,8 @@
 
 Namespace Contensive.Core
     Public Class ccService2
-        Dim taskScheduler As taskSchedulerClass = Nothing
-        Dim taskRunner As taskRunnerClass = Nothing
+        Dim taskScheduler As taskSchedulerServiceClass = Nothing
+        Dim taskRunner As taskRunnerServiceClass = Nothing
         '
         '====================================================================================================
         ''' <summary>
@@ -23,16 +23,16 @@ Namespace Contensive.Core
                     ' this server is the scheduler
                     '
                     cp.core.appendLog("ccService2.OnStart, start taskScheduler")
-                    taskScheduler = New taskSchedulerClass(cp.core)
-                    Call taskScheduler.StartServer(True, False)
+                    taskScheduler = New taskSchedulerServiceClass(cp.core)
+                    Call taskScheduler.StartService(True, False)
                 End If
                 If (True) Then
                     '
                     ' this server is a runner
                     '
                     cp.core.appendLog("ccService2.OnStart, start taskRunner")
-                    taskRunner = New taskRunnerClass(cp.core)
-                    Call taskRunner.StartServer(True, False)
+                    taskRunner = New taskRunnerServiceClass(cp.core)
+                    Call taskRunner.StartService()
                 End If
                 cp.core.appendLog("ccService2.OnStart exit")
             Catch ex As Exception
@@ -55,7 +55,7 @@ Namespace Contensive.Core
                     ' stop taskscheduler
                     '
                     cp.core.appendLog("ccService2.OnStop, stop taskScheduler")
-                    Call taskScheduler.stopServer()
+                    Call taskScheduler.stopService()
                     Call taskScheduler.Dispose()
                 End If
                 If (Not taskRunner Is Nothing) Then
@@ -63,7 +63,7 @@ Namespace Contensive.Core
                     ' stop taskrunner
                     '
                     cp.core.appendLog("ccService2.OnStop, stop taskRunner")
-                    Call taskRunner.stopServer()
+                    Call taskRunner.stopService()
                     Call taskRunner.Dispose()
                 End If
                 cp.core.appendLog("ccService2.OnStop exit")

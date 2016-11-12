@@ -10638,13 +10638,14 @@ ErrorTrap:
         ''' <param name="Source"></param>
         ''' <returns></returns>
         Public Function jsonDeserialize(Source As String) As Object
+            Dim returnObj As Object = Nothing
             Try
                 Dim json As New System.Web.Script.Serialization.JavaScriptSerializer
-                Return json.Deserialize(Of Object)(Source)
+                returnObj = json.Deserialize(Of Object)(Source)
             Catch ex As Exception
                 handleException(ex)
-                Return Nothing
             End Try
+            Return returnObj
         End Function
         '
         '=======================================================================================================
@@ -41141,6 +41142,51 @@ ErrorTrap:
         '
         '=============================================================================================================
         '
+        '====================================================================================================
+        ''' <summary>
+        ''' execute addon
+        ''' </summary>
+        ''' <param name="addonId">The Id of the addon to execute.</param>
+        ''' <param name="properties">properties are nameValue pairs consumable by the addon during execution. These properties are added to docProperties and made available. Originally this argument was for the nameValues modified in the page instance where the addon was placed.</param>
+        ''' <param name="context">member of addonContextEnum</param>
+        ''' <returns></returns>
+        Friend Function executeAddon(ByVal addonId As Integer, properties As Dictionary(Of String, String), context As addonContextEnum) As Object
+            Dim optionString As String = ""
+            Dim return_StatusOk As Boolean
+            For Each kvp As KeyValuePair(Of String, String) In properties
+                If Not String.IsNullOrEmpty(kvp.Key) Then
+                    optionString &= "&" & EncodeRequestVariable(kvp.Key) & "=" & EncodeRequestVariable(kvp.Value)
+                End If
+            Next
+            If Not String.IsNullOrEmpty(optionString) Then
+                optionString = optionString.Substring(1)
+            End If
+            Return executeAddon(addonId, "", optionString, context, "", 0, "", "", False, 0, "", return_StatusOk, Nothing, "", Nothing, "", 0, False)
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="addonId"></param>
+        ''' <param name="AddonNameOrGuid"></param>
+        ''' <param name="OptionString"></param>
+        ''' <param name="Context"></param>
+        ''' <param name="HostContentName"></param>
+        ''' <param name="HostRecordID"></param>
+        ''' <param name="HostFieldName"></param>
+        ''' <param name="ACInstanceID"></param>
+        ''' <param name="IsIncludeAddon"></param>
+        ''' <param name="DefaultWrapperID"></param>
+        ''' <param name="ignore_TemplateCaseOnly_PageContent"></param>
+        ''' <param name="return_StatusOK"></param>
+        ''' <param name="nothingObject"></param>
+        ''' <param name="ignore_addonCallingItselfIdList"></param>
+        ''' <param name="nothingObject2"></param>
+        ''' <param name="ignore_AddonsRunOnThisPageIdList"></param>
+        ''' <param name="personalizationPeopleId"></param>
+        ''' <param name="personalizationIsAuthenticated"></param>
+        ''' <returns></returns>
         Friend Function executeAddon(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal OptionString As String, ByVal Context As addonContextEnum, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal IsIncludeAddon As Boolean, ByVal DefaultWrapperID As Integer, ByVal ignore_TemplateCaseOnly_PageContent As String, ByRef return_StatusOK As Boolean, ByVal nothingObject As Object, ByVal ignore_addonCallingItselfIdList As String, ByVal nothingObject2 As Object, ByVal ignore_AddonsRunOnThisPageIdList As String, ByVal personalizationPeopleId As Integer, ByVal personalizationIsAuthenticated As Boolean) As String
             Dim returnVal As String = ""
             Try
@@ -43786,7 +43832,7 @@ ErrorTrap:
             Dim ReplaceValues() As String
             Dim SQLName As String
             Dim addonPtr As Integer
-            Dim taskScheduler As New taskSchedulerClass(Me)
+            Dim taskScheduler As New taskSchedulerServiceClass(Me)
             '
             'hint = "csv_executeAddonAsProcess, enter"
             '

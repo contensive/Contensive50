@@ -193,8 +193,8 @@
     <Compile Include="core_htmlToolsClass.vb" />
     <Compile Include="core_legacyStructuredDataClass.vb" />
     <Compile Include="core_propertyCacheClass.vb" />
-    <Compile Include="core_taskRunnerClass.vb" />
-    <Compile Include="core_taskSchedulerClass.vb" />
+    <Compile Include="core_taskRunnerServiceClass.vb" />
+    <Compile Include="core_taskSchedulerServiceClass.vb" />
     <Compile Include="CPAddonClass.vb" />
     <Compile Include="CPBlockClass.vb" />
     <Compile Include="CPCacheClass.vb" />

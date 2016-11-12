@@ -37,6 +37,8 @@ Namespace Contensive.Core
     ''' </summary>
     Public Class serverConfigClass
         Public clusterPath As String
+        Public allowTaskRunnerService As Boolean
+        Public allowTaskSchedulerService As Boolean
     End Class
 
     '
@@ -160,6 +162,8 @@ Namespace Contensive.Core
                     If Not (System.IO.Directory.Exists(serverConfig.clusterPath)) Then
                         System.IO.Directory.CreateDirectory(serverConfig.clusterPath)
                     End If
+                    serverConfig.allowTaskRunnerService = False
+                    serverConfig.allowTaskSchedulerService = False
                     programDataFiles.SaveFile("serverConfig.json", json_serializer.Serialize(serverConfig))
                 Else
                     serverConfig = json_serializer.Deserialize(Of serverConfigClass)(JSONTemp)

@@ -13,7 +13,9 @@ namespace Contensive.Core
             CPClass cp;
             CPClass cpCluster;
             fileSystemClass installFiles;
+            fileSystemClass programDataFiles;
             string appName;
+            string JSONTemp;
             //
             // create cp for cluster work, with no application
             //
@@ -95,15 +97,81 @@ namespace Contensive.Core
                             break;
                         case "-taskscheduler":
                             cpCluster = new CPClass("");
-                            //
-                            // this server is the scheduler
-                            //
-                            Console.WriteLine("Beginning command line taskScheduler. Hit any key to exit");
-                            taskSchedulerClass taskScheduler = new taskSchedulerClass(cpCluster.core);
-                            taskScheduler.StartServer(true, false);
-                            object  keyStroke = Console.ReadKey();
-                            taskScheduler.stopServer();
-                            exitCmd = true;
+                            programDataFiles = new fileSystemClass(cpCluster.core, cpCluster.core.cluster.config, fileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib");
+                            JSONTemp = programDataFiles.ReadFile("serverConfig.json");
+                            if (string.IsNullOrEmpty(JSONTemp))
+                            {
+                                Console.WriteLine("The serverConfig.json file was no found in c:\\programData\\clib. Please run -n to initialize the server.");
+                            }
+                            else
+                            {
+                                System.Web.Script.Serialization.JavaScriptSerializer json_serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+                                serverConfigClass serverConfig = json_serializer.Deserialize<serverConfigClass>(JSONTemp);
+                                if (i != (args.Length + 1))
+                                {
+                                    i++;
+                                    if (args[i].ToLower() == "run")
+                                    {
+                                        //
+                                        // run the taskscheduler in the console
+                                        //
+                                        Console.WriteLine("Beginning command line taskScheduler. Hit any key to exit");
+                                        taskSchedulerServiceClass taskScheduler = new taskSchedulerServiceClass(cpCluster.core);
+                                        taskScheduler.StartService(true, false);
+                                        object keyStroke = Console.ReadKey();
+                                        taskScheduler.stopService();
+                                        exitCmd = true;
+                                    }
+                                    else
+                                    {
+                                        //
+                                        // turn the windows service scheduler on/off
+                                        //
+                                        serverConfig.allowTaskSchedulerService = cpCluster.Utils.EncodeBoolean(args[i]);
+                                        Console.WriteLine("allowtaskscheduler set " + serverConfig.allowTaskSchedulerService.ToString());
+                                        programDataFiles.SaveFile("serverConfig.json", json_serializer.Serialize(serverConfig));
+                                    }
+                                }
+                            }
+                            break;
+                        case "-taskrunner":
+                            cpCluster = new CPClass("");
+                            programDataFiles = new fileSystemClass(cpCluster.core, cpCluster.core.cluster.config, fileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib");
+                            JSONTemp = programDataFiles.ReadFile("serverConfig.json");
+                            if (string.IsNullOrEmpty(JSONTemp))
+                            {
+                                Console.WriteLine("The serverConfig.json file was no found in c:\\programData\\clib. Please run -n to initialize the server.");
+                            }
+                            else
+                            {
+                                System.Web.Script.Serialization.JavaScriptSerializer json_serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+                                serverConfigClass serverConfig = json_serializer.Deserialize<serverConfigClass>(JSONTemp);
+                                if (i != (args.Length + 1))
+                                {
+                                    i++;
+                                    if (args[i].ToLower() == "run")
+                                    {
+                                        //
+                                        // run the taskrunner in the console
+                                        //
+                                        Console.WriteLine("Beginning command line taskRunner. Hit any key to exit");
+                                        taskRunnerServiceClass taskRunner = new taskRunnerServiceClass(cpCluster.core);
+                                        taskRunner.StartService();
+                                        object keyStroke = Console.ReadKey();
+                                        taskRunner.stopService();
+                                        exitCmd = true;
+                                    }
+                                    else
+                                    {
+                                        //
+                                        // turn the windows service scheduler on/off
+                                        //
+                                        serverConfig.allowTaskRunnerService = cpCluster.Utils.EncodeBoolean(args[i]);
+                                        Console.WriteLine("allowtaskrunner set " + serverConfig.allowTaskRunnerService.ToString());
+                                        programDataFiles.SaveFile("serverConfig.json", json_serializer.Serialize(serverConfig));
+                                    }
+                                }
+                            }
                             break;
                         default:
                             Console.Write(helpText);
