@@ -28,7 +28,8 @@ Namespace Contensive
         ' ----- Log File
         '
         Private Const LogMsg = "For more information, see the Contensive Trace Log."
-        Private verboseLogging As Boolean = False
+        Public allowVerboseLogging As Boolean = True
+        Public allowConsoleWrite As Boolean = False
         '
         ' ----- Task Timer
         '
@@ -57,7 +58,6 @@ Namespace Contensive
         ''' <remarks></remarks>
         Public Sub New(cpCore As cpCoreClass)
             Me.cpCore = cpCore
-            verboseLogging = False
             runnerGuid = Guid.NewGuid().ToString
         End Sub
         '
@@ -89,6 +89,9 @@ Namespace Contensive
         ''' </summary>
         Public Sub stopService()
             Try
+                '
+                appendLog("taskRunnerService.stopService")
+                '
                 processTimer.Enabled = False
             Catch ex As Exception
                 cpCore.handleException(ex)
@@ -105,6 +108,9 @@ Namespace Contensive
         Public Function StartService() As Boolean
             Dim returnStartedOk As Boolean = True
             Try
+                '
+                appendLog("taskRunnerService.StartService")
+                '
                 processTimer = New System.Timers.Timer(ProcessTimerMsecPerTick)
                 AddHandler processTimer.Elapsed, AddressOf processTimerTick
                 processTimer.Interval = ProcessTimerMsecPerTick
@@ -121,7 +127,14 @@ Namespace Contensive
         ''' </summary>
         Private Sub processTimerTick()
             Try
-                If (Not ProcessTimerInProcess) Then
+                '
+                appendLog("taskRunnerService.processTimerTick")
+                '
+                If (ProcessTimerInProcess) Then
+                    '
+                    appendLog("taskRunnerService.processTimerTick, processTimerInProcess true, skip")
+                    '
+                Else
                     ProcessTimerInProcess = True
                     '
                     ' run tasks in task
@@ -130,7 +143,11 @@ Namespace Contensive
                     Dim JSONTemp = programDataFiles.ReadFile("serverConfig.json")
                     Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer()
                     Dim serverConfig As serverConfigClass = json_serializer.Deserialize(Of serverConfigClass)(JSONTemp)
-                    If (serverConfig.allowTaskRunnerService) Then
+                    If (Not serverConfig.allowTaskRunnerService) Then
+                        '
+                        appendLog("taskRunnerService.processTimerTick, allowTaskRunnerService false, skip")
+                        '
+                    Else
                         Call runTasks()
                     End If
                     ProcessTimerInProcess = False
@@ -159,10 +176,12 @@ Namespace Contensive
                 Dim AppName As String
                 Dim cpSite As CPClass
                 '
-                Console.WriteLine("taskRunner.scheduleTasks")
+                appendLog("taskRunnerService.runTasks")
                 '
                 For Each kvp As KeyValuePair(Of String, appConfigClass) In cpCore.cluster.config.apps
                     AppName = kvp.Value.name
+                    '
+                    appendLog("taskRunnerService.runTasks, appname=[" & AppName & "]")
                     '
                     ' query tasks that need to be run
                     '
@@ -194,6 +213,9 @@ Namespace Contensive
                                     command = cpSite.core.app.db_GetCSText(CS, "command")
                                     cmdDetailText = cpSite.core.app.db_GetCSText(CS, "cmdDetail")
                                     cmdDetail = json.Deserialize(Of cmdDetailClass)(cmdDetailText)
+                                    '
+                                    appendLog("taskRunnerService.runTasks, command=[" & command & "], cmdDetailText=[" & cmdDetailText & "]")
+                                    '
                                     Select Case command.ToLower()
                                         Case taskQueueCommandEnumModule.runAddon
                                             Call cpSite.core.executeAddon(cmdDetail.addonId, cmdDetail.docProperties, cpCoreClass.addonContextEnum.ContextSimple)
@@ -230,7 +252,7 @@ Namespace Contensive
                 Dim cmdDetailJson As String = cpCore.jsonSerialize(cmdDetail)
                 Dim cs As Integer
                 '
-                Console.WriteLine("taskScheduler.addTaskToQueue, application=[" & cpCore.app.config.name & "], command=[" & Command & "], cmdDetail=[" & cmdDetailJson & "]")
+                appendLog("taskScheduler.addTaskToQueue, application=[" & cpCore.app.config.name & "], command=[" & Command & "], cmdDetail=[" & cmdDetailJson & "]")
                 '
                 returnTaskAdded = True
                 LcaseCommand = LCase(Command)
@@ -300,8 +322,13 @@ Namespace Contensive
             Return returnList
         End Function
         '
-        Private Sub appendTraceLog(ByVal method As String, ByVal logText As String)
-            cpCore.appendLog(logText, "", "trace")
+        Private Sub appendLog(ByVal logText As String, Optional isImportant As Boolean = False)
+            If (isImportant Or allowVerboseLogging) Then
+                cpCore.appendLog(logText, "", "trace")
+            End If
+            If (allowConsoleWrite) Then
+                Console.WriteLine(logText)
+            End If
         End Sub
 #Region " IDisposable Support "
         ' Do not change or add Overridable to these methods.

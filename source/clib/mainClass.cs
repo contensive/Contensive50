@@ -117,6 +117,8 @@ namespace Contensive.Core
                                         //
                                         Console.WriteLine("Beginning command line taskScheduler. Hit any key to exit");
                                         taskSchedulerServiceClass taskScheduler = new taskSchedulerServiceClass(cpCluster.core);
+                                        taskScheduler.allowVerboseLogging = true;
+                                        taskScheduler.allowConsoleWrite = true;
                                         taskScheduler.StartService(true, false);
                                         object keyStroke = Console.ReadKey();
                                         taskScheduler.stopService();
@@ -156,6 +158,8 @@ namespace Contensive.Core
                                         //
                                         Console.WriteLine("Beginning command line taskRunner. Hit any key to exit");
                                         taskRunnerServiceClass taskRunner = new taskRunnerServiceClass(cpCluster.core);
+                                        taskRunner.allowVerboseLogging = true;
+                                        taskRunner.allowConsoleWrite = true;
                                         taskRunner.StartService();
                                         object keyStroke = Console.ReadKey();
                                         taskRunner.stopService();

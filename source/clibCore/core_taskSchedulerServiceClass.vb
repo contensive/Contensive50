@@ -16,7 +16,8 @@ Namespace Contensive
         ' ----- Log File
         '
         Private Const LogMsg = "For more information, see the Contensive Trace Log."
-        Private verboseLogging As Boolean = False
+        Public allowVerboseLogging As Boolean = True
+        Public allowConsoleWrite As Boolean = False
         '
         ' ----- Task Timer
         '
@@ -25,11 +26,6 @@ Namespace Contensive
         Const ProcessTimerMsecPerTick = 5000            ' Check processs every 5 seconds
         Private ProcessTimerInProcess As Boolean        '
         Private ProcessTimerProcessCount As Integer        '
-        '
-        ' ----- Alarms within Process Timer
-        '
-        Private SiteProcessAlarmTime As Date            ' Run Site Processes every 30 seconds
-        Const SiteProcessIntervalSeconds = 30           '
         '
         ' ----- Debugging
         '
@@ -45,7 +41,6 @@ Namespace Contensive
         ''' <remarks></remarks>
         Public Sub New(cpCore As cpCoreClass)
             Me.cpCore = cpCore
-            verboseLogging = False
         End Sub
         '
         '========================================================================================================
@@ -76,6 +71,7 @@ Namespace Contensive
         ''' </summary>
         Public Sub stopService()
             Try
+                appendLog("taskScheduleServiceClass.stopService")
                 processTimer.Enabled = False
             Catch ex As Exception
                 cpCore.handleException(ex)
@@ -92,13 +88,10 @@ Namespace Contensive
         Public Function StartService(ByVal setVerbose As Boolean, ByVal singleThreaded As Boolean) As Boolean
             Dim returnStartedOk As Boolean = False
             Try
-                '
-                Dim StatusMessage As String
-                '
-                returnStartedOk = False
+                appendLog("taskScheduleServiceClass.startService")
                 '
                 If StartServiceInProgress Then
-                    StatusMessage = "Attempting a service start retry, but it is still starting"
+                    appendLog("taskScheduleServiceClass.startService, startServiceInProgress true, skip.")
                 Else
                     StartServiceInProgress = True
                     processTimer = New System.Timers.Timer(5000)
@@ -120,33 +113,23 @@ Namespace Contensive
         ''' </summary>
         Private Sub processTimerTick()
             Try
-                Dim rightNow As Date = Now
+                appendLog("taskScheduleServiceClass.processTimerTick")
                 '
-                If (Not ProcessTimerInProcess) Then
-                    '
-                    ' If not debug and not inprocess, run processes
-                    '
+                If (ProcessTimerInProcess) Then
+                    appendLog("taskScheduleServiceClass.processTimerTick, skipped because timerInProcess")
+                Else
                     ProcessTimerInProcess = True
-                    If SiteProcessAlarmTime = Date.MinValue Then
-                        '
-                        ' start process timer 1 minute after service starts
-                        '
-                        SiteProcessAlarmTime = rightNow.AddMinutes(1)
-                    ElseIf rightNow > SiteProcessAlarmTime Then
-                        '
-                        ' schedule tasks
-                        '
-                        Dim programDataFiles As New fileSystemClass(cpCore, cpCore.cluster.config, fileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib")
-                        Dim JSONTemp = programDataFiles.ReadFile("serverConfig.json")
-                        Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer()
-                        Dim serverConfig As serverConfigClass = json_serializer.Deserialize(Of serverConfigClass)(JSONTemp)
-                        If (serverConfig.allowTaskSchedulerService) Then
-                            Call scheduleTasks()
-                            SiteProcessAlarmTime = SiteProcessAlarmTime.AddMinutes(1)
-                            If rightNow > SiteProcessAlarmTime Then
-                                SiteProcessAlarmTime = rightNow.AddMinutes(1)
-                            End If
-                        End If
+                    '
+                    ' schedule tasks
+                    '
+                    Dim programDataFiles As New fileSystemClass(cpCore, cpCore.cluster.config, fileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib")
+                    Dim JSONTemp = programDataFiles.ReadFile("serverConfig.json")
+                    Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer()
+                    Dim serverConfig As serverConfigClass = json_serializer.Deserialize(Of serverConfigClass)(JSONTemp)
+                    If (Not serverConfig.allowTaskSchedulerService) Then
+                        appendLog("taskScheduleServiceClass.processTimerTick, skipped because serviceConfig.allowTaskSchedulerService false.")
+                    Else
+                        Call scheduleTasks()
                     End If
                     ProcessTimerInProcess = False
                 End If
@@ -179,7 +162,7 @@ Namespace Contensive
                 Dim AppName As String
                 Dim cpSite As CPClass
                 '
-                Console.WriteLine("taskScheduler.scheduleTasks")
+                appendLog("taskScheduler.scheduleTasks")
                 '
                 RightNow = Now
                 SQLNow = EncodeSQLDate(RightNow)
@@ -284,7 +267,7 @@ Namespace Contensive
                 Dim cmdDetailJson As String = cpCore.jsonSerialize(cmdDetail)
                 Dim cs As Integer
                 '
-                Console.WriteLine("taskScheduler.addTaskToQueue, application=[" & cpCore.app.config.name & "], command=[" & Command & "], cmdDetail=[" & cmdDetailJson & "]")
+                appendLog("taskScheduler.addTaskToQueue, application=[" & cpCore.app.config.name & "], command=[" & Command & "], cmdDetail=[" & cmdDetailJson & "]")
                 '
                 returnTaskAdded = True
                 LcaseCommand = LCase(Command)
@@ -354,8 +337,13 @@ Namespace Contensive
             Return returnList
         End Function
         '
-        Private Sub appendTraceLog(ByVal method As String, ByVal logText As String)
-            cpCore.appendLog(logText, "", "trace")
+        Private Sub appendLog(ByVal logText As String, Optional isImportant As Boolean = False)
+            If (isImportant Or allowVerboseLogging) Then
+                cpCore.appendLog(logText, "", "trace")
+            End If
+            If (allowConsoleWrite) Then
+                Console.WriteLine(logText)
+            End If
         End Sub
 #Region " IDisposable Support "
         ' Do not change or add Overridable to these methods.
