@@ -1491,7 +1491,7 @@ Namespace Contensive.Core
         '       returns responseOpen
         '==================================================================================
         '
-        Friend Function initApp() As Boolean
+        Friend Function webRoleInit() As Boolean
             Try
                 '
                 Dim forwardDomain As String
@@ -1565,11 +1565,6 @@ Namespace Contensive.Core
                 Else
                     '
                     ' continue
-                    '
-                    visitPropertyCache = New propertyCacheClass(Me, PropertyTypeVisit)
-                    visitorPropertyCache = New propertyCacheClass(Me, PropertyTypeVisitor)
-                    userPropertyCache = New propertyCacheClass(Me, PropertyTypeMember)
-                    cache_addonStyleRules = New keyPtrCacheClass(app, cacheNameAddonStyleRules, sqlAddonStyles)
                     '
                     main_InitCounter += 1
                     '
@@ -2544,7 +2539,7 @@ Namespace Contensive.Core
                     'Call AppendLog("main_init(), 2400")
                     '
                     ''hint = "Initializing Visit"
-                    Call initApp_visit(main_AllowVisitTracking)
+                    Call webRoleInit_initVisit(main_AllowVisitTracking)
                     '
                     '--------------------------------------------------------------------------
                     ' ----- Process Early redirects, like PageNotFound
@@ -18892,7 +18887,7 @@ ErrorTrap:
         '   main_AllowVisitTracking - if true a cookie will be written and the visit tracked
         '========================================================================
         '
-        Private Sub initApp_visit(ByVal main_AllowVisitTracking As Boolean)
+        Private Sub webRoleInit_initVisit(ByVal main_AllowVisitTracking As Boolean)
             Try
                 Dim NeedToWriteVisitCookie As Boolean
                 Dim TrackGuests As Boolean
@@ -21078,7 +21073,7 @@ ErrorTrap:
                     main_VisitStartTime = main_PageStartTime
                 End If
                 If Not EncodeBoolean(app.siteProperty_getBoolean("allowVisitTracking", True)) Then
-                    Call initApp_visit(True)
+                    Call webRoleInit_initVisit(True)
                 End If
                 '
                 ' Change autologin if included, selected, and allowed
@@ -21178,7 +21173,7 @@ ErrorTrap:
                     '
                     ' Visit was blocked during init, init the visit now
                     '
-                    Call initApp_visit(True)
+                    Call webRoleInit_initVisit(True)
                 End If
                 '
                 ' ----- Member was recognized
@@ -36876,7 +36871,10 @@ ErrorTrap:
                     '
                     'hint = hint & ",150"
                     Call cache_pageTemplate_clear()
-                    Call cache_addonStyleRules.clear()
+                    If Not IsNothing(cache_addonStyleRules) Then
+                        Call cache_addonStyleRules.clear()
+                    End If
+
                 Case "ccsections"
                     '
                     ' Attempt to update
@@ -36911,14 +36909,20 @@ ErrorTrap:
                     '
                     'hint = hint & ",170"
                     Call cache_addon_clear()
-                    Call cache_addonStyleRules.clear()
+                    If Not IsNothing(cache_addonStyleRules) Then
+                        Call cache_addonStyleRules.clear()
+                    End If
+
                     Call cache_addonIncludeRules_clear()
                 Case "ccsharedstylesaddonrules"
                     '
                     ' Update wysiwyg addon menus
                     '
                     'hint = hint & ",175"
-                    Call cache_addonStyleRules.clear()
+                    If Not IsNothing(cache_addonStyleRules) Then
+                        Call cache_addonStyleRules.clear()
+                    End If
+
                     Call cache_addon_clear()
                 Case "cclibraryfiles"
                     '
@@ -50604,27 +50608,44 @@ ErrorTrap:
         ''' <param name="cp"></param>
         ''' <remarks></remarks>
         Private Sub constructorCommonInitialize()
-            '
-            ' refactor - I think the app should be initialized right here, as soon as the appname and permissions are set
-            '   and appName should be set only through the new app( appName )
-            '
-            ' appName = My.MySettings.ConfigurationManager.AppSettings("appName")
-            docHandle = main_GetRandomLong_Internal()
-            'main_TrapLogFilename = "TrapLogs\" & Format(docHandle, "0000000000") & ".txt"
-            main_PageStartTickCount = GetTickCount
-            main_InitCounter = 0
-            main_ClosePageCounter = 0
-            allowDebugLog = True
-            main_PageStartTime = Now()
-            main_SqlPageStartTime = EncodeSQLDate(main_PageStartTime)
-            main_PageTestPointPrinting = True
-            main_AllowCookielessDetection = True
-            main_LoginIconFilename = ""
-            CPTickCountBase = GetTickCount
-            main_IconFileDefault = "/ccLib/images/IconDoc.gif"
-            main_IconFolderClosed = "/ccLib/images/main_IconFolderClosed.gif"
-            main_IconFolderOpen = "/ccLib/images/main_IconFolderOpen.gif"
-            main_IconFolderUp = "/ccLib/images/main_IconFolderOpen.gif"
+            Try
+                '
+                ' refactor - I think the app should be initialized right here, as soon as the appname and permissions are set
+                '   and appName should be set only through the new app( appName )
+                '
+                ' appName = My.MySettings.ConfigurationManager.AppSettings("appName")
+                docHandle = main_GetRandomLong_Internal()
+                'main_TrapLogFilename = "TrapLogs\" & Format(docHandle, "0000000000") & ".txt"
+                main_PageStartTickCount = GetTickCount
+                main_InitCounter = 0
+                main_ClosePageCounter = 0
+                allowDebugLog = True
+                main_PageStartTime = Now()
+                main_SqlPageStartTime = EncodeSQLDate(main_PageStartTime)
+                main_PageTestPointPrinting = True
+                main_AllowCookielessDetection = True
+                main_LoginIconFilename = ""
+                CPTickCountBase = GetTickCount
+                main_IconFileDefault = "/ccLib/images/IconDoc.gif"
+                main_IconFolderClosed = "/ccLib/images/main_IconFolderClosed.gif"
+                main_IconFolderOpen = "/ccLib/images/main_IconFolderOpen.gif"
+                main_IconFolderUp = "/ccLib/images/main_IconFolderOpen.gif"
+                '
+                ' initialize properties only used for applications (not cluster mode cp)
+                '
+                visitPropertyCache = New propertyCacheClass(Me, PropertyTypeVisit)
+                visitorPropertyCache = New propertyCacheClass(Me, PropertyTypeVisitor)
+                userPropertyCache = New propertyCacheClass(Me, PropertyTypeMember)
+                '
+                If (Not String.IsNullOrEmpty(applicationName)) Then
+                    '
+                    ' REFACTOR - cluster mode is not associated to an application, so no cache/sql, but the keyPtrCacheClass runs sql and uses cache, but this must be used in cluster mode
+                    '
+                    cache_addonStyleRules = New keyPtrCacheClass(app, cacheNameAddonStyleRules, sqlAddonStyles)
+                End If
+            Catch ex As Exception
+                handleException(ex)
+            End Try
         End Sub
         '
         '====================================================================================================
@@ -50929,7 +50950,7 @@ ErrorTrap:
             ' cp.initAppExecuteRoute calls cpCore.initApp, then cpCore.executeRoute, which calles wither cpCore.executePageManager or cpCore.executeAdmin
             ' convoluted because initApp has legacy code that executes some routes.
             '
-            Call initApp()
+            Call webRoleInit()
         End Sub
         '
         '=============================================================================================================
@@ -51151,7 +51172,7 @@ ErrorTrap:
                         iLogFolder = LogFolder
                         DayNumber = Day(Now)
                         MonthNumber = Month(Now)
-                        FilenameNoExt = getDateString(main_PageStartTime)
+                        FilenameNoExt = getDateString(Now)
                         If iLogFolder <> "" Then
                             iLogFolder = iLogFolder & "\"
                         End If
@@ -51182,8 +51203,18 @@ ErrorTrap:
                                 Try
                                     Dim absFile As String = LCase(cluster.clusterFiles.rootLocalFolderPath & PathFilenameNoExt & FileSuffix & ".log")
                                     Dim absContent As String = LogFileCopyPrep(FormatDateTime(Now(), vbGeneralDate)) & vbTab & threadName & vbTab & LogLine & vbCrLf
-                                    '
-                                    System.IO.File.AppendAllText(absFile, absContent)
+
+                                    If Not IO.File.Exists(absFile) Then
+                                        ' Create a file to write to.
+                                        Using sw As IO.StreamWriter = IO.File.CreateText(absFile)
+                                            sw.Write(absContent)
+                                        End Using
+                                    Else
+                                        Using sw As IO.StreamWriter = IO.File.AppendText(absFile)
+                                            sw.Write(absContent)
+                                        End Using
+                                    End If
+                                    'System.IO.File.AppendAllText(absFile, absContent)
                                     'Call cpCore.cluster.files.appendFile(absFile, absContent)
                                     'My.Computer.FileSystem.WriteAllText(LCase(PathFilenameNoExt & FileSuffix & ".log"), LogFileCopyPrep(FormatDateTime(Now(), vbGeneralDate)) & vbTab & threadName & vbTab & LogLine & vbCrLf, True)
                                 Catch ex As IO.IOException

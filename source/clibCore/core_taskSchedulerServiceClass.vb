@@ -23,7 +23,7 @@ Namespace Contensive
         '
         Private processTimer As System.Timers.Timer
         Private ProcessTimerTickCnt As Integer
-        Const ProcessTimerMsecPerTick = 5000            ' Check processs every 5 seconds
+        Const ProcessTimerMsecPerTick = 5100            ' Check processs every 5 seconds
         Private ProcessTimerInProcess As Boolean        '
         Private ProcessTimerProcessCount As Integer        '
         '

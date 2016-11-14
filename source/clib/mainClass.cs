@@ -177,6 +177,61 @@ namespace Contensive.Core
                                 }
                             }
                             break;
+                        case "-tasks":
+                            //
+                            // turn on, off or run both services together
+                            //
+                            cpCluster = new CPClass("");
+                            programDataFiles = new fileSystemClass(cpCluster.core, cpCluster.core.cluster.config, fileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib");
+                            JSONTemp = programDataFiles.ReadFile("serverConfig.json");
+                            if (string.IsNullOrEmpty(JSONTemp))
+                            {
+                                Console.WriteLine("The serverConfig.json file was no found in c:\\programData\\clib. Please run -n to initialize the server.");
+                            }
+                            else
+                            {
+                                System.Web.Script.Serialization.JavaScriptSerializer json_serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+                                serverConfigClass serverConfig = json_serializer.Deserialize<serverConfigClass>(JSONTemp);
+                                if (i != (args.Length + 1))
+                                {
+                                    i++;
+                                    if (args[i].ToLower() == "run")
+                                    {
+                                        //
+                                        // run the tasks in the console
+                                        //
+                                        Console.WriteLine("Beginning command line taskScheduler and taskRunner. Hit any key to exit");
+                                        //
+                                        taskSchedulerServiceClass taskScheduler = new taskSchedulerServiceClass(cpCluster.core);
+                                        taskScheduler.allowVerboseLogging = true;
+                                        taskScheduler.allowConsoleWrite = true;
+                                        taskScheduler.StartService(true, false);
+                                        //
+                                        taskRunnerServiceClass taskRunner = new taskRunnerServiceClass(cpCluster.core);
+                                        taskRunner.allowVerboseLogging = true;
+                                        taskRunner.allowConsoleWrite = true;
+                                        taskRunner.StartService();
+                                        //
+                                        object keyStroke = Console.ReadKey();
+                                        taskRunner.stopService();
+                                        exitCmd = true;
+                                    }
+                                    else
+                                    {
+                                        //
+                                        // turn the windows service scheduler on/off
+                                        //
+                                        serverConfig.allowTaskSchedulerService = cpCluster.Utils.EncodeBoolean(args[i]);
+                                        Console.WriteLine("allowTaskScheduler set " + serverConfig.allowTaskSchedulerService.ToString());
+                                        //
+                                        serverConfig.allowTaskRunnerService = cpCluster.Utils.EncodeBoolean(args[i]);
+                                        Console.WriteLine("allowTaskRunner set " + serverConfig.allowTaskRunnerService.ToString());
+                                        //
+                                        programDataFiles.SaveFile("serverConfig.json", json_serializer.Serialize(serverConfig));
+                                    }
+                                }
+                            }
+                            break;
                         default:
                             Console.Write(helpText);
                             exitCmd = true;

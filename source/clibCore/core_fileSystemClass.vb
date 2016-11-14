@@ -210,6 +210,7 @@ Namespace Contensive.Core
         Public Sub appendFile(ByVal PathFilename As String, ByVal FileContent As String)
             Try
                 Dim FileFolder As String
+                Dim absFile As String = rootLocalFolderPath & PathFilename
                 '
                 If (PathFilename = "") Then
                     Throw New ArgumentException("appendFile called with blank pathname.")
@@ -218,7 +219,16 @@ Namespace Contensive.Core
                     If Not checkPath(FileFolder) Then
                         Call createPath(FileFolder)
                     End If
-                    File.AppendAllText(rootLocalFolderPath & PathFilename, FileContent)
+                    If Not IO.File.Exists(absFile) Then
+                        Using sw As IO.StreamWriter = IO.File.CreateText(absFile)
+                            sw.Write(FileContent)
+                        End Using
+                    Else
+                        Using sw As IO.StreamWriter = IO.File.AppendText(absFile)
+                            sw.Write(FileContent)
+                        End Using
+                    End If
+                    'File.AppendAllText(rootLocalFolderPath & PathFilename, FileContent)
                 End If
                 'If Not clusterConfig.isLocal Then
                 '    ' s3 transfer
