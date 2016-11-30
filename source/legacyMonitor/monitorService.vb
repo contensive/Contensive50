@@ -14,7 +14,7 @@ Namespace Contensive.Monitor
             '
             ' store auth token in a config file
             '
-            cp = New CPClass("cluster-mode-not-implemented-yet")
+            cp = New CPClass()
             serverStatus = New statusServerClass(cp.core)
             Call serverStatus.startListening()
             siteCheck = New siteCheckClass(cp.core)

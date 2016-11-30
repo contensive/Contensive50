@@ -13,7 +13,7 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="args"></param>
         Protected Overrides Sub OnStart(ByVal args() As String)
-            Dim cp As New CPClass("cluster-mode-not-implemented-yet")
+            Dim cp As New CPClass()
             Try
                 '
                 cp.core.appendLog("ccService2.OnStart enter")
@@ -23,7 +23,7 @@ Namespace Contensive.Core
                     ' this server is the scheduler
                     '
                     cp.core.appendLog("ccService2.OnStart, start taskScheduler")
-                    taskScheduler = New taskSchedulerServiceClass(cp.core)
+                    taskScheduler = New taskSchedulerServiceClass()
                     Call taskScheduler.StartService(True, False)
                 End If
                 If (True) Then
@@ -31,7 +31,7 @@ Namespace Contensive.Core
                     ' this server is a runner
                     '
                     cp.core.appendLog("ccService2.OnStart, start taskRunner")
-                    taskRunner = New taskRunnerServiceClass(cp.core)
+                    taskRunner = New taskRunnerServiceClass()
                     Call taskRunner.StartService()
                 End If
                 cp.core.appendLog("ccService2.OnStart exit")
@@ -45,7 +45,7 @@ Namespace Contensive.Core
         ''' stop the taskrunner and or taskScheduler
         ''' </summary>
         Protected Overrides Sub OnStop()
-            Dim cp As New CPClass("cluster-mode-not-implemented-yet")
+            Dim cp As New CPClass()
             Try
                 '
                 cp.core.appendLog("ccService2.OnStop enter")

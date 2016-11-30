@@ -13831,6 +13831,7 @@ ErrorTrap:
                                                 findWord.Name = LineSplit(0)
                                                 findWord.Value = LineSplit(1)
                                                 findWord.MatchOption = DirectCast(EncodeInteger(LineSplit(2)), FindWordMatchEnum)
+                                                .FindWords.Add(findWord.Name, findWord)
                                             End If
                                             Ptr = Ptr + 1
                                         Loop
@@ -14057,9 +14058,9 @@ ErrorTrap:
                                 ColumnCnt = cpCore.main_GetStreamInteger2("ColumnCnt")
                                 If (ColumnCnt > 0) Then
                                     For ColumnPtr = 0 To ColumnCnt - 1
+                                        FindValue = Trim(cpCore.main_GetStreamText2("FindValue" & ColumnPtr))
                                         FindName = LCase(cpCore.main_GetStreamText2("FindName" & ColumnPtr))
-                                        If FindName <> "" Then
-                                            FindValue = Trim(cpCore.main_GetStreamText2("FindValue" & ColumnPtr))
+                                        If (Not String.IsNullOrEmpty(FindValue)) And (Not String.IsNullOrEmpty(FindName)) Then
                                             If Not .FindWords.ContainsKey(FindName) Then
                                                 Dim findWord As New indexConfigFindWordClass
                                                 findWord.Name = FindName
@@ -14766,6 +14767,15 @@ ErrorTrap:
                 ' ----- List out all fields
                 '
                 CDef = cpCore.app.metaData.getCdef(adminContent.Name)
+                FieldSize = 100
+                ReDim Preserve FieldNames(FieldSize)
+                ReDim Preserve FieldCaption(FieldSize)
+                ReDim Preserve fieldId(FieldSize)
+                ReDim Preserve fieldTypeId(FieldSize)
+                ReDim Preserve FieldValue(FieldSize)
+                ReDim Preserve FieldMatchOptions(FieldSize)
+                ReDim Preserve FieldLookupContentName(FieldSize)
+                ReDim Preserve FieldLookupList(FieldSize)
                 For Each keyValuePair As KeyValuePair(Of String, metaDataClass.CDefFieldClass) In adminContent.fields
                     Dim field As metaDataClass.CDefFieldClass = keyValuePair.Value
                     If FieldPtr >= FieldSize Then
@@ -14802,6 +14812,7 @@ ErrorTrap:
                             FieldMatchOptions(FieldPtr) = .FindWords(FieldName).MatchOption
                         End If
                     End With
+                    FieldPtr += 1
                 Next
                 '        Criteria = "(active<>0)and(ContentID=" & adminContent.id & ")and(authorable<>0)"
                 '        CS = cpCore.app.db_csOpen("Content Fields", Criteria, "EditSortPriority")
@@ -14887,12 +14898,12 @@ ErrorTrap:
                                 & "<td class=""ccAdminEditCaption"">" & FieldCaption(FieldPtr) & "</td>" _
                                 & "<td class=""ccAdminEditField"">" _
                                 & "<div style=""display:block;float:left;width:800px;"">" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchIgnore.ToString, FieldMatchOption.ToString, "") & "ignore</div>" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchEmpty.ToString, FieldMatchOption.ToString, "") & "empty</div>" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchNotEmpty.ToString, FieldMatchOption.ToString, "") & "not&nbsp;empty</div>" _
-                                & "<div style=""display:block;float:left;width:50px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchEquals.ToString, FieldMatchOption.ToString, "") & "=</div>" _
-                                & "<div style=""display:block;float:left;width:50px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchGreaterThan.ToString, FieldMatchOption.ToString, "") & "&gt;</div>" _
-                                & "<div style=""display:block;float:left;width:50px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchLessThan.ToString, FieldMatchOption.ToString, "") & "&lt;</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchIgnore).ToString, FieldMatchOption.ToString, "") & "ignore</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchEmpty).ToString, FieldMatchOption.ToString, "") & "empty</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchNotEmpty).ToString, FieldMatchOption.ToString, "") & "not&nbsp;empty</div>" _
+                                & "<div style=""display:block;float:left;width:50px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchEquals).ToString, FieldMatchOption.ToString, "") & "=</div>" _
+                                & "<div style=""display:block;float:left;width:50px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchGreaterThan).ToString, FieldMatchOption.ToString, "") & "&gt;</div>" _
+                                & "<div style=""display:block;float:left;width:50px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchLessThan).ToString, FieldMatchOption.ToString, "") & "&lt;</div>" _
                                 & "<div style=""display:block;float:left;width:300px;"">" & GetFormInputDateWithFocus2("fieldvalue" & FieldPtr, FieldValue(FieldPtr), "5", "", "", "ccAdvSearchText") & "</div>" _
                                 & "</div>" _
                                 & "</td>" _
@@ -14907,12 +14918,12 @@ ErrorTrap:
                                 & "<td class=""ccAdminEditCaption"">" & FieldCaption(FieldPtr) & "</td>" _
                                 & "<td class=""ccAdminEditField"">" _
                                 & "<div style=""display:block;float:left;width:800px;"">" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchIgnore.ToString, FieldMatchOption.ToString, "") & "ignore</div>" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchEmpty.ToString, FieldMatchOption.ToString, "") & "empty</div>" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchNotEmpty.ToString, FieldMatchOption.ToString, "") & "not&nbsp;empty</div>" _
-                                & "<div style=""display:block;float:left;width:50px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.matchincludes.ToString, FieldMatchOption.ToString, "n" & FieldPtr) & "=</div>" _
-                                & "<div style=""display:block;float:left;width:50px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchGreaterThan.ToString, FieldMatchOption.ToString, "") & "&gt;</div>" _
-                                & "<div style=""display:block;float:left;width:50px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchLessThan.ToString, FieldMatchOption.ToString, "") & "&lt;</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchIgnore).ToString, FieldMatchOption.ToString, "") & "ignore</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchEmpty).ToString, FieldMatchOption.ToString, "") & "empty</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchNotEmpty).ToString, FieldMatchOption.ToString, "") & "not&nbsp;empty</div>" _
+                                & "<div style=""display:block;float:left;width:50px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.matchincludes).ToString, FieldMatchOption.ToString, "n" & FieldPtr) & "=</div>" _
+                                & "<div style=""display:block;float:left;width:50px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchGreaterThan).ToString, FieldMatchOption.ToString, "") & "&gt;</div>" _
+                                & "<div style=""display:block;float:left;width:50px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchLessThan).ToString, FieldMatchOption.ToString, "") & "&lt;</div>" _
                                 & "<div style=""display:block;float:left;width:300px;"">" & GetFormInputWithFocus2("fieldvalue" & FieldPtr, FieldValue(FieldPtr), 1, 5, "", "var e=getElementById('n" & FieldPtr & "');e.checked=1;", "ccAdvSearchText") & "</div>" _
                                 & "</div>" _
                                 & "</td>" _
@@ -14950,9 +14961,9 @@ ErrorTrap:
                                 & "<td class=""ccAdminEditCaption"">" & FieldCaption(FieldPtr) & "</td>" _
                                 & "<td class=""ccAdminEditField"">" _
                                 & "<div style=""display:block;float:left;width:800px;"">" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchIgnore.ToString, FieldMatchOption.ToString, "") & "ignore</div>" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchEmpty.ToString, FieldMatchOption.ToString, "") & "empty</div>" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchNotEmpty.ToString, FieldMatchOption.ToString, "") & "not&nbsp;empty</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchIgnore).ToString, FieldMatchOption.ToString, "") & "ignore</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchEmpty).ToString, FieldMatchOption.ToString, "") & "empty</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchNotEmpty).ToString, FieldMatchOption.ToString, "") & "not&nbsp;empty</div>" _
                                 & "</div>" _
                                 & "</td>" _
                                 & "</tr>"
@@ -14980,9 +14991,9 @@ ErrorTrap:
                                 & "<td class=""ccAdminEditCaption"">" & FieldCaption(FieldPtr) & "</td>" _
                                 & "<td class=""ccAdminEditField"">" _
                                 & "<div style=""display:block;float:left;width:800px;"">" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchIgnore.ToString, FieldMatchOption.ToString, "") & "ignore</div>" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchTrue.ToString, FieldMatchOption.ToString, "") & "true</div>" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchFalse.ToString, FieldMatchOption.ToString, "") & "false</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchIgnore).ToString, FieldMatchOption.ToString, "") & "ignore</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchTrue).ToString, FieldMatchOption.ToString, "") & "true</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchFalse).ToString, FieldMatchOption.ToString, "") & "false</div>" _
                                 & "</div>" _
                                 & "</td>" _
                                 & "</tr>"
@@ -15009,10 +15020,10 @@ ErrorTrap:
                                 & "<td class=""ccAdminEditCaption"">" & FieldCaption(FieldPtr) & "</td>" _
                                 & "<td class=""ccAdminEditField"">" _
                                 & "<div style=""display:block;float:left;width:800px;"">" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchIgnore.ToString, FieldMatchOption.ToString, "") & "ignore</div>" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchEmpty.ToString, FieldMatchOption.ToString, "") & "empty</div>" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchNotEmpty.ToString, FieldMatchOption.ToString, "") & "not&nbsp;empty</div>" _
-                                & "<div style=""display:block;float:left;width:150px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.matchincludes.ToString, FieldMatchOption.ToString, "t" & FieldPtr) & "includes</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchIgnore).ToString, FieldMatchOption.ToString, "") & "ignore</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchEmpty).ToString, FieldMatchOption.ToString, "") & "empty</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchNotEmpty).ToString, FieldMatchOption.ToString, "") & "not&nbsp;empty</div>" _
+                                & "<div style=""display:block;float:left;width:150px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.matchincludes).ToString, FieldMatchOption.ToString, "t" & FieldPtr) & "includes</div>" _
                                 & "<div style=""display:block;float:left;width:300px;"">" & GetFormInputWithFocus2("fieldvalue" & FieldPtr, FieldValue(FieldPtr), 1, 5, "", "var e=getElementById('t" & FieldPtr & "');e.checked=1;", "ccAdvSearchText") & "</div>" _
                                 & "</div>" _
                                 & "</td>" _
@@ -15076,10 +15087,10 @@ ErrorTrap:
                                 & "<td class=""ccAdminEditCaption"">" & FieldCaption(FieldPtr) & "</td>" _
                                 & "<td class=""ccAdminEditField"">" _
                                 & "<div style=""display:block;float:left;width:800px;"">" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchIgnore.ToString, FieldMatchOption.ToString, "") & "ignore</div>" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchEmpty.ToString, FieldMatchOption.ToString, "") & "empty</div>" _
-                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.MatchNotEmpty.ToString, FieldMatchOption.ToString, "") & "not&nbsp;empty</div>" _
-                                & "<div style=""display:block;float:left;width:150px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, FindWordMatchEnum.matchincludes.ToString, FieldMatchOption.ToString, "t" & FieldPtr) & "includes</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchIgnore).ToString, FieldMatchOption.ToString, "") & "ignore</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchEmpty).ToString, FieldMatchOption.ToString, "") & "empty</div>" _
+                                & "<div style=""display:block;float:left;width:100px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.MatchNotEmpty).ToString, FieldMatchOption.ToString, "") & "not&nbsp;empty</div>" _
+                                & "<div style=""display:block;float:left;width:150px;"">" & cpCore.main_GetFormInputRadioBox("FieldMatch" & FieldPtr, CInt(FindWordMatchEnum.matchincludes).ToString, FieldMatchOption.ToString, "t" & FieldPtr) & "includes</div>" _
                                 & "<div style=""display:block;float:left;width:300px;"">" & GetFormInputWithFocus2("fieldvalue" & FieldPtr, FieldValue(FieldPtr), 1, 5, "", "var e=getElementById('t" & FieldPtr & "');e.checked=1;", "ccAdvSearchText") & "</div>" _
                                 & "</div>" _
                                 & "</td>" _

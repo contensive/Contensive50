@@ -21,7 +21,7 @@ Namespace Contensive
         '       taskRunnerTimer
         '==================================================================================================
         '
-        Private cpCore As cpCoreClass
+        'Private cpCore As cpCoreClass
         '
         Private runnerGuid As String                    ' set in constructor. used to tag tasks assigned to this runner
         '
@@ -56,8 +56,8 @@ Namespace Contensive
         ''' </summary>
         ''' <param name="cpCore"></param>
         ''' <remarks></remarks>
-        Public Sub New(cpCore As cpCoreClass)
-            Me.cpCore = cpCore
+        Public Sub New()
+            'Me.cpCore = cpCore
             runnerGuid = Guid.NewGuid().ToString
         End Sub
         '
@@ -74,7 +74,7 @@ Namespace Contensive
                     '
                     ' call .dispose for managed objects
                     '
-                    cpCore.dispose()
+                    ' cpCore.dispose()
                 End If
                 '
                 ' cp  creates and destroys cmc
@@ -94,7 +94,9 @@ Namespace Contensive
                 '
                 processTimer.Enabled = False
             Catch ex As Exception
-                cpCore.handleException(ex)
+                Using cp As New CPClass
+                    cp.core.handleException(ex)
+                End Using
             End Try
         End Sub
         '
@@ -116,7 +118,9 @@ Namespace Contensive
                 processTimer.Interval = ProcessTimerMsecPerTick
                 processTimer.Enabled = True
             Catch ex As Exception
-                cpCore.handleException(ex)
+                Using cp As New CPClass
+                    cp.core.handleException(ex)
+                End Using
             End Try
             Return returnStartedOk
         End Function
@@ -139,21 +143,24 @@ Namespace Contensive
                     '
                     ' run tasks in task
                     '
-                    Dim programDataFiles As New fileSystemClass(cpCore, cpCore.cluster.config, fileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib")
-                    Dim JSONTemp = programDataFiles.ReadFile("serverConfig.json")
-                    Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer()
-                    Dim serverConfig As serverConfigClass = json_serializer.Deserialize(Of serverConfigClass)(JSONTemp)
-                    If (Not serverConfig.allowTaskRunnerService) Then
-                        '
-                        appendLog("taskRunnerService.processTimerTick, allowTaskRunnerService false, skip")
-                        '
-                    Else
-                        Call runTasks()
-                    End If
+                    Using cpCluster As New CPClass
+                        Using programDataFiles As New fileSystemClass(cpCluster.core, cpCluster.core.cluster.config, fileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib")
+                            Dim JSONTemp = programDataFiles.ReadFile("serverConfig.json")
+                            Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer()
+                            Dim serverConfig As serverConfigClass = json_serializer.Deserialize(Of serverConfigClass)(JSONTemp)
+                            If (Not serverConfig.allowTaskRunnerService) Then
+                                appendLog("taskRunnerService.processTimerTick, allowTaskRunnerService false, skip")
+                            Else
+                                Call runTasks(cpCluster.core)
+                            End If
+                        End Using
+                    End Using
                     ProcessTimerInProcess = False
                 End If
             Catch ex As Exception
-                cpCore.handleException(ex)
+                Using cp As New CPClass
+                    cp.core.handleException(ex)
+                End Using
             End Try
         End Sub
         '
@@ -161,8 +168,7 @@ Namespace Contensive
         ''' <summary>
         ''' Iterate through all apps, find addosn that need to run and add them to the task queue
         ''' </summary>
-        Private Sub runTasks()
-            'Dim hint As String = ""
+        Private Sub runTasks(cpClusterCore As cpCoreClass)
             Try
                 '
                 Dim command As String
@@ -174,161 +180,74 @@ Namespace Contensive
                 Dim CS As Integer
                 Dim sql As String
                 Dim AppName As String
-                Dim cpSite As CPClass
                 '
                 appendLog("taskRunnerService.runTasks")
                 '
-                For Each kvp As KeyValuePair(Of String, appConfigClass) In cpCore.cluster.config.apps
+                For Each kvp As KeyValuePair(Of String, appConfigClass) In cpClusterCore.cluster.config.apps
                     AppName = kvp.Value.name
                     '
                     appendLog("taskRunnerService.runTasks, appname=[" & AppName & "]")
                     '
                     ' query tasks that need to be run
                     '
-                    cpSite = New CPClass(AppName)
-                    If cpSite.core.app.status = applicationStatusEnum.ApplicationStatusReady Then
-                        'hint &= ",app [" & AppName & "] is running, setup cp and cmc"
-                        '
-                        ' Execute Processes
-                        '
-                        Try
-                            'hint &= ",go through process addons that need to be run"
-                            Do
-                                '
-                                ' for now run an sql to get processes, eventually cache in variant cache
-                                '
-                                recordsRemaining = False
-                                sql = "" _
+                    Using cpSite As New CPClass(AppName)
+                        If cpSite.core.app.status = applicationStatusEnum.ApplicationStatusReady Then
+                            'hint &= ",app [" & AppName & "] is running, setup cp and cmc"
+                            '
+                            ' Execute Processes
+                            '
+                            Try
+                                'hint &= ",go through process addons that need to be run"
+                                Do
+                                    '
+                                    ' for now run an sql to get processes, eventually cache in variant cache
+                                    '
+                                    recordsRemaining = False
+                                    sql = "" _
                                     & vbCrLf & " BEGIN TRANSACTION" _
                                     & vbCrLf & " update cctasks set cmdRunner=" & EncodeSQLText(runnerGuid) & " where id in (select top 1 id from cctasks where (cmdRunner is null)and(datestarted is null))" _
                                     & vbCrLf & " COMMIT TRANSACTION"
-                                cpSite.core.app.executeSql(sql)
-                                CS = cpSite.core.app.db_csOpen("tasks", "(cmdRunner=" & EncodeSQLText(runnerGuid) & ")and(datestarted is null)", "id")
-                                If cpSite.core.app.db_csOk(CS) Then
-                                    Dim json As New System.Web.Script.Serialization.JavaScriptSerializer
-                                    recordsRemaining = True
-                                    Call cpSite.core.app.db_setCS(CS, "datestarted", Now())
-                                    Call cpSite.core.app.db_SaveCS(CS)
-                                    '
-                                    command = cpSite.core.app.db_GetCSText(CS, "command")
-                                    cmdDetailText = cpSite.core.app.db_GetCSText(CS, "cmdDetail")
-                                    cmdDetail = json.Deserialize(Of cmdDetailClass)(cmdDetailText)
-                                    '
-                                    appendLog("taskRunnerService.runTasks, command=[" & command & "], cmdDetailText=[" & cmdDetailText & "]")
-                                    '
-                                    Select Case command.ToLower()
-                                        Case taskQueueCommandEnumModule.runAddon
-                                            Call cpSite.core.executeAddon(cmdDetail.addonId, cmdDetail.docProperties, cpCoreClass.addonContextEnum.ContextSimple)
-                                    End Select
-                                End If
-                                cpSite.core.app.db_csClose(CS)
-                            Loop While recordsRemaining
-                        Catch ex As Exception
-                            cpCore.handleException(ex)
-                        End Try
-                    End If
-                    'hint &= ",app done"
-                    cpSite.Dispose()
+                                    cpSite.core.app.executeSql(sql)
+                                    CS = cpSite.core.app.db_csOpen("tasks", "(cmdRunner=" & EncodeSQLText(runnerGuid) & ")and(datestarted is null)", "id")
+                                    If cpSite.core.app.db_csOk(CS) Then
+                                        Dim json As New System.Web.Script.Serialization.JavaScriptSerializer
+                                        recordsRemaining = True
+                                        Call cpSite.core.app.db_setCS(CS, "datestarted", Now())
+                                        Call cpSite.core.app.db_SaveCS(CS)
+                                        '
+                                        command = cpSite.core.app.db_GetCSText(CS, "command")
+                                        cmdDetailText = cpSite.core.app.db_GetCSText(CS, "cmdDetail")
+                                        cmdDetail = json.Deserialize(Of cmdDetailClass)(cmdDetailText)
+                                        '
+                                        appendLog("taskRunnerService.runTasks, command=[" & command & "], cmdDetailText=[" & cmdDetailText & "]")
+                                        '
+                                        Select Case command.ToLower()
+                                            Case taskQueueCommandEnumModule.runAddon
+                                                Call cpSite.core.executeAddon(cmdDetail.addonId, cmdDetail.docProperties, cpCoreClass.addonContextEnum.ContextSimple)
+                                        End Select
+                                    End If
+                                    cpSite.core.app.db_csClose(CS)
+                                Loop While recordsRemaining
+                            Catch ex As Exception
+                                cpClusterCore.handleException(ex)
+                            End Try
+                        End If
+                    End Using
                 Next
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpClusterCore.handleException(ex)
             End Try
         End Sub
         '
-        '====================================================================================================
-        ''' <summary>
-        ''' Add a command task to the taskQueue to be run by the taskRunner
-        ''' </summary>
-        ''' <param name="cpCore"></param>
-        ''' <param name="Command"></param>
-        ''' <param name="cmdDetail"></param>
-        ''' <param name="BlockDuplicates"></param>
-        ''' <returns></returns>
-        Private Function addTaskToQueue(cpCore As cpCoreClass, ByVal Command As String, ByVal cmdDetail As cmdDetailClass, ByVal BlockDuplicates As Boolean) As Boolean
-            Dim returnTaskAdded As Boolean = True
-            Try
-                Dim LcaseCommand As String
-                Dim sql As String
-                Dim cmdDetailJson As String = cpCore.jsonSerialize(cmdDetail)
-                Dim cs As Integer
-                '
-                appendLog("taskScheduler.addTaskToQueue, application=[" & cpCore.app.config.name & "], command=[" & Command & "], cmdDetail=[" & cmdDetailJson & "]")
-                '
-                returnTaskAdded = True
-                LcaseCommand = LCase(Command)
-                If BlockDuplicates Then
-                    '
-                    ' Search for a duplicate
-                    '
-                    sql = "select top 1 id from cctasks where ((command=" & EncodeSQLText(Command) & ")and(cmdDetail=" & cmdDetailJson & "))"
-                    cs = cpCore.app.db_csOpenSql(sql)
-                    If cpCore.app.db_csOk(cs) Then
-                        returnTaskAdded = False
-                    End If
-                    Call cpCore.app.db_csClose(cs)
-                End If
-                '
-                ' Add it to the queue and shell out to the command
-                '
-                If returnTaskAdded Then
-                    cs = cpCore.app.db_csInsertRecord("tasks")
-                    If cpCore.app.db_csOk(cs) Then
-                        cpCore.app.db_SetCSField(cs, "name", "")
-                        cpCore.app.db_SetCSField(cs, "command", Command)
-                        cpCore.app.db_SetCSField(cs, "cmdDetail", cmdDetailJson)
-                        returnTaskAdded = True
-                    End If
-                    Call cpCore.app.db_csClose(cs)
-                End If
-            Catch ex As Exception
-                cpCore.handleException(ex)
-            End Try
-            Return returnTaskAdded
-        End Function
-        '
-        '======================================================================================
-        ''' <summary>
-        ''' Convert addon argument list to a doc property compatible dictionary of strings
-        ''' </summary>
-        ''' <param name="cpCore"></param>
-        ''' <param name="SrcOptionList"></param>
-        ''' <returns></returns>
-        Private Function convertAddonArgumentstoDocPropertiesList(cpCore As cpCoreClass, SrcOptionList As String) As Dictionary(Of String, String)
-            Dim returnList As New Dictionary(Of String, String)
-            Try
-                Dim SrcOptions As String()
-                Dim key As String
-                Dim value As String
-                Dim Pos As Integer
-                '
-                If Not String.IsNullOrEmpty(SrcOptionList) Then
-                    SrcOptions = Split(SrcOptionList.Replace(vbCrLf, vbCr).Replace(vbLf, vbCr), vbCr)
-                    For Ptr = 0 To UBound(SrcOptions)
-                        key = SrcOptions(Ptr).Replace(vbTab, "")
-                        If Not String.IsNullOrEmpty(key) Then
-                            value = ""
-                            Pos = InStr(1, key, "=")
-                            If Pos > 0 Then
-                                value = Mid(key, Pos + 1)
-                                key = Mid(key, 1, Pos - 1)
-                            End If
-                            returnList.Add(key, value)
-                        End If
-                    Next
-                End If
-            Catch ex As Exception
-                cpCore.handleException(ex)
-            End Try
-            Return returnList
-        End Function
-        '
         Private Sub appendLog(ByVal logText As String, Optional isImportant As Boolean = False)
-            If (isImportant Or allowVerboseLogging) Then
-                cpCore.appendLog(logText, "", "trace")
-            End If
-            If (allowConsoleWrite) Then
-                Console.WriteLine(logText)
-            End If
+            Using cp As New CPClass
+                If (isImportant Or allowVerboseLogging) Then
+                    cp.core.appendLog(logText, "", "trace")
+                End If
+                If (allowConsoleWrite) Then
+                    Console.WriteLine(logText)
+                End If
+            End Using
         End Sub
 #Region " IDisposable Support "
         ' Do not change or add Overridable to these methods.

@@ -10,7 +10,7 @@ Namespace Contensive.Core
             '
             If Not PrevInstance() Then
                 ' convert to cluster-level object, then do applicaiton work by enumerating applications and using cp for each app
-                cp = New CPClass("cluster-mode-not-implemented-yet")
+                cp = New CPClass()
                 ProcessEmail = New processEmailClass(cp.core)
                 Call ProcessEmail.ProcessEmail()
                 cp.Dispose()

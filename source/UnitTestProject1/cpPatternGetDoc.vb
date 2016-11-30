@@ -11,7 +11,7 @@ Imports Contensive.Core
         '
         Try
 
-            Using cp As New CPClass("cluster-mode-not-implemented-yet")
+            Using cp As New CPClass()
                 cpResult = cp.executeRoute()
                 Assert.AreNotEqual(cpResult, "")
             End Using

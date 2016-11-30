@@ -43836,7 +43836,7 @@ ErrorTrap:
             Dim ReplaceValues() As String
             Dim SQLName As String
             Dim addonPtr As Integer
-            Dim taskScheduler As New taskSchedulerServiceClass(Me)
+            ' Dim taskScheduler As New taskSchedulerServiceClass()
             '
             'hint = "csv_executeAddonAsProcess, enter"
             '
@@ -50656,7 +50656,7 @@ ErrorTrap:
         ''' <remarks></remarks>
         Friend Sub New(cp As CPClass)
             MyBase.New()
-            Me.applicationName = "cluster-mode-not-implemented-yet"
+            Me.applicationName = ""
             Me.cp = cp
             constructorCommonInitialize()
         End Sub
@@ -51153,7 +51153,7 @@ ErrorTrap:
                 '
                 ' dependant on app.privateFiles
                 '
-                If Not (_cluster Is Nothing) Then
+                If Not (cluster Is Nothing) Then
                     If Not (cluster.clusterFiles Is Nothing) Then
                         Dim iLogFolder As String
                         Dim MonthNumber As Integer

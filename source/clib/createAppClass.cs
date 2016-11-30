@@ -46,7 +46,7 @@ namespace  Contensive.Core {
                 //if (string.IsNullOrEmpty(authToken)) {
                 authToken = authTokenDefault;
                 //}
-                cp = new CPClass("cluster-mode-not-implemented-yet");
+                cp = new CPClass();
                 //
                 if (cp.clusterOk)
                 {
@@ -227,7 +227,7 @@ namespace  Contensive.Core {
                     // reload the cluster config and test connections
                     //   
                     cp.Dispose();
-                    cp = new CPClass("cluster-mode-not-implemented-yet");
+                    cp = new CPClass();
                 }
                 //
                 // ----------------------------------------------------------------------------------------------------

@@ -33,7 +33,7 @@ Namespace Contensive.Core
             '
             ' put authtooken in a config file or make it a command line argument
             '
-            cp = New CPClass("cluster-mode-not-implemented-yet")
+            cp = New CPClass()
             cp.core.appendLog("cmdModule.main, enter")
             '
             If Not cp.clusterOk Then

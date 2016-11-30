@@ -386,7 +386,7 @@ ErrorTrap:
                     ProcessTimerTickCnt = ProcessTimerTickCnt - TimerIntervalSec
                     ServiceInProcess = True
                     ' convert to cluster-level object, then do applicaiton work by enumerating applications and using cp for each app
-                    cp = New CPClass("cluster-mode-not-implemented-yet")
+                    cp = New CPClass()
                     config = New monitorConfigClass(cpCore)
                     If Not config.isInSchedule Then
                         '

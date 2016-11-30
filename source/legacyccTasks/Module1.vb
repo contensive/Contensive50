@@ -8,7 +8,7 @@ Namespace Contensive.Core
 
         Public Sub Main()
             Dim Tasks As tasksClass
-            Dim cp As New CPClass("cluster-mode-not-implemented-yet") ' move tasks to background processes
+            Dim cp As New CPClass() ' move tasks to background processes
             '
             If PrevInstance Then
                 Exit Sub
