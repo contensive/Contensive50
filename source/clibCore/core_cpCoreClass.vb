@@ -138,16 +138,33 @@ Namespace Contensive.Core
         '
         '   values read from the domain record during init
         '
-        Private main_domainId As Integer = 0
-        Private main_domainForwardUrl As String = ""
-        Private main_domainRootPageId As Integer = 0
-        Private main_domainNoFollow As Boolean = False
-        Private main_domainTypeId As Integer = 0
-        Private main_domainVisited As Boolean = False
-        Private main_domainDefaultTemplateId As Integer = 0
-        Private main_domainPageNotFoundPageId As Integer = 0
-        Private main_domainAllowCrossLogin As Boolean = False
-        Private main_domainForwardDomainId As Integer = 0
+        Private Class domainDetailsClass
+            Public name As String
+            Public rootPageId As Integer
+            Public noFollow As Boolean
+            Public typeId As Integer
+            Public visited As Boolean
+            Public id As Integer
+            Public forwardUrl As String
+            Public defaultTemplateId As Integer
+            Public pageNotFoundPageId As Integer
+            Public allowCrossLogin As Boolean
+            Public forwardDomainId As Integer
+        End Class
+        '
+        Private domainDetailsList As Dictionary(Of String, domainDetailsClass)
+        '
+        Private domainDetails As New domainDetailsClass
+        'Private domainDetails.id As Integer = 0
+        'Private domainDetails.forwardUrl As String = ""
+        'Private domainDetails.rootPageId As Integer = 0
+        'Private domainDetails.noFollow As Boolean = False
+        'Private domainDetails.typeId As Integer = 0
+        'Private domainDetails.visited As Boolean = False
+        'Private domainDetails.defaultTemplateId As Integer = 0
+        'Private domainDetails.pageNotFoundPageId As Integer = 0
+        'Private domainDetails.allowCrossLogin As Boolean = False
+        'Private domainDetails.forwardDomainId As Integer = 0
         '
         '   State values that must be initialized before Init()
         '   Everything else is derived from these
@@ -1500,7 +1517,7 @@ Namespace Contensive.Core
                 Dim defaultDomainContentList As String = ""
                 Dim domainSet As String
                 Dim max As Integer
-                Dim domainContentList As String
+                Dim domainDetailsListText As String
                 Dim domainArray() As String
                 Dim domainRow As String
                 Dim domainAttr() As String
@@ -2118,261 +2135,279 @@ Namespace Contensive.Core
                     '   verify Domain table entry
                     '--------------------------------------------------------------------------
                     '
-                    'Call AppendLog("main_init(), 1700")
+                    Dim updateDomainCache As Boolean = False
+                    Dim json As New System.Web.Script.Serialization.JavaScriptSerializer
                     '
-                    main_domainRootPageId = 0
-                    main_domainNoFollow = False
-                    main_domainTypeId = 1
-                    main_domainVisited = False
-                    main_domainId = 0
+                    domainDetails.name = requestDomain
+                    domainDetails.rootPageId = 0
+                    domainDetails.noFollow = False
+                    domainDetails.typeId = 1
+                    domainDetails.visited = False
+                    domainDetails.id = 0
+                    domainDetails.forwardUrl = ""
                     main_ServerDomain = requestDomain
-                    main_domainForwardUrl = ""
-                    If True Then
-                        '
-                        ' set main_ServerDomainPrmary to the first valid defaultDomain entry
-                        '
+                    '
+                    ' set main_ServerDomainPrmary to the first valid defaultDomain entry
+                    '
+                    If app.config.domainList.Count > 0 Then
                         main_ServerDomainPrimary = app.config.domainList(0)
-                        'DomainSplit = Split(app.config.domainList(0), ",")
-                        'For Ptr = 0 To UBound(DomainSplit)
-                        '    If Trim(DomainSplit(Ptr)) <> "" Then
-                        '        main_ServerDomainPrimary = DomainSplit(Ptr)
-                        '        Exit For
-                        '    End If
-                        'Next
+                    Else
+                        main_ServerDomainPrimary = ""
+                    End If
+                    '
+                    domainDetailsListText = EncodeText(app.cache_read(Of String)("domainContentList"))
+                    If Not String.IsNullOrEmpty(domainDetailsListText) Then
+                        Try
+                            domainDetailsList = json.Deserialize(Of Dictionary(Of String, domainDetailsClass))(domainDetailsListText)
+                        Catch ex As Exception
+                            domainDetailsList = Nothing
+                        End Try
+                    End If
+                    If (domainDetailsList Is Nothing) Then
                         '
-                        ' set
+                        '  no cache found, build domainContentList from database
                         '
-                        If (False) Then
-                            '
-                            ' legacy mode -- no domain table
-                            '
-                            domainContentList = ""
-                        Else
-                            domainContentList = EncodeText(app.cache_read(Of String)("domainContentList"))
-                            If domainContentList = "" Then
-                                '
-                                '  build domainContentList
-                                '
-                                domainContentList = vbCrLf
-                                SQL = "select name,rootpageid,nofollow,typeid,visited,id,ForwardURL,DefaultTemplateId,PageNotFoundPageID,allowCrossLogin,ForwardDomainId from ccdomains where (active<>0) order by id"
-                                Dim dt As DataTable
-                                Dim rowText As String
-                                dt = app.executeSql(SQL)
-                                If dt.Rows.Count > 0 Then
-                                    If Not (dt.Columns Is Nothing) Then
-                                        Dim colCnt As Integer = dt.Columns.Count
-                                        For Each row As DataRow In dt.Rows
-                                            rowText = ""
-                                            For colPtr As Integer = 0 To colCnt - 1
-                                                rowText &= vbTab & EncodeInteger(row.Item(colPtr))
-                                            Next
-                                            domainContentList &= vbCrLf & rowText.Substring(1)
-                                        Next
-                                        domainContentList = domainContentList.Substring(1)
+                        domainDetailsList = New Dictionary(Of String, domainDetailsClass)
+                        domainDetailsListText = vbCrLf
+                        SQL = "select name,rootpageid,nofollow,typeid,visited,id,ForwardURL,DefaultTemplateId,PageNotFoundPageID,allowCrossLogin,ForwardDomainId from ccdomains where (active<>0)and(name is not null) order by id"
+                        Dim dt As DataTable
+                        dt = app.executeSql(SQL)
+                        If dt.Rows.Count > 0 Then
+                            If Not (dt.Columns Is Nothing) Then
+                                Dim colCnt As Integer = dt.Columns.Count
+                                For Each row As DataRow In dt.Rows
+                                    Dim domainNameNew As String = row.Item(0).ToString.Trim
+                                    If Not String.IsNullOrEmpty(domainNameNew) Then
+                                        If Not domainDetailsList.ContainsKey(domainNameNew.ToLower) Then
+                                            Dim domainDetailsNew As New domainDetailsClass
+                                            domainDetailsNew.name = domainNameNew
+                                            domainDetailsNew.rootPageId = EncodeInteger(row.Item(1).ToString)
+                                            domainDetailsNew.noFollow = EncodeBoolean(row.Item(2).ToString)
+                                            domainDetailsNew.typeId = EncodeInteger(row.Item(3).ToString)
+                                            domainDetailsNew.visited = EncodeBoolean(row.Item(4).ToString)
+                                            domainDetailsNew.id = EncodeInteger(row.Item(5).ToString)
+                                            domainDetailsNew.forwardUrl = row.Item(6).ToString
+                                            domainDetailsNew.defaultTemplateId = EncodeInteger(row.Item(7).ToString)
+                                            domainDetailsNew.pageNotFoundPageId = EncodeInteger(row.Item(8).ToString)
+                                            domainDetailsNew.allowCrossLogin = EncodeBoolean(row.Item(9).ToString)
+                                            domainDetailsNew.forwardDomainId = EncodeInteger(row.Item(10).ToString)
+                                            domainDetailsList.Add(domainNameNew.ToLower(), domainDetailsNew)
+                                        End If
                                     End If
-                                End If
-                                Call app.cache_save("domainContentList", domainContentList, "domains")
-                            End If
-                            '
-                            ' build defaultDomainContentList
-                            '
-                            For Each domain As String In app.config.domainList
-                                domainSet = Trim(domain)
-                                If domainSet <> "" Then
-                                    defaultDomainContentList = defaultDomainContentList _
-                                        & vbCrLf & domainSet _
-                                        & vbTab & "0" _
-                                        & vbTab & "0" _
-                                        & vbTab & "1" _
-                                        & vbTab & "0" _
-                                        & vbTab & "0" _
-                                        & vbTab & "" _
-                                        & vbTab & "0" _
-                                        & vbTab & "0" _
-                                        & vbTab & "0" _
-                                        & vbTab & "0" _
-                                        & ""
-                                End If
-                            Next
-                            'DomainSplit = Split(app.config.domainList(0), ",")
-                            'For Ptr = 0 To UBound(DomainSplit)
-                            '    domainSet = Trim(DomainSplit(Ptr))
-                            '    If domainSet <> "" Then
-                            '        defaultDomainContentList = defaultDomainContentList _
-                            '            & vbCrLf & domainSet _
-                            '            & vbTab & "0" _
-                            '            & vbTab & "0" _
-                            '            & vbTab & "1" _
-                            '            & vbTab & "0" _
-                            '            & vbTab & "0" _
-                            '            & vbTab & "" _
-                            '            & vbTab & "0" _
-                            '            & vbTab & "0" _
-                            '            & vbTab & "0" _
-                            '            & vbTab & "0" _
-                            '            & ""
-                            '    End If
-                            'Next
-                            domainFound = False
-                            domainArray = Split(domainContentList & defaultDomainContentList, vbCrLf)
-                            For Ptr = 0 To UBound(domainArray)
-                                domainRow = domainArray(Ptr)
-                                If domainRow <> "" Then
-                                    If LCase(Left(domainRow, Len(requestDomain))) = LCase(requestDomain) Then
-                                        '
-                                        ' domain found, use this row
-                                        '
-                                        domainFound = True
-                                        domainAttr = Split(domainRow, vbTab)
-                                        max = UBound(domainAttr)
-                                        If max > 0 Then
-                                            main_domainRootPageId = EncodeInteger(domainAttr(1))
-                                            If max > 1 Then
-                                                main_domainNoFollow = EncodeBoolean(domainAttr(2))
-                                                If max > 2 Then
-                                                    main_domainTypeId = EncodeInteger(domainAttr(3))
-                                                    If max > 3 Then
-                                                        main_domainVisited = EncodeBoolean(domainAttr(4))
-                                                        If max > 4 Then
-                                                            main_domainId = EncodeInteger(domainAttr(5))
-                                                            If max > 5 Then
-                                                                main_domainForwardUrl = EncodeText(domainAttr(6))
-                                                                If max > 6 Then
-                                                                    main_domainDefaultTemplateId = EncodeInteger(domainAttr(7))
-                                                                    If max > 7 Then
-                                                                        main_domainPageNotFoundPageId = EncodeInteger(domainAttr(8))
-                                                                        If max > 8 Then
-                                                                            main_domainAllowCrossLogin = EncodeBoolean(domainAttr(9))
-                                                                            If max > 9 Then
-                                                                                main_domainForwardDomainId = EncodeInteger(domainAttr(10))
-                                                                            End If
-                                                                        End If
-                                                                    End If
-                                                                End If
-                                                            End If
-                                                        End If
-                                                    End If
-                                                End If
-                                            End If
-                                        End If
-                                        If (main_domainId = 0) Then
-                                            '
-                                            ' this is a default domain or a new domain -- add to the domain table
-                                            '
-                                            CS = app.db_csInsertRecord("domains")
-                                            If app.db_csOk(CS) Then
-                                                main_domainId = app.db_GetCSInteger(CS, "id")
-                                                Call app.db_setCS(CS, "name", requestDomain)
-                                                Call app.db_setCS(CS, "typeId", "1")
-                                                Call app.db_setCS(CS, "RootPageId", main_domainRootPageId.ToString)
-                                                Call app.db_setCS(CS, "ForwardUrl", main_domainForwardUrl)
-                                                Call app.db_setCS(CS, "NoFollow", main_domainNoFollow.ToString)
-                                                Call app.db_setCS(CS, "Visited", main_domainVisited.ToString)
-                                                If (True) Then
-                                                    '
-                                                    ' set default template and page not found
-                                                    '
-                                                    Call app.db_setCS(CS, "DefaultTemplateId", main_domainDefaultTemplateId.ToString)
-                                                    Call app.db_setCS(CS, "PageNotFoundPageId", main_domainPageNotFoundPageId.ToString)
-                                                    If (True) Then
-                                                        '
-                                                        ' set allowCrossLogin false
-                                                        '
-                                                        Call app.db_setCS(CS, "allowCrossLogin", main_domainAllowCrossLogin.ToString)
-                                                    End If
-                                                End If
-                                            End If
-                                            Call app.db_csClose(CS)
-
-                                        End If
-                                        If Not main_domainVisited Then
-                                            '
-                                            ' set visited true
-                                            '
-                                            SQL = "update ccdomains set visited=1 where name=" & EncodeSQLText(requestDomain)
-                                            Call app.executeSql(SQL)
-                                            Call app.cache_save("domainContentList", "", "domains")
-                                        End If
-                                        If main_domainTypeId = 1 Then
-                                            '
-                                            ' normal domain, leave it
-                                            '
-                                        ElseIf InStr(1, requestPathPage, app.siteProperty_AdminURL, vbTextCompare) <> 0 Then
-                                            '
-                                            ' forwarding does not work in the admin site
-                                            '
-                                        ElseIf (main_domainTypeId = 2) And (main_domainForwardUrl <> "") Then
-                                            '
-                                            ' forward to a URL
-                                            '
-                                            '
-                                            'Call AppendLog("main_init(), 1710 - exit for domain forward")
-                                            '
-                                            If InStr(1, main_domainForwardUrl, "://") = 0 Then
-                                                main_domainForwardUrl = "http://" & main_domainForwardUrl
-                                            End If
-                                            Call main_Redirect2(main_domainForwardUrl, "Forwarding to [" & main_domainForwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this URL", False)
-                                            Return docOpen
-                                        ElseIf (main_domainTypeId = 3) And (main_domainForwardDomainId <> 0) And (main_domainForwardDomainId <> main_domainId) Then
-                                            '
-                                            ' forward to a replacement domain
-                                            '
-                                            forwardDomain = main_GetRecordName("domains", main_domainForwardDomainId)
-                                            If forwardDomain <> "" Then
-                                                Pos = InStr(1, main_ServerLinkSource, requestDomain, vbTextCompare)
-                                                If (Pos > 0) Then
-                                                    '
-                                                    'Call AppendLog("main_init(), 1720 - exit for forward domain")
-                                                    '
-                                                    main_domainForwardUrl = Mid(main_ServerLinkSource, 1, Pos - 1) & forwardDomain & Mid(main_ServerLinkSource, Pos + Len(requestDomain))
-                                                    'main_domainForwardUrl = Replace(main_ServerLinkSource, main_ServerHost, forwardDomain)
-                                                    Call main_Redirect2(main_domainForwardUrl, "Forwarding to [" & main_domainForwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this replacement domain", False)
-                                                    Return docOpen
-                                                End If
-                                                '                                main_domainForwardUrl = "http://"
-                                                '                                If main_ServerPageSecure Then
-                                                '                                    main_domainForwardUrl = "https://"
-                                                '                                End If
-                                                '                                main_domainForwardUrl = main_domainForwardUrl & forwardDomain & main_ServerPathPage
-                                                '                                If main_ServerQueryString <> "" Then
-                                                '                                    main_domainForwardUrl = main_domainForwardUrl & "?" & main_ServerQueryString
-                                                '                                End If
-                                                '                                Call main_Redirect2(main_domainForwardUrl, "Forwarding to [" & main_domainForwardUrl & "] because the current domain [" & main_ServerHost & "] is in the domain content set to forward to this replacement domain", False)
-                                            End If
-                                        End If
-                                        If main_domainNoFollow Then
-                                            main_MetaContent_NoFollow = True
-                                        End If
-                                        Exit For
-                                    End If
-                                End If
-                            Next
-                            If Not domainFound Then
-                                '
-                                ' current host not in domainContent, add it and re-save the cache
-                                '
-                                CS = app.db_csInsertRecord("domains")
-                                If app.db_csOk(CS) Then
-                                    main_domainId = app.db_GetCSInteger(CS, "id")
-                                    Call app.db_setCS(CS, "name", requestDomain)
-                                    Call app.db_setCS(CS, "typeid", "1")
-                                End If
-                                Call app.db_csClose(CS)
-                                domainContentList = domainContentList _
-                                    & vbCrLf & requestDomain _
-                                    & vbTab & "0" _
-                                    & vbTab & "0" _
-                                    & vbTab & "1" _
-                                    & vbTab & "0" _
-                                    & vbTab & CStr(main_domainId) _
-                                    & vbTab & "0" _
-                                    & vbTab & "0" _
-                                    & vbTab & "0" _
-                                    & ""
-                                Call app.cache_save("domainContentList", domainContentList, "domains")
+                                Next
                             End If
                         End If
+                        updateDomainCache = True
                     End If
+                    '
+                    ' verify app config domainlist is in the domainlist cache
+                    '
+                    For Each domain As String In app.config.domainList
+                        If Not domainDetailsList.ContainsKey(domain.ToLower()) Then
+                            Dim domainDetailsNew As New domainDetailsClass
+                            domainDetailsNew.name = domain
+                            domainDetailsNew.rootPageId = 0
+                            domainDetailsNew.noFollow = False
+                            domainDetailsNew.typeId = 1
+                            domainDetailsNew.visited = False
+                            domainDetailsNew.id = 0
+                            domainDetailsNew.forwardUrl = ""
+                            domainDetailsNew.defaultTemplateId = 0
+                            domainDetailsNew.pageNotFoundPageId = 0
+                            domainDetailsNew.allowCrossLogin = False
+                            domainDetailsNew.forwardDomainId = 0
+                            domainDetailsList.Add(domain.ToLower(), domainDetailsNew)
+                        End If
+                    Next
+                    If domainDetailsList.ContainsKey(requestDomain.ToLower()) Then
+                        '
+                        ' domain found
+                        '
+                        domainDetails = domainDetailsList(requestDomain.ToLower())
+                        If (domainDetails.id = 0) Then
+                            '
+                            ' this is a default domain or a new domain -- add to the domain table
+                            '
+                            CS = app.db_csInsertRecord("domains")
+                            If app.db_csOk(CS) Then
+                                domainDetails.id = app.db_GetCSInteger(CS, "id")
+                                Call app.db_setCS(CS, "name", requestDomain)
+                                Call app.db_setCS(CS, "typeId", "1")
+                                Call app.db_setCS(CS, "RootPageId", domainDetails.rootPageId.ToString)
+                                Call app.db_setCS(CS, "ForwardUrl", domainDetails.forwardUrl)
+                                Call app.db_setCS(CS, "NoFollow", domainDetails.noFollow.ToString)
+                                Call app.db_setCS(CS, "Visited", domainDetails.visited.ToString)
+                                Call app.db_setCS(CS, "DefaultTemplateId", domainDetails.defaultTemplateId.ToString)
+                                Call app.db_setCS(CS, "PageNotFoundPageId", domainDetails.pageNotFoundPageId.ToString)
+                                Call app.db_setCS(CS, "allowCrossLogin", domainDetails.allowCrossLogin.ToString)
+                            End If
+                            Call app.db_csClose(CS)
+                        End If
+                        If Not domainDetails.visited Then
+                            '
+                            ' set visited true
+                            '
+                            SQL = "update ccdomains set visited=1 where name=" & EncodeSQLText(requestDomain)
+                            Call app.executeSql(SQL)
+                            Call app.cache_save("domainContentList", "", "domains")
+                        End If
+                        If domainDetails.typeId = 1 Then
+                            '
+                            ' normal domain, leave it
+                            '
+                        ElseIf InStr(1, requestPathPage, app.siteProperty_AdminURL, vbTextCompare) <> 0 Then
+                            '
+                            ' forwarding does not work in the admin site
+                            '
+                        ElseIf (domainDetails.typeId = 2) And (domainDetails.forwardUrl <> "") Then
+                            '
+                            ' forward to a URL
+                            '
+                            '
+                            'Call AppendLog("main_init(), 1710 - exit for domain forward")
+                            '
+                            If InStr(1, domainDetails.forwardUrl, "://") = 0 Then
+                                domainDetails.forwardUrl = "http://" & domainDetails.forwardUrl
+                            End If
+                            Call main_Redirect2(domainDetails.forwardUrl, "Forwarding to [" & domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this URL", False)
+                            Return docOpen
+                        ElseIf (domainDetails.typeId = 3) And (domainDetails.forwardDomainId <> 0) And (domainDetails.forwardDomainId <> domainDetails.id) Then
+                            '
+                            ' forward to a replacement domain
+                            '
+                            forwardDomain = main_GetRecordName("domains", domainDetails.forwardDomainId)
+                            If forwardDomain <> "" Then
+                                Pos = InStr(1, main_ServerLinkSource, requestDomain, vbTextCompare)
+                                If (Pos > 0) Then
+                                    '
+                                    'Call AppendLog("main_init(), 1720 - exit for forward domain")
+                                    '
+                                    domainDetails.forwardUrl = Mid(main_ServerLinkSource, 1, Pos - 1) & forwardDomain & Mid(main_ServerLinkSource, Pos + Len(requestDomain))
+                                    'main_domainForwardUrl = Replace(main_ServerLinkSource, main_ServerHost, forwardDomain)
+                                    Call main_Redirect2(domainDetails.forwardUrl, "Forwarding to [" & domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this replacement domain", False)
+                                    Return docOpen
+                                End If
+                                '                                main_domainForwardUrl = "http://"
+                                '                                If main_ServerPageSecure Then
+                                '                                    main_domainForwardUrl = "https://"
+                                '                                End If
+                                '                                main_domainForwardUrl = main_domainForwardUrl & forwardDomain & main_ServerPathPage
+                                '                                If main_ServerQueryString <> "" Then
+                                '                                    main_domainForwardUrl = main_domainForwardUrl & "?" & main_ServerQueryString
+                                '                                End If
+                                '                                Call main_Redirect2(main_domainForwardUrl, "Forwarding to [" & main_domainForwardUrl & "] because the current domain [" & main_ServerHost & "] is in the domain content set to forward to this replacement domain", False)
+                            End If
+                        End If
+                        If domainDetails.noFollow Then
+                            main_MetaContent_NoFollow = True
+                        End If
+
+                    Else
+                        '
+                        ' domain not found
+                        ' current host not in domainContent, add it and re-save the cache
+                        '
+                        Dim domainDetailsNew As New domainDetailsClass
+                        domainDetailsNew.name = requestDomain
+                        domainDetailsNew.rootPageId = 0
+                        domainDetailsNew.noFollow = False
+                        domainDetailsNew.typeId = 1
+                        domainDetailsNew.visited = False
+                        domainDetailsNew.id = 0
+                        domainDetailsNew.forwardUrl = ""
+                        domainDetailsNew.defaultTemplateId = 0
+                        domainDetailsNew.pageNotFoundPageId = 0
+                        domainDetailsNew.allowCrossLogin = False
+                        domainDetailsNew.forwardDomainId = 0
+                        domainDetailsList.Add(requestDomain.ToLower(), domainDetailsNew)
+                        '
+                        CS = app.db_csInsertRecord("domains")
+                        If app.db_csOk(CS) Then
+                            domainDetails.id = app.db_GetCSInteger(CS, "id")
+                            Call app.db_setCS(CS, "name", requestDomain)
+                            Call app.db_setCS(CS, "typeid", "1")
+                        End If
+                        Call app.db_csClose(CS)
+                        '
+                        updateDomainCache = True
+                    End If
+                    If (updateDomainCache) Then
+                        '
+                        ' if there was a change, update the cache
+                        '
+                        domainDetailsListText = json.Serialize(domainDetailsList)
+                        Call app.cache_save("domainContentList", domainDetailsListText, "domains")
+                    End If
+                    'domainFound = False
+                    'domainArray = Split(domainDetailsListText & defaultDomainContentList, vbCrLf)
+                    'For Ptr = 0 To UBound(domainArray)
+                    '    domainRow = domainArray(Ptr)
+                    '    If domainRow <> "" Then
+                    '        If LCase(Left(domainRow, Len(requestDomain))) = LCase(requestDomain) Then
+                    '            '
+                    '            ' domain found, use this row
+                    '            '
+                    '            domainFound = True
+                    '            domainAttr = Split(domainRow, vbTab)
+                    '            max = UBound(domainAttr)
+                    '            'If max > 0 Then
+                    '            '    domainDetails.rootPageId = EncodeInteger(domainAttr(1))
+                    '            '    If max > 1 Then
+                    '            '        domainDetails.noFollow = EncodeBoolean(domainAttr(2))
+                    '            '        If max > 2 Then
+                    '            '            domainDetails.typeId = EncodeInteger(domainAttr(3))
+                    '            '            If max > 3 Then
+                    '            '                domainDetails.visited = EncodeBoolean(domainAttr(4))
+                    '            '                If max > 4 Then
+                    '            '                    domainDetails.id = EncodeInteger(domainAttr(5))
+                    '            '                    If max > 5 Then
+                    '            '                        domainDetails.forwardUrl = EncodeText(domainAttr(6))
+                    '            '                        If max > 6 Then
+                    '            '                            domainDetails.defaultTemplateId = EncodeInteger(domainAttr(7))
+                    '            '                            If max > 7 Then
+                    '            '                                domainDetails.pageNotFoundPageId = EncodeInteger(domainAttr(8))
+                    '            '                                If max > 8 Then
+                    '            '                                    domainDetails.allowCrossLogin = EncodeBoolean(domainAttr(9))
+                    '            '                                    If max > 9 Then
+                    '            '                                        domainDetails.forwardDomainId = EncodeInteger(domainAttr(10))
+                    '            '                                    End If
+                    '            '                                End If
+                    '            '                            End If
+                    '            '                        End If
+                    '            '                    End If
+                    '            '                End If
+                    '            '            End If
+                    '            '        End If
+                    '            '    End If
+                    '            'End If
+                    '            Exit For
+                    '        End If
+                    '    End If
+                    'Next
+                    'If Not domainFound Then
+                    '    '
+                    '    ' current host not in domainContent, add it and re-save the cache
+                    '    '
+                    '    CS = app.db_csInsertRecord("domains")
+                    '    If app.db_csOk(CS) Then
+                    '        domainDetails.id = app.db_GetCSInteger(CS, "id")
+                    '        Call app.db_setCS(CS, "name", requestDomain)
+                    '        Call app.db_setCS(CS, "typeid", "1")
+                    '    End If
+                    '    Call app.db_csClose(CS)
+                    '    domainDetailsListText = domainDetailsListText _
+                    '            & vbCrLf & requestDomain _
+                    '            & vbTab & "0" _
+                    '            & vbTab & "0" _
+                    '            & vbTab & "1" _
+                    '            & vbTab & "0" _
+                    '            & vbTab & CStr(domainDetails.id) _
+                    '            & vbTab & "0" _
+                    '            & vbTab & "0" _
+                    '            & vbTab & "0" _
+                    '            & ""
+                    '    Call app.cache_save("domainContentList", domainDetailsListText, "domains")
+                    'End If
                     '
                     '--------------------------------------------------------------------------
                     ' ----- Defaults (needed for early processing)
@@ -12442,7 +12477,7 @@ ErrorTrap:
             MethodName = "main_addResponseCookie"
             '
             If docOpen And docBufferEnabled Then
-                If (isMissing(domain)) And main_domainAllowCrossLogin And EncodeBoolean(app.siteProperty_getBoolean("Write Cookies to All Domains", True)) Then
+                If (isMissing(domain)) And domainDetails.allowCrossLogin And EncodeBoolean(app.siteProperty_getBoolean("Write Cookies to All Domains", True)) Then
                     '
                     ' no domain provided, new mode
                     '   - write cookie for current domains
@@ -14920,7 +14955,7 @@ ErrorTrap:
                     DebugPanel = DebugPanel & main_DebugPanelRow("Page", "<a href=""" & app.siteProperty_AdminURL & "?cid=" & main_GetContentID("page content") & "&af=4&id=" & main_RenderedPageID & """>" & main_RenderedPageID & ", " & main_RenderedPageName & "</a>")
                     DebugPanel = DebugPanel & main_DebugPanelRow("Section", "<a href=""" & app.siteProperty_AdminURL & "?cid=" & main_GetContentID("site sections") & "&af=4&id=" & main_RenderedSectionID & """>" & main_RenderedSectionID & ", " & main_RenderedSectionName & "</a>")
                     DebugPanel = DebugPanel & main_DebugPanelRow("Template", "<a href=""" & app.siteProperty_AdminURL & "?cid=" & main_GetContentID("page templates") & "&af=4&id=" & main_RenderedTemplateID & """>" & main_RenderedTemplateID & ", " & main_RenderedTemplateName & "</a>")
-                    DebugPanel = DebugPanel & main_DebugPanelRow("Domain", "<a href=""" & app.siteProperty_AdminURL & "?cid=" & main_GetContentID("domains") & "&af=4&id=" & main_domainId & """>" & main_domainId & ", " & main_ServerDomain & "</a>")
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Domain", "<a href=""" & app.siteProperty_AdminURL & "?cid=" & main_GetContentID("domains") & "&af=4&id=" & domainDetails.id & """>" & domainDetails.id & ", " & main_ServerDomain & "</a>")
                     DebugPanel = DebugPanel & main_DebugPanelRow("Template Reason", main_PageList_TemplateReason)
                     DebugPanel = DebugPanel & main_DebugPanelRow("ProcessID", GetProcessID.ToString())
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Krnl ProcessID", encodeText(csv_HostServiceProcessID))
@@ -29964,12 +29999,12 @@ ErrorTrap:
                     ' this template has no domain preference, use current domain
                     '
                     linkDomain = requestDomain
-                ElseIf (main_domainId = 0) Then
+                ElseIf (domainDetails.id = 0) Then
                     '
                     ' the current domain is not recognized, or is default - use it
                     '
                     linkDomain = requestDomain
-                ElseIf (InStr(1, "," & templatedomainIdList & ",", "," & main_domainId & ",") <> 0) Then
+                ElseIf (InStr(1, "," & templatedomainIdList & ",", "," & domainDetails.id & ",") <> 0) Then
                     '
                     ' current domain is in the allowed domain list
                     '
@@ -30273,17 +30308,17 @@ ErrorTrap:
                     '       if this operation fails, exit now -- do not continue and create new template
                     '
                     main_RenderedTemplateID = 0
-                    If main_domainDefaultTemplateId <> 0 Then
+                    If domainDetails.defaultTemplateId <> 0 Then
                         '
                         ' ----- attempt to use the domain's default template
                         '
                         Call app.db_csClose(CS)
-                        CS = main_OpenCSContentRecord2(ContentName, main_domainDefaultTemplateId, , , FieldList)
+                        CS = main_OpenCSContentRecord2(ContentName, domainDetails.defaultTemplateId, , , FieldList)
                         If Not app.db_csOk(CS) Then
                             '
                             ' the defaultemplateid in the domain is not valid
                             '
-                            Call app.executeSql("update ccdomains set defaulttemplateid=0 where defaulttemplateid=" & main_domainDefaultTemplateId)
+                            Call app.executeSql("update ccdomains set defaulttemplateid=0 where defaulttemplateid=" & domainDetails.defaultTemplateId)
                             Call app.cache_invalidateTagList("domains")
                         End If
                     End If
@@ -34800,7 +34835,7 @@ ErrorTrap:
             Dim PCCPtr As Integer
             Dim Link As String
             '
-            main_GetPageNotFoundPageId = main_domainPageNotFoundPageId
+            main_GetPageNotFoundPageId = domainDetails.pageNotFoundPageId
             If main_GetPageNotFoundPageId = 0 Then
                 '
                 ' no domain page not found, use site default
@@ -47799,11 +47834,11 @@ ErrorTrap:
                                     main_PageList_TemplateReason = "This template [" & main_RenderedTemplateName & "] was used because it is selected by the current section [" & main_RenderedSectionName & "]."
                                 End If
                             End If
-                            If (templateId = 0) And (main_domainDefaultTemplateId <> 0) Then
+                            If (templateId = 0) And (domainDetails.defaultTemplateId <> 0) Then
                                 '
                                 ' try domain's default template
                                 '
-                                templateId = main_domainDefaultTemplateId
+                                templateId = domainDetails.defaultTemplateId
                                 TCPtr = cache_pageTemplate_getPtr(templateId)
                                 If TCPtr < 0 Then
                                     templateId = 0
@@ -48014,7 +48049,7 @@ ErrorTrap:
                                 '
                                 If main_PageList_RedirectLink = "" Then
                                     templatedomainIdList = EncodeText(cache_pageTemplate(TC_DomainIdList, TCPtr))
-                                    If (main_domainId = 0) Then
+                                    If (domainDetails.id = 0) Then
                                         '
                                         ' current domain not recognized or default, use current
                                         '
@@ -48022,7 +48057,7 @@ ErrorTrap:
                                         '
                                         ' current template has no domain preference, use current
                                         '
-                                    ElseIf (InStr(1, "," & templatedomainIdList & ",", "," & main_domainId & ",") <> 0) Then
+                                    ElseIf (InStr(1, "," & templatedomainIdList & ",", "," & domainDetails.id & ",") <> 0) Then
                                         '
                                         ' current domain is in the allowed domains list for this template, use it
                                         '
