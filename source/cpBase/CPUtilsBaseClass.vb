@@ -29,6 +29,8 @@ Namespace Contensive.BaseClasses
         Public MustOverride Function CreateGuid() As String
         Public MustOverride Function DecodeUrl(ByVal Url As String) As String
         Public MustOverride Function EncodeContentForWeb(ByVal Source As String, Optional ByVal ContextContentName As String = "", Optional ByVal ContextRecordID As Integer = 0, Optional ByVal WrapperID As Integer = 0) As String
+        Public MustOverride Function EncodeHtmlForWysiwygEditor(ByVal Source As String) As String
+        Public MustOverride Function DecodeHtmlFromWysiwygEditor(ByVal Source As String) As String
         Public MustOverride Function DecodeHTML(ByVal Source As String) As String
         Public MustOverride Function EncodeHTML(ByVal Source As String) As String
         Public MustOverride Function EncodeUrl(ByVal Source As String) As String

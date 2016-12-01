@@ -8691,7 +8691,7 @@ ErrorTrap:
                 contactPeopleId = app.db_GetCSInteger(CS, "modifiedBy")
                 returnString = app.db_GetCS(CS, "Copy")
                 returnString = executeContentCommands(Nothing, returnString, addonContextEnum.ContextPage, personalizationPeopleId, personalizationIsAuthenticated, Return_ErrorMessage)
-                returnString = csv_EncodeContent9(returnString, personalizationPeopleId, iContentName, RecordID, contactPeopleId, False, False, True, True, False, True, "", "", False, 0, "", addonContextEnum.ContextPage, False, Nothing, False)
+                returnString = encodeContent10(returnString, personalizationPeopleId, iContentName, RecordID, contactPeopleId, False, False, True, True, False, True, "", "", False, 0, "", addonContextEnum.ContextPage, False, Nothing, False)
                 '
                 If True Then
                     If user_isEditingAnything() Then
@@ -11094,124 +11094,124 @@ ErrorTrap:
 ErrorTrap:
             Call handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_addLinkAlias", True)
         End Sub
+        '        '
+        '        '========================================================================
+        '        ' Encode Active Content Compatiblity - so we could add contentname and recordid instead of CS
+        '        '========================================================================
+        '        '
+        '        Public Function csv_EncodeContent(ByVal Source As String, Optional ByVal MemberID As Integer = SystemMemberID, Optional ByVal CSFormattingContext As Integer = -1, Optional ByVal PlainText As Boolean = False, Optional ByVal AddLinkEID As Boolean = False, Optional ByVal EncodeActiveFormatting As Boolean = False, Optional ByVal EncodeActiveImages As Boolean = False, Optional ByVal EncodeActiveEditIcons As Boolean = False, Optional ByVal EncodeActivePersonalization As Boolean = False, Optional ByVal AddAnchorQuery As String = "", Optional ByVal ProtocolHostString As String = "") As String
+        '            On Error GoTo ErrorTrap 'Const Tn = "EncodeContent" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
+        '            '
+        '            Dim ProcessACTags As Boolean
+        '            'Dim CSContext As Integer
+        '            Dim FormattingContentID As Integer
+        '            Dim ContextContentName As String = ""
+        '            Dim ContextRecordID As Integer
+        '            Dim ContextContactPeopleID As Integer
+        '            Dim AdminURL As String
+        '            Dim defaultDoc As String
+        '            '
+        '            defaultDoc = app.siteProperty_getText(siteproperty_serverPageDefault_name, siteproperty_serverPageDefault_defaultValue)
+        '            AdminURL = app.siteProperty_AdminURL
+        '            ProcessACTags = ((EncodeActiveFormatting Or EncodeActivePersonalization Or EncodeActiveImages Or EncodeActiveEditIcons)) And (InStr(1, Source, "<AC ", vbTextCompare) <> 0)
+        '            If ProcessACTags Then
+        '                'CSContext = CSFormattingContext
+        '                If app.db_csOk(CSFormattingContext) Then
+        '                    FormattingContentID = app.db_GetCSInteger(CSFormattingContext, "ContentControlID")
+        '                    ContextContentName = app.csv_GetContentNameByID(FormattingContentID)
+        '                    ContextRecordID = app.db_GetCSInteger(CSFormattingContext, "ID")
+        '                    If app.db_IsCSFieldSupported(CSFormattingContext, "ContactMemberID") Then
+        '                        ContextContactPeopleID = app.db_GetCSInteger(CSFormattingContext, "ContactMemberID")
+        '                    End If
+        '                End If
+        '            End If
+        '            csv_EncodeContent = csv_EncodeContent9(Source, MemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, False, 0, "", addonContextEnum.ContextPage, False, Nothing, False)
+        '            'csv_EncodeContent = csv_EncodeContent8(Nothing, Source, MemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, False, AdminURL, 0, "", False, addonContextEnum.ContextPage)
+        '            '
+        '            Exit Function
+        '            '
+        '            ' ----- Error Trap
+        '            '
+        'ErrorTrap:
+        '            Call handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_EncodeContent", True)
+        '        End Function
         '
-        '========================================================================
-        ' Encode Active Content Compatiblity - so we could add contentname and recordid instead of CS
-        '========================================================================
-        '
-        Public Function csv_EncodeContent(ByVal Source As String, Optional ByVal MemberID As Integer = SystemMemberID, Optional ByVal CSFormattingContext As Integer = -1, Optional ByVal PlainText As Boolean = False, Optional ByVal AddLinkEID As Boolean = False, Optional ByVal EncodeActiveFormatting As Boolean = False, Optional ByVal EncodeActiveImages As Boolean = False, Optional ByVal EncodeActiveEditIcons As Boolean = False, Optional ByVal EncodeActivePersonalization As Boolean = False, Optional ByVal AddAnchorQuery As String = "", Optional ByVal ProtocolHostString As String = "") As String
-            On Error GoTo ErrorTrap 'Const Tn = "EncodeContent" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Dim ProcessACTags As Boolean
-            'Dim CSContext As Integer
-            Dim FormattingContentID As Integer
-            Dim ContextContentName As String = ""
-            Dim ContextRecordID As Integer
-            Dim ContextContactPeopleID As Integer
-            Dim AdminURL As String
-            Dim defaultDoc As String
-            '
-            defaultDoc = app.siteProperty_getText(siteproperty_serverPageDefault_name, siteproperty_serverPageDefault_defaultValue)
-            AdminURL = app.siteProperty_AdminURL
-            ProcessACTags = ((EncodeActiveFormatting Or EncodeActivePersonalization Or EncodeActiveImages Or EncodeActiveEditIcons)) And (InStr(1, Source, "<AC ", vbTextCompare) <> 0)
-            If ProcessACTags Then
-                'CSContext = CSFormattingContext
-                If app.db_csOk(CSFormattingContext) Then
-                    FormattingContentID = app.db_GetCSInteger(CSFormattingContext, "ContentControlID")
-                    ContextContentName = app.csv_GetContentNameByID(FormattingContentID)
-                    ContextRecordID = app.db_GetCSInteger(CSFormattingContext, "ID")
-                    If app.db_IsCSFieldSupported(CSFormattingContext, "ContactMemberID") Then
-                        ContextContactPeopleID = app.db_GetCSInteger(CSFormattingContext, "ContactMemberID")
-                    End If
-                End If
-            End If
-            csv_EncodeContent = csv_EncodeContent9(Source, MemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, False, 0, "", addonContextEnum.ContextPage, False, Nothing, False)
-            'csv_EncodeContent = csv_EncodeContent8(Nothing, Source, MemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, False, AdminURL, 0, "", False, addonContextEnum.ContextPage)
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_EncodeContent", True)
-        End Function
-        '
-        '========================================================================
-        ' Encode Active Content 2
-        '  For web content encoding only
-        '========================================================================
-        '
-        Public Function csv_EncodeContent2(Source As String, MemberID As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, AddAnchorQuery As String, ProtocolHostString As String) As String
-            Dim AdminURL As String
-            Dim defaultDoc As String
-            '
-            defaultDoc = app.siteProperty_getText(siteproperty_serverPageDefault_name, siteproperty_serverPageDefault_defaultValue)
-            AdminURL = app.siteProperty_AdminURL
-            csv_EncodeContent2 = csv_EncodeContent9(Source, MemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, False, 0, "", addonContextEnum.ContextPage, False, Nothing, False)
-            'csv_EncodeContent2 = csv_EncodeContent8(Nothing, Source, MemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, False, AdminURL, 0, "", False, addonContextEnum.ContextPage)
-        End Function
-        '
-        '========================================================================
-        ' Encode Active Content
-        '   Converts AC tags to content
-        '   Converts Edit Icons to AC tags
-        '========================================================================
-        '
-        Public Function csv_EncodeContent3(Source As String, MemberID As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, AddAnchorQuery As String, ProtocolHostString As String, IsEmailContent As Boolean) As String
-            Dim AdminURL As String
-            Dim defaultDoc As String
-            '
-            defaultDoc = app.siteProperty_getText(siteproperty_serverPageDefault_name, siteproperty_serverPageDefault_defaultValue)
-            AdminURL = app.siteProperty_AdminURL
-            csv_EncodeContent3 = csv_EncodeContent9(Source, MemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, False, 0, "", addonContextEnum.ContextPage, False, Nothing, False)
-            'csv_EncodeContent3 = csv_EncodeContent8(Nothing, Source, MemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, False, AdminURL, 0, "", False, addonContextEnum.ContextPage)
-        End Function
-        '
-        '========================================================================
-        ' Encode Active Content
-        '   Converts AC tags to content
-        '   Converts Edit Icons to AC tags
-        '   csv_EncodeContent4 added AdminURL
-        '========================================================================
-        '
-        Public Function csv_EncodeContent4(Source As String, MemberID As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, AddAnchorQuery As String, ProtocolHostString As String, IsEmailContent As Boolean, AdminURL As String) As String
-            csv_EncodeContent4 = csv_EncodeContent9(Source, MemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, False, 0, "", addonContextEnum.ContextPage, False, Nothing, False)
-        End Function
-        '
-        '========================================================================
-        ' Encode Active Content
-        '   Converts AC tags to content
-        '   Converts Edit Icons to AC tags
-        '   csv_EncodeContent5 added wrappers
-        '========================================================================
-        '
-        Public Function csv_EncodeContent5(Source As String, MemberID As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, AddAnchorQuery As String, ProtocolHostString As String, IsEmailContent As Boolean, AdminURL As String, ignore_DefaultWrapperID As Integer) As String
-            csv_EncodeContent5 = csv_EncodeContent9(Source, MemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, IsEmailContent, 0, "", addonContextEnum.ContextPage, False, Nothing, False)
-        End Function
-        '
-        '
-        '
-        Public Function csv_EncodeContent6(Source As String, MemberID As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, AddAnchorQuery As String, ProtocolHostString As String, IsEmailContent As Boolean, AdminURL As String, ignore_DefaultWrapperID As Integer, TemplateCaseOnly_Content As String) As String
-            csv_EncodeContent6 = csv_EncodeContent9(Source, MemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, IsEmailContent, ignore_DefaultWrapperID, TemplateCaseOnly_Content, addonContextEnum.ContextPage, False, Nothing, False)
-            'csv_EncodeContent6 = csv_EncodeContent8(Nothing, Source, MemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, IsEmailContent, AdminURL, ignore_DefaultWrapperID, TemplateCaseOnly_Content, False, addonContextEnum.ContextPage)
-        End Function
-        '
-        '
-        '
-        Public Function csv_EncodeContent7(ByVal Source As String, ByVal MemberID As Integer, ByVal ContextContentName As String, ByVal ContextRecordID As Integer, ByVal ContextContactPeopleID As Integer, ByVal PlainText As Boolean, ByVal AddLinkEID As Boolean, ByVal EncodeActiveFormatting As Boolean, ByVal EncodeActiveImages As Boolean, ByVal EncodeActiveEditIcons As Boolean, ByVal EncodeActivePersonalization As Boolean, ByVal queryStringForLinkAppend As String, ByVal ProtocolHostString As String, ByVal IsEmailContent As Boolean, ByVal AdminURL As String, ByVal ignore_DefaultWrapperID As Integer, ByVal TemplateCaseOnly_Content As String, ByVal isAuthenticated As Boolean) As String
-            csv_EncodeContent7 = csv_EncodeContent9(Source, MemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, queryStringForLinkAppend, ProtocolHostString, IsEmailContent, ignore_DefaultWrapperID, TemplateCaseOnly_Content, addonContextEnum.ContextPage, isAuthenticated, Nothing, False)
-            'csv_EncodeContent7 = csv_EncodeContent8(Nothing, Source, MemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, queryStringForLinkAppend, ProtocolHostString, IsEmailContent, AdminURL, ignore_DefaultWrapperID, TemplateCaseOnly_Content, isAuthenticated, addonContextEnum.ContextPage)
-        End Function
-        '
-        '
-        '
-        Public Function csv_EncodeContent8(nothingObject As Object, Source As String, personalizationPeopleId As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, queryStringForLinkAppend As String, ProtocolHostString As String, IsEmailContent As Boolean, AdminURL As String, ignore_DefaultWrapperID As Integer, ignore_TemplateCaseOnly_Content As String, isAuthenticated As Boolean, addonContext As addonContextEnum) As String
-            csv_EncodeContent8 = csv_EncodeContent9(Source, personalizationPeopleId, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, queryStringForLinkAppend, ProtocolHostString, IsEmailContent, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, isAuthenticated, Nothing, False)
-        End Function
+        ''========================================================================
+        '' Encode Active Content 2
+        ''  For web content encoding only
+        ''========================================================================
+        ''
+        'Public Function csv_EncodeContent2(Source As String, MemberID As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, AddAnchorQuery As String, ProtocolHostString As String) As String
+        '    Dim AdminURL As String
+        '    Dim defaultDoc As String
+        '    '
+        '    defaultDoc = app.siteProperty_getText(siteproperty_serverPageDefault_name, siteproperty_serverPageDefault_defaultValue)
+        '    AdminURL = app.siteProperty_AdminURL
+        '    csv_EncodeContent2 = csv_EncodeContent9(Source, MemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, False, 0, "", addonContextEnum.ContextPage, False, Nothing, False)
+        '    'csv_EncodeContent2 = csv_EncodeContent8(Nothing, Source, MemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, False, AdminURL, 0, "", False, addonContextEnum.ContextPage)
+        'End Function
+        ''
+        ''========================================================================
+        '' Encode Active Content
+        ''   Converts AC tags to content
+        ''   Converts Edit Icons to AC tags
+        ''========================================================================
+        ''
+        'Public Function csv_EncodeContent3(Source As String, MemberID As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, AddAnchorQuery As String, ProtocolHostString As String, IsEmailContent As Boolean) As String
+        '    Dim AdminURL As String
+        '    Dim defaultDoc As String
+        '    '
+        '    defaultDoc = app.siteProperty_getText(siteproperty_serverPageDefault_name, siteproperty_serverPageDefault_defaultValue)
+        '    AdminURL = app.siteProperty_AdminURL
+        '    csv_EncodeContent3 = csv_EncodeContent9(Source, MemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, False, 0, "", addonContextEnum.ContextPage, False, Nothing, False)
+        '    'csv_EncodeContent3 = csv_EncodeContent8(Nothing, Source, MemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, False, AdminURL, 0, "", False, addonContextEnum.ContextPage)
+        'End Function
+        ''
+        ''========================================================================
+        '' Encode Active Content
+        ''   Converts AC tags to content
+        ''   Converts Edit Icons to AC tags
+        ''   csv_EncodeContent4 added AdminURL
+        ''========================================================================
+        ''
+        'Public Function csv_EncodeContent4(Source As String, MemberID As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, AddAnchorQuery As String, ProtocolHostString As String, IsEmailContent As Boolean, AdminURL As String) As String
+        '    csv_EncodeContent4 = csv_EncodeContent9(Source, MemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, False, 0, "", addonContextEnum.ContextPage, False, Nothing, False)
+        'End Function
+        ''
+        ''========================================================================
+        '' Encode Active Content
+        ''   Converts AC tags to content
+        ''   Converts Edit Icons to AC tags
+        ''   csv_EncodeContent5 added wrappers
+        ''========================================================================
+        ''
+        'Public Function csv_EncodeContent5(Source As String, MemberID As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, AddAnchorQuery As String, ProtocolHostString As String, IsEmailContent As Boolean, AdminURL As String, ignore_DefaultWrapperID As Integer) As String
+        '    csv_EncodeContent5 = csv_EncodeContent9(Source, MemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, IsEmailContent, 0, "", addonContextEnum.ContextPage, False, Nothing, False)
+        'End Function
+        ''
+        ''
+        ''
+        'Public Function csv_EncodeContent6(Source As String, MemberID As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, AddAnchorQuery As String, ProtocolHostString As String, IsEmailContent As Boolean, AdminURL As String, ignore_DefaultWrapperID As Integer, TemplateCaseOnly_Content As String) As String
+        '    csv_EncodeContent6 = csv_EncodeContent9(Source, MemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, IsEmailContent, ignore_DefaultWrapperID, TemplateCaseOnly_Content, addonContextEnum.ContextPage, False, Nothing, False)
+        '    'csv_EncodeContent6 = csv_EncodeContent8(Nothing, Source, MemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, IsEmailContent, AdminURL, ignore_DefaultWrapperID, TemplateCaseOnly_Content, False, addonContextEnum.ContextPage)
+        'End Function
+        ''
+        ''
+        ''
+        'Public Function csv_EncodeContent7(ByVal Source As String, ByVal MemberID As Integer, ByVal ContextContentName As String, ByVal ContextRecordID As Integer, ByVal ContextContactPeopleID As Integer, ByVal PlainText As Boolean, ByVal AddLinkEID As Boolean, ByVal EncodeActiveFormatting As Boolean, ByVal EncodeActiveImages As Boolean, ByVal EncodeActiveEditIcons As Boolean, ByVal EncodeActivePersonalization As Boolean, ByVal queryStringForLinkAppend As String, ByVal ProtocolHostString As String, ByVal IsEmailContent As Boolean, ByVal AdminURL As String, ByVal ignore_DefaultWrapperID As Integer, ByVal TemplateCaseOnly_Content As String, ByVal isAuthenticated As Boolean) As String
+        '    csv_EncodeContent7 = csv_EncodeContent9(Source, MemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, queryStringForLinkAppend, ProtocolHostString, IsEmailContent, ignore_DefaultWrapperID, TemplateCaseOnly_Content, addonContextEnum.ContextPage, isAuthenticated, Nothing, False)
+        '    'csv_EncodeContent7 = csv_EncodeContent8(Nothing, Source, MemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, queryStringForLinkAppend, ProtocolHostString, IsEmailContent, AdminURL, ignore_DefaultWrapperID, TemplateCaseOnly_Content, isAuthenticated, addonContextEnum.ContextPage)
+        'End Function
+        ''
+        ''
+        ''
+        'Public Function csv_EncodeContent8(nothingObject As Object, Source As String, personalizationPeopleId As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, queryStringForLinkAppend As String, ProtocolHostString As String, IsEmailContent As Boolean, AdminURL As String, ignore_DefaultWrapperID As Integer, ignore_TemplateCaseOnly_Content As String, isAuthenticated As Boolean, addonContext As addonContextEnum) As String
+        '    csv_EncodeContent8 = csv_EncodeContent9(Source, personalizationPeopleId, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, queryStringForLinkAppend, ProtocolHostString, IsEmailContent, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, isAuthenticated, Nothing, False)
+        'End Function
         '
         ' To support the special case when the template calls this to encode itself, and the page content has already been rendered.
         '
-        Public Function csv_EncodeContent9(Source As String, personalizationPeopleId As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, queryStringForLinkAppend As String, ProtocolHostString As String, IsEmailContent As Boolean, ignore_DefaultWrapperID As Integer, ignore_TemplateCaseOnly_Content As String, Context As addonContextEnum, personalizationIsAuthenticated As Boolean, nothingObject As Object, isEditingAnything As Boolean) As String
+        Public Function encodeContent10(Source As String, personalizationPeopleId As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, queryStringForLinkAppend As String, ProtocolHostString As String, IsEmailContent As Boolean, ignore_DefaultWrapperID As Integer, ignore_TemplateCaseOnly_Content As String, Context As addonContextEnum, personalizationIsAuthenticated As Boolean, nothingObject As Object, isEditingAnything As Boolean) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("EncodeContent9")
             '
             Const StartFlag = "<!-- ADDON"
@@ -11270,6 +11270,14 @@ ErrorTrap:
             Dim LayoutEngineOptionString As String
             Dim LayoutErrorMessage As String
             '
+            ' if personalizationPeopleId is 0, set it to the current user
+            '
+            Dim iPersonalizationPeopleId As Integer
+            iPersonalizationPeopleId = personalizationPeopleId
+            If iPersonalizationPeopleId = 0 Then
+                iPersonalizationPeopleId = userId
+            End If
+            '
             returnValue = Source
             'hint = "csv_EncodeContent9 enter"
             If returnValue <> "" Then
@@ -11296,7 +11304,7 @@ ErrorTrap:
                 '
                 'hint = hint & ",030"
                 If (AddLinkEID Or EncodeActiveFormatting Or EncodeActiveImages Or EncodeActiveEditIcons) Then
-                    returnValue = csv_EncodeActiveContent_Internal(returnValue, personalizationPeopleId, ContextContentName, ContextRecordID, ContextContactPeopleID, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, queryStringForLinkAppend, ProtocolHostString, IsEmailContent, AdminURL, personalizationIsAuthenticated, Context)
+                    returnValue = csv_EncodeActiveContent_Internal(returnValue, iPersonalizationPeopleId, ContextContentName, ContextRecordID, ContextContactPeopleID, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, queryStringForLinkAppend, ProtocolHostString, IsEmailContent, AdminURL, personalizationIsAuthenticated, Context)
                 End If
                 '
                 ' ----- Do Plain Text Conversion
@@ -11363,7 +11371,7 @@ ErrorTrap:
                                             ' Dynamic Form - run the core addon replacement instead
                                             '
                                             'hint = hint & ",310"
-                                            returnValue = returnValue & executeAddon(0, DynamicFormGuid, addonOptionString, addonContextEnum.ContextPage, ContextContentName, ContextRecordID, "", "", False, ignore_DefaultWrapperID, "", AddonStatusOK, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
+                                            returnValue = returnValue & executeAddon(0, DynamicFormGuid, addonOptionString, addonContextEnum.ContextPage, ContextContentName, ContextRecordID, "", "", False, ignore_DefaultWrapperID, "", AddonStatusOK, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
                                         Case ACTypeChildList
                                             '
                                             ' Child Page List
@@ -11382,7 +11390,7 @@ ErrorTrap:
                                                     CopyName = "Default"
                                                 End If
                                             End If
-                                            returnValue = returnValue & csv_GetContentCopy3(CopyName, "copy content", "", personalizationPeopleId, Nothing, False, personalizationIsAuthenticated)
+                                            returnValue = returnValue & csv_GetContentCopy3(CopyName, "copy content", "", iPersonalizationPeopleId, Nothing, False, personalizationIsAuthenticated)
                                         Case ACTypeDynamicMenu
                                             '
                                             ' Dynamic Menu
@@ -11465,9 +11473,9 @@ ErrorTrap:
                                 End If
                                 ' dont have any way of getting fieldname yet
                                 If AddonGuid <> "" Then
-                                    Copy = executeAddon(0, AddonGuid, addonOptionString, addonContextEnum.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, AddonStatusOK, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
+                                    Copy = executeAddon(0, AddonGuid, addonOptionString, addonContextEnum.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, AddonStatusOK, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
                                 Else
-                                    Copy = executeAddon(0, AddonName, addonOptionString, addonContextEnum.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, AddonStatusOK, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
+                                    Copy = executeAddon(0, AddonName, addonOptionString, addonContextEnum.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, AddonStatusOK, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
                                 End If
                             End If
                         End If
@@ -11589,7 +11597,7 @@ ErrorTrap:
                 End If
             End If
             '
-            csv_EncodeContent9 = returnValue
+            encodeContent10 = returnValue
             Exit Function
             '
             ' ----- Error Trap
@@ -11613,7 +11621,7 @@ ErrorTrap:
             Dim ToAddress As String
             Dim MethodName As String
             Dim rootUrl As String
-            Dim layoutError As String
+            Dim layoutError As String = ""
             Dim subjectEncoded As String
             Dim bodyEncoded As String
             Dim templateEncoded As String
@@ -11640,18 +11648,18 @@ ErrorTrap:
                     ' encode subject
                     '
                     subjectEncoded = executeContentCommands(Nothing, subjectEncoded, addonContextEnum.contextEmail, ToMemberID, True, layoutError)
-                    subjectEncoded = csv_EncodeContent9(subjectEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & app.config.domainList(0), True, 0, "", addonContextEnum.contextEmail, True, Nothing, False)
+                    subjectEncoded = encodeContent10(subjectEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & app.config.domainList(0), True, 0, "", addonContextEnum.contextEmail, True, Nothing, False)
                     '
                     ' encode Body
                     '
                     bodyEncoded = executeContentCommands(Nothing, bodyEncoded, addonContextEnum.contextEmail, ToMemberID, True, layoutError)
-                    bodyEncoded = csv_EncodeContent9(bodyEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & app.config.domainList(0), True, 0, "", addonContextEnum.contextEmail, True, Nothing, False)
+                    bodyEncoded = encodeContent10(bodyEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & app.config.domainList(0), True, 0, "", addonContextEnum.contextEmail, True, Nothing, False)
                     '
                     ' encode template
                     '
                     If (templateEncoded <> "") Then
                         templateEncoded = executeContentCommands(Nothing, templateEncoded, addonContextEnum.contextEmail, ToMemberID, True, layoutError)
-                        templateEncoded = csv_EncodeContent9(templateEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & app.config.domainList(0), True, 0, "", addonContextEnum.contextEmail, True, Nothing, False)
+                        templateEncoded = encodeContent10(templateEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & app.config.domainList(0), True, 0, "", addonContextEnum.contextEmail, True, Nothing, False)
                         '
                         If (InStr(1, templateEncoded, fpoContentBox) <> 0) Then
                             bodyEncoded = Replace(templateEncoded, fpoContentBox, bodyEncoded)
@@ -15264,7 +15272,7 @@ ErrorTrap:
                     Copy = "[the content of this page is not available]" & BR
                     If app.db_csOk(CS) Then
                         Copy = (app.db_GetCS(CS, "copyFilename"))
-                        Copy = main_EncodeContent5(Copy, userId, iContentName, iRecordID, 0, False, False, True, True, False, True, "", "", False, 0)
+                        'Copy = main_EncodeContent5(Copy, userId, iContentName, iRecordID, 0, False, False, True, True, False, True, "", "", False, 0)
                     End If
                     NoteCopy = NoteCopy & Copy & BR
                     Call app.db_csClose(CS)
@@ -26367,7 +26375,7 @@ ErrorTrap:
                 RecordID = app.db_GetCSInteger(CSPointer, "id")
                 ContentName = main_GetContentNameByID(app.db_GetCSInteger(CSPointer, "contentcontrolId"))
             End If
-            main_GetCSEncodedField = encodeContent9(app.db_GetCS(EncodeInteger(CSPointer), EncodeText(FieldName)), userId, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & requestDomain, False, 0, "", addonContextEnum.ContextPage)
+            main_GetCSEncodedField = encodeContent10(app.db_GetCS(EncodeInteger(CSPointer), EncodeText(FieldName)), userId, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & requestDomain, False, 0, "", addonContextEnum.ContextPage, user_isAuthenticated, Nothing, user_isEditingAnything)
             Exit Function
             '
             ' ----- Error Trap
@@ -27437,20 +27445,20 @@ ErrorTrap:
         Public Function main_IsAuthoring(ByVal ContentName As String) As Boolean
             main_IsAuthoring = user_isEditing(ContentName)
         End Function
-        '
-        '   2.1 compatibility
-        '
-        Public Function main_EncodeMessagingByMemberID(ByVal MemberID As Integer, ByVal Text As String) As String
-            main_EncodeMessagingByMemberID = main_EncodeContent(Text, MemberID, , , , True, True, False, True)
-        End Function
-        '
-        '========================================================================
-        '   2.1 compatibility
-        '========================================================================
-        '
-        Public Function main_EncodeMessaging(ByVal Text As String) As String
-            main_EncodeMessaging = main_EncodeContent(Text, userId, , , , True, True, False, True)
-        End Function
+        ''
+        ''   2.1 compatibility
+        ''
+        'Public Function main_EncodeMessagingByMemberID(ByVal MemberID As Integer, ByVal Text As String) As String
+        '    main_EncodeMessagingByMemberID = main_EncodeContent(Text, MemberID, , , , True, True, False, True)
+        'End Function
+        ''
+        ''========================================================================
+        ''   2.1 compatibility
+        ''========================================================================
+        ''
+        'Public Function main_EncodeMessaging(ByVal Text As String) As String
+        '    main_EncodeMessaging = main_EncodeContent(Text, userId, , , , True, True, False, True)
+        'End Function
         '
         '========================================================================
         '   2.1 compatibility
@@ -29560,7 +29568,7 @@ ErrorTrap:
             Call app.db_csClose(CSSections)
             '
             main_PageList_GetSectionMenu = executeContentCommands(Nothing, main_PageList_GetSectionMenu, addonContextEnum.ContextPage, userId, user_isAuthenticated, layoutError)
-            main_PageList_GetSectionMenu = encodeContent9(main_PageList_GetSectionMenu, userId, "", 0, 0, False, False, True, True, False, True, "", "http://" & requestDomain, False, 0, "", addonContextEnum.ContextPage)
+            main_PageList_GetSectionMenu = encodeContent10(main_PageList_GetSectionMenu, userId, "", 0, 0, False, False, True, True, False, True, "", "http://" & requestDomain, False, 0, "", addonContextEnum.ContextPage, user_isAuthenticated, Nothing, user_isEditingAnything)
             'main_PageList_GetSectionMenu = main_EncodeContent5(main_PageList_GetSectionMenu, memberID, "", 0, 0, False, False, True, True, False, True, "", "", False, 0)
             '
             Exit Function
@@ -33509,14 +33517,9 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            Dim iPersonalizationPeopleId As Integer
             Dim returnValue As String
             '
-            iPersonalizationPeopleId = personalizationPeopleId
-            If iPersonalizationPeopleId = 0 Then
-                iPersonalizationPeopleId = userId
-            End If
-            returnValue = csv_EncodeContent9(Source, iPersonalizationPeopleId, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, IsEmailContent, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, user_isAuthenticated, Me, user_isEditingAnything)
+            returnValue = encodeContent10(Source, personalizationPeopleId, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, IsEmailContent, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, user_isAuthenticated, Nothing, user_isEditingAnything)
             '
             encodeContent9 = returnValue
             '
@@ -33527,73 +33530,73 @@ ErrorTrap:
 ErrorTrap:
             Call handleLegacyError18("main_EncodeContent9")
         End Function
-        '
-        ' To support the special case when the template calls this to encode itself, and the page content has already been rendered.
-        '
-        Public Function main_EncodeContent8(Source As String, ForMemberID As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, AddAnchorQuery As String, ProtocolHostString As String, IsEmailContent As Boolean, DefaultWrapperID As Integer, ignore_TemplateCaseOnly_Content As String, Context As addonContextEnum) As String
-            '
-            main_EncodeContent8 = encodeContent9(Source, ForMemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, IsEmailContent, DefaultWrapperID, ignore_TemplateCaseOnly_Content, Context)
-        End Function
-        '
-        ' To support wrappers
-        '
-        Public Function main_EncodeContent5(Source As String, ForMemberID As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, AddAnchorQuery As String, ProtocolHostString As String, IsEmailContent As Boolean, DefaultWrapperID As Integer) As String
-            main_EncodeContent5 = main_EncodeContent8(Source, ForMemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, IsEmailContent, DefaultWrapperID, "", addonContextEnum.ContextPage)
-        End Function
-        '
-        ' created just to keep in sync with content server changes, needing AdminURL
-        '
-        Public Function main_EncodeContent4(Source As String, ForMemberID As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, AddAnchorQuery As String, ProtocolHostString As String, IsEmailContent As Boolean) As String
-            main_EncodeContent4 = main_EncodeContent5(Source, ForMemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, False, 0)
-        End Function
-        '
-        ' Added IsEmailContent
-        '
-        Public Function main_EncodeContent3(Source As String, ForMemberID As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, AddAnchorQuery As String, ProtocolHostString As String, IsEmailContent As Boolean) As String
-            main_EncodeContent3 = main_EncodeContent4(Source, ForMemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, False)
-        End Function
-        '
-        '
-        '
-        Public Function main_EncodeContent2(Source As String, ForMemberID As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, AddAnchorQuery As String, ProtocolHostString As String) As String
-            main_EncodeContent2 = main_EncodeContent3(Source, ForMemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, False)
-        End Function
-        '
-        '========================================================================
-        ' Encode Content
-        '========================================================================
-        '
-        Public Function main_EncodeContent(Source As String, Optional ForMemberID As Integer = SystemMemberID, Optional CSFormattingContext As Integer = -1, Optional PlainText As Boolean = False, Optional AddLinkEID As Boolean = False, Optional EncodeActiveFormatting As Boolean = False, Optional EncodeActiveImages As Boolean = False, Optional EncodeActiveEditIcons As Boolean = False, Optional EncodeActivePersonalization As Boolean = False, Optional AddAnchorQuery As String = "", Optional ProtocolHostString As String = "") As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("EncodeContent")
-            '
-            Dim ProcessACTags As Boolean
-            ' Dim CSFormattingContext As Integer
-            Dim FormattingContentID As Integer
-            Dim ContextContentName As String
-            Dim ContextRecordID As Integer
-            Dim ContextContactPeopleID As Integer
-            '
-            ProcessACTags = ((EncodeActiveFormatting Or EncodeActivePersonalization Or EncodeActiveImages Or EncodeActiveEditIcons)) And (InStr(1, Source, "<ac ", vbTextCompare) <> 0)
-            If ProcessACTags Then
-                'CSFormattingContext = encodeEmptyInteger(CSFormattingContext, -1)
-                If app.db_csOk(CSFormattingContext) Then
-                    FormattingContentID = app.db_GetCSInteger(CSFormattingContext, "ContentControlID")
-                    ContextContentName = main_GetContentNameByID(FormattingContentID)
-                    ContextRecordID = app.db_GetCSInteger(CSFormattingContext, "ID")
-                    If app.db_IsCSFieldSupported(CSFormattingContext, "ContactMemberID") Then
-                        ContextContactPeopleID = app.db_GetCSInteger(CSFormattingContext, "ContactMemberID")
-                    End If
-                End If
-            End If
-            main_EncodeContent = main_EncodeContent5(EncodeText(Source), EncodeInteger(ForMemberID), ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, False, app.siteProperty_DefaultWrapperID)
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18("EncodeContent")
-        End Function
+        ''
+        '' To support the special case when the template calls this to encode itself, and the page content has already been rendered.
+        ''
+        'Public Function main_EncodeContent8(Source As String, ForMemberID As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, AddAnchorQuery As String, ProtocolHostString As String, IsEmailContent As Boolean, DefaultWrapperID As Integer, ignore_TemplateCaseOnly_Content As String, Context As addonContextEnum) As String
+        '    '
+        '    main_EncodeContent8 = encodeContent9(Source, ForMemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, IsEmailContent, DefaultWrapperID, ignore_TemplateCaseOnly_Content, Context)
+        'End Function
+        ''
+        '' To support wrappers
+        ''
+        'Public Function main_EncodeContent5(Source As String, ForMemberID As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, AddAnchorQuery As String, ProtocolHostString As String, IsEmailContent As Boolean, DefaultWrapperID As Integer) As String
+        '    main_EncodeContent5 = main_EncodeContent8(Source, ForMemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, IsEmailContent, DefaultWrapperID, "", addonContextEnum.ContextPage)
+        'End Function
+        ''
+        '' created just to keep in sync with content server changes, needing AdminURL
+        ''
+        'Public Function main_EncodeContent4(Source As String, ForMemberID As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, AddAnchorQuery As String, ProtocolHostString As String, IsEmailContent As Boolean) As String
+        '    main_EncodeContent4 = main_EncodeContent5(Source, ForMemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, False, 0)
+        'End Function
+        ''
+        '' Added IsEmailContent
+        ''
+        'Public Function main_EncodeContent3(Source As String, ForMemberID As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, AddAnchorQuery As String, ProtocolHostString As String, IsEmailContent As Boolean) As String
+        '    main_EncodeContent3 = main_EncodeContent4(Source, ForMemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, False)
+        'End Function
+        ''
+        ''
+        ''
+        'Public Function main_EncodeContent2(Source As String, ForMemberID As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, AddAnchorQuery As String, ProtocolHostString As String) As String
+        '    main_EncodeContent2 = main_EncodeContent3(Source, ForMemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, False)
+        'End Function
+        '        '
+        '        '========================================================================
+        '        ' Encode Content
+        '        '========================================================================
+        '        '
+        '        Public Function main_EncodeContent(Source As String, Optional ForMemberID As Integer = SystemMemberID, Optional CSFormattingContext As Integer = -1, Optional PlainText As Boolean = False, Optional AddLinkEID As Boolean = False, Optional EncodeActiveFormatting As Boolean = False, Optional EncodeActiveImages As Boolean = False, Optional EncodeActiveEditIcons As Boolean = False, Optional EncodeActivePersonalization As Boolean = False, Optional AddAnchorQuery As String = "", Optional ProtocolHostString As String = "") As String
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("EncodeContent")
+        '            '
+        '            Dim ProcessACTags As Boolean
+        '            ' Dim CSFormattingContext As Integer
+        '            Dim FormattingContentID As Integer
+        '            Dim ContextContentName As String
+        '            Dim ContextRecordID As Integer
+        '            Dim ContextContactPeopleID As Integer
+        '            '
+        '            ProcessACTags = ((EncodeActiveFormatting Or EncodeActivePersonalization Or EncodeActiveImages Or EncodeActiveEditIcons)) And (InStr(1, Source, "<ac ", vbTextCompare) <> 0)
+        '            If ProcessACTags Then
+        '                'CSFormattingContext = encodeEmptyInteger(CSFormattingContext, -1)
+        '                If app.db_csOk(CSFormattingContext) Then
+        '                    FormattingContentID = app.db_GetCSInteger(CSFormattingContext, "ContentControlID")
+        '                    ContextContentName = main_GetContentNameByID(FormattingContentID)
+        '                    ContextRecordID = app.db_GetCSInteger(CSFormattingContext, "ID")
+        '                    If app.db_IsCSFieldSupported(CSFormattingContext, "ContactMemberID") Then
+        '                        ContextContactPeopleID = app.db_GetCSInteger(CSFormattingContext, "ContactMemberID")
+        '                    End If
+        '                End If
+        '            End If
+        '            main_EncodeContent = main_EncodeContent5(EncodeText(Source), EncodeInteger(ForMemberID), ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, False, app.siteProperty_DefaultWrapperID)
+        '            '
+        '            Exit Function
+        '            '
+        '            ' ----- Error Trap
+        '            '
+        'ErrorTrap:
+        '            Call handleLegacyError18("EncodeContent")
+        '        End Function
         '
         '========================================================================
         ' ----- Encode Active Content AI
@@ -42329,7 +42332,7 @@ ErrorTrap:
                                     '
                                     ' csv_EncodeContent everything
                                     '
-                                    s = csv_EncodeContent9(s, personalizationPeopleId, HostContentName, HostRecordID, 0, False, False, True, True, False, True, "", "", (Context = addonContextEnum.contextEmail), WrapperID, ignore_TemplateCaseOnly_PageContent, Context, personalizationIsAuthenticated, Nothing, False)
+                                    s = encodeContent10(s, personalizationPeopleId, HostContentName, HostRecordID, 0, False, False, True, True, False, True, "", "", (Context = addonContextEnum.contextEmail), WrapperID, ignore_TemplateCaseOnly_PageContent, Context, personalizationIsAuthenticated, Nothing, False)
                                 End If
                                 ''
                                 '' +++++ 9/8/2011, 4.1.482

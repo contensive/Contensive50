@@ -3760,7 +3760,7 @@ ErrorTrap:
                             Filename = cpCore.app.db_GetCS(CS, .nameLc)
                             If Filename <> "" Then
                                 Copy = cpCore.app.cdnFiles.ReadFile(Filename)
-                                Copy = cpCore.encodeContent9(Copy, cpCore.userId, "", 0, 0, True, False, False, False, True, False, "", "", IsEmailContent, 0, "", cpCoreClass.addonContextEnum.ContextAdmin)
+                                Copy = cpCore.encodeContent10(Copy, cpCore.userId, "", 0, 0, True, False, False, False, True, False, "", "", IsEmailContent, 0, "", cpCoreClass.addonContextEnum.ContextAdmin, cpCore.user_isAuthenticated, Nothing, cpCore.user_isEditingAnything)
                                 Stream.Add(Copy)
                             End If
                         Case FieldTypeIdRedirect, FieldTypeIdManyToMany
@@ -3849,7 +3849,8 @@ ErrorTrap:
                 Dim TableID As Integer
                 Dim LastSendTestDate As Date
                 Dim AllowEmailSendWithoutTest As Boolean
-                Dim fieldEditorOptions() As fieldEditorType
+                'Dim fieldEditorOptions() As fieldEditorType
+                Dim fieldEditorOptions As New Dictionary(Of Integer, Integer)
                 Dim Ptr As Integer
                 Dim fieldEditorOptionCnt As Integer
                 Dim SQL As String
@@ -4273,11 +4274,12 @@ ErrorTrap:
                 dt = cpCore.app.executeSql(SQL)
 
                 Cells = convertDataTabletoArray(dt)
-                If CBool(Cells.GetLength(0)) Then
-                    Cnt = 0
-                Else
-                    Cnt = UBound(Cells, 2) + 1
-                End If
+                Cnt = Cells.GetLength(1)
+                'If CBool(Cells.GetLength(0)) Then
+                '    Cnt = 0
+                'Else
+                '    Cnt = UBound(Cells, 2) + 1
+                'End If
                 For Ptr = 0 To Cnt - 1
                     fieldId = EncodeInteger(Cells(0, Ptr))
                     If fieldId > 0 Then
@@ -4292,13 +4294,13 @@ ErrorTrap:
                     & " from ccAddonContentFieldTypeRules r" _
                     & " left join ccaggregatefunctions a on a.id=r.addonid" _
                     & " where (r.active<>0)and(a.active<>0)and(a.id is not null) order by r.contentFieldTypeID"
+                dt = cpCore.app.executeSql(SQL)
                 Cells = convertDataTabletoArray(dt)
                 fieldEditorOptionCnt = UBound(Cells, 2) + 1
                 For Ptr = 0 To fieldEditorOptionCnt - 1
                     fieldId = EncodeInteger(Cells(0, Ptr))
-                    If fieldId > 0 Then
-                        fieldEditorOptions(Ptr).fieldId = fieldId
-                        fieldEditorOptions(Ptr).addonid = EncodeInteger(Cells(1, Ptr))
+                    If (fieldId > 0) And (Not fieldEditorOptions.ContainsKey(fieldId)) Then
+                        fieldEditorOptions.Add(fieldId, EncodeInteger(Cells(1, Ptr)))
                     End If
                 Next
                 '

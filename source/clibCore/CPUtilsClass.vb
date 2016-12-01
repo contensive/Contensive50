@@ -425,6 +425,28 @@ Namespace Contensive.Core
             Throw New NotImplementedException()
         End Function
         '
+        '====================================================================================================
+        ''' <summary>
+        ''' Converts html content to the wysiwyg editor compatible format that includes edit icons for addons. Use this to convert the html content added to wysiwyg editors. Use EncodeHtmlFromWysiwygEditor() before saving back to Db.
+        ''' </summary>
+        ''' <param name="Source"></param>
+        ''' <returns></returns>
+        Public Overrides Function EncodeHtmlForWysiwygEditor(Source As String) As String
+            Return CP.core.encodeContent10(Source, 0, "", 0, 0, False, False, False, True, True, False, "", "", False, 0, "", cpCoreClass.addonContextEnum.ContextSimple, False, Nothing, False)
+            'Return CP.core.encodeContent9(Source, 0, "", 0, 0, False, False, False, True, True, False, "", "", False, 0, "", 1)
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Converts html content from wysiwyg editors to be saved. See EncodeHtmlForWysiwygEditor() for more details.
+        ''' </summary>
+        ''' <param name="Source"></param>
+        ''' <returns></returns>
+        Public Overrides Function DecodeHtmlFromWysiwygEditor(Source As String) As String
+            Return CP.core.main_DecodeContent(Source)
+            'Throw New NotImplementedException()
+        End Function
+        '
         '
         '
         Private Sub appendDebugLog(ByVal copy As String)

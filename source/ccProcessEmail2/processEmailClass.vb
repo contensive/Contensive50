@@ -670,10 +670,12 @@ ErrorTrap:
                         ' Encode body and subject
                         '
                         EmailBodyEncoded = cpCore.executeContentCommands(Nothing, EmailBodyEncoded, AddonContextEnum.contextEmail, MemberID, True, errorMessage)
-                        EmailBodyEncoded = cpCore.csv_EncodeContent8(Nothing, EmailBodyEncoded, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, "", True, AddonContextEnum.contextEmail)
+                        EmailBodyEncoded = cpCore.encodeContent10(EmailBodyEncoded, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, 0, "", AddonContextEnum.contextEmail, True, Nothing, False)
+                        'EmailBodyEncoded = cpCore.csv_EncodeContent8(Nothing, EmailBodyEncoded, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, "", True, AddonContextEnum.contextEmail)
                         '
                         EmailSubjectEncoded = cpCore.executeContentCommands(Nothing, EmailSubjectEncoded, AddonContextEnum.contextEmail, MemberID, True, errorMessage)
-                        EmailSubjectEncoded = cpCore.csv_EncodeContent8(Nothing, EmailSubjectEncoded, MemberID, "", 0, 0, True, False, False, False, False, True, "", PrimaryLink, True, "", 0, "", True, AddonContextEnum.contextEmail)
+                        EmailSubjectEncoded = cpCore.encodeContent10(EmailSubjectEncoded, MemberID, "", 0, 0, True, False, False, False, False, True, "", PrimaryLink, True, 0, "", AddonContextEnum.contextEmail, True, Nothing, False)
+                        'EmailSubjectEncoded = cpCore.csv_EncodeContent8(Nothing, EmailSubjectEncoded, MemberID, "", 0, 0, True, False, False, False, False, True, "", PrimaryLink, True, "", 0, "", True, AddonContextEnum.contextEmail)
                         '
                         ' Encode/Merge Template
                         '
@@ -687,7 +689,8 @@ ErrorTrap:
                             ' use provided template
                             '
                             EmailTemplateEncoded = cpCore.executeContentCommands(Nothing, EmailTemplateEncoded, AddonContextEnum.contextEmail, MemberID, True, errorMessage)
-                            EmailTemplateEncoded = cpCore.csv_EncodeContent8(Nothing, EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, "", True, AddonContextEnum.contextEmail)
+                            EmailTemplateEncoded = cpCore.encodeContent10(EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, 0, "", AddonContextEnum.contextEmail, True, Nothing, False)
+                            'EmailTemplateEncoded = cpCore.csv_EncodeContent8(Nothing, EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, "", True, AddonContextEnum.contextEmail)
                             'EmailTemplateEncoded = cpCore.csv_encodecontent8(Nothing, EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, ContentPlaceHolder, True, addonContextEnum.contextemail)
                             If InStr(1, EmailTemplateEncoded, fpoContentBox) <> 0 Then
                                 EmailBodyEncoded = Replace(EmailTemplateEncoded, fpoContentBox, EmailBodyEncoded)
@@ -829,10 +832,12 @@ ErrorTrap:
                 ClickFlagQuery = RequestNameEmailClickFlag & "=" & EmailDropID & "&" & RequestNameEmailMemberID & "=" & ConfirmationMemberID
                 '
                 EmailSubject = cpCore.executeContentCommands(Nothing, EmailSubject, AddonContextEnum.contextEmail, ConfirmationMemberID, True, errorMessage)
-                EmailSubject = cpCore.csv_EncodeContent8(Nothing, EmailSubject, ConfirmationMemberID, "", 0, 0, True, False, False, False, False, True, "", "http://" & GetPrimaryDomainName(), True, "", 0, "", True, AddonContextEnum.contextEmail)
+                EmailSubject = cpCore.encodeContent10(EmailSubject, ConfirmationMemberID, "", 0, 0, True, False, False, False, False, True, "", "http://" & GetPrimaryDomainName(), True, 0, "", AddonContextEnum.contextEmail, True, Nothing, False)
+                'EmailSubject = cpCore.csv_EncodeContent8(Nothing, EmailSubject, ConfirmationMemberID, "", 0, 0, True, False, False, False, False, True, "", "http://" & GetPrimaryDomainName(), True, "", 0, "", True, AddonContextEnum.contextEmail)
                 '
                 EmailBody = cpCore.executeContentCommands(Nothing, EmailBody, AddonContextEnum.contextEmail, ConfirmationMemberID, True, errorMessage)
-                EmailBody = cpCore.csv_EncodeContent8(Nothing, EmailCopy, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & GetPrimaryDomainName(), True, "", 0, "", True, AddonContextEnum.contextEmail)
+                EmailBody = cpCore.encodeContent10(EmailCopy, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & GetPrimaryDomainName(), True, 0, "", AddonContextEnum.contextEmail, True, Nothing, False)
+                'EmailBody = cpCore.csv_EncodeContent8(Nothing, EmailCopy, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & GetPrimaryDomainName(), True, "", 0, "", True, AddonContextEnum.contextEmail)
                 '
                 ' Encode the template
                 '
@@ -844,7 +849,7 @@ ErrorTrap:
                 Else
                     WorkingTemplate = EmailTemplate
                     WorkingTemplate = cpCore.executeContentCommands(Nothing, WorkingTemplate, AddonContextEnum.contextEmail, ConfirmationMemberID, True, errorMessage)
-                    WorkingTemplate = cpCore.csv_EncodeContent8(Nothing, WorkingTemplate, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, False, "http://" & GetPrimaryDomainName(), True, "", 0, "", True, AddonContextEnum.contextEmail)
+                    WorkingTemplate = cpCore.encodeContent10(WorkingTemplate, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, False, "http://" & GetPrimaryDomainName(), True, 0, "", AddonContextEnum.contextEmail, True, Nothing, False)
                     'WorkingTemplate = cpCore.csv_encodecontent8(Nothing, EmailTemplate, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, False, "http://" & GetPrimaryDomainName(), True, "", 0, ContentPlaceHolder, True, addonContextEnum.contextemail)
                     If InStr(1, WorkingTemplate, fpoContentBox) <> 0 Then
                         EmailBody = Replace(WorkingTemplate, fpoContentBox, EmailBody)

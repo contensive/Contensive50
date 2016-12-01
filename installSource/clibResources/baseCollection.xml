@@ -1557,7 +1557,6 @@
 	<NavigatorEntry Name="Layouts" NameSpace="Manage Design" NavIconTitle="" NavIconType="Content" LinkPage="" ContentName="Layouts" AdminOnly="0" DeveloperOnly="0" NewWindow="0" Active="1" AddonName="" guid="{947AAA5E-A1DE-4B6D-BAE6-086025CFC7D3}" />
 	<NavigatorEntry Name="Site Warnings" NameSpace="Reports" NavIconTitle="" NavIconType="Content" LinkPage="" ContentName="Site Warnings" AdminOnly="0" DeveloperOnly="0" NewWindow="0" Active="1" AddonName="" guid="{1D52D30A-571D-4A18-B88B-B1CF00437EF5}" />
 	<Addon Name="Email This Page Icon" Link="" ObjectProgramID="ccWebX3.EmailIconClass" ArgumentList="" SortOrder="" ></Addon>
-	<Addon Name="Popup Page Link" Link="" ObjectProgramID="" ArgumentList="Caption=Click Here,URL=,WindowWidth=300,WindowHeight=200" SortOrder="" >&lt;A onclick=&quot;javascript:window.open('URL', '_blank', 'menubar=no,toolbar=no,location=no,status=no,width=WindowWidth,height=WindowHeight,scrollbars=WindowScroll'); return false;&quot; href=&quot;#&quot;&gt;Caption&lt;/A&gt;</Addon>
 	<data>
 		<record content="sort methods" guid="{97128516-AEDF-4B6C-BC56-F6EAA4C3AA78}" name="By Name">
 			<field name="OrderByClause"><![CDATA[Name]]></field>
