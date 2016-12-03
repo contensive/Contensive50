@@ -85,7 +85,7 @@ Namespace Contensive.Core
 
         Public Overrides Function CreateGuid() As String
             'Dim guid As Guid = guid.NewGuid()
-            Return Guid.NewGuid().ToString
+            Return "{" & Guid.NewGuid().ToString & "}"
             'Dim guid As CSGUID.GUIDGenerator = New CSGUID.GUIDGenerator
             'Return guid.CreateGUID("")
             'If true Then

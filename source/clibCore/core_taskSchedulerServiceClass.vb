@@ -270,7 +270,7 @@ Namespace Contensive
         ''' <param name="cmdDetail"></param>
         ''' <param name="BlockDuplicates"></param>
         ''' <returns></returns>
-        Private Function addTaskToQueue(cpSiteCore As cpCoreClass, ByVal Command As String, ByVal cmdDetail As cmdDetailClass, ByVal BlockDuplicates As Boolean) As Boolean
+        Public Function addTaskToQueue(cpSiteCore As cpCoreClass, ByVal Command As String, ByVal cmdDetail As cmdDetailClass, ByVal BlockDuplicates As Boolean) As Boolean
             Dim returnTaskAdded As Boolean = True
             Try
                 Dim LcaseCommand As String
@@ -319,7 +319,7 @@ Namespace Contensive
         ''' <param name="cpCore"></param>
         ''' <param name="SrcOptionList"></param>
         ''' <returns></returns>
-        Private Function convertAddonArgumentstoDocPropertiesList(cpCore As cpCoreClass, SrcOptionList As String) As Dictionary(Of String, String)
+        Public Function convertAddonArgumentstoDocPropertiesList(cpCore As cpCoreClass, SrcOptionList As String) As Dictionary(Of String, String)
             Dim returnList As New Dictionary(Of String, String)
             Try
                 Dim SrcOptions As String()

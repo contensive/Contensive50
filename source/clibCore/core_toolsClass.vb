@@ -831,7 +831,7 @@ ErrorTrap:
                             streamRow.Add("<td class=""ccPanelInput"" align=""left""><img src=""/cclib/images/spacer.gif"" width=""1"" height=""10"">")
                             ContentFieldsCID = Local_GetContentID("Content Fields")
                             If (ContentFieldsCID <> 0) Then
-                                streamRow.Add("<nobr>" & SpanClassAdminSmall & "[<a href=""" & cpCore.main_ServerPage & "?aa=" & AdminActionNop & "&af=" & AdminFormEdit & "&id=" & RecordID & "&cid=" & ContentFieldsCID & "&mm=0"">EDIT</a>]</span></nobr>")
+                                streamRow.Add("<nobr>" & SpanClassAdminSmall & "[<a href=""?aa=" & AdminActionNop & "&af=" & AdminFormEdit & "&id=" & RecordID & "&cid=" & ContentFieldsCID & "&mm=0"">EDIT</a>]</span></nobr>")
                                 'streamRow.Add( "<nobr>" & SpanClassAdminSmall & "[")
                                 'streamRow.Add( "<a href=""#""")
                                 'streamRow.Add( " onclick=""" _
@@ -4046,7 +4046,7 @@ ErrorTrap:
             '
             Dim Stream As New fastStringClass
             Dim ButtonList As String
-            Dim runAtServer As runAtServerClass
+            ' Dim runAtServer As runAtServerClass
             '
             ButtonList = ButtonCancel & "," & ButtonRestartContensiveApplication
             Stream.Add(GetTitle("Load Content Definitions", "This tool stops and restarts the Contensive Application controlling this website. If you restart, the site will be unavailable for up to a minute while the site is stopped and restarted. If the site does not restart, you will need to contact a site administrator to have the Contensive Server restarted."))
@@ -4064,10 +4064,22 @@ ErrorTrap:
                 ' Restart
                 '
                 cpCore.appendLogWithLegacyRow(cpCore.app.config.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " & cpCore.userName & " (" & cpCore.userId & ") restarted using the Restart tool", False, True, cpCore.main_ServerLink, "", "")
-                runAtServer = New runAtServerClass(cpCore)
+                'runAtServer = New runAtServerClass(cpCore)
                 Call cpCore.main_Redirect("/ccLib/Popup/WaitForIISReset.htm")
                 Call Threading.Thread.Sleep(2000)
-                Call runAtServer.executeCmd("Restart", "appname=" & cpCore.app.config.name)
+                '
+                '
+                '
+                Throw New NotImplementedException("GetForm_Restart")
+                'hint = hint & ",035"
+                Dim taskScheduler As New taskSchedulerServiceClass()
+                Dim cmdDetail As New cmdDetailClass
+                cmdDetail.addonId = "0"
+                cmdDetail.addonName = "commandRestart"
+                cmdDetail.docProperties = taskScheduler.convertAddonArgumentstoDocPropertiesList(cpCore, "")
+                Call taskScheduler.addTaskToQueue(cpCore, taskQueueCommandEnumModule.runAddon, cmdDetail, False)
+                '
+                'Call runAtServer.executeCmd("Restart", "appname=" & cpCore.app.config.name)
             End If
             '
             ' Display form
@@ -4626,7 +4638,7 @@ ErrorTrap:
             Dim RecordID As Integer
             Dim CS As Integer
             Dim Stream As New fastStringClass
-            Dim runAtServer As New runAtServerClass(cpCore)
+            ' Dim runAtServer As New runAtServerClass(cpCore)
             Dim CDefList As String
             Dim FindText As String
             Dim ReplaceText As String
@@ -4659,10 +4671,20 @@ ErrorTrap:
                     'CDefList = cpCore.main_GetStreamText("CDefList")
                     FindText = cpCore.main_GetStreamText("FindText")
                     ReplaceText = cpCore.main_GetStreamText("ReplaceText")
-                    runAtServer.ipAddress = "127.0.0.1"
-                    runAtServer.port = "4531"
+                    'runAtServer.ipAddress = "127.0.0.1"
+                    'runAtServer.port = "4531"
                     QS = "app=" & encodeNvaArgument(cpCore.app.config.name) & "&FindText=" & encodeNvaArgument(FindText) & "&ReplaceText=" & encodeNvaArgument(ReplaceText) & "&CDefNameList=" & encodeNvaArgument(CDefList)
-                    Call runAtServer.executeCmd("FindAndReplace", QS)
+
+                    Throw New NotImplementedException("GetForm_FindAndReplace")
+                    Dim taskScheduler As New taskSchedulerServiceClass()
+                    Dim cmdDetail As New cmdDetailClass
+                    cmdDetail.addonId = "0"
+                    cmdDetail.addonName = "GetForm_FindAndReplace"
+                    cmdDetail.docProperties = taskScheduler.convertAddonArgumentstoDocPropertiesList(cpCore, QS)
+                    Call taskScheduler.addTaskToQueue(cpCore, taskQueueCommandEnumModule.runAddon, cmdDetail, False)
+
+
+                    '                    Call runAtServer.executeCmd("FindAndReplace", QS)
                     Call Stream.Add("Find and Replace has been requested for content definitions [" & CDefList & "], finding [" & FindText & "] and replacing with [" & ReplaceText & "]")
                 End If
             Else
@@ -4733,9 +4755,9 @@ ErrorTrap:
                 Dim Button As String
                 'Dim GUIDGenerator As guidClass
                 Dim s As fastStringClass
-                Dim runAtServer As runAtServerClass
-                '
-                s = New fastStringClass
+            'Dim runAtServer As runAtServerClass
+            '
+            s = New fastStringClass
                 s.Add(GetTitle("IIS Reset", "Reset the webserver."))
                 '
                 ' Process the form
@@ -4747,11 +4769,23 @@ ErrorTrap:
                     '
                     '
                     cpCore.appendLogWithLegacyRow(cpCore.app.config.name, "Resetting IIS", "dll", "ToolsClass", "GetForm_IISReset", 0, "dll", "Warning: member " & cpCore.userName & " (" & cpCore.userId & ") executed an IISReset using the IISReset tool", False, True, cpCore.main_ServerLink, "", "")
-                    runAtServer = New runAtServerClass(cpCore)
-                    Call cpCore.main_Redirect("/ccLib/Popup/WaitForIISReset.htm")
+                'runAtServer = New runAtServerClass(cpCore)
+                Call cpCore.main_Redirect("/ccLib/Popup/WaitForIISReset.htm")
                     Call Threading.Thread.Sleep(2000)
-                    Call runAtServer.executeCmd("IISReset", "")
-                End If
+
+
+
+                Throw New NotImplementedException("GetForm_IISReset")
+                Dim taskScheduler As New taskSchedulerServiceClass()
+                Dim cmdDetail As New cmdDetailClass
+                cmdDetail.addonId = "0"
+                cmdDetail.addonName = "GetForm_IISReset"
+                cmdDetail.docProperties = taskScheduler.convertAddonArgumentstoDocPropertiesList(cpCore, "")
+                Call taskScheduler.addTaskToQueue(cpCore, taskQueueCommandEnumModule.runAddon, cmdDetail, False)
+
+
+                ' Call runAtServer.executeCmd("IISReset", "")
+            End If
                 '
                 ' Display form
                 '

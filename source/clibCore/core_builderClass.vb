@@ -2502,37 +2502,37 @@ Namespace Contensive.Core
         'ErrorTrap:
         '    dim ex as new exception("todo"): Call HandleClassError(ex,cpcore.app.appEnvironment.name,Err.Number, Err.Source, Err.Description, "SetNavigatorEntry", True, False)
         'End Sub
-        '
-        '======================================================================================================
-        '   Installs Addons in the content folder install subfolder
-        '======================================================================================================
-        ' REFACTOR - \INSTALL FOLDER IS NOT THE CURRENT PATTERN
-        Public Function InstallAddons(IsNewBuild As Boolean, buildVersion As String) As Boolean
-            Dim returnOk As Boolean = True
-            Try
-                '
-                Dim IISResetRequired As Boolean
-                Dim runAtServer As runAtServerClass
-                Dim addonInstall As New addonInstallClass(cpCore)
-                Dim saveLogFolder As String
-                '
-                InstallAddons = False
-                '
-                saveLogFolder = classLogFolder
-                InstallAddons = addonInstall.InstallCollectionFromPrivateFolder(Me, buildVersion, "Install\", IISResetRequired, cpCore.app.config.name, "", "", IsNewBuild)
-                classLogFolder = saveLogFolder
-                '
-                ' IISReset if needed
-                '
-                If IISResetRequired Then
-                    runAtServer = New runAtServerClass(cpCore)
-                    Call runAtServer.executeCmd("IISReset", "")
-                End If
-            Catch ex As Exception
-                cpCore.handleException(ex)
-            End Try
-            Return returnOk
-        End Function
+        ''
+        ''======================================================================================================
+        ''   Installs Addons in the content folder install subfolder
+        ''======================================================================================================
+        '' REFACTOR - \INSTALL FOLDER IS NOT THE CURRENT PATTERN
+        'Public Function InstallAddons(IsNewBuild As Boolean, buildVersion As String) As Boolean
+        '    Dim returnOk As Boolean = True
+        '    Try
+        '        '
+        '        Dim IISResetRequired As Boolean
+        '        Dim runAtServer As runAtServerClass
+        '        Dim addonInstall As New addonInstallClass(cpCore)
+        '        Dim saveLogFolder As String
+        '        '
+        '        InstallAddons = False
+        '        '
+        '        saveLogFolder = classLogFolder
+        '        InstallAddons = addonInstall.InstallCollectionFromPrivateFolder(Me, buildVersion, "Install\", IISResetRequired, cpCore.app.config.name, "", "", IsNewBuild)
+        '        classLogFolder = saveLogFolder
+        '        '
+        '        ' IISReset if needed
+        '        '
+        '        If IISResetRequired Then
+        '            runAtServer = New runAtServerClass(cpCore)
+        '            Call runAtServer.executeCmd("IISReset", "")
+        '        End If
+        '    Catch ex As Exception
+        '        cpCore.handleException(ex)
+        '    End Try
+        '    Return returnOk
+        'End Function
         ''
         ''
         ''

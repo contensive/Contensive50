@@ -77,7 +77,7 @@ Namespace Contensive.Core
                         '
                         cp.core.appendLog("cmdModule.main, call getNextAsyncCmd and loop until command is 'error', or empty ")
                         '
-                        cmd = GetNextAsyncCmd(cp.core, "127.0.0.1", MonitorPort, "", "")
+                        'cmd = GetNextAsyncCmd(cp.core, "127.0.0.1", MonitorPort, "", "")
                         Do While cmd <> "" And InStr(1, cmd, "error", vbTextCompare) <> 1
                             '
                             cp.core.appendLog("cmdModule.main, looping, cmd=[" & cmd & "]")
@@ -96,58 +96,58 @@ Namespace Contensive.Core
                                 '
                                 Call ExecuteCmd(cp.core, tmp)
                             End If
-                            cmd = GetNextAsyncCmd(cp.core, "127.0.0.1", MonitorPort, "", "")
+                            'cmd = GetNextAsyncCmd(cp.core, "127.0.0.1", MonitorPort, "", "")
                         Loop
                     End If
                 End If
                 Tracker = Nothing
             End If
         End Sub
-        '
-        '
-        '
-        Private Function GetNextAsyncCmd(cpCore As cpCoreClass, ByVal IPAddress As String, ByVal port as integer, ByVal Username As String, ByVal Password As String) As String
-            On Error GoTo ErrorTrap
-            '
-            'Dim runAtServer As New runAtServerClass( cpcore )
-            Dim runAtServer As New runAtServerClass(cpCore)
-            Dim ServerResponse As String
-            Dim StatusLine As String
-            Dim hint As String
-            Dim throwAwayFirstLine As String
-            '
-            cpCore.appendLog("cmdMethod.getNextAsyncCmd enter")
-            '
-            'hint = "setting runAtServer properties"
-            runAtServer.ipAddress = IPAddress
-            runAtServer.port = port
-            runAtServer.username = Username
-            runAtServer.password = Password
-            runAtServer.userAgent = "Cmd " & Threading.Thread.CurrentThread.ManagedThreadId
-            'hint = "callng runAtServer executeCmd"
-            GetNextAsyncCmd = runAtServer.executeCmd("GetNextAsyncCmd", "")
-            'hint = "determining return status"
-            cpCore.appendLog("cmdMethod.getNextAsyncCmd exit, status=Mid(GetNextAsyncCmd, 1, 2)=[" & Mid(GetNextAsyncCmd, 1, 2) & "]")
-            If Mid(GetNextAsyncCmd, 1, 2) <> "OK" Then
-                '
-                ' There was a problem
-                '
-                cpCore.appendLog("cmdMethod.getNextAsyncCmd exit, NOT OK")
-                GetNextAsyncCmd = GetNextAsyncCmd
-            Else
-                '
-                ' Command returned, trim off OK and execute
-                '
-                throwAwayFirstLine = getLine(GetNextAsyncCmd)
-            End If
-            '
-            cpCore.appendLog("cmdMethod.getNextAsyncCmd exit, return  [" & GetNextAsyncCmd & "]")
-            '
-            Exit Function
-ErrorTrap:
-            cpCore.handleLegacyError3("(unknown)", "errorTrap in ccCmd", "App.EXEName", "cmdModule", "GetNextAsyncCmd", Err.Number, Err.Source, Err.Description, True, True, "")
-            Err.Clear()
-        End Function
+        '        '
+        '        '
+        '        '
+        '        Private Function GetNextAsyncCmd(cpCore As cpCoreClass, ByVal IPAddress As String, ByVal port as integer, ByVal Username As String, ByVal Password As String) As String
+        '            On Error GoTo ErrorTrap
+        '            '
+        '            'Dim runAtServer As New runAtServerClass( cpcore )
+        '            Dim runAtServer As New runAtServerClass(cpCore)
+        '            Dim ServerResponse As String
+        '            Dim StatusLine As String
+        '            Dim hint As String
+        '            Dim throwAwayFirstLine As String
+        '            '
+        '            cpCore.appendLog("cmdMethod.getNextAsyncCmd enter")
+        '            '
+        '            'hint = "setting runAtServer properties"
+        '            runAtServer.ipAddress = IPAddress
+        '            runAtServer.port = port
+        '            runAtServer.username = Username
+        '            runAtServer.password = Password
+        '            runAtServer.userAgent = "Cmd " & Threading.Thread.CurrentThread.ManagedThreadId
+        '            'hint = "callng runAtServer executeCmd"
+        '            GetNextAsyncCmd = runAtServer.executeCmd("GetNextAsyncCmd", "")
+        '            'hint = "determining return status"
+        '            cpCore.appendLog("cmdMethod.getNextAsyncCmd exit, status=Mid(GetNextAsyncCmd, 1, 2)=[" & Mid(GetNextAsyncCmd, 1, 2) & "]")
+        '            If Mid(GetNextAsyncCmd, 1, 2) <> "OK" Then
+        '                '
+        '                ' There was a problem
+        '                '
+        '                cpCore.appendLog("cmdMethod.getNextAsyncCmd exit, NOT OK")
+        '                GetNextAsyncCmd = GetNextAsyncCmd
+        '            Else
+        '                '
+        '                ' Command returned, trim off OK and execute
+        '                '
+        '                throwAwayFirstLine = getLine(GetNextAsyncCmd)
+        '            End If
+        '            '
+        '            cpCore.appendLog("cmdMethod.getNextAsyncCmd exit, return  [" & GetNextAsyncCmd & "]")
+        '            '
+        '            Exit Function
+        'ErrorTrap:
+        '            cpCore.handleLegacyError3("(unknown)", "errorTrap in ccCmd", "App.EXEName", "cmdModule", "GetNextAsyncCmd", Err.Number, Err.Source, Err.Description, True, True, "")
+        '            Err.Clear()
+        '        End Function
         '
         ' Execute Server Command
         '
@@ -189,11 +189,11 @@ ErrorTrap:
 
                         'End If
                         Select Case UCase(Method)
-                            Case "INSTALLADDON", "INSTALLADDONS"
-                                '
-                                ' Install Add-ons in the AddonInstall folder of the applications virtual folder
-                                '
-                                Call InstallAddons(cpCore, cpCore.app.dataBuildVersion)
+                            'Case "INSTALLADDON", "INSTALLADDONS"
+                            '    '
+                            '    ' Install Add-ons in the AddonInstall folder of the applications virtual folder
+                            '    '
+                            '    Call InstallAddons(cpCore, cpCore.app.dataBuildVersion)
                             Case "IISRESET"
                                 '
                                 ''Call appendErrorLog("ccCmd CmdModule.ExecuteServerCmd.IISRESET")
@@ -514,34 +514,34 @@ ErrorTrap:
                 Call cpCore.handleExceptionLegacyRow2(ex, "cmdModule", "executeCmd", "unexpected exception")
             End Try
         End Sub
-        '
-        '===================================================================================
-        '
-        '===================================================================================
-        '
-        Private Sub InstallAddons(cpCore As cpCoreClass, buildVersion As String)
-            On Error GoTo ErrorTrap
-            '
-            Dim builder As New builderClass(cpCore)
-            Dim Alarm As Integer
-            '
-            ' Wait 5 seconds -- to give the person requesting it a chance to get their page back
-            ' eliminate this with a progress animation that monitors 'done' status for this operation
-            ' and survives the iisreset.
-            '
-            Threading.Thread.Sleep(5000)
-            '
-            ' Go add the addons
-            '
-            If cpCore.app.status = applicationStatusEnum.ApplicationStatusReady Then
-                Call builder.InstallAddons(False, buildVersion)
-            End If
-            '
-            Exit Sub
-ErrorTrap:
-            cpCore.handleLegacyError3(cpCore.app.config.name, "errorTrap in ccCmd", "App.EXEName", "cmdModule", "InstallAddons", Err.Number, Err.Source, Err.Description, True, True, "")
-            Err.Clear()
-        End Sub
+        '        '
+        '        '===================================================================================
+        '        '
+        '        '===================================================================================
+        '        '
+        '        Private Sub InstallAddons(cpCore As cpCoreClass, buildVersion As String)
+        '            On Error GoTo ErrorTrap
+        '            '
+        '            Dim builder As New builderClass(cpCore)
+        '            Dim Alarm As Integer
+        '            '
+        '            ' Wait 5 seconds -- to give the person requesting it a chance to get their page back
+        '            ' eliminate this with a progress animation that monitors 'done' status for this operation
+        '            ' and survives the iisreset.
+        '            '
+        '            Threading.Thread.Sleep(5000)
+        '            '
+        '            ' Go add the addons
+        '            '
+        '            If cpCore.app.status = applicationStatusEnum.ApplicationStatusReady Then
+        '                Call builder.InstallAddons(False, buildVersion)
+        '            End If
+        '            '
+        '            Exit Sub
+        'ErrorTrap:
+        '            cpCore.handleLegacyError3(cpCore.app.config.name, "errorTrap in ccCmd", "App.EXEName", "cmdModule", "InstallAddons", Err.Number, Err.Source, Err.Description, True, True, "")
+        '            Err.Clear()
+        '        End Sub
         '
         '
         '

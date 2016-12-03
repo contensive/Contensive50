@@ -2452,11 +2452,11 @@ ErrorTrap:
             Dim Copy As String
             'Dim ResponseValueVariant As Object
             Dim FieldName As String
-            Dim ResponseValueIsOKToSave As Boolean
+            Dim ResponseFieldValueIsOKToSave As Boolean
             Dim SQLUnique As String
             Dim CSPointer As Integer
-            Dim IsEmptyResponse As Boolean
-            Dim ResponseValueText As String
+            Dim ResponseFieldIsEmpty As Boolean
+            Dim ResponseFieldValueText As String
             Dim Filename As String
             'Dim innovaEditor As New innovaEditorAddonClassFPO
             Dim HTML As New htmlParseClass(cpCore)
@@ -2488,19 +2488,15 @@ ErrorTrap:
                     ' Read value in and test it for valid response
                     ' Assume OK, mark not ok if there is a problem
                     '
-                    ResponseValueIsOKToSave = True
+                    ResponseFieldValueIsOKToSave = True
                     FieldName = UCase(.nameLc)
                     responseName = FieldName
                     InLoadedFieldList = (InStr(1, FormFieldListToBeLoaded, "," & FieldName & ",", vbTextCompare) <> 0)
                     InEmptyFieldList = (InStr(1, FormEmptyFieldList, "," & responseName & ",", vbTextCompare) <> 0)
                     InResponse = cpCore.main_InStream(responseName)
                     FormFieldListToBeLoaded = Replace(FormFieldListToBeLoaded, "," & FieldName & ",", ",", , , vbTextCompare)
-                    ResponseValueText = cpCore.main_ReadStreamText(responseName)
-                    'If InResponse Then
-                    '    'ResponseValueVariant = cpCore.main_ReadStreamText(responseName)
-                    '    'ResponseValueText = EncodeText(ResponseValueVariant)
-                    'End If
-                    'IsEmptyResponse = IsNull(ResponseValueVariant)
+                    ResponseFieldValueText = cpCore.main_ReadStreamText(responseName)
+                    ResponseFieldIsEmpty = String.IsNullOrEmpty(ResponseFieldValueText)
                     If .editTabName <> "" Then
                         TabCopy = " In the " & .editTabName & " tab"
                     End If
@@ -2532,10 +2528,10 @@ ErrorTrap:
                                 End If
                             End If
                             '
-                            ResponseValueText = cpCore.main_ReadStreamText(FieldName)
+                            ResponseFieldValueText = cpCore.main_ReadStreamText(FieldName)
                             'ResponseValueVariant = cpCore.main_ReadStreamText(FieldName)
                             'ResponseValueText = EncodeText(ResponseValueVariant)
-                            If EncodeInteger(ResponseValueText) = EncodeInteger(editRecord.fieldsLc(.nameLc).value) Then
+                            If EncodeInteger(ResponseFieldValueText) = EncodeInteger(editRecord.fieldsLc(.nameLc).value) Then
                                 '
                                 ' No change
                                 '
@@ -2543,8 +2539,8 @@ ErrorTrap:
                                 '
                                 ' new value
                                 '
-                                editRecord.fieldsLc(.nameLc).value = ResponseValueText
-                                IsEmptyResponse = False
+                                editRecord.fieldsLc(.nameLc).value = ResponseFieldValueText
+                                ResponseFieldIsEmpty = False
                             End If
                         Case "CONTENTCATEGORYID"
                             '
@@ -2560,9 +2556,9 @@ ErrorTrap:
                                 End If
                             End If
                             '
-                            ResponseValueText = cpCore.main_ReadStreamText(FieldName)
+                            ResponseFieldValueText = cpCore.main_ReadStreamText(FieldName)
                             'ResponseValueText = encodeText(ResponseValueVariant)
-                            If EncodeInteger(ResponseValueText) = EncodeInteger(editRecord.fieldsLc(.nameLc).value) Then
+                            If EncodeInteger(ResponseFieldValueText) = EncodeInteger(editRecord.fieldsLc(.nameLc).value) Then
                                 '
                                 ' No change
                                 '
@@ -2570,8 +2566,8 @@ ErrorTrap:
                                 '
                                 ' new value
                                 '
-                                editRecord.fieldsLc(.nameLc).value = ResponseValueText
-                                IsEmptyResponse = False
+                                editRecord.fieldsLc(.nameLc).value = ResponseFieldValueText
+                                ResponseFieldIsEmpty = False
                             End If
                         Case "CCGUID"
                             '
@@ -2587,8 +2583,8 @@ ErrorTrap:
                                 End If
                             End If
                             '
-                            ResponseValueText = cpCore.main_ReadStreamText(FieldName)
-                            If ResponseValueText = editRecord.fieldsLc(.nameLc).value.ToString Then
+                            ResponseFieldValueText = cpCore.main_ReadStreamText(FieldName)
+                            If ResponseFieldValueText = editRecord.fieldsLc(.nameLc).value.ToString Then
                                 '
                                 ' No change
                                 '
@@ -2596,14 +2592,14 @@ ErrorTrap:
                                 '
                                 ' new value
                                 '
-                                editRecord.fieldsLc(.nameLc).value = ResponseValueText
-                                IsEmptyResponse = False
+                                editRecord.fieldsLc(.nameLc).value = ResponseFieldValueText
+                                ResponseFieldIsEmpty = False
                             End If
                         Case "ID", "MODIFIEDBY", "MODIFIEDDATE", "CREATEDBY", "DATEADDED"
                             '
-                            ' -----Control fields that can not be edited
+                            ' -----Control fields that cannot be edited
                             '       9/24/2009 - do not save these into the response
-                            ResponseValueIsOKToSave = False
+                            ResponseFieldValueIsOKToSave = False
                             '
                         Case Else
                             '
@@ -2614,34 +2610,34 @@ ErrorTrap:
                                 '
                                 ' Is blocked from authoring, leave current value
                                 '
-                                ResponseValueIsOKToSave = False
+                                ResponseFieldValueIsOKToSave = False
                             ElseIf (.fieldTypeId = FieldTypeIdAutoIdIncrement) Or (.fieldTypeId = FieldTypeIdRedirect) Or (.fieldTypeId = FieldTypeIdManyToMany) Then
                                 '
                                 ' These fields types have no values to load, leave current value
                                 ' (many to many is handled during save)
                                 '
-                                ResponseValueIsOKToSave = False
+                                ResponseFieldValueIsOKToSave = False
                             ElseIf (.adminOnly) And (Not cpCore.user_isAdmin) Then
                                 '
                                 ' non-admin and admin only field, leave current value
                                 '
-                                ResponseValueIsOKToSave = False
+                                ResponseFieldValueIsOKToSave = False
                             ElseIf (.developerOnly) And (Not cpCore.user_isDeveloper) Then
                                 '
                                 ' non-developer and developer only field, leave current value
                                 '
-                                ResponseValueIsOKToSave = False
+                                ResponseFieldValueIsOKToSave = False
                             ElseIf (.ReadOnly) Or (.NotEditable And (editRecord.id <> 0)) Then
                                 '
                                 ' read only field, leave current
                                 '
-                                ResponseValueIsOKToSave = False
+                                ResponseFieldValueIsOKToSave = False
                             ElseIf (Not InLoadedFieldList) Then
                                 '
                                 ' Was not sent out, so just go with the current value
                                 ' Also, if the loaded field list is not returned, and the field is not returned, this is the bestwe can do.
                                 '
-                                ResponseValueIsOKToSave = False
+                                ResponseFieldValueIsOKToSave = False
                                 'ElseIf (InEmptyFieldList And (Not InResponse)) Then
                                 '    '
                                 '    ' NO - InEmptyFieldList is what comes back from the browser as a list of fields that are blank after the submit button is pressed
@@ -2654,7 +2650,7 @@ ErrorTrap:
                                 '
                                 Call cpCore.main_AddUserError("There has been an Error reading the response from your browser. The field [" & .caption & "]" & TabCopy & " was missing. Please Try your change again. If this Error happens repeatedly, please report this problem To your site administrator.")
                                 cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.app.config.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
-                                ResponseValueIsOKToSave = False
+                                ResponseFieldValueIsOKToSave = False
                             Else
                                 '
                                 ' Test input value for valid data
@@ -2664,50 +2660,50 @@ ErrorTrap:
                                         '
                                         ' ----- Integer
                                         '
-                                        IsEmptyResponse = IsEmptyResponse Or (ResponseValueText = "")
-                                        If Not IsEmptyResponse Then
-                                            If IsNumeric(ResponseValueText) Then
+                                        ResponseFieldIsEmpty = ResponseFieldIsEmpty Or (ResponseFieldValueText = "")
+                                        If Not ResponseFieldIsEmpty Then
+                                            If IsNumeric(ResponseFieldValueText) Then
                                                 'ResponseValueVariant = EncodeInteger(ResponseValueVariant)
                                             Else
-                                                cpCore.main_AddUserError("This record can Not be saved because the field [" & .caption & "]" & TabCopy & " must be a numeric value.")
-                                                ResponseValueIsOKToSave = False
+                                                cpCore.main_AddUserError("The record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be a numeric value.")
+                                                ResponseFieldValueIsOKToSave = False
                                             End If
                                         End If
                                     Case FieldTypeIdCurrency, FieldTypeIdFloat
                                         '
                                         ' ----- Floating point number
                                         '
-                                        IsEmptyResponse = IsEmptyResponse Or (ResponseValueText = "")
-                                        If Not IsEmptyResponse Then
-                                            If IsNumeric(ResponseValueText) Then
+                                        ResponseFieldIsEmpty = ResponseFieldIsEmpty Or (ResponseFieldValueText = "")
+                                        If Not ResponseFieldIsEmpty Then
+                                            If IsNumeric(ResponseFieldValueText) Then
                                                 'ResponseValueVariant = EncodeNumber(ResponseValueVariant)
                                             Else
-                                                cpCore.main_AddUserError("This record can Not be saved because the field [" & .caption & "]" & TabCopy & " must be a numeric value.")
-                                                ResponseValueIsOKToSave = False
+                                                cpCore.main_AddUserError("This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be a numeric value.")
+                                                ResponseFieldValueIsOKToSave = False
                                             End If
                                         End If
                                     Case FieldTypeIdLookup
                                         '
                                         ' ----- Must be a recordID
                                         '
-                                        IsEmptyResponse = IsEmptyResponse Or (ResponseValueText = "")
-                                        If Not IsEmptyResponse Then
-                                            If IsNumeric(ResponseValueText) Then
+                                        ResponseFieldIsEmpty = ResponseFieldIsEmpty Or (ResponseFieldValueText = "")
+                                        If Not ResponseFieldIsEmpty Then
+                                            If IsNumeric(ResponseFieldValueText) Then
                                                 'ResponseValueVariant = EncodeInteger(ResponseValueVariant)
                                             Else
-                                                cpCore.main_AddUserError("This record can Not be saved because the field [" & .caption & "]" & TabCopy & " had an invalid selection.")
-                                                ResponseValueIsOKToSave = False
+                                                cpCore.main_AddUserError("This record cannot be saved because the field [" & .caption & "]" & TabCopy & " had an invalid selection.")
+                                                ResponseFieldValueIsOKToSave = False
                                             End If
                                         End If
                                     Case FieldTypeIdDate
                                         '
                                         ' ----- Must be a Date value
                                         '
-                                        IsEmptyResponse = IsEmptyResponse Or (ResponseValueText = "")
-                                        If Not IsEmptyResponse Then
-                                            If Not IsDate(ResponseValueText) Then
-                                                cpCore.main_AddUserError("This record can Not be saved because the field [" & .caption & "]" & TabCopy & " must be a Date And/Or time In the form mm/dd/yy 0000 AM(PM).")
-                                                ResponseValueIsOKToSave = False
+                                        ResponseFieldIsEmpty = ResponseFieldIsEmpty Or (ResponseFieldValueText = "")
+                                        If Not ResponseFieldIsEmpty Then
+                                            If Not IsDate(ResponseFieldValueText) Then
+                                                cpCore.main_AddUserError("This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be a date And/Or time in the form mm/dd/yy 0000 AM(PM).")
+                                                ResponseFieldValueIsOKToSave = False
                                             End If
                                         End If
                                         'End Case
@@ -2715,14 +2711,14 @@ ErrorTrap:
                                         '
                                         ' ----- translate to boolean
                                         '
-                                        ResponseValueText = EncodeBoolean(ResponseValueText).ToString
+                                        ResponseFieldValueText = EncodeBoolean(ResponseFieldValueText).ToString
                                     Case FieldTypeIdLink
                                         '
                                         ' ----- Link field - if it starts with 'www.', add the http:// automatically
                                         '
-                                        ResponseValueText = EncodeText(ResponseValueText)
-                                        If Left(LCase(ResponseValueText), 4) = "www." Then
-                                            ResponseValueText = "http//" & ResponseValueText
+                                        ResponseFieldValueText = EncodeText(ResponseFieldValueText)
+                                        If Left(LCase(ResponseFieldValueText), 4) = "www." Then
+                                            ResponseFieldValueText = "http//" & ResponseFieldValueText
                                         End If
                                     Case FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate
                                         '
@@ -2738,7 +2734,7 @@ ErrorTrap:
                                         End If
                                         '
                                         If Not .htmlContent Then
-                                            lcaseCopy = LCase(ResponseValueText)
+                                            lcaseCopy = LCase(ResponseFieldValueText)
                                             lcaseCopy = Replace(lcaseCopy, vbCr, "")
                                             lcaseCopy = Replace(lcaseCopy, vbLf, "")
                                             lcaseCopy = Trim(lcaseCopy)
@@ -2746,34 +2742,34 @@ ErrorTrap:
                                                 '
                                                 ' if the editor was left blank, remote the default copy
                                                 '
-                                                ResponseValueText = ""
+                                                ResponseFieldValueText = ""
                                             Else
-                                                If InStr(1, ResponseValueText, HTMLEditorDefaultCopyStartMark) <> 0 Then
+                                                If InStr(1, ResponseFieldValueText, HTMLEditorDefaultCopyStartMark) <> 0 Then
                                                     '
                                                     ' if the default copy was editing, remote the markers
                                                     '
-                                                    ResponseValueText = Replace(ResponseValueText, HTMLEditorDefaultCopyStartMark, "")
-                                                    ResponseValueText = Replace(ResponseValueText, HTMLEditorDefaultCopyEndMark, "")
+                                                    ResponseFieldValueText = Replace(ResponseFieldValueText, HTMLEditorDefaultCopyStartMark, "")
+                                                    ResponseFieldValueText = Replace(ResponseFieldValueText, HTMLEditorDefaultCopyEndMark, "")
                                                     'ResponseValueVariant = ResponseValueText
                                                 End If
                                                 '
                                                 ' If the response is only white space, remove it
                                                 ' this is a fix for when content editors leave white space in the editor, and do not realize it
-                                                '   then can not fixgure out how to remove it
+                                                '   then cannot fixgure out how to remove it
                                                 '
-                                                ResponseValueText = cpCore.main_DecodeContent(ResponseValueText)
-                                                ResponseValueText = LCase(EncodeText(ResponseValueText))
-                                                If Len(ResponseValueText) < 20 Then
-                                                    HasInput = (InStr(1, ResponseValueText, "<input ") <> 0)
+                                                ResponseFieldValueText = cpCore.main_DecodeContent(ResponseFieldValueText)
+                                                ResponseFieldValueText = LCase(EncodeText(ResponseFieldValueText))
+                                                If Len(ResponseFieldValueText) < 20 Then
+                                                    HasInput = (InStr(1, ResponseFieldValueText, "<input ") <> 0)
                                                     If Not HasInput Then
-                                                        HasImg = (InStr(1, ResponseValueText, "<img ") <> 0)
+                                                        HasImg = (InStr(1, ResponseFieldValueText, "<img ") <> 0)
                                                         If Not HasImg Then
-                                                            HasAC = (InStr(1, ResponseValueText, "<ac ") <> 0)
+                                                            HasAC = (InStr(1, ResponseFieldValueText, "<ac ") <> 0)
                                                             If Not HasAC Then
                                                                 HTMLDecode = New converthtmlToTextClass(cpCore)
-                                                                Copy = Trim(HTMLDecode.convert(EncodeText(ResponseValueText)))
+                                                                Copy = Trim(HTMLDecode.convert(EncodeText(ResponseFieldValueText)))
                                                                 If Copy = "" Then
-                                                                    ResponseValueText = ""
+                                                                    ResponseFieldValueText = ""
                                                                 End If
                                                                 HTMLDecode = Nothing
                                                             End If
@@ -2800,7 +2796,7 @@ ErrorTrap:
                                     ' check circular reference on all parentid fields
                                     '
 
-                                    ParentID = EncodeInteger(ResponseValueText)
+                                    ParentID = EncodeInteger(ResponseFieldValueText)
                                     LoopPtr = 0
                                     UsedIDs = editRecord.id.ToString
                                     Do While (LoopPtr < LoopPtrMax) And (ParentID <> 0) And (InStr(1, "," & UsedIDs & ",", "," & CStr(ParentID) & ",", vbBinaryCompare) = 0)
@@ -2818,34 +2814,34 @@ ErrorTrap:
                                         '
                                         ' Too deep
                                         '
-                                        cpCore.main_AddUserError("This record can Not be saved because the field [" & .caption & "]" & TabCopy & " creates a relationship between records that Is too large. Please limit the depth of this relationship to " & LoopPtrMax & " records.")
-                                        ResponseValueIsOKToSave = False
+                                        cpCore.main_AddUserError("This record cannot be saved because the field [" & .caption & "]" & TabCopy & " creates a relationship between records that Is too large. Please limit the depth of this relationship to " & LoopPtrMax & " records.")
+                                        ResponseFieldValueIsOKToSave = False
                                     ElseIf (editRecord.id <> 0) And (editRecord.id = ParentID) Then
                                         '
                                         ' Reference to iteslf
                                         '
-                                        cpCore.main_AddUserError("This record can Not be saved because the field [" & .caption & "]" & TabCopy & " contains a circular reference. This record points back to itself. This Is Not allowed.")
-                                        ResponseValueIsOKToSave = False
+                                        cpCore.main_AddUserError("This record cannot be saved because the field [" & .caption & "]" & TabCopy & " contains a circular reference. This record points back to itself. This Is Not allowed.")
+                                        ResponseFieldValueIsOKToSave = False
                                     ElseIf ParentID <> 0 Then
                                         '
                                         ' Circular reference
                                         '
-                                        cpCore.main_AddUserError("This record can Not be saved because the field [" & .caption & "]" & TabCopy & " contains a circular reference. This field either points to other records which then point back to this record. This Is Not allowed.")
-                                        ResponseValueIsOKToSave = False
+                                        cpCore.main_AddUserError("This record cannot be saved because the field [" & .caption & "]" & TabCopy & " contains a circular reference. This field either points to other records which then point back to this record. This Is Not allowed.")
+                                        ResponseFieldValueIsOKToSave = False
                                     End If
                                 End If
                                 If .TextBuffered Then
                                     '
                                     ' text buffering
                                     '
-                                    ResponseValueText = cpCore.main_RemoveControlCharacters(ResponseValueText)
+                                    ResponseFieldValueText = cpCore.main_RemoveControlCharacters(ResponseFieldValueText)
                                 End If
-                                If (.Required) And (IsEmptyResponse) Then
+                                If (.Required) And (ResponseFieldIsEmpty) Then
                                     '
                                     ' field is required and is not given
                                     '
-                                    cpCore.main_AddUserError("This record can Not be saved because the field [" & .caption & "]" & TabCopy & " Is required but has no value.")
-                                    ResponseValueIsOKToSave = False
+                                    cpCore.main_AddUserError("This record cannot be saved because the field [" & .caption & "]" & TabCopy & " Is required but has no value.")
+                                    ResponseFieldValueIsOKToSave = False
                                 End If
                                 '
                                 ' special case - people records without Allowduplicateusername require username to be unique
@@ -2858,7 +2854,7 @@ ErrorTrap:
                                         blockDuplicateEmail = (cpCore.app.siteProperty_getBoolean("allowemaillogin", False))
                                     End If
                                 End If
-                                If (blockDuplicateUsername Or blockDuplicateEmail Or .UniqueName) And (Not IsEmptyResponse) Then
+                                If (blockDuplicateUsername Or blockDuplicateEmail Or .UniqueName) And (Not ResponseFieldIsEmpty) Then
                                     '
                                     ' ----- Do the unique check for this field
                                     '
@@ -2868,10 +2864,10 @@ ErrorTrap:
                                         ' new record
                                         '
                                         If AdminContentWorkflowAuthoring Then
-                                            SQLUnique = "SELECT ID,EditSourceID FROM " & adminContent.ContentTableName & " WHERE (" & FieldName & "=" & EncodeSQL(ResponseValueText, .fieldTypeId) & ")And(ID<>0)And(" & cpCore.csv_GetContentControlCriteria(adminContent.Name) & ")"
+                                            SQLUnique = "SELECT ID,EditSourceID FROM " & adminContent.ContentTableName & " WHERE (" & FieldName & "=" & EncodeSQL(ResponseFieldValueText, .fieldTypeId) & ")And(ID<>0)And(" & cpCore.csv_GetContentControlCriteria(adminContent.Name) & ")"
                                             SQLUnique = SQLUnique & "And((EditArchive Is null)Or(EditArchive=0))"
                                         Else
-                                            SQLUnique = "SELECT ID,0 as editsourceid FROM " & adminContent.ContentTableName & " WHERE (" & FieldName & "=" & EncodeSQL(ResponseValueText, .fieldTypeId) & ")And(ID<>0)And(" & cpCore.csv_GetContentControlCriteria(adminContent.Name) & ")"
+                                            SQLUnique = "SELECT ID,0 as editsourceid FROM " & adminContent.ContentTableName & " WHERE (" & FieldName & "=" & EncodeSQL(ResponseFieldValueText, .fieldTypeId) & ")And(ID<>0)And(" & cpCore.csv_GetContentControlCriteria(adminContent.Name) & ")"
                                         End If
                                     Else
                                         '
@@ -2881,10 +2877,10 @@ ErrorTrap:
                                             '
                                             ' check for another edit record that matches this record -or- a live record that matches it
                                             '
-                                            SQLUnique = "SELECT ID,EditSourceID FROM " & adminContent.ContentTableName & " WHERE (" & FieldName & "=" & EncodeSQL(ResponseValueText, .fieldTypeId) & ")And(ID<>0)And(" & cpCore.csv_GetContentControlCriteria(adminContent.Name) & ")"
+                                            SQLUnique = "SELECT ID,EditSourceID FROM " & adminContent.ContentTableName & " WHERE (" & FieldName & "=" & EncodeSQL(ResponseFieldValueText, .fieldTypeId) & ")And(ID<>0)And(" & cpCore.csv_GetContentControlCriteria(adminContent.Name) & ")"
                                             SQLUnique = SQLUnique & "And( (EditSourceID Is null) Or ((EditSourceID<>" & editRecord.id & ")And((EditArchive Is null)Or(EditArchive=0))))"
                                         Else
-                                            SQLUnique = "SELECT ID,0 as editsourceid FROM " & adminContent.ContentTableName & " WHERE (" & FieldName & "=" & EncodeSQL(ResponseValueText, .fieldTypeId) & ")And(ID<>0)And(" & cpCore.csv_GetContentControlCriteria(adminContent.Name) & ")"
+                                            SQLUnique = "SELECT ID,0 as editsourceid FROM " & adminContent.ContentTableName & " WHERE (" & FieldName & "=" & EncodeSQL(ResponseFieldValueText, .fieldTypeId) & ")And(ID<>0)And(" & cpCore.csv_GetContentControlCriteria(adminContent.Name) & ")"
                                         End If
                                         SQLUnique = SQLUnique & "And(ID<>" & editRecord.id & ")"
                                     End If
@@ -2897,12 +2893,12 @@ ErrorTrap:
                                             '
                                             '
                                             '
-                                            cpCore.main_AddUserError("This record can Not be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record with [" & ResponseValueText & "]. This must be unique because the preference Allow Duplicate Usernames Is Not checked.")
+                                            cpCore.main_AddUserError("This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record with [" & ResponseFieldValueText & "]. This must be unique because the preference Allow Duplicate Usernames Is Not checked.")
                                         ElseIf blockDuplicateEmail Then
                                             '
                                             '
                                             '
-                                            cpCore.main_AddUserError("This record can Not be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record with [" & ResponseValueText & "]. This must be unique because the preference Allow Email Login Is checked.")
+                                            cpCore.main_AddUserError("This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record with [" & ResponseFieldValueText & "]. This must be unique because the preference Allow Email Login Is checked.")
                                         ElseIf AdminContentWorkflowAuthoring Then
                                             '
                                             ' Workflow
@@ -2911,20 +2907,20 @@ ErrorTrap:
                                                 '
                                                 ' there is a live record that matches
                                                 '
-                                                cpCore.main_AddUserError("This record can Not be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record with the value [" & ResponseValueText & "].")
+                                                cpCore.main_AddUserError("This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record with the value [" & ResponseFieldValueText & "].")
                                             Else
                                                 '
                                                 ' there is an edit record that matches
                                                 '
-                                                cpCore.main_AddUserError("This record can Not be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record whose current edits include the value [" & ResponseValueText & "].")
+                                                cpCore.main_AddUserError("This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record whose current edits include the value [" & ResponseFieldValueText & "].")
                                             End If
                                         Else
                                             '
                                             ' non-workflow
                                             '
-                                            cpCore.main_AddUserError("This record can Not be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record with [" & ResponseValueText & "].")
+                                            cpCore.main_AddUserError("This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be unique And there Is another record with [" & ResponseFieldValueText & "].")
                                         End If
-                                        ResponseValueIsOKToSave = False
+                                        ResponseFieldValueIsOKToSave = False
                                     End If
                                     Call cpCore.app.db_csClose(CSPointer)
                                 End If
@@ -2934,8 +2930,8 @@ ErrorTrap:
                     '
                     ' Save response if it is valid
                     '
-                    If ResponseValueIsOKToSave Then
-                        editRecord.fieldsLc(.nameLc).value = ResponseValueText
+                    If ResponseFieldValueIsOKToSave Then
+                        editRecord.fieldsLc(.nameLc).value = ResponseFieldValueText
                     End If
                 End If
             End With
@@ -4338,7 +4334,7 @@ ErrorTrap:
                             EditSectionButtonBar = Replace(EditSectionButtonBar, ButtonDelete, ButtonDeletePerson)
                             Call Stream.Add(EditSectionButtonBar)
                             Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
-                            Call Stream.Add(GetForm_Edit_UserFieldTabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
+                            Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
                             Call Stream.Add(GetForm_Edit_AddTab("Groups", GetForm_Edit_MemberGroups(adminContent, editRecord), allowAdminTabs))
                             'Call Stream.Add(GetForm_Edit_AddTab("Topics", GetForm_Edit_TopicRules, AllowAdminTabs))
                             'Call Stream.Add(GetForm_Edit_AddTab("Calendar", GetForm_Edit_CalendarEvents, AllowAdminTabs))
@@ -4364,7 +4360,7 @@ ErrorTrap:
                             EditSectionButtonBar = Replace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
                             Call Stream.Add(EditSectionButtonBar)
                             Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
-                            Call Stream.Add(GetForm_Edit_UserFieldTabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
+                            Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
                             Call Stream.Add(GetForm_Edit_AddTab("Path Rules", GetForm_Edit_PathRules(adminContent, editRecord), allowAdminTabs))
                             'Call Stream.Add(GetForm_Edit_AddTab("Calendar", GetForm_Edit_CalendarEvents, AllowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
@@ -4425,7 +4421,7 @@ ErrorTrap:
                             '
                             Call Stream.Add(EditSectionButtonBar)
                             Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
-                            Call Stream.Add(GetForm_Edit_UserFieldTabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
+                            Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
                             Call Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Groups", GetForm_Edit_EmailRules(adminContent, editRecord, editRecord.Read_Only And (Not cpCore.user_isDeveloper)), allowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Topics", GetForm_Edit_EmailTopics(adminContent, editRecord, editRecord.Read_Only And (Not cpCore.user_isDeveloper)), allowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Bounce&nbsp;Control", GetForm_Edit_EmailBounceStatus(), allowAdminTabs))
@@ -4478,7 +4474,7 @@ ErrorTrap:
                             '
                             Call Stream.Add(EditSectionButtonBar)
                             Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
-                            Call Stream.Add(GetForm_Edit_UserFieldTabs(adminContent, editRecord, editRecord.Read_Only Or EmailSubmitted, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
+                            Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only Or EmailSubmitted, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
                             Call Stream.Add(GetForm_Edit_AddTab("Condition&nbsp;Groups", GetForm_Edit_EmailRules(adminContent, editRecord, editRecord.Read_Only Or EmailSubmitted), allowAdminTabs))
                             'Call Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Topics", GetForm_Edit_EmailTopics(editrecord.read_only Or EmailSubmitted), AllowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Bounce&nbsp;Control", GetForm_Edit_EmailBounceStatus(), allowAdminTabs))
@@ -4529,7 +4525,7 @@ ErrorTrap:
                             '
                             Call Stream.Add(EditSectionButtonBar)
                             Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
-                            Call Stream.Add(GetForm_Edit_UserFieldTabs(adminContent, editRecord, editRecord.Read_Only Or EmailSubmitted Or EmailSent, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
+                            Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only Or EmailSubmitted Or EmailSent, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
                             Call Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Groups", GetForm_Edit_EmailRules(adminContent, editRecord, editRecord.Read_Only Or EmailSubmitted Or EmailSent), allowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Topics", GetForm_Edit_EmailTopics(adminContent, editRecord, editRecord.Read_Only Or EmailSubmitted Or EmailSent), allowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Bounce&nbsp;Control", GetForm_Edit_EmailBounceStatus(), allowAdminTabs))
@@ -4554,7 +4550,7 @@ ErrorTrap:
                             EditSectionButtonBar = Replace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
                             Call Stream.Add(EditSectionButtonBar)
                             Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
-                            Call Stream.Add(GetForm_Edit_UserFieldTabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
+                            Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
                             Call Stream.Add(GetForm_Edit_AddTab("Authoring Permissions", GetForm_Edit_GroupRules(adminContent, editRecord), allowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                             If allowAdminTabs Then
@@ -4573,7 +4569,7 @@ ErrorTrap:
                         EditSectionButtonBar = Replace(EditSectionButtonBar, ButtonDelete, ButtonDeletePage)
                         Call Stream.Add(EditSectionButtonBar)
                         Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
-                        Call Stream.Add(GetForm_Edit_UserFieldTabs(adminContent, editRecord, editRecord.Read_Only, IsLandingPage Or IsLandingPageParent, IsRootPage, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
+                        Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, IsLandingPage Or IsLandingPageParent, IsRootPage, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
                         Call Stream.Add(GetForm_Edit_AddTab("Meta Content", GetForm_Edit_MetaContent(adminContent, editRecord, editRecord.Read_Only), allowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Link Aliases", GetForm_Edit_LinkAliases(adminContent, editRecord, editRecord.Read_Only), allowAdminTabs))
                         'Call Stream.Add(GetForm_Edit_AddTab("Topics", GetForm_Edit_TopicRules, AllowAdminTabs))
@@ -4593,7 +4589,7 @@ ErrorTrap:
                         EditSectionButtonBar = Replace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
                         Call Stream.Add(EditSectionButtonBar)
                         Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
-                        Call Stream.Add(GetForm_Edit_UserFieldTabs(adminContent, editRecord, editRecord.Read_Only, IsLandingSection, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
+                        Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, IsLandingSection, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
                         Call Stream.Add(GetForm_Edit_AddTab("Select Menus", GetForm_Edit_SectionDynamicMenuRules(adminContent, editRecord), allowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Section Blocking", GetForm_Edit_SectionBlockRules(adminContent, editRecord), allowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
@@ -4610,7 +4606,7 @@ ErrorTrap:
                         EditSectionButtonBar = Replace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
                         Call Stream.Add(EditSectionButtonBar)
                         Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
-                        Call Stream.Add(GetForm_Edit_UserFieldTabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
+                        Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
                         Call Stream.Add(GetForm_Edit_AddTab("Select Sections", GetForm_Edit_DynamicMenuSectionRules(adminContent, editRecord), allowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                         If allowAdminTabs Then
@@ -4626,7 +4622,7 @@ ErrorTrap:
                         EditSectionButtonBar = Replace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
                         Call Stream.Add(EditSectionButtonBar)
                         Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
-                        Call Stream.Add(GetForm_Edit_UserFieldTabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
+                        Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
                         Call Stream.Add(GetForm_Edit_AddTab("Authoring Access", GetForm_Edit_LibraryFolderRules(adminContent, editRecord), allowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                         If allowAdminTabs Then
@@ -4642,7 +4638,7 @@ ErrorTrap:
                         EditSectionButtonBar = Replace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
                         Call Stream.Add(EditSectionButtonBar)
                         Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
-                        Call Stream.Add(GetForm_Edit_UserFieldTabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
+                        Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
                         Call Stream.Add(GetForm_Edit_AddTab("Authoring Permissions", GetForm_Edit_ContentGroupRules(adminContent, editRecord), allowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Meta Content", GetForm_Edit_MetaContent(adminContent, editRecord, editRecord.Read_Only), allowAdminTabs))
                         'Call Stream.Add(GetForm_Edit_AddTab("Topics", GetForm_Edit_TopicRules, AllowAdminTabs))
@@ -4683,7 +4679,7 @@ ErrorTrap:
                         EditSectionButtonBar = Replace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
                         Call Stream.Add(EditSectionButtonBar)
                         Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
-                        Call Stream.Add(GetForm_Edit_UserFieldTabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
+                        Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
                         Call Stream.Add(GetForm_Edit_AddTab("Reports", GetForm_Edit_LayoutReports(adminContent, editRecord), allowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                         If allowAdminTabs Then
@@ -4698,7 +4694,7 @@ ErrorTrap:
                         EditSectionButtonBar = Replace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
                         Call Stream.Add(EditSectionButtonBar)
                         Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
-                        Call Stream.Add(GetForm_Edit_UserFieldTabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
+                        Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
                         Call Stream.Add(GetForm_Edit_AddTab("Meta Content", GetForm_Edit_MetaContent(adminContent, editRecord, editRecord.Read_Only), allowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Content Watch", GetForm_Edit_ContentTracking(adminContent, editRecord), allowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
@@ -5330,7 +5326,7 @@ ErrorTrap:
         '   Generate the content of a tab in the Edit Screen
         '========================================================================
         '
-        Private Function GetEditTabContent(adminContent As metaDataClass.CDefClass, editRecord As editRecordClass, ByVal RecordID As Integer, ByVal ContentID As Integer, ByVal ForceReadOnly As Boolean, ByVal IsLandingPage As Boolean, ByVal IsRootPage As Boolean, ByVal EditTab As String, ByVal EditorContext As csv_contentTypeEnum, ByRef return_NewFieldList As String, ByVal TemplateIDForStyles As Integer, ByVal HelpCnt As Integer, ByVal HelpIDCache() As Integer, ByVal helpDefaultCache() As String, ByVal HelpCustomCache() As String, ByVal AllowHelpMsgCustom As Boolean, ByVal helpIdIndex As keyPtrIndexClass, ByVal fieldTypeDefaultEditors As String(), ByVal fieldEditorPreferenceList As String, ByVal styleList As String, ByVal styleOptionList As String, ByVal emailIdForStyles As Integer, ByVal IsTemplateTable As Boolean, ByVal editorAddonListJSON As String) As String
+        Private Function GetForm_Edit_Tab(adminContent As metaDataClass.CDefClass, editRecord As editRecordClass, ByVal RecordID As Integer, ByVal ContentID As Integer, ByVal ForceReadOnly As Boolean, ByVal IsLandingPage As Boolean, ByVal IsRootPage As Boolean, ByVal EditTab As String, ByVal EditorContext As csv_contentTypeEnum, ByRef return_NewFieldList As String, ByVal TemplateIDForStyles As Integer, ByVal HelpCnt As Integer, ByVal HelpIDCache() As Integer, ByVal helpDefaultCache() As String, ByVal HelpCustomCache() As String, ByVal AllowHelpMsgCustom As Boolean, ByVal helpIdIndex As keyPtrIndexClass, ByVal fieldTypeDefaultEditors As String(), ByVal fieldEditorPreferenceList As String, ByVal styleList As String, ByVal styleOptionList As String, ByVal emailIdForStyles As Integer, ByVal IsTemplateTable As Boolean, ByVal editorAddonListJSON As String) As String
             Dim returnHtml As String = ""
             Try
                 '
@@ -6300,12 +6296,14 @@ ErrorTrap:
                             EditorHelp = ""
                             LcaseName = LCase(.nameLc)
                             If AllowHelpMsgCustom Then
-                                HelpPtr = helpIdIndex.getPtr(CStr(.id))
-                                If HelpPtr >= 0 Then
-                                    FieldHelpFound = True
-                                    HelpMsgDefault = helpDefaultCache(HelpPtr)
-                                    HelpMsgCustom = HelpCustomCache(HelpPtr)
-                                End If
+                                HelpMsgDefault = .HelpDefault
+                                HelpMsgCustom = .HelpCustom
+                                'HelpPtr = helpIdIndex.getPtr(CStr(.id))
+                                'If HelpPtr >= 0 Then
+                                '    FieldHelpFound = True
+                                '    HelpMsgDefault = helpDefaultCache(HelpPtr)
+                                '    HelpMsgCustom = HelpCustomCache(HelpPtr)
+                                'End If
                             End If
                             If Not FieldHelpFound Then
                                 Call getFieldHelpMsgs(adminContent.parentID, .nameLc, HelpMsgDefault, HelpMsgCustom)
@@ -6840,7 +6838,7 @@ ErrorTrap:
                         ' add a set button
                         '
                         Dim ccGuid As String
-                        ccGuid = Guid.NewGuid.ToString()
+                        ccGuid = "{" & Guid.NewGuid.ToString() & "}"
                         HTMLFieldString = cpCore.main_GetFormInputText2("ccguid", HTMLFieldString, , , "ccguid", , False) & "<input type=button value=set onclick=""var e=document.getElementById('ccguid');e.value='" & ccGuid & "';this.disabled=true;"">"
                     Else
                         '
@@ -6906,6 +6904,7 @@ ErrorTrap:
                         '
                         FieldHelp = EncodeText(.HelpMessage)
                         FieldRequired = EncodeBoolean(.Required)
+                        FieldValueInteger = editRecord.contentControlId
                         '
                         '
                         '
@@ -11950,7 +11949,7 @@ ErrorTrap:
         '
         '
         '
-        Private Function GetForm_Edit_UserFieldTabs(adminContent As metaDataClass.CDefClass, editRecord As editRecordClass, ByVal readOnlyField As Boolean, ByVal IsLandingPage As Boolean, ByVal IsRootPage As Boolean, ByVal EditorContext As csv_contentTypeEnum, ByVal allowAjaxTabs As Boolean, ByVal TemplateIDForStyles As Integer, ByVal fieldTypeDefaultEditors As String(), ByVal fieldEditorPreferenceList As String, ByVal styleList As String, ByVal styleOptionList As String, ByVal emailIdForStyles As Integer, ByVal IsTemplateTable As Boolean, ByVal editorAddonListJSON As String) As String
+        Private Function GetForm_Edit_Tabs(adminContent As metaDataClass.CDefClass, editRecord As editRecordClass, ByVal readOnlyField As Boolean, ByVal IsLandingPage As Boolean, ByVal IsRootPage As Boolean, ByVal EditorContext As csv_contentTypeEnum, ByVal allowAjaxTabs As Boolean, ByVal TemplateIDForStyles As Integer, ByVal fieldTypeDefaultEditors As String(), ByVal fieldEditorPreferenceList As String, ByVal styleList As String, ByVal styleOptionList As String, ByVal emailIdForStyles As Integer, ByVal IsTemplateTable As Boolean, ByVal editorAddonListJSON As String) As String
             Dim returnHtml As String = ""
             Try
                 '
@@ -12029,7 +12028,7 @@ ErrorTrap:
                             '
                             ' Live Tab (non-tab mode, non-ajax mode, or details tab
                             '
-                            tabContent = GetEditTabContent(adminContent, editRecord, editRecord.id, adminContent.Id, readOnlyField, IsLandingPage, IsRootPage, field.editTabName, EditorContext, NewFormFieldList, TemplateIDForStyles, HelpCnt, HelpIDCache, helpDefaultCache, HelpCustomCache, AllowHelpMsgCustom, helpIdIndex, fieldTypeDefaultEditors, fieldEditorPreferenceList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON)
+                            tabContent = GetForm_Edit_Tab(adminContent, editRecord, editRecord.id, adminContent.Id, readOnlyField, IsLandingPage, IsRootPage, field.editTabName, EditorContext, NewFormFieldList, TemplateIDForStyles, HelpCnt, HelpIDCache, helpDefaultCache, HelpCustomCache, AllowHelpMsgCustom, helpIdIndex, fieldTypeDefaultEditors, fieldEditorPreferenceList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON)
                             If tabContent <> "" Then
                                 returnHtml &= GetForm_Edit_AddTab2(editTabCaption, tabContent, allowAdminTabs, "")
                             End If

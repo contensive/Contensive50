@@ -35901,29 +35901,31 @@ ErrorTrap:
         '
         '
         Public Function main_IISReset() As Boolean
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("IISReset")
-            '
-            Dim runAtServer As New runAtServerClass(Me)
-            '
-            If main_IsStreamWritten Then
-                '
-                ' Not as good. The IISReset page directs back to the root page after 30 seconds
-                '
-                Call writeAltBuffer("<script type=""text/javascript"">window.location.assign('/ccLib/Popup/WaitForIISReset.htm');</script>")
-                Call main_FlushStream()
-            Else
-                '
-                ' The IISReset page directs back to the referrer when service is alive again
-                '
-                Call main_Redirect2("/ccLib/Popup/WaitForIISReset.htm", "Redirecting to the 'waiting for issreset' page. If you pause before this redirect, the web server may be resetting and the next page will not be available, resulting in a 404 error. Wait 30 seconds and refresh this link.", False)
-            End If
-            ' added 3 seconds to the iisreset. delay here is wrong because the page needs to return and main_Get away before the delay
-            'Call Threading.Thread.Sleep(3000)
-            Call runAtServer.executeCmd("IISReset", "")
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError10(Err.Number, Err.Source, Err.Description, "IISReset", True, False)
+            Throw New NotImplementedException("iisReset not implemented, may not be needed with removal of activex")
+            '            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("IISReset")
+            '            '
+
+            '            Dim runAtServer As New runAtServerClass(Me)
+            '            '
+            '            If main_IsStreamWritten Then
+            '                '
+            '                ' Not as good. The IISReset page directs back to the root page after 30 seconds
+            '                '
+            '                Call writeAltBuffer("<script type=""text/javascript"">window.location.assign('/ccLib/Popup/WaitForIISReset.htm');</script>")
+            '                Call main_FlushStream()
+            '            Else
+            '                '
+            '                ' The IISReset page directs back to the referrer when service is alive again
+            '                '
+            '                Call main_Redirect2("/ccLib/Popup/WaitForIISReset.htm", "Redirecting to the 'waiting for issreset' page. If you pause before this redirect, the web server may be resetting and the next page will not be available, resulting in a 404 error. Wait 30 seconds and refresh this link.", False)
+            '            End If
+            '            ' added 3 seconds to the iisreset. delay here is wrong because the page needs to return and main_Get away before the delay
+            '            'Call Threading.Thread.Sleep(3000)
+            '            Call runAtServer.executeCmd("IISReset", "")
+            '            '
+            '            Exit Function
+            'ErrorTrap:
+            '            Call handleLegacyError10(Err.Number, Err.Source, Err.Description, "IISReset", True, False)
         End Function
         '
         '==========================================================================================================
@@ -37439,381 +37441,379 @@ ErrorTrap:
         Public Sub main_LogActivity2(Message As String, SubjectMemberID As Integer, SubjectOrganizationID As Integer)
             Call csv_LogActivity3(Message, userId, SubjectMemberID, SubjectOrganizationID, main_ServerLink, main_VisitorID, main_VisitId)
         End Sub
-        ''
-        ''=================================================================================================
-        ''   Run and return results from a remotequery call from cj.ajax.data(handler,key,args,pagesize,pagenumber)
-        ''
-        ''   This routine builds an xml object inside a <result></result> node.
-        ''       Right now, the response is in JSON format, and conforms to the google data visualization spec 0.5
-        ''
-        ''
-        ''=================================================================================================
-        ''
-        'Private Function init_ProcessAjaxData() As String
-        '    On Error GoTo ErrorTrap: 'Dim th as integer: th = profileLogMethodEnter("Init_ProcessAjaxData")
-        '    '
-        '    Dim SetNameValue() As String
-        '    Dim SetPairs() As String
-        '    Dim Pos as integer
-        '    Dim FieldValue As String
-        '    Dim SetPairString As String
-        '    Dim RecordID as integer
-        '    Dim HelpMessage As String
-        '    Dim ArgCnt as integer
-        '    Dim RowDelim As String
-        '    Dim ColDelim As String
-        '    Dim s As New fastStringClass
-        '    Dim Rows As String
-        '    Dim Cols As String
-        '    Dim CDef As CDefType
-        '    Dim FieldList As String
-        '    Dim SelectFields() As String
-        '    Dim SrcPtr as integer
-        '    Dim FieldName As String
-        '    Dim FieldCaption As String
-        '    Dim LCaseFieldName As String
-        '    Dim ColumnName() As String
-        '    Dim ColumnCaption() As String
-        '    Dim ColumnType() As String
-        '    '
-        '    Dim fieldType As String
-        '    Dim test As String
-        '    Dim Copy As String
-        '    Dim PageSize as integer
-        '    Dim FieldCount as integer
-        '    Dim RowMax as integer
-        '    Dim ColMax as integer
-        '    'Dim RecordField As Field
-        '    Dim RowStart As String
-        '    Dim RowEnd As String
-        '    Dim ColumnStart As String
-        '    Dim ColumnEnd As String
-        '    Dim RowPtr as integer
-        '    Dim ColPtr as integer
-        '    Dim CellData as object
-        '    Dim Cnt as integer
-        '    'dim dt as datatable
-        '    Dim ErrorNumber as integer
-        '    Dim ErrorDescription As String
-        '    Dim Cells as object
-        '    Dim ArgArray() As String
-        '    Dim RemoteKey As String
-        '    Dim EncodedArgs As String
-        '    Dim Args As String
-        '    Dim PageNumber as integer
-        '    Dim CS as integer
-        '    Dim DataSource As String
-        '    Dim SQLQuery As String
-        '    Dim maxRows as integer
-        '    Dim ArgName() As String
-        '    Dim ArgValue() As String
-        '    Dim ArgPairs() As String
-        '    Dim Ptr as integer
-        '    Dim QueryType as integer
-        '    Dim ContentName As String
-        '    Dim Criteria As String
-        '    Dim SortFieldList As String
-        '    Dim AllowInactiveRecords As String
-        '    Dim AllowInactiveRecords2 As Boolean
+        '
+        '=================================================================================================
+        '   Run and return results from a remotequery call from cj.ajax.data(handler,key,args,pagesize,pagenumber)
+        '
+        '   This routine builds an xml object inside a <result></result> node.
+        '       Right now, the response is in JSON format, and conforms to the google data visualization spec 0.5
+        '
+        '
+        '=================================================================================================
+        '
+        Private Function init_ProcessAjaxData() As String
+            Dim result As String = ""
+            Try
+                Dim SetNameValue() As String
+                Dim SetPairs() As String
+                Dim Pos As Integer
+                Dim FieldValue As String
+                Dim SetPairString As String
+                Dim RecordID As Integer
+                Dim HelpMessage As String
+                Dim ArgCnt As Integer
+                Dim RowDelim As String
+                Dim ColDelim As String
+                Dim s As New fastStringClass
+                Dim Rows As String
+                Dim Cols As String
+                'Dim CDef As CDefType
+                Dim FieldList As String
+                Dim SelectFields() As String
+                Dim SrcPtr As Integer
+                Dim FieldName As String
+                Dim FieldCaption As String
+                Dim LCaseFieldName As String
+                Dim ColumnName() As String
+                Dim ColumnCaption() As String
+                Dim ColumnType() As String
+                '
+                Dim fieldType As String
+                Dim test As String
+                Dim Copy As String
+                Dim PageSize As Integer
+                Dim FieldCount As Integer
+                Dim RowMax As Integer
+                Dim ColMax As Integer
+                'Dim RecordField As Field
+                Dim RowStart As String
+                Dim RowEnd As String
+                Dim ColumnStart As String
+                Dim ColumnEnd As String
+                Dim RowPtr As Integer
+                Dim ColPtr As Integer
+                Dim CellData As Object
+                Dim Cnt As Integer
+                'dim dt as datatable
+                Dim ErrorNumber As Integer
+                Dim ErrorDescription As String
+                Dim Cells As Object
+                Dim ArgArray() As String
+                Dim RemoteKey As String
+                Dim EncodedArgs As String
+                Dim Args As String
+                Dim PageNumber As Integer
+                Dim CS As Integer
+                Dim DataSource As String
+                Dim SQLQuery As String
+                Dim maxRows As Integer
+                Dim ArgName() As String
+                Dim ArgValue() As String
+                Dim ArgPairs() As String
+                Dim Ptr As Integer
+                Dim QueryType As Integer
+                Dim ContentName As String
+                Dim Criteria As String
+                Dim SortFieldList As String
+                Dim AllowInactiveRecords As String
+                Dim AllowInactiveRecords2 As Boolean
 
-        '    Dim SelectFieldList As String
-        '    Dim gd As GoogleDataType
-        '    Dim gv As GoogleVisualizationType
-        '    Dim RemoteFormat As RemoteFormatEnum
-        '    '
-        '            gv.status = GoogleVisualizationStatusEnum.OK
-        '    gd.IsEmpty = True
-        '    '
-        '    RemoteKey = main_GetStreamText2("key")
-        '    EncodedArgs = main_GetStreamText2("args")
+                Dim SelectFieldList As String
+                Dim gd As New GoogleDataType
+                Dim gv As New GoogleVisualizationType
+                Dim RemoteFormat As RemoteFormatEnum
+                '
+                gv.status = GoogleVisualizationStatusEnum.OK
+                gd.IsEmpty = True
+                '
+                RemoteKey = main_GetStreamText2("key")
+                EncodedArgs = main_GetStreamText2("args")
 
-        '    PageSize = main_GetStreamInteger2("pagesize")
-        '    PageNumber = main_GetStreamInteger2("pagenumber")
-        '    Select Case LCase(main_GetStreamText2("responseformat"))
-        '        Case "jsonnamevalue"
-        '                    RemoteFormat = RemoteFormatEnum.RemoteFormatJsonNameValue
-        '        Case "jsonnamearray"
-        '                    RemoteFormat = RemoteFormatEnum.RemoteFormatJsonNameArray
-        '        Case Else 'jsontable
-        '                    RemoteFormat = RemoteFormatEnum.RemoteFormatJsonTable
-        '    End Select
-        '    '
-        '    ' Handle common work
-        '    '
-        '    If PageNumber = 0 Then
-        '        PageNumber = 1
-        '    End If
-        '    If PageSize = 0 Then
-        '        PageSize = 100
-        '    End If
-        '    If maxRows <> 0 And PageSize > maxRows Then
-        '        PageSize = maxRows
-        '    End If
-        '    '
-        '    If EncodedArgs <> "" Then
-        '        Args = EncodedArgs
-        '        ArgArray = Split(Args, "&")
-        '        ArgCnt = UBound(ArgArray) + 1
-        '        ReDim ArgName(ArgCnt)
-        '        ReDim ArgValue(ArgCnt)
-        '        For Ptr = 0 To ArgCnt - 1
-        '            Pos = InStr(1, ArgArray(Ptr), "=")
-        '            If Pos > 0 Then
-        '                ArgName(Ptr) = decodeResponseVariable(Mid(ArgArray(Ptr), 1, Pos - 1))
-        '                ArgValue(Ptr) = decodeResponseVariable(Mid(ArgArray(Ptr), Pos + 1))
-        '            End If
-        '        Next
-        '    End If
-        '    '
-        '    ' main_Get values out of the remote query record
-        '    '
-        '            If gv.status = GoogleVisualizationStatusEnum.OK Then
-        '                CS = app.db_csOpen("Remote Queries", "((VisitId=" & main_VisitId & ")and(remotekey=" & EncodeSQLText(RemoteKey) & "))")
-        '                If app.csv_IsCSOK(CS) Then
-        '                    '
-        '                    ' Use user definied query
-        '                    '
-        '                    SQLQuery = main_GetCSText(CS, "sqlquery")
-        '                    DataSource = main_GetDataSourceByID(app.db_GetCSInteger(CS, "datasourceid"))
-        '                    maxRows = app.db_GetCSInteger(CS, "maxrows")
-        '                    QueryType = app.db_GetCSInteger(CS, "QueryTypeID")
-        '                    ContentName = app.db_GetCS(CS, "ContentID")
-        '                    Criteria = main_GetCSText(CS, "Criteria")
-        '                    SortFieldList = main_GetCSText(CS, "SortFieldList")
-        '                    AllowInactiveRecords2 = main_GetCSBoolean(CS, "AllowInactiveRecords")
-        '                    SelectFieldList = main_GetCSText(CS, "SelectFieldList")
-        '                    SetPairString = ""
-        '                Else
-        '                    '
-        '                    ' Try Hardcoded queries
-        '                    '
-        '                    Select Case LCase(RemoteKey)
-        '                        Case "ccfieldhelpupdate"
-        '                            '
-        '                            ' developers editing field help
-        '                            '
-        '                            If Not main_IsDeveloper() Then
-        '                                gv.status = GoogleVisualizationStatusEnum.ErrorStatus
-        '                                If IsArray(gv.errors) Then
-        '                                    Ptr = 0
-        '                                Else
-        '                                    Ptr = UBound(gv.errors) + 1
-        '                                End If
-        '                                ReDim gv.errors(Ptr)
-        '                                gv.errors(Ptr) = "permission error"
-        '                            Else
-        '                                QueryType = QueryTypeUpdateContent
-        '                                ContentName = "Content Field Help"
-        '                                Criteria = ""
-        '                                AllowInactiveRecords2 = False
-        '                            End If
-        '                        Case Else
-        '                            '
-        '                            ' query not found
-        '                            '
-        '                            gv.status = GoogleVisualizationStatusEnum.ErrorStatus
-        '                            If IsArray(gv.errors) Then
-        '                                Ptr = 0
-        '                            Else
-        '                                Ptr = UBound(gv.errors) + 1
-        '                            End If
-        '                            ReDim gv.errors(Ptr)
-        '                            gv.errors(Ptr) = "query not found"
-        '                    End Select
-        '                End If
-        '                Call app.db_closeCS(CS)
-        '                '
-        '                If gv.status = GoogleVisualizationStatusEnum.OK Then
-        '                    Select Case QueryType
-        '                        Case QueryTypeSQL
-        '                            '
-        '                            ' ----- Run a SQL
-        '                            '
-        '                            If SQLQuery <> "" Then
-        '                                For Ptr = 0 To ArgCnt - 1
-        '                                    SQLQuery = Replace(SQLQuery, ArgName(Ptr), ArgValue(Ptr), , , vbTextCompare)
-        '                                    'Criteria = Replace(Criteria, ArgName(Ptr), ArgValue(Ptr), , , vbTextCompare)
-        '                                Next
-        '                                On Error Resume Next
-        '                                RS = main_ExecuteSQLCommand(DataSource, SQLQuery, 30, PageSize, PageNumber)
-        '                                ErrorNumber = Err.Number
-        '                                ErrorDescription = Err.Description
-        '                                Err.Clear()
-        '                                On Error GoTo ErrorTrap
-        '                                If ErrorNumber <> 0 Then
-        '                                    '
-        '                                    ' ----- Error
-        '                                    '
-        '                            gv.status = GoogleVisualizationStatusEnum.ErrorStatus
-        '                                    Ptr = UBound(gv.errors) + 1
-        '                                    ReDim gv.errors(Ptr)
-        '                                    gv.errors(Ptr) = "Error: " & Err.Description
-        '                                ElseIf (not isdatatableok(rs)) Then
-        '                                    '
-        '                                    ' ----- no result
-        '                                    '
-        '                                ElseIf (RS.State <> 1) Then
-        '                                    '
-        '                                    ' ----- no result
-        '                                    '
-        '                                ElseIf (rs.rows.count=0) Then
-        '                                    '
-        '                                    ' ----- no result
-        '                                    '
-        '                                Else
-        '                                    PageSize = RS.PageSize
-        '                                    Cells = RS.GetRows(PageSize)
-        '                                    '
-        '                                    gd.IsEmpty = False
-        '                                    RowMax = UBound(Cells, 2)
-        '                                    ColMax = UBound(Cells, 1)
-        '                                    '
-        '                                    ' Build headers
-        '                                    '
-        '                                    ReDim gd.col(ColMax)
-        '                                    For ColPtr = 0 To ColMax
-        '                                        RecordField = RS.Fields.Item(ColPtr)
-        '                                        gd.col(ColPtr).Id = RecordField.Name
-        '                                        gd.col(ColPtr).Label = RecordField.Name
-        '                                        gd.col(ColPtr).Type = ConvertRSTypeToGoogleType(RecordField.Type)
-        '                                    Next
-        '                                    'RS.Close()
-        '                                    'RS = Nothing
-        '                                    '
-        '                                    ' Build output table
-        '                                    '
-        '                                    ReDim gd.Row(RowMax)
-        '                                    For RowPtr = 0 To RowMax
-        '                                        With gd.Row(RowPtr)
-        '                                            ReDim .Cell(ColMax)
-        '                                            For ColPtr = 0 To ColMax
-        '                                                .Cell(ColPtr).v = EncodeText(Cells(ColPtr, RowPtr))
-        '                                            Next
-        '                                        End With
-        '                                    Next
-        '                                End If
-        '                                If (isDataTableOk(rs)) Then
-        '                                    If false Then
-        '                                        'RS.Close()
-        '                                    End If
-        '                                    'RS = Nothing
-        '                                End If
-        '                            End If
-        '                        Case QueryTypeOpenContent
-        '                            '
-        '                            ' Contensive Content Select, args are criteria replacements
-        '                            '
+                PageSize = main_GetStreamInteger2("pagesize")
+                PageNumber = main_GetStreamInteger2("pagenumber")
+                Select Case LCase(main_GetStreamText2("responseformat"))
+                    Case "jsonnamevalue"
+                        RemoteFormat = RemoteFormatEnum.RemoteFormatJsonNameValue
+                    Case "jsonnamearray"
+                        RemoteFormat = RemoteFormatEnum.RemoteFormatJsonNameArray
+                    Case Else 'jsontable
+                        RemoteFormat = RemoteFormatEnum.RemoteFormatJsonTable
+                End Select
+                '
+                ' Handle common work
+                '
+                If PageNumber = 0 Then
+                    PageNumber = 1
+                End If
+                If PageSize = 0 Then
+                    PageSize = 100
+                End If
+                If maxRows <> 0 And PageSize > maxRows Then
+                    PageSize = maxRows
+                End If
+                '
+                If EncodedArgs <> "" Then
+                    Args = EncodedArgs
+                    ArgArray = Split(Args, "&")
+                    ArgCnt = UBound(ArgArray) + 1
+                    ReDim ArgName(ArgCnt)
+                    ReDim ArgValue(ArgCnt)
+                    For Ptr = 0 To ArgCnt - 1
+                        Pos = InStr(1, ArgArray(Ptr), "=")
+                        If Pos > 0 Then
+                            ArgName(Ptr) = DecodeResponseVariable(Mid(ArgArray(Ptr), 1, Pos - 1))
+                            ArgValue(Ptr) = DecodeResponseVariable(Mid(ArgArray(Ptr), Pos + 1))
+                        End If
+                    Next
+                End If
+                '
+                ' main_Get values out of the remote query record
+                '
+                If gv.status = GoogleVisualizationStatusEnum.OK Then
+                    CS = app.db_csOpen("Remote Queries", "((VisitId=" & main_VisitId & ")and(remotekey=" & EncodeSQLText(RemoteKey) & "))")
+                    If app.db_csOk(CS) Then
+                        '
+                        ' Use user definied query
+                        '
+                        SQLQuery = main_GetCSText(CS, "sqlquery")
+                        DataSource = main_GetDataSourceByID(app.db_GetCSInteger(CS, "datasourceid"))
+                        maxRows = app.db_GetCSInteger(CS, "maxrows")
+                        QueryType = app.db_GetCSInteger(CS, "QueryTypeID")
+                        ContentName = app.db_GetCS(CS, "ContentID")
+                        Criteria = main_GetCSText(CS, "Criteria")
+                        SortFieldList = main_GetCSText(CS, "SortFieldList")
+                        AllowInactiveRecords2 = main_GetCSBoolean(CS, "AllowInactiveRecords")
+                        SelectFieldList = main_GetCSText(CS, "SelectFieldList")
+                        SetPairString = ""
+                    Else
+                        '
+                        ' Try Hardcoded queries
+                        '
+                        Select Case LCase(RemoteKey)
+                            Case "ccfieldhelpupdate"
+                                '
+                                ' developers editing field help
+                                '
+                                If Not userIsDeveloper Then
+                                    gv.status = GoogleVisualizationStatusEnum.ErrorStatus
+                                    If IsArray(gv.errors) Then
+                                        Ptr = 0
+                                    Else
+                                        Ptr = UBound(gv.errors) + 1
+                                    End If
+                                    ReDim gv.errors(Ptr)
+                                    gv.errors(Ptr) = "permission error"
+                                Else
+                                    QueryType = QueryTypeUpdateContent
+                                    ContentName = "Content Field Help"
+                                    Criteria = ""
+                                    AllowInactiveRecords2 = False
+                                End If
+                                'Case Else
+                                '    '
+                                '    ' query not found
+                                '    '
+                                '    gv.status = GoogleVisualizationStatusEnum.ErrorStatus
+                                '    If IsArray(gv.errors) Then
+                                '        Ptr = 0
+                                '    Else
+                                '        Ptr = UBound(gv.errors) + 1
+                                '    End If
+                                '    ReDim gv.errors(Ptr)
+                                '    gv.errors(Ptr) = "query not found"
+                        End Select
+                    End If
+                    Call app.db_csClose(CS)
+                    '
+                    If gv.status = GoogleVisualizationStatusEnum.OK Then
+                        Select Case QueryType
+                        'Case QueryTypeSQL
+                        '    '
+                        '    ' ----- Run a SQL
+                        '    '
+                        '    If SQLQuery <> "" Then
+                        '        For Ptr = 0 To ArgCnt - 1
+                        '            SQLQuery = Replace(SQLQuery, ArgName(Ptr), ArgValue(Ptr), , , vbTextCompare)
+                        '            'Criteria = Replace(Criteria, ArgName(Ptr), ArgValue(Ptr), , , vbTextCompare)
+                        '        Next
+                        '        On Error Resume Next
+                        '        RS = main_ExecuteSQLCommand(DataSource, SQLQuery, 30, PageSize, PageNumber)
+                        '        ErrorNumber = Err.Number
+                        '        ErrorDescription = Err.Description
+                        '        Err.Clear()
+                        '        On Error GoTo ErrorTrap
+                        '        If ErrorNumber <> 0 Then
+                        '            '
+                        '            ' ----- Error
+                        '            '
+                        '            gv.status = GoogleVisualizationStatusEnum.ErrorStatus
+                        '            Ptr = UBound(gv.errors) + 1
+                        '            ReDim gv.errors(Ptr)
+                        '            gv.errors(Ptr) = "Error: " & Err.Description
+                        '        ElseIf (Not isDataTableOk(rs)) Then
+                        '            '
+                        '            ' ----- no result
+                        '            '
+                        '        ElseIf (RS.State <> 1) Then
+                        '            '
+                        '            ' ----- no result
+                        '            '
+                        '        ElseIf (rs.rows.count = 0) Then
+                        '            '
+                        '            ' ----- no result
+                        '            '
+                        '        Else
+                        '            PageSize = RS.PageSize
+                        '            Cells = RS.GetRows(PageSize)
+                        '            '
+                        '            gd.IsEmpty = False
+                        '            RowMax = UBound(Cells, 2)
+                        '            ColMax = UBound(Cells, 1)
+                        '            '
+                        '            ' Build headers
+                        '            '
+                        '            ReDim gd.col(ColMax)
+                        '            For ColPtr = 0 To ColMax
+                        '                RecordField = RS.Fields.Item(ColPtr)
+                        '                gd.col(ColPtr).Id = RecordField.Name
+                        '                gd.col(ColPtr).Label = RecordField.Name
+                        '                gd.col(ColPtr).Type = ConvertRSTypeToGoogleType(RecordField.Type)
+                        '            Next
+                        '            'RS.Close()
+                        '            'RS = Nothing
+                        '            '
+                        '            ' Build output table
+                        '            '
+                        '            ReDim gd.row(RowMax)
+                        '            For RowPtr = 0 To RowMax
+                        '                With gd.row(RowPtr)
+                        '                    ReDim .Cell(ColMax)
+                        '                    For ColPtr = 0 To ColMax
+                        '                        .Cell(ColPtr).v = EncodeText(Cells(ColPtr, RowPtr))
+                        '                    Next
+                        '                End With
+                        '            Next
+                        '        End If
+                        '        If (isDataTableOk(rs)) Then
+                        '            If False Then
+                        '                'RS.Close()
+                        '            End If
+                        '            'RS = Nothing
+                        '        End If
+                        '    End If
+                        'Case QueryTypeOpenContent
+                        '    '
+                        '    ' Contensive Content Select, args are criteria replacements
+                        '    '
 
-        '                            CDef = app.getCdef(ContentName)
-        '                            CS = app.db_csOpen(ContentName, Criteria, SortFieldList, AllowInactiveRecords, , , SelectFieldList)
-        '                            Cells = app.csv_GetCSRows(CS)
-        '                            FieldList = app.db_GetCSSelectFieldList(CS)
-        '                            '
-        '                            RowMax = UBound(Cells, 2)
-        '                            ColMax = UBound(Cells, 1)
-        '                            If RowMax = 0 And ColMax = 0 Then
-        '                                '
-        '                                ' Single result, display with no table
-        '                                '
-        '                                Copy = EncodeText(Cells(0, 0))
-        '                            Else
-        '                                '
-        '                                ' Build headers
-        '                                '
-        '                                gd.IsEmpty = False
-        '                                RowMax = UBound(Cells, 2)
-        '                                ColMax = UBound(Cells, 1)
-        '                                '
-        '                                ' Build headers
-        '                                '
-        '                                ReDim gd.col(ColMax)
-        '                                For ColPtr = 0 To ColMax
-        '                                    RecordField = RS.Fields.Item(RowPtr)
-        '                                    gd.col(ColPtr).Id = RecordField.Name
-        '                                    gd.col(ColPtr).Label = RecordField.Name
-        '                                    gd.col(ColPtr).Type = ConvertRSTypeToGoogleType(RecordField.Type)
-        '                                Next
-        '                                '
-        '                                ' Build output table
-        '                                '
-        '                                'RowStart = vbCrLf & "<Row>"
-        '                                'Rowend = "</Row>"
-        '                                For RowPtr = 0 To RowMax
-        '                                    With gd.Row(RowPtr)
-        '                                        For ColPtr = 0 To ColMax
-        '                                            .Cell(ColPtr).v = Cells(ColPtr, RowPtr)
-        '                                        Next
-        '                                    End With
-        '                                Next
-        '                            End If
-        '                        Case QueryTypeUpdateContent
-        '                            '
-        '                            ' Contensive Content Update, args are field=value updates
-        '                            ' !!!! only allow inbound hits with a referrer from this site - later use the aggregate access table
-        '                            '
-        '                            '
-        '                            ' Go though args and main_Get Set and Criteria
-        '                            '
-        '                            SetPairString = ""
-        '                            Criteria = ""
-        '                            For Ptr = 0 To ArgCnt - 1
-        '                                If LCase(ArgName(Ptr)) = "setpairs" Then
-        '                                    SetPairString = ArgValue(Ptr)
-        '                                ElseIf LCase(ArgName(Ptr)) = "criteria" Then
-        '                                    Criteria = ArgValue(Ptr)
-        '                                End If
-        '                            Next
-        '                            '
-        '                            ' Open the content and cycle through each setPair
-        '                            '
-        '                            CS = app.db_csOpen(ContentName, Criteria, SortFieldList, AllowInactiveRecords2, , , SelectFieldList)
-        '                            If app.csv_IsCSOK(CS) Then
-        '                                '
-        '                                ' update by looping through the args and setting name=values
-        '                                '
-        '                                SetPairs = Split(SetPairString, "&")
-        '                                For Ptr = 0 To UBound(SetPairs)
-        '                                    If SetPairs(Ptr) <> "" Then
-        '                                        Pos = InStr(1, SetPairs(Ptr), "=")
-        '                                        If Pos > 0 Then
-        '                                            FieldValue = DecodeResponseVariable(Mid(SetPairs(Ptr), Pos + 1))
-        '                                            FieldName = DecodeResponseVariable(Mid(SetPairs(Ptr), 1, Pos - 1))
-        '                                            If Not main_IsContentFieldSupported(ContentName, FieldName) Then
-        '                                                Call main_HandleClassErrorAndResume("main_Init_ProcessAjaxData", "QueryTypeUpdateContent, key [" & RemoteKey & "], bad field [" & FieldName & "] skipped")
-        '                                            Else
-        '                                                Call app.db_SetCS(CS, FieldName, FieldValue)
-        '                                            End If
-        '                                        End If
-        '                                    End If
-        '                                Next
-        '                            End If
-        '                            Call app.db_closeCS(CS)
-        '                        Case QueryTypeInsertContent
-        '                            '
-        '                            ' !!!! only allow inbound hits with a referrer from this site - later use the aggregate access table
-        '                            '
-        '                            '
-        '                            ' Contensive Content Insert, args are field=value
-        '                            '
-        '                            'CS = main_InsertCSContent(ContentName)
-        '                        Case Else
-        '                    End Select
-        '                    '
-        '                    ' output
-        '                    '
-        '                    Copy = main_FormatRemoteQueryOutput(gd, RemoteFormat)
-        '                    Copy = EncodeHTML(Copy)
-        '                    init_ProcessAjaxData = "<data>" & Copy & "</data>"
-        '                End If
-        '            End If
-        '    '
-        '    Exit Function
-        '    '
-        '    ' ----- Error Trap
-        '    '
-        'ErrorTrap:
-        '    Call main_HandleClassError_RevArgs(Err.Number, Err.Source, Err.Description, "main_Init_ProcessAjaxData", True, False)
-        'End Function
+                        '    CDef = app.getCdef(ContentName)
+                        '    CS = app.db_csOpen(ContentName, Criteria, SortFieldList, AllowInactiveRecords, , , SelectFieldList)
+                        '    Cells = app.csv_GetCSRows(CS)
+                        '    FieldList = app.db_GetCSSelectFieldList(CS)
+                        '    '
+                        '    RowMax = UBound(Cells, 2)
+                        '    ColMax = UBound(Cells, 1)
+                        '    If RowMax = 0 And ColMax = 0 Then
+                        '        '
+                        '        ' Single result, display with no table
+                        '        '
+                        '        Copy = EncodeText(Cells(0, 0))
+                        '    Else
+                        '        '
+                        '        ' Build headers
+                        '        '
+                        '        gd.IsEmpty = False
+                        '        RowMax = UBound(Cells, 2)
+                        '        ColMax = UBound(Cells, 1)
+                        '        '
+                        '        ' Build headers
+                        '        '
+                        '        ReDim gd.col(ColMax)
+                        '        For ColPtr = 0 To ColMax
+                        '            RecordField = RS.Fields.Item(RowPtr)
+                        '            gd.col(ColPtr).Id = RecordField.Name
+                        '            gd.col(ColPtr).Label = RecordField.Name
+                        '            gd.col(ColPtr).Type = ConvertRSTypeToGoogleType(RecordField.Type)
+                        '        Next
+                        '        '
+                        '        ' Build output table
+                        '        '
+                        '        'RowStart = vbCrLf & "<Row>"
+                        '        'Rowend = "</Row>"
+                        '        For RowPtr = 0 To RowMax
+                        '            With gd.row(RowPtr)
+                        '                For ColPtr = 0 To ColMax
+                        '                    .Cell(ColPtr).v = Cells(ColPtr, RowPtr)
+                        '                Next
+                        '            End With
+                        '        Next
+                        '    End If
+                            Case QueryTypeUpdateContent
+                                '
+                                ' Contensive Content Update, args are field=value updates
+                                ' !!!! only allow inbound hits with a referrer from this site - later use the aggregate access table
+                                '
+                                '
+                                ' Go though args and main_Get Set and Criteria
+                                '
+                                SetPairString = ""
+                                Criteria = ""
+                                For Ptr = 0 To ArgCnt - 1
+                                    If LCase(ArgName(Ptr)) = "setpairs" Then
+                                        SetPairString = ArgValue(Ptr)
+                                    ElseIf LCase(ArgName(Ptr)) = "criteria" Then
+                                        Criteria = ArgValue(Ptr)
+                                    End If
+                                Next
+                                '
+                                ' Open the content and cycle through each setPair
+                                '
+                                CS = app.db_csOpen(ContentName, Criteria, SortFieldList, AllowInactiveRecords2, , ,, SelectFieldList)
+                                If app.db_csOk(CS) Then
+                                    '
+                                    ' update by looping through the args and setting name=values
+                                    '
+                                    SetPairs = Split(SetPairString, "&")
+                                    For Ptr = 0 To UBound(SetPairs)
+                                        If SetPairs(Ptr) <> "" Then
+                                            Pos = InStr(1, SetPairs(Ptr), "=")
+                                            If Pos > 0 Then
+                                                FieldValue = DecodeResponseVariable(Mid(SetPairs(Ptr), Pos + 1))
+                                                FieldName = DecodeResponseVariable(Mid(SetPairs(Ptr), 1, Pos - 1))
+                                                If Not main_IsContentFieldSupported(ContentName, FieldName) Then
+                                                    Dim errorMessage As String = "result, QueryTypeUpdateContent, key [" & RemoteKey & "], bad field [" & FieldName & "] skipped"
+                                                    Call handleException(New ApplicationException(errorMessage))
+                                                Else
+                                                    Call app.db_setCS(CS, FieldName, FieldValue)
+                                                End If
+                                            End If
+                                        End If
+                                    Next
+                                End If
+                                Call app.db_csClose(CS)
+                                'Case QueryTypeInsertContent
+                                '    '
+                                '    ' !!!! only allow inbound hits with a referrer from this site - later use the aggregate access table
+                                '    '
+                                '    '
+                                '    ' Contensive Content Insert, args are field=value
+                                '    '
+                                '    'CS = main_InsertCSContent(ContentName)
+                            Case Else
+                        End Select
+                        '
+                        ' output
+                        '
+                        Copy = main_FormatRemoteQueryOutput(gd, RemoteFormat)
+                        Copy = EncodeHTML(Copy)
+                        result = "<data>" & Copy & "</data>"
+                    End If
+                End If
+            Catch ex As Exception
+                handleException(ex)
+            End Try
+            Return result
+        End Function
         '
         '
         '
@@ -43716,7 +43716,7 @@ ErrorTrap:
             Dim DotNetClassFullName As String
             Dim WorkingAddonOptionString As String
             Dim cmdQueryString As String
-            Dim runAtServer As runAtServerClass
+            'Dim runAtServer As runAtServerClass
             Dim addonId As Integer
             'Dim AddonGuidOrName As String
             Dim ProcessStartTick As Integer
@@ -43744,14 +43744,20 @@ ErrorTrap:
             'hint = hint & ",030"
             appendLogWithLegacyRow(app.config.name, "start: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
             '
-            runAtServer = New runAtServerClass(Me)
+            ' runAtServer = New runAtServerClass(Me)
             ' must nva encode because that is what the server-execute command expects
             cmdQueryString = "" _
                     & "appname=" & csv_encodeNvaArgument(EncodeRequestVariable(app.config.name)) _
                     & "&AddonID=" & CStr(addonId) _
                     & "&OptionString=" & csv_encodeNvaArgument(EncodeRequestVariable(OptionString))
             'hint = hint & ",035"
-            Call runAtServer.executeCmd("RunProcess", cmdQueryString)
+            Dim taskScheduler As New taskSchedulerServiceClass()
+            Dim cmdDetail As New cmdDetailClass
+            cmdDetail.addonId = addonId.ToString()
+            cmdDetail.addonName = AddonName
+            cmdDetail.docProperties = taskScheduler.convertAddonArgumentstoDocPropertiesList(Me, cmdQueryString)
+            Call taskScheduler.addTaskToQueue(Me, taskQueueCommandEnumModule.runAddon, cmdDetail, False)
+            'Call runAtServer.executeCmd("RunProcess", cmdQueryString)
             '
             appendLogWithLegacyRow(app.config.name, "end: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
             '
@@ -50149,10 +50155,10 @@ ErrorTrap:
                                     returnResult = main_encodeHTML(returnResult)
                                     Call writeAltBuffer(returnResult)
                                 Case AjaxData
-                                '
-                                ' 7/7/2009 - Moved from HardCodedPages - Run remote query from cj.remote object call, and return results html encoded in a <result></result> block
-                                ' 20050427 - not used
-                                'Call writeAltBuffer(init_ProcessAjaxData())
+                                    '
+                                    ' 7/7/2009 - Moved from HardCodedPages - Run remote query from cj.remote object call, and return results html encoded in a <result></result> block
+                                    ' 20050427 - not used
+                                    Call writeAltBuffer(init_ProcessAjaxData())
                                 Case AjaxPing
                                     '
                                     ' returns OK if the server is alive
