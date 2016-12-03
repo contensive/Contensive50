@@ -1763,7 +1763,7 @@ ErrorTrap:
                 '
                 editRecord.menuHeadline = ""
                 If editRecord.fieldsLc.ContainsKey("menuheadline") Then
-                    editRecord.menuHeadline = EncodeText(editRecord.fieldsLc.Item("menuheadline"))
+                    editRecord.menuHeadline = EncodeText(editRecord.fieldsLc.Item("menuheadline").value)
                 End If
                 '
                 editRecord.menuHeadline = ""
@@ -2216,7 +2216,7 @@ ErrorTrap:
                                 Select Case .fieldTypeId
                                     Case FieldTypeIdRedirect, FieldTypeIdManyToMany
                                         DBValueVariant = ""
-                                    Case FieldTypeIdTextFile, FieldTypeIdCSSFile, FieldTypeIdXMLFile, FieldTypeIdJavascriptFile, FieldTypeIdHTMLFile
+                                    Case FieldTypeIdFileTextPrivate, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdFileHTMLPrivate
                                         DBValueVariant = cpCore.app.db_GetCS(CSPointer, .nameLc)
                                     Case Else
                                         DBValueVariant = cpCore.main_GetCSField_Internal(CSPointer, .nameLc)
@@ -2724,7 +2724,7 @@ ErrorTrap:
                                         If Left(LCase(ResponseValueText), 4) = "www." Then
                                             ResponseValueText = "http//" & ResponseValueText
                                         End If
-                                    Case FieldTypeIdHTML, FieldTypeIdHTMLFile
+                                    Case FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate
                                         '
                                         ' ----- Html fields
                                         '
@@ -3454,7 +3454,7 @@ ErrorTrap:
                                             '
                                             ' do nothing with these
                                             '
-                                    Case FieldTypeIdFile, FieldTypeIdImage
+                                    Case FieldTypeIdFile, FieldTypeIdFileImage
                                         '
                                         ' filenames, make changes if necessary
                                         '
@@ -3514,7 +3514,7 @@ ErrorTrap:
                                             RecordChanged = True
                                             Call cpCore.app.db_setCS(CSEditRecord, FieldName, FieldValueVariant)
                                         End If
-                                    Case FieldTypeIdLongText, FieldTypeIdText, FieldTypeIdTextFile, FieldTypeIdCSSFile, FieldTypeIdXMLFile, FieldTypeIdJavascriptFile, FieldTypeIdHTML, FieldTypeIdHTMLFile
+                                    Case FieldTypeIdLongText, FieldTypeIdText, FieldTypeIdFileTextPrivate, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate
                                         '
                                         ' Text
                                         '
@@ -3705,7 +3705,7 @@ ErrorTrap:
                     Select Case .fieldTypeId
                         'Case FieldTypeImage
                         '    Stream.Add( Mid(cpCore.app.db_GetCS(CS, .Name), 7 + Len(.Name) + Len(AdminContent.ContentTableName)))
-                        Case FieldTypeIdFile, FieldTypeIdImage
+                        Case FieldTypeIdFile, FieldTypeIdFileImage
                             Filename = cpCore.app.db_GetCS(CS, .nameLc)
                             Filename = Replace(Filename, "\", "/")
                             Pos = InStrRev(Filename, "/")
@@ -3755,7 +3755,7 @@ ErrorTrap:
                                 FieldText = Mid(FieldText, 1, 50) & "[more]"
                             End If
                             Stream.Add(FieldText)
-                        Case FieldTypeIdTextFile, FieldTypeIdCSSFile, FieldTypeIdXMLFile, FieldTypeIdJavascriptFile, FieldTypeIdHTMLFile
+                        Case FieldTypeIdFileTextPrivate, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdFileHTMLPrivate
                             ' rw( "n/a" )
                             Filename = cpCore.app.db_GetCS(CS, .nameLc)
                             If Filename <> "" Then
@@ -3923,7 +3923,7 @@ ErrorTrap:
                     For Each keyValuePair In adminContent.fields
                         Dim field As metaDataClass.CDefFieldClass = keyValuePair.Value
                         Select Case field.fieldTypeId
-                            Case FieldTypeIdFile, FieldTypeIdImage
+                            Case FieldTypeIdFile, FieldTypeIdFileImage
                                 editRecord.fieldsLc(field.nameLc).value = editRecord.fieldsLc(field.nameLc).dbValue
                         End Select
                     Next
@@ -5605,7 +5605,7 @@ ErrorTrap:
                                     & "&editorWidth=" _
                                     & "&editorHeight=" _
                                     & ""
-                                If EncodeBoolean((fieldTypeId = FieldTypeIdHTML) Or (fieldTypeId = FieldTypeIdHTMLFile)) Then
+                                If EncodeBoolean((fieldTypeId = FieldTypeIdHTML) Or (fieldTypeId = FieldTypeIdFileHTMLPrivate)) Then
                                     '
                                     ' include html related arguments
                                     '
@@ -5725,7 +5725,7 @@ ErrorTrap:
                                             EditorString &= (cpCore.main_GetFormInputCheckBox2(FormFieldLCaseName, FieldValueBoolean, , True, "checkBox"))
                                             EditorString &= WhyReadOnlyMsg
                                             '
-                                        Case FieldTypeIdFile, FieldTypeIdImage
+                                        Case FieldTypeIdFile, FieldTypeIdFileImage
                                             '
                                             ' ----- File ReadOnly
                                             '
@@ -5857,7 +5857,7 @@ ErrorTrap:
                                             EditorString &= (cpCore.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, , , , , True, "number"))
                                             EditorString &= WhyReadOnlyMsg
                                             '
-                                        Case FieldTypeIdHTML, FieldTypeIdHTMLFile
+                                        Case FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate
                                             '
                                             ' ----- HTML types
                                             '
@@ -5907,7 +5907,7 @@ ErrorTrap:
                                                 '
                                                 EditorString &= cpCore.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, , , , True, "text")
                                             End If
-                                        Case FieldTypeIdLongText, FieldTypeIdTextFile
+                                        Case FieldTypeIdLongText, FieldTypeIdFileTextPrivate
                                             '
                                             ' ----- LongText, TextFile
                                             '
@@ -5983,7 +5983,7 @@ ErrorTrap:
                                             EditorString &= (cpCore.main_GetFormInputCheckBox2(FormFieldLCaseName, FieldValueBoolean, , , "checkBox"))
                                             's.Add( "&nbsp;</span></nobr></td>")
                                             '
-                                        Case FieldTypeIdFile, FieldTypeIdImage
+                                        Case FieldTypeIdFile, FieldTypeIdFileImage
                                             '
                                             ' ----- File
                                             '
@@ -6156,7 +6156,7 @@ ErrorTrap:
                                                 End If
                                             End If
                                             '
-                                        Case FieldTypeIdHTML, FieldTypeIdHTMLFile
+                                        Case FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate
                                             '
                                             ' content is html
                                             '
@@ -6192,7 +6192,7 @@ ErrorTrap:
                                                 FieldOptionRow = "&nbsp;"
                                             End If
                                             '
-                                        Case FieldTypeIdLongText, FieldTypeIdTextFile
+                                        Case FieldTypeIdLongText, FieldTypeIdFileTextPrivate
                                             '
                                             ' -- Long Text, use text editor
                                             '
@@ -6203,7 +6203,7 @@ ErrorTrap:
                                             FieldRows = (cpCore.main_GetMemberPropertyInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
                                             EditorString = cpCore.main_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, FieldRows, , FormFieldLCaseName, False, , "text")
                                             '
-                                        Case FieldTypeIdCSSFile
+                                        Case FieldTypeIdFileCSS
                                             '
                                             ' ----- CSS field
                                             '
@@ -6213,7 +6213,7 @@ ErrorTrap:
                                             FieldRows = (cpCore.main_GetMemberPropertyInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
                                             EditorString = cpCore.main_GetFormInputStyles(FormFieldLCaseName, FieldValueText, , "styles")
                                             '
-                                        Case FieldTypeIdJavascriptFile
+                                        Case FieldTypeIdFileJavascript
                                             '
                                             ' ----- Javascript field
                                             '
@@ -6223,7 +6223,7 @@ ErrorTrap:
                                             FieldRows = (cpCore.main_GetMemberPropertyInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
                                             EditorString = cpCore.main_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, FieldRows, , FormFieldLCaseName, False, , "text")
                                             '
-                                        Case FieldTypeIdXMLFile
+                                        Case FieldTypeIdFileXML
                                             '
                                             ' ----- xml field
                                             '
@@ -14954,7 +14954,7 @@ ErrorTrap:
                             '                        & "</tr>"
 
                             RowPointer = RowPointer + 1
-                        Case FieldTypeIdFile, FieldTypeIdImage
+                        Case FieldTypeIdFile, FieldTypeIdFileImage
                             '
                             ' File
                             '
@@ -15013,7 +15013,7 @@ ErrorTrap:
                             '                        & "</tr></table>" _
                             '                        & "</td>" _
                             '                        & "</tr>"
-                        Case FieldTypeIdText, FieldTypeIdLongText, FieldTypeIdHTML, FieldTypeIdHTMLFile, FieldTypeIdCSSFile, FieldTypeIdJavascriptFile, FieldTypeIdXMLFile
+                        Case FieldTypeIdText, FieldTypeIdLongText, FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate, FieldTypeIdFileCSS, FieldTypeIdFileJavascript, FieldTypeIdFileXML
                             '
                             ' Text
                             '
@@ -15883,27 +15883,27 @@ ErrorTrap:
                                     ' file can not be search
                                     '
                                     Stream.Add("<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""50"" height=""15"" border=""0"" > " & .caption & " (file field)<br>")
-                                ElseIf (.fieldTypeId = FieldTypeIdTextFile) Then
+                                ElseIf (.fieldTypeId = FieldTypeIdFileTextPrivate) Then
                                     '
                                     ' filename can not be search
                                     '
                                     Stream.Add("<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""50"" height=""15"" border=""0"" > " & .caption & " (text file field)<br>")
-                                ElseIf (.fieldTypeId = FieldTypeIdHTMLFile) Then
+                                ElseIf (.fieldTypeId = FieldTypeIdFileHTMLPrivate) Then
                                     '
                                     ' filename can not be search
                                     '
                                     Stream.Add("<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""50"" height=""15"" border=""0"" > " & .caption & " (html file field)<br>")
-                                ElseIf (.fieldTypeId = FieldTypeIdCSSFile) Then
+                                ElseIf (.fieldTypeId = FieldTypeIdFileCSS) Then
                                     '
                                     ' css filename can not be search
                                     '
                                     Stream.Add("<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""50"" height=""15"" border=""0"" > " & .caption & " (css file field)<br>")
-                                ElseIf (.fieldTypeId = FieldTypeIdXMLFile) Then
+                                ElseIf (.fieldTypeId = FieldTypeIdFileXML) Then
                                     '
                                     ' xml filename can not be search
                                     '
                                     Stream.Add("<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""50"" height=""15"" border=""0"" > " & .caption & " (xml file field)<br>")
-                                ElseIf (.fieldTypeId = FieldTypeIdJavascriptFile) Then
+                                ElseIf (.fieldTypeId = FieldTypeIdFileJavascript) Then
                                     '
                                     ' javascript filename can not be search
                                     '
@@ -15918,7 +15918,7 @@ ErrorTrap:
                                     ' long text can not be search
                                     '
                                     Stream.Add("<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""50"" height=""15"" border=""0"" > " & .caption & " (long text field)<br>")
-                                ElseIf (.fieldTypeId = FieldTypeIdImage) Then
+                                ElseIf (.fieldTypeId = FieldTypeIdFileImage) Then
                                     '
                                     ' long text can not be search
                                     '
@@ -17215,7 +17215,7 @@ ErrorTrap:
                         ' disallow IncludedInColumns if a non-supported field type
                         '
                         Select Case .fieldTypeId
-                            Case FieldTypeIdCSSFile, FieldTypeIdFile, FieldTypeIdImage, FieldTypeIdJavascriptFile, FieldTypeIdLongText, FieldTypeIdManyToMany, FieldTypeIdRedirect, FieldTypeIdTextFile, FieldTypeIdXMLFile, FieldTypeIdHTML, FieldTypeIdHTMLFile
+                            Case FieldTypeIdFileCSS, FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdFileJavascript, FieldTypeIdLongText, FieldTypeIdManyToMany, FieldTypeIdRedirect, FieldTypeIdFileTextPrivate, FieldTypeIdFileXML, FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate
                                 IncludedInColumns = False
                         End Select
                         'FieldName = LCase(.Name)
@@ -17488,7 +17488,7 @@ ErrorTrap:
                                                             return_SQLWhere &= "AND(" & adminContent.ContentTableName & "." & FindWordName & "<" & EncodeSQLNumber(FindWordValue) & ")"
                                                     End Select
                                                     Exit For
-                                                Case FieldTypeIdFile, FieldTypeIdImage
+                                                Case FieldTypeIdFile, FieldTypeIdFileImage
                                                     '
                                                     ' Date
                                                     '

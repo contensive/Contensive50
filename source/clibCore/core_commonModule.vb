@@ -151,7 +151,7 @@ Namespace Contensive.Core
         End Structure
         '
         '========================================================================
-        '   kma defined errors
+        '   defined errors (event log eventId)
         '       1000-1999 Contensive
         '       2000-2999 Datatree
         '
@@ -2425,19 +2425,19 @@ Namespace Contensive.Core
         Public Const FieldTypeIdLookup = 7        ' A lookup is a FieldTypeInteger that indexes into another table
         Public Const FieldTypeIdRedirect = 8      ' creates a link to another section
         Public Const FieldTypeIdCurrency = 9      ' A Float that prints in dollars
-        Public Const FieldTypeIdTextFile = 10     ' Text saved in a file in the files area.
-        Public Const FieldTypeIdImage = 11        ' A filename of a file in the files directory.
+        Public Const FieldTypeIdFileTextPrivate = 10     ' Text saved in a file in the files area.
+        Public Const FieldTypeIdFileImage = 11        ' A filename of a file in the files directory.
         Public Const FieldTypeIdFloat = 12        ' A float number
         Public Const FieldTypeIdAutoIdIncrement = 13 'long that automatically increments with the new record
         Public Const FieldTypeIdManyToMany = 14    ' no database field - sets up a relationship through a Rule table to another table
         Public Const FieldTypeIdMemberSelect = 15 ' This ID is a ccMembers record in a group defined by the MemberSelectGroupID field
-        Public Const FieldTypeIdCSSFile = 16      ' A filename of a CSS compatible file
-        Public Const FieldTypeIdXMLFile = 17      ' the filename of an XML compatible file
-        Public Const FieldTypeIdJavascriptFile = 18 ' the filename of a javascript compatible file
+        Public Const FieldTypeIdFileCSS = 16      ' A filename of a CSS compatible file
+        Public Const FieldTypeIdFileXML = 17      ' the filename of an XML compatible file
+        Public Const FieldTypeIdFileJavascript = 18 ' the filename of a javascript compatible file
         Public Const FieldTypeIdLink = 19           ' Links used in href tags -- can go to pages or resources
         Public Const FieldTypeIdResourceLink = 20   ' Links used in resources, link <img or <object. Should not be pages
         Public Const FieldTypeIdHTML = 21           ' LongText field that expects HTML content
-        Public Const FieldTypeIdHTMLFile = 22       ' TextFile field that expects HTML content
+        Public Const FieldTypeIdFileHTMLPrivate = 22       ' TextFile field that expects HTML content
         Public Const FieldTypeIdMax = 22
         '
         ' ----- Field Descriptors for these type
@@ -4026,7 +4026,7 @@ Namespace Contensive.Core
                     EncodeSQL = EncodeSQLDate(expression)
                 Case FieldTypeIdLongText, FieldTypeIdHTML
                     EncodeSQL = EncodeSQLLongText(expression)
-                Case FieldTypeIdFile, FieldTypeIdImage, FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdRedirect, FieldTypeIdManyToMany, FieldTypeIdText, FieldTypeIdTextFile, FieldTypeIdJavascriptFile, FieldTypeIdXMLFile, FieldTypeIdCSSFile, FieldTypeIdHTMLFile
+                Case FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdRedirect, FieldTypeIdManyToMany, FieldTypeIdText, FieldTypeIdFileTextPrivate, FieldTypeIdFileJavascript, FieldTypeIdFileXML, FieldTypeIdFileCSS, FieldTypeIdFileHTMLPrivate
                     EncodeSQL = EncodeSQLText(expression)
                 Case Else
                     EncodeSQL = EncodeSQLText(expression)
@@ -7232,13 +7232,13 @@ ErrorTrap:
                 csv_GetVirtualFilenameByTable = iTableName & "/" & iFieldName & "/" & RecordIDString & "/" & OriginalFilename
             Else
                 Select Case fieldType
-                    Case FieldTypeIdCSSFile
+                    Case FieldTypeIdFileCSS
                         csv_GetVirtualFilenameByTable = iTableName & "/" & iFieldName & "/" & RecordIDString & ".css"
-                    Case FieldTypeIdXMLFile
+                    Case FieldTypeIdFileXML
                         csv_GetVirtualFilenameByTable = iTableName & "/" & iFieldName & "/" & RecordIDString & ".xml"
-                    Case FieldTypeIdJavascriptFile
+                    Case FieldTypeIdFileJavascript
                         csv_GetVirtualFilenameByTable = iTableName & "/" & iFieldName & "/" & RecordIDString & ".js"
-                    Case FieldTypeIdHTMLFile
+                    Case FieldTypeIdFileHTMLPrivate
                         csv_GetVirtualFilenameByTable = iTableName & "/" & iFieldName & "/" & RecordIDString & ".html"
                     Case Else
                         csv_GetVirtualFilenameByTable = iTableName & "/" & iFieldName & "/" & RecordIDString & ".txt"

@@ -17971,12 +17971,12 @@ ErrorTrap:
                                         returnResult = main_GetFormInputHTML(FieldName, FieldValueText, , Width.ToString)
                                     End If
                                 '
+                                ' html private files, read from privatefiles and use html editor
                                 '
-                                '
-                                Case FieldTypeIdHTMLFile
+                                Case FieldTypeIdFileHTMLPrivate
                                     FieldValueText = EncodeText(FieldValueVariant)
                                     If FieldValueText <> "" Then
-                                        FieldValueText = app.cdnFiles.ReadFile(FieldValueText)
+                                        FieldValueText = app.privateFiles.ReadFile(FieldValueText)
                                     End If
                                     If FieldReadOnly Then
                                         returnResult = FieldValueText
@@ -17985,9 +17985,23 @@ ErrorTrap:
                                         returnResult = main_GetFormInputHTML(FieldName, FieldValueText, , Width.ToString)
                                     End If
                                 '
+                                ' text private files, read from privatefiles and use text editor
                                 '
+                                Case FieldTypeIdFileTextPrivate
+                                    FieldValueText = EncodeText(FieldValueVariant)
+                                    If FieldValueText <> "" Then
+                                        FieldValueText = app.privateFiles.ReadFile(FieldValueText)
+                                    End If
+                                    If FieldReadOnly Then
+                                        returnResult = FieldValueText
+                                    Else
+                                        'Height = encodeEmptyInteger(Height, 4)
+                                        returnResult = main_GetFormInputText2(FieldName, FieldValueText, Height, Width)
+                                    End If
                                 '
-                                Case FieldTypeIdTextFile, FieldTypeIdCSSFile, FieldTypeIdXMLFile, FieldTypeIdJavascriptFile
+                                ' text public files, read from cdnfiles and use text editor
+                                '
+                                Case FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript
                                     FieldValueText = EncodeText(FieldValueVariant)
                                     If FieldValueText <> "" Then
                                         FieldValueText = app.cdnFiles.ReadFile(FieldValueText)
@@ -18035,7 +18049,7 @@ ErrorTrap:
                                 '
                                 '
                                 '
-                                Case FieldTypeIdImage
+                                Case FieldTypeIdFileImage
                                     FieldValueText = EncodeText(FieldValueVariant)
                                     If FieldReadOnly Then
                                         returnResult = FieldValueText
@@ -18507,7 +18521,7 @@ ErrorTrap:
                             FieldNameVariant = app.db_GetCSFirstFieldName(CSPointer)
                             Do While (FieldNameVariant <> "")
                                 Select Case app.db_GetCSFieldTypeId(CSPointer, EncodeText(FieldNameVariant))
-                                    Case FieldTypeIdTextFile, FieldTypeIdCSSFile, FieldTypeIdXMLFile, FieldTypeIdJavascriptFile, FieldTypeIdHTMLFile
+                                    Case FieldTypeIdFileTextPrivate, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdFileHTMLPrivate
                                         Copy = main_GetCSEncodedField(CSPointer, EncodeText(FieldNameVariant))
                                     Case FieldTypeIdLookup
                                         Copy = main_GetCSLookup(CSPointer, EncodeText(FieldNameVariant))
@@ -23405,7 +23419,7 @@ ErrorTrap:
                         Do While FieldName <> ""
                             fieldType = app.db_GetCSFieldTypeId(CS, FieldName)
                             Select Case fieldType
-                                Case FieldTypeIdLongText, FieldTypeIdText, FieldTypeIdTextFile, FieldTypeIdCSSFile, FieldTypeIdXMLFile, FieldTypeIdJavascriptFile, FieldTypeIdHTML, FieldTypeIdHTMLFile
+                                Case FieldTypeIdLongText, FieldTypeIdText, FieldTypeIdFileTextPrivate, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate
                                     Copy = app.db_GetCS(CS, FieldName)
                                     PosACInstanceID = InStr(1, Copy, "ACInstanceID=""" & ACInstanceID & """", vbTextCompare)
                                     If PosACInstanceID <> 0 Then
@@ -33348,7 +33362,7 @@ ErrorTrap:
                         ' Date
                         '
                         Call app.db_setCS(CSPointer, FieldName, main_GetStreamDate(LocalRequestName))
-                    Case FieldTypeIdFile, FieldTypeIdImage
+                    Case FieldTypeIdFile, FieldTypeIdFileImage
                         '
                         '
                         '
@@ -34831,24 +34845,19 @@ ErrorTrap:
         '
         '
         Private Function main_GetPageNotFoundPageId() As Integer
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetPageNotFoundPageId")
-            '
-            Dim Pos As Integer
-            Dim DefaultLink As String
-            Dim PCCPtr As Integer
-            Dim Link As String
-            '
-            main_GetPageNotFoundPageId = domainDetails.pageNotFoundPageId
-            If main_GetPageNotFoundPageId = 0 Then
-                '
-                ' no domain page not found, use site default
-                '
-                main_GetPageNotFoundPageId = EncodeInteger(app.siteProperty_getText("PageNotFoundPageID", "0"))
-            End If
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("main_GetPageNotFoundPageId")
+            Dim pageId As Integer
+            Try
+                pageId = domainDetails.pageNotFoundPageId
+                If pageId = 0 Then
+                    '
+                    ' no domain page not found, use site default
+                    '
+                    pageId = app.siteProperty_getinteger("PageNotFoundPageID", 0)
+                End If
+            Catch ex As Exception
+                handleException(ex)
+            End Try
+            Return pageId
         End Function
         '
         '
@@ -34953,201 +34962,43 @@ ErrorTrap:
         '---------------------------------------------------------------------------
         '
         Public Function main_GetLandingPageID() As Integer
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetLandingPageID")
-            '
-            Dim PCCPtr As Integer
-            Dim SectionID As Integer
-            Dim LandingPageIDProperty As String
-            Dim DomainLandingPageID As Integer
-            Dim IsSetupCorrectly As Boolean
-            Dim CS As Integer
-            '
-            IsSetupCorrectly = True
-            If Not main_PageList_LandingPageID_Loaded Then
-                main_PageList_LandingPageID_Loaded = True
-                PCCPtr = -1
+            Dim landingPageid As Integer = 0
+            Try
+                Dim CS As Integer
                 '
-                ' try the domain landing page first
-                '
-                If True Then
+                If Not main_PageList_LandingPageID_Loaded Then
+                    main_PageList_LandingPageID_Loaded = True
+                    '
+                    ' try the domain landing page first
+                    '
                     CS = app.db_csOpen("Domains", "(name=" & EncodeSQLText(requestDomain) & ")", , , , , , "RootPageID")
                     If app.db_csOk(CS) Then
-                        DomainLandingPageID = EncodeInteger(main_GetCSText(CS, "RootPageID"))
+                        main_PageList_LandingPageID = EncodeInteger(main_GetCSText(CS, "RootPageID"))
                     End If
                     Call app.db_csClose(CS)
-                    If DomainLandingPageID > 0 Then
-                        main_PageList_LandingPageID = DomainLandingPageID
-                        PCCPtr = cache_pageContent_getPtr(main_PageList_LandingPageID, main_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
+                    If main_PageList_LandingPageID = 0 Then
+                        '
+                        ' try the site property landing page id
+                        '
+                        main_PageList_LandingPageID = app.siteProperty_getinteger("LandingPageID", 0)
+                    End If
+                    If main_PageList_LandingPageID = 0 Then
+                        '
+                        ' landing page could not be determined
+                        '
+                        main_AdminWarning = main_AdminWarning _
+                            & "<p>This page is being displayed because the Landing Page was requested, but has not been configured." _
+                            & " To configure any page as your landing page, edit the page, select the 'Control' tab, and check the checkbox marked 'Set Landing Page'.</p>" _
+                            & "<p>The Landing Page is the page that is displayed when the domain name is requested without a specific page.</p>"
+                        '
+                        main_PageList_LandingPageID = main_GetPageNotFoundPageId()
                     End If
                 End If
-                If PCCPtr < 0 Then
-                    '
-                    ' try the site property landing page id
-                    '
-                    LandingPageIDProperty = app.siteProperty_getText("LandingPageID", "")
-                    If Not IsNumeric(LandingPageIDProperty) Then
-                        Call handleLegacyError15("main_GetLandingPageID, The LandingPageID site property returned [" & LandingPageIDProperty & "] -- recovery will be attempted", "main_GetLandingPageID")
-                    Else
-                        main_PageList_LandingPageID = EncodeInteger(LandingPageIDProperty)
-                        PCCPtr = cache_pageContent_getPtr(main_PageList_LandingPageID, main_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
-                    End If
-                Else
-                End If
-                If PCCPtr < 0 Then
-                    '
-                    IsSetupCorrectly = False
-                    Call handleLegacyError15("main_GetLandingPageID, LandingPageIDProperty from siteproperty=[" & LandingPageIDProperty & "], cache_pageContent_getPtr returned " & PCCPtr & ", determining LandingPageID...", "main_GetLandingPageID")
-                    '
-                    ' the site property was bad - try to find the pages, or create a new one
-                    '
-                    Call cache_pageContent_load(main_IsWorkflowRendering, user_isQuickEditing(""))
-                    If False Then '.3.756" Then
-                        '
-                        Call handleLegacyError15("main_GetLandingPageID, Legacy call because BuildVersion [" & app.dataBuildVersion & "]<3.3.756, looking for legacy page named [" & LegacyLandingPageName & "]", "main_GetLandingPageID")
-                        '
-                        ' Legacy method -- Default page is called "Landing Page Content"
-                        '
-                        If cache_pageContent_rows > 0 Then
-                            PCCPtr = cache_pageContent_nameIndex.getPtr(LegacyLandingPageName)
-                        End If
-                        If PCCPtr >= 0 Then
-                            main_PageList_LandingPageID = EncodeInteger(cache_pageContent(PCC_ID, PCCPtr))
-                        Else
-                            '
-                            Call handleLegacyError15("main_GetLandingPageID, Legacy page not found in index, try to find it in Db directly", "main_GetLandingPageID")
-                            '
-                            main_PageList_LandingPageID = main_GetRecordID_Internal("Page Content", LegacyLandingPageName)
-                            If main_PageList_LandingPageID <> 0 Then
-                                '
-                                Call handleLegacyError15("main_GetLandingPageID, ERROR -- landing page found in Db, but was not found in index.", "main_GetLandingPageID")
-                                '
-                            Else
-                                '
-                                Call handleLegacyError15("main_GetLandingPageID, ERROR -- Old DbBuild and legacy page was found in the Db, and not errors, so build new page and section", "main_GetLandingPageID")
-                                '
-                                main_PageList_LandingPageID = main_CreatePageGetID(LegacyLandingPageName, "Page Content", SystemMemberID, DefaultLandingPageGuid)
-                                'Call AppendLog("main_PageList_GetLandingPageId, 8-call cache_pageContent_updateRow")
-                                Call cache_pageContent_updateRow(main_PageList_LandingPageID, main_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
-                                SectionID = main_GetLandingPageID_CreateLandingSectionReturnID(DefaultLandingSectionName, main_PageList_LandingPageID, main_GetContentID("Page Content"))
-                            End If
-                        End If
-                    Else
-                        '
-                        Call handleLegacyError15("main_GetLandingPageID, non-Legacy call since BuildVersion>=3.3.756, first look for legacy page named [" & LegacyLandingPageName & "]", "main_GetLandingPageID")
-                        '
-                        ' current method -- try "Landing Page Content", then "Home"
-                        '
-                        'Call cache_pageContent_load(main_IsWorkflowRendering, main_IsQuickEditing(""))
-                        If (cache_pageContent_nameIndex Is Nothing) Then
-                            '
-                            Call handleLegacyError15("main_GetLandingPageID, ERROR -- main_PCCNameIndex is Nothing", "main_GetLandingPageID")
-                            '
-                        Else
-                            If cache_pageContent_rows > 0 Then
-                                PCCPtr = cache_pageContent_nameIndex.getPtr(LegacyLandingPageName)
-                                If PCCPtr >= 0 Then
-                                    If Not EncodeBoolean(cache_pageContent(PCC_Active, PCCPtr)) Then
-                                        PCCPtr = -1
-                                    End If
-                                End If
-                            End If
-                        End If
-                        If PCCPtr >= 0 Then
-                            '
-                            Call handleLegacyError15("main_GetLandingPageID, Good PCCPtr returned, main_Get LandingPageID out of main_pcc()", "main_GetLandingPageID")
-                            '
-                            main_PageList_LandingPageID = EncodeInteger(cache_pageContent(PCC_ID, PCCPtr))
-                        Else
-                            '
-                            Call handleLegacyError15("main_GetLandingPageID, Legacy page not found in index, try to find it in Db directly", "main_GetLandingPageID")
-                            '
-                            main_PageList_LandingPageID = main_GetRecordID_Internal("Page Content", LegacyLandingPageName)
-                            If main_PageList_LandingPageID <> 0 Then
-                                '
-                                Call handleLegacyError15("main_GetLandingPageID, ERROR -- Legacy page found in Db, but was not found in index.", "main_GetLandingPageID")
-                                '
-                            Else
-                                '
-                                Call handleLegacyError15("main_GetLandingPageID, Legacy page not found in Db or index, look for page named [" & DefaultNewLandingPageName & "]", "main_GetLandingPageID")
-                                '
-                                If cache_pageContent_rows > 0 Then
-                                    PCCPtr = cache_pageContent_nameIndex.getPtr(DefaultNewLandingPageName)
-                                    If PCCPtr >= 0 Then
-                                        If Not EncodeBoolean(cache_pageContent(PCC_Active, PCCPtr)) Then
-                                            PCCPtr = -1
-                                        End If
-                                    End If
-                                End If
-                                If PCCPtr >= 0 Then
-                                    '
-                                    Call handleLegacyError15("main_GetLandingPageID, Good PCCPtr returned, main_Get LandingPageID out of main_pcc()", "main_GetLandingPageID")
-                                    '
-                                    main_PageList_LandingPageID = EncodeInteger(cache_pageContent(PCC_ID, PCCPtr))
-                                Else
-                                    '
-                                    Call handleLegacyError15("main_GetLandingPageID, non-Legacy page not found in index, try to find it in Db directly", "main_GetLandingPageID")
-                                    '
-                                    main_PageList_LandingPageID = main_GetRecordID_Internal("Page Content", DefaultNewLandingPageName)
-                                    If main_PageList_LandingPageID <> 0 Then
-                                        '
-                                        Call handleLegacyError15("main_GetLandingPageID, ERROR -- non-Legacy page found in Db, but was not found in index.", "main_GetLandingPageID")
-                                        '
-                                    Else
-                                        '
-                                        Call handleLegacyError15("main_GetLandingPageID, Neither legacy or non-legacy page name was found in the Db, and no errors. Test for first time site build (AllowAutoHomeSectionOnce).", "main_GetLandingPageID")
-                                        '
-                                        ' ONLY if this is a new site, create a landing page, landing section and default template
-                                        '
-                                        If Not EncodeBoolean(app.siteProperty_getBoolean("AllowAutoHomeSectionOnce", False)) Then
-                                            Call handleLegacyError15("main_GetLandingPageID, ERROR -- Can not create new home page because SiteProperty 'AllowAutoHomeSectionOnce' is not set. This page will return an error.", "main_GetLandingPageID")
-                                        Else
-                                            Call handleLegacyError15("main_GetLandingPageID, AllowAutoHomeSectionOnce is true, this is the first time hit -- create landing page, section and template.", "main_GetLandingPageID")
-                                            main_PageList_LandingPageID = main_CreatePageGetID(DefaultNewLandingPageName, "Page Content", SystemMemberID, DefaultLandingPageGuid)
-                                            'Call AppendLog("main_PageList_GetLandingPageId, 9-call cache_pageContent_updateRow")
-                                            Call cache_pageContent_updateRow(main_PageList_LandingPageID, main_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
-                                            SectionID = main_GetLandingPageID_CreateLandingSectionReturnID(DefaultLandingSectionName, main_PageList_LandingPageID, main_GetContentID("Page Content"))
-                                            Call app.siteProperty_set("LandingPageID", EncodeText(main_PageList_LandingPageID))
-                                            Call app.siteProperty_set("AllowAutoHomeSectionOnce", "0")
-                                            IsSetupCorrectly = True
-                                        End If
-                                    End If
-                                End If
-                            End If
-                        End If
-                    End If
-                End If
-            End If
-            If Not IsSetupCorrectly Then
-                '
-                ' include an admin message here that this page was used because no home page was found
-                '
-                If main_PageList_LandingPageID <= 0 Then
-                    '
-                    ' section not found and AllowAutoHomeSectionOnce is false, just end in an error
-                    '
-                    main_AdminWarning = main_AdminWarning _
-                        & "<p>This page is being displayed because the Landing Page was requested, but has not been configured." _
-                        & " To configure any page as your landing page, edit the page, select the 'Control' tab, and check the checkbox marked 'Set Landing Page'.</p>" _
-                        & "<p>The Landing Page is the page that is displayed when the domain name is requested without a specific page.</p>"
-                    Call main_AddUserError("<p>The page you requested could not be found</p>")
-                    Call handleLegacyError12("main_GetLandingPageID", "Default SectionID or LandingPageID could not be found, and AllowAutoHomeSectionOnce is false. This page ended in an error.")
-                Else
-                    '
-                    '
-                    '
-                    main_AdminWarning = main_AdminWarning _
-                        & "<p>This page is being displayed because the Landing Page was requested, but has not been configured." _
-                        & " To configure any page as your landing page, edit the page, select the 'Control' tab, and check the checkbox marked 'Set Landing Page'.</p>" _
-                        & "<p>The Landing Page is the page that is displayed when the domain name is requested without a specific page.</p>"
-                    main_AdminWarningPageID = main_PageList_LandingPageID
-                    main_AdminWarningSectionID = SectionID
-                End If
-            End If
-            main_GetLandingPageID = main_PageList_LandingPageID
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("main_GetLandingPageID")
+                landingPageid = main_PageList_LandingPageID
+            Catch ex As Exception
+                handleException(ex)
+            End Try
+            Return landingPageid
         End Function
         '
         '---------------------------------------------------------------------------
@@ -39608,7 +39459,7 @@ ErrorTrap:
                     If HtmlStyle <> "" Then
                         main_GetFormInputField = Replace(main_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
-                Case FieldTypeIdCSSFile
+                Case FieldTypeIdFileCSS
                     '
                     '
                     '
@@ -39657,7 +39508,7 @@ ErrorTrap:
                     If HtmlStyle <> "" Then
                         main_GetFormInputField = Replace(main_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
-                Case FieldTypeIdImage
+                Case FieldTypeIdFileImage
                     '
                     '
                     '
@@ -39679,7 +39530,7 @@ ErrorTrap:
                     If HtmlStyle <> "" Then
                         main_GetFormInputField = Replace(main_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
-                Case FieldTypeIdJavascriptFile
+                Case FieldTypeIdFileJavascript
                     '
                     '
                     '
@@ -39763,7 +39614,7 @@ ErrorTrap:
                     If HtmlStyle <> "" Then
                         main_GetFormInputField = Replace(main_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
-                Case FieldTypeIdLongText, FieldTypeIdTextFile
+                Case FieldTypeIdLongText, FieldTypeIdFileTextPrivate
                     '
                     '
                     '
@@ -39771,7 +39622,7 @@ ErrorTrap:
                     If HtmlStyle <> "" Then
                         main_GetFormInputField = Replace(main_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
-                Case FieldTypeIdXMLFile
+                Case FieldTypeIdFileXML
                     '
                     '
                     '
@@ -39779,7 +39630,7 @@ ErrorTrap:
                     If HtmlStyle <> "" Then
                         main_GetFormInputField = Replace(main_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
-                Case FieldTypeIdHTML, FieldTypeIdHTMLFile
+                Case FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate
                     '
                     '
                     '
@@ -50876,11 +50727,16 @@ ErrorTrap:
                         '
                         parser = New MultipartFormDataParser(iisContext.Request.InputStream)
                         c = ""
-                        For Each Parameter As KeyValuePair(Of String, HttpMultipartParser.ParameterPart) In parser.Parameters
-                            NewKey = Parameter.Key
-                            newValue = Parameter.Value.Data
+                        For Each parameter As ParameterPart In parser.Parameters
+                            NewKey = parameter.Name
+                            newValue = parameter.Data
                             c &= "&" & iisContext.Server.UrlEncode(NewKey) & "=" & iisContext.Server.UrlEncode(newValue)
                         Next
+                        'For Each Parameter As KeyValuePair(Of String, HttpMultipartParser.ParameterPart) In parser.Parameters
+                        '    NewKey = Parameter.Key
+                        '    newValue = Parameter.Value.Data
+                        '    c &= "&" & iisContext.Server.UrlEncode(NewKey) & "=" & iisContext.Server.UrlEncode(newValue)
+                        'Next
                         If Len(c) > 0 Then
                             c = Mid(c, 2)
                         End If
@@ -51191,39 +51047,46 @@ ErrorTrap:
                 '
                 ' dependant on app.privateFiles
                 '
-                If Not (cluster Is Nothing) Then
-                    If Not (cluster.clusterFiles Is Nothing) Then
-                        Dim iLogFolder As String
-                        Dim MonthNumber As Integer
-                        Dim DayNumber As Integer
-                        Dim FilenameNoExt As String
-                        Dim PathFilenameNoExt As String
-                        Dim FileSize As Integer
-                        Dim RetryCnt As Integer
-                        Dim SaveOK As Boolean
-                        Dim FileSuffix As String
-                        Dim threadId As Integer = System.Threading.Thread.CurrentThread.ManagedThreadId
+                Dim logPath As String
+                Dim MonthNumber As Integer
+                Dim DayNumber As Integer
+                Dim FilenameNoExt As String
+                Dim PathFilenameNoExt As String
+                Dim FileSize As Integer
+                Dim RetryCnt As Integer
+                Dim SaveOK As Boolean
+                Dim FileSuffix As String
+                Dim threadId As Integer = System.Threading.Thread.CurrentThread.ManagedThreadId
+                Dim logPathRoot As String = "c:\"
+                '
+                Dim threadName As String = Format(threadId, "00000000")
+                '
+                Try
+                    '
+                    ' attempt to get cluster data, else go wtih defaults
+                    '
+                    If (cluster Is Nothing) Then
                         '
-                        Dim filenames As Collections.ObjectModel.ReadOnlyCollection(Of String)
-                        Dim threadName As String = Format(threadId, "00000000")
+                        ' no cluster object
                         '
-                        iLogFolder = LogFolder
+                    ElseIf (cluster.clusterFiles Is Nothing) Then
+                        '
+                        ' no cluster files object
+                        '
+                    Else
                         DayNumber = Day(Now)
                         MonthNumber = Month(Now)
                         FilenameNoExt = getDateString(Now)
-                        If iLogFolder <> "" Then
-                            iLogFolder = iLogFolder & "\"
+                        logPath = LogFolder
+                        If logPath <> "" Then
+                            logPath = logPath & "\"
                         End If
-                        iLogFolder = "clibLogs\" & iLogFolder
-                        PathFilenameNoExt = iLogFolder & FilenameNoExt
-                        '
-                        ' eliminate filesystem object
-                        '
-                        ' find-replace app.privateFiles. for cluster.files.
-                        If Not cluster.clusterFiles.checkPath(iLogFolder) Then
-                            Call cluster.clusterFiles.createPath(iLogFolder)
+                        logPath = "clibLogs\" & logPath
+                        logPathRoot = cluster.clusterFiles.rootLocalFolderPath
+                        If Not cluster.clusterFiles.checkPath(logPath) Then
+                            Call cluster.clusterFiles.createPath(logPath)
                         Else
-                            Dim logFiles As IO.FileInfo() = cluster.clusterFiles.GetFolderFiles(iLogFolder)
+                            Dim logFiles As IO.FileInfo() = cluster.clusterFiles.GetFolderFiles(logPath)
                             For Each fileInfo As IO.FileInfo In logFiles
                                 If fileInfo.Name.ToLower = FilenameNoExt.ToLower & ".log" Then
                                     FileSize = CInt(fileInfo.Length)
@@ -51231,6 +51094,9 @@ ErrorTrap:
                                 End If
                             Next
                         End If
+                        PathFilenameNoExt = logPath & FilenameNoExt
+                        '
+                        ' add to log file
                         '
                         If FileSize < 10000000 Then
                             RetryCnt = 0
@@ -51239,7 +51105,7 @@ ErrorTrap:
                             Do While (Not SaveOK) And (RetryCnt < 10)
                                 SaveOK = True
                                 Try
-                                    Dim absFile As String = LCase(cluster.clusterFiles.rootLocalFolderPath & PathFilenameNoExt & FileSuffix & ".log")
+                                    Dim absFile As String = LCase(logPathRoot & PathFilenameNoExt & FileSuffix & ".log")
                                     Dim absContent As String = LogFileCopyPrep(FormatDateTime(Now(), vbGeneralDate)) & vbTab & threadName & vbTab & LogLine & vbCrLf
 
                                     If Not IO.File.Exists(absFile) Then
@@ -51273,7 +51139,11 @@ ErrorTrap:
                             Loop
                         End If
                     End If
-                End If
+                Catch ex As Exception
+                    '
+                    '
+                    '
+                End Try
             Catch ex As Exception
                 '
                 ' cannot use execption handler because this routine is called by handleException
@@ -51382,12 +51252,40 @@ ErrorTrap:
                 Dim type As System.Type = method.DeclaringType()
                 Dim methodName As String = method.Name
                 Dim errMsg As String = type.Name & "." & methodName & ", cause=[" & cause & "], ex=[" & ex.ToString & "]"
-                Console.WriteLine(errMsg)
+                '
+                ' append to application event log
+                '
+                Dim sSource As String = "Contensive"
+                Dim sLog As String = "Application"
+                Dim eventId As Integer = 1001
+                Try
+                    '
+                    ' if command line has been run on this server, this will work. Otherwise skip
+                    '
+                    EventLog.WriteEntry(sSource, errMsg, EventLogEntryType.Error, eventId)
+                Catch exEvent As Exception
+                    ' ignore error. Can be caused if source has not been created. It is created automatically in command line installation util.
+                End Try
+                '
+                ' append to daily trace log
+                '
                 Call appendLog(errMsg)
+                '
+                ' add to doc exception list to display at top of webpage
+                '
                 If docExceptionList Is Nothing Then
                     docExceptionList = New List(Of String)
                 End If
-                docExceptionList.Add(errMsg)
+                If docExceptionList.Count = 10 Then
+                    docExceptionList.Add("Exception limit exceeded")
+                ElseIf docExceptionList.Count < 10 Then
+                    docExceptionList.Add(errMsg)
+                End If
+                '
+                ' write consol for debugging
+                '
+                Console.WriteLine(errMsg)
+                '
                 _handlingExceptionRecursionBlock = False
             End If
         End Sub

@@ -128,8 +128,9 @@
     </WarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Amazon.ElastiCacheCluster">
-      <HintPath>..\packages\Amazon.ElastiCacheCluster.1.0.0.3\lib\net35\Amazon.ElastiCacheCluster.dll</HintPath>
+    <Reference Include="Amazon.ElastiCacheCluster, Version=1.0.0.4, Culture=neutral, PublicKeyToken=445456c82d5a0fce, processorArchitecture=MSIL">
+      <HintPath>..\packages\Amazon.ElastiCacheCluster.1.0.0.4\lib\net35\Amazon.ElastiCacheCluster.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="AWS.SessionProvider">
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\AWS SDK for .NET\bin\Net35\AWS.SessionProvider.dll</HintPath>
@@ -141,11 +142,11 @@
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\AWS SDK for .NET\bin\Net35\AWSSDK.dll</HintPath>
     </Reference>
     <Reference Include="Enyim.Caching, Version=2.12.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\EnyimMemcached.2.12\lib\net35\Enyim.Caching.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="HttpMultipartParser, Version=1.1.5.0, Culture=neutral, PublicKeyToken=6d293681fa6c7a03, processorArchitecture=MSIL">
-      <HintPath>..\packages\HttpMultipartParser.1.1.5\lib\net40\HttpMultipartParser.dll</HintPath>
+    <Reference Include="HttpMultipartParser, Version=2.1.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\HttpMultipartParser.2.1.7\lib\net40\HttpMultipartParser.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib">
@@ -300,6 +301,7 @@
     <ProjectReference Include="..\CPBase\cpBase.vbproj">
       <Project>{E873F18E-47EF-46A9-AEA1-5A8B0F8BEB01}</Project>
       <Name>cpBase</Name>
+      <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\webClientExt\webClientExt.csproj">
       <Project>{41DC21C3-5FA4-43DD-9EEB-DA8964E5CD66}</Project>

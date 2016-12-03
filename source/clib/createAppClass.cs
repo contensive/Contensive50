@@ -418,7 +418,7 @@ namespace  Contensive.Core {
         /// <param name="installFiles"></param>
         public void upgradeResources(CPClass cp, fileSystemClass installFiles)
         {
-            string appPatternsSrc = "clibResources\\appPatterns";
+            //string appPatternsSrc = "clibResources\\appPatterns";
             //if (!cp.core.cluster.clusterFiles.checkPath(appPatternsSrc))
             //{
                 //

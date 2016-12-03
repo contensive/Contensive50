@@ -1516,12 +1516,12 @@ ErrorTrap:
             Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "convert FieldTypeLongText + htmlContent to FieldTypeHTML.")
             SQL = "update ccfields set type=" & FieldTypeIdHTML & " where type=" & FieldTypeIdLongText & " and ( htmlcontent<>0 )"
             Call cp.core.app.executeSql(SQL)
-            '
-            ' convert FieldTypeTextFile + htmlContent to FieldTypeHTMLFile
-            '
-            Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "convert FieldTypeTextFile + htmlContent to FieldTypeHTMLFile.")
-            SQL = "update ccfields set type=" & FieldTypeIdHTMLFile & " where type=" & FieldTypeIdTextFile & " and ( htmlcontent<>0 )"
-            Call cp.core.app.executeSql(SQL)
+            ''
+            '' convert FieldTypeTextFile + htmlContent to FieldTypeHTMLFile
+            ''
+            'Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "convert FieldTypeTextFile + htmlContent to FieldTypeHTMLFile.")
+            'SQL = "update ccfields set type=" & FieldTypeIdFileHTMLPrivate & " where type=" & FieldTypeIdFileTextPrivate & " and ( htmlcontent<>0 )"
+            'Call cp.core.app.executeSql(SQL)
             '
             ' Log files Older then 30 days
             '

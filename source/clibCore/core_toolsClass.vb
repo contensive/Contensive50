@@ -486,6 +486,7 @@ ErrorTrap:
             Dim Index As New keyPtrIndexClass
             Dim ButtonList As String
             Dim Stream As New fastStringClass
+            Dim StreamValidRows As New fastStringClass
             Dim TypeSelectTemplate As String
             Dim TypeSelect As String
             Dim IndexPointer As Integer
@@ -502,7 +503,7 @@ ErrorTrap:
             ContentName = Local_GetContentNameByID(ContentID)
             TableName = Local_GetContentTableName(ContentName)
             DataSourceName = Local_GetContentDataSource(ContentName)
-            CDef = cpCore.app.metaData.getCdefFromDb(ContentID, New List(Of Integer))
+            CDef = cpCore.app.metaData.getCdef(ContentID, True, True)
             '
             If (ToolButton <> "") Then
                 If (ToolButton <> ButtonCancel) Then
@@ -723,7 +724,7 @@ ErrorTrap:
                 Stream.Add("<div style=""clear:both"">&nbsp;</div>")
             End If
             If ReloadCDef Then
-                CDef = cpCore.app.metaData.getCdefFromDb(ContentID, New List(Of Integer))
+                CDef = cpCore.app.metaData.getCdef(ContentID, True, True)
             End If
             If (ContentID <> 0) Then
                 '
@@ -746,7 +747,7 @@ ErrorTrap:
                 Else
                     AllowCDefInherit = True
                     ParentContentName = cpCore.main_GetContentNameByID(ParentContentID)
-                    ParentCDef = cpCore.app.metaData.getCdefFromDb(ParentContentID, New List(Of Integer))
+                    ParentCDef = cpCore.app.metaData.getCdef(ParentContentID, True, True)
                 End If
                 If CDef.fields.Count > 0 Then
                     Stream.Add("<tr>")
@@ -811,6 +812,8 @@ ErrorTrap:
                     Next
                     fieldList.Sort(Function(p1, p2) p1.sort.CompareTo(p2.sort))
                     For Each fieldsort As fieldSortClass In fieldList
+                        Dim streamRow As New fastStringClass
+                        Dim rowValid As Boolean = True
                         With fieldsort.field
                             '
                             ' If Field has name and type, it is locked and can not be changed
@@ -820,23 +823,23 @@ ErrorTrap:
                             ' put the menu into the current menu format
                             '
                             RecordID = .id
-                            Call Stream.Add(cpCore.main_GetFormInputHidden("dtfaID." & RecordCount, RecordID))
-                            Stream.Add("<tr>")
+                            Call streamRow.Add(cpCore.main_GetFormInputHidden("dtfaID." & RecordCount, RecordID))
+                            streamRow.Add("<tr>")
                             '
                             ' edit button
                             '
-                            Stream.Add("<td class=""ccPanelInput"" align=""left""><img src=""/cclib/images/spacer.gif"" width=""1"" height=""10"">")
+                            streamRow.Add("<td class=""ccPanelInput"" align=""left""><img src=""/cclib/images/spacer.gif"" width=""1"" height=""10"">")
                             ContentFieldsCID = Local_GetContentID("Content Fields")
                             If (ContentFieldsCID <> 0) Then
-                                Stream.Add("<nobr>" & SpanClassAdminSmall & "[<a href=""" & cpCore.main_ServerPage & "?aa=" & AdminActionNop & "&af=" & AdminFormEdit & "&id=" & RecordID & "&cid=" & ContentFieldsCID & "&mm=0"">EDIT</a>]</span></nobr>")
-                                'Stream.Add( "<nobr>" & SpanClassAdminSmall & "[")
-                                'Stream.Add( "<a href=""#""")
-                                'Stream.Add( " onclick=""" _
+                                streamRow.Add("<nobr>" & SpanClassAdminSmall & "[<a href=""" & cpCore.main_ServerPage & "?aa=" & AdminActionNop & "&af=" & AdminFormEdit & "&id=" & RecordID & "&cid=" & ContentFieldsCID & "&mm=0"">EDIT</a>]</span></nobr>")
+                                'streamRow.Add( "<nobr>" & SpanClassAdminSmall & "[")
+                                'streamRow.Add( "<a href=""#""")
+                                'streamRow.Add( " onclick=""" _
                                 '    & " window.open('" & cpCore.main_ServerPage & "?aa=" & AdminActionNop & "&af=" & AdminFormEdit & "&id=" & RecordID & "&cid=" & ContentFieldsCID & "&mm=0', '_blank', 'scrollbars=yes,toolbar=no,status=no,resizable=yes');" _
                                 '    & " return false""")
-                                'Stream.Add( ">EDIT</a>]</span></nobr>")
+                                'streamRow.Add( ">EDIT</a>]</span></nobr>")
                             End If
-                            Stream.Add("</td>")
+                            streamRow.Add("</td>")
                             '
                             ' Inherited
                             '
@@ -844,12 +847,12 @@ ErrorTrap:
                                 '
                                 ' no parent
                                 '
-                                Stream.Add("<td class=""ccPanelInput"" align=""center"">" & SpanClassAdminSmall & "False</span></td>")
+                                streamRow.Add("<td class=""ccPanelInput"" align=""center"">" & SpanClassAdminSmall & "False</span></td>")
                             ElseIf .inherited Then
                                 '
                                 ' inherited property
                                 '
-                                Stream.Add("<td class=""ccPanelInput"" align=""center"">" & cpCore.main_GetFormInputCheckBox("dtfaInherited." & RecordCount, .inherited) & "</td>")
+                                streamRow.Add("<td class=""ccPanelInput"" align=""center"">" & cpCore.main_GetFormInputCheckBox("dtfaInherited." & RecordCount, .inherited) & "</td>")
                             Else
                                 '
                                 ' CDef has a parent, but the field is non-inherited, test for a matching Parent Field
@@ -862,141 +865,153 @@ ErrorTrap:
                                     End If
                                 Next
                                 If (parentField Is Nothing) Then
-                                    Stream.Add("<td class=""ccPanelInput"" align=""center"">" & SpanClassAdminSmall & "False**</span></td>")
+                                    streamRow.Add("<td class=""ccPanelInput"" align=""center"">" & SpanClassAdminSmall & "False**</span></td>")
                                     NeedFootNote2 = True
                                 Else
-                                    Stream.Add("<td class=""ccPanelInput"" align=""center"">" & cpCore.main_GetFormInputCheckBox("dtfaInherited." & RecordCount, .inherited) & "</td>")
+                                    streamRow.Add("<td class=""ccPanelInput"" align=""center"">" & cpCore.main_GetFormInputCheckBox("dtfaInherited." & RecordCount, .inherited) & "</td>")
                                 End If
                             End If
                             '
                             ' name
                             '
-                            Stream.Add("<td class=""ccPanelInput"" align=""left""><nobr>")
+                            Dim tmpValue As Boolean = String.IsNullOrEmpty(.nameLc)
+                            rowValid = rowValid And Not tmpValue
+                            streamRow.Add("<td class=""ccPanelInput"" align=""left""><nobr>")
                             If .inherited Then
-                                Call Stream.Add(SpanClassAdminSmall & .nameLc & "&nbsp;</SPAN>")
+                                Call streamRow.Add(SpanClassAdminSmall & .nameLc & "&nbsp;</SPAN>")
                             ElseIf FieldLocked Then
-                                Call Stream.Add(SpanClassAdminSmall & .nameLc & "&nbsp;</SPAN><input type=hidden name=dtfaName." & RecordCount & " value=""" & .nameLc & """>")
+                                Call streamRow.Add(SpanClassAdminSmall & .nameLc & "&nbsp;</SPAN><input type=hidden name=dtfaName." & RecordCount & " value=""" & .nameLc & """>")
                             Else
-                                Call Stream.Add(cpCore.main_GetFormInputText("dtfaName." & RecordCount, .nameLc, 1, 10))
+                                Call streamRow.Add(cpCore.main_GetFormInputText("dtfaName." & RecordCount, .nameLc, 1, 10))
                             End If
-                            Stream.Add("</nobr></td>")
+                            streamRow.Add("</nobr></td>")
                             '
                             ' caption
                             '
-                            Stream.Add("<td class=""ccPanelInput"" align=""left""><nobr>")
+                            streamRow.Add("<td class=""ccPanelInput"" align=""left""><nobr>")
                             If .inherited Then
-                                Call Stream.Add(SpanClassAdminSmall & .caption & "</SPAN>")
+                                Call streamRow.Add(SpanClassAdminSmall & .caption & "</SPAN>")
                             Else
-                                Call Stream.Add(cpCore.main_GetFormInputText("dtfaCaption." & RecordCount, .caption, 1, 10))
+                                Call streamRow.Add(cpCore.main_GetFormInputText("dtfaCaption." & RecordCount, .caption, 1, 10))
                             End If
-                            Stream.Add("</nobr></td>")
+                            streamRow.Add("</nobr></td>")
                             '
                             ' Edit Tab
                             '
-                            Stream.Add("<td class=""ccPanelInput"" align=""left""><nobr>")
+                            streamRow.Add("<td class=""ccPanelInput"" align=""left""><nobr>")
                             If .inherited Then
-                                Call Stream.Add(SpanClassAdminSmall & .editTabName & "</SPAN>")
+                                Call streamRow.Add(SpanClassAdminSmall & .editTabName & "</SPAN>")
                             Else
-                                Call Stream.Add(cpCore.main_GetFormInputText("dtfaEditTab." & RecordCount, .editTabName, 1, 10))
+                                Call streamRow.Add(cpCore.main_GetFormInputText("dtfaEditTab." & RecordCount, .editTabName, 1, 10))
                             End If
-                            Stream.Add("</nobr></td>")
+                            streamRow.Add("</nobr></td>")
                             '
                             ' default
                             '
-                            Stream.Add("<td class=""ccPanelInput"" align=""left""><nobr>")
+                            streamRow.Add("<td class=""ccPanelInput"" align=""left""><nobr>")
                             If .inherited Then
-                                Call Stream.Add(SpanClassAdminSmall & EncodeText(.defaultValue) & "</SPAN>")
+                                Call streamRow.Add(SpanClassAdminSmall & EncodeText(.defaultValue) & "</SPAN>")
                             Else
-                                Call Stream.Add(cpCore.main_GetFormInputText("dtfaDefaultValue." & RecordCount, EncodeText(.defaultValue), 1, 10))
+                                Call streamRow.Add(cpCore.main_GetFormInputText("dtfaDefaultValue." & RecordCount, EncodeText(.defaultValue), 1, 10))
                             End If
-                            Stream.Add("</nobr></td>")
+                            streamRow.Add("</nobr></td>")
                             '
                             ' type
                             '
-                            Stream.Add("<td class=""ccPanelInput"" align=""left""><nobr>")
+                            rowValid = rowValid And (.fieldTypeId > 0)
+                            streamRow.Add("<td class=""ccPanelInput"" align=""left""><nobr>")
                             If .inherited Then
                                 CSPointer = cpCore.main_OpenCSContentRecord("Content Field Types", .fieldTypeId)
                                 If Not cpCore.app.db_csOk(CSPointer) Then
-                                    Call Stream.Add(SpanClassAdminSmall & "Unknown[" & .fieldTypeId & "]</SPAN>")
+                                    Call streamRow.Add(SpanClassAdminSmall & "Unknown[" & .fieldTypeId & "]</SPAN>")
                                 Else
-                                    Call Stream.Add(SpanClassAdminSmall & cpCore.main_GetCSText(CSPointer, "Name") & "</SPAN>")
+                                    Call streamRow.Add(SpanClassAdminSmall & cpCore.main_GetCSText(CSPointer, "Name") & "</SPAN>")
                                 End If
                                 Call cpCore.app.db_csClose(CSPointer)
                             ElseIf FieldLocked Then
-                                Call Stream.Add(cpCore.main_GetRecordName("content field types", .fieldTypeId) & cpCore.main_GetFormInputHidden("dtfaType." & RecordCount, .fieldTypeId))
+                                Call streamRow.Add(cpCore.main_GetRecordName("content field types", .fieldTypeId) & cpCore.main_GetFormInputHidden("dtfaType." & RecordCount, .fieldTypeId))
                             Else
                                 TypeSelect = TypeSelectTemplate
                                 TypeSelect = Replace(TypeSelect, "menuname", "dtfaType." & RecordCount, , , vbTextCompare)
                                 TypeSelect = Replace(TypeSelect, "=""" & .fieldTypeId & """", "=""" & .fieldTypeId & """ selected", , , vbTextCompare)
-                                Call Stream.Add(TypeSelect)
+                                Call streamRow.Add(TypeSelect)
                             End If
-                            Stream.Add("</nobr></td>")
+                            streamRow.Add("</nobr></td>")
                             '
                             ' sort priority
                             '
-                            Stream.Add("<td class=""ccPanelInput"" align=""left""><nobr>")
+                            streamRow.Add("<td class=""ccPanelInput"" align=""left""><nobr>")
                             If .inherited Then
-                                Call Stream.Add(SpanClassAdminSmall & .editSortPriority & "</SPAN>")
+                                Call streamRow.Add(SpanClassAdminSmall & .editSortPriority & "</SPAN>")
                             Else
-                                Call Stream.Add(cpCore.main_GetFormInputText("dtfaEditSortPriority." & RecordCount, .editSortPriority, 1, 10))
+                                Call streamRow.Add(cpCore.main_GetFormInputText("dtfaEditSortPriority." & RecordCount, .editSortPriority, 1, 10))
                             End If
-                            Stream.Add("</nobr></td>")
+                            streamRow.Add("</nobr></td>")
                             '
                             ' active
                             '
-                            Stream.Add(GetForm_ConfigureEdit_CheckBox("dtfaActive." & RecordCount, EncodeText(.active), .inherited))
+                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaActive." & RecordCount, EncodeText(.active), .inherited))
                             '
                             ' read only
                             '
-                            Stream.Add(GetForm_ConfigureEdit_CheckBox("dtfaReadOnly." & RecordCount, EncodeText(.ReadOnly), .inherited))
+                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaReadOnly." & RecordCount, EncodeText(.ReadOnly), .inherited))
                             '
                             ' authorable
                             '
-                            Stream.Add(GetForm_ConfigureEdit_CheckBox("dtfaAuthorable." & RecordCount, EncodeText(.authorable), .inherited))
+                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaAuthorable." & RecordCount, EncodeText(.authorable), .inherited))
                             '
                             ' required
                             '
-                            Stream.Add(GetForm_ConfigureEdit_CheckBox("dtfaRequired." & RecordCount, EncodeText(.Required), .inherited))
+                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaRequired." & RecordCount, EncodeText(.Required), .inherited))
                             '
                             ' UniqueName
                             '
-                            Stream.Add(GetForm_ConfigureEdit_CheckBox("dtfaUniqueName." & RecordCount, EncodeText(.UniqueName), .inherited))
+                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaUniqueName." & RecordCount, EncodeText(.UniqueName), .inherited))
                             '
                             ' text buffered
                             '
-                            Stream.Add(GetForm_ConfigureEdit_CheckBox("dtfaTextBuffered." & RecordCount, EncodeText(.TextBuffered), .inherited))
+                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaTextBuffered." & RecordCount, EncodeText(.TextBuffered), .inherited))
                             '
                             ' password
                             '
-                            Stream.Add(GetForm_ConfigureEdit_CheckBox("dtfaPassword." & RecordCount, EncodeText(.Password), .inherited))
+                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaPassword." & RecordCount, EncodeText(.Password), .inherited))
                             '
                             ' scramble
                             '
-                            Stream.Add(GetForm_ConfigureEdit_CheckBox("dtfaScramble." & RecordCount, EncodeText(.Scramble), .inherited))
+                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaScramble." & RecordCount, EncodeText(.Scramble), .inherited))
                             '
                             ' HTML Content
                             '
-                            Stream.Add(GetForm_ConfigureEdit_CheckBox("dtfaHTMLContent." & RecordCount, EncodeText(.htmlContent), .inherited))
+                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaHTMLContent." & RecordCount, EncodeText(.htmlContent), .inherited))
                             '
                             ' Admin Only
                             '
                             If cpCore.user_isAdmin Then
-                                Stream.Add(GetForm_ConfigureEdit_CheckBox("dtfaAdminOnly." & RecordCount, EncodeText(.adminOnly), .inherited))
+                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaAdminOnly." & RecordCount, EncodeText(.adminOnly), .inherited))
                             End If
                             '
                             ' Developer Only
                             '
                             If cpCore.user_isDeveloper Then
-                                Stream.Add(GetForm_ConfigureEdit_CheckBox("dtfaDeveloperOnly." & RecordCount, EncodeText(.developerOnly), .inherited))
+                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaDeveloperOnly." & RecordCount, EncodeText(.developerOnly), .inherited))
                             End If
                             '
-                            Stream.Add("</tr>")
+                            streamRow.Add("</tr>")
                             RecordCount = RecordCount + 1
                         End With
+                        '
+                        ' rows are built - put the blank rows at the top
+                        '
+                        If Not rowValid Then
+                            Call Stream.Add(streamRow.Text())
+                        Else
+                            Call StreamValidRows.Add(streamRow.Text())
+                        End If
                     Next
+                    Call Stream.Add(StreamValidRows.Text())
                     Call Stream.Add(cpCore.main_GetFormInputHidden("dtfaRecordCount", RecordCount))
                 End If
-                Stream.Add("</table>")
+                    Stream.Add("</table>")
                 'Stream.Add( cpCore.main_GetPanelButtons(ButtonList, "Button"))
                 '
                 Call Stream.Add(cpCore.main_GetPanelBottom())
@@ -1564,7 +1579,7 @@ ErrorTrap:
             If ContentID <> 0 Then
                 ButtonList = ButtonCancel & "," & ButtonReloadCDef
                 ContentName = Local_GetContentNameByID(ContentID)
-                CDef = cpCore.app.metaData.getCdefFromDb(ContentID, New List(Of Integer))
+                CDef = cpCore.app.metaData.getCdef(ContentID, True, False)
                 If ToolsAction <> 0 Then
                     '
                     ' Block contentautoload, then force a load at the end
@@ -1901,7 +1916,7 @@ ErrorTrap:
                     '
                     ' Get a new copy of the content definition
                     '
-                    CDef = cpCore.app.metaData.getCdefFromDb(ContentID, New List(Of Integer))
+                    CDef = cpCore.app.metaData.getCdef(ContentID, True, False)
                 End If
                 If (Button = ButtonReloadCDef) Then
                     cpCore.app.cache_invalidateAll()
@@ -2028,22 +2043,22 @@ ErrorTrap:
                                     ' not authorable
                                     '
                                     Stream.Add("<IMG src=""/ccLib/images/Spacer.gif"" width=""50"" height=""15"" border=""0""> " & .caption & " (not authorable field)<br>")
-                                ElseIf (.fieldTypeId = FieldTypeIdTextFile) Then
+                                ElseIf (.fieldTypeId = FieldTypeIdFileTextPrivate) Then
                                     '
                                     ' text filename can not be search
                                     '
                                     Stream.Add("<IMG src=""/ccLib/images/Spacer.gif"" width=""50"" height=""15"" border=""0""> " & .caption & " (text file field)<br>")
-                                ElseIf (.fieldTypeId = FieldTypeIdCSSFile) Then
+                                ElseIf (.fieldTypeId = FieldTypeIdFileCSS) Then
                                     '
                                     ' text filename can not be search
                                     '
                                     Stream.Add("<IMG src=""/ccLib/images/Spacer.gif"" width=""50"" height=""15"" border=""0""> " & .caption & " (css file field)<br>")
-                                ElseIf (.fieldTypeId = FieldTypeIdXMLFile) Then
+                                ElseIf (.fieldTypeId = FieldTypeIdFileXML) Then
                                     '
                                     ' text filename can not be search
                                     '
                                     Stream.Add("<IMG src=""/ccLib/images/Spacer.gif"" width=""50"" height=""15"" border=""0""> " & .caption & " (xml file field)<br>")
-                                ElseIf (.fieldTypeId = FieldTypeIdJavascriptFile) Then
+                                ElseIf (.fieldTypeId = FieldTypeIdFileJavascript) Then
                                     '
                                     ' text filename can not be search
                                     '
@@ -2053,7 +2068,7 @@ ErrorTrap:
                                     ' long text can not be search
                                     '
                                     Stream.Add("<IMG src=""/ccLib/images/Spacer.gif"" width=""50"" height=""15"" border=""0""> " & .caption & " (long text field)<br>")
-                                ElseIf (.fieldTypeId = FieldTypeIdImage) Then
+                                ElseIf (.fieldTypeId = FieldTypeIdFileImage) Then
                                     '
                                     ' long text can not be search
                                     '

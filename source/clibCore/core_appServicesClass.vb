@@ -367,111 +367,75 @@ Namespace Contensive.Core
                 ReDim dataSources(0)
                 dataSources(0) = New dataSourceClass()
                 '
-                'Dim jsonConfigTemp As String
-                Dim propertyValue As String = ""
-                'Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer
-                Dim needToLoadCdefCache As Boolean = True
-                '
-                'json_serializer.MaxJsonLength = 100000000
-                csv_SQLTimeout = 30
-                csv_SlowSQLThreshholdMSec = 1000
-                DomainName = "www.DomainName.com"
-                RootPath = "/"
-                AllowMonitoring = False
-                LicenseKey = GetSiteLicenseKey()
-                If (Not cpCore.cluster.config.apps.ContainsKey(appName.ToLower())) Then
+                If (cpCore.cluster Is Nothing) Then
                     '
-                    ' application now configured
+                    ' cannot continue with the cluster created
                     '
-                    config = New appConfigClass()
-                    status = applicationStatusEnum.ApplicationStatusAppConfigNotValid
-                    Throw New Exception("application [" & appName & "] was not found in this cluster.")
+                    Throw New ApplicationException("appServices constructor failed because clusterServices are not valid.")
                 Else
-                    config = cpCore.cluster.config.apps(appName.ToLower())
-                End If
-                ''
-                '' load config
-                ''
-                'If False Then
-                '    '
-                '    ' dotnet app config
-                '    '
-                '    config.adminRoute = ConfigurationManager.AppSettings("adminRoute")
-                '    config.allowSiteMonitor = EncodeBoolean(ConfigurationManager.AppSettings("allowSiteMonitor"))
-                '    config.cdnFilesNetprefix = ConfigurationManager.AppSettings("contentFilePathPrefix")
-                '    config.defaultConnectionString = ConfigurationManager.AppSettings("defaultConnectionString")
-                '    config.domainList.AddRange(ConfigurationManager.AppSettings("domainList").Split(","))
-                '    config.enableCache = ConfigurationManager.AppSettings("enableCache")
-                '    config.enabled = ConfigurationManager.AppSettings("enabled")
-                '    config.name = ConfigurationManager.AppSettings("appName")
-                '    config.appRootPhysicalPath = ConfigurationManager.AppSettings("physicalWwwRootPath")
-                '    config.privateKey = ConfigurationManager.AppSettings("privateKey")
-                'Else
-                '    '
-                '    ' generic json file load
-                '    '
-                '    If (cpCore.cluster.config.apps.containskey(appName)) Then
-
-                '    End If
-                '    jsonConfigTemp = cpCore.cluster.files.ReadFile("apps\" + appName + "\appConfig.json")
-                '    If String.IsNullOrEmpty(jsonConfigTemp) Then
-                '        status = applicationStatusEnum.ApplicationStatusAppConfigNotFound
-                '        Throw New Exception("appConfigFile for application [" & appName & "] not found.")
-                '        'cpCore.handleExceptionLegacyRow2(New Exception("appServices failed to initialize"), "core_appServicesClass", "new", "appConfigFile for application [" & appName & "] not found.")
-                '    Else
-                '        config = json_serializer.Deserialize(Of appConfigClass)(jsonConfigTemp)
-                '        If config Is Nothing Then
-                '            config = New appConfigClass()
-                '            status = applicationStatusEnum.ApplicationStatusAppConfigNotValid
-                '            Throw New Exception("appConfigFile for application [" & appName & "] was not valid.")
-                '            'cpCore.handleException(New Exception("appServices failed to initialize"), "appConfigFile for application [" & appName & "] was not valid.")
-                '        End If
-                '    End If
-                'End If
-                'status = applicationStatusEnum.ApplicationStatusLoading
-                '
-                If InStr(1, config.domainList(0), ",") > 1 Then
+                    Dim propertyValue As String = ""
+                    Dim needToLoadCdefCache As Boolean = True
                     '
-                    ' if first entry in domain list is comma delimited, save only the first entry
+                    csv_SQLTimeout = 30
+                    csv_SlowSQLThreshholdMSec = 1000
+                    DomainName = "www.DomainName.com"
+                    RootPath = "/"
+                    AllowMonitoring = False
+                    LicenseKey = GetSiteLicenseKey()
+                    If (Not cpCore.cluster.config.apps.ContainsKey(appName.ToLower())) Then
+                        '
+                        ' application now configured
+                        '
+                        config = New appConfigClass()
+                        status = applicationStatusEnum.ApplicationStatusAppConfigNotValid
+                        Throw New Exception("application [" & appName & "] was not found in this cluster.")
+                    Else
+                        config = cpCore.cluster.config.apps(appName.ToLower())
+                    End If
                     '
-                    config.domainList(0) = Mid(config.domainList(0), 1, InStr(1, config.domainList(0), ",") - 1)
-                End If
-                '
-                ' initialize cache - load global cache invalidation date
-                '
-                cache_globalInvalidationDate = EncodeDate(cache_readRaw("globalInvalidationDate"))
-                '
-                ' initialie filesystem, public and rivate now, setup virtual when site property is available
-                '
-                If cpCore.cluster.config.isLocal Then
+                    If InStr(1, config.domainList(0), ",") > 1 Then
+                        '
+                        ' if first entry in domain list is comma delimited, save only the first entry
+                        '
+                        config.domainList(0) = Mid(config.domainList(0), 1, InStr(1, config.domainList(0), ",") - 1)
+                    End If
                     '
-                    ' local server -- everything is ephemeral
+                    ' initialize cache - load global cache invalidation date
                     '
-                    serverFiles = New fileSystemClass(cpCore, cpCore.cluster.config, fileSystemClass.fileSyncModeEnum.noSync, "")
-                    appRootFiles = New fileSystemClass(cpCore, cpCore.cluster.config, fileSystemClass.fileSyncModeEnum.noSync, cpCore.cluster.config.clusterPhysicalPath & config.appRootPath)
-                    privateFiles = New fileSystemClass(cpCore, cpCore.cluster.config, fileSystemClass.fileSyncModeEnum.noSync, cpCore.cluster.config.clusterPhysicalPath & config.privateFilesPath)
-                    cdnFiles = New fileSystemClass(cpCore, cpCore.cluster.config, fileSystemClass.fileSyncModeEnum.noSync, cpCore.cluster.config.clusterPhysicalPath & config.cdnFilesPath)
-                Else
+                    cache_globalInvalidationDate = EncodeDate(cache_readRaw("globalInvalidationDate"))
                     '
-                    ' cluster mode - each filesystem is configured accordingly
+                    ' initialie filesystem, public and rivate now, setup virtual when site property is available
                     '
-                    serverFiles = New fileSystemClass(cpCore, cpCore.cluster.config, fileSystemClass.fileSyncModeEnum.noSync, "")
-                    appRootFiles = New fileSystemClass(cpCore, cpCore.cluster.config, fileSystemClass.fileSyncModeEnum.activeSync, cpCore.cluster.config.clusterPhysicalPath & config.appRootPath)
-                    privateFiles = New fileSystemClass(cpCore, cpCore.cluster.config, fileSystemClass.fileSyncModeEnum.passiveSync, cpCore.cluster.config.clusterPhysicalPath & config.privateFilesPath)
-                    cdnFiles = New fileSystemClass(cpCore, cpCore.cluster.config, fileSystemClass.fileSyncModeEnum.passiveSync, cpCore.cluster.config.clusterPhysicalPath & config.cdnFilesPath)
-                End If
-                '
-                ' initialize datasource
-                '
-                AddDataSource("Default", -1, DefaultConnectionString)
-                If Not cpCore.cluster.checkDatabaseExists(appName) Then
+                    If cpCore.cluster.config.isLocal Then
+                        '
+                        ' local server -- everything is ephemeral
+                        '
+                        serverFiles = New fileSystemClass(cpCore, cpCore.cluster.config, fileSystemClass.fileSyncModeEnum.noSync, "")
+                        appRootFiles = New fileSystemClass(cpCore, cpCore.cluster.config, fileSystemClass.fileSyncModeEnum.noSync, cpCore.cluster.config.clusterPhysicalPath & config.appRootPath)
+                        privateFiles = New fileSystemClass(cpCore, cpCore.cluster.config, fileSystemClass.fileSyncModeEnum.noSync, cpCore.cluster.config.clusterPhysicalPath & config.privateFilesPath)
+                        cdnFiles = New fileSystemClass(cpCore, cpCore.cluster.config, fileSystemClass.fileSyncModeEnum.noSync, cpCore.cluster.config.clusterPhysicalPath & config.cdnFilesPath)
+                    Else
+                        '
+                        ' cluster mode - each filesystem is configured accordingly
+                        '
+                        serverFiles = New fileSystemClass(cpCore, cpCore.cluster.config, fileSystemClass.fileSyncModeEnum.noSync, "")
+                        appRootFiles = New fileSystemClass(cpCore, cpCore.cluster.config, fileSystemClass.fileSyncModeEnum.activeSync, cpCore.cluster.config.clusterPhysicalPath & config.appRootPath)
+                        privateFiles = New fileSystemClass(cpCore, cpCore.cluster.config, fileSystemClass.fileSyncModeEnum.passiveSync, cpCore.cluster.config.clusterPhysicalPath & config.privateFilesPath)
+                        cdnFiles = New fileSystemClass(cpCore, cpCore.cluster.config, fileSystemClass.fileSyncModeEnum.passiveSync, cpCore.cluster.config.clusterPhysicalPath & config.cdnFilesPath)
+                    End If
                     '
-                    ' database does not exist
+                    ' initialize datasource
                     '
-                    status = applicationStatusEnum.ApplicationStatusDbNotFound
-                Else
-                    'Call metaData.load()
-                    status = applicationStatusEnum.ApplicationStatusReady
+                    AddDataSource("Default", -1, DefaultConnectionString)
+                    If Not cpCore.cluster.checkDatabaseExists(appName) Then
+                        '
+                        ' database does not exist
+                        '
+                        status = applicationStatusEnum.ApplicationStatusDbNotFound
+                    Else
+                        'Call metaData.load()
+                        status = applicationStatusEnum.ApplicationStatusReady
+                    End If
                 End If
                 constructed = True
             Catch ex As Exception
@@ -2785,7 +2749,7 @@ ErrorTrap:
                             csv_GetSQLAlterColumnType = "Int NULL"
                         Case FieldTypeIdLookup, FieldTypeIdMemberSelect
                             csv_GetSQLAlterColumnType = "Int NULL"
-                        Case FieldTypeIdManyToMany, FieldTypeIdRedirect, FieldTypeIdImage, FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdText, FieldTypeIdFile, FieldTypeIdTextFile, FieldTypeIdJavascriptFile, FieldTypeIdXMLFile, FieldTypeIdCSSFile, FieldTypeIdHTMLFile
+                        Case FieldTypeIdManyToMany, FieldTypeIdRedirect, FieldTypeIdFileImage, FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdText, FieldTypeIdFile, FieldTypeIdFileTextPrivate, FieldTypeIdFileJavascript, FieldTypeIdFileXML, FieldTypeIdFileCSS, FieldTypeIdFileHTMLPrivate
                             csv_GetSQLAlterColumnType = "VarChar(255) NULL"
                         Case FieldTypeIdLongText, FieldTypeIdHTML
                             '
@@ -3084,7 +3048,7 @@ ErrorTrap:
                 Case FieldTypeNameLcaseFloat
                     getFieldTypeIdFromFieldTypeName = FieldTypeIdFloat
                 Case FieldTypeNameLcaseImage
-                    getFieldTypeIdFromFieldTypeName = FieldTypeIdImage
+                    getFieldTypeIdFromFieldTypeName = FieldTypeIdFileImage
                 Case FieldTypeNameLcaseLink
                     getFieldTypeIdFromFieldTypeName = FieldTypeIdLink
                 Case FieldTypeNameLcaseResourceLink, "resource link", "resourcelink"
@@ -3102,13 +3066,13 @@ ErrorTrap:
                 Case FieldTypeNameLcaseManyToMany
                     getFieldTypeIdFromFieldTypeName = FieldTypeIdManyToMany
                 Case FieldTypeNameLcaseTextFile, "text file", "textfile"
-                    getFieldTypeIdFromFieldTypeName = FieldTypeIdTextFile
+                    getFieldTypeIdFromFieldTypeName = FieldTypeIdFileTextPrivate
                 Case FieldTypeNameLcaseCSSFile, "cssfile", "css file"
-                    getFieldTypeIdFromFieldTypeName = FieldTypeIdCSSFile
+                    getFieldTypeIdFromFieldTypeName = FieldTypeIdFileCSS
                 Case FieldTypeNameLcaseXMLFile, "xmlfile", "xml file"
-                    getFieldTypeIdFromFieldTypeName = FieldTypeIdXMLFile
+                    getFieldTypeIdFromFieldTypeName = FieldTypeIdFileXML
                 Case FieldTypeNameLcaseJavascriptFile, "javascript file", "javascriptfile", "js file", "jsfile"
-                    getFieldTypeIdFromFieldTypeName = FieldTypeIdJavascriptFile
+                    getFieldTypeIdFromFieldTypeName = FieldTypeIdFileJavascript
                 Case FieldTypeNameLcaseText
                     getFieldTypeIdFromFieldTypeName = FieldTypeIdText
                 Case "autoincrement"
@@ -3118,7 +3082,7 @@ ErrorTrap:
                 Case FieldTypeNameLcaseHTML
                     getFieldTypeIdFromFieldTypeName = FieldTypeIdHTML
                 Case FieldTypeNameLcaseHTMLFile, "html file"
-                    getFieldTypeIdFromFieldTypeName = FieldTypeIdHTMLFile
+                    getFieldTypeIdFromFieldTypeName = FieldTypeIdFileHTMLPrivate
                 Case Else
                     '
                     ' Bad field type is a text field
@@ -3568,7 +3532,7 @@ ErrorTrap:
                                 With field
                                     fieldName = .nameLc
                                     Select Case .fieldTypeId
-                                        Case FieldTypeIdFile, FieldTypeIdImage, FieldTypeIdCSSFile, FieldTypeIdHTMLFile, FieldTypeIdJavascriptFile, FieldTypeIdXMLFile
+                                        Case FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdFileCSS, FieldTypeIdFileJavascript, FieldTypeIdFileXML
                                             '
                                             ' public content files
                                             '
@@ -3576,13 +3540,13 @@ ErrorTrap:
                                             If Filename <> "" Then
                                                 Call cdnFiles.DeleteFile(cdnFiles.joinPath(config.cdnFilesNetprefix, Filename))
                                             End If
-                                        Case FieldTypeIdTextFile
+                                        Case FieldTypeIdFileTextPrivate, FieldTypeIdFileHTMLPrivate
                                             '
                                             ' private files
                                             '
                                             Filename = db_GetCSText(CSPointer, fieldName)
                                             If Filename <> "" Then
-                                                Call cdnFiles.DeleteFile(Filename)
+                                                Call privateFiles.DeleteFile(Filename)
                                             End If
                                     End Select
                                 End With
@@ -4439,7 +4403,7 @@ ErrorTrap:
                                             '
                                             ' Never set
                                             '
-                                        Case FieldTypeIdTextFile, FieldTypeIdCSSFile, FieldTypeIdXMLFile, FieldTypeIdJavascriptFile, FieldTypeIdFile, FieldTypeIdImage, FieldTypeIdHTMLFile
+                                        Case FieldTypeIdFileTextPrivate, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdFileHTMLPrivate
                                             '
                                             ' Always set
                                             ' TextFile, assume this call is only made if a change was made to the copy.
@@ -4888,9 +4852,9 @@ ErrorTrap:
                             '
                             Select Case db_GetCSFieldTypeId(CSSource, FieldName)
                                 Case FieldTypeIdRedirect, FieldTypeIdManyToMany
-                                Case FieldTypeIdFile, FieldTypeIdImage, FieldTypeIdTextFile, FieldTypeIdCSSFile, FieldTypeIdXMLFile, FieldTypeIdJavascriptFile, FieldTypeIdHTMLFile
+                                Case FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript
                                     '
-                                    ' ----- file
+                                    ' ----- cdn file
                                     '
                                     SourceFilename = db_GetCSFilename(CSSource, FieldName, "")
                                     'SourceFilename = (csv_GetCSText(CSSource, FieldName))
@@ -4899,6 +4863,18 @@ ErrorTrap:
                                         'DestFilename = csv_GetVirtualFilename(DestContentName, FieldName, DestRecordID)
                                         Call db_SetCSField(CSDestination, FieldName, DestFilename)
                                         Call cdnFiles.copyFile(SourceFilename, DestFilename)
+                                    End If
+                                Case FieldTypeIdFileTextPrivate, FieldTypeIdFileHTMLPrivate
+                                    '
+                                    ' ----- private file
+                                    '
+                                    SourceFilename = db_GetCSFilename(CSSource, FieldName, "")
+                                    'SourceFilename = (csv_GetCSText(CSSource, FieldName))
+                                    If (SourceFilename <> "") Then
+                                        DestFilename = db_GetCSFilename(CSDestination, FieldName, "")
+                                        'DestFilename = csv_GetVirtualFilename(DestContentName, FieldName, DestRecordID)
+                                        Call db_SetCSField(CSDestination, FieldName, DestFilename)
+                                        Call privateFiles.copyFile(SourceFilename, DestFilename)
                                     End If
                                 Case Else
                                     '
@@ -5094,12 +5070,12 @@ ErrorTrap:
                                                     db_GetCS = FormatCurrency(FieldValueVariant, 2, vbFalse, vbFalse, vbFalse)
                                                 End If
                                             'NeedsHTMLEncode = False
-                                            Case FieldTypeIdTextFile, FieldTypeIdHTMLFile
+                                            Case FieldTypeIdFileTextPrivate, FieldTypeIdFileHTMLPrivate
                                                 '
                                                 '
                                                 '
-                                                db_GetCS = cdnFiles.ReadFile(EncodeText(FieldValueVariant))
-                                            Case FieldTypeIdCSSFile, FieldTypeIdXMLFile, FieldTypeIdJavascriptFile
+                                                db_GetCS = privateFiles.ReadFile(EncodeText(FieldValueVariant))
+                                            Case FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript
                                                 '
                                                 '
                                                 '
@@ -5110,7 +5086,7 @@ ErrorTrap:
                                                 '
                                                 '
                                                 db_GetCS = EncodeText(FieldValueVariant)
-                                            Case FieldTypeIdFile, FieldTypeIdImage, FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdAutoIdIncrement, FieldTypeIdFloat, FieldTypeIdInteger
+                                            Case FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdAutoIdIncrement, FieldTypeIdFloat, FieldTypeIdInteger
                                                 '
                                                 '
                                                 '
@@ -5179,7 +5155,7 @@ ErrorTrap:
                                             '
                                             ' Never set
                                             '
-                                            Case FieldTypeIdFile, FieldTypeIdImage
+                                            Case FieldTypeIdFile, FieldTypeIdFileImage
                                                 '
                                                 ' Always set
                                                 ' Saved in the field is the filename to the file
@@ -5188,7 +5164,7 @@ ErrorTrap:
                                                 '
                                                 FieldValueVariantLocal = FieldValueVariantLocal
                                                 SetNeeded = True
-                                            Case FieldTypeIdTextFile, FieldTypeIdHTMLFile
+                                            Case FieldTypeIdFileTextPrivate, FieldTypeIdFileHTMLPrivate
                                                 '
                                                 ' Always set
                                                 ' A virtual file is created to hold the content, 'tablename/FieldNameLocal/0000.ext
@@ -5217,7 +5193,7 @@ ErrorTrap:
                                                 End If
                                                 FieldValueVariantLocal = fileNameNoExt
                                                 SetNeeded = True
-                                            Case FieldTypeIdCSSFile, FieldTypeIdXMLFile, FieldTypeIdJavascriptFile
+                                            Case FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript
                                                 '
                                                 ' public files - save as FieldTypeTextFile except if only white space, consider it blank
                                                 '
@@ -5609,7 +5585,7 @@ ErrorTrap:
                                                     Copy = csv_TextScramble(Copy)
                                                 End If
                                                 SQLSetPair = FieldName & "=" & EncodeSQLText(Copy)
-                                            Case FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdFile, FieldTypeIdImage, FieldTypeIdTextFile, FieldTypeIdCSSFile, FieldTypeIdXMLFile, FieldTypeIdJavascriptFile, FieldTypeIdHTMLFile
+                                            Case FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdFileTextPrivate, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdFileHTMLPrivate
                                                 Copy = Left(EncodeText(writeCacheValueVariant), 255)
                                                 SQLSetPair = FieldName & "=" & EncodeSQLText(Copy)
                                             Case FieldTypeIdLongText, FieldTypeIdHTML
@@ -7967,7 +7943,7 @@ ErrorTrap:
                         returnFieldTypeName = FieldTypeNameFile
                     Case FieldTypeIdFloat
                         returnFieldTypeName = FieldTypeNameFloat
-                    Case FieldTypeIdImage
+                    Case FieldTypeIdFileImage
                         returnFieldTypeName = FieldTypeNameImage
                     Case FieldTypeIdLink
                         returnFieldTypeName = FieldTypeNameLink
@@ -7985,19 +7961,19 @@ ErrorTrap:
                         returnFieldTypeName = FieldTypeNameRedirect
                     Case FieldTypeIdManyToMany
                         returnFieldTypeName = FieldTypeNameManyToMany
-                    Case FieldTypeIdTextFile
+                    Case FieldTypeIdFileTextPrivate
                         returnFieldTypeName = FieldTypeNameTextFile
-                    Case FieldTypeIdCSSFile
+                    Case FieldTypeIdFileCSS
                         returnFieldTypeName = FieldTypeNameCSSFile
-                    Case FieldTypeIdXMLFile
+                    Case FieldTypeIdFileXML
                         returnFieldTypeName = FieldTypeNameXMLFile
-                    Case FieldTypeIdJavascriptFile
+                    Case FieldTypeIdFileJavascript
                         returnFieldTypeName = FieldTypeNameJavascriptFile
                     Case FieldTypeIdText
                         returnFieldTypeName = FieldTypeNameText
                     Case FieldTypeIdHTML
                         returnFieldTypeName = FieldTypeNameHTML
-                    Case FieldTypeIdHTMLFile
+                    Case FieldTypeIdFileHTMLPrivate
                         returnFieldTypeName = FieldTypeNameHTMLFile
                     Case Else
                         If fieldType = FieldTypeIdAutoIdIncrement Then
@@ -8268,9 +8244,9 @@ ErrorTrap:
                                                                 '
                                                                 If Not PublishingDelete Then
                                                                     Select Case fieldTypeId
-                                                                        Case FieldTypeIdTextFile, FieldTypeIdCSSFile, FieldTypeIdXMLFile, FieldTypeIdJavascriptFile, FieldTypeIdHTMLFile
+                                                                        Case FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript
                                                                             '
-                                                                            ' ----- create copy of File for neweditrecord
+                                                                            ' ----- cdn files - create copy of File for neweditrecord
                                                                             '
                                                                             EditFilename = EncodeText(db_getDataRowColumnName(RSEdit.Rows(0), FieldName))
                                                                             If EditFilename = "" Then
@@ -8279,6 +8255,19 @@ ErrorTrap:
                                                                                 NewEditFilename = csv_GetVirtualFilenameByTable(EditTableName, FieldName, NewEditRecordID, "", fieldTypeId)
                                                                                 'NewEditFilename = csv_GetVirtualFilename(ContentName, FieldName, NewEditRecordID)
                                                                                 Call cdnFiles.copyFile(EditFilename, NewEditFilename)
+                                                                                NewEditSqlFieldList.add(FieldName, EncodeSQLText(NewEditFilename))
+                                                                            End If
+                                                                        Case FieldTypeIdFileTextPrivate, FieldTypeIdFileHTMLPrivate
+                                                                            '
+                                                                            ' ----- private files - create copy of File for neweditrecord
+                                                                            '
+                                                                            EditFilename = EncodeText(db_getDataRowColumnName(RSEdit.Rows(0), FieldName))
+                                                                            If EditFilename = "" Then
+                                                                                NewEditSqlFieldList.add(FieldName, EncodeSQLText(""))
+                                                                            Else
+                                                                                NewEditFilename = csv_GetVirtualFilenameByTable(EditTableName, FieldName, NewEditRecordID, "", fieldTypeId)
+                                                                                'NewEditFilename = csv_GetVirtualFilename(ContentName, FieldName, NewEditRecordID)
+                                                                                Call privateFiles.copyFile(EditFilename, NewEditFilename)
                                                                                 NewEditSqlFieldList.add(FieldName, EncodeSQLText(NewEditFilename))
                                                                             End If
                                                                         Case Else
@@ -8540,14 +8529,25 @@ ErrorTrap:
                                                         '
                                                         ' allow only authorable fields
                                                         '
-                                                        If (fieldTypeId = FieldTypeIdTextFile) Or (fieldTypeId = FieldTypeIdCSSFile) Or (fieldTypeId = FieldTypeIdXMLFile) Or (fieldTypeId = FieldTypeIdJavascriptFile) Or (fieldTypeId = FieldTypeIdHTMLFile) Then
+                                                        If (fieldTypeId = FieldTypeIdFileCSS) Or (fieldTypeId = FieldTypeIdFileJavascript) Or (fieldTypeId = FieldTypeIdFileXML) Then
                                                             '
-                                                            '   create copy of Live TextFile for Edit record
+                                                            '   cdnfiles - create copy of Live TextFile for Edit record
                                                             '
                                                             LiveFilename = EncodeText(db_getDataRowColumnName(RSLive.Rows(0), FieldName))
                                                             If LiveFilename <> "" Then
                                                                 EditFilename = csv_GetVirtualFilenameByTable(EditTableName, FieldName, EditRecordID, "", fieldTypeId)
                                                                 Call cdnFiles.copyFile(LiveFilename, EditFilename)
+                                                                LiveSQLValue = EncodeSQLText(EditFilename)
+                                                            End If
+                                                        End If
+                                                        If (fieldTypeId = FieldTypeIdFileTextPrivate) Or (fieldTypeId = FieldTypeIdFileHTMLPrivate) Then
+                                                            '
+                                                            '   pivatefiles - create copy of Live TextFile for Edit record
+                                                            '
+                                                            LiveFilename = EncodeText(db_getDataRowColumnName(RSLive.Rows(0), FieldName))
+                                                            If LiveFilename <> "" Then
+                                                                EditFilename = csv_GetVirtualFilenameByTable(EditTableName, FieldName, EditRecordID, "", fieldTypeId)
+                                                                Call privateFiles.copyFile(LiveFilename, EditFilename)
                                                                 LiveSQLValue = EncodeSQLText(EditFilename)
                                                             End If
                                                         End If

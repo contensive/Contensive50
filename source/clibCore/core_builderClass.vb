@@ -3393,12 +3393,12 @@ Namespace Contensive.Core
                         field.ReadOnly = False
                     Case "COPYFILENAME"
                         field.caption = "Copy"
-                        field.fieldTypeId = FieldTypeIdHTMLFile
+                        field.fieldTypeId = FieldTypeIdFileHTMLPrivate
                         field.TextBuffered = True
                         field.editSortPriority = 2010
                     Case "BRIEFFILENAME"
                         field.caption = "Overview"
-                        field.fieldTypeId = FieldTypeIdHTMLFile
+                        field.fieldTypeId = FieldTypeIdFileHTMLPrivate
                         field.TextBuffered = True
                         field.editSortPriority = 2020
                         field.htmlContent = False

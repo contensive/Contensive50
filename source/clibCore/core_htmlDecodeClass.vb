@@ -37,110 +37,112 @@ Namespace Contensive.Core
         '========================================================================
         '
         Public Function convert(ByVal Body As String) As String
-            On Error GoTo ErrorTrap
-            '
-            Dim TextTest As String
-            Dim BlockOpen As Boolean
-            Dim BlockOpenLast As Boolean
-            Dim BlockClose As Boolean
-            Dim BlockCloseLast As Boolean
-            Dim Parse As htmlParseClass
-            Dim ElementCount As Integer
-            Dim ElementPointer As Integer
-            Dim ElementText As String
-            Dim iBody As String
-            Dim LoopCount As Integer
-            Dim LastHRef As String
-            Dim AttrCount As Integer
-            Dim AttrPointer As Integer
-            Dim StartPtr As Integer
-            Dim EndPtr As Integer
-            '
-            convert = ""
-            If Not IsNull(Body) Then
-                iBody = Body
+            Dim result As String = Body
+            Try
+                Dim TextTest As String
+                Dim BlockOpen As Boolean
+                Dim BlockOpenLast As Boolean
+                Dim BlockClose As Boolean
+                Dim BlockCloseLast As Boolean
+                Dim Parse As htmlParseClass
+                Dim ElementCount As Integer
+                Dim ElementPointer As Integer
+                Dim ElementText As String
+                Dim iBody As String
+                Dim LoopCount As Integer
+                Dim LastHRef As String
+                Dim AttrCount As Integer
+                Dim AttrPointer As Integer
+                Dim StartPtr As Integer
+                Dim EndPtr As Integer
                 '
-                ' ----- Remove HTML whitespace
-                '
-                iBody = Replace(iBody, vbLf, " ")
-                iBody = Replace(iBody, vbCr, " ")
-                iBody = Replace(iBody, vbTab, " ")
-                Do While isInStr(1, iBody, "  ")
-                    iBody = Replace(iBody, "  ", " ")
-                Loop
-                '
-                ' ----- Remove HTML tags
-                '
-                Parse = New htmlParseClass(cpCore)
-                If Not (Parse Is Nothing) Then
-                    Call Parse.Load(iBody)
-                    ElementCount = Parse.ElementCount
-                    ElementPointer = 0
-                    If ElementCount > 0 Then
-                        LoopCount = 0
-                        BlockOpen = False
-                        BlockClose = False
-                        Do While (ElementPointer < ElementCount) And (LoopCount < 100000)
-                            If Not Parse.IsTag(ElementPointer) Then
-                                ElementText = Parse.Text(ElementPointer)
-                                TextTest = ElementText
-                                TextTest = Replace(TextTest, " ", "")
-                                TextTest = Replace(TextTest, vbCr, "")
-                                TextTest = Replace(TextTest, vbLf, "")
-                                TextTest = Replace(TextTest, vbTab, "")
-                                If TextTest <> "" Then
-                                    '
-                                    ' if there is non-white space between tags, last element was no longer blockopen or closed
-                                    '
+                result = ""
+                If Not IsNull(Body) Then
+                    iBody = Body
+                    '
+                    ' ----- Remove HTML whitespace
+                    '
+                    iBody = iBody.Replace(vbLf, " ")
+                    iBody = iBody.Replace(vbCr, " ")
+                    iBody = iBody.Replace(vbTab, " ")
+                    LoopCount = 0
+                    Do While (iBody.IndexOf("  ") >= 0) And (LoopCount < 1000)
+                        iBody = iBody.Replace("  ", " ")
+                        LoopCount += 1
+                    Loop
+                    '
+                    ' ----- Remove HTML tags
+                    '
+                    Parse = New htmlParseClass(cpCore)
+                    If Not (Parse Is Nothing) Then
+                        Call Parse.Load(iBody)
+                        ElementCount = Parse.ElementCount
+                        ElementPointer = 0
+                        If ElementCount > 0 Then
+                            LoopCount = 0
+                            BlockOpen = False
+                            BlockClose = False
+                            Do While (ElementPointer < ElementCount) And (LoopCount < 100000)
+                                If Not Parse.IsTag(ElementPointer) Then
+                                    ElementText = Parse.Text(ElementPointer)
+                                    TextTest = ElementText
+                                    TextTest = Replace(TextTest, " ", "")
+                                    TextTest = Replace(TextTest, vbCr, "")
+                                    TextTest = Replace(TextTest, vbLf, "")
+                                    TextTest = Replace(TextTest, vbTab, "")
+                                    If TextTest <> "" Then
+                                        '
+                                        ' if there is non-white space between tags, last element was no longer blockopen or closed
+                                        '
+                                        BlockOpen = False
+                                        BlockClose = False
+                                    End If
+                                Else
+                                    ElementText = ""
+                                    BlockOpenLast = BlockOpen
+                                    BlockCloseLast = BlockClose
                                     BlockOpen = False
                                     BlockClose = False
-                                End If
-                            Else
-                                ElementText = ""
-                                BlockOpenLast = BlockOpen
-                                BlockCloseLast = BlockClose
-                                BlockOpen = False
-                                BlockClose = False
-                                Select Case UCase(Parse.TagName(ElementPointer))
-                                    Case "BR"
-                                        '
-                                        ' ----- break
-                                        '
-                                        ElementText = vbCrLf
-                                    Case "DIV", "TD", "LI", "OL", "UL", "P", "H1", "H2", "H3", "H4", "H5", "H6"
-                                        '
-                                        ' ----- Block tag open
-                                        '
-                                        BlockOpen = True
-                                        If BlockOpenLast Then
+                                    Select Case UCase(Parse.TagName(ElementPointer))
+                                        Case "BR"
                                             '
-                                            ' embedded block open, do nothing
-                                            '
-                                        ElseIf BlockCloseLast Then
-                                            '
-                                            ' block close did the crlf, do nothing
-                                            '
-                                        Else
-                                            '
-                                            ' new line
+                                            ' ----- break
                                             '
                                             ElementText = vbCrLf
-                                        End If
-                                    Case "/DIV", "/TD", "/LI", "/OL", "/UL", "/P", "/H1", "/H2", "/H3", "/H4", "/H5", "/H6"
-                                        '
-                                        ' ----- Block tag close
-                                        '
-                                        BlockClose = True
-                                        If BlockCloseLast Then
+                                        Case "DIV", "TD", "LI", "OL", "UL", "P", "H1", "H2", "H3", "H4", "H5", "H6"
                                             '
-                                            ' embedded block close, do nothing
+                                            ' ----- Block tag open
                                             '
-                                        Else
+                                            BlockOpen = True
+                                            If BlockOpenLast Then
+                                                '
+                                                ' embedded block open, do nothing
+                                                '
+                                            ElseIf BlockCloseLast Then
+                                                '
+                                                ' block close did the crlf, do nothing
+                                                '
+                                            Else
+                                                '
+                                                ' new line
+                                                '
+                                                ElementText = vbCrLf
+                                            End If
+                                        Case "/DIV", "/TD", "/LI", "/OL", "/UL", "/P", "/H1", "/H2", "/H3", "/H4", "/H5", "/H6"
                                             '
-                                            ' new line
+                                            ' ----- Block tag close
                                             '
-                                            ElementText = vbCrLf
-                                        End If
+                                            BlockClose = True
+                                            If BlockCloseLast Then
+                                                '
+                                                ' embedded block close, do nothing
+                                                '
+                                            Else
+                                                '
+                                                ' new line
+                                                '
+                                                ElementText = vbCrLf
+                                            End If
                                         'Case "/OL", "/UL"
                                         '    '
                                         '    ' ----- Special cases, go to new line
@@ -151,128 +153,130 @@ Namespace Contensive.Core
                                         '    ' ----- paragraph start, skip a line
                                         '    '
                                         '    ElementText = vbCrLf & vbCrLf
-                                    Case "/A"
-                                        '
-                                        ' ----- end anchor, put the URL in parantheses
-                                        '
-                                        ElementText = ""
-                                        If ConvertLinksToText And (LastHRef <> "") Then
-                                            ElementText = " (" & LastHRef & ") "
-                                        End If
-                                        LastHRef = ""
-                                    Case "A"
-                                        '
-                                        ' ----- paragraph start, skip a line
-                                        '
-                                        AttrCount = Parse.ElementAttributeCount(ElementPointer)
-                                        If AttrCount > 0 Then
-                                            For AttrPointer = 0 To AttrCount - 1
-                                                If UCase(Parse.ElementAttributeName(ElementPointer, AttrPointer)) = "HREF" Then
-                                                    LastHRef = Parse.ElementAttributeValue(ElementPointer, AttrPointer)
-                                                    Exit For
-                                                End If
-                                            Next
-                                        End If
-                                        ElementText = ""
+                                        Case "/A"
+                                            '
+                                            ' ----- end anchor, put the URL in parantheses
+                                            '
+                                            ElementText = ""
+                                            If ConvertLinksToText And (LastHRef <> "") Then
+                                                ElementText = " (" & LastHRef & ") "
+                                            End If
+                                            LastHRef = ""
+                                        Case "A"
+                                            '
+                                            ' ----- paragraph start, skip a line
+                                            '
+                                            AttrCount = Parse.ElementAttributeCount(ElementPointer)
+                                            If AttrCount > 0 Then
+                                                For AttrPointer = 0 To AttrCount - 1
+                                                    If UCase(Parse.ElementAttributeName(ElementPointer, AttrPointer)) = "HREF" Then
+                                                        LastHRef = Parse.ElementAttributeValue(ElementPointer, AttrPointer)
+                                                        Exit For
+                                                    End If
+                                                Next
+                                            End If
+                                            ElementText = ""
                                         'LastHRef = Parse.ElementAttributeValue(ElementPointer, 1)
                                         'ElementText = vbCrLf & vbCrLf
-                                    Case "SCRIPT"
-                                        '
-                                        ' ----- Script, skip to end of script
-                                        '
-                                        Do While ElementPointer < ElementCount
-                                            If Parse.IsTag(ElementPointer) Then
-                                                If UCase(Parse.TagName(ElementPointer)) = "/SCRIPT" Then
-                                                    Exit Do
+                                        Case "SCRIPT"
+                                            '
+                                            ' ----- Script, skip to end of script
+                                            '
+                                            Do While ElementPointer < ElementCount
+                                                If Parse.IsTag(ElementPointer) Then
+                                                    If UCase(Parse.TagName(ElementPointer)) = "/SCRIPT" Then
+                                                        Exit Do
+                                                    End If
                                                 End If
-                                            End If
-                                            ElementPointer = ElementPointer + 1
-                                        Loop
-                                        ElementText = ""
-                                    Case "STYLE"
-                                        '
-                                        ' ----- style, skip to end of style
-                                        '
-                                        Do While ElementPointer < ElementCount
-                                            If Parse.IsTag(ElementPointer) Then
-                                                If UCase(Parse.TagName(ElementPointer)) = "/STYLE" Then
-                                                    Exit Do
+                                                ElementPointer = ElementPointer + 1
+                                            Loop
+                                            ElementText = ""
+                                        Case "STYLE"
+                                            '
+                                            ' ----- style, skip to end of style
+                                            '
+                                            Do While ElementPointer < ElementCount
+                                                If Parse.IsTag(ElementPointer) Then
+                                                    If UCase(Parse.TagName(ElementPointer)) = "/STYLE" Then
+                                                        Exit Do
+                                                    End If
                                                 End If
-                                            End If
-                                            ElementPointer = ElementPointer + 1
-                                        Loop
-                                        ElementText = ""
-                                    Case "HEAD"
-                                        '
-                                        ' ----- head, skip to end of head
-                                        '
-                                        Do While ElementPointer < ElementCount
-                                            If Parse.IsTag(ElementPointer) Then
-                                                If UCase(Parse.TagName(ElementPointer)) = "/HEAD" Then
-                                                    Exit Do
+                                                ElementPointer = ElementPointer + 1
+                                            Loop
+                                            ElementText = ""
+                                        Case "HEAD"
+                                            '
+                                            ' ----- head, skip to end of head
+                                            '
+                                            Do While ElementPointer < ElementCount
+                                                If Parse.IsTag(ElementPointer) Then
+                                                    If UCase(Parse.TagName(ElementPointer)) = "/HEAD" Then
+                                                        Exit Do
+                                                    End If
                                                 End If
-                                            End If
-                                            ElementPointer = ElementPointer + 1
-                                        Loop
-                                        ElementText = ""
-                                    Case Else
-                                        '
-                                        ' ----- by default, just skip tags
-                                        '
-                                        ElementText = ""
-                                End Select
-                            End If
-                            convert = convert & ElementText
-                            ElementPointer = ElementPointer + 1
-                        Loop
+                                                ElementPointer = ElementPointer + 1
+                                            Loop
+                                            ElementText = ""
+                                        Case Else
+                                            '
+                                            ' ----- by default, just skip tags
+                                            '
+                                            ElementText = ""
+                                    End Select
+                                End If
+                                result = result & ElementText
+                                ElementPointer = ElementPointer + 1
+                                LoopCount += 1
+                            Loop
+                        End If
                     End If
+                    Parse = Nothing
+                    '
+                    ' do HTML character substitutions
+                    '
+                    result = Replace(result, "&quot;", """")
+                    result = Replace(result, "&nbsp;", " ")
+                    result = Replace(result, "&lt;", "<")
+                    result = Replace(result, "&gt;", ">")
+                    result = Replace(result, "&amp;", "&")
+                    '
+                    ' remove duplicate spaces
+                    '
+                    LoopCount = 0
+                    Do While (InStr(1, result, "  ") <> 0) And (LoopCount < 1000)
+                        result = Replace(result, "  ", " ")
+                        LoopCount += 1
+                    Loop
+                    '
+                    ' Remove lines that are just spaces
+                    '
+                    LoopCount = 0
+                    Do While (InStr(1, result, vbCrLf & " ") <> 0) And (LoopCount < 1000)
+                        result = Replace(result, vbCrLf & " ", vbCrLf)
+                        LoopCount += 1
+                    Loop
+                    '
+                    ' remove long sets of extra line feeds
+                    '
+                    LoopCount = 0
+                    Do While (InStr(1, result, vbCrLf & vbCrLf & vbCrLf) <> 0) And (LoopCount < 1000)
+                        result = Replace(result, vbCrLf & vbCrLf & vbCrLf, vbCrLf & vbCrLf)
+                        LoopCount += 1
+                    Loop
+                    '
+                    ' Trim CR from the start
+                    '
+                    LoopCount = 0
+                    Do While (InStr(1, result, vbCrLf) = 1) And (LoopCount < 1000)
+                        result = Mid(result, 3)
+                        LoopCount += 1
+                    Loop
+                    '
                 End If
-                Parse = Nothing
-                '
-                ' do HTML character substitutions
-                '
-                convert = Replace(convert, "&quot;", """")
-                convert = Replace(convert, "&nbsp;", " ")
-                convert = Replace(convert, "&lt;", "<")
-                convert = Replace(convert, "&gt;", ">")
-                convert = Replace(convert, "&amp;", "&")
-                '
-                ' remove duplicate spaces
-                '
-                LoopCount = 0
-                Do While (InStr(1, convert, "  ") <> 0) And (LoopCount < 1000)
-                    convert = Replace(convert, "  ", " ")
-                Loop
-                '
-                ' Remove lines that are just spaces
-                '
-                LoopCount = 0
-                Do While (InStr(1, convert, vbCrLf & " ") <> 0) And (LoopCount < 1000)
-                    convert = Replace(convert, vbCrLf & " ", vbCrLf)
-                Loop
-                '
-                ' remove long sets of extra line feeds
-                '
-                LoopCount = 0
-                Do While (InStr(1, convert, vbCrLf & vbCrLf & vbCrLf) <> 0) And (LoopCount < 1000)
-                    convert = Replace(convert, vbCrLf & vbCrLf & vbCrLf, vbCrLf & vbCrLf)
-                Loop
-                '
-                ' Trim CR from the start
-                '
-                LoopCount = 0
-                Do While (InStr(1, convert, vbCrLf) = 1) And (LoopCount < 1000)
-                    convert = Mid(convert, 3)
-                Loop
-                '
-            End If
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Err.Clear()
-            Resume Next
+            Catch ex As Exception
+                Throw New ApplicationException("Exception during convertHtmltoText", ex)
+            End Try
+            Return result
         End Function
         '        '
         '        ' Returns a string with only the text part of the body

@@ -46,6 +46,14 @@
     <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Amazon.ElastiCacheCluster, Version=1.0.0.4, Culture=neutral, PublicKeyToken=445456c82d5a0fce, processorArchitecture=MSIL">
+      <HintPath>..\packages\Amazon.ElastiCacheCluster.1.0.0.4\lib\net35\Amazon.ElastiCacheCluster.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Enyim.Caching, Version=2.12.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
+      <HintPath>..\packages\EnyimMemcached.2.12\lib\net35\Enyim.Caching.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -152,6 +160,10 @@
     <ProjectReference Include="..\clibCore\clibCore.vbproj">
       <Project>{9814c7bd-200c-4c57-859d-5d81899a3421}</Project>
       <Name>clibCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\cpBase\cpBase.vbproj">
+      <Project>{e873f18e-47ef-46a9-aea1-5a8b0f8beb01}</Project>
+      <Name>cpBase</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

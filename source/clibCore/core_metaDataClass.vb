@@ -464,7 +464,7 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="contentId"></param>
         ''' <returns></returns>
-        Public Function getCdef(contentId As Integer, Optional forceDbLoad As Boolean = False) As CDefClass
+        Public Function getCdef(contentId As Integer, Optional forceDbLoad As Boolean = False, Optional loadInvalidFields As Boolean = False) As CDefClass
             Dim returnCdef As CDefClass = Nothing
             Try
                 Dim sql As String
@@ -668,14 +668,21 @@ Namespace Contensive.Core
                                     & " where" _
                                     & " (c.ID Is not Null)" _
                                     & " and(c.Active<>0)" _
-                                    & " and(f.active<>0)" _
-                                    & " and(f.Type<>0)" _
                                     & " and(c.ID=" & contentId & ")" _
-                                    & " and(f.name <>'')" _
                                     & "" _
-                                    & " order by" _
-                                    & " f.ContentID,f.EditTab,f.EditSortPriority;"
+                                    & ""
                                 '
+                                If Not loadInvalidFields Then
+                                    sql &= "" _
+                                        & " and(f.active<>0)" _
+                                        & " and(f.Type<>0)" _
+                                        & " and(f.name <>'')" _
+                                        & ""
+                                End If
+                                sql &= "" _
+                                    & " order by" _
+                                    & " f.ContentID,f.EditTab,f.EditSortPriority" _
+                                    & ""
                                 dt = cpCore.app.executeSql(sql)
                                 If dt.Rows.Count = 0 Then
                                     '
@@ -702,8 +709,8 @@ Namespace Contensive.Core
                                                 If fieldHtmlContent Then
                                                     If fieldTypeId = FieldTypeIdLongText Then
                                                         fieldTypeId = FieldTypeIdHTML
-                                                    ElseIf fieldTypeId = FieldTypeIdTextFile Then
-                                                        fieldTypeId = FieldTypeIdHTMLFile
+                                                    ElseIf fieldTypeId = FieldTypeIdFileTextPrivate Then
+                                                        fieldTypeId = FieldTypeIdFileHTMLPrivate
                                                     End If
                                                 End If
                                                 .active = EncodeBoolean(row.Item(24))
@@ -2019,9 +2026,28 @@ Namespace Contensive.Core
                                                     Select Case field.nameLc
                                                         Case "ID", "EDITSOURCEID", "EDITARCHIVE", ""
                                                         Case Else
-                                                            If (field.fieldTypeId = FieldTypeIdTextFile) Or (field.fieldTypeId = FieldTypeIdCSSFile) Or (field.fieldTypeId = FieldTypeIdXMLFile) Or (field.fieldTypeId = FieldTypeIdJavascriptFile) Or (field.fieldTypeId = FieldTypeIdHTMLFile) Then
+                                                            If (field.fieldTypeId = FieldTypeIdFileTextPrivate) Or (field.fieldTypeId = FieldTypeIdFileHTMLPrivate) Then
                                                                 '
-                                                                ' create new text file and copy field
+                                                                ' create new text file and copy field - private files
+                                                                '
+                                                                EditFilename = ""
+                                                                LiveFilename = EncodeText(FieldValueVariant)
+                                                                If LiveFilename <> "" Then
+                                                                    EditFilename = csv_GetVirtualFilenameByTable(AuthoringTableName, field.nameLc, EditRecordID, "", field.fieldTypeId)
+                                                                    FieldValueVariant = EditFilename
+                                                                    If EditFilename <> "" Then
+                                                                        Copy = cpCore.app.privateFiles.ReadFile(cpCore.app.convertCdnUrlToCdnPathFilename(EditFilename))
+                                                                    End If
+                                                                    'Copy = contentFiles.ReadFile(LiveFilename)
+                                                                    If Copy <> "" Then
+                                                                        Call cpCore.app.privateFiles.SaveFile(cpCore.app.convertCdnUrlToCdnPathFilename(EditFilename), Copy)
+                                                                        'Call publicFiles.SaveFile(EditFilename, Copy)
+                                                                    End If
+                                                                End If
+                                                            End If
+                                                            If (field.fieldTypeId = FieldTypeIdFileCSS) Or (field.fieldTypeId = FieldTypeIdFileXML) Or (field.fieldTypeId = FieldTypeIdFileJavascript) Then
+                                                                '
+                                                                ' create new text file and copy field - public files
                                                                 '
                                                                 EditFilename = ""
                                                                 LiveFilename = EncodeText(FieldValueVariant)
@@ -2335,161 +2361,161 @@ ErrorTrap:
         Public Sub tableSchemaListClear()
             tableSchemaList.Clear()
         End Sub
-        '
-        '================================================================================
-        '
-        Friend Function getCdefFromDb(ByVal ContentID As Integer, ByVal UsedIDList As List(Of Integer)) As metaDataClass.CDefClass
-            Return getCdef(ContentID)
-            'Dim returnCdef As appServices_metaDataClass.CDefClass
-            'Try
-            '    Dim FieldName As String
-            '    'Dim FieldPtr As Integer
-            '    Dim lcaseFieldName As String
-            '    Dim SQL As String
-            '    Dim CS As Integer
-            '    Dim ParentID As Integer
-            '    Dim CSTable As Integer
-            '    Dim TableID As Integer
-            '    Dim hint As String
-            '    Dim field As appServices_metaDataClass.CDefFieldClass
-            '    '
-            '    If Not UsedIDList.Contains(ContentID) Then
-            '        SQL = "select * from ccContent where ID=" & ContentID
-            '        CS = cpCore.app.db_openCsSql_rev("default", SQL)
-            '        If cpCore.app.db_IsCSOK(CS) Then
-            '            ParentID = cpCore.app.db_GetCSInteger(CS, "ParentID")
-            '            If ParentID > 0 Then
-            '                UsedIDList.Add(ContentID)
-            '                returnCdef = getCdefFromDb(ParentID, UsedIDList)
-            '                UsedIDList.Remove(ContentID)
-            '            End If
-            '            If returnCdef Is Nothing Then
-            '                returnCdef = New appServices_metaDataClass.CDefClass
-            '            End If
-            '            With returnCdef
-            '                .ActiveOnly = True
-            '                '.ChildIDList = ""
-            '                .ContentControlCriteria = ""
-            '                .AdminOnly = cpCore.main_GetCSBoolean(CS, "AdminOnly")
-            '                '.AliasID = cpCore.app.db_GetCSInteger(CS, "AliasID")
-            '                '.AliasName = cpCore.app.db_GetCS(CS, "AliasName")
-            '                .AllowAdd = cpCore.main_GetCSBoolean(CS, "AllowAdd")
-            '                .AllowCalendarEvents = cpCore.main_GetCSBoolean(CS, "AllowCalendarEvents")
-            '                .AllowContentTracking = cpCore.main_GetCSBoolean(CS, "AllowContentTracking")
-            '                .AllowDelete = cpCore.main_GetCSBoolean(CS, "AllowDelete")
-            '                .AllowMetaContent = cpCore.main_GetCSBoolean(CS, "AllowMetaContent")
-            '                .AllowTopicRules = cpCore.main_GetCSBoolean(CS, "AllowTopicRules")
-            '                .AllowWorkflowAuthoring = cpCore.main_GetCSBoolean(CS, "AllowWorkflowAuthoring")
-            '                TableID = cpCore.app.db_GetCSInteger(CS, "ContentTableID")
-            '                If TableID > 0 Then
-            '                    SQL = "select Name, DataSourceID from ccTables where ID=" & TableID
-            '                    CSTable = cpCore.app.db_openCsSql_rev("default", SQL)
-            '                    If cpCore.app.db_IsCSOK(CS) Then
-            '                        .ContentTableName = cpCore.app.db_GetCS(CSTable, "name")
-            '                        .dataSourceId = cpCore.app.db_GetCSInteger(CSTable, "DataSourceID")
-            '                        .ContentDataSourceName = cpCore.main_GetRecordName("Data Sources", .dataSourceId)
-            '                    End If
-            '                    Call cpCore.app.db_closeCS(CSTable)
-            '                End If
-            '                TableID = cpCore.app.db_GetCSInteger(CS, "AuthoringTableID")
-            '                If TableID > 0 Then
-            '                    SQL = "select Name, DataSourceID from ccTables where ID=" & TableID
-            '                    CSTable = cpCore.app.db_openCsSql_rev("default", SQL)
-            '                    If cpCore.app.db_IsCSOK(CS) Then
-            '                        .AuthoringTableName = cpCore.app.db_GetCS(CSTable, "name")
-            '                        .AuthoringDataSourceName = cpCore.main_GetRecordName("Data Sources", cpCore.app.db_GetCSInteger(CSTable, "DataSourceID"))
-            '                    End If
-            '                    Call cpCore.app.db_closeCS(CSTable)
-            '                End If
-            '                .DefaultSortMethod = cpCore.main_GetRecordName("Sort Methods", cpCore.app.db_GetCSInteger(CS, "DefaultSortMethodID"))
-            '                .DeveloperOnly = cpCore.main_GetCSBoolean(CS, "DeveloperOnly")
-            '                .DropDownFieldList = cpCore.app.db_GetCS(CS, "DropDownFieldList")
-            '                .EditorGroupName = cpCore.main_GetRecordName("Groups", cpCore.app.db_GetCSInteger(CS, "EditorGroupID"))
-            '                .Id = ContentID
-            '                .IgnoreContentControl = False
-            '                .Name = cpCore.app.db_GetCS(CS, "name")
-            '                .ParentID = ParentID
-            '                .SelectCommaList = ""
-            '                .TimeStamp = ""
-            '                .WhereClause = ""
-            '            End With
-            '        End If
-            '        Call cpCore.app.db_closeCS(CS)
-            '        '
-            '        ' Load the content fields
-            '        '
-            '        With returnCdef
-            '            SQL = "select * from ccfields where contentid=" & ContentID
-            '            CS = cpCore.app.db_openCsSql_rev("default", SQL)
-            '            Do While cpCore.app.db_IsCSOK(CS)
-            '                FieldName = cpCore.app.db_GetCS(CS, "name")
-            '                lcaseFieldName = LCase(FieldName)
-            '                If Not .fields.ContainsKey(lcaseFieldName) Then
-            '                    .fields.Add(FieldName.ToLower, New appServices_metaDataClass.CDefFieldClass)
-            '                End If
-            '                field = .fields(lcaseFieldName)
-            '                lcaseFieldName = FieldName.ToUpper
-            '                'If .fields.Count > 0 Then
-            '                '    For FieldPtr = 0 To .fields.Count - 1
-            '                '        If UcaseFieldName = UCase(.fields(FieldPtr).Name) Then
-            '                '            Exit For
-            '                '        End If
-            '                '    Next
-            '                'End If
-            '                With field
-            '                    .active = cpCore.main_GetCSBoolean(CS, "active")
-            '                    .AdminOnly = cpCore.main_GetCSBoolean(CS, "AdminOnly")
-            '                    .Authorable = cpCore.main_GetCSBoolean(CS, "Authorable")
-            '                    .Caption = cpCore.main_GetCSText(CS, "Caption")
-            '                    .ContentID = ContentID
-            '                    .DeveloperOnly = cpCore.main_GetCSBoolean(CS, "DeveloperOnly")
-            '                    .EditSortPriority = cpCore.app.db_GetCSInteger(CS, "EditSortPriority")
-            '                    .fieldType = cpCore.app.db_GetCSInteger(CS, "Type")
-            '                    .HelpMessage = cpCore.main_GetCSText(CS, "HelpMessage")
-            '                    .htmlContent = cpCore.main_GetCSBoolean(CS, "HTMLContent")
-            '                    .Id = cpCore.app.db_GetCSInteger(CS, "ID")
-            '                    .IndexColumn = cpCore.app.db_GetCSInteger(CS, "IndexColumn")
-            '                    .IndexSortDirection = cpCore.app.db_GetCSInteger(CS, "IndexSortDirection")
-            '                    .IndexSortOrder = cpCore.app.db_GetCSText(CS, "IndexSortPriority")
-            '                    .IndexWidth = cpCore.app.db_GetCSText(CS, "IndexWidth")
-            '                    .Inherited = (UsedIDList.Count > 0)
-            '                    .LookupContentID = cpCore.app.db_GetCSInteger(CS, "LookupContentID")
-            '                    .ManyToManyContentID = cpCore.app.db_GetCSInteger(CS, "ManyToManyContentID")
-            '                    .ManyToManyRuleContentID = cpCore.app.db_GetCSInteger(CS, "ManyToManyRuleContentID")
-            '                    .ManyToManyRulePrimaryField = cpCore.main_GetCSText(CS, "ManyToManyRulePrimaryField")
-            '                    .Name = cpCore.main_GetCSText(CS, "name")
-            '                    .NotEditable = cpCore.main_GetCSBoolean(CS, "NotEditable")
-            '                    .Password = cpCore.main_GetCSBoolean(CS, "Password")
-            '                    .ReadOnlyField = cpCore.main_GetCSBoolean(CS, "ReadOnly")
-            '                    .RedirectContentID = cpCore.app.db_GetCSInteger(CS, "RedirectContentID")
-            '                    .RedirectID = cpCore.app.db_GetCSText(CS, "RedirectID")
-            '                    .RedirectPath = cpCore.main_GetCSText(CS, "RedirectPath")
-            '                    .Required = cpCore.main_GetCSBoolean(CS, "Required")
-            '                    .TextBuffered = cpCore.main_GetCSBoolean(CS, "TextBuffered")
-            '                    .UniqueName = cpCore.main_GetCSBoolean(CS, "UniqueName")
-            '                    .DefaultValueObject = cpCore.main_GetCSText(CS, "defaultvalue")
-            '                    .RSSTitleField = cpCore.main_GetCSBoolean(CS, "RSSTitleField")
-            '                    .RSSDescriptionField = cpCore.main_GetCSBoolean(CS, "RSSDescriptionField")
-            '                    .EditTab = cpCore.main_GetCSText(CS, "EditTab")
-            '                    .Scramble = cpCore.main_GetCSBoolean(CS, "Scramble")
-            '                    .MemberSelectGroupID = cpCore.app.db_GetCSInteger(CS, "MemberSelectGroupID")
-            '                End With
-            '                cpCore.app.db_nextCSRecord(CS)
-            '            Loop
-            '            Call cpCore.app.db_closeCS(CS)
-            '        End With
-            '    End If
-            '    '
-            '    '
-            '    '
-            '    If UsedIDList.Count = 0 Then
-            '        Call getCdef_SetAdminColumns(returnCdef)
-            '    End If
-            'Catch ex As Exception
-            '    cpCore.handleException(ex)
-            'End Try
-            'Return returnCdef
-        End Function
+        ''
+        ''================================================================================
+        ''
+        'Friend Function getCdefFromDb(ByVal ContentID As Integer, loadInvalidFields As Boolean) As metaDataClass.CDefClass
+        '    Return getCdef(ContentID, True, loadInvalidFields)
+        '    'Dim returnCdef As appServices_metaDataClass.CDefClass
+        '    'Try
+        '    '    Dim FieldName As String
+        '    '    'Dim FieldPtr As Integer
+        '    '    Dim lcaseFieldName As String
+        '    '    Dim SQL As String
+        '    '    Dim CS As Integer
+        '    '    Dim ParentID As Integer
+        '    '    Dim CSTable As Integer
+        '    '    Dim TableID As Integer
+        '    '    Dim hint As String
+        '    '    Dim field As appServices_metaDataClass.CDefFieldClass
+        '    '    '
+        '    '    If Not UsedIDList.Contains(ContentID) Then
+        '    '        SQL = "select * from ccContent where ID=" & ContentID
+        '    '        CS = cpCore.app.db_openCsSql_rev("default", SQL)
+        '    '        If cpCore.app.db_IsCSOK(CS) Then
+        '    '            ParentID = cpCore.app.db_GetCSInteger(CS, "ParentID")
+        '    '            If ParentID > 0 Then
+        '    '                UsedIDList.Add(ContentID)
+        '    '                returnCdef = getCdefFromDb(ParentID, UsedIDList)
+        '    '                UsedIDList.Remove(ContentID)
+        '    '            End If
+        '    '            If returnCdef Is Nothing Then
+        '    '                returnCdef = New appServices_metaDataClass.CDefClass
+        '    '            End If
+        '    '            With returnCdef
+        '    '                .ActiveOnly = True
+        '    '                '.ChildIDList = ""
+        '    '                .ContentControlCriteria = ""
+        '    '                .AdminOnly = cpCore.main_GetCSBoolean(CS, "AdminOnly")
+        '    '                '.AliasID = cpCore.app.db_GetCSInteger(CS, "AliasID")
+        '    '                '.AliasName = cpCore.app.db_GetCS(CS, "AliasName")
+        '    '                .AllowAdd = cpCore.main_GetCSBoolean(CS, "AllowAdd")
+        '    '                .AllowCalendarEvents = cpCore.main_GetCSBoolean(CS, "AllowCalendarEvents")
+        '    '                .AllowContentTracking = cpCore.main_GetCSBoolean(CS, "AllowContentTracking")
+        '    '                .AllowDelete = cpCore.main_GetCSBoolean(CS, "AllowDelete")
+        '    '                .AllowMetaContent = cpCore.main_GetCSBoolean(CS, "AllowMetaContent")
+        '    '                .AllowTopicRules = cpCore.main_GetCSBoolean(CS, "AllowTopicRules")
+        '    '                .AllowWorkflowAuthoring = cpCore.main_GetCSBoolean(CS, "AllowWorkflowAuthoring")
+        '    '                TableID = cpCore.app.db_GetCSInteger(CS, "ContentTableID")
+        '    '                If TableID > 0 Then
+        '    '                    SQL = "select Name, DataSourceID from ccTables where ID=" & TableID
+        '    '                    CSTable = cpCore.app.db_openCsSql_rev("default", SQL)
+        '    '                    If cpCore.app.db_IsCSOK(CS) Then
+        '    '                        .ContentTableName = cpCore.app.db_GetCS(CSTable, "name")
+        '    '                        .dataSourceId = cpCore.app.db_GetCSInteger(CSTable, "DataSourceID")
+        '    '                        .ContentDataSourceName = cpCore.main_GetRecordName("Data Sources", .dataSourceId)
+        '    '                    End If
+        '    '                    Call cpCore.app.db_closeCS(CSTable)
+        '    '                End If
+        '    '                TableID = cpCore.app.db_GetCSInteger(CS, "AuthoringTableID")
+        '    '                If TableID > 0 Then
+        '    '                    SQL = "select Name, DataSourceID from ccTables where ID=" & TableID
+        '    '                    CSTable = cpCore.app.db_openCsSql_rev("default", SQL)
+        '    '                    If cpCore.app.db_IsCSOK(CS) Then
+        '    '                        .AuthoringTableName = cpCore.app.db_GetCS(CSTable, "name")
+        '    '                        .AuthoringDataSourceName = cpCore.main_GetRecordName("Data Sources", cpCore.app.db_GetCSInteger(CSTable, "DataSourceID"))
+        '    '                    End If
+        '    '                    Call cpCore.app.db_closeCS(CSTable)
+        '    '                End If
+        '    '                .DefaultSortMethod = cpCore.main_GetRecordName("Sort Methods", cpCore.app.db_GetCSInteger(CS, "DefaultSortMethodID"))
+        '    '                .DeveloperOnly = cpCore.main_GetCSBoolean(CS, "DeveloperOnly")
+        '    '                .DropDownFieldList = cpCore.app.db_GetCS(CS, "DropDownFieldList")
+        '    '                .EditorGroupName = cpCore.main_GetRecordName("Groups", cpCore.app.db_GetCSInteger(CS, "EditorGroupID"))
+        '    '                .Id = ContentID
+        '    '                .IgnoreContentControl = False
+        '    '                .Name = cpCore.app.db_GetCS(CS, "name")
+        '    '                .ParentID = ParentID
+        '    '                .SelectCommaList = ""
+        '    '                .TimeStamp = ""
+        '    '                .WhereClause = ""
+        '    '            End With
+        '    '        End If
+        '    '        Call cpCore.app.db_closeCS(CS)
+        '    '        '
+        '    '        ' Load the content fields
+        '    '        '
+        '    '        With returnCdef
+        '    '            SQL = "select * from ccfields where contentid=" & ContentID
+        '    '            CS = cpCore.app.db_openCsSql_rev("default", SQL)
+        '    '            Do While cpCore.app.db_IsCSOK(CS)
+        '    '                FieldName = cpCore.app.db_GetCS(CS, "name")
+        '    '                lcaseFieldName = LCase(FieldName)
+        '    '                If Not .fields.ContainsKey(lcaseFieldName) Then
+        '    '                    .fields.Add(FieldName.ToLower, New appServices_metaDataClass.CDefFieldClass)
+        '    '                End If
+        '    '                field = .fields(lcaseFieldName)
+        '    '                lcaseFieldName = FieldName.ToUpper
+        '    '                'If .fields.Count > 0 Then
+        '    '                '    For FieldPtr = 0 To .fields.Count - 1
+        '    '                '        If UcaseFieldName = UCase(.fields(FieldPtr).Name) Then
+        '    '                '            Exit For
+        '    '                '        End If
+        '    '                '    Next
+        '    '                'End If
+        '    '                With field
+        '    '                    .active = cpCore.main_GetCSBoolean(CS, "active")
+        '    '                    .AdminOnly = cpCore.main_GetCSBoolean(CS, "AdminOnly")
+        '    '                    .Authorable = cpCore.main_GetCSBoolean(CS, "Authorable")
+        '    '                    .Caption = cpCore.main_GetCSText(CS, "Caption")
+        '    '                    .ContentID = ContentID
+        '    '                    .DeveloperOnly = cpCore.main_GetCSBoolean(CS, "DeveloperOnly")
+        '    '                    .EditSortPriority = cpCore.app.db_GetCSInteger(CS, "EditSortPriority")
+        '    '                    .fieldType = cpCore.app.db_GetCSInteger(CS, "Type")
+        '    '                    .HelpMessage = cpCore.main_GetCSText(CS, "HelpMessage")
+        '    '                    .htmlContent = cpCore.main_GetCSBoolean(CS, "HTMLContent")
+        '    '                    .Id = cpCore.app.db_GetCSInteger(CS, "ID")
+        '    '                    .IndexColumn = cpCore.app.db_GetCSInteger(CS, "IndexColumn")
+        '    '                    .IndexSortDirection = cpCore.app.db_GetCSInteger(CS, "IndexSortDirection")
+        '    '                    .IndexSortOrder = cpCore.app.db_GetCSText(CS, "IndexSortPriority")
+        '    '                    .IndexWidth = cpCore.app.db_GetCSText(CS, "IndexWidth")
+        '    '                    .Inherited = (UsedIDList.Count > 0)
+        '    '                    .LookupContentID = cpCore.app.db_GetCSInteger(CS, "LookupContentID")
+        '    '                    .ManyToManyContentID = cpCore.app.db_GetCSInteger(CS, "ManyToManyContentID")
+        '    '                    .ManyToManyRuleContentID = cpCore.app.db_GetCSInteger(CS, "ManyToManyRuleContentID")
+        '    '                    .ManyToManyRulePrimaryField = cpCore.main_GetCSText(CS, "ManyToManyRulePrimaryField")
+        '    '                    .Name = cpCore.main_GetCSText(CS, "name")
+        '    '                    .NotEditable = cpCore.main_GetCSBoolean(CS, "NotEditable")
+        '    '                    .Password = cpCore.main_GetCSBoolean(CS, "Password")
+        '    '                    .ReadOnlyField = cpCore.main_GetCSBoolean(CS, "ReadOnly")
+        '    '                    .RedirectContentID = cpCore.app.db_GetCSInteger(CS, "RedirectContentID")
+        '    '                    .RedirectID = cpCore.app.db_GetCSText(CS, "RedirectID")
+        '    '                    .RedirectPath = cpCore.main_GetCSText(CS, "RedirectPath")
+        '    '                    .Required = cpCore.main_GetCSBoolean(CS, "Required")
+        '    '                    .TextBuffered = cpCore.main_GetCSBoolean(CS, "TextBuffered")
+        '    '                    .UniqueName = cpCore.main_GetCSBoolean(CS, "UniqueName")
+        '    '                    .DefaultValueObject = cpCore.main_GetCSText(CS, "defaultvalue")
+        '    '                    .RSSTitleField = cpCore.main_GetCSBoolean(CS, "RSSTitleField")
+        '    '                    .RSSDescriptionField = cpCore.main_GetCSBoolean(CS, "RSSDescriptionField")
+        '    '                    .EditTab = cpCore.main_GetCSText(CS, "EditTab")
+        '    '                    .Scramble = cpCore.main_GetCSBoolean(CS, "Scramble")
+        '    '                    .MemberSelectGroupID = cpCore.app.db_GetCSInteger(CS, "MemberSelectGroupID")
+        '    '                End With
+        '    '                cpCore.app.db_nextCSRecord(CS)
+        '    '            Loop
+        '    '            Call cpCore.app.db_closeCS(CS)
+        '    '        End With
+        '    '    End If
+        '    '    '
+        '    '    '
+        '    '    '
+        '    '    If UsedIDList.Count = 0 Then
+        '    '        Call getCdef_SetAdminColumns(returnCdef)
+        '    '    End If
+        '    'Catch ex As Exception
+        '    '    cpCore.handleException(ex)
+        '    'End Try
+        '    'Return returnCdef
+        'End Function
 
 
 #Region " IDisposable Support "

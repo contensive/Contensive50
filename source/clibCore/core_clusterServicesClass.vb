@@ -3,11 +3,11 @@ Option Explicit On
 Option Strict On
 
 Imports System.Data.SqlClient
-Imports System.Configuration
-Imports Contensive.Core.ccCommonModule
-Imports System.Runtime.InteropServices
-Imports Enyim.Caching
-Imports Amazon.ElastiCacheCluster
+'Imports System.Configuration
+'Imports Contensive.Core.ccCommonModule
+'Imports System.Runtime.InteropServices
+'Imports Enyim.Caching
+'Imports Amazon.ElastiCacheCluster
 Imports System.Text.RegularExpressions
 
 Namespace Contensive.Core
@@ -134,7 +134,6 @@ Namespace Contensive.Core
             Try
                 Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer
                 Dim JSONTemp As String
-                Dim cacheConfig As Amazon.ElastiCacheCluster.ElastiCacheClusterConfig
                 Dim serverPortSplit As String()
                 Dim port As Integer = 11211
                 Dim serverConfig As serverConfigClass
@@ -205,10 +204,11 @@ Namespace Contensive.Core
                         If serverPortSplit.Count > 1 Then
                             port = EncodeInteger(serverPortSplit(1))
                         End If
+                        Dim cacheConfig As Amazon.ElastiCacheCluster.ElastiCacheClusterConfig
                         cacheConfig = New Amazon.ElastiCacheCluster.ElastiCacheClusterConfig(serverPortSplit(0), port)
                         cacheConfig.Protocol = Enyim.Caching.Memcached.MemcachedProtocol.Binary
                         mc = New Enyim.Caching.MemcachedClient(cacheConfig)
-                        mc.Store(Memcached.StoreMode.Set, "testing", "123", Now.AddMinutes(10))
+                        mc.Store(Enyim.Caching.Memcached.StoreMode.Set, "testing", "123", Now.AddMinutes(10))
                     End If
                 End If
             Catch ex As Exception
@@ -261,7 +261,7 @@ Namespace Contensive.Core
         '
         Public Sub cache_saveRaw(ByVal Key As String, ByVal data As Object, Optional invalidationDate As Date = #12:00:00 AM#)
             Try
-                Dim testValue As Object
+                'Dim testValue As Object
                 If invalidationDate <= Date.MinValue Then
                     invalidationDate = Now.AddDays(7 + Rnd())
                 End If
