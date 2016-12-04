@@ -13,19 +13,19 @@ Namespace Contensive.Core
     '<ProgId("smtp5Class")> _
     '<ComClass(SMTP5Class.ClassId, SMTP5Class.InterfaceId, SMTP5Class.EventsId)> _
     Public Class SMTP5Class
-        '
-        '#Region "COM GUIDs"
-        '        ' These  GUIDs provide the COM identity for this class 
-        '        ' and its COM interfaces. If you change them, existing 
-        '        ' clients will no longer be able to access the class.
-        '        Public Const ClassId As String = "525c570f-3287-4a0c-a96c-d0934c73a6ec"
-        '        Public Const InterfaceId As String = "5f8d922e-c0c8-4279-810e-04893e15236a"
-        '        Public Const EventsId As String = "c77cb3c9-06ab-45eb-a0bf-484ee923035f"
-        '#End Region
-        '
-        Public ErrorNumber As Integer
-        Public ErrorSource As String
-        Public ErrorDescription As String
+        ''
+        ''#Region "COM GUIDs"
+        ''        ' These  GUIDs provide the COM identity for this class 
+        ''        ' and its COM interfaces. If you change them, existing 
+        ''        ' clients will no longer be able to access the class.
+        ''        Public Const ClassId As String = "525c570f-3287-4a0c-a96c-d0934c73a6ec"
+        ''        Public Const InterfaceId As String = "5f8d922e-c0c8-4279-810e-04893e15236a"
+        ''        Public Const EventsId As String = "c77cb3c9-06ab-45eb-a0bf-484ee923035f"
+        ''#End Region
+        ''
+        'Public ErrorNumber As Integer
+        'Public ErrorSource As String
+        'Public ErrorDescription As String
         '
         Private LocalReturnAddress As String = ""
         Public Property ReturnAddress As String
@@ -46,11 +46,10 @@ Namespace Contensive.Core
                 LocalReplyToAddress = value
             End Set
         End Property
-
-
+        '
         'Public ReplyToAddress As String
         '
-        Public Function send(ByVal SMTPServer As String, ByVal ToAddress As String, ByVal fromAddress As String, ByVal subject As String, ByVal Body As String, Optional ByVal AttachmentFilename As String = "", Optional ByVal HTMLBody As String = "") As String
+        Public Function sendEmail5(ByVal SMTPServer As String, ByVal ToAddress As String, ByVal fromAddress As String, ByVal subject As String, ByVal Body As String, Optional ByVal AttachmentFilename As String = "", Optional ByVal HTMLBody As String = "") As String
             Dim status As String = ""
             Try
                 'this is an error

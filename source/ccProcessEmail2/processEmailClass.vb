@@ -66,7 +66,7 @@ Namespace Contensive.Core
                 '
                 EmailHandlerFolder = "EmailOut\"
                 SMTPHandler = New smtpHandlerClass(cpCore)
-                Call SMTPHandler.SendQueue(EmailHandlerFolder)
+                Call SMTPHandler.SendEmailQueue(EmailHandlerFolder)
                 SMTPHandler = Nothing
             End If
             'KernelService = Nothing
@@ -740,7 +740,7 @@ ErrorTrap:
                         '
                         ' Send
                         '
-                        EmailStatus = cpCore.csv_SendEmail2(ToAddress, FromAddress, EmailSubjectEncoded, EmailBodyEncoded, BounceAddress, ReplyToAddress, , True, True)
+                        EmailStatus = cpCore.sendEmail2(ToAddress, FromAddress, EmailSubjectEncoded, EmailBodyEncoded, BounceAddress, ReplyToAddress, , True, True)
                         If EmailStatus = "" Then
                             EmailStatus = "OK"
                         End If
@@ -883,7 +883,7 @@ ErrorTrap:
                     & "--- end of list ---" & BR _
                     & "</div></BODY></HTML>"
                 ConfirmBody = ConvertLinksToAbsolute(ConfirmBody, PrimaryLink & "/")
-                Call cpCore.csv_SendEmail2(cpCore.app.db_GetCSText(CSPeople, "Email"), EmailFrom, "Email confirmation from " & GetPrimaryDomainName(), ConfirmBody, "", "", , True, True)
+                Call cpCore.sendEmail2(cpCore.app.db_GetCSText(CSPeople, "Email"), EmailFrom, "Email confirmation from " & GetPrimaryDomainName(), ConfirmBody, "", "", , True, True)
             End If
             Call cpCore.app.db_csClose(CSPeople)
             '

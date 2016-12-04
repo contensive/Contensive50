@@ -3475,8 +3475,8 @@ ErrorTrap:
             Call handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_DeleteContentTracking", True)
         End Sub
         ''
-        Public Function csv_SendEmail(ByVal ToAddress As String, ByVal FromAddress As String, ByVal SubjectMessage As String, ByVal BodyMessage As String, Optional ByVal ResultLogFilename As String = "", Optional ByVal Immediate As Boolean = False, Optional ByVal HTML As Boolean = True) As String
-            csv_SendEmail = csv_SendEmail2(ToAddress, FromAddress, SubjectMessage, BodyMessage, "", "", ResultLogFilename, Immediate, HTML)
+        Public Function sendEmail(ByVal ToAddress As String, ByVal FromAddress As String, ByVal SubjectMessage As String, ByVal BodyMessage As String, Optional ByVal ResultLogFilename As String = "", Optional ByVal Immediate As Boolean = False, Optional ByVal HTML As Boolean = True) As String
+            sendEmail = sendEmail2(ToAddress, FromAddress, SubjectMessage, BodyMessage, "", "", ResultLogFilename, Immediate, HTML)
         End Function
         '
         '========================================================================
@@ -3485,8 +3485,8 @@ ErrorTrap:
         '   Returns a string with the error if there was a problem
         '========================================================================
         '
-        Public Function csv_SendEmail2(ByVal ToAddress As String, ByVal FromAddress As String, ByVal SubjectMessage As String, ByVal BodyMessage As String, ByVal BounceAddress As String, ByVal ReplyToAddress As String, Optional ByVal ResultLogFilename As String = "", Optional ByVal Immediate As Boolean = False, Optional ByVal HTML As Boolean = False) As String
-            csv_SendEmail2 = csv_SendEmail3(ToAddress, FromAddress, SubjectMessage, BodyMessage, BounceAddress, ReplyToAddress, ResultLogFilename, Immediate, HTML, 0)
+        Public Function sendEmail2(ByVal ToAddress As String, ByVal FromAddress As String, ByVal SubjectMessage As String, ByVal BodyMessage As String, ByVal BounceAddress As String, ByVal ReplyToAddress As String, Optional ByVal ResultLogFilename As String = "", Optional ByVal Immediate As Boolean = False, Optional ByVal HTML As Boolean = False) As String
+            sendEmail2 = sendEmail3(ToAddress, FromAddress, SubjectMessage, BodyMessage, BounceAddress, ReplyToAddress, ResultLogFilename, Immediate, HTML, 0)
         End Function
         '
         '========================================================================
@@ -3495,8 +3495,8 @@ ErrorTrap:
         '   Returns a string with the error if there was a problem
         '========================================================================
         '
-        Public Function csv_SendEmail3(ByVal ToAddress As String, ByVal FromAddress As String, ByVal SubjectMessage As String, ByVal BodyMessage As String, ByVal BounceAddress As String, ByVal ReplyToAddress As String, ByVal ResultLogFilename As String, ByVal isImmediate As Boolean, ByVal isHTML As Boolean, ByVal emailIdOrZeroForLog As Integer) As String
-            csv_SendEmail3 = ""
+        Public Function sendEmail3(ByVal ToAddress As String, ByVal FromAddress As String, ByVal SubjectMessage As String, ByVal BodyMessage As String, ByVal BounceAddress As String, ByVal ReplyToAddress As String, ByVal ResultLogFilename As String, ByVal isImmediate As Boolean, ByVal isHTML As Boolean, ByVal emailIdOrZeroForLog As Integer) As String
+            sendEmail3 = ""
             On Error GoTo ErrorTrap 'Const Tn = "SendEmail3" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
             Dim htmlBody As String
@@ -3521,7 +3521,7 @@ ErrorTrap:
                 '
                 ' They are in the block list
                 '
-                csv_SendEmail3 = "Recipient has blocked this email"
+                sendEmail3 = "Recipient has blocked this email"
             Else
                 '
                 iResultLogPathPage = ResultLogFilename
@@ -3569,12 +3569,12 @@ ErrorTrap:
                             & BodyMessage _
                             & "</body>" _
                             & "</html>"
-                    csv_SendEmail3 = EmailHandler.Send2(ToAddress, FromAddress, SubjectMessage, BodyMessage, BounceAddress, ReplyToAddress, iResultLogPathPage, app.siteProperty_getText("SMTPServer", "SMTP.YourServer.Com"), isImmediate, isHTML, "")
+                    sendEmail3 = EmailHandler.sendEmail4(ToAddress, FromAddress, SubjectMessage, BodyMessage, BounceAddress, ReplyToAddress, iResultLogPathPage, app.siteProperty_getText("SMTPServer", "SMTP.YourServer.Com"), isImmediate, isHTML, "")
                 Else
-                    csv_SendEmail3 = EmailHandler.Send2(ToAddress, FromAddress, SubjectMessage, BodyMessage, BounceAddress, ReplyToAddress, iResultLogPathPage, app.siteProperty_getText("SMTPServer", "SMTP.YourServer.Com"), isImmediate, isHTML, "")
+                    sendEmail3 = EmailHandler.sendEmail4(ToAddress, FromAddress, SubjectMessage, BodyMessage, BounceAddress, ReplyToAddress, iResultLogPathPage, app.siteProperty_getText("SMTPServer", "SMTP.YourServer.Com"), isImmediate, isHTML, "")
                 End If
-                If (csv_SendEmail3 = "") Then
-                    csv_SendEmail3 = WarningMsg
+                If (sendEmail3 = "") Then
+                    sendEmail3 = WarningMsg
                 End If
                 '
                 ' ----- Log the send
@@ -3584,7 +3584,7 @@ ErrorTrap:
                     If app.db_csOk(CSLog) Then
                         Call app.db_setCS(CSLog, "Name", "System Email Send " & CStr(Now()))
                         Call app.db_setCS(CSLog, "LogType", EmailLogTypeImmediateSend)
-                        Call app.db_setCS(CSLog, "SendStatus", csv_SendEmail3)
+                        Call app.db_setCS(CSLog, "SendStatus", sendEmail3)
                         Call app.db_setCS(CSLog, "toaddress", ToAddress)
                         Call app.db_setCS(CSLog, "fromaddress", FromAddress)
                         Call app.db_setCS(CSLog, "Subject", SubjectMessage)
@@ -11670,7 +11670,7 @@ ErrorTrap:
                     bodyEncoded = Replace(bodyEncoded, "#member_id#", ToMemberID.ToString)
                     bodyEncoded = Replace(bodyEncoded, "#member_email#", ToAddress)
                     '
-                    csv_SendMemberEmail3 = csv_SendEmail3(ToAddress, FromAddress, subjectEncoded, bodyEncoded, "", "", "", Immediate, HTML, emailIdOrZeroForLog)
+                    csv_SendMemberEmail3 = sendEmail3(ToAddress, FromAddress, subjectEncoded, bodyEncoded, "", "", "", Immediate, HTML, emailIdOrZeroForLog)
                     'csv_SendMemberEmail3 = csv_SendEmail(toAddress, fromAddress, subjectEncoded, bodyEncoded, emailIdOrZeroForLog, Immediate, HTML)
                 End If
             End If
@@ -40512,7 +40512,7 @@ ErrorTrap:
         '
         Public Function main_SendEmail(ByVal ToAddress As String, ByVal FromAddress As String, ByVal SubjectMessage As String, ByVal BodyMessage As String, Optional ByVal optionalEmailIdForLog As Integer = 0, Optional ByVal Immediate As Boolean = True, Optional ByVal HTML As Boolean = False) As String
             If True Then
-                main_SendEmail = csv_SendEmail3(EncodeText(ToAddress), EncodeText(FromAddress), EncodeText(SubjectMessage), EncodeText(BodyMessage), "", "", "", Immediate, EncodeBoolean(HTML), EncodeInteger(optionalEmailIdForLog))
+                main_SendEmail = sendEmail3(EncodeText(ToAddress), EncodeText(FromAddress), EncodeText(SubjectMessage), EncodeText(BodyMessage), "", "", "", Immediate, EncodeBoolean(HTML), EncodeInteger(optionalEmailIdForLog))
             End If
         End Function
         '

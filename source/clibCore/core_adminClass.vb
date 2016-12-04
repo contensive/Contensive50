@@ -9736,7 +9736,7 @@ ErrorTrap:
                             Case ButtonMarkReviewed
                                 AdminAction = AdminActionMarkReviewed
                                 AdminForm = GetForm_Close(MenuDepth, adminContent.Name, editRecord.id)
-                            Case ButtonReloadCDef
+                            Case ButtonSaveandInvalidateCache
                                 AdminAction = AdminActionReloadCDef
                                 AdminForm = AdminFormEdit
                             Case ButtonDelete, ButtonDeletePage, ButtonDeletePerson, ButtonDeleteRecord, ButtonDeleteEmail

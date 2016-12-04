@@ -2592,7 +2592,7 @@ Namespace Contensive.Core
         Public Const ButtonCreateReport = " Create Report "
         Public Const ButtonClearTrapLog = " Clear Trap Log "
         Public Const ButtonNewSearch = " New Search "
-        Public Const ButtonReloadCDef = " Reload Content Definitions "
+        Public Const ButtonSaveandInvalidateCache = " Save and Invalidate Cache "
         Public Const ButtonImportTemplates = " Import Templates "
         Public Const ButtonRSSRefresh = " Update RSS Feeds Now "
         Public Const ButtonRequestDownload = " Request Download "

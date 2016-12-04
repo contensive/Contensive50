@@ -55,7 +55,7 @@ Namespace Contensive.Core
         End Property
 
         Public Overrides Sub Send(ByVal ToAddress As String, ByVal FromAddress As String, ByVal Subject As String, ByVal Body As String, Optional ByVal SendImmediately As Boolean = True, Optional ByVal BodyIsHTML As Boolean = True)
-            Call cpCore.csv_SendEmail(ToAddress, FromAddress, Subject, Body, "", SendImmediately, BodyIsHTML)
+            Call cpCore.sendEmail(ToAddress, FromAddress, Subject, Body, "", SendImmediately, BodyIsHTML)
         End Sub
 
         Public Overrides Sub SendForm(ByVal ToAddress As String, ByVal FromAddress As String, ByVal Subject As String)

@@ -413,7 +413,7 @@ ErrorTrap:
                                     For Ptr = 0 To UBound(Emails)
                                         ToAddress = Emails(Ptr)
                                         If ToAddress <> "" Then
-                                            emailstatus = Mailer.send(AlarmEmailServer, Emails(Ptr), "Monitor@Contensive.com", "Monitor Alarm [" & ServerName & "]", AlarmEmailBody)
+                                            emailstatus = Mailer.sendEmail5(AlarmEmailServer, Emails(Ptr), "Monitor@Contensive.com", "Monitor Alarm [" & ServerName & "]", AlarmEmailBody)
                                             Call appendMonitorLog("Sending Alarm Notification to " & ToAddress & ", status=" & emailstatus)
                                         End If
                                     Next

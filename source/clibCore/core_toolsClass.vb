@@ -671,10 +671,10 @@ ErrorTrap:
                 ''
                 '' ----- Button Reload CDef
                 ''
-                'If (ToolButton = ButtonReloadCDef) Then
-                '    cpCore.app.cache_invalidateAll()
-                '    cpCore.app.metaData.clear()
-                'End If
+                If (ToolButton = ButtonSaveandInvalidateCache) Then
+                    cpCore.app.cache_invalidateAll()
+                    cpCore.app.metaData.clear()
+                End If
                 '
                 ' ----- Restore Content Autoload site property
                 '
@@ -1011,7 +1011,7 @@ ErrorTrap:
                     Call Stream.Add(StreamValidRows.Text())
                     Call Stream.Add(cpCore.main_GetFormInputHidden("dtfaRecordCount", RecordCount))
                 End If
-                    Stream.Add("</table>")
+                Stream.Add("</table>")
                 'Stream.Add( cpCore.main_GetPanelButtons(ButtonList, "Button"))
                 '
                 Call Stream.Add(cpCore.main_GetPanelBottom())
@@ -1577,7 +1577,7 @@ ErrorTrap:
             '--------------------------------------------------------------------------------
             '
             If ContentID <> 0 Then
-                ButtonList = ButtonCancel & "," & ButtonReloadCDef
+                ButtonList = ButtonCancel & "," & ButtonSaveandInvalidateCache
                 ContentName = Local_GetContentNameByID(ContentID)
                 CDef = cpCore.app.metaData.getCdef(ContentID, True, False)
                 If ToolsAction <> 0 Then
@@ -1918,7 +1918,7 @@ ErrorTrap:
                     '
                     CDef = cpCore.app.metaData.getCdef(ContentID, True, False)
                 End If
-                If (Button = ButtonReloadCDef) Then
+                If (Button = ButtonSaveandInvalidateCache) Then
                     cpCore.app.cache_invalidateAll()
                     cpCore.app.metaData.clear()
                     Call cpCore.main_Redirect("?af=" & AdminFormToolConfigureListing & "&ContentID=" & ContentID)
@@ -4003,10 +4003,10 @@ ErrorTrap:
             Dim Stream As New fastStringClass
             Dim ButtonList As String
             '
-            ButtonList = ButtonCancel & "," & ButtonReloadCDef
+            ButtonList = ButtonCancel & "," & ButtonSaveandInvalidateCache
             Stream.Add(GetTitle("Load Content Definitions", "This tool reloads the content definitions. This is necessary when changes are made to the ccContent or ccFields tables outside Contensive. The site will be blocked during the load."))
             '
-            If (cpCore.main_GetStreamText("button")) <> ButtonReloadCDef Then
+            If (cpCore.main_GetStreamText("button")) <> ButtonSaveandInvalidateCache Then
                 '
                 ' First pass, initialize
                 '

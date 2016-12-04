@@ -78,7 +78,7 @@ ErrorTrap:
         '   used on Normal Edit and others
         '========================================================================
         '
-        Friend Function GetEditButtonBar2(ByVal MenuDepth As Integer, ByVal AllowDelete As Boolean, ByVal AllowCancel As Boolean, ByVal allowSave As Boolean, ByVal AllowSpellCheck As Boolean, ByVal AllowPublish As Boolean, ByVal AllowAbort As Boolean, ByVal AllowSubmit As Boolean, ByVal AllowApprove As Boolean, ByVal AllowAdd As Boolean, ByVal AllowReloadCDef As Boolean, ByVal HasChildRecords As Boolean, ByVal IsPageContent As Boolean, ByVal AllowMarkReviewed As Boolean, ByVal AllowRefresh As Boolean, ByVal AllowCreateDuplicate As Boolean) As String
+        Friend Function GetEditButtonBar2(ByVal MenuDepth As Integer, ByVal AllowDelete As Boolean, ByVal AllowCancel As Boolean, ByVal allowSave As Boolean, ByVal AllowSpellCheck As Boolean, ByVal AllowPublish As Boolean, ByVal AllowAbort As Boolean, ByVal AllowSubmit As Boolean, ByVal AllowApprove As Boolean, ByVal AllowAdd As Boolean, ByVal ignore_AllowReloadCDef As Boolean, ByVal HasChildRecords As Boolean, ByVal IsPageContent As Boolean, ByVal AllowMarkReviewed As Boolean, ByVal AllowRefresh As Boolean, ByVal AllowCreateDuplicate As Boolean) As String
             On Error GoTo ErrorTrap
             '
             Dim JSOnClick As String
@@ -159,11 +159,11 @@ ErrorTrap:
                 '
                 GetEditButtonBar2 = GetEditButtonBar2 & cpCore.main_GetFormButton(ButtonPublishApprove, RequestNameButton)
             End If
-            If AllowReloadCDef Then
+            If ignore_AllowReloadCDef Then
                 '
                 ' Reload Content Definitions
                 '
-                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.main_GetFormButton(ButtonReloadCDef, RequestNameButton)
+                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.main_GetFormButton(ButtonSaveandInvalidateCache, RequestNameButton)
             End If
             If AllowMarkReviewed Then
                 '

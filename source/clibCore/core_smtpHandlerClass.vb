@@ -34,7 +34,7 @@ Namespace Contensive.Core
         '========================================================================
         '
         Public Function Send(ByVal ToAddress As Object, ByVal FromAddress As Object, ByVal SubjectMessage As Object, ByVal BodyMessage As Object, ByVal ResultLogPathPage As Object, ByVal SMTPServer As Object, ByVal Immediate As Boolean, ByVal HTML As Boolean, Optional ByVal EmailOutPath As String = "") As Boolean
-            Send = Send2( _
+            Send = sendEmail4(
                   EncodeText(ToAddress) _
                 , EncodeText(FromAddress) _
                 , EncodeText(SubjectMessage) _
@@ -56,53 +56,27 @@ Namespace Contensive.Core
         '   someone wants to know more.
         '========================================================================
         '
-        Public Function Send2(ByVal EmailTo As String, ByVal EmailFrom As String, ByVal EmailSubject As String, ByVal EmailBody As String, ByVal BounceAddress As String, ByVal ReplyToAddress As String, ByVal ResultLogPathPage As String, ByVal EmailSMTPServer As String, ByVal Immediate As Boolean, ByVal HTML As Boolean, ByVal EmailOutPath As String) As String
+        Public Function sendEmail4(ByVal EmailTo As String, ByVal EmailFrom As String, ByVal EmailSubject As String, ByVal EmailBody As String, ByVal BounceAddress As String, ByVal ReplyToAddress As String, ByVal ResultLogPathPage As String, ByVal EmailSMTPServer As String, ByVal Immediate As Boolean, ByVal HTML As Boolean, ByVal EmailOutPath As String) As String
             Try
                 Dim LogLine As String
-                Dim MonthNumber As Integer
-                Dim DayNumber As Integer
-                Dim FilenameNoExt As String
-                'Dim ErrorMessage As String
-                'Dim LogLine As String
-                'Dim ResumeMessage As String
-                Dim FolderFileList As IO.FileInfo()
-                'Dim FolderFiles() As String
-                'Dim Ptr as integer
-                Dim PathFilenameNoExt As String
-                'Dim FileDetails() As String
-                Dim FileSize As Integer
-                'Dim RetryCnt as integer
-                'Dim SaveOK As Boolean
-                'Dim FileSuffix As String
-                Dim LogNamePrefix As String
-                Dim LogFolder As String
-                Dim Ptr As Integer
-                '
                 Dim converthtmlToText As converthtmlToTextClass
                 Dim Mailer As SMTP5Class
-                'Dim kmafs As fileSystemClass
-                '
                 Dim EmailBodyText As String
                 Dim EmailBodyHTML As String
-                Dim LogFilename As String
                 Dim SendResult As String
-                Dim MethodName As String
                 '
-                MethodName = "Send2"
-                '
-                '---cpCore.AppendLog("Enter Send2(" & EmailTo & "," & EmailFrom & "," & EmailSubject & "," & EmailBody & "," & BounceAddress & "," & ReplyToAddress & "," & ResultLogPathPage & "," & EmailSMTPServer & "," & Immediate & "," & HTML & "," & EmailOutPath & ")")
                 If Not CheckAddress(EmailTo) Then
-                    Send2 = "The to-address [" & EmailTo & "] is not valid"
+                    sendEmail4 = "The to-address [" & EmailTo & "] is not valid"
                 ElseIf Not CheckAddress(EmailFrom) Then
-                    Send2 = "The from-address [" & EmailFrom & "] is not valid"
+                    sendEmail4 = "The from-address [" & EmailFrom & "] is not valid"
                 ElseIf Not CheckServer(EmailSMTPServer) Then
-                    Send2 = "The email server [" & EmailSMTPServer & "] is not valid"
+                    sendEmail4 = "The email server [" & EmailSMTPServer & "] is not valid"
                 Else
                     If Not Immediate Then
                         '
                         ' ----- Add the email to the queue
                         '
-                        Send2 = AddQueue(EmailTo, EmailFrom, EmailSubject, EmailBody, BounceAddress, ReplyToAddress, ResultLogPathPage, EmailSMTPServer, HTML, EmailOutPath)
+                        sendEmail4 = addEmailQueue(EmailTo, EmailFrom, EmailSubject, EmailBody, BounceAddress, ReplyToAddress, ResultLogPathPage, EmailSMTPServer, HTML, EmailOutPath)
                     Else
                         '
                         ' ----- Send the email now
@@ -124,23 +98,23 @@ Namespace Contensive.Core
                                 EmailBodyHTML = "<HTML>" & EmailBodyHTML & "</HTML>"
                             End If
                             EmailBodyText = converthtmlToText.convert(EmailBody)
-                            Send2 = Mailer.send(EmailSMTPServer, EmailTo, EmailFrom, EmailSubject, EmailBodyText, "", EmailBodyHTML)
+                            sendEmail4 = Mailer.sendEmail5(EmailSMTPServer, EmailTo, EmailFrom, EmailSubject, EmailBodyText, "", EmailBodyHTML)
                             converthtmlToText = Nothing
                         Else
                             '
                             ' ----- send plain text email
                             '
-                            Send2 = Mailer.send(EmailSMTPServer, EmailTo, EmailFrom, EmailSubject, EmailBody, "")
+                            sendEmail4 = Mailer.sendEmail5(EmailSMTPServer, EmailTo, EmailFrom, EmailSubject, EmailBody, "")
                         End If
                         Mailer = Nothing
                         '
                         ' ----- clean up the result code for logging (change empty to "OK")
                         '
-                        Send2 = Replace(Send2, vbCrLf, "")
-                        If Send2 = "" Then
+                        sendEmail4 = Replace(sendEmail4, vbCrLf, "")
+                        If sendEmail4 = "" Then
                             SendResult = "OK"
                         Else
-                            SendResult = Send2
+                            SendResult = sendEmail4
                         End If
                         '
                         ' ----- Update Email Result Log
@@ -157,10 +131,10 @@ Namespace Contensive.Core
                 End If
                 '
             Catch ex As Exception
-                cpCore.handleException( ex)
+                cpCore.handleException(ex)
                 'Mailer = Nothing
                 'converthtmlToText = Nothing
-                Send2 = "There was an unexpected error sending the email."
+                sendEmail4 = "There was an unexpected error sending the email."
             End Try
         End Function
         '
@@ -168,8 +142,8 @@ Namespace Contensive.Core
         '   add this email to the email queue
         '========================================================================
         '
-        Private Function AddQueue(ByVal ToAddress As Object, ByVal FromAddress As Object, ByVal SubjectMessage As Object, ByVal BodyMessage As Object, ByVal BounceAddress As Object, ByVal ReplyToAddress As Object, ByVal ResultLogPathPage As Object, ByVal SMTPServer As Object, ByVal HTML As Boolean, Optional ByVal EmailOutPath As String = "") As String
-            AddQueue = ""
+        Private Function addEmailQueue(ByVal ToAddress As Object, ByVal FromAddress As Object, ByVal SubjectMessage As Object, ByVal BodyMessage As Object, ByVal BounceAddress As Object, ByVal ReplyToAddress As Object, ByVal ResultLogPathPage As Object, ByVal SMTPServer As Object, ByVal HTML As Boolean, Optional ByVal EmailOutPath As String = "") As String
+            addEmailQueue = ""
             On Error GoTo ErrorTrap
             '
             Dim Filename As String
@@ -211,7 +185,7 @@ Namespace Contensive.Core
             '
             If Err.Number <> 0 Then
                 Call HandleClassTrapError("AddQueue", True)
-                AddQueue = "There was an unexpected error detected exiting the SMTPHandler AddQueue method [" & Err.Description & "]."
+                addEmailQueue = "There was an unexpected error detected exiting the SMTPHandler AddQueue method [" & Err.Description & "]."
                 Err.Clear()
             End If
             Exit Function
@@ -225,7 +199,7 @@ ErrorTrap:
             Call HandleClassTrapError(MethodName, True)
             Err.Clear()
             '
-            AddQueue = "There was an unexpected error saving the email to the email queue [" & Err.Description & "]."
+            addEmailQueue = "There was an unexpected error saving the email to the email queue [" & Err.Description & "]."
         End Function
         '
         '========================================================================
@@ -235,7 +209,7 @@ ErrorTrap:
         '   here is not the user, but the Service.
         '========================================================================
         '
-        Public Sub SendQueue(Optional ByVal EmailOutPath As String = "")
+        Public Sub SendEmailQueue(Optional ByVal EmailOutPath As String = "")
             On Error GoTo ErrorTrap
             '
             Dim SMTP As SMTP5Class
@@ -284,18 +258,18 @@ ErrorTrap:
                 ' Decode the file into the email arguments
                 '
                 Dim Line0 As String
-                Line0 = EncodeText(ReadLine(Copy))
+                Line0 = ReadLine(Copy)
                 If UCase(Mid(Line0, 1, 11)) = "CONTENSIVE " Then
                     '
                     ' Email record (LINE0 IS CONENSIVE AND VERSION)
                     '
-                    EmailSMTP = EncodeText(ReadLine(Copy))
-                    ResultLogPathPage = EncodeText(ReadLine(Copy))
-                    EmailTo = EncodeText(ReadLine(Copy))
-                    EmailFrom = EncodeText(ReadLine(Copy))
-                    BounceAddress = EncodeText(ReadLine(Copy))
-                    ReplyToAddress = EncodeText(ReadLine(Copy))
-                    EmailSubject = EncodeText(ReadLine(Copy))
+                    EmailSMTP = ReadLine(Copy)
+                    ResultLogPathPage = ReadLine(Copy)
+                    EmailTo = ReadLine(Copy)
+                    EmailFrom = ReadLine(Copy)
+                    BounceAddress = ReadLine(Copy)
+                    ReplyToAddress = ReadLine(Copy)
+                    EmailSubject = ReadLine(Copy)
                     HTML = EncodeBoolean(ReadLine(Copy))
                     '
                     ' removed this because the addqueue did not put it in
@@ -307,10 +281,10 @@ ErrorTrap:
                     ' Legacy record
                     '
                     EmailSMTP = Line0
-                    ResultLogPathPage = EncodeText(ReadLine(Copy))
-                    EmailTo = EncodeText(ReadLine(Copy))
-                    EmailFrom = EncodeText(ReadLine(Copy))
-                    EmailSubject = EncodeText(ReadLine(Copy))
+                    ResultLogPathPage = ReadLine(Copy)
+                    EmailTo = ReadLine(Copy)
+                    EmailFrom = ReadLine(Copy)
+                    EmailSubject = ReadLine(Copy)
                     HTML = EncodeBoolean(ReadLine(Copy))
                     EmailBody = Copy
                 End If
@@ -343,42 +317,37 @@ ErrorTrap:
         '
         '========================================================================
         '
-        Private Function ReadLine(ByVal Body As String) As Object
-            On Error GoTo ErrorTrap
-            Dim MethodName As String
-            Dim EOL As String
-            '
-            MethodName = "ReadLine"
-            '
-            EOL = InStr(1, Body, vbCrLf)
-            If EOL <> 0 Then
-                ReadLine = Mid(Body, 1, EOL - 1)
-                Body = Mid(Body, EOL + 2)
-            End If
-            '
-            Exit Function
-            '
-ErrorTrap:
-            Call HandleClassTrapError(MethodName, False)
+        Private Function ReadLine(ByRef Body As String) As String
+            Dim line As String = ""
+            Try
+                Dim EOL As String = InStr(1, Body, vbCrLf)
+                If EOL <> 0 Then
+                    line = Mid(Body, 1, EOL - 1)
+                    Body = Mid(Body, EOL + 2)
+                End If
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
+            Return line
         End Function
+        ''
+        ''
+        ''
+        'Public sub ErrorExit(ByVal ErrNumber As Integer, ByVal ErrSource As String, ByVal ErrDescription As String, ByVal MethodName As String, ByVal ErrorTrap As Boolean, ByVal ResumeNext As Boolean)
+        '    cpCore.handleLegacyError3("", "unknown", "ccEmail4", "SMTPHandler", MethodName, ErrNumber, ErrSource, ErrDescription, ErrorTrap, ResumeNext, "")
+        'End Function
         '
         '
         '
-        Public Function ErrorExit(ByVal ErrNumber As Integer, ByVal ErrSource As String, ByVal ErrDescription As String, ByVal MethodName As String, ByVal ErrorTrap As Boolean, ByVal ResumeNext As Boolean) As String
-            cpCore.handleLegacyError3("", "unknown", "ccEmail4", "SMTPHandler", MethodName, ErrNumber, ErrSource, ErrDescription, ErrorTrap, ResumeNext, "")
-        End Function
-        '
-        '
-        '
-        Private Function HandleClassTrapError(ByVal MethodName As String, ByVal ResumeNext As Boolean) As String
+        Private Sub HandleClassTrapError(ByVal MethodName As String, ByVal ResumeNext As Boolean)
             cpCore.handleLegacyError3("", "trap error", "ccEmail4", "SMTPHandlerClass", MethodName, Err.Number, Err.Source, Err.Description, True, ResumeNext, "unknown")
-        End Function
+        End Sub
         '
         '
         '
-        Private Function HandleClassInternalError(ByVal ErrNumber As Integer, ByVal ErrSource As String, ByVal ErrDescription As String, ByVal MethodName As String, ByVal ResumeNext As Boolean) As String
+        Private Sub HandleClassInternalError(ByVal ErrNumber As Integer, ByVal ErrSource As String, ByVal ErrDescription As String, ByVal MethodName As String, ByVal ResumeNext As Boolean)
             cpCore.handleLegacyError3("", "internal error", "ccEmail4", "SMTPHandlerClass", MethodName, ErrNumber, ErrSource, ErrDescription, True, ResumeNext, "unknown")
-        End Function
+        End Sub
         '
         '
         '
