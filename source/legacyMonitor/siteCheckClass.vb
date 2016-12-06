@@ -363,7 +363,7 @@ ErrorTrap:
             On Error GoTo ErrorTrap
             '
             Dim AlarmEmailBody As String
-            Dim Mailer As New SMTP5Class
+            'Dim Mailer As New SMTP5Class
             Dim Emails() As String
             Dim Ptr As Integer
             Dim emailstatus As String
@@ -413,8 +413,8 @@ ErrorTrap:
                                     For Ptr = 0 To UBound(Emails)
                                         ToAddress = Emails(Ptr)
                                         If ToAddress <> "" Then
-                                            emailstatus = Mailer.sendEmail5(AlarmEmailServer, Emails(Ptr), "Monitor@Contensive.com", "Monitor Alarm [" & ServerName & "]", AlarmEmailBody)
-                                            Call appendMonitorLog("Sending Alarm Notification to " & ToAddress & ", status=" & emailstatus)
+                                            'emailstatus = Mailer.sendEmail5(AlarmEmailServer, Emails(Ptr), "Monitor@Contensive.com", "Monitor Alarm [" & ServerName & "]", AlarmEmailBody)
+                                            'Call appendMonitorLog("Sending Alarm Notification to " & ToAddress & ", status=" & emailstatus)
                                         End If
                                     Next
                                 End If

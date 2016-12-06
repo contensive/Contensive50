@@ -123,7 +123,7 @@ Namespace Contensive.Core
             '                            Call cmc.cpCore.app.csv_SetCS(CS, "DateCompleted", Now)
             '                            If true Then
             '                                If ResultMessage = "" Then
-            '                                    ResultMessage = "OK"
+            '                                    ResultMessage = "ok"
             '                                End If
             '                                Call cmc.cpCore.app.csv_SetCS(CS, "ResultMessage", ResultMessage)
             '                            End If

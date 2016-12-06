@@ -367,29 +367,15 @@ ErrorTrap:
             Dim returnOk As Boolean = True
             Try
                 Dim localCollectionUpToDate As Boolean
-                Dim test As Integer
-                Dim hint As String
-                Dim DomReadyState As Integer
                 Dim GuidArray() As String
                 Dim GuidCnt As Integer
                 Dim GuidPtr As Integer
                 Dim RequestPtr As Integer
                 Dim SupportURL As String
                 Dim GuidList As String
-                Dim ErrorMessage As String
                 Dim CollectionLastChangeDate As Date
                 Dim WorkingFolder As String
-                Dim LoopPtr As Integer
-                Dim Ptr As Integer
                 Dim LocalFile As String
-                Dim Folders() As String
-                Dim FolderCnt As Integer
-                Dim Pos As Integer
-                Dim LastChangeDate As String
-                Dim SubFolderList As String
-                Dim SubFolders() As String
-                Dim SubFolder As String
-                Dim Cnt As Integer
                 Dim LocalGuid As String
                 Dim LocalLastChangeDateStr As String
                 Dim LocalLastChangeDate As Date
@@ -406,39 +392,7 @@ ErrorTrap:
                 Dim LibraryCollections As New XmlDocument
                 Dim LocalCollections As New XmlDocument
                 Dim Doc As New XmlDocument
-                'Dim AppService As appServicesClass
-                Dim SetTimeCheckString As String
-                Dim SetTimeCheck As Double
-                Dim LogDate As Date
-                Dim FolderName As String
-                Dim FileList As String
-                Dim FileArray() As String
-                Dim FileArrayCount As Integer
-                Dim FileArrayPointer As Integer
-                Dim FileSplit() As String
-                Dim FolderList As String
-                Dim FolderArray() As String
-                Dim FolderArrayCount As Integer
-                Dim FolderArrayPointer As Integer
-                Dim FolderSplit() As String
-                Dim VisitArchiveAgeDays As Integer
-                Dim DebugMode As Boolean
-                Dim NewDay As Boolean
-                '
-                Dim LastTimeCheck As Date
-                Dim CurrentTimeCheck As Date
-                '
-                Dim ConfigFilename As String
-                Dim Config As String
-                Dim ConfigLines() As String
-                '
-                Dim Line As String
-                Dim LineCnt As Integer
-                Dim LinePtr As Integer
-                Dim NameValue() As String
                 Dim Copy As String
-                'dim buildversion As String
-                '
                 Dim allowLogging As Boolean
                 Dim builder As New builderClass(cpCore)
                 '

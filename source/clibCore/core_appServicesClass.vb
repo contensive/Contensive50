@@ -7871,7 +7871,7 @@ ErrorTrap:
         Function isChildContent(ByVal ChildContentID As Integer, ByVal ParentContentID As Integer) As Boolean
             Dim returnOk As Boolean = False
             Try
-                isChildContent = metaData.isChildContent(ChildContentID, ParentContentID)
+                isChildContent = metaData.isWithinContent(ChildContentID, ParentContentID)
             Catch ex As Exception
                 cpCore.handleException(ex)
             End Try

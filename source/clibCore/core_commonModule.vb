@@ -7182,7 +7182,7 @@ ErrorTrap:
         '
         Public Function encodeDateMinValue(ByVal sourceDate As Date) As Date
             Dim returnValue As Date = sourceDate
-            If returnValue < #1/1/1990# Then
+            If returnValue < #1/1/1000# Then
                 returnValue = Date.MinValue
             End If
             Return returnValue

@@ -458,17 +458,17 @@ ErrorTrap:
             Dim RecordCount As Integer
             Dim RecordPointer As Integer
             Dim CSPointer As Integer
-            Dim RecordID As Integer
+            Dim formFieldId As Integer
             Dim ContentName As String
             Dim CDef As metaDataClass.CDefClass
-            Dim FieldName As String
-            Dim fieldTypeId As Integer
+            Dim formFieldName As String
+            Dim formFieldTypeId As Integer
             Dim TableName As String
             Dim ContentFieldsCID As Integer
             Dim StatusMessage As String
-            Dim ErrorMessage As String
+            Dim ErrorMessage As String = ""
             Dim FieldPointer As Integer
-            Dim SubmittedInherited As Boolean
+            Dim formFieldInherited As Boolean
             Dim AllowContentAutoLoad As Boolean
             Dim ReloadCDef As Boolean
             Dim CSTarget As Integer
@@ -520,86 +520,91 @@ ErrorTrap:
                     If RecordCount > 0 Then
                         For RecordPointer = 0 To RecordCount - 1
                             '
-                            FieldName = cpCore.main_GetStreamText("dtfaName." & RecordPointer)
-                            fieldTypeId = cpCore.main_GetStreamInteger("dtfaType." & RecordPointer)
-                            RecordID = EncodeInteger(cpCore.main_GetStreamInteger("dtfaID." & RecordPointer))
-                            SubmittedInherited = cpCore.main_GetStreamBoolean("dtfaInherited." & RecordPointer)
-                            If True Then
-                                '
-                                ' Field was found in CDef
-                                '
-                                With CDef.fields(FieldName.ToLower())
-                                    If .inherited And (Not SubmittedInherited) Then
-                                        '
-                                        ' Was inherited, but make a copy of the field
-                                        '
-                                        CSTarget = cpCore.app.db_csInsertRecord("Content Fields")
-                                        If cpCore.app.db_csOk(CSTarget) Then
-                                            CSSource = cpCore.main_OpenCSContentRecord("Content Fields", RecordID)
-                                            If cpCore.app.db_csOk(CSSource) Then
-                                                Call cpCore.main_CopyCSRecord(CSSource, CSTarget)
-                                            End If
-                                            Call cpCore.app.db_csClose(CSSource)
-                                            RecordID = cpCore.app.db_GetCSInteger(CSTarget, "ID")
-                                            Call cpCore.app.db_setCS(CSTarget, "ContentID", ContentID)
-                                        End If
-                                        Call cpCore.app.db_csClose(CSTarget)
-                                        ReloadCDef = True
-                                    ElseIf (Not .inherited) And (SubmittedInherited) Then
-                                        '
-                                        ' Was a field, make it inherit from it's parent
-                                        '
-                                        CSTarget = CSTarget
-                                        Call cpCore.main_DeleteContentRecord("Content Fields", RecordID)
-                                        ReloadCDef = True
-                                    ElseIf (Not .inherited) And (Not SubmittedInherited) Then
-                                        '
-                                        ' not inherited, save the field values and mark for a reload
-                                        '
-                                        If True Then
-                                            If (InStr(1, FieldName, " ") <> 0) Then
-                                                '
-                                                ' remoave spaces from new name
-                                                '
-                                                StatusMessage = StatusMessage & "<LI>Field [" & FieldName & "] was renamed [" & Replace(FieldName, " ", "") & "] because the field name can not include spaces.</LI>"
-                                                FieldName = Replace(FieldName, " ", "")
-                                            End If
+                            formFieldName = cpCore.main_GetStreamText("dtfaName." & RecordPointer)
+                            formFieldTypeId = cpCore.main_GetStreamInteger("dtfaType." & RecordPointer)
+                            formFieldId = EncodeInteger(cpCore.main_GetStreamInteger("dtfaID." & RecordPointer))
+                            formFieldInherited = cpCore.main_GetStreamBoolean("dtfaInherited." & RecordPointer)
+                            '
+                            ' problem - looking for the name in the Db using the form's name, but it could have changed.
+                            ' have to look field up by id
+                            '
+                            For Each cdefFieldKvp As KeyValuePair(Of String, metaDataClass.CDefFieldClass) In CDef.fields
+                                If cdefFieldKvp.Value.id = formFieldId Then
+                                    '
+                                    ' Field was found in CDef
+                                    '
+                                    With cdefFieldKvp.Value
+                                        If .inherited And (Not formFieldInherited) Then
                                             '
-                                            If (FieldName <> "") And (fieldTypeId <> 0) And ((.nameLc = "") Or (.fieldTypeId = 0)) Then
-                                                '
-                                                ' Create Db field, Field is good but was not before
-                                                '
-                                                Call cpCore.app.db_CreateSQLTableField(DataSourceName, TableName, FieldName, fieldTypeId)
-                                                StatusMessage = StatusMessage & "<LI>Field [" & FieldName & "] was saved to this content definition and a database field was created in [" & CDef.ContentTableName & "].</LI>"
-                                            ElseIf (FieldName = "") Or (fieldTypeId = 0) Then
-                                                '
-                                                ' name blank or type=0 - do nothing but tell them
-                                                '
-                                                If FieldName = "" And fieldTypeId = 0 Then
-                                                    ErrorMessage = ErrorMessage & "<LI>Field number " & RecordPointer + 1 & " was saved to this content definition but no database field was created because a name and field type are required.</LI>"
-                                                ElseIf FieldName = "" Then
-                                                    ErrorMessage = ErrorMessage & "<LI>Field number " & RecordPointer + 1 & " was saved to this content definition but no database field was created because a field name is required.</LI>"
-                                                Else
-                                                    ErrorMessage = ErrorMessage & "<LI>Field [" & FieldName & "] was saved to this content definition but no database field was created because a field type are required.</LI>"
+                                            ' Was inherited, but make a copy of the field
+                                            '
+                                            CSTarget = cpCore.app.db_csInsertRecord("Content Fields")
+                                            If cpCore.app.db_csOk(CSTarget) Then
+                                                CSSource = cpCore.main_OpenCSContentRecord("Content Fields", formFieldId)
+                                                If cpCore.app.db_csOk(CSSource) Then
+                                                    Call cpCore.main_CopyCSRecord(CSSource, CSTarget)
                                                 End If
-                                            ElseIf (FieldName = .nameLc) And (fieldTypeId <> .fieldTypeId) Then
-                                                '
-                                                ' Field Type changed, must be done manually
-                                                '
-                                                ErrorMessage = ErrorMessage & "<LI>Field [" & FieldName & "] changed type from [" & cpCore.main_GetRecordName("content Field Types", .fieldTypeId) & "] to [" & cpCore.main_GetRecordName("content Field Types", fieldTypeId) & "]. This may have caused a problem converting content.</LI>"
-                                                Dim DataSourceTypeID As Integer
-                                                DataSourceTypeID = cpCore.main_GetDataSourceType(DataSourceName)
-                                                Select Case DataSourceTypeID
-                                                    Case DataSourceTypeODBCMySQL
-                                                        SQL = "alter table " & CDef.ContentTableName & " change " & .nameLc & " " & .nameLc & " " & cpCore.csv_GetSQLAlterColumnType(DataSourceName, fieldTypeId) & ";"
-                                                    Case Else
-                                                        SQL = "alter table " & CDef.ContentTableName & " alter column " & .nameLc & " " & cpCore.csv_GetSQLAlterColumnType(DataSourceName, fieldTypeId) & ";"
-                                                End Select
-                                                Call cpCore.app.executeSql(SQL, DataSourceName)
+                                                Call cpCore.app.db_csClose(CSSource)
+                                                formFieldId = cpCore.app.db_GetCSInteger(CSTarget, "ID")
+                                                Call cpCore.app.db_setCS(CSTarget, "ContentID", ContentID)
                                             End If
-                                            SQL = "Update ccFields" _
-                                                & " Set name=" & EncodeSQLText(FieldName) _
-                                                & ",type=" & fieldTypeId _
+                                            Call cpCore.app.db_csClose(CSTarget)
+                                            ReloadCDef = True
+                                        ElseIf (Not .inherited) And (formFieldInherited) Then
+                                            '
+                                            ' Was a field, make it inherit from it's parent
+                                            '
+                                            CSTarget = CSTarget
+                                            Call cpCore.main_DeleteContentRecord("Content Fields", formFieldId)
+                                            ReloadCDef = True
+                                        ElseIf (Not .inherited) And (Not formFieldInherited) Then
+                                            '
+                                            ' not inherited, save the field values and mark for a reload
+                                            '
+                                            If True Then
+                                                If (InStr(1, formFieldName, " ") <> 0) Then
+                                                    '
+                                                    ' remoave spaces from new name
+                                                    '
+                                                    StatusMessage = StatusMessage & "<LI>Field [" & formFieldName & "] was renamed [" & Replace(formFieldName, " ", "") & "] because the field name can not include spaces.</LI>"
+                                                    formFieldName = Replace(formFieldName, " ", "")
+                                                End If
+                                                '
+                                                If (formFieldName <> "") And (formFieldTypeId <> 0) And ((.nameLc = "") Or (.fieldTypeId = 0)) Then
+                                                    '
+                                                    ' Create Db field, Field is good but was not before
+                                                    '
+                                                    Call cpCore.app.db_CreateSQLTableField(DataSourceName, TableName, formFieldName, formFieldTypeId)
+                                                    StatusMessage = StatusMessage & "<LI>Field [" & formFieldName & "] was saved to this content definition and a database field was created in [" & CDef.ContentTableName & "].</LI>"
+                                                ElseIf (formFieldName = "") Or (formFieldTypeId = 0) Then
+                                                    '
+                                                    ' name blank or type=0 - do nothing but tell them
+                                                    '
+                                                    If formFieldName = "" And formFieldTypeId = 0 Then
+                                                        ErrorMessage &= "<LI>Field number " & RecordPointer + 1 & " was saved to this content definition but no database field was created because a name and field type are required.</LI>"
+                                                    ElseIf formFieldName = "unnamedfield" & toolsClass.fieldId.ToString Then
+                                                        ErrorMessage &= "<LI>Field number " & RecordPointer + 1 & " was saved to this content definition but no database field was created because a field name is required.</LI>"
+                                                    Else
+                                                        ErrorMessage &= "<LI>Field [" & formFieldName & "] was saved to this content definition but no database field was created because a field type are required.</LI>"
+                                                    End If
+                                                ElseIf (formFieldName = .nameLc) And (formFieldTypeId <> .fieldTypeId) Then
+                                                    '
+                                                    ' Field Type changed, must be done manually
+                                                    '
+                                                    ErrorMessage &= "<LI>Field [" & formFieldName & "] changed type from [" & cpCore.main_GetRecordName("content Field Types", .fieldTypeId) & "] to [" & cpCore.main_GetRecordName("content Field Types", formFieldTypeId) & "]. This may have caused a problem converting content.</LI>"
+                                                    Dim DataSourceTypeID As Integer
+                                                    DataSourceTypeID = cpCore.main_GetDataSourceType(DataSourceName)
+                                                    Select Case DataSourceTypeID
+                                                        Case DataSourceTypeODBCMySQL
+                                                            SQL = "alter table " & CDef.ContentTableName & " change " & .nameLc & " " & .nameLc & " " & cpCore.csv_GetSQLAlterColumnType(DataSourceName, formFieldTypeId) & ";"
+                                                        Case Else
+                                                            SQL = "alter table " & CDef.ContentTableName & " alter column " & .nameLc & " " & cpCore.csv_GetSQLAlterColumnType(DataSourceName, formFieldTypeId) & ";"
+                                                    End Select
+                                                    Call cpCore.app.executeSql(SQL, DataSourceName)
+                                                End If
+                                                SQL = "Update ccFields" _
+                                                & " Set name=" & EncodeSQLText(formFieldName) _
+                                                & ",type=" & formFieldTypeId _
                                                 & ",caption=" & EncodeSQLText(cpCore.main_GetStreamText("dtfaCaption." & RecordPointer)) _
                                                 & ",DefaultValue=" & EncodeSQLText(cpCore.main_GetStreamText("dtfaDefaultValue." & RecordPointer)) _
                                                 & ",EditSortPriority=" & EncodeSQLText(cpCore.main_GetStreamInteger("dtfaEditSortPriority." & RecordPointer)) _
@@ -614,42 +619,44 @@ ErrorTrap:
                                                 & ",EditTab=" & EncodeSQLText(cpCore.main_GetStreamText("dtfaEditTab." & RecordPointer)) _
                                                 & ",Scramble=" & EncodeSQLBoolean(cpCore.main_GetStreamBoolean("dtfaScramble." & RecordPointer)) _
                                                 & ""
-                                            If cpCore.user_isAdmin Then
-                                                SQL &= ",adminonly=" & EncodeSQLBoolean(cpCore.main_GetStreamBoolean("dtfaAdminOnly." & RecordPointer))
+                                                If cpCore.user_isAdmin Then
+                                                    SQL &= ",adminonly=" & EncodeSQLBoolean(cpCore.main_GetStreamBoolean("dtfaAdminOnly." & RecordPointer))
+                                                End If
+                                                If cpCore.user_isDeveloper Then
+                                                    SQL &= ",DeveloperOnly=" & EncodeSQLBoolean(cpCore.main_GetStreamBoolean("dtfaDeveloperOnly." & RecordPointer))
+                                                End If
+                                                SQL &= " where ID=" & formFieldId
+                                                Call cpCore.app.executeSql(SQL)
+                                                'CSPointer = cpCore.app.db_csOpen("Content Fields", "ID=" & RecordID, , False)
+                                                'If cpCore.asv.csv_IsCSOK(CSPointer) Then
+                                                '    Call cpCore.app.db_SetCS(CSPointer, "name", FieldName)
+                                                '    Call cpCore.app.db_SetCS(CSPointer, "type", FieldType)
+                                                '    Call cpCore.app.db_SetCS(CSPointer, "caption", cpCore.main_GetStreamText("dtfaCaption." & RecordPointer))
+                                                '    Call cpCore.app.db_SetCS(CSPointer, "DefaultValue", cpCore.main_GetStreamText("dtfaDefaultValue." & RecordPointer))
+                                                '    Call cpCore.app.db_SetCS(CSPointer, "EditSortPriority", cpCore.main_GetStreamInteger("dtfaEditSortPriority." & RecordPointer))
+                                                '    Call cpCore.app.db_SetCS(CSPointer, "Active", cpCore.main_GetStreamBoolean("dtfaActive." & RecordPointer))
+                                                '    Call cpCore.app.db_SetCS(CSPointer, "ReadOnly", cpCore.main_GetStreamBoolean("dtfaReadOnly." & RecordPointer))
+                                                '    Call cpCore.app.db_SetCS(CSPointer, "Authorable", cpCore.main_GetStreamBoolean("dtfaAuthorable." & RecordPointer))
+                                                '    Call cpCore.app.db_SetCS(CSPointer, "Required", cpCore.main_GetStreamBoolean("dtfaRequired." & RecordPointer))
+                                                '    Call cpCore.app.db_SetCS(CSPointer, "UniqueName", cpCore.main_GetStreamBoolean("dtfaUniqueName." & RecordPointer))
+                                                '    Call cpCore.app.db_SetCS(CSPointer, "TextBuffered", cpCore.main_GetStreamBoolean("dtfaTextBuffered." & RecordPointer))
+                                                '    Call cpCore.app.db_SetCS(CSPointer, "Password", cpCore.main_GetStreamBoolean("dtfaPassword." & RecordPointer))
+                                                '    Call cpCore.app.db_SetCS(CSPointer, "HTMLContent", cpCore.main_GetStreamBoolean("dtfaHTMLContent." & RecordPointer))
+                                                'If cpCore.main_IsAdmin Then
+                                                '    Call cpCore.app.db_SetCS(CSPointer, "AdminOnly", cpCore.main_GetStreamBoolean("dtfaAdminOnly." & RecordPointer))
+                                                'End If
+                                                'If cpCore.main_IsDeveloper Then
+                                                '    Call cpCore.app.db_SetCS(CSPointer, "DeveloperOnly", cpCore.main_GetStreamBoolean("dtfaDeveloperOnly." & RecordPointer))
+                                                'End If
+                                                ReloadCDef = True
+                                                'Call cpCore.app.db_closeCS(CSPointer)
+                                                'Call cpCore.app.loadContentDefinition(ContentID)
                                             End If
-                                            If cpCore.user_isDeveloper Then
-                                                SQL &= ",DeveloperOnly=" & EncodeSQLBoolean(cpCore.main_GetStreamBoolean("dtfaDeveloperOnly." & RecordPointer))
-                                            End If
-                                            SQL &= " where ID=" & RecordID
-                                            Call cpCore.app.executeSql(SQL)
-                                            'CSPointer = cpCore.app.db_csOpen("Content Fields", "ID=" & RecordID, , False)
-                                            'If cpCore.asv.csv_IsCSOK(CSPointer) Then
-                                            '    Call cpCore.app.db_SetCS(CSPointer, "name", FieldName)
-                                            '    Call cpCore.app.db_SetCS(CSPointer, "type", FieldType)
-                                            '    Call cpCore.app.db_SetCS(CSPointer, "caption", cpCore.main_GetStreamText("dtfaCaption." & RecordPointer))
-                                            '    Call cpCore.app.db_SetCS(CSPointer, "DefaultValue", cpCore.main_GetStreamText("dtfaDefaultValue." & RecordPointer))
-                                            '    Call cpCore.app.db_SetCS(CSPointer, "EditSortPriority", cpCore.main_GetStreamInteger("dtfaEditSortPriority." & RecordPointer))
-                                            '    Call cpCore.app.db_SetCS(CSPointer, "Active", cpCore.main_GetStreamBoolean("dtfaActive." & RecordPointer))
-                                            '    Call cpCore.app.db_SetCS(CSPointer, "ReadOnly", cpCore.main_GetStreamBoolean("dtfaReadOnly." & RecordPointer))
-                                            '    Call cpCore.app.db_SetCS(CSPointer, "Authorable", cpCore.main_GetStreamBoolean("dtfaAuthorable." & RecordPointer))
-                                            '    Call cpCore.app.db_SetCS(CSPointer, "Required", cpCore.main_GetStreamBoolean("dtfaRequired." & RecordPointer))
-                                            '    Call cpCore.app.db_SetCS(CSPointer, "UniqueName", cpCore.main_GetStreamBoolean("dtfaUniqueName." & RecordPointer))
-                                            '    Call cpCore.app.db_SetCS(CSPointer, "TextBuffered", cpCore.main_GetStreamBoolean("dtfaTextBuffered." & RecordPointer))
-                                            '    Call cpCore.app.db_SetCS(CSPointer, "Password", cpCore.main_GetStreamBoolean("dtfaPassword." & RecordPointer))
-                                            '    Call cpCore.app.db_SetCS(CSPointer, "HTMLContent", cpCore.main_GetStreamBoolean("dtfaHTMLContent." & RecordPointer))
-                                            'If cpCore.main_IsAdmin Then
-                                            '    Call cpCore.app.db_SetCS(CSPointer, "AdminOnly", cpCore.main_GetStreamBoolean("dtfaAdminOnly." & RecordPointer))
-                                            'End If
-                                            'If cpCore.main_IsDeveloper Then
-                                            '    Call cpCore.app.db_SetCS(CSPointer, "DeveloperOnly", cpCore.main_GetStreamBoolean("dtfaDeveloperOnly." & RecordPointer))
-                                            'End If
-                                            ReloadCDef = True
-                                            'Call cpCore.app.db_closeCS(CSPointer)
-                                            'Call cpCore.app.loadContentDefinition(ContentID)
                                         End If
-                                    End If
-                                End With
-                            End If
+                                    End With
+                                    Exit For
+                                End If
+                            Next
                         Next
                     End If
                     cpCore.app.cache_invalidateAll()
@@ -662,6 +669,7 @@ ErrorTrap:
                     '
                     CSPointer = cpCore.main_InsertCSContent("Content Fields")
                     If cpCore.app.db_csOk(CSPointer) Then
+                        Call cpCore.app.db_setCS(CSPointer, "name", "unnamedField" & cpCore.app.db_GetCSInteger(CSPointer, "id").ToString())
                         Call cpCore.app.db_setCS(CSPointer, "ContentID", ContentID)
                         Call cpCore.app.db_setCS(CSPointer, "EditSortPriority", 0)
                         ReloadCDef = True
@@ -822,8 +830,8 @@ ErrorTrap:
                             '
                             ' put the menu into the current menu format
                             '
-                            RecordID = .id
-                            Call streamRow.Add(cpCore.main_GetFormInputHidden("dtfaID." & RecordCount, RecordID))
+                            formFieldId = .id
+                            Call streamRow.Add(cpCore.main_GetFormInputHidden("dtfaID." & RecordCount, formFieldId))
                             streamRow.Add("<tr>")
                             '
                             ' edit button
@@ -831,7 +839,7 @@ ErrorTrap:
                             streamRow.Add("<td class=""ccPanelInput"" align=""left""><img src=""/cclib/images/spacer.gif"" width=""1"" height=""10"">")
                             ContentFieldsCID = Local_GetContentID("Content Fields")
                             If (ContentFieldsCID <> 0) Then
-                                streamRow.Add("<nobr>" & SpanClassAdminSmall & "[<a href=""?aa=" & AdminActionNop & "&af=" & AdminFormEdit & "&id=" & RecordID & "&cid=" & ContentFieldsCID & "&mm=0"">EDIT</a>]</span></nobr>")
+                                streamRow.Add("<nobr>" & SpanClassAdminSmall & "[<a href=""?aa=" & AdminActionNop & "&af=" & AdminFormEdit & "&id=" & formFieldId & "&cid=" & ContentFieldsCID & "&mm=0"">EDIT</a>]</span></nobr>")
                                 'streamRow.Add( "<nobr>" & SpanClassAdminSmall & "[")
                                 'streamRow.Add( "<a href=""#""")
                                 'streamRow.Add( " onclick=""" _

@@ -2951,7 +2951,9 @@ ErrorTrap:
         '=============================================================================
         '
         Public Sub csv_CreateContentFromSQLTable(ByVal DataSourceName As String, ByVal TableName As String, ByVal ContentName As String, ByVal MemberID As Integer)
-            Call csv_CreateContentFromSQLTable(DataSourceName, TableName, ContentName, MemberID)
+
+            Dim bulder As New builderClass(Me)
+            bulder.csv_CreateContentFromSQLTable(DataSourceName, TableName, ContentName, MemberID)
         End Sub
         '
         '=============================================================================
@@ -3474,91 +3476,97 @@ ErrorTrap:
 ErrorTrap:
             Call handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_DeleteContentTracking", True)
         End Sub
+        '
+        'Public Function sendEmail(ByVal ToAddress As String, ByVal FromAddress As String, ByVal SubjectMessage As String, ByVal BodyMessage As String, Optional ByVal ResultLogFilename As String = "", Optional ByVal Immediate As Boolean = False, Optional ByVal HTML As Boolean = True) As String
+        '    sendEmail = sendEmail3(ToAddress, FromAddress, SubjectMessage, BodyMessage, "", "", ResultLogFilename, Immediate, HTML, 0)
+        'End Function
         ''
-        Public Function sendEmail(ByVal ToAddress As String, ByVal FromAddress As String, ByVal SubjectMessage As String, ByVal BodyMessage As String, Optional ByVal ResultLogFilename As String = "", Optional ByVal Immediate As Boolean = False, Optional ByVal HTML As Boolean = True) As String
-            sendEmail = sendEmail2(ToAddress, FromAddress, SubjectMessage, BodyMessage, "", "", ResultLogFilename, Immediate, HTML)
-        End Function
+        ''========================================================================
+        ''   Sends an email
+        ''    Returns blank if all OK
+        ''   Returns a string with the error if there was a problem
+        ''========================================================================
+        ''
+        'Public Function sendEmail2(ByVal ToAddress As String, ByVal FromAddress As String, ByVal SubjectMessage As String, ByVal BodyMessage As String, ByVal BounceAddress As String, ByVal ReplyToAddress As String, Optional ByVal ResultLogFilename As String = "", Optional ByVal Immediate As Boolean = False, Optional ByVal HTML As Boolean = False, Optional emailIdForLog As Integer = 0) As String
+        '    sendEmail2 = sendEmail3(ToAddress, FromAddress, SubjectMessage, BodyMessage, BounceAddress, ReplyToAddress, ResultLogFilename, Immediate, HTML, 0)
+        'End Function
         '
-        '========================================================================
-        '   Sends an email
-        '    Returns blank if all OK
-        '   Returns a string with the error if there was a problem
-        '========================================================================
-        '
-        Public Function sendEmail2(ByVal ToAddress As String, ByVal FromAddress As String, ByVal SubjectMessage As String, ByVal BodyMessage As String, ByVal BounceAddress As String, ByVal ReplyToAddress As String, Optional ByVal ResultLogFilename As String = "", Optional ByVal Immediate As Boolean = False, Optional ByVal HTML As Boolean = False) As String
-            sendEmail2 = sendEmail3(ToAddress, FromAddress, SubjectMessage, BodyMessage, BounceAddress, ReplyToAddress, ResultLogFilename, Immediate, HTML, 0)
-        End Function
-        '
-        '========================================================================
-        '   Sends an email
-        '    Returns blank if all OK
-        '   Returns a string with the error if there was a problem
-        '========================================================================
-        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Send Email
+        ''' </summary>
+        ''' <param name="ToAddress"></param>
+        ''' <param name="FromAddress"></param>
+        ''' <param name="SubjectMessage"></param>
+        ''' <param name="BodyMessage"></param>
+        ''' <param name="BounceAddress"></param>
+        ''' <param name="ReplyToAddress"></param>
+        ''' <param name="ResultLogFilename"></param>
+        ''' <param name="isImmediate"></param>
+        ''' <param name="isHTML"></param>
+        ''' <param name="emailIdOrZeroForLog"></param>
+        ''' <returns>OK if send is successful, otherwise returns the principle issue as a user error.</returns>
         Public Function sendEmail3(ByVal ToAddress As String, ByVal FromAddress As String, ByVal SubjectMessage As String, ByVal BodyMessage As String, ByVal BounceAddress As String, ByVal ReplyToAddress As String, ByVal ResultLogFilename As String, ByVal isImmediate As Boolean, ByVal isHTML As Boolean, ByVal emailIdOrZeroForLog As Integer) As String
-            sendEmail3 = ""
-            On Error GoTo ErrorTrap 'Const Tn = "SendEmail3" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Dim htmlBody As String
-            Dim rootUrl As String
-            Dim EmailHandler As New smtpHandlerClass(Me)
-            Dim iResultLogPathPage As String
-            Dim MethodName As String
-            Dim WarningMsg As String = ""
-            Dim CSLog As Integer
-            '
-            MethodName = "csv_SendEmail3"
-            '
-            If ToAddress = "" Then
-                ' block
-            ElseIf (InStr(1, ToAddress, "@") = 0) Or (InStr(1, ToAddress, ".") = 0) Then
-                ' block
-            ElseIf FromAddress = "" Then
-                ' block
-            ElseIf (InStr(1, FromAddress, "@") = 0) Or (InStr(1, FromAddress, ".") = 0) Then
-                ' block
-            ElseIf 0 <> InStr(1, getEmailBlockList_InternalOnly, vbCrLf & ToAddress & vbCrLf, vbTextCompare) Then
+            Dim returnStatus As String = ""
+            Try
                 '
-                ' They are in the block list
+                Dim htmlBody As String
+                Dim rootUrl As String
+                Dim EmailHandler As New smtpHandlerClass(Me)
+                Dim iResultLogPathPage As String
+                Dim WarningMsg As String = ""
+                Dim CSLog As Integer
                 '
-                sendEmail3 = "Recipient has blocked this email"
-            Else
-                '
-                iResultLogPathPage = ResultLogFilename
-                '
-                ' Test for from-address / to-address matches
-                '
-                If LCase(FromAddress) = LCase(ToAddress) Then
-                    FromAddress = app.siteProperty_getText("EmailFromAddress", "")
-                    If FromAddress = "" Then
-                        '
-                        '
-                        '
-                        FromAddress = ToAddress
-                        WarningMsg = "The from-address matches the to-address. This email was sent, but may be blocked by spam filtering."
-                    ElseIf LCase(FromAddress) = LCase(ToAddress) Then
-                        '
-                        '
-                        '
-                        WarningMsg = "The from-address matches the to-address. This email was sent, but may be blocked by spam filtering."
-                    Else
-                        '
-                        '
-                        '
-                        WarningMsg = "The from-address matches the to-address. The from-address was changed to " & FromAddress & " to prevent it from being blocked by spam filtering."
+                If ToAddress = "" Then
+                    ' block
+                ElseIf (InStr(1, ToAddress, "@") = 0) Or (InStr(1, ToAddress, ".") = 0) Then
+                    ' block
+                ElseIf FromAddress = "" Then
+                    ' block
+                ElseIf (InStr(1, FromAddress, "@") = 0) Or (InStr(1, FromAddress, ".") = 0) Then
+                    ' block
+                ElseIf 0 <> InStr(1, getEmailBlockList_InternalOnly, vbCrLf & ToAddress & vbCrLf, vbTextCompare) Then
+                    '
+                    ' They are in the block list
+                    '
+                    returnStatus = "Recipient has blocked this email"
+                Else
+                    '
+                    iResultLogPathPage = ResultLogFilename
+                    '
+                    ' Test for from-address / to-address matches
+                    '
+                    If LCase(FromAddress) = LCase(ToAddress) Then
+                        FromAddress = app.siteProperty_getText("EmailFromAddress", "")
+                        If FromAddress = "" Then
+                            '
+                            '
+                            '
+                            FromAddress = ToAddress
+                            WarningMsg = "The from-address matches the to-address. This email was sent, but may be blocked by spam filtering."
+                        ElseIf LCase(FromAddress) = LCase(ToAddress) Then
+                            '
+                            '
+                            '
+                            WarningMsg = "The from-address matches the to-address. This email was sent, but may be blocked by spam filtering."
+                        Else
+                            '
+                            '
+                            '
+                            WarningMsg = "The from-address matches the to-address. The from-address was changed to " & FromAddress & " to prevent it from being blocked by spam filtering."
+                        End If
                     End If
-                End If
-                '
-                If isHTML Then
                     '
-                    ' Fix links for HTML send
-                    '
-                    rootUrl = "http://" & app.config.domainList(0) & "/"
-                    BodyMessage = ConvertLinksToAbsolute(BodyMessage, rootUrl)
-                    '
-                    ' compose body
-                    '
-                    htmlBody = "" _
+                    If isHTML Then
+                        '
+                        ' Fix links for HTML send
+                        '
+                        rootUrl = "http://" & app.config.domainList(0) & "/"
+                        BodyMessage = ConvertLinksToAbsolute(BodyMessage, rootUrl)
+                        '
+                        ' compose body
+                        '
+                        htmlBody = "" _
                             & "<html>" _
                             & "<head>" _
                             & "<Title>" & SubjectMessage & "</Title>" _
@@ -3569,39 +3577,36 @@ ErrorTrap:
                             & BodyMessage _
                             & "</body>" _
                             & "</html>"
-                    sendEmail3 = EmailHandler.sendEmail4(ToAddress, FromAddress, SubjectMessage, BodyMessage, BounceAddress, ReplyToAddress, iResultLogPathPage, app.siteProperty_getText("SMTPServer", "SMTP.YourServer.Com"), isImmediate, isHTML, "")
-                Else
-                    sendEmail3 = EmailHandler.sendEmail4(ToAddress, FromAddress, SubjectMessage, BodyMessage, BounceAddress, ReplyToAddress, iResultLogPathPage, app.siteProperty_getText("SMTPServer", "SMTP.YourServer.Com"), isImmediate, isHTML, "")
-                End If
-                If (sendEmail3 = "") Then
-                    sendEmail3 = WarningMsg
-                End If
-                '
-                ' ----- Log the send
-                '
-                If True Then
-                    CSLog = app.db_csInsertRecord("Email Log", 0)
-                    If app.db_csOk(CSLog) Then
-                        Call app.db_setCS(CSLog, "Name", "System Email Send " & CStr(Now()))
-                        Call app.db_setCS(CSLog, "LogType", EmailLogTypeImmediateSend)
-                        Call app.db_setCS(CSLog, "SendStatus", sendEmail3)
-                        Call app.db_setCS(CSLog, "toaddress", ToAddress)
-                        Call app.db_setCS(CSLog, "fromaddress", FromAddress)
-                        Call app.db_setCS(CSLog, "Subject", SubjectMessage)
-                        If emailIdOrZeroForLog <> 0 Then
-                            Call app.db_setCS(CSLog, "emailid", emailIdOrZeroForLog)
-                        End If
+                        returnStatus = EmailHandler.sendEmail5(ToAddress, FromAddress, SubjectMessage, BodyMessage, BounceAddress, ReplyToAddress, iResultLogPathPage, app.siteProperty_getText("SMTPServer", "SMTP.YourServer.Com"), isImmediate, isHTML, "")
+                    Else
+                        returnStatus = EmailHandler.sendEmail5(ToAddress, FromAddress, SubjectMessage, BodyMessage, BounceAddress, ReplyToAddress, iResultLogPathPage, app.siteProperty_getText("SMTPServer", "SMTP.YourServer.Com"), isImmediate, isHTML, "")
                     End If
-                    Call app.db_csClose(CSLog)
+                    If (returnStatus = "") Then
+                        returnStatus = WarningMsg
+                    End If
+                    '
+                    ' ----- Log the send
+                    '
+                    If True Then
+                        CSLog = app.db_csInsertRecord("Email Log", 0)
+                        If app.db_csOk(CSLog) Then
+                            Call app.db_setCS(CSLog, "Name", "System Email Send " & CStr(Now()))
+                            Call app.db_setCS(CSLog, "LogType", EmailLogTypeImmediateSend)
+                            Call app.db_setCS(CSLog, "SendStatus", returnStatus)
+                            Call app.db_setCS(CSLog, "toaddress", ToAddress)
+                            Call app.db_setCS(CSLog, "fromaddress", FromAddress)
+                            Call app.db_setCS(CSLog, "Subject", SubjectMessage)
+                            If emailIdOrZeroForLog <> 0 Then
+                                Call app.db_setCS(CSLog, "emailid", emailIdOrZeroForLog)
+                            End If
+                        End If
+                        Call app.db_csClose(CSLog)
+                    End If
                 End If
-            End If
-            '
-            EmailHandler = Nothing
-            '
-            Exit Function
-            '
-ErrorTrap:
-            Call handleLegacyError4(Err.Number, Err.Source, Err.Description, MethodName, True)
+            Catch ex As Exception
+                handleException(ex)
+            End Try
+            Return returnStatus
         End Function
         '
         ''========================================================================
@@ -3691,7 +3696,10 @@ ErrorTrap:
         End Function
         '
         Public Sub csv_CreateContent4(ByVal Active As Boolean, ByVal DataSourceName As String, ByVal TableName As String, ByVal ContentName As String, Optional ByVal AdminOnly As Boolean = False, Optional ByVal DeveloperOnly As Boolean = False, Optional ByVal AllowAdd As Boolean = True, Optional ByVal AllowDelete As Boolean = True, Optional ByVal ParentContentName As String = "", Optional ByVal DefaultSortMethod As String = "", Optional ByVal DropDownFieldList As String = "", Optional ByVal AllowWorkflowAuthoring As Boolean = False, Optional ByVal AllowCalendarEvents As Boolean = False, Optional ByVal AllowContentTracking As Boolean = False, Optional ByVal AllowTopicRules As Boolean = False, Optional ByVal AllowContentChildTool As Boolean = False, Optional ByVal AllowMetaContent As Boolean = False, Optional ByVal IconLink As String = "", Optional ByVal IconWidth As Integer = 0, Optional ByVal IconHeight As Integer = 0, Optional ByVal IconSprites As Integer = 0, Optional ByVal ccGuid As String = "", Optional ByVal IsBaseContent As Boolean = False, Optional ByVal installedByCollectionGuid As String = "")
-            Call csv_CreateContent4(Active, DataSourceName, TableName, ContentName, AdminOnly)
+
+            Dim bulder As New builderClass(Me)
+            Call bulder.csv_CreateContent4(Active, DataSourceName, TableName, ContentName, AdminOnly)
+
         End Sub
         '
         '   Patch -- returns true if the cdef field exists
@@ -11609,76 +11617,83 @@ ErrorTrap:
                 Call handleLegacyError7("csv_EncodeContent9", "Unexpected Trap Error")
             End If
         End Function
-        '
+        '  
         '========================================================================
-        '   Migrated from cpCoreClass to expose csv_SendSystemEmail and sendGroupEmail
-        '========================================================================
-        '
-        Public Function csv_SendMemberEmail3(ByVal ToMemberID As Integer, ByVal FromAddress As String, ByVal subject As String, ByVal Body As String, ByVal Immediate As Boolean, ByVal HTML As Boolean, ByVal emailIdOrZeroForLog As Integer, ByVal template As String, ByVal EmailAllowLinkEID As Boolean) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SendMemberEmail3")
-            '
-            Dim CS As Integer
-            Dim ToAddress As String
-            Dim MethodName As String
-            Dim rootUrl As String
-            Dim layoutError As String = ""
-            Dim subjectEncoded As String
-            Dim bodyEncoded As String
-            Dim templateEncoded As String
-            '
-            MethodName = "csv_SendMemberEmail3( " & ToMemberID & "," & FromAddress & "," & subject & "," & Body & "," & Immediate & "," & HTML & " )"
-            '
-            subjectEncoded = subject
-            bodyEncoded = Body
-            templateEncoded = template
-            '
-            CS = app.db_OpenCSContentRecord("People", ToMemberID, , , , "email")
-            If app.db_csOk(CS) Then
-                ToAddress = Trim(app.db_GetCSText(CS, "email"))
-                If ToAddress = "" Then
-                    csv_SendMemberEmail3 = "The email was not sent because the to-address was blank."
-                ElseIf (InStr(1, ToAddress, "@") = 0) Or (InStr(1, ToAddress, ".") = 0) Then
-                    csv_SendMemberEmail3 = "The email was not sent because the to-address [" & ToAddress & "] was not valid."
-                ElseIf FromAddress = "" Then
-                    csv_SendMemberEmail3 = "The email was not sent because the from-address was blank."
-                ElseIf (InStr(1, FromAddress, "@") = 0) Or (InStr(1, FromAddress, ".") = 0) Then
-                    csv_SendMemberEmail3 = "The email was not sent because the from-address [" & FromAddress & "] was not valid."
-                Else
-                    '
-                    ' encode subject
-                    '
-                    subjectEncoded = executeContentCommands(Nothing, subjectEncoded, addonContextEnum.contextEmail, ToMemberID, True, layoutError)
-                    subjectEncoded = encodeContent10(subjectEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & app.config.domainList(0), True, 0, "", addonContextEnum.contextEmail, True, Nothing, False)
-                    '
-                    ' encode Body
-                    '
-                    bodyEncoded = executeContentCommands(Nothing, bodyEncoded, addonContextEnum.contextEmail, ToMemberID, True, layoutError)
-                    bodyEncoded = encodeContent10(bodyEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & app.config.domainList(0), True, 0, "", addonContextEnum.contextEmail, True, Nothing, False)
-                    '
-                    ' encode template
-                    '
-                    If (templateEncoded <> "") Then
-                        templateEncoded = executeContentCommands(Nothing, templateEncoded, addonContextEnum.contextEmail, ToMemberID, True, layoutError)
-                        templateEncoded = encodeContent10(templateEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & app.config.domainList(0), True, 0, "", addonContextEnum.contextEmail, True, Nothing, False)
+        ''' <summary>
+        ''' Send email to a memberId, returns ok if send is successful, otherwise returns the principle issue as a user error.
+        ''' </summary>
+        ''' <param name="ToMemberID"></param>
+        ''' <param name="FromAddress"></param>
+        ''' <param name="subject"></param>
+        ''' <param name="Body"></param>
+        ''' <param name="Immediate"></param>
+        ''' <param name="HTML"></param>
+        ''' <param name="emailIdOrZeroForLog"></param>
+        ''' <param name="template"></param>
+        ''' <param name="EmailAllowLinkEID"></param>
+        ''' <returns> returns ok if send is successful, otherwise returns the principle issue as a user error</returns>
+        Public Function sendMemberEmail3(ByVal ToMemberID As Integer, ByVal FromAddress As String, ByVal subject As String, ByVal Body As String, ByVal Immediate As Boolean, ByVal HTML As Boolean, ByVal emailIdOrZeroForLog As Integer, ByVal template As String, ByVal EmailAllowLinkEID As Boolean) As String
+            Dim returnStatus As String = ""
+            Try
+                Dim CS As Integer
+                Dim ToAddress As String
+                'Dim MethodName As String
+                Dim rootUrl As String
+                Dim layoutError As String = ""
+                Dim subjectEncoded As String
+                Dim bodyEncoded As String
+                Dim templateEncoded As String
+                '
+                subjectEncoded = subject
+                bodyEncoded = Body
+                templateEncoded = template
+                '
+                CS = app.db_OpenCSContentRecord("People", ToMemberID, , , , "email")
+                If app.db_csOk(CS) Then
+                    ToAddress = Trim(app.db_GetCSText(CS, "email"))
+                    If ToAddress = "" Then
+                        returnStatus = "The email was not sent because the to-address was blank."
+                    ElseIf (InStr(1, ToAddress, "@") = 0) Or (InStr(1, ToAddress, ".") = 0) Then
+                        returnStatus = "The email was not sent because the to-address [" & ToAddress & "] was not valid."
+                    ElseIf FromAddress = "" Then
+                        returnStatus = "The email was not sent because the from-address was blank."
+                    ElseIf (InStr(1, FromAddress, "@") = 0) Or (InStr(1, FromAddress, ".") = 0) Then
+                        returnStatus = "The email was not sent because the from-address [" & FromAddress & "] was not valid."
+                    Else
                         '
-                        If (InStr(1, templateEncoded, fpoContentBox) <> 0) Then
-                            bodyEncoded = Replace(templateEncoded, fpoContentBox, bodyEncoded)
-                        Else
-                            bodyEncoded = templateEncoded & bodyEncoded
+                        ' encode subject
+                        '
+                        subjectEncoded = executeContentCommands(Nothing, subjectEncoded, addonContextEnum.contextEmail, ToMemberID, True, layoutError)
+                        subjectEncoded = encodeContent10(subjectEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & app.config.domainList(0), True, 0, "", addonContextEnum.contextEmail, True, Nothing, False)
+                        '
+                        ' encode Body
+                        '
+                        bodyEncoded = executeContentCommands(Nothing, bodyEncoded, addonContextEnum.contextEmail, ToMemberID, True, layoutError)
+                        bodyEncoded = encodeContent10(bodyEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & app.config.domainList(0), True, 0, "", addonContextEnum.contextEmail, True, Nothing, False)
+                        '
+                        ' encode template
+                        '
+                        If (templateEncoded <> "") Then
+                            templateEncoded = executeContentCommands(Nothing, templateEncoded, addonContextEnum.contextEmail, ToMemberID, True, layoutError)
+                            templateEncoded = encodeContent10(templateEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & app.config.domainList(0), True, 0, "", addonContextEnum.contextEmail, True, Nothing, False)
+                            '
+                            If (InStr(1, templateEncoded, fpoContentBox) <> 0) Then
+                                bodyEncoded = Replace(templateEncoded, fpoContentBox, bodyEncoded)
+                            Else
+                                bodyEncoded = templateEncoded & bodyEncoded
+                            End If
                         End If
+                        bodyEncoded = Replace(bodyEncoded, "#member_id#", ToMemberID.ToString)
+                        bodyEncoded = Replace(bodyEncoded, "#member_email#", ToAddress)
+                        '
+                        returnStatus = sendEmail3(ToAddress, FromAddress, subjectEncoded, bodyEncoded, "", "", "", Immediate, HTML, emailIdOrZeroForLog)
                     End If
-                    bodyEncoded = Replace(bodyEncoded, "#member_id#", ToMemberID.ToString)
-                    bodyEncoded = Replace(bodyEncoded, "#member_email#", ToAddress)
-                    '
-                    csv_SendMemberEmail3 = sendEmail3(ToAddress, FromAddress, subjectEncoded, bodyEncoded, "", "", "", Immediate, HTML, emailIdOrZeroForLog)
-                    'csv_SendMemberEmail3 = csv_SendEmail(toAddress, fromAddress, subjectEncoded, bodyEncoded, emailIdOrZeroForLog, Immediate, HTML)
                 End If
-            End If
-            Call app.db_csClose(CS)
-            Exit Function
-            '
-ErrorTrap:
-            Call handleLegacyError6(MethodName, "unexpected Trap")
+                Call app.db_csClose(CS)
+            Catch ex As Exception
+                handleException(ex)
+            End Try
+            Return returnStatus
         End Function
         '
         '========================================================================
@@ -11686,24 +11701,52 @@ ErrorTrap:
         '   Used to send the email and as body on the email test
         '========================================================================
         '
-        Public Function csv_getGroupEmailSQL(ByVal ToAll As Boolean, ByVal EmailID As Integer) As String
+        Public Function getGroupEmailSQL(ByVal ToAll As Boolean, ByVal EmailID As Integer) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("getGroupEmailSQL")
             '
             ' converted array to dictionary - Dim FieldPointer As Integer
             '
-            csv_getGroupEmailSQL = ""
+            getGroupEmailSQL = ""
             If ToAll Then
-                csv_getGroupEmailSQL = "SELECT ccMembers.ID AS ID, ccMembers.Name AS Name, ccMembers.Email AS Email" _
+                getGroupEmailSQL = "SELECT ccMembers.ID AS ID, ccMembers.Name AS Name, ccMembers.Email AS Email" _
                     & " FROM ccMembers" _
-                    & " WHERE (((ccMembers.Email) Is Not Null) AND (ccMembers.Active<>0) AND (ccMembers.AllowBulkEmail<>0))" _
+                    & " WHERE ((ccMembers.Email Is Not Null) AND (ccMembers.Active<>0) AND (ccMembers.AllowBulkEmail<>0))" _
                     & " ORDER BY ccMembers.Email,ccMembers.ID"
             Else
-                csv_getGroupEmailSQL = "SELECT ccMembers.ID AS ID, ccMembers.Name AS Name, ccMembers.Email AS Email" _
-                    & " FROM (ccEmailGroups LEFT JOIN ccGroups ON ccEmailGroups.GroupID = ccGroups.ID) LEFT JOIN (ccMemberRules LEFT JOIN ccMembers ON ccMemberRules.MemberID = ccMembers.ID) ON ccGroups.ID = ccMemberRules.GroupID" _
-                    & " WHERE (((ccEmailGroups.EmailID)=" & EncodeSQLNumber(EmailID) & ") AND (ccEmailGroups.Active<>0) AND (ccGroups.Active<>0) AND (ccGroups.AllowBulkEmail<>0) AND (ccMemberRules.Active<>0) AND (ccMembers.Active<>0) AND ((ccMembers.AllowBulkEmail)<>0))AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & EncodeSQLDate(Now()) & "))" _
-                    & " GROUP BY ccMembers.ID, ccMembers.Name, ccMembers.Email" _
-                    & " HAVING (((ccMembers.Email) Is Not Null) and ((ccMembers.Email)<>" & EncodeSQLText("") & "))" _
-                    & " ORDER BY ccMembers.Email,ccMembers.ID"
+                getGroupEmailSQL = "SELECT " _
+                    & " u.ID AS ID" _
+                    & " ,u.Name AS Name" _
+                    & " ,u.Email AS Email " _
+                    & " " _
+                    & " from " _
+                    & " (((ccMembers u" _
+                    & " left join ccMemberRules mr on mr.memberid=u.id)" _
+                    & " left join ccGroups g on g.id=mr.groupid)" _
+                    & " left join ccEmailGroups r on r.groupid=g.id)" _
+                    & " " _
+                    & " where " _
+                    & " (r.EmailID=1) " _
+                    & " and(r.Active<>0) " _
+                    & " and(g.Active<>0) " _
+                    & " and(g.AllowBulkEmail<>0) " _
+                    & " and(mr.Active<>0) " _
+                    & " and(u.Active<>0) " _
+                    & " and(u.AllowBulkEmail<>0)" _
+                    & " AND((mr.DateExpires is null)OR(mr.DateExpires>'20161205 22:40:58:184')) " _
+                    & " " _
+                    & " group by " _
+                    & " u.ID, u.Name, u.Email " _
+                    & " " _
+                    & " having ((u.Email Is Not Null) and(u.Email<>'')) " _
+                    & " " _
+                    & " order by u.Email,u.ID" _
+                    & " "
+                'csv_getGroupEmailSQL = "SELECT ccMembers.ID AS ID, ccMembers.Name AS Name, ccMembers.Email AS Email" _
+                '    & " FROM (ccEmailGroups LEFT JOIN ccGroups ON ccEmailGroups.GroupID = ccGroups.ID) LEFT JOIN (ccMemberRules LEFT JOIN ccMembers ON ccMemberRules.MemberID = ccMembers.ID) ON ccGroups.ID = ccMemberRules.GroupID" _
+                '    & " WHERE (((ccEmailGroups.EmailID)=" & EncodeSQLNumber(EmailID) & ") AND (ccEmailGroups.Active<>0) AND (ccGroups.Active<>0) AND (ccGroups.AllowBulkEmail<>0) AND (ccMemberRules.Active<>0) AND (ccMembers.Active<>0) AND ((ccMembers.AllowBulkEmail)<>0))AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & EncodeSQLDate(Now()) & "))" _
+                '    & " GROUP BY ccMembers.ID, ccMembers.Name, ccMembers.Email" _
+                '    & " HAVING (((ccMembers.Email) Is Not Null) and ((ccMembers.Email)<>" & EncodeSQLText("") & "))" _
+                '    & " ORDER BY ccMembers.Email,ccMembers.ID"
             End If
             Exit Function
             '
@@ -11830,9 +11873,9 @@ ErrorTrap:
                         If EmailToAddress = "" Then
                             EmailStatusMessage = EmailStatusMessage & "&nbsp;&nbsp;Error: Not Sent to " & EmailToName & " (people #" & EMailToMemberID & ") because their email address was blank." & BR
                         Else
-                            EmailStatus = csv_SendMemberEmail3(iAdditionalMemberID, EmailFrom, EmailSubjectSource, EmailBodySource, False, True, EmailRecordID, EmailTemplateSource, EmailAllowLinkEID)
+                            EmailStatus = sendMemberEmail3(iAdditionalMemberID, EmailFrom, EmailSubjectSource, EmailBodySource, False, True, EmailRecordID, EmailTemplateSource, EmailAllowLinkEID)
                             If EmailStatus = "" Then
-                                EmailStatus = "OK"
+                                EmailStatus = "ok"
                             End If
                             EmailStatusMessage = EmailStatusMessage & "&nbsp;&nbsp;Sent to " & EmailToName & " at " & EmailToAddress & ", Status = " & EmailStatus & BR
                         End If
@@ -11843,7 +11886,7 @@ ErrorTrap:
                 ' --- Send message to everyone selected
                 '
                 EmailStatusMessage = EmailStatusMessage & BR & "Recipients in selected System Email groups:" & BR
-                SQL = csv_getGroupEmailSQL(False, EmailRecordID)
+                SQL = getGroupEmailSQL(False, EmailRecordID)
                 CSPeople = app.db_openCsSql_rev("default", SQL)
                 Do While app.db_csOk(CSPeople)
                     EMailToMemberID = app.db_GetCSInteger(CSPeople, "ID")
@@ -11852,9 +11895,9 @@ ErrorTrap:
                     If EmailToAddress = "" Then
                         EmailStatusMessage = EmailStatusMessage & "&nbsp;&nbsp;Not Sent to " & EmailToName & ", people #" & EMailToMemberID & " because their email address was blank." & BR
                     Else
-                        EmailStatus = csv_SendMemberEmail3(EMailToMemberID, EmailFrom, EmailSubjectSource, EmailBodySource, False, True, EmailRecordID, EmailTemplateSource, EmailAllowLinkEID)
+                        EmailStatus = sendMemberEmail3(EMailToMemberID, EmailFrom, EmailSubjectSource, EmailBodySource, False, True, EmailRecordID, EmailTemplateSource, EmailAllowLinkEID)
                         If EmailStatus = "" Then
-                            EmailStatus = "OK"
+                            EmailStatus = "ok"
                         End If
                         EmailStatusMessage = EmailStatusMessage & "&nbsp;&nbsp;Sent to " & EmailToName & " at " & EmailToAddress & ", Status = " & EmailStatus & BR
                         Call app.db_csGoNext(CSPeople)
@@ -11912,7 +11955,7 @@ ErrorTrap:
                         ConfirmBody = ConfirmBody & "--- end of list ---" & BR
                         ConfirmBody = ConfirmBody & "</div>"
                         '
-                        EmailStatus = csv_SendMemberEmail3(EmailToConfirmationMemberID, EmailFrom, "System Email confirmation from " & app.config.domainList(0), ConfirmBody, False, True, EmailRecordID, "", False)
+                        EmailStatus = sendMemberEmail3(EmailToConfirmationMemberID, EmailFrom, "System Email confirmation from " & app.config.domainList(0), ConfirmBody, False, True, EmailRecordID, "", False)
                         If isAdmin And (EmailStatus <> "") Then
                             returnString = "Administrator: There was a problem sending the confirmation email, " & EmailStatus
                         End If
@@ -15277,7 +15320,7 @@ ErrorTrap:
                     NoteCopy = NoteCopy & Copy & BR
                     Call app.db_csClose(CS)
                     '
-                    Call csv_SendMemberEmail3(iToMemberID, NoteFromEmail, "Feedback Form Submitted", NoteCopy, False, True, 0, "", False)
+                    Call sendMemberEmail3(iToMemberID, NoteFromEmail, "Feedback Form Submitted", NoteCopy, False, True, 0, "", False)
                     '
                     ' ----- Note sent, say thanks
                     '
@@ -20304,29 +20347,29 @@ ErrorTrap:
             Call handleLegacyError18(MethodName)
             '
         End Sub
-        '
-        '=============================================================================
-        ' Create a content definition
-        '=============================================================================
-        '
-        Public Sub main_CreateContent(ByVal DataSourceName As String, ByVal TableName As Object, ByVal ContentName As String)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("CreateContent")
-            '
-            'If Not (true) Then Exit Sub
-            Dim MethodName As String
-            '
-            MethodName = "main_CreateContent"
-            '
-            Call csv_CreateContent4(True, EncodeText(DataSourceName), EncodeText(TableName), EncodeText(ContentName))
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18(MethodName)
-            '
+        '        '
+        '        '=============================================================================
+        '        ' Create a content definition
+        '        '=============================================================================
+        '        '
+        '        Public Sub main_CreateContent(ByVal DataSourceName As String, ByVal TableName As Object, ByVal ContentName As String)
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("CreateContent")
+        '            '
+        '            'If Not (true) Then Exit Sub
+        '            Dim MethodName As String
+        '            '
+        '            MethodName = "main_CreateContent"
+        '            '
+        '            Call csv_CreateContent4(True, EncodeText(DataSourceName), EncodeText(TableName), EncodeText(ContentName))
+        '            Exit Sub
+        '            '
+        '            ' ----- Error Trap
+        '            '
+        'ErrorTrap:
+        '            Call handleLegacyError18(MethodName)
+        '            '
 
-        End Sub
+        '        End Sub
         '        '
         '        '=============================================================================
         '        ' Create a content definition field
@@ -24812,7 +24855,7 @@ ErrorTrap:
             '
             MethodName = "IsWithinContent"
             '
-            main_IsWithinContent = app.metaData.isChildContent(EncodeInteger(ChildContentID), EncodeInteger(ParentContentID))
+            main_IsWithinContent = app.metaData.isWithinContent(EncodeInteger(ChildContentID), EncodeInteger(ParentContentID))
             Exit Function
             '
             ' ----- Error Trap
@@ -40468,228 +40511,236 @@ ErrorTrap:
 ErrorTrap:
             Call handleLegacyError18("main_encodeCookieName")
         End Function
+        ''
+        ''========================================================================
+        ''   legacy
+        ''========================================================================
+        ''
+        'Public Function main_SendMemberEmail(ByVal ToMemberID As Integer, ByVal From As String, ByVal subject As String, ByVal Body As String, ByVal Immediate As Boolean, ByVal HTML As Boolean) As String
+        '    main_SendMemberEmail = main_SendMemberEmail2(ToMemberID, From, subject, Body, Immediate, HTML, 0, "", False)
+        'End Function
+        '        '
+        '        '========================================================================
+        '        '   main_SendMemberEmail2( ToMemberID, From, Subject, Body, Immediate, HTML, emailIdForLog ) As String
+        '        '       Returns "" if send is OK, otherwise it returns an error message
+        '        '========================================================================
+        '        '
+        '        Public Function main_SendMemberEmail2(ByVal ToMemberID As Integer, ByVal From As String, ByVal subject As String, ByVal Body As String, ByVal Immediate As Boolean, ByVal HTML As Boolean, ByVal emailIdForLog As Integer, template As String, emailAllowLinkEID As Boolean) As String
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SendMemberEmail2")
+        '            '
+        '            'If Not (true) Then Exit Function
+        '            '
+        '            main_SendMemberEmail2 = csv_SendMemberEmail3(EncodeInteger(ToMemberID), EncodeText(From), EncodeText(subject), EncodeText(Body), EncodeBoolean(Immediate), EncodeBoolean(HTML), emailIdForLog, "", False)
+        '            '
+        '            Exit Function
+        '            '
+        'ErrorTrap:
+        '            Call handleLegacyError18("main_SendMemberEmail2")
+        '        End Function
+        ''
+        ''========================================================================
+        ''   Legacy
+        ''========================================================================
+        ''
+        'Public Function main_SendMemberEmail_Fast(ByVal ToMemberID As Integer, ByVal From As String, ByVal subject As String, ByVal Body As String, ByVal Immediate As Boolean, ByVal HTML As Boolean) As String
+        '    main_SendMemberEmail_Fast = csv_SendMemberEmail3(ToMemberID, From, subject, Body, Immediate, HTML, 0, "", False)
+        'End Function
         '
         '========================================================================
-        '   legacy
-        '========================================================================
-        '
-        Public Function main_SendMemberEmail(ByVal ToMemberID As Integer, ByVal From As String, ByVal subject As String, ByVal Body As String, ByVal Immediate As Boolean, ByVal HTML As Boolean) As String
-            main_SendMemberEmail = main_SendMemberEmail2(ToMemberID, From, subject, Body, Immediate, HTML, 0)
-        End Function
-        '
-        '========================================================================
-        '   main_SendMemberEmail2( ToMemberID, From, Subject, Body, Immediate, HTML, emailIdForLog ) As String
-        '       Returns "" if send is OK, otherwise it returns an error message
-        '========================================================================
-        '
-        Public Function main_SendMemberEmail2(ByVal ToMemberID As Integer, ByVal From As String, ByVal subject As String, ByVal Body As String, ByVal Immediate As Boolean, ByVal HTML As Boolean, Optional ByVal emailIdForLog As Integer = 0) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SendMemberEmail2")
-            '
-            'If Not (true) Then Exit Function
-            '
-            main_SendMemberEmail2 = csv_SendMemberEmail3(EncodeInteger(ToMemberID), EncodeText(From), EncodeText(subject), EncodeText(Body), EncodeBoolean(Immediate), EncodeBoolean(HTML), emailIdForLog, "", False)
-            '
-            Exit Function
-            '
-ErrorTrap:
-            Call handleLegacyError18("main_SendMemberEmail2")
-        End Function
-        '
-        '========================================================================
-        '   Legacy
-        '========================================================================
-        '
-        Public Function main_SendMemberEmail_Fast(ByVal ToMemberID As Integer, ByVal From As String, ByVal subject As String, ByVal Body As String, ByVal Immediate As Boolean, ByVal HTML As Boolean) As String
-            main_SendMemberEmail_Fast = csv_SendMemberEmail3(ToMemberID, From, subject, Body, Immediate, HTML, 0, "", False)
-        End Function
-        '
-        '========================================================================
-        '   main_SendEmail()
-        '
-        '   Sends non-encoded email. It is not encoded because we can not determine personalization
-        '   without the memberID. To encode, use main_SendMemberEmail.
-        '========================================================================
-        '
+        ''' <summary>
+        ''' Send Email to address
+        ''' </summary>
+        ''' <param name="ToAddress"></param>
+        ''' <param name="FromAddress"></param>
+        ''' <param name="SubjectMessage"></param>
+        ''' <param name="BodyMessage"></param>
+        ''' <param name="optionalEmailIdForLog"></param>
+        ''' <param name="Immediate"></param>
+        ''' <param name="HTML"></param>
+        ''' <returns>Returns OK if successful, otherwise returns user status</returns>
         Public Function main_SendEmail(ByVal ToAddress As String, ByVal FromAddress As String, ByVal SubjectMessage As String, ByVal BodyMessage As String, Optional ByVal optionalEmailIdForLog As Integer = 0, Optional ByVal Immediate As Boolean = True, Optional ByVal HTML As Boolean = False) As String
-            If True Then
-                main_SendEmail = sendEmail3(EncodeText(ToAddress), EncodeText(FromAddress), EncodeText(SubjectMessage), EncodeText(BodyMessage), "", "", "", Immediate, EncodeBoolean(HTML), EncodeInteger(optionalEmailIdForLog))
-            End If
+            Dim returnStatus As String = ""
+            Try
+                returnStatus = sendEmail3(EncodeText(ToAddress), EncodeText(FromAddress), EncodeText(SubjectMessage), EncodeText(BodyMessage), "", "", "", Immediate, EncodeBoolean(HTML), EncodeInteger(optionalEmailIdForLog))
+            Catch ex As Exception
+                handleException(ex)
+            End Try
+            Return returnStatus
         End Function
         '
-        '
-        '
-        Public Sub main_SendEmailConfirmation(ByVal EmailID As Integer, ByVal ConfirmationMemberID As Integer)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("main_SendEmailConfirmation")
-            '
-            Dim ConfirmFooter As String
-            Dim TotalCnt As Integer
-            Dim BlankCnt As Integer
-            Dim DupCnt As Integer
-            Dim DupList As String
-            Dim BadCnt As Integer
-            Dim BadList As String
+        '====================================================================================================
+        ''' <summary>
+        ''' send the confirmation email as a test
+        ''' </summary>
+        ''' <param name="EmailID"></param>
+        ''' <param name="ConfirmationMemberID"></param>
+        Public Sub sendEmailConfirmationTest(ByVal EmailID As Integer, ByVal ConfirmationMemberID As Integer)
+            Try
+                Dim ConfirmFooter As String
+                Dim TotalCnt As Integer
+                Dim BlankCnt As Integer
+                Dim DupCnt As Integer
+                Dim DupList As String
+                Dim BadCnt As Integer
+                Dim BadList As String
 
-            Dim EmailLen As Integer
-            Dim Pos As Integer
+                Dim EmailLen As Integer
+                Dim Pos As Integer
 
-            Dim LastEmail As String
-            Dim Email As String
-            Dim LastDupEmail As String
-            Dim EmailLine As String
-            Dim TotalList As String
-            Dim EMailName As String
-            Dim EmailMemberID As Integer
-            Dim Posat As Integer
-            Dim PosDot As Integer
-            Dim CS As Integer
-            Dim EmailSubject As String
-            Dim EmailBody As String
-            Dim EmailTemplate As String
-            Dim EMailTemplateID As Integer
-            Dim CSTemplate As Integer
-            Dim SpamFooter As String
-            Dim CSPeople As Integer
-            Dim SQL As String
-            Dim EmailStatus As String
-            Dim emailstyles As String
-            Dim layoutError As String
-            '
-            CS = main_OpenCSContentRecord("email", EmailID)
-            If Not app.db_csOk(CS) Then
-                Call main_AddUserError("There was a problem sending the email confirmation. The email record could not be found.")
-            Else
-                EmailSubject = app.db_GetCS(CS, "Subject")
-                EmailBody = app.db_GetCS(CS, "copyFilename")
+                Dim LastEmail As String
+                Dim Email As String
+                Dim LastDupEmail As String
+                Dim EmailLine As String
+                Dim TotalList As String
+                Dim EMailName As String
+                Dim EmailMemberID As Integer
+                Dim Posat As Integer
+                Dim PosDot As Integer
+                Dim CS As Integer
+                Dim EmailSubject As String
+                Dim EmailBody As String
+                Dim EmailTemplate As String
+                Dim EMailTemplateID As Integer
+                Dim CSTemplate As Integer
+                Dim SpamFooter As String
+                Dim CSPeople As Integer
+                Dim SQL As String
+                Dim EmailStatus As String
+                Dim emailstyles As String
+                Dim layoutError As String
                 '
-                ' merge in template
-                '
-                EmailTemplate = ""
-                EMailTemplateID = app.db_GetCSInteger(CS, "EmailTemplateID")
-                If EMailTemplateID <> 0 Then
-                    CSTemplate = main_OpenCSContentRecord("Email Templates", EMailTemplateID, , , "BodyHTML")
-                    If app.db_csOk(CSTemplate) Then
-                        EmailTemplate = app.db_GetCS(CSTemplate, "BodyHTML")
-                    End If
-                    Call app.db_csClose(CSTemplate)
-                End If
-                '
-                ' styles
-                '
-                emailstyles = csv_getEmailStyles(EmailID)
-                EmailBody = emailstyles & EmailBody
-                '
-                ' spam footer
-                '
-                If app.db_GetCSBoolean(CS, "AllowSpamFooter") Then
-                    '
-                    ' This field is default true, and non-authorable
-                    ' It will be true in all cases, except a possible unforseen exception
-                    '
-                    EmailBody = EmailBody & "<div style=""clear:both;padding:10px;"">" & main_GetLinkedText("<a href=""" & EncodeHTML(main_ServerProtocol & requestDomain & app.RootPath & app.siteProperty_ServerPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", app.siteProperty_getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
-                    EmailBody = Replace(EmailBody, "#member_email#", "UserEmailAddress")
-                End If
-                '
-                ' Confirm footer
-                '
-                SQL = main_GetGroupEmailSQL(False, EmailID)
-                'SQL = main_GetGroupEmailSQL(main_GetCSBoolean(CS, "ToAll"), EmailID)
-                CSPeople = app.db_csOpenSql(SQL)
-                If Not app.db_csOk(CSPeople) Then
-                    main_AddUserError("There are no valid recipients of this email, other than the confirmation address. Either no groups or topics were selected, or those selections contain no people with both a valid email addresses and 'Allow Group Email' enabled.")
+                CS = main_OpenCSContentRecord("email", EmailID)
+                If Not app.db_csOk(CS) Then
+                    Call main_AddUserError("There was a problem sending the email confirmation. The email record could not be found.")
                 Else
-                    'TotalList = TotalList & "--- all recipients ---" & BR
-                    LastEmail = "empty"
-                    Do While app.db_csOk(CSPeople)
-                        Email = app.db_GetCS(CSPeople, "email")
-                        EMailName = app.db_GetCS(CSPeople, "name")
-                        EmailMemberID = app.db_GetCSInteger(CSPeople, "ID")
-                        If EMailName = "" Then
-                            EMailName = "no name (member id " & EmailMemberID & ")"
+                    EmailSubject = app.db_GetCS(CS, "Subject")
+                    EmailBody = app.db_GetCS(CS, "copyFilename")
+                    '
+                    ' merge in template
+                    '
+                    EmailTemplate = ""
+                    EMailTemplateID = app.db_GetCSInteger(CS, "EmailTemplateID")
+                    If EMailTemplateID <> 0 Then
+                        CSTemplate = main_OpenCSContentRecord("Email Templates", EMailTemplateID, , , "BodyHTML")
+                        If app.db_csOk(CSTemplate) Then
+                            EmailTemplate = app.db_GetCS(CSTemplate, "BodyHTML")
                         End If
-                        EmailLine = Email & " for " & EMailName
-                        If Email = "" Then
-                            BlankCnt = BlankCnt + 1
-                        Else
-                            If Email = LastEmail Then
-                                DupCnt = DupCnt + 1
-                                If Email <> LastDupEmail Then
-                                    DupList = DupList & "<div class=i>" & Email & "</div>" & BR
-                                    LastDupEmail = Email
+                        Call app.db_csClose(CSTemplate)
+                    End If
+                    '
+                    ' styles
+                    '
+                    emailstyles = csv_getEmailStyles(EmailID)
+                    EmailBody = emailstyles & EmailBody
+                    '
+                    ' spam footer
+                    '
+                    If app.db_GetCSBoolean(CS, "AllowSpamFooter") Then
+                        '
+                        ' This field is default true, and non-authorable
+                        ' It will be true in all cases, except a possible unforseen exception
+                        '
+                        EmailBody = EmailBody & "<div style=""clear:both;padding:10px;"">" & main_GetLinkedText("<a href=""" & EncodeHTML(main_ServerProtocol & requestDomain & app.RootPath & app.siteProperty_ServerPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", app.siteProperty_getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
+                        EmailBody = Replace(EmailBody, "#member_email#", "UserEmailAddress")
+                    End If
+                    '
+                    ' Confirm footer
+                    '
+                    SQL = main_GetGroupEmailSQL(False, EmailID)
+                    'SQL = main_GetGroupEmailSQL(main_GetCSBoolean(CS, "ToAll"), EmailID)
+                    CSPeople = app.db_csOpenSql(SQL)
+                    If Not app.db_csOk(CSPeople) Then
+                        main_AddUserError("There are no valid recipients of this email, other than the confirmation address. Either no groups or topics were selected, or those selections contain no people with both a valid email addresses and 'Allow Group Email' enabled.")
+                    Else
+                        'TotalList = TotalList & "--- all recipients ---" & BR
+                        LastEmail = "empty"
+                        Do While app.db_csOk(CSPeople)
+                            Email = app.db_GetCS(CSPeople, "email")
+                            EMailName = app.db_GetCS(CSPeople, "name")
+                            EmailMemberID = app.db_GetCSInteger(CSPeople, "ID")
+                            If EMailName = "" Then
+                                EMailName = "no name (member id " & EmailMemberID & ")"
+                            End If
+                            EmailLine = Email & " for " & EMailName
+                            If Email = "" Then
+                                BlankCnt = BlankCnt + 1
+                            Else
+                                If Email = LastEmail Then
+                                    DupCnt = DupCnt + 1
+                                    If Email <> LastDupEmail Then
+                                        DupList = DupList & "<div class=i>" & Email & "</div>" & BR
+                                        LastDupEmail = Email
+                                    End If
                                 End If
                             End If
+                            EmailLen = Len(Email)
+                            Posat = InStr(1, Email, "@")
+                            PosDot = InStrRev(Email, ".")
+                            If EmailLen < 6 Then
+                                BadCnt = BadCnt + 1
+                                BadList = BadList & EmailLine & BR
+                            ElseIf (Posat < 2) Or (Posat > (EmailLen - 4)) Then
+                                BadCnt = BadCnt + 1
+                                BadList = BadList & EmailLine & BR
+                            ElseIf (PosDot < 4) Or (PosDot > (EmailLen - 2)) Then
+                                BadCnt = BadCnt + 1
+                                BadList = BadList & EmailLine & BR
+                            End If
+                            TotalList = TotalList & EmailLine & BR
+                            LastEmail = Email
+                            TotalCnt = TotalCnt + 1
+                            Call app.db_csGoNext(CSPeople)
+                        Loop
+                        'TotalList = TotalList & "--- end all recipients ---" & BR
+                    End If
+                    Call app.db_csClose(CSPeople)
+                    '
+                    If DupCnt = 1 Then
+                        Call main_AddUserError("There is 1 duplicate email address. See the test email for details.")
+                        ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">WARNING: There is 1 duplicate email address. Only one email will be sent to each address. If the email includes personalization, or if you are using link authentication to automatically log in the user, you may want to correct duplicates to be sure the email is created correctly.<div style=""margin:20px;"">" & DupList & "</div></div>"
+                    ElseIf DupCnt > 1 Then
+                        Call main_AddUserError("There are " & DupCnt & " duplicate email addresses. See the test email for details")
+                        ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">WARNING: There are " & DupCnt & " duplicate email addresses. Only one email will be sent to each address. If the email includes personalization, or if you are using link authentication to automatically log in the user, you may want to correct duplicates to be sure the email is created correctly.<div style=""margin:20px;"">" & DupList & "</div></div>"
+                    End If
+                    '
+                    If BadCnt = 1 Then
+                        Call main_AddUserError("There is 1 invalid email address. See the test email for details.")
+                        ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">WARNING: There is 1 invalid email address<div style=""margin:20px;"">" & BadList & "</div></div>"
+                    ElseIf BadCnt > 1 Then
+                        Call main_AddUserError("There are " & BadCnt & " invalid email addresses. See the test email for details")
+                        ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">WARNING: There are " & BadCnt & " invalid email addresses<div style=""margin:20px;"">" & BadList & "</div></div>"
+                    End If
+                    '
+                    If BlankCnt = 1 Then
+                        Call main_AddUserError("There is 1 blank email address. See the test email for details")
+                        ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">WARNING: There is 1 blank email address.</div>"
+                    ElseIf BlankCnt > 1 Then
+                        Call main_AddUserError("There are " & DupCnt & " blank email addresses. See the test email for details.")
+                        ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">WARNING: There are " & BlankCnt & " blank email addresses.</div>"
+                    End If
+                    '
+                    If TotalCnt = 0 Then
+                        ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">WARNING: There are no recipients for this email.</div>"
+                    ElseIf TotalCnt = 1 Then
+                        ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">There is 1 recipient<div style=""margin:20px;"">" & TotalList & "</div></div>"
+                    Else
+                        ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">There are " & TotalCnt & " recipients<div style=""margin:20px;"">" & TotalList & "</div></div>"
+                    End If
+                    '
+                    If ConfirmationMemberID = 0 Then
+                        main_AddUserError("No confirmation email was send because a Confirmation member is not selected")
+                    Else
+                        EmailBody = EmailBody & "<div style=""clear:both;padding:10px;margin:10px;border:1px dashed #888;"">Administrator<br><br>" & ConfirmFooter & "</div>"
+                        EmailStatus = sendMemberEmail3(ConfirmationMemberID, main_GetCSText(CS, "FromAddress"), EmailSubject, EmailBody, True, True, EmailID, EmailTemplate, False)
+                        If EmailStatus <> "ok" Then
+                            main_AddUserError(EmailStatus)
                         End If
-                        EmailLen = Len(Email)
-                        Posat = InStr(1, Email, "@")
-                        PosDot = InStrRev(Email, ".")
-                        If EmailLen < 6 Then
-                            BadCnt = BadCnt + 1
-                            BadList = BadList & EmailLine & BR
-                        ElseIf (Posat < 2) Or (Posat > (EmailLen - 4)) Then
-                            BadCnt = BadCnt + 1
-                            BadList = BadList & EmailLine & BR
-                        ElseIf (PosDot < 4) Or (PosDot > (EmailLen - 2)) Then
-                            BadCnt = BadCnt + 1
-                            BadList = BadList & EmailLine & BR
-                        End If
-                        TotalList = TotalList & EmailLine & BR
-                        LastEmail = Email
-                        TotalCnt = TotalCnt + 1
-                        Call app.db_csGoNext(CSPeople)
-                    Loop
-                    'TotalList = TotalList & "--- end all recipients ---" & BR
-                End If
-                Call app.db_csClose(CSPeople)
-                '
-                If DupCnt = 1 Then
-                    Call main_AddUserError("There is 1 duplicate email address. See the test email for details.")
-                    ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">WARNING: There is 1 duplicate email address. Only one email will be sent to each address. If the email includes personalization, or if you are using link authentication to automatically log in the user, you may want to correct duplicates to be sure the email is created correctly.<div style=""margin:20px;"">" & DupList & "</div></div>"
-                ElseIf DupCnt > 1 Then
-                    Call main_AddUserError("There are " & DupCnt & " duplicate email addresses. See the test email for details")
-                    ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">WARNING: There are " & DupCnt & " duplicate email addresses. Only one email will be sent to each address. If the email includes personalization, or if you are using link authentication to automatically log in the user, you may want to correct duplicates to be sure the email is created correctly.<div style=""margin:20px;"">" & DupList & "</div></div>"
-                End If
-                '
-                If BadCnt = 1 Then
-                    Call main_AddUserError("There is 1 invalid email address. See the test email for details.")
-                    ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">WARNING: There is 1 invalid email address<div style=""margin:20px;"">" & BadList & "</div></div>"
-                ElseIf BadCnt > 1 Then
-                    Call main_AddUserError("There are " & BadCnt & " invalid email addresses. See the test email for details")
-                    ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">WARNING: There are " & BadCnt & " invalid email addresses<div style=""margin:20px;"">" & BadList & "</div></div>"
-                End If
-                '
-                If BlankCnt = 1 Then
-                    Call main_AddUserError("There is 1 blank email address. See the test email for details")
-                    ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">WARNING: There is 1 blank email address.</div>"
-                ElseIf BlankCnt > 1 Then
-                    Call main_AddUserError("There are " & DupCnt & " blank email addresses. See the test email for details.")
-                    ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">WARNING: There are " & BlankCnt & " blank email addresses.</div>"
-                End If
-                '
-                If TotalCnt = 0 Then
-                    ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">WARNING: There are no recipients for this email.</div>"
-                ElseIf TotalCnt = 1 Then
-                    ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">There is 1 recipient<div style=""margin:20px;"">" & TotalList & "</div></div>"
-                Else
-                    ConfirmFooter = ConfirmFooter & "<div style=""clear:all"">There are " & TotalCnt & " recipients<div style=""margin:20px;"">" & TotalList & "</div></div>"
-                End If
-                '
-                If ConfirmationMemberID = 0 Then
-                    main_AddUserError("No confirmation email was send because a Confirmation member is not selected")
-                Else
-                    EmailBody = EmailBody & "<div style=""clear:both;padding:10px;margin:10px;border:1px dashed #888;"">Administrator<br><br>" & ConfirmFooter & "</div>"
-                    EmailStatus = csv_SendMemberEmail3(ConfirmationMemberID, main_GetCSText(CS, "FromAddress"), EmailSubject, EmailBody, True, True, EmailID, EmailTemplate, False)
-                    If EmailStatus <> "" Then
-                        main_AddUserError(EmailStatus)
                     End If
                 End If
-            End If
-            Call app.db_csClose(CS)
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18("main_SendEmailConfirmation")
+                Call app.db_csClose(CS)
+            Catch ex As Exception
+                handleException(ex)
+            End Try
         End Sub
         '
         '========================================================================
@@ -40837,7 +40888,7 @@ ErrorTrap:
 
                     ' send
                     '
-                    Call csv_SendMemberEmail3(ToMemberID, iFromAddress, iSubject, iBody, iImmediate, iHTML, 0, "", False)
+                    Call sendMemberEmail3(ToMemberID, iFromAddress, iSubject, iBody, iImmediate, iHTML, 0, "", False)
                     Call app.db_csGoNext(CSPointer)
                 Loop
             End If
@@ -40872,7 +40923,7 @@ ErrorTrap:
         '========================================================================
         '
         Friend Function main_GetGroupEmailSQL(ByVal ignore_ToAll As Boolean, ByVal EmailID As Integer) As String
-            main_GetGroupEmailSQL = csv_getGroupEmailSQL(False, EmailID)
+            main_GetGroupEmailSQL = getGroupEmailSQL(False, EmailID)
             Exit Function
         End Function
         '
@@ -48544,7 +48595,7 @@ ErrorTrap:
                                 Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Authenticated", CStr(visit_isAuthenticated), True)
                                 Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Referrer", main_VisitReferer, False)
                                 Body = Body & kmaEndTable
-                                Call main_SendMemberEmail2(contactMemberID, app.siteProperty_getText("EmailFromAddress", "info@" & main_ServerDomain), "Page Hit Notification", Body, False, True, 0)
+                                Call sendMemberEmail3(contactMemberID, app.siteProperty_getText("EmailFromAddress", "info@" & main_ServerDomain), "Page Hit Notification", Body, False, True, 0, "", False)
                             End If
                         End If
                         '
@@ -50163,7 +50214,7 @@ ErrorTrap:
                                     '
                                     ' returns OK if the server is alive
                                     '
-                                    returnResult = "OK"
+                                    returnResult = "ok"
                                 Case AjaxOpenIndexFilter
                                     Call main_SetVisitProperty("IndexFilterOpen", "1")
                                 Case AjaxOpenIndexFilterGetContent

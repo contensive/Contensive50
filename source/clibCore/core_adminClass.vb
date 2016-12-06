@@ -1322,7 +1322,7 @@ ErrorTrap:
                                     EmailToConfirmationMemberID = 0
                                     If editRecord.fieldsLc.ContainsKey("testmemberid") Then
                                         EmailToConfirmationMemberID = EncodeInteger(editRecord.fieldsLc.Item("testmemberid").value)
-                                        Call cpCore.main_SendEmailConfirmation(editRecord.id, EmailToConfirmationMemberID)
+                                        Call cpCore.sendEmailConfirmationTest(editRecord.id, EmailToConfirmationMemberID)
                                         '
                                         If editRecord.fieldsLc.ContainsKey("lastsendtestdate") Then
                                             editRecord.fieldsLc.Item("lastsendtestdate").value = cpCore.main_PageStartTime
@@ -5402,7 +5402,7 @@ ErrorTrap:
                 Dim FieldValueNumber As Double
                 Dim FieldValueBoolean As Boolean
                 Dim fieldTypeId As Integer
-                Dim FieldValueVariant As Object
+                Dim FieldValueObject As Object
                 Dim FieldPreferenceHTML As Boolean
                 Dim CSLookup As Integer
                 Dim Delimiter As String
@@ -5489,8 +5489,8 @@ ErrorTrap:
                             FieldName = .nameLc
                             FormFieldLCaseName = LCase(FieldName)
                             fieldTypeId = .fieldTypeId
-                            FieldValueVariant = editRecord.fieldsLc(.nameLc).value
-                            FieldValueText = EncodeText(FieldValueVariant)
+                            FieldValueObject = editRecord.fieldsLc(.nameLc).value
+                            FieldValueText = EncodeText(FieldValueObject)
                             FieldRows = 1
                             FieldOptionRow = "&nbsp;"
                             FieldPreferenceHTML = .htmlContent
@@ -5521,7 +5521,7 @@ ErrorTrap:
                                         '
                                         ' if active, it is read only -- if inactive, let them set it active.
                                         '
-                                        FieldReadOnly = (EncodeBoolean(FieldValueVariant))
+                                        FieldReadOnly = (EncodeBoolean(FieldValueObject))
                                         If FieldReadOnly Then
                                             WhyReadOnlyMsg = "&nbsp;(disabled because you can not mark the landing page inactive)"
                                         End If
@@ -5541,7 +5541,7 @@ ErrorTrap:
                                         WhyReadOnlyMsg = "&nbsp;(disabled for root pages)"
                                     Case "allowinmenus", "allowinchildlists"
                                         FieldValueBoolean = True
-                                        FieldValueVariant = "1"
+                                        FieldValueObject = "1"
                                         FieldReadOnly = True
                                         WhyReadOnlyMsg = "&nbsp;(disabled for root pages)"
                                 End Select
@@ -5552,7 +5552,7 @@ ErrorTrap:
                             If LCase(adminContent.ContentTableName) = "ccemail" And LCase(FieldName) = "allowlinkeid" Then
                                 If Not (cpCore.app.siteProperty_getBoolean("AllowLinkLogin", True)) Then
                                     '.ValueVariant = "0"
-                                    FieldValueVariant = "0"
+                                    FieldValueObject = "0"
                                     FieldReadOnly = True
                                     FieldValueBoolean = False
                                     FieldValueText = "0"
@@ -5716,7 +5716,7 @@ ErrorTrap:
                                             ' ----- Boolean ReadOnly
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueBoolean = EncodeBoolean(FieldValueVariant)
+                                            FieldValueBoolean = EncodeBoolean(FieldValueObject)
                                             EditorString &= (cpCore.main_GetFormInputHidden(FormFieldLCaseName, EncodeText(FieldValueBoolean)))
                                             EditorString &= (cpCore.main_GetFormInputCheckBox2(FormFieldLCaseName, FieldValueBoolean, , True, "checkBox"))
                                             EditorString &= WhyReadOnlyMsg
@@ -5726,7 +5726,7 @@ ErrorTrap:
                                             ' ----- File ReadOnly
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueVariant)
+                                            FieldValueText = EncodeText(FieldValueObject)
                                             NonEncodedLink = cpCore.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.app.config.cdnFilesNetprefix, FieldValueText)
                                             EncodedLink = EncodeURL(NonEncodedLink)
                                             EditorString &= (cpCore.main_GetFormInputHidden(FormFieldLCaseName, ""))
@@ -5742,7 +5742,7 @@ ErrorTrap:
                                             ' ----- Lookup ReadOnly
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueInteger = EncodeInteger(FieldValueVariant)
+                                            FieldValueInteger = EncodeInteger(FieldValueObject)
                                             EditorString &= (cpCore.main_GetFormInputHidden(FormFieldLCaseName, EncodeText(FieldValueInteger)))
                                             'Call s.Add("<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
                                             LookupContentName = ""
@@ -5757,7 +5757,7 @@ ErrorTrap:
                                                     Else
                                                         EditorString &= (cpCore.main_encodeHTML(cpCore.app.db_GetCS(CSLookup, "Name")))
                                                     End If
-                                                    EditorString &= ("&nbsp;[<a TabIndex=-1 href=""?" & RequestNameAdminForm & "=4&cid=" & .lookupContentID & "&id=" & FieldValueVariant.ToString & """ target=""_blank"">View details in new window</a>]")
+                                                    EditorString &= ("&nbsp;[<a TabIndex=-1 href=""?" & RequestNameAdminForm & "=4&cid=" & .lookupContentID & "&id=" & FieldValueObject.ToString & """ target=""_blank"">View details in new window</a>]")
                                                 Else
                                                     EditorString &= ("None")
                                                 End If
@@ -5780,7 +5780,7 @@ ErrorTrap:
                                             ' ----- Member Select ReadOnly
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueInteger = EncodeInteger(FieldValueVariant)
+                                            FieldValueInteger = EncodeInteger(FieldValueObject)
                                             EditorString &= (cpCore.main_GetFormInputHidden(FormFieldLCaseName, EncodeText(FieldValueInteger)))
                                             If FieldValueInteger = 0 Then
                                                 EditorString &= ("None")
@@ -5799,7 +5799,7 @@ ErrorTrap:
                                                 '    End If
                                                 'End If
                                                 'EditorString &=  ("&nbsp;[<a TabIndex=-1 href=""?cid=" & cpCore.main_GetContentID("groups") & """ target=""_blank"">" & SelectMessage & "</a>]")
-                                                EditorString &= ("&nbsp;[<a TabIndex=-1 href=""?af=4&cid=" & cpCore.main_GetContentID("people") & "&id=" & FieldValueVariant.ToString & """ target=""_blank"">View details in new window</a>]")
+                                                EditorString &= ("&nbsp;[<a TabIndex=-1 href=""?af=4&cid=" & cpCore.main_GetContentID("people") & "&id=" & FieldValueObject.ToString & """ target=""_blank"">View details in new window</a>]")
                                             End If
                                             EditorString &= WhyReadOnlyMsg
                                             '
@@ -5807,7 +5807,7 @@ ErrorTrap:
                                             '
                                             '   Placeholder
                                             '
-                                            FieldValueText = EncodeText(FieldValueVariant)
+                                            FieldValueText = EncodeText(FieldValueObject)
                                             MTMContent0 = cpCore.main_GetContentNameByID(.contentId)
                                             MTMContent1 = cpCore.main_GetContentNameByID(.manyToManyContentID)
                                             MTMRuleContent = cpCore.main_GetContentNameByID(.manyToManyRuleContentID)
@@ -5821,7 +5821,7 @@ ErrorTrap:
                                             ' ----- Currency ReadOnly
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueNumber = EncodeNumber(FieldValueVariant)
+                                            FieldValueNumber = EncodeNumber(FieldValueObject)
                                             EditorString &= (cpCore.main_GetFormInputHidden(FormFieldLCaseName, EncodeText(FieldValueNumber)))
                                             EditorString &= (cpCore.main_GetFormInputText2(FormFieldLCaseName, CStr(FieldValueNumber), , , , , True, "text"))
                                             EditorString &= (FormatCurrency(FieldValueNumber))
@@ -5832,13 +5832,12 @@ ErrorTrap:
                                             ' ----- date
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueDate = EncodeDate(FieldValueVariant)
+                                            FieldValueDate = encodeDateMinValue(EncodeDate(FieldValueObject))
                                             If FieldValueDate = Date.MinValue Then
                                                 FieldValueText = ""
                                             Else
                                                 FieldValueText = CStr(FieldValueDate)
                                             End If
-
                                             EditorString &= (cpCore.main_GetFormInputHidden(FormFieldLCaseName, FieldValueText))
                                             EditorString &= (cpCore.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, , , , , True, "date"))
                                             EditorString &= WhyReadOnlyMsg
@@ -5848,7 +5847,7 @@ ErrorTrap:
                                             ' ----- number
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueVariant)
+                                            FieldValueText = EncodeText(FieldValueObject)
                                             EditorString &= (cpCore.main_GetFormInputHidden(FormFieldLCaseName, FieldValueText))
                                             EditorString &= (cpCore.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, , , , , True, "number"))
                                             EditorString &= WhyReadOnlyMsg
@@ -5862,7 +5861,7 @@ ErrorTrap:
                                                 ' edit html as html (see the code)
                                                 '
                                                 return_NewFieldList = return_NewFieldList & "," & FieldName
-                                                FieldValueText = EncodeText(FieldValueVariant)
+                                                FieldValueText = EncodeText(FieldValueObject)
                                                 EditorString &= cpCore.main_GetFormInputHidden(FormFieldLCaseName, FieldValueText)
                                                 EditorStyleModifier = "textexpandable"
                                                 FieldRows = (cpCore.main_GetMemberPropertyInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
@@ -5872,7 +5871,7 @@ ErrorTrap:
                                                 ' edit html as wysiwyg
                                                 '
                                                 return_NewFieldList = return_NewFieldList & "," & FieldName
-                                                FieldValueText = EncodeText(FieldValueVariant)
+                                                FieldValueText = EncodeText(FieldValueObject)
                                                 EditorString &= cpCore.main_GetFormInputHidden(FormFieldLCaseName, FieldValueText)
                                                 '
                                                 EditorStyleModifier = "text"
@@ -5890,7 +5889,7 @@ ErrorTrap:
                                             ' ----- FieldTypeText
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueVariant)
+                                            FieldValueText = EncodeText(FieldValueObject)
                                             EditorString &= cpCore.main_GetFormInputHidden(FormFieldLCaseName, FieldValueText)
                                             If .Password Then
                                                 '
@@ -5908,7 +5907,7 @@ ErrorTrap:
                                             ' ----- LongText, TextFile
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueVariant)
+                                            FieldValueText = EncodeText(FieldValueObject)
                                             EditorString &= cpCore.main_GetFormInputHidden(FormFieldLCaseName, FieldValueText)
                                             EditorStyleModifier = "textexpandable"
                                             FieldRows = (cpCore.main_GetMemberPropertyInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
@@ -5918,7 +5917,7 @@ ErrorTrap:
                                             ' ----- Legacy text type -- not used unless something was missed
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueVariant)
+                                            FieldValueText = EncodeText(FieldValueObject)
                                             EditorString &= cpCore.main_GetFormInputHidden(FormFieldLCaseName, FieldValueText)
                                             If .Password Then
                                                 '
@@ -5974,7 +5973,7 @@ ErrorTrap:
                                             ' ----- Boolean
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueBoolean = EncodeBoolean(FieldValueVariant)
+                                            FieldValueBoolean = EncodeBoolean(FieldValueObject)
                                             's.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
                                             EditorString &= (cpCore.main_GetFormInputCheckBox2(FormFieldLCaseName, FieldValueBoolean, , , "checkBox"))
                                             's.Add( "&nbsp;</span></nobr></td>")
@@ -5984,7 +5983,7 @@ ErrorTrap:
                                             ' ----- File
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueVariant)
+                                            FieldValueText = EncodeText(FieldValueObject)
                                             'Call s.Add("<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
                                             If FieldValueText = "" Then
                                                 EditorString &= (cpCore.main_GetFormInputFile2(FormFieldLCaseName, , "file"))
@@ -6000,7 +5999,7 @@ ErrorTrap:
                                             '
                                             ' ----- Lookup
                                             '
-                                            FieldValueInteger = EncodeInteger(FieldValueVariant)
+                                            FieldValueInteger = EncodeInteger(FieldValueObject)
                                             LookupContentName = ""
                                             If .lookupContentID <> 0 Then
                                                 LookupContentName = EncodeText(cpCore.main_GetContentNameByID(.lookupContentID))
@@ -6015,7 +6014,7 @@ ErrorTrap:
                                                 If FieldValueInteger <> 0 Then
                                                     CSPointer = cpCore.main_OpenCSContentRecord2(LookupContentName, FieldValueInteger, , , "ID")
                                                     If cpCore.app.db_csOk(CSPointer) Then
-                                                        EditorString &= ("&nbsp;[<a TabIndex=-1 href=""?" & RequestNameAdminForm & "=4&cid=" & .lookupContentID & "&id=" & FieldValueVariant.ToString & """ target=""_blank"">Details</a>]")
+                                                        EditorString &= ("&nbsp;[<a TabIndex=-1 href=""?" & RequestNameAdminForm & "=4&cid=" & .lookupContentID & "&id=" & FieldValueObject.ToString & """ target=""_blank"">Details</a>]")
                                                     End If
                                                     Call cpCore.app.db_csClose(CSPointer)
                                                 End If
@@ -6037,7 +6036,7 @@ ErrorTrap:
                                             ' ----- Member Select
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueInteger = EncodeInteger(FieldValueVariant)
+                                            FieldValueInteger = EncodeInteger(FieldValueObject)
                                             's.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
                                             If Not .Required Then
                                                 EditorString &= (cpCore.main_GetFormInputMemberSelect(FormFieldLCaseName, FieldValueInteger, .MemberSelectGroupID, "", "None", "select"))
@@ -6047,7 +6046,7 @@ ErrorTrap:
                                             If FieldValueInteger <> 0 Then
                                                 CSPointer = cpCore.main_OpenCSContentRecord2("people", FieldValueInteger, , , "ID")
                                                 If cpCore.app.db_csOk(CSPointer) Then
-                                                    EditorString &= ("&nbsp;[<a TabIndex=-1 href=""?" & RequestNameAdminForm & "=4&cid=" & cpCore.main_GetContentID("people") & "&id=" & FieldValueVariant.ToString & """ target=""_blank"">Details</a>]")
+                                                    EditorString &= ("&nbsp;[<a TabIndex=-1 href=""?" & RequestNameAdminForm & "=4&cid=" & cpCore.main_GetContentID("people") & "&id=" & FieldValueObject.ToString & """ target=""_blank"">Details</a>]")
                                                 End If
                                                 Call cpCore.app.db_csClose(CSPointer)
                                             End If
@@ -6059,7 +6058,7 @@ ErrorTrap:
                                             '
                                             '   Placeholder
                                             '
-                                            FieldValueText = EncodeText(FieldValueVariant)
+                                            FieldValueText = EncodeText(FieldValueObject)
                                             'Call s.Add("<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
                                             '
                                             MTMContent0 = cpCore.main_GetContentNameByID(.contentId)
@@ -6073,10 +6072,11 @@ ErrorTrap:
                                             ' ----- Date
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeDate(FieldValueVariant).ToString
-                                            's.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
-                                            If (FieldValueText = "12:00:00 AM") Then
+                                            FieldValueDate = encodeDateMinValue(EncodeDate(FieldValueObject))
+                                            If FieldValueDate = Date.MinValue Then
                                                 FieldValueText = ""
+                                            Else
+                                                FieldValueText = CStr(FieldValueDate)
                                             End If
                                             EditorString &= (cpCore.main_GetFormInputDate(FormFieldLCaseName, FieldValueText))
                                             's.Add( "&nbsp;</span></nobr></td>")
@@ -6085,7 +6085,7 @@ ErrorTrap:
                                             ' ----- Others that simply print
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueVariant)
+                                            FieldValueText = EncodeText(FieldValueObject)
                                             's.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal)
                                             If .Password Then
                                                 EditorString &= (cpCore.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, , , , True, False, "password"))
@@ -6107,7 +6107,7 @@ ErrorTrap:
                                             ' ----- Link (href value
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueVariant)
+                                            FieldValueText = EncodeText(FieldValueObject)
                                             EditorString = "" _
                                                 & cpCore.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80, FormFieldLCaseName, , , "link") _
                                                 & "&nbsp;<a href=""#"" onClick=""OpenResourceLinkWindow( '" & FormFieldLCaseName & "' ) ;return false;""><img src=""/ccLib/images/ResourceLink1616.gif"" width=16 height=16 border=0 alt=""Link to a resource"" title=""Link to a resource""></a>" _
@@ -6118,7 +6118,7 @@ ErrorTrap:
                                             ' ----- Resource Link (src value)
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueVariant)
+                                            FieldValueText = EncodeText(FieldValueObject)
                                             EditorString = "" _
                                                 & cpCore.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80, FormFieldLCaseName, , , "resourceLink") _
                                                 & "&nbsp;<a href=""#"" onClick=""OpenResourceLinkWindow( '" & FormFieldLCaseName & "' ) ;return false;""><img src=""/ccLib/images/ResourceLink1616.gif"" width=16 height=16 border=0 alt=""Link to a resource"" title=""Link to a resource""></a>"
@@ -6128,7 +6128,7 @@ ErrorTrap:
                                             ' ----- Text Type
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueVariant)
+                                            FieldValueText = EncodeText(FieldValueObject)
                                             If .Password Then
                                                 '
                                                 ' Password forces simple text box
@@ -6157,7 +6157,7 @@ ErrorTrap:
                                             ' content is html
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueVariant)
+                                            FieldValueText = EncodeText(FieldValueObject)
                                             '
                                             ' 9/7/2012 -- added this to support:
                                             '   html fields types mean they hold html
@@ -6193,7 +6193,7 @@ ErrorTrap:
                                             ' -- Long Text, use text editor
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueVariant)
+                                            FieldValueText = EncodeText(FieldValueObject)
                                             '
                                             EditorStyleModifier = "textexpandable"
                                             FieldRows = (cpCore.main_GetMemberPropertyInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
@@ -6204,7 +6204,7 @@ ErrorTrap:
                                             ' ----- CSS field
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueVariant)
+                                            FieldValueText = EncodeText(FieldValueObject)
                                             EditorStyleModifier = "textexpandable"
                                             FieldRows = (cpCore.main_GetMemberPropertyInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
                                             EditorString = cpCore.main_GetFormInputStyles(FormFieldLCaseName, FieldValueText, , "styles")
@@ -6214,7 +6214,7 @@ ErrorTrap:
                                             ' ----- Javascript field
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueVariant)
+                                            FieldValueText = EncodeText(FieldValueObject)
                                             EditorStyleModifier = "textexpandable"
                                             FieldRows = (cpCore.main_GetMemberPropertyInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
                                             EditorString = cpCore.main_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, FieldRows, , FormFieldLCaseName, False, , "text")
@@ -6224,7 +6224,7 @@ ErrorTrap:
                                             ' ----- xml field
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueVariant)
+                                            FieldValueText = EncodeText(FieldValueObject)
                                             EditorStyleModifier = "textexpandable"
                                             FieldRows = (cpCore.main_GetMemberPropertyInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
                                             EditorString = cpCore.main_GetFormInputTextExpandable2(FormFieldLCaseName, FieldValueText, FieldRows, , FormFieldLCaseName, False, , "text")
@@ -6234,7 +6234,7 @@ ErrorTrap:
                                             ' ----- Legacy text type -- not used unless something was missed
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
-                                            FieldValueText = EncodeText(FieldValueVariant)
+                                            FieldValueText = EncodeText(FieldValueObject)
                                             If .Password Then
                                                 '
                                                 ' Password forces simple text box
@@ -6305,17 +6305,20 @@ ErrorTrap:
                                 '    HelpMsgCustom = HelpCustomCache(HelpPtr)
                                 'End If
                             End If
-                            If Not FieldHelpFound Then
-                                Call getFieldHelpMsgs(adminContent.parentID, .nameLc, HelpMsgDefault, HelpMsgCustom)
-                                CS = cpCore.app.db_csInsertRecord("Content Field Help")
-                                If cpCore.app.db_csOk(CS) Then
-                                    Call cpCore.app.db_setCS(CS, "fieldid", fieldId)
-                                    Call cpCore.app.db_setCS(CS, "name", adminContent.Name & "." & .nameLc)
-                                    Call cpCore.app.db_setCS(CS, "HelpDefault", HelpMsgDefault)
-                                    Call cpCore.app.db_setCS(CS, "HelpCustom", HelpMsgCustom)
-                                End If
-                                Call cpCore.app.db_csClose(CS)
-                            End If
+                            '
+                            ' 12/4/2016 - REFACTOR - this is from the old system. Delete this after we varify it is no longer needed
+                            '
+                            'If Not FieldHelpFound Then
+                            '    Call getFieldHelpMsgs(adminContent.parentID, .nameLc, HelpMsgDefault, HelpMsgCustom)
+                            '    CS = cpCore.app.db_csInsertRecord("Content Field Help")
+                            '    If cpCore.app.db_csOk(CS) Then
+                            '        Call cpCore.app.db_setCS(CS, "fieldid", fieldId)
+                            '        Call cpCore.app.db_setCS(CS, "name", adminContent.Name & "." & .nameLc)
+                            '        Call cpCore.app.db_setCS(CS, "HelpDefault", HelpMsgDefault)
+                            '        Call cpCore.app.db_setCS(CS, "HelpCustom", HelpMsgCustom)
+                            '    End If
+                            '    Call cpCore.app.db_csClose(CS)
+                            'End If
                             If HelpMsgCustom <> "" Then
                                 HelpMsg = HelpMsgCustom
                             Else
@@ -11812,7 +11815,7 @@ ErrorTrap:
                             Cell = Cell & vbCrLf & "</script>"
                             '
                             Cells(RowPointer, 4) = Cell
-                        ElseIf ResultMessage = "OK" Then
+                        ElseIf ResultMessage = "ok" Then
                             Cells(RowPointer, 4) = "<div id=""pending" & RowPointer & """>" & LinkPrefix & cpCore.main_GetCSText(CS, "filename") & LinkSuffix & "</div>"
                         Else
                             Cells(RowPointer, 4) = "<div id=""pending" & RowPointer & """><a href=""javascript:alert('" & EncodeJavascript(ResultMessage) & ";return false');"">error</a></div>"

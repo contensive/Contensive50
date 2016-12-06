@@ -66,7 +66,6 @@ Namespace Contensive.Core
                 Dim AppLogPtr As Integer
                 Dim AppName As String
                 Dim Meg As Double
-                Dim Hint As String
                 Dim LoopCount As Integer
                 Dim errors() As String
                 Dim ErrorCount As Integer
@@ -77,11 +76,8 @@ Namespace Contensive.Core
                 Dim monitorConfig As monitorConfigClass
                 Dim DisplayStatusMethod As Boolean
                 Dim logMessage As String
-                Dim AppNameList As List(Of String)
                 Dim cpApp As CPClass
-                'Dim clusterServices As New clusterServicesClass()
-                ' convert to cluster-level object, then do applicaiton work by enumerating applications and using cp for each app
-                Dim cp As New CPClass(AppName)
+                Dim cp As New CPClass("")
                 '
                 monitorConfig = New monitorConfigClass(cpcore)
                 '

@@ -9,7 +9,7 @@
     </SchemaVersion>
     <ProjectGuid>{18117558-373E-4C4E-94E5-188AE322F575}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <StartupObject>ccCmd.Contensive.Core.cmdModule</StartupObject>
+    <StartupObject>Sub Main</StartupObject>
     <RootNamespace>ccCmd</RootNamespace>
     <AssemblyName>ccCmd</AssemblyName>
     <FileAlignment>512</FileAlignment>

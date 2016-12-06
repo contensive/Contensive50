@@ -192,7 +192,7 @@ Namespace Contensive.Core
         End Function
 
         Public Overrides Function IsChildContent(ByVal ChildContentID As String, ByVal ParentContentID As String) As Boolean 'Inherits CPContentBaseClass.IsChildContent
-            Return cpCore.app.metaData.isChildContent(ChildContentID, ParentContentID)
+            Return cpCore.app.metaData.isWithinContent(ChildContentID, ParentContentID)
         End Function
 
         Public Overrides Function IsWorkflow(ByVal ContentName As String) As Boolean 'Inherits CPContentBaseClass.IsWorkflow

@@ -53,21 +53,53 @@ Namespace Contensive.Core
                 End If
             End Get
         End Property
-
+        '==========================================================================================
+        ''' <summary>
+        ''' Send email to an email address.
+        ''' </summary>
+        ''' <param name="ToAddress"></param>
+        ''' <param name="FromAddress"></param>
+        ''' <param name="Subject"></param>
+        ''' <param name="Body"></param>
+        ''' <param name="SendImmediately"></param>
+        ''' <param name="BodyIsHTML"></param>
         Public Overrides Sub Send(ByVal ToAddress As String, ByVal FromAddress As String, ByVal Subject As String, ByVal Body As String, Optional ByVal SendImmediately As Boolean = True, Optional ByVal BodyIsHTML As Boolean = True)
-            Call cpCore.sendEmail(ToAddress, FromAddress, Subject, Body, "", SendImmediately, BodyIsHTML)
+            Try
+                Call cpCore.sendEmail3(ToAddress, FromAddress, Subject, Body, "", "", "", SendImmediately, BodyIsHTML, 0)
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
         End Sub
-
+        '====================================================================================================
+        ''' <summary>
+        ''' Send submitted form within an email
+        ''' </summary>
+        ''' <param name="ToAddress"></param>
+        ''' <param name="FromAddress"></param>
+        ''' <param name="Subject"></param>
         Public Overrides Sub SendForm(ByVal ToAddress As String, ByVal FromAddress As String, ByVal Subject As String)
-            If True Then
+            Try
                 Call cpCore.main_SendFormEmail(ToAddress, FromAddress, Subject)
-            End If
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
         End Sub
-
+        '====================================================================================================
+        ''' <summary>
+        ''' Send email to a list of groups
+        ''' </summary>
+        ''' <param name="GroupList"></param>
+        ''' <param name="FromAddress"></param>
+        ''' <param name="Subject"></param>
+        ''' <param name="Body"></param>
+        ''' <param name="SendImmediately"></param>
+        ''' <param name="BodyIsHTML"></param>
         Public Overrides Sub SendGroup(ByVal GroupList As String, ByVal FromAddress As String, ByVal Subject As String, ByVal Body As String, Optional ByVal SendImmediately As Boolean = True, Optional ByVal BodyIsHTML As Boolean = True)
-            If True Then
+            Try
                 Call cpCore.main_SendGroupEmail(GroupList, FromAddress, Subject, Body, SendImmediately, BodyIsHTML)
-            End If
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
         End Sub
 
         Public Overrides Sub SendPassword(ByVal UserEmailAddress As String) 'Inherits BaseClasses.CPEmailBaseClass.SendPassword
@@ -84,7 +116,7 @@ Namespace Contensive.Core
             Dim userId As Integer = 0
             If IsNumeric(toUserId) Then
                 userId = CInt(toUserId)
-                Call cpCore.csv_SendMemberEmail3(userId, FromAddress, Subject, Body, SendImmediately, BodyIsHTML, 0, "", False)
+                Call cpCore.sendMemberEmail3(userId, FromAddress, Subject, Body, SendImmediately, BodyIsHTML, 0, "", False)
             End If
         End Sub
         Private Sub appendDebugLog(ByVal copy As String)

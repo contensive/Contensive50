@@ -490,10 +490,16 @@ Namespace Contensive.Core
                     '
                 ElseIf (Not forceDbLoad) And (cdefList.ContainsKey(contentId)) Then
                     '
-                    ' already loaded
+                    ' already loaded and no force re-load, just return the current cdef
                     '
                     returnCdef = cdefList.Item(contentId)
                 Else
+                    If (cdefList.ContainsKey(contentId)) Then
+                        '
+                        ' key is already there, remove it first
+                        '
+                        cdefList.Remove(contentId)
+                    End If
                     '
                     ' load cache version
                     '
@@ -687,14 +693,41 @@ Namespace Contensive.Core
                                 If dt.Rows.Count = 0 Then
                                     '
                                 Else
+                                    Dim usedFields As New List(Of String)
                                     For Each row In dt.Rows
+                                        Dim skipDuplicateField As Boolean = False
                                         fieldName = EncodeText(row.Item(13))
-                                        If Not .fields.ContainsKey(fieldName.ToLower) Then
+                                        fieldId = EncodeInteger(row.Item(12))
+                                        Dim fieldNameLower As String = fieldName.ToLower()
+                                        If usedFields.Contains(fieldNameLower) Then
+                                            '
+                                            ' this is a dup field for this content (not accounting for possibleinherited field) - keep the one with the lowest id
+                                            '
+                                            If .fields(fieldNameLower).id < fieldId Then
+                                                '
+                                                ' this new field has a higher id, skip it
+                                                '
+                                                skipDuplicateField = True
+                                            Else
+                                                '
+                                                ' this new field has a lower id, remove the other one
+                                                '
+                                                .fields.Remove(fieldNameLower)
+                                            End If
+                                        End If
+                                        If Not skipDuplicateField Then
+                                            '
+                                            ' only add the first field found, ordered by id
+                                            '
+                                            If (.fields.ContainsKey(fieldNameLower)) Then
+                                                '
+                                                ' remove inherited field and replace it with field from this table
+                                                '
+                                                .fields.Remove(fieldNameLower)
+                                            End If
                                             field = New CDefFieldClass
-
                                             With field
                                                 Dim fieldIndexColumn As Integer
-                                                fieldId = EncodeInteger(row.Item(12))
                                                 fieldTypeId = EncodeInteger(row.Item(15))
                                                 If (EncodeText(row.Item(4)) = "") Then
                                                     fieldIndexColumn = -1
@@ -747,7 +780,7 @@ Namespace Contensive.Core
                                                 .ManyToManyRuleContentName = ""
                                                 .MemberSelectGroupID = EncodeInteger(row.Item(36))
                                                 .MemberSelectGroupName = ""
-                                                .nameLc = fieldName.ToLower()
+                                                .nameLc = fieldNameLower
                                                 .NotEditable = EncodeBoolean(row.Item(26))
                                                 .Password = EncodeBoolean(row.Item(3))
                                                 .ReadOnly = EncodeBoolean(row.Item(17))
@@ -803,16 +836,16 @@ Namespace Contensive.Core
                                                 End If
                                                 dt.Dispose()
                                             End With
-                                            .fields.Add(fieldName.ToLower, field)
+                                            .fields.Add(fieldNameLower, field)
                                             'REFACTOR
                                             If (contentName.ToLower() = "system email") And (field.nameLc = "sharedstylesid") Then
                                                 contentName = contentName
                                             End If
-                                            If Not ((field.fieldTypeId = FieldTypeIdManyToMany) Or (field.fieldTypeId = FieldTypeIdRedirect)) Then
+                                            If ((field.fieldTypeId <> FieldTypeIdManyToMany) And (field.fieldTypeId <> FieldTypeIdRedirect) And (Not .selectList.Contains(fieldNameLower))) Then
                                                 '
                                                 ' add only fields that can be selected
                                                 '
-                                                .selectList.Add(fieldName.ToLower)
+                                                .selectList.Add(fieldNameLower)
                                             End If
                                         End If
                                     Next
@@ -1528,19 +1561,23 @@ Namespace Contensive.Core
         '       Returns true if ChildContentID is in ParentContentID
         '========================================================================
         '
-        Function isChildContent(ByVal ChildContentID As Integer, ByVal ParentContentID As Integer) As Boolean
+        Function isWithinContent(ByVal ChildContentID As Integer, ByVal ParentContentID As Integer) As Boolean
             Dim returnOK As Boolean = False
             Try
                 Dim cdef As CDefClass
-                cdef = getCdef(ParentContentID)
-                If Not (cdef Is Nothing) Then
-                    If cdef.childIdList.Count > 0 Then
-                        returnOK = cdef.childIdList.Contains(ChildContentID)
-                        If Not returnOK Then
-                            For Each contentId As Integer In cdef.childIdList
-                                returnOK = isChildContent(contentId, ParentContentID)
-                                If returnOK Then Exit For
-                            Next
+                If (ChildContentID = ParentContentID) Then
+                    returnOK = True
+                Else
+                    cdef = getCdef(ParentContentID)
+                    If Not (cdef Is Nothing) Then
+                        If cdef.childIdList.Count > 0 Then
+                            returnOK = cdef.childIdList.Contains(ChildContentID)
+                            If Not returnOK Then
+                                For Each contentId As Integer In cdef.childIdList
+                                    returnOK = isWithinContent(contentId, ParentContentID)
+                                    If returnOK Then Exit For
+                                Next
+                            End If
                         End If
                     End If
                 End If

@@ -1,4 +1,11 @@
-﻿
+﻿Imports System
+Imports System.IO
+Imports System.Reflection
+Imports System.Runtime.InteropServices
+Imports System.Text
+Imports System.Net.Mail
+Imports System.Net.Mime
+Imports System.Net
 Imports Contensive.Core.ccCommonModule
 'Imports Contensive.Core
 'Imports Contensive.Core
@@ -33,8 +40,8 @@ Namespace Contensive.Core
         '   Compatibility
         '========================================================================
         '
-        Public Function Send(ByVal ToAddress As Object, ByVal FromAddress As Object, ByVal SubjectMessage As Object, ByVal BodyMessage As Object, ByVal ResultLogPathPage As Object, ByVal SMTPServer As Object, ByVal Immediate As Boolean, ByVal HTML As Boolean, Optional ByVal EmailOutPath As String = "") As Boolean
-            Send = sendEmail4(
+        Public Function SendEmail4(ByVal ToAddress As Object, ByVal FromAddress As Object, ByVal SubjectMessage As Object, ByVal BodyMessage As Object, ByVal ResultLogPathPage As Object, ByVal SMTPServer As Object, ByVal Immediate As Boolean, ByVal HTML As Boolean, Optional ByVal EmailOutPath As String = "") As Boolean
+            SendEmail4 = sendEmail5(
                   EncodeText(ToAddress) _
                 , EncodeText(FromAddress) _
                 , EncodeText(SubjectMessage) _
@@ -56,35 +63,35 @@ Namespace Contensive.Core
         '   someone wants to know more.
         '========================================================================
         '
-        Public Function sendEmail4(ByVal EmailTo As String, ByVal EmailFrom As String, ByVal EmailSubject As String, ByVal EmailBody As String, ByVal BounceAddress As String, ByVal ReplyToAddress As String, ByVal ResultLogPathPage As String, ByVal EmailSMTPServer As String, ByVal Immediate As Boolean, ByVal HTML As Boolean, ByVal EmailOutPath As String) As String
+        Public Function sendEmail5(ByVal EmailTo As String, ByVal EmailFrom As String, ByVal EmailSubject As String, ByVal EmailBody As String, ByVal BounceAddress As String, ByVal ReplyToAddress As String, ByVal ResultLogPathPage As String, ByVal EmailSMTPServer As String, ByVal Immediate As Boolean, ByVal HTML As Boolean, ByVal EmailOutPath As String) As String
             Try
                 Dim LogLine As String
                 Dim converthtmlToText As converthtmlToTextClass
-                Dim Mailer As SMTP5Class
+                'Dim Mailer As SMTP5Class
                 Dim EmailBodyText As String
                 Dim EmailBodyHTML As String
                 Dim SendResult As String
                 '
                 If Not CheckAddress(EmailTo) Then
-                    sendEmail4 = "The to-address [" & EmailTo & "] is not valid"
+                    sendEmail5 = "The to-address [" & EmailTo & "] is not valid"
                 ElseIf Not CheckAddress(EmailFrom) Then
-                    sendEmail4 = "The from-address [" & EmailFrom & "] is not valid"
+                    sendEmail5 = "The from-address [" & EmailFrom & "] is not valid"
                 ElseIf Not CheckServer(EmailSMTPServer) Then
-                    sendEmail4 = "The email server [" & EmailSMTPServer & "] is not valid"
+                    sendEmail5 = "The email server [" & EmailSMTPServer & "] is not valid"
                 Else
                     If Not Immediate Then
                         '
                         ' ----- Add the email to the queue
                         '
-                        sendEmail4 = addEmailQueue(EmailTo, EmailFrom, EmailSubject, EmailBody, BounceAddress, ReplyToAddress, ResultLogPathPage, EmailSMTPServer, HTML, EmailOutPath)
+                        sendEmail5 = addEmailQueue(EmailTo, EmailFrom, EmailSubject, EmailBody, BounceAddress, ReplyToAddress, ResultLogPathPage, EmailSMTPServer, HTML, EmailOutPath)
                     Else
                         '
                         ' ----- Send the email now
                         '
                         'kma() 'fs = New fileSystemClass
-                        Mailer = New SMTP5Class
-                        Mailer.ReplyToAddress = ReplyToAddress
-                        Mailer.ReturnAddress = BounceAddress
+                        'Mailer = New SMTP5Class
+                        ReplyToAddress = ReplyToAddress
+                        ReturnAddress = BounceAddress
                         If HTML Then
                             '
                             ' ----- send HTML email (and plain text conversion)
@@ -98,23 +105,23 @@ Namespace Contensive.Core
                                 EmailBodyHTML = "<HTML>" & EmailBodyHTML & "</HTML>"
                             End If
                             EmailBodyText = converthtmlToText.convert(EmailBody)
-                            sendEmail4 = Mailer.sendEmail5(EmailSMTPServer, EmailTo, EmailFrom, EmailSubject, EmailBodyText, "", EmailBodyHTML)
-                            converthtmlToText = Nothing
+                            sendEmail5 = sendEmail6(EmailSMTPServer, EmailTo, EmailFrom, EmailSubject, EmailBodyText, "", EmailBodyHTML)
+                            'converthtmlToText = Nothing
                         Else
                             '
                             ' ----- send plain text email
                             '
-                            sendEmail4 = Mailer.sendEmail5(EmailSMTPServer, EmailTo, EmailFrom, EmailSubject, EmailBody, "")
+                            sendEmail5 = sendEmail6(EmailSMTPServer, EmailTo, EmailFrom, EmailSubject, EmailBody, "")
                         End If
-                        Mailer = Nothing
+                        'Mailer = Nothing
                         '
-                        ' ----- clean up the result code for logging (change empty to "OK")
+                        ' ----- clean up the result code for logging (change empty to "ok")
                         '
-                        sendEmail4 = Replace(sendEmail4, vbCrLf, "")
-                        If sendEmail4 = "" Then
-                            SendResult = "OK"
+                        sendEmail5 = Replace(sendEmail5, vbCrLf, "")
+                        If sendEmail5 = "" Then
+                            SendResult = "ok"
                         Else
-                            SendResult = sendEmail4
+                            SendResult = sendEmail5
                         End If
                         '
                         ' ----- Update Email Result Log
@@ -134,7 +141,7 @@ Namespace Contensive.Core
                 cpCore.handleException(ex)
                 'Mailer = Nothing
                 'converthtmlToText = Nothing
-                sendEmail4 = "There was an unexpected error sending the email."
+                sendEmail5 = "There was an unexpected error sending the email."
             End Try
         End Function
         '
@@ -212,7 +219,7 @@ ErrorTrap:
         Public Sub SendEmailQueue(Optional ByVal EmailOutPath As String = "")
             On Error GoTo ErrorTrap
             '
-            Dim SMTP As SMTP5Class
+            'Dim SMTP As SMTP5Class
             Dim HTML As Boolean
             Dim LogFile As Object
             Dim LogFilename As String
@@ -294,7 +301,7 @@ ErrorTrap:
                     '
                     ' Send email
                     '
-                    Call Send(EmailTo, EmailFrom, EmailSubject, EmailBody, ResultLogPathPage, EmailSMTP, True, HTML, EmailOutPath)
+                    Call SendEmail4(EmailTo, EmailFrom, EmailSubject, EmailBody, ResultLogPathPage, EmailSMTP, True, HTML, EmailOutPath)
                 Else
                     '
                     ' Error, log the problem
@@ -398,5 +405,103 @@ ErrorTrap:
             CheckServer = False
             Err.Clear()
         End Function
+        '
+        '
+        '
+        '
+        '
+        Private LocalReturnAddress As String = ""
+        Public Property ReturnAddress As String
+            Get
+                Return LocalReturnAddress
+            End Get
+            Set(ByVal value As String)
+                LocalReturnAddress = value
+            End Set
+        End Property
+        '
+        Private LocalReplyToAddress As String = ""
+        Public Property ReplyToAddress As String
+            Get
+                Return LocalReplyToAddress
+            End Get
+            Set(ByVal value As String)
+                LocalReplyToAddress = value
+            End Set
+        End Property
+        '
+        'Public ReplyToAddress As String
+        '
+        Public Function sendEmail6(ByVal SMTPServer As String, ByVal ToAddress As String, ByVal fromAddress As String, ByVal subject As String, ByVal Body As String, Optional ByVal AttachmentFilename As String = "", Optional ByVal HTMLBody As String = "") As String
+            Dim status As String = ""
+            Try
+                'this is an error
+                Dim client As SmtpClient = New SmtpClient(SMTPServer)
+                Dim mailMessage As MailMessage = New MailMessage()
+                Dim fromAddresses As MailAddress = New MailAddress(fromAddress.Trim())
+                Dim data As Attachment
+                Dim disposition As ContentDisposition
+                Dim mimeType As ContentType
+                Dim alternate As AlternateView
+                '
+                mailMessage.From = fromAddresses
+                mailMessage.To.Add(New MailAddress(ToAddress.Trim()))
+                mailMessage.Subject = subject
+                client.EnableSsl = False
+                client.UseDefaultCredentials = False
+                '
+                If (Body = "") And (HTMLBody <> "") Then
+                    '
+                    ' html only
+                    '
+                    mailMessage.Body = HTMLBody
+                    mailMessage.IsBodyHtml = True
+                ElseIf (Body <> "") And (HTMLBody = "") Then
+                    '
+                    ' text body only
+                    '
+                    mailMessage.Body = Body
+                    mailMessage.IsBodyHtml = False
+                Else
+                    '
+                    ' both html and text
+                    '
+                    mailMessage.Body = Body
+                    mailMessage.IsBodyHtml = False
+                    mimeType = New System.Net.Mime.ContentType("text/html")
+                    alternate = AlternateView.CreateAlternateViewFromString(HTMLBody, mimeType)
+                    mailMessage.AlternateViews.Add(alternate)
+                End If
+                '
+                ' Create  the file attachment for this e-mail message.
+                '
+                If (AttachmentFilename <> "") Then
+                    data = New Attachment(AttachmentFilename, MediaTypeNames.Application.Octet)
+                    disposition = data.ContentDisposition
+                    disposition.CreationDate = System.IO.File.GetCreationTime(AttachmentFilename)
+                    disposition.ModificationDate = System.IO.File.GetLastWriteTime(AttachmentFilename)
+                    disposition.ReadDate = System.IO.File.GetLastAccessTime(AttachmentFilename)
+                    mailMessage.Attachments.Add(data)
+                End If
+                '
+                ' Send the message.
+                '
+                'Add credentials if the SMTP server requires them.
+                'client.Credentials = CredentialCache.DefaultNetworkCredentials;
+                'client.Credentials = basicCredential;
+                '
+                ' if there is an error sending, an exception is thrown
+                '
+                Call client.Send(mailMessage)
+                status = "ok"
+            Catch ex As Exception
+                '
+                '
+                '
+                status = ex.Message
+            End Try
+            Return status
+        End Function        '
+        '
     End Class
 End Namespace

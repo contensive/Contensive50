@@ -12,23 +12,23 @@ Why do this / use this
 ---- it is a layer to abstract basic io to make updating and lifecycle management easier. As technology changes, we integrate at the api layer.
 
 Short Term Goals: 20160930
----- process addons
--------- save to task table with serialized doc properties
--------- create service
------------- task Scheduling pushes on ccTasks, enabled or disabled in serverConfig.json
------------- taskRunner pops and executes, enabled or disabled in serverConfig.json
----- Write "wiki" - that thing -someone- said means you have established software
+/--- process addons
+/------- save to task table with serialized doc properties
+/------- create service
+/----------- task Scheduling pushes on ccTasks, enabled or disabled in serverConfig.json
+/----------- taskRunner pops and executes, enabled or disabled in serverConfig.json
+/--- Write "wiki" - that thing -someone- said means you have established software
 /------- clib.io is the domain
--------- find a sample software project like this that I want to model after (to start, simple clean styles)
--------- write How-To-Get-Started
----- Installations
+/------- find a sample software project like this that I want to model after (to start, simple clean styles)
+/------- write How-To-Get-Started
+/--- Installations
 /-------- nuget package that a developer can add to webproject, develop and push to the appRoot folder to develop any type of ASPX site
 /------------ long term - https://docs.nuget.org/ndocs/create-packages/creating-a-package
 /------------ publishing - https://docs.nuget.org/ndocs/create-packages/publish-a-package
 /------------ quickstart - 
--------- setup install
------------- Installs all software for all server types, etc and clib.exe to manage server configuration
----- configuration
+/------- setup install
+/----------- Installs all software for all server types, etc and clib.exe to manage server configuration
+/--- configuration
 -------- each server (webRole,workerRole,scheduler) is part of one and only one cluster
 -------- each cluster can have one or more apps
 -------- all apps in a cluster trust each other - no work is done to protect files,db,etc. from another
@@ -129,6 +129,7 @@ Long Term Goal: 2017Q1
 ---- integrate nlog nuget package to prevent log saving issues, and provide a standard format.
 
 Long Term Goal: 2017Q2
+---- all work and no play makes Johnny a dull little girl
 ---- convert to c#, then open source, then ms dotnet Core.
 -------- http://www.vbconversions.com/  $199, robust
 -------- http://converter.telerik.com/ free, snippet

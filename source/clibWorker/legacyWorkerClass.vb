@@ -813,17 +813,17 @@ Namespace Contensive
                             '
                             ' Connect
                             '
-                            returnString = "OK" ' & vbCrLf & KernelServices.instanceID
+                            returnString = "ok" ' & vbCrLf & KernelServices.instanceID
                         Case "GETNEXTASYNCCMD"
                             '
                             ' GetNextAsyncCmd -- returns the next command to be executed
                             '
-                            returnString = "OK" & vbCrLf & getNextAsyncCmdFromQueue()
+                            returnString = "ok" & vbCrLf & getNextAsyncCmdFromQueue()
                         Case "GETSERVERCONFIG"
                             '
                             ' GetConnectInfo (must return it if connecion is local)
                             '
-                            returnString = "OK" _
+                            returnString = "ok" _
                                 & vbCrLf & serverListenerPort _
                                 & vbCrLf & "" _
                                 & vbCrLf & AdminUsername _
@@ -854,15 +854,15 @@ Namespace Contensive
                                 End If
                             End If
                             '
-                            returnString = "OK"
+                            returnString = "ok"
                             '
                             ' Status and configuration functions - controller calls
                             '
                             'Case "APPLIST"
-                            '    returnString = "OK" & vbCrLf & Controller.GetApplicationList()
+                            '    returnString = "ok" & vbCrLf & Controller.GetApplicationList()
                             'Case "APPSTATUS"
                             '    AppName = getCommandArgument("appname", queryString)
-                            '    returnString = "OK" & vbCrLf & Controller.GetApplicationStatus(AppName)
+                            '    returnString = "ok" & vbCrLf & Controller.GetApplicationStatus(AppName)
                             'Case "ADDAPP"
                             '    AppName = getCommandArgument("appname", queryString)
                             '    If AppName = "" Then
@@ -871,7 +871,7 @@ Namespace Contensive
                             '        If Not Controller.AddApplication(AppName) Then
                             '            returnString = "ERROR " & ccError_ErrorAddingApp
                             '        Else
-                            '            returnString = "OK"
+                            '            returnString = "ok"
                             '        End If
                             '    End If
                             'Case "DELAPP"
@@ -883,7 +883,7 @@ Namespace Contensive
                             '        If Not Controller.DeleteApplication(AppName) Then
                             '            returnString = "ERROR " & ccError_ErrorDeletingApp
                             '        Else
-                            '            returnString = "OK"
+                            '            returnString = "ok"
                             '        End If
                             '    End If
                             'Case "MODIFYSERVER"
@@ -897,7 +897,7 @@ Namespace Contensive
                             '        AdminPassword = SetPassword
                             '        Call SaveConfig()
                             '        'KernelServices.ConfigModified = True
-                            '        returnString = "OK"
+                            '        returnString = "ok"
                             '    End If
                             'Case "MODIFYAPP"
                             '    AppName = getCommandArgument("appname", queryString)
@@ -916,28 +916,28 @@ Namespace Contensive
                             '                Select Case UCase(Name)
                             '                    Case "NAME"
                             '                        appServices.config.name = Value
-                            '                        returnString = "OK"
+                            '                        returnString = "ok"
                             '                    Case "AUTOSTART"
                             '                        AppServices.AutoStart = EncodeBoolean(Value)
-                            '                        returnString = "OK"
+                            '                        returnString = "ok"
                             '                    Case "CONNECTIONSTRING"
                             '                        AppServices.ConnectionString = Value
-                            '                        returnString = "OK"
+                            '                        returnString = "ok"
                             '                    Case "PHYSICALFILEPATH"
                             '                        AppServices.PhysicalFilePath = Value
-                            '                        returnString = "OK"
+                            '                        returnString = "ok"
                             '                    Case "PHYSICALWWWPATH"
                             '                        AppServices.PhysicalWWWPath = Value
-                            '                        returnString = "OK"
+                            '                        returnString = "ok"
                             '                    Case "DOMAINNAME"
                             '                        appServices.config.domainList(0) = Value
-                            '                        returnString = "OK"
+                            '                        returnString = "ok"
                             '                    Case "ROOTPATH"
                             '                        AppServices.RootPath = Value
-                            '                        returnString = "OK"
+                            '                        returnString = "ok"
                             '                    Case "ALLOWMONITORING"
                             '                        AppServices.AllowMonitoring = EncodeBoolean(Value)
-                            '                        returnString = "OK"
+                            '                        returnString = "ok"
                             '                    Case Else
                             '                        returnString = "ERROR " & ccError_InvalidFieldName
                             '                End Select
@@ -971,7 +971,7 @@ Namespace Contensive
                             '        Next
                             '    End If
                             'End If
-                            'returnString = "OK"
+                            'returnString = "ok"
                             '
                             ' File Copy
                             '
@@ -987,7 +987,7 @@ Namespace Contensive
                                     'fs = New fileSystemClass
                                     'Call cpCore.app.publicFiles.DeleteFile(DstFile)
                                     Call cpCore.app.appRootFiles.copyFile(SrcFile, DstFile)
-                                    returnString = "OK"
+                                    returnString = "ok"
                                 End If
                             End If
                             '
@@ -1001,7 +1001,7 @@ Namespace Contensive
                             Else
                                 'fs = New fileSystemClass
                                 Call cpCore.app.appRootFiles.DeleteFile(File)
-                                returnString = "OK"
+                                returnString = "ok"
                             End If
                             '
                             ' Create Folder
@@ -1013,7 +1013,7 @@ Namespace Contensive
                             Else
                                 'fs = New fileSystemClass
                                 Call cpCore.app.appRootFiles.createPath(FolderPath)
-                                returnString = "OK"
+                                returnString = "ok"
                             End If
                             '
                             ' Delete Folder
@@ -1025,7 +1025,7 @@ Namespace Contensive
                             Else
                                 'fs = New fileSystemClass
                                 Call cpCore.app.appRootFiles.DeleteFileFolder(FolderPath)
-                                returnString = "OK"
+                                returnString = "ok"
                             End If
                             '
                             ' async cmds (run with ccCmd in a new process)
@@ -1079,7 +1079,7 @@ Namespace Contensive
                             If Not addAsyncCmd(cpCore, Cmd, False) Then
                                 returnString = "Command was blocked because there are too many commands waiting, or this is a duplicate command."
                             Else
-                                returnString = "OK"
+                                returnString = "ok"
                             End If
                             '
                             ' Unknown call
