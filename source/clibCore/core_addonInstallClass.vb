@@ -3298,7 +3298,7 @@ ErrorTrap:
                                         '
                                         ' 20161002 - maybe this should be testing for an xmlElemetn, not node
                                         '
-                                        If TypeOf TestObject Is XmlNode Then
+                                        If (TypeOf (TestObject) Is XmlElement) Then
                                             SrcMainNode = DirectCast(TestObject, XmlElement)
                                             If LCase(SrcMainNode.Name) = "addon" Then
                                                 SrcAddonGuid = SrcMainNode.GetAttribute("guid")
