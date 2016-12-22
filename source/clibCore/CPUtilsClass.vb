@@ -1,5 +1,5 @@
 
-Imports cl = Contensive.Core.ccCommonModule
+Imports cl = Contensive.Core.coreCommonModule
 Imports System.Web.Security.FormsAuthentication
 Imports System.Guid
 Imports Contensive.BaseClasses
@@ -55,7 +55,7 @@ Namespace Contensive.Core
         ''' <remarks></remarks>
         Public Overrides Sub Upgrade(isNewApp As Boolean)
             Try
-                Dim builder As New builderClass(CP.core)
+                Dim builder As New coreBuilderClass(CP.core)
                 builder.upgrade(isNewApp)
             Catch ex As Exception
                 CP.core.handleException(ex)

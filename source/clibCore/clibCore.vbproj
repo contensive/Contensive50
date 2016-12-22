@@ -200,21 +200,22 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="core_metaDataClass.vb" />
-    <Compile Include="core_keyPtrCacheClass.vb" />
-    <Compile Include="core_encryptClass.vb" />
-    <Compile Include="core_addonInstallClass.vb" />
-    <Compile Include="core_addonManClass.vb" />
-    <Compile Include="core_adminClass.vb" />
-    <Compile Include="core_adminUIClass.vb" />
-    <Compile Include="core_appServicesClass.vb" />
-    <Compile Include="core_clusterServicesClass.vb" />
-    <Compile Include="core_contentCmdClass.vb" />
-    <Compile Include="core_htmlToolsClass.vb" />
-    <Compile Include="core_legacyStructuredDataClass.vb" />
-    <Compile Include="core_propertyCacheClass.vb" />
-    <Compile Include="core_taskRunnerServiceClass.vb" />
-    <Compile Include="core_taskSchedulerServiceClass.vb" />
+    <Compile Include="coreCacheClass.vb" />
+    <Compile Include="coreWebClass.vb" />
+    <Compile Include="coreMetaDataClass.vb" />
+    <Compile Include="coreCacheKeyPtrClass.vb" />
+    <Compile Include="coreSecurityClass.vb" />
+    <Compile Include="coreAddonInstallClass.vb" />
+    <Compile Include="addon_AddonMngrSafeClass.vb" />
+    <Compile Include="addon_AdminClass.vb" />
+    <Compile Include="coreAdminUIClass.vb" />
+    <Compile Include="coreAppClass.vb" />
+    <Compile Include="coreClusterClass.vb" />
+    <Compile Include="coreContentCmdClass.vb" />
+    <Compile Include="coreHtmlToolsClass.vb" />
+    <Compile Include="corePropertyCacheClass.vb" />
+    <Compile Include="coreTaskRunnerServiceClass.vb" />
+    <Compile Include="coreTaskSchedulerServiceClass.vb" />
     <Compile Include="CPAddonClass.vb" />
     <Compile Include="CPBlockClass.vb" />
     <Compile Include="CPCacheClass.vb" />
@@ -242,27 +243,24 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>DataSet1.xsd</DependentUpon>
     </Compile>
-    <Compile Include="core_cpCoreClass.vb" />
-    <Compile Include="core_commonModule.vb" />
-    <Compile Include="core_dataTreeClass.vb" />
-    <Compile Include="core_keyPtrIndexClass.vb" />
-    <Compile Include="core_fastStringClass.vb" />
-    <Compile Include="core_fileSystemClass.vb" />
-    <Compile Include="core_htmlDecodeClass.vb" />
-    <Compile Include="core_htmlParseClass.vb" />
-    <Compile Include="core_http4Class.vb" />
-    <Compile Include="core_imageClass.vb" />
-    <Compile Include="core_importClass.vb" />
-    <Compile Include="core_ipDaemonClass.vb" />
-    <Compile Include="core_ItemStorageClass.vb" />
-    <Compile Include="core_menuComboTabClass.vb" />
-    <Compile Include="core_menuFlyoutClass.vb" />
-    <Compile Include="core_menuLiveTabClass.vb" />
-    <Compile Include="core_menuTabClass.vb" />
-    <Compile Include="core_menuTreeClass.vb" />
-    <Compile Include="core_runAtServerClass.vb" />
-    <Compile Include="core_builderClass.vb" />
-    <Compile Include="core_smtp5Class.vb" />
+    <Compile Include="coreClass.vb" />
+    <Compile Include="coreCommonModule.vb" />
+    <Compile Include="coreDataTreeClass.vb" />
+    <Compile Include="coreKeyPtrIndexClass.vb" />
+    <Compile Include="coreFastStringClass.vb" />
+    <Compile Include="coreFileSystemClass.vb" />
+    <Compile Include="coreHtmlToTextClass.vb" />
+    <Compile Include="coreHtmlParseClass.vb" />
+    <Compile Include="coreHttpRequestClass.vb" />
+    <Compile Include="coreImageEditClass.vb" />
+    <Compile Include="coreIpDaemonClass.vb" />
+    <Compile Include="coreUploadItemStorageClass.vb" />
+    <Compile Include="coreMenuComboTabClass.vb" />
+    <Compile Include="coreMenuFlyoutClass.vb" />
+    <Compile Include="coreMenuLiveTabClass.vb" />
+    <Compile Include="coreMenuTabClass.vb" />
+    <Compile Include="coreMenuTreeClass.vb" />
+    <Compile Include="coreBuilderClass.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -278,10 +276,10 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="core_smtpHandlerClass.vb" />
-    <Compile Include="core_toolsClass.vb" />
-    <Compile Include="core_uploadClassFPO.vb" />
-    <Compile Include="core_xmlToolsClass.vb" />
+    <Compile Include="coreSmtpHandlerClass.vb" />
+    <Compile Include="coreToolsClass.vb" />
+    <Compile Include="coreUploadClass.vb" />
+    <Compile Include="coreXmlToolsClass.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -340,6 +338,9 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>

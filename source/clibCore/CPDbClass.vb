@@ -80,7 +80,7 @@ Namespace Contensive.Core
         '
         '
         Public Overrides Function GetDataSourceType(ByVal DataSourcename As String) As Integer
-            Return cp.core.csv_GetDataSourceType(DataSourcename)
+            Return cp.core.app.csv_GetDataSourceType(DataSourcename)
         End Function
         '
         ' deprecated

@@ -187,7 +187,7 @@ namespace  Contensive.Core {
                     // determine app pattern
                     //
                     //
-                    fileSystemClass installFiles = new fileSystemClass(cp.core, cp.core.cluster.config, fileSystemClass.fileSyncModeEnum.noSync, System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
+                    coreFileSystemClass installFiles = new coreFileSystemClass(cp.core, cp.core.cluster.config, coreFileSystemClass.fileSyncModeEnum.noSync, System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
                     if (!cp.core.cluster.clusterFiles.checkPath("clibCommonAssemblies\\"))
                     {
                         cp.core.cluster.clusterFiles.createPath("clibCommonAssemblies\\");
@@ -373,7 +373,7 @@ namespace  Contensive.Core {
                 //
                 // create the database on the server
                 //
-                cp.core.cluster.executeMasterSql("create database " + appName);
+                cp.core.cluster.executeSql("create database " + appName);
                 //
                 // copy in the pattern files
                 //
@@ -391,7 +391,7 @@ namespace  Contensive.Core {
                 // initialize the new app, use the save authentication that was used to authorize this object
                 //
                 CPClass cpNewApp = new CPClass(appName);
-                builderClass builder = new builderClass(cpNewApp.core);
+                coreBuilderClass builder = new coreBuilderClass(cpNewApp.core);
                 if (useIis)
                 {
                     builder.web_addSite(appName, domainName, "\\", iisDefaultDoc);
@@ -401,7 +401,7 @@ namespace  Contensive.Core {
                     }
                 }
                 builder.upgrade(true);
-                cpNewApp.core.app.siteProperty_set(Contensive.Core.ccCommonModule.siteproperty_serverPageDefault_name, iisDefaultDoc);
+                cpNewApp.core.app.siteProperty_set(Contensive.Core.coreCommonModule.siteproperty_serverPageDefault_name, iisDefaultDoc);
                 cpNewApp.Dispose();
             }
             catch (Exception ex)
@@ -416,7 +416,7 @@ namespace  Contensive.Core {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="installFiles"></param>
-        public void upgradeResources(CPClass cp, fileSystemClass installFiles)
+        public void upgradeResources(CPClass cp, coreFileSystemClass installFiles)
         {
             //string appPatternsSrc = "clibResources\\appPatterns";
             //if (!cp.core.cluster.clusterFiles.checkPath(appPatternsSrc))

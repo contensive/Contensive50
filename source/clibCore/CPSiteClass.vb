@@ -1,6 +1,6 @@
 
 Imports System.Windows.Forms
-Imports CL = Contensive.Core.ccCommonModule
+Imports CL = Contensive.Core.coreCommonModule
 Imports Contensive.BaseClasses
 Imports System.Runtime.InteropServices
 

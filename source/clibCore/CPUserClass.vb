@@ -369,7 +369,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function GetProperty(ByVal PropertyName As String, Optional ByVal DefaultValue As String = "", Optional ByVal TargetMemberId As Integer = 0) As String
             If True Then
-                Return cpCore.main_GetMemberProperty(PropertyName, DefaultValue, TargetMemberId)
+                Return cpCore.userProperty_getText(PropertyName, DefaultValue, TargetMemberId)
             Else
                 Return ""
             End If

@@ -131,7 +131,7 @@ Namespace Contensive.Core
             Dim DataSourceType As Integer
             'Dim KernelService As New KernelServicesClass
             Dim DatePtr As Integer
-            Dim AddonInstall As addonInstallClass
+            Dim AddonInstall As coreAddonInstallClass
             Dim cp As CPClass
             Dim appList As List(Of String)
             'Dim control As New controlClass
@@ -150,7 +150,7 @@ Namespace Contensive.Core
             rightNow = Now()
             Yesterday = rightNow.AddDays(-1).Date
             ALittleWhileAgo = rightNow.AddDays(-90).Date
-            SQLNow = EncodeSQLDate(rightNow)
+            SQLNow = cp.core.app.db_EncodeSQLDate(rightNow)
             '
             ' ----- Read config file
             '
@@ -208,7 +208,7 @@ Namespace Contensive.Core
                 FolderName = "Logs"
                 Call HousekeepLogFolder("server", FolderName)
                 '
-                Dim subDir As New System.IO.DirectoryInfo(cpCore.app.privateFiles.rootLocalFolderPath & "\logs\")
+                Dim subDir As New System.IO.DirectoryInfo(cp.core.app.privateFiles.rootLocalFolderPath & "\logs\")
                 For Each SubDirInfo As System.IO.DirectoryInfo In subDir.GetDirectories
                     FolderName = "logs\" & SubDirInfo.Name
                 Call HousekeepLogFolder("server", FolderName)
@@ -245,7 +245,7 @@ Namespace Contensive.Core
             '
             ' Housekeep each application
             '
-            For Each kvp As KeyValuePair(Of String, appConfigClass) In cpCore.cluster.config.apps
+            For Each kvp As KeyValuePair(Of String, appConfigClass) In cp.core.cluster.config.apps
                 appName = kvp.Value.name
                 If True Then
                     'End If
@@ -279,7 +279,7 @@ Namespace Contensive.Core
                                 ErrorMessage = ""
                                 Call AppendClassLog("", "HouseKeep", "Updating local collections from library, see Upgrade log for details during this period.")
                                 Dim ignoreRefactor As String = ""
-                                AddonInstall = New addonInstallClass(cp.core)
+                                AddonInstall = New coreAddonInstallClass(cp.core)
                                 If Not AddonInstall.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(ErrorMessage, ignoreRefactor, ignoreRefactor, False) Then
                                     If ErrorMessage = "" Then
                                         ErrorMessage = "No detailed error message was returned from UpgradeAllLocalCollectionsFromLib2 although it returned 'not ok' status."
@@ -300,7 +300,7 @@ Namespace Contensive.Core
                                     DomainNamePrimary = Mid(DomainNamePrimary, 1, Pos - 1)
                                 End If
                                 'dataBuildVersion = cp.Core.app.getSiteProperty("BuildVersion", "0")
-                                DataSourceType = cp.core.csv_GetDataSourceType("default")
+                                DataSourceType = cp.core.app.csv_GetDataSourceType("default")
                                 '
                                 DefaultMemberName = ""
                                 PeopleCID = cp.core.csv_GetContentID("people")
@@ -370,8 +370,8 @@ Namespace Contensive.Core
                                         '
                                         If NeedToClearCache Then
                                             emptyData = Nothing
-                                            Call cp.core.app.cache_invalidateTag("Page Content")
-                                            Call cp.core.app.cache_saveRaw("PCC", emptyData)
+                                            Call cp.core.app.cache.invalidateTag("Page Content")
+                                            Call cp.core.app.cache.saveRaw2("PCC", emptyData)
                                         End If
                                     End If
                                     If True Then
@@ -382,8 +382,8 @@ Namespace Contensive.Core
                                             & " where id in (" _
                                             & " select d.id from ccvisitsummary d,ccvisitsummary f" _
                                             & " where f.datenumber=d.datenumber" _
-                                            & " and f.datenumber>" & EncodeSQLDate(OldestVisitSummaryWeCareAbout) _
-                                            & " and f.datenumber<" & EncodeSQLDate(Yesterday) _
+                                            & " and f.datenumber>" & cp.core.app.db_EncodeSQLDate(OldestVisitSummaryWeCareAbout) _
+                                            & " and f.datenumber<" & cp.core.app.db_EncodeSQLDate(Yesterday) _
                                             & " and f.TimeDuration=24" _
                                             & " and d.TimeDuration=24" _
                                             & " and f.id<d.id" _
@@ -445,7 +445,7 @@ Namespace Contensive.Core
                                         '
                                         ' Remote Query Expiration
                                         '
-                                        SQL = "delete from ccRemoteQueries where (DateExpires is not null)and(DateExpires<" & EncodeSQLDate(Now()) & ")"
+                                        SQL = "delete from ccRemoteQueries where (DateExpires is not null)and(DateExpires<" & cp.core.app.db_EncodeSQLDate(Now()) & ")"
                                         Call cp.core.app.executeSql(SQL)
                                     End If
                                     If True Then
@@ -543,7 +543,7 @@ Namespace Contensive.Core
                                     LastTimeSummaryWasRun = VisitArchiveDate
                                     'LastTimeSummaryWasRun = ALittleWhileAgo
                                     'sql="select top 1 dateadded from ccvisitsummary where (timeduration=1)and(Dateadded>" & encodeSQLDate(ALittleWhileAgo) & ") order by id desc"
-                                    SQL = cp.core.app.csv_GetSQLSelect("default", "ccVisitSummary", "DateAdded", "(timeduration=1)and(Dateadded>" & EncodeSQLDate(VisitArchiveDate) & ")", "id Desc", , 1)
+                                    SQL = cp.core.app.csv_GetSQLSelect("default", "ccVisitSummary", "DateAdded", "(timeduration=1)and(Dateadded>" & cp.core.app.db_EncodeSQLDate(VisitArchiveDate) & ")", "id Desc", , 1)
                                     'SQL = cp.Core.app.csv_GetSQLSelect("default", "ccVisitSummary", "DateAdded", "(timeduration=1)and(Dateadded>" & encodeSQLDate(ALittleWhileAgo) & ")", "id Desc", , 1)
                                     CS = cp.core.app.db_openCsSql_rev("default", SQL)
                                     If cp.core.app.db_csOk(CS) Then
@@ -565,7 +565,7 @@ Namespace Contensive.Core
                                     'PeriodStep = CDbl(1) / CDbl(24)
                                     StartOfHour = New Date(LastTimeSummaryWasRun.Year, LastTimeSummaryWasRun.Month, LastTimeSummaryWasRun.Day, LastTimeSummaryWasRun.Hour, 1, 1).AddHours(-1) ' (Int(24 * LastTimeSummaryWasRun) / 24) - PeriodStep
                                     OldestDateAdded = StartOfHour
-                                    SQL = cp.core.app.csv_GetSQLSelect("default", "ccVisits", "DateAdded", "LastVisitTime>" & EncodeSQLDate(StartOfHour), "dateadded", , 1)
+                                    SQL = cp.core.app.csv_GetSQLSelect("default", "ccVisits", "DateAdded", "LastVisitTime>" & cp.core.app.db_EncodeSQLDate(StartOfHour), "dateadded", , 1)
                                     'SQL = "select top 1 Dateadded from ccvisits where LastVisitTime>" & encodeSQLDate(StartOfHour) & " order by DateAdded"
                                     CS = cp.core.app.db_openCsSql_rev("default", SQL)
                                     If cp.core.app.db_csOk(CS) Then
@@ -735,17 +735,17 @@ ErrorTrap:
             '
             Yesterday = rightNow.AddDays(-1).Date
             MidnightTwoDaysAgo = rightNow.AddDays(-2).Date
-            SQLDateMidnightTwoDaysAgo = EncodeSQLDate(MidnightTwoDaysAgo)
             thirtyDaysAgo = rightNow.AddDays(-30).Date
             appName = cp.core.app.config.name
             ArchiveDeleteNoCookie = EncodeBoolean(cp.core.app.siteProperty_getText("ArchiveDeleteNoCookie", "1"))
-            DataSourceType = cp.core.csv_GetDataSourceType("default")
+            DataSourceType = cp.core.app.csv_GetDataSourceType("default")
             TimeoutSave = cp.core.app.csv_SQLCommandTimeout
             cp.core.app.csv_SQLCommandTimeout = 1800
             '
             SQLTablePeople = cp.core.csv_GetContentTablename("People")
             SQLTableMemberRules = cp.core.csv_GetContentTablename("Member Rules")
             SQLTableGroups = cp.core.csv_GetContentTablename("Groups")
+            SQLDateMidnightTwoDaysAgo = cp.core.app.db_EncodeSQLDate(MidnightTwoDaysAgo)
             '
             ' Any member records that were created outside contensive need to have CreatedByVisit=0 (past v4.1.152)
             '
@@ -907,7 +907,7 @@ ErrorTrap:
             ' Visits with no DateAdded
             '
             Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting visits with no DateAdded")
-            Call cp.core.csv_DeleteTableRecordChunks("default", "ccvisits", "(DateAdded is null)or(DateAdded<=" & EncodeSQLDate("1/1/1995") & ")", 1000, 10000)
+            Call cp.core.csv_DeleteTableRecordChunks("default", "ccvisits", "(DateAdded is null)or(DateAdded<=" & cp.core.app.db_EncodeSQLDate("1/1/1995") & ")", 1000, 10000)
             '
             ' Visits with no visitor
             '
@@ -1057,7 +1057,7 @@ ErrorTrap:
             Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting email drops older then " & EmailDropArchiveAgeDays & " days")
             ArchiveEmailDropDate = rightNow.AddDays(-EmailDropArchiveAgeDays).Date
             On Error Resume Next
-            Call cp.core.app.db_DeleteContentRecords("Email drops", "(DateAdded is null)or(DateAdded<=" & EncodeSQLDate(ArchiveEmailDropDate) & ")")
+            Call cp.core.app.db_DeleteContentRecords("Email drops", "(DateAdded is null)or(DateAdded<=" & cp.core.app.db_EncodeSQLDate(ArchiveEmailDropDate) & ")")
             If Err.Number <> 0 Then
                 Call HandleClassTrapError(appName, "HouseKeep_App_Daily", "Error while deleting old email drops, " & GetErrString(Err), True)
             End If
@@ -1069,7 +1069,7 @@ ErrorTrap:
             Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting non-drop email logs older then " & EmailDropArchiveAgeDays & " days")
             ArchiveEmailDropDate = rightNow.AddDays(-EmailDropArchiveAgeDays).Date
             On Error Resume Next
-            Call cp.core.app.db_DeleteContentRecords("Email Log", "(emailDropId is null)and((DateAdded is null)or(DateAdded<=" & EncodeSQLDate(ArchiveEmailDropDate) & "))")
+            Call cp.core.app.db_DeleteContentRecords("Email Log", "(emailDropId is null)and((DateAdded is null)or(DateAdded<=" & cp.core.app.db_EncodeSQLDate(ArchiveEmailDropDate) & "))")
             If Err.Number <> 0 Then
                 Call HandleClassTrapError(appName, "HouseKeep_App_Daily", "Error while deleting old email log, " & GetErrString(Err), True)
             End If
@@ -1537,7 +1537,7 @@ ErrorTrap:
             If EncodeBoolean(cp.core.app.siteProperty_getText("ArchiveAllowFileClean", "false")) Then
                 '
                 Dim DSType As Integer
-                DSType = cp.core.csv_GetDataSourceType("")
+                DSType = cp.core.app.csv_GetDataSourceType("")
                 Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Content TextFile types with no controlling record.")
                 SQL = "SELECT DISTINCT ccTables.Name as TableName, ccFields.Name as FieldName" _
                     & " FROM (ccFields LEFT JOIN ccContent ON ccFields.ContentID = ccContent.ID) LEFT JOIN ccTables ON ccContent.ContentTableID = ccTables.ID" _
@@ -1563,11 +1563,11 @@ ErrorTrap:
                             VirtualLink = Replace(VirtualFileName, "\", "/")
                             FileSize = file.Length
                             If FileSize = 0 Then
-                                SQL = "update " & TableName & " set " & FieldName & "=null where (" & FieldName & "=" & EncodeSQLText(VirtualFileName) & ")or(" & FieldName & "=" & EncodeSQLText(VirtualLink) & ")"
+                                SQL = "update " & TableName & " set " & FieldName & "=null where (" & FieldName & "=" & cp.core.app.db_EncodeSQLText(VirtualFileName) & ")or(" & FieldName & "=" & cp.core.app.db_EncodeSQLText(VirtualLink) & ")"
                                 Call cp.core.app.executeSql(SQL)
                                 Call cp.core.app.cdnFiles.DeleteFile(VirtualFileName)
                             Else
-                                SQL = "SELECT ID FROM " & TableName & " WHERE (" & FieldName & "=" & EncodeSQLText(VirtualFileName) & ")or(" & FieldName & "=" & EncodeSQLText(VirtualLink) & ")"
+                                SQL = "SELECT ID FROM " & TableName & " WHERE (" & FieldName & "=" & cp.core.app.db_EncodeSQLText(VirtualFileName) & ")or(" & FieldName & "=" & cp.core.app.db_EncodeSQLText(VirtualLink) & ")"
                                 CSTest = cp.core.app.db_openCsSql_rev("default", SQL)
                                 If Not cp.core.app.db_csOk(CSTest) Then
                                     Call cp.core.app.cdnFiles.DeleteFile(VirtualFileName)
@@ -1743,7 +1743,7 @@ ErrorTrap:
             'VisitArchiveAgeDays = encodeInteger(cp.Core.csv_GetSiteProperty("ArchiveRecordAgeDays", "0"))
             If True Then
                 appName = cp.core.app.config.name
-                DeleteBeforeDateSQL = EncodeSQLDate(DeleteBeforeDate)
+                DeleteBeforeDateSQL = cp.core.app.db_EncodeSQLDate(DeleteBeforeDate)
                 '
                 ' Visits older then archive age
                 '
@@ -1863,7 +1863,7 @@ ErrorTrap:
             'VisitArchiveAgeDays = encodeInteger(cp.Core.csv_GetSiteProperty("ArchiveRecordAgeDays", "0"))
             If True Then
                 appName = cp.core.app.config.name
-                DeleteBeforeDateSQL = EncodeSQLDate(DeleteBeforeDate)
+                DeleteBeforeDateSQL = cp.core.app.db_EncodeSQLDate(DeleteBeforeDate)
                 '        '
                 '        ' Visits older then archive age
                 '        '
@@ -2102,8 +2102,8 @@ ErrorTrap:
                     SQL = "select count(v.id) as NoCookieVisits" _
                         & " from ccvisits v" _
                         & " where (v.CookieSupport<>1)" _
-                        & " and(v.dateadded>=" & EncodeSQLDate(DateStart) & ")" _
-                        & " and (v.dateadded<" & EncodeSQLDate(DateEnd) & ")" _
+                        & " and(v.dateadded>=" & cp.core.app.db_EncodeSQLDate(DateStart) & ")" _
+                        & " and (v.dateadded<" & cp.core.app.db_EncodeSQLDate(DateEnd) & ")" _
                         & " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))" _
                         & ""
                     'SQL = "select count(id) as NoCookieVisits from ccvisits where (CookieSupport<>1)and(dateadded>=" & encodeSQLDate(DateStart) & ")and(dateadded<" & encodeSQLDate(DateEnd) & ")"
@@ -2118,8 +2118,8 @@ ErrorTrap:
                     SQL = "select count(v.id) as VisitCnt ,Sum(v.PageVisits) as HitCnt ,sum(v.TimetoLastHit) as TimeOnSite" _
                         & " from ccvisits v" _
                         & " where (v.CookieSupport<>0)" _
-                        & " and(v.dateadded>=" & EncodeSQLDate(DateStart) & ")" _
-                        & " and (v.dateadded<" & EncodeSQLDate(DateEnd) & ")" _
+                        & " and(v.dateadded>=" & cp.core.app.db_EncodeSQLDate(DateStart) & ")" _
+                        & " and (v.dateadded<" & cp.core.app.db_EncodeSQLDate(DateEnd) & ")" _
                         & " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))" _
                         & ""
                     'SQL = "select count(id) as VisitCnt ,Sum(PageVisits) as HitCnt ,sum(TimetoLastHit) as TimeOnSite from ccvisits where (CookieSupport<>0)and(dateadded>=" & encodeSQLDate(DateStart) & ")and (dateadded<" & encodeSQLDate(DateEnd) & ")"
@@ -2137,8 +2137,8 @@ ErrorTrap:
                         SQL = "select count(v.id) as NewVisitorVisits" _
                             & " from ccvisits v" _
                             & " where (v.CookieSupport<>0)" _
-                            & " and(v.dateadded>=" & EncodeSQLDate(DateStart) & ")" _
-                            & " and (v.dateadded<" & EncodeSQLDate(DateEnd) & ")" _
+                            & " and(v.dateadded>=" & cp.core.app.db_EncodeSQLDate(DateStart) & ")" _
+                            & " and (v.dateadded<" & cp.core.app.db_EncodeSQLDate(DateEnd) & ")" _
                             & " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))" _
                             & " and(v.VisitorNew<>0)" _
                             & ""
@@ -2154,8 +2154,8 @@ ErrorTrap:
                         SQL = "select count(v.id) as SinglePageVisits" _
                             & " from ccvisits v" _
                             & " where (v.CookieSupport<>0)" _
-                            & " and(v.dateadded>=" & EncodeSQLDate(DateStart) & ")" _
-                            & " and (v.dateadded<" & EncodeSQLDate(DateEnd) & ")" _
+                            & " and(v.dateadded>=" & cp.core.app.db_EncodeSQLDate(DateStart) & ")" _
+                            & " and (v.dateadded<" & cp.core.app.db_EncodeSQLDate(DateEnd) & ")" _
                             & " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))" _
                             & " and(v.PageVisits=1)" _
                             & ""
@@ -2171,8 +2171,8 @@ ErrorTrap:
                         SQL = "select count(v.id) as VisitCnt ,sum(v.PageVisits) as HitCnt ,sum(v.TimetoLastHit) as TimetoLastHitSum " _
                             & " from ccvisits v" _
                             & " where (v.CookieSupport<>0)" _
-                            & " and(v.dateadded>=" & EncodeSQLDate(DateStart) & ")" _
-                            & " and (v.dateadded<" & EncodeSQLDate(DateEnd) & ")" _
+                            & " and(v.dateadded>=" & cp.core.app.db_EncodeSQLDate(DateStart) & ")" _
+                            & " and (v.dateadded<" & cp.core.app.db_EncodeSQLDate(DateEnd) & ")" _
                             & " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))" _
                             & " and(PageVisits>1)" _
                             & ""
@@ -2190,8 +2190,8 @@ ErrorTrap:
                         SQL = "select count(v.id) as AuthenticatedVisits " _
                             & " from ccvisits v" _
                             & " where (v.CookieSupport<>0)" _
-                            & " and(v.dateadded>=" & EncodeSQLDate(DateStart) & ")" _
-                            & " and (v.dateadded<" & EncodeSQLDate(DateEnd) & ")" _
+                            & " and(v.dateadded>=" & cp.core.app.db_EncodeSQLDate(DateStart) & ")" _
+                            & " and (v.dateadded<" & cp.core.app.db_EncodeSQLDate(DateEnd) & ")" _
                             & " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))" _
                             & " and(VisitAuthenticated<>0)" _
                             & ""
@@ -2209,8 +2209,8 @@ ErrorTrap:
                             SQL = "select count(v.id) as cnt " _
                                 & " from ccvisits v" _
                                 & " where (v.CookieSupport<>0)" _
-                                & " and(v.dateadded>=" & EncodeSQLDate(DateStart) & ")" _
-                                & " and (v.dateadded<" & EncodeSQLDate(DateEnd) & ")" _
+                                & " and(v.dateadded>=" & cp.core.app.db_EncodeSQLDate(DateStart) & ")" _
+                                & " and (v.dateadded<" & cp.core.app.db_EncodeSQLDate(DateEnd) & ")" _
                                 & " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))" _
                                 & " and(Mobile<>0)" _
                                 & ""
@@ -2226,8 +2226,8 @@ ErrorTrap:
                             SQL = "select count(v.id) as cnt " _
                                 & " from ccvisits v" _
                                 & " where (v.CookieSupport<>0)" _
-                                & " and(v.dateadded>=" & EncodeSQLDate(DateStart) & ")" _
-                                & " and (v.dateadded<" & EncodeSQLDate(DateEnd) & ")" _
+                                & " and(v.dateadded>=" & cp.core.app.db_EncodeSQLDate(DateStart) & ")" _
+                                & " and (v.dateadded<" & cp.core.app.db_EncodeSQLDate(DateEnd) & ")" _
                                 & " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))" _
                                 & " and(Bot<>0)" _
                                 & ""
@@ -2581,8 +2581,8 @@ ErrorTrap:
                     '
                     SQL = "select distinct recordid,pagetitle from ccviewings h" _
                         & " where (h.recordid<>0)" _
-                        & " and(h.dateadded>=" & EncodeSQLDate(DateStart) & ")" _
-                        & " and (h.dateadded<" & EncodeSQLDate(DateEnd) & ")" _
+                        & " and(h.dateadded>=" & cp.core.app.db_EncodeSQLDate(DateStart) & ")" _
+                        & " and (h.dateadded<" & cp.core.app.db_EncodeSQLDate(DateEnd) & ")" _
                         & " and((h.ExcludeFromAnalytics is null)or(h.ExcludeFromAnalytics=0))" _
                         & "order by recordid"
                     CSPages = cp.core.app.db_openCsSql_rev("default", SQL)
@@ -2590,7 +2590,7 @@ ErrorTrap:
                         '
                         ' no hits found - add or update a single record for this day so we know it has been calculated
                         '
-                        CS = cp.core.app.db_csOpen("Page View Summary", "(timeduration=" & HourDuration & ")and(DateNumber=" & DateNumber & ")and(TimeNumber=" & TimeNumber & ")and(pageid=" & PageID & ")and(pagetitle=" & EncodeSQLText(PageTitle) & ")")
+                        CS = cp.core.app.db_csOpen("Page View Summary", "(timeduration=" & HourDuration & ")and(DateNumber=" & DateNumber & ")and(TimeNumber=" & TimeNumber & ")and(pageid=" & PageID & ")and(pagetitle=" & cp.core.app.db_EncodeSQLText(PageTitle) & ")")
                         If Not cp.core.app.db_csOk(CS) Then
                             Call cp.core.app.db_csClose(CS)
                             CS = cp.core.app.db_csInsertRecord("Page View Summary")
@@ -2622,13 +2622,13 @@ ErrorTrap:
                             baseCriteria = "" _
                                 & " (h.recordid=" & PageID & ")" _
                                 & " " _
-                                & " and(h.dateadded>=" & EncodeSQLDate(DateStart) & ")" _
-                                & " and(h.dateadded<" & EncodeSQLDate(DateEnd) & ")" _
+                                & " and(h.dateadded>=" & cp.core.app.db_EncodeSQLDate(DateStart) & ")" _
+                                & " and(h.dateadded<" & cp.core.app.db_EncodeSQLDate(DateEnd) & ")" _
                                 & " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))" _
                                 & " and((h.ExcludeFromAnalytics is null)or(h.ExcludeFromAnalytics=0))" _
                                 & ""
                             If PageTitle <> "" Then
-                                baseCriteria = baseCriteria & "and(h.pagetitle=" & EncodeSQLText(PageTitle) & ")"
+                                baseCriteria = baseCriteria & "and(h.pagetitle=" & cp.core.app.db_EncodeSQLText(PageTitle) & ")"
                             End If
                             '
                             ' Total Page Views
@@ -2704,7 +2704,7 @@ ErrorTrap:
                             '
                             ' Add or update the Visit Summary Record
                             '
-                            CS = cp.core.app.db_csOpen("Page View Summary", "(timeduration=" & HourDuration & ")and(DateNumber=" & DateNumber & ")and(TimeNumber=" & TimeNumber & ")and(pageid=" & PageID & ")and(pagetitle=" & EncodeSQLText(PageTitle) & ")")
+                            CS = cp.core.app.db_csOpen("Page View Summary", "(timeduration=" & HourDuration & ")and(DateNumber=" & DateNumber & ")and(TimeNumber=" & TimeNumber & ")and(pageid=" & PageID & ")and(pagetitle=" & cp.core.app.db_EncodeSQLText(PageTitle) & ")")
                             If Not cp.core.app.db_csOk(CS) Then
                                 Call cp.core.app.db_csClose(CS)
                                 CS = cp.core.app.db_csInsertRecord("Page View Summary")

@@ -42,7 +42,7 @@ Namespace Contensive.Core
             '
             On Error GoTo ErrorTrap
             '
-            Dim SMTPHandler As smtpHandlerClass
+            Dim SMTPHandler As coreSmtpHandlerClass
             'Dim AppService As appServicesClass
             'Dim KernelService As KernelServicesClass
             Dim EmailHandlerFolder As String
@@ -65,7 +65,7 @@ Namespace Contensive.Core
                 ' ----- check for email in the send queue
                 '
                 EmailHandlerFolder = "EmailOut\"
-                SMTPHandler = New smtpHandlerClass(cpCore)
+                SMTPHandler = New coreSmtpHandlerClass(cpCore)
                 Call SMTPHandler.SendEmailQueue(EmailHandlerFolder)
                 SMTPHandler = Nothing
             End If
@@ -171,7 +171,7 @@ ErrorTrap:
             Dim emailStyles As String
             Dim EmailFrom As String
             '
-            SQLDateNow = EncodeSQLDate(Now)
+            SQLDateNow = cpCore.app.db_EncodeSQLDate(Now)
             PrimaryLink = "http://" & GetPrimaryDomainName()
             '
             ' Open the email records
@@ -383,7 +383,7 @@ ErrorTrap:
             Dim dataSourceType As Integer
             Dim sqlDateTest As String
             '
-            dataSourceType = cpCore.csv_GetDataSourceType("default")
+            dataSourceType = cpCore.app.csv_GetDataSourceType("default")
             SQLTablePeople = cpCore.csv_GetContentTablename("People")
             SQLTableMemberRules = cpCore.csv_GetContentTablename("Member Rules")
             SQLTableGroups = cpCore.csv_GetContentTablename("Groups")
@@ -395,7 +395,7 @@ ErrorTrap:
 
 
 
-            SQLDateNow = EncodeSQLDate(Now)
+            SQLDateNow = cpCore.app.db_EncodeSQLDate(Now)
             '
             ' Send Conditional Email - Offset days after Joining
             '   sends email between the condition period date and date +1. if a conditional email is setup and there are already
@@ -556,7 +556,7 @@ ErrorTrap:
                         & " AND (" & SQLTablePeople & ".AllowBulkEmail <> 0)" _
                         & " AND (" & SQLTablePeople & ".BirthdayMonth=" & Month(Now) & ")" _
                         & " AND (" & SQLTablePeople & ".BirthdayDay=" & Day(Now) & ")" _
-                        & " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.MemberID=" & SQLTablePeople & ".ID and ccEmailLog.DateAdded>=" & EncodeSQLDate(Int(Now())) & "))"
+                        & " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.MemberID=" & SQLTablePeople & ".ID and ccEmailLog.DateAdded>=" & cpCore.app.db_EncodeSQLDate(Int(Now())) & "))"
                     CSEmailBig = cpCore.app.db_openCsSql_rev("Default", SQL)
                     Do While cpCore.app.db_csOk(CSEmailBig)
                         emailID = cpCore.app.db_GetCSInteger(CSEmailBig, "EmailID")

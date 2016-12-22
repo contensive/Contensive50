@@ -13,27 +13,27 @@ Namespace Contensive.Core
         '
         Public Sub Process()
             '
-            On Error GoTo ErrorTrap
+            'On Error GoTo ErrorTrap
             '
-            Dim ResultMessage As String = ""
-            Dim SQLDateNow As String
-            Dim CS as integer
-            Dim SQL As String
-            Dim Filename As String
-            Dim DataSource As String
-            Dim CSVFilename As String
-            Dim NotifyEMail As String = ""
-            Dim NotifyBody As String
-            Dim NotifySubject As String
-            Dim SQLFieldName As String
-            Dim PreviousProcessAborted As Boolean
-            '
-            Dim cp As CPClass
-            Dim appStatus as integer
-            Dim appName As String
-            '
-            appName = ""
-            SQLDateNow = EncodeSQLDate(Now)
+            'Dim ResultMessage As String = ""
+            'Dim SQLDateNow As String
+            'Dim CS as integer
+            'Dim SQL As String
+            'Dim Filename As String
+            'Dim DataSource As String
+            'Dim CSVFilename As String
+            'Dim NotifyEMail As String = ""
+            'Dim NotifyBody As String
+            'Dim NotifySubject As String
+            'Dim SQLFieldName As String
+            'Dim PreviousProcessAborted As Boolean
+            ''
+            'Dim cp As CPClass
+            'Dim appStatus as integer
+            'Dim appName As String
+            ''
+            'appName = ""
+            'SQLDateNow = app.db_EncodeSQLDate(Now)
             Throw New NotImplementedException
             'For Each AppService In KernelService.AppServices
             '    appName = cpCore.app.Name
@@ -145,10 +145,10 @@ Namespace Contensive.Core
             'AppService = Nothing
             'KernelService = Nothing
             '
-            Exit Sub
-ErrorTrap:
-            Call HandleClassTrapErrorResumeNext("Process", "trap", appName)
-            Err.Clear()
+            '            Exit Sub
+            'ErrorTrap:
+            '            Call HandleClassTrapErrorResumeNext("Process", "trap", appName)
+            '            Err.Clear()
         End Sub
         '
         '==========================================================================================

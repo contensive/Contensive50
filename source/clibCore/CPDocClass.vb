@@ -528,7 +528,7 @@ Namespace Contensive.Core
                         If cpCore.main_IsViewingProperty(lcName) Then
                             globalVar = cpCore.main_GetViewingProperty(lcName)
                         Else
-                            globalVar = cpCore.main_GetStreamText(lcName)
+                            globalVar = cpCore.main_GetStreamText2(lcName)
                         End If
                     End If
                 Else

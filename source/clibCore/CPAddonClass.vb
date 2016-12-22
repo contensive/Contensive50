@@ -1,5 +1,7 @@
 
-Imports Contensive.BaseClasses
+Option Explicit On
+Option Strict On
+
 Imports System.Runtime.InteropServices
 
 Namespace Contensive.Core

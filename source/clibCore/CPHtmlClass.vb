@@ -101,7 +101,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function CheckBox(ByVal HtmlName As String, Optional ByVal HtmlValue As Boolean = False, Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Inherits BaseClasses.CPHtmlBaseClass.CheckBox
             If True Then
-                Return cpCore.main_GetFormInputCheckBox(HtmlName, HtmlValue.ToString, HtmlId)
+                Return cpCore.html_GetFormInputCheckBox(HtmlName, HtmlValue.ToString, HtmlId)
             Else
                 Return ""
             End If

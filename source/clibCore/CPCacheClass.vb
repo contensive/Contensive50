@@ -38,7 +38,7 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <remarks></remarks>
         Public Overrides Sub ClearAll()
-            Call cpCore.app.cache_invalidateAll()
+            Call cpCore.app.cache.invalidateAll2()
         End Sub
         '
         '====================================================================================================
@@ -48,7 +48,7 @@ Namespace Contensive.Core
         ''' <param name="ContentNameList"></param>
         ''' <remarks></remarks>
         Public Overrides Sub Clear(ByVal cacheDataSourceTag As String)
-            Call cpCore.app.cache_invalidateTagList(cacheDataSourceTag)
+            Call cpCore.app.cache.invalidateTagList2(cacheDataSourceTag)
         End Sub
         '
         '====================================================================================================
@@ -61,7 +61,7 @@ Namespace Contensive.Core
         Public Overrides Function Read(ByVal Name As String) As String
             Dim returnString As String = ""
             Try
-                returnString = EncodeText(cpCore.app.cache_read(Of String)(Name))
+                returnString = EncodeText(cpCore.app.cache.read4(Of String)(Name))
             Catch ex As Exception
                 cp.core.handleException(ex, "Unexpected error in cp.cache.read()")
                 returnString = ""
@@ -80,7 +80,7 @@ Namespace Contensive.Core
         ''' <remarks></remarks>
         Public Overrides Sub Save(ByVal Name As String, ByVal Value As String, Optional ByVal ClearOnContentChangeList As String = "", Optional ByVal invalidationDate As Date = #12:00:00 AM#)
             invalidationDate = encodeDateMinValue(invalidationDate)
-            Call cpCore.app.cache_save(Name, Value, ClearOnContentChangeList, invalidationDate)
+            Call cpCore.app.cache.save3(Name, Value, ClearOnContentChangeList, invalidationDate)
         End Sub
 #Region " IDisposable Support "
         '

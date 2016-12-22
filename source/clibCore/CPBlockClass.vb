@@ -1,7 +1,7 @@
-﻿'Option Strict Off
-'Option Explicit On
+﻿
+Option Strict Off
+Option Explicit On
 
-Imports Contensive.BaseClasses
 Imports System.Runtime.InteropServices
 
 Namespace Contensive.Core
@@ -23,7 +23,7 @@ Namespace Contensive.Core
         Private cpCore As Contensive.Core.cpCoreClass
         Private cp As CPClass
         Private accum As String
-        Private htmlTools As htmlToolsClass
+        Private htmlTools As coreHtmlToolsClass
         Protected disposed As Boolean = False
         '
         ' Constructor - Initialize the Main and Csv objects
@@ -35,7 +35,7 @@ Namespace Contensive.Core
                 cp = cpParent
                 cpCore = cp.core
                 Try
-                    htmlTools = New htmlToolsClass(cpCore)
+                    htmlTools = New coreHtmlToolsClass(cpCore)
                 Catch ex As Exception
                     cp.core.handleException(ex, "Error creating object aoPrimitives.HtmlToolsClass during cp.block constructor.")
                 End Try
@@ -166,11 +166,11 @@ Namespace Contensive.Core
                 If wwwFileName <> "" Then
                     accum = cp.File.Read(cpCore.cluster.config.clusterPhysicalPath & cpCore.app.config.appRootPath & wwwFileName)
                     If accum <> "" Then
-                        head = ccCommonModule.GetTagInnerHTML(accum, "head", False)
+                        head = coreCommonModule.GetTagInnerHTML(accum, "head", False)
                         If head <> "" Then
                             Call cpCore.csv_addHeadTags(head)
                         End If
-                        accum = ccCommonModule.GetTagInnerHTML(accum, "body", False)
+                        accum = coreCommonModule.GetTagInnerHTML(accum, "body", False)
                     End If
                 End If
             Catch ex As Exception

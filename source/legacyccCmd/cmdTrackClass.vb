@@ -1,5 +1,5 @@
 ﻿
-Imports Contensive.Core.ccCommonModule
+Imports Contensive.Core.coreCommonModule
 'Imports Interop.adodb
 Imports System.Xml
 

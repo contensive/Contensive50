@@ -1249,7 +1249,7 @@ Namespace Contensive
                 hint &= ",entering"
                 '
                 RightNow = Now
-                SQLNow = EncodeSQLDate(RightNow)
+                SQLNow = cpCore.app.db_EncodeSQLDate(RightNow)
                 For Each kvp As KeyValuePair(Of String, appConfigClass) In cpCore.cluster.config.apps
                     AppName = kvp.Value.name
                     '

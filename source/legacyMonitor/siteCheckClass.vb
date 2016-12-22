@@ -4,8 +4,7 @@ Option Strict On
 
 Imports System.Reflection
 Imports System.Timers
-'Imports Contensive.Core
-'Imports Contensive.Core
+Imports System.Threading
 
 Namespace Contensive.Core
     Public Class siteCheckClass
@@ -126,7 +125,7 @@ Namespace Contensive.Core
         Private Function GetDoc(ByVal Link As String, ByVal AppName As String, ByVal RequestTimeout As Integer, ByRef return_needsErrorRecovery As Boolean) As String
             On Error GoTo ErrorTrap
             '
-            Dim kmaHTTP As New http4Class()
+            Dim kmaHTTP As New coreHttpRequestClass()
             Dim CookiePointer As Integer
             Dim CookieGood As Boolean
             Dim CookieMatchCount As Integer
@@ -769,6 +768,63 @@ ErrorTrap:
             version = Assembly.GetEntryAssembly().GetName().Version.ToString()
             AddHandler processTimer.Elapsed, AddressOf ProcessTimerTick
         End Sub
+        '
+        '
+        '
+        Public Function executeCommandSync(ByVal command As String) As String
+            Dim result As String = ""
+            Try
+                'create the ProcessStartInfo using "cmd" as the program to be run,
+                'and "/c " as the parameters.
+                'Incidentally, /c tells cmd that we want it to execute the command that follows,
+                'and then exit.
+                Dim procStartInfo As System.Diagnostics.ProcessStartInfo = New System.Diagnostics.ProcessStartInfo("%comspec%", "/c " + command)
+                'Dim procStartInfo As System.Diagnostics.ProcessStartInfo = New System.Diagnostics.ProcessStartInfo("cmd", "/c " + command)
+                'The following commands are needed to redirect the standard output.
+                'This means that it will be redirected to the Process.StandardOutput StreamReader.
+                procStartInfo.RedirectStandardOutput = True
+                procStartInfo.UseShellExecute = False
+                'Do not create the black window.
+                procStartInfo.CreateNoWindow = True
+                'Now we create a process, assign its ProcessStartInfo and start it
+                Dim proc As System.Diagnostics.Process = New System.Diagnostics.Process()
+                proc.StartInfo = procStartInfo
+                proc.Start()
+                'Get the output into a string
+                result = proc.StandardOutput.ReadToEnd()
+                'Display the command output.
+            Catch ex As Exception
+
+            End Try
+            Return result
+        End Function
+        ''
+        ''
+        ''
+        'Public Sub executeCommandAsync(ByVal Command As String)
+        '    Try
+        '        '//Asynchronously start the Thread to process the Execute command request.
+        '        Dim objThread As Thread = New Thread(New ParameterizedThreadStart(AddressOf executeCommandSync))
+        '        '//Make the thread as background thread.
+        '        objThread.IsBackground = True
+        '        '//Set the Priority of the thread.
+        '        objThread.Priority = ThreadPriority.AboveNormal
+        '        '//Start the thread.
+        '        objThread.Start(Command)
+        '    Catch ex As ThreadStartException
+        '        '
+        '        '
+        '        '
+        '    Catch ex As ThreadAbortException
+        '        '
+        '        '
+        '        '
+        '    Catch ex As Exception
+        '        '
+        '        '
+        '        '
+        '    End Try
+        'End Sub
     End Class
 
 End Namespace

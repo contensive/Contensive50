@@ -15,8 +15,8 @@ namespace Contensive.Core
             {
                 CPClass cp;
                 CPClass cpCluster;
-                fileSystemClass installFiles;
-                fileSystemClass programDataFiles;
+                coreFileSystemClass installFiles;
+                coreFileSystemClass programDataFiles;
                 string appName;
                 string JSONTemp;
                 //
@@ -134,10 +134,10 @@ namespace Contensive.Core
                                 }
                                 else {
                                     cp = new CPClass(appName);
-                                    installFiles = new fileSystemClass(cp.core, cp.core.cluster.config, fileSystemClass.fileSyncModeEnum.noSync, System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
+                                    installFiles = new coreFileSystemClass(cp.core, cp.core.cluster.config, coreFileSystemClass.fileSyncModeEnum.noSync, System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
                                     Console.WriteLine("Upgrading cluster folder clibResources from installation");
                                     createApp.upgradeResources(cp, installFiles);
-                                    builderClass builder = new builderClass(cp.core);
+                                    coreBuilderClass builder = new coreBuilderClass(cp.core);
                                     builder.upgrade(false);
                                     installFiles.Dispose();
                                     cp.Dispose();
@@ -150,7 +150,7 @@ namespace Contensive.Core
                                 //
                                 using (cpCluster = new CPClass())
                                 {
-                                    using (installFiles = new fileSystemClass(cpCluster.core, cpCluster.core.cluster.config, fileSystemClass.fileSyncModeEnum.noSync, System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)))
+                                    using (installFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.cluster.config, coreFileSystemClass.fileSyncModeEnum.noSync, System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)))
                                     {
                                         Console.WriteLine("Upgrading cluster folder clibResources from installation");
                                         createApp.upgradeResources(cpCluster, installFiles);
@@ -158,7 +158,7 @@ namespace Contensive.Core
                                         foreach (var item in cpCluster.core.cluster.config.apps)
                                         {
                                             cp = new CPClass(item.Key);
-                                            builderClass builder = new builderClass(cp.core);
+                                            coreBuilderClass builder = new coreBuilderClass(cp.core);
                                             builder.upgrade(false);
                                         }
                                         exitCmd = true;
@@ -168,7 +168,7 @@ namespace Contensive.Core
                             case "-taskscheduler":
                                 using (cpCluster = new CPClass())
                                 {
-                                    using (programDataFiles = new fileSystemClass(cpCluster.core, cpCluster.core.cluster.config, fileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib"))
+                                    using (programDataFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.cluster.config, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib"))
                                     {
                                         JSONTemp = programDataFiles.ReadFile("serverConfig.json");
                                         if (string.IsNullOrEmpty(JSONTemp))
@@ -188,7 +188,7 @@ namespace Contensive.Core
                                                     // run the taskscheduler in the console
                                                     //
                                                     Console.WriteLine("Beginning command line taskScheduler. Hit any key to exit");
-                                                    taskSchedulerServiceClass taskScheduler = new taskSchedulerServiceClass();
+                                                    coreTaskSchedulerServiceClass taskScheduler = new coreTaskSchedulerServiceClass();
                                                     taskScheduler.allowVerboseLogging = true;
                                                     taskScheduler.allowConsoleWrite = true;
                                                     taskScheduler.StartService(true, false);
@@ -213,7 +213,7 @@ namespace Contensive.Core
                             case "-taskrunner":
                                 using (cpCluster = new CPClass())
                                 {
-                                    using (programDataFiles = new fileSystemClass(cpCluster.core, cpCluster.core.cluster.config, fileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib"))
+                                    using (programDataFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.cluster.config, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib"))
                                     {
                                         JSONTemp = programDataFiles.ReadFile("serverConfig.json");
                                         if (string.IsNullOrEmpty(JSONTemp))
@@ -233,7 +233,7 @@ namespace Contensive.Core
                                                     // run the taskrunner in the console
                                                     //
                                                     Console.WriteLine("Beginning command line taskRunner. Hit any key to exit");
-                                                    taskRunnerServiceClass taskRunner = new taskRunnerServiceClass();
+                                                    coreTaskRunnerServiceClass taskRunner = new coreTaskRunnerServiceClass();
                                                     taskRunner.allowVerboseLogging = true;
                                                     taskRunner.allowConsoleWrite = true;
                                                     taskRunner.StartService();
@@ -261,10 +261,10 @@ namespace Contensive.Core
                                 //
                                 using (cpCluster = new CPClass())
                                 {
-                                    using (programDataFiles = new fileSystemClass(cpCluster.core, cpCluster.core.cluster.config, fileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib"))
+                                    using (programDataFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.cluster.config, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib"))
                                     {
                                         cpCluster = new CPClass();
-                                        programDataFiles = new fileSystemClass(cpCluster.core, cpCluster.core.cluster.config, fileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib");
+                                        programDataFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.cluster.config, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib");
                                         JSONTemp = programDataFiles.ReadFile("serverConfig.json");
                                         if (string.IsNullOrEmpty(JSONTemp))
                                         {
@@ -284,12 +284,12 @@ namespace Contensive.Core
                                                     //
                                                     Console.WriteLine("Beginning command line taskScheduler and taskRunner. Hit any key to exit");
                                                     //
-                                                    taskSchedulerServiceClass taskScheduler = new taskSchedulerServiceClass();
+                                                    coreTaskSchedulerServiceClass taskScheduler = new coreTaskSchedulerServiceClass();
                                                     taskScheduler.allowVerboseLogging = true;
                                                     taskScheduler.allowConsoleWrite = true;
                                                     taskScheduler.StartService(true, false);
                                                     //
-                                                    taskRunnerServiceClass taskRunner = new taskRunnerServiceClass();
+                                                    coreTaskRunnerServiceClass taskRunner = new coreTaskRunnerServiceClass();
                                                     taskRunner.allowVerboseLogging = true;
                                                     taskRunner.allowConsoleWrite = true;
                                                     taskRunner.StartService();

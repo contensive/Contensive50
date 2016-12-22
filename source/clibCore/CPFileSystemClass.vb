@@ -24,14 +24,14 @@ Namespace Contensive.Core
         Private core As Contensive.Core.cpCoreClass
         Protected disposed As Boolean = False
         '
-        Private fileSystem As Core.fileSystemClass
+        Private fileSystem As Core.coreFileSystemClass
         '
         '==========================================================================================
         ''' <summary>
         ''' Constructor
         ''' </summary>
         ''' <param name="core"></param>
-        Public Sub New(ByVal core As Contensive.Core.cpCoreClass, fileSystem As fileSystemClass)
+        Public Sub New(ByVal core As Contensive.Core.cpCoreClass, fileSystem As coreFileSystemClass)
             MyBase.New()
             Me.core = core
             Me.fileSystem = fileSystem

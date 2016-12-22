@@ -4,7 +4,7 @@
 
 Namespace Contensive.Core
     Public Class statusServerClass
-        Private cmdListener As New ipDaemonClass
+        Private cmdListener As New coreIpDaemonClass
         Private cpCore As cpCoreClass
         '
         Friend Sub startListening()
@@ -238,52 +238,52 @@ Namespace Contensive.Core
 
                                     'hint = "Checking status for application [" & AppName & "]"
                                     Select Case cpApp.core.app.status
-                                        Case ccCommonModule.applicationStatusEnum.ApplicationStatusConnectionObjectFailure
+                                        Case coreCommonModule.applicationStatusEnum.ApplicationStatusConnectionObjectFailure
                                             ReDim Preserve errors(ErrorCount)
                                             errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Connection Object failure")
                                             Content = Content & StatusLine(2, errors(ErrorCount))
                                             ErrorCount = ErrorCount + 1
-                                        Case ccCommonModule.applicationStatusEnum.ApplicationStatusConnectionStringFailure
+                                        Case coreCommonModule.applicationStatusEnum.ApplicationStatusConnectionStringFailure
                                             ReDim Preserve errors(ErrorCount)
                                             errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Connection String Failure")
                                             Content = Content & StatusLine(2, errors(ErrorCount))
                                             ErrorCount = ErrorCount + 1
-                                        Case ccCommonModule.applicationStatusEnum.ApplicationStatusDataSourceFailure
+                                        Case coreCommonModule.applicationStatusEnum.ApplicationStatusDataSourceFailure
                                             ReDim Preserve errors(ErrorCount)
                                             errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Data Source Failure")
                                             Content = Content & StatusLine(2, errors(ErrorCount))
                                             ErrorCount = ErrorCount + 1
-                                        Case ccCommonModule.applicationStatusEnum.ApplicationStatusDbBad
+                                        Case coreCommonModule.applicationStatusEnum.ApplicationStatusDbBad
                                             ReDim Preserve errors(ErrorCount)
                                             errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Bad Database")
                                             Content = Content & StatusLine(2, errors(ErrorCount))
                                             ErrorCount = ErrorCount + 1
-                                        Case ccCommonModule.applicationStatusEnum.ApplicationStatusDbNotFound
+                                        Case coreCommonModule.applicationStatusEnum.ApplicationStatusDbNotFound
                                             ReDim Preserve errors(ErrorCount)
                                             errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Database Failure")
                                             Content = Content & StatusLine(2, errors(ErrorCount))
                                             ErrorCount = ErrorCount + 1
-                                        Case ccCommonModule.applicationStatusEnum.ApplicationStatusKernelFailure
+                                        Case coreCommonModule.applicationStatusEnum.ApplicationStatusKernelFailure
                                             ReDim Preserve errors(ErrorCount)
                                             errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Kernel Failure")
                                             Content = Content & StatusLine(2, errors(ErrorCount))
                                             ErrorCount = ErrorCount + 1
-                                        Case ccCommonModule.applicationStatusEnum.ApplicationStatusLicenseFailure
+                                        Case coreCommonModule.applicationStatusEnum.ApplicationStatusLicenseFailure
                                             ReDim Preserve errors(ErrorCount)
                                             errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned License Failure")
                                             Content = Content & StatusLine(2, errors(ErrorCount))
                                             ErrorCount = ErrorCount + 1
-                                        Case ccCommonModule.applicationStatusEnum.ApplicationStatusNoHostService
+                                        Case coreCommonModule.applicationStatusEnum.ApplicationStatusNoHostService
                                             ReDim Preserve errors(ErrorCount)
                                             errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned ccServer Service is not running")
                                             Content = Content & StatusLine(2, errors(ErrorCount))
                                             ErrorCount = ErrorCount + 1
-                                        Case ccCommonModule.applicationStatusEnum.ApplicationStatusNotFound
+                                        Case coreCommonModule.applicationStatusEnum.ApplicationStatusNotFound
                                             ReDim Preserve errors(ErrorCount)
                                             errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned application not found")
                                             Content = Content & StatusLine(2, errors(ErrorCount))
                                             ErrorCount = ErrorCount + 1
-                                        Case ccCommonModule.applicationStatusEnum.ApplicationStatusNotEnabled
+                                        Case coreCommonModule.applicationStatusEnum.ApplicationStatusNotEnabled
                                             ReDim Preserve errors(ErrorCount)
                                             errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned application not running")
                                             Content = Content & StatusLine(2, errors(ErrorCount))
@@ -293,12 +293,12 @@ Namespace Contensive.Core
                                                 '    errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned application starting")
                                                 '    Content = Content & StatusLine(2, errors(ErrorCount))
                                                 '    ErrorCount = ErrorCount + 1
-                                        Case ccCommonModule.applicationStatusEnum.ApplicationStatusUpgrading
+                                        Case coreCommonModule.applicationStatusEnum.ApplicationStatusUpgrading
                                             ReDim Preserve errors(ErrorCount)
                                             errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned application upgrading")
                                             Content = Content & StatusLine(2, errors(ErrorCount))
                                             ErrorCount = ErrorCount + 1
-                                        Case ccCommonModule.applicationStatusEnum.ApplicationStatusReady
+                                        Case coreCommonModule.applicationStatusEnum.ApplicationStatusReady
                                             If True Then
                                                 '
                                                 ' access content server for this application

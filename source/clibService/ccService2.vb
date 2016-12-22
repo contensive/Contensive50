@@ -4,8 +4,8 @@
 
 Namespace Contensive.Core
     Public Class ccService2
-        Dim taskScheduler As taskSchedulerServiceClass = Nothing
-        Dim taskRunner As taskRunnerServiceClass = Nothing
+        Dim taskScheduler As coreTaskSchedulerServiceClass = Nothing
+        Dim taskRunner As coreTaskRunnerServiceClass = Nothing
         '
         '====================================================================================================
         ''' <summary>
@@ -23,7 +23,7 @@ Namespace Contensive.Core
                     ' this server is the scheduler
                     '
                     cp.core.appendLog("ccService2.OnStart, start taskScheduler")
-                    taskScheduler = New taskSchedulerServiceClass()
+                    taskScheduler = New coreTaskSchedulerServiceClass()
                     Call taskScheduler.StartService(True, False)
                 End If
                 If (True) Then
@@ -31,7 +31,7 @@ Namespace Contensive.Core
                     ' this server is a runner
                     '
                     cp.core.appendLog("ccService2.OnStart, start taskRunner")
-                    taskRunner = New taskRunnerServiceClass()
+                    taskRunner = New coreTaskRunnerServiceClass()
                     Call taskRunner.StartService()
                 End If
                 cp.core.appendLog("ccService2.OnStart exit")

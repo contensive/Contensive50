@@ -108,7 +108,7 @@ Namespace Contensive.Core
         End Function
 
         Public Overrides Function GetDataSource(ByVal ContentName As String) As String
-            Return cpCore.csv_GetContentDataSource(ContentName)
+            Return cpCore.db_GetContentDataSource(ContentName)
         End Function
 
         Public Overrides Function GetEditLink(ByVal ContentName As String, ByVal RecordID As String, ByVal AllowCut As Boolean, ByVal RecordName As String, ByVal IsEditing As Boolean) As String

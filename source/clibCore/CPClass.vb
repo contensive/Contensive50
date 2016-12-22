@@ -1,18 +1,14 @@
 
-Imports System
-Imports System.IO
-Imports System.Reflection
 Imports System.Runtime.InteropServices
-Imports System.Text
 Imports Contensive.BaseClasses
-Imports Contensive.Core
+Imports Xunit
 
 Namespace Contensive.Core
     '
     ' comVisible to be activeScript compatible
     '
-    <ComVisible(True)> _
-    <ComClass(CPClass.ClassId, CPClass.InterfaceId, CPClass.EventsId)> _
+    <ComVisible(True)>
+    <ComClass(CPClass.ClassId, CPClass.InterfaceId, CPClass.EventsId)>
     Public Class CPClass
         Inherits CPBaseClass
         Implements IDisposable
@@ -481,7 +477,7 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public ReadOnly Property cluster() As clusterServicesClass
+        Public ReadOnly Property cluster() As coreClusterClass
             Get
                 '
                 ' core blocks this property if not authCluster
@@ -518,5 +514,156 @@ Namespace Contensive.Core
             MyBase.Finalize()
         End Sub
 #End Region
+    End Class
+    '
+    '====================================================================================================
+    ' unit tests
+    '
+    Public Class CPClassTests
+        '
+        '====================================================================================================
+        ' unit test - cp.addVar
+        '
+        <Fact> Public Sub cp_AddVar_unit()
+            ' arrange
+            Dim cp As New CPClass()
+            Dim cpApp As New CPClass("testapp")
+            ' act
+            cp.AddVar("a", "1")
+            cp.AddVar("b", "2")
+            cp.AddVar("b", "3")
+            cpApp.AddVar("a", "4")
+            cpApp.AddVar("b", "5")
+            For ptr = 1 To 1000
+                cpApp.AddVar("key" & ptr.ToString, "value" & ptr.ToString())
+            Next
+            ' assert
+            Assert.Equal(cp.Doc.GetText("a"), "1")
+            Assert.Equal(cp.Doc.GetText("b"), "3")
+            Assert.Equal(cpApp.Doc.GetText("a"), "4")
+            Assert.Equal(cpApp.Doc.GetText("b"), "5")
+            For ptr = 1 To 1000
+                Assert.Equal(cpApp.Doc.GetText("key" & ptr.ToString), "value" & ptr.ToString())
+            Next
+            ' dispose
+            cp.Dispose()
+            cpApp.Dispose()
+        End Sub
+        '
+        '====================================================================================================
+        ' unit test - cp.appOk
+        '
+        <Fact> Public Sub cp_AppOk_unit()
+            ' arrange
+            Dim cp As New CPClass()
+            Dim cpApp As New CPClass("testapp")
+            ' act
+            ' assert
+            Assert.Equal(cp.appOk, False)
+            Assert.Equal(cpApp.appOk, True)
+            ' dispose
+            cp.Dispose()
+            cpApp.Dispose()
+        End Sub
+        '
+        '====================================================================================================
+        ' unit test - cp.blockNew
+        '
+        <Fact> Public Sub cp_BlockNew_unit()
+            ' arrange
+            Dim cpApp As New CPClass("testapp")
+            Dim block As CPBlockClass = cpApp.BlockNew()
+            Const layoutContent As String = "content"
+            Const layoutA As String = "<div id=""aid"" class=""aclass"">" & layoutContent & "</div>"
+            Const layoutB As String = "<div id=""bid"" class=""bclass"">" & layoutA & "</div>"
+            Const layoutC As String = "<div id=""cid"" class=""cclass"">" & layoutB & "</div>"
+            Dim layoutInnerLength As Integer = layoutA.Length
+            ' act
+            block.Load(layoutC)
+            ' assert
+            Assert.Equal(block.GetHtml(), layoutC)
+            '
+            Assert.Equal(block.GetInner("#aid"), layoutContent)
+            Assert.Equal(block.GetInner(".aclass"), layoutContent)
+            '
+            Assert.Equal(block.GetOuter("#aid"), layoutA)
+            Assert.Equal(block.GetOuter(".aclass"), layoutA)
+            '
+            Assert.Equal(block.GetInner("#bid"), layoutA)
+            Assert.Equal(block.GetInner(".bclass"), layoutA)
+            '
+            Assert.Equal(block.GetOuter("#bid"), layoutB)
+            Assert.Equal(block.GetOuter(".bclass"), layoutB)
+            '
+            Assert.Equal(block.GetInner("#cid"), layoutB)
+            Assert.Equal(block.GetInner(".cclass"), layoutB)
+            '
+            Assert.Equal(block.GetOuter("#cid"), layoutC)
+            Assert.Equal(block.GetOuter(".cclass"), layoutC)
+            '
+            Assert.Equal(block.GetInner("#cid .bclass"), layoutA)
+            Assert.Equal(block.GetInner(".cclass #bid"), layoutA)
+            '
+            Assert.Equal(block.GetOuter("#cid .bclass"), layoutB)
+            Assert.Equal(block.GetOuter(".cclass #bid"), layoutB)
+            '
+            Assert.Equal(block.GetInner("#cid .aclass"), layoutContent)
+            Assert.Equal(block.GetInner(".cclass #aid"), layoutContent)
+            '
+            Assert.Equal(block.GetOuter("#cid .aclass"), layoutA)
+            Assert.Equal(block.GetOuter(".cclass #aid"), layoutA)
+            '
+            block.Clear()
+            Assert.Equal(block.GetHtml(), "")
+            '
+            block.Clear()
+            block.Append("1")
+            block.Append("2")
+            Assert.Equal(block.GetHtml(), "12")
+            '
+            block.Clear()
+            block.Prepend("1")
+            block.Prepend("2")
+            Assert.Equal(block.GetHtml(), "21")
+            '
+            block.Load(layoutA)
+            block.SetInner("#aid", "1234")
+            Assert.Equal(block.GetHtml(), layoutA.Replace(layoutContent, "1234"))
+            '
+            block.Load(layoutB)
+            block.SetOuter("#aid", "1234")
+            Assert.Equal(block.GetHtml(), layoutB.Replace(layoutA, "1234"))
+            '
+            ' dispose
+            cpApp.Dispose()
+        End Sub
+        '
+        '====================================================================================================
+        ' unit test - cache
+        '
+        <Fact> Public Sub cp_cache_unit()
+            ' arrange
+            Dim cp As New CPClass()
+            ' act
+            '
+            ' assert
+            Assert.Equal(cp.appOk, False)
+            ' dispose
+            cp.Dispose()
+        End Sub
+        '
+        '====================================================================================================
+        ' unit test - sample
+        '
+        <Fact> Public Sub cp_sample_unit()
+            ' arrange
+            Dim cp As New CPClass()
+            ' act
+            '
+            ' assert
+            Assert.Equal(cp.appOk, False)
+            ' dispose
+            cp.Dispose()
+        End Sub
     End Class
 End Namespace

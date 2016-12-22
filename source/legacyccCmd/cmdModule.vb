@@ -208,7 +208,7 @@ End Namespace
 '                                '
 '                                System.Threading.Thread.Sleep(3000)
 '                                SiteBuilder = New builderClass(cpCore)
-'                                Call SiteBuilder.web_reset()
+'                                Call SiteBuilder.web.reset()
 '                            Case "UNZIPANDDELETEFILE"
 '                                '
 '                                '
