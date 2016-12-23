@@ -120,7 +120,7 @@ Namespace Contensive.Core
                 If Not dataStore.loaded Then
                     Try
                         needsToReload = True
-                        dataStore = DirectCast(app.cache.readRaw2(cacheName), dataStoreClass)
+                        dataStore = DirectCast(app.cache.readRaw(cacheName), dataStoreClass)
                     Catch ex As Exception
                         needsToReload = True
                     End Try

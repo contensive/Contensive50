@@ -40,5 +40,20 @@ namespace TestIntegration2
 
             cp.Dispose();
         }
+        /// <summary>
+        /// cp.cache save
+        /// </summary>
+        [Fact]
+        private void cpCacheSave_integration()
+        {
+            // arrange
+            CPClass cp = new CPClass("testapp");
+            // act
+            cp.Cache.Save("testKey", "testValue");
+            // assert
+            Assert.Equal(cp.Cache.Read("testKey"), "testValue");
+            // dispose
+            cp.Dispose();
+        }
     }
 }

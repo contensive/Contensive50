@@ -2083,7 +2083,7 @@ Namespace Contensive.Core
                         main_ServerDomainPrimary = ""
                     End If
                     '
-                    domainDetailsListText = EncodeText(app.cache.read4(Of String)("domainContentList"))
+                    domainDetailsListText = EncodeText(app.cache.read(Of String)("domainContentList"))
                     If Not String.IsNullOrEmpty(domainDetailsListText) Then
                         Try
                             domainDetailsList = json.Deserialize(Of Dictionary(Of String, domainDetailsClass))(domainDetailsListText)
@@ -2177,7 +2177,7 @@ Namespace Contensive.Core
                             '
                             SQL = "update ccdomains set visited=1 where name=" & app.db_EncodeSQLText(web.requestDomain)
                             Call app.executeSql(SQL)
-                            Call app.cache.save3("domainContentList", "", "domains")
+                            Call app.cache.save("domainContentList", "", "domains")
                         End If
                         If domainDetails.typeId = 1 Then
                             '
@@ -2264,7 +2264,7 @@ Namespace Contensive.Core
                         ' if there was a change, update the cache
                         '
                         domainDetailsListText = json.Serialize(domainDetailsList)
-                        Call app.cache.save3("domainContentList", domainDetailsListText, "domains")
+                        Call app.cache.save("domainContentList", domainDetailsListText, "domains")
                     End If
                     'domainFound = False
                     'domainArray = Split(domainDetailsListText & defaultDomainContentList, vbCrLf)
@@ -27614,7 +27614,7 @@ ErrorTrap:
                     Next
                 End If
                 '
-                BotList = EncodeText(app.cache.readRaw2("DefaultBotNameList"))
+                BotList = EncodeText(app.cache.readRaw("DefaultBotNameList"))
                 If BotList <> "" Then
                     '
                     ' First line of Persistent variant is the expiration date (1 hour in the future)
@@ -28361,7 +28361,7 @@ ErrorTrap:
                 BakeName = Replace(BakeName, ":", "_")
                 BakeName = Replace(BakeName, ".", "_")
                 BakeName = Replace(BakeName, " ", "_")
-                main_GetSectionMenu_NameMenu = EncodeText(app.cache.read4(Of String)(BakeName))
+                main_GetSectionMenu_NameMenu = EncodeText(app.cache.read(Of String)(BakeName))
                 If main_GetSectionMenu_NameMenu <> "" Then
                     main_GetSectionMenu_NameMenu = main_GetSectionMenu_NameMenu
                 Else
@@ -28518,7 +28518,7 @@ ErrorTrap:
                         End If
                         main_GetSectionMenu_NameMenu = main_GetSectionMenu_NameMenu & Replace(main_GetMenu(MenuNamePrefix & EncodeText(MenuID), MenuStyle, StyleSheetPrefix), vbCrLf, "")
                         main_GetSectionMenu_NameMenu = main_GetSectionMenu_NameMenu & main_GetMenuClose()
-                        Call app.cache.save3(BakeName, main_GetSectionMenu_NameMenu, ContentName & ",Site Sections,Dynamic Menus,Dynamic Menu Section Rules")
+                        Call app.cache.save(BakeName, main_GetSectionMenu_NameMenu, ContentName & ",Site Sections,Dynamic Menus,Dynamic Menu Section Rules")
                     End If
                 End If
             End If
@@ -28583,7 +28583,7 @@ ErrorTrap:
                 BakeName = Replace(BakeName, ":", "_")
                 BakeName = Replace(BakeName, ".", "_")
                 BakeName = Replace(BakeName, " ", "_")
-                main_GetSectionMenu_IdMenu = EncodeText(app.cache.read4(Of String)(BakeName))
+                main_GetSectionMenu_IdMenu = EncodeText(app.cache.read(Of String)(BakeName))
                 If main_GetSectionMenu_IdMenu <> "" Then
                     main_GetSectionMenu_IdMenu = main_GetSectionMenu_IdMenu
                 Else
@@ -28793,7 +28793,7 @@ ErrorTrap:
                         '
                         ' ----- Bake the completed menu
                         '
-                        Call app.cache.save3(BakeName, main_GetSectionMenu_IdMenu, ContentName & ",Site Sections,Dynamic Menus,Dynamic Menu Section Rules")
+                        Call app.cache.save(BakeName, main_GetSectionMenu_IdMenu, ContentName & ",Site Sections,Dynamic Menus,Dynamic Menu Section Rules")
                     End If
                 End If
             End If
@@ -30461,7 +30461,7 @@ ErrorTrap:
             Dim StyleSheetCopy As String
             '
             BakeName = "AutoSiteTemplate" & templateId
-            main_GetAutoSite_Template = EncodeText(app.cache.read4(Of String)(BakeName))
+            main_GetAutoSite_Template = EncodeText(app.cache.read(Of String)(BakeName))
             If main_GetAutoSite_Template = "" Then
                 If templateId = 0 Then
                     '
@@ -30501,7 +30501,7 @@ ErrorTrap:
                     ' Assemble Template
                     '
                 End If
-                Call app.cache.save3(BakeName, main_GetAutoSite_Template, "AutoSite Templates")
+                Call app.cache.save(BakeName, main_GetAutoSite_Template, "AutoSite Templates")
             End If
             '
             Exit Function
@@ -34108,7 +34108,7 @@ ErrorTrap:
                         & "</table>" _
                         & "</div>"
                     If Not IsAuthoringMode Then
-                        Call app.cache.save3(BakeName, main_GetFormInputCheckListCategories, "Content Categories," & PrimaryContentName & "," & SecondaryContentName & "," & RulesContentName)
+                        Call app.cache.save(BakeName, main_GetFormInputCheckListCategories, "Content Categories," & PrimaryContentName & "," & SecondaryContentName & "," & RulesContentName)
                     End If
                     '
                     ' initialize with all open
@@ -34582,7 +34582,7 @@ ErrorTrap:
             ' Load cache
             '
             On Error Resume Next
-            cacheTest = app.cache.readRaw2(cache_linkAlias_cacheName)
+            cacheTest = app.cache.readRaw(cache_linkAlias_cacheName)
             If Not main_IsWorkflowRendering() Then
                 If Not IsNothing(cacheTest) Then
                     cacheArray = DirectCast(cacheTest, Object())
@@ -34674,7 +34674,7 @@ ErrorTrap:
             cacheArray(0) = cache_linkAlias
             cacheArray(1) = cache_linkAlias_PageIdQSSIndex.exportPropertyBag
             cacheArray(2) = cache_linkAlias_NameIndex.exportPropertyBag
-            Call app.cache.save3(cache_linkAlias_cacheName, cacheArray, "link aliases")
+            Call app.cache.save(cache_linkAlias_cacheName, cacheArray, "link aliases")
             '
             Exit Sub
 ErrorTrap:
@@ -35245,7 +35245,7 @@ ErrorTrap:
             '
             On Error Resume Next
             If Not main_IsWorkflowRendering Then
-                arrayTest = app.cache.readRaw2(pageManager_cache_pageContent_cacheName)
+                arrayTest = app.cache.readRaw(pageManager_cache_pageContent_cacheName)
                 If Not IsNothing(arrayTest) Then
                     arrayData = DirectCast(arrayTest, Object())
                     If Not IsNothing(arrayData) Then
@@ -35935,7 +35935,7 @@ ErrorTrap:
             '
             On Error Resume Next
             If Not main_IsWorkflowRendering() Then
-                cacheTest = app.cache.readRaw2(pageManager_cache_siteSection_cacheName)
+                cacheTest = app.cache.readRaw(pageManager_cache_siteSection_cacheName)
                 If Not IsNothing(cacheTest) Then
                     cacheObject = DirectCast(cacheTest, Object())
                     If Not IsNothing(cacheObject) Then
@@ -36120,7 +36120,7 @@ ErrorTrap:
             '
             On Error Resume Next
             If Not main_IsWorkflowRendering() Then
-                arrayTest = app.cache.readRaw2(pageManager_cache_pageTemplate_cacheName)
+                arrayTest = app.cache.readRaw(pageManager_cache_pageTemplate_cacheName)
                 If Not IsNothing(arrayTest) Then
                     arrayData = DirectCast(arrayTest, Object())
                     If Not IsNothing(arrayData) Then
@@ -36462,7 +36462,7 @@ ErrorTrap:
             Dim DateExpires As Date
             Dim datetext As String
             '
-            main_GetMobileBrowserList = EncodeText(app.cache.readRaw2("MobileBrowserList"))
+            main_GetMobileBrowserList = EncodeText(app.cache.readRaw("MobileBrowserList"))
             If main_GetMobileBrowserList <> "" Then
                 datetext = getLine(main_GetMobileBrowserList)
                 If EncodeDate(datetext) < Now() Then
@@ -37005,7 +37005,7 @@ ErrorTrap:
             Else
                 BakeName = "SharedStyleMap-Public"
             End If
-            MapList = EncodeText(app.cache.read4(Of String)(BakeName))
+            MapList = EncodeText(app.cache.read(Of String)(BakeName))
             If MapList = "" Then
                 '
                 ' BuildMap
@@ -37046,7 +37046,7 @@ ErrorTrap:
                 If MapList = "" Then
                     MapList = ","
                 End If
-                Call app.cache.save3(BakeName, MapList, "Shared Styles")
+                Call app.cache.save(BakeName, MapList, "Shared Styles")
             End If
             If (MapList <> "") And (MapList <> ",") Then
                 Srcs = Split(SharedStyleIDList, ",")
@@ -40248,7 +40248,7 @@ ErrorTrap:
                 Const cacheName = "Domain Content List Cache"
                 '
                 If Not serverDomainList_localLoaded Then
-                    serverDomainList_local = DirectCast(app.cache.read4(Of List(Of String))(cacheName), List(Of String))
+                    serverDomainList_local = DirectCast(app.cache.read(Of List(Of String))(cacheName), List(Of String))
                     If (serverDomainList_local Is Nothing) Then
                         '
                         ' recreate (non-default) domain table list
@@ -40264,7 +40264,7 @@ ErrorTrap:
                         For Each dr As DataRow In dt.Rows
                             serverDomainList_local.Add(dr(0).ToString)
                         Next
-                        Call app.cache.save3(cacheName, serverDomainList_local, "domains")
+                        Call app.cache.save(cacheName, serverDomainList_local, "domains")
                     End If
                     serverDomainList_localLoaded = True
                 End If
@@ -40285,7 +40285,7 @@ ErrorTrap:
                 Const cacheName = "Domain Content Cross List Cache"
                 '
                 If Not main_Private_ServerDomainCrossList_Loaded Then
-                    main_Private_ServerDomainCrossList = EncodeText(app.cache.read4(Of String)(cacheName))
+                    main_Private_ServerDomainCrossList = EncodeText(app.cache.read(Of String)(cacheName))
                     If True And (main_Private_ServerDomainCrossList = "") Then
                         main_Private_ServerDomainCrossList = ","
                         SQL = "select name from ccDomains where (typeId=1)and(allowCrossLogin<>0)"
@@ -40293,7 +40293,7 @@ ErrorTrap:
                         For Each dr As DataRow In dt.Rows
                             main_Private_ServerDomainCrossList &= dr(0).ToString
                         Next
-                        Call app.cache.save3(cacheName, main_Private_ServerDomainCrossList, "domains")
+                        Call app.cache.save(cacheName, main_Private_ServerDomainCrossList, "domains")
                     End If
                     main_Private_ServerDomainCrossList_Loaded = True
                 End If
@@ -45288,7 +45288,7 @@ ErrorTrap:
                     ' Load cached addonCache
                     '
                     Try
-                        cacheTest = app.cache.read4(Of cache_addonsClass)(cache_addon_cacheName)
+                        cacheTest = app.cache.read(Of cache_addonsClass)(cache_addon_cacheName)
                         If Not IsNothing(cacheTest) Then
                             cache_addons = DirectCast(cacheTest, cache_addonsClass)
                             If Not IsNothing(cache_addons) Then
@@ -45446,7 +45446,7 @@ ErrorTrap:
             Call cache_addons.guidIndex.getPtr("test")
             cache_addons.propertyBag_guidIndex = cache_addons.guidIndex.exportPropertyBag()
             '
-            Call app.cache.save3(cache_addon_cacheName, cache_addons, "add-ons")
+            Call app.cache.save(cache_addon_cacheName, cache_addons, "add-ons")
             'Call app.cache.cache_saveRaw(cache_addon_cacheName, cache_addons)
             '
             Exit Sub
@@ -45473,7 +45473,7 @@ ErrorTrap:
             cache_addons.propertyBag_guidIndex = ""
             cache_addons.propertyBag_idIndex = ""
             cache_addons.propertyBag_nameIndex = ""
-            Call app.cache.save3(cache_addon_cacheName, cache_addons, "add-ons")
+            Call app.cache.save(cache_addon_cacheName, cache_addons, "add-ons")
             '
             Exit Sub
             '
@@ -46027,7 +46027,7 @@ ErrorTrap:
             '
             On Error Resume Next
             If Not main_IsWorkflowRendering() Then
-                cacheTest = app.cache.readRaw2(cache_addonIncludeRules_cacheName)
+                cacheTest = app.cache.readRaw(cache_addonIncludeRules_cacheName)
                 If TypeOf cacheTest Is addonIncludeRulesClass Then
                     cache_addonIncludeRules = DirectCast(cacheTest, addonIncludeRulesClass)
                 End If
@@ -46144,7 +46144,7 @@ ErrorTrap:
             '
             ' Load cache
             '
-            cacheValue = DirectCast(app.cache.readRaw2(cache_linkForward_cacheName), String)
+            cacheValue = DirectCast(app.cache.readRaw(cache_linkForward_cacheName), String)
             If cacheValue = "" Then
                 RS = app.executeSql("select sourceLink from ccLinkForwards where (sourceLink<>'')and(DestinationLink<>'')and(active<>0) order by id desc")
                 For Each dr As DataRow In RS.Rows
@@ -46245,7 +46245,7 @@ ErrorTrap:
                 cache_libraryFilesIdIndex = New coreKeyPtrIndexClass
                 cache_libraryFilesCnt = 0
                 '
-                cacheTest = app.cache.readRaw2(cache_LibraryFiles_cacheName)
+                cacheTest = app.cache.readRaw(cache_LibraryFiles_cacheName)
                 If Not IsNothing(cacheTest) Then
                     cacheArray = DirectCast(cacheTest, Object())
                     cache_libraryFiles = DirectCast(cacheArray(0), String(,))

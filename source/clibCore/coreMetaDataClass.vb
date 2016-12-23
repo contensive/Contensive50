@@ -431,7 +431,7 @@ Namespace Contensive.Core
                 '
                 ' load xref from cache
                 '
-                cdefNameIdXref = DirectCast(cpCore.app.cache.read4(Of Dictionary(Of String, Integer))("cdefNameIdXref"), Dictionary(Of String, Integer))
+                cdefNameIdXref = DirectCast(cpCore.app.cache.read(Of Dictionary(Of String, Integer))("cdefNameIdXref"), Dictionary(Of String, Integer))
                 If (cdefNameIdXref Is Nothing) OrElse (cdefNameIdXref.Count = 0) Then
                     '
                     ' load xref from Db
@@ -447,7 +447,7 @@ Namespace Contensive.Core
                         Next
                     End If
                     dt.Dispose()
-                    Call cpCore.app.cache.save3("cdefNameIdXref", cdefNameIdXref)
+                    Call cpCore.app.cache.save("cdefNameIdXref", cdefNameIdXref)
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex)
@@ -501,7 +501,7 @@ Namespace Contensive.Core
                     '
                     '
                     If (Not forceDbLoad) Then
-                        returnCdef = DirectCast(cpCore.app.cache.read4(Of CDefClass)("cdefId" & contentId.ToString), CDefClass)
+                        returnCdef = DirectCast(cpCore.app.cache.read(Of CDefClass)("cdefId" & contentId.ToString), CDefClass)
                     End If
                     If returnCdef Is Nothing Then
                         '
@@ -864,7 +864,7 @@ Namespace Contensive.Core
                             End With
                             getCdef_SetAdminColumns(returnCdef)
                         End If
-                        Call cpCore.app.cache.save3("cdefId" & contentId.ToString, returnCdef, "content,content fields")
+                        Call cpCore.app.cache.save("cdefId" & contentId.ToString, returnCdef, "content,content fields")
                     End If
                     cdefList.Add(contentId, returnCdef)
                 End If

@@ -10445,7 +10445,7 @@ ErrorTrap:
                 ' ----- Get the baked version
                 '
                 BakeName = "AdminMenu" & Format(cpCore.userId, "00000000")
-                GetMenuTopMode = EncodeText(cpCore.app.cache.read4(Of String)(BakeName))
+                GetMenuTopMode = EncodeText(cpCore.app.cache.read(Of String)(BakeName))
                 MenuDelimiterPosition = InStr(1, GetMenuTopMode, MenuDelimiter, vbTextCompare)
                 If MenuDelimiterPosition > 1 Then
                     MenuClose = Mid(GetMenuTopMode, MenuDelimiterPosition + Len(MenuDelimiter))
@@ -10546,7 +10546,7 @@ ErrorTrap:
                     '
                     MenuClose = cpCore.main_GetMenuClose()
                     'GetMenuTopMode = GetMenuTopMode & cpCore.main_GetMenuClose
-                    Call cpCore.app.cache.save3(BakeName, GetMenuTopMode & MenuDelimiter & MenuClose, "Menu Entries,People,Content,Groups,Group Rules")
+                    Call cpCore.app.cache.save(BakeName, GetMenuTopMode & MenuDelimiter & MenuClose, "Menu Entries,People,Content,Groups,Group Rules")
                 End If
                 cpCore.main_ClosePageHTML = cpCore.main_ClosePageHTML & MenuClose
             End If

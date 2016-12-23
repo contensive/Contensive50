@@ -11,16 +11,14 @@ Namespace Contensive.Core
         '
         ' store just for live of object. Cannot load in constructor without global code update
         '
-        Private Const invalidationDaysDefault As Double = 365
-        '
         Private cpCore As cpCoreClass
-        Private mc As Enyim.Caching.MemcachedClient
-        Private rightNow As Date = Now
-        Private cacheLogFilename As String
-        ' -- refactoring -- this is the old cache system run locally in this class, replace with cache lazy constructed external object
         Private cacheClient As Enyim.Caching.MemcachedClient
-        Private cacheClientConnected As Boolean = False
-        Private cache_globalInvalidationDate As Date = Date.MinValue            ' all read and save (not readRaw and saveRaw) are checked against this date, creates a glocval clear
+        Private rightNow As Date
+        Private cacheLogFilename As String
+        '
+        Private Const invalidationDaysDefault As Double = 365
+        Private cache_globalInvalidationDate As Date = Date.MinValue
+        Private cacheForceLocal As Boolean
         '
         '
         <Serializable()>
@@ -30,15 +28,31 @@ Namespace Contensive.Core
             Public invalidationDate As Date
             Public data As Object
         End Class
-        ''
-        '' App Cache storage data
-        ''
-        '<Serializable>
-        'Private Class CacheDataClass
-        '    Public dataSourceTagList As New List(Of String)
-        '    Public saveDate As Date
-        '    Public data As Object
-        'End Class
+
+        '
+        '====================================================================================================
+        '
+        Public Function readRaw(ByVal key As String) As Object
+            Dim returnObj As Object = Nothing
+            Try
+                If (String.IsNullOrEmpty(key)) Then
+                    Throw New ArgumentException("key cannot be blank")
+                Else
+                    If (siteProperty_AllowCache_SpecialCaseNotCached) Then
+                        If cpCore.cluster.config.isLocalCache Then
+                            Throw New NotImplementedException("local cache not implemented yet")
+                        Else
+                            If cpCore.app.config.enableCache Then
+                                returnObj = cacheClient.Get(encodeCacheKey(cpCore.app.config.name & "-" & key))
+                            End If
+                        End If
+                    End If
+                End If
+            Catch ex As Exception
+                Call cpCore.handleLegacyError8("exception")
+            End Try
+            Return returnObj
+        End Function
         '
         '====================================================================================================
         ''' <summary>
@@ -48,78 +62,44 @@ Namespace Contensive.Core
         Public Sub New(cpCore As cpCoreClass)
             Dim logMsg As String = "new cache instance"
             Try
+                Me.cpCore = cpCore
+                Dim cacheEndpointSplit As String()
+                Dim cacheEndpointPort As Integer
+                Dim cacheEndpoint As String
+                Dim cacheConfig As Amazon.ElastiCacheCluster.ElastiCacheClusterConfig
+                '
                 rightNow = Now()
                 cacheLogFilename = "cacheLog" & rightNow.Year.ToString() & rightNow.Month.ToString().PadLeft(2, "0"c) & rightNow.Day.ToString().PadLeft(2, "0"c) & ".txt"
-                If True Then
-                    Me.cpCore = cpCore
-                    Dim serverPortSplit As String()
-                    Dim port As Integer
-                    Dim awsElastiCacheConfigurationEndpoint As String
-                    Dim cacheConfig As Amazon.ElastiCacheCluster.ElastiCacheClusterConfig
-                    Dim saveValue As String = "123"
+                '
+                cacheForceLocal = True
+                cacheEndpoint = cpCore.cluster.config.awsElastiCacheConfigurationEndpoint
+                If String.IsNullOrEmpty(cacheEndpoint) Then
                     '
-                    ' setup cache
+                    logMsg &= ", elasticache disabled"
                     '
-                    _cacheIsLocal = True
-                    awsElastiCacheConfigurationEndpoint = cpCore.cluster.config.awsElastiCacheConfigurationEndpoint
-                    If String.IsNullOrEmpty(awsElastiCacheConfigurationEndpoint) Then
-                        '
-                        logMsg &= ", elasticache disabled"
-                        '
+                Else
+                    cacheEndpointSplit = cacheEndpoint.Split(":"c)
+                    If cacheEndpointSplit.Count > 1 Then
+                        cacheEndpointPort = EncodeInteger(cacheEndpointSplit(1))
                     Else
-                        '
-                        ' site property set, attempt connection
-                        '
-                        serverPortSplit = awsElastiCacheConfigurationEndpoint.Split(CChar(":"))
-                        If serverPortSplit.Count > 1 Then
-                            port = EncodeInteger(serverPortSplit(1))
-                        Else
-                            port = 11211
-                        End If
-                        cacheConfig = New Amazon.ElastiCacheCluster.ElastiCacheClusterConfig(serverPortSplit(0), port)
-                        cacheConfig.Protocol = Enyim.Caching.Memcached.MemcachedProtocol.Binary
-                        mc = New Enyim.Caching.MemcachedClient(cacheConfig)
-                        _cacheIsLocal = False
-                        ''
-                        '' test connection (comment out later)
-                        ''
-                        'mc.Store(Memcached.StoreMode.Set, testKey, saveValue, Now.AddMinutes(10))
-                        'testValue = mc.Get(testKey).ToString
-                        'If testValue = saveValue Then
-                        '    _cacheIsLocal = False
-                        '    logMsg &= ", elasticache enabled"
-                        'Else
-                        '    _cacheIsLocal = True
-                        '    logMsg &= ", elasticache failed initialization test, testKey(" & testKey & "), saveValue(" & saveValue & "), testValue(" & testValue & ")"
-                        '    cpCore.handleException(cp, New Exception("cacheClass constructor failed save/get memcachd test."))
-                        'End If
+                        cacheEndpointPort = 11211
                     End If
-                    '
-                    ' initialize cache - load global cache invalidation date
-                    '
-                    cache_globalInvalidationDate = EncodeDate(readRaw2("globalInvalidationDate"))
-                    appendCacheLog(logMsg)
+                    cacheConfig = New Amazon.ElastiCacheCluster.ElastiCacheClusterConfig(cacheEndpointSplit(0), cacheEndpointPort)
+                    cacheConfig.Protocol = Enyim.Caching.Memcached.MemcachedProtocol.Binary
+                    cacheClient = New Enyim.Caching.MemcachedClient(cacheConfig)
+                    cacheForceLocal = False
                 End If
+                '
+                ' initialize cache - load global cache invalidation date
+                '
+                cache_globalInvalidationDate = EncodeDate(readRaw("globalInvalidationDate"))
+                appendCacheLog(logMsg)
             Catch ex As Exception
                 '
                 appendCacheLog(logMsg & ", exception exit")
                 cpCore.handleException(ex, "Exception in cacheClass newNew constructor")
             End Try
         End Sub
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' false if elasticache has initialized successfully
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Private ReadOnly Property cacheIsLocal As Boolean
-            Get
-                Return _cacheIsLocal
-            End Get
-        End Property
-        Private _cacheIsLocal As Boolean = True
         '
         '====================================================================================================
         ''' <summary>
@@ -159,25 +139,25 @@ Namespace Contensive.Core
         ''' <remarks></remarks>
         Private Sub saveRaw(ByVal Key As String, ByVal data As Object, invalidationDate As Date)
             Try
-                Dim dataString As String
-                Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer
+                'Dim dataString As String
+                'Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer
                 '
                 'appendCacheLog(vbTab & vbTab & "saveRaw(" & cp.Doc.StartTime & "), cacheName(" & Key & "), data(" & data.ToString() & "), invalidationDate(" & invalidationDate.ToString() & ")")
                 '
-                If TypeOf (data) Is String Then
-                    dataString = DirectCast(data, String)
-                ElseIf TypeOf (data) Is Date Then
-                    dataString = CDate(data).ToString
-                Else
-                    dataString = json_serializer.Serialize(data)
-                    'dataString = Newtonsoft.Json.JsonConvert.SerializeObject(data)
-                    'dataString = Newtonsoft.Json.JsonConvert.SerializeObject(data).Replace(vbCrLf, "")
-                End If
-                If cacheIsLocal Then
+                'If TypeOf (data) Is String Then
+                '    dataString = DirectCast(data, String)
+                'ElseIf TypeOf (data) Is Date Then
+                '    dataString = CDate(data).ToString
+                'Else
+                '    dataString = json_serializer.Serialize(data)
+                '    'dataString = Newtonsoft.Json.JsonConvert.SerializeObject(data)
+                '    'dataString = Newtonsoft.Json.JsonConvert.SerializeObject(data).Replace(vbCrLf, "")
+                'End If
+                If cacheForceLocal Then
                     Throw New NotImplementedException("Local cache mode is not implemented yet")
                     'cp.Cache.Save(encodeCacheKey(Key), dataString, , invalidationDate)
                 Else
-                    Call mc.Store(Enyim.Caching.Memcached.StoreMode.Set, encodeCacheKey(Key), dataString, invalidationDate)
+                    Call cacheClient.Store(Enyim.Caching.Memcached.StoreMode.Set, encodeCacheKey(Key), data, invalidationDate)
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex)
@@ -186,13 +166,13 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         ''' <summary>
-        ''' write a cacheData object to ae.pcache. Private because newNew must have already been called.
+        ''' write a cacheData object to cache. Private because newNew must have already been called.
         ''' </summary>
         ''' <param name="Key"></param>
-        ''' <param name="data"></param>
+        ''' <param name="cacheData"></param>
         ''' <param name="invalidationDate"></param>
         ''' <remarks></remarks>
-        Private Sub save2(ByVal Key As String, ByVal data As cacheDataClass, Optional invalidationDate As Date = #12:00:00 AM#)
+        Private Sub save(ByVal Key As String, ByVal cacheData As cacheDataClass, Optional invalidationDate As Date = #12:00:00 AM#)
             Try
                 Dim allowSave As Boolean
                 '
@@ -206,15 +186,15 @@ Namespace Contensive.Core
                     cpCore.handleException(New Exception("invalidationDate must be > current date/time"))
                 Else
                     allowSave = False
-                    If data Is Nothing Then
+                    If cacheData Is Nothing Then
                         allowSave = True
-                    ElseIf Not data.GetType.IsSerializable Then
+                    ElseIf Not cacheData.GetType.IsSerializable Then
                         cpCore.handleException(New Exception("Data object must be serializable"))
                     Else
                         allowSave = True
                     End If
                     If allowSave Then
-                        saveRaw(encodeCacheKey(Key), data, invalidationDate)
+                        saveRaw(encodeCacheKey(Key), cacheData, invalidationDate)
                     End If
                 End If
             Catch ex As Exception
@@ -227,31 +207,17 @@ Namespace Contensive.Core
         ''' save a string to cache, for compatibility with existing site. (no objects, no invalidation, yet)
         ''' </summary>
         ''' <param name="CP"></param>
-        ''' <param name="cacheName"></param>
-        ''' <param name="cacheValue"></param>
+        ''' <param name="key"></param>
+        ''' <param name="cacheObject"></param>
         ''' <remarks></remarks>
-        Public Sub save(ByVal CP As Contensive.BaseClasses.CPBaseClass, cacheName As String, cacheValue As String)
+        Public Sub save(key As String, cacheObject As Object)
             Try
-                Dim cacheData As cacheDataClass
-                Dim invalidationDate As Date
+                Dim invalidationDate As Date = rightNow.AddDays(invalidationDaysDefault + Rnd())
                 '
-                appendCacheLog(vbTab & "save(" & CP.Doc.StartTime & "), cacheName(" & cacheName & "), length(" & cacheValue.Length() & ")")
-                '
-                If allowCache Then
-                    invalidationDate = rightNow.AddDays(invalidationDaysDefault + Rnd())
-                    'addCacheNameToList(CP, cacheName)
-                    cacheData = New cacheDataClass()
-                    cacheData.data = cacheValue
-                    cacheData.saveDate = Now()
-                    cacheData.invalidationDate = invalidationDate
-                    cacheData.tagList = New List(Of String)
-                    save2(cacheName, cacheData, invalidationDate)
-                End If
+                Call save(key, cacheObject, invalidationDate, New List(Of String))
+
             Catch ex As Exception
-                Try
-                    cpCore.handleException(ex)
-                Catch errObj As Exception
-                End Try
+                cpCore.handleException(ex)
             End Try
         End Sub
         '
@@ -260,20 +226,19 @@ Namespace Contensive.Core
         ''' save an object to cache, with invalidation
         ''' 
         ''' </summary>
-        ''' <param name="CP"></param>
-        ''' <param name="cacheName"></param>
+        ''' <param name="key"></param>
         ''' <param name="cacheObject"></param>
         ''' <param name="invalidationDate"></param>
         ''' <param name="invalidationTagList">Each tag should represent the source of data, and should be invalidated when that source changes.</param>
         ''' <remarks></remarks>
-        Public Sub save(ByVal CP As Contensive.BaseClasses.CPBaseClass, cacheName As String, cacheObject As Object, invalidationDate As Date, invalidationTagList As List(Of String))
+        Public Sub save(key As String, cacheObject As Object, invalidationDate As Date, invalidationTagList As List(Of String))
             Try
-                '
-                If TypeOf cacheObject Is String Then
-                    appendCacheLog(vbTab & "save(" & CP.Doc.StartTime & "), cacheName(" & cacheName & "), length(" & DirectCast(cacheObject, String).Length() & ")")
-                Else
-                    appendCacheLog(vbTab & "save(" & CP.Doc.StartTime & "), cacheName(" & cacheName & "), length(not string)")
-                End If
+                '    '
+                '    If TypeOf cacheObject Is String Then
+                '        appendCacheLog(vbTab & "save( key(" & key & "), length(" & DirectCast(cacheObject, String).Length() & ")")
+                '    Else
+                '        appendCacheLog(vbTab & "save( key(" & key & "), obj")
+                '    End If
                 '
                 Dim cacheData As cacheDataClass
                 '
@@ -284,7 +249,8 @@ Namespace Contensive.Core
                     cacheData.saveDate = Now()
                     cacheData.invalidationDate = invalidationDate
                     cacheData.tagList = invalidationTagList
-                    save2(cacheName, cacheData, invalidationDate)
+                    '
+                    saveRaw(key, cacheData, invalidationDate)
                 End If
             Catch ex As Exception
                 Try
@@ -299,28 +265,16 @@ Namespace Contensive.Core
         ''' save a cache value, compatible with legacy method signature.
         ''' </summary>
         ''' <param name="CP"></param>
-        ''' <param name="cacheName"></param>
-        ''' <param name="cacheValue"></param>
-        ''' <param name="invalidationTagCommaList">Comma delimited list of tags. Each tag should represent the source of data, and should be invalidated when that source changes.</param>
+        ''' <param name="key"></param>
+        ''' <param name="cacheObject"></param>
+        ''' <param name="invalidationTagList">Comma delimited list of tags. Each tag should represent the source of data, and should be invalidated when that source changes.</param>
         ''' <remarks></remarks>
-        Public Sub save(ByVal CP As Contensive.BaseClasses.CPBaseClass, cacheName As String, cacheValue As String, invalidationTagCommaList As String)
+        Public Sub save(key As String, cacheObject As Object, invalidationTagList As List(Of String))
             Try
-                Dim invalidationList As New List(Of String)
-                Dim invalidationDate As Date
-                Dim cacheData As cacheDataClass
+                Dim invalidationDate As Date = rightNow.AddDays(invalidationDaysDefault + Rnd())
                 '
-                appendCacheLog(vbTab & "save(" & CP.Doc.StartTime & "), cacheName(" & cacheName & "), length(" & cacheValue.Length() & ")")
-                '
-                If allowCache Then
-                    invalidationList.AddRange(invalidationTagCommaList.Split(","c))
-                    invalidationDate = rightNow.AddDays(invalidationDaysDefault + Rnd())
-                    cacheData = New cacheDataClass()
-                    cacheData.data = cacheValue
-                    cacheData.saveDate = Now()
-                    cacheData.invalidationDate = invalidationDate
-                    cacheData.tagList = invalidationList
-                    save2(cacheName, cacheData, invalidationDate)
-                End If
+                Call save(key, cacheObject, invalidationDate, invalidationTagList)
+
             Catch ex As Exception
                 Try
                     cpCore.handleException(ex)
@@ -334,27 +288,17 @@ Namespace Contensive.Core
         ''' save a cache value, compatible with legacy method signature.
         ''' </summary>
         ''' <param name="CP"></param>
-        ''' <param name="cacheName"></param>
-        ''' <param name="cacheValue"></param>
-        ''' <param name="invalidationList">Comma delimited list of tags. Each tag should represent the source of data, and should be invalidated when that source changes.</param>
+        ''' <param name="key"></param>
+        ''' <param name="cacheObject"></param>
+        ''' <param name="invalidationTagList">Comma delimited list of tags. Each tag should represent the source of data, and should be invalidated when that source changes.</param>
         ''' <remarks></remarks>
-        Public Sub save(ByVal CP As Contensive.BaseClasses.CPBaseClass, cacheName As String, cacheValue As String, invalidationList As List(Of String))
+        Public Sub save(key As String, cacheObject As Object, invalidationTagCommaList As String)
             Try
-                Dim invalidationDate As Date
-                Dim cacheData As cacheDataClass
+                Dim invalidationDate As Date = rightNow.AddDays(invalidationDaysDefault + Rnd())
+                Dim invalidationTagList As New List(Of String)
                 '
-                appendCacheLog(vbTab & "save(" & CP.Doc.StartTime & "), cacheName(" & cacheName & "), length(" & cacheValue.Length() & ")")
-                '
-                If allowCache Then
-                    invalidationDate = rightNow.AddDays(invalidationDaysDefault + Rnd())
-                    'addCacheNameToList(CP, cacheName)
-                    cacheData = New cacheDataClass()
-                    cacheData.data = cacheValue
-                    cacheData.saveDate = Now()
-                    cacheData.invalidationDate = invalidationDate
-                    cacheData.tagList = invalidationList
-                    save2(cacheName, cacheData, invalidationDate)
-                End If
+                invalidationTagList.AddRange(invalidationTagCommaList.Split(","c))                '
+                Call save(key, cacheObject, invalidationDate, invalidationTagList)
             Catch ex As Exception
                 Try
                     cpCore.handleException(ex)
@@ -363,61 +307,8 @@ Namespace Contensive.Core
             End Try
         End Sub
         '
-        '====================================================================================================
-        ''' <summary>
-        ''' Read directly from ae.pcache. returns an object. Private because newNew must have already been called.
-        ''' </summary>
-        ''' <param name="Key"></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Private Function readRaw(ByVal Key As String) As Object
-            Dim returnValue As Object = Nothing
-            Try
-                If cacheIsLocal Then
-                    Throw New NotImplementedException("cache local mode is not implemented yet")
-                Else
-                    returnValue = mc.Get(encodeCacheKey(Key))
-                End If
-                '
-            Catch ex As Exception
-                cpCore.handleException(ex)
-            End Try
-            Return returnValue
-        End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Read a cacheData object from ae.pcache. Private because newNew must have already been called.
-        ''' </summary>
-        ''' <param name="Key"></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Private Function read3(ByVal Key As String) As cacheDataClass
-            Dim returnCacheData As cacheDataClass = Nothing
-            Dim dataRaw As Object
-            Try
-                Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer
-                Dim dataString As String
-                If cacheIsLocal Then
-                    dataString = DirectCast(readRaw(Key), String)
-                    returnCacheData = json_serializer.Deserialize(Of cacheDataClass)(dataString)
-                Else
-                    dataRaw = readRaw(Key)
-                    If Not (dataRaw Is Nothing) Then
-                        Try
-                            dataString = DirectCast(dataRaw, String)
-                            'returnCacheData = Newtonsoft.Json.JsonConvert.DeserializeObject(Of cacheDataClass)(dataString)
-                            returnCacheData = json_serializer.Deserialize(Of cacheDataClass)(dataString)
-                        Catch ex As Exception
-                            cpCore.handleException(ex, "readCacheData error converting cache object to cacheDataClass object")
-                        End Try
-                    End If
-                End If
-            Catch ex As Exception
-                cpCore.handleException(ex)
-            End Try
-            Return returnCacheData
-        End Function
+
+
         ''
         ''====================================================================================================
         '''' <summary>
@@ -486,46 +377,49 @@ Namespace Contensive.Core
         ''' read a cache name and return the object.
         ''' </summary>
         ''' <param name="CP"></param>
-        ''' <param name="cacheName">The cache entry name, a-z, 0-9, no spaces only</param>
+        ''' <param name="key">The cache entry name, a-z, 0-9, no spaces only</param>
         ''' <param name="return_cacheHit">Returns true if a valid cache entry found, false if there was no valid cache stored.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function read2(cacheName As String, Optional ByRef return_cacheHit As Boolean = False) As Object
+        Public Function read(key As String) As Object
             Dim returnData As Object = Nothing
             'Dim logMsg As String = vbTab & "read2(" & CP.Doc.StartTime & "), cacheName(" & cacheName & ")"
             Try
                 Dim cacheData As cacheDataClass
+                Dim cacheDataObject As Object
                 Dim tagInvalidated As Boolean
                 '
-                return_cacheHit = False
                 If allowCache Then
-                    cacheData = read3(cacheName)
-                    If (cacheData Is Nothing) Then
-                        'logMsg &= ", CACHE-MISS"
-                    Else
-                        If (globalInvalidationDate > cacheData.saveDate) Or (cacheData.invalidationDate < rightNow) Then
-                            If (globalInvalidationDate > cacheData.saveDate) Then
-                                'logMsg &= ", CACHE-INVALIDATED by globalInvalidationDate"
-                            Else
-                                'logMsg &= ", CACHE-INVALIDATED by data invalidationDate"
-                            End If
-                        Else
-                            '
-                            ' if this data is newer that the last glocal invalidation, continue
-                            '
-                            For Each tag As String In cacheData.tagList
-                                If (getTagInvalidationDate(tag) > cacheData.saveDate) Then
-                                    tagInvalidated = True
-                                    'logMsg &= ", CACHE-INVALIDATED by tag invalidationDate (" & tag & ")"
-                                    Exit For
+                    cacheDataObject = readRaw(key)
+                    '
+                    ' cast object as cacheDataClass
+                    '
+                    If Not cacheDataObject Is Nothing Then
+                        If (TypeOf cacheDataObject Is cacheDataClass) Then
+                            cacheData = DirectCast(cacheDataObject, cacheDataClass)
+                            If (globalInvalidationDate > cacheData.saveDate) Or (cacheData.invalidationDate < rightNow) Then
+                                If (globalInvalidationDate > cacheData.saveDate) Then
+                                    'logMsg &= ", CACHE-INVALIDATED by globalInvalidationDate"
+                                Else
+                                    'logMsg &= ", CACHE-INVALIDATED by data invalidationDate"
                                 End If
-                            Next
-                            If Not tagInvalidated Then
+                            Else
                                 '
-                                ' no tags are invalidated, return the data
+                                ' if this data is newer that the last glocal invalidation, continue
                                 '
-                                returnData = cacheData.data
-                                return_cacheHit = True
+                                For Each tag As String In cacheData.tagList
+                                    If (getTagInvalidationDate(tag) > cacheData.saveDate) Then
+                                        tagInvalidated = True
+                                        'logMsg &= ", CACHE-INVALIDATED by tag invalidationDate (" & tag & ")"
+                                        Exit For
+                                    End If
+                                Next
+                                If Not tagInvalidated Then
+                                    '
+                                    ' no tags are invalidated, return the data
+                                    '
+                                    returnData = cacheData.data
+                                End If
                             End If
                         End If
                     End If
@@ -784,9 +678,6 @@ Namespace Contensive.Core
                         If cpCore.cluster.config.isLocalCache Then
                             Throw New NotImplementedException("local cache not implemented yet")
                         Else
-                            If Not cacheClientConnected Then
-                                cacheClientConnect()
-                            End If
                             Call cacheClient.Store(Enyim.Caching.Memcached.StoreMode.Set, encodeCacheKey(Key), data, invalidationDate)
                         End If
                     End If
@@ -795,72 +686,7 @@ Namespace Contensive.Core
                 cpCore.handleException(ex)
             End Try
         End Sub
-        '
-        '==========
-        Private Sub cacheClientConnect()
-            Try
-                Dim serverPortSplit As String()
-                Dim port As Integer = 0
-                If Not String.IsNullOrEmpty(cpCore.cluster.config.awsElastiCacheConfigurationEndpoint) Then
-                    serverPortSplit = cpCore.cluster.config.awsElastiCacheConfigurationEndpoint.Split(":"c)
-                    If serverPortSplit.Count > 1 Then
-                        port = EncodeInteger(serverPortSplit(1))
-                    End If
-                    Dim cacheConfig As Amazon.ElastiCacheCluster.ElastiCacheClusterConfig
-                    cacheConfig = New Amazon.ElastiCacheCluster.ElastiCacheClusterConfig(serverPortSplit(0), port)
-                    cacheConfig.Protocol = Enyim.Caching.Memcached.MemcachedProtocol.Binary
-                    cacheClient = New Enyim.Caching.MemcachedClient(cacheConfig)
-                    '
-                    ' REFACTOR - removed because during debug it costs 20 msec. test cache fail case to measure benefit
-                    '
-                    'mc.Store(Enyim.Caching.Memcached.StoreMode.Set, "testing", "123", Now.AddMinutes(10))
-                    cacheClientConnected = True
-                End If
-            Catch ex As Exception
 
-            End Try
-        End Sub
-        '
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Read from the cluster
-        ''' </summary>
-        ''' <param name="Key"></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Function readRaw3(ByVal Key As String) As Object
-            Dim returnValue As Object = Nothing
-            Try
-                If cpCore.cluster.config.isLocalCache Then
-                    Throw New NotImplementedException("local cache not implemented yet")
-                Else
-                    If Not cacheClientConnected Then
-                        cacheClientConnect()
-                    End If
-                    returnValue = cacheClient.Get(encodeCacheKey(Key))
-                End If
-            Catch ex As Exception
-                cpCore.handleException(ex)
-            End Try
-            Return returnValue
-        End Function
-        '
-        '
-        '
-        Public Function readRaw2(ByVal key As String) As Object
-            Dim returnObj As Object = Nothing
-            Try
-                If cpCore.app.config.enableCache Then
-                    If Not (cpCore Is Nothing) Then
-                        returnObj = readRaw3(cpCore.app.config.name & "-" & key)
-                    End If
-                End If
-            Catch ex As Exception
-                Call cpCore.handleLegacyError8("exception")
-            End Try
-            Return returnObj
-        End Function
         '
         '
         '
@@ -983,41 +809,35 @@ Namespace Contensive.Core
         '       If they match, the result cachestring is returned, else "" is returned and the cache is cleared
         '========================================================================
         '
-        Public Function read4(Of resultType)(ByVal Name As String) As Object
+        Public Function read(Of resultType)(ByVal key As String) As Object
             Dim returnObject As Object = Nothing
             Try
                 Dim cacheData As cacheDataClass
                 Dim invalidate As Boolean = False
                 '
-                If cpCore.app.config.enableCache Then
-                    If (siteProperty_AllowCache_SpecialCaseNotCached) Then
-                        '
-                        ' user_isEditing and visitProperty_allowWorkflowRendering have to be checked where they are used, not globally
-                        '   1) site properties are cached, so the cache cannot check site properties (cyclic calls)
-                        '   2) cache calls are made for many more things that do not depend on editing
-                        ' allowCache cant be a site property because it sp are cached (cyclic again)
-                        'If (siteProperty_AllowCache_SpecialCaseNotCached) And (Not cpCore.user_isEditingAnything) And (Not cpCore.main_VisitProperty_AllowWorkflowRendering) Then
-                        '
-                        ' block all cache if editing or rendering edits
-                        '
-                        If (Name <> "") Then
-                            cacheData = DirectCast(readRaw2(Name), cacheDataClass)
-                            If Not (cacheData Is Nothing) Then
-                                If cache_globalInvalidationDate < cacheData.saveDate Then
-                                    '
-                                    ' if this data is newer that the last glocal invalidation, continue
-                                    '
-                                    For Each dataSourceTag As String In cacheData.tagList
-                                        If (getTagInvalidationDate(dataSourceTag) > cacheData.saveDate) Then
-                                            invalidate = True
-                                            Exit For
-                                        End If
-                                    Next
-                                    If Not invalidate Then
-                                        If TypeOf cacheData.data Is resultType Then
-                                            returnObject = cacheData.data
-                                        End If
-                                    End If
+                'return_cacheHit = False
+                If (String.IsNullOrEmpty(key)) Then
+                    Throw New ArgumentException("cache.read, key cannot be blank.")
+                Else
+                    '
+                    ' block all cache if editing or rendering edits
+                    '
+                    cacheData = DirectCast(readRaw(key), cacheDataClass)
+                    If Not (cacheData Is Nothing) Then
+                        If cache_globalInvalidationDate < cacheData.saveDate Then
+                            '
+                            ' if this data is newer that the last global invalidation, continue
+                            '
+                            For Each tag As String In cacheData.tagList
+                                If (getTagInvalidationDate(tag) > cacheData.saveDate) Then
+                                    invalidate = True
+                                    Exit For
+                                End If
+                            Next
+                            If Not invalidate Then
+                                If TypeOf cacheData.data Is resultType Then
+                                    returnObject = cacheData.data
+                                    'return_cacheHit = True
                                 End If
                             End If
                         End If
@@ -1035,7 +855,7 @@ Namespace Contensive.Core
         '   Creates the depency string from the tablenamelist
         '========================================================================
         '
-        Public Sub save3(ByVal key As String, ByVal data As Object, Optional ByVal tagList As String = "", Optional ByVal invalidationDate As Date = #12:00:00 AM#)
+        Public Sub cachexSaveRename(ByVal key As String, ByVal data As Object, Optional ByVal tagList As String = "", Optional ByVal invalidationDate As Date = #12:00:00 AM#)
             Try
                 Dim cacheData As New cacheDataClass
                 '
@@ -1085,11 +905,11 @@ Namespace Contensive.Core
                     '
                     ' ----- call .dispose for managed objects
                     '
-                    If Not (mc Is Nothing) Then
+                    If Not (cacheClient Is Nothing) Then
                         '
                         appendCacheLog("dispose mc")
                         '
-                        mc.Dispose()
+                        cacheClient.Dispose()
                     Else
                         '
                         appendCacheLog("dispose NO mc")

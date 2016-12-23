@@ -1209,7 +1209,7 @@ ErrorTrap:
                     SQL = "INSERT INTO ccSetup (ACTIVE,CONTENTCONTROLID,NAME,FIELDVALUE,ModifiedDate,DateAdded)VALUES(" & SQLTrue & "," & db_EncodeSQLNumber(ContentID) & "," & db_EncodeSQLText(UCase(propertyName)) & "," & db_EncodeSQLText(Value) & "," & SQLNow & "," & SQLNow & ");"
                     Call executeSql(SQL)
                 End If
-                Call cache.save3(cacheName, Value, "site properties", Now.AddDays(1))
+                Call cache.save(cacheName, Value, "site properties")
 
             Catch ex As Exception
                 Call cpCore.handleException(ex)
@@ -1267,15 +1267,15 @@ ErrorTrap:
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function siteProperty_getText(ByVal PropertyName As String, Optional ByVal DefaultValue As String = "") As String
-            Dim returnString As String
+            Dim returnString As String = ""
             Try
                 Dim cacheName As String = "siteProperty-" & PropertyName
                 Dim propertyFound As Boolean = False
-                returnString = EncodeText(cache.read4(Of String)(cacheName))
+                returnString = EncodeText(cache.read(Of String)(cacheName))
                 If returnString = "" Then
                     returnString = siteProperty_getText_noCache(PropertyName, DefaultValue, propertyFound)
                     If (propertyFound) And (returnString <> "") Then
-                        Call cache.save3(cacheName, returnString, "Site Properties", Now.AddDays(1))
+                        Call cache.save(cacheName, returnString, "Site Properties")
                     End If
                 End If
             Catch ex As Exception

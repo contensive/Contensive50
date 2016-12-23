@@ -61,7 +61,7 @@ Namespace Contensive.Core
         Public Overrides Function Read(ByVal Name As String) As String
             Dim returnString As String = ""
             Try
-                returnString = EncodeText(cpCore.app.cache.read4(Of String)(Name))
+                returnString = EncodeText(cpCore.app.cache.read(Of String)(Name))
             Catch ex As Exception
                 cp.core.handleException(ex, "Unexpected error in cp.cache.read()")
                 returnString = ""
@@ -73,14 +73,16 @@ Namespace Contensive.Core
         ''' <summary>
         ''' save a cache value
         ''' </summary>
-        ''' <param name="Name"></param>
+        ''' <param name="key"></param>
         ''' <param name="Value"></param>
-        ''' <param name="ClearOnContentChangeList"></param>
+        ''' <param name="invalidationTagCommaList"></param>
         ''' <param name="ClearOnDate"></param>
         ''' <remarks></remarks>
-        Public Overrides Sub Save(ByVal Name As String, ByVal Value As String, Optional ByVal ClearOnContentChangeList As String = "", Optional ByVal invalidationDate As Date = #12:00:00 AM#)
+        Public Overrides Sub Save(ByVal key As String, ByVal Value As String, Optional ByVal invalidationTagCommaList As String = "", Optional ByVal invalidationDate As Date = #12:00:00 AM#)
             invalidationDate = encodeDateMinValue(invalidationDate)
-            Call cpCore.app.cache.save3(Name, Value, ClearOnContentChangeList, invalidationDate)
+            Dim invalidationTagList As New List(Of String)
+            invalidationTagList.AddRange(invalidationTagCommaList.Split(","))
+            Call cpCore.app.cache.save(key, Value, invalidationDate, invalidationTagList)
         End Sub
 #Region " IDisposable Support "
         '
