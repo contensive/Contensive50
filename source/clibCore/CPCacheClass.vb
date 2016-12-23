@@ -79,10 +79,21 @@ Namespace Contensive.Core
         ''' <param name="ClearOnDate"></param>
         ''' <remarks></remarks>
         Public Overrides Sub Save(ByVal key As String, ByVal Value As String, Optional ByVal invalidationTagCommaList As String = "", Optional ByVal invalidationDate As Date = #12:00:00 AM#)
-            invalidationDate = encodeDateMinValue(invalidationDate)
-            Dim invalidationTagList As New List(Of String)
-            invalidationTagList.AddRange(invalidationTagCommaList.Split(","))
-            Call cpCore.app.cache.save(key, Value, invalidationDate, invalidationTagList)
+            Try
+                Dim invalidationTagList As New List(Of String)
+                If String.IsNullOrEmpty(invalidationTagCommaList.Trim) Then
+                    '
+                Else
+                    invalidationTagList.AddRange(invalidationTagCommaList.Split(","))
+                End If
+                If (invalidationDate = #12:00:00 AM#) Then
+                    Call cpCore.app.cache.save(key, Value, invalidationTagList)
+                Else
+                    Call cpCore.app.cache.save(key, Value, invalidationDate, invalidationTagList)
+                End If
+            Catch ex As Exception
+                cpCore.handleException(ex)
+            End Try
         End Sub
 #Region " IDisposable Support "
         '

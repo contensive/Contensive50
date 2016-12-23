@@ -292,7 +292,7 @@ namespace  Contensive.Core {
                 appConfig.allowSiteMonitor = false;
                 appConfig.defaultConnectionString = "";
                 appConfig.domainList.Add(domainName);
-                appConfig.enableCache = false;
+                appConfig.enableCache = true;
                 appConfig.enabled = true;
                 appConfig.name = appName.ToLower();
                 appConfig.privateKey = Guid.NewGuid().ToString().Replace("{", "").Replace("}", "").Replace("-", "");

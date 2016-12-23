@@ -14,7 +14,7 @@ Namespace Contensive.Core
         Private cpCore As cpCoreClass
         Private cacheClient As Enyim.Caching.MemcachedClient
         Private rightNow As Date
-        Private cacheLogFilename As String
+        Private cacheLogPrefix As String
         '
         Private Const invalidationDaysDefault As Double = 365
         Private cache_globalInvalidationDate As Date = Date.MinValue
@@ -69,7 +69,7 @@ Namespace Contensive.Core
                 Dim cacheConfig As Amazon.ElastiCacheCluster.ElastiCacheClusterConfig
                 '
                 rightNow = Now()
-                cacheLogFilename = "cacheLog" & rightNow.Year.ToString() & rightNow.Month.ToString().PadLeft(2, "0"c) & rightNow.Day.ToString().PadLeft(2, "0"c) & ".txt"
+                cacheLogPrefix = "cacheLog"
                 '
                 cacheForceLocal = True
                 cacheEndpoint = cpCore.cluster.config.awsElastiCacheConfigurationEndpoint
@@ -139,25 +139,17 @@ Namespace Contensive.Core
         ''' <remarks></remarks>
         Private Sub saveRaw(ByVal Key As String, ByVal data As Object, invalidationDate As Date)
             Try
-                'Dim dataString As String
-                'Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer
-                '
-                'appendCacheLog(vbTab & vbTab & "saveRaw(" & cp.Doc.StartTime & "), cacheName(" & Key & "), data(" & data.ToString() & "), invalidationDate(" & invalidationDate.ToString() & ")")
-                '
-                'If TypeOf (data) Is String Then
-                '    dataString = DirectCast(data, String)
-                'ElseIf TypeOf (data) Is Date Then
-                '    dataString = CDate(data).ToString
-                'Else
-                '    dataString = json_serializer.Serialize(data)
-                '    'dataString = Newtonsoft.Json.JsonConvert.SerializeObject(data)
-                '    'dataString = Newtonsoft.Json.JsonConvert.SerializeObject(data).Replace(vbCrLf, "")
-                'End If
-                If cacheForceLocal Then
-                    Throw New NotImplementedException("Local cache mode is not implemented yet")
-                    'cp.Cache.Save(encodeCacheKey(Key), dataString, , invalidationDate)
+                If (String.IsNullOrEmpty(Key)) Then
+                    Throw New ArgumentException("Cache key cannot be blank")
+                ElseIf (invalidationDate.CompareTo(now) <= 0) Then
+                    Throw New ArgumentException("Cache invalidation date cannot be in the past")
                 Else
-                    Call cacheClient.Store(Enyim.Caching.Memcached.StoreMode.Set, encodeCacheKey(Key), data, invalidationDate)
+                    If cacheForceLocal Then
+                        Throw New NotImplementedException("Local cache mode is not implemented yet")
+                        'cp.Cache.Save(encodeCacheKey(Key), dataString, , invalidationDate)
+                    Else
+                        Call cacheClient.Store(Enyim.Caching.Memcached.StoreMode.Set, encodeCacheKey(cpCore.app.config.name & "-" & Key), data, invalidationDate)
+                    End If
                 End If
             Catch ex As Exception
                 cpCore.handleException(ex)
@@ -176,11 +168,24 @@ Namespace Contensive.Core
             Try
                 Dim allowSave As Boolean
                 '
-                If invalidationDate <= Date.MinValue Then
-                    ' add random component so everything does not clear all at once
-                    invalidationDate = Now.AddDays(invalidationDaysDefault + Rnd())
+                If (invalidationDate = #12:00:00 AM#) Then
+                    '
+                    ' date option excluded, use default date
+                    '
+                    invalidationDate = invalidationDateDefault
+                ElseIf (invalidationDate > Now()) Then
+                    '
+                    ' use the provided invalidation date
+                    '
+                    saveRaw(Key, cacheData, invalidationDate)
+                Else
+                    '
+                    ' invalidate this key
+                    '
+                    saveRaw(Key, Nothing, invalidationDateDefault)
                 End If
-                If (Key = "") Then
+
+                If (String.IsNullOrEmpty(Key)) Then
                     cpCore.handleException(New Exception("key cannot be empty"))
                 ElseIf (invalidationDate <= Now()) Then
                     cpCore.handleException(New Exception("invalidationDate must be > current date/time"))
@@ -194,7 +199,7 @@ Namespace Contensive.Core
                         allowSave = True
                     End If
                     If allowSave Then
-                        saveRaw(encodeCacheKey(Key), cacheData, invalidationDate)
+                        saveRaw(Key, cacheData, invalidationDate)
                     End If
                 End If
             Catch ex As Exception
@@ -212,10 +217,7 @@ Namespace Contensive.Core
         ''' <remarks></remarks>
         Public Sub save(key As String, cacheObject As Object)
             Try
-                Dim invalidationDate As Date = rightNow.AddDays(invalidationDaysDefault + Rnd())
-                '
-                Call save(key, cacheObject, invalidationDate, New List(Of String))
-
+                Call save(key, cacheObject, invalidationDateDefault, New List(Of String))
             Catch ex As Exception
                 cpCore.handleException(ex)
             End Try
@@ -271,10 +273,7 @@ Namespace Contensive.Core
         ''' <remarks></remarks>
         Public Sub save(key As String, cacheObject As Object, invalidationTagList As List(Of String))
             Try
-                Dim invalidationDate As Date = rightNow.AddDays(invalidationDaysDefault + Rnd())
-                '
-                Call save(key, cacheObject, invalidationDate, invalidationTagList)
-
+                Call save(key, cacheObject, invalidationDateDefault, invalidationTagList)
             Catch ex As Exception
                 Try
                     cpCore.handleException(ex)
@@ -294,11 +293,11 @@ Namespace Contensive.Core
         ''' <remarks></remarks>
         Public Sub save(key As String, cacheObject As Object, invalidationTagCommaList As String)
             Try
-                Dim invalidationDate As Date = rightNow.AddDays(invalidationDaysDefault + Rnd())
                 Dim invalidationTagList As New List(Of String)
                 '
                 invalidationTagList.AddRange(invalidationTagCommaList.Split(","c))                '
-                Call save(key, cacheObject, invalidationDate, invalidationTagList)
+                '
+                Call save(key, cacheObject, invalidationDateDefault, invalidationTagList)
             Catch ex As Exception
                 Try
                     cpCore.handleException(ex)
@@ -408,7 +407,7 @@ Namespace Contensive.Core
                                 ' if this data is newer that the last glocal invalidation, continue
                                 '
                                 For Each tag As String In cacheData.tagList
-                                    If (getTagInvalidationDate(tag) > cacheData.saveDate) Then
+                                    If (getTagInvalidationDate(tag) >= cacheData.saveDate) Then
                                         tagInvalidated = True
                                         'logMsg &= ", CACHE-INVALIDATED by tag invalidationDate (" & tag & ")"
                                         Exit For
@@ -517,7 +516,7 @@ Namespace Contensive.Core
                 Dim cacheName As String = "tagInvalidationDate-"
                 '
                 If allowCache Then
-                    If tag <> "" Then
+                    If String.IsNullOrEmpty(tag) Then
                         saveRaw(cacheName & tag, Now.ToString, Now.AddYears(10))
                     End If
                 End If
@@ -640,7 +639,7 @@ Namespace Contensive.Core
         '=======================================================================
         Private Sub appendCacheLog(line As String)
             Try
-                cpCore.appendLog(cacheLogFilename, "pid(" & Process.GetCurrentProcess().Id.ToString.PadLeft(4, "0"c) & "),thread(" & Threading.Thread.CurrentThread.ManagedThreadId.ToString.PadLeft(4, "0"c) & ")" & vbTab & line)
+                cpCore.appendLog("pid(" & Process.GetCurrentProcess().Id.ToString.PadLeft(4, "0"c) & "),thread(" & Threading.Thread.CurrentThread.ManagedThreadId.ToString.PadLeft(4, "0"c) & ")" & vbTab & line, cacheLogPrefix)
             Catch ex As Exception
                 ' ignore logging errors
             End Try
@@ -828,8 +827,10 @@ Namespace Contensive.Core
                             '
                             ' if this data is newer that the last global invalidation, continue
                             '
+                            Dim tagInvalidationDate As Date
                             For Each tag As String In cacheData.tagList
-                                If (getTagInvalidationDate(tag) > cacheData.saveDate) Then
+                                tagInvalidationDate = getTagInvalidationDate(tag)
+                                If (tagInvalidationDate >= cacheData.saveDate) Then
                                     invalidate = True
                                     Exit For
                                 End If
@@ -942,6 +943,18 @@ Namespace Contensive.Core
         End Property
         Private siteProperty_AllowCache_LocalLoaded As Boolean = False
         Private siteProperty_AllowCache_Local As Boolean
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' The default invalidation date, calculated as the current date plus the invalidationDaysDefault, plus a random number of hours, 0-24
+        ''' </summary>
+        ''' <returns></returns>
+        '
+        Public ReadOnly Property invalidationDateDefault As Date
+            Get
+                Return Now.AddDays(invalidationDaysDefault + Rnd())
+            End Get
+        End Property
 
 
         ' Do not change or add Overridable to these methods.

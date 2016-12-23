@@ -1,5 +1,6 @@
 ﻿
 using Contensive.Core;
+using Contensive.BaseClasses;
 using Xunit;
 
 namespace TestIntegration2
@@ -41,10 +42,10 @@ namespace TestIntegration2
             cp.Dispose();
         }
         /// <summary>
-        /// cp.cache save
+        /// cp.cache save read
         /// </summary>
         [Fact]
-        private void cpCacheSave_integration()
+        private void cpCacheSaveRead_integration()
         {
             // arrange
             CPClass cp = new CPClass("testapp");
@@ -52,6 +53,30 @@ namespace TestIntegration2
             cp.Cache.Save("testKey", "testValue");
             // assert
             Assert.Equal(cp.Cache.Read("testKey"), "testValue");
+            // dispose
+            cp.Dispose();
+        }
+        /// <summary>
+        /// cp.cache save read
+        /// </summary>
+        [Fact]
+        private void cpCacheInvalidationOnEdit_integration()
+        {
+            // arrange
+            CPClass cp = new CPClass("testapp");
+            // act
+            cp.Cache.Save("keyA", "testValue","people");
+            // assert
+            Assert.Equal(cp.Cache.Read("keyA"), "testValue");
+            // act
+            CPCSBaseClass cs = cp.CSNew();
+            if (cs.Insert("people"))
+            {
+                cs.SetField("name", "test");
+            }
+            cs.Close();
+            // assert
+            Assert.Equal(cp.Cache.Read("keyA"), "" );
             // dispose
             cp.Dispose();
         }
