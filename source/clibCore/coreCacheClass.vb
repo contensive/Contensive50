@@ -17,7 +17,6 @@ Namespace Contensive.Core
         Private cacheLogPrefix As String
         '
         Private Const invalidationDaysDefault As Double = 365
-        Private cache_globalInvalidationDate As Date = Date.MinValue
         Private cacheForceLocal As Boolean
         '
         '
@@ -32,7 +31,7 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         '
-        Public Function readRaw(ByVal key As String) As Object
+        Private Function GetObjectRaw(ByVal key As String) As Object
             Dim returnObj As Object = Nothing
             Try
                 If (String.IsNullOrEmpty(key)) Then
@@ -43,7 +42,11 @@ Namespace Contensive.Core
                             Throw New NotImplementedException("local cache not implemented yet")
                         Else
                             If cpCore.app.config.enableCache Then
-                                returnObj = cacheClient.Get(encodeCacheKey(cpCore.app.config.name & "-" & key))
+                                Dim rawCacheName As String = encodeCacheKey(cpCore.app.config.name & "-" & key)
+                                returnObj = cacheClient.Get(rawCacheName)
+                                '
+                                'appendCacheLog("readRaw(" & key & "), result=[" & returnObj.ToString & "")
+                                '
                             End If
                         End If
                     End If
@@ -92,7 +95,6 @@ Namespace Contensive.Core
                 '
                 ' initialize cache - load global cache invalidation date
                 '
-                cache_globalInvalidationDate = EncodeDate(readRaw("globalInvalidationDate"))
                 appendCacheLog(logMsg)
             Catch ex As Exception
                 '
@@ -110,11 +112,10 @@ Namespace Contensive.Core
         ''' <remarks></remarks>
         Private ReadOnly Property globalInvalidationDate As Date
             Get
-                Dim dataObject As Object
                 '
                 If Not _globalInvalidationDateLoaded Then
                     _globalInvalidationDateLoaded = True
-                    dataObject = readRaw("globalInvalidationDate")
+                    Dim dataObject As Object = GetObjectRaw("globalInvalidationDate")
                     If TypeOf (dataObject) Is Date Then
                         _globalInvalidationDate = DirectCast(dataObject, Date)
                     ElseIf TypeOf (dataObject) Is String Then
@@ -137,11 +138,11 @@ Namespace Contensive.Core
         ''' <param name="data">Either a string, a date, or a serializable object</param>
         ''' <param name="invalidationDate"></param>
         ''' <remarks></remarks>
-        Private Sub saveRaw(ByVal Key As String, ByVal data As Object, invalidationDate As Date)
+        Private Sub SetKeyRaw(ByVal Key As String, ByVal data As Object, invalidationDate As Date)
             Try
                 If (String.IsNullOrEmpty(Key)) Then
                     Throw New ArgumentException("Cache key cannot be blank")
-                ElseIf (invalidationDate.CompareTo(now) <= 0) Then
+                ElseIf (invalidationDate.CompareTo(Now) <= 0) Then
                     Throw New ArgumentException("Cache invalidation date cannot be in the past")
                 Else
                     If cacheForceLocal Then
@@ -164,7 +165,7 @@ Namespace Contensive.Core
         ''' <param name="cacheData"></param>
         ''' <param name="invalidationDate"></param>
         ''' <remarks></remarks>
-        Private Sub save(ByVal Key As String, ByVal cacheData As cacheDataClass, Optional invalidationDate As Date = #12:00:00 AM#)
+        Private Sub SetKey(ByVal Key As String, ByVal cacheData As cacheDataClass, Optional invalidationDate As Date = #12:00:00 AM#)
             Try
                 Dim allowSave As Boolean
                 '
@@ -177,12 +178,12 @@ Namespace Contensive.Core
                     '
                     ' use the provided invalidation date
                     '
-                    saveRaw(Key, cacheData, invalidationDate)
+                    SetKeyRaw(Key, cacheData, invalidationDate)
                 Else
                     '
                     ' invalidate this key
                     '
-                    saveRaw(Key, Nothing, invalidationDateDefault)
+                    SetKeyRaw(Key, Nothing, invalidationDateDefault)
                 End If
 
                 If (String.IsNullOrEmpty(Key)) Then
@@ -199,7 +200,7 @@ Namespace Contensive.Core
                         allowSave = True
                     End If
                     If allowSave Then
-                        saveRaw(Key, cacheData, invalidationDate)
+                        SetKeyRaw(Key, cacheData, invalidationDate)
                     End If
                 End If
             Catch ex As Exception
@@ -215,9 +216,9 @@ Namespace Contensive.Core
         ''' <param name="key"></param>
         ''' <param name="cacheObject"></param>
         ''' <remarks></remarks>
-        Public Sub save(key As String, cacheObject As Object)
+        Public Sub SetKey(key As String, cacheObject As Object)
             Try
-                Call save(key, cacheObject, invalidationDateDefault, New List(Of String))
+                Call SetKey(key, cacheObject, invalidationDateDefault, New List(Of String))
             Catch ex As Exception
                 cpCore.handleException(ex)
             End Try
@@ -233,7 +234,7 @@ Namespace Contensive.Core
         ''' <param name="invalidationDate"></param>
         ''' <param name="invalidationTagList">Each tag should represent the source of data, and should be invalidated when that source changes.</param>
         ''' <remarks></remarks>
-        Public Sub save(key As String, cacheObject As Object, invalidationDate As Date, invalidationTagList As List(Of String))
+        Public Sub SetKey(key As String, cacheObject As Object, invalidationDate As Date, invalidationTagList As List(Of String))
             Try
                 '    '
                 '    If TypeOf cacheObject Is String Then
@@ -252,7 +253,39 @@ Namespace Contensive.Core
                     cacheData.invalidationDate = invalidationDate
                     cacheData.tagList = invalidationTagList
                     '
-                    saveRaw(key, cacheData, invalidationDate)
+                    SetKeyRaw(key, cacheData, invalidationDate)
+                End If
+            Catch ex As Exception
+                Try
+                    cpCore.handleException(ex)
+                Catch errObj As Exception
+                End Try
+            End Try
+        End Sub
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' save an object to cache, with invalidation
+        ''' 
+        ''' </summary>
+        ''' <param name="key"></param>
+        ''' <param name="cacheObject"></param>
+        ''' <param name="invalidationDate"></param>
+        ''' <param name="invalidationTagList">Each tag should represent the source of data, and should be invalidated when that source changes.</param>
+        ''' <remarks></remarks>
+        Public Sub SetKey(key As String, cacheObject As Object, invalidationDate As Date, invalidationTag As String)
+            Try
+                If allowCache Then
+                    Dim invalidationTagList As New List(Of String)
+                    Dim cacheData As New cacheDataClass()
+                    '
+                    invalidationTagList.Add(invalidationTag)
+                    cacheData.data = cacheObject
+                    cacheData.saveDate = Now()
+                    cacheData.invalidationDate = invalidationDate
+                    cacheData.tagList = invalidationTagList
+                    '
+                    SetKeyRaw(key, cacheData, invalidationDate)
                 End If
             Catch ex As Exception
                 Try
@@ -269,11 +302,11 @@ Namespace Contensive.Core
         ''' <param name="CP"></param>
         ''' <param name="key"></param>
         ''' <param name="cacheObject"></param>
-        ''' <param name="invalidationTagList">Comma delimited list of tags. Each tag should represent the source of data, and should be invalidated when that source changes.</param>
+        ''' <param name="invalidationTagList">List of tags. Each tag should represent the source of data, and should be invalidated when that source changes.</param>
         ''' <remarks></remarks>
-        Public Sub save(key As String, cacheObject As Object, invalidationTagList As List(Of String))
+        Public Sub SetKey(key As String, cacheObject As Object, invalidationTagList As List(Of String))
             Try
-                Call save(key, cacheObject, invalidationDateDefault, invalidationTagList)
+                Call SetKey(key, cacheObject, invalidationDateDefault, invalidationTagList)
             Catch ex As Exception
                 Try
                     cpCore.handleException(ex)
@@ -291,13 +324,13 @@ Namespace Contensive.Core
         ''' <param name="cacheObject"></param>
         ''' <param name="invalidationTagList">Comma delimited list of tags. Each tag should represent the source of data, and should be invalidated when that source changes.</param>
         ''' <remarks></remarks>
-        Public Sub save(key As String, cacheObject As Object, invalidationTagCommaList As String)
+        Public Sub SetKey(key As String, cacheObject As Object, invalidationTag As String)
             Try
                 Dim invalidationTagList As New List(Of String)
                 '
-                invalidationTagList.AddRange(invalidationTagCommaList.Split(","c))                '
+                invalidationTagList.Add(invalidationTag)
                 '
-                Call save(key, cacheObject, invalidationDateDefault, invalidationTagList)
+                Call SetKey(key, cacheObject, invalidationDateDefault, invalidationTagList)
             Catch ex As Exception
                 Try
                     cpCore.handleException(ex)
@@ -305,130 +338,6 @@ Namespace Contensive.Core
                 End Try
             End Try
         End Sub
-        '
-
-
-        ''
-        ''====================================================================================================
-        '''' <summary>
-        '''' read a cache name and return it serialized as a string, for compatibility with existing site.
-        '''' </summary>
-        '''' <param name="CP"></param>
-        '''' <param name="cacheName"></param>
-        '''' <returns></returns>
-        '''' <remarks></remarks>
-        'Public Function read(ByVal CP As Contensive.BaseClasses.CPBaseClass, cacheName As String) As String
-        '    Dim returnResult As String = ""
-        '    Dim logMsg As String = vbTab & "read(" & CP.Doc.StartTime & "), cacheName(" & cacheName & ")"
-        '    Try
-        '        '
-        '        Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer
-        '        Dim cacheData As cacheDataClass
-        '        Dim tagInvalidated As Boolean
-        '        If allowCache Then
-        '            'addCacheNameToList(CP, cacheName)
-        '            cacheData = read3(cacheName)
-        '            If (cacheData Is Nothing) Then
-        '                logMsg &= ", CACHE-MISS"
-        '            Else
-        '                If (globalInvalidationDate > cacheData.saveDate) Or (cacheData.invalidationDate < rightNow) Then
-        '                    If (globalInvalidationDate > cacheData.saveDate) Then
-        '                        logMsg &= ", CACHE-INVALIDATED by globalInvalidationDate"
-        '                    Else
-        '                        logMsg &= ", CACHE-INVALIDATED by data invalidationDate"
-        '                    End If
-        '                Else
-        '                    '
-        '                    ' if this data is newer that the last glocal invalidation, continue
-        '                    '
-        '                    For Each tag As String In cacheData.tagList
-        '                        If (getTagInvalidationDate(tag) > cacheData.saveDate) Then
-        '                            tagInvalidated = True
-        '                            logMsg &= ", CACHE-INVALIDATED by tag invalidationDate (" & tag & ")"
-        '                            Exit For
-        '                        End If
-        '                    Next
-        '                    If Not tagInvalidated Then
-        '                        '
-        '                        ' no tags are invalidated, return the data
-        '                        '
-        '                        If TypeOf (cacheData.data) Is String Then
-        '                            returnResult = DirectCast(cacheData.data, String)
-        '                        Else
-        '                            returnResult = json_serializer.Serialize(cacheData.data)
-        '                            's = Newtonsoft.Json.JsonConvert.SerializeObject(cacheData.data)
-        '                        End If
-        '                    End If
-        '                End If
-        '            End If
-        '        End If
-        '        '
-        '        appendCacheLog(logMsg & ", length(" & returnResult.Length & ")")
-        '        '
-        '    Catch ex As Exception
-        '        cpCore.handleException(ex)
-        '    End Try
-        '    Return returnResult
-        'End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' read a cache name and return the object.
-        ''' </summary>
-        ''' <param name="CP"></param>
-        ''' <param name="key">The cache entry name, a-z, 0-9, no spaces only</param>
-        ''' <param name="return_cacheHit">Returns true if a valid cache entry found, false if there was no valid cache stored.</param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Function read(key As String) As Object
-            Dim returnData As Object = Nothing
-            'Dim logMsg As String = vbTab & "read2(" & CP.Doc.StartTime & "), cacheName(" & cacheName & ")"
-            Try
-                Dim cacheData As cacheDataClass
-                Dim cacheDataObject As Object
-                Dim tagInvalidated As Boolean
-                '
-                If allowCache Then
-                    cacheDataObject = readRaw(key)
-                    '
-                    ' cast object as cacheDataClass
-                    '
-                    If Not cacheDataObject Is Nothing Then
-                        If (TypeOf cacheDataObject Is cacheDataClass) Then
-                            cacheData = DirectCast(cacheDataObject, cacheDataClass)
-                            If (globalInvalidationDate > cacheData.saveDate) Or (cacheData.invalidationDate < rightNow) Then
-                                If (globalInvalidationDate > cacheData.saveDate) Then
-                                    'logMsg &= ", CACHE-INVALIDATED by globalInvalidationDate"
-                                Else
-                                    'logMsg &= ", CACHE-INVALIDATED by data invalidationDate"
-                                End If
-                            Else
-                                '
-                                ' if this data is newer that the last glocal invalidation, continue
-                                '
-                                For Each tag As String In cacheData.tagList
-                                    If (getTagInvalidationDate(tag) >= cacheData.saveDate) Then
-                                        tagInvalidated = True
-                                        'logMsg &= ", CACHE-INVALIDATED by tag invalidationDate (" & tag & ")"
-                                        Exit For
-                                    End If
-                                Next
-                                If Not tagInvalidated Then
-                                    '
-                                    ' no tags are invalidated, return the data
-                                    '
-                                    returnData = cacheData.data
-                                End If
-                            End If
-                        End If
-                    End If
-                End If
-            Catch ex As Exception
-                cpCore.handleException(ex)
-            End Try
-            Return returnData
-        End Function
-
         '
         '====================================================================================================
         ''' <summary>
@@ -441,8 +350,7 @@ Namespace Contensive.Core
                 '
                 appendCacheLog(vbTab & "flushCache(" & CP.Doc.StartTime & ")")
                 '
-                invalidateAll(CP)
-                CP.Cache.ClearAll()
+                invalidateAll()
             Catch ex As Exception
                 Try
                     cpCore.handleException(ex)
@@ -461,7 +369,7 @@ Namespace Contensive.Core
         Public Function getTagInvalidationDate(ByVal tag As String) As Date
             Dim returnTagInvalidationDate As Date = New Date(1990, 8, 7)
             Try
-                Dim cacheNameTagInvalidateDate As String = "tagInvalidationDate-" & tag
+                Dim cacheNameTagInvalidateDate As String = getTagInvalidationDateCacheName(tag)
                 Dim cacheObject As Object
                 '
                 If allowCache Then
@@ -469,7 +377,7 @@ Namespace Contensive.Core
                         '
                         ' get it from raw cache
                         '
-                        cacheObject = readRaw(cacheNameTagInvalidateDate)
+                        cacheObject = GetObjectRaw(cacheNameTagInvalidateDate)
                         If TypeOf (cacheObject) Is String Then
                             returnTagInvalidationDate = EncodeDate(cacheObject)
                         ElseIf TypeOf (cacheObject) Is Date Then
@@ -490,40 +398,38 @@ Namespace Contensive.Core
         ''' invalidates the entire cache (except those entires written with saveRaw)
         ''' </summary>
         ''' <remarks></remarks>
-        Public Sub invalidateAll(cp As Contensive.BaseClasses.CPBaseClass)
+        Public Sub invalidateAll()
             Try
                 '
-                appendCacheLog(vbTab & "invalidateAll(" & cp.Doc.StartTime & ")")
-                '
-                Call saveRaw("globalInvalidationDate", Now().ToString(), Now().AddYears(10))
+                Call SetKeyRaw("globalInvalidationDate", Now(), Now().AddYears(10))
                 _globalInvalidationDateLoaded = False
             Catch ex As Exception
                 cpCore.handleException(ex)
             End Try
         End Sub
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' invalidates a tag
-        ''' </summary>
-        ''' <param name="tag"></param>
-        ''' <remarks></remarks>
-        Public Sub invalidateTag(cp As Contensive.BaseClasses.CPBaseClass, ByVal tag As String)
-            Try
-                '
-                appendCacheLog(vbTab & "invalidateTag(" & cp.Doc.StartTime & ")")
-                '
-                Dim cacheName As String = "tagInvalidationDate-"
-                '
-                If allowCache Then
-                    If String.IsNullOrEmpty(tag) Then
-                        saveRaw(cacheName & tag, Now.ToString, Now.AddYears(10))
-                    End If
-                End If
-            Catch ex As Exception
-                cpCore.handleException(ex)
-            End Try
-        End Sub
+        ''
+        ''====================================================================================================
+        '''' <summary>
+        '''' invalidates a tag
+        '''' </summary>
+        '''' <param name="tag"></param>
+        '''' <remarks></remarks>
+        'Public Sub invalidateTag(cp As Contensive.BaseClasses.CPBaseClass, ByVal tag As String)
+        '    Try
+        '        '
+        '        appendCacheLog(vbTab & "invalidateTag(" & cp.Doc.StartTime & ")")
+        '        '
+        '        Dim cacheName As String = getTagInvalidationDateCacheName(tag)
+        '        '
+        '        If allowCache Then
+        '            If String.IsNullOrEmpty(tag) Then
+        '                saveRaw(cacheName, Now.ToString, Now.AddYears(10))
+        '            End If
+        '        End If
+        '    Catch ex As Exception
+        '        cpCore.handleException(ex)
+        '    End Try
+        'End Sub
         '
         '========================================================================
         '   Clear a Content definitions TimeStamp, and all of its child's also
@@ -531,15 +437,17 @@ Namespace Contensive.Core
         '
         Public Sub invalidateTag(ByVal tag As String)
             Try
-                Dim cacheName As String = "tagInvalidationDate-"
+                Dim cacheName As String = getTagInvalidationDateCacheName(tag)
                 Dim cdef As coreMetaDataClass.CDefClass
                 '
+                appendCacheLog("invalidateTag(" & tag & "), tagInvalidationDateCacheName [" & cacheName & "]")
+                '
                 If cpCore.app.config.enableCache Then
-                    If tag <> "" Then
+                    If Not String.IsNullOrEmpty(tag) Then
                         '
                         ' set the tags invalidation date
                         '
-                        saveRaw2(cacheName & tag, Now.ToString)
+                        SetKeyRaw(cacheName, Now, Now.AddDays(invalidationDaysDefault))
                         '
                         ' test if this tag is a content name
                         '
@@ -553,7 +461,8 @@ Namespace Contensive.Core
                                     Dim childCdef As coreMetaDataClass.CDefClass
                                     childCdef = cpCore.app.metaData.getCdef(childId)
                                     If Not childCdef Is Nothing Then
-                                        saveRaw2(cacheName & childCdef.Name, Now.ToString)
+                                        cacheName = getTagInvalidationDateCacheName(childCdef.Name)
+                                        SetKeyRaw(cacheName, Now, Now.AddDays(invalidationDaysDefault))
                                     End If
                                 Next
                             End If
@@ -561,10 +470,10 @@ Namespace Contensive.Core
                             ' Now go up to the top-most parent
                             '
                             Do While cdef.parentID > 0
-                                'Dim parentCdef As metaDataClass.CDefClass
                                 cdef = cpCore.app.metaData.getCdef(cdef.parentID)
                                 If Not cdef Is Nothing Then
-                                    saveRaw2(cacheName & cdef.Name, Now.ToString)
+                                    cacheName = getTagInvalidationDateCacheName(cdef.Name)
+                                    SetKeyRaw(cacheName, Now, Now.AddDays(invalidationDaysDefault))
                                 End If
                             Loop
                         End If
@@ -607,14 +516,11 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="tagList"></param>
         ''' <remarks></remarks>
-        Public Sub invalidateTagList(cp As Contensive.BaseClasses.CPBaseClass, ByVal tagList As List(Of String))
+        Public Sub invalidateTagList(ByVal tagList As List(Of String))
             Try
-                '
-                appendCacheLog(vbTab & "invalidateTag(" & cp.Doc.StartTime & ")")
-                '
                 If allowCache Then
                     For Each tag In tagList
-                        Call invalidateTag(cp, tag)
+                        Call invalidateTag(tag)
                     Next
                 End If
             Catch ex As Exception
@@ -650,119 +556,119 @@ Namespace Contensive.Core
                 Return cpCore.app.config.enableCache
             End Get
         End Property
-        '
-        '
-        '
-        Public Sub saveRaw3(ByVal Key As String, ByVal data As Object, Optional invalidationDate As Date = #12:00:00 AM#)
-            Try
-                'Dim testValue As Object
-                If invalidationDate <= Date.MinValue Then
-                    invalidationDate = Now.AddDays(7 + Rnd())
-                End If
-                If (Key = "") Then
-                    cpCore.handleException(New ApplicationException("key cannot be empty"))
-                ElseIf (invalidationDate <= Now()) Then
-                    cpCore.handleException(New ApplicationException("invalidationDate must be > current date/time"))
-                Else
-                    Dim allowSave As Boolean
-                    allowSave = False
-                    If data Is Nothing Then
-                        allowSave = True
-                    ElseIf Not data.GetType.IsSerializable Then
-                        cpCore.handleException(New ApplicationException("data object must be serializable"))
-                    Else
-                        allowSave = True
-                    End If
-                    If allowSave Then
-                        If cpCore.cluster.config.isLocalCache Then
-                            Throw New NotImplementedException("local cache not implemented yet")
-                        Else
-                            Call cacheClient.Store(Enyim.Caching.Memcached.StoreMode.Set, encodeCacheKey(Key), data, invalidationDate)
-                        End If
-                    End If
-                End If
-            Catch ex As Exception
-                cpCore.handleException(ex)
-            End Try
-        End Sub
+        ''
+        ''
+        ''
+        'Public Sub saveRaw3(ByVal Key As String, ByVal data As Object, Optional invalidationDate As Date = #12:00:00 AM#)
+        '    Try
+        '        'Dim testValue As Object
+        '        If invalidationDate <= Date.MinValue Then
+        '            invalidationDate = Now.AddDays(7 + Rnd())
+        '        End If
+        '        If (Key = "") Then
+        '            cpCore.handleException(New ApplicationException("key cannot be empty"))
+        '        ElseIf (invalidationDate <= Now()) Then
+        '            cpCore.handleException(New ApplicationException("invalidationDate must be > current date/time"))
+        '        Else
+        '            Dim allowSave As Boolean
+        '            allowSave = False
+        '            If data Is Nothing Then
+        '                allowSave = True
+        '            ElseIf Not data.GetType.IsSerializable Then
+        '                cpCore.handleException(New ApplicationException("data object must be serializable"))
+        '            Else
+        '                allowSave = True
+        '            End If
+        '            If allowSave Then
+        '                If cpCore.cluster.config.isLocalCache Then
+        '                    Throw New NotImplementedException("local cache not implemented yet")
+        '                Else
+        '                    Call cacheClient.Store(Enyim.Caching.Memcached.StoreMode.Set, encodeCacheKey(Key), data, invalidationDate)
+        '                End If
+        '            End If
+        '        End If
+        '    Catch ex As Exception
+        '        cpCore.handleException(ex)
+        '    End Try
+        'End Sub
 
-        '
-        '
-        '
-        Public Sub saveRaw2(ByVal Key As String, ByVal data As Object, Optional invalidationDate As Date = #12:00:00 AM#)
-            Try
-                If cpCore.app.config.enableCache Then
-                    If (invalidationDate <= Date.MinValue) Then
-                        invalidationDate = Now.AddDays(7.0# + Rnd())
-                    End If
-                    Call saveRaw3(cpCore.app.config.name & "-" & Key, data, invalidationDate)
-                End If
-            Catch ex As Exception
-                Call cpCore.handleLegacyError8("exception")
-            End Try
-            '            On Error GoTo ErrorTrap
-            '            '
-            '            Dim Ptr As Integer
-            '            '
-            '            If (Key = "") Then
-            '                Call csv_HandleClassErrorAndResume("cache_save", "Can not call cache_save with empty key")
-            '            Else
-            '                If InStr(1, "," & docCacheUsedKeyList & ",", "," & Key & ",", vbTextCompare) <> 0 Then
-            '                    '
-            '                    ' the key is there already, remove it and add the new one
-            '                    '
-            '                    On Error Resume Next
-            '                    Call docCache.Remove(Key)
-            '                    If Err.Number <> 0 Then
-            '                        Call csv_HandleClassErrorAndResume("cache_save", "Error during collection remove method for key [" & Key & "], err " & GetErrString(Err))
-            '                        Err.Clear()
-            '                    End If
-            '                    Call docCache.Add(Var, Key)
-            '                    If Err.Number <> 0 Then
-            '                        Call csv_HandleClassErrorAndResume("cache_save", "Error during collection Add method for key [" & Key & "], err " & GetErrString(Err))
-            '                        Err.Clear()
-            '                    End If
-            '                    On Error GoTo ErrorTrap
-            '                Else
-            '                    '
-            '                    ' not there yet, just add it
-            '                    '
-            '                    docCacheUsedKeyList = docCacheUsedKeyList & "," & Key
-            '                    Call docCache.Add(Var, Key)
-            '                End If
-            '            End If
-            '            '
-            '            Exit Sub
-            '            '
-            'ErrorTrap:
-            '            Call csv_HandleClassErrorAndResume("cache_save", "errorTrap")
-        End Sub
-        '
-        '========================================================================
-        '   Clear Cache
-        '========================================================================
-        '
-        Public Sub invalidateAll2()
-            Try
-                If cpCore.app.config.enableCache Then
-                    cache_globalInvalidationDate = Now
-                    Call saveRaw2("globalInvalidationDate", cache_globalInvalidationDate, Now.AddYears(1))
-                    '
-                    '' the rest of this should use cache_save() which is handled by the global invalidation
-                    ''
-                    'Call cpCore.cache_addon_clear()
-                    'Call cpCore.cache_linkAlias_clear()
-                    'Call cpCore.pageManager_cache_pageContent_clear()
-                    'Call cpCore.pageManager_cache_pageTemplate_clear()
-                    'Call cpCore.pageManager_cache_siteSection_clear()
-                    'If Not IsNothing(cpCore.cache_addonStyleRules) Then
-                    '    cpCore.cache_addonStyleRules.clear()
-                    'End If
-                End If
-            Catch ex As Exception
-                cpCore.handleException(ex)
-            End Try
-        End Sub
+        ''
+        ''
+        ''
+        'Public Sub saveRaw(ByVal Key As String, ByVal data As Object, Optional invalidationDate As Date = #12:00:00 AM#)
+        '    Try
+        '        If cpCore.app.config.enableCache Then
+        '            If (invalidationDate <= Date.MinValue) Then
+        '                invalidationDate = Now.AddDays(7.0# + Rnd())
+        '            End If
+        '            Call saveRaw3(cpCore.app.config.name & "-" & Key, data, invalidationDate)
+        '        End If
+        '    Catch ex As Exception
+        '        Call cpCore.handleLegacyError8("exception")
+        '    End Try
+        '    '            On Error GoTo ErrorTrap
+        '    '            '
+        '    '            Dim Ptr As Integer
+        '    '            '
+        '    '            If (Key = "") Then
+        '    '                Call csv_HandleClassErrorAndResume("cache_save", "Can not call cache_save with empty key")
+        '    '            Else
+        '    '                If InStr(1, "," & docCacheUsedKeyList & ",", "," & Key & ",", vbTextCompare) <> 0 Then
+        '    '                    '
+        '    '                    ' the key is there already, remove it and add the new one
+        '    '                    '
+        '    '                    On Error Resume Next
+        '    '                    Call docCache.Remove(Key)
+        '    '                    If Err.Number <> 0 Then
+        '    '                        Call csv_HandleClassErrorAndResume("cache_save", "Error during collection remove method for key [" & Key & "], err " & GetErrString(Err))
+        '    '                        Err.Clear()
+        '    '                    End If
+        '    '                    Call docCache.Add(Var, Key)
+        '    '                    If Err.Number <> 0 Then
+        '    '                        Call csv_HandleClassErrorAndResume("cache_save", "Error during collection Add method for key [" & Key & "], err " & GetErrString(Err))
+        '    '                        Err.Clear()
+        '    '                    End If
+        '    '                    On Error GoTo ErrorTrap
+        '    '                Else
+        '    '                    '
+        '    '                    ' not there yet, just add it
+        '    '                    '
+        '    '                    docCacheUsedKeyList = docCacheUsedKeyList & "," & Key
+        '    '                    Call docCache.Add(Var, Key)
+        '    '                End If
+        '    '            End If
+        '    '            '
+        '    '            Exit Sub
+        '    '            '
+        '    'ErrorTrap:
+        '    '            Call csv_HandleClassErrorAndResume("cache_save", "errorTrap")
+        'End Sub
+        ''
+        ''========================================================================
+        ''   Clear Cache
+        ''========================================================================
+        ''
+        'Public Sub invalidateAll2()
+        '    Try
+        '        If cpCore.app.config.enableCache Then
+        '            cache_globalInvalidationDate = Now
+        '            Call saveRaw("globalInvalidationDate", cache_globalInvalidationDate, Now.AddYears(1))
+        '            '
+        '            '' the rest of this should use cache_save() which is handled by the global invalidation
+        '            ''
+        '            'Call cpCore.cache_addon_clear()
+        '            'Call cpCore.cache_linkAlias_clear()
+        '            'Call cpCore.pageManager_cache_pageContent_clear()
+        '            'Call cpCore.pageManager_cache_pageTemplate_clear()
+        '            'Call cpCore.pageManager_cache_siteSection_clear()
+        '            'If Not IsNothing(cpCore.cache_addonStyleRules) Then
+        '            '    cpCore.cache_addonStyleRules.clear()
+        '            'End If
+        '        End If
+        '    Catch ex As Exception
+        '        cpCore.handleException(ex)
+        '    End Try
+        'End Sub
         ''
         ''========================================================================
         ''   Create the Content Time Stamp
@@ -808,11 +714,12 @@ Namespace Contensive.Core
         '       If they match, the result cachestring is returned, else "" is returned and the cache is cleared
         '========================================================================
         '
-        Public Function read(Of resultType)(ByVal key As String) As Object
+        Public Function GetObject(Of resultType)(ByVal key As String) As Object
             Dim returnObject As Object = Nothing
             Try
                 Dim cacheData As cacheDataClass
                 Dim invalidate As Boolean = False
+                Dim dateCompare As Integer
                 '
                 'return_cacheHit = False
                 If (String.IsNullOrEmpty(key)) Then
@@ -821,21 +728,29 @@ Namespace Contensive.Core
                     '
                     ' block all cache if editing or rendering edits
                     '
-                    cacheData = DirectCast(readRaw(key), cacheDataClass)
+                    cacheData = DirectCast(GetObjectRaw(key), cacheDataClass)
                     If Not (cacheData Is Nothing) Then
-                        If cache_globalInvalidationDate < cacheData.saveDate Then
+                        dateCompare = globalInvalidationDate.CompareTo(cacheData.saveDate)
+                        If (dateCompare >= 0) Then
+                            appendCacheLog("read(" & key & ") invalidated, cache_globalInvalidationDate[" & globalInvalidationDate & "] >= saveDate[" & cacheData.saveDate & "], dateCompare[" & dateCompare & "]")
+                        Else
                             '
                             ' if this data is newer that the last global invalidation, continue
                             '
                             Dim tagInvalidationDate As Date
                             For Each tag As String In cacheData.tagList
                                 tagInvalidationDate = getTagInvalidationDate(tag)
-                                If (tagInvalidationDate >= cacheData.saveDate) Then
+                                dateCompare = tagInvalidationDate.CompareTo(cacheData.saveDate)
+                                Dim ticks As Long = ((tagInvalidationDate - cacheData.saveDate).Ticks)
+                                appendCacheLog("ticks[" & ticks & "], tagInvalidationDate[" & tagInvalidationDate & "], cacheData.saveDate[" & cacheData.saveDate & "], dateCompare[" & dateCompare & "]")
+                                If (dateCompare >= 0) Then
                                     invalidate = True
+                                    appendCacheLog("invalidate")
                                     Exit For
                                 End If
                             Next
                             If Not invalidate Then
+                                appendCacheLog("-valid-")
                                 If TypeOf cacheData.data Is resultType Then
                                     returnObject = cacheData.data
                                     'return_cacheHit = True
@@ -850,43 +765,47 @@ Namespace Contensive.Core
             Return returnObject
         End Function
         '
-        '========================================================================
-        '   Saves a string to the Bake Cache
+        '   Buffered Site Property
         '
-        '   Creates the depency string from the tablenamelist
-        '========================================================================
-        '
-        Public Sub cachexSaveRename(ByVal key As String, ByVal data As Object, Optional ByVal tagList As String = "", Optional ByVal invalidationDate As Date = #12:00:00 AM#)
-            Try
-                Dim cacheData As New cacheDataClass
+        Public ReadOnly Property siteProperty_AllowCache_SpecialCaseNotCached() As Boolean
+            Get
                 '
-                If cpCore.app.config.enableCache Then
-                    If (siteProperty_AllowCache_SpecialCaseNotCached) Then
-                        '
-                        ' user_isEditing and visitProperty_allowWorkflowRendering have to be checked where they are used, not globally
-                        '   1) site properties are cached, so the cache cannot check site properties (cyclic calls)
-                        '   2) cache calls are made for many more things that do not depend on editing
-                        ' allowCache cant be a site property because it sp are cached (cyclic again)
-                        '
-                        'If (siteProperty_AllowCache_SpecialCaseNotCached) And (Not cpCore.user_isEditingAnything) And (Not cpCore.main_VisitProperty_AllowWorkflowRendering) Then
-                        If (invalidationDate <= Date.MinValue) Then
-                            invalidationDate = Now.AddDays(7.0# + Rnd())
-                        End If
-                        cacheData.data = data
-                        If Not String.IsNullOrEmpty(tagList) Then
-                            cacheData.tagList.AddRange(tagList.Split(CChar(",")))
-                        End If
-                        cacheData.saveDate = Now()
-                        Call saveRaw2(key, cacheData, invalidationDate)
-                    End If
+                ' site property now runs query
+                '
+                'Return True
+                Dim propertyFound As Boolean = False
+                If Not siteProperty_AllowCache_LocalLoaded Then
+                    siteProperty_AllowCache_Local = EncodeBoolean(cpCore.app.siteProperty_getText_noCache("AllowBake", "0", propertyFound))
+                    siteProperty_AllowCache_LocalLoaded = True
                 End If
-            Catch ex As Exception
-                cpCore.handleException(ex)
-            End Try
-        End Sub
+                siteProperty_AllowCache_SpecialCaseNotCached = siteProperty_AllowCache_Local
 
-
-
+            End Get
+        End Property
+        Private siteProperty_AllowCache_LocalLoaded As Boolean = False
+        Private siteProperty_AllowCache_Local As Boolean
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' The default invalidation date, calculated as the current date plus the invalidationDaysDefault, plus a random number of hours, 0-24
+        ''' </summary>
+        ''' <returns></returns>
+        '
+        Public ReadOnly Property invalidationDateDefault As Date
+            Get
+                Return Now.AddDays(invalidationDaysDefault + Rnd())
+            End Get
+        End Property
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' get the cachename for the invalidation date for a tag
+        ''' </summary>
+        ''' <param name="tag"></param>
+        ''' <returns></returns>
+        Private Function getTagInvalidationDateCacheName(tag As String) As String
+            Return "TagInvalidationDate-" & tag.ToLower()
+        End Function
 
 #Region " IDisposable Support "
         Protected disposed As Boolean = False
@@ -923,38 +842,6 @@ Namespace Contensive.Core
             End If
             Me.disposed = True
         End Sub
-        '
-        '   Buffered Site Property
-        '
-        Public ReadOnly Property siteProperty_AllowCache_SpecialCaseNotCached() As Boolean
-            Get
-                '
-                ' site property now runs query
-                '
-                'Return True
-                Dim propertyFound As Boolean = False
-                If Not siteProperty_AllowCache_LocalLoaded Then
-                    siteProperty_AllowCache_Local = EncodeBoolean(cpCore.app.siteProperty_getText_noCache("AllowBake", "0", propertyFound))
-                    siteProperty_AllowCache_LocalLoaded = True
-                End If
-                siteProperty_AllowCache_SpecialCaseNotCached = siteProperty_AllowCache_Local
-
-            End Get
-        End Property
-        Private siteProperty_AllowCache_LocalLoaded As Boolean = False
-        Private siteProperty_AllowCache_Local As Boolean
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' The default invalidation date, calculated as the current date plus the invalidationDaysDefault, plus a random number of hours, 0-24
-        ''' </summary>
-        ''' <returns></returns>
-        '
-        Public ReadOnly Property invalidationDateDefault As Date
-            Get
-                Return Now.AddDays(invalidationDaysDefault + Rnd())
-            End Get
-        End Property
 
 
         ' Do not change or add Overridable to these methods.

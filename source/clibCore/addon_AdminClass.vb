@@ -1380,7 +1380,7 @@ ErrorTrap:
                                 Call LoadEditRecord(adminContent, editRecord)
                                 Call LoadEditResponse(adminContent, editRecord)
                                 Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
-                                cpCore.app.cache.invalidateAll2()
+                                cpCore.app.cache.invalidateAll()
                                 cpCore.app.metaData.clear()
                             End If
                             AdminAction = AdminActionNop ' convert so action can be used in as a refresh
@@ -10445,7 +10445,7 @@ ErrorTrap:
                 ' ----- Get the baked version
                 '
                 BakeName = "AdminMenu" & Format(cpCore.userId, "00000000")
-                GetMenuTopMode = EncodeText(cpCore.app.cache.read(Of String)(BakeName))
+                GetMenuTopMode = EncodeText(cpCore.app.cache.GetObject(Of String)(BakeName))
                 MenuDelimiterPosition = InStr(1, GetMenuTopMode, MenuDelimiter, vbTextCompare)
                 If MenuDelimiterPosition > 1 Then
                     MenuClose = Mid(GetMenuTopMode, MenuDelimiterPosition + Len(MenuDelimiter))
@@ -10546,7 +10546,7 @@ ErrorTrap:
                     '
                     MenuClose = cpCore.main_GetMenuClose()
                     'GetMenuTopMode = GetMenuTopMode & cpCore.main_GetMenuClose
-                    Call cpCore.app.cache.save(BakeName, GetMenuTopMode & MenuDelimiter & MenuClose, "Menu Entries,People,Content,Groups,Group Rules")
+                    Call cpCore.app.cache.SetKey(BakeName, GetMenuTopMode & MenuDelimiter & MenuClose, "Menu Entries,People,Content,Groups,Group Rules")
                 End If
                 cpCore.main_ClosePageHTML = cpCore.main_ClosePageHTML & MenuClose
             End If
@@ -10873,7 +10873,7 @@ ErrorTrap:
                         BlockForm = True
                     End If
                     cpCore.app.metaData.clear()
-                    cpCore.app.cache.invalidateAll2()
+                    cpCore.app.cache.invalidateAll()
                 End If
                 '
                 ' Get the form
@@ -15762,7 +15762,7 @@ ErrorTrap:
                     '
                     If NeedToReloadCDef Then
                         cpCore.app.metaData.clear()
-                        cpCore.app.cache.invalidateAll2()
+                        cpCore.app.cache.invalidateAll()
                         CDef = cpCore.app.metaData.getCdef(ContentName)
                     End If
                     '
@@ -16775,7 +16775,7 @@ ErrorTrap:
                             '
                             ' Clear the cache
                             '
-                            Call cpCore.app.cache.invalidateAll2()
+                            Call cpCore.app.cache.invalidateAll()
                     End Select
                     If (Button = ButtonOK) Then
                         '

@@ -371,7 +371,7 @@ Namespace Contensive.Core
                                         If NeedToClearCache Then
                                             emptyData = Nothing
                                             Call cp.core.app.cache.invalidateTag("Page Content")
-                                            Call cp.core.app.cache.saveRaw2("PCC", emptyData)
+                                            Call cp.core.app.cache.SetKey("PCC", emptyData)
                                         End If
                                     End If
                                     If True Then

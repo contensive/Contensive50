@@ -659,7 +659,7 @@ ErrorTrap:
                             Next
                         Next
                     End If
-                    cpCore.app.cache.invalidateAll2()
+                    cpCore.app.cache.invalidateAll()
                     cpCore.app.metaData.clear()
                 End If
                 If (ToolButton = ButtonAdd) Then
@@ -680,7 +680,7 @@ ErrorTrap:
                 '' ----- Button Reload CDef
                 ''
                 If (ToolButton = ButtonSaveandInvalidateCache) Then
-                    cpCore.app.cache.invalidateAll2()
+                    cpCore.app.cache.invalidateAll()
                     cpCore.app.metaData.clear()
                 End If
                 '
@@ -1422,7 +1422,7 @@ ErrorTrap:
                 If (ContentName <> "") And (TableName <> "") And (DataSourceName <> "") Then
                     Call cpCore.app.db_CreateSQLTable(DataSourceName, TableName)
                     Call cpCore.main_CreateContentFromSQLTable(DataSourceName, TableName, ContentName)
-                    cpCore.app.cache.invalidateAll2()
+                    cpCore.app.cache.invalidateAll()
                     cpCore.app.metaData.clear()
                     ContentID = cpCore.main_GetContentID(ContentName)
                     ParentNavID = cpCore.main_GetRecordID("Navigator Entries", "Manage Site Content")
@@ -1928,7 +1928,7 @@ ErrorTrap:
                     CDef = cpCore.app.metaData.getCdef(ContentID, True, False)
                 End If
                 If (Button = ButtonSaveandInvalidateCache) Then
-                    cpCore.app.cache.invalidateAll2()
+                    cpCore.app.cache.invalidateAll()
                     cpCore.app.metaData.clear()
                     Call cpCore.main_Redirect("?af=" & AdminFormToolConfigureListing & "&ContentID=" & ContentID)
                 End If
@@ -2727,7 +2727,7 @@ ErrorTrap:
                     Call cpCore.main_CreateContentChild(ChildContentName, ParentContentName)
                     '
                     Stream.Add("<br>Reloading Content Definitions...")
-                    cpCore.app.cache.invalidateAll2()
+                    cpCore.app.cache.invalidateAll()
                     cpCore.app.metaData.clear()
                     '
                     ' Add Admin Menu Entry
@@ -4024,7 +4024,7 @@ ErrorTrap:
                 ' Restart
                 '
                 Call Stream.Add("<br>Loading Content Definitions...")
-                cpCore.app.cache.invalidateAll2()
+                cpCore.app.cache.invalidateAll()
                 cpCore.app.metaData.clear()
                 Call Stream.Add("<br>Content Definitions loaded")
             End If

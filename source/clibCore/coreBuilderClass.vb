@@ -565,7 +565,7 @@ Namespace Contensive.Core
                     '
                     ' clear all cache
                     '
-                    Call cpCore.app.cache.invalidateAll2()
+                    Call cpCore.app.cache.invalidateAll()
                     '
                     '---------------------------------------------------------------------
                     ' ----- internal upgrade complete
@@ -1738,7 +1738,7 @@ Namespace Contensive.Core
                 '
                 ' ----- Reload CSv
                 '
-                Call cpCore.app.cache.invalidateAll2()
+                Call cpCore.app.cache.invalidateAll()
                 Call cpCore.app.metaData.clear()
             Catch ex As Exception
                 cpCore.handleException(ex)
@@ -3159,7 +3159,7 @@ Namespace Contensive.Core
                             ' ----- Load CDef
                             '
                             If clearMetaCache Then
-                                cpCore.app.cache.invalidateAll2()
+                                cpCore.app.cache.invalidateAll()
                                 cpCore.app.metaData.clear()
                             End If
                         End If
@@ -3691,7 +3691,7 @@ Namespace Contensive.Core
                 End If
                 '
                 If Not isNewFieldRecord Then
-                    cpCore.app.cache.invalidateAll2()
+                    cpCore.app.cache.invalidateAll()
                     cpCore.app.metaData.clear()
                 End If
                 '
@@ -3796,7 +3796,7 @@ Namespace Contensive.Core
                                 Call cpCore.app.executeSql("update ccContent Set CreateKey=0 where id=" & ContentID)
                             End If
                             rsContent = Nothing
-                            cpCore.app.cache.invalidateAll2()
+                            cpCore.app.cache.invalidateAll()
                             cpCore.app.metaData.clear()
                         End If
                         '
@@ -3848,7 +3848,7 @@ Namespace Contensive.Core
                 '       Load only if the previous state of autoload was true
                 '       Leave Autoload false during load so more do not trigger
                 '
-                cpCore.app.cache.invalidateAll2()
+                cpCore.app.cache.invalidateAll()
                 cpCore.app.metaData.clear()
                 rsTable = Nothing
             Catch ex As Exception

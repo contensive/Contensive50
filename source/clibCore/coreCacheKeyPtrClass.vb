@@ -43,7 +43,7 @@ Namespace Contensive.Core
                 dataStore.loaded = False
                 dataStore.dataList.Clear()
                 dataStore.keyPtrIndex = New coreKeyPtrIndexClass
-                Call app.cache.saveRaw2(cacheName & "-dataList", dataStore.dataList)
+                Call app.cache.SetKey(cacheName & "-dataList", dataStore.dataList)
             Catch ex As Exception
                 Throw New ApplicationException("Exception in cacheKeyPtrClass.clear", ex)
             End Try
@@ -120,7 +120,7 @@ Namespace Contensive.Core
                 If Not dataStore.loaded Then
                     Try
                         needsToReload = True
-                        dataStore = DirectCast(app.cache.readRaw(cacheName), dataStoreClass)
+                        dataStore = DirectCast(app.cache.GetObject(Of dataStoreClass)(cacheName), dataStoreClass)
                     Catch ex As Exception
                         needsToReload = True
                     End Try
@@ -168,7 +168,7 @@ Namespace Contensive.Core
             Try
                 If dataStore.loaded Then '
                     Call dataStore.keyPtrIndex.getPtr("test")
-                    Call app.cache.saveRaw2(cacheName, dataStore)
+                    Call app.cache.SetKey(cacheName, dataStore)
                 End If
             Catch ex As Exception
                 Throw New ApplicationException("Exception in cacheKeyPtrClass.save", ex)

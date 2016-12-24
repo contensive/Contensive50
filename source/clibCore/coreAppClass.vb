@@ -1209,7 +1209,7 @@ ErrorTrap:
                     SQL = "INSERT INTO ccSetup (ACTIVE,CONTENTCONTROLID,NAME,FIELDVALUE,ModifiedDate,DateAdded)VALUES(" & SQLTrue & "," & db_EncodeSQLNumber(ContentID) & "," & db_EncodeSQLText(UCase(propertyName)) & "," & db_EncodeSQLText(Value) & "," & SQLNow & "," & SQLNow & ");"
                     Call executeSql(SQL)
                 End If
-                Call cache.save(cacheName, Value, "site properties")
+                Call cache.SetKey(cacheName, Value, "site properties")
 
             Catch ex As Exception
                 Call cpCore.handleException(ex)
@@ -1271,11 +1271,11 @@ ErrorTrap:
             Try
                 Dim cacheName As String = "siteProperty-" & PropertyName
                 Dim propertyFound As Boolean = False
-                returnString = EncodeText(cache.read(Of String)(cacheName))
+                returnString = EncodeText(cache.GetObject(Of String)(cacheName))
                 If returnString = "" Then
                     returnString = siteProperty_getText_noCache(PropertyName, DefaultValue, propertyFound)
                     If (propertyFound) And (returnString <> "") Then
-                        Call cache.save(cacheName, returnString, "Site Properties")
+                        Call cache.SetKey(cacheName, returnString, "Site Properties")
                     End If
                 End If
             Catch ex As Exception
@@ -2014,7 +2014,7 @@ ErrorTrap:
                     '
                     '
                     If clearMetaCache Then
-                        Call cache.invalidateAll2()
+                        Call cache.invalidateAll()
                         Call metaData.clear()
                     End If
                 End If
@@ -2038,7 +2038,7 @@ ErrorTrap:
         Public Sub csv_DeleteTable(ByVal DataSourceName As String, ByVal TableName As String)
             Try
                 Call executeSql("DROP TABLE " & TableName, DataSourceName)
-                cache.invalidateAll2()
+                cache.invalidateAll()
                 metaData.clear()
             Catch ex As Exception
                 Call handleLegacyClassError1(System.Reflection.MethodBase.GetCurrentMethod.Name, "trap")
@@ -2122,7 +2122,7 @@ ErrorTrap:
                         If Not ts.indexes.Contains(IndexName.ToLower) Then
                             Call executeSql("CREATE INDEX " & IndexName & " ON " & TableName & "( " & FieldNames & " );", DataSourceName)
                             If clearMetaCache Then
-                                cache.invalidateAll2()
+                                cache.invalidateAll()
                                 metaData.clear()
                             End If
                         End If
@@ -2330,7 +2330,7 @@ ErrorTrap:
                                 sql = "DROP INDEX " & TableName & "." & IndexName & ";"
                         End Select
                         Call executeSql(sql, DataSourceName)
-                        cache.invalidateAll2()
+                        cache.invalidateAll()
                         metaData.clear()
                     End If
                 End If
@@ -7334,7 +7334,7 @@ ErrorTrap:
             '
             ' ----- Load CDef
             '
-            cache.invalidateAll2()
+            cache.invalidateAll()
             metaData.clear()
             '
             Exit Sub

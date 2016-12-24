@@ -2269,7 +2269,7 @@ ErrorTrap:
                                                         '
                                                         ' import complete, flush caches
                                                         '
-                                                        Call cpCore.app.cache.invalidateAll2()
+                                                        Call cpCore.app.cache.invalidateAll()
                                                     End If
                                                 End If
                                             End With
@@ -4803,7 +4803,7 @@ ErrorTrap:
                         End With
                     Next
                     cpCore.app.metaData.clear()
-                    cpCore.app.cache.invalidateAll2()
+                    cpCore.app.cache.invalidateAll()
                     '
                     '----------------------------------------------------------------------------------------------------------------------
                     Call AppendClassLogFile(cpCore.app.config.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 2: Verify all CDef names in ccContent so GetContentID calls will succeed")
@@ -4835,7 +4835,7 @@ ErrorTrap:
                         End If
                     Next
                     cpCore.app.metaData.clear()
-                    cpCore.app.cache.invalidateAll2()
+                    cpCore.app.cache.invalidateAll()
                     '        '
                     '----------------------------------------------------------------------------------------------------------------------
                     Call AppendClassLogFile(cpCore.app.config.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 3: Load datasources")
@@ -4850,7 +4850,7 @@ ErrorTrap:
                     Call VerifySortMethods()
                     Call VerifyContentFieldTypes()
                     cpCore.app.metaData.clear()
-                    cpCore.app.cache.invalidateAll2()
+                    cpCore.app.cache.invalidateAll()
                     '
                     '----------------------------------------------------------------------------------------------------------------------
                     Call AppendClassLogFile(cpCore.app.config.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 5: verify 'Content' content definition")
@@ -4874,7 +4874,7 @@ ErrorTrap:
                         End With
                     Next
                     cpCore.app.metaData.clear()
-                    cpCore.app.cache.invalidateAll2()
+                    cpCore.app.cache.invalidateAll()
                     '
                     '----------------------------------------------------------------------------------------------------------------------
                     Call AppendClassLogFile(cpCore.app.config.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 6.1: Verify all definitions and fields")
@@ -4902,7 +4902,7 @@ ErrorTrap:
                         End If
                     Next
                     cpCore.app.metaData.clear()
-                    cpCore.app.cache.invalidateAll2()
+                    cpCore.app.cache.invalidateAll()
                     '
                     '----------------------------------------------------------------------------------------------------------------------
                     Call AppendClassLogFile(cpCore.app.config.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 6.2: Verify all field help")
@@ -4952,7 +4952,7 @@ ErrorTrap:
                         Next
                     Next
                     cpCore.app.metaData.clear()
-                    cpCore.app.cache.invalidateAll2()
+                    cpCore.app.cache.invalidateAll()
                     '
                     '----------------------------------------------------------------------------------------------------------------------
                     Call AppendClassLogFile(cpCore.app.config.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 7: create SQL indexes")
@@ -4971,7 +4971,7 @@ ErrorTrap:
                         End With
                     Next
                     cpCore.app.metaData.clear()
-                    cpCore.app.cache.invalidateAll2()
+                    cpCore.app.cache.invalidateAll()
                     '
                     '----------------------------------------------------------------------------------------------------------------------
                     Call AppendClassLogFile(cpCore.app.config.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 8a: Verify All Menu Names, then all Menus")
@@ -5361,7 +5361,7 @@ ErrorTrap:
                             ' clear the cdef cache and list
                             '
                             cpCore.app.metaData.clear()
-                            cpCore.app.cache.invalidateAll2()
+                            cpCore.app.cache.invalidateAll()
                         End If
                     End With
                 End If
