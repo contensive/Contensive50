@@ -40,7 +40,9 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "setup", "setup\setup.vdproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "clibTaskHost", "clibTaskHost\clibTaskHost.csproj", "{4C879D9E-C3AB-4968-86FD-34EA74303E90}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestIntegrations", "TestIntegration2\TestIntegrations.csproj", "{A5AC1D36-6D5A-41F3-9F9E-6A7CFBAE554F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "integrationTests", "TestIntegration2\integrationTests.csproj", "{A5AC1D36-6D5A-41F3-9F9E-6A7CFBAE554F}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "integrationTestsVb", "integrationTestsVb\integrationTestsVb.vbproj", "{F043CBB8-A557-4592-8946-0DC05CDB86CD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -294,6 +296,22 @@ Global
 		{A5AC1D36-6D5A-41F3-9F9E-6A7CFBAE554F}.Release|x64.Build.0 = Release|Any CPU
 		{A5AC1D36-6D5A-41F3-9F9E-6A7CFBAE554F}.Release|x86.ActiveCfg = Release|Any CPU
 		{A5AC1D36-6D5A-41F3-9F9E-6A7CFBAE554F}.Release|x86.Build.0 = Release|Any CPU
+		{F043CBB8-A557-4592-8946-0DC05CDB86CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F043CBB8-A557-4592-8946-0DC05CDB86CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F043CBB8-A557-4592-8946-0DC05CDB86CD}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{F043CBB8-A557-4592-8946-0DC05CDB86CD}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{F043CBB8-A557-4592-8946-0DC05CDB86CD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F043CBB8-A557-4592-8946-0DC05CDB86CD}.Debug|x64.Build.0 = Debug|Any CPU
+		{F043CBB8-A557-4592-8946-0DC05CDB86CD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F043CBB8-A557-4592-8946-0DC05CDB86CD}.Debug|x86.Build.0 = Debug|Any CPU
+		{F043CBB8-A557-4592-8946-0DC05CDB86CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F043CBB8-A557-4592-8946-0DC05CDB86CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F043CBB8-A557-4592-8946-0DC05CDB86CD}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{F043CBB8-A557-4592-8946-0DC05CDB86CD}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{F043CBB8-A557-4592-8946-0DC05CDB86CD}.Release|x64.ActiveCfg = Release|Any CPU
+		{F043CBB8-A557-4592-8946-0DC05CDB86CD}.Release|x64.Build.0 = Release|Any CPU
+		{F043CBB8-A557-4592-8946-0DC05CDB86CD}.Release|x86.ActiveCfg = Release|Any CPU
+		{F043CBB8-A557-4592-8946-0DC05CDB86CD}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -545,7 +545,8 @@ Namespace Contensive.Core
         '=======================================================================
         Private Sub appendCacheLog(line As String)
             Try
-                cpCore.appendLog("pid(" & Process.GetCurrentProcess().Id.ToString.PadLeft(4, "0"c) & "),thread(" & Threading.Thread.CurrentThread.ManagedThreadId.ToString.PadLeft(4, "0"c) & ")" & vbTab & line, cacheLogPrefix)
+                cpCore.appendLog(line)
+                'cpCore.appendLog("pid(" & Process.GetCurrentProcess().Id.ToString.PadLeft(4, "0"c) & "),thread(" & Threading.Thread.CurrentThread.ManagedThreadId.ToString.PadLeft(4, "0"c) & ")" & vbTab & line, cacheLogPrefix)
             Catch ex As Exception
                 ' ignore logging errors
             End Try
@@ -723,7 +724,7 @@ Namespace Contensive.Core
                 '
                 'return_cacheHit = False
                 If (String.IsNullOrEmpty(key)) Then
-                    Throw New ArgumentException("cache.read, key cannot be blank.")
+                    Throw New ArgumentException("cache.GetObject, key cannot be blank.")
                 Else
                     '
                     ' block all cache if editing or rendering edits
@@ -732,7 +733,7 @@ Namespace Contensive.Core
                     If Not (cacheData Is Nothing) Then
                         dateCompare = globalInvalidationDate.CompareTo(cacheData.saveDate)
                         If (dateCompare >= 0) Then
-                            appendCacheLog("read(" & key & ") invalidated, cache_globalInvalidationDate[" & globalInvalidationDate & "] >= saveDate[" & cacheData.saveDate & "], dateCompare[" & dateCompare & "]")
+                            appendCacheLog("GetObject(" & key & "), invalidated, cache_globalInvalidationDate[" & globalInvalidationDate & "] >= saveDate[" & cacheData.saveDate & "], dateCompare[" & dateCompare & "]")
                         Else
                             '
                             ' if this data is newer that the last global invalidation, continue
@@ -742,15 +743,15 @@ Namespace Contensive.Core
                                 tagInvalidationDate = getTagInvalidationDate(tag)
                                 dateCompare = tagInvalidationDate.CompareTo(cacheData.saveDate)
                                 Dim ticks As Long = ((tagInvalidationDate - cacheData.saveDate).Ticks)
-                                appendCacheLog("ticks[" & ticks & "], tagInvalidationDate[" & tagInvalidationDate & "], cacheData.saveDate[" & cacheData.saveDate & "], dateCompare[" & dateCompare & "]")
+                                appendCacheLog("GetObject(" & key & "), tagInvalidationDate[" & tagInvalidationDate & "], cacheData.saveDate[" & cacheData.saveDate & "], dateCompare[" & dateCompare & "], tick diff [" & ticks & "]")
                                 If (dateCompare >= 0) Then
                                     invalidate = True
-                                    appendCacheLog("invalidate")
+                                    appendCacheLog("GetObject(" & key & "), invalidated")
                                     Exit For
                                 End If
                             Next
                             If Not invalidate Then
-                                appendCacheLog("-valid-")
+                                appendCacheLog("GetObject(" & key & "), valid")
                                 If TypeOf cacheData.data Is resultType Then
                                     returnObject = cacheData.data
                                     'return_cacheHit = True
@@ -760,6 +761,7 @@ Namespace Contensive.Core
                     End If
                 End If
             Catch ex As Exception
+                appendCacheLog("GetObject(" & key & "), exception[" & ex.Message & "]")
                 cpCore.handleException(ex)
             End Try
             Return returnObject
