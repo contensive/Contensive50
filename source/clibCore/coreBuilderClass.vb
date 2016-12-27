@@ -420,7 +420,7 @@ Namespace Contensive.Core
                         ' add the root developer
                         '
                         Dim cid As Integer
-                        cid = cpCore.app.csv_GetContentID("people")
+                        cid = cpCore.app.db_GetContentID("people")
                         dt = cpCore.app.executeSql("select id from ccmembers where (Developer<>0)")
                         If dt.Rows.Count = 0 Then
                             SQL = "" _
@@ -1718,7 +1718,7 @@ Namespace Contensive.Core
                     '
                     ' remove all non add-on contentdefs for ccaggregatefunctions
                     '
-                    CID = cpCore.app.csv_GetContentID("Add-ons")
+                    CID = cpCore.app.db_GetContentID("Add-ons")
                     If CID <> 0 Then
                         Call cpCore.app.executeSql("update ccaggregatefunctions set contentcontrolid=" & CID)
                         Call cpCore.app.executeSql("delete from cccontent where id in (select c.id from cccontent c left join cctables t on t.id=c.contenttableid where t.name='ccAggregateFunctions' and c.id<>" & CID & ")")
@@ -2637,7 +2637,7 @@ Namespace Contensive.Core
         '       Entries are unique by their name
         '=============================================================================
         '
-        Public Sub csv_VerifyMenuEntry(ByVal ParentName As String, ByVal EntryName As String, ByVal ContentName As String, ByVal LinkPage As String, ByVal SortOrder As String, ByVal AdminOnly As Boolean, ByVal DeveloperOnly As Boolean, ByVal NewWindow As Boolean, ByVal Active As Boolean, ByVal MenuContentName As String, ByVal AddonName As String)
+        Public Sub admin_VerifyMenuEntry(ByVal ParentName As String, ByVal EntryName As String, ByVal ContentName As String, ByVal LinkPage As String, ByVal SortOrder As String, ByVal AdminOnly As Boolean, ByVal DeveloperOnly As Boolean, ByVal NewWindow As Boolean, ByVal Active As Boolean, ByVal MenuContentName As String, ByVal AddonName As String)
             Try
                 '
                 Const AddonContentName = "Aggregate Functions"
@@ -2655,7 +2655,7 @@ Namespace Contensive.Core
                 MethodName = "csv_VerifyMenuEntry"
                 '
                 SelectList = "Name,ContentID,ParentID,LinkPage,SortOrder,AdminOnly,DeveloperOnly,NewWindow,Active"
-                SupportAddonID = cpCore.app.csv_IsContentFieldSupported(MenuContentName, "AddonID")
+                SupportAddonID = cpCore.app.metaData_IsContentFieldSupported(MenuContentName, "AddonID")
                 '
                 ' Get AddonID from AddonName
                 '
@@ -2692,7 +2692,7 @@ Namespace Contensive.Core
                 '
                 ContentID = -1
                 If ContentName <> "" Then
-                    ContentID = cpCore.app.csv_GetContentID(ContentName)
+                    ContentID = cpCore.app.db_GetContentID(ContentName)
                 End If
                 '
                 ' Locate current entry
@@ -2740,7 +2740,7 @@ Namespace Contensive.Core
         '       called from upgrade and DeveloperTools
         '========================================================================
         '
-        Public Sub csv_CreateContent4(ByVal Active As Boolean, ByVal DataSourceName As String, ByVal TableName As String, ByVal ContentName As String, Optional ByVal AdminOnly As Boolean = False, Optional ByVal DeveloperOnly As Boolean = False, Optional ByVal AllowAdd As Boolean = True, Optional ByVal AllowDelete As Boolean = True, Optional ByVal ParentName As String = "", Optional ByVal DefaultSortMethod As String = "", Optional ByVal DropDownFieldList As String = "", Optional ByVal AllowWorkflowAuthoring As Boolean = False, Optional ByVal AllowCalendarEvents As Boolean = False, Optional ByVal AllowContentTracking As Boolean = False, Optional ByVal AllowTopicRules As Boolean = False, Optional ByVal AllowContentChildTool As Boolean = False, Optional ByVal AllowMetaContent As Boolean = False, Optional ByVal IconLink As String = "", Optional ByVal IconWidth As Integer = 0, Optional ByVal IconHeight As Integer = 0, Optional ByVal IconSprites As Integer = 0, Optional ByVal ccGuid As String = "", Optional ByVal IsBaseContent As Boolean = False, Optional ByVal installedByCollectionGuid As String = "", Optional clearMetaCache As Boolean = False)
+        Public Sub db_CreateContent4(ByVal Active As Boolean, ByVal DataSourceName As String, ByVal TableName As String, ByVal ContentName As String, Optional ByVal AdminOnly As Boolean = False, Optional ByVal DeveloperOnly As Boolean = False, Optional ByVal AllowAdd As Boolean = True, Optional ByVal AllowDelete As Boolean = True, Optional ByVal ParentName As String = "", Optional ByVal DefaultSortMethod As String = "", Optional ByVal DropDownFieldList As String = "", Optional ByVal AllowWorkflowAuthoring As Boolean = False, Optional ByVal AllowCalendarEvents As Boolean = False, Optional ByVal AllowContentTracking As Boolean = False, Optional ByVal AllowTopicRules As Boolean = False, Optional ByVal AllowContentChildTool As Boolean = False, Optional ByVal AllowMetaContent As Boolean = False, Optional ByVal IconLink As String = "", Optional ByVal IconWidth As Integer = 0, Optional ByVal IconHeight As Integer = 0, Optional ByVal IconSprites As Integer = 0, Optional ByVal ccGuid As String = "", Optional ByVal IsBaseContent As Boolean = False, Optional ByVal installedByCollectionGuid As String = "", Optional clearMetaCache As Boolean = False)
             Try
                 '
                 Dim ContentIsBaseContent As Boolean
@@ -2867,7 +2867,7 @@ Namespace Contensive.Core
                                 sqlList.add("name", cpCore.app.db_EncodeSQLText(TableName))
                                 sqlList.add("active", SQLTrue)
                                 sqlList.add("DATASOURCEID", cpCore.app.db_EncodeSQLNumber(DataSourceID))
-                                sqlList.add("CONTENTCONTROLID", cpCore.app.db_EncodeSQLNumber(cpCore.app.csv_GetContentID("Tables")))
+                                sqlList.add("CONTENTCONTROLID", cpCore.app.db_EncodeSQLNumber(cpCore.app.db_GetContentID("Tables")))
                                 '
                                 Call cpCore.app.db_UpdateTableRecord("Default", "ccTables", "ID=" & TableID, sqlList)
                             Else
@@ -2960,7 +2960,7 @@ Namespace Contensive.Core
                                 '
                                 ' CDef does not inherit its fields, create what is needed for a non-inherited CDef
                                 '
-                                If Not cpCore.app.csv_isCdefField(ContentID, "ID") Then
+                                If Not cpCore.app.db_isCdefField(ContentID, "ID") Then
                                     field = New coreMetaDataClass.CDefFieldClass
                                     field.nameLc = "id"
                                     field.active = True
@@ -2973,7 +2973,7 @@ Namespace Contensive.Core
                                     Call metaData_VerifyCDefField_ReturnID(ContentName, field)
                                 End If
                                 '
-                                If Not cpCore.app.csv_isCdefField(ContentID, "name") Then
+                                If Not cpCore.app.db_isCdefField(ContentID, "name") Then
                                     field = New coreMetaDataClass.CDefFieldClass
                                     field.nameLc = "name"
                                     field.active = True
@@ -2986,7 +2986,7 @@ Namespace Contensive.Core
                                     Call metaData_VerifyCDefField_ReturnID(ContentName, field)
                                 End If
                                 '
-                                If Not cpCore.app.csv_isCdefField(ContentID, "active") Then
+                                If Not cpCore.app.db_isCdefField(ContentID, "active") Then
                                     field = New coreMetaDataClass.CDefFieldClass
                                     field.nameLc = "active"
                                     field.active = True
@@ -2999,7 +2999,7 @@ Namespace Contensive.Core
                                     Call metaData_VerifyCDefField_ReturnID(ContentName, field)
                                 End If
                                 '
-                                If Not cpCore.app.csv_isCdefField(ContentID, "sortorder") Then
+                                If Not cpCore.app.db_isCdefField(ContentID, "sortorder") Then
                                     field = New coreMetaDataClass.CDefFieldClass
                                     field.nameLc = "sortorder"
                                     field.active = True
@@ -3012,7 +3012,7 @@ Namespace Contensive.Core
                                     Call metaData_VerifyCDefField_ReturnID(ContentName, field)
                                 End If
                                 '
-                                If Not cpCore.app.csv_isCdefField(ContentID, "dateadded") Then
+                                If Not cpCore.app.db_isCdefField(ContentID, "dateadded") Then
                                     field = New coreMetaDataClass.CDefFieldClass
                                     field.nameLc = "dateadded"
                                     field.active = True
@@ -3024,7 +3024,7 @@ Namespace Contensive.Core
                                     field.isBaseField = IsBaseContent
                                     Call metaData_VerifyCDefField_ReturnID(ContentName, field)
                                 End If
-                                If Not cpCore.app.csv_isCdefField(ContentID, "createdby") Then
+                                If Not cpCore.app.db_isCdefField(ContentID, "createdby") Then
                                     field = New coreMetaDataClass.CDefFieldClass
                                     field.nameLc = "createdby"
                                     field.active = True
@@ -3037,7 +3037,7 @@ Namespace Contensive.Core
                                     field.isBaseField = IsBaseContent
                                     Call metaData_VerifyCDefField_ReturnID(ContentName, field)
                                 End If
-                                If Not cpCore.app.csv_isCdefField(ContentID, "modifieddate") Then
+                                If Not cpCore.app.db_isCdefField(ContentID, "modifieddate") Then
                                     field = New coreMetaDataClass.CDefFieldClass
                                     field.nameLc = "modifieddate"
                                     field.active = True
@@ -3049,7 +3049,7 @@ Namespace Contensive.Core
                                     field.isBaseField = IsBaseContent
                                     Call metaData_VerifyCDefField_ReturnID(ContentName, field)
                                 End If
-                                If Not cpCore.app.csv_isCdefField(ContentID, "modifiedby") Then
+                                If Not cpCore.app.db_isCdefField(ContentID, "modifiedby") Then
                                     field = New coreMetaDataClass.CDefFieldClass
                                     field.nameLc = "modifiedby"
                                     field.active = True
@@ -3062,7 +3062,7 @@ Namespace Contensive.Core
                                     field.isBaseField = IsBaseContent
                                     Call metaData_VerifyCDefField_ReturnID(ContentName, field)
                                 End If
-                                If Not cpCore.app.csv_isCdefField(ContentID, "ContentControlID") Then
+                                If Not cpCore.app.db_isCdefField(ContentID, "ContentControlID") Then
                                     field = New coreMetaDataClass.CDefFieldClass
                                     field.nameLc = "ContentControlID"
                                     field.active = True
@@ -3075,7 +3075,7 @@ Namespace Contensive.Core
                                     field.isBaseField = IsBaseContent
                                     Call metaData_VerifyCDefField_ReturnID(ContentName, field)
                                 End If
-                                If Not cpCore.app.csv_isCdefField(ContentID, "CreateKey") Then
+                                If Not cpCore.app.db_isCdefField(ContentID, "CreateKey") Then
                                     field = New coreMetaDataClass.CDefFieldClass
                                     field.nameLc = "CreateKey"
                                     field.active = True
@@ -3090,7 +3090,7 @@ Namespace Contensive.Core
                                 '
                                 ' REFACTOR - these fieldsonly apply to page content
                                 '
-                                If Not cpCore.app.csv_isCdefField(ContentID, "EditSourceID") Then
+                                If Not cpCore.app.db_isCdefField(ContentID, "EditSourceID") Then
                                     field = New coreMetaDataClass.CDefFieldClass
                                     field.nameLc = "EditSourceID"
                                     field.active = True
@@ -3103,7 +3103,7 @@ Namespace Contensive.Core
                                     field.isBaseField = IsBaseContent
                                     Call metaData_VerifyCDefField_ReturnID(ContentName, field)
                                 End If
-                                If Not cpCore.app.csv_isCdefField(ContentID, "EditArchive") Then
+                                If Not cpCore.app.db_isCdefField(ContentID, "EditArchive") Then
                                     field = New coreMetaDataClass.CDefFieldClass
                                     field.nameLc = "EditArchive"
                                     field.active = True
@@ -3116,7 +3116,7 @@ Namespace Contensive.Core
                                     field.isBaseField = IsBaseContent
                                     Call metaData_VerifyCDefField_ReturnID(ContentName, field)
                                 End If
-                                If Not cpCore.app.csv_isCdefField(ContentID, "EditBlank") Then
+                                If Not cpCore.app.db_isCdefField(ContentID, "EditBlank") Then
                                     field = New coreMetaDataClass.CDefFieldClass
                                     field.nameLc = "EditBlank"
                                     field.active = True
@@ -3129,7 +3129,7 @@ Namespace Contensive.Core
                                     field.isBaseField = IsBaseContent
                                     Call metaData_VerifyCDefField_ReturnID(ContentName, field)
                                 End If
-                                If Not cpCore.app.csv_isCdefField(ContentID, "ContentCategoryID") Then
+                                If Not cpCore.app.db_isCdefField(ContentID, "ContentCategoryID") Then
                                     field = New coreMetaDataClass.CDefFieldClass
                                     field.nameLc = "ContentCategoryID"
                                     field.active = True
@@ -3142,7 +3142,7 @@ Namespace Contensive.Core
                                     field.isBaseField = IsBaseContent
                                     Call metaData_VerifyCDefField_ReturnID(ContentName, field)
                                 End If
-                                If Not cpCore.app.csv_isCdefField(ContentID, "ccGuid") Then
+                                If Not cpCore.app.db_isCdefField(ContentID, "ccGuid") Then
                                     field = New coreMetaDataClass.CDefFieldClass
                                     field.nameLc = "ccGuid"
                                     field.active = True
@@ -3174,12 +3174,12 @@ Namespace Contensive.Core
         ' Define a Content Definition Field based only on what is known from a SQL table
         '========================================================================
         '
-        Public Sub csv_CreateContentFieldFromTableField(ByVal ContentName As String, ByVal FieldName As String, ByVal ADOFieldType As Integer)
+        Public Sub db_CreateContentFieldFromTableField(ByVal ContentName As String, ByVal FieldName As String, ByVal ADOFieldType As Integer)
             Try
                 '
                 Dim field As New coreMetaDataClass.CDefFieldClass
                 '
-                field.fieldTypeId = cpCore.app.csv_GetFieldTypeIdByADOType(ADOFieldType)
+                field.fieldTypeId = cpCore.app.db_GetFieldTypeIdByADOType(ADOFieldType)
                 field.caption = FieldName
                 field.editSortPriority = 1000
                 field.ReadOnly = False
@@ -3521,28 +3521,28 @@ Namespace Contensive.Core
                     ManyToManyRuleSecondaryField = field.ManyToManyRuleSecondaryField
                     '
                     If RedirectContentName <> "" Then
-                        RedirectContentID = cpCore.app.csv_GetContentID(RedirectContentName)
+                        RedirectContentID = cpCore.app.db_GetContentID(RedirectContentName)
                         If RedirectContentID <= 0 Then
                             Call cpCore.handleException(New Exception("Could Not create redirect For field [" & field.nameLc & "] For Content Definition [" & ContentName & "] because no Content Definition was found For RedirectContentName [" & RedirectContentName & "]."))
                         End If
                     End If
                     '
                     If LookupContentName <> "" Then
-                        LookupContentID = cpCore.app.csv_GetContentID(LookupContentName)
+                        LookupContentID = cpCore.app.db_GetContentID(LookupContentName)
                         If LookupContentID <= 0 Then
                             Call cpCore.handleException(New Exception("Could Not create lookup For field [" & field.nameLc & "] For Content Definition [" & ContentName & "] because no Content Definition was found For [" & LookupContentName & "]."))
                         End If
                     End If
                     '
                     If ManyToManyContent <> "" Then
-                        ManyToManyContentID = cpCore.app.csv_GetContentID(ManyToManyContent)
+                        ManyToManyContentID = cpCore.app.db_GetContentID(ManyToManyContent)
                         If ManyToManyContentID <= 0 Then
                             Call cpCore.handleException(New ApplicationException("Could Not create many To many For field [" & field.nameLc & "] For Content Definition [" & ContentName & "] because no Content Definition was found For ManyToManyContent [" & ManyToManyContent & "]."))
                         End If
                     End If
                     '
                     If ManyToManyRuleContent <> "" Then
-                        ManyToManyRuleContentID = cpCore.app.csv_GetContentID(ManyToManyRuleContent)
+                        ManyToManyRuleContentID = cpCore.app.db_GetContentID(ManyToManyRuleContent)
                         If ManyToManyRuleContentID <= 0 Then
                             Call cpCore.handleException(New ApplicationException("Could Not create many To many For field [" & field.nameLc & "] For Content Definition [" & ContentName & "] because no Content Definition was found For ManyToManyRuleContent [" & ManyToManyRuleContent & "]."))
                         End If
@@ -3644,7 +3644,7 @@ Namespace Contensive.Core
                             Call sqlList.add("EDITSORTPRIORITY", cpCore.app.db_EncodeSQLNumber(field.editSortPriority)) ' Pointer)
                             Call sqlList.add("ADMINONLY", cpCore.app.db_EncodeSQLBoolean(field.adminOnly)) ' Pointer)
                             Call sqlList.add("DEVELOPERONLY", cpCore.app.db_EncodeSQLBoolean(FieldDeveloperOnly)) ' Pointer)
-                            Call sqlList.add("CONTENTCONTROLID", cpCore.app.db_EncodeSQLNumber(cpCore.app.csv_GetContentID("Content Fields"))) ' Pointer)
+                            Call sqlList.add("CONTENTCONTROLID", cpCore.app.db_EncodeSQLNumber(cpCore.app.db_GetContentID("Content Fields"))) ' Pointer)
                             Call sqlList.add("DefaultValue", cpCore.app.db_EncodeSQLText(DefaultValue)) ' Pointer)
                             Call sqlList.add("HTMLCONTENT", cpCore.app.db_EncodeSQLBoolean(HTMLContent)) ' Pointer)
                             Call sqlList.add("NOTEDITABLE", cpCore.app.db_EncodeSQLBoolean(NotEditable)) ' Pointer)
@@ -3712,7 +3712,7 @@ Namespace Contensive.Core
         '       - content does not exist
         '=============================================================================
         '
-        Public Sub csv_CreateContentFromSQLTable(ByVal DataSourceName As String, ByVal TableName As String, ByVal ContentName As String, ByVal MemberID As Integer)
+        Public Sub db_CreateContentFromSQLTable(ByVal DataSourceName As String, ByVal TableName As String, ByVal ContentName As String, ByVal MemberID As Integer)
             Try
                 '
                 Dim SQL As String
@@ -3778,13 +3778,13 @@ Namespace Contensive.Core
                         ' --- Find/Create the Content Definition
                         '----------------------------------------------------------------
                         '
-                        ContentID = cpCore.app.csv_GetContentID(ContentName)
+                        ContentID = cpCore.app.db_GetContentID(ContentName)
                         If (ContentID < 0) Then
                             '
                             ' ----- Content definition not found, create it
                             '
                             ContentIsNew = True
-                            Call csv_CreateContent4(True, DataSourceName, TableName, ContentName)
+                            Call db_CreateContent4(True, DataSourceName, TableName, ContentName)
                             'ContentID = csv_GetContentID(ContentName)
                             SQL = "Select ID from ccContent where name=" & cpCore.app.db_EncodeSQLText(ContentName)
                             Dim rsContent As DataTable
@@ -3828,7 +3828,7 @@ Namespace Contensive.Core
                                 '
                                 ' create the content field
                                 '
-                                Call csv_CreateContentFieldFromTableField(ContentName, dcTableColumns.ColumnName, EncodeInteger(dcTableColumns.DataType))
+                                Call db_CreateContentFieldFromTableField(ContentName, dcTableColumns.ColumnName, EncodeInteger(dcTableColumns.DataType))
                             Else
                                 '
                                 ' touch field so upgrade does not delete it

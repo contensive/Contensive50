@@ -61,7 +61,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function GetProperty(ByVal PropertyName As String, Optional ByVal DefaultValue As String = "", Optional ByVal TargetVisitId As Integer = 0) As String 'Inherits BaseClasses.CPVisitBaseClass.GetProperty
             If True Then
-                Return cpCore.main_GetVisitProperty(PropertyName, DefaultValue, TargetVisitId)
+                Return cpCore.properties_GetVisitProperty(PropertyName, DefaultValue, TargetVisitId)
             Else
                 Return ""
             End If
@@ -134,7 +134,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub SetProperty(ByVal PropertyName As String, ByVal Value As String, Optional ByVal TargetVisitId As Integer = 0) 'Inherits BaseClasses.CPVisitBaseClass.SetProperty
             If True Then
-                Call cpCore.main_SetVisitProperty(PropertyName, Value, TargetVisitId)
+                Call cpCore.properties_SetVisitProperty(PropertyName, Value, TargetVisitId)
             End If
         End Sub
         '

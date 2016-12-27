@@ -161,14 +161,14 @@ Namespace Contensive.Core
         '
         '
         Public Overrides Sub ImportFile(ByVal wwwFileName As String)
-            Dim head As String = ""
+            Dim headTags As String = ""
             Try
                 If wwwFileName <> "" Then
-                    accum = cp.File.Read(cpCore.cluster.config.clusterPhysicalPath & cpCore.app.config.appRootPath & wwwFileName)
+                    accum = cp.File.appRootFiles.read(wwwFileName)
                     If accum <> "" Then
-                        head = coreCommonModule.GetTagInnerHTML(accum, "head", False)
-                        If head <> "" Then
-                            Call cpCore.csv_addHeadTags(head)
+                        headTags = coreCommonModule.GetTagInnerHTML(accum, "head", False)
+                        If headTags <> "" Then
+                            Call cpCore.html_addHeadTags(headTags)
                         End If
                         accum = coreCommonModule.GetTagInnerHTML(accum, "body", False)
                     End If
@@ -183,8 +183,9 @@ Namespace Contensive.Core
         Public Overrides Sub OpenCopy(ByVal copyRecordNameOrGuid As String)
             Dim cs As CPCSClass = CP.CSNew
             Try
+                accum = ""
                 If copyRecordNameOrGuid <> "" Then
-                    Call cs.Open("copy content", "(name=" & CP.Db.EncodeSQLText(copyRecordNameOrGuid) & ")or(ccGuid=" & CP.Db.EncodeSQLText(copyRecordNameOrGuid) & ")", "id", , "copy")
+                    Call cs.Open("copy content", "(name=" & cp.Db.EncodeSQLText(copyRecordNameOrGuid) & ")or(ccGuid=" & cp.Db.EncodeSQLText(copyRecordNameOrGuid) & ")", "id", , "copy")
                     If cs.OK Then
                         accum = cs.GetText("copy")
                     End If
@@ -199,8 +200,9 @@ Namespace Contensive.Core
         '
         Public Overrides Sub OpenFile(ByVal wwwFileName As String)
             Try
-                If wwwFileName <> "" Then
-                    accum = cp.File.Read(cpCore.cluster.config.clusterPhysicalPath & cpCore.app.config.appRootPath & wwwFileName)
+                accum = ""
+                If (Not String.IsNullOrEmpty(wwwFileName)) Then
+                    accum = cp.File.appRootFiles.read(wwwFileName)
                 End If
             Catch ex As Exception
                 cp.core.handleException(ex, "Unexpected Error in block.OpenFile")

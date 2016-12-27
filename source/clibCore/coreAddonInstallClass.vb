@@ -22,7 +22,7 @@ Namespace Contensive.Core
                 '
                 ' Block entries to the root node - this is to block entries made for system collections I may have missed
                 '
-                Call cpCore.handleException(New Exception("Adding root navigator entry [" & EntryName & "] by collection [" & cpCore.csv_GetRecordName("content", InstalledByCollectionID) & "]. This Is Not allowed."))
+                Call cpCore.handleException(New Exception("Adding root navigator entry [" & EntryName & "] by collection [" & cpCore.db_GetRecordName("content", InstalledByCollectionID) & "]. This Is Not allowed."))
             Else
                 GetNonRootNavigatorID = GetNavigatorID(EntryName, ParentID, addonId, ContentID, NavIconType, NavIconTitle, DeveloperOnly, ignore, LinkPage, HelpCollectionID, HelpAddonID, InstalledByCollectionID, AdminOnly)
             End If
@@ -144,7 +144,7 @@ ErrorTrap:
                         ' pause for a second between fetches to pace the server (<10 hits in 10 seconds)
                         '
                         Threading.Thread.Sleep(downloadDelay)
-                        responseStream = cpCore.getHttpRequest(URL)
+                        responseStream = cpCore.common_getHttpRequest(URL)
                         reader = New XmlTextReader(responseStream)
                         Doc.Load(reader)
                         Exit Do
@@ -1767,7 +1767,7 @@ ErrorTrap:
                                                                                             '
                                                                                             ' setup cdef rule
                                                                                             '
-                                                                                            ContentID = cpCore.app.csv_GetContentID(ContentName)
+                                                                                            ContentID = cpCore.app.db_GetContentID(ContentName)
                                                                                             If ContentID > 0 Then
                                                                                                 CS = cpCore.app.db_csInsertRecord("Add-on Collection CDef Rules", 0)
                                                                                                 If cpCore.app.db_csOk(CS) Then
@@ -1977,7 +1977,7 @@ ErrorTrap:
                                                                                                                         If FieldLookupContentID <> 0 Then
                                                                                                                             FieldLookupContentName = cpCore.app.csv_GetContentNameByID(FieldLookupContentID)
                                                                                                                             If FieldLookupContentName <> "" Then
-                                                                                                                                If (Left(FieldValue, 1) = "{") And (Right(FieldValue, 1) = "}") And cpCore.app.csv_IsContentFieldSupported(FieldLookupContentName, "ccguid") Then
+                                                                                                                                If (Left(FieldValue, 1) = "{") And (Right(FieldValue, 1) = "}") And cpCore.app.metaData_IsContentFieldSupported(FieldLookupContentName, "ccguid") Then
                                                                                                                                     '
                                                                                                                                     ' Lookup by guid
                                                                                                                                     '
@@ -2598,7 +2598,7 @@ ErrorTrap:
             '
             If True Then
                 CS = cpCore.app.db_csOpen("Navigator Entries", "ccguid=" & cpCore.app.db_EncodeSQLText(ccGuid), "ID", , , , , "ID")
-            ElseIf cpCore.app.csv_IsSQLTableField("default", "ccMenuEntries", "navguid") Then
+            ElseIf cpCore.app.db_IsSQLTableField("default", "ccMenuEntries", "navguid") Then
                 CS = cpCore.app.db_csOpen("Navigator Entries", "navguid=" & cpCore.app.db_EncodeSQLText(ccGuid), "ID", , , , , "ID")
             End If
             If cpCore.app.db_csOk(CS) Then
@@ -3253,7 +3253,7 @@ ErrorTrap:
                                             '
                                             ' Bad field name - need to report it somehow
                                             '
-                                            cpCore.handleException(New Exception("bad field found [" & FieldName & "], in addon node [" & addonName & "], of collection [" & cpCore.csv_GetRecordName("add-on collections", CollectionID) & "]"))
+                                            cpCore.handleException(New Exception("bad field found [" & FieldName & "], in addon node [" & addonName & "], of collection [" & cpCore.db_GetRecordName("add-on collections", CollectionID) & "]"))
                                         Else
                                             Call cpCore.app.db_setCS(CS, FieldName, FieldValue)
                                         End If
@@ -4966,7 +4966,7 @@ ErrorTrap:
                                 ' stop the errors here, so a bad field does not block the upgrade
                                 '
                                 'On Error Resume Next
-                                Call cpCore.app.csv_CreateSQLIndex(.DataSourceName, .TableName, .IndexName, .FieldNameList)
+                                Call cpCore.app.db_CreateSQLIndex(.DataSourceName, .TableName, .IndexName, .FieldNameList)
                             End If
                         End With
                     Next
@@ -4996,7 +4996,7 @@ ErrorTrap:
                                 Else
                                     ContentName = "Menu Entries"
                                     Call AppendClassLogFile(cpCore.app.config.name, "UpgradeCDef_BuildDbFromCollection", "creating menu entry [" & .Name & "], parentname [" & .ParentName & "]")
-                                    Call builder.csv_VerifyMenuEntry(.ParentName, .Name, .ContentName, .LinkPage, .SortOrder, .AdminOnly, .DeveloperOnly, .NewWindow, .Active, ContentName, .AddonName)
+                                    Call builder.admin_VerifyMenuEntry(.ParentName, .Name, .ContentName, .LinkPage, .SortOrder, .AdminOnly, .DeveloperOnly, .NewWindow, .Active, ContentName, .AddonName)
                                 End If
                             End If
                         End With
@@ -5217,7 +5217,7 @@ ErrorTrap:
                         ContentID = 0
                         ContentName = .Name
                         ContentIsBaseContent = False
-                        FieldHelpCID = cpCore.app.csv_GetContentID("Field Help")
+                        FieldHelpCID = cpCore.app.db_GetContentID("Field Help")
                         '
                         DataSourceName = .ContentDataSourceName
                         If DataSourceName = "" Then
@@ -5252,7 +5252,7 @@ ErrorTrap:
                             '
                             ' ----- update definition (use SingleRecord as an update flag)
                             '
-                            Call builder.csv_CreateContent4(True _
+                            Call builder.db_CreateContent4(True _
                                     , .ContentDataSourceName _
                                     , .ContentTableName _
                                     , ContentName _
@@ -6415,7 +6415,7 @@ ErrorTrap:
                 Call sqlList.add("CreatedBy", "0")
                 Call sqlList.add("OrderByClause", cpCore.app.db_EncodeSQLText(OrderByCriteria))
                 Call sqlList.add("active", SQLTrue)
-                Call sqlList.add("ContentControlID", cpCore.app.csv_GetContentID("Sort Methods").ToString())
+                Call sqlList.add("ContentControlID", cpCore.app.db_GetContentID("Sort Methods").ToString())
                 '
                 dt = cpCore.app.db_openTable("Default", "ccSortMethods", "Name=" & cpCore.app.db_EncodeSQLText(Name), "ID", "ID", 1)
                 If dt.Rows.Count > 0 Then
@@ -6497,7 +6497,7 @@ ErrorTrap:
                 ' ----- Replace table if needed
                 '
                 If TableBad Then
-                    Call cpCore.app.csv_DeleteTable("Default", "ccFieldTypes")
+                    Call cpCore.app.db_DeleteTable("Default", "ccFieldTypes")
                     Call cpCore.app.db_CreateSQLTable("Default", "ccFieldTypes")
                     RowsFound = 0
                 End If
@@ -6506,7 +6506,7 @@ ErrorTrap:
                 '
                 RowsNeeded = FieldTypeIdMax - RowsFound
                 If RowsNeeded > 0 Then
-                    CID = cpCore.app.csv_GetContentID("Content Field Types")
+                    CID = cpCore.app.db_GetContentID("Content Field Types")
                     If CID <= 0 Then
                         '
                         ' Problem
@@ -6594,8 +6594,8 @@ ErrorTrap:
                     ' Setup misc arguments
                     '
                     SelectList = "Name,ContentID,ParentID,LinkPage,SortOrder,AdminOnly,DeveloperOnly,NewWindow,Active,NavIconType,NavIconTitle"
-                    SupportAddonID = cpCore.app.csv_IsContentFieldSupported(MenuContentName, "AddonID")
-                    SupportInstalledByCollectionID = cpCore.app.csv_IsContentFieldSupported(MenuContentName, "InstalledByCollectionID")
+                    SupportAddonID = cpCore.app.metaData_IsContentFieldSupported(MenuContentName, "AddonID")
+                    SupportInstalledByCollectionID = cpCore.app.metaData_IsContentFieldSupported(MenuContentName, "InstalledByCollectionID")
                     If SupportAddonID Then
                         SelectList = SelectList & ",AddonID"
                     Else
@@ -6604,12 +6604,12 @@ ErrorTrap:
                     If SupportInstalledByCollectionID Then
                         SelectList = SelectList & ",InstalledByCollectionID"
                     End If
-                    If cpCore.app.csv_IsContentFieldSupported(MenuContentName, "ccGuid") Then
+                    If cpCore.app.metaData_IsContentFieldSupported(MenuContentName, "ccGuid") Then
                         SupportGuid = True
                         SupportccGuid = True
                         GuidFieldName = "ccguid"
                         SelectList = SelectList & ",ccGuid"
-                    ElseIf cpCore.app.csv_IsContentFieldSupported(MenuContentName, "NavGuid") Then
+                    ElseIf cpCore.app.metaData_IsContentFieldSupported(MenuContentName, "NavGuid") Then
                         SupportGuid = True
                         SupportNavGuid = True
                         GuidFieldName = "navguid"
@@ -6617,7 +6617,7 @@ ErrorTrap:
                     Else
                         SelectList = SelectList & ",'' as ccGuid"
                     End If
-                    SupportNavIcon = cpCore.app.csv_IsContentFieldSupported(MenuContentName, "NavIconType")
+                    SupportNavIcon = cpCore.app.metaData_IsContentFieldSupported(MenuContentName, "NavIconType")
                     addonId = 0
                     If SupportAddonID And (AddonName <> "") Then
                         CS = cpCore.app.db_csOpen(AddonContentName, "name=" & cpCore.app.db_EncodeSQLText(AddonName), "ID", False, , , , "ID", 1)
@@ -6629,7 +6629,7 @@ ErrorTrap:
                     ParentID = csv_GetParentIDFromNameSpace(MenuContentName, menuNameSpace)
                     ContentID = -1
                     If ContentName <> "" Then
-                        ContentID = cpCore.app.csv_GetContentID(ContentName)
+                        ContentID = cpCore.app.db_GetContentID(ContentName)
                     End If
                     '
                     ' Locate current entry(s)

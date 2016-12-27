@@ -84,7 +84,7 @@ Namespace Contensive.Core
         Public Overrides Function GetId(ByVal GroupNameIdOrGuid As String) As Integer
             Dim returnInteger As Integer = 0
             Try
-                returnInteger = cpCore.csv_GetRecordID("groups", GroupNameIdOrGuid)
+                returnInteger = cpCore.db_GetRecordID("groups", GroupNameIdOrGuid)
             Catch ex As Exception
 
             End Try
@@ -97,7 +97,7 @@ Namespace Contensive.Core
             Dim returnText As String = ""
             Try
                 If IsNumeric(GroupNameIdOrGuid) Then
-                    returnText = cpCore.csv_GetRecordName("groups", EncodeInteger(GroupNameIdOrGuid))
+                    returnText = cpCore.db_GetRecordName("groups", EncodeInteger(GroupNameIdOrGuid))
                 Else
                     Dim sqlCriteria As String = cpCore.app.db_getNameIdOrGuidSqlCriteria(GroupNameIdOrGuid)
                     Dim cs As CPCSClass = cp.CSNew()

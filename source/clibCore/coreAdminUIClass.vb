@@ -51,8 +51,8 @@ Namespace Contensive.Core
             '
             ' Add Errors
             '
-            If cpCore.main_IsUserError Then
-                Copy = Copy & "<div>" & cpCore.main_GetUserError & "</div>"
+            If cpCore.error_IsUserError Then
+                Copy = Copy & "<div>" & cpCore.error_GetUserError & "</div>"
             End If
             '
             If Copy <> "" Then
@@ -135,49 +135,49 @@ ErrorTrap:
                 '
                 ' Publish
                 '
-                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.main_GetFormButton(ButtonPublish, RequestNameButton)
+                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.html_GetFormButton(ButtonPublish, RequestNameButton)
             End If
             If AllowAbort Then
                 '
                 ' Abort
                 '
-                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.main_GetFormButton(ButtonAbortEdit, RequestNameButton)
+                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.html_GetFormButton(ButtonAbortEdit, RequestNameButton)
             End If
             If AllowSubmit Then
                 '
                 ' Submit for Publishing
                 '
-                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.main_GetFormButton(ButtonPublishSubmit, RequestNameButton)
+                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.html_GetFormButton(ButtonPublishSubmit, RequestNameButton)
             End If
             If AllowApprove Then
                 '
                 ' Approve Publishing
                 '
-                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.main_GetFormButton(ButtonPublishApprove, RequestNameButton)
+                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.html_GetFormButton(ButtonPublishApprove, RequestNameButton)
             End If
             If ignore_AllowReloadCDef Then
                 '
                 ' Reload Content Definitions
                 '
-                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.main_GetFormButton(ButtonSaveandInvalidateCache, RequestNameButton)
+                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.html_GetFormButton(ButtonSaveandInvalidateCache, RequestNameButton)
             End If
             If AllowMarkReviewed Then
                 '
                 ' Reload Content Definitions
                 '
-                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.main_GetFormButton(ButtonMarkReviewed, RequestNameButton)
+                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.html_GetFormButton(ButtonMarkReviewed, RequestNameButton)
             End If
             If AllowRefresh Then
                 '
                 ' just like a save, but don't save jsut redraw
                 '
-                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.main_GetFormButton(ButtonRefresh, RequestNameButton)
+                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.html_GetFormButton(ButtonRefresh, RequestNameButton)
             End If
             If AllowCreateDuplicate Then
                 '
                 ' just like a save, but don't save jsut redraw
                 '
-                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.main_GetFormButton(ButtonCreateDuplicate, RequestNameButton, , "return processSubmit(this)")
+                GetEditButtonBar2 = GetEditButtonBar2 & cpCore.html_GetFormButton(ButtonCreateDuplicate, RequestNameButton, , "return processSubmit(this)")
             End If
             '
             GetEditButtonBar2 = "" _
@@ -258,7 +258,7 @@ ErrorTrap:
                                 s = s & "<input TYPE=SUBMIT NAME=""" & ButtonName & """ DISABLED VALUE=""" & Buttons(Ptr) & """>"
                             End If
                         Case Trim(ButtonClose)
-                            s = s & cpCore.main_GetFormButton(Buttons(Ptr), , , "window.close();")
+                            s = s & cpCore.html_GetFormButton(Buttons(Ptr), , , "window.close();")
                         Case Trim(ButtonAdd)
                             If AllowAdd Then
                                 s = s & "<input TYPE=SUBMIT NAME=""" & ButtonName & """ VALUE=""" & Buttons(Ptr) & """ onClick=""return processSubmit(this);"">"
@@ -267,7 +267,7 @@ ErrorTrap:
                             End If
                         Case ""
                         Case Else
-                            s = s & cpCore.main_GetFormButton(Buttons(Ptr), ButtonName)
+                            s = s & cpCore.html_GetFormButton(Buttons(Ptr), ButtonName)
                     End Select
                 Next
             End If
@@ -451,9 +451,9 @@ ErrorTrap:
                 & ""
 
             GetBody = "" _
-                & cr & cpCore.main_GetUploadFormStart() _
+                & cr & cpCore.html_GetUploadFormStart() _
                 & kmaIndent(GetBody) _
-                & cr & cpCore.main_GetUploadFormEnd
+                & cr & cpCore.html_GetUploadFormEnd
             '
             Exit Function
             '
@@ -732,7 +732,7 @@ ErrorTrap:
         Public Function GetReportSortColumnPtr(ByVal DefaultSortColumnPtr As Integer) As Integer
             Dim VarText As String
             '
-            VarText = cpCore.main_GetStreamText2("ColPtr")
+            VarText = cpCore.doc_getText("ColPtr")
             GetReportSortColumnPtr = EncodeInteger(VarText)
             If (GetReportSortColumnPtr = 0) And (VarText <> "0") Then
                 GetReportSortColumnPtr = DefaultSortColumnPtr
@@ -755,12 +755,12 @@ ErrorTrap:
         Public Function GetReportSortType() As Integer
             Dim VarText As String
             '
-            VarText = cpCore.main_GetStreamText2("ColPtr")
+            VarText = cpCore.doc_getText("ColPtr")
             If (EncodeInteger(VarText) <> 0) Or (VarText = "0") Then
                 '
                 ' A valid ColPtr was found
                 '
-                GetReportSortType = cpCore.main_GetStreamInteger2("ColSort")
+                GetReportSortType = cpCore.web_GetStreamInteger2("ColSort")
             Else
                 GetReportSortType = SortingStateEnum.SortableSetAZ
             End If
@@ -844,7 +844,7 @@ ErrorTrap:
             'If IsArray(Cells) Then
             ColumnCount = UBound(Cells, 2)
             'End If
-            RQS = cpCore.main_RefreshQueryString
+            RQS = cpCore.web_RefreshQueryString
             '
             SortColPtr = GetReportSortColumnPtr(DefaultSortColumnPtr)
             SortColType = GetReportSortType()
@@ -929,29 +929,29 @@ ErrorTrap:
                 If PageCount > 1 Then
                     GetReport2 = GetReport2 & "<br>Go to Page "
                     If PagePointer <> 1 Then
-                        WorkingQS = cpCore.main_RefreshQueryString
+                        WorkingQS = cpCore.web_RefreshQueryString
                         WorkingQS = ModifyQueryString(WorkingQS, "GotoPage", "1", True)
-                        GetReport2 = GetReport2 & "<a href=""" & cpCore.main_ServerPage & "?" & WorkingQS & """>1</A>...&nbsp;"
+                        GetReport2 = GetReport2 & "<a href=""" & cpCore.web_requestPage & "?" & WorkingQS & """>1</A>...&nbsp;"
                     End If
-                    WorkingQS = cpCore.main_RefreshQueryString
+                    WorkingQS = cpCore.web_RefreshQueryString
                     WorkingQS = ModifyQueryString(WorkingQS, RequestNamePageSize, CStr(ReportPageSize), True)
                     Do While (PagePointer <= PageCount) And (LinkCount < 20)
                         If PagePointer = ReportPageNumber Then
                             GetReport2 = GetReport2 & PagePointer & "&nbsp;"
                         Else
                             WorkingQS = ModifyQueryString(WorkingQS, RequestNamePageNumber, CStr(PagePointer), True)
-                            GetReport2 = GetReport2 & "<a href=""" & cpCore.main_ServerPage & "?" & WorkingQS & """>" & PagePointer & "</A>&nbsp;"
+                            GetReport2 = GetReport2 & "<a href=""" & cpCore.web_requestPage & "?" & WorkingQS & """>" & PagePointer & "</A>&nbsp;"
                         End If
                         PagePointer = PagePointer + 1
                         LinkCount = LinkCount + 1
                     Loop
                     If PagePointer < PageCount Then
                         WorkingQS = ModifyQueryString(WorkingQS, RequestNamePageNumber, CStr(PageCount), True)
-                        GetReport2 = GetReport2 & "...<a href=""" & cpCore.main_ServerPage & "?" & WorkingQS & """>" & PageCount & "</A>&nbsp;"
+                        GetReport2 = GetReport2 & "...<a href=""" & cpCore.web_requestPage & "?" & WorkingQS & """>" & PageCount & "</A>&nbsp;"
                     End If
                     If ReportPageNumber < PageCount Then
                         WorkingQS = ModifyQueryString(WorkingQS, RequestNamePageNumber, CStr(ReportPageNumber + 1), True)
-                        GetReport2 = GetReport2 & "...<a href=""" & cpCore.main_ServerPage & "?" & WorkingQS & """>next</A>&nbsp;"
+                        GetReport2 = GetReport2 & "...<a href=""" & cpCore.web_requestPage & "?" & WorkingQS & """>next</A>&nbsp;"
                     End If
                     GetReport2 = GetReport2 & "<br>&nbsp;"
                 End If

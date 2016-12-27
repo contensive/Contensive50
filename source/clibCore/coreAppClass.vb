@@ -209,7 +209,7 @@ Namespace Contensive.Core
         Public DefaultConnectionString As String
         Public LicenseKey As String
         Public DomainName As String
-        Public RootPath As String
+        Public RootWebPath As String
         Public ConnectionsActive As Integer
         'Public ConnectionHandleCount As Integer            ' The connection handles created
         Public ErrorCount As Integer                       ' Errors since last start
@@ -386,7 +386,7 @@ Namespace Contensive.Core
                     csv_SQLTimeout = 30
                     csv_SlowSQLThreshholdMSec = 1000
                     DomainName = "www.DomainName.com"
-                    RootPath = "/"
+                    RootWebPath = "/"
                     AllowMonitoring = False
                     LicenseKey = GetSiteLicenseKey()
                     If (Not cpCore.cluster.config.apps.ContainsKey(appName.ToLower())) Then
@@ -1505,7 +1505,7 @@ ErrorTrap:
         '   Returns -1 if not found
         '========================================================================
         '
-        Public Function csv_GetContentID(ByVal ContentName As String) As Integer
+        Public Function db_GetContentID(ByVal ContentName As String) As Integer
             Dim returnId As Integer
             Try
                 Dim cdef As coreMetaDataClass.CDefClass
@@ -1820,7 +1820,7 @@ ErrorTrap:
         '   Returns true if the field exists in the table
         '========================================================================
         '
-        Public Function csv_IsSQLTableField(ByVal DataSourceName As String, ByVal TableName As String, ByVal FieldName As String) As Boolean
+        Public Function db_IsSQLTableField(ByVal DataSourceName As String, ByVal TableName As String, ByVal FieldName As String) As Boolean
             Dim returnOK As Boolean = False
             Try
                 Dim tableSchema As coreMetaDataClass.tableSchemaClass
@@ -1839,7 +1839,7 @@ ErrorTrap:
         '   Returns true if the table exists
         '========================================================================
         '
-        Public Function csv_IsSQLTable(ByVal DataSourceName As String, ByVal TableName As String) As Boolean
+        Public Function db_IsSQLTable(ByVal DataSourceName As String, ByVal TableName As String) As Boolean
             Dim ReturnOK As Boolean = False
             Try
                 ReturnOK = (Not metaData.getTableSchema(TableName, DataSourceName) Is Nothing)
@@ -1893,10 +1893,10 @@ ErrorTrap:
                 '
                 If Not TableFound Then
                     If Not iAllowAutoIncrement Then
-                        SQL = "Create Table " & TableName & "(ID " & csv_GetSQLAlterColumnType(DataSourceName, FieldTypeIdInteger) & ");"
+                        SQL = "Create Table " & TableName & "(ID " & db_GetSQLAlterColumnType(DataSourceName, FieldTypeIdInteger) & ");"
                         Call executeSql(SQL, DataSourceName)
                     Else
-                        SQL = "Create Table " & TableName & "(ID " & csv_GetSQLAlterColumnType(DataSourceName, FieldTypeIdAutoIdIncrement) & ");"
+                        SQL = "Create Table " & TableName & "(ID " & db_GetSQLAlterColumnType(DataSourceName, FieldTypeIdAutoIdIncrement) & ");"
                         Call executeSql(SQL, DataSourceName)
                     End If
                 End If
@@ -1921,17 +1921,17 @@ ErrorTrap:
                 '
                 ' ----- setup core indexes
                 '
-                Call csv_CreateSQLIndex(DataSourceName, TableName, TableName & "ID", "ID")
-                Call csv_CreateSQLIndex(DataSourceName, TableName, TableName & "Active", "ACTIVE")
-                Call csv_CreateSQLIndex(DataSourceName, TableName, TableName & "Name", "NAME")
-                Call csv_CreateSQLIndex(DataSourceName, TableName, TableName & "SortOrder", "SORTORDER")
-                Call csv_CreateSQLIndex(DataSourceName, TableName, TableName & "DateAdded", "DATEADDED")
-                Call csv_CreateSQLIndex(DataSourceName, TableName, TableName & "CreateKey", "CREATEKEY")
-                Call csv_CreateSQLIndex(DataSourceName, TableName, TableName & "EditSourceID", "EDITSOURCEID")
-                Call csv_CreateSQLIndex(DataSourceName, TableName, TableName & "ContentControlID", "CONTENTCONTROLID")
-                Call csv_CreateSQLIndex(DataSourceName, TableName, TableName & "ModifiedDate", "MODIFIEDDATE")
-                Call csv_CreateSQLIndex(DataSourceName, TableName, TableName & "ContentCategoryID", "CONTENTCATEGORYID")
-                Call csv_CreateSQLIndex(DataSourceName, TableName, TableName & "ccGuid", "CCGUID")
+                Call db_CreateSQLIndex(DataSourceName, TableName, TableName & "ID", "ID")
+                Call db_CreateSQLIndex(DataSourceName, TableName, TableName & "Active", "ACTIVE")
+                Call db_CreateSQLIndex(DataSourceName, TableName, TableName & "Name", "NAME")
+                Call db_CreateSQLIndex(DataSourceName, TableName, TableName & "SortOrder", "SORTORDER")
+                Call db_CreateSQLIndex(DataSourceName, TableName, TableName & "DateAdded", "DATEADDED")
+                Call db_CreateSQLIndex(DataSourceName, TableName, TableName & "CreateKey", "CREATEKEY")
+                Call db_CreateSQLIndex(DataSourceName, TableName, TableName & "EditSourceID", "EDITSOURCEID")
+                Call db_CreateSQLIndex(DataSourceName, TableName, TableName & "ContentControlID", "CONTENTCONTROLID")
+                Call db_CreateSQLIndex(DataSourceName, TableName, TableName & "ModifiedDate", "MODIFIEDDATE")
+                Call db_CreateSQLIndex(DataSourceName, TableName, TableName & "ContentCategoryID", "CONTENTCATEGORYID")
+                Call db_CreateSQLIndex(DataSourceName, TableName, TableName & "ccGuid", "CCGUID")
             End If
             metaData.tableSchemaListClear()
             '
@@ -1995,7 +1995,7 @@ ErrorTrap:
                 Call handleLegacyClassError1(MethodName, "csv_CreateSQLTableField called with blank fieldname")
             Else
                 UcaseFieldName = UCase(FieldName)
-                If Not csv_IsSQLTableField(DataSourceName, TableName, FieldName) Then
+                If Not db_IsSQLTableField(DataSourceName, TableName, FieldName) Then
                     SQL = "ALTER TABLE " & TableName & " ADD " & FieldName & " "
                     If Not IsNumeric(fieldType) Then
                         '
@@ -2006,7 +2006,7 @@ ErrorTrap:
                         '
                         ' ----- translater type into SQL string
                         '
-                        SQL &= csv_GetSQLAlterColumnType(DataSourceName, fieldType)
+                        SQL &= db_GetSQLAlterColumnType(DataSourceName, fieldType)
                     End If
                     On Error GoTo ErrorTrap_SQL
                     Call executeSql(SQL, DataSourceName)
@@ -2035,7 +2035,7 @@ ErrorTrap:
         '   Delete a table field from a table
         '========================================================================
         '
-        Public Sub csv_DeleteTable(ByVal DataSourceName As String, ByVal TableName As String)
+        Public Sub db_DeleteTable(ByVal DataSourceName As String, ByVal TableName As String)
             Try
                 Call executeSql("DROP TABLE " & TableName, DataSourceName)
                 cache.invalidateAll()
@@ -2049,7 +2049,7 @@ ErrorTrap:
         '   Delete a table field from a table
         '========================================================================
         '
-        Public Sub csv_DeleteTableField(ByVal DataSourceName As String, ByVal TableName As String, ByVal FieldName As String)
+        Public Sub db_DeleteTableField(ByVal DataSourceName As String, ByVal TableName As String, ByVal FieldName As String)
             Throw New NotImplementedException("deletetablefield")
 
             '            On Error GoTo ErrorTrap
@@ -2113,7 +2113,7 @@ ErrorTrap:
         '   Fieldnames is  a comma delimited list of fields
         '========================================================================
         '
-        Public Sub csv_CreateSQLIndex(ByVal DataSourceName As String, ByVal TableName As String, ByVal IndexName As String, ByVal FieldNames As String, Optional clearMetaCache As Boolean = False)
+        Public Sub db_CreateSQLIndex(ByVal DataSourceName As String, ByVal TableName As String, ByVal IndexName As String, ByVal FieldNames As String, Optional clearMetaCache As Boolean = False)
             Try
                 Dim ts As coreMetaDataClass.tableSchemaClass
                 If TableName <> "" And IndexName <> "" And FieldNames <> "" Then
@@ -2137,13 +2137,13 @@ ErrorTrap:
         ' Get a Contents Tablename from the ContentPointer
         '========================================================================
         '
-        Public Function csv_GetContentTablename(ByVal ContentName As String) As String
+        Public Function metaData_GetContentTablename(ByVal ContentName As String) As String
             On Error GoTo ErrorTrap
             '
             Dim CDef As coreMetaDataClass.CDefClass
             '
             CDef = metaData.getCdef(ContentName)
-            csv_GetContentTablename = CDef.ContentTableName
+            metaData_GetContentTablename = CDef.ContentTableName
             '
             Exit Function
             '
@@ -2157,14 +2157,14 @@ ErrorTrap:
         '
         '=============================================================
         '
-        Public Function csv_GetRecordName(ByVal ContentName As String, ByVal RecordID As Integer) As String
+        Public Function db_GetRecordName(ByVal ContentName As String, ByVal RecordID As Integer) As String
             On Error GoTo ErrorTrap
             '
             Dim CS As Integer
             '
             CS = db_OpenCSContentRecord(ContentName, RecordID, , , , "Name")
             If db_csOk(CS) Then
-                csv_GetRecordName = db_GetCS(CS, "Name")
+                db_GetRecordName = db_GetCS(CS, "Name")
             End If
             Call db_csClose(CS)
 
@@ -2200,7 +2200,7 @@ ErrorTrap:
         '
         '=============================================================
         '
-        Public Function csv_IsContentFieldSupported(ByVal ContentName As String, ByVal FieldName As String) As Boolean
+        Public Function metaData_IsContentFieldSupported(ByVal ContentName As String, ByVal FieldName As String) As Boolean
             Dim returnOk As Boolean = False
             Try
                 Dim cdef As coreMetaDataClass.CDefClass
@@ -2219,7 +2219,7 @@ ErrorTrap:
         ' ----- Get FieldDescritor from FieldType
         '========================================================================
         '
-        Public Function csv_GetSQLAlterColumnType(ByVal DataSourceName As String, ByVal fieldType As Integer) As String
+        Public Function db_GetSQLAlterColumnType(ByVal DataSourceName As String, ByVal fieldType As Integer) As String
             On Error GoTo ErrorTrap
             '
             Dim MethodName As String
@@ -2227,7 +2227,7 @@ ErrorTrap:
             '
             MethodName = "csv_GetSQLAlterColumnType(" & DataSourceName & "," & fieldType & ")"
             '
-            csv_GetSQLAlterColumnType = ""
+            db_GetSQLAlterColumnType = ""
             '
             ' ----- It may depend on the datasource
             '
@@ -2243,26 +2243,26 @@ ErrorTrap:
                     'Else
                     Select Case fieldType
                         Case FieldTypeIdBoolean
-                            csv_GetSQLAlterColumnType = "Int NULL"
+                            db_GetSQLAlterColumnType = "Int NULL"
                         Case FieldTypeIdCurrency
-                            csv_GetSQLAlterColumnType = "Float NULL"
+                            db_GetSQLAlterColumnType = "Float NULL"
                         Case FieldTypeIdDate
-                            csv_GetSQLAlterColumnType = "DateTime NULL"
+                            db_GetSQLAlterColumnType = "DateTime NULL"
                         Case FieldTypeIdFloat
-                            csv_GetSQLAlterColumnType = "Float NULL"
+                            db_GetSQLAlterColumnType = "Float NULL"
                         Case FieldTypeIdCurrency
-                            csv_GetSQLAlterColumnType = "Float NULL"
+                            db_GetSQLAlterColumnType = "Float NULL"
                         Case FieldTypeIdInteger
-                            csv_GetSQLAlterColumnType = "Int NULL"
+                            db_GetSQLAlterColumnType = "Int NULL"
                         Case FieldTypeIdLookup, FieldTypeIdMemberSelect
-                            csv_GetSQLAlterColumnType = "Int NULL"
+                            db_GetSQLAlterColumnType = "Int NULL"
                         Case FieldTypeIdManyToMany, FieldTypeIdRedirect, FieldTypeIdFileImage, FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdText, FieldTypeIdFile, FieldTypeIdFileTextPrivate, FieldTypeIdFileJavascript, FieldTypeIdFileXML, FieldTypeIdFileCSS, FieldTypeIdFileHTMLPrivate
-                            csv_GetSQLAlterColumnType = "VarChar(255) NULL"
+                            db_GetSQLAlterColumnType = "VarChar(255) NULL"
                         Case FieldTypeIdLongText, FieldTypeIdHTML
                             '
                             ' ----- Longtext, depends on datasource
                             '
-                            csv_GetSQLAlterColumnType = "Text Null"
+                            db_GetSQLAlterColumnType = "Text Null"
                             'Select Case DataSourceConnectionObjs(Pointer).Type
                             '    Case DataSourceTypeODBCSQLServer
                             '        csv_GetSQLAlterColumnType = "Text Null"
@@ -2277,7 +2277,7 @@ ErrorTrap:
                             '
                             ' ----- autoincrement type, depends on datasource
                             '
-                            csv_GetSQLAlterColumnType = "INT IDENTITY PRIMARY KEY"
+                            db_GetSQLAlterColumnType = "INT IDENTITY PRIMARY KEY"
                             'Select Case DataSourceConnectionObjs(Pointer).Type
                             '    Case DataSourceTypeODBCSQLServer
                             '        csv_GetSQLAlterColumnType = "INT IDENTITY PRIMARY KEY"
@@ -2401,11 +2401,11 @@ ErrorTrap:
         '
         '   Patch -- returns true if the cdef field exists
         '
-        Friend Function csv_isCdefField(ByVal ContentID As Integer, ByVal FieldName As String) As Boolean
+        Friend Function db_isCdefField(ByVal ContentID As Integer, ByVal FieldName As String) As Boolean
             Dim RS As DataTable
             '
             RS = executeSql("select top 1 id from ccFields where name=" & db_EncodeSQLText(FieldName) & " and contentid=" & ContentID)
-            csv_isCdefField = isDataTableOk(RS)
+            db_isCdefField = isDataTableOk(RS)
             If (isDataTableOk(RS)) Then
                 RS.Dispose()
             End If
@@ -2488,7 +2488,7 @@ ErrorTrap:
         ' ----- Get FieldType from ADO Field Type
         '========================================================================
         '
-        Friend Function csv_GetFieldTypeIdByADOType(ByVal ADOFieldType As Integer) As Integer
+        Friend Function db_GetFieldTypeIdByADOType(ByVal ADOFieldType As Integer) As Integer
             On Error GoTo ErrorTrap
             '
             Dim MethodName As String
@@ -2498,27 +2498,27 @@ ErrorTrap:
             Select Case ADOFieldType
 
                 Case 2
-                    csv_GetFieldTypeIdByADOType = FieldTypeIdFloat
+                    db_GetFieldTypeIdByADOType = FieldTypeIdFloat
                 Case 3
-                    csv_GetFieldTypeIdByADOType = FieldTypeIdInteger
+                    db_GetFieldTypeIdByADOType = FieldTypeIdInteger
                 Case 4
-                    csv_GetFieldTypeIdByADOType = FieldTypeIdFloat
+                    db_GetFieldTypeIdByADOType = FieldTypeIdFloat
                 Case 5
-                    csv_GetFieldTypeIdByADOType = FieldTypeIdFloat
+                    db_GetFieldTypeIdByADOType = FieldTypeIdFloat
                 Case 6
-                    csv_GetFieldTypeIdByADOType = FieldTypeIdInteger
+                    db_GetFieldTypeIdByADOType = FieldTypeIdInteger
                 Case 11
-                    csv_GetFieldTypeIdByADOType = FieldTypeIdBoolean
+                    db_GetFieldTypeIdByADOType = FieldTypeIdBoolean
                 Case 135
-                    csv_GetFieldTypeIdByADOType = FieldTypeIdDate
+                    db_GetFieldTypeIdByADOType = FieldTypeIdDate
                 Case 200
-                    csv_GetFieldTypeIdByADOType = FieldTypeIdText
+                    db_GetFieldTypeIdByADOType = FieldTypeIdText
                 Case 201
-                    csv_GetFieldTypeIdByADOType = FieldTypeIdLongText
+                    db_GetFieldTypeIdByADOType = FieldTypeIdLongText
                 Case 202
-                    csv_GetFieldTypeIdByADOType = FieldTypeIdText
+                    db_GetFieldTypeIdByADOType = FieldTypeIdText
                 Case Else
-                    csv_GetFieldTypeIdByADOType = FieldTypeIdText
+                    db_GetFieldTypeIdByADOType = FieldTypeIdText
                     'Call csv_HandleClassTrapError(KmaErrorUser, "dll", "Unknown ADO field type [" & ADOFieldType & "], [Text] used", MethodName, False, True)
             End Select
             '
@@ -3374,6 +3374,7 @@ ErrorTrap:
                         '
                         If .writeCache.ContainsKey(FieldName.ToLower) Then
                             db_GetCSField = .writeCache.Item(FieldName.ToLower)
+                            fieldFound = True
                         End If
                         'For writeCachePointer = 0 To .writeCacheCount - 1
                         '    With .writeCache(writeCachePointer)
@@ -3726,7 +3727,7 @@ ErrorTrap:
                             '
                             ' CS is SQL-based, use the contentname
                             '
-                            TableName = csv_GetContentTablename(ContentName)
+                            TableName = metaData_GetContentTablename(ContentName)
                         Else
                             '
                             ' no Contentname given
@@ -3973,19 +3974,19 @@ ErrorTrap:
         '   Returns the ID of the record, -1 if error
         '========================================================================
         '
-        Public Function db_InsertContentRecordGetID(ByVal ContentName As String, ByVal MemberID As Integer) As Integer
+        Public Function metaData_InsertContentRecordGetID(ByVal ContentName As String, ByVal MemberID As Integer) As Integer
             On Error GoTo ErrorTrap 'Const Tn = "MethodName-071" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
             Dim CS As Integer
             Dim hint As String
             '
             'hint = "csv_InsertContentRecordGetID(" & ContentName & ")"
-            db_InsertContentRecordGetID = -1
+            metaData_InsertContentRecordGetID = -1
             CS = db_csInsertRecord(ContentName, MemberID)
             If Not db_csOk(CS) Then
                 'hint = hint & ", notok"
             Else
-                db_InsertContentRecordGetID = EncodeInteger(db_GetCSField(CS, "ID"))
+                metaData_InsertContentRecordGetID = EncodeInteger(db_GetCSField(CS, "ID"))
                 'hint = hint & ", ok Return=" & db_InsertContentRecordGetID
             End If
             Call db_csClose(CS)
@@ -4491,7 +4492,7 @@ ErrorTrap:
                                         RecordID = EncodeInteger(db_GetCSField(CSPointer, "id"))
                                         With field
                                             ContentName = csv_GetContentNameByID(.manyToManyRuleContentID)
-                                            DbTable = csv_GetContentTablename(ContentName)
+                                            DbTable = metaData_GetContentTablename(ContentName)
                                             SQL = "Select " & .ManyToManyRuleSecondaryField & " from " & DbTable & " where " & .ManyToManyRulePrimaryField & "=" & RecordID
                                             rs = executeSql(SQL)
                                             If (isDataTableOk(rs)) Then
@@ -4567,7 +4568,7 @@ ErrorTrap:
                                                 '
                                                 '
                                                 If IsNumeric(FieldValueVariant) Then
-                                                    db_GetCS = csv_GetRecordName("people", EncodeInteger(FieldValueVariant))
+                                                    db_GetCS = db_GetRecordName("people", EncodeInteger(FieldValueVariant))
                                                 End If
                                             Case FieldTypeIdCurrency
                                                 '
@@ -5283,7 +5284,7 @@ ErrorTrap:
                                 ' ----- mark the record NOT UpToDate for SpiderDocs
                                 '
                                 If (LCase(EditTableName) = "ccpagecontent") And (LiveRecordID <> 0) Then
-                                    If csv_IsSQLTableField("default", "ccSpiderDocs", "PageID") Then
+                                    If db_IsSQLTableField("default", "ccSpiderDocs", "PageID") Then
                                         SQL = "UPDATE ccspiderdocs SET UpToDate = 0 WHERE PageID=" & LiveRecordID
                                         Call executeSql(SQL)
                                     End If
@@ -6634,11 +6635,11 @@ ErrorTrap:
                 ContentRecordKey = CStr(ContentID) & "." & CStr(RecordID)
                 Criteria = "(ContentRecordKey=" & db_EncodeSQLText(ContentRecordKey) & ")"
                 ContentName = csv_GetContentNameByID(ContentID)
-                TableName = csv_GetContentTablename(ContentName)
+                TableName = metaData_GetContentTablename(ContentName)
                 '
                 ' ----- Delete CalendarEventRules and CalendarEvents
                 '
-                If csv_IsContentFieldSupported("calendar events", "ID") Then
+                If metaData_IsContentFieldSupported("calendar events", "ID") Then
                     Call db_DeleteContentRecords("Calendar Events", Criteria)
                 End If
                 '
@@ -7208,7 +7209,7 @@ ErrorTrap:
         '   If child already exists, add any missing fields from parent
         '=============================================================================
         '
-        Public Sub csv_CreateContentChild(ByVal ChildContentName As String, ByVal ParentContentName As String, ByVal MemberID As Integer)
+        Public Sub metaData_CreateContentChild(ByVal ChildContentName As String, ByVal ParentContentName As String, ByVal MemberID As Integer)
             On Error GoTo ErrorTrap 'Const Tn = "MethodName-037" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
             'Dim GUIDGenerator As guidClass
@@ -8037,7 +8038,7 @@ ErrorTrap:
                                         ' ----- mark the SpiderDocs record not up-to-date
                                         '
                                         If (LCase(EditTableName) = "ccpagecontent") And (LiveRecordID <> 0) Then
-                                            If csv_IsSQLTableField("default", "ccSpiderDocs", "PageID") Then
+                                            If db_IsSQLTableField("default", "ccSpiderDocs", "PageID") Then
                                                 SQL = "UPDATE ccspiderdocs SET UpToDate = 0 WHERE PageID=" & LiveRecordID
                                                 Call executeSql(SQL)
                                             End If
@@ -8168,7 +8169,7 @@ ErrorTrap:
                                         Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
                                         With field
                                             FieldName = .nameLc
-                                            If csv_IsSQLTableField(EditDataSourceName, EditTableName, FieldName) Then
+                                            If db_IsSQLTableField(EditDataSourceName, EditTableName, FieldName) Then
                                                 fieldTypeId = .fieldTypeId
                                                 LiveSQLValue = EncodeSQL(db_getDataRowColumnName(RSLive.Rows(0), FieldName), fieldTypeId)
                                                 Select Case UCase(FieldName)
@@ -9088,7 +9089,7 @@ ErrorTrap:
             Try
                 If IsNumeric(nameIdOrGuid) Then
                     sqlCriteria = "id=" & db_EncodeSQLNumber(CDbl(nameIdOrGuid))
-                ElseIf cpCore.isGuid(nameIdOrGuid) Then
+                ElseIf cpCore.common_isGuid(nameIdOrGuid) Then
                     sqlCriteria = "ccGuid=" & db_EncodeSQLText(nameIdOrGuid)
                 Else
                     sqlCriteria = "name=" & db_EncodeSQLText(nameIdOrGuid)

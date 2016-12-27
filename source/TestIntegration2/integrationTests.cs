@@ -8,13 +8,13 @@ using System.Collections.Generic;
 namespace integrationTests
 {
 
-    public class testCp
+    public class cpTests
     {
         /// <summary>
         ///  Test 1 - cp ok without application (cluster mode).
         /// </summary>
         [Fact]
-        public void TestMethod1()
+        public void constructorWithoutApp()
         {
             // arrange
             CPClass cp = new CPClass();
@@ -30,7 +30,7 @@ namespace integrationTests
         /// Test 2 - cp ok with application
         /// </summary>
         [Fact]
-        private void TestMethod2()
+        private void constructorWithApp()
         {
             // arrange
             CPClass cp = new CPClass("testapp");
@@ -43,8 +43,83 @@ namespace integrationTests
 
             cp.Dispose();
         }
+        /// <summary>
+        /// cpExecuteAddontest
+        /// </summary>
+        [Fact]
+        private void cpExecuteAddontest()
+        {
+            // arrange
+            CPClass cp = new CPClass("testapp");
+            CPCSBaseClass cs = cp.CSNew();
+            string addonName = "testAddon" + cp.Utils.GetRandomInteger().ToString();
+            int recordId = 0;
+            string htmlText = "12345";
+            string wysiwygText = "<b>abcde</b>";
+            string addonGuid = cp.Utils.CreateGuid();
+            string activeScript = "function m\nm=cp.doc.getText(\"echo\")\nend function";
+            string echoText = "text added to document";
+            //
+            if (cs.Insert("add-ons"))
+            {
+                recordId = cs.GetInteger("id");
+                cs.SetField("name", addonName);
+                cs.SetField("copytext", htmlText);
+                cs.SetField("copy", wysiwygText);
+                cs.SetField("ccGuid", addonGuid);
+                cs.SetField("scriptingcode", activeScript);
+            }
+            cs.Close();
+            cp.Doc.SetProperty("echo", echoText);
+            // act
+            // assert
+            Assert.Equal(htmlText + wysiwygText + echoText, cp.executeAddon(addonName));
+            //
+            Assert.Equal(htmlText + wysiwygText + echoText, cp.executeAddon(addonGuid));
+            //
+            Assert.Equal(htmlText + wysiwygText + echoText, cp.executeAddon(recordId.ToString()));
+            //dispose
+            cp.Content.Delete("add-ons", "id=" + recordId.ToString());
+            cp.Dispose();
+        }
+        /// <summary>
+        /// cpExecuteAddontest
+        /// </summary>
+        [Fact]
+        private void cpExecuteRouteTest()
+        {
+            // arrange
+            CPClass cp = new CPClass("testapp");
+            CPCSBaseClass cs = cp.CSNew();
+            string addonName = "testAddon" + cp.Utils.GetRandomInteger().ToString();
+            int recordId = 0;
+            string htmlText = "12345";
+            string wysiwygText = "<b>abcde</b>";
+            string addonGuid = cp.Utils.CreateGuid();
+            string activeScript = "function m\nm=cp.doc.getText(\"echo\")\nend function";
+            string echoText = "text added to document";
+            //
+            if (cs.Insert("add-ons"))
+            {
+                recordId = cs.GetInteger("id");
+                cs.SetField("name", addonName);
+                cs.SetField("copytext", htmlText);
+                cs.SetField("copy", wysiwygText);
+                cs.SetField("ccGuid", addonGuid);
+                cs.SetField("scriptingcode", activeScript);
+                cs.SetField("remotemethod", "1");
+            }
+            cs.Close();
+            cp.Doc.SetProperty("echo", echoText);
+            // act
+            // assert
+            Assert.Equal(htmlText + wysiwygText + echoText, cp.executeRoute(addonName));
+            //dispose
+            cp.Content.Delete("add-ons", "id=" + recordId.ToString());
+            cp.Dispose();
+        }
     }
-    public class testCpCache
+    public class cpCacheTests
     {
         /// <summary>
         /// cp.cache save read
@@ -169,6 +244,12 @@ namespace integrationTests
             {
                 cp.Utils.AppendLog("cpCacheInvalidationOnEdit_integration, enter");
                 // act
+                if (cp.Content.GetID("Content For cpCacheInvalidationOnEdit_integration")==0)
+                {
+                    
+
+                }
+                
                 cp.Cache.Save("keyA", "testValue", "people");
                 // assert
                 Assert.Equal("testValue", cp.Cache.Read("keyA"));
@@ -214,7 +295,7 @@ namespace integrationTests
             cp.Dispose();
         }
     }
-    public class testCpContent
+    public class cpContentTests
     {
         /// <summary>
         /// cp.content.addRecord
@@ -225,23 +306,18 @@ namespace integrationTests
             // arrange
             CPClass cp = new CPClass("testapp");
             CPCSBaseClass cs = cp.CSNew();
-            int peopleCntBefore = 0;
-            int peopleCntAfter = 0;
-            if (cs.OpenSQL("select count(*) as cnt  from ccmembers"))
-            {
-                peopleCntBefore = cs.GetInteger("cnt");
-            }
-            cs.Close();
+            int recordAId = 0;
+            int recordBId = 0;
             // act
-            cp.Content.AddRecord("people");
-            if (cs.OpenSQL("select count(*) as cnt  from ccmembers"))
-            {
-                peopleCntAfter = cs.GetInteger("cnt");
-            }
-            cs.Close();
+            recordAId = cp.Content.AddRecord("people");
+            recordBId = cp.Content.AddRecord("people");
             // assert
-            Assert.Equal(peopleCntAfter, (peopleCntBefore+1));
+            Assert.NotEqual(0, recordAId);
+            Assert.NotEqual(0, recordBId);
+            Assert.NotEqual(recordAId, recordBId);
             // dispose
+            cp.Content.Delete("people", "id=" + recordAId);
+            cp.Content.Delete("people", "id=" + recordBId);
             cp.Dispose();
         }
         /// <summary>
@@ -273,6 +349,93 @@ namespace integrationTests
             // assert
             Assert.Equal(peopleCntAfter, (peopleCntBefore - 1));
             // dispose
+            cp.Dispose();
+        }
+        /// <summary>
+        /// cp.content.getCopy
+        /// </summary>
+        [Fact]
+        private void cpContentGetCopyTest()
+        {
+            // arrange
+            CPClass cp = new CPClass("testapp");
+            CPCSBaseClass cs = cp.CSNew();
+            int recordId = 0;
+            string testCopy = "test copy " + cp.Utils.GetRandomInteger().ToString() ;
+            string copyName = "copy record name " + cp.Utils.GetRandomInteger().ToString();
+            recordId = cp.Content.AddRecord("copy content");
+            cp.Db.ExecuteSQL("update ccCopyContent set name=" + cp.Db.EncodeSQLText(copyName) + ",copy=" + cp.Db.EncodeSQLText(testCopy) + " where id=" + recordId.ToString());
+            // act
+            //
+            // assert
+            Assert.Equal(testCopy,cp.Content.GetCopy(copyName));
+            // dispose
+            cp.Content.Delete("copy content", "id=" + recordId.ToString());
+            cp.Dispose();
+        }
+        /// <summary>
+        /// cp.content.getCopy_withDefaultValue
+        /// </summary>
+        [Fact]
+        private void cpContentGetCopyWithDefaultTest()
+        {
+            // arrange
+            CPClass cp = new CPClass("testapp");
+            CPCSBaseClass cs = cp.CSNew();
+            string testCopy = "test copy " + cp.Utils.GetRandomInteger().ToString();
+            string copyName = "copy record name " + cp.Utils.GetRandomInteger().ToString();
+            // act
+            //
+            // assert
+            Assert.Equal(testCopy, cp.Content.GetCopy(copyName,testCopy));
+            // dispose
+            cp.Content.Delete("copy content", "name=" + cp.Db.EncodeSQLText(copyName));
+            cp.Dispose();
+        }
+        /// <summary>
+        /// cp.content.setCopy
+        /// </summary>
+        [Fact]
+        private void cpContentSetCopyTest()
+        {
+            // arrange
+            CPClass cp = new CPClass("testapp");
+            string testCopyA = "test copy A " + cp.Utils.GetRandomInteger().ToString();
+            string testCopyB = "test copy B " + cp.Utils.GetRandomInteger().ToString();
+            string copyName = "copy record name " + cp.Utils.GetRandomInteger().ToString();
+            // act
+            cp.Content.SetCopy(copyName, testCopyA);
+            // assert
+            Assert.Equal(testCopyA, cp.Content.GetCopy(copyName, "shouldNotNeedDefault"));
+            // act
+            cp.Content.SetCopy(copyName, testCopyB);
+            // assert
+            Assert.Equal(testCopyB, cp.Content.GetCopy(copyName, "shouldNotNeedDefault"));
+            // dispose
+            cp.Content.Delete("copy content", "name=" + cp.Db.EncodeSQLText(copyName));
+            cp.Dispose();
+        }
+        /// <summary>
+        /// cp.content.getId
+        /// </summary>
+        [Fact]
+        private void cpContentGetId()
+        {
+            // arrange
+            CPClass cp = new CPClass("testapp");
+            CPCSBaseClass cs = cp.CSNew();
+            int peopleContentId = 0;
+            string peopleContentName = "people";
+            if (cs.Open("content", "name=" + cp.Db.EncodeSQLText(peopleContentName)))
+            {
+                peopleContentId = cs.GetInteger("id");
+            }
+            cs.Close();
+            //
+            // assert
+            Assert.NotEqual(0, peopleContentId);
+            Assert.Equal(peopleContentId, cp.Content.GetID( peopleContentName));
+            // act
             cp.Dispose();
         }
     }

@@ -107,7 +107,7 @@ Namespace Contensive.Core
 
         Public Overrides Function Cookie(ByVal CookieName As String) As String 'Inherits BaseClasses.CPRequestBaseClass.Cookie
             If True Then
-                Return cpCore.main_GetStreamCookie(CookieName)
+                Return cpCore.web_GetStreamCookie(CookieName)
             Else
                 Return ""
             End If
@@ -136,7 +136,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property FormAction() As String 'Inherits BaseClasses.CPRequestBaseClass.FormAction
             Get
                 If True Then
-                    Return cpCore.main_ServerFormActionURL
+                    Return cpCore.web_ServerFormActionURL
                 Else
                     Return ""
                 End If
@@ -153,7 +153,7 @@ Namespace Contensive.Core
 
         Public Overrides Function GetDate(ByVal RequestName As String) As Date 'Inherits BaseClasses.CPRequestBaseClass.GetDate
             If True Then
-                Return cpCore.main_GetStreamDate(RequestName)
+                Return cpCore.doc_getDate(RequestName)
             Else
                 Return New Date
             End If
@@ -161,7 +161,7 @@ Namespace Contensive.Core
 
         Public Overrides Function GetInteger(ByVal RequestName As String) As Integer 'Inherits BaseClasses.CPRequestBaseClass.GetInteger
             If True Then
-                Return cpCore.main_GetStreamInteger(RequestName)
+                Return cpCore.doc_getInteger(RequestName)
             Else
                 Return 0
             End If
@@ -177,7 +177,7 @@ Namespace Contensive.Core
 
         Public Overrides Function GetText(ByVal RequestName As String) As String 'Inherits BaseClasses.CPRequestBaseClass.GetText
             If True Then
-                Return cpCore.main_GetStreamText2(RequestName)
+                Return cpCore.doc_getText(RequestName)
             Else
                 Return ""
             End If
@@ -256,7 +256,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property LinkForwardSource() As String 'Inherits BaseClasses.CPRequestBaseClass.LinkForwardSource
             Get
                 If True Then
-                    Return cpCore.main_LinkForwardSource
+                    Return cpCore.web_LinkForwardSource
                 Else
                     Return ""
                 End If
@@ -266,7 +266,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property LinkSource() As String 'Inherits BaseClasses.CPRequestBaseClass.LinkSource
             Get
                 If True Then
-                    Return cpCore.main_ServerLinkSource
+                    Return cpCore.web.requestLinkSource
                 Else
                     Return ""
                 End If
@@ -276,7 +276,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Page() As String 'Inherits BaseClasses.CPRequestBaseClass.Page
             Get
                 If True Then
-                    Return cpCore.main_ServerPage
+                    Return cpCore.web_requestPage
                 Else
                     Return ""
                 End If
@@ -286,7 +286,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Path() As String 'Inherits BaseClasses.CPRequestBaseClass.Path
             Get
                 If True Then
-                    Return cpCore.main_ServerPath
+                    Return cpCore.web_requestPath
                 Else
                     Return ""
                 End If
@@ -306,7 +306,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Protocol() As String 'Inherits BaseClasses.CPRequestBaseClass.Protocol
             Get
                 If True Then
-                    Return cpCore.main_ServerProtocol
+                    Return cpCore.web_requestProtocol
                 Else
                     Return ""
                 End If
@@ -326,7 +326,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Referer() As String 'Inherits BaseClasses.CPRequestBaseClass.Referer
             Get
                 If True Then
-                    Return cpCore.main_ServerReferer
+                    Return cpCore.web_requestReferer
                 Else
                     Return ""
                 End If

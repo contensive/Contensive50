@@ -323,7 +323,7 @@ ErrorTrap:
                     ' The Node has not already been used in this branch
                     '
                     Caption = iEntry(NodePointer).Caption
-                    Link = EncodeHTML(iEntry(NodePointer).Link)
+                    Link = html_EncodeHTML(iEntry(NodePointer).Link)
                     If Link <> "" Then
                         Caption = "<A TARGET=""_blank"" HREF=""" & Link & """>" & Caption & "</A>"
                     End If
@@ -410,7 +410,7 @@ ErrorTrap:
                             If .Name = UcaseMenuName Then
                                 Caption = .Caption
                                 If .Link <> "" Then
-                                    Caption = "<a href=""" & EncodeHTML(.Link) & """>" & Caption & "</a>"
+                                    Caption = "<a href=""" & html_EncodeHTML(.Link) & """>" & Caption & "</a>"
                                 End If
                                 UsedEntries = UsedEntries & "," & CStr(EntryPointer)
                                 GetTree = "" _
@@ -483,11 +483,11 @@ ErrorTrap:
                         If (InStr(1, iUsedEntries & ",", "," & EntryPointer & ",") = 0) Then
                             Caption = .Caption
                             If .OnClick <> "" And .Link <> "" Then
-                                Caption = "<a href=""" & EncodeHTML(.Link) & """ onClick=""" & .OnClick & """>" & Caption & "</a>"
+                                Caption = "<a href=""" & html_EncodeHTML(.Link) & """ onClick=""" & .OnClick & """>" & Caption & "</a>"
                             ElseIf .OnClick <> "" Then
                                 Caption = "<a href=""#"" onClick=""" & .OnClick & """>" & Caption & "</a>"
                             ElseIf .Link <> "" Then
-                                Caption = "<a href=""" & EncodeHTML(.Link) & """>" & Caption & "</a>"
+                                Caption = "<a href=""" & html_EncodeHTML(.Link) & """>" & Caption & "</a>"
                             Else
                                 Caption = Caption
                             End If

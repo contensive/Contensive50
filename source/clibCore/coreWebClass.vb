@@ -36,6 +36,7 @@ Namespace Contensive.Core
         Public requestCookies As String = ""              ' Set in InitASPEnvironment, the full cookie string
         Public requestSpaceAsUnderscore As Boolean = False ' when true, is it assumed that dots in request variable names will convert
         Public requestDotAsUnderscore As Boolean = False '   (php converts spaces and dots to underscores)
+        Public requestLinkSource As String = ""
         '
         '====================================================================================================
         '

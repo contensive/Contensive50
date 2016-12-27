@@ -77,8 +77,8 @@ Namespace Contensive.Core
                 If True Then
                     localId = cpCore.userId
                     If (localId = 0) Then
-                        localId = cpCore.app.db_InsertContentRecordGetID("people", 0)
-                        Call cpCore.main_RecognizeMemberByID(localId)
+                        localId = cpCore.app.metaData_InsertContentRecordGetID("people", 0)
+                        Call cpCore.useer_RecognizeMemberByID(localId)
                     End If
                 End If
                 Return localId
@@ -97,7 +97,7 @@ Namespace Contensive.Core
 
         Public Overrides Function IsAdvancedEditing(ByVal ContentName As String) As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsAdvancedEditing
             If True Then
-                Return cpCore.main_IsAdvancedEditing(ContentName)
+                Return cpCore.user_IsAdvancedEditing(ContentName)
             Else
                 Return False
             End If
@@ -115,7 +115,7 @@ Namespace Contensive.Core
 
         Public Overrides Function IsAuthoring(ByVal ContentName As String) As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsAuthoring
             If True Then
-                Return cpCore.main_IsAuthoring(ContentName)
+                Return cpCore.user_IsAuthoring(ContentName)
             Else
                 Return False
             End If
@@ -161,7 +161,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property IsGuest() As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsGuest
             Get
                 If True Then
-                    Return cpCore.main_IsGuest
+                    Return cpCore.user_IsGuest
                 Else
                     Return False
                 End If
@@ -200,7 +200,7 @@ Namespace Contensive.Core
                 If userId = 0 Then
                     userId = Id
                 End If
-                result = cpCore.csv_IsGroupIDListMember2(userId, IsAuthenticated(), GroupIDList, False)
+                result = cpCore.user_isMemberOfGroupIdList2(userId, IsAuthenticated(), GroupIDList, False)
             Catch ex As Exception
                 Call cp.core.handleException(ex, "Unexpected error in cs.user.IsInGroupList")
                 result = False
@@ -212,7 +212,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property IsMember() As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsMember
             Get
                 If True Then
-                    Return cpCore.main_IsMember
+                    Return cpCore.user_IsMember
                 Else
                     Return False
                 End If
@@ -240,7 +240,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property IsWorkflowRendering() As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsWorkflowRendering
             Get
                 If True Then
-                    Return cpCore.main_IsWorkflowRendering
+                    Return cpCore.pagemanager_IsWorkflowRendering
                 Else
                     Return False
                 End If
@@ -269,7 +269,7 @@ Namespace Contensive.Core
 
         Public Overrides Function Login(ByVal UsernameOrEmail As String, ByVal Password As String, Optional ByVal SetAutoLogin As Boolean = False) As Boolean 'Inherits BaseClasses.CPUserBaseClass.Login
             If True Then
-                Return cpCore.main_LoginMember(UsernameOrEmail, Password, SetAutoLogin)
+                Return cpCore.user_LoginMember(UsernameOrEmail, Password, SetAutoLogin)
             Else
                 Return False
             End If
@@ -277,7 +277,7 @@ Namespace Contensive.Core
 
         Public Overrides Function LoginByID(ByVal RecordID As String, Optional ByVal SetAutoLogin As Boolean = False) As Boolean 'Inherits BaseClasses.CPUserBaseClass.LoginById
             If True Then
-                Return cpCore.main_LoginMemberByID(RecordID, SetAutoLogin)
+                Return cpCore.user_LoginMemberByID(RecordID, SetAutoLogin)
             Else
                 Return False
             End If
@@ -293,7 +293,7 @@ Namespace Contensive.Core
 
         Public Overrides Sub Logout() 'Inherits BaseClasses.CPUserBaseClass.Logout
             If True Then
-                Call cpCore.main_LogoutMember()
+                Call cpCore.security_LogoutMember()
             End If
         End Sub
 
@@ -347,7 +347,7 @@ Namespace Contensive.Core
 
         Public Overrides Function Recognize(ByVal UserID As Integer) As Boolean 'Inherits BaseClasses.CPUserBaseClass.Recognize
             If True Then
-                Return cpCore.main_RecognizeMemberByID(UserID)
+                Return cpCore.useer_RecognizeMemberByID(UserID)
             Else
                 Return False
             End If
@@ -369,7 +369,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function GetProperty(ByVal PropertyName As String, Optional ByVal DefaultValue As String = "", Optional ByVal TargetMemberId As Integer = 0) As String
             If True Then
-                Return cpCore.userProperty_getText(PropertyName, DefaultValue, TargetMemberId)
+                Return cpCore.properties_user_getText(PropertyName, DefaultValue, TargetMemberId)
             Else
                 Return ""
             End If
@@ -381,7 +381,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub SetProperty(ByVal PropertyName As String, ByVal Value As String, Optional ByVal TargetMemberId As Integer = 0)
             If True Then
-                Call cpCore.main_SetMemberProperty(PropertyName, Value, TargetMemberId)
+                Call cpCore.properties_SetMemberProperty2(PropertyName, Value, TargetMemberId)
             End If
         End Sub
         '

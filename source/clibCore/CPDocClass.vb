@@ -119,7 +119,7 @@ Namespace Contensive.Core
             Get
                 Dim s As String
                 If True Then
-                    s = cpCore.main_RefreshQueryString
+                    s = cpCore.web_RefreshQueryString
                     If (s Is Nothing) Then
                         s = ""
                     End If
@@ -222,7 +222,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub addRefreshQueryString(ByVal Name As String, ByVal Value As String)
             If True Then
-                Call cpCore.main_AddRefreshQueryString(Name, Value)
+                Call cpCore.web_addRefreshQueryString(Name, Value)
             End If
         End Sub
         '
@@ -528,7 +528,7 @@ Namespace Contensive.Core
                         If cpCore.main_IsViewingProperty(lcName) Then
                             globalVar = cpCore.main_GetViewingProperty(lcName)
                         Else
-                            globalVar = cpCore.main_GetStreamText2(lcName)
+                            globalVar = cpCore.doc_getText(lcName)
                         End If
                     End If
                 Else

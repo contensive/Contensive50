@@ -135,9 +135,9 @@ Namespace Contensive.Core
 
                 Else
                     If ActionQueryString = "" Then
-                        FormStart = cpCore.main_GetUploadFormStart()
+                        FormStart = cpCore.html_GetUploadFormStart()
                     Else
-                        FormStart = cpCore.main_GetUploadFormStart(ActionQueryString)
+                        FormStart = cpCore.html_GetUploadFormStart(ActionQueryString)
                     End If
                     If HtmlName <> "" Then
                         FormStart = FormStart.Replace(">", " name=""" & HtmlName & """>")
@@ -196,7 +196,7 @@ Namespace Contensive.Core
 
         Public Overrides Function RadioBox(ByVal HtmlName As String, ByVal HtmlValue As String, ByVal CurrentValue As String, Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Inherits BaseClasses.CPHtmlBaseClass.RadioBox
             If True Then
-                Return cpCore.main_GetFormInputRadioBox(HtmlName, HtmlValue, CurrentValue, HtmlId)
+                Return cpCore.html_GetFormInputRadioBox(HtmlName, HtmlValue, CurrentValue, HtmlId)
             Else
                 Return ""
             End If
@@ -243,7 +243,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub ProcessInputFile(ByVal HtmlName As String, Optional ByVal VirtualFilePath As String = "") 'Inherits BaseClasses.CPHtmlBaseClass.ProcessInputFile
             If True Then
-                Call cpCore.main_ProcessFormInputPublicFile(HtmlName, VirtualFilePath)
+                Call cpCore.web_ProcessFormInputFile(HtmlName, VirtualFilePath)
             End If
         End Sub
         '
@@ -251,7 +251,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function Hidden(ByVal HtmlName As String, ByVal HtmlValue As String, Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Inherits BaseClasses.CPHtmlBaseClass.Hidden
             If True Then
-                Return cpCore.main_GetFormInputHidden(HtmlName, HtmlValue, HtmlId)
+                Return cpCore.html_GetFormInputHidden(HtmlName, HtmlValue, HtmlId)
             Else
                 Return ""
             End If
@@ -262,7 +262,7 @@ Namespace Contensive.Core
         Public Overrides Function InputDate(ByVal HtmlName As String, Optional ByVal HtmlValue As String = "", Optional ByVal Width As String = "", Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Inherits BaseClasses.CPHtmlBaseClass.InputDate
             Dim returnValue As String = ""
             If True Then
-                returnValue = cpCore.main_GetFormInputDate(HtmlName, HtmlValue, Width, HtmlId)
+                returnValue = cpCore.html_GetFormInputDate(HtmlName, HtmlValue, Width, HtmlId)
                 If HtmlClass <> "" Then
                     returnValue = returnValue.Replace(">", " class=""" & HtmlClass & """>")
                 End If
@@ -275,7 +275,7 @@ Namespace Contensive.Core
         Public Overrides Function InputFile(ByVal HtmlName As String, Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String
             Dim returnValue As String = ""
             If True Then
-                returnValue = cpCore.main_GetFormInputFile2(HtmlName, HtmlId, HtmlClass)
+                returnValue = cpCore.html_GetFormInputFile2(HtmlName, HtmlId, HtmlClass)
             End If
             Return returnValue
         End Function
@@ -388,7 +388,7 @@ Namespace Contensive.Core
 
         Public Overrides Function InputWysiwyg(ByVal HtmlName As String, Optional ByVal HtmlValue As String = "", Optional ByVal UserScope As BaseClasses.CPHtmlBaseClass.EditorUserScope = BaseClasses.CPHtmlBaseClass.EditorUserScope.CurrentUser, Optional ByVal ContentScope As BaseClasses.CPHtmlBaseClass.EditorContentScope = BaseClasses.CPHtmlBaseClass.EditorContentScope.Page, Optional ByVal Height As String = "", Optional ByVal Width As String = "", Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Inherits BaseClasses.CPHtmlBaseClass.InputWysiwyg
             If True Then
-                Return cpCore.main_GetFormInputHTML(HtmlName, HtmlValue, Height, Width)
+                Return cpCore.html_GetFormInputHTML(HtmlName, HtmlValue, Height, Width)
             Else
                 Return ""
             End If
@@ -406,7 +406,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function Button(ByVal HtmlName As String, Optional ByVal HtmlValue As String = "", Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String
             If True Then
-                Button = cpCore.main_GetFormButton(HtmlValue, HtmlName, HtmlId, "")
+                Button = cpCore.html_GetFormButton(HtmlValue, HtmlName, HtmlId, "")
                 If HtmlClass <> "" Then
                     Button = Button.Replace(">", " class=""" & HtmlClass & """>")
                 End If

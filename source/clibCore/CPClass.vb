@@ -176,10 +176,7 @@ Namespace Contensive.Core
         Public Function executeRoute(Optional route As String = "") As String
             Dim result As String = ""
             Try
-                If Response.isOpen Then
-                    result = core.executeRoute(route)
-                End If
-                '
+                result = core.executeRoute(route)
             Catch ex As Exception
                 Site.ErrorReport(ex, "Unexpected error in cp.executeRoute()")
             End Try
@@ -195,11 +192,9 @@ Namespace Contensive.Core
         Public Function executeAddon(addonNameOrGuid As String, Optional addonContext As cpCoreClass.addonContextEnum = cpCoreClass.addonContextEnum.ContextSimple) As String
             Dim result As String = ""
             Try
-                If Response.isOpen Then
-                    Dim MyDoc As CPDocClass = Doc
-                    Dim LegacyOptionString As String = MyDoc.getLegacyOptionStringFromVar()
-                    result = core.executeAddon_legacy4(addonNameOrGuid, LegacyOptionString, addonContext, Nothing)
-                End If
+                Dim MyDoc As CPDocClass = Doc
+                Dim LegacyOptionString As String = MyDoc.getLegacyOptionStringFromVar()
+                result = core.executeAddon_legacy4(addonNameOrGuid, LegacyOptionString, addonContext, Nothing)
             Catch ex As Exception
                 Site.ErrorReport(ex, "Unexpected error in cp.executeRoute()")
             End Try

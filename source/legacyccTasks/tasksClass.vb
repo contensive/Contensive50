@@ -283,7 +283,7 @@ ErrorTrap:
                             FieldName = FieldNames(FieldNamePtr)
                             If FieldName <> "" Then
                                 Copy = cpCore.app.db_GetCS(CS, FieldNames(FieldNamePtr))
-                                Copy = EncodeHTML(Copy)
+                                Copy = html_EncodeHTML(Copy)
                                 If Copy = "" Then
                                     RowBuffer = RowBuffer & "<" & FieldName & " />"
                                 Else

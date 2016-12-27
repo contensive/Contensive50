@@ -225,7 +225,7 @@ Namespace Contensive.Core
 
         Public Overrides Function GetFormInput(ByVal ContentName As String, ByVal FieldName As String, Optional ByVal Height As String = "", Optional ByVal Width As String = "", Optional ByVal HtmlId As String = "") As Object
             If True Then
-                Return cpCore.main_GetFormInputCS(CSPointer, ContentName, FieldName, Height, Width, HtmlId)
+                Return cpCore.html_GetFormInputCS(CSPointer, ContentName, FieldName, Height, Width, HtmlId)
             Else
                 Return ""
             End If

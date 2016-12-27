@@ -77,7 +77,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function ConvertText2Html(ByVal Source As String) As String
             If True Then
-                ConvertText2Html = CP.core.convertText2HTML(Source)
+                ConvertText2Html = CP.core.html_convertText2HTML(Source)
             Else
                 ConvertText2Html = Source
             End If
@@ -126,7 +126,7 @@ Namespace Contensive.Core
             Dim returnValue As String = ""
             '
             If (Source <> "") Then
-                returnValue = cl.EncodeHTML(Source)
+                returnValue = cl.html_EncodeHTML(Source)
             End If
             Return returnValue
         End Function
@@ -410,7 +410,7 @@ Namespace Contensive.Core
         End Function
         '
         Public Overrides Function isGuid(guid As String) As Boolean
-            Return CP.core.isGuid(guid)
+            Return CP.core.common_isGuid(guid)
         End Function
         '
         Public Overrides Function installCollectionFromFile(privateFile As String) As Integer
@@ -432,7 +432,7 @@ Namespace Contensive.Core
         ''' <param name="Source"></param>
         ''' <returns></returns>
         Public Overrides Function EncodeHtmlForWysiwygEditor(Source As String) As String
-            Return CP.core.encodeContent10(Source, 0, "", 0, 0, False, False, False, True, True, False, "", "", False, 0, "", cpCoreClass.addonContextEnum.ContextSimple, False, Nothing, False)
+            Return CP.core.html_encodeContent10(Source, 0, "", 0, 0, False, False, False, True, True, False, "", "", False, 0, "", cpCoreClass.addonContextEnum.ContextSimple, False, Nothing, False)
             'Return CP.core.encodeContent9(Source, 0, "", 0, 0, False, False, False, True, True, False, "", "", False, 0, "", 1)
         End Function
         '

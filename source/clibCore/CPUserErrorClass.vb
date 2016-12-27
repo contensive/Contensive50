@@ -47,13 +47,13 @@ Namespace Contensive.Core
         '
         Public Overrides Sub Add(ByVal Message As String) 'Inherits BaseClasses.CPUserErrorBaseClass.Add
             If True Then
-                Call cpCore.main_AddUserError(Message)
+                Call cpCore.error_AddUserError(Message)
             End If
         End Sub
 
         Public Overrides Function GetList() As String 'Inherits BaseClasses.CPUserErrorBaseClass.GetList
             If True Then
-                Return cpCore.main_GetUserError()
+                Return cpCore.error_GetUserError()
             Else
                 Return ""
             End If
@@ -61,7 +61,7 @@ Namespace Contensive.Core
 
         Public Overrides Function OK() As Boolean 'Inherits BaseClasses.CPUserErrorBaseClass.OK
             If True Then
-                Return Not cpCore.main_IsUserError()
+                Return Not cpCore.error_IsUserError()
             Else
                 Return True
             End If

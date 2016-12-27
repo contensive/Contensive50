@@ -57,7 +57,7 @@ Namespace Contensive.Core
             End Get
             Set(ByVal value As String)
                 If True Then
-                    Call cpCore.setResponseContentType(value)
+                    Call cpCore.web_setResponseContentType(value)
                 End If
             End Set
         End Property
@@ -100,7 +100,7 @@ Namespace Contensive.Core
 
         Public Overrides Sub AddHeader(ByVal HeaderName As String, ByVal HeaderValue As String) 'Inherits BaseClasses.CPResponseBaseClass.AddHeader
             If True Then
-                Call cpCore.addResponseHeader(HeaderName, HeaderValue)
+                Call cpCore.web_addResponseHeader(HeaderName, HeaderValue)
             End If
         End Sub
 
@@ -117,13 +117,13 @@ Namespace Contensive.Core
 
         Public Overrides Sub SetBuffer(ByVal BufferOn As Boolean) 'Inherits BaseClasses.CPResponseBaseClass.SetBuffer
             If True Then
-                Call cpCore.main_SetStreamBuffer(BufferOn)
+                Call cpCore.web_SetStreamBuffer(BufferOn)
             End If
         End Sub
 
         Public Overrides Sub SetStatus(ByVal status As String) 'Inherits BaseClasses.CPResponseBaseClass.SetStatus
             If True Then
-                Call cpCore.setResponseStatus(status)
+                Call cpCore.web_setResponseStatus(status)
             End If
         End Sub
 
@@ -135,7 +135,7 @@ Namespace Contensive.Core
 
         Public Overrides Sub SetType(ByVal ContentType As String) 'Inherits BaseClasses.CPResponseBaseClass.SetType
             If True Then
-                Call cpCore.setResponseContentType(ContentType)
+                Call cpCore.web_setResponseContentType(ContentType)
             End If
         End Sub
 

@@ -293,7 +293,7 @@ Namespace Contensive.Core
                                 '
                                 '
                                 '
-                                DomainNameList = cp.core.domainList
+                                DomainNameList = cp.core.app_domainList
                                 DomainNamePrimary = DomainNameList
                                 Pos = InStr(1, DomainNamePrimary, ",")
                                 If Pos > 1 Then
@@ -303,7 +303,7 @@ Namespace Contensive.Core
                                 DataSourceType = cp.core.app.csv_GetDataSourceType("default")
                                 '
                                 DefaultMemberName = ""
-                                PeopleCID = cp.core.csv_GetContentID("people")
+                                PeopleCID = cp.core.metaData_GetContentID("people")
                                 SQL = "select defaultvalue from ccfields where name='name' and contentid=(" & PeopleCID & ")"
                                 CS = cp.core.app.db_openCsSql_rev("default", SQL)
                                 If cp.core.app.db_csOk(CS) Then
@@ -742,9 +742,9 @@ ErrorTrap:
             TimeoutSave = cp.core.app.csv_SQLCommandTimeout
             cp.core.app.csv_SQLCommandTimeout = 1800
             '
-            SQLTablePeople = cp.core.csv_GetContentTablename("People")
-            SQLTableMemberRules = cp.core.csv_GetContentTablename("Member Rules")
-            SQLTableGroups = cp.core.csv_GetContentTablename("Groups")
+            SQLTablePeople = cp.core.metaData_GetContentTablename2("People")
+            SQLTableMemberRules = cp.core.metaData_GetContentTablename2("Member Rules")
+            SQLTableGroups = cp.core.metaData_GetContentTablename2("Groups")
             SQLDateMidnightTwoDaysAgo = cp.core.app.db_EncodeSQLDate(MidnightTwoDaysAgo)
             '
             ' Any member records that were created outside contensive need to have CreatedByVisit=0 (past v4.1.152)
@@ -901,23 +901,23 @@ ErrorTrap:
                 ' delete visits from the non-cookie visits
                 '
                 Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting visits with no cookie support older than Midnight, Two Days Ago")
-                Call cp.core.csv_DeleteTableRecordChunks("default", "ccvisits", "(CookieSupport=0)and(LastVisitTime<" & SQLDateMidnightTwoDaysAgo & ")", 1000, 10000)
+                Call cp.core.db_DeleteTableRecordChunks("default", "ccvisits", "(CookieSupport=0)and(LastVisitTime<" & SQLDateMidnightTwoDaysAgo & ")", 1000, 10000)
             End If
             '
             ' Visits with no DateAdded
             '
             Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting visits with no DateAdded")
-            Call cp.core.csv_DeleteTableRecordChunks("default", "ccvisits", "(DateAdded is null)or(DateAdded<=" & cp.core.app.db_EncodeSQLDate("1/1/1995") & ")", 1000, 10000)
+            Call cp.core.db_DeleteTableRecordChunks("default", "ccvisits", "(DateAdded is null)or(DateAdded<=" & cp.core.app.db_EncodeSQLDate("1/1/1995") & ")", 1000, 10000)
             '
             ' Visits with no visitor
             '
             Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting visits with no DateAdded")
-            Call cp.core.csv_DeleteTableRecordChunks("default", "ccvisits", "(VisitorID is null)or(VisitorID=0)", 1000, 10000)
+            Call cp.core.db_DeleteTableRecordChunks("default", "ccvisits", "(VisitorID is null)or(VisitorID=0)", 1000, 10000)
             '
             ' viewings with no visit
             '
             Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "Deleting viewings with null or invalid VisitID")
-            Call cp.core.csv_DeleteTableRecordChunks("default", "ccviewings", "(visitid=0 or visitid is null)", 1000, 10000)
+            Call cp.core.db_DeleteTableRecordChunks("default", "ccviewings", "(visitid=0 or visitid is null)", 1000, 10000)
             '
             ' Get Oldest Visit
             '
@@ -1736,7 +1736,7 @@ ErrorTrap:
             TimeoutSave = cp.core.app.csv_SQLCommandTimeout
             cp.core.app.csv_SQLCommandTimeout = 1800
             '
-            SQLTablePeople = cp.core.csv_GetContentTablename("People")
+            SQLTablePeople = cp.core.metaData_GetContentTablename2("People")
             'SQLTableMemberRules = cp.Core.csv_GetContentTablename("Member Rules")
             'SQLTableGroups = cp.Core.csv_GetContentTablename("Groups")
             '
@@ -1748,12 +1748,12 @@ ErrorTrap:
                 ' Visits older then archive age
                 '
                 Call AppendClassLog(cp.core.app.config.name, "HouseKeep_App_Daily_RemoveVisitRecords(" & appName & ")", "Deleting visits before [" & DeleteBeforeDateSQL & "]")
-                Call cp.core.csv_DeleteTableRecordChunks("default", "ccVisits", "(DateAdded<" & DeleteBeforeDateSQL & ")", 1000, 10000)
+                Call cp.core.db_DeleteTableRecordChunks("default", "ccVisits", "(DateAdded<" & DeleteBeforeDateSQL & ")", 1000, 10000)
                 '
                 ' Viewings with visits before the first
                 '
                 Call AppendClassLog(appName, "HouseKeep_App_Daily_RemoveVisitRecords(" & appName & ")", "Deleting viewings with visitIDs lower then the lowest ccVisits.ID")
-                Call cp.core.csv_DeleteTableRecordChunks("default", "ccviewings", "(visitid<(select min(ID) from ccvisits))", 1000, 10000)
+                Call cp.core.db_DeleteTableRecordChunks("default", "ccviewings", "(visitid<(select min(ID) from ccvisits))", 1000, 10000)
                 '
                 ' Visitors with no visits
                 '
@@ -1856,7 +1856,7 @@ ErrorTrap:
             TimeoutSave = cp.core.app.csv_SQLCommandTimeout
             cp.core.app.csv_SQLCommandTimeout = 1800
             '
-            SQLTablePeople = cp.core.csv_GetContentTablename("People")
+            SQLTablePeople = cp.core.metaData_GetContentTablename2("People")
             'SQLTableMemberRules = cp.Core.csv_GetContentTablename("Member Rules")
             'SQLTableGroups = cp.Core.csv_GetContentTablename("Groups")
             '
@@ -1911,7 +1911,7 @@ ErrorTrap:
                     & " and(Visits=1)" _
                     & " and(Username is null)" _
                     & " and(email is null)"
-                Call cp.core.csv_DeleteTableRecordChunks("default", "" & SQLTablePeople & "", SQLCriteria, 1000, 10000)
+                Call cp.core.db_DeleteTableRecordChunks("default", "" & SQLTablePeople & "", SQLCriteria, 1000, 10000)
                 '& "(" & SQLTablePeople & ".Name=" & encodeSQLText(DefaultName) & ")"
             End If
             '
@@ -2714,7 +2714,7 @@ ErrorTrap:
                                 Dim PageName As String
 
                                 If PageTitle = "" Then
-                                    PageName = cp.core.csv_GetRecordName("page content", PageID)
+                                    PageName = cp.core.db_GetRecordName("page content", PageID)
                                     Call cp.core.app.db_setCS(CS, "name", HourDuration & " hr summary for " & Date.FromOADate(CDbl(DateNumber)) & " " & TimeNumber & ":00, " & PageName)
                                     Call cp.core.app.db_setCS(CS, "PageTitle", PageName)
                                 Else

@@ -102,12 +102,12 @@ ErrorTrap:
                         '
                         ' This tab is linked to a page
                         '
-                        TabLink = EncodeHTML(Tabs(TabPtr).Link)
+                        TabLink = html_EncodeHTML(Tabs(TabPtr).Link)
                     Else
                         '
                         ' This tab has a visible body
                         '
-                        TabLink = EncodeHTML(Tabs(TabPtr).Link)
+                        TabLink = html_EncodeHTML(Tabs(TabPtr).Link)
                         If Not FirstLiveBodyShown Then
                             FirstLiveBodyShown = True
                             TabBody = TabBody & "<div style=""visibility: visible; position: absolute; left: 0px;"" class=""" & Tabs(TabPtr).StylePrefix & "Body"" id=""" & TabID & """></div>"

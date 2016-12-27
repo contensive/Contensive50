@@ -421,19 +421,19 @@ Namespace Contensive.Core
                                 '
                                 RecordID = EncodeInteger(CFields(f_LookupContentID, CFieldPtr))
                                 RecordName = CacheLookup(RecordID, Contents)
-                                sb.Append(" LookupContent=""" & EncodeHTML(RecordName) & """")
+                                sb.Append(" LookupContent=""" & html_EncodeHTML(RecordName) & """")
                                 '
                                 RecordID = EncodeInteger(CFields(f_RedirectContentID, CFieldPtr))
                                 RecordName = CacheLookup(RecordID, Contents)
-                                sb.Append(" RedirectContent=""" & EncodeHTML(RecordName) & """")
+                                sb.Append(" RedirectContent=""" & html_EncodeHTML(RecordName) & """")
                                 '
                                 RecordID = EncodeInteger(CFields(f_ManyToManyContentID, CFieldPtr))
                                 RecordName = CacheLookup(RecordID, Contents)
-                                sb.Append(" ManyToManyContent=""" & EncodeHTML(RecordName) & """")
+                                sb.Append(" ManyToManyContent=""" & html_EncodeHTML(RecordName) & """")
                                 '
                                 RecordID = EncodeInteger(CFields(f_ManyToManyRuleContentID, CFieldPtr))
                                 RecordName = CacheLookup(RecordID, Contents)
-                                sb.Append(" ManyToManyRuleContent=""" & EncodeHTML(RecordName) & """")
+                                sb.Append(" ManyToManyRuleContent=""" & html_EncodeHTML(RecordName) & """")
                                 '
                                 sb.Append(" >")
                                 '
@@ -845,7 +845,7 @@ ErrorTrap:
             ' ****************************** if cdef not loaded, this fails
             '
             appName = cpCore.app.config.name
-            MenuContentID = cpCore.csv_GetRecordID("Content", "Navigator Entries")
+            MenuContentID = cpCore.db_GetRecordID("Content", "Navigator Entries")
             dt = cpCore.app.executeSql("select * from ccMenuEntries where (contentcontrolid=" & MenuContentID & ")and(name<>'')")
             If dt.Rows.Count > 0 Then
                 NavIconType = 0
@@ -920,7 +920,7 @@ ErrorTrap:
             '
             ' ****************************** if cdef not loaded, this fails
             '
-            MenuContentID = cpCore.csv_GetRecordID("Content", "Menu Entries")
+            MenuContentID = cpCore.db_GetRecordID("Content", "Menu Entries")
             rs = cpCore.app.executeSql("select * from ccMenuEntries where (contentcontrolid=" & MenuContentID & ")and(name<>'')")
             If (isDataTableOk(rs)) Then
                 If True Then
@@ -991,7 +991,7 @@ ErrorTrap:
         '
         '
         Private Function EncodeXMLattribute(ByVal Source As String) As String
-            EncodeXMLattribute = EncodeHTML(Source)
+            EncodeXMLattribute = html_EncodeHTML(Source)
             EncodeXMLattribute = Replace(EncodeXMLattribute, vbCrLf, " ")
             EncodeXMLattribute = Replace(EncodeXMLattribute, vbCr, "")
             EncodeXMLattribute = Replace(EncodeXMLattribute, vbLf, "")

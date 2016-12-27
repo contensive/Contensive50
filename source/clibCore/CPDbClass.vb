@@ -68,7 +68,7 @@ Namespace Contensive.Core
         '
         '
         Public Overrides Function GetConnectionString(ByVal DataSourcename As String) As String
-            Return cp.core.csv_GetConnectionString(DataSourcename)
+            Return cp.core.db_GetConnectionString(DataSourcename)
         End Function
         '
         ' deprecated
@@ -92,7 +92,7 @@ Namespace Contensive.Core
         '
         '
         Public Overrides Function GetTableID(ByVal TableName As String) As Integer
-            Return cp.core.main_GetTableID(TableName)
+            Return cp.core.db_GetTableID(TableName)
         End Function
         '
         ' deprecated 
@@ -104,7 +104,7 @@ Namespace Contensive.Core
         '
         '
         Public Overrides Function IsTable(ByVal DataSourcename As String, ByVal TableName As String) As Boolean
-            Return cp.core.csv_IsSQLTable(DataSourcename, TableName)
+            Return cp.core.db_IsSQLTable(DataSourcename, TableName)
         End Function
         '
         ' deprecated
@@ -116,7 +116,7 @@ Namespace Contensive.Core
         '
         '
         Public Overrides Function IsTableField(ByVal DataSourcename As String, ByVal TableName As String, ByVal FieldName As String) As Boolean
-            Return cp.core.csv_IsSQLTableField(DataSourcename, TableName, FieldName)
+            Return cp.core.db_IsSQLTableField(DataSourcename, TableName, FieldName)
         End Function
         '
         ' deprecated 
@@ -128,25 +128,25 @@ Namespace Contensive.Core
         '
         '
         Public Overrides Function EncodeSQLBoolean(ByVal SourceBoolean As Boolean) As String
-            Return cp.core.csv_EncodeSQLBoolean(SourceBoolean)
+            Return cp.core.app.db_EncodeSQLBoolean(SourceBoolean)
         End Function
         '
         '
         '
         Public Overrides Function EncodeSQLDate(ByVal SourceDate As Date) As String
-            Return cp.core.csv_EncodeSQLDate(SourceDate)
+            Return cp.core.app.db_EncodeSQLDate(SourceDate)
         End Function
         '
         '
         '
         Public Overrides Function EncodeSQLNumber(ByVal SourceNumber As Double) As String
-            Return cp.core.csv_EncodeSQLNumber(SourceNumber)
+            Return cp.core.app.db_EncodeSQLNumber(SourceNumber)
         End Function
         '
         '
         '
         Public Overrides Function EncodeSQLText(ByVal SourceText As String) As String
-            Return cp.core.csv_EncodeSQLText(SourceText)
+            Return cp.core.app.db_EncodeSQLText(SourceText)
         End Function
         '
         '

@@ -264,7 +264,7 @@ ErrorTrap:
                     End Select
                     '
                     With iEntry(EntryPointer)
-                        Link = EncodeHTML(.Link)
+                        Link = html_EncodeHTML(.Link)
                         If .Image <> "" Then
                             '
                             ' Create hotspot from image
@@ -439,7 +439,7 @@ ErrorTrap:
                                     '
                                     ' ----- Link but no child panel
                                     '
-                                    PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ href=""" & EncodeHTML(.Link) & """" & target & " onmouseover=""ccFlyoutHoverMode(1); ccFlyoutPanelButtonHover(event,'','" & StyleSheetPrefix & "');"">" & HotSpotHTML & "</a>"
+                                    PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ href=""" & html_EncodeHTML(.Link) & """" & target & " onmouseover=""ccFlyoutHoverMode(1); ccFlyoutPanelButtonHover(event,'','" & StyleSheetPrefix & "');"">" & HotSpotHTML & "</a>"
                                     'PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ href=""" & encodeHTML(.Link) & """" & Target & ">" & HotSpotHTML & "</a>"
                                 End If
                             Else
@@ -461,10 +461,10 @@ ErrorTrap:
                                     ' ----- Child Panel and a link
                                     '
                                     If FlyoutHover Then
-                                        PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ onmouseover=""ccFlyoutHoverMode(1); ccFlyoutPanelButtonHover(event,'" & MenuFlyoutNamePrefix & "_" & .Name & "','" & StyleSheetPrefix & "');"" onmouseout=""ccFlyoutHoverMode(0);"" href=""" & EncodeHTML(.Link) & """" & target & ">" & HotSpotHTML & MenuFlyoutIcon_Local & "</a>"
+                                        PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ onmouseover=""ccFlyoutHoverMode(1); ccFlyoutPanelButtonHover(event,'" & MenuFlyoutNamePrefix & "_" & .Name & "','" & StyleSheetPrefix & "');"" onmouseout=""ccFlyoutHoverMode(0);"" href=""" & html_EncodeHTML(.Link) & """" & target & ">" & HotSpotHTML & MenuFlyoutIcon_Local & "</a>"
                                         'PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ onmouseover=""ccFlyoutHoverMode(1); ccFlyoutPanelButtonHover(event,'" & MenuFlyoutNamePrefix & "_" & .Name & "','" & StyleSheetPrefix & "');"" onmouseout=""ccFlyoutHoverMode(0);"" href=""" & .Link & """" & Target & ">" & HotSpotHTML & "&nbsp;<font face=""webdings"">4</font></a>"
                                     Else
-                                        PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ onmouseover=""ccFlyoutPanelButtonHover(event,'" & MenuFlyoutNamePrefix & "_" & .Name & "','" & StyleSheetPrefix & "');"" href=""" & EncodeHTML(.Link) & """" & target & ">" & HotSpotHTML & MenuFlyoutIcon_Local & "</a>"
+                                        PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ onmouseover=""ccFlyoutPanelButtonHover(event,'" & MenuFlyoutNamePrefix & "_" & .Name & "','" & StyleSheetPrefix & "');"" href=""" & html_EncodeHTML(.Link) & """" & target & ">" & HotSpotHTML & MenuFlyoutIcon_Local & "</a>"
                                         'PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ onmouseover=""ccFlyoutPanelButtonHover(event,'" & MenuFlyoutNamePrefix & "_" & .Name & "','" & StyleSheetPrefix & "');"" href=""" & .Link & """" & Target & ">" & HotSpotHTML & "&nbsp;<font face=""webdings"">4</font></a>"
                                     End If
                                 End If

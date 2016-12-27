@@ -201,7 +201,7 @@ Namespace Contensive.Core
             Dim Stream As New coreFastStringClass
             Dim Adminui As New coreAdminUIClass(cpCore)
             '
-            Button = cpCore.main_GetStreamText2("Button")
+            Button = cpCore.doc_getText("Button")
             If (Button = ButtonCancelAll) Then
                 '
                 ' Cancel to the admin site
@@ -218,27 +218,27 @@ Namespace Contensive.Core
                 GetForm = Adminui.GetFormBodyAdminOnly()
                 GetForm = Adminui.GetBody("Admin Tools", ButtonCancelAll, "", False, False, "<div>Administration Tools</div>", "", 0, GetForm)
             Else
-                ToolsAction = cpCore.main_GetStreamInteger("dta")
-                Button = cpCore.main_GetStreamText2("Button")
-                AdminFormTool = cpCore.main_GetStreamInteger(RequestNameAdminForm)
-                ToolsTable = cpCore.main_GetStreamText2("dtt")
-                ToolsContentName = cpCore.main_GetStreamText2("ContentName")
-                ToolsQuery = cpCore.main_GetStreamText2("dtq")
-                ToolsDataSource = cpCore.main_GetStreamText2("dtds")
-                MenuEntryID = cpCore.main_GetStreamInteger("dtei")
-                MenuHeaderID = cpCore.main_GetStreamInteger("dthi")
-                MenuDirection = cpCore.main_GetStreamInteger("dtmd")
-                DefaultReadOnly = cpCore.main_GetStreamBoolean("dtdreadonly")
-                DefaultActive = cpCore.main_GetStreamBoolean("dtdactive")
-                DefaultPassword = cpCore.main_GetStreamBoolean("dtdpassword")
-                DefaulttextBuffered = cpCore.main_GetStreamBoolean("dtdtextbuffered")
-                DefaultRequired = cpCore.main_GetStreamBoolean("dtdrequired")
-                DefaultAdminOnly = cpCore.main_GetStreamBoolean("dtdadmin")
-                DefaultDeveloperOnly = cpCore.main_GetStreamBoolean("dtddev")
-                defaultAddMenu = cpCore.main_GetStreamBoolean("dtdam")
-                DefaultCreateBlankRecord = cpCore.main_GetStreamBoolean("dtblank")
+                ToolsAction = cpCore.doc_getInteger("dta")
+                Button = cpCore.doc_getText("Button")
+                AdminFormTool = cpCore.doc_getInteger(RequestNameAdminForm)
+                ToolsTable = cpCore.doc_getText("dtt")
+                ToolsContentName = cpCore.doc_getText("ContentName")
+                ToolsQuery = cpCore.doc_getText("dtq")
+                ToolsDataSource = cpCore.doc_getText("dtds")
+                MenuEntryID = cpCore.doc_getInteger("dtei")
+                MenuHeaderID = cpCore.doc_getInteger("dthi")
+                MenuDirection = cpCore.doc_getInteger("dtmd")
+                DefaultReadOnly = cpCore.doc_getBoolean("dtdreadonly")
+                DefaultActive = cpCore.doc_getBoolean("dtdactive")
+                DefaultPassword = cpCore.doc_getBoolean("dtdpassword")
+                DefaulttextBuffered = cpCore.doc_getBoolean("dtdtextbuffered")
+                DefaultRequired = cpCore.doc_getBoolean("dtdrequired")
+                DefaultAdminOnly = cpCore.doc_getBoolean("dtdadmin")
+                DefaultDeveloperOnly = cpCore.doc_getBoolean("dtddev")
+                defaultAddMenu = cpCore.doc_getBoolean("dtdam")
+                DefaultCreateBlankRecord = cpCore.doc_getBoolean("dtblank")
                 '
-                Call cpCore.main_AddRefreshQueryString("dta", ToolsAction)
+                Call cpCore.web_addRefreshQueryString("dta", ToolsAction.ToString())
                 'Call cpCore.main_AddRefreshQueryString("Button=" & Button)
                 'Call cpCore.main_AddRefreshQueryString("af=" & AdminFormTool)
                 '
@@ -374,7 +374,7 @@ ErrorTrap:
             Dim Stream As New coreFastStringClass
             Dim ButtonList As String
             '
-            Stream.Add(SpanClassAdminNormal & "<strong><A href=""" & cpCore.main_ServerPage & "?af=" & AdminFormToolRoot & """>Tools</A></strong></SPAN>")
+            Stream.Add(SpanClassAdminNormal & "<strong><A href=""" & cpCore.web_requestPage & "?af=" & AdminFormToolRoot & """>Tools</A></strong></SPAN>")
             Stream.Add(SpanClassAdminNormal & ":Create Content Fields from Table</SPAN>")
             '
             '   print out the submit form
@@ -416,7 +416,7 @@ ErrorTrap:
             '   process the button if present
             '
             If Button = ButtonCreateFields Then
-                ContentName = cpCore.main_GetStreamText2("ContentName")
+                ContentName = cpCore.doc_getText("ContentName")
                 If (ContentName = "") Then
                     Stream.Add("Select a content before submitting. Fields were not changed.")
                 Else
@@ -497,9 +497,9 @@ ErrorTrap:
             '
             ButtonList = ButtonCancel & "," & ButtonSelect
             '
-            ContentID = cpCore.main_GetStreamInteger("" & RequestNameToolContentID & "")
-            ToolButton = cpCore.main_GetStreamText2("Button")
-            ReloadCDef = cpCore.main_GetStreamBoolean("ReloadCDef")
+            ContentID = cpCore.doc_getInteger("" & RequestNameToolContentID & "")
+            ToolButton = cpCore.doc_getText("Button")
+            ReloadCDef = cpCore.doc_getBoolean("ReloadCDef")
             ContentName = Local_GetContentNameByID(ContentID)
             TableName = Local_GetContentTableName(ContentName)
             DataSourceName = Local_GetContentDataSource(ContentName)
@@ -516,14 +516,14 @@ ErrorTrap:
                     '
                     ' ----- Save the input
                     '
-                    RecordCount = EncodeInteger(cpCore.main_GetStreamInteger("dtfaRecordCount"))
+                    RecordCount = EncodeInteger(cpCore.doc_getInteger("dtfaRecordCount"))
                     If RecordCount > 0 Then
                         For RecordPointer = 0 To RecordCount - 1
                             '
-                            formFieldName = cpCore.main_GetStreamText2("dtfaName." & RecordPointer)
-                            formFieldTypeId = cpCore.main_GetStreamInteger("dtfaType." & RecordPointer)
-                            formFieldId = EncodeInteger(cpCore.main_GetStreamInteger("dtfaID." & RecordPointer))
-                            formFieldInherited = cpCore.main_GetStreamBoolean("dtfaInherited." & RecordPointer)
+                            formFieldName = cpCore.doc_getText("dtfaName." & RecordPointer)
+                            formFieldTypeId = cpCore.doc_getInteger("dtfaType." & RecordPointer)
+                            formFieldId = EncodeInteger(cpCore.doc_getInteger("dtfaID." & RecordPointer))
+                            formFieldInherited = cpCore.doc_getBoolean("dtfaInherited." & RecordPointer)
                             '
                             ' problem - looking for the name in the Db using the form's name, but it could have changed.
                             ' have to look field up by id
@@ -540,9 +540,9 @@ ErrorTrap:
                                             '
                                             CSTarget = cpCore.app.db_csInsertRecord("Content Fields")
                                             If cpCore.app.db_csOk(CSTarget) Then
-                                                CSSource = cpCore.main_OpenCSContentRecord("Content Fields", formFieldId)
+                                                CSSource = cpCore.db_csOpen("Content Fields", formFieldId)
                                                 If cpCore.app.db_csOk(CSSource) Then
-                                                    Call cpCore.main_CopyCSRecord(CSSource, CSTarget)
+                                                    Call cpCore.db_cs_CopyRecord(CSSource, CSTarget)
                                                 End If
                                                 Call cpCore.app.db_csClose(CSSource)
                                                 formFieldId = cpCore.app.db_GetCSInteger(CSTarget, "ID")
@@ -596,34 +596,34 @@ ErrorTrap:
                                                     DataSourceTypeID = cpCore.main_GetDataSourceType(DataSourceName)
                                                     Select Case DataSourceTypeID
                                                         Case DataSourceTypeODBCMySQL
-                                                            SQL = "alter table " & CDef.ContentTableName & " change " & .nameLc & " " & .nameLc & " " & cpCore.csv_GetSQLAlterColumnType(DataSourceName, formFieldTypeId) & ";"
+                                                            SQL = "alter table " & CDef.ContentTableName & " change " & .nameLc & " " & .nameLc & " " & cpCore.db_GetSQLAlterColumnType(DataSourceName, formFieldTypeId) & ";"
                                                         Case Else
-                                                            SQL = "alter table " & CDef.ContentTableName & " alter column " & .nameLc & " " & cpCore.csv_GetSQLAlterColumnType(DataSourceName, formFieldTypeId) & ";"
+                                                            SQL = "alter table " & CDef.ContentTableName & " alter column " & .nameLc & " " & cpCore.db_GetSQLAlterColumnType(DataSourceName, formFieldTypeId) & ";"
                                                     End Select
                                                     Call cpCore.app.executeSql(SQL, DataSourceName)
                                                 End If
                                                 SQL = "Update ccFields" _
                                                 & " Set name=" & cpCore.app.db_EncodeSQLText(formFieldName) _
                                                 & ",type=" & formFieldTypeId _
-                                                & ",caption=" & cpCore.app.db_EncodeSQLText(cpCore.main_GetStreamText2("dtfaCaption." & RecordPointer)) _
-                                                & ",DefaultValue=" & cpCore.app.db_EncodeSQLText(cpCore.main_GetStreamText2("dtfaDefaultValue." & RecordPointer)) _
-                                                & ",EditSortPriority=" & cpCore.app.db_EncodeSQLText(cpCore.main_GetStreamInteger("dtfaEditSortPriority." & RecordPointer)) _
-                                                & ",Active=" & cpCore.app.db_EncodeSQLBoolean(cpCore.main_GetStreamBoolean("dtfaActive." & RecordPointer)) _
-                                                & ",ReadOnly=" & cpCore.app.db_EncodeSQLBoolean(cpCore.main_GetStreamBoolean("dtfaReadOnly." & RecordPointer)) _
-                                                & ",Authorable=" & cpCore.app.db_EncodeSQLBoolean(cpCore.main_GetStreamBoolean("dtfaAuthorable." & RecordPointer)) _
-                                                & ",Required=" & cpCore.app.db_EncodeSQLBoolean(cpCore.main_GetStreamBoolean("dtfaRequired." & RecordPointer)) _
-                                                & ",UniqueName=" & cpCore.app.db_EncodeSQLBoolean(cpCore.main_GetStreamBoolean("dtfaUniqueName." & RecordPointer)) _
-                                                & ",TextBuffered=" & cpCore.app.db_EncodeSQLBoolean(cpCore.main_GetStreamBoolean("dtfaTextBuffered." & RecordPointer)) _
-                                                & ",Password=" & cpCore.app.db_EncodeSQLBoolean(cpCore.main_GetStreamBoolean("dtfaPassword." & RecordPointer)) _
-                                                & ",HTMLContent=" & cpCore.app.db_EncodeSQLBoolean(cpCore.main_GetStreamBoolean("dtfaHTMLContent." & RecordPointer)) _
-                                                & ",EditTab=" & cpCore.app.db_EncodeSQLText(cpCore.main_GetStreamText2("dtfaEditTab." & RecordPointer)) _
-                                                & ",Scramble=" & cpCore.app.db_EncodeSQLBoolean(cpCore.main_GetStreamBoolean("dtfaScramble." & RecordPointer)) _
+                                                & ",caption=" & cpCore.app.db_EncodeSQLText(cpCore.doc_getText("dtfaCaption." & RecordPointer)) _
+                                                & ",DefaultValue=" & cpCore.app.db_EncodeSQLText(cpCore.doc_getText("dtfaDefaultValue." & RecordPointer)) _
+                                                & ",EditSortPriority=" & cpCore.app.db_EncodeSQLText(cpCore.doc_getInteger("dtfaEditSortPriority." & RecordPointer)) _
+                                                & ",Active=" & cpCore.app.db_EncodeSQLBoolean(cpCore.doc_getBoolean("dtfaActive." & RecordPointer)) _
+                                                & ",ReadOnly=" & cpCore.app.db_EncodeSQLBoolean(cpCore.doc_getBoolean("dtfaReadOnly." & RecordPointer)) _
+                                                & ",Authorable=" & cpCore.app.db_EncodeSQLBoolean(cpCore.doc_getBoolean("dtfaAuthorable." & RecordPointer)) _
+                                                & ",Required=" & cpCore.app.db_EncodeSQLBoolean(cpCore.doc_getBoolean("dtfaRequired." & RecordPointer)) _
+                                                & ",UniqueName=" & cpCore.app.db_EncodeSQLBoolean(cpCore.doc_getBoolean("dtfaUniqueName." & RecordPointer)) _
+                                                & ",TextBuffered=" & cpCore.app.db_EncodeSQLBoolean(cpCore.doc_getBoolean("dtfaTextBuffered." & RecordPointer)) _
+                                                & ",Password=" & cpCore.app.db_EncodeSQLBoolean(cpCore.doc_getBoolean("dtfaPassword." & RecordPointer)) _
+                                                & ",HTMLContent=" & cpCore.app.db_EncodeSQLBoolean(cpCore.doc_getBoolean("dtfaHTMLContent." & RecordPointer)) _
+                                                & ",EditTab=" & cpCore.app.db_EncodeSQLText(cpCore.doc_getText("dtfaEditTab." & RecordPointer)) _
+                                                & ",Scramble=" & cpCore.app.db_EncodeSQLBoolean(cpCore.doc_getBoolean("dtfaScramble." & RecordPointer)) _
                                                 & ""
                                                 If cpCore.user_isAdmin Then
-                                                    SQL &= ",adminonly=" & cpCore.app.db_EncodeSQLBoolean(cpCore.main_GetStreamBoolean("dtfaAdminOnly." & RecordPointer))
+                                                    SQL &= ",adminonly=" & cpCore.app.db_EncodeSQLBoolean(cpCore.doc_getBoolean("dtfaAdminOnly." & RecordPointer))
                                                 End If
                                                 If cpCore.user_isDeveloper Then
-                                                    SQL &= ",DeveloperOnly=" & cpCore.app.db_EncodeSQLBoolean(cpCore.main_GetStreamBoolean("dtfaDeveloperOnly." & RecordPointer))
+                                                    SQL &= ",DeveloperOnly=" & cpCore.app.db_EncodeSQLBoolean(cpCore.doc_getBoolean("dtfaDeveloperOnly." & RecordPointer))
                                                 End If
                                                 SQL &= " where ID=" & formFieldId
                                                 Call cpCore.app.executeSql(SQL)
@@ -667,7 +667,7 @@ ErrorTrap:
                     '
                     ' ----- Insert a blank Field
                     '
-                    CSPointer = cpCore.main_InsertCSContent("Content Fields")
+                    CSPointer = cpCore.db_InsertCSContent("Content Fields")
                     If cpCore.app.db_csOk(CSPointer) Then
                         Call cpCore.app.db_setCS(CSPointer, "name", "unnamedField" & cpCore.app.db_GetCSInteger(CSPointer, "id").ToString())
                         Call cpCore.app.db_setCS(CSPointer, "ContentID", ContentID)
@@ -696,7 +696,7 @@ ErrorTrap:
                     '
                     ' ----- Exit back to menu
                     '
-                    Call cpCore.main_Redirect(cpCore.main_ServerProtocol & cpCore.main_ServerDomain & cpCore.main_ServerPath & cpCore.main_ServerPage & "?af=" & AdminFormTools)
+                    Call cpCore.main_Redirect(cpCore.web_requestProtocol & cpCore.main_ServerDomain & cpCore.web_requestPath & cpCore.web_requestPage & "?af=" & AdminFormTools)
                 End If
             End If
             '
@@ -705,7 +705,7 @@ ErrorTrap:
             '--------------------------------------------------------------------------------
             '
             cpCore.testPoint("ConfigureEdit, Start Form")
-            Stream.Add(SpanClassAdminNormal & "<strong><a href=""" & cpCore.main_ServerPage & "?af=" & AdminFormToolRoot & """>Tools</a></strong>&nbsp;»&nbsp;Manage Admin Edit Fields</span>")
+            Stream.Add(SpanClassAdminNormal & "<strong><a href=""" & cpCore.web_requestPage & "?af=" & AdminFormToolRoot & """>Tools</a></strong>&nbsp;»&nbsp;Manage Admin Edit Fields</span>")
             Stream.Add("<div>")
             Stream.Add("<div style=""width:45%;float:left;padding:10px;"">" _
                 & "Use this tool to add or modify content definition fields. Contensive uses a caching system for content definitions that is not automatically reloaded. Change you make will not take effect until the next time the system is reloaded. When you create a new field, the database field is created automatically when you have saved both a name and a field type. If you change the field type, you may have to manually change the database field." _
@@ -831,7 +831,7 @@ ErrorTrap:
                             ' put the menu into the current menu format
                             '
                             formFieldId = .id
-                            Call streamRow.Add(cpCore.main_GetFormInputHidden("dtfaID." & RecordCount, formFieldId))
+                            Call streamRow.Add(cpCore.html_GetFormInputHidden("dtfaID." & RecordCount, formFieldId))
                             streamRow.Add("<tr>")
                             '
                             ' edit button
@@ -929,7 +929,7 @@ ErrorTrap:
                             rowValid = rowValid And (.fieldTypeId > 0)
                             streamRow.Add("<td class=""ccPanelInput"" align=""left""><nobr>")
                             If .inherited Then
-                                CSPointer = cpCore.main_OpenCSContentRecord("Content Field Types", .fieldTypeId)
+                                CSPointer = cpCore.db_csOpen("Content Field Types", .fieldTypeId)
                                 If Not cpCore.app.db_csOk(CSPointer) Then
                                     Call streamRow.Add(SpanClassAdminSmall & "Unknown[" & .fieldTypeId & "]</SPAN>")
                                 Else
@@ -937,7 +937,7 @@ ErrorTrap:
                                 End If
                                 Call cpCore.app.db_csClose(CSPointer)
                             ElseIf FieldLocked Then
-                                Call streamRow.Add(cpCore.main_GetRecordName("content field types", .fieldTypeId) & cpCore.main_GetFormInputHidden("dtfaType." & RecordCount, .fieldTypeId))
+                                Call streamRow.Add(cpCore.main_GetRecordName("content field types", .fieldTypeId) & cpCore.html_GetFormInputHidden("dtfaType." & RecordCount, .fieldTypeId))
                             Else
                                 TypeSelect = TypeSelectTemplate
                                 TypeSelect = Replace(TypeSelect, "menuname", "dtfaType." & RecordCount, , , vbTextCompare)
@@ -1017,7 +1017,7 @@ ErrorTrap:
                         End If
                     Next
                     Call Stream.Add(StreamValidRows.Text())
-                    Call Stream.Add(cpCore.main_GetFormInputHidden("dtfaRecordCount", RecordCount))
+                    Call Stream.Add(cpCore.html_GetFormInputHidden("dtfaRecordCount", RecordCount))
                 End If
                 Stream.Add("</table>")
                 'Stream.Add( cpCore.main_GetPanelButtons(ButtonList, "Button"))
@@ -1036,7 +1036,7 @@ ErrorTrap:
                 '
                 ' Save the content selection
                 '
-                Call Stream.Add(cpCore.main_GetFormInputHidden(RequestNameToolContentID, ContentID))
+                Call Stream.Add(cpCore.html_GetFormInputHidden(RequestNameToolContentID, ContentID))
             Else
                 '
                 ' content tables that have edit forms to Configure
@@ -1112,7 +1112,7 @@ ErrorTrap:
             '
             GetForm_RootRow = ""
             GetForm_RootRow = GetForm_RootRow & "<tr><td colspan=""2"">"
-            GetForm_RootRow = GetForm_RootRow & SpanClassAdminNormal & "<P class=""ccAdminNormal""><A href=""" & cpCore.main_ServerPage & "?af=" & AdminFormToolId.ToString() & """><B>" & Caption & "</b></SPAN></A></p>"
+            GetForm_RootRow = GetForm_RootRow & SpanClassAdminNormal & "<P class=""ccAdminNormal""><A href=""" & cpCore.web_requestPage & "?af=" & AdminFormToolId.ToString() & """><B>" & Caption & "</b></SPAN></A></p>"
             GetForm_RootRow = GetForm_RootRow & "</td></tr>"
             If Description <> "" Then
                 GetForm_RootRow = GetForm_RootRow & "<tr><td width=""30""><img src=""/cclib/images/spacer.gif"" height=""1"" width=""30""></td>"
@@ -1136,7 +1136,7 @@ ErrorTrap:
             Dim SQL As String
             '
             GetTitle = GetTitle & "<P>" & SpanClassAdminNormal _
-                    & "<A href=""" & cpCore.main_ServerPage & "?af=" & AdminFormToolRoot & """><B>Tools</b></A>" _
+                    & "<A href=""" & cpCore.web_requestPage & "?af=" & AdminFormToolRoot & """><B>Tools</b></A>" _
                     & "&nbsp;&gt;&nbsp;" _
                     & Title _
                     & "</P><P>" & SpanClassAdminNormal & Description & "</P>"
@@ -1193,32 +1193,32 @@ ErrorTrap:
                 '
                 ' Get the members SQL Queue
                 '
-                SQLFilename = cpCore.userProperty_getText("SQLArchive")
+                SQLFilename = cpCore.properties_user_getText("SQLArchive")
                 If SQLFilename = "" Then
                     SQLFilename = "SQLArchive" & Format(cpCore.userId, "000000000") & ".txt"
-                    Call cpCore.main_SetMemberProperty("SQLArchive", SQLFilename)
+                    Call cpCore.properties_SetMemberProperty2("SQLArchive", SQLFilename)
                 End If
                 SQLArchive = cpCore.app.cdnFiles.ReadFile(SQLFilename)
                 '
                 ' Read in arguments if available
                 '
-                Timeout = cpCore.main_GetStreamInteger("Timeout")
+                Timeout = cpCore.doc_getInteger("Timeout")
                 If Timeout = 0 Then
                     Timeout = 30
                 End If
                 '
-                PageSize = cpCore.main_GetStreamInteger("PageSize")
+                PageSize = cpCore.doc_getInteger("PageSize")
                 If PageSize = 0 Then
                     PageSize = 10
                 End If
                 '
-                PageNumber = cpCore.main_GetStreamInteger("PageNumber")
+                PageNumber = cpCore.doc_getInteger("PageNumber")
                 If PageNumber = 0 Then
                     PageNumber = 1
                 End If
                 '
-                If (cpCore.main_GetStreamText2("button")) = ButtonRun Then
-                    DataSourceID = cpCore.main_GetStreamInteger("DataSourceID")
+                If (cpCore.doc_getText("button")) = ButtonRun Then
+                    DataSourceID = cpCore.doc_getInteger("DataSourceID")
                     DataSourceName = ""
                     If DataSourceID <> 0 Then
                         DataSourceName = cpCore.main_GetDataSourceByID(DataSourceID)
@@ -1226,9 +1226,9 @@ ErrorTrap:
                     If DataSourceName = "" Then
                         DataSourceName = "default"
                     End If
-                    SQL = cpCore.main_GetStreamText2("SQL")
+                    SQL = cpCore.doc_getText("SQL")
                     If SQL = "" Then
-                        SQL = cpCore.main_GetStreamText2("SQLList")
+                        SQL = cpCore.doc_getText("SQLList")
                     End If
                     '
                     ' Add this SQL to the members SQL list
@@ -1308,7 +1308,7 @@ ErrorTrap:
                                 ElseIf CellData = "" Then
                                     Stream.Add(ColumnStart & "[empty]" & ColumnEnd)
                                 Else
-                                    Stream.Add(ColumnStart & EncodeHTML(EncodeText(CellData)) & ColumnEnd)
+                                    Stream.Add(ColumnStart & html_EncodeHTML(EncodeText(CellData)) & ColumnEnd)
                                 End If
                             Next
                             Stream.Add(RowEnd)
@@ -1327,11 +1327,11 @@ ErrorTrap:
                 'Call Stream.Add(SpanClassAdminNormal & cpCore.main_GetFormStart(""))
                 '
                 Dim SQLRows As Integer
-                SQLRows = cpCore.main_GetStreamInteger("SQLRows")
+                SQLRows = cpCore.doc_getInteger("SQLRows")
                 If SQLRows = 0 Then
-                    SQLRows = cpCore.userProperty_getInteger("ManualQueryInputRows", 5)
+                    SQLRows = cpCore.properties_user_getInteger("ManualQueryInputRows", 5)
                 Else
-                    Call cpCore.main_SetMemberProperty("ManualQueryInputRows", CStr(SQLRows))
+                    Call cpCore.properties_SetMemberProperty2("ManualQueryInputRows", CStr(SQLRows))
                 End If
                 Call Stream.Add("<TEXTAREA NAME=""SQL"" ROWS=""" & SQLRows & """ ID=""SQL"" STYLE=""width: 800px;"">" & SQL & "</TEXTAREA>")
                 Call Stream.Add("&nbsp;<INPUT TYPE=""Text"" TabIndex=-1 NAME=""SQLRows"" SIZE=""3"" VALUE=""" & SQLRows & """ ID=""""  onchange=""SQL.rows=SQLRows.value; return true""> Rows")
@@ -1408,20 +1408,20 @@ ErrorTrap:
             '
             '   print out the submit form
             '
-            If (cpCore.main_GetStreamText2("Button") <> "") Then
+            If (cpCore.doc_getText("Button") <> "") Then
                 '
                 ' Process input
                 '
-                DataSourceID = cpCore.main_GetStreamInteger("DataSourceID")
+                DataSourceID = cpCore.doc_getInteger("DataSourceID")
                 DataSourceName = cpCore.main_GetDataSourceByID(DataSourceID)
-                ContentName = cpCore.main_GetStreamText2("ContentName")
-                TableName = cpCore.main_GetStreamText2("TableName")
+                ContentName = cpCore.doc_getText("ContentName")
+                TableName = cpCore.doc_getText("TableName")
                 '
                 Call Stream.Add(SpanClassAdminSmall)
                 Stream.Add("<P>Creating content [" & ContentName & "] on table [" & TableName & "] on Datasource [" & DataSourceName & "].</P>")
                 If (ContentName <> "") And (TableName <> "") And (DataSourceName <> "") Then
                     Call cpCore.app.db_CreateSQLTable(DataSourceName, TableName)
-                    Call cpCore.main_CreateContentFromSQLTable(DataSourceName, TableName, ContentName)
+                    Call cpCore.db_CreateContentFromSQLTable(DataSourceName, TableName, ContentName)
                     cpCore.app.cache.invalidateAll()
                     cpCore.app.metaData.clear()
                     ContentID = cpCore.main_GetContentID(ContentName)
@@ -1572,14 +1572,14 @@ ErrorTrap:
             '   Load Request
             '--------------------------------------------------------------------------------
             '
-            ToolsAction = cpCore.main_GetStreamInteger("dta")
-            TargetFieldID = cpCore.main_GetStreamInteger("fi")
-            ContentID = cpCore.main_GetStreamInteger(RequestNameToolContentID)
+            ToolsAction = cpCore.doc_getInteger("dta")
+            TargetFieldID = cpCore.doc_getInteger("fi")
+            ContentID = cpCore.doc_getInteger(RequestNameToolContentID)
             'ColumnPointer = cpCore.main_GetStreamInteger("dtcn")
-            FieldNameToAdd = UCase(cpCore.main_GetStreamText2(RequestNameAddField))
-            FieldIDToAdd = cpCore.main_GetStreamInteger(RequestNameAddFieldID)
+            FieldNameToAdd = UCase(cpCore.doc_getText(RequestNameAddField))
+            FieldIDToAdd = cpCore.doc_getInteger(RequestNameAddFieldID)
             ButtonList = ButtonCancel & "," & ButtonSelect
-            ReloadCDef = cpCore.main_GetStreamBoolean("ReloadCDef")
+            ReloadCDef = cpCore.doc_getBoolean("ReloadCDef")
             '
             '--------------------------------------------------------------------------------
             ' Process actions
@@ -1610,7 +1610,7 @@ ErrorTrap:
                                     If cpCore.app.db_csOk(CSSource) Then
                                         CSTarget = cpCore.app.db_csInsertRecord("Content Fields")
                                         If cpCore.app.db_csOk(CSTarget) Then
-                                            Call cpCore.main_CopyCSRecord(CSSource, CSTarget)
+                                            Call cpCore.db_cs_CopyRecord(CSSource, CSTarget)
                                             Call cpCore.app.db_setCS(CSTarget, "ContentID", ContentID)
                                             ReloadCDef = True
                                         End If
@@ -1636,7 +1636,7 @@ ErrorTrap:
                             If cpCore.app.db_csOk(CSSource) Then
                                 CSTarget = cpCore.app.db_csInsertRecord("Content Fields")
                                 If cpCore.app.db_csOk(CSTarget) Then
-                                    Call cpCore.main_CopyCSRecord(CSSource, CSTarget)
+                                    Call cpCore.db_cs_CopyRecord(CSSource, CSTarget)
                                     Call cpCore.app.db_setCS(CSTarget, "ContentID", ContentID)
                                     ReloadCDef = True
                                 End If
@@ -1665,14 +1665,14 @@ ErrorTrap:
                                     For Each keyValuePair In CDef.adminColumns
                                         Dim adminColumn As coreMetaDataClass.CDefAdminColumnClass = keyValuePair.Value
                                         Dim field As coreMetaDataClass.CDefFieldClass = CDef.fields(adminColumn.Name)
-                                        CSPointer = cpCore.main_OpenCSContentRecord("Content Fields", field.id)
+                                        CSPointer = cpCore.db_csOpen("Content Fields", field.id)
                                         Call cpCore.app.db_setCS(CSPointer, "IndexColumn", (columnPtr) * 10)
                                         Call cpCore.app.db_setCS(CSPointer, "IndexWidth", Int((adminColumn.Width * 80) / ColumnWidthTotal))
                                         Call cpCore.app.db_csClose(CSPointer)
                                         columnPtr += 1
                                     Next
                                 End If
-                                CSPointer = cpCore.main_OpenCSContentRecord("Content Fields", FieldIDToAdd, False, False)
+                                CSPointer = cpCore.db_csOpen("Content Fields", FieldIDToAdd, False, False)
                                 If cpCore.app.db_csOk(CSPointer) Then
                                     Call cpCore.app.db_setCS(CSPointer, "IndexColumn", columnPtr * 10)
                                     Call cpCore.app.db_setCS(CSPointer, "IndexWidth", 20)
@@ -1692,7 +1692,7 @@ ErrorTrap:
                                 For Each keyValuePair In CDef.adminColumns
                                     Dim adminColumn As coreMetaDataClass.CDefAdminColumnClass = keyValuePair.Value
                                     Dim field As coreMetaDataClass.CDefFieldClass = CDef.fields(adminColumn.Name)
-                                    CSPointer = cpCore.main_OpenCSContentRecord("Content Fields", field.id)
+                                    CSPointer = cpCore.db_csOpen("Content Fields", field.id)
                                     If fieldId = TargetFieldID Then
                                         Call cpCore.app.db_setCS(CSPointer, "IndexColumn", 0)
                                         Call cpCore.app.db_setCS(CSPointer, "IndexWidth", 0)
@@ -1718,7 +1718,7 @@ ErrorTrap:
                                     Dim adminColumn As coreMetaDataClass.CDefAdminColumnClass = keyValuePair.Value
                                     Dim field As coreMetaDataClass.CDefFieldClass = CDef.fields(adminColumn.Name)
                                     FieldName = adminColumn.Name
-                                    CS1 = cpCore.main_OpenCSContentRecord("Content Fields", field.id)
+                                    CS1 = cpCore.db_csOpen("Content Fields", field.id)
                                     If (CDef.fields(FieldName.ToLower()).id = TargetFieldID) And (columnPtr < CDef.adminColumns.Count) Then
                                         Call cpCore.app.db_setCS(CS1, "IndexColumn", (columnPtr + 1) * 10)
                                         '
@@ -1754,7 +1754,7 @@ ErrorTrap:
                                     Dim adminColumn As coreMetaDataClass.CDefAdminColumnClass = keyValuePair.Value
                                     Dim field As coreMetaDataClass.CDefFieldClass = CDef.fields(adminColumn.Name)
                                     FieldName = adminColumn.Name
-                                    CS1 = cpCore.main_OpenCSContentRecord("Content Fields", field.id)
+                                    CS1 = cpCore.db_csOpen("Content Fields", field.id)
                                     If (field.id = TargetFieldID) And (columnPtr < CDef.adminColumns.Count) Then
                                         Call cpCore.app.db_setCS(CS1, "IndexColumn", (columnPtr - 1) * 10)
                                         '
@@ -1994,7 +1994,7 @@ ErrorTrap:
                                     Caption = Caption & "*"
                                     InheritedFieldCount = InheritedFieldCount + 1
                                 End If
-                                AStart = "<A href=""" & cpCore.main_ServerPage & "?" & RequestNameToolContentID & "=" & ContentID & "&af=" & AdminFormToolConfigureListing & "&fi=" & fieldId & "&dtcn=" & ColumnCount
+                                AStart = "<A href=""" & cpCore.web_requestPage & "?" & RequestNameToolContentID & "=" & ContentID & "&af=" & AdminFormToolConfigureListing & "&fi=" & fieldId & "&dtcn=" & ColumnCount
                                 Call Stream.Add("<td width=""" & ColumnWidth & "%"" valign=""top"" align=""left"">" & SpanClassAdminNormal & Caption & "<br>")
                                 Call Stream.Add("<IMG src=""/ccLib/images/black.GIF"" width=""100%"" height=""1"">")
                                 Call Stream.Add(AStart & "&dta=" & ToolsActionRemoveField & """><IMG src=""/ccLib/images/LibButtonDeleteUp.gif"" width=""50"" height=""15"" border=""0""></A><br>")
@@ -2091,7 +2091,7 @@ ErrorTrap:
                                     '
                                     ' can be used as column header
                                     '
-                                    Stream.Add("<A href=""" & cpCore.main_ServerPage & "?" & RequestNameToolContentID & "=" & ContentID & "&af=" & AdminFormToolConfigureListing & "&fi=" & .id & "&dta=" & ToolsActionAddField & "&" & RequestNameAddFieldID & "=" & .id & """><IMG src=""/ccLib/images/LibButtonAddUp.gif"" width=""50"" height=""15"" border=""0""></A> " & .caption & "<br>")
+                                    Stream.Add("<A href=""" & cpCore.web_requestPage & "?" & RequestNameToolContentID & "=" & ContentID & "&af=" & AdminFormToolConfigureListing & "&fi=" & .id & "&dta=" & ToolsActionAddField & "&" & RequestNameAddFieldID & "=" & .id & """><IMG src=""/ccLib/images/LibButtonAddUp.gif"" width=""50"" height=""15"" border=""0""></A> " & .caption & "<br>")
                                 End If
                             End If
                         End With
@@ -2188,8 +2188,8 @@ ErrorTrap:
             Call Stream.Add(GetTitle("Content Diagnostic", "This tool finds Content and Table problems. To run successfully, the Site Property 'TrapErrors' must be set to true."))
             Call Stream.Add(SpanClassAdminNormal & "<br>")
             '
-            iDiagActionCount = cpCore.main_GetStreamInteger("DiagActionCount")
-            Button = cpCore.main_GetStreamText2("Button")
+            iDiagActionCount = cpCore.doc_getInteger("DiagActionCount")
+            Button = cpCore.doc_getText("Button")
             If (iDiagActionCount <> 0) And ((Button = ButtonFix) Or (Button = ButtonFixAndRun)) Then
                 '
                 '-----------------------------------------------------------------------------------------------
@@ -2198,7 +2198,7 @@ ErrorTrap:
                 '
                 Stream.Add("<br>")
                 For DiagActionPointer = 0 To iDiagActionCount
-                    DiagAction = cpCore.main_GetStreamText2("DiagAction" & DiagActionPointer)
+                    DiagAction = cpCore.doc_getText("DiagAction" & DiagActionPointer)
                     Stream.Add("Perform Action " & DiagActionPointer & " - " & DiagAction & "<br>")
                     Select Case EncodeInteger(DiagArgument(DiagAction, 0))
                         Case DiagActionSetFieldType
@@ -2280,7 +2280,7 @@ ErrorTrap:
                     '
                     Call Stream.Add("Site Property 'TrapErrors' is currently set false. This property must be true to run Content Diagnostics successfully.<br>")
                 Else
-                    Call cpCore.main_SetStreamBuffer(False)
+                    Call cpCore.web_SetStreamBuffer(False)
                     '
                     ' ----- check Content Sources for duplicates
                     '
@@ -2537,7 +2537,7 @@ ErrorTrap:
                     '
                     ' ----- Done with diagnostics
                     '
-                    Stream.Add(cpCore.main_GetFormInputHidden("DiagActionCount", DiagActionCount))
+                    Stream.Add(cpCore.html_GetFormInputHidden("DiagActionCount", DiagActionCount))
                 End If
             End If
             '
@@ -2707,14 +2707,14 @@ ErrorTrap:
             '
             '   print out the submit form
             '
-            If (cpCore.main_GetStreamText2("Button") <> "") Then
+            If (cpCore.doc_getText("Button") <> "") Then
                 '
                 ' Process input
                 '
-                ParentContentID = cpCore.main_GetStreamInteger("ParentContentID")
+                ParentContentID = cpCore.doc_getInteger("ParentContentID")
                 ParentContentName = Local_GetContentNameByID(ParentContentID)
-                ChildContentName = cpCore.main_GetStreamText2("ChildContentName")
-                AddAdminMenuEntry = cpCore.main_GetStreamBoolean("AddAdminMenuEntry")
+                ChildContentName = cpCore.doc_getText("ChildContentName")
+                AddAdminMenuEntry = cpCore.doc_getBoolean("AddAdminMenuEntry")
                 '
                 Call Stream.Add(SpanClassAdminSmall)
                 If (ParentContentName = "") Or (ChildContentName = "") Then
@@ -2724,7 +2724,7 @@ ErrorTrap:
                     ' Create Definition
                     '
                     Stream.Add("<P>Creating content [" & ChildContentName & "] from [" & ParentContentName & "]")
-                    Call cpCore.main_CreateContentChild(ChildContentName, ParentContentName)
+                    Call cpCore.metaData_CreateContentChild(ChildContentName, ParentContentName)
                     '
                     Stream.Add("<br>Reloading Content Definitions...")
                     cpCore.app.cache.invalidateAll()
@@ -2793,7 +2793,7 @@ ErrorTrap:
             Call Stream.Add(SpanClassAdminNormal)
             Stream.Add(GetTitle("Clear ContentWatch Links", "This tools nulls the Links field of all Content Watch records. After running this tool, run the diagnostic spider to repopulate the links."))
             '
-            If (cpCore.main_GetStreamText2("Button") <> "") Then
+            If (cpCore.doc_getText("Button") <> "") Then
                 '
                 ' Process input
                 '
@@ -2838,7 +2838,7 @@ ErrorTrap:
                 '
                 Stream.Add(GetTitle("Synchronize Tables to Content Definitions", "This tools goes through all Content Definitions and creates any necessary Tables and Table Fields to support the Definition."))
                 '
-                If (cpCore.main_GetStreamText2("Button") <> "") Then
+                If (cpCore.doc_getText("Button") <> "") Then
                     '
                     '   Run Tools
                     '
@@ -2901,7 +2901,7 @@ ErrorTrap:
                     If Caption <> "" Then
                         Panel = Panel & "<tr>"
                         Panel = Panel & "<td width=""30"" align=""right"">"
-                        Panel = Panel & cpCore.main_GetFormInputRadioBox("DiagAction" & DiagActionCount, DiagActions(ActionPointer).Command, "")
+                        Panel = Panel & cpCore.html_GetFormInputRadioBox("DiagAction" & DiagActionCount, DiagActions(ActionPointer).Command, "")
                         Panel = Panel & "</td>"
                         Panel = Panel & "<td width=""100%"">" & SpanClassAdminNormal & Caption & "</SPAN></td>"
                         Panel = Panel & "</tr>"
@@ -2956,9 +2956,6 @@ ErrorTrap:
         End Function
         '
         '=============================================================================
-        '   Go through all Content Definitions and create appropriate tables and fields
-        '
-        '
         '=============================================================================
         '
         Private Function GetForm_Benchmark() As String
@@ -2986,7 +2983,7 @@ ErrorTrap:
             '
             Stream.Add(GetTitle("Benchmark", "Run a series of data operations and compare the results to previous known values."))
             '
-            If (cpCore.main_GetStreamText2("Button") <> "") Then
+            If (cpCore.doc_getText("Button") <> "") Then
                 '
                 '   Run Tools
                 '
@@ -2999,15 +2996,15 @@ ErrorTrap:
                 PageNumber = 1
                 SQL = "SELECT * FROM ccSetup WHERE ACTIVE<>0;"
                 '
-                Stream.Add("<br>")
-                Stream.Add("Measure ContentServer communication time by getting contentfieldcount 1000 times<br>")
-                Stream.Add(Now & " count=[" & TestCount & "]x, PageSize=[" & PageSize & "]<br>")
-                For TestPointer = 1 To 1000
-                    TestTicks = GetTickCount
-                    TestCopy = EncodeText(cpCore.main_GetContentFieldCount(1))
-                    OpenTicks = OpenTicks + GetTickCount - TestTicks
-                Next
-                Stream.Add(Now & " Finished<br>")
+                'Stream.Add("<br>")
+                'Stream.Add("Measure ContentServer communication time by getting contentfieldcount 1000 times<br>")
+                'Stream.Add(Now & " count=[" & TestCount & "]x, PageSize=[" & PageSize & "]<br>")
+                'For TestPointer = 1 To 1000
+                '    TestTicks = GetTickCount
+                '    TestCopy = EncodeText(cpCore.db_csGetFieldCount(1))
+                '    OpenTicks = OpenTicks + GetTickCount - TestTicks
+                'Next
+                'Stream.Add(Now & " Finished<br>")
                 Stream.Add("Time to make a ContentServer call = " & Format((OpenTicks / 1000), "00.000") & " msec<br>")
                 '
                 ' ExecuteSQL Test
@@ -3282,7 +3279,7 @@ ErrorTrap:
             Stream.Add(GetTitle("Query Database Schema", "This tool examines the database schema for all tables available."))
             '
             StatusOK = True
-            If (cpCore.main_GetStreamText2("button")) <> ButtonRun Then
+            If (cpCore.doc_getText("button")) <> ButtonRun Then
                 '
                 ' First pass, initialize
                 '
@@ -3293,8 +3290,8 @@ ErrorTrap:
                 '
                 ' Read in arguments
                 '
-                TableName = cpCore.main_GetStreamText2("TableName")
-                DataSourceID = cpCore.main_GetStreamInteger("DataSourceID")
+                TableName = cpCore.doc_getText("TableName")
+                DataSourceID = cpCore.doc_getInteger("DataSourceID")
                 DataSourceName = cpCore.main_GetDataSourceByID(DataSourceID)
                 '
                 ' Run the SQL
@@ -3585,27 +3582,27 @@ ErrorTrap:
             '
             ' Process Input
             '
-            Button = cpCore.main_GetStreamText2("Button")
-            TableID = cpCore.main_GetStreamInteger("TableID")
+            Button = cpCore.doc_getText("Button")
+            TableID = cpCore.doc_getInteger("TableID")
             '
             ' Get Tablename and DataSource
             '
-            CS = cpCore.main_OpenCSContentRecord("Tables", TableID, , , "Name,DataSourceID")
+            CS = cpCore.db_csOpen("Tables", TableID, , , "Name,DataSourceID")
             If cpCore.app.db_csOk(CS) Then
                 TableName = cpCore.main_GetCSText(CS, "name")
                 DataSource = cpCore.main_GetCSLookup(CS, "DataSourceID")
             End If
             Call cpCore.app.db_csClose(CS)
             '
-            If (TableID <> 0) And (TableID = cpCore.main_GetStreamInteger("previoustableid")) And (Button <> "") Then
+            If (TableID <> 0) And (TableID = cpCore.doc_getInteger("previoustableid")) And (Button <> "") Then
                 '
                 ' Drop Indexes
                 '
-                Count = cpCore.main_GetStreamInteger("DropCount")
+                Count = cpCore.doc_getInteger("DropCount")
                 If Count > 0 Then
                     For Pointer = 0 To Count - 1
-                        If cpCore.main_GetStreamBoolean("DropIndex." & Pointer) Then
-                            IndexName = cpCore.main_GetStreamText2("DropIndexName." & Pointer)
+                        If cpCore.doc_getBoolean("DropIndex." & Pointer) Then
+                            IndexName = cpCore.doc_getText("DropIndexName." & Pointer)
                             GetForm_DbIndex = GetForm_DbIndex & "<br>Dropping index [" & IndexName & "] from table [" & TableName & "]"
                             Call cpCore.app.db_deleteSqlIndex("Default", TableName, IndexName)
                         End If
@@ -3614,15 +3611,15 @@ ErrorTrap:
                 '
                 ' Add Indexes
                 '
-                Count = cpCore.main_GetStreamInteger("AddCount")
+                Count = cpCore.doc_getInteger("AddCount")
                 If Count > 0 Then
                     For Pointer = 0 To Count - 1
-                        If cpCore.main_GetStreamBoolean("AddIndex." & Pointer) Then
+                        If cpCore.doc_getBoolean("AddIndex." & Pointer) Then
                             'IndexName = cpCore.main_GetStreamText2("AddIndexFieldName." & Pointer)
-                            FieldName = cpCore.main_GetStreamText2("AddIndexFieldName." & Pointer)
+                            FieldName = cpCore.doc_getText("AddIndexFieldName." & Pointer)
                             IndexName = TableName & FieldName
                             GetForm_DbIndex = GetForm_DbIndex & "<br>Adding index [" & IndexName & "] to table [" & TableName & "] for field [" & FieldName & "]"
-                            Call cpCore.app.csv_CreateSQLIndex(DataSource, TableName, IndexName, FieldName)
+                            Call cpCore.app.db_CreateSQLIndex(DataSource, TableName, IndexName, FieldName)
                         End If
                     Next
                 End If
@@ -3640,7 +3637,7 @@ ErrorTrap:
                 '
                 ' Add/Drop Indexes form
                 '
-                GetForm_DbIndex = GetForm_DbIndex & cpCore.main_GetFormInputHidden("PreviousTableID", TableID)
+                GetForm_DbIndex = GetForm_DbIndex & cpCore.html_GetFormInputHidden("PreviousTableID", TableID)
                 '
                 ' Drop Indexes
                 '
@@ -3663,7 +3660,7 @@ ErrorTrap:
                         If IndexName <> "" Then
                             GetForm_DbIndex = GetForm_DbIndex & StartTableRow()
                             Copy = cpCore.html_GetFormInputCheckBox2("DropIndex." & RowPointer, False) _
-                                    & cpCore.main_GetFormInputHidden("DropIndexName." & RowPointer, IndexName) _
+                                    & cpCore.html_GetFormInputHidden("DropIndexName." & RowPointer, IndexName) _
                                     & EncodeText(IndexName)
                             GetForm_DbIndex = GetForm_DbIndex & GetTableCell(Copy, , , TableRowEven)
                             GetForm_DbIndex = GetForm_DbIndex & GetTableCell(EncodeText(Rows(17, RowPointer)), , , TableRowEven)
@@ -3672,7 +3669,7 @@ ErrorTrap:
                             TableRowEven = Not TableRowEven
                         End If
                     Next
-                    GetForm_DbIndex = GetForm_DbIndex & cpCore.main_GetFormInputHidden("DropCount", RowMax + 1)
+                    GetForm_DbIndex = GetForm_DbIndex & cpCore.html_GetFormInputHidden("DropCount", RowMax + 1)
                 End If
                 '
                 ' Add Indexes
@@ -3694,7 +3691,7 @@ ErrorTrap:
                     For RowPointer = 0 To RowMax
                         GetForm_DbIndex = GetForm_DbIndex & StartTableRow()
                         Copy = cpCore.html_GetFormInputCheckBox2("AddIndex." & RowPointer, False) _
-                                & cpCore.main_GetFormInputHidden("AddIndexFieldName." & RowPointer, Rows(3, RowPointer)) _
+                                & cpCore.html_GetFormInputHidden("AddIndexFieldName." & RowPointer, Rows(3, RowPointer)) _
                                 & EncodeText(Rows(3, RowPointer))
                         GetForm_DbIndex = GetForm_DbIndex & GetTableCell(Copy, , , TableRowEven)
                         GetForm_DbIndex = GetForm_DbIndex & GetTableCell("&nbsp;", , , TableRowEven)
@@ -3702,7 +3699,7 @@ ErrorTrap:
                         GetForm_DbIndex = GetForm_DbIndex & kmaEndTableRow
                         TableRowEven = Not TableRowEven
                     Next
-                    GetForm_DbIndex = GetForm_DbIndex & cpCore.main_GetFormInputHidden("AddCount", RowMax + 1)
+                    GetForm_DbIndex = GetForm_DbIndex & cpCore.html_GetFormInputHidden("AddCount", RowMax + 1)
                 End If
                 '
                 ' Spacers
@@ -3882,7 +3879,7 @@ ErrorTrap:
             '
             ' CurrentPath is what is concatinated on to StartPath to get the current folder, it must start with a slash
             '
-            CurrentPath = cpCore.main_GetStreamText2("SetPath")
+            CurrentPath = cpCore.doc_getText("SetPath")
             If CurrentPath = "" Then
                 CurrentPath = "\"
             ElseIf Left(CurrentPath, 1) <> "\" Then
@@ -3899,13 +3896,13 @@ ErrorTrap:
             End If
             '
             '
-            If cpCore.main_GetStreamText2("SourceFile") <> "" Then
+            If cpCore.doc_getText("SourceFile") <> "" Then
                 '
                 ' Return the content of the file
                 '
 
-                Call cpCore.setResponseContentType("text/text")
-                Call cpCore.writeAltBuffer(cpCore.app.appRootFiles.ReadFile(cpCore.main_GetStreamText2("SourceFile")))
+                Call cpCore.web_setResponseContentType("text/text")
+                Call cpCore.writeAltBuffer(cpCore.app.appRootFiles.ReadFile(cpCore.doc_getText("SourceFile")))
                 Call cpCore.main_CloseStream()
                 'GetForm_LogFiles_Details = cpCore.app.publicFiles.ReadFile(cpCore.main_GetStreamText2("SourceFile"))
             Else
@@ -3916,7 +3913,7 @@ ErrorTrap:
                 If CurrentPath <> ParentPath Then
                     FileSize = ""
                     FileDate = ""
-                    GetForm_LogFiles_Details = GetForm_LogFiles_Details & GetForm_LogFiles_Details_GetRow("<A href=""" & cpCore.main_ServerPage & "?SetPath=" & ParentPath & """>" & FolderOpenImage & "</A>", "<A href=""" & cpCore.main_ServerPage & "?SetPath=" & ParentPath & """>" & ParentPath & "</A>", FileSize, FileDate, RowEven)
+                    GetForm_LogFiles_Details = GetForm_LogFiles_Details & GetForm_LogFiles_Details_GetRow("<A href=""" & cpCore.web_requestPage & "?SetPath=" & ParentPath & """>" & FolderOpenImage & "</A>", "<A href=""" & cpCore.web_requestPage & "?SetPath=" & ParentPath & """>" & ParentPath & "</A>", FileSize, FileDate, RowEven)
                 End If
                 '
                 ' Sub-Folders
@@ -3933,7 +3930,7 @@ ErrorTrap:
                             FolderName = LineSplit(0)
                             FileSize = LineSplit(1)
                             FileDate = LineSplit(2)
-                            GetForm_LogFiles_Details = GetForm_LogFiles_Details & GetForm_LogFiles_Details_GetRow("<A href=""" & cpCore.main_ServerPage & "?SetPath=" & CurrentPath & "\" & FolderName & """>" & FolderClosedImage & "</A>", "<A href=""" & cpCore.main_ServerPage & "?SetPath=" & CurrentPath & "\" & FolderName & """>" & FolderName & "</A>", FileSize, FileDate, RowEven)
+                            GetForm_LogFiles_Details = GetForm_LogFiles_Details & GetForm_LogFiles_Details_GetRow("<A href=""" & cpCore.web_requestPage & "?SetPath=" & CurrentPath & "\" & FolderName & """>" & FolderClosedImage & "</A>", "<A href=""" & cpCore.web_requestPage & "?SetPath=" & CurrentPath & "\" & FolderName & """>" & FolderName & "</A>", FileSize, FileDate, RowEven)
                         End If
                     Next
                 End If
@@ -3956,11 +3953,11 @@ ErrorTrap:
                             FileSize = LineSplit(5)
                             FileDate = LineSplit(3)
                             FileURL = StartPath & CurrentPath & "\" & Filename
-                            QueryString = cpCore.main_RefreshQueryString
+                            QueryString = cpCore.web_RefreshQueryString
                             QueryString = ModifyQueryString(QueryString, RequestNameAdminForm, CStr(AdminFormTool), True)
                             QueryString = ModifyQueryString(QueryString, "at", AdminFormToolLogFileView, True)
                             QueryString = ModifyQueryString(QueryString, "SourceFile", FileURL, True)
-                            CellCopy = "<A href=""" & cpCore.main_ServerPath & "?" & QueryString & """ target=""_blank"">" & Filename & "</A>"
+                            CellCopy = "<A href=""" & cpCore.web_requestPath & "?" & QueryString & """ target=""_blank"">" & Filename & "</A>"
                             GetForm_LogFiles_Details = GetForm_LogFiles_Details & GetForm_LogFiles_Details_GetRow(SpacerImage, CellCopy, FileSize, FileDate, RowEven)
                         End If
                     Next
@@ -4015,7 +4012,7 @@ ErrorTrap:
             ButtonList = ButtonCancel & "," & ButtonSaveandInvalidateCache
             Stream.Add(GetTitle("Load Content Definitions", "This tool reloads the content definitions. This is necessary when changes are made to the ccContent or ccFields tables outside Contensive. The site will be blocked during the load."))
             '
-            If (cpCore.main_GetStreamText2("button")) <> ButtonSaveandInvalidateCache Then
+            If (cpCore.doc_getText("button")) <> ButtonSaveandInvalidateCache Then
                 '
                 ' First pass, initialize
                 '
@@ -4064,7 +4061,7 @@ ErrorTrap:
                 '
                 GetForm_Restart = "<P>You must be an administrator to use this tool.</P>"
                 '
-            ElseIf (cpCore.main_GetStreamText2("button")) <> ButtonRestartContensiveApplication Then
+            ElseIf (cpCore.doc_getText("button")) <> ButtonRestartContensiveApplication Then
                 '
                 ' First pass, initialize
                 '
@@ -4224,14 +4221,14 @@ ErrorTrap:
             Dim AllowImageImport As Boolean
             Dim AllowStyleImport As Boolean
             '
-            AllowBodyHTML = cpCore.main_GetStreamBoolean("AllowBodyHTML")
-            AllowScriptLink = cpCore.main_GetStreamBoolean("AllowScriptLink")
-            AllowImageImport = cpCore.main_GetStreamBoolean("AllowImageImport")
-            AllowStyleImport = cpCore.main_GetStreamBoolean("AllowStyleImport")
+            AllowBodyHTML = cpCore.doc_getBoolean("AllowBodyHTML")
+            AllowScriptLink = cpCore.doc_getBoolean("AllowScriptLink")
+            AllowImageImport = cpCore.doc_getBoolean("AllowImageImport")
+            AllowStyleImport = cpCore.doc_getBoolean("AllowStyleImport")
             '
             Stream.Add(GetTitle("Load Templates", "This tool creates template records from the HTML files in the root folder of the site."))
             '
-            If (cpCore.main_GetStreamText2("button")) <> ButtonImportTemplates Then
+            If (cpCore.doc_getText("button")) <> ButtonImportTemplates Then
                 '
                 ' First pass, initialize
                 '
@@ -4240,7 +4237,7 @@ ErrorTrap:
                 ' Restart
                 '
                 Call Stream.Add("<br>Loading Templates...")
-                Call Stream.Add(ImportTemplates(Replace(cpCore.cluster.config.clusterPhysicalPath & cpCore.app.config.appRootPath & cpCore.app.RootPath, "/", "\"), "", AllowBodyHTML, AllowScriptLink, AllowImageImport, AllowStyleImport))
+                Call Stream.Add(ImportTemplates(Replace(cpCore.cluster.config.clusterPhysicalPath & cpCore.app.config.appRootPath & cpCore.app.RootWebPath, "/", "\"), "", AllowBodyHTML, AllowScriptLink, AllowImageImport, AllowStyleImport))
                 Call Stream.Add("<br>Templates loaded")
             End If
             '
@@ -4660,15 +4657,15 @@ ErrorTrap:
             '
             ' Process the form
             '
-            Button = cpCore.main_GetStreamText2("button")
+            Button = cpCore.doc_getText("button")
             '
             IsDeveloper = cpCore.user_isDeveloper()
             If Button = ButtonFindAndReplace Then
-                RowCnt = cpCore.main_GetStreamInteger("CDefRowCnt")
+                RowCnt = cpCore.doc_getInteger("CDefRowCnt")
                 If RowCnt > 0 Then
                     For RowPtr = 0 To RowCnt - 1
-                        If cpCore.main_GetStreamBoolean("Cdef" & RowPtr) Then
-                            lcName = LCase(cpCore.main_GetStreamText2("CDefName" & RowPtr))
+                        If cpCore.doc_getBoolean("Cdef" & RowPtr) Then
+                            lcName = LCase(cpCore.doc_getText("CDefName" & RowPtr))
                             If IsDeveloper Or (lcName = "page content") Or (lcName = "copy content") Or (lcName = "page templates") Then
                                 CDefList = CDefList & "," & lcName
                             End If
@@ -4678,8 +4675,8 @@ ErrorTrap:
                         CDefList = Mid(CDefList, 2)
                     End If
                     'CDefList = cpCore.main_GetStreamText2("CDefList")
-                    FindText = cpCore.main_GetStreamText2("FindText")
-                    ReplaceText = cpCore.main_GetStreamText2("ReplaceText")
+                    FindText = cpCore.doc_getText("FindText")
+                    ReplaceText = cpCore.doc_getText("ReplaceText")
                     'runAtServer.ipAddress = "127.0.0.1"
                     'runAtServer.port = "4531"
                     QS = "app=" & encodeNvaArgument(cpCore.app.config.name) & "&FindText=" & encodeNvaArgument(FindText) & "&ReplaceText=" & encodeNvaArgument(ReplaceText) & "&CDefNameList=" & encodeNvaArgument(CDefList)
@@ -4704,17 +4701,17 @@ ErrorTrap:
             '
             ' Display form
             '
-            FindRows = cpCore.main_GetStreamInteger("SQLRows")
+            FindRows = cpCore.doc_getInteger("SQLRows")
             If FindRows = 0 Then
-                FindRows = cpCore.userProperty_getInteger("FindAndReplaceFindRows", 1)
+                FindRows = cpCore.properties_user_getInteger("FindAndReplaceFindRows", 1)
             Else
-                Call cpCore.main_SetMemberProperty("FindAndReplaceFindRows", CStr(FindRows))
+                Call cpCore.properties_SetMemberProperty2("FindAndReplaceFindRows", CStr(FindRows))
             End If
-            ReplaceRows = cpCore.main_GetStreamInteger("ReplaceRows")
+            ReplaceRows = cpCore.doc_getInteger("ReplaceRows")
             If ReplaceRows = 0 Then
-                ReplaceRows = cpCore.userProperty_getInteger("FindAndReplaceReplaceRows", 1)
+                ReplaceRows = cpCore.properties_user_getInteger("FindAndReplaceReplaceRows", 1)
             Else
-                Call cpCore.main_SetMemberProperty("FindAndReplaceReplaceRows", CStr(ReplaceRows))
+                Call cpCore.properties_SetMemberProperty2("FindAndReplaceReplaceRows", CStr(ReplaceRows))
             End If
             '
             Call Stream.Add("<div>Find</div>")
@@ -4734,16 +4731,16 @@ ErrorTrap:
                 If IsDeveloper Or (lcName = "page content") Or (lcName = "copy content") Or (lcName = "page templates") Then
                     RecordID = cpCore.app.db_GetCSInteger(CS, "ID")
                     If InStr(1, "," & CDefList & ",", "," & RecordName & ",") <> 0 Then
-                        TopHalf = TopHalf & "<div>" & cpCore.html_GetFormInputCheckBox2("Cdef" & RowPtr, True) & cpCore.main_GetFormInputHidden("CDefName" & RowPtr, RecordName) & "&nbsp;" & cpCore.main_GetCSText(CS, "Name") & "</div>"
+                        TopHalf = TopHalf & "<div>" & cpCore.html_GetFormInputCheckBox2("Cdef" & RowPtr, True) & cpCore.html_GetFormInputHidden("CDefName" & RowPtr, RecordName) & "&nbsp;" & cpCore.main_GetCSText(CS, "Name") & "</div>"
                     Else
-                        BottomHalf = BottomHalf & "<div>" & cpCore.html_GetFormInputCheckBox2("Cdef" & RowPtr, False) & cpCore.main_GetFormInputHidden("CDefName" & RowPtr, RecordName) & "&nbsp;" & cpCore.main_GetCSText(CS, "Name") & "</div>"
+                        BottomHalf = BottomHalf & "<div>" & cpCore.html_GetFormInputCheckBox2("Cdef" & RowPtr, False) & cpCore.html_GetFormInputHidden("CDefName" & RowPtr, RecordName) & "&nbsp;" & cpCore.main_GetCSText(CS, "Name") & "</div>"
                     End If
                 End If
                 Call cpCore.app.db_csGoNext(CS)
                 RowPtr = RowPtr + 1
             Loop
             Call cpCore.app.db_csClose(CS)
-            Stream.Add(TopHalf & BottomHalf & cpCore.main_GetFormInputHidden("CDefRowCnt", RowPtr))
+            Stream.Add(TopHalf & BottomHalf & cpCore.html_GetFormInputHidden("CDefRowCnt", RowPtr))
             '
             GetForm_FindAndReplace = OpenFormTable(ButtonCancel & "," & ButtonFindAndReplace) & Stream.Text & CloseFormTable(ButtonCancel & "," & ButtonFindAndReplace)
             Exit Function
@@ -4771,7 +4768,7 @@ ErrorTrap:
             '
             ' Process the form
             '
-            Button = cpCore.main_GetStreamText2("button")
+            Button = cpCore.doc_getText("button")
             '
             If Button = ButtonIISReset Then
                 '
@@ -4823,7 +4820,7 @@ ErrorTrap:
             '
             ' Process the form
             '
-            Button = cpCore.main_GetStreamText2("button")
+            Button = cpCore.doc_getText("button")
             '
             'If Button = ButtonCreateGUID Then
             'GUIDGenerator = New guidClass

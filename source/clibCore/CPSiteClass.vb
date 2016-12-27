@@ -114,7 +114,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property MultiDomainMode() As Boolean 'Inherits BaseClasses.CPSiteBaseClass.MultiDomainMode
             Get
                 MultiDomainMode = False
-                If InStr(1, "," & cpCore.domainList & ",", ",*,", vbTextCompare) <> 0 Then
+                If InStr(1, "," & cpCore.app_domainList & ",", ",*,", vbTextCompare) <> 0 Then
                     MultiDomainMode = True
                 End If
             End Get
@@ -163,7 +163,7 @@ Namespace Contensive.Core
                 If False Then
                     Return ""
                 Else
-                    Return cpCore.main_ServerAppPath
+                    Return cpCore.web_requestAppPath
                 End If
             End Get
         End Property
@@ -175,7 +175,7 @@ Namespace Contensive.Core
                 If False Then
                     Return "/"
                 Else
-                    Return cpCore.app.RootPath
+                    Return cpCore.app.RootWebPath
                 End If
             End Get
         End Property
@@ -191,7 +191,7 @@ Namespace Contensive.Core
                 'CP.File.AppendVirtual("cpDebug.log", "test 1")
                 If False Then
                     'CP.File.AppendVirtual("cpDebug.log", "test 2")
-                    DomainList = cpCore.domainList
+                    DomainList = cpCore.app_domainList
                     If DomainList <> "" Then
                         Domains = DomainList.Split(",")
                         DomainPrimary = Domains(0)
@@ -220,7 +220,7 @@ Namespace Contensive.Core
         '
         Public Overrides ReadOnly Property DomainList() As String 'Inherits BaseClasses.CPSiteBaseClass.DomainList
             Get
-                Return cpCore.domainList
+                Return cpCore.app_domainList
             End Get
         End Property
         '
@@ -267,7 +267,7 @@ Namespace Contensive.Core
         End Function
 
         Public Overrides Sub LogActivity(ByVal Message As String, ByVal UserID As Integer, ByVal OrganizationID As Integer) 'Inherits BaseClasses.CPSiteBaseClass.LogActivity
-            Call cpCore.csv_LogActivity2(Message, 0, UserID, OrganizationID)
+            Call cpCore.logActivity(Message, 0, UserID, OrganizationID)
         End Sub
         '
         ' Report an alarm
@@ -310,7 +310,7 @@ Namespace Contensive.Core
 
         Public Overrides Sub RequestTask(ByVal Command As String, ByVal SQL As String, ByVal ExportName As String, ByVal Filename As String) 'Inherits BaseClasses.CPSiteBaseClass.RequestTask
             If False Then
-                Call cpCore.csv_RequestTask(Command, SQL, ExportName, Filename, 0)
+                Call cpCore.tasks_RequestTask(Command, SQL, ExportName, Filename, 0)
             Else
                 Call cpCore.main_RequestTask(Command, SQL, ExportName, Filename)
             End If
@@ -333,7 +333,7 @@ Namespace Contensive.Core
         '
         '
         Public Overrides Sub addLinkAlias(ByVal linkAlias As String, ByVal pageId As Integer, Optional ByVal queryStringSuffix As String = "")
-            Call cpCore.csv_addLinkAlias(linkAlias, pageId, queryStringSuffix)
+            Call cpCore.app_addLinkAlias(linkAlias, pageId, queryStringSuffix)
         End Sub
         '
         '

@@ -47,7 +47,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property fromAddressDefault() As String
             Get
                 If True Then
-                    Return cpCore.main_IsMember
+                    Return cpCore.user_IsMember
                 Else
                     Return False
                 End If
@@ -65,7 +65,7 @@ Namespace Contensive.Core
         ''' <param name="BodyIsHTML"></param>
         Public Overrides Sub Send(ByVal ToAddress As String, ByVal FromAddress As String, ByVal Subject As String, ByVal Body As String, Optional ByVal SendImmediately As Boolean = True, Optional ByVal BodyIsHTML As Boolean = True)
             Try
-                Call cpCore.sendEmail3(ToAddress, FromAddress, Subject, Body, "", "", "", SendImmediately, BodyIsHTML, 0)
+                Call cpCore.email_send3(ToAddress, FromAddress, Subject, Body, "", "", "", SendImmediately, BodyIsHTML, 0)
             Catch ex As Exception
                 cpCore.handleException(ex)
             End Try
@@ -104,7 +104,7 @@ Namespace Contensive.Core
 
         Public Overrides Sub SendPassword(ByVal UserEmailAddress As String) 'Inherits BaseClasses.CPEmailBaseClass.SendPassword
             If True Then
-                Call cpCore.main_SendMemberPassword(UserEmailAddress)
+                Call cpCore.security_SendMemberPassword(UserEmailAddress)
             End If
         End Sub
 

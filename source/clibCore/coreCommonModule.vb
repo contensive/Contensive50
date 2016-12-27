@@ -1340,7 +1340,7 @@ Namespace Contensive.Core
         '
         Public Function ModifyQueryString(ByVal WorkingQuery As String, ByVal QueryName As String, ByVal QueryValue As String, Optional ByVal AddIfMissing As Boolean = True) As String
             '
-            If InStr(1, WorkingQuery, "?") >= 0 Then
+            If WorkingQuery.IndexOf("?") >= 0 Then
                 ModifyQueryString = modifyLinkQuery(WorkingQuery, QueryName, QueryValue, AddIfMissing)
             Else
                 ModifyQueryString = Mid(modifyLinkQuery("?" & WorkingQuery, QueryName, QueryValue, AddIfMissing), 2)
@@ -1356,79 +1356,88 @@ Namespace Contensive.Core
         End Function
         '
         '=============================================================================
-        '   Modify a querystring name/value pair in a Link
-        '=============================================================================
-        '
+        ''' <summary>
+        ''' Modify the querystring at the end of a link. If there is no, question mark, the link argument is assumed to be a link, not the querysting
+        ''' </summary>
+        ''' <param name="Link"></param>
+        ''' <param name="QueryName"></param>
+        ''' <param name="QueryValue"></param>
+        ''' <param name="AddIfMissing"></param>
+        ''' <returns></returns>
         Public Function modifyLinkQuery(ByVal Link As String, ByVal QueryName As String, ByVal QueryValue As String, Optional ByVal AddIfMissing As Boolean = True) As String
-            '
-            Dim Element() As String
-            Dim ElementCount As Integer
-            Dim ElementPointer As Integer
-            Dim NameValue() As String
-            Dim UcaseQueryName As String
-            Dim ElementFound As Boolean
-            Dim iAddIfMissing As Boolean
-            Dim QueryString As String
-            '
-            iAddIfMissing = AddIfMissing
-            If InStr(1, Link, "?") <> 0 Then
-                modifyLinkQuery = Mid(Link, 1, InStr(1, Link, "?") - 1)
-                QueryString = Mid(Link, Len(modifyLinkQuery) + 2)
-            Else
-                modifyLinkQuery = Link
-                QueryString = ""
-            End If
-            UcaseQueryName = UCase(EncodeRequestVariable(QueryName))
-            If QueryString <> "" Then
-                Element = Split(QueryString, "&")
-                ElementCount = UBound(Element) + 1
-                For ElementPointer = 0 To ElementCount - 1
-                    NameValue = Split(Element(ElementPointer), "=")
-                    If UBound(NameValue) = 1 Then
-                        If UCase(NameValue(0)) = UcaseQueryName Then
-                            If QueryValue = "" Then
-                                Element(ElementPointer) = ""
-                            Else
-                                Element(ElementPointer) = QueryName & "=" & QueryValue
+            Try
+                Dim Element() As String = {}
+                Dim ElementCount As Integer
+                Dim ElementPointer As Integer
+                Dim NameValue() As String
+                Dim UcaseQueryName As String
+                Dim ElementFound As Boolean
+                Dim iAddIfMissing As Boolean
+                Dim QueryString As String
+                '
+                iAddIfMissing = AddIfMissing
+                If InStr(1, Link, "?") <> 0 Then
+                    modifyLinkQuery = Mid(Link, 1, InStr(1, Link, "?") - 1)
+                    QueryString = Mid(Link, Len(modifyLinkQuery) + 2)
+                Else
+                    modifyLinkQuery = Link
+                    QueryString = ""
+                End If
+                UcaseQueryName = UCase(EncodeRequestVariable(QueryName))
+                If QueryString <> "" Then
+                    Element = Split(QueryString, "&")
+                    ElementCount = UBound(Element) + 1
+                    For ElementPointer = 0 To ElementCount - 1
+                        NameValue = Split(Element(ElementPointer), "=")
+                        If UBound(NameValue) = 1 Then
+                            If UCase(NameValue(0)) = UcaseQueryName Then
+                                If QueryValue = "" Then
+                                    Element(ElementPointer) = ""
+                                Else
+                                    Element(ElementPointer) = QueryName & "=" & QueryValue
+                                End If
+                                ElementFound = True
+                                Exit For
                             End If
-                            ElementFound = True
-                            Exit For
+                        End If
+                    Next
+                End If
+                If Not ElementFound And (QueryValue <> "") Then
+                    '
+                    ' element not found, it needs to be added
+                    '
+                    If iAddIfMissing Then
+                        If QueryString = "" Then
+                            QueryString = EncodeRequestVariable(QueryName) & "=" & EncodeRequestVariable(QueryValue)
+                        Else
+                            QueryString = QueryString & "&" & EncodeRequestVariable(QueryName) & "=" & EncodeRequestVariable(QueryValue)
                         End If
                     End If
-                Next
-            End If
-            If Not ElementFound And (QueryValue <> "") Then
-                '
-                ' element not found, it needs to be added
-                '
-                If iAddIfMissing Then
-                    If QueryString = "" Then
-                        QueryString = EncodeRequestVariable(QueryName) & "=" & EncodeRequestVariable(QueryValue)
-                    Else
-                        QueryString = QueryString & "&" & EncodeRequestVariable(QueryName) & "=" & EncodeRequestVariable(QueryValue)
+                Else
+                    '
+                    ' element found
+                    '
+                    QueryString = Join(Element, "&")
+                    If (QueryString <> "") And (QueryValue = "") Then
+                        '
+                        ' element found and needs to be removed
+                        '
+                        QueryString = Replace(QueryString, "&&", "&")
+                        If Left(QueryString, 1) = "&" Then
+                            QueryString = Mid(QueryString, 2)
+                        End If
+                        If Right(QueryString, 1) = "&" Then
+                            QueryString = Mid(QueryString, 1, Len(QueryString) - 1)
+                        End If
                     End If
                 End If
-            Else
-                '
-                ' element found
-                '
-                QueryString = Join(Element, "&")
-                If (QueryString <> "") And (QueryValue = "") Then
-                    '
-                    ' element found and needs to be removed
-                    '
-                    QueryString = Replace(QueryString, "&&", "&")
-                    If Left(QueryString, 1) = "&" Then
-                        QueryString = Mid(QueryString, 2)
-                    End If
-                    If Right(QueryString, 1) = "&" Then
-                        QueryString = Mid(QueryString, 1, Len(QueryString) - 1)
-                    End If
+                If (QueryString <> "") Then
+                    modifyLinkQuery = modifyLinkQuery & "?" & QueryString
                 End If
-            End If
-            If (QueryString <> "") Then
-                modifyLinkQuery = modifyLinkQuery & "?" & QueryString
-            End If
+            Catch ex As Exception
+                Throw New ApplicationException("Exception in modifyLinkQuery", ex)
+            End Try
+            '
         End Function
         '    '
         '    '=================================================================================
@@ -5674,15 +5683,15 @@ ErrorTrap:
         '   in preperation for use on an HTML page
         '========================================================================
         '
-        Public Function EncodeHTML(ByVal Source As String) As String
+        Public Function html_EncodeHTML(ByVal Source As String) As String
             ' ##### removed to catch err<>0 problem on error resume next
             '
-            EncodeHTML = Source
-            EncodeHTML = Replace(EncodeHTML, "&", "&amp;")
-            EncodeHTML = Replace(EncodeHTML, "<", "&lt;")
-            EncodeHTML = Replace(EncodeHTML, ">", "&gt;")
-            EncodeHTML = Replace(EncodeHTML, """", "&quot;")
-            EncodeHTML = Replace(EncodeHTML, "'", "&apos;")
+            html_EncodeHTML = Source
+            html_EncodeHTML = Replace(html_EncodeHTML, "&", "&amp;")
+            html_EncodeHTML = Replace(html_EncodeHTML, "<", "&lt;")
+            html_EncodeHTML = Replace(html_EncodeHTML, ">", "&gt;")
+            html_EncodeHTML = Replace(html_EncodeHTML, """", "&quot;")
+            html_EncodeHTML = Replace(html_EncodeHTML, "'", "&apos;")
             '
         End Function
         ''
@@ -7380,6 +7389,28 @@ ErrorTrap:
             ' assert
             Assert.Equal(dateToSeconds(New Date(1900, 1, 1)), 0)
             Assert.Equal(dateToSeconds(New Date(1900, 1, 2)), 86400)
+        End Sub
+        '
+        <Fact> Public Sub ModifyQueryString_unit()
+            ' arrange
+            ' act
+            ' assert
+            Assert.Equal("", ModifyQueryString("", "a", "1", False))
+            Assert.Equal("a=1", ModifyQueryString("", "a", "1", True))
+            Assert.Equal("a=1", ModifyQueryString("a=0", "a", "1", False))
+            Assert.Equal("a=1", ModifyQueryString("a=0", "a", "1", True))
+            Assert.Equal("a=1&b=2", ModifyQueryString("a=1", "b", "2", True))
+        End Sub
+        '
+        <Fact> Public Sub ModifyLinkQuery_unit()
+            ' arrange
+            ' act
+            ' assert
+            Assert.Equal("index.html", modifyLinkQuery("index.html", "a", "1", False))
+            Assert.Equal("index.html?a=1", modifyLinkQuery("index.html", "a", "1", True))
+            Assert.Equal("index.html?a=1", modifyLinkQuery("index.html?a=0", "a", "1", False))
+            Assert.Equal("index.html?a=1", modifyLinkQuery("index.html?a=0", "a", "1", True))
+            Assert.Equal("index.html?a=1&b=2", modifyLinkQuery("index.html?a=1", "b", "2", True))
         End Sub
 
     End Class

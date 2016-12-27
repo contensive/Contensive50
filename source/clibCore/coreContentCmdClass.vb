@@ -626,7 +626,7 @@ Namespace Contensive.Core
                                     End Select
                                 Next
                                 If ArgName <> "" Then
-                                    CmdAccumulator = cpCore.main_GetContentCopy(ArgName, "copy content")
+                                    CmdAccumulator = cpCore.html_GetContentCopy(ArgName, "copy content", cpCore.userId, True, cpCore.user_isAuthenticated)
                                 End If
                             Case "opencopy"
                                 '
@@ -646,12 +646,7 @@ Namespace Contensive.Core
                                     End Select
                                 Next
                                 If ArgName <> "" Then
-                                    CmdAccumulator = cpCore.main_GetContentCopy(ArgName, "copy content")
-                                    'Dim dt As DataTable = cpCore.app.executeSql("select copy from ccCopyContent where name=" & EncodeSQLText(ArgName))
-                                    'If Not (dt Is Nothing) Then
-                                    '    CmdAccumulator = EncodeText(dt.Rows(0).Item("copy"))
-                                    'End If
-                                    'dt.Dispose()
+                                    CmdAccumulator = cpCore.html_GetContentCopy(ArgName, "copy content", cpCore.userId, True, cpCore.user_isAuthenticated)
                                 End If
                             Case "openlayout"
                                 '
@@ -721,7 +716,7 @@ Namespace Contensive.Core
                                         importHead = GetTagInnerHTML(CmdAccumulator, "head", False)
                                         If importHead <> "" Then
                                             ' try this, but it may not be implemented yet
-                                            Call cpCore.csv_addHeadTags(importHead)
+                                            Call cpCore.html_addHeadTags(importHead)
                                         End If
                                         CmdAccumulator = GetTagInnerHTML(CmdAccumulator, "body", False)
                                     End If

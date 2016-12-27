@@ -7,7 +7,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{F043CBB8-A557-4592-8946-0DC05CDB86CD}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>integrationTestsVb</RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <AssemblyName>integrationTestsVb</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>

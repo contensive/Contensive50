@@ -50,65 +50,45 @@ Namespace Contensive.Core
             Call cpCore.app.db_DeleteContentRecords(ContentName, SQLCriteria)
         End Sub
         '
-        '
+        '====================================================================================================
         '
         Public Overrides Function GetCopy(ByVal CopyName As String, Optional ByVal DefaultContent As String = "") As String
-            Return GetCopy(CopyName, DefaultContent, 0)
+            GetCopy = cpCore.html_GetContentCopy(CopyName, DefaultContent, cpCore.userId, True, cpCore.user_isAuthenticated)
         End Function
         '
         '
         '
         Public Overrides Function GetCopy(ByVal CopyName As String, ByVal DefaultContent As String, ByVal personalizationPeopleId As Integer) As String
-            If True Then
-                GetCopy = cpCore.main_GetContentCopy2(CopyName, "Copy Content", DefaultContent)
-            Else
-                GetCopy = cpCore.csv_GetContentCopy(CopyName, "Copy Content", DefaultContent, personalizationPeopleId)
-            End If
+            GetCopy = cpCore.html_GetContentCopy(CopyName, DefaultContent, personalizationPeopleId, True, cpCore.user_isAuthenticated)
         End Function
 
         Public Overrides Sub SetCopy(ByVal CopyName As String, ByVal Content As String)
-            '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            If True Then
-                Call cpCore.main_SetContentCopy(CopyName, Content)
-            End If
+            Call cpCore.content_SetContentCopy(CopyName, Content)
         End Sub
 
 
         Public Overrides Function GetAddLink(ByVal ContentName As String, ByVal PresetNameValueList As String, ByVal AllowPaste As Boolean, ByVal IsEditing As Boolean) As String
-            '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            If True Then
-                Return cpCore.main_GetRecordAddLink2(ContentName, PresetNameValueList, AllowPaste, IsEditing)
-            Else
-                Return ""
-            End If
+            Return cpCore.main_GetRecordAddLink2(ContentName, PresetNameValueList, AllowPaste, IsEditing)
         End Function
 
         Public Overrides Function GetContentControlCriteria(ByVal ContentName As String) As String
-            Return cpCore.csv_GetContentControlCriteria(ContentName)
+            Return cpCore.db_GetContentControlCriteria(ContentName)
         End Function
 
         Public Overrides Function GetFieldProperty(ByVal ContentName As String, ByVal FieldName As String, ByVal PropertyName As String) As String
-            If True Then
-                Return cpCore.main_GetContentFieldProperty(ContentName, FieldName, PropertyName)
-            Else
-                Return ""
-            End If
+            Return cpCore.db_GetContentFieldProperty(ContentName, FieldName, PropertyName)
         End Function
 
         Public Overrides Function GetID(ByVal ContentName As String) As Integer
-            Return cpCore.csv_GetContentID(ContentName)
+            Return cpCore.metaData_GetContentID(ContentName)
         End Function
 
         Public Overrides Function GetProperty(ByVal ContentName As String, ByVal PropertyName As String) As String
-            If True Then
-                Return cpCore.main_GetContentProperty(ContentName, PropertyName)
-            Else
-                Return ""
-            End If
+            Return cpCore.db_GetContentProperty(ContentName, PropertyName)
         End Function
 
         Public Overrides Function GetDataSource(ByVal ContentName As String) As String
-            Return cpCore.db_GetContentDataSource(ContentName)
+            Return cpCore.metaData_GetContentDataSource(ContentName)
         End Function
 
         Public Overrides Function GetEditLink(ByVal ContentName As String, ByVal RecordID As String, ByVal AllowCut As Boolean, ByVal RecordName As String, ByVal IsEditing As Boolean) As String
@@ -134,57 +114,25 @@ Namespace Contensive.Core
                 Return ""
             End If
         End Function
-
-
-
+        '
         Public Overrides Function GetRecordID(ByVal ContentName As String, ByVal RecordName As String) As Integer
-            Dim expression As Integer
-
-            GetRecordID = 0
-            Try
-                expression = cpCore.csv_GetRecordID(ContentName, RecordName)
-                If IsNumeric(expression) Then
-                    GetRecordID = CInt(expression)
-                Else
-                    GetRecordID = 0
-                End If
-            Catch ex As Exception
-                GetRecordID = 0
-            End Try
-
-
+            Return cpCore.db_GetRecordID(ContentName, RecordName)
         End Function
-
+        '
         Public Overrides Function GetRecordName(ByVal ContentName As String, ByVal RecordID As Integer) As String
-            Dim Expression As String
-            GetRecordName = ""
-            Try
-                Expression = cpCore.csv_GetRecordName(ContentName, RecordID)
-                If (Expression Is Nothing) Then
-                    GetRecordName = ""
-                Else
-                    GetRecordName = CStr(Expression)
-                End If
-            Catch
-                GetRecordName = ""
-            End Try
-
+            Return cpCore.db_GetRecordName(ContentName, RecordID)
         End Function
 
         Public Overrides Function GetTable(ByVal ContentName As String) As String
-            Return cpCore.csv_GetContentTablename(ContentName)
+            Return cpCore.metaData_GetContentTablename2(ContentName)
         End Function
 
         Public Overrides Function GetTemplateLink(ByVal TemplateID As Integer) As String
-            If True Then
-                Return cpCore.main_GetTemplateLink(TemplateID)
-            Else
-                Return ""
-            End If
+            Return cpCore.main_GetTemplateLink(TemplateID)
         End Function
 
         Public Overrides Function IsField(ByVal ContentName As String, ByVal FieldName As String) As Boolean
-            Return cpCore.csv_IsContentFieldSupported(ContentName, FieldName)
+            Return cpCore.metaData_IsContentFieldSupported(ContentName, FieldName)
         End Function
 
         Public Overrides Function IsLocked(ByVal ContentName As String, ByVal RecordID As String) As Boolean 'Inherits CPContentBaseClass.IsLocked
@@ -194,31 +142,29 @@ Namespace Contensive.Core
         Public Overrides Function IsChildContent(ByVal ChildContentID As String, ByVal ParentContentID As String) As Boolean 'Inherits CPContentBaseClass.IsChildContent
             Return cpCore.app.metaData.isWithinContent(ChildContentID, ParentContentID)
         End Function
-
-        Public Overrides Function IsWorkflow(ByVal ContentName As String) As Boolean 'Inherits CPContentBaseClass.IsWorkflow
+        '
+        Public Overrides Function IsWorkflow(ByVal ContentName As String) As Boolean
             ' ****************************************************
             ' this needs to be added to cmc
             ' ****************************************************
             Return False
         End Function
-
+        '
         Public Overrides Sub PublishEdit(ByVal ContentName As String, ByVal RecordID As Integer) 'Inherits CPContentBaseClass.PublishEdit
             Call cpCore.app.csv_PublishEdit(ContentName, RecordID, 0)
         End Sub
-
+        '
         Public Overrides Sub SubmitEdit(ByVal ContentName As String, ByVal RecordID As Integer) 'Inherits CPContentBaseClass.SubmitEdit
             Call cpCore.app.csv_PublishEdit(ContentName, RecordID, 0)
         End Sub
-
+        '
         Public Overrides Sub AbortEdit(ByVal ContentName As String, ByVal RecordId As Integer) 'Inherits CPContentBaseClass.AbortEdit
             Call cpCore.app.csv_AbortEdit(ContentName, RecordId, 0)
         End Sub
-
+        '
         Public Overrides Sub ApproveEdit(ByVal ContentName As String, ByVal RecordId As Integer) 'Inherits CPContentBaseClass.ApproveEdit
             Call cpCore.app.csv_ApproveEdit(ContentName, RecordId, 0)
         End Sub
-        '
-        '
         '
         Public Overrides Function getLayout(ByVal layoutName As String) As String
             Dim result As String = ""
@@ -226,7 +172,7 @@ Namespace Contensive.Core
                 Dim cs As CPCSClass
                 '
                 cs = New CPCSClass(cp)
-                cs.Open("layouts", "name=" & cp.Db.EncodeSQLText(layoutName))
+                cs.Open("layouts", "name=" & cp.Db.EncodeSQLText(layoutName), "id",, "layout")
                 If cs.OK Then
                     result = cs.GetText("layout")
                 End If
@@ -236,8 +182,6 @@ Namespace Contensive.Core
             End Try
             Return result
         End Function
-        '
-        '
         '
         Public Overrides Function AddRecord(ContentName As Object) As Integer
             Dim recordId As Integer = 0
@@ -252,8 +196,6 @@ Namespace Contensive.Core
             End Try
             Return recordId
         End Function
-        '
-        '
         '
         Public Overrides Function GetListLink(ContentName As String) As String
             Dim returnHtml As String = ""
@@ -278,26 +220,11 @@ Namespace Contensive.Core
             End Try
             Return returnHtml
         End Function
-        'Public Overrides Function GetFormInput(ByVal ContentName As String, ByVal FieldName As String, Optional ByVal Height As String = "", Optional ByVal Width As String = "", Optional ByVal HtmlId As String = "") As Object
-        '    'Dim result As String = ""
-        '    ''
-        '    'Try
-        '    ' If false Then
-        '    ' Call cp.core.handleException("cs.GetFormInput does not support non-web calls.")
-        '    ' Else
-        '    ' result = cmc.main_GetFormInputCS(CSPointer, ContentName, FieldName, Height, Width, HtmlId)
-        '    ' End If
-        '    ' Catch ex As Exception
-        '    ' Call cp.core.handleException(ex, "Unexpected error in cs.GetFormInput")
-        '    ' End Try
-        '    Return ""
-        'End Function
         '
         ' append to logfile
         '
         Private Sub appendDebugLog(ByVal copy As String)
             'My.Computer.FileSystem.WriteAllText("c:\clibCpDebug.log", Now & " - cp.content, " & copy & vbCrLf, True)
-            ' 'My.Computer.FileSystem.WriteAllText(System.AppDocmc.main_CurrentDocmc.main_BaseDirectory() & "cpLog.txt", Now & " - " & copy & vbCrLf, True)
         End Sub
         '
         ' testpoint

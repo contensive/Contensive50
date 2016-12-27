@@ -273,7 +273,7 @@ Namespace Contensive
             Try
                 Dim LcaseCommand As String
                 Dim sql As String
-                Dim cmdDetailJson As String = cpSiteCore.jsonSerialize(cmdDetail)
+                Dim cmdDetailJson As String = cpSiteCore.common_jsonSerialize(cmdDetail)
                 Dim cs As Integer
                 '
                 appendLog(cpSiteCore, "taskScheduler.addTaskToQueue, application=[" & cpSiteCore.app.config.name & "], command=[" & Command & "], cmdDetail=[" & cmdDetailJson & "]")

@@ -126,7 +126,7 @@ Namespace Contensive.Core
 
                 DbUpToDate = (dataBuildVersion = coreVersion)
                 '
-                Button = cpCore.main_GetStreamText2(RequestNameButton)
+                Button = cpCore.doc_getText(RequestNameButton)
                 AllowInstallFromFolder = False
                 If True Then
                     GuidFieldName = "ccguid"
@@ -137,7 +137,7 @@ Namespace Contensive.Core
                     '
                     ' ----- redirect back to the root
                     '
-                    Call cpCore.main_Redirect2(cpCore.app.siteProperty_AdminURL, "Addon Manager, Cancel Button Pressed", False)
+                    Call cpCore.web_Redirect2(cpCore.app.siteProperty_AdminURL, "Addon Manager, Cancel Button Pressed", False)
                 Else
                     If Not cpCore.user_isAdmin Then
                         '
@@ -156,10 +156,10 @@ Namespace Contensive.Core
                             ' Download and install Collections from the Collection Library
                             '---------------------------------------------------------------------------------------------
                             '
-                            If cpCore.main_GetStreamText2("LibraryRow") <> "" Then
-                                Ptr = cpCore.main_GetStreamInteger2("LibraryRow")
+                            If cpCore.doc_getText("LibraryRow") <> "" Then
+                                Ptr = cpCore.web_GetStreamInteger2("LibraryRow")
                                 'If cpcore.main_GetStreamBoolean2("LibraryRow" & Ptr) Then
-                                CollectionGuid = cpCore.main_GetStreamText2("LibraryRowguid" & Ptr)
+                                CollectionGuid = cpCore.doc_getText("LibraryRowguid" & Ptr)
                                 InstallLibCollectionList = InstallLibCollectionList & "," & CollectionGuid
                             End If
 
@@ -179,11 +179,11 @@ Namespace Contensive.Core
                             '   Before deleting each addon, make sure it is not in another collection
                             '---------------------------------------------------------------------------------------------
                             '
-                            Cnt = cpCore.main_GetStreamInteger2("accnt")
+                            Cnt = cpCore.web_GetStreamInteger2("accnt")
                             If Cnt > 0 Then
                                 For Ptr = 0 To Cnt - 1
                                     If cpCore.main_GetStreamBoolean2("ac" & Ptr) Then
-                                        TargetCollectionID = cpCore.main_GetStreamInteger("acID" & Ptr)
+                                        TargetCollectionID = cpCore.doc_getInteger("acID" & Ptr)
                                         TargetCollectionName = cpCore.main_GetRecordName("Add-on Collections", TargetCollectionID)
                                         '
                                         ' Delete any addons from this collection
@@ -446,11 +446,11 @@ Namespace Contensive.Core
                             ' Delete Add-ons
                             '---------------------------------------------------------------------------------------------
                             '
-                            Cnt = cpCore.main_GetStreamInteger2("aocnt")
+                            Cnt = cpCore.web_GetStreamInteger2("aocnt")
                             If Cnt > 0 Then
                                 For Ptr = 0 To Cnt - 1
                                     If cpCore.main_GetStreamBoolean2("ao" & Ptr) Then
-                                        Call cpCore.main_DeleteContentRecord("Add-ons", cpCore.main_GetStreamInteger2("aoID" & Ptr))
+                                        Call cpCore.main_DeleteContentRecord("Add-ons", cpCore.web_GetStreamInteger2("aoID" & Ptr))
                                     End If
                                 Next
                             End If
@@ -459,7 +459,7 @@ Namespace Contensive.Core
                             ' Reinstall core collection
                             '---------------------------------------------------------------------------------------------
                             '
-                            If cpCore.user_isDeveloper() And cpCore.main_GetStreamBoolean("InstallCore") Then
+                            If cpCore.user_isDeveloper() And cpCore.doc_getBoolean("InstallCore") Then
                                 UpgradeOK = addonInstall.installCollectionFromRemoteRepo("{8DAABAE6-8E45-4CEE-A42C-B02D180E799B}", cpCore.app.config.name, IISResetRequired, RegisterList, ErrorMessage, "", False)
                             End If
                             '
@@ -467,7 +467,7 @@ Namespace Contensive.Core
                             ' Upload new collection files
                             '---------------------------------------------------------------------------------------------
                             '
-                            CollectionFilePathPage = cpCore.main_ProcessFormInputFile("MetaFile", cpCore.app.privateFiles, InstallFolder)
+                            CollectionFilePathPage = cpCore.web_ProcessFormInputFile2("MetaFile", cpCore.app.privateFiles, InstallFolder)
                             '
                             ' Process the MetaFile
                             '
@@ -477,10 +477,10 @@ Namespace Contensive.Core
                                 '
                                 cpCore.appendLog("app [" & cpCore.app.config.name & "], Uploading new collection file, member=[#" & cpCore.userId & ", " & cpCore.userName & "], CollectionFilename [" & CollectionFilename & "]")
                                 '
-                                UploadsCnt = cpCore.main_GetStreamInteger2("UploadCount")
+                                UploadsCnt = cpCore.web_GetStreamInteger2("UploadCount")
                                 ReDim Uploads(UploadsCnt)
                                 For Ptr = 0 To UploadsCnt - 1
-                                    UploadPathPage = cpCore.main_ProcessFormInputFile("Upload" & Ptr, cpCore.app.privateFiles, InstallFolder)
+                                    UploadPathPage = cpCore.web_ProcessFormInputFile2("Upload" & Ptr, cpCore.app.privateFiles, InstallFolder)
                                     If UploadPathPage <> "" Then
                                         Uploads(Ptr) = Mid(Replace(UploadPathPage, InstallFolder, ""), 2)
                                         Call HandleClassAppendLog("AddonManager", " app=" & cpCore.app.config.name & ", Member=" & cpCore.userName & " (" & cpCore.userId & "), Uploads=" & Uploads(Ptr))
@@ -508,7 +508,7 @@ Namespace Contensive.Core
                                     ' block the reset because we will loose the error message
                                     '
                                     IISResetRequired = False
-                                    cpCore.main_AddUserError("This Add-on Collection did not install correctly, " & ErrorMessage)
+                                    cpCore.error_AddUserError("This Add-on Collection did not install correctly, " & ErrorMessage)
                                 Else
                                     '
                                     ' Save the first collection as the installed collection
@@ -530,9 +530,9 @@ Namespace Contensive.Core
                                 UpgradeOK = addonInstall.InstallCollectionFromPrivateFolder(builder, cpCore.app.dataBuildVersion, privateFilesInstallPath, IISResetRequired, cpCore.app.config.name, ErrorMessage, InstalledCollectionGuid, False)
                                 If Not UpgradeOK Then
                                     If ErrorMessage = "" Then
-                                        cpCore.main_AddUserError("The Add-on Collection did not install correctly, but no detailed error message was given.")
+                                        cpCore.error_AddUserError("The Add-on Collection did not install correctly, but no detailed error message was given.")
                                     Else
-                                        cpCore.main_AddUserError("The Add-on Collection did not install correctly, " & ErrorMessage)
+                                        cpCore.error_AddUserError("The Add-on Collection did not install correctly, " & ErrorMessage)
                                     End If
                                 End If
                             End If
@@ -570,7 +570,7 @@ Namespace Contensive.Core
                         '   IISReset if required
                         ' --------------------------------------------------------------------------------
                         '
-                        If IISResetRequired And (Not cpCore.main_IsUserError) Then
+                        If IISResetRequired And (Not cpCore.error_IsUserError) Then
                             '
                             ' not sure here. If addons all are dotnet, they should all reload themselves.
                             '
@@ -583,8 +583,8 @@ Namespace Contensive.Core
                         '   Forward to help page
                         ' --------------------------------------------------------------------------------
                         '
-                        If (InstalledCollectionID <> 0) And (Not cpCore.main_IsUserError) Then
-                            Call cpCore.main_Redirect2(cpCore.app.siteProperty_AdminURL & "?helpcollectionid=" & InstalledCollectionID, "Redirecting to help page after collection installation", False)
+                        If (InstalledCollectionID <> 0) And (Not cpCore.error_IsUserError) Then
+                            Call cpCore.web_Redirect2(cpCore.app.siteProperty_AdminURL & "?helpcollectionid=" & InstalledCollectionID, "Redirecting to help page after collection installation", False)
                         End If
                         '
                         ' --------------------------------------------------------------------------------
@@ -648,7 +648,7 @@ Namespace Contensive.Core
                                     UserError = "There was an error reading the Collection Library. The site may be unavailable."
                                     Call HandleClassAppendLog("AddonManager", UserError)
                                     status = status & "<br>" & UserError
-                                    cpCore.main_AddUserError(UserError)
+                                    cpCore.error_AddUserError(UserError)
                                     parseError = True
                                 End Try
                                 Ptr = 0
@@ -657,7 +657,7 @@ Namespace Contensive.Core
                                         UserError = "There was an error reading the Collection Library file. The '" & CollectionListRootNode & "' element was not found."
                                         Call HandleClassAppendLog("AddonManager", UserError)
                                         status = status & "<br>" & UserError
-                                        cpCore.main_AddUserError(UserError)
+                                        cpCore.error_AddUserError(UserError)
                                     Else
                                         '
                                         ' Go through file to validate the XML, and build status message -- since service process can not communicate to user
@@ -759,7 +759,7 @@ Namespace Contensive.Core
                                                                 '
                                                                 ' Not installed yet
                                                                 '
-                                                                Cells3(RowPtr, 0) = "<input TYPE=""CheckBox"" NAME=""LibraryRow"" VALUE=""" & RowPtr & """ onClick=""clearLibraryRows('" & RowPtr & "');"">" & cpCore.main_GetFormInputHidden("LibraryRowGuid" & RowPtr, CollectionGuid) & cpCore.main_GetFormInputHidden("LibraryRowName" & RowPtr, Collectionname)
+                                                                Cells3(RowPtr, 0) = "<input TYPE=""CheckBox"" NAME=""LibraryRow"" VALUE=""" & RowPtr & """ onClick=""clearLibraryRows('" & RowPtr & "');"">" & cpCore.html_GetFormInputHidden("LibraryRowGuid" & RowPtr, CollectionGuid) & cpCore.html_GetFormInputHidden("LibraryRowName" & RowPtr, Collectionname)
                                                                 'Cells3(RowPtr, 0) = cpcore.main_GetFormInputCheckBox2("LibraryRow" & RowPtr) & cpcore.main_GetFormInputHidden("LibraryRowGuid" & RowPtr, CollectionGUID) & cpcore.main_GetFormInputHidden("LibraryRowName" & RowPtr, CollectionName)
                                                                 Cells3(RowPtr, 1) = Collectionname & "&nbsp;"
                                                                 Cells3(RowPtr, 2) = CollectionLastChangeDate & "&nbsp;"
@@ -786,7 +786,7 @@ Namespace Contensive.Core
                                         & "<div style=""width:100%"">" & Adminui.GetReport2(RowPtr, ColCaption, ColAlign, ColWidth, Cells3, RowPtr, 1, "", PostTableCopy, RowPtr, "ccAdmin", ColSortable, 0) & "</div>" _
                                         & ""
                                     BodyHTML = Adminui.GetEditPanel(True, "Add-on Collection Library", "Select an Add-on to install from the Contensive Add-on Library. Please select only one at a time. Click OK to install the selected Add-on. The site may need to be stopped during the installation, but will be available again in approximately one minute.", BodyHTML)
-                                    BodyHTML = BodyHTML & cpCore.main_GetFormInputHidden("AOCnt", RowPtr)
+                                    BodyHTML = BodyHTML & cpCore.html_GetFormInputHidden("AOCnt", RowPtr)
                                     Call cpCore.main_AddLiveTabEntry("<nobr>Collection&nbsp;Library</nobr>", BodyHTML, "ccAdminTab")
                                 End If
                                 '
@@ -842,7 +842,7 @@ Namespace Contensive.Core
                                 ReDim Preserve Cells(cpCore.app.csv_GetCSRowCount(CS), ColumnCnt)
                                 RowPtr = 0
                                 Do While cpCore.app.db_csOk(CS)
-                                    Cells(RowPtr, 0) = cpCore.html_GetFormInputCheckBox2("AC" & RowPtr) & cpCore.main_GetFormInputHidden("ACID" & RowPtr, cpCore.app.db_GetCSInteger(CS, "ID"))
+                                    Cells(RowPtr, 0) = cpCore.html_GetFormInputCheckBox2("AC" & RowPtr) & cpCore.html_GetFormInputHidden("ACID" & RowPtr, cpCore.app.db_GetCSInteger(CS, "ID"))
                                     'Cells(RowPtr, 1) = "<a href=""" & cpcore.app.SiteProperty_AdminURL & "?id=" & cpcore.app.db_GetCSInteger(CS, "ID") & "&cid=" & cpcore.app.db_GetCSInteger(CS, "ContentControlID") & "&af=4""><img src=""/ccLib/images/IconContentEdit.gif"" border=0></a>"
                                     Cells(RowPtr, 1) = cpCore.main_GetCSText(CS, "name")
                                     If DisplaySystem Then
@@ -856,7 +856,7 @@ Namespace Contensive.Core
                                 Call cpCore.app.db_csClose(CS)
                                 BodyHTML = "<div style=""width:100%"">" & Adminui.GetReport2(RowPtr, ColCaption, ColAlign, ColWidth, Cells, RowPtr, 1, "", PostTableCopy, RowPtr, "ccAdmin", ColSortable, 0) & "</div>"
                                 BodyHTML = Adminui.GetEditPanel(True, "Add-on Collections", "Use this form to review and delete current add-on collections.", BodyHTML)
-                                BodyHTML = BodyHTML & cpCore.main_GetFormInputHidden("accnt", RowPtr)
+                                BodyHTML = BodyHTML & cpCore.html_GetFormInputHidden("accnt", RowPtr)
                                 Call cpCore.main_AddLiveTabEntry("Installed&nbsp;Collections", BodyHTML, "ccAdminTab")
                                 '
                                 ' --------------------------------------------------------------------------------
@@ -871,14 +871,14 @@ Namespace Contensive.Core
                                     If cpCore.user_isDeveloper Then
                                         Call Body.Add(Adminui.GetEditRow(cpCore.html_GetFormInputCheckBox2("InstallCore"), "Reinstall Core Collection", "", False, False, ""))
                                     End If
-                                    Call Body.Add(Adminui.GetEditRow(cpCore.main_GetFormInputFile("MetaFile"), "Add-on Collection File(s)", "", True, False, ""))
+                                    Call Body.Add(Adminui.GetEditRow(cpCore.html_GetFormInputFile("MetaFile"), "Add-on Collection File(s)", "", True, False, ""))
                                     FormInput = "" _
                                         & "<table id=""UploadInsert"" border=""0"" cellpadding=""0"" cellspacing=""1"" width=""100%"">" _
                                         & "</table>" _
                                         & "<table border=""0"" cellpadding=""0"" cellspacing=""1"" width=""100%"">" _
                                         & "<tr><td align=""left""><a href=""#"" onClick=""InsertUpload(); return false;"">+ Add more files</a></td></tr>" _
                                         & "</table>" _
-                                        & cpCore.main_GetFormInputHidden("UploadCount", 1, "UploadCount") _
+                                        & cpCore.html_GetFormInputHidden("UploadCount", 1, "UploadCount") _
                                         & ""
                                     Call Body.Add(Adminui.GetEditRow(FormInput, "&nbsp;", "", True, False, ""))
                                     Call Body.Add(Adminui.EditTableClose)
@@ -892,7 +892,7 @@ Namespace Contensive.Core
                                 Content.Add(cpCore.main_GetLiveTabs())
                                 '
                                 ButtonList = ButtonCancel & "," & ButtonOK
-                                Content.Add(cpCore.main_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormLegacyAddonManager))
+                                Content.Add(cpCore.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormLegacyAddonManager))
                             End If
                         End If
                     End If
