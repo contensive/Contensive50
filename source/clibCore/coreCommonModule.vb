@@ -4023,7 +4023,7 @@ Namespace Contensive.Core
         '        Case FieldTypeIdDate
         '            EncodeSQL = app.db_EncodeSQLDate(expression)
         '        Case FieldTypeIdLongText, FieldTypeIdHTML
-        '            EncodeSQL = app.db_EncodeSQLLongText(expression)
+        '            EncodeSQL = app.db_EncodeSQLText(expression)
         '        Case FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdRedirect, FieldTypeIdManyToMany, FieldTypeIdText, FieldTypeIdFileTextPrivate, FieldTypeIdFileJavascript, FieldTypeIdFileXML, FieldTypeIdFileCSS, FieldTypeIdFileHTMLPrivate
         '            EncodeSQL = app.db_EncodeSQLText(expression)
         '        Case Else
@@ -6499,9 +6499,9 @@ ErrorTrap:
             EncodeDate = Date.MinValue
             If IsDate(Expression) Then
                 EncodeDate = CDate(Expression)
-                If EncodeDate < #1/1/1990# Then
-                    EncodeDate = Date.MinValue
-                End If
+                'If EncodeDate < #1/1/1990# Then
+                '    EncodeDate = Date.MinValue
+                'End If
             End If
         End Function
         '
@@ -6687,7 +6687,7 @@ ErrorTrap:
         '        '   encodeSQLLongText
         '        '========================================================================
         '        '
-        '        Public Function app.db_EncodeSQLLongText(ByVal expression As Object) As String
+        '        Public Function app.db_EncodeSQLText(ByVal expression As Object) As String
         '            Dim returnString As String = ""
         '            If expression Is Nothing Then
         '                returnString = "null"

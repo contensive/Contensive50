@@ -77,7 +77,7 @@ Namespace Contensive.Core
                 If True Then
                     localId = cpCore.userId
                     If (localId = 0) Then
-                        localId = cpCore.app.metaData_InsertContentRecordGetID("people", 0)
+                        localId = cpCore.db.metaData_InsertContentRecordGetID("people", 0)
                         Call cpCore.useer_RecognizeMemberByID(localId)
                     End If
                 End If
@@ -185,7 +185,7 @@ Namespace Contensive.Core
                     result = IsInGroupList(groupId.ToString, userId)
                 End If
             Catch ex As Exception
-                Call cp.core.handleException(ex, "Unexpected error in cs.user.IsInGroup")
+                Call cp.core.handleExceptionAndRethrow(ex, "Unexpected error in cs.user.IsInGroup")
                 result = False
             End Try
             Return result
@@ -202,7 +202,7 @@ Namespace Contensive.Core
                 End If
                 result = cpCore.user_isMemberOfGroupIdList2(userId, IsAuthenticated(), GroupIDList, False)
             Catch ex As Exception
-                Call cp.core.handleException(ex, "Unexpected error in cs.user.IsInGroupList")
+                Call cp.core.handleExceptionAndRethrow(ex, "Unexpected error in cs.user.IsInGroupList")
                 result = False
             End Try
             Return result

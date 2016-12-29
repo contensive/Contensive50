@@ -55,7 +55,7 @@ Namespace Contensive.Core
             Try
                 Call cpCore.group_add2(GroupNameOrGuid, groupCaption)
             Catch ex As Exception
-                cp.core.handleException(ex, "Unexpected error in cp.group.add()")
+                cp.core.handleExceptionAndRethrow(ex, "Unexpected error in cp.group.add()")
             End Try
         End Sub
         '
@@ -65,7 +65,7 @@ Namespace Contensive.Core
             Try
                 Call cpCore.group_AddUser(GroupNameIdOrGuid, UserId, DateExpires)
             Catch ex As Exception
-                cp.core.handleException(ex)
+                cp.core.handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '
@@ -75,7 +75,7 @@ Namespace Contensive.Core
             Try
                 cpCore.group_delete(GroupNameIdOrGuid)
             Catch ex As Exception
-                cp.core.handleException(ex)
+                cp.core.handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '
@@ -99,7 +99,7 @@ Namespace Contensive.Core
                 If IsNumeric(GroupNameIdOrGuid) Then
                     returnText = cpCore.db_GetRecordName("groups", EncodeInteger(GroupNameIdOrGuid))
                 Else
-                    Dim sqlCriteria As String = cpCore.app.db_getNameIdOrGuidSqlCriteria(GroupNameIdOrGuid)
+                    Dim sqlCriteria As String = cpCore.db.db_getNameIdOrGuidSqlCriteria(GroupNameIdOrGuid)
                     Dim cs As CPCSClass = cp.CSNew()
                     If cs.Open("groups", sqlCriteria, , , "name") Then
                         returnText = cs.GetText("name")
@@ -123,7 +123,7 @@ Namespace Contensive.Core
                 If userId = 0 Then
                     userId = cp.User.Id
                 End If
-                Call cp.Content.Delete("Member Rules", "((memberid=" & removeUserId.ToString & ")and(groupid=" & GroupID.ToString & "))")
+                Call cp.Content.DeleteRecords("Member Rules", "((memberid=" & removeUserId.ToString & ")and(groupid=" & GroupID.ToString & "))")
             End If
         End Sub
         '

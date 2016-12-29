@@ -172,9 +172,9 @@ Namespace Contensive.Core
             Dim RowBuffer As String = ""
             Dim appName As String
             '
-            appName = cpCore.app.config.name
-            CS = cpCore.app.db_openCsSql_rev(DataSource, SQL)
-            If cpCore.app.db_csOk(CS) Then
+            appName = cpCore.db.config.name
+            CS = cpCore.db.db_openCsSql_rev(DataSource, SQL)
+            If cpCore.db.db_csOk(CS) Then
                 '
                 ' ----- print out the field names
                 '
@@ -182,7 +182,7 @@ Namespace Contensive.Core
                 FieldNameCnt = 0
                 FieldNameSize = 100
                 ReDim FieldNames(FieldNameSize)
-                FieldName = cpCore.app.db_GetCSFirstFieldName(CS)
+                FieldName = cpCore.db.db_GetCSFirstFieldName(CS)
                 Do While (FieldName <> "")
                     If FieldNameCnt > FieldNameSize Then
                         FieldNameSize = FieldNameSize + 10
@@ -190,21 +190,21 @@ Namespace Contensive.Core
                     End If
                     FieldNames(FieldNameCnt) = FieldName
                     RowBuffer = RowBuffer & ",""" & FieldName & """"
-                    FieldName = cpCore.app.csv_GetCSNextFieldName(CS)
+                    FieldName = cpCore.db.db_GetCSNextFieldName(CS)
                     FieldNameCnt = FieldNameCnt + 1
                     'DoEvents()
                 Loop
                 ReDim Preserve FieldNames(FieldNameCnt - 1)
                 If RowBuffer <> "" Then
-                    Call cpCore.app.cdnFiles.appendFile(Filename, Mid(RowBuffer, 2) & vbCrLf)
+                    Call cpCore.db.cdnFiles.appendFile(Filename, Mid(RowBuffer, 2) & vbCrLf)
                     '
                     ' ----- print out the values
                     '
-                    Do While cpCore.app.db_csOk(CS)
+                    Do While cpCore.db.db_csOk(CS)
                         Delimiter = ""
                         RowBuffer = ""
                         For FieldNamePtr = 0 To FieldNameCnt - 1
-                            Copy = cpCore.app.db_GetCS(CS, FieldNames(FieldNamePtr))
+                            Copy = cpCore.db.db_GetCS(CS, FieldNames(FieldNamePtr))
                             Copy = Replace(Copy, """", """""")
                             ' if propertly quoted, line breaks can be preserved
                             'Copy = Replace(Copy, vbCrLf, " ")
@@ -213,14 +213,14 @@ Namespace Contensive.Core
                             RowBuffer = RowBuffer & ",""" & Copy & """"
                             'DoEvents()
                         Next
-                        Call cpCore.app.cdnFiles.appendFile(Filename, Mid(RowBuffer, 2) & vbCrLf)
-                        Call cpCore.app.db_csGoNext(CS)
+                        Call cpCore.db.cdnFiles.appendFile(Filename, Mid(RowBuffer, 2) & vbCrLf)
+                        Call cpCore.db.db_csGoNext(CS)
                         'DoEvents()
                     Loop
                 End If
             End If
             '
-            Call cpCore.app.db_csClose(CS)
+            Call cpCore.db.db_csClose(CS)
             '
             Exit Function
 ErrorTrap:
@@ -249,40 +249,40 @@ ErrorTrap:
             Dim RowBuffer As String
             Dim appName As String
             '
-            appName = cpCore.app.config.name
-            CS = cpCore.app.db_openCsSql_rev(DataSource, SQL)
-            If cpCore.app.db_csOk(CS) Then
+            appName = cpCore.db.config.name
+            CS = cpCore.db.db_openCsSql_rev(DataSource, SQL)
+            If cpCore.db.db_csOk(CS) Then
                 '
                 ' ----- setup the field names
                 '
                 FieldNameCnt = 0
                 FieldNameSize = 100
                 ReDim FieldNames(FieldNameSize)
-                FieldName = cpCore.app.db_GetCSFirstFieldName(CS)
+                FieldName = cpCore.db.db_GetCSFirstFieldName(CS)
                 Do While (FieldName <> "")
                     If FieldNameCnt > FieldNameSize Then
                         FieldNameSize = FieldNameSize + 10
                         ReDim Preserve FieldNames(FieldNameSize)
                     End If
                     FieldNames(FieldNameCnt) = FieldName
-                    FieldName = cpCore.app.csv_GetCSNextFieldName(CS)
+                    FieldName = cpCore.db.db_GetCSNextFieldName(CS)
                     FieldNameCnt = FieldNameCnt + 1
                     'DoEvents()
                 Loop
                 FieldNameCnt = FieldNameCnt - 1
                 ReDim Preserve FieldNames(FieldNameCnt)
                 If FieldNameCnt > 0 Then
-                    Call cpCore.app.cdnFiles.appendFile(Filename, "<Content>" & vbCrLf)
+                    Call cpCore.db.cdnFiles.appendFile(Filename, "<Content>" & vbCrLf)
                     '
                     ' ----- print out the values
                     '
-                    Do While cpCore.app.db_csOk(CS)
+                    Do While cpCore.db.db_csOk(CS)
                         Delimiter = ""
                         RowBuffer = "<Record>"
                         For FieldNamePtr = 0 To FieldNameCnt - 1
                             FieldName = FieldNames(FieldNamePtr)
                             If FieldName <> "" Then
-                                Copy = cpCore.app.db_GetCS(CS, FieldNames(FieldNamePtr))
+                                Copy = cpCore.db.db_GetCS(CS, FieldNames(FieldNamePtr))
                                 Copy = html_EncodeHTML(Copy)
                                 If Copy = "" Then
                                     RowBuffer = RowBuffer & "<" & FieldName & " />"
@@ -293,15 +293,15 @@ ErrorTrap:
                             'DoEvents()
                         Next
                         RowBuffer = RowBuffer & "</Record>"
-                        Call cpCore.app.cdnFiles.appendFile(Filename, RowBuffer & vbCrLf)
-                        Call cpCore.app.db_csGoNext(CS)
+                        Call cpCore.db.cdnFiles.appendFile(Filename, RowBuffer & vbCrLf)
+                        Call cpCore.db.db_csGoNext(CS)
                         'DoEvents()
                     Loop
-                    Call cpCore.app.cdnFiles.appendFile(Filename, "</Content>" & vbCrLf)
+                    Call cpCore.db.cdnFiles.appendFile(Filename, "</Content>" & vbCrLf)
                 End If
             End If
             '
-            Call cpCore.app.db_csClose(CS)
+            Call cpCore.db.db_csClose(CS)
             'FS = Nothing
             '
             Exit Function

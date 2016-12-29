@@ -371,12 +371,11 @@ Namespace Contensive.Core
             MyBase.New()
             Me.cpCore = cpCore
             '
-            '
+            ' reset metaData
             '
             cdefList = New Dictionary(Of Integer, CDefClass)
             cdefNameIdXref = Nothing
-            '
-            'loadMetaCache()
+            tableSchemaList = Nothing
         End Sub
         '
         '====================================================================================================
@@ -395,7 +394,7 @@ Namespace Contensive.Core
                     returnId = cdefNameIdXref(contentName.ToLower)
                 End If
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return returnId
         End Function
@@ -415,7 +414,7 @@ Namespace Contensive.Core
                     returnCdef = getCdef(ContentId)
                 End If
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return returnCdef
         End Function
@@ -431,13 +430,13 @@ Namespace Contensive.Core
                 '
                 ' load xref from cache
                 '
-                cdefNameIdXref = DirectCast(cpCore.app.cache.GetObject(Of Dictionary(Of String, Integer))("cdefNameIdXref"), Dictionary(Of String, Integer))
+                cdefNameIdXref = DirectCast(cpCore.cache.GetObject(Of Dictionary(Of String, Integer))("cdefNameIdXref"), Dictionary(Of String, Integer))
                 If (cdefNameIdXref Is Nothing) OrElse (cdefNameIdXref.Count = 0) Then
                     '
                     ' load xref from Db
                     '
                     cdefNameIdXref = New Dictionary(Of String, Integer)
-                    dt = cpCore.app.executeSql("select id,name from ccContent where (active<>0)")
+                    dt = cpCore.db.executeSql("select id,name from ccContent where (active<>0)")
                     If dt.Rows.Count > 0 Then
                         For Each row As DataRow In dt.Rows
                             recordName = EncodeText(row.Item("name")).ToLower
@@ -447,10 +446,10 @@ Namespace Contensive.Core
                         Next
                     End If
                     dt.Dispose()
-                    Call cpCore.app.cache.SetKey("cdefNameIdXref", cdefNameIdXref)
+                    Call cpCore.cache.SetKey("cdefNameIdXref", cdefNameIdXref, "content")
                 End If
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '
@@ -501,7 +500,7 @@ Namespace Contensive.Core
                     '
                     '
                     If (Not forceDbLoad) Then
-                        returnCdef = DirectCast(cpCore.app.cache.GetObject(Of CDefClass)("cdefId" & contentId.ToString), CDefClass)
+                        returnCdef = DirectCast(cpCore.cache.GetObject(Of CDefClass)("cdefId" & contentId.ToString), CDefClass)
                     End If
                     If returnCdef Is Nothing Then
                         '
@@ -539,7 +538,7 @@ Namespace Contensive.Core
                                 & " left join ccGroups ON c.EditorGroupID = ccGroups.ID" _
                                 & " where (c.Active<>0)" _
                                 & " and(c.id=" & contentId.ToString & ")"
-                        dt = cpCore.app.executeSql(sql)
+                        dt = cpCore.db.executeSql(sql)
                         If dt.Rows.Count = 0 Then
                             '
                             ' cdef not found
@@ -609,7 +608,7 @@ Namespace Contensive.Core
                                 ' append child cdef
                                 '
                                 sql = "select id from cccontent where parentid=" & .Id
-                                dt = cpCore.app.executeSql(sql)
+                                dt = cpCore.db.executeSql(sql)
                                 If dt.Rows.Count = 0 Then
                                     For Each parentrow As DataRow In dt.Rows
                                         .childIdList.Add(EncodeInteger(parentrow.Item(0)))
@@ -685,7 +684,7 @@ Namespace Contensive.Core
                                     & " order by" _
                                     & " f.ContentID,f.EditTab,f.EditSortPriority" _
                                     & ""
-                                dt = cpCore.app.executeSql(sql)
+                                dt = cpCore.db.executeSql(sql)
                                 If dt.Rows.Count = 0 Then
                                     '
                                 Else
@@ -801,31 +800,31 @@ Namespace Contensive.Core
                                                 End If
                                                 .HelpChanged = False
                                                 If .lookupContentID > 0 Then
-                                                    dt = cpCore.app.executeSql("select name from cccontent where id=" & .lookupContentID)
+                                                    dt = cpCore.db.executeSql("select name from cccontent where id=" & .lookupContentID)
                                                     If dt.Rows.Count > 0 Then
                                                         .lookupContentName = EncodeText(dt.Rows(0).Item(0))
                                                     End If
                                                 End If
                                                 If .manyToManyContentID > 0 Then
-                                                    dt = cpCore.app.executeSql("select name from cccontent where id=" & .manyToManyContentID)
+                                                    dt = cpCore.db.executeSql("select name from cccontent where id=" & .manyToManyContentID)
                                                     If dt.Rows.Count > 0 Then
                                                         .ManyToManyContentName = EncodeText(dt.Rows(0).Item(0))
                                                     End If
                                                 End If
                                                 If .manyToManyRuleContentID > 0 Then
-                                                    dt = cpCore.app.executeSql("select name from cccontent where id=" & .manyToManyRuleContentID)
+                                                    dt = cpCore.db.executeSql("select name from cccontent where id=" & .manyToManyRuleContentID)
                                                     If dt.Rows.Count > 0 Then
                                                         .ManyToManyRuleContentName = EncodeText(dt.Rows(0).Item(0))
                                                     End If
                                                 End If
                                                 If .MemberSelectGroupID > 0 Then
-                                                    dt = cpCore.app.executeSql("select name from ccgroups where id=" & .MemberSelectGroupID)
+                                                    dt = cpCore.db.executeSql("select name from ccgroups where id=" & .MemberSelectGroupID)
                                                     If dt.Rows.Count > 0 Then
                                                         .MemberSelectGroupName = EncodeText(dt.Rows(0).Item(0))
                                                     End If
                                                 End If
                                                 If .RedirectContentID > 0 Then
-                                                    dt = cpCore.app.executeSql("select name from cccontent where id=" & .RedirectContentID)
+                                                    dt = cpCore.db.executeSql("select name from cccontent where id=" & .RedirectContentID)
                                                     If dt.Rows.Count > 0 Then
                                                         .RedirectContentName = EncodeText(dt.Rows(0).Item(0))
                                                     End If
@@ -864,12 +863,12 @@ Namespace Contensive.Core
                             End With
                             getCdef_SetAdminColumns(returnCdef)
                         End If
-                        Call cpCore.app.cache.SetKey("cdefId" & contentId.ToString, returnCdef, "content,content fields")
+                        Call cpCore.cache.SetKey("cdefId" & contentId.ToString, returnCdef, "content,content fields")
                     End If
                     cdefList.Add(contentId, returnCdef)
                 End If
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return returnCdef
         End Function
@@ -957,7 +956,7 @@ Namespace Contensive.Core
                     If Not parentIdList.Contains(contentId) Then
                         parentIdList.Add(contentId)
                         returnCriteria = "((" & contentTableName & ".contentcontrolId=" & contentId & ")"
-                        dt = cpCore.app.executeSql("select id from cccontent where parentid=" & contentId, contentDAtaSourceName)
+                        dt = cpCore.db.executeSql("select id from cccontent where parentid=" & contentId, contentDAtaSourceName)
                         For Each datarow As DataRow In dt.Rows
                             childContentId = EncodeInteger(datarow.Item(0))
                             returnCriteria &= "OR" & getContentControlCriteria(childContentId, contentTableName, contentDAtaSourceName, parentIdList)
@@ -968,7 +967,7 @@ Namespace Contensive.Core
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return returnCriteria
         End Function
@@ -1578,7 +1577,7 @@ Namespace Contensive.Core
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return returnOK
         End Function
@@ -1705,7 +1704,7 @@ Namespace Contensive.Core
                     End If
                 End With
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
         ''
@@ -1883,22 +1882,22 @@ Namespace Contensive.Core
                 Dim dt As DataTable
                 Dim ptr As Integer = 0
                 '
-                dt = cpCore.app.executeSql("select id,name,typeId,address,username,password,ConnString from ccDataSources")
+                dt = cpCore.db.executeSql("select id,name,typeId,address,username,password,ConnString from ccDataSources")
                 If dt.Rows.Count > 0 Then
-                    ReDim cpCore.app.dataSources(cpCore.app.dataSources.Length - 1)
+                    ReDim cpCore.db.db_dataSources(cpCore.db.db_dataSources.Length - 1)
                     For Each row As DataRow In dt.Rows
-                        cpCore.app.dataSources(ptr).Id = EncodeInteger(row(0))
-                        cpCore.app.dataSources(ptr).NameLower = EncodeText(row(1)).ToLower
-                        cpCore.app.dataSources(ptr).dataSourceType = DirectCast(EncodeInteger(row(2)), dataSourceTypeEnum)
-                        cpCore.app.dataSources(ptr).endPoint = EncodeText(row(3))
-                        cpCore.app.dataSources(ptr).username = EncodeText(row(4))
-                        cpCore.app.dataSources(ptr).password = EncodeText(row(5))
-                        cpCore.app.dataSources(ptr).odbcConnectionString = EncodeText(row(6))
+                        cpCore.db.db_dataSources(ptr).Id = EncodeInteger(row(0))
+                        cpCore.db.db_dataSources(ptr).NameLower = EncodeText(row(1)).ToLower
+                        cpCore.db.db_dataSources(ptr).dataSourceType = DirectCast(EncodeInteger(row(2)), dataSourceTypeEnum)
+                        cpCore.db.db_dataSources(ptr).endPoint = EncodeText(row(3))
+                        cpCore.db.db_dataSources(ptr).username = EncodeText(row(4))
+                        cpCore.db.db_dataSources(ptr).password = EncodeText(row(5))
+                        cpCore.db.db_dataSources(ptr).odbcConnectionString = EncodeText(row(6))
                         ptr += 1
                     Next
                 End If
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '
@@ -1973,16 +1972,16 @@ Namespace Contensive.Core
                 ' Database needs to be updated - Until this upgrade, Request Follow Allow
                 ' After upgrade, Allow Follows Request
                 '
-                Call cpCore.app.siteProperty_set("RequestWorkflowAuthoring", cpCore.app.siteProperty_getText("AllowWorkflowAuthoring", "0"))
+                Call cpCore.db.siteProperty_set("RequestWorkflowAuthoring", cpCore.db.siteProperty_getText("AllowWorkflowAuthoring", "0"))
             Else
                 '
                 ' Database is up-to-date, Set Allow from state of Request
                 '
-                Call cpCore.app.siteProperty_set("AllowWorkflowAuthoring", cpCore.app.siteProperty_getText("RequestWorkflowAuthoring", "0"))
+                Call cpCore.db.siteProperty_set("AllowWorkflowAuthoring", cpCore.db.siteProperty_getText("RequestWorkflowAuthoring", "0"))
             End If
             '
             Dim dt As DataTable
-            dt = cpCore.app.executeSql("select id,name from ccContent where active<>0")
+            dt = cpCore.db.executeSql("select id,name from ccContent where active<>0")
             If Not (dt Is Nothing) Then
                 For Each row As DataRow In dt.Rows
                     Dim cdef As CDefClass = getCdef(EncodeInteger(row("id")))
@@ -1999,7 +1998,7 @@ Namespace Contensive.Core
                         ContentID = .Id
                     End With
                     If (ContentName <> "") And (ContentTableName <> "") And (ContentDataSourceName <> "") Then
-                        If Not ((cpCore.app.siteProperty_AllowWorkflowAuthoring) And (cdef.AllowWorkflowAuthoring)) Then
+                        If Not ((cpCore.db.siteProperty_AllowWorkflowAuthoring) And (cdef.AllowWorkflowAuthoring)) Then
                             '
                             ' Not Authoring - delete edit and archive records
                             '
@@ -2009,7 +2008,7 @@ Namespace Contensive.Core
                                 ' to stop timeouts on members/visits/etc.
                                 '
                                 SQL = "delete from " & ContentTableName & " where (editsourceid>0)"
-                                Call cpCore.app.executeSql(SQL, ContentDataSourceName)
+                                Call cpCore.db.executeSql(SQL, ContentDataSourceName)
                             End If
                         Else
                             '
@@ -2026,8 +2025,8 @@ Namespace Contensive.Core
                                 '
                                 SQL = "SELECT ContentTable.*" _
                                     & " FROM " & ContentTableName & " AS ContentTable LEFT JOIN " & AuthoringTableName & " AS AuthoringTable ON ContentTable.ID = AuthoringTable.EditSourceID" _
-                                    & " WHERE ((ContentTable.ContentControlID=" & cpCore.app.db_EncodeSQLNumber(ContentID) & ")AND(ContentTable.EditSourceID Is Null)AND(AuthoringTable.ID Is Null));"
-                                dtContent = cpCore.app.executeSql(SQL)
+                                    & " WHERE ((ContentTable.ContentControlID=" & cpCore.db.db_EncodeSQLNumber(ContentID) & ")AND(ContentTable.EditSourceID Is Null)AND(AuthoringTable.ID Is Null));"
+                                dtContent = cpCore.db.executeSql(SQL)
                                 If dtContent.Rows.Count > 0 Then
                                     Do While rowPtr < dtContent.Rows.Count
 
@@ -2039,7 +2038,7 @@ Namespace Contensive.Core
                                         '
                                         ' Create sqlFieldList array for each live record
                                         '
-                                        EditRecordID = cpCore.app.db_InsertTableRecordGetID(AuthoringDataSourceName, AuthoringTableName, SystemMemberID)
+                                        EditRecordID = cpCore.db.db_InsertTableRecordGetID(AuthoringDataSourceName, AuthoringTableName, SystemMemberID)
                                         LiveRecordID = EncodeInteger(dtContent.Rows(rowPtr).Item("ID"))
                                         If LiveRecordID = 159 Then
                                             LiveRecordID = LiveRecordID
@@ -2069,11 +2068,11 @@ Namespace Contensive.Core
                                                                     EditFilename = csv_GetVirtualFilenameByTable(AuthoringTableName, field.nameLc, EditRecordID, "", field.fieldTypeId)
                                                                     FieldValueVariant = EditFilename
                                                                     If EditFilename <> "" Then
-                                                                        Copy = cpCore.app.privateFiles.ReadFile(cpCore.app.convertCdnUrlToCdnPathFilename(EditFilename))
+                                                                        Copy = cpCore.db.privateFiles.ReadFile(cpCore.db.convertCdnUrlToCdnPathFilename(EditFilename))
                                                                     End If
                                                                     'Copy = contentFiles.ReadFile(LiveFilename)
                                                                     If Copy <> "" Then
-                                                                        Call cpCore.app.privateFiles.SaveFile(cpCore.app.convertCdnUrlToCdnPathFilename(EditFilename), Copy)
+                                                                        Call cpCore.db.privateFiles.SaveFile(cpCore.db.convertCdnUrlToCdnPathFilename(EditFilename), Copy)
                                                                         'Call publicFiles.SaveFile(EditFilename, Copy)
                                                                     End If
                                                                 End If
@@ -2088,17 +2087,17 @@ Namespace Contensive.Core
                                                                     EditFilename = csv_GetVirtualFilenameByTable(AuthoringTableName, field.nameLc, EditRecordID, "", field.fieldTypeId)
                                                                     FieldValueVariant = EditFilename
                                                                     If EditFilename <> "" Then
-                                                                        Copy = cpCore.app.cdnFiles.ReadFile(cpCore.app.convertCdnUrlToCdnPathFilename(EditFilename))
+                                                                        Copy = cpCore.db.cdnFiles.ReadFile(cpCore.db.convertCdnUrlToCdnPathFilename(EditFilename))
                                                                     End If
                                                                     'Copy = contentFiles.ReadFile(LiveFilename)
                                                                     If Copy <> "" Then
-                                                                        Call cpCore.app.cdnFiles.SaveFile(cpCore.app.convertCdnUrlToCdnPathFilename(EditFilename), Copy)
+                                                                        Call cpCore.db.cdnFiles.SaveFile(cpCore.db.convertCdnUrlToCdnPathFilename(EditFilename), Copy)
                                                                         'Call publicFiles.SaveFile(EditFilename, Copy)
                                                                     End If
                                                                 End If
                                                             End If
                                                             'SQLNames(FieldPointer) = field.Name
-                                                            sqlFieldList.add(field.nameLc, cpCore.app.EncodeSQL(FieldValueVariant, field.fieldTypeId))
+                                                            sqlFieldList.add(field.nameLc, cpCore.db.db_EncodeSQL(FieldValueVariant, field.fieldTypeId))
                                                             'end case
                                                     End Select
                                                     'end case
@@ -2108,7 +2107,7 @@ Namespace Contensive.Core
                                         ' EditSourceID
                                         '
                                         'SQLNames(FieldPointer) = "EDITSOURCEID"
-                                        sqlFieldList.add("editsourceid", cpCore.app.db_EncodeSQLNumber(LiveRecordID))
+                                        sqlFieldList.add("editsourceid", cpCore.db.db_EncodeSQLNumber(LiveRecordID))
                                         FieldPointer = FieldPointer + 1
                                         '
                                         ' EditArchive
@@ -2117,57 +2116,58 @@ Namespace Contensive.Core
                                         sqlFieldList.add("EDITARCHIVE", SQLFalse)
                                         FieldPointer = FieldPointer + 1
                                         '
-                                        Call cpCore.app.db_UpdateTableRecord(AuthoringDataSourceName, AuthoringTableName, "ID=" & EditRecordID, sqlFieldList)
+                                        Call cpCore.db.db_UpdateTableRecord(AuthoringDataSourceName, AuthoringTableName, "ID=" & EditRecordID, sqlFieldList)
                                     Loop
                                     '
                                     ' ----- Verify good DateAdded
                                     '
-                                    SQL = "UPDATE " & ContentTableName & " set DateAdded=" & cpCore.app.db_EncodeSQLDate("1/1/1980") & " where dateadded is null;"
-                                    Call cpCore.app.executeSql(SQL, ContentDataSourceName)
+                                    Dim testDate As Date = New Date(1990, 8, 7)
+                                    SQL = "UPDATE " & ContentTableName & " set DateAdded=" & cpCore.db.db_EncodeSQLDate(testDate) & " where dateadded is null;"
+                                    Call cpCore.db.executeSql(SQL, ContentDataSourceName)
                                     If ContentTableName <> AuthoringTableName Then
-                                        SQL = "UPDATE " & AuthoringTableName & " set DateAdded=" & cpCore.app.db_EncodeSQLDate("1/1/1980") & " where dateadded is null;"
-                                        Call cpCore.app.executeSql(SQL, AuthoringDataSourceName)
+                                        SQL = "UPDATE " & AuthoringTableName & " set DateAdded=" & cpCore.db.db_EncodeSQLDate(testDate) & " where dateadded is null;"
+                                        Call cpCore.db.executeSql(SQL, AuthoringDataSourceName)
                                     End If
                                     '
                                     ' ----- Verify good CreatedBy
                                     '
-                                    SQL = "UPDATE " & ContentTableName & " set CreatedBy=" & cpCore.app.db_EncodeSQLNumber(SystemMemberID) & " where CreatedBy is null;"
-                                    Call cpCore.app.executeSql(SQL, ContentDataSourceName)
+                                    SQL = "UPDATE " & ContentTableName & " set CreatedBy=" & cpCore.db.db_EncodeSQLNumber(SystemMemberID) & " where CreatedBy is null;"
+                                    Call cpCore.db.executeSql(SQL, ContentDataSourceName)
                                     If ContentTableName <> AuthoringTableName Then
-                                        SQL = "UPDATE " & AuthoringTableName & " set CreatedBy=" & cpCore.app.db_EncodeSQLNumber(SystemMemberID) & " where CreatedBy is null;"
-                                        Call cpCore.app.executeSql(SQL, AuthoringDataSourceName)
+                                        SQL = "UPDATE " & AuthoringTableName & " set CreatedBy=" & cpCore.db.db_EncodeSQLNumber(SystemMemberID) & " where CreatedBy is null;"
+                                        Call cpCore.db.executeSql(SQL, AuthoringDataSourceName)
                                     End If
                                     '
                                     ' ----- Verify good ModifiedDate
                                     '
                                     SQL = "UPDATE " & ContentTableName & " set ModifiedDate=DateAdded where ModifiedDate is null;"
-                                    Call cpCore.app.executeSql(SQL, ContentDataSourceName)
+                                    Call cpCore.db.executeSql(SQL, ContentDataSourceName)
                                     If ContentTableName <> AuthoringTableName Then
                                         SQL = "UPDATE " & AuthoringTableName & " set ModifiedDate=DateAdded where ModifiedDate is null;"
-                                        Call cpCore.app.executeSql(SQL, AuthoringDataSourceName)
+                                        Call cpCore.db.executeSql(SQL, AuthoringDataSourceName)
                                     End If
                                     '
                                     ' ----- Verify good ModifiedBy
                                     '
-                                    SQL = "UPDATE " & ContentTableName & " set ModifiedBy=" & cpCore.app.db_EncodeSQLNumber(SystemMemberID) & " where ModifiedBy is null;"
-                                    Call cpCore.app.executeSql(SQL, ContentDataSourceName)
+                                    SQL = "UPDATE " & ContentTableName & " set ModifiedBy=" & cpCore.db.db_EncodeSQLNumber(SystemMemberID) & " where ModifiedBy is null;"
+                                    Call cpCore.db.executeSql(SQL, ContentDataSourceName)
                                     If ContentTableName <> AuthoringTableName Then
-                                        SQL = "UPDATE " & AuthoringTableName & " set ModifiedBy=" & cpCore.app.db_EncodeSQLNumber(SystemMemberID) & " where ModifiedBy is null;"
-                                        Call cpCore.app.executeSql(SQL, AuthoringDataSourceName)
+                                        SQL = "UPDATE " & AuthoringTableName & " set ModifiedBy=" & cpCore.db.db_EncodeSQLNumber(SystemMemberID) & " where ModifiedBy is null;"
+                                        Call cpCore.db.executeSql(SQL, AuthoringDataSourceName)
                                     End If
                                     '
                                     ' ----- Verify good EditArchive in authoring table
                                     '
                                     SQL = "UPDATE " & AuthoringTableName & " set EditArchive=" & SQLFalse & " where EditArchive is null;"
-                                    Call cpCore.app.executeSql(SQL, AuthoringDataSourceName)
+                                    Call cpCore.db.executeSql(SQL, AuthoringDataSourceName)
                                     '
                                     ' ----- Verify good EditBlank
                                     '
                                     SQL = "UPDATE " & AuthoringTableName & " set EditBlank=" & SQLFalse & " where EditBlank is null;"
-                                    Call cpCore.app.executeSql(SQL, AuthoringDataSourceName)
+                                    Call cpCore.db.executeSql(SQL, AuthoringDataSourceName)
                                     If ContentTableName <> AuthoringTableName Then
                                         SQL = "UPDATE " & ContentTableName & " set EditBlank=" & SQLFalse & " where EditBlank is null;"
-                                        Call cpCore.app.executeSql(SQL, ContentDataSourceName)
+                                        Call cpCore.db.executeSql(SQL, ContentDataSourceName)
                                     End If
                                 End If
                                 dtContent = Nothing
@@ -2207,7 +2207,7 @@ ErrorTrap:
         '        'ReDim metaCache.cdefContentFieldIndex(0)
         '        'metaCache.cdefContentFieldIndex(0) = New keyPtrIndexClass
         '        '
-        '        metaCache = DirectCast(cpCore.app.cache.cache_read(Of metaCacheClass)(cacheName), metaCacheClass)
+        '        metaCache = DirectCast(cpCore.cache.cache_read(Of metaCacheClass)(cacheName), metaCacheClass)
         '        If metaCache Is Nothing Then
         '            needToLoadCdefCache = True
         '        Else
@@ -2232,7 +2232,7 @@ ErrorTrap:
         '                .contentTableNameIndexBag = .cdefContentTableNameIndex.exportPropertyBag()
         '                jsonMetaTemp = json_serializer.Serialize(metaCache)
         '            End With
-        '            Call cpCore.app.cache.cache_save(cacheName, metaCache, "cdef")
+        '            Call cpCore.cache.cache_save(cacheName, metaCache, "cdef")
         '            'Call cpCore.app.privateFiles.SaveFile("metaCache.json", jsonMetaTemp)
         '            returnOk = True
         '        End If
@@ -2269,7 +2269,7 @@ ErrorTrap:
                     & " AND(ccGroupRules.Active<>0)" _
                     & " AND(ccContent.Active<>0)" _
                     & " AND(ccMemberRules.Active<>0)"
-                cidDataTable = cpCore.app.executeSql(SQL)
+                cidDataTable = cpCore.db.executeSql(SQL)
                 CIDCount = cidDataTable.Rows.Count
                 For CIDPointer = 0 To CIDCount - 1
                     ContentID = EncodeInteger(cidDataTable.Rows(CIDPointer).Item(0))
@@ -2292,7 +2292,7 @@ ErrorTrap:
                 '    main_GetContentManagementList = Mid(main_GetContentManagementList, 2)
                 'End If
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return returnList
         End Function
@@ -2329,7 +2329,7 @@ ErrorTrap:
                 Dim buildCache As Boolean
                 '
                 If (DataSourceName <> "") And (DataSourceName <> "-1") And (DataSourceName.ToLower <> "default") Then
-                    cpCore.handleException(New NotImplementedException("alternate datasources not supported yet"))
+                    cpCore.handleExceptionAndRethrow(New NotImplementedException("alternate datasources not supported yet"))
                 Else
                     If TableName <> "" Then
                         lowerTablename = TableName.ToLower
@@ -2346,7 +2346,7 @@ ErrorTrap:
                             '
                             ' cache needs to be built
                             '
-                            dt = cpCore.app.getTableSchemaData(TableName)
+                            dt = cpCore.db.getTableSchemaData(TableName)
                             If dt.Rows.Count <= 0 Then
                                 tableSchema = Nothing
                             Else
@@ -2358,7 +2358,7 @@ ErrorTrap:
                                 '
                                 ' load columns
                                 '
-                                dt = cpCore.app.getColumnSchemaData(TableName)
+                                dt = cpCore.db.getColumnSchemaData(TableName)
                                 If dt.Rows.Count > 0 Then
                                     For Each row As DataRow In dt.Rows
                                         tableSchema.columns.Add(EncodeText(row("COLUMN_NAME")).ToLower)
@@ -2367,7 +2367,7 @@ ErrorTrap:
                                 '
                                 ' Load the index schema
                                 '
-                                dt = cpCore.app.getIndexSchemaData(TableName)
+                                dt = cpCore.db.getIndexSchemaData(TableName)
                                 If dt.Rows.Count > 0 Then
                                     For Each row As DataRow In dt.Rows
                                         tableSchema.indexes.Add(EncodeText(row("INDEX_NAME")).ToLower)
@@ -2385,7 +2385,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return tableSchema
         End Function
@@ -2394,162 +2394,291 @@ ErrorTrap:
         Public Sub tableSchemaListClear()
             tableSchemaList.Clear()
         End Sub
-        ''
-        ''================================================================================
-        ''
-        'Friend Function getCdefFromDb(ByVal ContentID As Integer, loadInvalidFields As Boolean) As metaDataClass.CDefClass
-        '    Return getCdef(ContentID, True, loadInvalidFields)
-        '    'Dim returnCdef As appServices_metaDataClass.CDefClass
-        '    'Try
-        '    '    Dim FieldName As String
-        '    '    'Dim FieldPtr As Integer
-        '    '    Dim lcaseFieldName As String
-        '    '    Dim SQL As String
-        '    '    Dim CS As Integer
-        '    '    Dim ParentID As Integer
-        '    '    Dim CSTable As Integer
-        '    '    Dim TableID As Integer
-        '    '    Dim hint As String
-        '    '    Dim field As appServices_metaDataClass.CDefFieldClass
-        '    '    '
-        '    '    If Not UsedIDList.Contains(ContentID) Then
-        '    '        SQL = "select * from ccContent where ID=" & ContentID
-        '    '        CS = cpCore.app.db_openCsSql_rev("default", SQL)
-        '    '        If cpCore.app.db_IsCSOK(CS) Then
-        '    '            ParentID = cpCore.app.db_GetCSInteger(CS, "ParentID")
-        '    '            If ParentID > 0 Then
-        '    '                UsedIDList.Add(ContentID)
-        '    '                returnCdef = getCdefFromDb(ParentID, UsedIDList)
-        '    '                UsedIDList.Remove(ContentID)
-        '    '            End If
-        '    '            If returnCdef Is Nothing Then
-        '    '                returnCdef = New appServices_metaDataClass.CDefClass
-        '    '            End If
-        '    '            With returnCdef
-        '    '                .ActiveOnly = True
-        '    '                '.ChildIDList = ""
-        '    '                .ContentControlCriteria = ""
-        '    '                .AdminOnly = cpCore.main_GetCSBoolean(CS, "AdminOnly")
-        '    '                '.AliasID = cpCore.app.db_GetCSInteger(CS, "AliasID")
-        '    '                '.AliasName = cpCore.app.db_GetCS(CS, "AliasName")
-        '    '                .AllowAdd = cpCore.main_GetCSBoolean(CS, "AllowAdd")
-        '    '                .AllowCalendarEvents = cpCore.main_GetCSBoolean(CS, "AllowCalendarEvents")
-        '    '                .AllowContentTracking = cpCore.main_GetCSBoolean(CS, "AllowContentTracking")
-        '    '                .AllowDelete = cpCore.main_GetCSBoolean(CS, "AllowDelete")
-        '    '                .AllowMetaContent = cpCore.main_GetCSBoolean(CS, "AllowMetaContent")
-        '    '                .AllowTopicRules = cpCore.main_GetCSBoolean(CS, "AllowTopicRules")
-        '    '                .AllowWorkflowAuthoring = cpCore.main_GetCSBoolean(CS, "AllowWorkflowAuthoring")
-        '    '                TableID = cpCore.app.db_GetCSInteger(CS, "ContentTableID")
-        '    '                If TableID > 0 Then
-        '    '                    SQL = "select Name, DataSourceID from ccTables where ID=" & TableID
-        '    '                    CSTable = cpCore.app.db_openCsSql_rev("default", SQL)
-        '    '                    If cpCore.app.db_IsCSOK(CS) Then
-        '    '                        .ContentTableName = cpCore.app.db_GetCS(CSTable, "name")
-        '    '                        .dataSourceId = cpCore.app.db_GetCSInteger(CSTable, "DataSourceID")
-        '    '                        .ContentDataSourceName = cpCore.main_GetRecordName("Data Sources", .dataSourceId)
-        '    '                    End If
-        '    '                    Call cpCore.app.db_closeCS(CSTable)
-        '    '                End If
-        '    '                TableID = cpCore.app.db_GetCSInteger(CS, "AuthoringTableID")
-        '    '                If TableID > 0 Then
-        '    '                    SQL = "select Name, DataSourceID from ccTables where ID=" & TableID
-        '    '                    CSTable = cpCore.app.db_openCsSql_rev("default", SQL)
-        '    '                    If cpCore.app.db_IsCSOK(CS) Then
-        '    '                        .AuthoringTableName = cpCore.app.db_GetCS(CSTable, "name")
-        '    '                        .AuthoringDataSourceName = cpCore.main_GetRecordName("Data Sources", cpCore.app.db_GetCSInteger(CSTable, "DataSourceID"))
-        '    '                    End If
-        '    '                    Call cpCore.app.db_closeCS(CSTable)
-        '    '                End If
-        '    '                .DefaultSortMethod = cpCore.main_GetRecordName("Sort Methods", cpCore.app.db_GetCSInteger(CS, "DefaultSortMethodID"))
-        '    '                .DeveloperOnly = cpCore.main_GetCSBoolean(CS, "DeveloperOnly")
-        '    '                .DropDownFieldList = cpCore.app.db_GetCS(CS, "DropDownFieldList")
-        '    '                .EditorGroupName = cpCore.main_GetRecordName("Groups", cpCore.app.db_GetCSInteger(CS, "EditorGroupID"))
-        '    '                .Id = ContentID
-        '    '                .IgnoreContentControl = False
-        '    '                .Name = cpCore.app.db_GetCS(CS, "name")
-        '    '                .ParentID = ParentID
-        '    '                .SelectCommaList = ""
-        '    '                .TimeStamp = ""
-        '    '                .WhereClause = ""
-        '    '            End With
-        '    '        End If
-        '    '        Call cpCore.app.db_closeCS(CS)
-        '    '        '
-        '    '        ' Load the content fields
-        '    '        '
-        '    '        With returnCdef
-        '    '            SQL = "select * from ccfields where contentid=" & ContentID
-        '    '            CS = cpCore.app.db_openCsSql_rev("default", SQL)
-        '    '            Do While cpCore.app.db_IsCSOK(CS)
-        '    '                FieldName = cpCore.app.db_GetCS(CS, "name")
-        '    '                lcaseFieldName = LCase(FieldName)
-        '    '                If Not .fields.ContainsKey(lcaseFieldName) Then
-        '    '                    .fields.Add(FieldName.ToLower, New appServices_metaDataClass.CDefFieldClass)
-        '    '                End If
-        '    '                field = .fields(lcaseFieldName)
-        '    '                lcaseFieldName = FieldName.ToUpper
-        '    '                'If .fields.Count > 0 Then
-        '    '                '    For FieldPtr = 0 To .fields.Count - 1
-        '    '                '        If UcaseFieldName = UCase(.fields(FieldPtr).Name) Then
-        '    '                '            Exit For
-        '    '                '        End If
-        '    '                '    Next
-        '    '                'End If
-        '    '                With field
-        '    '                    .active = cpCore.main_GetCSBoolean(CS, "active")
-        '    '                    .AdminOnly = cpCore.main_GetCSBoolean(CS, "AdminOnly")
-        '    '                    .Authorable = cpCore.main_GetCSBoolean(CS, "Authorable")
-        '    '                    .Caption = cpCore.main_GetCSText(CS, "Caption")
-        '    '                    .ContentID = ContentID
-        '    '                    .DeveloperOnly = cpCore.main_GetCSBoolean(CS, "DeveloperOnly")
-        '    '                    .EditSortPriority = cpCore.app.db_GetCSInteger(CS, "EditSortPriority")
-        '    '                    .fieldType = cpCore.app.db_GetCSInteger(CS, "Type")
-        '    '                    .HelpMessage = cpCore.main_GetCSText(CS, "HelpMessage")
-        '    '                    .htmlContent = cpCore.main_GetCSBoolean(CS, "HTMLContent")
-        '    '                    .Id = cpCore.app.db_GetCSInteger(CS, "ID")
-        '    '                    .IndexColumn = cpCore.app.db_GetCSInteger(CS, "IndexColumn")
-        '    '                    .IndexSortDirection = cpCore.app.db_GetCSInteger(CS, "IndexSortDirection")
-        '    '                    .IndexSortOrder = cpCore.app.db_GetCSText(CS, "IndexSortPriority")
-        '    '                    .IndexWidth = cpCore.app.db_GetCSText(CS, "IndexWidth")
-        '    '                    .Inherited = (UsedIDList.Count > 0)
-        '    '                    .LookupContentID = cpCore.app.db_GetCSInteger(CS, "LookupContentID")
-        '    '                    .ManyToManyContentID = cpCore.app.db_GetCSInteger(CS, "ManyToManyContentID")
-        '    '                    .ManyToManyRuleContentID = cpCore.app.db_GetCSInteger(CS, "ManyToManyRuleContentID")
-        '    '                    .ManyToManyRulePrimaryField = cpCore.main_GetCSText(CS, "ManyToManyRulePrimaryField")
-        '    '                    .Name = cpCore.main_GetCSText(CS, "name")
-        '    '                    .NotEditable = cpCore.main_GetCSBoolean(CS, "NotEditable")
-        '    '                    .Password = cpCore.main_GetCSBoolean(CS, "Password")
-        '    '                    .ReadOnlyField = cpCore.main_GetCSBoolean(CS, "ReadOnly")
-        '    '                    .RedirectContentID = cpCore.app.db_GetCSInteger(CS, "RedirectContentID")
-        '    '                    .RedirectID = cpCore.app.db_GetCSText(CS, "RedirectID")
-        '    '                    .RedirectPath = cpCore.main_GetCSText(CS, "RedirectPath")
-        '    '                    .Required = cpCore.main_GetCSBoolean(CS, "Required")
-        '    '                    .TextBuffered = cpCore.main_GetCSBoolean(CS, "TextBuffered")
-        '    '                    .UniqueName = cpCore.main_GetCSBoolean(CS, "UniqueName")
-        '    '                    .DefaultValueObject = cpCore.main_GetCSText(CS, "defaultvalue")
-        '    '                    .RSSTitleField = cpCore.main_GetCSBoolean(CS, "RSSTitleField")
-        '    '                    .RSSDescriptionField = cpCore.main_GetCSBoolean(CS, "RSSDescriptionField")
-        '    '                    .EditTab = cpCore.main_GetCSText(CS, "EditTab")
-        '    '                    .Scramble = cpCore.main_GetCSBoolean(CS, "Scramble")
-        '    '                    .MemberSelectGroupID = cpCore.app.db_GetCSInteger(CS, "MemberSelectGroupID")
-        '    '                End With
-        '    '                cpCore.app.db_nextCSRecord(CS)
-        '    '            Loop
-        '    '            Call cpCore.app.db_closeCS(CS)
-        '    '        End With
-        '    '    End If
-        '    '    '
-        '    '    '
-        '    '    '
-        '    '    If UsedIDList.Count = 0 Then
-        '    '        Call getCdef_SetAdminColumns(returnCdef)
-        '    '    End If
-        '    'Catch ex As Exception
-        '    '    cpCore.handleException(ex)
-        '    'End Try
-        '    'Return returnCdef
-        'End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' delete a content based on name or guid, without removing the table
+        ''' </summary>
+        ''' <param name="contentNameOrGuid"></param>
+        Public Sub deleteContent(contentNameOrGuid As String)
+            Try
+                cpCore.db.executeSql("delete from cccontent where (name=" & cpCore.db.db_EncodeSQLText(contentNameOrGuid) & ")or(ccguid=" & cpCore.db.db_EncodeSQLText(contentNameOrGuid) & ")")
+                cpCore.cache.invalidateTag("content")
+                cpCore.metaData.clear()
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+        End Sub
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' delete a content based on name or guid, without removing the table
+        ''' </summary>
+        ''' <param name="contentNameOrGuid"></param>
+        Public Sub deleteContent(contentid As Integer)
+            Try
+                cpCore.db.executeSql("delete from cccontent where (id=" & cpCore.db.db_EncodeSQLNumber(contentid) & ")")
+                cpCore.cache.invalidateTag("content")
+                cpCore.metaData.clear()
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+        End Sub
+        '
+        '=============================================================================
+        ' Create a child content from a parent content
+        '
+        '   If child does not exist, copy everything from the parent
+        '   If child already exists, add any missing fields from parent
+        '=============================================================================
+        '
+        Public Sub CreateContentChild(ByVal ChildContentName As String, ByVal ParentContentName As String, ByVal MemberID As Integer)
+            Try
+                Dim DataSourceName As String = ""
+                Dim MethodName As String
+                Dim SQL As String
+                Dim rs As DataTable
+                Dim ChildContentID As Integer
+                Dim ParentContentID As Integer
+                'Dim StateOfAllowContentAutoLoad As Boolean
+                Dim CSContent As Integer
+                Dim CSNew As Integer
+                Dim SelectFieldList As String
+                Dim Fields() As String
+                ' converted array to dictionary - Dim FieldPointer As Integer
+                Dim FieldName As String
+                Dim DateNow As Date
+                '
+                DateNow = Date.MinValue
+                '
+                MethodName = "csv_CreateContentChild"
+                '
+                ' ----- Prevent StateOfAllowContentAutoLoad
+                '
+                'StateOfAllowContentAutoLoad = AllowContentAutoLoad
+                'AllowContentAutoLoad = False
+                '
+                ' ----- check if child already exists
+                '
+                SQL = "select ID from ccContent where name=" & cpCore.db.db_EncodeSQLText(ChildContentName) & ";"
+                rs = cpCore.db.executeSql(SQL)
+                If isDataTableOk(rs) Then
+                    ChildContentID = EncodeInteger(cpCore.db.db_getDataRowColumnName(rs.Rows(0), "ID"))
+                    '
+                    ' mark the record touched so upgrade will not delete it
+                    '
+                    Call cpCore.db.executeSql("update ccContent set CreateKey=0 where ID=" & ChildContentID)
+                End If
+                Call closeDataTable(rs)
+                If (isDataTableOk(rs)) Then
+                    If False Then
+                        'RS.Dispose)
+                    End If
+                    'RS = Nothing
+                End If
+                If ChildContentID = 0 Then
+                    '
+                    ' Get ContentID of parent
+                    '
+                    SQL = "select ID from ccContent where name=" & cpCore.db.db_EncodeSQLText(ParentContentName) & ";"
+                    rs = cpCore.db.executeSql(SQL, DataSourceName)
+                    If isDataTableOk(rs) Then
+                        ParentContentID = EncodeInteger(cpCore.db.db_getDataRowColumnName(rs.Rows(0), "ID"))
+                        '
+                        ' mark the record touched so upgrade will not delete it
+                        '
+                        Call cpCore.db.executeSql("update ccContent set CreateKey=0 where ID=" & ParentContentID)
+                    End If
+                    Call closeDataTable(rs)
+                    If (isDataTableOk(rs)) Then
+                        If False Then
+                            'RS.Close()
+                        End If
+                        'RS = Nothing
+                    End If
+                    '
+                    If ParentContentID = 0 Then
+                        cpCore.handleExceptionAndRethrow(New ApplicationException("Can not create Child Content [" & ChildContentName & "] because the Parent Content [" & ParentContentName & "] was not found."))
+                    Else
+                        '
+                        ' ----- create child content record, let the csv_ExecuteSQL reload CDef
+                        '
+                        DataSourceName = "Default"
+                        CSContent = cpCore.db.db_OpenCSContentRecord("Content", ParentContentID)
+                        If Not cpCore.db.db_csOk(CSContent) Then
+                            cpCore.handleExceptionAndRethrow(New ApplicationException("Can not create Child Content [" & ChildContentName & "] because the Parent Content [" & ParentContentName & "] was not found."))
+                        Else
+                            SelectFieldList = cpCore.db.db_GetCSSelectFieldList(CSContent)
+                            If SelectFieldList = "" Then
+                                cpCore.handleExceptionAndRethrow(New ApplicationException("Can not create Child Content [" & ChildContentName & "] because the Parent Content [" & ParentContentName & "] record has not fields."))
+                            Else
+                                CSNew = cpCore.db.db_csInsertRecord("Content", 0)
+                                If Not cpCore.db.db_csOk(CSNew) Then
+                                    Call cpCore.handleExceptionAndRethrow(New ApplicationException("Can not create Child Content [" & ChildContentName & "] because there was an error creating a new record in ccContent."))
+                                Else
+                                    Fields = Split(SelectFieldList, ",")
+                                    DateNow = Now()
+                                    For FieldPointer = 0 To UBound(Fields)
+                                        FieldName = Fields(FieldPointer)
+                                        Select Case UCase(FieldName)
+                                            Case "ID"
+                                            ' do nothing
+                                            Case "NAME"
+                                                Call cpCore.db.db_SetCSField(CSNew, FieldName, ChildContentName)
+                                            Case "PARENTID"
+                                                Call cpCore.db.db_SetCSField(CSNew, FieldName, cpCore.db.db_GetCSText(CSContent, "ID"))
+                                            Case "CREATEDBY", "MODIFIEDBY"
+                                                Call cpCore.db.db_SetCSField(CSNew, FieldName, MemberID)
+                                            Case "DATEADDED", "MODIFIEDDATE"
+                                                Call cpCore.db.db_SetCSField(CSNew, FieldName, DateNow)
+                                            Case "CCGUID"
 
+                                                '
+                                                ' new, non-blank guid so if this cdef is exported, it will be updateable
+                                                '
+                                                Call cpCore.db.db_SetCSField(CSNew, FieldName, Guid.NewGuid.ToString())
+                                            Case Else
+                                                Call cpCore.db.db_SetCSField(CSNew, FieldName, cpCore.db.db_GetCSText(CSContent, FieldName))
+                                        End Select
+                                    Next
+                                End If
+                                Call cpCore.db.db_csClose(CSNew)
+                            End If
+                        End If
+                        Call cpCore.db.db_csClose(CSContent)
+                        'SQL = "INSERT INTO ccContent ( Name, Active, DateAdded, CreatedBy, ModifiedBy, ModifiedDate, AllowAdd, DeveloperOnly, AdminOnly, CreateKey, SortOrder, ContentControlID, AllowDelete, ParentID, EditSourceID, EditArchive, EditBlank, ContentTableID, AuthoringTableID, AllowWorkflowAuthoring, DefaultSortMethodID, DropDownFieldList, EditorGroupID )" _
+                        '    & " SELECT " & encodeSQLText(ChildContentName) & " AS Name, ccContent.Active, ccContent.DateAdded, ccContent.CreatedBy, ccContent.ModifiedBy, ccContent.ModifiedDate, ccContent.AllowAdd, ccContent.DeveloperOnly, ccContent.AdminOnly, ccContent.CreateKey, ccContent.SortOrder, ccContent.ContentControlID, ccContent.AllowDelete, ccContent.ID, ccContent.EditSourceID, ccContent.EditArchive, ccContent.EditBlank, ccContent.ContentTableID, ccContent.AuthoringTableID, ccContent.AllowWorkflowAuthoring, ccContent.DefaultSortMethodID, ccContent.DropDownFieldList, ccContent.EditorGroupID" _
+                        '    & " From ccContent" _
+                        '    & " WHERE (((ccContent.ID)=" & encodeSQLNumber(ParentContentID) & "));"
+                        'Call csv_ExecuteSQL(sql,DataSourceName)
+                    End If
+                End If
+                '
+                ' ----- Load CDef
+                '
+                cpCore.cache.invalidateAll()
+                cpCore.metaData.clear()
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(New ApplicationException("Exception in CreateContentChild"))
+            End Try
+        End Sub
+        '
+        '=============================================================================
+        '   Return just the copy from a content page
+        '=============================================================================
+        '
+        Public Function TextDeScramble(ByVal Copy As String) As String
+            Dim returnCopy As String = ""
+            Try
+                Dim CS As Integer
+                Dim CPtr As Integer
+                Dim C As String
+                Dim CValue As Integer
+                Dim crc As Integer
+                Dim ModAnswer As String
+                Dim Source As String
+                Dim Base As Integer
+                Const CMin = 32
+                Const CMax = 126
+                '
+                ' assume this one is not converted
+                '
+                Source = Copy
+                Base = 50
+                '
+                ' First characger must be _
+                ' Second character is the scramble version 'a' is the starting system
+                '
+                If Mid(Source, 1, 2) <> "_a" Then
+                    returnCopy = Copy
+                Else
+                    Source = Mid(Source, 3)
+                    '
+                    ' cycle through all characters
+                    '
+                    For CPtr = Len(Source) - 1 To 1 Step -1
+                        C = Mid(Source, CPtr, 1)
+                        CValue = Asc(C)
+                        crc = crc + CValue
+                        If (CValue < CMin) Or (CValue > CMax) Then
+                            '
+                            ' if out of ascii bounds, just leave it in place
+                            '
+                        Else
+                            CValue = CValue - Base
+                            If CValue < CMin Then
+                                CValue = CValue + CMax - CMin + 1
+                            End If
+                        End If
+                        returnCopy = returnCopy & Chr(CValue)
+                    Next
+                    '
+                    ' Test mod
+                    '
+                    If CStr(crc Mod 9) <> Mid(Source, Len(Source), 1) Then
+                        '
+                        ' Nope - set it back to the input
+                        '
+                        returnCopy = Copy
+                    End If
+                End If
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+            Return returnCopy
+        End Function
+
+        '
+        '=============================================================================
+        '   Return just the copy from a content page
+        '=============================================================================
+        '
+        Public Function TextScramble(ByVal Copy As String) As String
+            Dim returnCopy As String = ""
+            Try
+                Dim CS As Integer
+                Dim CPtr As Integer
+                Dim C As String
+                Dim CValue As Integer
+                Dim crc As Integer
+                Dim Base As Integer
+                Const CMin = 32
+                Const CMax = 126
+                '
+                ' scrambled starts with _
+                '
+                Base = 50
+                For CPtr = 1 To Len(Copy)
+                    C = Mid(Copy, CPtr, 1)
+                    CValue = Asc(C)
+                    If (CValue < CMin) Or (CValue > CMax) Then
+                        '
+                        ' if out of ascii bounds, just leave it in place
+                        '
+                    Else
+                        CValue = CValue + Base
+                        If CValue > CMax Then
+                            CValue = CValue - CMax + CMin - 1
+                        End If
+                    End If
+                    '
+                    ' CRC is addition of all scrambled characters
+                    '
+                    crc = crc + CValue
+                    '
+                    ' put together backwards
+                    '
+                    returnCopy = Chr(CValue) & returnCopy
+                Next
+                '
+                ' Ends with the mod of the CRC and 13
+                '
+                returnCopy = "_a" & returnCopy & CStr(crc Mod 9)
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+            Return returnCopy
+        End Function
 
 #Region " IDisposable Support "
         Protected disposed As Boolean = False

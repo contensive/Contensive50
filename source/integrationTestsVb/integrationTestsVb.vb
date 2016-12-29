@@ -133,7 +133,7 @@ Namespace integrationTests
                 ' assert
                 Assert.Equal(layoutC, block.GetHtml())
             Finally
-                cp.Content.Delete("copy content", "id=" & recordId)
+                cp.Content.DeleteRecords("copy content", "id=" & recordId)
             End Try
         End Sub
         '
@@ -179,7 +179,7 @@ Namespace integrationTests
                 ' assert
                 Assert.Equal(layoutC, block.GetHtml())
             Finally
-                cp.Content.Delete("layouts", "id=" & recordId)
+                cp.Content.DeleteRecords("layouts", "id=" & recordId)
             End Try
         End Sub
         '

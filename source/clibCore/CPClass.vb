@@ -130,7 +130,7 @@ Namespace Contensive.Core
         '
         Public ReadOnly Property status As applicationStatusEnum
             Get
-                Return core.app.status
+                Return core.db.status
             End Get
         End Property
         '
@@ -138,7 +138,7 @@ Namespace Contensive.Core
         '
         Public ReadOnly Property statusMessage As String
             Get
-                Return GetApplicationStatusMessage(core.app.status)
+                Return GetApplicationStatusMessage(core.db.status)
             End Get
         End Property
         '
@@ -160,10 +160,10 @@ Namespace Contensive.Core
             Get
                 If (core Is Nothing) Then
                     Return False
-                ElseIf (core.app Is Nothing) Then
+                ElseIf (core.db Is Nothing) Then
                     Return False
                 Else
-                    Return (core.app.status = applicationStatusEnum.ApplicationStatusReady)
+                    Return (core.db.status = applicationStatusEnum.ApplicationStatusReady)
                 End If
             End Get
         End Property

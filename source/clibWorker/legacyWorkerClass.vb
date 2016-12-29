@@ -986,7 +986,7 @@ Namespace Contensive
                                 Else
                                     'fs = New fileSystemClass
                                     'Call cpCore.app.publicFiles.DeleteFile(DstFile)
-                                    Call cpCore.app.appRootFiles.copyFile(SrcFile, DstFile)
+                                    Call cpCore.db.appRootFiles.copyFile(SrcFile, DstFile)
                                     returnString = "ok"
                                 End If
                             End If
@@ -1000,7 +1000,7 @@ Namespace Contensive
                                 returnString = "ERROR: file is empty"
                             Else
                                 'fs = New fileSystemClass
-                                Call cpCore.app.appRootFiles.DeleteFile(File)
+                                Call cpCore.db.appRootFiles.DeleteFile(File)
                                 returnString = "ok"
                             End If
                             '
@@ -1012,7 +1012,7 @@ Namespace Contensive
                                 returnString = "ERROR: Folder is empty"
                             Else
                                 'fs = New fileSystemClass
-                                Call cpCore.app.appRootFiles.createPath(FolderPath)
+                                Call cpCore.db.appRootFiles.createPath(FolderPath)
                                 returnString = "ok"
                             End If
                             '
@@ -1024,7 +1024,7 @@ Namespace Contensive
                                 returnString = "ERROR: Folder is empty"
                             Else
                                 'fs = New fileSystemClass
-                                Call cpCore.app.appRootFiles.DeleteFileFolder(FolderPath)
+                                Call cpCore.db.appRootFiles.DeleteFileFolder(FolderPath)
                                 returnString = "ok"
                             End If
                             '
@@ -1249,14 +1249,14 @@ Namespace Contensive
                 hint &= ",entering"
                 '
                 RightNow = Now
-                SQLNow = cpCore.app.db_EncodeSQLDate(RightNow)
+                SQLNow = cpCore.db.db_EncodeSQLDate(RightNow)
                 For Each kvp As KeyValuePair(Of String, appConfigClass) In cpCore.cluster.config.apps
                     AppName = kvp.Value.name
                     '
                     ' permissions issue -- this is a root process - maybe the token will be saved in a configuration file
                     '
                     cpSite = New CPClass(AppName)
-                    If cpSite.core.app.status = applicationStatusEnum.ApplicationStatusReady Then
+                    If cpSite.core.db.status = applicationStatusEnum.ApplicationStatusReady Then
                         hint &= ",app [" & AppName & "] is running, setup cp and cmc"
                         '
                         ' Execute Processes
@@ -1271,13 +1271,13 @@ Namespace Contensive
                                     & " or((ProcessInterval is not null)and(ProcessInterval<>0)and(ProcessNextRun is null))" _
                                     & " or(ProcessNextRun<" & SQLNow & ")" _
                                     & ")"
-                            CS = cpSite.core.app.db_csOpen("add-ons", SQL)
-                            Do While cpSite.core.app.db_csOk(CS)
-                                ProcessInterval = cpSite.core.app.db_GetCSInteger(CS, "ProcessInterval")
-                                ProcessID = cpSite.core.app.db_GetCSInteger(CS, "ID")
-                                processName = cpSite.core.app.db_GetCSText(CS, "name")
-                                ProcessRunOnce = cpSite.core.app.db_GetCSBoolean(CS, "ProcessRunOnce")
-                                ProcessNextRun = cpSite.core.app.db_GetCSDate(CS, "ProcessNextRun")
+                            CS = cpSite.core.db.db_csOpen("add-ons", SQL)
+                            Do While cpSite.core.db.db_csOk(CS)
+                                ProcessInterval = cpSite.core.db.db_GetCSInteger(CS, "ProcessInterval")
+                                ProcessID = cpSite.core.db.db_GetCSInteger(CS, "ID")
+                                processName = cpSite.core.db.db_GetCSText(CS, "name")
+                                ProcessRunOnce = cpSite.core.db.db_GetCSBoolean(CS, "ProcessRunOnce")
+                                ProcessNextRun = cpSite.core.db.db_GetCSDate(CS, "ProcessNextRun")
                                 NextRun = Date.MinValue
                                 hint &= ",run addon " & processName
                                 If ProcessInterval > 0 Then
@@ -1289,31 +1289,31 @@ Namespace Contensive
                                     ' Server has been restarted, reset next run
                                     '
                                     'Call cpSite.core.app.cpSite.core.app.csv_SetCS(CS, "ProcessServerKey", HostProcessID)
-                                    Call cpSite.core.app.db_setCS(CS, "ProcessNextRun", NextRun)
+                                    Call cpSite.core.db.db_setCS(CS, "ProcessNextRun", NextRun)
                                 ElseIf ProcessRunOnce Then
                                     '
                                     ' Run Once
                                     '
-                                    Call cpSite.core.app.db_setCS(CS, "ProcessRunOnce", False)
-                                    Call cpSite.core.app.db_setCS(CS, "ProcessNextRun", NextRun)
-                                    Call addAsyncCmd(cpCore, "runprocess appname=""" & cpSite.core.app.config.name & """ addonid=""" & ProcessID & """", True)
+                                    Call cpSite.core.db.db_setCS(CS, "ProcessRunOnce", False)
+                                    Call cpSite.core.db.db_setCS(CS, "ProcessNextRun", NextRun)
+                                    Call addAsyncCmd(cpCore, "runprocess appname=""" & cpSite.core.db.config.name & """ addonid=""" & ProcessID & """", True)
                                     'Call addAsyncCmd(cp,"runprocess appname=""" & cpSite.core.appEnvironment.name & """ addonname=""" & ProcessName & """", True)
-                                ElseIf cpSite.core.app.db_GetCSDate(CS, "ProcessNextRun") = Date.MinValue Then
+                                ElseIf cpSite.core.db.db_GetCSDate(CS, "ProcessNextRun") = Date.MinValue Then
                                     '
                                     ' Interval is OK but NextRun is 0, just set next run
                                     '
-                                    Call cpSite.core.app.db_setCS(CS, "ProcessNextRun", NextRun)
+                                    Call cpSite.core.db.db_setCS(CS, "ProcessNextRun", NextRun)
                                 ElseIf ProcessNextRun < RightNow Then
                                     '
                                     ' All is OK, triggered on NextRun, Cycle RightNow
                                     '
-                                    Call addAsyncCmd(cpCore, "runprocess appname=""" & cpSite.core.app.config.name & """ addonid=""" & ProcessID & """", True)
-                                    Call cpSite.core.app.db_setCS(CS, "ProcessNextRun", NextRun)
+                                    Call addAsyncCmd(cpCore, "runprocess appname=""" & cpSite.core.db.config.name & """ addonid=""" & ProcessID & """", True)
+                                    Call cpSite.core.db.db_setCS(CS, "ProcessNextRun", NextRun)
                                 End If
-                                Call cpSite.core.app.db_csGoNext(CS)
+                                Call cpSite.core.db.db_csGoNext(CS)
                                 cpSite.Dispose()
                             Loop
-                            Call cpSite.core.app.db_csClose(CS)
+                            Call cpSite.core.db.db_csClose(CS)
                         Catch ex As Exception
                             '
                             ' error on this site, skip to next

@@ -403,8 +403,8 @@ Namespace Contensive.Core
             Try
                 returnOk = cp.core.installCollectionFile(privateFolder, returnUserError)
             Catch ex As Exception
-                cp.core.handleException(ex)
-                If Not cp.core.app.SiteProperty_trapErrors Then
+                cp.core.handleExceptionAndRethrow(ex)
+                If Not cp.core.db.SiteProperty_trapErrors Then
                     Throw New ApplicationException("rethrow", ex)
                 End If
             End Try

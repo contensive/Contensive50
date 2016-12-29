@@ -401,7 +401,7 @@ namespace  Contensive.Core {
                     }
                 }
                 builder.upgrade(true);
-                cpNewApp.core.app.siteProperty_set(Contensive.Core.coreCommonModule.siteproperty_serverPageDefault_name, iisDefaultDoc);
+                cpNewApp.core.db.siteProperty_set(Contensive.Core.coreCommonModule.siteproperty_serverPageDefault_name, iisDefaultDoc);
                 cpNewApp.Dispose();
             }
             catch (Exception ex)

@@ -42,7 +42,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property cdnFiles() As CPFileSystemBaseClass
             Get
                 If (_cdnFiles Is Nothing) Then
-                    _cdnFiles = New CPFileSystemClass(core, core.app.cdnFiles)
+                    _cdnFiles = New CPFileSystemClass(core, core.db.cdnFiles)
                 End If
                 Return _cdnFiles
             End Get
@@ -51,7 +51,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property appRootFiles() As CPFileSystemBaseClass
             Get
                 If (_appRootFiles Is Nothing) Then
-                    _appRootFiles = New CPFileSystemClass(core, core.app.appRootFiles)
+                    _appRootFiles = New CPFileSystemClass(core, core.db.appRootFiles)
                 End If
                 Return _appRootFiles
             End Get
@@ -60,7 +60,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property privateFiles() As CPFileSystemBaseClass
             Get
                 If (_privateFiles Is Nothing) Then
-                    _privateFiles = New CPFileSystemClass(core, core.app.privateFiles)
+                    _privateFiles = New CPFileSystemClass(core, core.db.privateFiles)
                 End If
                 Return _privateFiles
             End Get
@@ -69,7 +69,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property serverFiles() As CPFileSystemBaseClass
             Get
                 If (_serverFiles Is Nothing) Then
-                    _serverFiles = New CPFileSystemClass(core, core.app.serverFiles)
+                    _serverFiles = New CPFileSystemClass(core, core.db.serverFiles)
                 End If
                 Return _serverFiles
             End Get
@@ -107,7 +107,7 @@ Namespace Contensive.Core
         ''' <returns></returns>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
         Public Overrides Function getVirtualFileLink(virtualFilename As String) As String
-            Return core.csv_getVirtualFileLink(core.app.config.cdnFilesNetprefix, virtualFilename)
+            Return core.csv_getVirtualFileLink(core.db.config.cdnFilesNetprefix, virtualFilename)
         End Function
         '
         '==========================================================================================
@@ -170,7 +170,7 @@ Namespace Contensive.Core
         ''' <returns></returns>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
         Public Overrides Function read(ByVal filename As String) As String
-            Return core.app.appRootFiles.ReadFile(filename)
+            Return core.db.appRootFiles.ReadFile(filename)
         End Function
         '
         '==========================================================================================

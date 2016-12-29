@@ -598,7 +598,7 @@ Namespace Contensive.Core
                 Try
                     returnIsAdmin = (InStr(1, cp.Request.PathPage, cp.Site.GetText("adminUrl"), vbTextCompare) <> 0)
                 Catch ex As Exception
-                    Call cp.core.handleException(ex, "unexpected error in IsAdminSite")
+                    Call cp.core.handleExceptionAndRethrow(ex, "unexpected error in IsAdminSite")
                 End Try
                 Return returnIsAdmin
             End Get

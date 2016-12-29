@@ -36,7 +36,7 @@ Namespace Contensive.Core
             Dim RecordID As Integer
             Dim CS As Integer
             Dim SQLNow As String
-            Dim app As coreAppClass = cpCore.app
+            Dim db As coreDbClass = cpCore.db
             '
             Ptr = -1
             If Not propertyCacheLoaded Then
@@ -56,23 +56,23 @@ Namespace Contensive.Core
                 '
                 ' insert a new property record, get the ID back and save it in cache
                 '
-                CS = app.db_csInsertRecord("Properties", SystemMemberID)
-                If app.db_csOk(CS) Then
-                    propertyCache(2, Ptr) = app.db_GetCSText(CS, "ID")
-                    Call app.db_setCS(CS, "name", propertyName)
-                    Call app.db_setCS(CS, "FieldValue", PropertyValue)
-                    Call app.db_setCS(CS, "TypeID", propertyTypeId)
-                    Call app.db_setCS(CS, "KeyID", CStr(keyId))
+                CS = db.db_csInsertRecord("Properties", SystemMemberID)
+                If db.db_csOk(CS) Then
+                    propertyCache(2, Ptr) = db.db_GetCSText(CS, "ID")
+                    Call db.db_setCS(CS, "name", propertyName)
+                    Call db.db_setCS(CS, "FieldValue", PropertyValue)
+                    Call db.db_setCS(CS, "TypeID", propertyTypeId)
+                    Call db.db_setCS(CS, "KeyID", CStr(keyId))
                 End If
-                Call app.db_csClose(CS)
+                Call db.db_csClose(CS)
             ElseIf propertyCache(1, Ptr) <> PropertyValue Then
                 propertyCache(1, Ptr) = PropertyValue
                 RecordID = EncodeInteger(propertyCache(2, Ptr))
-                SQLNow = app.db_EncodeSQLDate(Now)
+                SQLNow = db.db_EncodeSQLDate(Now)
                 '
                 ' save the value in the property that was found
                 '
-                Call app.executeSql("update ccProperties set FieldValue=" & app.db_EncodeSQLText(PropertyValue) & ",ModifiedDate=" & SQLNow & " where id=" & RecordID)
+                Call db.executeSql("update ccProperties set FieldValue=" & db.db_EncodeSQLText(PropertyValue) & ",ModifiedDate=" & SQLNow & " where id=" & RecordID)
             End If
             '
 
@@ -82,7 +82,7 @@ Namespace Contensive.Core
             ' ----- Error Trap
             '
 ErrorTrap:
-            cpCore.handleException(New Exception("Unexpected exception"))
+            cpCore.handleExceptionAndRethrow(New Exception("Unexpected exception"))
         End Sub
         '
         '
@@ -111,7 +111,7 @@ ErrorTrap:
                     Call setProperty(propertyName, defaultValue, keyId)
                 End If
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return returnString
         End Function
@@ -122,12 +122,12 @@ ErrorTrap:
             On Error GoTo ErrorTrap 'Const Tn = "LoadVisitProperties" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
             Dim Name As String
-            Dim app As coreAppClass = cpCore.app
+            Dim db As coreDbClass = cpCore.db
             '
             propertyCache_nameIndex = New coreKeyPtrIndexClass
             propertyCacheCnt = 0
             '
-            Using dt As DataTable = app.executeSql("select Name,FieldValue,ID from ccProperties where (active<>0)and(TypeID=" & propertyTypeId & ")and(KeyID=" & keyId & ")")
+            Using dt As DataTable = db.executeSql("select Name,FieldValue,ID from ccProperties where (active<>0)and(TypeID=" & propertyTypeId & ")and(KeyID=" & keyId & ")")
                 If dt.Rows.Count > 0 Then
                     propertyCacheCnt = 0
                     ReDim propertyCache(2, dt.Rows.Count - 1)
@@ -150,7 +150,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            cpCore.handleException(New Exception("Unexpected exception"))
+            cpCore.handleExceptionAndRethrow(New Exception("Unexpected exception"))
         End Sub
     End Class
 End Namespace

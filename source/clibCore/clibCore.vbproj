@@ -209,7 +209,7 @@
     <Compile Include="addon_AddonMngrSafeClass.vb" />
     <Compile Include="addon_AdminClass.vb" />
     <Compile Include="coreAdminUIClass.vb" />
-    <Compile Include="coreAppClass.vb" />
+    <Compile Include="coreDbClass.vb" />
     <Compile Include="coreClusterClass.vb" />
     <Compile Include="coreContentCmdClass.vb" />
     <Compile Include="coreHtmlToolsClass.vb" />

@@ -55,14 +55,14 @@ Namespace Contensive.Core
         '
         Private Sub reportClassError(ByVal ex As Exception, ByVal methodName As String)
             Try
-                Call cp.core.handleException(ex, "Unexpected Trap Error in CP.DB." & methodName)
+                Call cp.core.handleExceptionAndRethrow(ex, "Unexpected Trap Error in CP.DB." & methodName)
             Catch exInner As Exception
                 '
             End Try
         End Sub
         '
         Public Overrides Sub Delete(ByVal DataSourcename As String, ByVal TableName As String, ByVal RecordId As Integer) 'Inherits BaseClasses.CPDbBaseClass.Delete
-            Call cp.core.app.db_DeleteTableRecord(DataSourcename, TableName, RecordId)
+            Call cp.core.db.db_DeleteTableRecord(DataSourcename, TableName, RecordId)
         End Sub
         '
         '
@@ -80,7 +80,7 @@ Namespace Contensive.Core
         '
         '
         Public Overrides Function GetDataSourceType(ByVal DataSourcename As String) As Integer
-            Return cp.core.app.csv_GetDataSourceType(DataSourcename)
+            Return cp.core.db.db_GetDataSourceType(DataSourcename)
         End Function
         '
         ' deprecated
@@ -128,25 +128,25 @@ Namespace Contensive.Core
         '
         '
         Public Overrides Function EncodeSQLBoolean(ByVal SourceBoolean As Boolean) As String
-            Return cp.core.app.db_EncodeSQLBoolean(SourceBoolean)
+            Return cp.core.db.db_EncodeSQLBoolean(SourceBoolean)
         End Function
         '
         '
         '
         Public Overrides Function EncodeSQLDate(ByVal SourceDate As Date) As String
-            Return cp.core.app.db_EncodeSQLDate(SourceDate)
+            Return cp.core.db.db_EncodeSQLDate(SourceDate)
         End Function
         '
         '
         '
         Public Overrides Function EncodeSQLNumber(ByVal SourceNumber As Double) As String
-            Return cp.core.app.db_EncodeSQLNumber(SourceNumber)
+            Return cp.core.db.db_EncodeSQLNumber(SourceNumber)
         End Function
         '
         '
         '
         Public Overrides Function EncodeSQLText(ByVal SourceText As String) As String
-            Return cp.core.app.db_EncodeSQLText(SourceText)
+            Return cp.core.db.db_EncodeSQLText(SourceText)
         End Function
         '
         '
@@ -182,17 +182,17 @@ Namespace Contensive.Core
         '
         '
         Public Overrides Function ExecuteSQL(ByVal SQL As String, Optional ByVal DataSourcename As String = "Default", Optional ByVal Retries As String = "0", Optional ByVal PageSize As String = "10", Optional ByVal PageNumber As String = "1") As Object
-            Return cp.core.app.executeSql(SQL, DataSourcename, PageNumber * PageSize, PageSize)
+            Return cp.core.db.executeSql(SQL, DataSourcename, PageNumber * PageSize, PageSize)
         End Function
         '
         '
         '
         Public Overrides Property SQLTimeout() As Integer
             Get
-                Return cp.core.app.csv_SQLCommandTimeout
+                Return cp.core.db.db_SQLCommandTimeout
             End Get
             Set(ByVal value As Integer)
-                cp.core.app.csv_SQLCommandTimeout = value
+                cp.core.db.db_SQLCommandTimeout = value
             End Set
         End Property
         '

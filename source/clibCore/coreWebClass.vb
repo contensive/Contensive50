@@ -63,13 +63,13 @@ Namespace Contensive.Core
                 Cmd = "IISReset.exe"
                 arg = "/restart >> """ & LogFilename & """"
                 Call runProcess(cpCore, Cmd, arg, True)
-                Copy = cpCore.app.privateFiles.ReadFile(LogFilename)
-                Call cpCore.app.privateFiles.DeleteFile(LogFilename)
+                Copy = cpCore.db.privateFiles.ReadFile(LogFilename)
+                Call cpCore.db.privateFiles.DeleteFile(LogFilename)
                 Copy = Replace(Copy, vbCrLf, "\n")
                 Copy = Replace(Copy, vbCr, "\n")
                 Copy = Replace(Copy, vbLf, "\n")
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '
@@ -89,13 +89,13 @@ Namespace Contensive.Core
                 LogFilename = "Temp\" & EncodeText(GetRandomInteger()) & ".Log"
                 Cmd = "%comspec% /c IISReset /stop >> """ & LogFilename & """"
                 Call runProcess(cpCore, Cmd, , True)
-                Copy = cpCore.app.privateFiles.ReadFile(LogFilename)
-                Call cpCore.app.privateFiles.DeleteFile(LogFilename)
+                Copy = cpCore.db.privateFiles.ReadFile(LogFilename)
+                Call cpCore.db.privateFiles.DeleteFile(LogFilename)
                 Copy = Replace(Copy, vbCrLf, "\n")
                 Copy = Replace(Copy, vbCr, "\n")
                 Copy = Replace(Copy, vbLf, "\n")
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '
@@ -115,13 +115,13 @@ Namespace Contensive.Core
                 Call Randomize()
                 Cmd = "%comspec% /c IISReset /start >> """ & LogFilename & """"
                 Call runProcess(cpCore, Cmd, , True)
-                Copy = cpCore.app.privateFiles.ReadFile(LogFilename)
-                Call cpCore.app.privateFiles.DeleteFile(LogFilename)
+                Copy = cpCore.db.privateFiles.ReadFile(LogFilename)
+                Call cpCore.db.privateFiles.DeleteFile(LogFilename)
                 Copy = Replace(Copy, vbCrLf, "\n")
                 Copy = Replace(Copy, vbCr, "\n")
                 Copy = Replace(Copy, vbLf, "\n")
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '
@@ -143,7 +143,7 @@ Namespace Contensive.Core
                     End If
                 Next
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
     End Class

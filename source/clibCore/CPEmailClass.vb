@@ -67,7 +67,7 @@ Namespace Contensive.Core
             Try
                 Call cpCore.email_send3(ToAddress, FromAddress, Subject, Body, "", "", "", SendImmediately, BodyIsHTML, 0)
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '====================================================================================================
@@ -81,7 +81,7 @@ Namespace Contensive.Core
             Try
                 Call cpCore.main_SendFormEmail(ToAddress, FromAddress, Subject)
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '====================================================================================================
@@ -98,7 +98,7 @@ Namespace Contensive.Core
             Try
                 Call cpCore.main_SendGroupEmail(GroupList, FromAddress, Subject, Body, SendImmediately, BodyIsHTML)
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
 

@@ -150,7 +150,7 @@ Namespace Contensive.Core
             Exit Sub
             '
 ErrorTrap:
-            Call cpCore.handleException(New Exception("Unexpected exception")) ' Call HandleClassError("AddEntry", Err.Number, Err.Source, Err.Description)
+            Call cpCore.handleExceptionAndRethrow(New Exception("Unexpected exception")) ' Call HandleClassError("AddEntry", Err.Number, Err.Source, Err.Description)
         End Sub
         '
         '===============================================================================
@@ -228,7 +228,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            Call cpCore.handleException(New Exception("Unexpected exception")) ' Call HandleClassError("GetMenu", Err.Number, Err.Source, Err.Description)
+            Call cpCore.handleExceptionAndRethrow(New Exception("Unexpected exception")) ' Call HandleClassError("GetMenu", Err.Number, Err.Source, Err.Description)
         End Function
         '
         '===============================================================================
@@ -263,7 +263,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            Call cpCore.handleException(New Exception("Unexpected exception")) ' Call HandleClassError("GetMenuTreeBranch", Err.Number, Err.Source, Err.Description)
+            Call cpCore.handleExceptionAndRethrow(New Exception("Unexpected exception")) ' Call HandleClassError("GetMenuTreeBranch", Err.Number, Err.Source, Err.Description)
         End Function
         '
         ' Temp log file solution
@@ -297,7 +297,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            Call cpCore.handleException(New Exception("Unexpected exception")) ' Call HandleClassError("GetMenuTreeList", Err.Number, Err.Source, Err.Description)
+            Call cpCore.handleExceptionAndRethrow(New Exception("Unexpected exception")) ' Call HandleClassError("GetMenuTreeList", Err.Number, Err.Source, Err.Description)
         End Function
         '
         '===============================================================================
@@ -365,7 +365,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            Call cpCore.handleException(New Exception("Unexpected exception")) ' Call HandleClassError("GetMenutreeListBranch2", Err.Number, Err.Source, Err.Description)
+            Call cpCore.handleExceptionAndRethrow(New Exception("Unexpected exception")) ' Call HandleClassError("GetMenutreeListBranch2", Err.Number, Err.Source, Err.Description)
         End Function
         '
         '===============================================================================
@@ -459,7 +459,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            Call cpCore.handleException(New Exception("Unexpected exception")) ' Call HandleClassError("GetTree", Err.Number, Err.Source, Err.Description)
+            Call cpCore.handleExceptionAndRethrow(New Exception("Unexpected exception")) ' Call HandleClassError("GetTree", Err.Number, Err.Source, Err.Description)
         End Function
         '
         '===============================================================================
@@ -541,7 +541,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            Call cpCore.handleException(New Exception("Unexpected exception")) ' Call HandleClassError("GetMKTreeBranch", Err.Number, Err.Source, Err.Description)
+            Call cpCore.handleExceptionAndRethrow(New Exception("Unexpected exception")) ' Call HandleClassError("GetMKTreeBranch", Err.Number, Err.Source, Err.Description)
         End Function
         '
         '========================================================================
@@ -555,7 +555,7 @@ ErrorTrap:
         ''' <remarks></remarks>
         Private Sub handleLegacyClassError(ByVal MethodName As String, ByVal ErrNumber As Integer, ByVal ErrSource As String, ByVal ErrDescription As String)
             '
-            Call cpCore.handleException(New Exception("unexpected exception in method [" & MethodName & "], errDescription [" & ErrDescription & "]"))
+            Call cpCore.handleExceptionAndRethrow(New Exception("unexpected exception in method [" & MethodName & "], errDescription [" & ErrDescription & "]"))
             '
         End Sub
     End Class

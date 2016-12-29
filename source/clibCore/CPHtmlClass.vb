@@ -125,7 +125,7 @@ Namespace Contensive.Core
                 '
                 If Method.ToLower = "get" Then
                     If (InnerHtml.IndexOf("type=""file", 0, 1, StringComparison.OrdinalIgnoreCase) >= 0) Then
-                        Call cp.core.handleException(New ApplicationException("cp.html.form called with method=get can not contain an upload file (input type=file)"))
+                        Call cp.core.handleExceptionAndRethrow(New ApplicationException("cp.html.form called with method=get can not contain an upload file (input type=file)"))
                     End If
                     If ActionQueryString = "" Then
                         FormStart = cpCore.main_GetFormStart(, HtmlName, HtmlId, Method)
@@ -431,7 +431,7 @@ Namespace Contensive.Core
                         & "</div>"
                 End If
             Catch ex As Exception
-                cp.core.handleException(ex, "Unexpected error in cp.html.adminHint()")
+                cp.core.handleExceptionAndRethrow(ex, "Unexpected error in cp.html.adminHint()")
             End Try
             Return returnString
         End Function

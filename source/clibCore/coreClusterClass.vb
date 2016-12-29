@@ -212,7 +212,7 @@ Namespace Contensive.Core
                     'End If
                 End If
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '
@@ -280,7 +280,7 @@ Namespace Contensive.Core
                     returnString &= "initial catalog=" & catalogName & ";"
                 End If
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return returnString
         End Function
@@ -303,7 +303,7 @@ Namespace Contensive.Core
                     End Using
                 End Using
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return returnData
         End Function
@@ -322,7 +322,7 @@ Namespace Contensive.Core
                 returnOk = (dt.Rows.Count > 0)
                 dt.Dispose()
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return returnOk
         End Function
@@ -346,7 +346,7 @@ Namespace Contensive.Core
         ''' <param name="Cause"></param>
         ''' <remarks></remarks>
         Private Sub handleClassException(ByVal ex As Exception, ByVal methodName As String, ByVal Cause As String)
-            cpCore.handleException(ex, "Unexpected exception in clusterServicesClass." & methodName & ", cause=[" & Cause & "]")
+            cpCore.handleExceptionAndRethrow(ex, "Unexpected exception in clusterServicesClass." & methodName & ", cause=[" & Cause & "]")
         End Sub
         '
         '====================================================================================================

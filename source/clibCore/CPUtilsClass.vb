@@ -58,7 +58,7 @@ Namespace Contensive.Core
                 Dim builder As New coreBuilderClass(CP.core)
                 builder.upgrade(isNewApp)
             Catch ex As Exception
-                CP.core.handleException(ex)
+                CP.core.handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '

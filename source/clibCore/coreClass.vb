@@ -5,6 +5,7 @@ Option Explicit On
 Imports System.Xml
 Imports System.Reflection
 Imports HttpMultipartParser
+Imports Xunit
 
 '
 Namespace Contensive.Core
@@ -28,6 +29,23 @@ Namespace Contensive.Core
         '
         '===================================================================================================
         ''' <summary>
+        ''' returns the cache object.
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public ReadOnly Property cache() As coreCacheClass
+            Get
+                If (_cache Is Nothing) Then
+                    _cache = New coreCacheClass(Me)
+                End If
+                Return _cache
+            End Get
+        End Property
+        Private _cache As coreCacheClass = Nothing
+        '
+        '===================================================================================================
+        ''' <summary>
         ''' returns the clusterServices object.  This property is public, but the constuctor is not. This property may not be available for appAccess (to limit access to only  this app). 
         ''' </summary>
         ''' <value></value>
@@ -44,21 +62,33 @@ Namespace Contensive.Core
         Private _cluster As coreClusterClass
         '
         '===================================================================================================
+        '
+        Friend ReadOnly Property metaData As coreMetaDataClass
+            Get
+                If _metaData Is Nothing Then
+                    _metaData = New coreMetaDataClass(Me)
+                End If
+                Return _metaData
+            End Get
+        End Property
+        Private _metaData As coreMetaDataClass = Nothing
+        '
+        '===================================================================================================
         ''' <summary>
         ''' returns the appServices object. This property is public, but the constuctor is not.
         ''' </summary>
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>_app created duirng init(), after cp.context() is loaded</remarks>
-        Public ReadOnly Property app As coreAppClass
+        Public ReadOnly Property db As coreDbClass
             Get
-                If (_app Is Nothing) And (Not String.IsNullOrEmpty(applicationName)) Then
-                    _app = New coreAppClass(Me, applicationName)
+                If (_db Is Nothing) And (Not String.IsNullOrEmpty(applicationName)) Then
+                    _db = New coreDbClass(Me, applicationName)
                 End If
-                Return _app
+                Return _db
             End Get
         End Property
-        Private _app As coreAppClass
+        Private _db As coreDbClass
         ' 
         '-----------------------------------------------------------------------
         ' document being constructed
@@ -1470,7 +1500,7 @@ Namespace Contensive.Core
                 '--------------------------------------------------------------------------
                 '
                 'app = New appServicesClass(cp, initApplicationName)
-                If (app.status <> applicationStatusEnum.ApplicationStatusReady) Then
+                If (db.status <> applicationStatusEnum.ApplicationStatusReady) Then
                     '
                     ' did not initialize correctly
                     '
@@ -1783,8 +1813,8 @@ Namespace Contensive.Core
                     '
                     ' count the hit
                     '
-                    If Not (_app Is Nothing) Then
-                        Call app.IncrementHitCounter()
+                    If Not (_db Is Nothing) Then
+                        Call db.IncrementHitCounter()
                     End If
 
                     '
@@ -1813,10 +1843,10 @@ Namespace Contensive.Core
                         'Call AppendLog("main_init(), 1630 - exit for cookie key detected/processed")
                         '
                         Dim cookieDetectDate As Date = New Date
-                        Call security_decodeToken(CookieDetectKey, app.config.privateKey, CookieDetectVisitId, cookieDetectDate)
+                        Call security_decodeToken(CookieDetectKey, db.config.privateKey, CookieDetectVisitId, cookieDetectDate)
                         'CookieDetectVisitId = main_DecodeKeyNumber(CookieDetectKey)
                         If CookieDetectVisitId <> 0 Then
-                            Call app.executeSql("update ccvisits set CookieSupport=1 where id=" & CookieDetectVisitId)
+                            Call db.executeSql("update ccvisits set CookieSupport=1 where id=" & CookieDetectVisitId)
                             docOpen = False '--- should be disposed by caller --- Call dispose
                             Return cp.Response.isOpen
                         End If
@@ -1840,13 +1870,13 @@ Namespace Contensive.Core
                     '
                     ' set main_ServerDomainPrmary to the first valid defaultDomain entry
                     '
-                    If app.config.domainList.Count > 0 Then
-                        main_ServerDomainPrimary = app.config.domainList(0)
+                    If db.config.domainList.Count > 0 Then
+                        main_ServerDomainPrimary = db.config.domainList(0)
                     Else
                         main_ServerDomainPrimary = ""
                     End If
                     '
-                    domainDetailsListText = EncodeText(app.cache.GetObject(Of String)("domainContentList"))
+                    domainDetailsListText = EncodeText(cache.GetObject(Of String)("domainContentList"))
                     If Not String.IsNullOrEmpty(domainDetailsListText) Then
                         Try
                             domainDetailsList = json.Deserialize(Of Dictionary(Of String, domainDetailsClass))(domainDetailsListText)
@@ -1862,7 +1892,7 @@ Namespace Contensive.Core
                         domainDetailsListText = vbCrLf
                         SQL = "select name,rootpageid,nofollow,typeid,visited,id,ForwardURL,DefaultTemplateId,PageNotFoundPageID,allowCrossLogin,ForwardDomainId from ccdomains where (active<>0)and(name is not null) order by id"
                         Dim dt As DataTable
-                        dt = app.executeSql(SQL)
+                        dt = db.executeSql(SQL)
                         If dt.Rows.Count > 0 Then
                             If Not (dt.Columns Is Nothing) Then
                                 Dim colCnt As Integer = dt.Columns.Count
@@ -1893,7 +1923,7 @@ Namespace Contensive.Core
                     '
                     ' verify app config domainlist is in the domainlist cache
                     '
-                    For Each domain As String In app.config.domainList
+                    For Each domain As String In db.config.domainList
                         If Not domainDetailsList.ContainsKey(domain.ToLower()) Then
                             Dim domainDetailsNew As New domainDetailsClass
                             domainDetailsNew.name = domain
@@ -1919,34 +1949,34 @@ Namespace Contensive.Core
                             '
                             ' this is a default domain or a new domain -- add to the domain table
                             '
-                            CS = app.db_csInsertRecord("domains")
-                            If app.db_csOk(CS) Then
-                                domainDetails.id = app.db_GetCSInteger(CS, "id")
-                                Call app.db_setCS(CS, "name", web.requestDomain)
-                                Call app.db_setCS(CS, "typeId", "1")
-                                Call app.db_setCS(CS, "RootPageId", domainDetails.rootPageId.ToString)
-                                Call app.db_setCS(CS, "ForwardUrl", domainDetails.forwardUrl)
-                                Call app.db_setCS(CS, "NoFollow", domainDetails.noFollow.ToString)
-                                Call app.db_setCS(CS, "Visited", domainDetails.visited.ToString)
-                                Call app.db_setCS(CS, "DefaultTemplateId", domainDetails.defaultTemplateId.ToString)
-                                Call app.db_setCS(CS, "PageNotFoundPageId", domainDetails.pageNotFoundPageId.ToString)
-                                Call app.db_setCS(CS, "allowCrossLogin", domainDetails.allowCrossLogin.ToString)
+                            CS = db.db_csInsertRecord("domains")
+                            If db.db_csOk(CS) Then
+                                domainDetails.id = db.db_GetCSInteger(CS, "id")
+                                Call db.db_setCS(CS, "name", web.requestDomain)
+                                Call db.db_setCS(CS, "typeId", "1")
+                                Call db.db_setCS(CS, "RootPageId", domainDetails.rootPageId.ToString)
+                                Call db.db_setCS(CS, "ForwardUrl", domainDetails.forwardUrl)
+                                Call db.db_setCS(CS, "NoFollow", domainDetails.noFollow.ToString)
+                                Call db.db_setCS(CS, "Visited", domainDetails.visited.ToString)
+                                Call db.db_setCS(CS, "DefaultTemplateId", domainDetails.defaultTemplateId.ToString)
+                                Call db.db_setCS(CS, "PageNotFoundPageId", domainDetails.pageNotFoundPageId.ToString)
+                                Call db.db_setCS(CS, "allowCrossLogin", domainDetails.allowCrossLogin.ToString)
                             End If
-                            Call app.db_csClose(CS)
+                            Call db.db_csClose(CS)
                         End If
                         If Not domainDetails.visited Then
                             '
                             ' set visited true
                             '
-                            SQL = "update ccdomains set visited=1 where name=" & app.db_EncodeSQLText(web.requestDomain)
-                            Call app.executeSql(SQL)
-                            Call app.cache.SetKey("domainContentList", "", "domains")
+                            SQL = "update ccdomains set visited=1 where name=" & db.db_EncodeSQLText(web.requestDomain)
+                            Call db.executeSql(SQL)
+                            Call cache.SetKey("domainContentList", "", "domains")
                         End If
                         If domainDetails.typeId = 1 Then
                             '
                             ' normal domain, leave it
                             '
-                        ElseIf InStr(1, web.requestPathPage, app.siteProperty_AdminURL, vbTextCompare) <> 0 Then
+                        ElseIf InStr(1, web.requestPathPage, db.siteProperty_AdminURL, vbTextCompare) <> 0 Then
                             '
                             ' forwarding does not work in the admin site
                             '
@@ -2012,13 +2042,13 @@ Namespace Contensive.Core
                         domainDetailsNew.forwardDomainId = 0
                         domainDetailsList.Add(web.requestDomain.ToLower(), domainDetailsNew)
                         '
-                        CS = app.db_csInsertRecord("domains")
-                        If app.db_csOk(CS) Then
-                            domainDetails.id = app.db_GetCSInteger(CS, "id")
-                            Call app.db_setCS(CS, "name", web.requestDomain)
-                            Call app.db_setCS(CS, "typeid", "1")
+                        CS = db.db_csInsertRecord("domains")
+                        If db.db_csOk(CS) Then
+                            domainDetails.id = db.db_GetCSInteger(CS, "id")
+                            Call db.db_setCS(CS, "name", web.requestDomain)
+                            Call db.db_setCS(CS, "typeid", "1")
                         End If
-                        Call app.db_csClose(CS)
+                        Call db.db_csClose(CS)
                         '
                         updateDomainCache = True
                     End If
@@ -2027,31 +2057,31 @@ Namespace Contensive.Core
                         ' if there was a change, update the cache
                         '
                         domainDetailsListText = json.Serialize(domainDetailsList)
-                        Call app.cache.SetKey("domainContentList", domainDetailsListText, "domains")
+                        Call cache.SetKey("domainContentList", domainDetailsListText, "domains")
                     End If
 
                     '
-                    properties_site__AllowVisitTracking = app.siteProperty_getBoolean("allowVisitTracking", True)
+                    properties_site__AllowVisitTracking = db.siteProperty_getBoolean("allowVisitTracking", True)
                     '
-                    If app.RootWebPath <> "/" Then
-                        If Right(app.RootWebPath, 1) <> "/" Then
-                            app.RootWebPath = app.RootWebPath & "/"
+                    If db.RootWebPath <> "/" Then
+                        If Right(db.RootWebPath, 1) <> "/" Then
+                            db.RootWebPath = db.RootWebPath & "/"
                         End If
-                        If Left(app.RootWebPath, 1) <> "/" Then
-                            app.RootWebPath = "/" & app.RootWebPath
+                        If Left(db.RootWebPath, 1) <> "/" Then
+                            db.RootWebPath = "/" & db.RootWebPath
                         End If
                         '
                         ' Fix possible case difference between VirtualPath and AppRootPath
                         '
-                        web_requestVirtualFilePath = Left(app.RootWebPath, Len(app.RootWebPath) - 1)
+                        web_requestVirtualFilePath = Left(db.RootWebPath, Len(db.RootWebPath) - 1)
                     Else
                         '
                         ' This site is not virtual hosted, just use the Init application name.
                         '
-                        web_requestVirtualFilePath = "/" & app.config.name
+                        web_requestVirtualFilePath = "/" & db.config.name
                     End If
                     '
-                    web_requestContentWatchPrefix = web_requestProtocol & web.requestDomain & app.RootWebPath
+                    web_requestContentWatchPrefix = web_requestProtocol & web.requestDomain & db.RootWebPath
                     web_requestContentWatchPrefix = Mid(web_requestContentWatchPrefix, 1, Len(web_requestContentWatchPrefix) - 1)
                     '
                     'ServerSocketLoaded = False
@@ -2062,31 +2092,31 @@ Namespace Contensive.Core
                     '
                     '
                     web_requestPath = "/"
-                    web_requestPage = app.siteProperty_ServerPageDefault
+                    web_requestPage = db.siteProperty_ServerPageDefault
                     TextStartPointer = InStrRev(web.requestPathPage, "/")
                     If TextStartPointer <> 0 Then
                         web_requestPath = Mid(web.requestPathPage, 1, TextStartPointer)
                         web_requestPage = Mid(web.requestPathPage, TextStartPointer + 1)
                     End If
-                    web_requestAppPath = Mid(web_requestPath, Len(app.RootWebPath) + 1)
-                    web_requestSecureURLRoot = "https://" & main_ServerDomain & app.RootWebPath
+                    web_requestAppPath = Mid(web_requestPath, Len(db.RootWebPath) + 1)
+                    web_requestSecureURLRoot = "https://" & main_ServerDomain & db.RootWebPath
                     '
                     ' ----- If virtual site, check RootPath case against current URL
                     '
-                    If app.RootWebPath <> "/" Then
-                        PathTest = Left(web_requestPath, Len(app.RootWebPath))
-                        If PathTest <> app.RootWebPath Then
+                    If db.RootWebPath <> "/" Then
+                        PathTest = Left(web_requestPath, Len(db.RootWebPath))
+                        If PathTest <> db.RootWebPath Then
                             '
                             ' Case mismatch, redirect to correct case so cookies will be valid
                             '
                             'Call AppendLog("main_init(), 1810 - exit for rootpath mismatch (?)")
                             '
                             If web.requestQueryString = "" Then
-                                Link = web_requestProtocol & main_ServerDomain & app.RootWebPath & web_requestAppPath & web_requestPage
+                                Link = web_requestProtocol & main_ServerDomain & db.RootWebPath & web_requestAppPath & web_requestPage
                             Else
-                                Link = web_requestProtocol & main_ServerDomain & app.RootWebPath & web_requestAppPath & web_requestPage & "?" & web.requestQueryString
+                                Link = web_requestProtocol & main_ServerDomain & db.RootWebPath & web_requestAppPath & web_requestPage & "?" & web.requestQueryString
                             End If
-                            Call web_Redirect2(Link, "Redirecting because this site is configured to only run in the path [" & app.RootWebPath & "]. See the IIS Virtual Folder property of the Contensive Application Manager.", False)
+                            Call web_Redirect2(Link, "Redirecting because this site is configured to only run in the path [" & db.RootWebPath & "]. See the IIS Virtual Folder property of the Contensive Application Manager.", False)
                             docOpen = False '--- should be disposed by caller --- Call dispose
                             Return docOpen
                         End If
@@ -2105,7 +2135,7 @@ Namespace Contensive.Core
                     '
                     ' ----- Create Server Link property
                     '
-                    main_ServerLink = web_requestProtocol & web.requestDomain & app.RootWebPath & web_requestAppPath & web_requestPage
+                    main_ServerLink = web_requestProtocol & web.requestDomain & db.RootWebPath & web_requestAppPath & web_requestPage
                     If web.requestQueryString <> "" Then
                         main_ServerLink = main_ServerLink & "?" & web.requestQueryString
                     End If
@@ -2119,7 +2149,7 @@ Namespace Contensive.Core
                     '
                     ' ----- Style tag
                     '
-                    main_AdminMessage = "For more information, please contact the <a href=""mailto:" & app.siteProperty_EmailAdmin & "?subject=Re: " & main_ServerDomain & """>Site Administrator</A>."
+                    main_AdminMessage = "For more information, please contact the <a href=""mailto:" & db.siteProperty_EmailAdmin & "?subject=Re: " & main_ServerDomain & """>Site Administrator</A>."
 
                     '
                     '
@@ -2135,7 +2165,7 @@ Namespace Contensive.Core
                     ' ----- Create Server Link property
                     '--------------------------------------------------------------------------
                     '
-                    main_ServerLink = web_requestProtocol & web.requestDomain & app.RootWebPath & web_requestAppPath & web_requestPage
+                    main_ServerLink = web_requestProtocol & web.requestDomain & db.RootWebPath & web_requestAppPath & web_requestPage
                     If web.requestQueryString <> "" Then
                         main_ServerLink = main_ServerLink & "?" & web.requestQueryString
                     End If
@@ -2163,13 +2193,13 @@ Namespace Contensive.Core
                     '
                     ' ----- Verify virtual path is not used on non-virtual sites
                     '
-                    If (RedirectLink = "") And (app.RootWebPath = "/") And (InStr(1, web_requestPath, web_requestVirtualFilePath & "/", vbTextCompare) = 1) Then
+                    If (RedirectLink = "") And (db.RootWebPath = "/") And (InStr(1, web_requestPath, web_requestVirtualFilePath & "/", vbTextCompare) = 1) Then
                         Copy = "Redirecting because this site can not be run in the path [" & web_requestVirtualFilePath & "]"
-                        web_requestAppPath = Replace(web_requestAppPath, app.config.name & "/", "", , , vbTextCompare)
+                        web_requestAppPath = Replace(web_requestAppPath, db.config.name & "/", "", , , vbTextCompare)
                         If web.requestQueryString <> "" Then
-                            Call web_Redirect2(web_requestProtocol & main_ServerDomain & app.RootWebPath & web_requestAppPath & web_requestPage & "?" & web.requestQueryString, Copy, False)
+                            Call web_Redirect2(web_requestProtocol & main_ServerDomain & db.RootWebPath & web_requestAppPath & web_requestPage & "?" & web.requestQueryString, Copy, False)
                         Else
-                            Call web_Redirect2(web_requestProtocol & main_ServerDomain & app.RootWebPath & web_requestAppPath & web_requestPage, Copy, False)
+                            Call web_Redirect2(web_requestProtocol & main_ServerDomain & db.RootWebPath & web_requestAppPath & web_requestPage, Copy, False)
                         End If
                     End If
                     '
@@ -2237,7 +2267,7 @@ Namespace Contensive.Core
         '========================================================================
         '
         Public Function metaData_GetContentID(ByVal ContentName As String) As Integer
-            Return app.db_GetContentID(ContentName)
+            Return db.db_GetContentID(ContentName)
         End Function
         '
         '========================================================================
@@ -2245,7 +2275,7 @@ Namespace Contensive.Core
         '========================================================================
         '
         Public Function metaData_GetContentTablename2(ByVal ContentName As String) As String
-            Return app.metaData_GetContentTablename(ContentName)
+            Return db.metaData_GetContentTablename(ContentName)
         End Function
         '
         ' ----- Get a DataSource Name from its ContentName
@@ -2253,7 +2283,7 @@ Namespace Contensive.Core
         Public Function metaData_GetContentDataSource(ContentName As String) As String
             Dim CDef As coreMetaDataClass.CDefClass
             '
-            CDef = app.metaData.getCdef(ContentName)
+            CDef = metaData.getCdef(ContentName)
             metaData_GetContentDataSource = CDef.ContentDataSourceName
         End Function
         '
@@ -2271,7 +2301,7 @@ Namespace Contensive.Core
             '
             MethodName = "csv_GetDataSourceByID"
             '
-            If app.dataSources.Length <= 0 Then
+            If db.db_dataSources.Length <= 0 Then
                 '
                 ' if none available, use default
                 '
@@ -2284,16 +2314,16 @@ Namespace Contensive.Core
                 '
                 metaData_GetDataSourceByID = "Default"
             Else
-                For DataSourcePointer = 0 To app.dataSources.Length - 1
-                    If app.dataSources(DataSourcePointer).Id = DataSourceID Then
+                For DataSourcePointer = 0 To db.db_dataSources.Length - 1
+                    If db.db_dataSources(DataSourcePointer).Id = DataSourceID Then
                         Exit For
                     End If
                 Next
-                If (DataSourcePointer >= app.dataSources.Length) Then
+                If (DataSourcePointer >= db.db_dataSources.Length) Then
                     metaData_GetDataSourceByID = "Default"
                     Call handleLegacyError4(KmaErrorUser, "dll", "Datasource ID [" & DataSourceID & "] was not found, the default datasource will be used", MethodName, False, True)
                 Else
-                    metaData_GetDataSourceByID = app.dataSources(DataSourcePointer).NameLower
+                    metaData_GetDataSourceByID = db.db_dataSources(DataSourcePointer).NameLower
                 End If
             End If
             '
@@ -2377,11 +2407,11 @@ ErrorTrap:
             db_GetContentIDByTablename = -1
             If TableName <> "" Then
                 SQL = "select ContentControlID from " & TableName & " where contentcontrolid is not null order by contentcontrolid;"
-                CS = app.db_openCsSql_rev("Default", SQL, 1, 1)
-                If app.db_csOk(CS) Then
-                    db_GetContentIDByTablename = app.db_GetCSInteger(CS, "ContentControlID")
+                CS = db.db_openCsSql_rev("Default", SQL, 1, 1)
+                If db.db_csOk(CS) Then
+                    db_GetContentIDByTablename = db.db_GetCSInteger(CS, "ContentControlID")
                 End If
-                Call app.db_csClose(CS)
+                Call db.db_csClose(CS)
             End If
             '
             Exit Function
@@ -2408,12 +2438,12 @@ ErrorTrap:
             'dim dt as datatable
             Dim DataSourceType As Integer
             '
-            DataSourceType = app.csv_GetDataSourceType(DataSourceName)
+            DataSourceType = db.db_GetDataSourceType(DataSourceName)
             If (DataSourceType <> DataSourceTypeODBCSQLServer) And (DataSourceType <> DataSourceTypeODBCAccess) Then
                 '
                 ' If not SQL server, just delete them
                 '
-                Call app.csv_DeleteTableRecords(DataSourceName, TableName, Criteria)
+                Call db.db_DeleteTableRecords(DataSourceName, TableName, Criteria)
             Else
                 '
                 ' ----- Clear up to date for the properties
@@ -2434,20 +2464,20 @@ ErrorTrap:
                 CurrentCount = 0
                 SQL = "select count(*) as RecordCount from " & TableName & " where " & Criteria
                 Dim dt As DataTable
-                dt = app.executeSql(SQL)
+                dt = db.executeSql(SQL)
                 If dt.Rows.Count > 0 Then
                     CurrentCount = EncodeInteger(dt.Rows(0).Item(0))
                 End If
                 Do While (CurrentCount <> 0) And (PreviousCount <> CurrentCount) And (LoopCount < iChunkCount)
-                    If app.csv_GetDataSourceType(DataSourceName) = DataSourceTypeODBCMySQL Then
+                    If db.db_GetDataSourceType(DataSourceName) = DataSourceTypeODBCMySQL Then
                         SQL = "delete from " & TableName & " where id in (select ID from " & TableName & " where " & Criteria & " limit " & iChunkSize & ")"
                     Else
                         SQL = "delete from " & TableName & " where id in (select top " & iChunkSize & " ID from " & TableName & " where " & Criteria & ")"
                     End If
-                    Call app.executeSql(SQL, DataSourceName)
+                    Call db.executeSql(SQL, DataSourceName)
                     PreviousCount = CurrentCount
                     SQL = "select count(*) as RecordCount from " & TableName & " where " & Criteria
-                    dt = app.executeSql(SQL)
+                    dt = db.executeSql(SQL)
                     If dt.Rows.Count > 0 Then
                         CurrentCount = EncodeInteger(dt.Rows(0).Item(0))
                     End If
@@ -2488,7 +2518,7 @@ ErrorTrap:
             '
             MethodName = "csv_GetContentControlCriteria"
             '
-            CDef = app.metaData.getCdef(ContentName)
+            CDef = metaData.getCdef(ContentName)
             db_GetContentControlCriteria = CDef.ContentControlCriteria
             '
             Exit Function
@@ -2546,13 +2576,13 @@ ErrorTrap:
             '
             SQL = "SELECT ccContent.Name AS ContentName, ccTables.Name AS TableName, ccContent.ID AS ContentID" _
                 & " FROM ccContent LEFT JOIN ccTables ON ccContent.ContentTableID = ccTables.ID" _
-                & " WHERE ccTables.Name=" & app.db_EncodeSQLText(TableName) & ";"
+                & " WHERE ccTables.Name=" & db.db_EncodeSQLText(TableName) & ";"
             Const dtColumnContentName As Integer = 0
             Const dtColumnTableName As Integer = 1
             Const dtColumnContentId As Integer = 2
             '
             Dim dt As DataTable
-            dt = app.executeSql(SQL)
+            dt = db.executeSql(SQL)
             If dt.Rows.Count = 0 Then
                 Call handleLegacyError25(MethodName, ("No Content Definition could be found for records in table [" & TableName & "]"))
             Else
@@ -2561,13 +2591,13 @@ ErrorTrap:
                 ' Read in a record from the table to get fields
                 '----------------------------------------------------------------
                 '
-                SQL = app.csv_GetSQLSelect("default", TableName, , , , , 1)
+                SQL = db.db_GetSQLSelect("default", TableName, , , , , 1)
                 'If csv_GetDataSourceType(DataSourceName) = DataSourceTypeODBCMySQL Then
                 '    SQL = "select * from " & TableName & " limit 1"
                 'Else
                 '    SQL = "select top 1 * from " & TableName & ";"
                 'End If
-                Dim dtTargetTable As DataTable = app.executeSql(SQL, DataSourceName)
+                Dim dtTargetTable As DataTable = db.executeSql(SQL, DataSourceName)
                 If dtTargetTable.Rows.Count = 0 Then
                     '
                     ' --- no records were found, add a blank if we can
@@ -2576,19 +2606,19 @@ ErrorTrap:
                     CreateKey = getRandomLong()
                     SQL = "INSERT INTO " & TableName & " (CreateKey,DateAdded" _
                         & ")VALUES(" _
-                        & " " & app.db_EncodeSQLNumber(CreateKey) _
-                        & "," & app.db_EncodeSQLDate(DateAdded) _
+                        & " " & db.db_EncodeSQLNumber(CreateKey) _
+                        & "," & db.db_EncodeSQLDate(DateAdded) _
                         & ");"
-                    Call app.executeSql(SQL, DataSourceName)
-                    SQL = app.csv_GetSQLSelect("default", TableName, "ID", "DateAdded=" & app.db_EncodeSQLDate(DateAdded) & " AND CreateKey=" & app.db_EncodeSQLNumber(CreateKey))
-                    dtTargetTable = app.executeSql(SQL, DataSourceName)
+                    Call db.executeSql(SQL, DataSourceName)
+                    SQL = db.db_GetSQLSelect("default", TableName, "ID", "DateAdded=" & db.db_EncodeSQLDate(DateAdded) & " AND CreateKey=" & db.db_EncodeSQLNumber(CreateKey))
+                    dtTargetTable = db.executeSql(SQL, DataSourceName)
                     If dtTargetTable.Rows.Count = 0 Then
                         Call handleLegacyError25(MethodName, ("Could not locate a new re   cord added to table [" & TableName & "]"))
                     Else
                         BlankRecordID = EncodeInteger(dtTargetTable.Rows(0).Item("id"))
                     End If
-                    SQL = app.csv_GetSQLSelect("default", TableName, , , , , 1)
-                    dtTargetTable = app.executeSql(SQL, DataSourceName)
+                    SQL = db.db_GetSQLSelect("default", TableName, , , , , 1)
+                    dtTargetTable = db.executeSql(SQL, DataSourceName)
                     If dtTargetTable.Rows.Count = 0 Then
                         Call handleLegacyError25(MethodName, ("Could not open a record to table [" & TableName & "]."))
                     End If
@@ -2604,8 +2634,8 @@ ErrorTrap:
                         ContentID = EncodeInteger(dt(dtColumnContentId))
                         For Each dc As DataColumn In dtTargetTable.Rows
                             TableFieldName = dc.ColumnName
-                            SQL = "SELECT * FROM ccFields where (ContentID=" & ContentID & ")and(name=" & app.db_EncodeSQLText(TableFieldName) & ")"
-                            Dim dtField As DataTable = app.executeSql(SQL, "Default")
+                            SQL = "SELECT * FROM ccFields where (ContentID=" & ContentID & ")and(name=" & db.db_EncodeSQLText(TableFieldName) & ")"
+                            Dim dtField As DataTable = db.executeSql(SQL, "Default")
                             If dtField.Rows.Count = 0 Then
                                 Call db_CreateContentFieldFromTableField(ContentName, dc.ColumnName, EncodeInteger(dc.DataType))
                             End If
@@ -2616,9 +2646,9 @@ ErrorTrap:
             '
             ' ----- Load CDef
             '
-            If (Not app.UpgradeInProgress) Then
-                app.cache.invalidateAll()
-                app.metaData.clear()
+            If (Not db.UpgradeInProgress) Then
+                cache.invalidateAll()
+                metaData.clear()
             End If
             'app.AllowContentAutoLoad = StateOfAllowContentAutoLoad
             Exit Sub
@@ -2662,7 +2692,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function db_GetSQLAlterColumnType(ByVal DataSourceName As String, ByVal fieldType As Integer) As String
-            Return app.db_GetSQLAlterColumnType(DataSourceName, fieldType)
+            Return db.db_GetSQLAlterColumnType(DataSourceName, fieldType)
         End Function
         '        '
         '========================================================================
@@ -2670,7 +2700,7 @@ ErrorTrap:
         '========================================================================
         '
         Private Function db_GetFieldTypeByADOType(ByVal ADOFieldType As Integer) As Integer
-            Return app.db_GetFieldTypeIdByADOType(ADOFieldType)
+            Return db.db_GetFieldTypeIdByADOType(ADOFieldType)
         End Function
         '
         '========================================================================
@@ -2682,7 +2712,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Sub db_CreateSQLTable(ByVal DataSourceName As String, ByVal TableName As String, Optional ByVal AllowAutoIncrement As Boolean = True)
-            Call app.db_CreateSQLTable(DataSourceName, TableName, AllowAutoIncrement)
+            Call db.db_CreateSQLTable(DataSourceName, TableName, AllowAutoIncrement)
         End Sub
 
         '
@@ -2690,7 +2720,7 @@ ErrorTrap:
         '   Delete a table field from a table
         '======================================================================
         Public Sub db_DeleteTable(ByVal DataSourceName As String, ByVal TableName As String)
-            app.db_DeleteTable(DataSourceName, TableName)
+            db.db_DeleteTable(DataSourceName, TableName)
         End Sub
         '
         '========================================================================
@@ -2698,7 +2728,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Sub db_DeleteTableField(ByVal DataSourceName As String, ByVal TableName As String, ByVal FieldName As String)
-            Call app.db_DeleteTableField(DataSourceName, TableName, FieldName)
+            Call db.db_DeleteTableField(DataSourceName, TableName, FieldName)
         End Sub
         '
         '========================================================================
@@ -2708,7 +2738,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Sub db_CreateSQLIndex(ByVal DataSourceName As String, ByVal TableName As String, ByVal IndexName As String, ByVal FieldNames As String)
-            Call app.db_CreateSQLIndex(DataSourceName, TableName, IndexName, FieldNames)
+            Call db.db_CreateSQLIndex(DataSourceName, TableName, IndexName, FieldNames)
         End Sub
         '
         '======================================================================================
@@ -2718,13 +2748,13 @@ ErrorTrap:
         Public Property csv_UpgradeInProgress() As Boolean
             Get
                 csv_UpgradeInProgress = False
-                If Not (_app Is Nothing) Then
-                    csv_UpgradeInProgress = app.UpgradeInProgress
+                If Not (_db Is Nothing) Then
+                    csv_UpgradeInProgress = db.UpgradeInProgress
                 End If
             End Get
             Set(ByVal value As Boolean)
-                If Not (_app Is Nothing) Then
-                    app.UpgradeInProgress = value
+                If Not (_db Is Nothing) Then
+                    db.UpgradeInProgress = value
                 End If
                 'csv_UpgradeInProgressLocal = InProgress
 
@@ -2745,7 +2775,7 @@ ErrorTrap:
             ' ----- remove all ContentWatchListRules (uncheck the watch lists in admin)
             '
             ContentID = metaData_GetContentID(ContentName)
-            Call app.csv_DeleteContentRules(ContentID, RecordID)
+            Call db.db_DeleteContentRules(ContentID, RecordID)
             Exit Sub
             '
             ' ----- Error Trap
@@ -2814,7 +2844,7 @@ ErrorTrap:
                     ' Test for from-address / to-address matches
                     '
                     If LCase(FromAddress) = LCase(ToAddress) Then
-                        FromAddress = app.siteProperty_getText("EmailFromAddress", "")
+                        FromAddress = db.siteProperty_getText("EmailFromAddress", "")
                         If FromAddress = "" Then
                             '
                             '
@@ -2838,7 +2868,7 @@ ErrorTrap:
                         '
                         ' Fix links for HTML send
                         '
-                        rootUrl = "http://" & app.config.domainList(0) & "/"
+                        rootUrl = "http://" & db.config.domainList(0) & "/"
                         BodyMessage = ConvertLinksToAbsolute(BodyMessage, rootUrl)
                         '
                         ' compose body
@@ -2854,9 +2884,9 @@ ErrorTrap:
                             & BodyMessage _
                             & "</body>" _
                             & "</html>"
-                        returnStatus = EmailHandler.sendEmail5(ToAddress, FromAddress, SubjectMessage, BodyMessage, BounceAddress, ReplyToAddress, iResultLogPathPage, app.siteProperty_getText("SMTPServer", "SMTP.YourServer.Com"), isImmediate, isHTML, "")
+                        returnStatus = EmailHandler.sendEmail5(ToAddress, FromAddress, SubjectMessage, BodyMessage, BounceAddress, ReplyToAddress, iResultLogPathPage, db.siteProperty_getText("SMTPServer", "SMTP.YourServer.Com"), isImmediate, isHTML, "")
                     Else
-                        returnStatus = EmailHandler.sendEmail5(ToAddress, FromAddress, SubjectMessage, BodyMessage, BounceAddress, ReplyToAddress, iResultLogPathPage, app.siteProperty_getText("SMTPServer", "SMTP.YourServer.Com"), isImmediate, isHTML, "")
+                        returnStatus = EmailHandler.sendEmail5(ToAddress, FromAddress, SubjectMessage, BodyMessage, BounceAddress, ReplyToAddress, iResultLogPathPage, db.siteProperty_getText("SMTPServer", "SMTP.YourServer.Com"), isImmediate, isHTML, "")
                     End If
                     If (returnStatus = "") Then
                         returnStatus = WarningMsg
@@ -2865,23 +2895,23 @@ ErrorTrap:
                     ' ----- Log the send
                     '
                     If True Then
-                        CSLog = app.db_csInsertRecord("Email Log", 0)
-                        If app.db_csOk(CSLog) Then
-                            Call app.db_setCS(CSLog, "Name", "System Email Send " & CStr(Now()))
-                            Call app.db_setCS(CSLog, "LogType", EmailLogTypeImmediateSend)
-                            Call app.db_setCS(CSLog, "SendStatus", returnStatus)
-                            Call app.db_setCS(CSLog, "toaddress", ToAddress)
-                            Call app.db_setCS(CSLog, "fromaddress", FromAddress)
-                            Call app.db_setCS(CSLog, "Subject", SubjectMessage)
+                        CSLog = db.db_csInsertRecord("Email Log", 0)
+                        If db.db_csOk(CSLog) Then
+                            Call db.db_setCS(CSLog, "Name", "System Email Send " & CStr(Now()))
+                            Call db.db_setCS(CSLog, "LogType", EmailLogTypeImmediateSend)
+                            Call db.db_setCS(CSLog, "SendStatus", returnStatus)
+                            Call db.db_setCS(CSLog, "toaddress", ToAddress)
+                            Call db.db_setCS(CSLog, "fromaddress", FromAddress)
+                            Call db.db_setCS(CSLog, "Subject", SubjectMessage)
                             If emailIdOrZeroForLog <> 0 Then
-                                Call app.db_setCS(CSLog, "emailid", emailIdOrZeroForLog)
+                                Call db.db_setCS(CSLog, "emailid", emailIdOrZeroForLog)
                             End If
                         End If
-                        Call app.db_csClose(CSLog)
+                        Call db.db_csClose(CSLog)
                     End If
                 End If
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
             Return returnStatus
         End Function
@@ -2905,7 +2935,7 @@ ErrorTrap:
             'MethodName = "csv_FilterDomainName"
             '
             filterDomainName = Link
-            csv_DomainName = app.config.domainList(0)
+            csv_DomainName = db.config.domainList(0)
             If InStr(1, csv_DomainName, ",") <> 0 Then
                 csv_DomainName = Mid(csv_DomainName, 1, InStr(1, csv_DomainName, ",") - 1)
             End If
@@ -2925,14 +2955,14 @@ ErrorTrap:
         Public Sub db_CreateContent4(ByVal Active As Boolean, ByVal DataSourceName As String, ByVal TableName As String, ByVal ContentName As String, Optional ByVal AdminOnly As Boolean = False, Optional ByVal DeveloperOnly As Boolean = False, Optional ByVal AllowAdd As Boolean = True, Optional ByVal AllowDelete As Boolean = True, Optional ByVal ParentContentName As String = "", Optional ByVal DefaultSortMethod As String = "", Optional ByVal DropDownFieldList As String = "", Optional ByVal AllowWorkflowAuthoring As Boolean = False, Optional ByVal AllowCalendarEvents As Boolean = False, Optional ByVal AllowContentTracking As Boolean = False, Optional ByVal AllowTopicRules As Boolean = False, Optional ByVal AllowContentChildTool As Boolean = False, Optional ByVal AllowMetaContent As Boolean = False, Optional ByVal IconLink As String = "", Optional ByVal IconWidth As Integer = 0, Optional ByVal IconHeight As Integer = 0, Optional ByVal IconSprites As Integer = 0, Optional ByVal ccGuid As String = "", Optional ByVal IsBaseContent As Boolean = False, Optional ByVal installedByCollectionGuid As String = "")
 
             Dim bulder As New coreBuilderClass(Me)
-            Call bulder.db_CreateContent4(Active, DataSourceName, TableName, ContentName, AdminOnly)
+            Call bulder.metaData_CreateContent4(Active, DataSourceName, TableName, ContentName, AdminOnly)
 
         End Sub
         '
         '   Patch -- returns true if the cdef field exists
         '
         Private Function db_isCdefField(ByVal ContentID As Integer, ByVal FieldName As String) As Boolean
-            Return app.db_isCdefField(ContentID, FieldName)
+            Return db.db_isCdefField(ContentID, FieldName)
         End Function
         '
         '========================================================================
@@ -3025,7 +3055,7 @@ ErrorTrap:
         '
         Public ReadOnly Property app_rootWebPath() As String
             Get
-                app_rootWebPath = app.RootWebPath
+                app_rootWebPath = db.RootWebPath
             End Get
         End Property
         '
@@ -3033,7 +3063,7 @@ ErrorTrap:
         '
         Public ReadOnly Property app_domainList() As String
             Get
-                app_domainList = app.config.domainList(0)
+                app_domainList = db.config.domainList(0)
             End Get
 
 
@@ -3042,8 +3072,8 @@ ErrorTrap:
         Public ReadOnly Property error_ErrorCount() As Integer
             Get
                 error_ErrorCount = 0
-                If Not (_app Is Nothing) Then
-                    error_ErrorCount = app.ErrorCount
+                If Not (_db Is Nothing) Then
+                    error_ErrorCount = db.ErrorCount
                 End If
 
             End Get
@@ -3051,8 +3081,8 @@ ErrorTrap:
 
         '
         Public Sub error_IncrementErrorCount()
-            If Not (_app Is Nothing) Then
-                Call app.IncrementErrorCount()
+            If Not (_db Is Nothing) Then
+                Call db.IncrementErrorCount()
             End If
         End Sub
         '
@@ -3061,7 +3091,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function db_IsSQLTableField(ByVal DataSourceName As String, ByVal TableName As String, ByVal FieldName As String) As Boolean
-            Return app.db_IsSQLTableField(DataSourceName, TableName, FieldName)
+            Return db.db_IsSQLTableField(DataSourceName, TableName, FieldName)
         End Function
         '
         '========================================================================
@@ -3069,7 +3099,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function db_IsSQLTable(ByVal DataSourceName As String, ByVal TableName As String) As Boolean
-            Return app.db_IsSQLTable(DataSourceName, TableName)
+            Return db.db_IsSQLTable(DataSourceName, TableName)
         End Function
         '
         '========================================================================
@@ -3081,7 +3111,7 @@ ErrorTrap:
             '
             pageManager_cache_pageContent_rows = 0
             cache_pageContent = Nothing
-            Call app.cache.SetKey(pageManager_cache_pageContent_cacheName, cache_pageContent)
+            Call cache.SetKey(pageManager_cache_pageContent_cacheName, cache_pageContent)
             '
             Exit Sub
             '
@@ -3101,18 +3131,18 @@ ErrorTrap:
             Try
                 Dim Pointer As Integer
                 '
-                If Not (_app Is Nothing) Then
+                If Not (_db Is Nothing) Then
                     If UCase(DataSourceName) = "DEFAULT" Then
-                        db_GetConnectionString = app.DefaultConnectionString
+                        db_GetConnectionString = db.DefaultConnectionString
                     Else
-                        Pointer = app.csv_GetDataSourcePointer(DataSourceName)
+                        Pointer = db.db_GetDataSourcePointer(DataSourceName)
                         If Pointer >= 0 Then
-                            db_GetConnectionString = app.dataSources(Pointer).odbcConnectionString
+                            db_GetConnectionString = db.db_dataSources(Pointer).odbcConnectionString
                         End If
                     End If
                 End If
             Catch ex As Exception
-                Call handleException(ex)
+                Call handleExceptionAndRethrow(ex)
             End Try
         End Function
         '
@@ -3139,8 +3169,8 @@ ErrorTrap:
         '
         Friend ReadOnly Property security_LicenseKey() As String
             Get
-                If Not (_app Is Nothing) Then
-                    Return app.LicenseKey
+                If Not (_db Is Nothing) Then
+                    Return db.LicenseKey
                 End If
                 Return ""
             End Get
@@ -3195,11 +3225,11 @@ ErrorTrap:
         Public Function security_encodeToken(ByVal keyInteger As Integer, ByVal keyDate As Date) As String
             Dim returnToken As String = ""
             Try
-                Dim encrypt As New coreSecurityClass(Me, app.config.privateKey)
+                Dim encrypt As New coreSecurityClass(Me, db.config.privateKey)
                 Dim sourceText As String = keyInteger.ToString & vbTab & keyDate.ToString
                 returnToken = encrypt.twoWayEncrypt(sourceText)
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
             Return returnToken
         End Function
@@ -3223,7 +3253,7 @@ ErrorTrap:
 
                 End If
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '
@@ -3261,7 +3291,7 @@ ErrorTrap:
                     LoopPtr = LoopPtr + 1
                 Loop
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
             Return returnValue
         End Function
@@ -3632,7 +3662,7 @@ ErrorTrap:
                 If KmaHTML.ElementCount > 0 Then
                     ElementPointer = 0
                     workingContent = ""
-                    serverFilePath = ProtocolHostString & "/" & app.config.name & "/files/"
+                    serverFilePath = ProtocolHostString & "/" & db.config.name & "/files/"
                     Stream = New coreFastStringClass
                     Do While ElementPointer < KmaHTML.ElementCount
                         Copy = KmaHTML.Text(ElementPointer)
@@ -3696,7 +3726,7 @@ ErrorTrap:
                                                             'Link = Mid(Link, Pos + 1)
                                                         End If
                                                     End If
-                                                    If (Link = "") Or (InStr(1, "," & app.config.domainList(0) & ",", "," & Link & ",", vbTextCompare) <> 0) Then
+                                                    If (Link = "") Or (InStr(1, "," & db.config.domainList(0) & ",", "," & Link & ",", vbTextCompare) <> 0) Then
                                                         'If InStr(1, app.config.domainList(0), Value, vbTextCompare) <> 0 Then
                                                         '
                                                         ' ----- link is for this site
@@ -3809,11 +3839,11 @@ ErrorTrap:
                                                         Copy = security_encodeToken(personalizationPeopleId, Now())
                                                     Else
                                                         If Not CSPeopleSet Then
-                                                            CSPeople = app.db_OpenCSContentRecord("People", personalizationPeopleId)
+                                                            CSPeople = db.db_OpenCSContentRecord("People", personalizationPeopleId)
                                                             CSPeopleSet = True
                                                         End If
-                                                        If app.db_csOk(CSPeople) And app.db_IsCSFieldSupported(CSPeople, FieldName) Then
-                                                            Copy = app.db_GetCSLookup(CSPeople, FieldName)
+                                                        If db.db_csOk(CSPeople) And db.db_IsCSFieldSupported(CSPeople, FieldName) Then
+                                                            Copy = db.db_GetCSLookup(CSPeople, FieldName)
                                                         End If
                                                     End If
                                                 End If
@@ -3897,14 +3927,14 @@ ErrorTrap:
                                                 Else
                                                     If Not PeopleLanguageSet Then
                                                         If Not CSPeopleSet Then
-                                                            CSPeople = app.db_OpenCSContentRecord("people", personalizationPeopleId)
+                                                            CSPeople = db.db_OpenCSContentRecord("people", personalizationPeopleId)
                                                             CSPeopleSet = True
                                                         End If
-                                                        CSlanguage = app.db_OpenCSContentRecord("Languages", app.db_GetCSInteger(CSPeople, "LanguageID"), , , , "Name")
-                                                        If app.db_csOk(CSlanguage) Then
-                                                            PeopleLanguage = app.db_GetCSText(CSlanguage, "name")
+                                                        CSlanguage = db.db_OpenCSContentRecord("Languages", db.db_GetCSInteger(CSPeople, "LanguageID"), , , , "Name")
+                                                        If db.db_csOk(CSlanguage) Then
+                                                            PeopleLanguage = db.db_GetCSText(CSlanguage, "name")
                                                         End If
-                                                        Call app.db_csClose(CSlanguage)
+                                                        Call db.db_csClose(CSlanguage)
                                                         PeopleLanguageSet = True
                                                     End If
                                                 End If
@@ -4017,21 +4047,21 @@ ErrorTrap:
                                                         SelectList = "Name,Link,ID,ArgumentList,ObjectProgramID,IconFilename,IconWidth,IconHeight,IconSprites,IsInline,ccGuid"
                                                     End If
                                                     If ACGuid <> "" Then
-                                                        Criteria = "ccguid=" & app.db_EncodeSQLText(ACGuid)
+                                                        Criteria = "ccguid=" & db.db_EncodeSQLText(ACGuid)
                                                     Else
-                                                        Criteria = "name=" & app.db_EncodeSQLText(UCaseACName)
+                                                        Criteria = "name=" & db.db_EncodeSQLText(UCaseACName)
                                                     End If
-                                                    CS = app.db_csOpen(AddonContentName, Criteria, "Name,ID", , , , , SelectList)
-                                                    If app.db_csOk(CS) Then
+                                                    CS = db.db_csOpen(AddonContentName, Criteria, "Name,ID", , , , , SelectList)
+                                                    If db.db_csOk(CS) Then
                                                         AddonFound = True
                                                         ' ArgumentList comes in already encoded
-                                                        IconFilename = app.db_GetCS(CS, "IconFilename")
-                                                        SrcOptionList = app.db_GetCS(CS, "ArgumentList")
-                                                        IconWidth = app.db_GetCSInteger(CS, "IconWidth")
-                                                        IconHeight = app.db_GetCSInteger(CS, "IconHeight")
-                                                        IconSprites = app.db_GetCSInteger(CS, "IconSprites")
-                                                        AddonIsInline = app.db_GetCSBoolean(CS, "IsInline")
-                                                        ACGuid = app.db_GetCSText(CS, "ccGuid")
+                                                        IconFilename = db.db_GetCS(CS, "IconFilename")
+                                                        SrcOptionList = db.db_GetCS(CS, "ArgumentList")
+                                                        IconWidth = db.db_GetCSInteger(CS, "IconWidth")
+                                                        IconHeight = db.db_GetCSInteger(CS, "IconHeight")
+                                                        IconSprites = db.db_GetCSInteger(CS, "IconSprites")
+                                                        AddonIsInline = db.db_GetCSBoolean(CS, "IsInline")
+                                                        ACGuid = db.db_GetCSText(CS, "ccGuid")
                                                         IconAlt = ACName
                                                         IconTitle = "Rendered as the Add-on [" & ACName & "]"
                                                     Else
@@ -4064,7 +4094,7 @@ ErrorTrap:
                                                                 ACGuid = ""
                                                         End Select
                                                     End If
-                                                    Call app.db_csClose(CS)
+                                                    Call db.db_csClose(CS)
                                                     '
                                                     ' Build AddonOptionStringHTMLEncoded from SrcOptionList (for names), itself (for current settings), and SrcOptionList (for select options)
                                                     '
@@ -4271,7 +4301,7 @@ ErrorTrap:
                                                 '                                        End If
                                                 '                                        Call app.csv_CloseCS(CS)
                                                 '
-                                                Copy = "<a href=""" & ProtocolHostString & app.RootWebPath & app.siteProperty_ServerPageDefault & "?" & RequestNameDownloadID & "=" & ACAttrRecordID & """ target=""_blank""><img src=""" & ProtocolHostString & "/cclib/images/IconDownload3.gif"" width=""16"" height=""16"" border=""0"" alt=""" & ACAttrAlt & """></a>"
+                                                Copy = "<a href=""" & ProtocolHostString & db.RootWebPath & db.siteProperty_ServerPageDefault & "?" & RequestNameDownloadID & "=" & ACAttrRecordID & """ target=""_blank""><img src=""" & ProtocolHostString & "/cclib/images/IconDownload3.gif"" width=""16"" height=""16"" border=""0"" alt=""" & ACAttrAlt & """></a>"
                                             End If
                                         Case ACTypeTemplateContent
                                             '
@@ -4420,16 +4450,16 @@ ErrorTrap:
                 End If
                 workingContent = ReplaceInstructions & workingContent
                 If CSPeopleSet Then
-                    Call app.db_csClose(CSPeople)
+                    Call db.db_csClose(CSPeople)
                 End If
                 If CSOrganizationSet Then
-                    Call app.db_csClose(CSOrganization)
+                    Call db.db_csClose(CSOrganization)
                 End If
                 If CSVisitorSet Then
-                    Call app.db_csClose(CSVisitor)
+                    Call db.db_csClose(CSVisitor)
                 End If
                 If CSVisitSet Then
-                    Call app.db_csClose(CSVisit)
+                    Call db.db_csClose(CSVisit)
                 End If
                 KmaHTML = Nothing
             End If
@@ -4459,11 +4489,11 @@ ErrorTrap:
             Dim Copy As String
             '
             Copy = ""
-            CS = app.db_OpenCSContentRecord("People", PeopleID, , , , "Name,Phone,Email")
-            If app.db_csOk(CS) Then
-                ContactName = (app.db_GetCSText(CS, "Name"))
-                ContactPhone = (app.db_GetCSText(CS, "Phone"))
-                ContactEmail = (app.db_GetCSText(CS, "Email"))
+            CS = db.db_OpenCSContentRecord("People", PeopleID, , , , "Name,Phone,Email")
+            If db.db_csOk(CS) Then
+                ContactName = (db.db_GetCSText(CS, "Name"))
+                ContactPhone = (db.db_GetCSText(CS, "Phone"))
+                ContactEmail = (db.db_GetCSText(CS, "Email"))
                 If ContactName <> "" Then
                     Copy = Copy & "For more information, please contact " & ContactName
                     If ContactEmail = "" Then
@@ -4491,7 +4521,7 @@ ErrorTrap:
                     End If
                 End If
             End If
-            Call app.db_csClose(CS)
+            Call db.db_csClose(CS)
             '
             pageManager_getMoreInfoHtml = Copy
             '
@@ -4646,7 +4676,7 @@ ErrorTrap:
                                         If AttributeCount > 0 Then
                                             ImageID = DHTML.ElementAttribute(ElementPointer, "id")
                                             ImageSrcOriginal = DHTML.ElementAttribute(ElementPointer, "src")
-                                            VirtualFilePathBad = app.config.name & "/files/"
+                                            VirtualFilePathBad = db.config.name & "/files/"
                                             serverFilePath = "/" & VirtualFilePathBad
                                             If Left(LCase(ImageSrcOriginal), Len(VirtualFilePathBad)) = LCase(VirtualFilePathBad) Then
                                                 '
@@ -4930,7 +4960,7 @@ ErrorTrap:
                                                     End If
                                                 End If
                                             ElseIf InStr(1, ImageSrc, "cclibraryfiles", vbTextCompare) <> 0 Then
-                                                ImageAllowSFResize = EncodeBoolean(app.siteProperty_getBoolean("ImageAllowSFResize", True))
+                                                ImageAllowSFResize = EncodeBoolean(db.siteProperty_getBoolean("ImageAllowSFResize", True))
                                                 If ImageAllowSFResize And True Then
                                                     '
                                                     ' if it is a real image, check for resize
@@ -5152,7 +5182,7 @@ ErrorTrap:
                                                                                                     '
                                                                                                     ' image load failed, use raw filename
                                                                                                     '
-                                                                                                    handleLegacyError3(app.config.name, "Error while loading image to resize, [" & RecordVirtualFilename & "]", "dll", "cpCoreClass", "DecodeAciveContent", Err.Number, Err.Source, Err.Description, False, True, "")
+                                                                                                    handleLegacyError3(db.config.name, "Error while loading image to resize, [" & RecordVirtualFilename & "]", "dll", "cpCoreClass", "DecodeAciveContent", Err.Number, Err.Source, Err.Description, False, True, "")
                                                                                                     Err.Clear()
                                                                                                     NewImageFilename = ImageFilename
                                                                                                 Else
@@ -5211,7 +5241,7 @@ ErrorTrap:
                                                                                                     ' Update image record
                                                                                                     '
                                                                                                     RecordAltSizeList = RecordAltSizeList & vbCrLf & ImageAltSize
-                                                                                                    recordUpdateSql = recordUpdateSql & ",altsizelist=" & app.db_EncodeSQLText(RecordAltSizeList)
+                                                                                                    recordUpdateSql = recordUpdateSql & ",altsizelist=" & db.db_EncodeSQLText(RecordAltSizeList)
                                                                                                     'Call app.csv_SetCS(CS, "altsizelist", RecordAltSizeList)
                                                                                                 End If
                                                                                                 '
@@ -5226,7 +5256,7 @@ ErrorTrap:
                                                                             End If
                                                                             If recordUpdateSql <> "" Then
                                                                                 recordUpdateSql = Mid(recordUpdateSql, 2)
-                                                                                Call app.executeSql("update cclibraryfiles set " & recordUpdateSql & " where id=" & RecordID)
+                                                                                Call db.executeSql("update cclibraryfiles set " & recordUpdateSql & " where id=" & RecordID)
                                                                             End If
                                                                             'Call app.csv_CloseCS(CS)
                                                                         End If
@@ -5281,7 +5311,7 @@ ErrorTrap:
         '=============================================================
         '
         Public Function db_GetRecordID(ByVal ContentName As String, ByVal RecordName As String) As Integer
-            Return app.getRecordID(ContentName, RecordName)
+            Return db.getRecordID(ContentName, RecordName)
         End Function
         '
         '=============================================================
@@ -5289,7 +5319,7 @@ ErrorTrap:
         '=============================================================
         '
         Public Function db_GetRecordName(ByVal ContentName As String, ByVal RecordID As Integer) As String
-            Return app.db_GetRecordName(ContentName, RecordID)
+            Return db.db_GetRecordName(ContentName, RecordID)
         End Function
         '
         '=============================================================
@@ -5297,7 +5327,7 @@ ErrorTrap:
         '=============================================================
         '
         Public Function metaData_IsContentFieldSupported(ByVal ContentName As String, ByVal FieldName As String) As Boolean
-            Return app.metaData_IsContentFieldSupported(ContentName, FieldName)
+            Return db.metaData_IsContentFieldSupported(ContentName, FieldName)
         End Function
         '
         '
@@ -5314,14 +5344,14 @@ ErrorTrap:
             Else
                 TaskName = CStr(Now()) & " snapshot of " & LCase(ExportName)
             End If
-            CS = app.db_csInsertRecord("Tasks", RequestedByMemberID)
-            If app.db_csOk(CS) Then
-                Call app.db_GetCSFilename(CS, "Filename", Filename)
-                Call app.db_setCS(CS, "Name", TaskName)
-                Call app.db_setCS(CS, "Command", Command)
-                Call app.db_setCS(CS, "SQLQuery", SQL)
+            CS = db.db_csInsertRecord("Tasks", RequestedByMemberID)
+            If db.db_csOk(CS) Then
+                Call db.db_GetCSFilename(CS, "Filename", Filename)
+                Call db.db_setCS(CS, "Name", TaskName)
+                Call db.db_setCS(CS, "Command", Command)
+                Call db.db_setCS(CS, "SQLQuery", SQL)
             End If
-            Call app.db_csClose(CS)
+            Call db.db_csClose(CS)
             '
             Exit Sub
 ErrorTrap:
@@ -5366,29 +5396,29 @@ ErrorTrap:
             '
             SQL = "SELECT ccContentWatch.ID AS ID, ccContentWatch.Link as Link, ccContentWatch.LinkLabel as LinkLabel, ccContentWatch.SortOrder as SortOrder, ccContentWatch.DateAdded as DateAdded, ccContentWatch.ContentID as ContentID, ccContentWatch.RecordID as RecordID, ccContentWatch.ModifiedDate as ModifiedDate" _
                 & " FROM (ccContentWatchLists LEFT JOIN ccContentWatchListRules ON ccContentWatchLists.ID = ccContentWatchListRules.ContentWatchListID) LEFT JOIN ccContentWatch ON ccContentWatchListRules.ContentWatchID = ccContentWatch.ID" _
-                & " WHERE (((ccContentWatchLists.Name)=" & app.db_EncodeSQLText(ListName) & ")" _
+                & " WHERE (((ccContentWatchLists.Name)=" & db.db_EncodeSQLText(ListName) & ")" _
                     & "AND ((ccContentWatchLists.Active)<>0)" _
                     & "AND ((ccContentWatchListRules.Active)<>0)" _
                     & "AND ((ccContentWatch.Active)<>0)" _
                     & "AND (ccContentWatch.Link is not null)" _
                     & "AND (ccContentWatch.LinkLabel is not null)" _
-                    & "AND ((ccContentWatch.WhatsNewDateExpires is null)or(ccContentWatch.WhatsNewDateExpires>" & app.db_EncodeSQLDate(Now) & "))" _
+                    & "AND ((ccContentWatch.WhatsNewDateExpires is null)or(ccContentWatch.WhatsNewDateExpires>" & db.db_EncodeSQLDate(Now) & "))" _
                     & ")" _
                 & " ORDER BY " & SortFieldList & ";"
-            db_csOpenWatchList = app.db_openCsSql_rev("Default", SQL)
-            If Not app.db_csOk(db_csOpenWatchList) Then
+            db_csOpenWatchList = db.db_openCsSql_rev("Default", SQL)
+            If Not db.db_csOk(db_csOpenWatchList) Then
                 '
                 ' Check if listname exists
                 '
-                CS = app.db_csOpen("Content Watch Lists", "name=" & app.db_EncodeSQLText(ListName), "ID", , , , , "ID")
-                If Not app.db_csOk(CS) Then
-                    Call app.db_csClose(CS)
-                    CS = app.db_csInsertRecord("Content Watch Lists", 0)
-                    If app.db_csOk(CS) Then
-                        Call app.db_setCS(CS, "name", ListName)
+                CS = db.db_csOpen("Content Watch Lists", "name=" & db.db_EncodeSQLText(ListName), "ID", , , , , "ID")
+                If Not db.db_csOk(CS) Then
+                    Call db.db_csClose(CS)
+                    CS = db.db_csInsertRecord("Content Watch Lists", 0)
+                    If db.db_csOk(CS) Then
+                        Call db.db_setCS(CS, "name", ListName)
                     End If
                 End If
-                Call app.db_csClose(CS)
+                Call db.db_csClose(CS)
             End If
             '
             Exit Function
@@ -5537,41 +5567,41 @@ ErrorTrap:
                     iMenuName = "Default"
                 End If
                 '
-                CS = app.db_openCsSql_rev("default", "select ID from ccDynamicMenus where name=" & app.db_EncodeSQLText(iMenuName))
-                If app.db_csOk(CS) Then
-                    csv_VerifyDynamicMenu = app.db_GetCSInteger(CS, "ID")
+                CS = db.db_openCsSql_rev("default", "select ID from ccDynamicMenus where name=" & db.db_EncodeSQLText(iMenuName))
+                If db.db_csOk(CS) Then
+                    csv_VerifyDynamicMenu = db.db_GetCSInteger(CS, "ID")
                 End If
-                Call app.db_csClose(CS)
+                Call db.db_csClose(CS)
                 '
                 If csv_VerifyDynamicMenu = 0 Then
                     '
                     ' Add the Menu
                     '
-                    CS = app.db_csInsertRecord("Dynamic Menus", SystemMemberID)
-                    If app.db_csOk(CS) Then
-                        csv_VerifyDynamicMenu = app.db_GetCSInteger(CS, "ID")
-                        Call app.db_setCS(CS, "name", iMenuName)
+                    CS = db.db_csInsertRecord("Dynamic Menus", SystemMemberID)
+                    If db.db_csOk(CS) Then
+                        csv_VerifyDynamicMenu = db.db_GetCSInteger(CS, "ID")
+                        Call db.db_setCS(CS, "name", iMenuName)
                         If True Then
-                            Call app.db_setCS(CS, "ccGuid", DefaultDynamicMenuGuid)
+                            Call db.db_setCS(CS, "ccGuid", DefaultDynamicMenuGuid)
                         End If
                     End If
-                    Call app.db_csClose(CS)
+                    Call db.db_csClose(CS)
                     '
                     If UCase(iMenuName) = "DEFAULT" Then
                         '
                         ' Adding the Default menu - put all sections into this when it is created
                         '
-                        CS = app.db_csOpen("Site Sections")
-                        Do While app.db_csOk(CS)
-                            CSRule = app.db_csInsertRecord("Dynamic Menu Section Rules", SystemMemberID)
-                            If app.db_csOk(CSRule) Then
-                                Call app.db_setCS(CSRule, "DynamicMenuID", csv_VerifyDynamicMenu)
-                                Call app.db_setCS(CSRule, "SectionID", app.db_GetCSInteger(CS, "ID"))
+                        CS = db.db_csOpen("Site Sections")
+                        Do While db.db_csOk(CS)
+                            CSRule = db.db_csInsertRecord("Dynamic Menu Section Rules", SystemMemberID)
+                            If db.db_csOk(CSRule) Then
+                                Call db.db_setCS(CSRule, "DynamicMenuID", csv_VerifyDynamicMenu)
+                                Call db.db_setCS(CSRule, "SectionID", db.db_GetCSInteger(CS, "ID"))
                             End If
-                            Call app.db_csClose(CSRule)
-                            app.db_csGoNext(CS)
+                            Call db.db_csClose(CSRule)
+                            db.db_csGoNext(CS)
                         Loop
-                        Call app.db_csClose(CS)
+                        Call db.db_csClose(CS)
                     End If
                 End If
             End If
@@ -5597,20 +5627,20 @@ ErrorTrap:
             If True Then
                 '
                 If csv_DynamicMenuACSelect = "" Then
-                    CS = app.db_csOpen("Dynamic Menus", , "Name", , , , , "Name")
-                    If Not app.db_csOk(CS) Then
-                        Call app.db_csClose(CS)
+                    CS = db.db_csOpen("Dynamic Menus", , "Name", , , , , "Name")
+                    If Not db.db_csOk(CS) Then
+                        Call db.db_csClose(CS)
                         Call csv_VerifyDynamicMenu("Default")
-                        CS = app.db_csOpen("Dynamic Menus", , "Name", , , , , "Name")
+                        CS = db.db_csOpen("Dynamic Menus", , "Name", , , , , "Name")
                     End If
-                    Do While app.db_csOk(CS)
+                    Do While db.db_csOk(CS)
                         If csv_DynamicMenuACSelect <> "" Then
                             csv_DynamicMenuACSelect = csv_DynamicMenuACSelect & "|"
                         End If
-                        csv_DynamicMenuACSelect = csv_DynamicMenuACSelect & app.db_GetCSText(CS, "name")
-                        app.db_csGoNext(CS)
+                        csv_DynamicMenuACSelect = csv_DynamicMenuACSelect & db.db_GetCSText(CS, "name")
+                        db.db_csGoNext(CS)
                     Loop
-                    Call app.db_csClose(CS)
+                    Call db.db_csClose(CS)
                 End If
                 csv_GetDynamicMenuACSelect = csv_DynamicMenuACSelect
             End If
@@ -5723,13 +5753,13 @@ ErrorTrap:
                     & vbCrLf & "/*" _
                     & vbCrLf & "Site Styles" _
                     & vbCrLf & "*/" _
-                    & vbCrLf & RemoveStyleTags(app.cdnFiles.ReadFile("templates\styles.css"))
+                    & vbCrLf & RemoveStyleTags(db.cdnFiles.ReadFile("templates\styles.css"))
                 '
                 ' shared styles marked AlwaysInclude
                 '
                 SQL = "select s.name,s.id,s.StyleFilename from ccSharedStyles s where (s.active<>0)and(s.AlwaysInclude<>0)"
                 Dim dt As DataTable
-                dt = app.executeSql(SQL)
+                dt = db.executeSql(SQL)
                 If dt.Rows.Count > 0 Then
                     For Each row As DataRow In dt.Rows
                         styleId = EncodeInteger(row("id"))
@@ -5743,7 +5773,7 @@ ErrorTrap:
                                     & vbCrLf & "/*" _
                                     & vbCrLf & "Shared Style " & StyleName & " marked always include" _
                                     & vbCrLf & "*/" _
-                                    & vbCrLf & RemoveStyleTags(app.cdnFiles.ReadFile(Filename))
+                                    & vbCrLf & RemoveStyleTags(db.cdnFiles.ReadFile(Filename))
                             End If
                         End If
                     Next
@@ -5755,7 +5785,7 @@ ErrorTrap:
                     '
                     SQL = "select name,stylesFilename from cctemplates where (id=" & templateId & ")and(stylesFilename is not null)"
                     'Dim dt As DataTable
-                    dt = app.executeSql(SQL)
+                    dt = db.executeSql(SQL)
                     If dt.Rows.Count > 0 Then
                         For Each dr As DataRow In dt.Rows
                             Filename = EncodeText(dr("stylesfilename"))
@@ -5766,7 +5796,7 @@ ErrorTrap:
                                     & vbCrLf & "/*" _
                                     & vbCrLf & "Template Styles" _
                                     & vbCrLf & "*/" _
-                                    & vbCrLf & RemoveStyleTags(app.cdnFiles.ReadFile(Filename))
+                                    & vbCrLf & RemoveStyleTags(db.cdnFiles.ReadFile(Filename))
                             End If
 
                         Next
@@ -5777,7 +5807,7 @@ ErrorTrap:
                     Dim rs As DataTable
 
                     SQL = "select s.name,s.id,s.StyleFilename from ccSharedStyles s left join ccSharedStylesTemplateRules r on s.id=r.styleid where (s.active<>0)and(r.templateid=" & templateId & ")and((s.AlwaysInclude=0)or(s.AlwaysInclude is null))"
-                    rs = app.executeSql(SQL)
+                    rs = db.executeSql(SQL)
                     If rs.Rows.Count > 0 Then
                         styleId = EncodeInteger(rs.Rows(0).Item("id"))
                         StyleName = EncodeText(rs.Rows(0).Item("name"))
@@ -5790,7 +5820,7 @@ ErrorTrap:
                                     & vbCrLf & "/*" _
                                     & vbCrLf & "Shared Style " & StyleName & " included in template" _
                                     & vbCrLf & "*/" _
-                                    & vbCrLf & RemoveStyleTags(app.cdnFiles.ReadFile(Filename))
+                                    & vbCrLf & RemoveStyleTags(db.cdnFiles.ReadFile(Filename))
                             End If
                         End If
                     End If
@@ -5803,7 +5833,7 @@ ErrorTrap:
                     SQL = "select name,blockSiteStyles,stylesFilename,emailTemplateID from ccemail where id=" & EmailID
                     'Dim dt As DataTable
 
-                    dt = app.executeSql(SQL)
+                    dt = db.executeSql(SQL)
                     If dt.Rows.Count > 0 Then
                         For Each rsDr As DataRow In dt.Rows
                             blockStyles = EncodeBoolean(rsDr("blockSiteStyles"))
@@ -5817,7 +5847,7 @@ ErrorTrap:
                                         & vbCrLf & "/*" _
                                         & vbCrLf & "Email Styles" _
                                         & vbCrLf & "*/" _
-                                        & vbCrLf & RemoveStyleTags(app.cdnFiles.ReadFile(Filename))
+                                        & vbCrLf & RemoveStyleTags(db.cdnFiles.ReadFile(Filename))
                                 End If
                             End If
                         Next
@@ -5826,7 +5856,7 @@ ErrorTrap:
                     ' email shared styles
                     '
                     SQL = "select s.name,s.id,s.StyleFilename from ccSharedStyles s left join ccEmailStyleRules r on s.id=r.sharedstylesid where (s.active<>0)and(r.emailid=" & EmailID & ")and((s.AlwaysInclude=0)or(s.AlwaysInclude is null))"
-                    dt = app.executeSql(SQL)
+                    dt = db.executeSql(SQL)
                     For Each rsDr As DataRow In dt.Rows
                         styleId = EncodeInteger(rsDr("id"))
                         StyleName = EncodeText(rsDr("name"))
@@ -5839,7 +5869,7 @@ ErrorTrap:
                                     & vbCrLf & "/*" _
                                     & vbCrLf & "Shared Styles included in email" _
                                     & vbCrLf & "*/" _
-                                    & vbCrLf & RemoveStyleTags(app.cdnFiles.ReadFile(Filename))
+                                    & vbCrLf & RemoveStyleTags(db.cdnFiles.ReadFile(Filename))
                             End If
                         End If
                     Next
@@ -5889,18 +5919,18 @@ ErrorTrap:
         Public Function csv_getStyleSheetDefault() As String
             On Error GoTo ErrorTrap 'Const Tn = "csv_getStyleSheetDefault" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
-            If (True) And EncodeBoolean(app.siteProperty_getBoolean("Allow CSS Reset", False)) Then
+            If (True) And EncodeBoolean(db.siteProperty_getBoolean("Allow CSS Reset", False)) Then
                 csv_getStyleSheetDefault = csv_getStyleSheetDefault _
                     & vbCrLf & "/*" _
                     & vbCrLf & "Reset Styles" _
                     & vbCrLf & "*/" _
-                    & vbCrLf & RemoveStyleTags(app.appRootFiles.ReadFile("\cclib\styles\ccreset.css"))
+                    & vbCrLf & RemoveStyleTags(db.appRootFiles.ReadFile("\cclib\styles\ccreset.css"))
             End If
             csv_getStyleSheetDefault = csv_getStyleSheetDefault _
                 & vbCrLf & "/*" _
                 & vbCrLf & "Contensive Styles" _
                 & vbCrLf & "*/" _
-                & vbCrLf & RemoveStyleTags(app.appRootFiles.ReadFile("\cclib\styles\" & defaultStyleFilename))
+                & vbCrLf & RemoveStyleTags(db.appRootFiles.ReadFile("\cclib\styles\" & defaultStyleFilename))
             '
             Exit Function
 ErrorTrap:
@@ -5919,10 +5949,10 @@ ErrorTrap:
             Dim DPtr As Integer
             Dim DataSourceName As String
             '
-            If app.dataSources.Length > 0 Then
-                For DPtr = 0 To app.dataSources.Length - 1
+            If db.db_dataSources.Length > 0 Then
+                For DPtr = 0 To db.db_dataSources.Length - 1
                     db_GetDataSourceList = db_GetDataSourceList _
-                        & vbCrLf & app.dataSources(DPtr).NameLower
+                        & vbCrLf & db.db_dataSources(DPtr).NameLower
                 Next
                 If db_GetDataSourceList <> "" Then
                     db_GetDataSourceList = Mid(db_GetDataSourceList, 3)
@@ -6106,9 +6136,9 @@ ErrorTrap:
                             ' ContentList - Open the Content and build the options from the names
                             '
                             If ContentCriteria <> "" Then
-                                CS = app.db_csOpen(ContentName, ContentCriteria, "name", , , , , "ID,Name")
+                                CS = db.db_csOpen(ContentName, ContentCriteria, "name", , , , , "ID,Name")
                             Else
-                                CS = app.db_csOpen(ContentName, , "name", , , , , "ID,Name")
+                                CS = db.db_csOpen(ContentName, , "name", , , , , "ID,Name")
                             End If
                         ElseIf IsListField Then
                             '
@@ -6116,12 +6146,12 @@ ErrorTrap:
                             '
                             CID = metaData_GetContentID(ContentName)
                             If CID > 0 Then
-                                CS = app.db_csOpen("Content Fields", "Contentid=" & CID, "name", , , , , "ID,Name")
+                                CS = db.db_csOpen("Content Fields", "Contentid=" & CID, "name", , , , , "ID,Name")
                             End If
                         End If
 
-                        If app.db_csOk(CS) Then
-                            Cell = app.csv_GetCSRows(CS)
+                        If db.db_csOk(CS) Then
+                            Cell = db.db_GetCSRows(CS)
                             RowCnt = UBound(Cell, 2) + 1
                             For RowPtr = 0 To RowCnt - 1
                                 '
@@ -6140,7 +6170,7 @@ ErrorTrap:
                                 End If
                             Next
                         End If
-                        Call app.db_csClose(CS)
+                        Call db.db_csClose(CS)
                     Else
                         '
                         ' choice is not a function, just add the choice back to the list
@@ -6179,7 +6209,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            handleException(New Exception("Unexpected exception"))
+            handleExceptionAndRethrow(New Exception("Unexpected exception"))
         End Function
         '
         '===============================================================================================================================
@@ -6243,9 +6273,9 @@ ErrorTrap:
                                 & " or(m.developer<>0)" _
                             & " )" _
                             & " "
-                        CS = app.db_openCsSql_rev("default", SQL)
-                        user_isMemberOfGroupIdList2 = app.db_csOk(CS)
-                        Call app.db_csClose(CS)
+                        CS = db.db_openCsSql_rev("default", SQL)
+                        user_isMemberOfGroupIdList2 = db.db_csOk(CS)
+                        Call db.db_csClose(CS)
                     End If
                 Else
                     '
@@ -6259,7 +6289,7 @@ ErrorTrap:
                     Criteria = "" _
                         & "(" & Criteria & ")" _
                         & " and(r.id is not null)" _
-                        & " and((r.DateExpires is null)or(r.DateExpires>" & app.db_EncodeSQLDate(Now) & "))" _
+                        & " and((r.DateExpires is null)or(r.DateExpires>" & db.db_EncodeSQLDate(Now) & "))" _
                         & " "
                     If adminReturnsTrue Then
                         Criteria = "(" & Criteria & ")or(m.admin<>0)or(m.developer<>0)"
@@ -6273,16 +6303,16 @@ ErrorTrap:
                         & " from ccmembers m" _
                         & " left join ccMemberRules r on r.Memberid=m.id" _
                         & " where" & Criteria
-                    CS = app.db_openCsSql_rev("default", SQL)
-                    user_isMemberOfGroupIdList2 = app.db_csOk(CS)
-                    Call app.db_csClose(CS)
+                    CS = db.db_openCsSql_rev("default", SQL)
+                    user_isMemberOfGroupIdList2 = db.db_csOk(CS)
+                    Call db.db_csClose(CS)
                 End If
             End If
             '
             Exit Function
             '
 ErrorTrap:
-            handleException(New Exception("Unexpected exception"))
+            handleExceptionAndRethrow(New Exception("Unexpected exception"))
         End Function
         ''
         ''
@@ -6306,7 +6336,7 @@ ErrorTrap:
             Dim Filename As String
             '
             If Not email_BlockList_LocalLoaded Then
-                Filename = "Config\SMTPBlockList_" & app.config.name & ".txt"
+                Filename = "Config\SMTPBlockList_" & db.config.name & ".txt"
                 email_BlockList_Local = cluster.clusterFiles.ReadFile(Filename)
                 email_BlockList_LocalLoaded = True
             End If
@@ -6335,7 +6365,7 @@ ErrorTrap:
                 ' add them to the list
                 '
                 email_BlockList_Local = getEmailBlockList_InternalOnly() & vbCrLf & EmailAddress & vbTab & Now()
-                Call cluster.clusterFiles.SaveFile("Config\SMTPBlockList_" & app.config.name & ".txt", email_BlockList_Local)
+                Call cluster.clusterFiles.SaveFile("Config\SMTPBlockList_" & db.config.name & ".txt", email_BlockList_Local)
                 email_BlockList_LocalLoaded = False
             End If
         End Sub
@@ -6349,21 +6379,21 @@ ErrorTrap:
             '
             Dim CS As Integer
             '
-            CS = app.db_csInsertRecord("Activity Log", ByMemberID)
-            If app.db_csOk(CS) Then
-                Call app.db_setCS(CS, "MemberID", SubjectMemberID)
-                Call app.db_setCS(CS, "OrganizationID", SubjectOrganizationID)
-                Call app.db_setCS(CS, "Message", Message)
-                Call app.db_setCS(CS, "Link", Link)
-                Call app.db_setCS(CS, "VisitorID", VisitorID)
-                Call app.db_setCS(CS, "VisitID", VisitID)
+            CS = db.db_csInsertRecord("Activity Log", ByMemberID)
+            If db.db_csOk(CS) Then
+                Call db.db_setCS(CS, "MemberID", SubjectMemberID)
+                Call db.db_setCS(CS, "OrganizationID", SubjectOrganizationID)
+                Call db.db_setCS(CS, "Message", Message)
+                Call db.db_setCS(CS, "Link", Link)
+                Call db.db_setCS(CS, "VisitorID", VisitorID)
+                Call db.db_setCS(CS, "VisitID", VisitID)
             End If
-            Call app.db_csClose(CS)
+            Call db.db_csClose(CS)
             '
             Exit Sub
             '
 ErrorTrap:
-            handleException(New Exception("Unexpected exception"))
+            handleExceptionAndRethrow(New Exception("Unexpected exception"))
         End Sub
         '
         '===================================================================================================
@@ -6547,7 +6577,7 @@ ErrorTrap:
             Exit Sub
             '
 ErrorTrap:
-            handleException(New Exception("Unexpected exception"))
+            handleExceptionAndRethrow(New Exception("Unexpected exception"))
         End Sub
         '
         '=================================================================================================================
@@ -6609,7 +6639,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            handleException(New Exception("Unexpected exception"))
+            handleExceptionAndRethrow(New Exception("Unexpected exception"))
         End Function
         '
         '   Returns the next entry in the array, empty when there are no more
@@ -6631,7 +6661,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            handleException(New Exception("Unexpected exception"))
+            handleExceptionAndRethrow(New Exception("Unexpected exception"))
         End Function
         '
         '   Returns the next entry in the array, empty when there are no more
@@ -6653,7 +6683,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            handleException(New Exception("Unexpected exception"))
+            handleExceptionAndRethrow(New Exception("Unexpected exception"))
         End Function
         '
         '   Returns the next entry in the array, empty when there are no more
@@ -6675,7 +6705,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            handleException(New Exception("Unexpected exception"))
+            handleExceptionAndRethrow(New Exception("Unexpected exception"))
         End Function
         '
         '   Returns the next entry in the array, empty when there are no more
@@ -6697,7 +6727,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            handleException(New Exception("Unexpected exception"))
+            handleExceptionAndRethrow(New Exception("Unexpected exception"))
         End Function
         '
         '========================================================================================================
@@ -6908,9 +6938,9 @@ ErrorTrap:
             ''hint = "csv_EncodeContentUpgrades enter"
             html_EncodeContentUpgrades = Source
             '
-            ContentFilesLinkPrefix = "/" & app.config.name & "/files/"
+            ContentFilesLinkPrefix = "/" & db.config.name & "/files/"
             ResourceLibraryLinkPrefix = ContentFilesLinkPrefix & "ccLibraryFiles/"
-            ImageAllowUpdate = EncodeBoolean(app.siteProperty_getBoolean("ImageAllowUpdate", True))
+            ImageAllowUpdate = EncodeBoolean(db.siteProperty_getBoolean("ImageAllowUpdate", True))
             ImageAllowUpdate = ImageAllowUpdate And (InStr(1, Source, ResourceLibraryLinkPrefix, vbTextCompare) <> 0)
             If ImageAllowUpdate Then
                 '
@@ -7307,7 +7337,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            handleException(New Exception("Unexpected exception"))
+            handleExceptionAndRethrow(New Exception("Unexpected exception"))
             'Call csv_HandleClassTrapError(Err.Number, Err.Source, Err.Description, "unknownMethodNameLegacyCall" & ", hint=[" & hint & "]", True)
         End Function
         '
@@ -7322,7 +7352,7 @@ ErrorTrap:
                 '
                 ' error, do nothing but log
                 '
-                handleLegacyError3(app.config.name, "Attempt to resize an image to 0,0. This is not allowed.", "dll", "cpCoreClass", "csv_ResizeImage2", KmaErrorInternal, "", "", False, True, "")
+                handleLegacyError3(db.config.name, "Attempt to resize an image to 0,0. This is not allowed.", "dll", "cpCoreClass", "csv_ResizeImage2", KmaErrorInternal, "", "", False, True, "")
             Else
                 If sf.load(SrcFilename) Then
                     If Width = 0 Then
@@ -7341,7 +7371,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            handleException(New Exception("Unexpected exception"))
+            handleExceptionAndRethrow(New Exception("Unexpected exception"))
         End Sub
         '
         '
@@ -7350,10 +7380,10 @@ ErrorTrap:
             Try
                 Dim Algorithm As Integer
                 '
-                Algorithm = EncodeInteger(app.siteProperty_getText("ImageResizeSFAlgorithm", "5"))
+                Algorithm = EncodeInteger(db.siteProperty_getText("ImageResizeSFAlgorithm", "5"))
                 Call image_ResizeImage2(SrcFilename, DstFilename, Width, Height, DirectCast(Algorithm, csv_SfImageResizeAlgorithms))
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '
@@ -7373,7 +7403,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            handleException(New Exception("Unexpected exception"))
+            handleExceptionAndRethrow(New Exception("Unexpected exception"))
         End Function
         '
         '====================================================================================================
@@ -7387,7 +7417,7 @@ ErrorTrap:
                 Dim json As New System.Web.Script.Serialization.JavaScriptSerializer
                 Return json.Serialize(source)
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
                 Return ""
             End Try
         End Function
@@ -7404,7 +7434,7 @@ ErrorTrap:
                 Dim json As New System.Web.Script.Serialization.JavaScriptSerializer
                 returnObj = json.Deserialize(Of Object)(Source)
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
             Return returnObj
         End Function
@@ -7521,11 +7551,11 @@ ErrorTrap:
             '
             warningId = 0
             SQL = "select top 1 ID from ccSiteWarnings" _
-                & " where (generalKey=" & app.db_EncodeSQLText(generalKey) & ")" _
-                & " and(specificKey=" & app.db_EncodeSQLText(specificKey) & ")" _
+                & " where (generalKey=" & db.db_EncodeSQLText(generalKey) & ")" _
+                & " and(specificKey=" & db.db_EncodeSQLText(specificKey) & ")" _
                 & ""
             Dim dt As DataTable
-            dt = app.executeSql(SQL)
+            dt = db.executeSql(SQL)
             If dt.Rows.Count > 0 Then
                 warningId = EncodeInteger(dt.Rows(0).Item("id"))
             End If
@@ -7534,27 +7564,27 @@ ErrorTrap:
                 '
                 ' increment count for matching warning
                 '
-                SQL = "update ccsitewarnings set count=count+1,DateLastReported=" & app.db_EncodeSQLDate(Now()) & " where id=" & warningId
-                Call app.executeSql(SQL)
+                SQL = "update ccsitewarnings set count=count+1,DateLastReported=" & db.db_EncodeSQLDate(Now()) & " where id=" & warningId
+                Call db.executeSql(SQL)
             Else
                 '
                 ' insert new record
                 '
-                CS = app.db_csInsertRecord("Site Warnings", 0)
-                If app.db_csOk(CS) Then
-                    Call app.db_setCS(CS, "name", Name)
-                    Call app.db_setCS(CS, "description", Description)
-                    Call app.db_setCS(CS, "generalKey", generalKey)
-                    Call app.db_setCS(CS, "specificKey", specificKey)
-                    Call app.db_setCS(CS, "count", 1)
-                    Call app.db_setCS(CS, "DateLastReported", Now())
+                CS = db.db_csInsertRecord("Site Warnings", 0)
+                If db.db_csOk(CS) Then
+                    Call db.db_setCS(CS, "name", Name)
+                    Call db.db_setCS(CS, "description", Description)
+                    Call db.db_setCS(CS, "generalKey", generalKey)
+                    Call db.db_setCS(CS, "specificKey", specificKey)
+                    Call db.db_setCS(CS, "count", 1)
+                    Call db.db_setCS(CS, "DateLastReported", Now())
                     If True Then
-                        Call app.db_setCS(CS, "shortDescription", shortDescription)
-                        Call app.db_setCS(CS, "location", location)
-                        Call app.db_setCS(CS, "pageId", PageID)
+                        Call db.db_setCS(CS, "shortDescription", shortDescription)
+                        Call db.db_setCS(CS, "location", location)
+                        Call db.db_setCS(CS, "pageId", PageID)
                     End If
                 End If
-                Call app.db_csClose(CS)
+                Call db.db_csClose(CS)
             End If
             '
         End Function
@@ -7605,7 +7635,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            handleLegacyError3(app.config.name, "", "dll", "cpCoreClass", "csv_getNvaValue", Err.Number, Err.Source, Err.Description, True, False, "")
+            handleLegacyError3(db.config.name, "", "dll", "cpCoreClass", "csv_getNvaValue", Err.Number, Err.Source, Err.Description, True, False, "")
         End Function
         '
         '=================================================================================================================================================
@@ -7655,7 +7685,7 @@ ErrorTrap:
             'dim buildversion As String
             '
             If (True) Then
-                AllowLinkAlias = EncodeBoolean(app.siteProperty_getBoolean("allowLinkAlias", False))
+                AllowLinkAlias = EncodeBoolean(db.siteProperty_getBoolean("allowLinkAlias", False))
                 WorkingLinkAlias = linkAlias
                 If (WorkingLinkAlias <> "") Then
                     '
@@ -7693,7 +7723,7 @@ ErrorTrap:
                             WorkingLinkAlias = "/" & WorkingLinkAlias
                         End If
                         '
-                        If LCase(WorkingLinkAlias) = LCase("/" & app.config.name) Then
+                        If LCase(WorkingLinkAlias) = LCase("/" & db.config.name) Then
                             '
                             ' This alias points to the cclib folder
                             '
@@ -7711,7 +7741,7 @@ ErrorTrap:
                                     & "The Link Alias being created (" & WorkingLinkAlias & ") can not be used because there is a virtual directory in your website directory that already uses this name." _
                                     & " Please change it to ensure the Link Alias is unique. To set or change the Link Alias, use the Link Alias tab and select a name not used by another page."
                             End If
-                        ElseIf app.appRootFiles.checkPath(cluster.config.clusterPhysicalPath & app.config.appRootPath & "\" & Mid(WorkingLinkAlias, 2)) Then
+                        ElseIf db.appRootFiles.checkPath(cluster.config.clusterPhysicalPath & db.config.appRootPath & "\" & Mid(WorkingLinkAlias, 2)) Then
                             '
                             ' This alias points to a different link, call it an error
                             '
@@ -7732,19 +7762,19 @@ ErrorTrap:
                                 '
                                 FieldList = "Name,PageID,'' as QueryStringSuffix"
                             End If
-                            CS = app.db_csOpen("Link Aliases", "name=" & app.db_EncodeSQLText(WorkingLinkAlias), , , , , , FieldList)
-                            If Not app.db_csOk(CS) Then
+                            CS = db.db_csOpen("Link Aliases", "name=" & db.db_EncodeSQLText(WorkingLinkAlias), , , , , , FieldList)
+                            If Not db.db_csOk(CS) Then
                                 '
                                 ' Alias not found, create a Link Aliases
                                 '
-                                Call app.db_csClose(CS)
-                                CS = app.db_csInsertRecord("Link Aliases", 0)
-                                If app.db_csOk(CS) Then
-                                    Call app.db_setCS(CS, "Name", WorkingLinkAlias)
+                                Call db.db_csClose(CS)
+                                CS = db.db_csInsertRecord("Link Aliases", 0)
+                                If db.db_csOk(CS) Then
+                                    Call db.db_setCS(CS, "Name", WorkingLinkAlias)
                                     'Call app.csv_SetCS(CS, "Link", Link)
-                                    Call app.db_setCS(CS, "Pageid", PageID)
+                                    Call db.db_setCS(CS, "Pageid", PageID)
                                     If True Then
-                                        Call app.db_setCS(CS, "QueryStringSuffix", QueryStringSuffix)
+                                        Call db.db_setCS(CS, "QueryStringSuffix", QueryStringSuffix)
                                     End If
                                 End If
                             Else
@@ -7754,27 +7784,27 @@ ErrorTrap:
                                 Dim CurrentLinkAliasID As Integer
                                 Dim resaveLinkAlias As Boolean
                                 Dim CS2 As Integer
-                                LinkAliasPageID = app.db_GetCSInteger(CS, "pageID")
-                                If (app.db_GetCSText(CS, "QueryStringSuffix").ToLower = QueryStringSuffix.ToLower) And (PageID = LinkAliasPageID) Then
+                                LinkAliasPageID = db.db_GetCSInteger(CS, "pageID")
+                                If (db.db_GetCSText(CS, "QueryStringSuffix").ToLower = QueryStringSuffix.ToLower) And (PageID = LinkAliasPageID) Then
                                     '
                                     ' it maches a current entry for this link alias, if the current entry is not the highest number id,
                                     '   remove it and add this one
                                     '
-                                    CurrentLinkAliasID = app.db_GetCSInteger(CS, "id")
-                                    CS2 = app.db_openCsSql_rev("default", "select top 1 id from ccLinkAliases where pageid=" & LinkAliasPageID & " order by id desc")
-                                    If app.db_csOk(CS2) Then
-                                        resaveLinkAlias = (CurrentLinkAliasID <> app.db_GetCSInteger(CS2, "id"))
+                                    CurrentLinkAliasID = db.db_GetCSInteger(CS, "id")
+                                    CS2 = db.db_openCsSql_rev("default", "select top 1 id from ccLinkAliases where pageid=" & LinkAliasPageID & " order by id desc")
+                                    If db.db_csOk(CS2) Then
+                                        resaveLinkAlias = (CurrentLinkAliasID <> db.db_GetCSInteger(CS2, "id"))
                                     End If
-                                    Call app.db_csClose(CS2)
+                                    Call db.db_csClose(CS2)
                                     If resaveLinkAlias Then
-                                        Call app.executeSql("delete from ccLinkAliases where id=" & CurrentLinkAliasID)
-                                        Call app.db_csClose(CS)
-                                        CS = app.db_csInsertRecord("Link Aliases", 0)
-                                        If app.db_csOk(CS) Then
-                                            Call app.db_setCS(CS, "Name", WorkingLinkAlias)
-                                            Call app.db_setCS(CS, "Pageid", PageID)
+                                        Call db.executeSql("delete from ccLinkAliases where id=" & CurrentLinkAliasID)
+                                        Call db.db_csClose(CS)
+                                        CS = db.db_csInsertRecord("Link Aliases", 0)
+                                        If db.db_csOk(CS) Then
+                                            Call db.db_setCS(CS, "Name", WorkingLinkAlias)
+                                            Call db.db_setCS(CS, "Pageid", PageID)
                                             If True Then
-                                                Call app.db_setCS(CS, "QueryStringSuffix", QueryStringSuffix)
+                                                Call db.db_setCS(CS, "QueryStringSuffix", QueryStringSuffix)
                                             End If
                                         End If
                                     End If
@@ -7787,9 +7817,9 @@ ErrorTrap:
                                         ' change the Link Alias to the new link
                                         '
                                         'Call app.csv_SetCS(CS, "Link", Link)
-                                        Call app.db_setCS(CS, "Pageid", PageID)
+                                        Call db.db_setCS(CS, "Pageid", PageID)
                                         If True Then
-                                            Call app.db_setCS(CS, "QueryStringSuffix", QueryStringSuffix)
+                                            Call db.db_setCS(CS, "QueryStringSuffix", QueryStringSuffix)
                                         End If
                                     ElseIf AllowLinkAlias Then
                                         '
@@ -7811,7 +7841,7 @@ ErrorTrap:
                                     End If
                                 End If
                             End If
-                            Call app.db_csClose(CS)
+                            Call db.db_csClose(CS)
                             Call cache_linkAlias_clear()
                         End If
                     End If
@@ -7898,7 +7928,7 @@ ErrorTrap:
             returnValue = Source
             'hint = "csv_EncodeContent9 enter"
             If returnValue <> "" Then
-                AdminURL = app.siteProperty_AdminURL
+                AdminURL = db.siteProperty_AdminURL
                 '
                 '--------
                 ' cut-paste from csv_EncodeContent8
@@ -7907,7 +7937,7 @@ ErrorTrap:
                 ' ----- Do EncodeCRLF Conversion
                 '
                 'hint = hint & ",010"
-                If EncodeBoolean(app.siteProperty_getBoolean("ConvertContentCRLF2BR", False)) And (Not PlainText) Then
+                If EncodeBoolean(db.siteProperty_getBoolean("ConvertContentCRLF2BR", False)) And (Not PlainText) Then
                     returnValue = Replace(returnValue, vbCr, "")
                     returnValue = Replace(returnValue, vbLf, "<br>")
                 End If
@@ -8013,7 +8043,7 @@ ErrorTrap:
                                             ' Dynamic Menu
                                             '
                                             'hint = hint & ",320"
-                                            returnValue = returnValue & main_GetDynamicMenu(addonOptionString, app.siteProperty_UseContentWatchLink)
+                                            returnValue = returnValue & main_GetDynamicMenu(addonOptionString, db.siteProperty_UseContentWatchLink)
                                         Case ACTypeWatchList
                                             '
                                             ' Watch List
@@ -8189,7 +8219,7 @@ ErrorTrap:
                         If InStr(1, Copy, "://") <> 0 Then
                         ElseIf Left(Copy, 1) = "/" Then
                         Else
-                            Copy = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, Copy)
+                            Copy = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, Copy)
                         End If
                         Call main_AddHeadScriptLink(Copy, "embedded content")
                         Copy = csv_GetEncodeContent_JSFilename()
@@ -8206,7 +8236,7 @@ ErrorTrap:
                         If InStr(1, Copy, "://") <> 0 Then
                         ElseIf Left(Copy, 1) = "/" Then
                         Else
-                            Copy = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, Copy)
+                            Copy = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, Copy)
                         End If
                         Call main_AddStylesheetLink2(Copy, "")
                         Copy = csv_GetEncodeContent_StyleFilenames()
@@ -8257,9 +8287,9 @@ ErrorTrap:
                 bodyEncoded = Body
                 templateEncoded = template
                 '
-                CS = app.db_OpenCSContentRecord("People", ToMemberID, , , , "email")
-                If app.db_csOk(CS) Then
-                    ToAddress = Trim(app.db_GetCSText(CS, "email"))
+                CS = db.db_OpenCSContentRecord("People", ToMemberID, , , , "email")
+                If db.db_csOk(CS) Then
+                    ToAddress = Trim(db.db_GetCSText(CS, "email"))
                     If ToAddress = "" Then
                         returnStatus = "The email was not sent because the to-address was blank."
                     ElseIf (InStr(1, ToAddress, "@") = 0) Or (InStr(1, ToAddress, ".") = 0) Then
@@ -8273,18 +8303,18 @@ ErrorTrap:
                         ' encode subject
                         '
                         subjectEncoded = html_executeContentCommands(Nothing, subjectEncoded, addonContextEnum.contextEmail, ToMemberID, True, layoutError)
-                        subjectEncoded = html_encodeContent10(subjectEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & app.config.domainList(0), True, 0, "", addonContextEnum.contextEmail, True, Nothing, False)
+                        subjectEncoded = html_encodeContent10(subjectEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & db.config.domainList(0), True, 0, "", addonContextEnum.contextEmail, True, Nothing, False)
                         '
                         ' encode Body
                         '
                         bodyEncoded = html_executeContentCommands(Nothing, bodyEncoded, addonContextEnum.contextEmail, ToMemberID, True, layoutError)
-                        bodyEncoded = html_encodeContent10(bodyEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & app.config.domainList(0), True, 0, "", addonContextEnum.contextEmail, True, Nothing, False)
+                        bodyEncoded = html_encodeContent10(bodyEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & db.config.domainList(0), True, 0, "", addonContextEnum.contextEmail, True, Nothing, False)
                         '
                         ' encode template
                         '
                         If (templateEncoded <> "") Then
                             templateEncoded = html_executeContentCommands(Nothing, templateEncoded, addonContextEnum.contextEmail, ToMemberID, True, layoutError)
-                            templateEncoded = html_encodeContent10(templateEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & app.config.domainList(0), True, 0, "", addonContextEnum.contextEmail, True, Nothing, False)
+                            templateEncoded = html_encodeContent10(templateEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & db.config.domainList(0), True, 0, "", addonContextEnum.contextEmail, True, Nothing, False)
                             '
                             If (InStr(1, templateEncoded, fpoContentBox) <> 0) Then
                                 bodyEncoded = Replace(templateEncoded, fpoContentBox, bodyEncoded)
@@ -8298,9 +8328,9 @@ ErrorTrap:
                         returnStatus = email_send3(ToAddress, FromAddress, subjectEncoded, bodyEncoded, "", "", "", Immediate, HTML, emailIdOrZeroForLog)
                     End If
                 End If
-                Call app.db_csClose(CS)
+                Call db.db_csClose(CS)
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
             Return returnStatus
         End Function
@@ -8413,43 +8443,43 @@ ErrorTrap:
             Else
                 SelectList = "ID,TestMemberID,FromAddress,Subject,copyfilename,AddLinkEID,AllowSpamFooter,0 as EmailTemplateID"
             End If
-            CSEmail = app.db_csOpen("System Email", "name=" & app.db_EncodeSQLText(EMailName), "ID", , , , , SelectList)
-            If Not app.db_csOk(CSEmail) Then
+            CSEmail = db.db_csOpen("System Email", "name=" & db.db_EncodeSQLText(EMailName), "ID", , , , , SelectList)
+            If Not db.db_csOk(CSEmail) Then
                 '
                 ' ----- Email was not found
                 '
-                Call app.db_csClose(CSEmail)
-                CSEmail = app.db_csInsertRecord("System Email")
-                Call app.db_setCS(CSEmail, "name", EMailName)
-                Call app.db_setCS(CSEmail, "Subject", EMailName)
-                Call app.db_setCS(CSEmail, "FromAddress", app.siteProperty_getText("EmailAdmin", "webmaster@" & app.config.domainList(0)))
+                Call db.db_csClose(CSEmail)
+                CSEmail = db.db_csInsertRecord("System Email")
+                Call db.db_setCS(CSEmail, "name", EMailName)
+                Call db.db_setCS(CSEmail, "Subject", EMailName)
+                Call db.db_setCS(CSEmail, "FromAddress", db.siteProperty_getText("EmailAdmin", "webmaster@" & db.config.domainList(0)))
                 'Call app.csv_SetCS(CSEmail, "caption", EmailName)
-                Call app.db_csClose(CSEmail)
+                Call db.db_csClose(CSEmail)
                 Call Err.Raise(KmaErrorInternal, "dll", "No system email was found with the name [" & EMailName & "]. A new email blank was created but not sent.")
             Else
                 '
                 ' --- collect values needed for send
                 '
-                EmailRecordID = app.db_GetCSInteger(CSEmail, "ID")
-                EmailToConfirmationMemberID = app.db_GetCSInteger(CSEmail, "testmemberid")
-                EmailFrom = app.db_GetCSText(CSEmail, "FromAddress")
-                EmailSubjectSource = app.db_GetCSText(CSEmail, "Subject")
-                EmailBodySource = app.db_GetCS(CSEmail, "copyfilename") & AdditionalCopy
-                EmailAllowLinkEID = app.db_GetCSBoolean(CSEmail, "AddLinkEID")
-                BounceAddress = app.siteProperty_getText("EmailBounceAddress", "")
+                EmailRecordID = db.db_GetCSInteger(CSEmail, "ID")
+                EmailToConfirmationMemberID = db.db_GetCSInteger(CSEmail, "testmemberid")
+                EmailFrom = db.db_GetCSText(CSEmail, "FromAddress")
+                EmailSubjectSource = db.db_GetCSText(CSEmail, "Subject")
+                EmailBodySource = db.db_GetCS(CSEmail, "copyfilename") & AdditionalCopy
+                EmailAllowLinkEID = db.db_GetCSBoolean(CSEmail, "AddLinkEID")
+                BounceAddress = db.siteProperty_getText("EmailBounceAddress", "")
                 If BounceAddress = "" Then
                     BounceAddress = EmailFrom
                 End If
-                EMailTemplateID = app.db_GetCSInteger(CSEmail, "EmailTemplateID")
+                EMailTemplateID = db.db_GetCSInteger(CSEmail, "EmailTemplateID")
                 '
                 ' Get the Email Template
                 '
                 If EMailTemplateID <> 0 Then
-                    CS = app.db_OpenCSContentRecord("Email Templates", EMailTemplateID)
-                    If app.db_csOk(CS) Then
-                        EmailTemplateSource = app.db_GetCS(CS, "BodyHTML")
+                    CS = db.db_OpenCSContentRecord("Email Templates", EMailTemplateID)
+                    If db.db_csOk(CS) Then
+                        EmailTemplateSource = db.db_GetCS(CS, "BodyHTML")
                     End If
-                    Call app.db_csClose(CS)
+                    Call db.db_csClose(CS)
                 End If
                 If EmailTemplateSource = "" Then
                     EmailTemplateSource = "<div style=""padding:10px""><ac type=content></div>"
@@ -8462,23 +8492,23 @@ ErrorTrap:
                 '
                 ' Spam Footer
                 '
-                If app.db_GetCSBoolean(CSEmail, "AllowSpamFooter") Then
+                If db.db_GetCSBoolean(CSEmail, "AllowSpamFooter") Then
                     '
                     ' This field is default true, and non-authorable
                     ' It will be true in all cases, except a possible unforseen exception
                     '
-                    EmailTemplateSource = EmailTemplateSource & "<div style=""clear: both;padding:10px;"">" & csv_GetLinkedText("<a href=""" & html_EncodeHTML("http://" & app.config.domainList(0) & "/" & app.siteProperty_ServerPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", app.siteProperty_getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
+                    EmailTemplateSource = EmailTemplateSource & "<div style=""clear: both;padding:10px;"">" & csv_GetLinkedText("<a href=""" & html_EncodeHTML("http://" & db.config.domainList(0) & "/" & db.siteProperty_ServerPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", db.siteProperty_getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
                 End If
                 '
                 ' --- Send message to the additional member
                 '
                 If iAdditionalMemberID <> 0 Then
                     EmailStatusMessage = EmailStatusMessage & BR & "Primary Recipient:" & BR
-                    CSPeople = app.db_OpenCSContentRecord("People", iAdditionalMemberID, , , , "ID,Name,Email")
-                    If app.db_csOk(CSPeople) Then
-                        EMailToMemberID = app.db_GetCSInteger(CSPeople, "ID")
-                        EmailToName = app.db_GetCSText(CSPeople, "name")
-                        EmailToAddress = app.db_GetCSText(CSPeople, "email")
+                    CSPeople = db.db_OpenCSContentRecord("People", iAdditionalMemberID, , , , "ID,Name,Email")
+                    If db.db_csOk(CSPeople) Then
+                        EMailToMemberID = db.db_GetCSInteger(CSPeople, "ID")
+                        EmailToName = db.db_GetCSText(CSPeople, "name")
+                        EmailToAddress = db.db_GetCSText(CSPeople, "email")
                         If EmailToAddress = "" Then
                             EmailStatusMessage = EmailStatusMessage & "&nbsp;&nbsp;Error: Not Sent to " & EmailToName & " (people #" & EMailToMemberID & ") because their email address was blank." & BR
                         Else
@@ -8489,18 +8519,18 @@ ErrorTrap:
                             EmailStatusMessage = EmailStatusMessage & "&nbsp;&nbsp;Sent to " & EmailToName & " at " & EmailToAddress & ", Status = " & EmailStatus & BR
                         End If
                     End If
-                    Call app.db_csClose(CSPeople)
+                    Call db.db_csClose(CSPeople)
                 End If
                 '
                 ' --- Send message to everyone selected
                 '
                 EmailStatusMessage = EmailStatusMessage & BR & "Recipients in selected System Email groups:" & BR
                 SQL = email_getGroupEmailSQL(False, EmailRecordID)
-                CSPeople = app.db_openCsSql_rev("default", SQL)
-                Do While app.db_csOk(CSPeople)
-                    EMailToMemberID = app.db_GetCSInteger(CSPeople, "ID")
-                    EmailToName = app.db_GetCSText(CSPeople, "name")
-                    EmailToAddress = app.db_GetCSText(CSPeople, "email")
+                CSPeople = db.db_openCsSql_rev("default", SQL)
+                Do While db.db_csOk(CSPeople)
+                    EMailToMemberID = db.db_GetCSInteger(CSPeople, "ID")
+                    EmailToName = db.db_GetCSText(CSPeople, "name")
+                    EmailToAddress = db.db_GetCSText(CSPeople, "email")
                     If EmailToAddress = "" Then
                         EmailStatusMessage = EmailStatusMessage & "&nbsp;&nbsp;Not Sent to " & EmailToName & ", people #" & EMailToMemberID & " because their email address was blank." & BR
                     Else
@@ -8509,10 +8539,10 @@ ErrorTrap:
                             EmailStatus = "ok"
                         End If
                         EmailStatusMessage = EmailStatusMessage & "&nbsp;&nbsp;Sent to " & EmailToName & " at " & EmailToAddress & ", Status = " & EmailStatus & BR
-                        Call app.db_csGoNext(CSPeople)
+                        Call db.db_csGoNext(CSPeople)
                     End If
                 Loop
-                Call app.db_csClose(CSPeople)
+                Call db.db_csClose(CSPeople)
                 '
                 ' --- Send the completion message to the administrator
                 '
@@ -8523,15 +8553,15 @@ ErrorTrap:
                     ' get the confirmation info
                     '
                     isValid = False
-                    CSPeople = app.db_OpenCSContentRecord("people", EmailToConfirmationMemberID)
-                    If app.db_csOk(CSPeople) Then
-                        isValid = app.db_GetCSBoolean(CSPeople, "active")
-                        EMailToMemberID = app.db_GetCSInteger(CSPeople, "ID")
-                        EmailToName = app.db_GetCSText(CSPeople, "name")
-                        EmailToAddress = app.db_GetCSText(CSPeople, "email")
-                        isAdmin = app.db_GetCSBoolean(CSPeople, "admin")
+                    CSPeople = db.db_OpenCSContentRecord("people", EmailToConfirmationMemberID)
+                    If db.db_csOk(CSPeople) Then
+                        isValid = db.db_GetCSBoolean(CSPeople, "active")
+                        EMailToMemberID = db.db_GetCSInteger(CSPeople, "ID")
+                        EmailToName = db.db_GetCSText(CSPeople, "name")
+                        EmailToAddress = db.db_GetCSText(CSPeople, "email")
+                        isAdmin = db.db_GetCSBoolean(CSPeople, "admin")
                     End If
-                    Call app.db_csClose(CSPeople)
+                    Call db.db_csClose(CSPeople)
                     '
                     If Not isValid Then
                         'returnString = "Administrator: The confirmation email was not sent because the confirmation email person is not selected or inactive, " & EmailStatus
@@ -8564,7 +8594,7 @@ ErrorTrap:
                         ConfirmBody = ConfirmBody & "--- end of list ---" & BR
                         ConfirmBody = ConfirmBody & "</div>"
                         '
-                        EmailStatus = sendMemberEmail3(EmailToConfirmationMemberID, EmailFrom, "System Email confirmation from " & app.config.domainList(0), ConfirmBody, False, True, EmailRecordID, "", False)
+                        EmailStatus = sendMemberEmail3(EmailToConfirmationMemberID, EmailFrom, "System Email confirmation from " & db.config.domainList(0), ConfirmBody, False, True, EmailRecordID, "", False)
                         If isAdmin And (EmailStatus <> "") Then
                             returnString = "Administrator: There was a problem sending the confirmation email, " & EmailStatus
                         End If
@@ -8573,9 +8603,9 @@ ErrorTrap:
                 '
                 ' ----- Done
                 '
-                Call app.db_csClose(CSPeople)
+                Call db.db_csClose(CSPeople)
             End If
-            Call app.db_csClose(CSEmail)
+            Call db.db_csClose(CSEmail)
             '
             csv_SendSystemEmail = returnString
             '
@@ -8670,7 +8700,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function csv_getPhysicalFilename(ByVal VirtualFilename As String) As String
-            Return app.convertCdnUrlToCdnPathFilename(VirtualFilename)
+            Return db.convertCdnUrlToCdnPathFilename(VirtualFilename)
         End Function
         '
         '========================================================================
@@ -8739,8 +8769,8 @@ ErrorTrap:
                     End If
                 End If
                 If AllowChange Then
-                    CSMember = app.db_csOpen("people", "id=" & app.db_EncodeSQLNumber(userId))
-                    If Not app.db_csOk(CSMember) Then
+                    CSMember = db.db_csOpen("people", "id=" & db.db_EncodeSQLNumber(userId))
+                    If Not db.db_csOk(CSMember) Then
                         Call error_AddUserError("There was a problem locating your account record. No changes were saved.")
                         ' if user error, it goes back to the hardcodedpage
                         'LegacyInterceptPageSN = LegacyInterceptPageSNMyProfile
@@ -8748,22 +8778,22 @@ ErrorTrap:
                         '
                         ' Check for unique violations first
                         '
-                        ContentName = main_GetContentNameByID(main_getcsInteger(CSMember, "ContentControlID"))
+                        ContentName = main_GetContentNameByID(db.db_GetCSInteger(CSMember, "ContentControlID"))
                         If ContentName = "" Then
                             Call error_AddUserError("There was a problem locating the information you requested.")
                         Else
-                            CDef = app.metaData.getCdef(ContentName)
+                            CDef = metaData.getCdef(ContentName)
                             For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In CDef.fields
                                 Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
                                 If field.UniqueName Then
                                     FieldName = field.nameLc
                                     FieldValue = doc_getText(FieldName)
                                     If FieldValue <> "" Then
-                                        CSTest = app.db_csOpen(ContentName, "(" & FieldName & "=" & app.db_EncodeSQLText(FieldValue) & ")and(ID<>" & userId & ")")
-                                        If app.db_csOk(CSTest) Then
+                                        CSTest = db.db_csOpen(ContentName, "(" & FieldName & "=" & db.db_EncodeSQLText(FieldValue) & ")and(ID<>" & userId & ")")
+                                        If db.db_csOk(CSTest) Then
                                             Call error_AddUserError("The field '" & FieldName & "' must be unique, and another account has already used '" & FieldValue & "'")
                                         End If
-                                        Call app.db_csClose(CSTest)
+                                        Call db.db_csClose(CSTest)
                                     End If
                                 End If
                             Next
@@ -8824,7 +8854,7 @@ ErrorTrap:
                             Call main_ProcessFormMyProfile_UpdateFieldBoolean(CSMember, "AllowBulkEmail")
                             Call main_ProcessFormMyProfile_UpdateField(CSMember, "LanguageID")
 
-                            If EncodeBoolean(app.siteProperty_getBoolean("AllowAutoLogin", False)) Then
+                            If EncodeBoolean(db.siteProperty_getBoolean("AllowAutoLogin", False)) Then
                                 Call main_ProcessFormMyProfile_UpdateFieldBoolean(CSMember, "AutoLogin")
                             End If
                             If main_IsContentManager() Then
@@ -8851,9 +8881,9 @@ ErrorTrap:
                                 End If
                             End If
                         End If
-                        Call app.cache.invalidateTagList2("People")
+                        Call cache.invalidateTagList2("People")
                     End If
-                    Call app.db_csClose(CSMember)
+                    Call db.db_csClose(CSMember)
                 End If
             End If
             '
@@ -8875,9 +8905,9 @@ ErrorTrap:
             Dim FieldValue As String
             '
             FieldValue = doc_getText(FieldName)
-            If app.db_GetCSText(CSMember, FieldName) <> FieldValue Then
+            If db.db_GetCSText(CSMember, FieldName) <> FieldValue Then
                 Call main_LogActivity2("profile changed " & FieldName, userId, userOrganizationId)
-                Call app.db_setCS(CSMember, FieldName, FieldValue)
+                Call db.db_setCS(CSMember, FieldName, FieldValue)
             End If
             Exit Sub
             '
@@ -8897,9 +8927,9 @@ ErrorTrap:
             Dim FieldValue As Boolean
             '
             FieldValue = main_GetStreamBoolean2(FieldName)
-            If app.db_GetCSBoolean(CSMember, FieldName) <> FieldValue Then
+            If db.db_GetCSBoolean(CSMember, FieldName) <> FieldValue Then
                 Call main_LogActivity2("profile changed " & FieldName, userId, userOrganizationId)
-                Call app.db_setCS(CSMember, FieldName, FieldValue)
+                Call db.db_setCS(CSMember, FieldName, FieldValue)
             End If
             Exit Sub
             '
@@ -8971,7 +9001,7 @@ ErrorTrap:
                 Else
                     ShortLink = NonEncodedLink
                     ShortLink = ConvertLinkToShortLink(ShortLink, web.requestDomain, web_requestVirtualFilePath)
-                    ShortLink = EncodeAppRootPath(ShortLink, web_requestVirtualFilePath, app.RootWebPath, web.requestDomain)
+                    ShortLink = EncodeAppRootPath(ShortLink, web_requestVirtualFilePath, db.RootWebPath, web.requestDomain)
                     FullLink = web_requestProtocol & web.requestDomain & ShortLink
                 End If
                 If (NonEncodedLink = "") Then
@@ -8997,7 +9027,7 @@ ErrorTrap:
                     '
                     Call appendLogPageNotFound(web.requestLinkSource)
                     If ShortLink <> "" Then
-                        Call app.executeSql("Update ccContentWatch set link=null where link=" & app.db_EncodeSQLText(ShortLink))
+                        Call db.executeSql("Update ccContentWatch set link=null where link=" & db.db_EncodeSQLText(ShortLink))
                     End If
                     '
                     If main_PageTestPointPrinting Then
@@ -9137,7 +9167,7 @@ ErrorTrap:
             MethodName = "main_addResponseCookie"
             '
             If docOpen And docBufferEnabled Then
-                If (isMissing(domain)) And domainDetails.allowCrossLogin And EncodeBoolean(app.siteProperty_getBoolean("Write Cookies to All Domains", True)) Then
+                If (isMissing(domain)) And domainDetails.allowCrossLogin And EncodeBoolean(db.siteProperty_getBoolean("Write Cookies to All Domains", True)) Then
                     '
                     ' no domain provided, new mode
                     '   - write cookie for current domains
@@ -9541,7 +9571,7 @@ ErrorTrap:
                 main_testPointMessage = main_testPointMessage & "<nobr>" & iMessage & "</nobr><br >"
                 'writeAltBuffer ("<nobr>" & iMessage & "</nobr><br >")
             End If
-            If app.siteProperty_AllowTestPointLogging Then
+            If db.siteProperty_AllowTestPointLogging Then
                 '
                 ' write to debug log in virtual files - to read from a test verbose viewer
                 '
@@ -9551,7 +9581,7 @@ ErrorTrap:
                 iMessage = Replace(iMessage, vbLf, " ")
                 iMessage = FormatDateTime(Now, vbShortTime) & vbTab & Format((ElapsedTime), "00.000") & vbTab & main_VisitId & vbTab & iMessage
                 '
-                Call appendLog(iMessage, "", "testPoints_" & app.config.name)
+                Call appendLog(iMessage, "", "testPoints_" & db.config.name)
             End If
             Exit Sub
             '
@@ -9609,13 +9639,13 @@ ErrorTrap:
             '
             main_RedirectByRecord_ReturnStatus = False
             BlockRedirect = False
-            CSPointer = app.db_csOpen(iContentName, "ID=" & iRecordID)
-            If app.db_csOk(CSPointer) Then
+            CSPointer = db.db_csOpen(iContentName, "ID=" & iRecordID)
+            If db.db_csOk(CSPointer) Then
                 ' 2/18/2008 - EncodeLink change
                 '
                 ' Assume all Link fields are already encoded -- as this is how they would appear if the admin cut and pasted
                 '
-                EncodedLink = Trim(app.db_GetCSText(CSPointer, iFieldName))
+                EncodedLink = Trim(db.db_GetCSText(CSPointer, iFieldName))
                 If EncodedLink = "" Then
                     BlockRedirect = True
                 Else
@@ -9631,33 +9661,33 @@ ErrorTrap:
                             '       inactive or expired before redirecting
                             '
                             LinkPrefix = web_requestContentWatchPrefix
-                            ContentID = (app.db_GetCSInteger(CSPointer, "ContentID"))
+                            ContentID = (db.db_GetCSInteger(CSPointer, "ContentID"))
                             HostContentName = main_GetContentNameByID(ContentID)
                             If (HostContentName = "") Then
                                 '
                                 ' ----- Content Watch with a bad ContentID, mark inactive
                                 '
                                 BlockRedirect = True
-                                Call app.db_setCS(CSPointer, "active", 0)
+                                Call db.db_setCS(CSPointer, "active", 0)
                             Else
-                                HostRecordID = (app.db_GetCSInteger(CSPointer, "RecordID"))
+                                HostRecordID = (db.db_GetCSInteger(CSPointer, "RecordID"))
                                 If HostRecordID = 0 Then
                                     '
                                     ' ----- Content Watch with a bad iRecordID, mark inactive
                                     '
                                     BlockRedirect = True
-                                    Call app.db_setCS(CSPointer, "active", 0)
+                                    Call db.db_setCS(CSPointer, "active", 0)
                                 Else
-                                    CSHost = app.db_csOpen(HostContentName, "ID=" & HostRecordID)
-                                    If Not app.db_csOk(CSHost) Then
+                                    CSHost = db.db_csOpen(HostContentName, "ID=" & HostRecordID)
+                                    If Not db.db_csOk(CSHost) Then
                                         '
                                         ' ----- Content Watch host record not found, mark inactive
                                         '
                                         BlockRedirect = True
-                                        Call app.db_setCS(CSPointer, "active", 0)
+                                        Call db.db_setCS(CSPointer, "active", 0)
                                     End If
                                 End If
-                                Call app.db_csClose(CSHost)
+                                Call db.db_csClose(CSHost)
                             End If
                             If BlockRedirect Then
                                 '
@@ -9672,14 +9702,14 @@ ErrorTrap:
                     ' If link incorrectly includes the LinkPrefix, take it off first, then add it back
                     '
                     NonEncodedLink = ConvertShortLinkToLink(NonEncodedLink, LinkPrefix)
-                    If app.db_IsCSFieldSupported(CSPointer, "Clicks") Then
-                        Call app.db_setCS(CSPointer, "Clicks", (app.db_GetCSNumber(CSPointer, "Clicks")) + 1)
+                    If db.db_IsCSFieldSupported(CSPointer, "Clicks") Then
+                        Call db.db_setCS(CSPointer, "Clicks", (db.db_GetCSNumber(CSPointer, "Clicks")) + 1)
                     End If
                     Call web_Redirect2(LinkPrefix & NonEncodedLink, "Call to " & MethodName & ", no reason given.", False)
                     main_RedirectByRecord_ReturnStatus = True
                 End If
             End If
-            Call app.db_csClose(CSPointer)
+            Call db.db_csClose(CSPointer)
             Exit Function
             '
             ' ----- Error Trap
@@ -9780,7 +9810,7 @@ ErrorTrap:
                 '
                 ' This was commented out -- I really do not know why -- seems like the best way
                 '
-                CDef = app.metaData.getCdef(ContentName)
+                CDef = metaData.getCdef(ContentName)
                 TableName = CDef.ContentTableName
                 DataSource = CDef.ContentDataSourceName
                 ContentControlCriteria = CDef.ContentControlCriteria
@@ -9796,7 +9826,7 @@ ErrorTrap:
                     SQL &= " and " & LcaseCriteria
                 End If
                 Dim dt As DataTable
-                dt = app.executeSql(SQL)
+                dt = db.executeSql(SQL)
                 If dt.Rows.Count > 0 Then
                     RowCnt = EncodeInteger(dt.Rows(0).Item("cnt"))
                 End If
@@ -9807,23 +9837,23 @@ ErrorTrap:
                     RowMax = RowCnt - 1
                 End If
                 '
-                If RowCnt > app.siteProperty_SelectFieldLimit Then
+                If RowCnt > db.siteProperty_SelectFieldLimit Then
                     '
                     ' Selection is too big
                     '
                     Call error_AddUserError("The drop down list for " & ContentName & " called " & MenuName & " is too long to display. The site administrator has been notified and the problem will be resolved shortly. To fix this issue temporarily, go to the admin tab of the Preferences page and set the Select Field Limit larger than " & RowCnt & ".")
                     '                    handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
 
-                    handleException(New Exception("Error creating select list from content [" & ContentName & "] called [" & MenuName & "]. Selection of [" & RowCnt & "] records exceeds [" & app.siteProperty_SelectFieldLimit & "], the current Site Property SelectFieldLimit."))
+                    handleExceptionAndRethrow(New Exception("Error creating select list from content [" & ContentName & "] called [" & MenuName & "]. Selection of [" & RowCnt & "] records exceeds [" & db.siteProperty_SelectFieldLimit & "], the current Site Property SelectFieldLimit."))
                     main_GetFormInputSelect2 = main_GetFormInputSelect2 & html_GetFormInputHidden(MenuNameFPO, CurrentValue)
                     If CurrentValue = 0 Then
                         main_GetFormInputSelect2 = main_GetFormInputText2(MenuName, "0")
                     Else
                         CSPointer = db_csOpen(ContentName, CurrentValue)
-                        If app.db_csOk(CSPointer) Then
-                            main_GetFormInputSelect2 = app.db_GetCSText(CSPointer, "name") & "&nbsp;"
+                        If db.db_csOk(CSPointer) Then
+                            main_GetFormInputSelect2 = db.db_GetCSText(CSPointer, "name") & "&nbsp;"
                         End If
-                        Call app.db_csClose(CSPointer)
+                        Call db.db_csClose(CSPointer)
                     End If
                     main_GetFormInputSelect2 = main_GetFormInputSelect2 & "(Selection is too large to display option list)"
                 Else
@@ -9891,7 +9921,7 @@ ErrorTrap:
                         DropDownFieldCount = DropDownFieldCount + 1
                     End If
                     If DropDownFieldCount = 0 Then
-                        handleException(New Exception("No drop down field names found for content [" & ContentName & "]."))
+                        handleExceptionAndRethrow(New Exception("No drop down field names found for content [" & ContentName & "]."))
                     Else
                         ReDim DropDownFieldPointer(DropDownFieldCount - 1)
                         SelectFields = "ID"
@@ -9910,13 +9940,13 @@ ErrorTrap:
                         '
                         ' ----- select values
                         '
-                        CSPointer = app.db_csOpen(ContentName, Criteria, SortFieldList, , , , , SelectFields)
-                        If app.db_csOk(CSPointer) Then
+                        CSPointer = db.db_csOpen(ContentName, Criteria, SortFieldList, , , , , SelectFields)
+                        If db.db_csOk(CSPointer) Then
                             Call testPoint("main_GetFormInputSelect2, 10 ContentName=[" & ContentName & "] Criteria=[" & Criteria & "] ")
-                            RowsArray = app.csv_GetCSRows2(CSPointer)
+                            RowsArray = db.db_GetCSRows2(CSPointer)
                             Call testPoint("main_GetFormInputSelect2, 20")
                             'RowFieldArray = app.csv_GetCSRowFields(CSPointer)
-                            RowFieldArray = Split(app.db_GetCSSelectFieldList(CSPointer), ",")
+                            RowFieldArray = Split(db.db_GetCSSelectFieldList(CSPointer), ",")
                             Call testPoint("main_GetFormInputSelect2, 30")
                             ColumnMax = UBound(RowsArray, 1)
                             Call testPoint("main_GetFormInputSelect2, 40")
@@ -9963,25 +9993,25 @@ ErrorTrap:
                                     Call FastString.Add("selected")
                                     SelectedFound = True
                                 End If
-                                If app.siteProperty_SelectFieldWidthLimit <> 0 Then
-                                    If Len(Copy) > app.siteProperty_SelectFieldWidthLimit Then
-                                        Copy = Left(Copy, app.siteProperty_SelectFieldWidthLimit) & "...+"
+                                If db.siteProperty_SelectFieldWidthLimit <> 0 Then
+                                    If Len(Copy) > db.siteProperty_SelectFieldWidthLimit Then
+                                        Copy = Left(Copy, db.siteProperty_SelectFieldWidthLimit) & "...+"
                                     End If
                                 End If
                                 Call FastString.Add(">" & html_EncodeHTML(Copy) & "</option>")
                             Next
                             If Not SelectedFound And (CurrentValue <> 0) Then
-                                Call app.db_csClose(CSPointer)
+                                Call db.db_csClose(CSPointer)
                                 If Criteria <> "" Then
                                     Criteria = Criteria & "and"
                                 End If
                                 Criteria = Criteria & "(id=" & EncodeInteger(CurrentValue) & ")"
-                                CSPointer = app.db_csOpen(ContentName, Criteria, SortFieldList, False, , , , SelectFields)
-                                If app.db_csOk(CSPointer) Then
+                                CSPointer = db.db_csOpen(ContentName, Criteria, SortFieldList, False, , , , SelectFields)
+                                If db.db_csOk(CSPointer) Then
                                     Call testPoint("main_GetFormInputSelect2, 110")
-                                    RowsArray = app.csv_GetCSRows2(CSPointer)
+                                    RowsArray = db.db_GetCSRows2(CSPointer)
                                     Call testPoint("main_GetFormInputSelect2, 120")
-                                    RowFieldArray = Split(app.db_GetCSSelectFieldList(CSPointer), ",")
+                                    RowFieldArray = Split(db.db_GetCSSelectFieldList(CSPointer), ",")
                                     Call testPoint("main_GetFormInputSelect2, 130")
                                     RowMax = UBound(RowsArray, 2)
                                     Call testPoint("main_GetFormInputSelect2, 140")
@@ -9998,9 +10028,9 @@ ErrorTrap:
                                     End If
                                     Call FastString.Add(vbCrLf & "<option value=""" & RecordID & """ selected")
                                     SelectedFound = True
-                                    If app.siteProperty_SelectFieldWidthLimit <> 0 Then
-                                        If Len(Copy) > app.siteProperty_SelectFieldWidthLimit Then
-                                            Copy = Left(Copy, app.siteProperty_SelectFieldWidthLimit) & "...+"
+                                    If db.siteProperty_SelectFieldWidthLimit <> 0 Then
+                                        If Len(Copy) > db.siteProperty_SelectFieldWidthLimit Then
+                                            Copy = Left(Copy, db.siteProperty_SelectFieldWidthLimit) & "...+"
                                         End If
                                     End If
                                     Call FastString.Add(">" & html_EncodeHTML(Copy) & "</option>")
@@ -10008,7 +10038,7 @@ ErrorTrap:
                             End If
                         End If
                         Call FastString.Add("</select>")
-                        Call app.db_csClose(CSPointer)
+                        Call db.db_csClose(CSPointer)
                         SelectRaw = FastString.Text
                     End If
                 End If
@@ -10142,11 +10172,11 @@ ErrorTrap:
                     & " inner join ccMembers P on R.MemberID=P.ID" _
                     & " where (P.active<>0)" _
                     & " and (R.GroupID=" & GroupID & ")"
-                CSPointer = app.db_openCsSql_rev(PeopleDataSource, SQL)
-                If app.db_csOk(CSPointer) Then
-                    RowMax = RowMax + app.db_GetCSInteger(CSPointer, "cnt")
+                CSPointer = db.db_openCsSql_rev(PeopleDataSource, SQL)
+                If db.db_csOk(CSPointer) Then
+                    RowMax = RowMax + db.db_GetCSInteger(CSPointer, "cnt")
                 End If
-                Call app.db_csClose(CSPointer)
+                Call db.db_csClose(CSPointer)
                 '
                 '        SQL = " select count(*) as cnt" _
                 '            & " from ccMembers P" _
@@ -10158,18 +10188,18 @@ ErrorTrap:
                 '        End If
                 '        Call app.db_closeCS(CSPointer)
                 '
-                If RowMax > app.siteProperty_SelectFieldLimit Then
+                If RowMax > db.siteProperty_SelectFieldLimit Then
                     '
                     ' Selection is too big
                     '
-                    handleException(New Exception("While building a group members list for group [" & group_GetGroupName(GroupID) & "], too many rows were selected. [" & RowMax & "] records exceeds [" & app.siteProperty_SelectFieldLimit & "], the current Site Property app.SiteProperty_SelectFieldLimit."))
+                    handleExceptionAndRethrow(New Exception("While building a group members list for group [" & group_GetGroupName(GroupID) & "], too many rows were selected. [" & RowMax & "] records exceeds [" & db.siteProperty_SelectFieldLimit & "], the current Site Property app.SiteProperty_SelectFieldLimit."))
                     main_GetFormInputMemberSelect2 = main_GetFormInputMemberSelect2 & html_GetFormInputHidden(MenuNameFPO, iCurrentValue)
                     If iCurrentValue <> 0 Then
                         CSPointer = db_csOpen("people", iCurrentValue)
-                        If app.db_csOk(CSPointer) Then
-                            main_GetFormInputMemberSelect2 = app.db_GetCSText(CSPointer, "name") & "&nbsp;"
+                        If db.db_csOk(CSPointer) Then
+                            main_GetFormInputMemberSelect2 = db.db_GetCSText(CSPointer, "name") & "&nbsp;"
                         End If
-                        Call app.db_csClose(CSPointer)
+                        Call db.db_csClose(CSPointer)
                     End If
                     main_GetFormInputMemberSelect2 = main_GetFormInputMemberSelect2 & "(Selection is too large to display)"
                 Else
@@ -10236,7 +10266,7 @@ ErrorTrap:
                         DropDownFieldCount = DropDownFieldCount + 1
                     End If
                     If DropDownFieldCount = 0 Then
-                        handleException(New Exception("No drop down field names found for content [" & GroupID & "]."))
+                        handleExceptionAndRethrow(New Exception("No drop down field names found for content [" & GroupID & "]."))
                     Else
                         ReDim DropDownFieldPointer(DropDownFieldCount - 1)
                         SelectFields = "P.ID"
@@ -10268,7 +10298,7 @@ ErrorTrap:
                             & " from ccMemberRules R" _
                             & " inner join ccMembers P on R.MemberID=P.ID" _
                             & " where (R.GroupID=" & GroupID & ")" _
-                            & " and((R.DateExpires is null)or(R.DateExpires>" & app.db_EncodeSQLDate(Now) & "))" _
+                            & " and((R.DateExpires is null)or(R.DateExpires>" & db.db_EncodeSQLDate(Now) & "))" _
                             & " and(P.active<>0)" _
                             & " order by P." & SortFieldList
                         '                SQL = "select " & SelectFields _
@@ -10283,11 +10313,11 @@ ErrorTrap:
                         '                    & " where (active<>0)" _
                         '                    & " and(( P.admin<>0 )or( P.developer<>0 ))" _
                         '                    & " order by P." & SortFieldList
-                        CSPointer = app.db_openCsSql_rev(PeopleDataSource, SQL)
-                        If app.db_csOk(CSPointer) Then
-                            RowsArray = app.csv_GetCSRows(CSPointer)
+                        CSPointer = db.db_openCsSql_rev(PeopleDataSource, SQL)
+                        If db.db_csOk(CSPointer) Then
+                            RowsArray = db.db_GetCSRows(CSPointer)
                             'RowFieldArray = app.csv_GetCSRowFields(CSPointer)
-                            RowFieldArray = Split(app.db_GetCSSelectFieldList(CSPointer), ",")
+                            RowFieldArray = Split(db.db_GetCSSelectFieldList(CSPointer), ",")
                             RowMax = UBound(RowsArray, 2)
                             ColumnMax = UBound(RowsArray, 1)
                             '
@@ -10332,9 +10362,9 @@ ErrorTrap:
                                         Call FastString.Add("selected")
                                         SelectedFound = True
                                     End If
-                                    If app.siteProperty_SelectFieldWidthLimit <> 0 Then
-                                        If Len(Copy) > app.siteProperty_SelectFieldWidthLimit Then
-                                            Copy = Left(Copy, app.siteProperty_SelectFieldWidthLimit) & "...+"
+                                    If db.siteProperty_SelectFieldWidthLimit <> 0 Then
+                                        If Len(Copy) > db.siteProperty_SelectFieldWidthLimit Then
+                                            Copy = Left(Copy, db.siteProperty_SelectFieldWidthLimit) & "...+"
                                         End If
                                     End If
                                     Call FastString.Add(">" & Copy & "</option>")
@@ -10343,7 +10373,7 @@ ErrorTrap:
                             Next
                         End If
                         Call FastString.Add("</select>")
-                        Call app.db_csClose(CSPointer)
+                        Call db.db_csClose(CSPointer)
                         SelectRaw = FastString.Text
                     End If
                 End If
@@ -10399,7 +10429,7 @@ ErrorTrap:
             Dim TagID As String
             Dim SelectFieldWidthLimit As Integer
             '
-            SelectFieldWidthLimit = app.siteProperty_SelectFieldWidthLimit
+            SelectFieldWidthLimit = db.siteProperty_SelectFieldWidthLimit
             If SelectFieldWidthLimit = 0 Then
                 SelectFieldWidthLimit = 256
             End If
@@ -10456,11 +10486,11 @@ ErrorTrap:
             Dim Link As String
             Dim IconFilename As String
             '
-            If EncodeBoolean(app.siteProperty_getBoolean("AllowLoginIcon", True)) Then
+            If EncodeBoolean(db.siteProperty_getBoolean("AllowLoginIcon", True)) Then
                 main_GetLoginLink = main_GetLoginLink & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"">"
                 main_GetLoginLink = main_GetLoginLink & "<tr><td align=""right"">"
                 If main_IsContentManager() Then
-                    main_GetLoginLink = main_GetLoginLink & "<a href=""" & html_EncodeHTML(app.siteProperty_AdminURL) & """ target=""_blank"">"
+                    main_GetLoginLink = main_GetLoginLink & "<a href=""" & html_EncodeHTML(db.siteProperty_AdminURL) & """ target=""_blank"">"
                 Else
                     Link = web_requestPage & "?" & web_RefreshQueryString
                     Link = modifyLinkQuery(Link, RequestNameHardCodedPage, HardCodedPageLogin, True)
@@ -10468,11 +10498,11 @@ ErrorTrap:
                     main_GetLoginLink = main_GetLoginLink & "<a href=""" & html_EncodeHTML(Link) & """ >"
                 End If
                 If (main_LoginIconFilename <> "") Then
-                    main_GetLoginLink = main_GetLoginLink & "<img alt=""Login"" src=""" & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, main_LoginIconFilename) & """ border=""0"" >"
+                    main_GetLoginLink = main_GetLoginLink & "<img alt=""Login"" src=""" & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, main_LoginIconFilename) & """ border=""0"" >"
                 Else
-                    IconFilename = app.siteProperty_getText("LoginIconFilename", "/ccLib/images/ccLibLogin.GIF")
+                    IconFilename = db.siteProperty_getText("LoginIconFilename", "/ccLib/images/ccLibLogin.GIF")
                     If LCase(Mid(IconFilename, 1, 7)) <> "/cclib/" Then
-                        IconFilename = csv_getVirtualFileLink(app.config.cdnFilesNetprefix, IconFilename)
+                        IconFilename = csv_getVirtualFileLink(db.config.cdnFilesNetprefix, IconFilename)
                     End If
                     main_GetLoginLink = main_GetLoginLink & "<img alt=""Login"" src=""" & IconFilename & """ border=""0"" >"
                 End If
@@ -10504,7 +10534,7 @@ ErrorTrap:
             Try
                 main_GetClosePage2 = main_GetClosePage3(AllowLogin, AllowTools, False, False)
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
         End Function
         '
@@ -10521,7 +10551,7 @@ ErrorTrap:
             Try
                 main_GetClosePage3 = main_GetEndOfBody(AllowLogin, AllowTools, BlockNonContentExtras, False)
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
         End Function
         '
@@ -10562,13 +10592,13 @@ ErrorTrap:
                     '
                     main_ClosePageCounter = main_ClosePageCounter + 1
                     If web_InitCounter = 0 Then
-                        handleException(New Exception("Page was not initialized properly. Init(...) call may be missing."))
+                        handleExceptionAndRethrow(New Exception("Page was not initialized properly. Init(...) call may be missing."))
                     End If
                     If web_InitCounter > 1 Then
-                        handleException(New Exception("Page was not initialized properly. Init(...) was called multiple times."))
+                        handleExceptionAndRethrow(New Exception("Page was not initialized properly. Init(...) was called multiple times."))
                     End If
                     If main_ClosePageCounter > 1 Then
-                        handleException(New Exception("Page was not closed properly. main_GetEndOfBody was called multiple times."))
+                        handleExceptionAndRethrow(New Exception("Page was not closed properly. main_GetEndOfBody was called multiple times."))
                     End If
                     '
                     ' ----- add window.print if this is the Printerversion
@@ -10576,7 +10606,7 @@ ErrorTrap:
                     If main_ServerPagePrintVersion Then
                         autoPrintText = doc_getText("AutoPrint")
                         If autoPrintText = "" Then
-                            autoPrintText = app.siteProperty_getText("AllowAutoPrintDialog", "1")
+                            autoPrintText = db.siteProperty_getText("AllowAutoPrintDialog", "1")
                         End If
                         If EncodeBoolean(autoPrintText) Then
                             Call main_AddOnLoadJavascript2("window.print(); window.close()", "Print Page")
@@ -10606,7 +10636,7 @@ ErrorTrap:
                     ' ----- Popup USER errors
                     '
                     If (Not BlockNonContentExtras) And error_IsUserError() Then
-                        AllowPopupErrors = EncodeBoolean(app.siteProperty_getBoolean("AllowPopupErrors", True))
+                        AllowPopupErrors = EncodeBoolean(db.siteProperty_getBoolean("AllowPopupErrors", True))
                         If AllowPopupErrors Then
                             's = s & main_GetPopupMessage("<div style=""margin:20px;"">" & main_GetUserError() & "</div>", 300, 200, False)
                         End If
@@ -10623,7 +10653,7 @@ ErrorTrap:
                     ' ----- popup error if this is a developer
                     '
                     If (Not BlockNonContentExtras) And user_isDeveloper() Then
-                        AllowPopupTraps = EncodeBoolean(app.siteProperty_getBoolean("AllowPopupTraps", True))
+                        AllowPopupTraps = EncodeBoolean(db.siteProperty_getBoolean("AllowPopupTraps", True))
                         If AllowPopupTraps Then
                             If main_PageErrorWithoutCsv Then
                                 main_TrapLogMessage = "" _
@@ -10710,7 +10740,7 @@ ErrorTrap:
                                     If Parts(1) <> "" Then
                                         headTags = headTags & cr & decodeHtml(Parts(1))
                                     End If
-                                    headTags = headTags & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, Parts(0)) & """ >"
+                                    headTags = headTags & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, Parts(0)) & """ >"
                                     If Parts(2) <> "" Then
                                         headTags = headTags & cr & decodeHtml(Parts(2))
                                     End If
@@ -10723,7 +10753,7 @@ ErrorTrap:
                     ' ----- Add Member Stylesheet if left over
                     '
                     If userStyleFilename <> "" Then
-                        Copy = app.cdnFiles.ReadFile(userStyleFilename)
+                        Copy = db.cdnFiles.ReadFile(userStyleFilename)
                         headTags = headTags & cr & "<style type=""text/css"">" & Copy & "</style>"
                         'JS = JS & vbCrLf & vbTab & "cjAddHeadTag('<style type=""text/css"">" & Copy & "</style>');"
                         userStyleFilename = ""
@@ -10789,7 +10819,7 @@ ErrorTrap:
                 main_GetEndOfBody = s
                 '
             Catch ex As Exception
-                Call handleException(ex)
+                Call handleExceptionAndRethrow(ex)
             End Try
         End Function
         '
@@ -10798,7 +10828,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Sub main_IncrementTableField(ByVal TableName As String, ByVal RecordID As Integer, ByVal FieldName As String, Optional ByVal DataSourceName As String = "")
-            Call app.executeSql("update " & TableName & " set " & FieldName & "=" & FieldName & "+1 where id=" & RecordID, DataSourceName)
+            Call db.executeSql("update " & TableName & " set " & FieldName & "=" & FieldName & "+1 where id=" & RecordID, DataSourceName)
 
             '            On Error GoTo ErrorTrap : ''Dim th as integer : th = profileLogMethodEnter("IncrementTableField")
             '            '
@@ -11278,7 +11308,7 @@ ErrorTrap:
             MethodName = "main_GetToolsPanel"
             '
             If userAllowToolsPanel Then
-                ShowLegacyToolsPanel = (False) Or (EncodeBoolean(app.siteProperty_getBoolean("AllowLegacyToolsPanel", True)))
+                ShowLegacyToolsPanel = (False) Or (EncodeBoolean(db.siteProperty_getBoolean("AllowLegacyToolsPanel", True)))
                 '
                 ' --- Link Panel - used for both Legacy Tools Panel, and without it
                 '
@@ -11287,10 +11317,10 @@ ErrorTrap:
                 LinkPanel.Add("Contensive " & cp.Version() & " | ")
                 LinkPanel.Add(FormatDateTime(main_PageStartTime) & " | ")
                 LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""http://support.Contensive.com/"">Support</A> | ")
-                LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html_EncodeHTML(app.siteProperty_AdminURL) & """>Admin Home</A> | ")
+                LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html_EncodeHTML(db.siteProperty_AdminURL) & """>Admin Home</A> | ")
                 LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html_EncodeHTML("http://" & main_ServerDomain) & """>Public Home</A> | ")
-                LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & html_EncodeHTML(app.siteProperty_AdminURL & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
-                If EncodeBoolean(app.siteProperty_getBoolean("AllowMobileTemplates", False)) Then
+                LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & html_EncodeHTML(db.siteProperty_AdminURL & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
+                If EncodeBoolean(db.siteProperty_getBoolean("AllowMobileTemplates", False)) Then
                     If main_VisitBrowserIsMobile Then
                         QS = web_RefreshQueryString
                         QS = ModifyQueryString(QS, "method", "forcenonmobile")
@@ -11378,7 +11408,7 @@ ErrorTrap:
                         '
                         helpLink = ""
                         'helpLink = main_GetHelpLink(9, "Enable Workflow Rendering", "Control the display of workflow rendering. With workflow rendering enabled, any changes saved to content records that have not been published will be visible for your review.")
-                        If app.siteProperty_AllowWorkflowAuthoring Then
+                        If db.siteProperty_AllowWorkflowAuthoring Then
                             iValueBoolean = main_VisitProperty_AllowWorkflowRendering
                             Tag = html_GetFormInputCheckBox2(WorkflowTagID, iValueBoolean, WorkflowTagID)
                             OptionsPanel = OptionsPanel _
@@ -11399,21 +11429,21 @@ ErrorTrap:
                         '
                         If user_isDeveloper() Then
                             TagID = "CreatePathBlock"
-                            If app.siteProperty_AllowPathBlocking Then
+                            If db.siteProperty_AllowPathBlocking Then
                                 '
                                 ' Path blocking allowed
                                 '
                                 'OptionsPanel = OptionsPanel & SpanClassAdminSmall & "<LABEL for=""" & TagID & """>"
-                                CS = app.db_csOpen("Paths", "name=" & app.db_EncodeSQLText("/" & web_requestAppPath), , , , , , "ID")
-                                If app.db_csOk(CS) Then
-                                    PathID = (app.db_GetCSInteger(CS, "ID"))
+                                CS = db.db_csOpen("Paths", "name=" & db.db_EncodeSQLText("/" & web_requestAppPath), , , , , , "ID")
+                                If db.db_csOk(CS) Then
+                                    PathID = (db.db_GetCSInteger(CS, "ID"))
                                 End If
-                                Call app.db_csClose(CS)
+                                Call db.db_csClose(CS)
                                 If PathID <> 0 Then
                                     '
                                     ' Path is blocked
                                     '
-                                    Tag = html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [/" & web_requestAppPath & "] [<a href=""" & html_EncodeHTML(app.siteProperty_AdminURL & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & main_GetContentID("paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
+                                    Tag = html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [/" & web_requestAppPath & "] [<a href=""" & html_EncodeHTML(db.siteProperty_AdminURL & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & main_GetContentID("paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
                                 Else
                                     '
                                     ' Path is not blocked
@@ -11453,7 +11483,7 @@ ErrorTrap:
                     ' Username
                     '
                     Dim Caption As String
-                    If EncodeBoolean(app.siteProperty_getBoolean("allowEmailLogin", False)) Then
+                    If EncodeBoolean(db.siteProperty_getBoolean("allowEmailLogin", False)) Then
                         Caption = "Username&nbsp;or&nbsp;Email"
                     Else
                         Caption = "Username"
@@ -11466,7 +11496,7 @@ ErrorTrap:
                     '
                     ' Username
                     '
-                    If EncodeBoolean(app.siteProperty_getBoolean("allownopasswordLogin", False)) Then
+                    If EncodeBoolean(db.siteProperty_getBoolean("allownopasswordLogin", False)) Then
                         Caption = "Password&nbsp;(optional)"
                     Else
                         Caption = "Password"
@@ -11479,7 +11509,7 @@ ErrorTrap:
                     '
                     ' Autologin checkbox
                     '
-                    If EncodeBoolean(app.siteProperty_getBoolean("AllowAutoLogin", False)) Then
+                    If EncodeBoolean(db.siteProperty_getBoolean("AllowAutoLogin", False)) Then
                         If main_VisitCookieSupport Then
                             TagID = "autologin"
                             LoginPanel = LoginPanel & "" _
@@ -11534,9 +11564,9 @@ ErrorTrap:
                     LinkPanel.Add("Contensive " & cp.Version() & " | ")
                     LinkPanel.Add(FormatDateTime(main_PageStartTime) & " | ")
                     LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""http: //support.Contensive.com/"">Support</A> | ")
-                    LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html_EncodeHTML(app.siteProperty_AdminURL) & """>Admin Home</A> | ")
+                    LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html_EncodeHTML(db.siteProperty_AdminURL) & """>Admin Home</A> | ")
                     LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html_EncodeHTML("http://" & main_ServerDomain) & """>Public Home</A> | ")
-                    LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & html_EncodeHTML(app.siteProperty_AdminURL & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
+                    LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & html_EncodeHTML(db.siteProperty_AdminURL & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
                     LinkPanel.Add("</span>")
                     '
                     '
@@ -11551,8 +11581,8 @@ ErrorTrap:
                         & cr2 & "</tr>"
                     '
                     DebugPanel = DebugPanel & main_DebugPanelRow("DOM", "<a class=""ccAdminLink"" href=""/cclib/clientside/DOMViewer.htm"" target=""_blank"">Click</A>")
-                    DebugPanel = DebugPanel & main_DebugPanelRow("Trap Errors", html_EncodeHTML(app.siteProperty_trapErrors.ToString))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("Trap Email", html_EncodeHTML(app.siteProperty_getText("TrapEmail")))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Trap Errors", html_EncodeHTML(db.siteProperty_trapErrors.ToString))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Trap Email", html_EncodeHTML(db.siteProperty_getText("TrapEmail")))
                     DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerLink", html_EncodeHTML(main_ServerLink))
                     DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerDomain", html_EncodeHTML(main_ServerDomain))
                     DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerProtocol", html_EncodeHTML(web_requestProtocol))
@@ -11595,27 +11625,27 @@ ErrorTrap:
                         Copy = Mid(Copy, 8)
                     End If
                     DebugPanel = DebugPanel & main_DebugPanelRow("ServerForm", Copy)
-                    DebugPanel = DebugPanel & main_DebugPanelRow("ServerAppRootPath", html_EncodeHTML(app.RootWebPath))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("ServerAppRootPath", html_EncodeHTML(db.RootWebPath))
                     DebugPanel = DebugPanel & main_DebugPanelRow("ServerAppPath", html_EncodeHTML(web_requestAppPath))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("serverFilePath", html_EncodeHTML(app.config.cdnFilesNetprefix))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("serverFilePath", html_EncodeHTML(db.config.cdnFilesNetprefix))
                     DebugPanel = DebugPanel & main_DebugPanelRow("ServerReferrer", html_EncodeHTML(web.requestReferrer))
                     DebugPanel = DebugPanel & main_DebugPanelRow("ServerCookies", html_EncodeHTML(web.requestCookies))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("VisitId", "<a href=""" & app.siteProperty_AdminURL & "?cid=" & main_GetContentID("visits") & "&af=4&id=" & main_VisitId & """>" & main_VisitId & "</a>")
+                    DebugPanel = DebugPanel & main_DebugPanelRow("VisitId", "<a href=""" & db.siteProperty_AdminURL & "?cid=" & main_GetContentID("visits") & "&af=4&id=" & main_VisitId & """>" & main_VisitId & "</a>")
                     DebugPanel = DebugPanel & main_DebugPanelRow("VisitStartDateValue", EncodeText(main_VisitStartDateValue))
                     DebugPanel = DebugPanel & main_DebugPanelRow("VisitStartTime", EncodeText(main_VisitStartTime))
                     DebugPanel = DebugPanel & main_DebugPanelRow("VisitLastTime", EncodeText(main_VisitLastTime))
                     DebugPanel = DebugPanel & main_DebugPanelRow("VisitCookieSupport", EncodeText(main_VisitCookieSupport))
                     DebugPanel = DebugPanel & main_DebugPanelRow("VisitPages", EncodeText(main_VisitPages))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("VisitorID", "<a href=""" & app.siteProperty_AdminURL & "?cid=" & main_GetContentID("visitors") & "&af=4&id=" & main_VisitorID & """>" & main_VisitorID & "</a>")
+                    DebugPanel = DebugPanel & main_DebugPanelRow("VisitorID", "<a href=""" & db.siteProperty_AdminURL & "?cid=" & main_GetContentID("visitors") & "&af=4&id=" & main_VisitorID & """>" & main_VisitorID & "</a>")
                     DebugPanel = DebugPanel & main_DebugPanelRow("VisitorNew", EncodeText(main_VisitorNew))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("MemberID", "<a href=""" & app.siteProperty_AdminURL & "?cid=" & main_GetContentID("people") & "&af=4&id=" & userId & """>" & userId & "</a>")
+                    DebugPanel = DebugPanel & main_DebugPanelRow("MemberID", "<a href=""" & db.siteProperty_AdminURL & "?cid=" & main_GetContentID("people") & "&af=4&id=" & userId & """>" & userId & "</a>")
                     DebugPanel = DebugPanel & main_DebugPanelRow("MemberName", html_EncodeHTML(userName))
                     DebugPanel = DebugPanel & main_DebugPanelRow("MemberNew", EncodeText(userIsNew))
                     DebugPanel = DebugPanel & main_DebugPanelRow("Member Language", userLanguage)
-                    DebugPanel = DebugPanel & main_DebugPanelRow("Page", "<a href=""" & app.siteProperty_AdminURL & "?cid=" & main_GetContentID("page content") & "&af=4&id=" & main_RenderedPageID & """>" & main_RenderedPageID & ", " & main_RenderedPageName & "</a>")
-                    DebugPanel = DebugPanel & main_DebugPanelRow("Section", "<a href=""" & app.siteProperty_AdminURL & "?cid=" & main_GetContentID("site sections") & "&af=4&id=" & main_RenderedSectionID & """>" & main_RenderedSectionID & ", " & main_RenderedSectionName & "</a>")
-                    DebugPanel = DebugPanel & main_DebugPanelRow("Template", "<a href=""" & app.siteProperty_AdminURL & "?cid=" & main_GetContentID("page templates") & "&af=4&id=" & main_RenderedTemplateID & """>" & main_RenderedTemplateID & ", " & main_RenderedTemplateName & "</a>")
-                    DebugPanel = DebugPanel & main_DebugPanelRow("Domain", "<a href=""" & app.siteProperty_AdminURL & "?cid=" & main_GetContentID("domains") & "&af=4&id=" & domainDetails.id & """>" & domainDetails.id & ", " & main_ServerDomain & "</a>")
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Page", "<a href=""" & db.siteProperty_AdminURL & "?cid=" & main_GetContentID("page content") & "&af=4&id=" & main_RenderedPageID & """>" & main_RenderedPageID & ", " & main_RenderedPageName & "</a>")
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Section", "<a href=""" & db.siteProperty_AdminURL & "?cid=" & main_GetContentID("site sections") & "&af=4&id=" & main_RenderedSectionID & """>" & main_RenderedSectionID & ", " & main_RenderedSectionName & "</a>")
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Template", "<a href=""" & db.siteProperty_AdminURL & "?cid=" & main_GetContentID("page templates") & "&af=4&id=" & main_RenderedTemplateID & """>" & main_RenderedTemplateID & ", " & main_RenderedTemplateName & "</a>")
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Domain", "<a href=""" & db.siteProperty_AdminURL & "?cid=" & main_GetContentID("domains") & "&af=4&id=" & domainDetails.id & """>" & domainDetails.id & ", " & main_ServerDomain & "</a>")
                     DebugPanel = DebugPanel & main_DebugPanelRow("Template Reason", pageManager_TemplateReason)
                     DebugPanel = DebugPanel & main_DebugPanelRow("ProcessID", GetProcessID.ToString())
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Krnl ProcessID", encodeText(csv_HostServiceProcessID))
@@ -11780,28 +11810,28 @@ ErrorTrap:
                 End If
                 If (ContentID > 0) Then
                     '
-                    CS = app.db_csOpen("See Also", "((active<>0)AND(ContentID=" & ContentID & ")AND(RecordID=" & iRecordID & "))")
-                    Do While (app.db_csOk(CS))
-                        SeeAlsoLink = (app.db_GetCSText(CS, "Link"))
+                    CS = db.db_csOpen("See Also", "((active<>0)AND(ContentID=" & ContentID & ")AND(RecordID=" & iRecordID & "))")
+                    Do While (db.db_csOk(CS))
+                        SeeAlsoLink = (db.db_GetCSText(CS, "Link"))
                         If SeeAlsoLink <> "" Then
                             main_GetSeeAlso = main_GetSeeAlso & cr & "<li class=""ccListItem"">"
                             If InStr(1, SeeAlsoLink, "://") = 0 Then
                                 SeeAlsoLink = web_requestProtocol & SeeAlsoLink
                             End If
                             If IsEditingLocal Then
-                                main_GetSeeAlso = main_GetSeeAlso & main_GetRecordEditLink2("See Also", (app.db_GetCSInteger(CS, "ID")), False, "", user_isEditing("See Also"))
+                                main_GetSeeAlso = main_GetSeeAlso & main_GetRecordEditLink2("See Also", (db.db_GetCSInteger(CS, "ID")), False, "", user_isEditing("See Also"))
                             End If
-                            main_GetSeeAlso = main_GetSeeAlso & "<a href=""" & html_EncodeHTML(SeeAlsoLink) & """ target=""_blank"">" & (app.db_GetCSText(CS, "Name")) & "</A>"
-                            Copy = (app.db_GetCSText(CS, "Brief"))
+                            main_GetSeeAlso = main_GetSeeAlso & "<a href=""" & html_EncodeHTML(SeeAlsoLink) & """ target=""_blank"">" & (db.db_GetCSText(CS, "Name")) & "</A>"
+                            Copy = (db.db_GetCSText(CS, "Brief"))
                             If Copy <> "" Then
                                 main_GetSeeAlso = main_GetSeeAlso & "<br >" & AddSpan(Copy, "ccListCopy")
                             End If
                             SeeAlsoCount = SeeAlsoCount + 1
                             main_GetSeeAlso = main_GetSeeAlso & "</li>"
                         End If
-                        app.db_csGoNext(CS)
+                        db.db_csGoNext(CS)
                     Loop
-                    app.db_csClose(CS)
+                    db.db_csClose(CS)
                     '
                     If IsEditingLocal Then
                         SeeAlsoCount = SeeAlsoCount + 1
@@ -11920,14 +11950,14 @@ ErrorTrap:
                     NoteCopy = NoteCopy & BR
                     NoteCopy = NoteCopy & "<b>Content on which the comments are based</b>" & BR
                     '
-                    CS = app.db_csOpen(iContentName, "ID=" & iRecordID)
+                    CS = db.db_csOpen(iContentName, "ID=" & iRecordID)
                     Copy = "[the content of this page is not available]" & BR
-                    If app.db_csOk(CS) Then
-                        Copy = (app.db_GetCS(CS, "copyFilename"))
+                    If db.db_csOk(CS) Then
+                        Copy = (db.db_GetCS(CS, "copyFilename"))
                         'Copy = main_EncodeContent5(Copy, userId, iContentName, iRecordID, 0, False, False, True, True, False, True, "", "", False, 0)
                     End If
                     NoteCopy = NoteCopy & Copy & BR
-                    Call app.db_csClose(CS)
+                    Call db.db_csClose(CS)
                     '
                     Call sendMemberEmail3(iToMemberID, NoteFromEmail, "Feedback Form Submitted", NoteCopy, False, True, 0, "", False)
                     '
@@ -12059,29 +12089,29 @@ ErrorTrap:
                 & " FROM (ccContentWatchLists" _
                     & " LEFT JOIN ccContentWatchListRules ON ccContentWatchLists.ID = ccContentWatchListRules.ContentWatchListID)" _
                     & " LEFT JOIN ccContentWatch ON ccContentWatchListRules.ContentWatchID = ccContentWatch.ID" _
-                & " WHERE (((ccContentWatchLists.Name)=" & app.db_EncodeSQLText(ListName) & ")" _
+                & " WHERE (((ccContentWatchLists.Name)=" & db.db_EncodeSQLText(ListName) & ")" _
                     & "AND ((ccContentWatchLists.Active)<>0)" _
                     & "AND ((ccContentWatchListRules.Active)<>0)" _
                     & "AND ((ccContentWatch.Active)<>0)" _
                     & "AND (ccContentWatch.Link is not null)" _
                     & "AND (ccContentWatch.LinkLabel is not null)" _
-                    & "AND ((ccContentWatch.WhatsNewDateExpires is null)or(ccContentWatch.WhatsNewDateExpires>" & app.db_EncodeSQLDate(main_PageStartTime) & "))" _
+                    & "AND ((ccContentWatch.WhatsNewDateExpires is null)or(ccContentWatch.WhatsNewDateExpires>" & db.db_EncodeSQLDate(main_PageStartTime) & "))" _
                     & ")" _
                 & " ORDER BY " & iSortFieldList & ";"
-            main_OpenCSContentWatchList = app.db_csOpenSql(SQL, , PageSize, PageNumber)
-            If Not app.db_csOk(main_OpenCSContentWatchList) Then
+            main_OpenCSContentWatchList = db.db_csOpenSql(SQL, , PageSize, PageNumber)
+            If Not db.db_csOk(main_OpenCSContentWatchList) Then
                 '
                 ' Check if listname exists
                 '
-                CS = app.db_csOpen("Content Watch Lists", "name=" & app.db_EncodeSQLText(ListName), "ID", , , , , "ID")
-                If Not app.db_csOk(CS) Then
-                    Call app.db_csClose(CS)
-                    CS = app.db_csInsertRecord("Content Watch Lists")
-                    If app.db_csOk(CS) Then
-                        Call app.db_setCS(CS, "name", ListName)
+                CS = db.db_csOpen("Content Watch Lists", "name=" & db.db_EncodeSQLText(ListName), "ID", , , , , "ID")
+                If Not db.db_csOk(CS) Then
+                    Call db.db_csClose(CS)
+                    CS = db.db_csInsertRecord("Content Watch Lists")
+                    If db.db_csOk(CS) Then
+                        Call db.db_setCS(CS, "name", ListName)
                     End If
                 End If
-                Call app.db_csClose(CS)
+                Call db.db_csClose(CS)
             End If
             '
             Exit Function
@@ -12114,12 +12144,12 @@ ErrorTrap:
             '
             CSPointer = main_OpenCSWhatsNew(SortFieldList)
             '
-            If app.db_csOk(CSPointer) Then
+            If db.db_csOk(CSPointer) Then
                 ContentID = main_GetContentID("Content Watch")
-                Do While app.db_csOk(CSPointer)
-                    Link = app.db_GetCSText(CSPointer, "link")
-                    LinkLabel = app.db_GetCSText(CSPointer, "LinkLabel")
-                    RecordID = app.db_GetCSInteger(CSPointer, "ID")
+                Do While db.db_csOk(CSPointer)
+                    Link = db.db_GetCSText(CSPointer, "link")
+                    LinkLabel = db.db_GetCSText(CSPointer, "LinkLabel")
+                    RecordID = db.db_GetCSInteger(CSPointer, "ID")
                     If (LinkLabel <> "") Then
                         main_GetWhatsNew = main_GetWhatsNew & cr & "<li class=""ccListItem"">"
                         If (Link <> "") Then
@@ -12129,11 +12159,11 @@ ErrorTrap:
                         End If
                         main_GetWhatsNew = main_GetWhatsNew & "</li>"
                     End If
-                    Call app.db_csGoNext(CSPointer)
+                    Call db.db_csGoNext(CSPointer)
                 Loop
                 main_GetWhatsNew = cr & "<ul class=""ccWatchList"">" & kmaIndent(main_GetWhatsNew) & cr & "</ul>"
             End If
-            Call app.db_csClose(CSPointer)
+            Call db.db_csClose(CSPointer)
             Exit Function
             '
             ' ----- Error Trap
@@ -12167,15 +12197,15 @@ ErrorTrap:
                 ' dont just do main_CheckMember() -- in case a pretty login is needed
                 '
                 CS = db_csOpenRecord("People", iRecordID)
-                If Not app.db_csOk(CS) Then
+                If Not db.db_csOk(CS) Then
                 Else
-                    userId = (app.db_GetCSInteger(CS, "ID"))
-                    userName = (app.db_GetCSText(CS, "Name"))
-                    userIsDeveloper = (app.db_GetCSBoolean(CS, "Developer"))
-                    userIsAdmin = (app.db_GetCSBoolean(CS, "Admin"))
-                    userContentControlID = (app.db_GetCSInteger(CS, "ContentControlID"))
-                    userOrganizationId = (app.db_GetCSInteger(CS, "OrganizationID"))
-                    userLanguageId = (app.db_GetCSInteger(CS, "LanguageID"))
+                    userId = (db.db_GetCSInteger(CS, "ID"))
+                    userName = (db.db_GetCSText(CS, "Name"))
+                    userIsDeveloper = (db.db_GetCSBoolean(CS, "Developer"))
+                    userIsAdmin = (db.db_GetCSBoolean(CS, "Admin"))
+                    userContentControlID = (db.db_GetCSInteger(CS, "ContentControlID"))
+                    userOrganizationId = (db.db_GetCSInteger(CS, "OrganizationID"))
+                    userLanguageId = (db.db_GetCSInteger(CS, "LanguageID"))
                     userLanguage = (main_GetCSEncodedField(CS, "LanguageID"))
                     '
                     '  main_MemberCompany = main_GetCSField_Internal(CS, "Company")
@@ -12188,40 +12218,40 @@ ErrorTrap:
                     '  MemberEmail = main_GetCSField_Internal(CS, "Email")
                     '  main_MemberPhone = main_GetCSField_Internal(CS, "Phone")
                     '
-                    main_MemberShipName = (app.db_GetCSText(CS, "ShipName"))
-                    main_MemberShipCompany = (app.db_GetCSText(CS, "ShipCompany"))
-                    main_MemberShipAddress = (app.db_GetCSText(CS, "ShipAddress"))
-                    main_MemberShipCity = (app.db_GetCSText(CS, "ShipCity"))
-                    main_MemberShipState = (app.db_GetCSText(CS, "ShipState"))
-                    main_MemberShipZip = (app.db_GetCSText(CS, "ShipZip"))
-                    main_MemberShipCountry = (app.db_GetCSText(CS, "ShipCountry"))
-                    main_MemberShipPhone = (app.db_GetCSText(CS, "ShipPhone"))
+                    main_MemberShipName = (db.db_GetCSText(CS, "ShipName"))
+                    main_MemberShipCompany = (db.db_GetCSText(CS, "ShipCompany"))
+                    main_MemberShipAddress = (db.db_GetCSText(CS, "ShipAddress"))
+                    main_MemberShipCity = (db.db_GetCSText(CS, "ShipCity"))
+                    main_MemberShipState = (db.db_GetCSText(CS, "ShipState"))
+                    main_MemberShipZip = (db.db_GetCSText(CS, "ShipZip"))
+                    main_MemberShipCountry = (db.db_GetCSText(CS, "ShipCountry"))
+                    main_MemberShipPhone = (db.db_GetCSText(CS, "ShipPhone"))
                     '
-                    main_MemberBillCompany = (app.db_GetCSText(CS, "BillCompany"))
-                    main_MemberBillAddress = (app.db_GetCSText(CS, "BillAddress"))
-                    main_MemberBillCity = (app.db_GetCSText(CS, "BillCity"))
-                    main_MemberBillState = (app.db_GetCSText(CS, "BillState"))
-                    main_MemberBillZip = (app.db_GetCSText(CS, "BillZip"))
-                    main_MemberBillCountry = (app.db_GetCSText(CS, "BillCountry"))
-                    user_billEmail = (app.db_GetCSText(CS, "BillEmail"))
-                    user_billPhone = (app.db_GetCSText(CS, "BillPhone"))
-                    user_billFax = (app.db_GetCSText(CS, "BillFax"))
+                    main_MemberBillCompany = (db.db_GetCSText(CS, "BillCompany"))
+                    main_MemberBillAddress = (db.db_GetCSText(CS, "BillAddress"))
+                    main_MemberBillCity = (db.db_GetCSText(CS, "BillCity"))
+                    main_MemberBillState = (db.db_GetCSText(CS, "BillState"))
+                    main_MemberBillZip = (db.db_GetCSText(CS, "BillZip"))
+                    main_MemberBillCountry = (db.db_GetCSText(CS, "BillCountry"))
+                    user_billEmail = (db.db_GetCSText(CS, "BillEmail"))
+                    user_billPhone = (db.db_GetCSText(CS, "BillPhone"))
+                    user_billFax = (db.db_GetCSText(CS, "BillFax"))
                     '
-                    user_allowBulkEmail = (app.db_GetCSBoolean(CS, "AllowBulkEmail"))
-                    userAllowToolsPanel = (app.db_GetCSBoolean(CS, "AllowToolsPanel"))
-                    user_adminMenuModeID = (app.db_GetCSInteger(CS, "AdminMenuModeID"))
-                    user_autoLogin = (app.db_GetCSBoolean(CS, "AutoLogin"))
+                    user_allowBulkEmail = (db.db_GetCSBoolean(CS, "AllowBulkEmail"))
+                    userAllowToolsPanel = (db.db_GetCSBoolean(CS, "AllowToolsPanel"))
+                    user_adminMenuModeID = (db.db_GetCSInteger(CS, "AdminMenuModeID"))
+                    user_autoLogin = (db.db_GetCSBoolean(CS, "AutoLogin"))
                     ' 6/18/2009 - removed notes from base
                     '            MemberSendNotes = (app.csv_GetCSBoolean(CS, "SendNotes"))
                     '
                     If True Then
-                        userStyleFilename = app.db_GetCSText(CS, "StyleFilename")
+                        userStyleFilename = db.db_GetCSText(CS, "StyleFilename")
                         If userStyleFilename <> "" Then
-                            Call main_AddStylesheetLink(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, userStyleFilename))
+                            Call main_AddStylesheetLink(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, userStyleFilename))
                         End If
                     End If
                     If True Then
-                        userExcludeFromAnalytics = app.db_GetCSBoolean(CS, "ExcludeFromAnalytics")
+                        userExcludeFromAnalytics = db.db_GetCSBoolean(CS, "ExcludeFromAnalytics")
                     End If
                     '
                     '
@@ -12235,7 +12265,7 @@ ErrorTrap:
                     '  main_MemberPassword = main_GetCSField_Internal(CS, "Password")
                     '
                 End If
-                Call app.db_csClose(CS)
+                Call db.db_csClose(CS)
             End If
             '
             Exit Sub
@@ -12364,7 +12394,7 @@ ErrorTrap:
                 '
                 ' ----- Error Messages
                 '
-                If EncodeBoolean(app.siteProperty_getBoolean("allowEmailLogin", False)) Then
+                If EncodeBoolean(db.siteProperty_getBoolean("allowEmailLogin", False)) Then
                     usernameMsg = "<b>To login, enter your username or email address with your password.</b></p>"
                 Else
                     usernameMsg = "<b>To login, enter your username and password.</b></p>"
@@ -12376,7 +12406,7 @@ ErrorTrap:
                 '
                 ' ----- Username
                 '
-                If EncodeBoolean(app.siteProperty_getBoolean("allowEmailLogin", False)) Then
+                If EncodeBoolean(db.siteProperty_getBoolean("allowEmailLogin", False)) Then
                     Caption = "Username&nbsp;or&nbsp;Email"
                 Else
                     Caption = "Username"
@@ -12390,7 +12420,7 @@ ErrorTrap:
                 '
                 ' ----- Password
                 '
-                If EncodeBoolean(app.siteProperty_getBoolean("allowNoPasswordLogin", False)) Then
+                If EncodeBoolean(db.siteProperty_getBoolean("allowNoPasswordLogin", False)) Then
                     Caption = "Password&nbsp;(optional)"
                 Else
                     Caption = "Password"
@@ -12404,7 +12434,7 @@ ErrorTrap:
                 '
                 ' ----- autologin support
                 '
-                If EncodeBoolean(app.siteProperty_getBoolean("AllowAutoLogin", False)) Then
+                If EncodeBoolean(db.siteProperty_getBoolean("AllowAutoLogin", False)) Then
                     loginForm = loginForm _
                         & cr & "<tr>" _
                         & cr2 & "<td align=""right"">&nbsp;</td>" _
@@ -12455,7 +12485,7 @@ ErrorTrap:
                 '
                 ' ----- Password Form
                 '
-                If EncodeBoolean(app.siteProperty_getBoolean("allowPasswordEmail", True)) Then
+                If EncodeBoolean(db.siteProperty_getBoolean("allowPasswordEmail", True)) Then
                     Panel = "" _
                         & Panel _
                         & cr & "<p class=""ccAdminNormal""><b>Forget your password?</b></p>" _
@@ -12576,28 +12606,28 @@ ErrorTrap:
                 '
                 ' ----- check if the iUsername is in use (con not use main_OpenContent because active tested)
                 '
-                CS = app.db_csOpen("People", "(Username=" & app.db_EncodeSQLText(iUsername) & ")", , False)
-                If app.db_csOk(CS) Then
+                CS = db.db_csOpen("People", "(Username=" & db.db_EncodeSQLText(iUsername) & ")", , False)
+                If db.db_csOk(CS) Then
                     '
                     ' ----- iUsername is taken
                     '
-                    Call app.db_csClose(CS)
+                    Call db.db_csClose(CS)
                     error_AddUserError("This Username is currently in use.")
                 Else
-                    Call app.db_csClose(CS)
+                    Call db.db_csClose(CS)
                     '
                     ' ----- Create the new people with whatever you got
                     '
                     Call user_CreateUser()
                     '
-                    CSPointer = app.db_csOpen("people", "ID=" & app.db_EncodeSQLNumber(userId))
-                    If app.db_csOk(CSPointer) Then
-                        Call app.db_setCS(CSPointer, "Username", iUsername)
-                        Call app.db_setCS(CSPointer, "password", iPassword)
-                        Call app.db_setCS(CSPointer, "email", iemail)
-                        Call app.db_setCS(CSPointer, "ContentControlID", main_GetContentID("Members"))
+                    CSPointer = db.db_csOpen("people", "ID=" & db.db_EncodeSQLNumber(userId))
+                    If db.db_csOk(CSPointer) Then
+                        Call db.db_setCS(CSPointer, "Username", iUsername)
+                        Call db.db_setCS(CSPointer, "password", iPassword)
+                        Call db.db_setCS(CSPointer, "email", iemail)
+                        Call db.db_setCS(CSPointer, "ContentControlID", main_GetContentID("Members"))
                     End If
-                    Call app.db_csClose(CSPointer)
+                    Call db.db_csClose(CSPointer)
                     main_CreateMember = userId
                 End If
             End If
@@ -12630,45 +12660,45 @@ ErrorTrap:
             If visit_initialized Then
                 If (userId > 0) Then
                     SQL = "UPDATE ccMembers SET " _
-                        & " Name=" & app.db_EncodeSQLText(userName) _
-                        & ",username=" & app.db_EncodeSQLText(userUsername) _
-                        & ",email=" & app.db_EncodeSQLText(userEmail) _
-                        & ",password=" & app.db_EncodeSQLText(userPassword) _
-                        & ",OrganizationID=" & app.db_EncodeSQLNumber(userOrganizationId) _
-                        & ",LanguageID=" & app.db_EncodeSQLNumber(userLanguageId) _
-                        & ",Active=" & app.db_EncodeSQLBoolean(user_Active) _
-                        & ",Company=" & app.db_EncodeSQLText(user_company) _
-                        & ",Visits=" & app.db_EncodeSQLNumber(user_visits) _
-                        & ",LastVisit=" & app.db_EncodeSQLDate(user_lastVisit) _
-                        & ",AllowBulkEmail=" & app.db_EncodeSQLBoolean(user_allowBulkEmail) _
-                        & ",AdminMenuModeID=" & app.db_EncodeSQLNumber(user_adminMenuModeID) _
-                        & ",AutoLogin=" & app.db_EncodeSQLBoolean(user_autoLogin)
+                        & " Name=" & db.db_EncodeSQLText(userName) _
+                        & ",username=" & db.db_EncodeSQLText(userUsername) _
+                        & ",email=" & db.db_EncodeSQLText(userEmail) _
+                        & ",password=" & db.db_EncodeSQLText(userPassword) _
+                        & ",OrganizationID=" & db.db_EncodeSQLNumber(userOrganizationId) _
+                        & ",LanguageID=" & db.db_EncodeSQLNumber(userLanguageId) _
+                        & ",Active=" & db.db_EncodeSQLBoolean(user_Active) _
+                        & ",Company=" & db.db_EncodeSQLText(user_company) _
+                        & ",Visits=" & db.db_EncodeSQLNumber(user_visits) _
+                        & ",LastVisit=" & db.db_EncodeSQLDate(user_lastVisit) _
+                        & ",AllowBulkEmail=" & db.db_EncodeSQLBoolean(user_allowBulkEmail) _
+                        & ",AdminMenuModeID=" & db.db_EncodeSQLNumber(user_adminMenuModeID) _
+                        & ",AutoLogin=" & db.db_EncodeSQLBoolean(user_autoLogin)
                     ' 6/18/2009 - removed notes from base
                     '           & ",SendNotes=" & encodeSQLBoolean(MemberSendNotes)
                     SQL &= "" _
-                        & ",BillEmail=" & app.db_EncodeSQLText(user_billEmail) _
-                        & ",BillPhone=" & app.db_EncodeSQLText(user_billPhone) _
-                        & ",BillFax=" & app.db_EncodeSQLText(user_billFax) _
-                        & ",BillCompany=" & app.db_EncodeSQLText(main_MemberBillCompany) _
-                        & ",BillAddress=" & app.db_EncodeSQLText(main_MemberBillAddress) _
-                        & ",BillCity=" & app.db_EncodeSQLText(main_MemberBillCity) _
-                        & ",BillState=" & app.db_EncodeSQLText(main_MemberBillState) _
-                        & ",BillZip=" & app.db_EncodeSQLText(main_MemberBillZip) _
-                        & ",BillCountry=" & app.db_EncodeSQLText(main_MemberBillCountry)
+                        & ",BillEmail=" & db.db_EncodeSQLText(user_billEmail) _
+                        & ",BillPhone=" & db.db_EncodeSQLText(user_billPhone) _
+                        & ",BillFax=" & db.db_EncodeSQLText(user_billFax) _
+                        & ",BillCompany=" & db.db_EncodeSQLText(main_MemberBillCompany) _
+                        & ",BillAddress=" & db.db_EncodeSQLText(main_MemberBillAddress) _
+                        & ",BillCity=" & db.db_EncodeSQLText(main_MemberBillCity) _
+                        & ",BillState=" & db.db_EncodeSQLText(main_MemberBillState) _
+                        & ",BillZip=" & db.db_EncodeSQLText(main_MemberBillZip) _
+                        & ",BillCountry=" & db.db_EncodeSQLText(main_MemberBillCountry)
                     SQL &= "" _
-                        & ",ShipName=" & app.db_EncodeSQLText(main_MemberShipName) _
-                        & ",ShipCompany=" & app.db_EncodeSQLText(main_MemberShipCompany) _
-                        & ",ShipAddress=" & app.db_EncodeSQLText(main_MemberShipAddress) _
-                        & ",ShipCity=" & app.db_EncodeSQLText(main_MemberShipCity) _
-                        & ",ShipState=" & app.db_EncodeSQLText(main_MemberShipState) _
-                        & ",ShipZip=" & app.db_EncodeSQLText(main_MemberShipZip) _
-                        & ",ShipCountry=" & app.db_EncodeSQLText(main_MemberShipCountry) _
-                        & ",ShipPhone=" & app.db_EncodeSQLText(main_MemberShipPhone)
+                        & ",ShipName=" & db.db_EncodeSQLText(main_MemberShipName) _
+                        & ",ShipCompany=" & db.db_EncodeSQLText(main_MemberShipCompany) _
+                        & ",ShipAddress=" & db.db_EncodeSQLText(main_MemberShipAddress) _
+                        & ",ShipCity=" & db.db_EncodeSQLText(main_MemberShipCity) _
+                        & ",ShipState=" & db.db_EncodeSQLText(main_MemberShipState) _
+                        & ",ShipZip=" & db.db_EncodeSQLText(main_MemberShipZip) _
+                        & ",ShipCountry=" & db.db_EncodeSQLText(main_MemberShipCountry) _
+                        & ",ShipPhone=" & db.db_EncodeSQLText(main_MemberShipPhone)
                     If True Then
-                        SQL &= ",ExcludeFromAnalytics=" & app.db_EncodeSQLBoolean(userExcludeFromAnalytics)
+                        SQL &= ",ExcludeFromAnalytics=" & db.db_EncodeSQLBoolean(userExcludeFromAnalytics)
                     End If
                     SQL &= " WHERE ID=" & userId & ";"
-                    Call app.executeSql(SQL)
+                    Call db.executeSql(SQL)
                 End If
             End If
             '
@@ -12696,7 +12726,7 @@ ErrorTrap:
             Dim isAddonOk As Boolean
             Dim QS As String
             '
-            loginAddonID = EncodeInteger(app.siteProperty_getText("Login Page AddonID", "0"))
+            loginAddonID = EncodeInteger(db.siteProperty_getText("Login Page AddonID", "0"))
             If loginAddonID <> 0 Then
                 '
                 ' Custom Login
@@ -12749,7 +12779,7 @@ ErrorTrap:
             '
             MethodName = "main_GetSendPasswordForm"
             '
-            If EncodeBoolean(app.siteProperty_getBoolean("allowPasswordEmail", True)) Then
+            If EncodeBoolean(db.siteProperty_getBoolean("allowPasswordEmail", True)) Then
                 s = "" _
                     & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"">" _
                     & cr2 & "<tr>" _
@@ -12849,7 +12879,7 @@ ErrorTrap:
         '                        ' ----- Not authenticated, Guest identity, ask for information.
         '                        '
         '                        Dim QS As String
-        '                        FirstName = main_GetCSText(CSPeople, "firstName")
+        '                        FirstName = db.db_GetCSText(CSPeople, "firstName")
         '                        If LCase(FirstName) = "guest" Then
         '                            FirstName = ""
         '                        End If
@@ -12865,15 +12895,15 @@ ErrorTrap:
         '                        returnHtml = returnHtml & "</tr>"
         '                        returnHtml = returnHtml & "<tr>"
         '                        returnHtml = returnHtml & "<td align=""right"" width=""30%"">" & SpanClassAdminNormal & "Last Name</span></td>"
-        '                        returnHtml = returnHtml & "<td align=""left""  width=""70%""><input NAME=""" & "lastname"" VALUE=""" & html_EncodeHTML(main_GetCSText(CSPeople, "lastname")) & """ SIZE=""20"" MAXLENGTH=""50""></td>"
+        '                        returnHtml = returnHtml & "<td align=""left""  width=""70%""><input NAME=""" & "lastname"" VALUE=""" & html_EncodeHTML(db.db_GetCSText(CSPeople, "lastname")) & """ SIZE=""20"" MAXLENGTH=""50""></td>"
         '                        returnHtml = returnHtml & "</tr>"
         '                        returnHtml = returnHtml & "<tr>"
         '                        returnHtml = returnHtml & "<td align=""right"" width=""30%"">" & SpanClassAdminNormal & "Email</span></td>"
-        '                        returnHtml = returnHtml & "<td align=""left""  width=""70%""><input NAME=""" & "email"" VALUE=""" & html_EncodeHTML(main_GetCSText(CSPeople, "email")) & """ SIZE=""20"" MAXLENGTH=""50""></td>"
+        '                        returnHtml = returnHtml & "<td align=""left""  width=""70%""><input NAME=""" & "email"" VALUE=""" & html_EncodeHTML(db.db_GetCSText(CSPeople, "email")) & """ SIZE=""20"" MAXLENGTH=""50""></td>"
         '                        returnHtml = returnHtml & "</tr>"
         '                        returnHtml = returnHtml & "<tr>"
         '                        returnHtml = returnHtml & "<td align=""right"" width=""30%"">" & SpanClassAdminNormal & "Username</span></td>"
-        '                        returnHtml = returnHtml & "<td align=""left""  width=""70%""><input NAME=""" & "username"" VALUE=""" & html_EncodeHTML(main_GetCSText(CSPeople, "username")) & """ SIZE=""20"" MAXLENGTH=""50""></td>"
+        '                        returnHtml = returnHtml & "<td align=""left""  width=""70%""><input NAME=""" & "username"" VALUE=""" & html_EncodeHTML(db.db_GetCSText(CSPeople, "username")) & """ SIZE=""20"" MAXLENGTH=""50""></td>"
         '                        returnHtml = returnHtml & "</tr>"
         '                        returnHtml = returnHtml & "<tr>"
         '                        returnHtml = returnHtml & "<td align=""right"" width=""30%"">" & SpanClassAdminNormal & "Password</span></td>"
@@ -13107,9 +13137,9 @@ ErrorTrap:
             If Not user_isAuthenticated() Then
                 Call error_AddUserError("You can not edit your MyAccount page until you have logged in.")
             Else
-                CSMember = main_OpenContent("People", "ID=" & app.db_EncodeSQLNumber(iPeopleID))
-                If app.db_csOk(CSMember) Then
-                    ContentID = app.db_GetCSInteger(CSMember, "ContentControlID")
+                CSMember = main_OpenContent("People", "ID=" & db.db_EncodeSQLNumber(iPeopleID))
+                If db.db_csOk(CSMember) Then
+                    ContentID = db.db_GetCSInteger(CSMember, "ContentControlID")
                     ContentName = main_GetContentNameByID(ContentID)
                     '
                     RowDivider = "<tr><td width=""100%"" align=""left""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""1"" ></td></tr>" & vbCrLf
@@ -13181,7 +13211,7 @@ ErrorTrap:
                     ' 6/18/2009 - removed notes from base
                     '            Stream.Add( main_GetMyProfileForm_RowCS(CSMember, "People", "sendnotes", "If checked, notes sent to you as a site member will be emailed. Otherwise, they are available only when you have logged on.", RowCount) & vbcrlf )
                     Stream.Add(main_GetMyProfileForm_RowCS(CSMember, "People", "LanguageID", "", RowCount) & vbCrLf)
-                    If EncodeBoolean(app.siteProperty_getBoolean("AllowAutoLogin", False)) Then
+                    If EncodeBoolean(db.siteProperty_getBoolean("AllowAutoLogin", False)) Then
                         Stream.Add(main_GetMyProfileForm_RowCS(CSMember, "People", "autologin", "This site allows automatic login. If this box is check, you will enable this function for your member account.", RowCount) & vbCrLf)
                     End If
                     If main_IsContentManager() Then
@@ -13209,8 +13239,8 @@ ErrorTrap:
                     Stream.Add(main_GetMyProfileForm_Row("Member Number", EncodeText(userId)) & vbCrLf)
                     Stream.Add(main_GetMyProfileForm_Row("Visitor Number", EncodeText(main_VisitorID)) & vbCrLf)
                     Stream.Add(main_GetMyProfileForm_Row("Visit Number", EncodeText(main_VisitId)) & vbCrLf)
-                    CSLastVisit = app.db_csOpen("Visits", "MemberID=" & iPeopleID, "ID DESC")
-                    If app.db_csOk(CSLastVisit) Then
+                    CSLastVisit = db.db_csOpen("Visits", "MemberID=" & iPeopleID, "ID DESC")
+                    If db.db_csOk(CSLastVisit) Then
                         'Stream.Add( main_GetMyProfileForm_RowCS(CSLastVisit, "Visits", "main_VisitorID", "", RowCount) & vbcrlf )
                         'Stream.Add( main_GetMyProfileForm_RowCS(CSLastVisit, "Visits", "ID", "", RowCount) & vbcrlf )
                         Stream.Add(main_GetMyProfileForm_RowCS(CSLastVisit, "Visits", "StartTime", "", RowCount, "Start Time", True) & vbCrLf)
@@ -13221,7 +13251,7 @@ ErrorTrap:
                         Stream.Add(main_GetMyProfileForm_RowCS(CSLastVisit, "Visits", "CookieSupport", "", RowCount, "Cookie Support", True) & vbCrLf)
                         'Stream.Add( main_GetMyProfileForm_RowCS(CSLastVisit, "Visits", "main_VisitAuthenticated", "", RowCount) & vbcrlf )
                     End If
-                    Call app.db_csClose(CSLastVisit)
+                    Call db.db_csClose(CSLastVisit)
                     '
                     Stream.Add("</table>")
                     '
@@ -13256,14 +13286,14 @@ ErrorTrap:
             '
             iCaption = Caption
             If Caption = "" Then
-                iCaption = app.db_getCSFieldCaption(CSPointer, FieldName)
+                iCaption = db.db_getCSFieldCaption(CSPointer, FieldName)
             End If
             '
-            If Not app.db_csOk(CSPointer) Then
-                handleException(New Exception("ContentSet argument is not valid"))
+            If Not db.db_csOk(CSPointer) Then
+                handleExceptionAndRethrow(New Exception("ContentSet argument is not valid"))
             Else
                 If readOnlyField Then
-                    Stream = app.db_GetCSText(CSPointer, FieldName)
+                    Stream = db.db_GetCSText(CSPointer, FieldName)
                 Else
                     Stream = html_GetFormInputCS(CSPointer, ContentName, FieldName, , 60)
                 End If
@@ -13351,13 +13381,13 @@ ErrorTrap:
                 & " WHERE (((ccTopics.Active)<>0) AND ((ccTopicHabits.MemberID)=" & userId & ")) OR (((ccTopics.Active)<>0) AND ((ccTopicHabits.MemberID) Is Null))" _
                 & " Group By ccTopics.name" _
                 & " Order by ccTopics.Name"
-            CS = app.db_csOpenSql(SQL)
-            Do While app.db_csOk(CS)
-                Stream = Stream & SpanClassAdminNormal & app.db_GetCSText(CS, "name") & " = " & EncodeText(app.db_GetCSInteger(CS, "score")) & "</span><BR >"
-                Call app.db_csGoNext(CS)
+            CS = db.db_csOpenSql(SQL)
+            Do While db.db_csOk(CS)
+                Stream = Stream & SpanClassAdminNormal & db.db_GetCSText(CS, "name") & " = " & EncodeText(db.db_GetCSInteger(CS, "score")) & "</span><BR >"
+                Call db.db_csGoNext(CS)
                 TopicCount = TopicCount + 1
             Loop
-            Call app.db_csClose(CS)
+            Call db.db_csClose(CS)
             '
             '
             '
@@ -13440,7 +13470,7 @@ ErrorTrap:
                 '
                 ' ----- main_Get the Group ID
                 '
-                dt = app.executeSql("select top 1 id from ccGroups where name=" & app.db_EncodeSQLText(iGroupName))
+                dt = db.executeSql("select top 1 id from ccGroups where name=" & db.db_EncodeSQLText(iGroupName))
                 If dt.Rows.Count > 0 Then
                     main_GetGroupID = EncodeInteger(dt.Rows(0).Item(0))
                 End If
@@ -13475,10 +13505,10 @@ ErrorTrap:
                 ' ----- main_Get the Group name
                 '
                 CS = db_csOpenRecord("Groups", iGroupID)
-                If app.db_csOk(CS) Then
+                If db.db_csOk(CS) Then
                     group_GetGroupName = EncodeText(db_cs_GetField(CS, "Name"))
                 End If
-                Call app.db_csClose(CS)
+                Call db.db_csClose(CS)
             End If
             Exit Function
             '
@@ -13511,18 +13541,18 @@ ErrorTrap:
             '
             group_Add = -1
             Dim dt As DataTable
-            dt = app.executeSql("SELECT ID FROM ccgroups WHERE NAME=" & app.db_EncodeSQLText(iGroupName))
+            dt = db.executeSql("SELECT ID FROM ccgroups WHERE NAME=" & db.db_EncodeSQLText(iGroupName))
             If dt.Rows.Count > 0 Then
                 group_Add = EncodeInteger(dt.Rows(0).Item(0))
             Else
-                CS = app.db_csInsertRecord("Groups", SystemMemberID)
-                If app.db_csOk(CS) Then
-                    group_Add = EncodeInteger(app.db_GetCSField(CS, "ID"))
-                    Call app.db_setCS(CS, "name", iGroupName)
-                    Call app.db_setCS(CS, "caption", iGroupCaption)
-                    Call app.db_setCS(CS, "active", True)
+                CS = db.db_csInsertRecord("Groups", SystemMemberID)
+                If db.db_csOk(CS) Then
+                    group_Add = EncodeInteger(db.db_GetCSField(CS, "ID"))
+                    Call db.db_setCS(CS, "name", iGroupName)
+                    Call db.db_setCS(CS, "caption", iGroupCaption)
+                    Call db.db_setCS(CS, "active", True)
                 End If
-                Call app.db_csClose(CS)
+                Call db.db_csClose(CS)
             End If
             Exit Function
             '
@@ -13542,7 +13572,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Sub
             '
-            Call app.db_DeleteContentRecords("Groups", "name=" & app.db_EncodeSQLText(GroupName))
+            Call db.db_DeleteContentRecords("Groups", "name=" & db.db_EncodeSQLText(GroupName))
             '
             Exit Sub
             '
@@ -13580,24 +13610,24 @@ ErrorTrap:
                 If (GroupID < 1) Then
                     Call handleLegacyError14(MethodName, "main_AddGroupMember could not find or add Group [" & GroupName & "]")
                 Else
-                    CS = app.db_csOpen("Member Rules", "(MemberID=" & app.db_EncodeSQLNumber(NewMemberID) & ")and(GroupID=" & app.db_EncodeSQLNumber(GroupID) & ")", , False)
-                    If Not app.db_csOk(CS) Then
-                        Call app.db_csClose(CS)
-                        CS = app.db_csInsertRecord("Member Rules")
+                    CS = db.db_csOpen("Member Rules", "(MemberID=" & db.db_EncodeSQLNumber(NewMemberID) & ")and(GroupID=" & db.db_EncodeSQLNumber(GroupID) & ")", , False)
+                    If Not db.db_csOk(CS) Then
+                        Call db.db_csClose(CS)
+                        CS = db.db_csInsertRecord("Member Rules")
                     End If
-                    If Not app.db_csOk(CS) Then
+                    If Not db.db_csOk(CS) Then
                         Call handleLegacyError14(MethodName, "main_AddGroupMember could not add this member to the Group [" & GroupName & "]")
                     Else
-                        Call app.db_setCS(CS, "active", True)
-                        Call app.db_setCS(CS, "memberid", NewMemberID)
-                        Call app.db_setCS(CS, "groupid", GroupID)
+                        Call db.db_setCS(CS, "active", True)
+                        Call db.db_setCS(CS, "memberid", NewMemberID)
+                        Call db.db_setCS(CS, "groupid", GroupID)
                         If iDateExpires <> Date.MinValue Then
-                            Call app.db_setCS(CS, "DateExpires", iDateExpires)
+                            Call db.db_setCS(CS, "DateExpires", iDateExpires)
                         Else
-                            Call app.db_setCS(CS, "DateExpires", Nothing)
+                            Call db.db_setCS(CS, "DateExpires", Nothing)
                         End If
                     End If
-                    Call app.db_csClose(CS)
+                    Call db.db_csClose(CS)
                 End If
             End If
             '
@@ -13633,7 +13663,7 @@ ErrorTrap:
                 ElseIf (NewMemberID < 1) Then
                     Call handleLegacyError14(MethodName, "Member ID is invalid")
                 Else
-                    Call app.db_DeleteContentRecords("Member Rules", "(MemberID=" & app.db_EncodeSQLNumber(NewMemberID) & ")AND(groupid=" & app.db_EncodeSQLNumber(GroupID) & ")")
+                    Call db.db_DeleteContentRecords("Member Rules", "(MemberID=" & db.db_EncodeSQLNumber(NewMemberID) & ")AND(groupid=" & db.db_EncodeSQLNumber(GroupID) & ")")
                 End If
             End If
             '
@@ -13714,20 +13744,20 @@ ErrorTrap:
             '
             '  BuildVersion = app.dataBuildVersion
             If False Then '.3.210" Then
-                handleException(New Exception("Contensive database was created with version " & app.dataBuildVersion & ". main_SetContentCopy requires an builder."))
+                handleExceptionAndRethrow(New Exception("Contensive database was created with version " & db.dataBuildVersion & ". main_SetContentCopy requires an builder."))
             Else
                 iCopyName = EncodeText(CopyName)
                 iContent = EncodeText(Content)
-                CS = app.db_csOpen(ContentName, "name=" & db_EncodeSQLText(iCopyName))
-                If Not app.db_csOk(CS) Then
-                    Call app.db_csClose(CS)
-                    CS = app.db_csInsertRecord(ContentName)
+                CS = db.db_csOpen(ContentName, "name=" & db_EncodeSQLText(iCopyName))
+                If Not db.db_csOk(CS) Then
+                    Call db.db_csClose(CS)
+                    CS = db.db_csInsertRecord(ContentName)
                 End If
-                If app.db_csOk(CS) Then
-                    Call app.db_setCS(CS, "name", iCopyName)
-                    Call app.db_setCS(CS, "Copy", iContent)
+                If db.db_csOk(CS) Then
+                    Call db.db_setCS(CS, "name", iCopyName)
+                    Call db.db_setCS(CS, "Copy", iContent)
                 End If
-                Call app.db_csClose(CS)
+                Call db.db_csClose(CS)
             End If
             '
             Exit Sub
@@ -13778,7 +13808,7 @@ ErrorTrap:
             '
             ' ----- Test if the page has been preloaded
             '
-            contentPage = main_GetHtmlBody_GetSection_GetContent(pageId, rootPageId, iContentName, iOrderByClause, AllowChildPageList, AllowReturnLink, False, 0, app.siteProperty_UseContentWatchLink, False)
+            contentPage = main_GetHtmlBody_GetSection_GetContent(pageId, rootPageId, iContentName, iOrderByClause, AllowChildPageList, AllowReturnLink, False, 0, db.siteProperty_UseContentWatchLink, False)
             main_GetContentPage = main_GetEditWrapper(iContentName, contentPage)
             '
             ' ----- Redirect if required
@@ -13834,7 +13864,7 @@ ErrorTrap:
                 rootPageId = main_GetRecordID(iContentName, iRootPageName)
             End If
             '
-            main_GetContentPageArchive = main_GetHtmlBody_GetSection_GetContent(PageRecordID, rootPageId, iContentName, EncodeText(OrderByClause), True, True, True, 0, app.siteProperty_UseContentWatchLink, False)
+            main_GetContentPageArchive = main_GetHtmlBody_GetSection_GetContent(PageRecordID, rootPageId, iContentName, EncodeText(OrderByClause), True, True, True, 0, db.siteProperty_UseContentWatchLink, False)
             '
             If pageManager_RedirectLink <> "" Then
                 Call web_Redirect2(pageManager_RedirectLink, "Redirecting due to a main_GetContentPageArchive condition. (" & pageManager_RedirectReason & ")", pageManager_RedirectBecausePageNotFound)
@@ -13877,7 +13907,7 @@ ErrorTrap:
             MenuStyleLocal = encodeEmptyInteger(MenuStyle, 1)
             StyleSheetPrefixLocal = encodeEmptyText(StyleSheetPrefix, "ccFlyout")
             IMenuImage = encodeEmptyText(MenuImage, "")
-            UseContentWatchLink = app.siteProperty_UseContentWatchLink
+            UseContentWatchLink = db.siteProperty_UseContentWatchLink
             '
             main_GetContentPageMenu = main_GetSectionMenu_NameMenu(RootPageNameLocal, ContentNameLocal, PageLink, RootPageRecordID, DepthLimit, MenuStyleLocal, StyleSheetPrefixLocal, IMenuImage, IMenuImage, "", 0, UseContentWatchLink)
             '
@@ -13896,7 +13926,7 @@ ErrorTrap:
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("OpenContent")
             '
             'If Not (true) Then Exit Function
-            main_OpenContent = app.db_csOpen(EncodeText(ContentName), Criteria, SortFieldList, ActiveOnly)
+            main_OpenContent = db.db_csOpen(EncodeText(ContentName), Criteria, SortFieldList, ActiveOnly)
             '
             Exit Function
 ErrorTrap:
@@ -13926,15 +13956,15 @@ ErrorTrap:
             If iCSPointer = -1 Then
                 Call handleLegacyError14(MethodName, "main_GetCSRecordEditLink called with invalid iCSPointer")
             Else
-                If Not app.db_csOk(iCSPointer) Then
+                If Not db.db_csOk(iCSPointer) Then
                     Call handleLegacyError14(MethodName, "main_GetCSRecordEditLink called with Not main_CSOK")
                 Else
                     '
                     ' Print an edit link for the records Content (may not be iCSPointer content)
                     '
-                    RecordID = (app.db_GetCSInteger(iCSPointer, "ID"))
-                    RecordName = app.db_GetCSText(iCSPointer, "Name")
-                    ContentControlID = (app.db_GetCSInteger(iCSPointer, "contentcontrolid"))
+                    RecordID = (db.db_GetCSInteger(iCSPointer, "ID"))
+                    RecordName = db.db_GetCSText(iCSPointer, "Name")
+                    ContentControlID = (db.db_GetCSInteger(iCSPointer, "contentcontrolid"))
                     ContentName = main_GetContentNameByID(ContentControlID)
                     If ContentName <> "" Then
                         main_GetCSRecordEditLink = main_GetRecordEditLink2(ContentName, RecordID, EncodeBoolean(AllowCut), RecordName, user_isEditing(ContentName))
@@ -14083,12 +14113,12 @@ ErrorTrap:
                 '
                 iWidth = Width
                 If (iWidth <= 0) Then
-                    iWidth = app.siteProperty_DefaultFormInputWidth
+                    iWidth = db.siteProperty_DefaultFormInputWidth
                 End If
                 '
                 iHeight = Height
                 If (iHeight <= 0) Then
-                    iHeight = app.siteProperty_DefaultFormInputTextHeight
+                    iHeight = db.siteProperty_DefaultFormInputTextHeight
                 End If
                 '
                 If Disabled Then
@@ -14116,7 +14146,7 @@ ErrorTrap:
         '
         Public Function main_GetFormInputTextExpandable(ByVal TagName As String, Optional ByVal Value As String = "", Optional ByVal Rows As Integer = 0, Optional ByVal styleWidth As String = "100%", Optional ByVal Id As String = "", Optional ByVal PasswordField As Boolean = False) As String
             If Rows = 0 Then
-                Rows = app.siteProperty_DefaultFormInputTextHeight
+                Rows = db.siteProperty_DefaultFormInputTextHeight
             End If
             main_GetFormInputTextExpandable = main_GetFormInputTextExpandable2(TagName, Value, Rows, styleWidth, Id, PasswordField, False, "")
         End Function
@@ -14190,7 +14220,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            handleException(New Exception("Unexpected exception"))
+            handleExceptionAndRethrow(New Exception("Unexpected exception"))
             '
         End Function
         '
@@ -14414,7 +14444,7 @@ ErrorTrap:
             '
             ' ----- Gather all the SecondaryContent that associates to the PrimaryContent
             '
-            SecondaryCDef = app.metaData.getCdef(SecondaryContentName)
+            SecondaryCDef = metaData.getCdef(SecondaryContentName)
             SecondaryTablename = SecondaryCDef.ContentTableName
             SecondaryContentID = SecondaryCDef.Id
             SecondaryCDef.childIdList.Add(SecondaryContentID)
@@ -14430,16 +14460,16 @@ ErrorTrap:
             SQL &= "" _
                 & " GROUP BY " & SecondaryTablename & ".ID, ccContent.Name, " & SecondaryTablename & "." & iCaptionFieldName & ", " & SecondaryTablename & ".name, " & SecondaryTablename & ".SortOrder" _
                 & " ORDER BY ccContent.Name, " & SecondaryTablename & "." & iCaptionFieldName
-            CS = app.db_csOpenSql(SQL)
-            If app.db_csOk(CS) Then
+            CS = db.db_csOpenSql(SQL)
+            If db.db_csOk(CS) Then
                 SectionName = ""
                 GroupCount = 0
                 CanSeeHiddenFields = user_isDeveloper()
-                Do While app.db_csOk(CS)
-                    GroupName = app.db_GetCSText(CS, "GroupName")
+                Do While db.db_csOk(CS)
+                    GroupName = db.db_GetCSText(CS, "GroupName")
                     If (Mid(GroupName, 1, 1) <> "_") Or CanSeeHiddenFields Then
-                        RecordID = app.db_GetCSInteger(CS, "ID")
-                        GroupCaption = app.db_GetCSText(CS, "GroupCaption")
+                        RecordID = db.db_GetCSInteger(CS, "ID")
+                        GroupCaption = db.db_GetCSText(CS, "GroupCaption")
                         If GroupCaption = "" Then
                             GroupCaption = GroupName
                         End If
@@ -14470,11 +14500,11 @@ ErrorTrap:
                         Result = Result & SpanClassAdminNormal & GroupCaption
                         GroupCount = GroupCount + 1
                     End If
-                    app.db_csGoNext(CS)
+                    db.db_csGoNext(CS)
                 Loop
                 Result = Result & "<input type=""hidden"" name=""" & TagName & ".RowCount"" value=""" & GroupCount & """>" & vbCrLf
             End If
-            app.db_csClose(CS)
+            db.db_csClose(CS)
             html_GetFormInputCheckListByIDList = Result
             Exit Function
             '
@@ -14514,7 +14544,7 @@ ErrorTrap:
                 Stream = ""
                 If True Then
                     fieldFound = False
-                    Contentdefinition = app.metaData.getCdef(ContentName)
+                    Contentdefinition = metaData.getCdef(ContentName)
                     For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In Contentdefinition.fields
                         Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
                         With field
@@ -14533,12 +14563,12 @@ ErrorTrap:
                         End With
                     Next
                     If Not fieldFound Then
-                        handleException(New Exception("Field [" & FieldName & "] was not found in Content Definition [" & ContentName & "]"))
+                        handleExceptionAndRethrow(New Exception("Field [" & FieldName & "] was not found in Content Definition [" & ContentName & "]"))
                     Else
                         '
                         ' main_Get the current value if the record was found
                         '
-                        If app.db_csOk(CSPointer) Then
+                        If db.db_csOk(CSPointer) Then
                             FieldValueVariant = db_cs_GetField(CSPointer, FieldName)
                         End If
                         '
@@ -14569,7 +14599,7 @@ ErrorTrap:
                                 Case FieldTypeIdFileHTMLPrivate
                                     FieldValueText = EncodeText(FieldValueVariant)
                                     If FieldValueText <> "" Then
-                                        FieldValueText = app.privateFiles.ReadFile(FieldValueText)
+                                        FieldValueText = db.privateFiles.ReadFile(FieldValueText)
                                     End If
                                     If FieldReadOnly Then
                                         returnResult = FieldValueText
@@ -14583,7 +14613,7 @@ ErrorTrap:
                                 Case FieldTypeIdFileTextPrivate
                                     FieldValueText = EncodeText(FieldValueVariant)
                                     If FieldValueText <> "" Then
-                                        FieldValueText = app.privateFiles.ReadFile(FieldValueText)
+                                        FieldValueText = db.privateFiles.ReadFile(FieldValueText)
                                     End If
                                     If FieldReadOnly Then
                                         returnResult = FieldValueText
@@ -14597,7 +14627,7 @@ ErrorTrap:
                                 Case FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript
                                     FieldValueText = EncodeText(FieldValueVariant)
                                     If FieldValueText <> "" Then
-                                        FieldValueText = app.cdnFiles.ReadFile(FieldValueText)
+                                        FieldValueText = db.cdnFiles.ReadFile(FieldValueText)
                                     End If
                                     If FieldReadOnly Then
                                         returnResult = FieldValueText
@@ -14647,7 +14677,7 @@ ErrorTrap:
                                     If FieldReadOnly Then
                                         returnResult = FieldValueText
                                     Else
-                                        returnResult = "<img src=""" & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, FieldValueText) & """><BR >change: " & html_GetFormInputFile(FieldName, EncodeText(FieldValueVariant))
+                                        returnResult = "<img src=""" & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, FieldValueText) & """><BR >change: " & html_GetFormInputFile(FieldName, EncodeText(FieldValueVariant))
                                     End If
                                 '
                                 '
@@ -14661,10 +14691,10 @@ ErrorTrap:
                                         '
                                         If FieldReadOnly Then
                                             CSPointer = db_csOpenRecord(FieldLookupContentName, FieldValueInteger)
-                                            If app.db_csOk(CSLookup) Then
+                                            If db.db_csOk(CSLookup) Then
                                                 returnResult = main_GetCSEncodedField(CSLookup, "name")
                                             End If
-                                            Call app.db_csClose(CSLookup)
+                                            Call db.db_csClose(CSLookup)
                                         Else
                                             returnResult = main_GetFormInputSelect2(FieldName, FieldValueInteger, FieldLookupContentName, "", "", "", IsEmptyList)
                                         End If
@@ -14705,7 +14735,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
         End Function
         '
@@ -14946,21 +14976,21 @@ ErrorTrap:
                     If Not user_isAdmin() Then
                         Call sb.Append("Warning: You must be a site administrator to export this information.")
                     Else
-                        CSPointer = app.db_csOpen(iContentName, , "ID", False, , , ,, PageSize, PageNumber)
+                        CSPointer = db.db_csOpen(iContentName, , "ID", False, , , ,, PageSize, PageNumber)
                         '
                         ' ----- print out the field names
                         '
-                        If app.db_csOk(CSPointer) Then
+                        If db.db_csOk(CSPointer) Then
                             Call sb.Append("""EID""")
                             Delimiter = ","
-                            FieldNameVariant = app.db_GetCSFirstFieldName(CSPointer)
+                            FieldNameVariant = db.db_GetCSFirstFieldName(CSPointer)
                             Do While (FieldNameVariant <> "")
                                 FieldName = EncodeText(FieldNameVariant)
                                 UcaseFieldName = UCase(FieldName)
                                 If (UcaseFieldName <> "USERNAME") And (UcaseFieldName <> "PASSWORD") Then
                                     Call sb.Append(Delimiter & """" & FieldName & """")
                                 End If
-                                FieldNameVariant = app.csv_GetCSNextFieldName(CSPointer)
+                                FieldNameVariant = db.db_GetCSNextFieldName(CSPointer)
                                 '''DoEvents
                             Loop
                             Call sb.Append(vbCrLf)
@@ -14968,17 +14998,17 @@ ErrorTrap:
                         '
                         ' ----- print out the values
                         '
-                        Do While app.db_csOk(CSPointer)
-                            If Not (app.db_GetCSBoolean(CSPointer, "Developer")) Then
-                                Copy = security_encodeToken((app.db_GetCSInteger(CSPointer, "ID")), main_PageStartTime)
+                        Do While db.db_csOk(CSPointer)
+                            If Not (db.db_GetCSBoolean(CSPointer, "Developer")) Then
+                                Copy = security_encodeToken((db.db_GetCSInteger(CSPointer, "ID")), main_PageStartTime)
                                 Call sb.Append("""" & Copy & """")
                                 Delimiter = ","
-                                FieldNameVariant = app.db_GetCSFirstFieldName(CSPointer)
+                                FieldNameVariant = db.db_GetCSFirstFieldName(CSPointer)
                                 Do While (FieldNameVariant <> "")
                                     FieldName = EncodeText(FieldNameVariant)
                                     UcaseFieldName = UCase(FieldName)
                                     If (UcaseFieldName <> "USERNAME") And (UcaseFieldName <> "PASSWORD") Then
-                                        Copy = app.db_GetCS(CSPointer, FieldName)
+                                        Copy = db.db_GetCS(CSPointer, FieldName)
                                         If Copy <> "" Then
                                             Copy = Replace(Copy, """", "'")
                                             Copy = Replace(Copy, vbCrLf, " ")
@@ -14987,12 +15017,12 @@ ErrorTrap:
                                         End If
                                         Call sb.Append(Delimiter & """" & Copy & """")
                                     End If
-                                    FieldNameVariant = app.csv_GetCSNextFieldName(CSPointer)
+                                    FieldNameVariant = db.db_GetCSNextFieldName(CSPointer)
                                     '''DoEvents
                                 Loop
                                 Call sb.Append(vbCrLf)
                             End If
-                            Call app.db_csGoNext(CSPointer)
+                            Call db.db_csGoNext(CSPointer)
                             '''DoEvents
                         Loop
                     End If
@@ -15004,36 +15034,36 @@ ErrorTrap:
                     If Not main_IsContentManager(iContentName) Then
                         Call sb.Append("Error: You must be a content manager to export this data.")
                     Else
-                        CSPointer = app.db_csOpen(iContentName, , "ID", False, , , ,, PageSize, PageNumber)
+                        CSPointer = db.db_csOpen(iContentName, , "ID", False, , , ,, PageSize, PageNumber)
                         '
                         ' ----- print out the field names
                         '
-                        If app.db_csOk(CSPointer) Then
+                        If db.db_csOk(CSPointer) Then
                             Delimiter = ""
-                            FieldNameVariant = app.db_GetCSFirstFieldName(CSPointer)
+                            FieldNameVariant = db.db_GetCSFirstFieldName(CSPointer)
                             Do While (FieldNameVariant <> "")
-                                Call app.appRootFiles.appendFile(TestFilename, Delimiter & """" & FieldNameVariant & """")
+                                Call db.appRootFiles.appendFile(TestFilename, Delimiter & """" & FieldNameVariant & """")
                                 Delimiter = ","
-                                FieldNameVariant = app.csv_GetCSNextFieldName(CSPointer)
+                                FieldNameVariant = db.db_GetCSNextFieldName(CSPointer)
                                 '''DoEvents
                             Loop
-                            Call app.appRootFiles.appendFile(TestFilename, vbCrLf)
+                            Call db.appRootFiles.appendFile(TestFilename, vbCrLf)
                         End If
                         '
                         ' ----- print out the values
                         '
-                        Do While app.db_csOk(CSPointer)
+                        Do While db.db_csOk(CSPointer)
                             Delimiter = ""
-                            FieldNameVariant = app.db_GetCSFirstFieldName(CSPointer)
+                            FieldNameVariant = db.db_GetCSFirstFieldName(CSPointer)
                             Do While (FieldNameVariant <> "")
-                                Select Case app.db_GetCSFieldTypeId(CSPointer, EncodeText(FieldNameVariant))
+                                Select Case db.db_GetCSFieldTypeId(CSPointer, EncodeText(FieldNameVariant))
                                     Case FieldTypeIdFileTextPrivate, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdFileHTMLPrivate
                                         Copy = main_GetCSEncodedField(CSPointer, EncodeText(FieldNameVariant))
                                     Case FieldTypeIdLookup
-                                        Copy = main_GetCSLookup(CSPointer, EncodeText(FieldNameVariant))
+                                        Copy = db.db_GetCSLookup(CSPointer, EncodeText(FieldNameVariant))
                                     Case FieldTypeIdRedirect, FieldTypeIdManyToMany
                                     Case Else
-                                        Copy = app.db_GetCSText(CSPointer, EncodeText(FieldNameVariant))
+                                        Copy = db.db_GetCSText(CSPointer, EncodeText(FieldNameVariant))
                                 End Select
                                 If Copy <> "" Then
                                     Copy = Replace(Copy, """", "'")
@@ -15041,19 +15071,19 @@ ErrorTrap:
                                     Copy = Replace(Copy, vbCr, " ")
                                     Copy = Replace(Copy, vbLf, " ")
                                 End If
-                                Call app.appRootFiles.appendFile(TestFilename, Delimiter & """" & Copy & """")
+                                Call db.appRootFiles.appendFile(TestFilename, Delimiter & """" & Copy & """")
                                 Delimiter = ","
-                                FieldNameVariant = app.csv_GetCSNextFieldName(CSPointer)
+                                FieldNameVariant = db.db_GetCSNextFieldName(CSPointer)
                                 '''DoEvents
                             Loop
-                            Call app.appRootFiles.appendFile(TestFilename, vbCrLf)
-                            Call app.db_csGoNext(CSPointer)
+                            Call db.appRootFiles.appendFile(TestFilename, vbCrLf)
+                            Call db.db_csGoNext(CSPointer)
                             '''DoEvents
                         Loop
                     End If
             End Select
-            GetAsciiExport = app.appRootFiles.ReadFile(TestFilename)
-            Call app.appRootFiles.DeleteFile(TestFilename)
+            GetAsciiExport = db.appRootFiles.ReadFile(TestFilename)
+            Call db.appRootFiles.DeleteFile(TestFilename)
             Exit Function
             '
             ' ----- Error Trap
@@ -15078,13 +15108,13 @@ ErrorTrap:
             '
             MethodName = "main_SetMember"
             '
-            CSPointer = app.db_csOpen("people", "id=" & app.db_EncodeSQLNumber(iPeopleID))
-            If Not app.db_csOk(CSPointer) Then
+            CSPointer = db.db_csOpen("people", "id=" & db.db_EncodeSQLNumber(iPeopleID))
+            If Not db.db_csOk(CSPointer) Then
                 Call handleLegacyError14(MethodName, "main_SetMember ErrorTrap, could not find RecordID [" & iPeopleID & "] in people content.")
             Else
-                Call app.db_setCS(CSPointer, "ContentControlID", main_GetContentID("Members"))
+                Call db.db_setCS(CSPointer, "ContentControlID", main_GetContentID("Members"))
             End If
-            Call app.db_csClose(CSPointer)
+            Call db.db_csClose(CSPointer)
             '
             Exit Sub
             '
@@ -15110,7 +15140,7 @@ ErrorTrap:
                     docBufferEnabled = BufferOn
                 End If
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '
@@ -15214,7 +15244,7 @@ ErrorTrap:
             '
             MethodName = "main_GetVirtualFilename"
             '
-            main_GetVirtualFilename = app.csv_GetVirtualFilename(iContentName, iFieldName, iRecordID, OriginalFilename)
+            main_GetVirtualFilename = db.db_GetVirtualFilename(iContentName, iFieldName, iRecordID, OriginalFilename)
             Exit Function
             '
             ' ----- Error Trap
@@ -15265,53 +15295,53 @@ ErrorTrap:
                     ' First page of the visit, save everything
                     '
                     SQL = "UPDATE ccVisits SET " _
-                        & " LastVisitTime=" & app.db_EncodeSQLDate(main_PageStartTime) _
+                        & " LastVisitTime=" & db.db_EncodeSQLDate(main_PageStartTime) _
                         & ",PageVisits=" & main_VisitPages _
                         & ",VisitorID=" & main_VisitorID _
-                        & ",Name=" & app.db_EncodeSQLText(main_VisitName) _
-                        & ",VisitorNew=" & app.db_EncodeSQLBoolean(main_VisitorNew) _
+                        & ",Name=" & db.db_EncodeSQLText(main_VisitName) _
+                        & ",VisitorNew=" & db.db_EncodeSQLBoolean(main_VisitorNew) _
                         & ",MemberID=" & main_VisitMemberID _
-                        & ",CookieSupport=" & app.db_EncodeSQLBoolean(main_VisitCookieSupport) _
+                        & ",CookieSupport=" & db.db_EncodeSQLBoolean(main_VisitCookieSupport) _
                         & ",LoginAttempts=" & main_VisitLoginAttempts _
-                        & ",VisitAuthenticated=" & app.db_EncodeSQLBoolean(visit_isAuthenticated) _
-                        & ",MemberNew=" & app.db_EncodeSQLBoolean(userIsNew) _
-                        & ",StartTime=" & app.db_EncodeSQLDate(main_VisitStartTime) _
+                        & ",VisitAuthenticated=" & db.db_EncodeSQLBoolean(visit_isAuthenticated) _
+                        & ",MemberNew=" & db.db_EncodeSQLBoolean(userIsNew) _
+                        & ",StartTime=" & db.db_EncodeSQLDate(main_VisitStartTime) _
                         & ",StartDateValue=" & main_VisitStartDateValue _
-                        & ",DateAdded=" & app.db_EncodeSQLDate(main_VisitStartTime) _
-                        & ",Remote_Addr=" & app.db_EncodeSQLText(web.requestRemoteIP) _
-                        & ",Browser=" & app.db_EncodeSQLText(Left(web.requestBrowser, 255)) _
-                        & ",HTTP_Via=" & app.db_EncodeSQLText(Left(web.requestHTTPVia, 255)) _
-                        & ",HTTP_From=" & app.db_EncodeSQLText(Left(web.requestHTTPFrom, 255)) _
-                        & ",HTTP_REFERER=" & app.db_EncodeSQLText(Left(main_VisitRefererHost, 255)) _
-                        & ",RefererPathPage=" & app.db_EncodeSQLText(Left(main_VisitRefererPathPage, 255))
+                        & ",DateAdded=" & db.db_EncodeSQLDate(main_VisitStartTime) _
+                        & ",Remote_Addr=" & db.db_EncodeSQLText(web.requestRemoteIP) _
+                        & ",Browser=" & db.db_EncodeSQLText(Left(web.requestBrowser, 255)) _
+                        & ",HTTP_Via=" & db.db_EncodeSQLText(Left(web.requestHTTPVia, 255)) _
+                        & ",HTTP_From=" & db.db_EncodeSQLText(Left(web.requestHTTPFrom, 255)) _
+                        & ",HTTP_REFERER=" & db.db_EncodeSQLText(Left(main_VisitRefererHost, 255)) _
+                        & ",RefererPathPage=" & db.db_EncodeSQLText(Left(main_VisitRefererPathPage, 255))
                 Else
                     '
                     ' non-First page of the visit, save only what can change
                     '
                     SQL = "UPDATE ccVisits SET " _
-                        & " LastVisitTime=" & app.db_EncodeSQLDate(main_PageStartTime) _
+                        & " LastVisitTime=" & db.db_EncodeSQLDate(main_PageStartTime) _
                         & ",PageVisits=" & (main_VisitPages) _
                         & ",MemberID=" & main_VisitMemberID _
-                        & ",CookieSupport=" & app.db_EncodeSQLBoolean(main_VisitCookieSupport) _
+                        & ",CookieSupport=" & db.db_EncodeSQLBoolean(main_VisitCookieSupport) _
                         & ",LoginAttempts=" & main_VisitLoginAttempts _
-                        & ",VisitAuthenticated=" & app.db_EncodeSQLBoolean(visit_isAuthenticated) _
-                        & ",MemberNew=" & app.db_EncodeSQLBoolean(userIsNew)
+                        & ",VisitAuthenticated=" & db.db_EncodeSQLBoolean(visit_isAuthenticated) _
+                        & ",MemberNew=" & db.db_EncodeSQLBoolean(userIsNew)
                 End If
                 If True Then
-                    SQL &= ",TimeToLastHit=" & app.db_EncodeSQLNumber(main_VisitTimeToLastHit)
+                    SQL &= ",TimeToLastHit=" & db.db_EncodeSQLNumber(main_VisitTimeToLastHit)
                     If True Then
-                        SQL &= ",ExcludeFromAnalytics=" & app.db_EncodeSQLBoolean(main_VisitExcludeFromAnalytics)
+                        SQL &= ",ExcludeFromAnalytics=" & db.db_EncodeSQLBoolean(main_VisitExcludeFromAnalytics)
                         If True Then
                             '
                             ' can be changed with forcemobile flag
                             '
-                            SQL &= ",Mobile=" & app.db_EncodeSQLBoolean(main_VisitBrowserIsMobile)
-                            SQL &= ",Bot=" & app.db_EncodeSQLBoolean(main_VisitIsBot Or main_VisitIsBadBot)
+                            SQL &= ",Mobile=" & db.db_EncodeSQLBoolean(main_VisitBrowserIsMobile)
+                            SQL &= ",Bot=" & db.db_EncodeSQLBoolean(main_VisitIsBot Or main_VisitIsBadBot)
                         End If
                     End If
                 End If
                 SQL &= " WHERE (ID=" & main_VisitId & ");"
-                Call app.executeSql(SQL)
+                Call db.executeSql(SQL)
             End If
             Exit Sub
             '
@@ -15342,19 +15372,19 @@ ErrorTrap:
             If visit_initialized Then
                 If True Then
                     SQL = "UPDATE ccVisitors SET " _
-                        & " Name = " & app.db_EncodeSQLText(main_VisitorName) _
-                        & ",MemberID = " & app.db_EncodeSQLNumber(main_VisitorMemberID) _
-                        & ",OrderID = " & app.db_EncodeSQLNumber(main_VisitorOrderID) _
-                        & ",ForceBrowserMobile = " & app.db_EncodeSQLNumber(main_VisitorForceBrowserMobile) _
+                        & " Name = " & db.db_EncodeSQLText(main_VisitorName) _
+                        & ",MemberID = " & db.db_EncodeSQLNumber(main_VisitorMemberID) _
+                        & ",OrderID = " & db.db_EncodeSQLNumber(main_VisitorOrderID) _
+                        & ",ForceBrowserMobile = " & db.db_EncodeSQLNumber(main_VisitorForceBrowserMobile) _
                         & " WHERE ID=" & main_VisitorID & ";"
                 Else
                     SQL = "UPDATE ccVisitors SET " _
-                        & " Name = " & app.db_EncodeSQLText(main_VisitorName) _
-                        & ",MemberID = " & app.db_EncodeSQLNumber(main_VisitorMemberID) _
-                        & ",OrderID = " & app.db_EncodeSQLNumber(main_VisitorOrderID) _
+                        & " Name = " & db.db_EncodeSQLText(main_VisitorName) _
+                        & ",MemberID = " & db.db_EncodeSQLNumber(main_VisitorMemberID) _
+                        & ",OrderID = " & db.db_EncodeSQLNumber(main_VisitorOrderID) _
                         & " WHERE ID=" & main_VisitorID & ";"
                 End If
-                Call app.executeSql(SQL)
+                Call db.executeSql(SQL)
             End If
             Exit Sub
             '
@@ -15374,7 +15404,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            main_GetDataSourceType = app.csv_GetDataSourceType(EncodeText(DataSourceName))
+            main_GetDataSourceType = db.db_GetDataSourceType(EncodeText(DataSourceName))
             '
             Exit Function
             '
@@ -15443,7 +15473,7 @@ ErrorTrap:
                 Dim AuthDomain As String
                 Dim main_appNameCookiePrefix As String
                 '
-                main_appNameCookiePrefix = LCase(main_encodeCookieName(app.config.name))
+                main_appNameCookiePrefix = LCase(main_encodeCookieName(db.config.name))
 
                 ' ----- Visit Defaults
                 '
@@ -15492,17 +15522,17 @@ ErrorTrap:
                 MemberLinkLoginID = 0
                 MemberLinkRecognizeID = 0
                 If (MemberLinkinEID <> "") Then
-                    If EncodeBoolean(app.siteProperty_getBoolean("AllowLinkLogin", True)) Then
+                    If EncodeBoolean(db.siteProperty_getBoolean("AllowLinkLogin", True)) Then
                         '
                         ' Link Login
                         '
-                        Call security_decodeToken(MemberLinkinEID, app.config.privateKey, MemberLinkLoginID, tokenDate)
+                        Call security_decodeToken(MemberLinkinEID, db.config.privateKey, MemberLinkLoginID, tokenDate)
                         'MemberLinkLoginID = main_DecodeKeyNumber(MemberLinkinEID)
-                    ElseIf EncodeBoolean(app.siteProperty_getBoolean("AllowLinkRecognize", True)) Then
+                    ElseIf EncodeBoolean(db.siteProperty_getBoolean("AllowLinkRecognize", True)) Then
                         '
                         ' Link Recognize
                         '
-                        Call security_decodeToken(MemberLinkinEID, app.config.privateKey, MemberLinkRecognizeID, tokenDate)
+                        Call security_decodeToken(MemberLinkinEID, db.config.privateKey, MemberLinkRecognizeID, tokenDate)
                         'MemberLinkRecognizeID = main_DecodeKeyNumber(MemberLinkinEID)
                     Else
                         '
@@ -15518,7 +15548,7 @@ ErrorTrap:
                     '
                     'hint = "210"
                     If (CookieVisit <> "") Then
-                        Call security_decodeToken(CookieVisit, app.config.privateKey, main_VisitId, main_VisitLastTimeFromCookie)
+                        Call security_decodeToken(CookieVisit, db.config.privateKey, main_VisitId, main_VisitLastTimeFromCookie)
                         'main_VisitId = main_DecodeKeyNumber(CookieVisit)
                         If main_VisitId = 0 Then
                             '
@@ -15619,8 +15649,8 @@ ErrorTrap:
                         '
                         'Call AppendLog("main_InitVisit(), 2430")
                         '
-                        CS = app.db_csOpenSql(SQL)
-                        If Not app.db_csOk(CS) Then
+                        CS = db.db_csOpenSql(SQL)
+                        If Not db.db_csOk(CS) Then
                             '
                             'Call AppendLog("main_InitVisit(), 2435")
                             '
@@ -15637,18 +15667,18 @@ ErrorTrap:
                             '--------------------------------------------------------------------------
                             '
                             'hint = "240"
-                            main_VisitorID = app.db_GetCSInteger(CS, "VisitorID")
-                            main_VisitorName = app.db_GetCSText(CS, "VisitorName")
-                            main_VisitorMemberID = (app.db_GetCSInteger(CS, "VisitorMemberID"))
-                            main_VisitorForceBrowserMobile = (app.db_GetCSInteger(CS, "VisitorForceBrowserMobile"))
-                            main_VisitorOrderID = (app.db_GetCSInteger(CS, "VisitorOrderID"))
+                            main_VisitorID = db.db_GetCSInteger(CS, "VisitorID")
+                            main_VisitorName = db.db_GetCSText(CS, "VisitorName")
+                            main_VisitorMemberID = (db.db_GetCSInteger(CS, "VisitorMemberID"))
+                            main_VisitorForceBrowserMobile = (db.db_GetCSInteger(CS, "VisitorForceBrowserMobile"))
+                            main_VisitorOrderID = (db.db_GetCSInteger(CS, "VisitorOrderID"))
                             '
                             '--------------------------------------------------------------------------
                             ' ----- test visit age
                             '--------------------------------------------------------------------------
                             '
                             'hint = "250"
-                            main_VisitLastTime = app.db_GetCSDate(CS, "VisitLastVisitTime")
+                            main_VisitLastTime = db.db_GetCSDate(CS, "VisitLastVisitTime")
                             If main_VisitLastTime.ToOADate + 0.041666 < main_PageStartTime.ToOADate Then
                                 '--------------------------------------------------------------------------
                                 ' ----- kill visit (no activity for over 1 hour)
@@ -15666,38 +15696,38 @@ ErrorTrap:
                                 '--------------------------------------------------------------------------
                                 '
                                 'hint = "252"
-                                main_VisitId = (app.db_GetCSInteger(CS, "VisitId"))
-                                main_VisitName = (app.db_GetCSText(CS, "VisitName"))
-                                main_VisitCookieSupport = (app.db_GetCSBoolean(CS, "VisitCookieSupport"))
-                                main_VisitPages = (app.db_GetCSInteger(CS, "VisitPageVisits"))
-                                main_VisitMemberID = (app.db_GetCSInteger(CS, "VisitMemberID"))
-                                visit_isAuthenticated = (app.db_GetCSBoolean(CS, "VisitAuthenticated"))
-                                main_VisitStartTime = (app.db_GetCSDate(CS, "VisitStartTime"))
-                                main_VisitStartDateValue = (app.db_GetCSInteger(CS, "VisitStartDateValue"))
-                                main_VisitReferer = (app.db_GetCSText(CS, "VisitHTTP_REFERER"))
-                                main_VisitLoginAttempts = (app.db_GetCSInteger(CS, "VisitLoginAttempts"))
-                                main_VisitorNew = (app.db_GetCSBoolean(CS, "VisitVisitorNew"))
-                                userIsNew = (app.db_GetCSBoolean(CS, "VisitMemberNew"))
-                                web.requestRemoteIP = (app.db_GetCSText(CS, "VisitREMOTE_ADDR"))
-                                web.requestBrowser = (app.db_GetCSText(CS, "VisitBrowser"))
+                                main_VisitId = (db.db_GetCSInteger(CS, "VisitId"))
+                                main_VisitName = (db.db_GetCSText(CS, "VisitName"))
+                                main_VisitCookieSupport = (db.db_GetCSBoolean(CS, "VisitCookieSupport"))
+                                main_VisitPages = (db.db_GetCSInteger(CS, "VisitPageVisits"))
+                                main_VisitMemberID = (db.db_GetCSInteger(CS, "VisitMemberID"))
+                                visit_isAuthenticated = (db.db_GetCSBoolean(CS, "VisitAuthenticated"))
+                                main_VisitStartTime = (db.db_GetCSDate(CS, "VisitStartTime"))
+                                main_VisitStartDateValue = (db.db_GetCSInteger(CS, "VisitStartDateValue"))
+                                main_VisitReferer = (db.db_GetCSText(CS, "VisitHTTP_REFERER"))
+                                main_VisitLoginAttempts = (db.db_GetCSInteger(CS, "VisitLoginAttempts"))
+                                main_VisitorNew = (db.db_GetCSBoolean(CS, "VisitVisitorNew"))
+                                userIsNew = (db.db_GetCSBoolean(CS, "VisitMemberNew"))
+                                web.requestRemoteIP = (db.db_GetCSText(CS, "VisitREMOTE_ADDR"))
+                                web.requestBrowser = (db.db_GetCSText(CS, "VisitBrowser"))
                                 main_VisitTimeToLastHit = 0
                                 If main_VisitStartTime > Date.MinValue Then
                                     main_VisitTimeToLastHit = CInt((main_PageStartTime - main_VisitStartTime).TotalSeconds)
                                 End If
-                                main_VisitExcludeFromAnalytics = app.db_GetCSBoolean(CS, "VisitExcludeFromAnalytics")
+                                main_VisitExcludeFromAnalytics = db.db_GetCSBoolean(CS, "VisitExcludeFromAnalytics")
                                 If ((Not main_VisitCookieSupport) And (CookieVisit <> "")) Then
                                     main_VisitCookieSupport = True
                                 End If
-                                main_VisitBrowserIsMobile = app.db_GetCSBoolean(CS, "VisitMobile")
-                                main_VisitIsBot = app.db_GetCSBoolean(CS, "VisitBot")
+                                main_VisitBrowserIsMobile = db.db_GetCSBoolean(CS, "VisitMobile")
+                                main_VisitIsBot = db.db_GetCSBoolean(CS, "VisitBot")
                                 '
                                 '--------------------------------------------------------------------------
                                 ' -----  Member info
                                 '--------------------------------------------------------------------------
                                 '
                                 'hint = "260"
-                                userId = app.db_GetCSInteger(CS, "MemberID")
-                                user_Active = app.db_GetCSBoolean(CS, "MemberActive")
+                                userId = db.db_GetCSInteger(CS, "MemberID")
+                                user_Active = db.db_GetCSBoolean(CS, "MemberActive")
                                 'MemberActive = encodeBoolean(MemberActive)
                                 If (userId = 0) Or (Not user_Active) Then
                                     '
@@ -15712,30 +15742,30 @@ ErrorTrap:
                                     'Call AppendLog("main_InitVisit(), 2460")
                                     '
                                     'hint = "262"
-                                    userName = (app.db_GetCSText(CS, "MemberName"))
-                                    userIsDeveloper = (app.db_GetCSBoolean(CS, "MemberDeveloper"))
-                                    userIsAdmin = (app.db_GetCSBoolean(CS, "MemberAdmin"))
-                                    userContentControlID = (app.db_GetCSInteger(CS, "MemberContentControlID"))
-                                    user_allowBulkEmail = (app.db_GetCSBoolean(CS, "MemberAllowBulkEmail"))
-                                    userAllowToolsPanel = (app.db_GetCSBoolean(CS, "MemberAllowToolsPanel"))
-                                    user_adminMenuModeID = app.db_GetCSInteger(CS, "MemberAdminMenuModeID")
-                                    user_autoLogin = (app.db_GetCSBoolean(CS, "MemberAutoLogin"))
+                                    userName = (db.db_GetCSText(CS, "MemberName"))
+                                    userIsDeveloper = (db.db_GetCSBoolean(CS, "MemberDeveloper"))
+                                    userIsAdmin = (db.db_GetCSBoolean(CS, "MemberAdmin"))
+                                    userContentControlID = (db.db_GetCSInteger(CS, "MemberContentControlID"))
+                                    user_allowBulkEmail = (db.db_GetCSBoolean(CS, "MemberAllowBulkEmail"))
+                                    userAllowToolsPanel = (db.db_GetCSBoolean(CS, "MemberAllowToolsPanel"))
+                                    user_adminMenuModeID = db.db_GetCSInteger(CS, "MemberAdminMenuModeID")
+                                    user_autoLogin = (db.db_GetCSBoolean(CS, "MemberAutoLogin"))
                                     ' 6/18/2009 notes was removed from base
                                     '                        MemberSendNotes = (app.csv_GetCSBoolean(CS, "MemberSendNotes"))
-                                    userUsername = (app.db_GetCSText(CS, "MemberUsername"))
-                                    userPassword = (app.db_GetCSText(CS, "MemberPassword"))
-                                    userLanguageId = (app.db_GetCSInteger(CS, "MemberLanguageID"))
-                                    userLanguage = (app.db_GetCSText(CS, "MemberLanguage"))
-                                    userOrganizationId = (app.db_GetCSInteger(CS, "MemberOrganizationID"))
-                                    userStyleFilename = app.db_GetCSText(CS, "MemberStyleFilename")
-                                    userExcludeFromAnalytics = (app.db_GetCSBoolean(CS, "MemberExcludeFromAnalytics"))
+                                    userUsername = (db.db_GetCSText(CS, "MemberUsername"))
+                                    userPassword = (db.db_GetCSText(CS, "MemberPassword"))
+                                    userLanguageId = (db.db_GetCSInteger(CS, "MemberLanguageID"))
+                                    userLanguage = (db.db_GetCSText(CS, "MemberLanguage"))
+                                    userOrganizationId = (db.db_GetCSInteger(CS, "MemberOrganizationID"))
+                                    userStyleFilename = db.db_GetCSText(CS, "MemberStyleFilename")
+                                    userExcludeFromAnalytics = (db.db_GetCSBoolean(CS, "MemberExcludeFromAnalytics"))
                                     '
                                     ' ----- consider removing
                                     '
-                                    userEmail = (app.db_GetCSText(CS, "MemberEmail"))
-                                    user_company = (app.db_GetCSText(CS, "MemberCompany"))
-                                    user_visits = (app.db_GetCSInteger(CS, "MemberVisits"))
-                                    user_lastVisit = (app.db_GetCSDate(CS, "MemberLastVisit"))
+                                    userEmail = (db.db_GetCSText(CS, "MemberEmail"))
+                                    user_company = (db.db_GetCSText(CS, "MemberCompany"))
+                                    user_visits = (db.db_GetCSInteger(CS, "MemberVisits"))
+                                    user_lastVisit = (db.db_GetCSDate(CS, "MemberLastVisit"))
                                 End If
                                 '
                                 '--------------------------------------------------------------------------
@@ -15749,7 +15779,7 @@ ErrorTrap:
                                 End If
                             End If
                         End If
-                        Call app.db_csClose(CS)
+                        Call db.db_csClose(CS)
                     End If
                     '
                     '--------------------------------------------------------------------------
@@ -15769,10 +15799,10 @@ ErrorTrap:
                         ' ----- create new visit record
                         '
                         'hint = "310"
-                        main_VisitId = app.metaData_InsertContentRecordGetID("Visits", userId)
+                        main_VisitId = db.metaData_InsertContentRecordGetID("Visits", userId)
                         If (main_VisitId < 1) Then
                             main_VisitId = 0
-                            handleException(New Exception("Internal error, new visit record could not be selected."))
+                            handleExceptionAndRethrow(New Exception("Internal error, new visit record could not be selected."))
                         End If
                         If main_VisitName = "" Then
                             main_VisitName = "User"
@@ -15810,12 +15840,12 @@ ErrorTrap:
                         '
                         'Call AppendLog("main_InitVisit(), 2480")
                         '
-                        If EncodeBoolean(app.siteProperty_getBoolean("AllowAutoRecognize", True)) Then
+                        If EncodeBoolean(db.siteProperty_getBoolean("AllowAutoRecognize", True)) Then
                             '
                             'Call AppendLog("main_InitVisit(), 2485")
                             '
                             'hint = "340"
-                            Call security_decodeToken(CookieVisitor, app.config.privateKey, main_VisitorID, tokenDate)
+                            Call security_decodeToken(CookieVisitor, db.config.privateKey, main_VisitorID, tokenDate)
                             'main_VisitorID = main_DecodeKeyNumber(CookieVisitor)
                             If main_VisitorID <> 0 Then
                                 '
@@ -15828,8 +15858,8 @@ ErrorTrap:
                                 Else
                                     SQL = "SELECT ID,Name,MemberID,OrderID,0 as ForceBrowserMobile from ccVisitors WHERE ID=" & main_VisitorID & ";"
                                 End If
-                                CS = app.db_csOpenSql(SQL)
-                                If Not app.db_csOk(CS) Then
+                                CS = db.db_csOpenSql(SQL)
+                                If Not db.db_csOk(CS) Then
                                     '
                                     ' ----- bad cookie, kill main_VisitorID
                                     '
@@ -15839,13 +15869,13 @@ ErrorTrap:
                                     ' ----- set visitor values
                                     '
                                     VisitorChanges = False
-                                    main_VisitorID = (app.db_GetCSInteger(CS, "ID"))
-                                    main_VisitorName = (app.db_GetCSText(CS, "Name"))
-                                    main_VisitorMemberID = (app.db_GetCSInteger(CS, "MemberID"))
-                                    main_VisitorForceBrowserMobile = (app.db_GetCSInteger(CS, "ForceBrowserMobile"))
-                                    main_VisitorOrderID = (app.db_GetCSInteger(CS, "OrderID"))
+                                    main_VisitorID = (db.db_GetCSInteger(CS, "ID"))
+                                    main_VisitorName = (db.db_GetCSText(CS, "Name"))
+                                    main_VisitorMemberID = (db.db_GetCSInteger(CS, "MemberID"))
+                                    main_VisitorForceBrowserMobile = (db.db_GetCSInteger(CS, "ForceBrowserMobile"))
+                                    main_VisitorOrderID = (db.db_GetCSInteger(CS, "OrderID"))
                                 End If
-                                Call app.db_csClose(CS)
+                                Call db.db_csClose(CS)
                             End If
                         End If
                         '
@@ -15860,7 +15890,7 @@ ErrorTrap:
                             '
                             ' Visitor Fields
                             '
-                            main_VisitorID = app.metaData_InsertContentRecordGetID("Visitors", userId)
+                            main_VisitorID = db.metaData_InsertContentRecordGetID("Visitors", userId)
                             If (main_VisitorID < 1) Then
                                 Call handleLegacyError14(MethodName, "main_InitVisit, could not create new visitor")
                                 main_VisitorID = 0
@@ -15895,15 +15925,15 @@ ErrorTrap:
                                 '
                                 'hint = "520"
 
-                                If (EncodeBoolean(app.siteProperty_getBoolean("AllowAutoLogin", False))) And (user_autoLogin) And main_VisitCookieSupport Then
+                                If (EncodeBoolean(db.siteProperty_getBoolean("AllowAutoLogin", False))) And (user_autoLogin) And main_VisitCookieSupport Then
                                     '
                                     ' ----- they allow it, now Check if they were logged in on their last visit
                                     '
                                     'hint = "530"
                                     SQL = "select top 1 V.VisitAuthenticated from ccVisits V where (V.ID<>" & main_VisitId & ")and(V.VisitorID=" & main_VisitorID & ") order by id desc"
-                                    CS = app.db_csOpenSql(SQL)
-                                    If app.db_csOk(CS) Then
-                                        If main_GetCSBoolean(CS, "VisitAuthenticated") Then
+                                    CS = db.db_csOpenSql(SQL)
+                                    If db.db_csOk(CS) Then
+                                        If db.db_GetCSBoolean(CS, "VisitAuthenticated") Then
                                             '
                                             ' ----- yes, go ahead with autologin
                                             '
@@ -15914,7 +15944,7 @@ ErrorTrap:
                                             End If
                                         End If
                                     End If
-                                    Call app.db_csClose(CS)
+                                    Call db.db_csClose(CS)
                                 Else
                                     '
                                     ' Recognized, not auto login
@@ -15931,7 +15961,7 @@ ErrorTrap:
                         '
                         'hint = "600"
                         If main_AllowVisitTracking Then
-                            Call inet_addResponseCookie(main_appNameCookiePrefix & main_cookieNameVisitor, security_encodeToken(main_VisitorID, main_VisitStartTime), main_VisitStartTime.AddYears(1), , app.RootWebPath, False)
+                            Call inet_addResponseCookie(main_appNameCookiePrefix & main_cookieNameVisitor, security_encodeToken(main_VisitorID, main_VisitStartTime), main_VisitStartTime.AddYears(1), , db.RootWebPath, False)
                         End If
                         '
                         '--------------------------------------------------------------------------
@@ -15989,7 +16019,7 @@ ErrorTrap:
                             '
                             ' upgraded, determine the kind of tracking - experimental build set to true
                             '
-                            TrackGuests = EncodeBoolean(app.siteProperty_getBoolean("track guests", False))
+                            TrackGuests = EncodeBoolean(db.siteProperty_getBoolean("track guests", False))
                             If Not TrackGuests Then
                                 '
                                 ' do not track guests at all
@@ -16005,7 +16035,7 @@ ErrorTrap:
                                     '
                                     ' upgraded, set it to the site property - experimental build set to true
                                     '
-                                    TrackGuestsWithoutCookies = EncodeBoolean(app.siteProperty_getBoolean("track guests without cookies", False))
+                                    TrackGuestsWithoutCookies = EncodeBoolean(db.siteProperty_getBoolean("track guests without cookies", False))
                                     If TrackGuestsWithoutCookies Then
                                         '
                                         ' compatibiltiy mode - create people for non-cookies too
@@ -16047,45 +16077,45 @@ ErrorTrap:
                                 '
                                 ' Still no match, main_Get the default language
                                 '
-                                userLanguage = app.siteProperty_getText("Language", "English")
+                                userLanguage = db.siteProperty_getText("Language", "English")
                                 If userLanguage <> "English" Then
                                     '
                                     ' Handle the non-English case first, so if there is a problem, fall back is English
                                     '
-                                    CS = app.db_csOpen("Languages", "name=" & app.db_EncodeSQLText(userLanguage))
-                                    If app.db_csOk(CS) Then
-                                        userLanguageId = app.db_GetCSInteger(CS, "ID")
+                                    CS = db.db_csOpen("Languages", "name=" & db.db_EncodeSQLText(userLanguage))
+                                    If db.db_csOk(CS) Then
+                                        userLanguageId = db.db_GetCSInteger(CS, "ID")
                                         MemberChanges = True
                                     End If
-                                    Call app.db_csClose(CS)
+                                    Call db.db_csClose(CS)
                                     If userLanguageId = 0 Then
                                         '
                                         ' non-English Language is not in Language Table, set default to english
                                         '
                                         userLanguage = "English"
-                                        Call app.siteProperty_set("Language", userLanguage)
+                                        Call db.siteProperty_set("Language", userLanguage)
                                     End If
                                 End If
                                 If userLanguage = "English" Then
-                                    CS = app.db_csOpen("Languages", "name=" & app.db_EncodeSQLText(userLanguage))
-                                    If app.db_csOk(CS) Then
-                                        userLanguageId = app.db_GetCSInteger(CS, "ID")
+                                    CS = db.db_csOpen("Languages", "name=" & db.db_EncodeSQLText(userLanguage))
+                                    If db.db_csOk(CS) Then
+                                        userLanguageId = db.db_GetCSInteger(CS, "ID")
                                         MemberChanges = True
                                     End If
-                                    Call app.db_csClose(CS)
+                                    Call db.db_csClose(CS)
                                     If userLanguageId < 1 Then
                                         '
                                         ' English is not in Language table, add it, and set it in Member
                                         '
-                                        CS = app.db_csInsertRecord("Languages")
-                                        If app.db_csOk(CS) Then
-                                            userLanguageId = app.db_GetCSInteger(CS, "ID")
+                                        CS = db.db_csInsertRecord("Languages")
+                                        If db.db_csOk(CS) Then
+                                            userLanguageId = db.db_GetCSInteger(CS, "ID")
                                             userLanguage = "English"
-                                            Call app.db_setCS(CS, "Name", userLanguage)
-                                            Call app.db_setCS(CS, "HTTP_Accept_LANGUAGE", "en")
+                                            Call db.db_setCS(CS, "Name", userLanguage)
+                                            Call db.db_setCS(CS, "HTTP_Accept_LANGUAGE", "en")
                                             MemberChanges = True
                                         End If
-                                        Call app.db_csClose(CS)
+                                        Call db.db_csClose(CS)
                                     End If
                                 End If
                             End If
@@ -16151,12 +16181,12 @@ ErrorTrap:
                     'hint = "980"
                     '$$$$$ cache this
                     ' $$$$$ make ptr list on load
-                    CS = app.db_csOpen("Add-ons", "(OnNewVisitEvent<>0)", "Name", , , , , "id")
-                    Do While app.db_csOk(CS)
-                        Call main_GetAddonContent(app.db_GetCSInteger(CS, "ID"), "", "", addonContextEnum.ContextOnNewVisit, "", 0, "", 0)
-                        app.db_csGoNext(CS)
+                    CS = db.db_csOpen("Add-ons", "(OnNewVisitEvent<>0)", "Name", , , , , "id")
+                    Do While db.db_csOk(CS)
+                        Call main_GetAddonContent(db.db_GetCSInteger(CS, "ID"), "", "", addonContextEnum.ContextOnNewVisit, "", 0, "", 0)
+                        db.db_csGoNext(CS)
                     Loop
-                    Call app.db_csClose(CS)
+                    Call db.db_csClose(CS)
                 End If
                 '
                 '---------------------------------------------------------------------------------
@@ -16164,9 +16194,9 @@ ErrorTrap:
                 '---------------------------------------------------------------------------------
                 '
                 CookieVisit = security_encodeToken(main_VisitId, main_PageStartTime)
-                Call inet_addResponseCookie(main_appNameCookiePrefix & main_cookieNameVisit, CookieVisit, , , app.RootWebPath, False)
+                Call inet_addResponseCookie(main_appNameCookiePrefix & main_cookieNameVisit, CookieVisit, , , db.RootWebPath, False)
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '        '
@@ -16435,7 +16465,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            main_GetFolderList = app.appRootFiles.getFolderList(EncodeText(FolderPath))
+            main_GetFolderList = db.appRootFiles.getFolderList(EncodeText(FolderPath))
             '
             Exit Function
             '
@@ -16492,7 +16522,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            main_GetVirtualFolderList = app.cdnFiles.getFolderList(EncodeText(FolderPath))
+            main_GetVirtualFolderList = db.cdnFiles.getFolderList(EncodeText(FolderPath))
             '
             Exit Function
             '
@@ -16530,7 +16560,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function main_GetContentNameByID(ByVal ContentID As Integer) As String
-            Return app.csv_GetContentNameByID(EncodeInteger(ContentID))
+            Return db.db_GetContentNameByID(EncodeInteger(ContentID))
         End Function
         '
         ' ----- main_Get a DataSource Name from its ContentName
@@ -16561,7 +16591,7 @@ ErrorTrap:
         '   call main_DeleteContentRecords.
         '========================================================================
         '
-        Public Sub main_DeleteContentRecord(ByVal ContentName As String, ByVal RecordID As Integer)
+        Public Sub db_DeleteContentRecord(ByVal ContentName As String, ByVal RecordID As Integer)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("DeleteContentRecord")
             '
             'If Not (true) Then Exit Sub
@@ -16577,12 +16607,12 @@ ErrorTrap:
             '
             If (iContentName = "") Or (iRecordID = 0) Then
                 If (EncodeText(RecordID) <> "") And (EncodeText(RecordID) <> "0") Then
-                    Call app.db_DeleteContentRecord(ContentName, RecordID)
+                    Call db.db_DeleteContentRecord(ContentName, RecordID)
                 Else
-                    handleException(New Exception("Invalid ContentName [" & iContentName & "] or RecordID [" & EncodeText(RecordID) & "]"))
+                    handleExceptionAndRethrow(New Exception("Invalid ContentName [" & iContentName & "] or RecordID [" & EncodeText(RecordID) & "]"))
                 End If
             Else
-                Call app.db_DeleteContentRecord(iContentName, iRecordID, userId)
+                Call db.db_DeleteContentRecord(iContentName, iRecordID, userId)
             End If
             Call main_ProcessSpecialCaseAfterSave(True, iContentName, iRecordID, "", 0, False)
             Exit Sub
@@ -16607,7 +16637,7 @@ ErrorTrap:
             '
             MethodName = "main_DeleteCSRecord"
             '
-            Call app.csv_DeleteCSRecord(EncodeInteger(CSPointer))
+            Call db.db_DeleteCSRecord(EncodeInteger(CSPointer))
             Exit Sub
             '
             ' ----- Error Trap
@@ -16624,7 +16654,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function metaData_InsertContentRecordGetID(ByVal ContentName As String) As Integer
-            metaData_InsertContentRecordGetID = app.metaData_InsertContentRecordGetID(EncodeText(ContentName), userId)
+            metaData_InsertContentRecordGetID = db.metaData_InsertContentRecordGetID(EncodeText(ContentName), userId)
         End Function
         '
         '=============================================================================
@@ -16649,13 +16679,13 @@ ErrorTrap:
         '=============================================================================
         '
         Public Sub metaData_CreateContentChild(ByVal ChildContentName As String, ByVal ParentContentName As String)
-            Call app.metaData_CreateContentChild(EncodeText(ChildContentName), EncodeText(ParentContentName), userId)
+            Call metaData.CreateContentChild(EncodeText(ChildContentName), EncodeText(ParentContentName), userId)
         End Sub
         '
         ' ----- alternate name
         '
         Public Function db_InsertCSContent(ByVal ContentName As String) As Integer
-            db_InsertCSContent = app.db_csInsertRecord(EncodeText(ContentName))
+            db_InsertCSContent = db.db_csInsertRecord(EncodeText(ContentName))
         End Function
         '
         '========================================================================
@@ -16736,7 +16766,7 @@ ErrorTrap:
                 If main_VisitStartTime = Date.MinValue Then
                     main_VisitStartTime = main_PageStartTime
                 End If
-                If Not EncodeBoolean(app.siteProperty_getBoolean("allowVisitTracking", True)) Then
+                If Not EncodeBoolean(db.siteProperty_getBoolean("allowVisitTracking", True)) Then
                     Call web_init_initVisit(True)
                 End If
                 '
@@ -16744,12 +16774,12 @@ ErrorTrap:
                 '
                 If Not isMissing(AllowAutoLogin) Then
                     If AllowAutoLogin Xor user_autoLogin Then
-                        If EncodeBoolean(app.siteProperty_getBoolean("AllowAutoLogin", False)) Then
+                        If EncodeBoolean(db.siteProperty_getBoolean("AllowAutoLogin", False)) Then
                             CS = db_csOpenRecord("people", iRecordID)
-                            If app.db_csOk(CS) Then
-                                Call app.db_setCS(CS, "AutoLogin", AllowAutoLogin)
+                            If db.db_csOk(CS) Then
+                                Call db.db_setCS(CS, "AutoLogin", AllowAutoLogin)
                             End If
-                            Call app.db_csClose(CS)
+                            Call db.db_csClose(CS)
                         End If
                     End If
                 End If
@@ -16784,9 +16814,9 @@ ErrorTrap:
             ' ----- Member is attempting a login
             '
             user_SetMemberIdentity = False
-            CS = app.db_csOpen("people", Criteria, , , , , , "ID")
-            If app.db_csOk(CS) Then
-                user_SetMemberIdentity = useer_RecognizeMemberByID(app.db_GetCSInteger(CS, "ID"))
+            CS = db.db_csOpen("people", Criteria, , , , , , "ID")
+            If db.db_csOk(CS) Then
+                user_SetMemberIdentity = useer_RecognizeMemberByID(db.db_GetCSInteger(CS, "ID"))
             End If
             '
             Exit Function
@@ -16828,11 +16858,11 @@ ErrorTrap:
                 & " and(ccMembers.ID=" & RecordID & ")"
             If True Then
                 SQL &= "" _
-                    & " and((ccMembers.dateExpires is null)or(ccMembers.dateExpires>" & app.db_EncodeSQLDate(Now) & "))" _
+                    & " and((ccMembers.dateExpires is null)or(ccMembers.dateExpires>" & db.db_EncodeSQLDate(Now) & "))" _
                     & ""
             End If
-            CS = app.db_csOpenSql(SQL)
-            If app.db_csOk(CS) Then
+            CS = db.db_csOpenSql(SQL)
+            If db.db_csOk(CS) Then
                 If main_VisitId = 0 Then
                     '
                     ' Visit was blocked during init, init the visit now
@@ -16842,36 +16872,36 @@ ErrorTrap:
                 '
                 ' ----- Member was recognized
                 '
-                userId = (app.db_GetCSInteger(CS, "ID"))
-                userName = (app.db_GetCSText(CS, "Name"))
-                userUsername = (app.db_GetCSText(CS, "username"))
-                userEmail = (app.db_GetCSText(CS, "Email"))
-                userPassword = (app.db_GetCSText(CS, "Password"))
-                userOrganizationId = (app.db_GetCSInteger(CS, "OrganizationID"))
-                userLanguageId = (app.db_GetCSInteger(CS, "LanguageID"))
-                user_Active = (app.db_GetCSBoolean(CS, "Active"))
-                user_company = (app.db_GetCSText(CS, "Company"))
-                user_visits = (app.db_GetCSInteger(CS, "Visits"))
-                user_lastVisit = (app.db_GetCSDate(CS, "LastVisit"))
-                user_allowBulkEmail = (app.db_GetCSBoolean(CS, "AllowBulkEmail"))
-                userAllowToolsPanel = (app.db_GetCSBoolean(CS, "AllowToolsPanel"))
-                user_adminMenuModeID = (app.db_GetCSInteger(CS, "AdminMenuModeID"))
-                user_autoLogin = (app.db_GetCSBoolean(CS, "AutoLogin"))
+                userId = (db.db_GetCSInteger(CS, "ID"))
+                userName = (db.db_GetCSText(CS, "Name"))
+                userUsername = (db.db_GetCSText(CS, "username"))
+                userEmail = (db.db_GetCSText(CS, "Email"))
+                userPassword = (db.db_GetCSText(CS, "Password"))
+                userOrganizationId = (db.db_GetCSInteger(CS, "OrganizationID"))
+                userLanguageId = (db.db_GetCSInteger(CS, "LanguageID"))
+                user_Active = (db.db_GetCSBoolean(CS, "Active"))
+                user_company = (db.db_GetCSText(CS, "Company"))
+                user_visits = (db.db_GetCSInteger(CS, "Visits"))
+                user_lastVisit = (db.db_GetCSDate(CS, "LastVisit"))
+                user_allowBulkEmail = (db.db_GetCSBoolean(CS, "AllowBulkEmail"))
+                userAllowToolsPanel = (db.db_GetCSBoolean(CS, "AllowToolsPanel"))
+                user_adminMenuModeID = (db.db_GetCSInteger(CS, "AdminMenuModeID"))
+                user_autoLogin = (db.db_GetCSBoolean(CS, "AutoLogin"))
                 ' 6/18/2009 notes was removed from base
                 '        MemberSendNotes = (app.csv_GetCSBoolean(CS, "SendNotes"))
-                userIsDeveloper = (app.db_GetCSBoolean(CS, "Developer"))
-                userIsAdmin = (app.db_GetCSBoolean(CS, "Admin"))
-                userContentControlID = (app.db_GetCSInteger(CS, "ContentControlID"))
-                userLanguageId = (app.db_GetCSInteger(CS, "LanguageID"))
-                userLanguage = (app.db_GetCSText(CS, "LanguageName"))
+                userIsDeveloper = (db.db_GetCSBoolean(CS, "Developer"))
+                userIsAdmin = (db.db_GetCSBoolean(CS, "Admin"))
+                userContentControlID = (db.db_GetCSInteger(CS, "ContentControlID"))
+                userLanguageId = (db.db_GetCSInteger(CS, "LanguageID"))
+                userLanguage = (db.db_GetCSText(CS, "LanguageName"))
                 If True Then
-                    userStyleFilename = app.db_GetCSText(CS, "StyleFilename")
+                    userStyleFilename = db.db_GetCSText(CS, "StyleFilename")
                     If userStyleFilename <> "" Then
-                        Call main_AddStylesheetLink(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, userStyleFilename))
+                        Call main_AddStylesheetLink(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, userStyleFilename))
                     End If
                 End If
                 If True Then
-                    userExcludeFromAnalytics = app.db_GetCSBoolean(CS, "ExcludeFromAnalytics")
+                    userExcludeFromAnalytics = db.db_GetCSBoolean(CS, "ExcludeFromAnalytics")
                 End If
                 '
                 user_visits = user_visits + 1
@@ -16890,7 +16920,7 @@ ErrorTrap:
                 Call user_SaveMemberBase()
                 useer_RecognizeMemberByID = True
             End If
-            Call app.db_csClose(CS)
+            Call db.db_csClose(CS)
             '
             Exit Function
             '
@@ -16925,46 +16955,46 @@ ErrorTrap:
             Call user_CreateUserDefaults(main_VisitName)
             '
             userId = 0
-            CSMember = app.db_csInsertRecord("people")
-            If Not app.db_csOk(CSMember) Then
+            CSMember = db.db_csInsertRecord("people")
+            If Not db.db_csOk(CSMember) Then
                 Call handleLegacyError14(MethodName, "main_CreateUser, Error inserting new people record, could not main_CreateUser")
             Else
-                userId = app.db_GetCSInteger(CSMember, "id")
+                userId = db.db_GetCSInteger(CSMember, "id")
                 If DefaultVisitName <> "" Then
                     userName = DefaultVisitName
-                    Call app.db_setCS(CSMember, "name", userName)
+                    Call db.db_setCS(CSMember, "name", userName)
                 End If
                 '
                 ' Created By Visit
                 '
                 If True Then
-                    Call app.db_setCS(CSMember, "CreatedByVisit", True)
+                    Call db.db_setCS(CSMember, "CreatedByVisit", True)
                 End If
                 '
                 user_Active = True
-                Call app.db_setCS(CSMember, "active", user_Active)
+                Call db.db_setCS(CSMember, "active", user_Active)
                 '
                 user_visits = 1
-                Call app.db_setCS(CSMember, "Visits", user_visits)
+                Call db.db_setCS(CSMember, "Visits", user_visits)
                 '
                 user_lastVisit = main_PageStartTime
-                Call app.db_setCS(CSMember, "LastVisit", user_lastVisit)
+                Call db.db_setCS(CSMember, "LastVisit", user_lastVisit)
                 '
                 '
                 CSlanguage = db_csOpenRecord("Languages", web_GetBrowserLanguageID, , , "Name")
-                If app.db_csOk(CSlanguage) Then
-                    userLanguageId = app.db_GetCSInteger(CSlanguage, "ID")
-                    userLanguage = app.db_GetCSText(CSlanguage, "Name")
-                    Call app.db_setCS(CSMember, "LanguageID", userLanguageId)
+                If db.db_csOk(CSlanguage) Then
+                    userLanguageId = db.db_GetCSInteger(CSlanguage, "ID")
+                    userLanguage = db.db_GetCSText(CSlanguage, "Name")
+                    Call db.db_setCS(CSMember, "LanguageID", userLanguageId)
                 End If
-                Call app.db_csClose(CSlanguage)
+                Call db.db_csClose(CSlanguage)
                 '
                 userAdded = True
                 userIsNew = True
                 userStyleFilename = ""
                 userExcludeFromAnalytics = False
                 '
-                Call app.db_csClose(CSMember)
+                Call db.db_csClose(CSMember)
                 '
                 main_VisitMemberID = userId
                 main_VisitorMemberID = userId
@@ -17046,11 +17076,11 @@ ErrorTrap:
             '
             '
             CSlanguage = db_csOpenRecord("Languages", web_GetBrowserLanguageID, , , "Name")
-            If app.db_csOk(CSlanguage) Then
-                userLanguageId = app.db_GetCSInteger(CSlanguage, "ID")
-                userLanguage = app.db_GetCSText(CSlanguage, "Name")
+            If db.db_csOk(CSlanguage) Then
+                userLanguageId = db.db_GetCSInteger(CSlanguage, "ID")
+                userLanguage = db.db_GetCSText(CSlanguage, "Name")
             End If
-            Call app.db_csClose(CSlanguage)
+            Call db.db_csClose(CSlanguage)
             '
             userAdded = True
             userIsNew = True
@@ -17122,12 +17152,12 @@ ErrorTrap:
                         AcceptLanguage = Mid(AcceptLanguage, 1, DashPosition - 1)
                     End If
                     If Len(AcceptLanguage) > 0 Then
-                        CS = app.db_csOpen("languages", "HTTP_Accept_LANGUAGE=" & app.db_EncodeSQLText(AcceptLanguage), , , , , , "ID", 1)
-                        If app.db_csOk(CS) Then
-                            LanguageID = app.db_GetCSInteger(CS, "ID")
-                            LanguageName = app.db_GetCSText(CS, "Name")
+                        CS = db.db_csOpen("languages", "HTTP_Accept_LANGUAGE=" & db.db_EncodeSQLText(AcceptLanguage), , , , , , "ID", 1)
+                        If db.db_csOk(CS) Then
+                            LanguageID = db.db_GetCSInteger(CS, "ID")
+                            LanguageName = db.db_GetCSText(CS, "Name")
                         End If
-                        Call app.db_csClose(CS)
+                        Call db.db_csClose(CS)
                     End If
                 End If
                 CommaPosition = InStr(1, AcceptLanguageString, ",")
@@ -17137,12 +17167,12 @@ ErrorTrap:
                 '
                 ' ----- no matching browser language, use site default
                 '
-                CS = app.db_csOpen("languages", "name=" & app.db_EncodeSQLText(app.siteProperty_Language), , , , , , "ID", 1)
-                If app.db_csOk(CS) Then
-                    LanguageID = app.db_GetCSInteger(CS, "ID")
-                    LanguageName = app.db_GetCSText(CS, "Name")
+                CS = db.db_csOpen("languages", "name=" & db.db_EncodeSQLText(db.siteProperty_Language), , , , , , "ID", 1)
+                If db.db_csOk(CS) Then
+                    LanguageID = db.db_GetCSInteger(CS, "ID")
+                    LanguageName = db.db_GetCSText(CS, "Name")
                 End If
-                Call app.db_csClose(CS)
+                Call db.db_csClose(CS)
             End If
             Exit Sub
             '
@@ -17172,28 +17202,28 @@ ErrorTrap:
             If visit_initialized Then
                 If (userId > 0) Then
                     SQL = "UPDATE ccMembers SET " _
-                        & " Name=" & app.db_EncodeSQLText(userName) _
-                        & ",username=" & app.db_EncodeSQLText(userUsername) _
-                        & ",email=" & app.db_EncodeSQLText(userEmail) _
-                        & ",password=" & app.db_EncodeSQLText(userPassword) _
-                        & ",OrganizationID=" & app.db_EncodeSQLNumber(userOrganizationId) _
-                        & ",LanguageID=" & app.db_EncodeSQLNumber(userLanguageId) _
-                        & ",Active=" & app.db_EncodeSQLBoolean(user_Active) _
-                        & ",Company=" & app.db_EncodeSQLText(user_company) _
-                        & ",Visits=" & app.db_EncodeSQLNumber(user_visits) _
-                        & ",LastVisit=" & app.db_EncodeSQLDate(user_lastVisit) _
-                        & ",AllowBulkEmail=" & app.db_EncodeSQLBoolean(user_allowBulkEmail) _
-                        & ",AllowToolsPanel=" & app.db_EncodeSQLBoolean(userAllowToolsPanel) _
-                        & ",AdminMenuModeID=" & app.db_EncodeSQLNumber(user_adminMenuModeID) _
-                        & ",AutoLogin=" & app.db_EncodeSQLBoolean(user_autoLogin)
+                        & " Name=" & db.db_EncodeSQLText(userName) _
+                        & ",username=" & db.db_EncodeSQLText(userUsername) _
+                        & ",email=" & db.db_EncodeSQLText(userEmail) _
+                        & ",password=" & db.db_EncodeSQLText(userPassword) _
+                        & ",OrganizationID=" & db.db_EncodeSQLNumber(userOrganizationId) _
+                        & ",LanguageID=" & db.db_EncodeSQLNumber(userLanguageId) _
+                        & ",Active=" & db.db_EncodeSQLBoolean(user_Active) _
+                        & ",Company=" & db.db_EncodeSQLText(user_company) _
+                        & ",Visits=" & db.db_EncodeSQLNumber(user_visits) _
+                        & ",LastVisit=" & db.db_EncodeSQLDate(user_lastVisit) _
+                        & ",AllowBulkEmail=" & db.db_EncodeSQLBoolean(user_allowBulkEmail) _
+                        & ",AllowToolsPanel=" & db.db_EncodeSQLBoolean(userAllowToolsPanel) _
+                        & ",AdminMenuModeID=" & db.db_EncodeSQLNumber(user_adminMenuModeID) _
+                        & ",AutoLogin=" & db.db_EncodeSQLBoolean(user_autoLogin)
 
                     ' 6/18/2009 notes was removed from base
                     '            & ",SendNotes=" & encodeSQLBoolean(MemberSendNotes)
                     If True Then
-                        SQL &= ",ExcludeFromAnalytics=" & app.db_EncodeSQLBoolean(userExcludeFromAnalytics)
+                        SQL &= ",ExcludeFromAnalytics=" & db.db_EncodeSQLBoolean(userExcludeFromAnalytics)
                     End If
                     SQL &= " WHERE ID=" & userId & ";"
-                    Call app.executeSql(SQL)
+                    Call db.executeSql(SQL)
                 End If
             End If
             '
@@ -17295,14 +17325,14 @@ ErrorTrap:
                     '
                     Call main_LogActivity2("password request for email " & workingEmail, userId, userOrganizationId)
                     '
-                    allowEmailLogin = app.siteProperty_getBoolean("allowEmailLogin", False)
+                    allowEmailLogin = db.siteProperty_getBoolean("allowEmailLogin", False)
                     recordCnt = 0
-                    sqlCriteria = "(email=" & app.db_EncodeSQLText(workingEmail) & ")"
+                    sqlCriteria = "(email=" & db.db_EncodeSQLText(workingEmail) & ")"
                     If True Then
-                        sqlCriteria = sqlCriteria & "and((dateExpires is null)or(dateExpires>" & app.db_EncodeSQLDate(Now) & "))"
+                        sqlCriteria = sqlCriteria & "and((dateExpires is null)or(dateExpires>" & db.db_EncodeSQLDate(Now) & "))"
                     End If
-                    CS = app.db_csOpen("People", sqlCriteria, "ID", , , ,, "username,password", 1)
-                    If Not app.db_csOk(CS) Then
+                    CS = db.db_csOpen("People", sqlCriteria, "ID", , , ,, "username,password", 1)
+                    If Not db.db_csOk(CS) Then
                         '
                         ' valid login account for this email not found
                         '
@@ -17310,41 +17340,41 @@ ErrorTrap:
                             '
                             ' look for expired account to renew
                             '
-                            Call app.db_csClose(CS)
-                            CS = app.db_csOpen("People", "((email=" & app.db_EncodeSQLText(workingEmail) & "))", "ID", , , , , , 1)
-                            If app.db_csOk(CS) Then
+                            Call db.db_csClose(CS)
+                            CS = db.db_csOpen("People", "((email=" & db.db_EncodeSQLText(workingEmail) & "))", "ID", , , , , , 1)
+                            If db.db_csOk(CS) Then
                                 '
                                 ' renew this old record
                                 '
                                 'hint = "150"
-                                Call app.db_SetCSField(CS, "developer", "1")
-                                Call app.db_SetCSField(CS, "admin", "1")
-                                Call app.db_SetCSField(CS, "dateExpires", Now.AddDays(7).Date.ToString)
+                                Call db.db_SetCSField(CS, "developer", "1")
+                                Call db.db_SetCSField(CS, "admin", "1")
+                                Call db.db_SetCSField(CS, "dateExpires", Now.AddDays(7).Date.ToString)
                             Else
                                 '
                                 ' inject support record
                                 '
                                 'hint = "150"
-                                Call app.db_csClose(CS)
-                                CS = app.db_csInsertRecord("people")
-                                Call app.db_SetCSField(CS, "name", "Contensive Support")
-                                Call app.db_SetCSField(CS, "email", workingEmail)
-                                Call app.db_SetCSField(CS, "developer", "1")
-                                Call app.db_SetCSField(CS, "admin", "1")
-                                Call app.db_SetCSField(CS, "dateExpires", Now.AddDays(7).Date.ToString)
+                                Call db.db_csClose(CS)
+                                CS = db.db_csInsertRecord("people")
+                                Call db.db_SetCSField(CS, "name", "Contensive Support")
+                                Call db.db_SetCSField(CS, "email", workingEmail)
+                                Call db.db_SetCSField(CS, "developer", "1")
+                                Call db.db_SetCSField(CS, "admin", "1")
+                                Call db.db_SetCSField(CS, "dateExpires", Now.AddDays(7).Date.ToString)
                             End If
-                            Call app.csv_SaveCSRecord(CS)
+                            Call db.db_SaveCSRecord(CS)
                         Else
                             'hint = "155"
                             error_AddUserError("No current user was found matching this email address. Please try again. ")
                         End If
                     End If
-                    If app.db_csOk(CS) Then
+                    If db.db_csOk(CS) Then
                         'hint = "160"
-                        FromAddress = app.siteProperty_getText("EmailFromAddress", "info@" & main_ServerDomain)
+                        FromAddress = db.siteProperty_getText("EmailFromAddress", "info@" & main_ServerDomain)
                         subject = "Password Request at " & main_ServerDomain
                         Message = ""
-                        Do While app.db_csOk(CS)
+                        Do While db.db_csOk(CS)
                             'hint = "170"
                             updateUser = False
                             If Message = "" Then
@@ -17361,7 +17391,7 @@ ErrorTrap:
                             ' username
                             '
                             'hint = "200"
-                            Username = app.db_GetCSText(CS, "Username")
+                            Username = db.db_GetCSText(CS, "Username")
                             usernameOK = True
                             If Not allowEmailLogin Then
                                 'hint = "210"
@@ -17395,7 +17425,7 @@ ErrorTrap:
                                 ' password
                                 '
                                 'hint = "280"
-                                Password = app.db_GetCSText(CS, "Password")
+                                Password = db.db_GetCSText(CS, "Password")
                                 If Trim(Password) <> Password Then
                                     'hint = "290"
                                     Password = Trim(Password)
@@ -17417,12 +17447,12 @@ ErrorTrap:
                                 security_SendMemberPassword = True
                                 If updateUser Then
                                     'hint = "350"
-                                    Call app.db_setCS(CS, "username", Username)
-                                    Call app.db_setCS(CS, "password", Password)
+                                    Call db.db_setCS(CS, "username", Username)
+                                    Call db.db_setCS(CS, "password", Password)
                                 End If
                                 recordCnt = recordCnt + 1
                             End If
-                            app.db_csGoNext(CS)
+                            db.db_csGoNext(CS)
                         Loop
                     End If
                 End If
@@ -17516,7 +17546,7 @@ ErrorTrap:
                             & "<a" _
                             & " class=""ccRecordEditLink"" " _
                             & " TabIndex=-1" _
-                            & " href=""" & html_EncodeHTML(app.siteProperty_AdminURL & "?cid=" & ContentID & "&id=" & iRecordID & "&af=4&aa=2&ad=1") & """"
+                            & " href=""" & html_EncodeHTML(db.siteProperty_AdminURL & "?cid=" & ContentID & "&id=" & iRecordID & "&af=4&aa=2&ad=1") & """"
                         If Not main_ReturnAfterEdit Then
                             main_GetRecordEditLink2 = main_GetRecordEditLink2 & " target=""_blank"""
                         End If
@@ -17599,7 +17629,7 @@ ErrorTrap:
                 '
                 ' Print an add tag to the iCSPointers Content
                 '
-                ContentName = app.csv_GetCSContentName(iCSPointer)
+                ContentName = db.db_GetCSContentName(iCSPointer)
                 If ContentName = "" Then
                     Call handleLegacyError14(MethodName, "main_GetCSRecordAddLink was called with a ContentSet that was created with an SQL statement. The function requires a ContentSet opened with an OpenCSContent.")
                 Else
@@ -17697,12 +17727,12 @@ ErrorTrap:
                     Call handleLegacyError14(MethodName, "Method called with blank ContentName")
                 Else
                     iContentID = main_GetContentID(iContentName)
-                    csChildContent = app.db_csOpen("Content", "ParentID=" & iContentID, , , , , , "id")
-                    useFlyout = app.db_csOk(csChildContent)
-                    Call app.db_csClose(csChildContent)
+                    csChildContent = db.db_csOpen("Content", "ParentID=" & iContentID, , , , , , "id")
+                    useFlyout = db.db_csOk(csChildContent)
+                    Call db.db_csClose(csChildContent)
                     '
                     If Not useFlyout Then
-                        Link = app.siteProperty_AdminURL & "?cid=" & iContentID & "&af=4&aa=2&ad=1"
+                        Link = db.siteProperty_AdminURL & "?cid=" & iContentID & "&af=4&aa=2&ad=1"
                         If PresetNameValueList <> "" Then
                             Link = Link & "&wc=" & main_EncodeRequestVariable(PresetNameValueList)
                         End If
@@ -17832,7 +17862,7 @@ ErrorTrap:
             '
             main_IsChildRecord = (ChildRecordID = ParentRecordID)
             If Not main_IsChildRecord Then
-                CDef = app.metaData.getCdef(ContentName)
+                CDef = metaData.getCdef(ContentName)
                 If IsInDelimitedString(UCase(CDef.SelectCommaList), "PARENTID", ",") Then
                     main_IsChildRecord = main_IsChildRecord_Recurse(CDef.ContentDataSourceName, CDef.ContentTableName, ChildRecordID, ParentRecordID, "")
                 End If
@@ -17859,11 +17889,11 @@ ErrorTrap:
             Dim ChildRecordParentID As Integer
             '
             SQL = "select ParentID from " & TableName & " where id=" & ChildRecordID
-            CS = app.db_csOpenSql(SQL)
-            If app.db_csOk(CS) Then
-                ChildRecordParentID = app.db_GetCSInteger(CS, "ParentID")
+            CS = db.db_csOpenSql(SQL)
+            If db.db_csOk(CS) Then
+                ChildRecordParentID = db.db_GetCSInteger(CS, "ParentID")
             End If
-            Call app.db_csClose(CS)
+            Call db.db_csClose(CS)
             If (ChildRecordParentID <> 0) And (Not IsInDelimitedString(History, CStr(ChildRecordID), ",")) Then
                 main_IsChildRecord_Recurse = (ParentRecordID = ChildRecordParentID)
                 If Not main_IsChildRecord_Recurse Then
@@ -17937,22 +17967,22 @@ ErrorTrap:
                         SQL = "SELECT ID as ContentID, AllowAdd as ContentAllowAdd, 1 as GroupRulesAllowAdd, null as MemberRulesDateExpires" _
                             & " FROM ccContent" _
                             & " WHERE (" _
-                            & " (ccContent.Name=" & app.db_EncodeSQLText(ContentName) & ")" _
+                            & " (ccContent.Name=" & db.db_EncodeSQLText(ContentName) & ")" _
                             & " AND(ccContent.active<>0)" _
                             & " );"
-                        CS = app.db_csOpenSql(SQL)
-                        If app.db_csOk(CS) Then
+                        CS = db.db_csOpenSql(SQL)
+                        If db.db_csOk(CS) Then
                             '
                             ' Entry was found
                             '
                             ContentRecordFound = True
-                            ContentID = app.db_GetCSInteger(CS, "ContentID")
-                            ContentAllowAdd = app.db_GetCSBoolean(CS, "ContentAllowAdd")
+                            ContentID = db.db_GetCSInteger(CS, "ContentID")
+                            ContentAllowAdd = db.db_GetCSBoolean(CS, "ContentAllowAdd")
                             GroupRulesAllowAdd = True
                             MemberRulesDateExpires = Date.MinValue
                             MemberRulesAllow = True
                         End If
-                        Call app.db_csClose(CS)
+                        Call db.db_csClose(CS)
                     Else
                         '
                         ' non-admin member, first check if they have access and main_Get true markers
@@ -17964,25 +17994,25 @@ ErrorTrap:
                                 & " LEFT JOIN ccMemberRules ON ccgroups.ID=ccMemberRules.GroupID)" _
                                 & " LEFT JOIN ccMembers ON ccMemberRules.MemberID=ccMembers.ID" _
                             & " WHERE (" _
-                            & " (ccContent.Name=" & app.db_EncodeSQLText(ContentName) & ")" _
+                            & " (ccContent.Name=" & db.db_EncodeSQLText(ContentName) & ")" _
                             & " AND(ccContent.active<>0)" _
                             & " AND(ccGroupRules.active<>0)" _
                             & " AND(ccMemberRules.active<>0)" _
-                            & " AND((ccMemberRules.DateExpires is Null)or(ccMemberRules.DateExpires>" & app.db_EncodeSQLDate(main_PageStartTime) & "))" _
+                            & " AND((ccMemberRules.DateExpires is Null)or(ccMemberRules.DateExpires>" & db.db_EncodeSQLDate(main_PageStartTime) & "))" _
                             & " AND(ccgroups.active<>0)" _
                             & " AND(ccMembers.active<>0)" _
                             & " AND(ccMembers.ID=" & userId & ")" _
                             & " );"
-                        CS = app.db_csOpenSql(SQL)
-                        If app.db_csOk(CS) Then
+                        CS = db.db_csOpenSql(SQL)
+                        If db.db_csOk(CS) Then
                             '
                             ' ----- Entry was found, member has some kind of access
                             '
                             ContentRecordFound = True
-                            ContentID = app.db_GetCSInteger(CS, "ContentID")
-                            ContentAllowAdd = app.db_GetCSBoolean(CS, "ContentAllowAdd")
-                            GroupRulesAllowAdd = app.db_GetCSBoolean(CS, "GroupRulesAllowAdd")
-                            MemberRulesDateExpires = app.db_GetCSDate(CS, "MemberRulesDateExpires")
+                            ContentID = db.db_GetCSInteger(CS, "ContentID")
+                            ContentAllowAdd = db.db_GetCSBoolean(CS, "ContentAllowAdd")
+                            GroupRulesAllowAdd = db.db_GetCSBoolean(CS, "GroupRulesAllowAdd")
+                            MemberRulesDateExpires = db.db_GetCSDate(CS, "MemberRulesDateExpires")
                             MemberRulesAllow = False
                             If MemberRulesDateExpires = Date.MinValue Then
                                 MemberRulesAllow = True
@@ -17999,7 +18029,7 @@ ErrorTrap:
                             GroupRulesAllowAdd = False
                             MemberRulesAllow = False
                         End If
-                        Call app.db_csClose(CS)
+                        Call db.db_csClose(CS)
                     End If
                     If ContentRecordFound Then
                         '
@@ -18009,7 +18039,7 @@ ErrorTrap:
                         ButtonCaption = ContentName
                         main_GetRecordAddLink_AddMenuEntry = MenuName
                         If ContentAllowAdd And GroupRulesAllowAdd And MemberRulesAllow Then
-                            Link = app.siteProperty_AdminURL & "?cid=" & ContentID & "&af=4&aa=2&ad=1"
+                            Link = db.siteProperty_AdminURL & "?cid=" & ContentID & "&af=4&aa=2&ad=1"
                             If PresetNameValueList <> "" Then
                                 Dim NameValueList As String
                                 NameValueList = PresetNameValueList
@@ -18020,8 +18050,8 @@ ErrorTrap:
                         '
                         ' Create child submenu if Child Entries found
                         '
-                        csChildContent = app.db_csOpen("Content", "ParentID=" & ContentID, , , , , , "name")
-                        If Not app.db_csOk(csChildContent) Then
+                        csChildContent = db.db_csOpen("Content", "ParentID=" & ContentID, , , , , , "name")
+                        If Not db.db_csOk(csChildContent) Then
                             '
                             ' No child menu
                             '
@@ -18034,8 +18064,8 @@ ErrorTrap:
                             '
                             ' ----- Create the ChildPanel with all Children found
                             '
-                            Do While app.db_csOk(csChildContent)
-                                ChildContentName = app.db_GetCSText(csChildContent, "name")
+                            Do While db.db_csOk(csChildContent)
+                                ChildContentName = db.db_GetCSText(csChildContent, "name")
                                 Copy = main_GetRecordAddLink_AddMenuEntry(ChildContentName, PresetNameValueList, MyContentNameList, MenuName, ParentMenuName)
                                 'Copy = main_GetRecordAddLink_AddMenuEntry(ChildContentName, PresetNameValueList, MyContentNameList, MenuName, ChildMenuName)
                                 If Copy <> "" Then
@@ -18044,12 +18074,12 @@ ErrorTrap:
                                 If (main_GetRecordAddLink_AddMenuEntry = "") And (Copy <> "") Then
                                     main_GetRecordAddLink_AddMenuEntry = Copy
                                 End If
-                                app.db_csGoNext(csChildContent)
+                                db.db_csGoNext(csChildContent)
                             Loop
                         End If
                     End If
                 End If
-                Call app.db_csClose(csChildContent)
+                Call db.db_csClose(csChildContent)
                 'main_GetRecordAddLink_AddMenuEntry = Link
             End If
             '
@@ -18102,11 +18132,11 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            If app.db_csOk(EncodeInteger(CSPointer)) Then
+            If db.db_csOk(EncodeInteger(CSPointer)) Then
                 '
                 ' Just do a text box with the value
                 '
-                main_GetFormCSInput = main_GetFormInputText2(FieldName, EncodeText(app.db_GetCSField(CSPointer, FieldName)))
+                main_GetFormCSInput = main_GetFormInputText2(FieldName, EncodeText(db.db_GetCSField(CSPointer, FieldName)))
             Else
                 '
                 ' Just do a text box with a blank
@@ -18135,7 +18165,7 @@ ErrorTrap:
                     _RefreshQueryString = ModifyQueryString(_RefreshQueryString, Name, Value, True)
                 End If
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
             '
         End Sub
@@ -18257,7 +18287,7 @@ ErrorTrap:
                 End If
 
             Catch ex As Exception
-                Call handleException(ex)
+                Call handleExceptionAndRethrow(ex)
             End Try
             Return returnHtml
         End Function
@@ -18340,27 +18370,27 @@ ErrorTrap:
                                 ' ----- Create Path Block record, if requested
                                 '
                                 CreatePathBlock = main_GetStreamBoolean2("CreatePathBlock")
-                                CS = app.db_csOpen("Paths", "name=" & app.db_EncodeSQLText("/" & web_requestAppPath))
+                                CS = db.db_csOpen("Paths", "name=" & db.db_EncodeSQLText("/" & web_requestAppPath))
                                 PathID = 0
-                                If app.db_csOk(CS) Then
-                                    PathID = app.db_GetCSInteger(CS, "id")
+                                If db.db_csOk(CS) Then
+                                    PathID = db.db_GetCSInteger(CS, "id")
                                 End If
-                                Call app.db_csClose(CS)
+                                Call db.db_csClose(CS)
                                 If (PathID = 0) And (CreatePathBlock) Then
                                     '
                                     ' path is not blocked, but we want it blocked
                                     '
-                                    CS = app.db_csInsertRecord("Paths")
-                                    If app.db_csOk(CS) Then
-                                        Call app.db_setCS(CS, "name", "/" & web_requestAppPath)
-                                        Call app.db_setCS(CS, "active", 1)
+                                    CS = db.db_csInsertRecord("Paths")
+                                    If db.db_csOk(CS) Then
+                                        Call db.db_setCS(CS, "name", "/" & web_requestAppPath)
+                                        Call db.db_setCS(CS, "active", 1)
                                     End If
-                                    Call app.db_csClose(CS)
+                                    Call db.db_csClose(CS)
                                 ElseIf (PathID <> 0) And (Not CreatePathBlock) Then
                                     '
                                     ' path is blocked, but we do not want it blocked
                                     '
-                                    Call main_DeleteContentRecord("Paths", PathID)
+                                    Call db_DeleteContentRecord("Paths", PathID)
                                 End If
                             End If
                     End Select
@@ -18514,11 +18544,11 @@ ErrorTrap:
                 ' ----- Page Content Child List Add-on
                 '
                 If (RecordID <> 0) And (True) Then
-                    CSAddon = db_csOpen("Add-ons", app.siteProperty_ChildListAddonID)
+                    CSAddon = db_csOpen("Add-ons", db.siteProperty_ChildListAddonID)
                     FoundAddon = False
-                    If app.db_csOk(CSAddon) Then
+                    If db.db_csOk(CSAddon) Then
                         FoundAddon = True
-                        AddonOptionConstructor = main_GetCSText(CSAddon, "ArgumentList")
+                        AddonOptionConstructor = db.db_GetCSText(CSAddon, "ArgumentList")
                         AddonOptionConstructor = Replace(AddonOptionConstructor, vbCrLf, vbCr)
                         AddonOptionConstructor = Replace(AddonOptionConstructor, vbLf, vbCr)
                         AddonOptionConstructor = Replace(AddonOptionConstructor, vbCr, vbCrLf)
@@ -18526,7 +18556,7 @@ ErrorTrap:
                             If AddonOptionConstructor <> "" Then
                                 AddonOptionConstructor = AddonOptionConstructor & vbCrLf
                             End If
-                            If main_GetCSBoolean(CSAddon, "IsInline") Then
+                            If db.db_GetCSBoolean(CSAddon, "IsInline") Then
                                 AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Inline
                             Else
                                 AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Block
@@ -18563,9 +18593,9 @@ ErrorTrap:
                             addonOption_String = Mid(addonOption_String, 2)
                         End If
                     End If
-                    Call app.db_csClose(CSAddon)
+                    Call db.db_csClose(CSAddon)
                     ' ????? need to test
-                    Call app.executeSql("update ccpagecontent set ChildListInstanceOptions=" & app.db_EncodeSQLText(addonOption_String) & " where id=" & RecordID)
+                    Call db.executeSql("update ccpagecontent set ChildListInstanceOptions=" & db.db_EncodeSQLText(addonOption_String) & " where id=" & RecordID)
                     needToClearCache = True
                     'CS = main_OpenCSContentRecord("page content", RecordID)
                     'If app.csv_IsCSOK(CS) Then
@@ -18601,14 +18631,14 @@ ErrorTrap:
                 '        FoundAddon = False
                 '        If app.csv_IsCSOK(CSAddon) Then
                 '            FoundAddon = True
-                '            AddonOptionConstructor = main_GetCSText(CSAddon, "ArgumentList")
+                '            AddonOptionConstructor = db.db_GetCSText(CSAddon, "ArgumentList")
                 '            AddonOptionConstructor = Replace(AddonOptionConstructor, vbCrLf, vbCr)
                 '            AddonOptionConstructor = Replace(AddonOptionConstructor, vbLf, vbCr)
                 '            AddonOptionConstructor = Replace(AddonOptionConstructor, vbCr, vbCrLf)
                 '            If AddonOptionConstructor <> "" Then
                 '                AddonOptionConstructor = AddonOptionConstructor & vbCrLf
                 '            End If
-                '            If main_GetCSBoolean(CSAddon, "IsInline") Then
+                '            If db.db_GetCSBoolean(CSAddon, "IsInline") Then
                 '                AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Inline
                 '            Else
                 '                AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Block
@@ -18667,31 +18697,31 @@ ErrorTrap:
                 '
                 ' ----- Public Site call, must have contentname and recordid
                 '
-                handleException(New Exception("invalid content [" & ContentName & "], RecordID [" & RecordID & "]"))
+                handleExceptionAndRethrow(New Exception("invalid content [" & ContentName & "], RecordID [" & RecordID & "]"))
             Else
                 '
                 ' ----- Normal Content Edit - find instance in the content
                 '
                 CS = db_csOpen(ContentName, RecordID)
-                If Not app.db_csOk(CS) Then
-                    handleException(New Exception("No record found with content [" & ContentName & "] and RecordID [" & RecordID & "]"))
+                If Not db.db_csOk(CS) Then
+                    handleExceptionAndRethrow(New Exception("No record found with content [" & ContentName & "] and RecordID [" & RecordID & "]"))
                 Else
                     If FieldName <> "" Then
                         '
                         ' Field is given, find the position
                         '
-                        Copy = app.db_GetCS(CS, FieldName)
+                        Copy = db.db_GetCS(CS, FieldName)
                         PosACInstanceID = InStr(1, Copy, "=""" & ACInstanceID & """ ", vbTextCompare)
                     Else
                         '
                         ' Find the field, then find the position
                         '
-                        FieldName = app.db_GetCSFirstFieldName(CS)
+                        FieldName = db.db_GetCSFirstFieldName(CS)
                         Do While FieldName <> ""
-                            fieldType = app.db_GetCSFieldTypeId(CS, FieldName)
+                            fieldType = db.db_GetCSFieldTypeId(CS, FieldName)
                             Select Case fieldType
                                 Case FieldTypeIdLongText, FieldTypeIdText, FieldTypeIdFileTextPrivate, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate
-                                    Copy = app.db_GetCS(CS, FieldName)
+                                    Copy = db.db_GetCS(CS, FieldName)
                                     PosACInstanceID = InStr(1, Copy, "ACInstanceID=""" & ACInstanceID & """", vbTextCompare)
                                     If PosACInstanceID <> 0 Then
                                         '
@@ -18701,14 +18731,14 @@ ErrorTrap:
                                         Exit Do
                                     End If
                             End Select
-                            FieldName = app.csv_GetCSNextFieldName(CS)
+                            FieldName = db.db_GetCSNextFieldName(CS)
                         Loop
                     End If
                     '
                     ' Parse out the Addon Name
                     '
                     If PosACInstanceID = 0 Then
-                        handleException(New Exception("AC Instance [" & ACInstanceID & "] not found in record with content [" & ContentName & "] and RecordID [" & RecordID & "]"))
+                        handleExceptionAndRethrow(New Exception("AC Instance [" & ACInstanceID & "] not found in record with content [" & ContentName & "] and RecordID [" & RecordID & "]"))
                     Else
                         Copy = html_EncodeContentUpgrades(Copy)
                         ParseOK = False
@@ -18800,18 +18830,18 @@ ErrorTrap:
                                     If PosIDEnd <> 0 Then
                                         ParseOK = True
                                         Copy = Mid(Copy, 1, PosIDStart - 1) & html_EncodeHTML(addonOption_String) & Mid(Copy, PosIDEnd)
-                                        Call app.db_setCS(CS, FieldName, Copy)
+                                        Call db.db_setCS(CS, FieldName, Copy)
                                         needToClearCache = True
                                     End If
                                 End If
                             End If
                         End If
                         If Not ParseOK Then
-                            handleException(New Exception("There was a problem parsing AC Instance [" & ACInstanceID & "] record with content [" & ContentName & "] and RecordID [" & RecordID & "]"))
+                            handleExceptionAndRethrow(New Exception("There was a problem parsing AC Instance [" & ACInstanceID & "] record with content [" & ContentName & "] and RecordID [" & RecordID & "]"))
                         End If
                     End If
                 End If
-                Call app.db_csClose(CS)
+                Call db.db_csClose(CS)
             End If
             If needToClearCache Then
                 '
@@ -18820,12 +18850,12 @@ ErrorTrap:
                 Call pageManager_cache_pageContent_clear()
                 Call pageManager_cache_pageTemplate_clear()
                 Call pageManager_cache_siteSection_clear()
-                Call app.cache.invalidateTagList2("")
+                Call cache.invalidateTagList2("")
                 If ContentName <> "" Then
-                    Call app.cache.invalidateTagList2(ContentName)
+                    Call cache.invalidateTagList2(ContentName)
                     TableName = db_GetContentTablename(ContentName)
                     If LCase(TableName) = "cctemplates" Then
-                        Call app.cache.SetKey(pageManager_cache_pageTemplate_cacheName, EmptyVariant)
+                        Call cache.SetKey(pageManager_cache_pageTemplate_cacheName, EmptyVariant)
                         Call pageManager_cache_pageTemplate_load()
                     End If
                     If LCase(TableName) = "ccpagecontent" Then
@@ -18876,10 +18906,10 @@ ErrorTrap:
                         If RecordID > 0 Then
                             HelpCaption = doc_getText("helpcaption")
                             HelpMessage = doc_getText("helptext")
-                            SQL = "update ccfields set caption=" & app.db_EncodeSQLText(HelpCaption) & ",HelpMessage=" & app.db_EncodeSQLText(HelpMessage) & " where id=" & RecordID
-                            Call app.executeSql(SQL)
-                            app.cache.invalidateAll()
-                            app.metaData.clear()
+                            SQL = "update ccfields set caption=" & db.db_EncodeSQLText(HelpCaption) & ",HelpMessage=" & db.db_EncodeSQLText(HelpMessage) & " where id=" & RecordID
+                            Call db.executeSql(SQL)
+                            cache.invalidateAll()
+                            metaData.clear()
                         End If
                     End If
             End Select
@@ -18918,18 +18948,18 @@ ErrorTrap:
             loginForm_Username = doc_getText("username")
             loginForm_Password = doc_getText("password")
             '
-            If Not EncodeBoolean(app.siteProperty_getBoolean("AllowMemberJoin", False)) Then
+            If Not EncodeBoolean(db.siteProperty_getBoolean("AllowMemberJoin", False)) Then
                 error_AddUserError("This site does not accept public main_MemberShip.")
             Else
                 If Not main_IsNewLoginOK(loginForm_Username, loginForm_Password, ErrorMessage) Then
                     Call error_AddUserError(ErrorMessage)
                 Else
                     If Not error_IsUserError() Then
-                        CS = app.db_csOpen("people", "ID=" & app.db_EncodeSQLNumber(userId))
-                        If Not app.db_csOk(CS) Then
-                            handleException(New Exception("Could not open the current members account to set the username and password."))
+                        CS = db.db_csOpen("people", "ID=" & db.db_EncodeSQLNumber(userId))
+                        If Not db.db_csOk(CS) Then
+                            handleExceptionAndRethrow(New Exception("Could not open the current members account to set the username and password."))
                         Else
-                            If (main_GetCSText(CS, "username") <> "") Or (main_GetCSText(CS, "password") <> "") Or (main_GetCSBoolean(CS, "admin")) Or (main_GetCSBoolean(CS, "developer")) Then
+                            If (db.db_GetCSText(CS, "username") <> "") Or (db.db_GetCSText(CS, "password") <> "") Or (db.db_GetCSBoolean(CS, "admin")) Or (db.db_GetCSBoolean(CS, "developer")) Then
                                 '
                                 ' if the current account can be logged into, you can not join 'into' it
                                 '
@@ -18939,18 +18969,18 @@ ErrorTrap:
                             LastName = doc_getText("firstname")
                             FullName = FirstName & " " & LastName
                             Email = doc_getText("email")
-                            Call app.db_setCS(CS, "FirstName", FirstName)
-                            Call app.db_setCS(CS, "LastName", LastName)
-                            Call app.db_setCS(CS, "Name", FullName)
-                            Call app.db_setCS(CS, "username", loginForm_Username)
-                            Call app.db_setCS(CS, "password", loginForm_Password)
+                            Call db.db_setCS(CS, "FirstName", FirstName)
+                            Call db.db_setCS(CS, "LastName", LastName)
+                            Call db.db_setCS(CS, "Name", FullName)
+                            Call db.db_setCS(CS, "username", loginForm_Username)
+                            Call db.db_setCS(CS, "password", loginForm_Password)
                             Call user_LoginMemberByID(userId)
                         End If
-                        Call app.db_csClose(CS)
+                        Call db.db_csClose(CS)
                     End If
                 End If
             End If
-            Call app.cache.invalidateTagList2("People")
+            Call cache.invalidateTagList2("People")
             '
             Exit Sub
 ErrorTrap:
@@ -19089,7 +19119,7 @@ ErrorTrap:
                 iMenuName = EncodeText(MenuName)
                 '
                 '
-                MenuFlyoutIcon = app.siteProperty_getText("MenuFlyoutIcon", DefaultIcon)
+                MenuFlyoutIcon = db.siteProperty_getText("MenuFlyoutIcon", DefaultIcon)
                 If MenuFlyoutIcon <> DefaultIcon Then
                     main_MenuSystem.MenuFlyoutIcon = MenuFlyoutIcon
                 End If
@@ -19140,7 +19170,7 @@ ErrorTrap:
             If Not (main_MenuSystem Is Nothing) Then
                 menu_MenuSystemCloseCount = menu_MenuSystemCloseCount + 1
                 menu_GetClose = menu_GetClose & main_MenuSystem.GetMenuClose()
-                MenuFlyoutIcon = app.siteProperty_getText("MenuFlyoutIcon", "&#187;")
+                MenuFlyoutIcon = db.siteProperty_getText("MenuFlyoutIcon", "&#187;")
                 If MenuFlyoutIcon <> "&#187;" Then
                     menu_GetClose = Replace(menu_GetClose, "&#187;</a>", MenuFlyoutIcon & "</a>")
                 End If
@@ -19178,7 +19208,7 @@ ErrorTrap:
                     returnProperty = userPropertyCache.getProperty(PropertyName, DefaultValue, TargetMemberID)
                 End If
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
             Return returnProperty
         End Function
@@ -19199,7 +19229,7 @@ ErrorTrap:
                     Call userPropertyCache.setProperty(PropertyName, Value, TargetMemberID)
                 End If
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '
@@ -19220,7 +19250,7 @@ ErrorTrap:
                     returnProperty = visitPropertyCache.getProperty(PropertyName, DefaultValue, TargetVisitId)
                 End If
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
             Return returnProperty
         End Function
@@ -19237,7 +19267,7 @@ ErrorTrap:
                     Call visitPropertyCache.setProperty(PropertyName, Value, TargetVisitId)
                 End If
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '
@@ -19254,7 +19284,7 @@ ErrorTrap:
                     returnProperty = visitorPropertyCache.getProperty(PropertyName, DefaultValue, TargetVisitorid)
                 End If
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
             Return returnProperty
         End Function
@@ -19271,7 +19301,7 @@ ErrorTrap:
                     Call visitorPropertyCache.setProperty(PropertyName, Value, TargetVisitorid)
                 End If
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '
@@ -19354,7 +19384,7 @@ ErrorTrap:
             '
             MethodName = "main_CopyCSRecord"
             '
-            Call app.db_CopyCSRecord(EncodeInteger(CSSource), EncodeInteger(CSDestination))
+            Call db.db_CopyCSRecord(EncodeInteger(CSSource), EncodeInteger(CSDestination))
             Exit Sub
             '
             ' ----- Error Trap
@@ -19378,7 +19408,7 @@ ErrorTrap:
             '
             MethodName = "main_GetContentProperty"
             '
-            Contentdefinition = app.metaData.getCdef(EncodeText(ContentName))
+            Contentdefinition = metaData.getCdef(EncodeText(ContentName))
             Select Case UCase(EncodeText(PropertyName))
                 Case "CONTENTCONTROLCRITERIA"
                     db_GetContentProperty = Contentdefinition.ContentControlCriteria
@@ -19464,7 +19494,7 @@ ErrorTrap:
             db_GetContentFieldProperty = ""
             If True Then
                 UcaseFieldName = UCase(EncodeText(FieldName))
-                Contentdefinition = app.metaData.getCdef(EncodeText(ContentName))
+                Contentdefinition = metaData.getCdef(EncodeText(ContentName))
                 If (UcaseFieldName = "") Or (Contentdefinition.fields.Count < 1) Then
                     Call handleLegacyError14(MethodName, "Content Name [" & EncodeText(ContentName) & "] or FieldName [" & EncodeText(FieldName) & "] was not valid")
                 Else
@@ -19546,7 +19576,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
             Return returnTrue
         End Function
@@ -19705,7 +19735,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            db_csOpenRecord = app.db_csOpen(ContentName, "(ID=" & app.db_EncodeSQLNumber(RecordID) & ")", , False, userId, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
+            db_csOpenRecord = db.db_csOpen(ContentName, "(ID=" & db.db_EncodeSQLNumber(RecordID) & ")", , False, userId, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
             '
             Exit Function
             '
@@ -19730,7 +19760,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            db_csOpen = app.db_csOpen(EncodeText(ContentName), "(ID=" & app.db_EncodeSQLNumber(RecordID) & ")", , False, userId, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
+            db_csOpen = db.db_csOpen(EncodeText(ContentName), "(ID=" & db.db_EncodeSQLNumber(RecordID) & ")", , False, userId, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
             '
             Exit Function
             '
@@ -19752,7 +19782,7 @@ ErrorTrap:
                     pagemanager_IsWorkflowRendering = main_VisitProperty_AllowWorkflowRendering
                 End If
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
             Return returnIs
         End Function
@@ -19857,7 +19887,7 @@ ErrorTrap:
             '
             MethodName = "IsWithinContent"
             '
-            db_IsWithinContent = app.metaData.isWithinContent(EncodeInteger(ChildContentID), EncodeInteger(ParentContentID))
+            db_IsWithinContent = metaData.isWithinContent(EncodeInteger(ChildContentID), EncodeInteger(ParentContentID))
             Exit Function
             '
             ' ----- Error Trap
@@ -19925,7 +19955,7 @@ ErrorTrap:
         Public Function user_isEditing(ByVal ContentNameOrId As String) As Boolean
             Dim returnResult As Boolean = False
             Try
-                If Not (_app Is Nothing) Then
+                If Not (_db Is Nothing) Then
                     Dim localContentNameOrId As String
                     Dim cacheTestName As String
                     '
@@ -19969,7 +19999,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
             Return returnResult
         End Function
@@ -20055,7 +20085,7 @@ ErrorTrap:
                 End If
                 returnIs = property_user_isAdmin
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
             Return returnIs
         End Function
@@ -20073,7 +20103,7 @@ ErrorTrap:
                 End If
                 returnIs = property_user_isDeveloper
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
             Return returnIs
         End Function
@@ -20118,7 +20148,7 @@ ErrorTrap:
             Dim SQL As String
             Dim CDef As coreMetaDataClass.CDefClass
             '
-            CDef = app.metaData.getCdef(ContentName)
+            CDef = metaData.getCdef(ContentName)
             Call main_IncrementTableField(CDef.ContentTableName, RecordID, FieldName, CDef.ContentDataSourceName)
             '
             Exit Sub
@@ -20143,7 +20173,7 @@ ErrorTrap:
             '
             MethodName = "main_EncodeSQLText( " & iSourceText & " )"
             '
-            db_EncodeSQLText = app.db_EncodeSQLText(iSourceText)
+            db_EncodeSQLText = db.db_EncodeSQLText(iSourceText)
             '
             Exit Function
             '
@@ -20176,7 +20206,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            db_cs_GetField = app.db_GetCSField(CSPointer, FieldName)
+            db_cs_GetField = db.db_GetCSField(CSPointer, FieldName)
             '
             Exit Function
             '
@@ -20200,7 +20230,7 @@ ErrorTrap:
             '
             MethodName = "main_GetAuthoringStatus"
             '
-            Call app.csv_GetAuthoringStatus(ContentName, RecordID, IsSubmitted, IsApproved, SubmittedName, ApprovedName, IsInserted, IsDeleted, IsModified, ModifiedName, ModifiedDate, SubmittedDate, ApprovedDate)
+            Call db.workflow_GetAuthoringStatus(ContentName, RecordID, IsSubmitted, IsApproved, SubmittedName, ApprovedName, IsInserted, IsDeleted, IsModified, ModifiedName, ModifiedDate, SubmittedDate, ApprovedDate)
             '
             Exit Sub
             '
@@ -20250,12 +20280,12 @@ ErrorTrap:
             ' main_Get Authoring Workflow Status
             '
             If RecordID <> 0 Then
-                Call app.csv_GetAuthoringStatus(ContentName, RecordID, IsSubmitted, IsApproved, SubmittedName, ApprovedName, IsInserted, IsDeleted, IsModified, ModifiedName, ModifiedDate, SubmittedDate, ApprovedDate)
+                Call db.workflow_GetAuthoringStatus(ContentName, RecordID, IsSubmitted, IsApproved, SubmittedName, ApprovedName, IsInserted, IsDeleted, IsModified, ModifiedName, ModifiedDate, SubmittedDate, ApprovedDate)
             End If
             '
             ' main_Get Content Definition
             '
-            CDef = app.metaData.getCdef(ContentName)
+            CDef = metaData.getCdef(ContentName)
             '
             ' Set Buttons based on Status
             '
@@ -20265,7 +20295,7 @@ ErrorTrap:
                 '
                 AllowCancel = True
                 readOnlyField = True
-            ElseIf (Not app.siteProperty_AllowWorkflowAuthoring) Or (Not CDef.AllowWorkflowAuthoring) Then
+            ElseIf (Not db.siteProperty_AllowWorkflowAuthoring) Or (Not CDef.AllowWorkflowAuthoring) Then
                 '
                 ' No Workflow Authoring
                 '
@@ -20434,9 +20464,9 @@ ErrorTrap:
             '
             MethodName = "main_SendPublishSubmitNotice"
             '
-            FromAddress = app.siteProperty_getText("EmailPublishSubmitFrom", app.siteProperty_EmailAdmin)
-            CDef = app.metaData.getCdef(ContentName)
-            Link = app.siteProperty_AdminURL & "?af=" & AdminFormPublishing
+            FromAddress = db.siteProperty_getText("EmailPublishSubmitFrom", db.siteProperty_EmailAdmin)
+            CDef = metaData.getCdef(ContentName)
+            Link = db.siteProperty_AdminURL & "?af=" & AdminFormPublishing
             Copy = Msg_AuthoringSubmittedNotification
             Copy = Replace(Copy, "<DOMAINNAME>", "<a href=""" & html_EncodeHTML(Link) & """>" & main_ServerDomain & "</a>")
             Copy = Replace(Copy, "<RECORDNAME>", RecordName)
@@ -20445,7 +20475,7 @@ ErrorTrap:
             Copy = Replace(Copy, "<SUBMITTEDDATE>", main_PageStartTime.ToString)
             Copy = Replace(Copy, "<SUBMITTEDNAME>", userName)
             '
-            Call main_SendGroupEmail(app.siteProperty_getText("WorkflowEditorGroup", "Content Editors"), FromAddress, "Authoring Submitted Notification", Copy, False, True)
+            Call main_SendGroupEmail(db.siteProperty_getText("WorkflowEditorGroup", "Content Editors"), FromAddress, "Authoring Submitted Notification", Copy, False, True)
             '
             Exit Sub
             '
@@ -20469,11 +20499,11 @@ ErrorTrap:
             MethodName = "main_GetTableID"
             '
             db_GetTableID = -1
-            CS = app.db_csOpenSql("Select ID from ccTables where name=" & app.db_EncodeSQLText(TableName), , 1)
-            If app.db_csOk(CS) Then
-                db_GetTableID = app.db_GetCSInteger(CS, "ID")
+            CS = db.db_csOpenSql("Select ID from ccTables where name=" & db.db_EncodeSQLText(TableName), , 1)
+            If db.db_csOk(CS) Then
+                db_GetTableID = db.db_GetCSInteger(CS, "ID")
             End If
-            Call app.db_csClose(CS)
+            Call db.db_csClose(CS)
             '
             Exit Function
             '
@@ -20505,7 +20535,7 @@ ErrorTrap:
             MethodName = "main_GetAuthoringStatusMessage"
             '
             main_EditLockExpiresMinutes = CInt((main_EditLockExpires - main_PageStartTime).TotalMinutes)
-            If Not app.siteProperty_AllowWorkflowAuthoring Then
+            If Not db.siteProperty_AllowWorkflowAuthoring Then
                 '
                 ' ----- site does not support workflow authoring
                 '
@@ -20690,8 +20720,8 @@ ErrorTrap:
             MethodName = "main_GetLoginMemberID"
             '
             main_GetLoginMemberID = 0
-            allowEmailLogin = EncodeBoolean(app.siteProperty_getBoolean("allowEmailLogin", False))
-            allowNoPasswordLogin = EncodeBoolean(app.siteProperty_getBoolean("allowNoPasswordLogin", False))
+            allowEmailLogin = EncodeBoolean(db.siteProperty_getBoolean("allowEmailLogin", False))
+            allowNoPasswordLogin = EncodeBoolean(db.siteProperty_getBoolean("allowNoPasswordLogin", False))
             If iLoginFieldValue = "" Then
                 '
                 ' ----- loginFieldValue blank, stop here
@@ -20716,23 +20746,23 @@ ErrorTrap:
                     '
                     ' login by username or email
                     '
-                    Criteria = "((username=" & app.db_EncodeSQLText(iLoginFieldValue) & ")or(email=" & app.db_EncodeSQLText(iLoginFieldValue) & "))"
+                    Criteria = "((username=" & db.db_EncodeSQLText(iLoginFieldValue) & ")or(email=" & db.db_EncodeSQLText(iLoginFieldValue) & "))"
                 Else
                     '
                     ' login by username only
                     '
-                    Criteria = "(username=" & app.db_EncodeSQLText(iLoginFieldValue) & ")"
+                    Criteria = "(username=" & db.db_EncodeSQLText(iLoginFieldValue) & ")"
                 End If
                 If True Then
-                    Criteria = Criteria & "and((dateExpires is null)or(dateExpires>" & app.db_EncodeSQLDate(Now()) & "))"
+                    Criteria = Criteria & "and((dateExpires is null)or(dateExpires>" & db.db_EncodeSQLDate(Now()) & "))"
                 End If
-                CS = app.db_csOpen("People", Criteria, "id", , , , , "ID ,password,admin,developer", 2)
-                If Not app.db_csOk(CS) Then
+                CS = db.db_csOpen("People", Criteria, "id", , , , , "ID ,password,admin,developer", 2)
+                If Not db.db_csOk(CS) Then
                     '
                     ' ----- loginFieldValue not found, stop here
                     '
                     Call error_AddUserError(badLoginUserError)
-                ElseIf (Not EncodeBoolean(app.siteProperty_getBoolean("AllowDuplicateUsernames", False))) And (app.csv_GetCSRowCount(CS) > 1) Then
+                ElseIf (Not EncodeBoolean(db.siteProperty_getBoolean("AllowDuplicateUsernames", False))) And (db.db_GetCSRowCount(CS) > 1) Then
                     '
                     ' ----- AllowDuplicates is false, and there are more then one record
                     '
@@ -20741,7 +20771,7 @@ ErrorTrap:
                     '
                     ' ----- search all found records for the correct password
                     '
-                    Do While app.db_csOk(CS)
+                    Do While db.db_csOk(CS)
                         main_GetLoginMemberID = 0
                         '
                         ' main_Get Id if password good
@@ -20750,46 +20780,46 @@ ErrorTrap:
                             '
                             ' no-password-login -- allowNoPassword + no password given + account has no password + account not admin/dev/cm
                             '
-                            recordIsAdmin = app.db_GetCSBoolean(CS, "admin")
-                            recordIsDeveloper = Not app.db_GetCSBoolean(CS, "admin")
-                            If allowNoPasswordLogin And (app.db_GetCSText(CS, "password") = "") And (Not recordIsAdmin) And (recordIsDeveloper) Then
-                                main_GetLoginMemberID = app.db_GetCSInteger(CS, "ID")
+                            recordIsAdmin = db.db_GetCSBoolean(CS, "admin")
+                            recordIsDeveloper = Not db.db_GetCSBoolean(CS, "admin")
+                            If allowNoPasswordLogin And (db.db_GetCSText(CS, "password") = "") And (Not recordIsAdmin) And (recordIsDeveloper) Then
+                                main_GetLoginMemberID = db.db_GetCSInteger(CS, "ID")
                                 '
                                 ' verify they are in no content manager groups
                                 '
                                 SQL = "SELECT ccGroupRules.ContentID" _
                                     & " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupID = ccMemberRules.GroupID" _
                                     & " WHERE (" _
-                                        & "(ccMemberRules.MemberID=" & app.db_EncodeSQLNumber(main_GetLoginMemberID) & ")" _
+                                        & "(ccMemberRules.MemberID=" & db.db_EncodeSQLNumber(main_GetLoginMemberID) & ")" _
                                         & " AND(ccMemberRules.active<>0)" _
                                         & " AND(ccGroupRules.active<>0)" _
                                         & " AND(ccGroupRules.ContentID Is not Null)" _
-                                        & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & app.db_EncodeSQLDate(main_PageStartTime) & "))" _
+                                        & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & db.db_EncodeSQLDate(main_PageStartTime) & "))" _
                                         & ");"
-                                CS = app.db_csOpenSql(SQL)
-                                If app.db_csOk(CS) Then
+                                CS = db.db_csOpenSql(SQL)
+                                If db.db_csOk(CS) Then
                                     main_GetLoginMemberID = 0
                                 End If
-                                Call app.db_csClose(CS)
+                                Call db.db_csClose(CS)
                             End If
                         Else
                             '
                             ' password login
                             '
-                            If LCase(app.db_GetCSText(CS, "password")) = LCase(iPassword) Then
-                                main_GetLoginMemberID = app.db_GetCSInteger(CS, "ID")
+                            If LCase(db.db_GetCSText(CS, "password")) = LCase(iPassword) Then
+                                main_GetLoginMemberID = db.db_GetCSInteger(CS, "ID")
                             End If
                         End If
                         If main_GetLoginMemberID <> 0 Then
                             Exit Do
                         End If
-                        Call app.db_csGoNext(CS)
+                        Call db.db_csGoNext(CS)
                     Loop
                     If main_GetLoginMemberID = 0 Then
                         Call error_AddUserError(badLoginUserError)
                     End If
                 End If
-                Call app.db_csClose(CS)
+                Call db.db_csClose(CS)
             End If
             Exit Function
             '
@@ -20844,8 +20874,8 @@ ErrorTrap:
                 '        errorMessage = "You currently have cookie support disabled in your browser. Without cookies, your browser can not support the level of security required to login."
             Else
 
-                CSPointer = app.db_csOpen("People", "username=" & app.db_EncodeSQLText(iUsername), , False, , , , "ID", 2)
-                If app.db_csOk(CSPointer) Then
+                CSPointer = db.db_csOpen("People", "username=" & db.db_EncodeSQLText(iUsername), , False, , , , "ID", 2)
+                If db.db_csOk(CSPointer) Then
                     '
                     ' ----- username was found, stop here
                     '
@@ -20854,7 +20884,7 @@ ErrorTrap:
                 Else
                     main_IsNewLoginOK = True
                 End If
-                Call app.db_csClose(CSPointer)
+                Call db.db_csClose(CSPointer)
             End If
             Exit Function
             '
@@ -21009,7 +21039,7 @@ ErrorTrap:
                 rulesTablename = db_GetContentTablename(RulesContentName)
                 SQL = "select " & RulesSecondaryFieldName & ",id from " & rulesTablename & " where (" & RulesPrimaryFieldname & "=" & PrimaryRecordID & ")and(active<>0) order by " & RulesSecondaryFieldName
                 currentRulesCnt = 0
-                currentRules = app.executeSql(SQL)
+                currentRules = db.executeSql(SQL)
                 currentRulesCnt = currentRules.Rows.Count
                 For GroupPtr = 0 To GroupCnt - 1
                     '
@@ -21050,29 +21080,29 @@ ErrorTrap:
                         '
                         ' Record exists and is needed, update the rule copy
                         '
-                        SQL = "update " & rulesTablename & " set rulecopy=" & app.db_EncodeSQLText(RuleCopy) & " where id=" & RuleId
-                        Call app.executeSql(SQL)
+                        SQL = "update " & rulesTablename & " set rulecopy=" & db.db_EncodeSQLText(RuleCopy) & " where id=" & RuleId
+                        Call db.executeSql(SQL)
                     ElseIf RuleNeeded And (Not RuleFound) Then
                         '
                         ' No record exists, and one is needed
                         '
-                        CSRule = app.db_csInsertRecord(RulesContentName)
-                        If app.db_csOk(CSRule) Then
-                            Call app.db_setCS(CSRule, "Active", RuleNeeded)
-                            Call app.db_setCS(CSRule, RulesPrimaryFieldname, PrimaryRecordID)
-                            Call app.db_setCS(CSRule, RulesSecondaryFieldName, SecondaryRecordID)
+                        CSRule = db.db_csInsertRecord(RulesContentName)
+                        If db.db_csOk(CSRule) Then
+                            Call db.db_setCS(CSRule, "Active", RuleNeeded)
+                            Call db.db_setCS(CSRule, RulesPrimaryFieldname, PrimaryRecordID)
+                            Call db.db_setCS(CSRule, RulesSecondaryFieldName, SecondaryRecordID)
                             If SupportRuleCopy Then
-                                Call app.db_setCS(CSRule, "RuleCopy", RuleCopy)
+                                Call db.db_setCS(CSRule, "RuleCopy", RuleCopy)
                             End If
                         End If
-                        Call app.db_csClose(CSRule)
+                        Call db.db_csClose(CSRule)
                         RuleContentChanged = True
                     ElseIf (Not RuleNeeded) And RuleFound Then
                         '
                         ' Record exists and it is not needed
                         '
                         SQL = "delete from " & rulesTablename & " where id=" & RuleId
-                        Call app.executeSql(SQL)
+                        Call db.executeSql(SQL)
                         RuleContentChanged = True
                     End If
                 Next
@@ -21081,7 +21111,7 @@ ErrorTrap:
                 '
                 If dupRuleIdList <> "" Then
                     SQL = "delete from " & rulesTablename & " where id in (" & Mid(dupRuleIdList, 2) & ")"
-                    Call app.executeSql(SQL)
+                    Call db.executeSql(SQL)
                     RuleContentChanged = True
                 End If
                 '        For GroupPtr = 0 To GroupCnt - 1
@@ -21126,7 +21156,7 @@ ErrorTrap:
                 '        Next
             End If
             If RuleContentChanged Then
-                Call app.cache.invalidateTagList2(RulesContentName)
+                Call cache.invalidateTagList2(RulesContentName)
             End If
             Exit Sub
             '
@@ -21149,11 +21179,11 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            If app.db_IsCSFieldSupported(CSPointer, "id") And app.db_IsCSFieldSupported(CSPointer, "contentcontrolId") Then
-                RecordID = app.db_GetCSInteger(CSPointer, "id")
-                ContentName = main_GetContentNameByID(app.db_GetCSInteger(CSPointer, "contentcontrolId"))
+            If db.db_IsCSFieldSupported(CSPointer, "id") And db.db_IsCSFieldSupported(CSPointer, "contentcontrolId") Then
+                RecordID = db.db_GetCSInteger(CSPointer, "id")
+                ContentName = main_GetContentNameByID(db.db_GetCSInteger(CSPointer, "contentcontrolId"))
             End If
-            main_GetCSEncodedField = html_encodeContent10(app.db_GetCS(EncodeInteger(CSPointer), EncodeText(FieldName)), userId, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & web.requestDomain, False, 0, "", addonContextEnum.ContextPage, user_isAuthenticated, Nothing, user_isEditingAnything)
+            main_GetCSEncodedField = html_encodeContent10(db.db_GetCS(EncodeInteger(CSPointer), EncodeText(FieldName)), userId, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & web.requestDomain, False, 0, "", addonContextEnum.ContextPage, user_isAuthenticated, Nothing, user_isEditingAnything)
             Exit Function
             '
             ' ----- Error Trap
@@ -21166,135 +21196,80 @@ ErrorTrap:
         '   main_GetCS calls
         '=============================================================================================
         '
-        Public Function main_GetCSText(ByVal CSPointer As Integer, ByVal FieldName As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetCSText")
-            '
-            'If Not (true) Then Exit Function
-            '
-            main_GetCSText = app.db_GetCSText(EncodeInteger(CSPointer), EncodeText(FieldName))
-            'main_GetCSText = encodeText(main_GetCSField_Internal(encodeInteger(CSPointer), encodeText(FieldName)))
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("main_GetCSText")
-        End Function
+        '        Public Function db.db_GetCSText(ByVal CSPointer As Integer, ByVal FieldName As String) As String
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetCSText")
+        '            '
+        '            'If Not (true) Then Exit Function
+        '            '
+        '            main_GetCSText = db.db_GetCSText(EncodeInteger(CSPointer), EncodeText(FieldName))
+        '            'main_GetCSText = encodeText(main_GetCSField_Internal(encodeInteger(CSPointer), encodeText(FieldName)))
+        '            '
+        '            Exit Function
+        'ErrorTrap:
+        '            Call handleLegacyError18("main_GetCSText")
+        '        End Function
         '
         '=============================================================================================
         '   main_GetCS calls
         '=============================================================================================
         '
-        Public Function main_GetCSFilename(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal OriginalFilename As String, Optional ByVal ContentName As String = "") As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetCSFilename")
-            '
-            'If Not (true) Then Exit Function
-            '
-            main_GetCSFilename = app.db_GetCSFilename(EncodeInteger(CSPointer), EncodeText(FieldName), EncodeText(OriginalFilename), encodeEmptyText(ContentName, ""))
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("main_GetCSFilename")
-        End Function
-
-        '        '
-        '        Public Function app.db_GetCSInteger(ByVal CSPointer As Integer, ByVal FieldName As String) As Integer
-        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetCSInteger")
+        '        Public Function db.db_GetCSFilename(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal OriginalFilename As String, Optional ByVal ContentName As String = "") As String
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetCSFilename")
         '            '
         '            'If Not (true) Then Exit Function
         '            '
-        '            main_GetCSInteger = app.db_GetCSInteger(EncodeInteger(CSPointer), EncodeText(FieldName))
+        '            db.db_GetCSFilename = db.db_GetCSFilename(EncodeInteger(CSPointer), EncodeText(FieldName), EncodeText(OriginalFilename), encodeEmptyText(ContentName, ""))
         '            '
         '            Exit Function
         'ErrorTrap:
-        '            Call handleLegacyError18("main_GetCSInteger")
+        '            Call handleLegacyError18("db.db_GetCSFilename")
         '        End Function
+        '        '
+        '        Public Function db.db_GetCSBoolean(ByVal CSPointer As Integer, ByVal FieldName As String) As Boolean
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetCSBoolean")
+        '            '
+        '            main_GetCSBoolean = db.db_GetCSBoolean((CSPointer), EncodeText(FieldName))
+        '            '
+        '            Exit Function
+        'ErrorTrap:
+        '            Call handleLegacyError18("main_GetCSBoolean")
+        '        End Function
+        '
 
-        '
-        Public Function main_GetCSDate(ByVal CSPointer As Integer, ByVal FieldName As String) As Date
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetCSDate")
-            '
-            'If Not (true) Then Exit Function
-            '
-            main_GetCSDate = app.db_GetCSDate(EncodeInteger(CSPointer), EncodeText(FieldName))
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("main_GetCSDate")
-        End Function
-
-        '
-        Public Function main_GetCSBoolean(ByVal CSPointer As Integer, ByVal FieldName As String) As Boolean
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetCSBoolean")
-            '
-            'If Not (true) Then Exit Function
-            '
-            main_GetCSBoolean = app.db_GetCSBoolean((CSPointer), EncodeText(FieldName))
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("main_GetCSBoolean")
-        End Function
-        '
-        Public Function main_getcsInteger(ByVal csPointer As Integer, fieldname As String) As Integer
-            Return EncodeInteger(main_GetCSText(csPointer, fieldname))
-        End Function
-        '
-        Public Function main_GetCSNumber(ByVal CSPointer As Integer, ByVal FieldName As String) As Double
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetCSNumber")
-            '
-            'If Not (true) Then Exit Function
-            '
-            main_GetCSNumber = app.db_GetCSNumber(EncodeInteger(CSPointer), EncodeText(FieldName))
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("main_GetCSNumber")
-        End Function
+        ''
+        'Public Function db.db_GetCSNumber(ByVal CSPointer As Integer, ByVal FieldName As String) As Double
+        '    db_xxGetCSNumber = db.db_GetCSNumber(EncodeInteger(CSPointer), EncodeText(FieldName))
+        'End Function
+        ''
+        ''
+        ''
+        'Public Function db.db_GetCSLookup(ByVal CSPointer As Integer, ByVal FieldName As String) As String
+        '    db_xxGetCSLookup = db.db_GetCSLookup(EncodeInteger(CSPointer), EncodeText(FieldName))
+        'End Function
         '
         '
         '
-        Public Function main_GetCSLookup(ByVal CSPointer As Integer, ByVal FieldName As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetCSLookup")
-            '
-            'If Not (true) Then Exit Function
-            '
-            main_GetCSLookup = app.db_GetCSLookup(EncodeInteger(CSPointer), EncodeText(FieldName))
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("main_GetCSLookup")
-        End Function
-        '
-        '
-        '
-        Public Function main_GetCSSource(ByVal CSPointer As Integer) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetCSSource")
-            '
-            'If Not (true) Then Exit Function
-            '
+        Public Function db_GetCSSource(ByVal CSPointer As Integer) As String
             Dim iCS As Integer
             '
             iCS = EncodeInteger(CSPointer)
-            If Not app.db_csOk(iCS) Then
+            If Not db.db_csOk(iCS) Then
                 Call Err.Raise(KmaErrorInternal, "dll", "ContentSet is not main_CSOK")
             Else
-                main_GetCSSource = app.db_GetCSSource(iCS)
+                db_GetCSSource = db.db_GetCSSource(iCS)
             End If
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("main_GetCSSource")
         End Function
         '
         '========================================================================
         '   Aborts any edits for this record
         '========================================================================
         '
-        Public Sub main_AbortEdit(ByVal ContentName As String, ByVal RecordID As Integer)
+        Public Sub workflow_AbortEdit(ByVal ContentName As String, ByVal RecordID As Integer)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("AbortEdit")
             '
             'If Not (true) Then Exit Sub
             '
-            Call app.csv_AbortEdit(EncodeText(ContentName), EncodeInteger(RecordID), userId)
+            Call db.workflow_AbortEdit(EncodeText(ContentName), EncodeInteger(RecordID), userId)
             '
             Exit Sub
             '
@@ -21308,12 +21283,12 @@ ErrorTrap:
         '   Aborts any edits for this record
         '========================================================================
         '
-        Public Sub main_PublishEdit(ByVal ContentName As String, ByVal RecordID As Integer)
+        Public Sub workflow_PublishEdit(ByVal ContentName As String, ByVal RecordID As Integer)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("PublishEdit")
             '
             'If Not (true) Then Exit Sub
             '
-            Call app.csv_PublishEdit(EncodeText(ContentName), EncodeInteger(RecordID), userId)
+            Call db.workflow_PublishEdit(EncodeText(ContentName), EncodeInteger(RecordID), userId)
             '
             Exit Sub
             '
@@ -21328,11 +21303,11 @@ ErrorTrap:
         '   Approves any edits for this record
         '========================================================================
         '
-        Public Sub main_ApproveEdit(ByVal ContentName As String, ByVal RecordID As Integer)
+        Public Sub workflow_ApproveEdit(ByVal ContentName As String, ByVal RecordID As Integer)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("ApproveEdit")
             '
             'If Not (true) Then Exit Sub
-            Call app.csv_ApproveEdit(EncodeText(ContentName), EncodeInteger(RecordID), userId)
+            Call db.workflow_ApproveEdit(EncodeText(ContentName), EncodeInteger(RecordID), userId)
             '
             Exit Sub
             '
@@ -21352,7 +21327,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Sub
             '
-            Call app.csv_SubmitEdit(EncodeText(ContentName), EncodeInteger(RecordID), userId)
+            Call db.workflow_SubmitEdit(EncodeText(ContentName), EncodeInteger(RecordID), userId)
             '
             Exit Sub
             '
@@ -21362,26 +21337,26 @@ ErrorTrap:
             Call handleLegacyError18("main_SubmitEdit")
             '
         End Sub
-        '
-        '========================================================================
-        ' ----- main_Get the menu link for the menu name specified
-        '========================================================================
-        '
-        Public Function main_GetCalendar(Optional ByVal CalendarName As String = "") As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetCalendar")
-            '
-            'If Not (true) Then Exit Function
-            '
-            main_GetCalendar = main_GetAddonContent(0, "Calendar", "", addonContextEnum.ContextPage, "", 0, "", 0)
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            'Set CalendarSystem = Nothing
-            Call handleLegacyError18("main_GetCalendar")
-        End Function
+        '        '
+        '        '========================================================================
+        '        ' ----- main_Get the menu link for the menu name specified
+        '        '========================================================================
+        '        '
+        '        Public Function main_GetCalendar(Optional ByVal CalendarName As String = "") As String
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetCalendar")
+        '            '
+        '            'If Not (true) Then Exit Function
+        '            '
+        '            main_GetCalendar = main_GetAddonContent(0, "Calendar", "", addonContextEnum.ContextPage, "", 0, "", 0)
+        '            '
+        '            Exit Function
+        '            '
+        '            ' ----- Error Trap
+        '            '
+        'ErrorTrap:
+        '            'Set CalendarSystem = Nothing
+        '            Call handleLegacyError18("main_GetCalendar")
+        '        End Function
         '
         '=========================================================================================
         '   Determine if this Content Definition is run on a table that supports
@@ -21407,44 +21382,44 @@ ErrorTrap:
 ErrorTrap:
             Call handleLegacyError18("IsWorkflowAuthoringCompatible")
         End Function
-        '
-        '
-        '
-        Public Function main_GetCSRow(ByVal CSPointer As Integer) As Object
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetCSRow")
-            '
-            'If Not (true) Then Exit Function
-            '
-            main_GetCSRow = app.csv_GetCSRow(EncodeInteger(CSPointer))
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18("main_GetCSRow")
-            '
-        End Function
-        '
-        '
-        '
-        Public Function main_GetCSRows(ByVal CSPointer As Integer) As Object
-            main_GetCSRows = app.csv_GetCSRows(EncodeInteger(CSPointer))
-        End Function
-        '
-        '
-        '
-        Public Function main_GetCSRowCount(ByVal CSPointer As Integer) As Integer
-            main_GetCSRowCount = app.csv_GetCSRowCount(EncodeInteger(CSPointer))
-        End Function
-        '
-        '   Leave interface
-        '
-        Public ReadOnly Property main_AllowencodeHTML() As Boolean
-            Get
-                Call handleLegacyError18("AllowEncodeHTML is not supported")
-            End Get
-        End Property
+        '        '
+        '        '
+        '        '
+        '        Public Function db.db_GetCSRow(ByVal CSPointer As Integer) As Object
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetCSRow")
+        '            '
+        '            'If Not (true) Then Exit Function
+        '            '
+        '            main_GetCSRow = db.db_GetCSRow(EncodeInteger(CSPointer))
+        '            '
+        '            Exit Function
+        '            '
+        '            ' ----- Error Trap
+        '            '
+        'ErrorTrap:
+        '            Call handleLegacyError18("main_GetCSRow")
+        '            '
+        '        End Function
+        ''
+        ''
+        ''
+        'Public Function db.db_GetCSRows(ByVal CSPointer As Integer) As Object
+        '    main_GetCSRows = db.db_GetCSRows(EncodeInteger(CSPointer))
+        'End Function
+        ''
+        ''
+        ''
+        'Public Function main_GetCSRowCount(ByVal CSPointer As Integer) As Integer
+        '    main_GetCSRowCount = db.db_GetCSRowCount(EncodeInteger(CSPointer))
+        'End Function
+        ''
+        ''   Leave interface
+        ''
+        'Public ReadOnly Property main_AllowencodeHTML() As Boolean
+        '    Get
+        '        Call handleLegacyError18("AllowEncodeHTML is not supported")
+        '    End Get
+        'End Property
         '
         '   Buffered Visit Property
         '
@@ -21568,7 +21543,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            main_InsertContentRecordGetID_Fast = app.metaData_InsertContentRecordGetID(ContentName, userId)
+            main_InsertContentRecordGetID_Fast = db.metaData_InsertContentRecordGetID(ContentName, userId)
             '
             Exit Function
             '
@@ -21814,7 +21789,7 @@ ErrorTrap:
             main_EditLockMemberName_Local = ""
             main_EditLockStatus_Local = False
             '
-            returnStatus = app.csv_GetEditLock(EncodeText(ContentName), EncodeInteger(RecordID), ReturnMemberID, ReturnDateExpires)
+            returnStatus = db.workflow_GetEditLock(EncodeText(ContentName), EncodeInteger(RecordID), ReturnMemberID, ReturnDateExpires)
             If returnStatus And (ReturnMemberID <> userId) Then
                 main_EditLockStatus_Local = True
                 main_EditLockDateExpires_Local = ReturnDateExpires
@@ -21849,10 +21824,10 @@ ErrorTrap:
                 If main_EditLockMemberName_Local = "" Then
                     If main_EditLockMemberID_Local <> 0 Then
                         CS = db_csOpenRecord("people", main_EditLockMemberID_Local)
-                        If app.db_csOk(CS) Then
-                            main_EditLockMemberName_Local = app.db_GetCSText(CS, "name")
+                        If db.db_csOk(CS) Then
+                            main_EditLockMemberName_Local = db.db_GetCSText(CS, "name")
                         End If
-                        Call app.db_csClose(CS)
+                        Call db.db_csClose(CS)
                     End If
                     If main_EditLockMemberName_Local = "" Then
                         main_EditLockMemberName_Local = "unknown"
@@ -21901,7 +21876,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Sub
             '
-            Call app.csv_SetEditLock(EncodeText(ContentName), EncodeInteger(RecordID), userId)
+            Call db.workflow_SetEditLock(EncodeText(ContentName), EncodeInteger(RecordID), userId)
             Exit Sub
             '
             ' ----- Error Trap
@@ -21920,7 +21895,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Sub
             '
-            Call app.csv_ClearEditLock(EncodeText(ContentName), EncodeInteger(RecordID), userId)
+            Call db.workflow_ClearEditLock(EncodeText(ContentName), EncodeInteger(RecordID), userId)
             Exit Sub
             '
             ' ----- Error Trap
@@ -21943,7 +21918,7 @@ ErrorTrap:
             Dim rs As DataTable
             '
             returnString = ""
-            rs = app.executeSql("select " & EncodeText(FieldName) & " from ccpagecontent where id=" & main_RenderedPageID)
+            rs = db.executeSql("select " & EncodeText(FieldName) & " from ccpagecontent where id=" & main_RenderedPageID)
             If rs.Rows.Count > 0 Then
                 returnString = EncodeText(rs.Rows(0).Item(0))
             End If
@@ -22110,7 +22085,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function web_ProcessFormInputFile(ByVal TagName As String, Optional ByVal VirtualFilePath As String = "") As String
-            web_ProcessFormInputFile = web_ProcessFormInputFile2(TagName, app.appRootFiles, VirtualFilePath)
+            web_ProcessFormInputFile = web_ProcessFormInputFile2(TagName, db.appRootFiles, VirtualFilePath)
         End Function
         '
         '========================================================================
@@ -22165,7 +22140,7 @@ ErrorTrap:
                                 '
                                 ' copy tmp private files to the appropriate folder in the destination file system
                                 '
-                                Call app.privateFiles.copyFile(.tmpPrivatefile, web_ProcessFormInputFile2, files)
+                                Call db.privateFiles.copyFile(.tmpPrivatefile, web_ProcessFormInputFile2, files)
                             Else
                                 Call files.SaveFile(web_ProcessFormInputFile2, .FileContent)
                             End If
@@ -22351,7 +22326,7 @@ ErrorTrap:
                     Next
                 End If
                 '
-                BotList = EncodeText(app.cache.GetObject(Of String)("DefaultBotNameList"))
+                BotList = EncodeText(cache.GetObject(Of String)("DefaultBotNameList"))
                 If BotList <> "" Then
                     '
                     ' First line of Persistent variant is the expiration date (1 hour in the future)
@@ -22391,7 +22366,7 @@ ErrorTrap:
                         Call cluster.clusterFiles.SaveFile(Filename, BotList)
                     End If
                     DateExpires = main_PageStartTime.AddHours(1)
-                    Call app.cache.SetKey("DefaultBotNameList", CStr(DateExpires) & vbCrLf & BotList)
+                    Call cache.SetKey("DefaultBotNameList", CStr(DateExpires) & vbCrLf & BotList)
                 End If
                 '
                 If BotList <> "" Then
@@ -22457,10 +22432,10 @@ ErrorTrap:
             '
             If SortMethodID > 0 Then
                 CS = db_csOpenRecord("Sort Methods", SortMethodID)
-                If app.db_csOk(CS) Then
-                    db_GetSortMethodByID = app.db_GetCSText(CS, "OrderByClause")
+                If db.db_csOk(CS) Then
+                    db_GetSortMethodByID = db.db_GetCSText(CS, "OrderByClause")
                 End If
-                Call app.db_csClose(CS)
+                Call db.db_csClose(CS)
             End If
             '
             Exit Function
@@ -22496,8 +22471,8 @@ ErrorTrap:
             End If
             MenuID = csv_VerifyDynamicMenu(MenuNameLocal)
             '
-            DefaultTemplateLink = app.siteProperty_getText("SectionLandingLink", app.RootWebPath & app.siteProperty_ServerPageDefault)
-            pageManager_GetSectionMenuNamed = pageManager_GetSectionMenu(DepthLimit, MenuStyle, StyleSheetPrefixLocal, DefaultTemplateLink, MenuID, MenuNameLocal, app.siteProperty_UseContentWatchLink)
+            DefaultTemplateLink = db.siteProperty_getText("SectionLandingLink", db.RootWebPath & db.siteProperty_ServerPageDefault)
+            pageManager_GetSectionMenuNamed = pageManager_GetSectionMenu(DepthLimit, MenuStyle, StyleSheetPrefixLocal, DefaultTemplateLink, MenuID, MenuNameLocal, db.siteProperty_UseContentWatchLink)
             pageManager_GetSectionMenuNamed = main_GetEditWrapper("Section Menu", pageManager_GetSectionMenuNamed)
             '
             If pageManager_RedirectLink <> "" Then
@@ -22532,18 +22507,18 @@ ErrorTrap:
             '
             ' Lookup link in main_ContentWatch
             '
-            CSPointer = app.db_csOpen("Content Watch", "ContentRecordKey=" & app.db_EncodeSQLText(ContentRecordKey), , , , , , "Link,Clicks")
-            If app.db_csOk(CSPointer) Then
-                main_GetContentWatchLinkByKey = app.db_GetCSText(CSPointer, "Link")
+            CSPointer = db.db_csOpen("Content Watch", "ContentRecordKey=" & db.db_EncodeSQLText(ContentRecordKey), , , , , , "Link,Clicks")
+            If db.db_csOk(CSPointer) Then
+                main_GetContentWatchLinkByKey = db.db_GetCSText(CSPointer, "Link")
                 If EncodeBoolean(IncrementClicks) Then
-                    Call app.db_setCS(CSPointer, "Clicks", app.db_GetCSInteger(CSPointer, "clicks") + 1)
+                    Call db.db_setCS(CSPointer, "Clicks", db.db_GetCSInteger(CSPointer, "clicks") + 1)
                 End If
             Else
                 main_GetContentWatchLinkByKey = EncodeText(DefaultLink)
             End If
-            Call app.db_csClose(CSPointer)
+            Call db.db_csClose(CSPointer)
             '
-            main_GetContentWatchLinkByKey = EncodeAppRootPath(main_GetContentWatchLinkByKey, web_requestVirtualFilePath, app.RootWebPath, web.requestDomain)
+            main_GetContentWatchLinkByKey = EncodeAppRootPath(main_GetContentWatchLinkByKey, web_requestVirtualFilePath, db.RootWebPath, web.requestDomain)
             '
             Exit Function
             '
@@ -22609,7 +22584,7 @@ ErrorTrap:
             '
             ' BuildVersion = app.dataBuildVersion
             main_GetContentBoxWrapper = Content
-            If (EncodeBoolean(app.siteProperty_getBoolean("Compatibility ContentBox Pad With Table", False))) Then
+            If (EncodeBoolean(db.siteProperty_getBoolean("Compatibility ContentBox Pad With Table", False))) Then
                 '
                 If ContentPadding > 0 Then
                     '
@@ -22708,7 +22683,7 @@ ErrorTrap:
             iIsAdmin = user_isAdmin()
             '
             If (Button <> "") And (RecordID <> 0) And (ContentName <> "") And (main_IsContentManager(ContentName)) Then
-                main_WorkflowSupport = app.siteProperty_AllowWorkflowAuthoring And main_IsWorkflowAuthoringCompatible(ContentName)
+                main_WorkflowSupport = db.siteProperty_AllowWorkflowAuthoring And main_IsWorkflowAuthoringCompatible(ContentName)
                 Call pageManager_GetAuthoringStatus(ContentName, RecordID, IsSubmitted, IsApproved, SubmittedMemberName, ApprovedMemberName, IsInserted, IsDeleted, IsModified, ModifiedMemberName, ModifiedDate, SubmittedDate, ApprovedDate)
                 IsEditLocked = db_GetEditLockStatus(ContentName, RecordID)
                 main_EditLockMemberName = db_GetEditLockMemberName(ContentName, RecordID)
@@ -22758,34 +22733,34 @@ ErrorTrap:
                         Call error_AddUserError("A name is required to save this page")
                     Else
                         CSBlock = db_csOpenRecord(ContentName, RecordID, True, True)
-                        If app.db_csOk(CSBlock) Then
+                        If db.db_csOk(CSBlock) Then
                             FieldName = "copyFilename"
                             Copy = doc_getText(FieldName)
                             Copy = main_DecodeContent(Copy)
-                            If Copy <> app.db_GetCS(CSBlock, "copyFilename") Then
-                                Call app.db_setCS(CSBlock, "copyFilename", Copy)
+                            If Copy <> db.db_GetCS(CSBlock, "copyFilename") Then
+                                Call db.db_setCS(CSBlock, "copyFilename", Copy)
                                 SaveButNoChanges = False
                             End If
                             RecordName = doc_getText("name")
-                            If RecordName <> app.db_GetCS(CSBlock, "name") Then
-                                Call app.db_setCS(CSBlock, "name", RecordName)
+                            If RecordName <> db.db_GetCS(CSBlock, "name") Then
+                                Call db.db_setCS(CSBlock, "name", RecordName)
                                 SaveButNoChanges = False
                             End If
                             Call main_AddLinkAlias(RecordName, RecordID, "")
-                            If (doc_getText("headline") <> app.db_GetCS(CSBlock, "headline")) Then
-                                Call app.db_setCS(CSBlock, "headline", doc_getText("headline"))
+                            If (doc_getText("headline") <> db.db_GetCS(CSBlock, "headline")) Then
+                                Call db.db_setCS(CSBlock, "headline", doc_getText("headline"))
                                 SaveButNoChanges = False
                             End If
-                            RecordParentID = app.db_GetCSInteger(CSBlock, "parentid")
+                            RecordParentID = db.db_GetCSInteger(CSBlock, "parentid")
                         End If
-                        Call app.db_csClose(CSBlock)
+                        Call db.db_csClose(CSBlock)
                         '
                         Call main_SetEditLock(ContentName, RecordID)
                         '
                         If Not SaveButNoChanges Then
                             Call main_ProcessSpecialCaseAfterSave(False, ContentName, RecordID, RecordName, RecordParentID, False)
                             Call pageManager_cache_pageContent_clear()
-                            Call app.cache.invalidateTagList2(ContentName)
+                            Call cache.invalidateTagList2(ContentName)
                         End If
                     End If
                 End If
@@ -22793,87 +22768,87 @@ ErrorTrap:
                     '
                     '
                     '
-                    CSBlock = app.db_csInsertRecord(ContentName)
-                    If app.db_csOk(CSBlock) Then
-                        Call app.db_setCS(CSBlock, "active", True)
-                        Call app.db_setCS(CSBlock, "ParentID", RecordID)
-                        Call app.db_setCS(CSBlock, "contactmemberid", userId)
-                        Call app.db_setCS(CSBlock, "name", "New Page added " & main_PageStartTime & " by " & userName)
-                        Call app.db_setCS(CSBlock, "copyFilename", "")
-                        RecordID = app.db_GetCSInteger(CSBlock, "ID")
-                        Call app.csv_SaveCSRecord(CSBlock)
+                    CSBlock = db.db_csInsertRecord(ContentName)
+                    If db.db_csOk(CSBlock) Then
+                        Call db.db_setCS(CSBlock, "active", True)
+                        Call db.db_setCS(CSBlock, "ParentID", RecordID)
+                        Call db.db_setCS(CSBlock, "contactmemberid", userId)
+                        Call db.db_setCS(CSBlock, "name", "New Page added " & main_PageStartTime & " by " & userName)
+                        Call db.db_setCS(CSBlock, "copyFilename", "")
+                        RecordID = db.db_GetCSInteger(CSBlock, "ID")
+                        Call db.db_SaveCSRecord(CSBlock)
                         '
-                        Link = main_GetPageLink4(RecordID, "", True, False)
+                        Link = pageManager_GetPageLink4(RecordID, "", True, False)
                         'Link = main_GetPageLink(RecordID)
                         If main_WorkflowSupport Then
                             If Not pagemanager_IsWorkflowRendering() Then
                                 Link = modifyLinkQuery(Link, "main_AdminWarningMsg", "This new unpublished page has been added and Workflow Rendering has been enabled so you can edit this page.", True)
-                                Call app.siteProperty_set("AllowWorkflowRendering", True)
+                                Call db.siteProperty_set("AllowWorkflowRendering", True)
                             End If
                         End If
                         Call web_Redirect2(Link, "Redirecting because a new page has been added with the quick editor.", False)
                     End If
-                    Call app.db_csClose(CSBlock)
+                    Call db.db_csClose(CSBlock)
                     '
                     'Call AppendLog("pageManager_ProcessFormQuickEditor, 7-call pageManager_cache_pageContent_clear")
                     Call pageManager_cache_pageContent_clear()
-                    Call app.cache.invalidateTagList2(ContentName)
+                    Call cache.invalidateTagList2(ContentName)
                 End If
                 If (Button = ButtonAddSiblingPage) Then
                     '
                     '
                     '
                     CSBlock = db_csOpen(ContentName, RecordID, , , "ParentID")
-                    If app.db_csOk(CSBlock) Then
-                        ParentID = app.db_GetCSInteger(CSBlock, "ParentID")
+                    If db.db_csOk(CSBlock) Then
+                        ParentID = db.db_GetCSInteger(CSBlock, "ParentID")
                     End If
-                    Call app.db_csClose(CSBlock)
+                    Call db.db_csClose(CSBlock)
                     If ParentID <> 0 Then
-                        CSBlock = app.db_csInsertRecord(ContentName)
-                        If app.db_csOk(CSBlock) Then
-                            Call app.db_setCS(CSBlock, "active", True)
-                            Call app.db_setCS(CSBlock, "ParentID", ParentID)
-                            Call app.db_setCS(CSBlock, "contactmemberid", userId)
-                            Call app.db_setCS(CSBlock, "name", "New Page added " & main_PageStartTime & " by " & userName)
-                            Call app.db_setCS(CSBlock, "copyFilename", "")
-                            RecordID = app.db_GetCSInteger(CSBlock, "ID")
-                            Call app.csv_SaveCSRecord(CSBlock)
+                        CSBlock = db.db_csInsertRecord(ContentName)
+                        If db.db_csOk(CSBlock) Then
+                            Call db.db_setCS(CSBlock, "active", True)
+                            Call db.db_setCS(CSBlock, "ParentID", ParentID)
+                            Call db.db_setCS(CSBlock, "contactmemberid", userId)
+                            Call db.db_setCS(CSBlock, "name", "New Page added " & main_PageStartTime & " by " & userName)
+                            Call db.db_setCS(CSBlock, "copyFilename", "")
+                            RecordID = db.db_GetCSInteger(CSBlock, "ID")
+                            Call db.db_SaveCSRecord(CSBlock)
                             '
-                            Link = main_GetPageLink4(RecordID, "", True, False)
+                            Link = pageManager_GetPageLink4(RecordID, "", True, False)
                             'Link = main_GetPageLink(RecordID)
                             If main_WorkflowSupport Then
                                 If Not pagemanager_IsWorkflowRendering() Then
                                     Link = modifyLinkQuery(Link, "main_AdminWarningMsg", "This new unpublished page has been added and Workflow Rendering has been enabled so you can edit this page.", True)
-                                    Call app.siteProperty_set("AllowWorkflowRendering", True)
+                                    Call db.siteProperty_set("AllowWorkflowRendering", True)
                                 End If
                             End If
                             Call web_Redirect2(Link, "Redirecting because a new page has been added with the quick editor.", False)
                         End If
-                        Call app.db_csClose(CSBlock)
+                        Call db.db_csClose(CSBlock)
                     End If
                     '
                     'Call AppendLog("pageManager_ProcessFormQuickEditor, 8-call pageManager_cache_pageContent_clear")
                     Call pageManager_cache_pageContent_clear()
-                    Call app.cache.invalidateTagList2(ContentName)
+                    Call cache.invalidateTagList2(ContentName)
                 End If
                 If (Button = ButtonDelete) Then
                     CSBlock = db_csOpen(ContentName, RecordID)
-                    If app.db_csOk(CSBlock) Then
-                        ParentID = app.db_GetCSInteger(CSBlock, "parentid")
+                    If db.db_csOk(CSBlock) Then
+                        ParentID = db.db_GetCSInteger(CSBlock, "parentid")
                     End If
-                    Call app.db_csClose(CSBlock)
+                    Call db.db_csClose(CSBlock)
                     '
-                    Call main_DeleteChildRecords(ContentName, RecordID, False)
-                    Call main_DeleteContentRecord(ContentName, RecordID)
+                    Call pageManager_DeleteChildRecords(ContentName, RecordID, False)
+                    Call db_DeleteContentRecord(ContentName, RecordID)
                     '
                     If Not main_WorkflowSupport Then
                         'Call AppendLog("pageManager_ProcessFormQuickEditor, 9-call pageManager_cache_pageContent_clear")
                         Call pageManager_cache_pageContent_clear()
-                        Call app.cache.invalidateTagList2(ContentName)
+                        Call cache.invalidateTagList2(ContentName)
                     End If
                     '
                     If Not main_WorkflowSupport Then
-                        Link = main_GetPageLink4(ParentID, "", True, False)
+                        Link = pageManager_GetPageLink4(ParentID, "", True, False)
                         'Link = main_GetPageLink(ParentID)
                         Link = modifyLinkQuery(Link, "main_AdminWarningMsg", "The page has been deleted, and you have been redirected to the parent of the deleted page.", True)
                         Call web_Redirect2(Link, "Redirecting to the parent page because the page was deleted with the quick editor.", pageManager_RedirectBecausePageNotFound)
@@ -22882,7 +22857,7 @@ ErrorTrap:
                 End If
                 '
                 If (Button = ButtonAbortEdit) Then
-                    Call main_AbortEdit(ContentName, RecordID)
+                    Call workflow_AbortEdit(ContentName, RecordID)
                 End If
                 If (Button = ButtonPublishSubmit) Then
                     Call main_SubmitEdit(ContentName, RecordID)
@@ -22899,11 +22874,11 @@ ErrorTrap:
                     ' ----- Admin only functions
                     '
                     If (Button = ButtonPublish) Then
-                        Call main_PublishEdit(ContentName, RecordID)
-                        Call app.cache.invalidateTagList2(ContentName)
+                        Call workflow_PublishEdit(ContentName, RecordID)
+                        Call cache.invalidateTagList2(ContentName)
                     End If
                     If (Button = ButtonPublishApprove) Then
-                        Call main_ApproveEdit(ContentName, RecordID)
+                        Call workflow_ApproveEdit(ContentName, RecordID)
                     End If
                 End If
             End If
@@ -22961,7 +22936,7 @@ ErrorTrap:
                 BakeName = Replace(BakeName, ":", "_")
                 BakeName = Replace(BakeName, ".", "_")
                 BakeName = Replace(BakeName, " ", "_")
-                main_GetSectionMenu_NameMenu = EncodeText(app.cache.GetObject(Of String)(BakeName))
+                main_GetSectionMenu_NameMenu = EncodeText(cache.GetObject(Of String)(BakeName))
                 If main_GetSectionMenu_NameMenu <> "" Then
                     main_GetSectionMenu_NameMenu = main_GetSectionMenu_NameMenu
                 Else
@@ -22999,7 +22974,7 @@ ErrorTrap:
                         '
                         AllowInMenus = True
                         LinkWorking = DefaultLink
-                        LinkWorking = EncodeAppRootPath(LinkWorking, web_requestVirtualFilePath, app.RootWebPath, web.requestDomain)
+                        LinkWorking = EncodeAppRootPath(LinkWorking, web_requestVirtualFilePath, db.RootWebPath, web.requestDomain)
                         LinkWorking = modifyLinkQuery(LinkWorking, "bid", "", False)
                         MenuNamePrefix = EncodeText(GetRandomInteger) & "_"
                         MenuID = 0
@@ -23045,7 +23020,7 @@ ErrorTrap:
                             '
                             ' main_Get the Link
                             '
-                            LinkWorking = main_GetPageLink4(MenuID, "", True, False)
+                            LinkWorking = pageManager_GetPageLink4(MenuID, "", True, False)
                             'LinkWorking = main_GetPageDynamicLinkWithArgs(ContentControlID, MenuID, DefaultLink, True, TemplateID, SectionID, MenuLinkOverRide, UseContentWatchLink)
                         End If
                     End If
@@ -23113,12 +23088,12 @@ ErrorTrap:
                         If ChildPagesFound Then
                             ChildPageCount = main_GetSectionMenu_AddChildMenu_ReturnChildCount(MenuID, ContentName, LinkWorking, Tier1MenuCaption, "," & EncodeText(MenuID), MenuNamePrefix, 1, DepthLimit, childListSortMethodId, SectionID, AddRootButton, UseContentWatchLink)
                             If (ChildPageCount = 0) And (True) Then
-                                Call app.executeSql("update ccpagecontent set ChildPagesFound=0 where id=" & MenuID)
+                                Call db.executeSql("update ccpagecontent set ChildPagesFound=0 where id=" & MenuID)
                             End If
                         End If
                         main_GetSectionMenu_NameMenu = main_GetSectionMenu_NameMenu & Replace(menu_Get(MenuNamePrefix & EncodeText(MenuID), MenuStyle, StyleSheetPrefix), vbCrLf, "")
                         main_GetSectionMenu_NameMenu = main_GetSectionMenu_NameMenu & menu_GetClose()
-                        Call app.cache.SetKey(BakeName, main_GetSectionMenu_NameMenu, ContentName & ",Site Sections,Dynamic Menus,Dynamic Menu Section Rules")
+                        Call cache.SetKey(BakeName, main_GetSectionMenu_NameMenu, ContentName & ",Site Sections,Dynamic Menus,Dynamic Menu Section Rules")
                     End If
                 End If
             End If
@@ -23183,7 +23158,7 @@ ErrorTrap:
                 BakeName = Replace(BakeName, ":", "_")
                 BakeName = Replace(BakeName, ".", "_")
                 BakeName = Replace(BakeName, " ", "_")
-                main_GetSectionMenu_IdMenu = EncodeText(app.cache.GetObject(Of String)(BakeName))
+                main_GetSectionMenu_IdMenu = EncodeText(cache.GetObject(Of String)(BakeName))
                 If main_GetSectionMenu_IdMenu <> "" Then
                     main_GetSectionMenu_IdMenu = main_GetSectionMenu_IdMenu
                 Else
@@ -23209,7 +23184,7 @@ ErrorTrap:
                         AllowInMenus = True
                         LinkWorking = DefaultLink
                         LinkWorkingNoRedirect = LinkWorking
-                        LinkWorking = EncodeAppRootPath(LinkWorking, web_requestVirtualFilePath, app.RootWebPath, web.requestDomain)
+                        LinkWorking = EncodeAppRootPath(LinkWorking, web_requestVirtualFilePath, db.RootWebPath, web.requestDomain)
                         LinkWorking = modifyLinkQuery(LinkWorking, "bid", "", False)
                         MenuNamePrefix = EncodeText(GetRandomInteger) & "_"
                         ' ***** just want to know what would happen here
@@ -23259,7 +23234,7 @@ ErrorTrap:
                             '
                             '1/13/2010 - convert everything to use linkalias and issecure
                             'LinkWorkingNoRedirect = main_GetPageLink4()
-                            LinkWorkingNoRedirect = main_GetPageLink4(PageID, "", True, False)
+                            LinkWorkingNoRedirect = pageManager_GetPageLink4(PageID, "", True, False)
                             '                    LinkWorkingNoRedirect = main_GetPageDynamicLinkWithArgs(contentcontrolid, pageId, DefaultLink, True, TemplateID, SectionID, "", UseContentWatchLink)
                             LinkWorking = LinkWorkingNoRedirect
                             '                    If MenuLinkOverRide <> "" Then
@@ -23367,14 +23342,14 @@ ErrorTrap:
                                         '
                                         ' ChildPagesFound flag is true, but no pages were found - clear flag
                                         '
-                                        Call app.executeSql("update ccpagecontent set ChildPagesFound=0 where id=" & PageID)
+                                        Call db.executeSql("update ccpagecontent set ChildPagesFound=0 where id=" & PageID)
                                         'Call AppendLog("main_GetSectionMenu_IdMenu, 4-call pageManager_cache_pageContent_updateRow")
                                         Call pageManager_cache_pageContent_updateRow(PageID, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
                                     ElseIf (ChildPageCount > 0) And (Not ChildPagesFound) Then
                                         '
                                         ' ChildPagesFlag is cleared, but pages were found -- set the flag
                                         '
-                                        Call app.executeSql("update ccpagecontent set ChildPagesFound=1 where id=" & PageID)
+                                        Call db.executeSql("update ccpagecontent set ChildPagesFound=1 where id=" & PageID)
                                         'Call AppendLog("main_GetSectionMenu_IdMenu, 5-call pageManager_cache_pageContent_updateRow")
                                         Call pageManager_cache_pageContent_updateRow(PageID, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
                                     End If
@@ -23393,7 +23368,7 @@ ErrorTrap:
                         '
                         ' ----- Bake the completed menu
                         '
-                        Call app.cache.SetKey(BakeName, main_GetSectionMenu_IdMenu, ContentName & ",Site Sections,Dynamic Menus,Dynamic Menu Section Rules")
+                        Call cache.SetKey(BakeName, main_GetSectionMenu_IdMenu, ContentName & ",Site Sections,Dynamic Menus,Dynamic Menu Section Rules")
                     End If
                 End If
             End If
@@ -23533,7 +23508,7 @@ ErrorTrap:
                                 ChildSortMethodID(ChildCount) = EncodeInteger(cache_pageContent(PCC_ChildListSortMethodID, PCCPtr))
                                 templateId = EncodeInteger(cache_pageContent(PCC_TemplateID, PCCPtr))
                                 '
-                                Link = main_GetPageLink4(PageID, "", True, UseContentWatchLink)
+                                Link = pageManager_GetPageLink4(PageID, "", True, UseContentWatchLink)
                                 'Link = main_GetPageDynamicLinkWithArgs(contentcontrolid, PageID, DefaultLink, False, TemplateID, SectionID, MenuLinkOverRide, UseContentWatchLink)
                                 ChildLink(ChildCount) = Link
                                 ChildPagesFoundTest = cache_pageContent(PCC_ChildPagesFound, PCCPtr)
@@ -23609,7 +23584,7 @@ ErrorTrap:
                                                 ' no pages were found, clear the child pages found property
                                                 ' child pages found property is set at admin site when a page is saved with this as the parent id
                                                 '
-                                                Call app.executeSql("update ccpagecontent set ChildPagesFound=0 where id=" & MenuID)
+                                                Call db.executeSql("update ccpagecontent set ChildPagesFound=0 where id=" & MenuID)
                                                 'Call AppendLog("main_GetHtmlBody_GetSection_GetContentMenu_AddChildMenu, 6-call pageManager_cache_pageContent_updateRow -- fix here to NOT call pageManager_cache_pageContent_updateRow()")
                                                 cache_pageContent(PCC_ChildPagesFound, ChildPointer) = "0"
                                                 'Call pageManager_cache_pageContent_updateRow(MenuID, main_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
@@ -23617,7 +23592,7 @@ ErrorTrap:
                                                 '
                                                 ' pages were found, set the child pages found property
                                                 '
-                                                Call app.executeSql("update ccpagecontent set ChildPagesFound=1 where id=" & MenuID)
+                                                Call db.executeSql("update ccpagecontent set ChildPagesFound=1 where id=" & MenuID)
                                                 'Call AppendLog("main_GetHtmlBody_GetSection_GetContentMenu_AddChildMenu, 7-call pageManager_cache_pageContent_updateRow -- fix here to NOT call pageManager_cache_pageContent_updateRow()")
                                                 cache_pageContent(PCC_ChildPagesFound, ChildPointer) = "1"
                                                 'Call pageManager_cache_pageContent_updateRow(MenuID, main_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
@@ -23699,13 +23674,13 @@ ErrorTrap:
             '
             archiveLink = web.requestPathPage
             archiveLink = ConvertLinkToShortLink(archiveLink, web.requestDomain, web_requestVirtualFilePath)
-            archiveLink = EncodeAppRootPath(archiveLink, web_requestVirtualFilePath, app.RootWebPath, web.requestDomain)
+            archiveLink = EncodeAppRootPath(archiveLink, web_requestVirtualFilePath, db.RootWebPath, web.requestDomain)
             '
             For childBranchPtr = 0 To main_RenderCache_ChildBranch_PCCPtrCnt - 1
                 PCCPtr = EncodeInteger(main_RenderCache_ChildBranch_PCCPtrs(childBranchPtr))
                 PageName = EncodeText(cache_pageContent(PCC_Name, PCCPtr))
                 PageID = EncodeInteger(cache_pageContent(PCC_ID, PCCPtr))
-                PageLink = main_GetPageLink4(PageID, "", True, False)
+                PageLink = pageManager_GetPageLink4(PageID, "", True, False)
                 pageBlockContent = EncodeBoolean(cache_pageContent(PCC_BlockContent, PCCPtr))
                 pageBlockPage = EncodeBoolean(cache_pageContent(PCC_BlockPage, PCCPtr))
                 pageContentControlId = EncodeInteger(cache_pageContent(PCC_ContentControlID, PCCPtr))
@@ -23826,7 +23801,7 @@ ErrorTrap:
                     ' if AllowBrief is false, BriefFilename is not loaded
                     '
                     If (pageBriefFilename <> "") And (pageAllowBrief) Then
-                        Brief = Trim(app.cdnFiles.ReadFile(pageBriefFilename))
+                        Brief = Trim(db.cdnFiles.ReadFile(pageBriefFilename))
                         If Brief <> "" Then
                             ActiveList = ActiveList & "<div class=""ccListCopy"">" & Brief & "</div>"
                         End If
@@ -23931,7 +23906,7 @@ ErrorTrap:
                     '
                     ' Section/Page connection at RootPageID, show all sections
                     '
-                    CSSections = app.db_csOpen("Site Sections", , , , , ,, SelectFieldList)
+                    CSSections = db.db_csOpen("Site Sections", , , , , ,, SelectFieldList)
                 Else
                     '
                     ' Section/Page connection at RootPageID, only show sections connected to the menu
@@ -23942,7 +23917,7 @@ ErrorTrap:
                         & " left join ccDynamicMenus M on M.ID=R.DynamicMenuID)" _
                         & " where M.ID=" & MenuID
                     Criteria = "ID in (" & SQL & ")"
-                    CSSections = app.db_csOpen("Site Sections", Criteria, , , , , , SelectFieldList)
+                    CSSections = db.db_csOpen("Site Sections", Criteria, , , , , , SelectFieldList)
                 End If
                 '        '
                 '        ' Section/Page connection at RootPageID
@@ -23967,7 +23942,7 @@ ErrorTrap:
                     '
                     ' Section/Page connection at RootPageID, show all sections
                     '
-                    CSSections = app.db_csOpen("Site Sections", , , , , , , SelectFieldList)
+                    CSSections = db.db_csOpen("Site Sections", , , , , , , SelectFieldList)
                 Else
                     '
                     ' Section/Page connection at RootPageID, only show sections connected to the menu
@@ -23978,7 +23953,7 @@ ErrorTrap:
                         & " left join ccDynamicMenus M on M.ID=R.DynamicMenuID)" _
                         & " where M.ID=" & MenuID
                     Criteria = "ID in (" & SQL & ")"
-                    CSSections = app.db_csOpen("Site Sections", Criteria, , , , ,, SelectFieldList)
+                    CSSections = db.db_csOpen("Site Sections", Criteria, , , , ,, SelectFieldList)
                 End If
                 '        SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,BlockSection"
                 '        SQL = "Select Distinct S.ID" _
@@ -23997,7 +23972,7 @@ ErrorTrap:
                 Criteria = ""
                 ShowHiddenMenu = user_isEditingAnything()
                 'ShowHiddenMenu = main_IsEditing("Site Sections")
-                CSSections = app.db_csOpen("Site Sections", Criteria, , , , ,, SelectFieldList)
+                CSSections = db.db_csOpen("Site Sections", Criteria, , , , ,, SelectFieldList)
             ElseIf db_IsSQLTableField("Default", "ccSections", "MenuImageOverFilename") Then
                 '
                 ' All sections menu mode with Image Over
@@ -24006,7 +23981,7 @@ ErrorTrap:
                 Criteria = ""
                 ShowHiddenMenu = user_isEditingAnything()
                 'ShowHiddenMenu = main_IsEditing("Site Sections")
-                CSSections = app.db_csOpen("Site Sections", Criteria, , , , ,, SelectFieldList)
+                CSSections = db.db_csOpen("Site Sections", Criteria, , , , ,, SelectFieldList)
             ElseIf db_IsSQLTableField("Default", "ccSections", "HideMenu") Then
                 '
                 ' All sections menu mode with HideMenu
@@ -24015,36 +23990,36 @@ ErrorTrap:
                 Criteria = ""
                 ShowHiddenMenu = user_isEditingAnything()
                 'ShowHiddenMenu = main_IsEditing("Site Sections")
-                CSSections = app.db_csOpen("Site Sections", Criteria, , , , ,, SelectFieldList)
+                CSSections = db.db_csOpen("Site Sections", Criteria, , , , ,, SelectFieldList)
             Else
                 SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,'' as MenuImageOverFilename,0 as HideMenu,0 as BlockSection,0 as RootPageID"
                 Criteria = ""
                 ShowHiddenMenu = True
-                CSSections = app.db_csOpen("Site Sections", Criteria, , , , ,, SelectFieldList)
+                CSSections = db.db_csOpen("Site Sections", Criteria, , , , ,, SelectFieldList)
             End If
-            Do While app.db_csOk(CSSections)
-                HideMenu = app.db_GetCSBoolean(CSSections, "HideMenu")
-                BlockSection = app.db_GetCSBoolean(CSSections, "BlockSection")
-                SectionID = app.db_GetCSInteger(CSSections, "ID")
+            Do While db.db_csOk(CSSections)
+                HideMenu = db.db_GetCSBoolean(CSSections, "HideMenu")
+                BlockSection = db.db_GetCSBoolean(CSSections, "BlockSection")
+                SectionID = db.db_GetCSInteger(CSSections, "ID")
                 If ShowHiddenMenu Or Not (HideMenu Or main_isSectionBlocked(SectionID, BlockSection)) Then
-                    SectionName = Trim(app.db_GetCSText(CSSections, "Name"))
+                    SectionName = Trim(db.db_GetCSText(CSSections, "Name"))
                     If SectionName = "" Then
                         SectionName = "Section " & SectionID
-                        Call app.executeSql("update ccSections set Name=" & app.db_EncodeSQLText(SectionName) & " where ID=" & SectionID)
+                        Call db.executeSql("update ccSections set Name=" & db.db_EncodeSQLText(SectionName) & " where ID=" & SectionID)
                     End If
-                    SectionCaption = app.db_GetCSText(CSSections, "Caption")
+                    SectionCaption = db.db_GetCSText(CSSections, "Caption")
                     If SectionCaption = "" Then
                         SectionCaption = SectionName
-                        Call app.executeSql("update ccSections set Caption=" & app.db_EncodeSQLText(SectionCaption) & " where ID=" & SectionID)
+                        Call db.executeSql("update ccSections set Caption=" & db.db_EncodeSQLText(SectionCaption) & " where ID=" & SectionID)
                     End If
                     If HideMenu Then
                         SectionCaption = "[Hidden: " & SectionCaption & "]"
                     End If
-                    SectionTemplateID = app.db_GetCSInteger(CSSections, "TemplateID")
-                    ContentID = app.db_GetCSInteger(CSSections, "ContentID")
+                    SectionTemplateID = db.db_GetCSInteger(CSSections, "TemplateID")
+                    ContentID = db.db_GetCSInteger(CSSections, "ContentID")
                     If (ContentID <> PageContentCID) And (Not db_IsWithinContent(ContentID, PageContentCID)) Then
                         ContentID = PageContentCID
-                        Call app.db_setCS(CSSections, "ContentID", ContentID)
+                        Call db.db_setCS(CSSections, "ContentID", ContentID)
                     End If
                     If ContentID = PageContentCID Then
                         ContentName = "Page Content"
@@ -24053,16 +24028,16 @@ ErrorTrap:
                         If ContentName = "" Then
                             ContentName = "Page Content"
                             ContentID = main_GetContentID(ContentName)
-                            Call app.executeSql("update ccSections set ContentID=" & ContentID & " where ID=" & SectionID)
+                            Call db.executeSql("update ccSections set ContentID=" & ContentID & " where ID=" & SectionID)
                         End If
                     End If
-                    MenuImage = app.db_GetCSText(CSSections, "MenuImageFilename")
+                    MenuImage = db.db_GetCSText(CSSections, "MenuImageFilename")
                     If MenuImage <> "" Then
-                        MenuImage = csv_getVirtualFileLink(app.config.cdnFilesNetprefix, MenuImage)
+                        MenuImage = csv_getVirtualFileLink(db.config.cdnFilesNetprefix, MenuImage)
                     End If
-                    MenuImageOver = app.db_GetCSText(CSSections, "MenuImageOverFilename")
+                    MenuImageOver = db.db_GetCSText(CSSections, "MenuImageOverFilename")
                     If MenuImageOver <> "" Then
-                        MenuImageOver = csv_getVirtualFileLink(app.config.cdnFilesNetprefix, MenuImageOver)
+                        MenuImageOver = csv_getVirtualFileLink(db.config.cdnFilesNetprefix, MenuImageOver)
                     End If
                     '
                     ' main_Get Root Page for templateID
@@ -24088,7 +24063,7 @@ ErrorTrap:
                         '
                         ' section-page connection by name
                         '
-                        rootPageId = app.db_GetCSInteger(CSSections, "rootpageid")
+                        rootPageId = db.db_GetCSInteger(CSSections, "rootpageid")
                         PCCPtr = pageManager_cache_pageContent_getPtr(rootPageId, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
                         'SelectFieldList = "ID,TemplateID,BlockPage"
                         'CSPage = main_OpenCSContentRecord_Internal(ContentName, RootPageID, , , SelectFieldList)
@@ -24144,13 +24119,13 @@ ErrorTrap:
                     End If
                     '
                 End If
-                Call app.db_csGoNext(CSSections)
+                Call db.db_csGoNext(CSSections)
             Loop
             AuthoringTag = main_GetRecordAddLink("Site Sections", "MenuID=" & MenuID)
             If AuthoringTag <> "" Then
                 pageManager_GetSectionMenu = pageManager_GetSectionMenu & AuthoringTag
             End If
-            Call app.db_csClose(CSSections)
+            Call db.db_csClose(CSSections)
             '
             pageManager_GetSectionMenu = html_executeContentCommands(Nothing, pageManager_GetSectionMenu, addonContextEnum.ContextPage, userId, user_isAuthenticated, layoutError)
             pageManager_GetSectionMenu = html_encodeContent10(pageManager_GetSectionMenu, userId, "", 0, 0, False, False, True, True, False, True, "", "http://" & web.requestDomain, False, 0, "", addonContextEnum.ContextPage, user_isAuthenticated, Nothing, user_isEditingAnything)
@@ -24183,11 +24158,11 @@ ErrorTrap:
                     & " AND ((ccPageContentBlockRules.Active)<>0)" _
                     & " AND ((ccgroups.Active)<>0)" _
                     & " AND ((ccMemberRules.Active)<>0)" _
-                    & " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" & app.db_EncodeSQLDate(main_PageStartTime) & ")" _
+                    & " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" & db.db_EncodeSQLDate(main_PageStartTime) & ")" _
                     & " AND ((ccMemberRules.MemberID)=" & userId & "));"
-                CS = app.db_csOpenSql(SQL)
-                pageManager_BypassContentBlock = app.db_csOk(CS)
-                Call app.db_csClose(CS)
+                CS = db.db_csOpenSql(SQL)
+                pageManager_BypassContentBlock = db.db_csOk(CS)
+                Call db.db_csClose(CS)
             End If
             '
             Exit Function
@@ -24198,7 +24173,7 @@ ErrorTrap:
         '
         '
         Public Function main_EncodeAppRootPath(ByVal Link As String) As String
-            main_EncodeAppRootPath = EncodeAppRootPath(EncodeText(Link), web_requestVirtualFilePath, app.RootWebPath, web.requestDomain)
+            main_EncodeAppRootPath = EncodeAppRootPath(EncodeText(Link), web_requestVirtualFilePath, db.RootWebPath, web.requestDomain)
         End Function
         '
         '
@@ -24343,7 +24318,7 @@ ErrorTrap:
             '
             '    CS = main_OpenCSContentRecord("Page Content", PageID, , , "Name,ParentID")
             '    If app.csv_IsCSOK(CS) Then
-            '        PageName2 = main_GetCSText(CS, "Name")
+            '        PageName2 = db.db_GetCSText(CS, "Name")
             '        ParentID = app.db_GetCSInteger(CS, "ParentID")
             '    End If
             '    Call app.db_closeCS(CS)
@@ -24398,11 +24373,11 @@ ErrorTrap:
             '
             '
             CS = db_csOpen("Page Content", PageID, , , "TemplateID,ParentID")
-            If app.db_csOk(CS) Then
-                templateId = app.db_GetCSInteger(CS, "TemplateID")
-                ParentID = app.db_GetCSInteger(CS, "ParentID")
+            If db.db_csOk(CS) Then
+                templateId = db.db_GetCSInteger(CS, "TemplateID")
+                ParentID = db.db_GetCSInteger(CS, "ParentID")
             End If
-            Call app.db_csClose(CS)
+            Call db.db_csClose(CS)
             '
             ' Chase page tree to main_Get templateid
             '
@@ -24469,7 +24444,7 @@ ErrorTrap:
         '
         '====================================================================================================
         '
-        Public Function main_GetPageLink4(ByVal PageID As Integer, ByVal QueryStringSuffix As String, ByVal AllowLinkAliasIfEnabled As Boolean, ByVal UseContentWatchNotDefaultPage As Boolean) As String
+        Public Function pageManager_GetPageLink4(ByVal PageID As Integer, ByVal QueryStringSuffix As String, ByVal AllowLinkAliasIfEnabled As Boolean, ByVal UseContentWatchNotDefaultPage As Boolean) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetPageLink")
             '
             Dim main_domainIds() As String
@@ -24505,7 +24480,7 @@ ErrorTrap:
             '
             ' main_Get defaultpathpage
             '
-            defaultPathPage = app.siteProperty_ServerPageDefault
+            defaultPathPage = db.siteProperty_ServerPageDefault
             If defaultPathPage <> "" Then
                 Pos = InStr(1, defaultPathPage, "?")
                 If Pos <> 0 Then
@@ -24563,7 +24538,7 @@ ErrorTrap:
                 '
                 ' ----- templateLink is blank
                 '
-                If AllowLinkAliasIfEnabled And app.siteProperty_allowLinkAlias Then
+                If AllowLinkAliasIfEnabled And db.siteProperty_allowLinkAlias Then
                     If cache_linkAliasCnt = 0 Then
                         Call cache_linkAlias_load()
                     End If
@@ -24658,9 +24633,9 @@ ErrorTrap:
             '
             ' assemble
             '
-            main_GetPageLink4 = linkLong
+            pageManager_GetPageLink4 = linkLong
             If linkQS <> "" Then
-                main_GetPageLink4 = main_GetPageLink4 & "?" & linkQS
+                pageManager_GetPageLink4 = pageManager_GetPageLink4 & "?" & linkQS
             End If
             '
             Exit Function
@@ -24675,16 +24650,16 @@ ErrorTrap:
         '====================================================================================================
         '
         Public Function main_GetPageLink3(ByVal PageID As Integer, ByVal QueryStringSuffix As String, ByVal AllowLinkAlias As Boolean) As String
-            main_GetPageLink3 = main_GetPageLink4(PageID, QueryStringSuffix, AllowLinkAlias, False)
+            main_GetPageLink3 = pageManager_GetPageLink4(PageID, QueryStringSuffix, AllowLinkAlias, False)
         End Function
         '
         Public Function main_GetPageLink2(ByVal PageID As Integer, ByVal QueryStringSuffix As String) As String
-            main_GetPageLink2 = main_GetPageLink4(PageID, QueryStringSuffix, True, False)
+            main_GetPageLink2 = pageManager_GetPageLink4(PageID, QueryStringSuffix, True, False)
             'main_GetPageLink2 = main_GetPageLink3(PageID, QueryStringSuffix, True)
         End Function
         '
         Public Function main_GetPageLink(ByVal PageID As Integer) As String
-            main_GetPageLink = main_GetPageLink4(PageID, "", True, False)
+            main_GetPageLink = pageManager_GetPageLink4(PageID, "", True, False)
             'main_GetPageLink = main_GetPageLink3(PageID, "", True)
         End Function
         '
@@ -24731,9 +24706,9 @@ ErrorTrap:
             '
             ' Convert default page to default link
             '
-            DefaultLink = app.siteProperty_ServerPageDefault
+            DefaultLink = db.siteProperty_ServerPageDefault
             If Mid(DefaultLink, 1, 1) <> "/" Then
-                DefaultLink = "/" & app.siteProperty_ServerPageDefault
+                DefaultLink = "/" & db.siteProperty_ServerPageDefault
             End If
             '
             main_GetPageDynamicLink = main_GetPageDynamicLinkWithArgs(CCID, PageID, DefaultLink, IsRootPage, templateId, SectionID, MenuLinkOverRide, UseContentWatchLink)
@@ -24809,7 +24784,7 @@ ErrorTrap:
             End If
             ' ##### if the default is long, leave it long -- move this to just the content watch tree
             'main_GetPageDynamicLinkWithArgs = ConvertLinkToShortLink(main_GetPageDynamicLinkWithArgs, main_ServerHost, main_ServerVirtualPath)
-            main_GetPageDynamicLinkWithArgs = EncodeAppRootPath(main_GetPageDynamicLinkWithArgs, web_requestVirtualFilePath, app.RootWebPath, web.requestDomain)
+            main_GetPageDynamicLinkWithArgs = EncodeAppRootPath(main_GetPageDynamicLinkWithArgs, web_requestVirtualFilePath, db.RootWebPath, web.requestDomain)
             '
             Exit Function
             '
@@ -24895,7 +24870,7 @@ ErrorTrap:
                 If templateId <> 0 Then
                     CS = db_csOpenRecord(ContentName, templateId, , , FieldList)
                 End If
-                If (templateId = 0) Or (Not app.db_csOk(CS)) Then
+                If (templateId = 0) Or (Not db.db_csOk(CS)) Then
                     '
                     ' ----- if template not found, return default template
                     '       if this operation fails, exit now -- do not continue and create new template
@@ -24905,53 +24880,53 @@ ErrorTrap:
                         '
                         ' ----- attempt to use the domain's default template
                         '
-                        Call app.db_csClose(CS)
+                        Call db.db_csClose(CS)
                         CS = db_csOpenRecord(ContentName, domainDetails.defaultTemplateId, , , FieldList)
-                        If Not app.db_csOk(CS) Then
+                        If Not db.db_csOk(CS) Then
                             '
                             ' the defaultemplateid in the domain is not valid
                             '
-                            Call app.executeSql("update ccdomains set defaulttemplateid=0 where defaulttemplateid=" & domainDetails.defaultTemplateId)
-                            Call app.cache.invalidateTagList2("domains")
+                            Call db.executeSql("update ccdomains set defaulttemplateid=0 where defaulttemplateid=" & domainDetails.defaultTemplateId)
+                            Call cache.invalidateTagList2("domains")
                         End If
                     End If
-                    If Not app.db_csOk(CS) Then
+                    If Not db.db_csOk(CS) Then
                         '
                         ' ----- attempt to use the site's default template
                         '
-                        Call app.db_csClose(CS)
-                        CS = app.db_csOpen(ContentName, "name=" & app.db_EncodeSQLText(TemplateDefaultName), "ID", , , , , FieldList)
+                        Call db.db_csClose(CS)
+                        CS = db.db_csOpen(ContentName, "name=" & db.db_EncodeSQLText(TemplateDefaultName), "ID", , , , , FieldList)
                     End If
-                    If app.db_csOk(CS) Then
-                        main_RenderedTemplateID = app.db_GetCSInteger(CS, "ID")
-                        main_RenderedTemplateName = app.db_GetCSText(CS, "name")
+                    If db.db_csOk(CS) Then
+                        main_RenderedTemplateID = db.db_GetCSInteger(CS, "ID")
+                        main_RenderedTemplateName = db.db_GetCSText(CS, "name")
                         pageManager_TemplateName = main_RenderedTemplateName
-                        pageManager_TemplateLink = main_verifyTemplateLink(app.db_GetCS(CS, "Link"))
+                        pageManager_TemplateLink = main_verifyTemplateLink(db.db_GetCS(CS, "Link"))
                         'pageManager_TemplateLink = app.csv_GetCS(CS, "Link")
                         If True Then
-                            pageManager_TemplateBody = app.db_GetCS(CS, "BodyHTML")
+                            pageManager_TemplateBody = db.db_GetCS(CS, "BodyHTML")
                         End If
                     End If
-                    Call app.db_csClose(CS)
+                    Call db.db_csClose(CS)
                     '
                     ' ----- if default template not found, create a simple default template
                     '
                     If main_RenderedTemplateID = 0 Then
                         pageManager_TemplateName = TemplateDefaultName
                         pageManager_TemplateBody = TemplateDefaultBody
-                        CS = app.db_csInsertRecord("Page Templates")
-                        If app.db_csOk(CS) Then
-                            main_RenderedTemplateID = app.db_GetCSInteger(CS, "ID")
+                        CS = db.db_csInsertRecord("Page Templates")
+                        If db.db_csOk(CS) Then
+                            main_RenderedTemplateID = db.db_GetCSInteger(CS, "ID")
                             main_RenderedTemplateName = TemplateDefaultName
-                            Call app.db_setCS(CS, "name", TemplateDefaultName)
-                            Call app.db_setCS(CS, "Link", "")
+                            Call db.db_setCS(CS, "name", TemplateDefaultName)
+                            Call db.db_setCS(CS, "Link", "")
                             If True Then
-                                Call app.db_setCS(CS, "BodyHTML", pageManager_TemplateBody)
+                                Call db.db_setCS(CS, "BodyHTML", pageManager_TemplateBody)
                             End If
                             If True Then
-                                Call app.db_setCS(CS, "ccGuid", DefaultTemplateGuid)
+                                Call db.db_setCS(CS, "ccGuid", DefaultTemplateGuid)
                             End If
-                            Call app.db_csClose(CS)
+                            Call db.db_csClose(CS)
                         End If
                         Call pageManager_cache_pageTemplate_clear()
                     End If
@@ -24961,14 +24936,14 @@ ErrorTrap:
                     ' ----- load template
                     '
                     If True Then
-                        pageManager_TemplateBody = app.db_GetCS(CS, "BodyHTML")
+                        pageManager_TemplateBody = db.db_GetCS(CS, "BodyHTML")
                     Else
                         pageManager_TemplateBody = "<!-- Template Body support requires a Contensive database upgrade through the Application Manager. -->" & TemplateDefaultBody
                     End If
-                    pageManager_TemplateName = app.db_GetCS(CS, "name")
-                    pageManager_TemplateLink = main_verifyTemplateLink(app.db_GetCS(CS, "Link"))
+                    pageManager_TemplateName = db.db_GetCS(CS, "name")
+                    pageManager_TemplateLink = main_verifyTemplateLink(db.db_GetCS(CS, "Link"))
                 End If
-                Call app.db_csClose(CS)
+                Call db.db_csClose(CS)
                 pageManager_TemplateLink = main_verifyTemplateLink(pageManager_TemplateLink)
             End If
             '
@@ -25000,7 +24975,7 @@ ErrorTrap:
         '
         '
         Public Function main_GetCS2Text(ByVal CSPointer As Integer, ByVal FieldName As String) As String
-            main_GetCS2Text = app.db_GetCS(EncodeInteger(CSPointer), EncodeText(FieldName))
+            main_GetCS2Text = db.db_GetCS(EncodeInteger(CSPointer), EncodeText(FieldName))
         End Function
         '        '
         '        '=============================================================================================
@@ -25061,7 +25036,7 @@ ErrorTrap:
             Dim StyleSheetCopy As String
             '
             BakeName = "AutoSiteTemplate" & templateId
-            main_GetAutoSite_Template = EncodeText(app.cache.GetObject(Of String)(BakeName))
+            main_GetAutoSite_Template = EncodeText(cache.GetObject(Of String)(BakeName))
             If main_GetAutoSite_Template = "" Then
                 If templateId = 0 Then
                     '
@@ -25082,26 +25057,26 @@ ErrorTrap:
                     ' Template Specified
                     '
                     CS = db_csOpen("AutoSite Templates", templateId, , , "Copy,StyleSheetID")
-                    If app.db_csOk(CS) Then
-                        main_GetAutoSite_Template = app.db_GetCS(CS, "Copy")
-                        StyleSheetID = EncodeInteger(app.db_GetCS(CS, "StyleSheetID"))
+                    If db.db_csOk(CS) Then
+                        main_GetAutoSite_Template = db.db_GetCS(CS, "Copy")
+                        StyleSheetID = EncodeInteger(db.db_GetCS(CS, "StyleSheetID"))
                     End If
-                    Call app.db_csClose(CS)
+                    Call db.db_csClose(CS)
                     '
                     ' StyleSheet Specified
                     '
                     If StyleSheetID <> 0 Then
                         CS = db_csOpen("AutoSite Styles", StyleSheetID, , , "Copy")
-                        If app.db_csOk(CS) Then
-                            StyleSheetCopy = app.db_GetCS(CS, "Copy")
+                        If db.db_csOk(CS) Then
+                            StyleSheetCopy = db.db_GetCS(CS, "Copy")
                         End If
-                        Call app.db_csClose(CS)
+                        Call db.db_csClose(CS)
                     End If
                     '
                     ' Assemble Template
                     '
                 End If
-                Call app.cache.SetKey(BakeName, main_GetAutoSite_Template, "AutoSite Templates")
+                Call cache.SetKey(BakeName, main_GetAutoSite_Template, "AutoSite Templates")
             End If
             '
             Exit Function
@@ -25141,20 +25116,20 @@ ErrorTrap:
                 Else
                     FieldList = "ID,Name,MetaDescription,OtherHeadTags,MetaKeywordList"
                 End If
-                CS = app.db_csOpen("Meta Content", Criteria, , , , ,, FieldList)
-                If app.db_csOk(CS) Then
-                    MetaContentID = app.db_GetCSInteger(CS, "ID")
-                    Call main_AddPagetitle2(html_EncodeHTML(app.db_GetCSText(CS, "Name")), "page content")
-                    Call main_addMetaDescription2(html_EncodeHTML(app.db_GetCSText(CS, "MetaDescription")), "page content")
-                    Call main_AddHeadTag2(app.db_GetCSText(CS, "OtherHeadTags"), "page content")
+                CS = db.db_csOpen("Meta Content", Criteria, , , , ,, FieldList)
+                If db.db_csOk(CS) Then
+                    MetaContentID = db.db_GetCSInteger(CS, "ID")
+                    Call main_AddPagetitle2(html_EncodeHTML(db.db_GetCSText(CS, "Name")), "page content")
+                    Call main_addMetaDescription2(html_EncodeHTML(db.db_GetCSText(CS, "MetaDescription")), "page content")
+                    Call main_AddHeadTag2(db.db_GetCSText(CS, "OtherHeadTags"), "page content")
                     If True Then
-                        KeywordList = Replace(app.db_GetCSText(CS, "MetaKeywordList"), vbCrLf, ",")
+                        KeywordList = Replace(db.db_GetCSText(CS, "MetaKeywordList"), vbCrLf, ",")
                     End If
                     'main_MetaContent_Title = encodeHTML(app.csv_GetCSText(CS, "Name"))
                     'main_MetaContent_Description = encodeHTML(app.csv_GetCSText(CS, "MetaDescription"))
                     'main_MetaContent_OtherHeadTags = app.csv_GetCSText(CS, "OtherHeadTags")
                 End If
-                Call app.db_csClose(CS)
+                Call db.db_csClose(CS)
                 '
                 ' main_Get Keyword List
                 '
@@ -25162,10 +25137,10 @@ ErrorTrap:
                     & " From ccMetaKeywords" _
                     & " LEFT JOIN ccMetaKeywordRules on ccMetaKeywordRules.MetaKeywordID=ccMetaKeywords.ID" _
                     & " Where ccMetaKeywordRules.MetaContentID=" & MetaContentID
-                CS = app.db_csOpenSql(SQL)
-                Do While app.db_csOk(CS)
-                    KeywordList = KeywordList & "," & app.db_GetCSText(CS, "Name")
-                    Call app.db_csGoNext(CS)
+                CS = db.db_csOpenSql(SQL)
+                Do While db.db_csOk(CS)
+                    KeywordList = KeywordList & "," & db.db_GetCSText(CS, "Name")
+                    Call db.db_csGoNext(CS)
                 Loop
                 If KeywordList <> "" Then
                     If Left(KeywordList, 1) = "," Then
@@ -25175,7 +25150,7 @@ ErrorTrap:
                     KeywordList = html_EncodeHTML(KeywordList)
                     Call main_addMetaKeywordList2(KeywordList, "page content")
                 End If
-                Call app.db_csClose(CS)
+                Call db.db_csClose(CS)
                 'main_MetaContent_KeyWordList = encodeHTML(KeyWordList)
             End If
 
@@ -25251,10 +25226,10 @@ ErrorTrap:
         '
         Public Property main_SQLCommandTimeout() As Integer
             Get
-                Return app.csv_SQLCommandTimeout
+                Return db.db_SQLCommandTimeout
             End Get
             Set(ByVal value As Integer)
-                app.csv_SQLCommandTimeout = value
+                db.db_SQLCommandTimeout = value
             End Set
         End Property
         '
@@ -25430,12 +25405,12 @@ ErrorTrap:
                     '--------------------------------------------------------------------------
                     '
                     If web_GetStreamInteger2("ContensiveUserForm") = 1 Then
-                        Dim FromAddress As String = app.siteProperty_getText("EmailFromAddress", "info@" & main_ServerDomain)
-                        Call main_SendFormEmail(app.siteProperty_EmailAdmin, FromAddress, "Form Submitted on " & web_requestReferer)
+                        Dim FromAddress As String = db.siteProperty_getText("EmailFromAddress", "info@" & main_ServerDomain)
+                        Call main_SendFormEmail(db.siteProperty_EmailAdmin, FromAddress, "Form Submitted on " & web_requestReferer)
                         If True Then
-                            Dim cs As Integer = app.db_csInsertRecord("User Form Response")
-                            If app.db_csOk(cs) Then
-                                Call app.db_setCS(cs, "name", "Form " & web.requestReferrer)
+                            Dim cs As Integer = db.db_csInsertRecord("User Form Response")
+                            If db.db_csOk(cs) Then
+                                Call db.db_setCS(cs, "name", "Form " & web.requestReferrer)
                                 Dim Copy As String = ""
                                 For Ptr = 0 To web_InStreamArrayCount - 1
                                     NameValue = web_InStreamArray(Ptr).NameValue
@@ -25443,12 +25418,12 @@ ErrorTrap:
                                         Copy = Copy & NameValue & vbCrLf
                                     End If
                                 Next
-                                Call app.db_setCS(cs, "copy", Copy)
+                                Call db.db_setCS(cs, "copy", Copy)
                                 If True Then
-                                    Call app.db_setCS(cs, "VisitId", main_VisitId)
+                                    Call db.db_setCS(cs, "VisitId", main_VisitId)
                                 End If
                             End If
-                            Call app.db_csClose(cs)
+                            Call db.db_csClose(cs)
                         End If
                     End If
                     '
@@ -25496,7 +25471,7 @@ ErrorTrap:
                     '--------------------------------------------------------------------------
                     '
                     If doc_getText("tpmode") <> "" Then
-                        Call app.siteProperty_set("ToolsPanelMode", web_GetStreamInteger2("tpmode"))
+                        Call db.siteProperty_set("ToolsPanelMode", web_GetStreamInteger2("tpmode"))
                     End If
                     '
                     '--------------------------------------------------------------------------
@@ -25512,7 +25487,7 @@ ErrorTrap:
                         Dim RecordEID As String = doc_getText(RequestNameLibraryFileID)
                         If (RecordEID <> "") Then
                             Dim tokenDate As Date
-                            Call security_decodeToken(RecordEID, app.config.privateKey, downloadId, tokenDate)
+                            Call security_decodeToken(RecordEID, db.config.privateKey, downloadId, tokenDate)
                             'downloadId = main_DecodeKeyNumber(RecordEID)
                         End If
                         If downloadId <> 0 Then
@@ -25524,23 +25499,23 @@ ErrorTrap:
                             If libraryFilePtr >= 0 Then
                                 libraryFileClicks = EncodeInteger(cache_libraryFiles(LibraryFilesCache_clicks, libraryFilePtr))
                                 link = EncodeText(cache_libraryFiles(LibraryFilesCache_filename, libraryFilePtr))
-                                Call app.executeSql("update cclibraryfiles set clicks=" & (libraryFileClicks + 1) & " where id=" & downloadId)
+                                Call db.executeSql("update cclibraryfiles set clicks=" & (libraryFileClicks + 1) & " where id=" & downloadId)
                             End If
                             If link <> "" Then
                                 '
                                 ' ----- create log entry
                                 '
-                                Dim CSPointer As Integer = app.db_csInsertRecord("Library File Log")
-                                If app.db_csOk(CSPointer) Then
-                                    Call app.db_setCS(CSPointer, "FileID", downloadId)
-                                    Call app.db_setCS(CSPointer, "VisitId", main_VisitId)
-                                    Call app.db_setCS(CSPointer, "MemberID", userId)
+                                Dim CSPointer As Integer = db.db_csInsertRecord("Library File Log")
+                                If db.db_csOk(CSPointer) Then
+                                    Call db.db_setCS(CSPointer, "FileID", downloadId)
+                                    Call db.db_setCS(CSPointer, "VisitId", main_VisitId)
+                                    Call db.db_setCS(CSPointer, "MemberID", userId)
                                 End If
-                                Call app.db_csClose(CSPointer)
+                                Call db.db_csClose(CSPointer)
                                 '
                                 ' ----- and go
                                 '
-                                Call web_Redirect2(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, link), "Redirecting because the active download request variable is set to a valid Library Files record. Library File Log has been appended.", False)
+                                Call web_Redirect2(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, link), "Redirecting because the active download request variable is set to a valid Library Files record. Library File Log has been appended.", False)
                             End If
                         End If
                     End If
@@ -25610,21 +25585,21 @@ ErrorTrap:
                                                     '
                                                     ClipChildRecordName = "record " & ClipChildRecordID
                                                     CSClip = db_csOpenRecord(ClipChildContentName, ClipChildRecordID, True, True)
-                                                    If Not app.db_csOk(CSClip) Then
+                                                    If Not db.db_csOk(CSClip) Then
                                                         Call error_AddUserError("The paste operation failed because the data record referenced by the clipboard could not found.")
                                                     Else
                                                         '
                                                         ' Paste the edit record record
                                                         '
-                                                        ClipChildRecordName = main_GetCSText(CSClip, "name")
+                                                        ClipChildRecordName = db.db_GetCSText(CSClip, "name")
                                                         If ClipParentFieldList = "" Then
                                                             '
                                                             ' Legacy paste - go right to the parent id
                                                             '
-                                                            If Not app.db_IsCSFieldSupported(CSClip, "ParentID") Then
+                                                            If Not db.db_IsCSFieldSupported(CSClip, "ParentID") Then
                                                                 Call error_AddUserError("The paste operation failed because the record you are pasting does not   support the necessary parenting feature.")
                                                             Else
-                                                                Call app.db_setCS(CSClip, "ParentID", ClipParentRecordID)
+                                                                Call db.db_setCS(CSClip, "ParentID", ClipParentRecordID)
                                                             End If
                                                         Else
                                                             '
@@ -25642,10 +25617,10 @@ ErrorTrap:
                                                                 If UBound(NameValues) = 0 Then
                                                                     Call error_AddUserError("The paste operation failed because the clipboard data Field List is not configured correctly.")
                                                                 Else
-                                                                    If Not app.db_IsCSFieldSupported(CSClip, CStr(NameValues(0))) Then
+                                                                    If Not db.db_IsCSFieldSupported(CSClip, CStr(NameValues(0))) Then
                                                                         Call error_AddUserError("The paste operation failed because the clipboard data Field [" & CStr(NameValues(0)) & "] is not supported by the location data.")
                                                                     Else
-                                                                        Call app.db_setCS(CSClip, CStr(NameValues(0)), CStr(NameValues(1)))
+                                                                        Call db.db_setCS(CSClip, CStr(NameValues(0)), CStr(NameValues(1)))
                                                                     End If
                                                                 End If
                                                             Next
@@ -25658,17 +25633,17 @@ ErrorTrap:
                                                         'ShortLink = modifyLinkQuery(ShortLink, "bid", CStr(ClipChildRecordID), True)
                                                         'Call main_TrackContentSet(CSClip, ShortLink)
                                                     End If
-                                                    Call app.db_csClose(CSClip)
+                                                    Call db.db_csClose(CSClip)
                                                     '
                                                     ' Set Child Pages Found and clear caches
                                                     '
                                                     CSClip = db_csOpen(ClipParentContentName, ClipParentRecordID, , , "ChildPagesFound")
-                                                    If app.db_csOk(CSClip) Then
-                                                        Call app.db_setCS(CSClip, "ChildPagesFound", True.ToString)
+                                                    If db.db_csOk(CSClip) Then
+                                                        Call db.db_setCS(CSClip, "ChildPagesFound", True.ToString)
                                                     End If
-                                                    Call app.db_csClose(CSClip)
+                                                    Call db.db_csClose(CSClip)
                                                     Call pageManager_cache_pageContent_clear()
-                                                    If (app.siteProperty_AllowWorkflowAuthoring And main_IsWorkflowAuthoringCompatible(ClipChildContentName)) Then
+                                                    If (db.siteProperty_AllowWorkflowAuthoring And main_IsWorkflowAuthoringCompatible(ClipChildContentName)) Then
                                                         '
                                                         ' Workflow editing
                                                         '
@@ -25676,7 +25651,7 @@ ErrorTrap:
                                                         '
                                                         ' Live Editing
                                                         '
-                                                        Call app.cache.invalidateTagList2(ClipChildContentName & "," & ClipParentContentName)
+                                                        Call cache.invalidateTagList2(ClipChildContentName & "," & ClipParentContentName)
                                                         Call pageManager_cache_pageContent_clear()
                                                     End If
                                                 End If
@@ -25774,19 +25749,19 @@ ErrorTrap:
                                 If cache_linkForward <> "" Then
                                     If 0 < InStr(1, cache_linkForward, "," & web.requestPathPage & ",", vbTextCompare) Then
                                         isLinkForward = True
-                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & app.db_EncodeSQLText(web.requestPathPage) & ")"
+                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & db.db_EncodeSQLText(web.requestPathPage) & ")"
                                     ElseIf 0 < InStr(1, cache_linkForward, "," & web.requestPathPage & "/,", vbTextCompare) Then
                                         isLinkForward = True
-                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & app.db_EncodeSQLText(web.requestPathPage & "/") & ")"
+                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & db.db_EncodeSQLText(web.requestPathPage & "/") & ")"
                                     ElseIf 0 < InStr(1, cache_linkForward, "," & LinkNoProtocol & ",", vbTextCompare) Then
                                         isLinkForward = True
-                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & app.db_EncodeSQLText(LinkNoProtocol) & ")"
+                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & db.db_EncodeSQLText(LinkNoProtocol) & ")"
                                     ElseIf 0 < InStr(1, cache_linkForward, "," & LinkFullPath & ",", vbTextCompare) Then
                                         isLinkForward = True
-                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & app.db_EncodeSQLText(LinkFullPath) & ")"
+                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & db.db_EncodeSQLText(LinkFullPath) & ")"
                                     ElseIf 0 < InStr(1, cache_linkForward, "," & LinkFullPathNoSlash & ",", vbTextCompare) Then
                                         isLinkForward = True
-                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & app.db_EncodeSQLText(LinkFullPathNoSlash) & ")"
+                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & db.db_EncodeSQLText(LinkFullPathNoSlash) & ")"
                                     End If
                                     If isLinkForward Then
                                         '
@@ -25794,8 +25769,8 @@ ErrorTrap:
                                         '
                                         isLinkForward = False
                                         Sql = main_GetSQLSelect("", "ccLinkForwards", "ID,DestinationLink,Viewings,GroupID", LinkForwardCriteria, "ID", , 1)
-                                        CSPointer = app.db_csOpenSql(Sql)
-                                        If app.db_csOk(CSPointer) Then
+                                        CSPointer = db.db_csOpenSql(Sql)
+                                        If db.db_csOk(CSPointer) Then
                                             '
                                             ' Link Forward found - update count
                                             '
@@ -25804,17 +25779,17 @@ ErrorTrap:
                                             Dim groupName As String
                                             '
                                             IsInLinkForwardTable = True
-                                            Viewings = app.db_GetCSInteger(CSPointer, "Viewings") + 1
-                                            Sql = "update ccLinkForwards set Viewings=" & Viewings & " where ID=" & app.db_GetCSInteger(CSPointer, "ID")
-                                            Call app.executeSql(Sql)
-                                            Link = app.db_GetCSText(CSPointer, "DestinationLink")
+                                            Viewings = db.db_GetCSInteger(CSPointer, "Viewings") + 1
+                                            Sql = "update ccLinkForwards set Viewings=" & Viewings & " where ID=" & db.db_GetCSInteger(CSPointer, "ID")
+                                            Call db.executeSql(Sql)
+                                            Link = db.db_GetCSText(CSPointer, "DestinationLink")
                                             If Link <> "" Then
                                                 '
                                                 ' Valid Link Forward (without link it is just a record created by the autocreate function
                                                 '
                                                 isLinkForward = True
-                                                Link = app.db_GetCSText(CSPointer, "DestinationLink")
-                                                GroupID = app.db_GetCSInteger(CSPointer, "GroupID")
+                                                Link = db.db_GetCSText(CSPointer, "DestinationLink")
+                                                GroupID = db.db_GetCSInteger(CSPointer, "GroupID")
                                                 If GroupID <> 0 Then
                                                     groupName = group_GetGroupName(GroupID)
                                                     If groupName <> "" Then
@@ -25827,7 +25802,7 @@ ErrorTrap:
                                                 End If
                                             End If
                                         End If
-                                        Call app.db_csClose(CSPointer)
+                                        Call db.db_csClose(CSPointer)
                                     End If
                                 End If
                                 '
@@ -25861,7 +25836,7 @@ ErrorTrap:
                                             '
                                             ' Handle Favicon.ico when the client did not recognize the meta tag
                                             '
-                                            Dim Filename As String = app.siteProperty_getText("FaviconFilename", "")
+                                            Dim Filename As String = db.siteProperty_getText("FaviconFilename", "")
                                             If Filename = "" Then
                                                 '
                                                 ' no favicon, 404 the call
@@ -25871,7 +25846,7 @@ ErrorTrap:
                                                 docOpen = False '--- should be disposed by caller --- Call dispose
                                                 Return _docBuffer
                                             Else
-                                                Call web_Redirect2(csv_getVirtualFileLink(app.config.cdnFilesNetprefix, Filename), "favicon request", False)
+                                                Call web_Redirect2(csv_getVirtualFileLink(db.config.cdnFilesNetprefix, Filename), "favicon request", False)
                                                 docOpen = False '--- should be disposed by caller --- Call dispose
                                                 Return _docBuffer
                                             End If
@@ -25885,14 +25860,14 @@ ErrorTrap:
                                             '
                                             Dim Filename As String = "config/RobotsTxtBase.txt"
                                             ' set this way because the preferences page needs a filename in a site property (enhance later)
-                                            Call app.siteProperty_set("RobotsTxtFilename", Filename)
-                                            Dim Content As String = app.cdnFiles.ReadFile(Filename)
+                                            Call db.siteProperty_set("RobotsTxtFilename", Filename)
+                                            Dim Content As String = db.cdnFiles.ReadFile(Filename)
                                             If Content = "" Then
                                                 '
                                                 ' save default robots.txt
                                                 '
                                                 Content = "User-agent: *" & vbCrLf & "Disallow: /admin/" & vbCrLf & "Disallow: /images/"
-                                                Call app.appRootFiles.SaveFile(Filename, Content)
+                                                Call db.appRootFiles.SaveFile(Filename, Content)
                                             End If
                                             Content = Content & cache_addons.robotsTxt
                                             Call web_setResponseContentType("text/plain")
@@ -25903,17 +25878,17 @@ ErrorTrap:
                                         '
                                         ' No Link Forward, no Link Alias, no RemoteMethodFromPage, not Robots.txt
                                         '
-                                        If (main_PageErrorCount = 0) And EncodeBoolean(app.siteProperty_getBoolean("LinkForwardAutoInsert", False)) And (Not IsInLinkForwardTable) Then
+                                        If (main_PageErrorCount = 0) And EncodeBoolean(db.siteProperty_getBoolean("LinkForwardAutoInsert", False)) And (Not IsInLinkForwardTable) Then
                                             '
                                             ' Add a new Link Forward entry
                                             '
                                             CSPointer = db_InsertCSContent("Link Forwards")
-                                            If app.db_csOk(CSPointer) Then
-                                                Call app.db_setCS(CSPointer, "Name", web.requestPathPage)
-                                                Call app.db_setCS(CSPointer, "sourcelink", web.requestPathPage)
-                                                Call app.db_setCS(CSPointer, "Viewings", 1)
+                                            If db.db_csOk(CSPointer) Then
+                                                Call db.db_setCS(CSPointer, "Name", web.requestPathPage)
+                                                Call db.db_setCS(CSPointer, "sourcelink", web.requestPathPage)
+                                                Call db.db_setCS(CSPointer, "Viewings", 1)
                                             End If
-                                            Call app.db_csClose(CSPointer)
+                                            Call db.db_csClose(CSPointer)
                                         End If
                                         '
                                         ' real 404
@@ -25930,12 +25905,12 @@ ErrorTrap:
                     ' ----- do anonymous access blocking
                     '
                     If Not user_isAuthenticated() Then
-                        If (web_requestPath <> "/") And InStr(1, app.siteProperty_AdminURL, web_requestPath, vbTextCompare) <> 0 Then
+                        If (web_requestPath <> "/") And InStr(1, db.siteProperty_AdminURL, web_requestPath, vbTextCompare) <> 0 Then
                             '
                             ' admin page is excluded from custom blocking
                             '
                         Else
-                            Dim AnonymousUserResponseID As Integer = EncodeInteger(app.siteProperty_getText("AnonymousUserResponseID", "0"))
+                            Dim AnonymousUserResponseID As Integer = EncodeInteger(db.siteProperty_getText("AnonymousUserResponseID", "0"))
                             Select Case AnonymousUserResponseID
                                 Case 1
                                     '
@@ -25984,7 +25959,7 @@ ErrorTrap:
                     '
                     ' run the appropriate body addon
                     '
-                    bodyAddonId = EncodeInteger(app.siteProperty_getText("Html Body AddonId", "0"))
+                    bodyAddonId = EncodeInteger(db.siteProperty_getText("Html Body AddonId", "0"))
                     If bodyAddonId <> 0 Then
                         htmlBody = executeAddon(bodyAddonId, "", "", addonContextEnum.ContextPage, "", 0, "", "", False, 0, "", bodyAddonStatusOK, Nothing, "", Nothing, "", userId, user_isAuthenticated)
                     Else
@@ -26027,7 +26002,7 @@ ErrorTrap:
                     '
                     '--------------------------------------------------------------------------
                     '
-                    If LCase(web.requestPathPage) = LCase(app.RootWebPath & app.siteProperty_ServerPageDefault) Then
+                    If LCase(web.requestPathPage) = LCase(db.RootWebPath & db.siteProperty_ServerPageDefault) Then
                         '
                         ' This is a 404 caused by Contensive returning a 404
                         '   possibly because the pageid was not found or was inactive.
@@ -26072,7 +26047,7 @@ ErrorTrap:
                                 '
                                 main_ServerReferrerURL = main_ServerReferrerURL & web_requestPage
                             Else
-                                main_ServerReferrerURL = main_ServerReferrerURL & app.siteProperty_ServerPageDefault
+                                main_ServerReferrerURL = main_ServerReferrerURL & db.siteProperty_ServerPageDefault
                             End If
                         End If
                         Dim linkDst As String
@@ -26187,7 +26162,7 @@ ErrorTrap:
             ' stylesheets first -- for performance
             ' put stylesheets inline without processing
             '
-            If (True) And EncodeBoolean(app.siteProperty_getBoolean("Allow CSS Reset", False)) Then
+            If (True) And EncodeBoolean(db.siteProperty_getBoolean("Allow CSS Reset", False)) Then
                 '
                 ' reset styles
                 '
@@ -26198,7 +26173,7 @@ ErrorTrap:
                 '
                 ' site styles
                 '
-                main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, "templates/styles.css") & """ >"
+                main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, "templates/styles.css") & """ >"
             End If
             '
             ' Template shared styles
@@ -26214,7 +26189,7 @@ ErrorTrap:
                         If Parts(1) <> "" Then
                             main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & decodeHtml(Parts(1))
                         End If
-                        main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, Parts(0)) & """ >"
+                        main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, Parts(0)) & """ >"
                         If Parts(2) <> "" Then
                             main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & decodeHtml(Parts(2))
                         End If
@@ -26239,7 +26214,7 @@ ErrorTrap:
             ' Member Styles
             '
             If userStyleFilename <> "" Then
-                Call main_AddStylesheetLink2(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, userStyleFilename), "member style")
+                Call main_AddStylesheetLink2(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, userStyleFilename), "member style")
                 userStyleFilename = ""
             End If
             '
@@ -26262,20 +26237,20 @@ ErrorTrap:
             '
             ' favicon
             '
-            VirtualFilename = app.siteProperty_getText("faviconfilename")
+            VirtualFilename = db.siteProperty_getText("faviconfilename")
             If VirtualFilename <> "" Then
                 Pos = InStrRev(VirtualFilename, ".")
                 If Pos > 0 Then
                     Ext = LCase(Mid(VirtualFilename, Pos))
                     Select Case Ext
                         Case ".ico"
-                            main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/vnd.microsoft.icon"" href=""" & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, VirtualFilename) & """ >"
+                            main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/vnd.microsoft.icon"" href=""" & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, VirtualFilename) & """ >"
                         Case ".png"
-                            main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/png"" href=""" & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, VirtualFilename) & """ >"
+                            main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/png"" href=""" & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, VirtualFilename) & """ >"
                         Case ".gif"
-                            main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/gif"" href=""" & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, VirtualFilename) & """ >"
+                            main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/gif"" href=""" & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, VirtualFilename) & """ >"
                         Case ".jpg"
-                            main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/jpg"" href=""" & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, VirtualFilename) & """ >"
+                            main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/jpg"" href=""" & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, VirtualFilename) & """ >"
                     End Select
                 End If
             End If
@@ -26283,7 +26258,7 @@ ErrorTrap:
             ' misc caching, etc
             '
             Dim encoding As String
-            encoding = html_EncodeHTML(app.siteProperty_getText("Site Character Encoding", "utf-8"))
+            encoding = html_EncodeHTML(db.siteProperty_getText("Site Character Encoding", "utf-8"))
             main_GetHTMLInternalHead = main_GetHTMLInternalHead _
                 & OtherHeadTags _
                 & cr & "<meta http-equiv=""content-type"" content=""text/html; charset=" & encoding & """ >" _
@@ -26446,18 +26421,18 @@ ErrorTrap:
             Dim CS As Integer
             Dim Id As Integer
             '
-            CS = app.db_csInsertRecord(ContentName, CreatedBy)
-            If app.db_csOk(CS) Then
-                Id = app.db_GetCSInteger(CS, "ID")
-                Call app.db_setCS(CS, "name", PageName)
-                Call app.db_setCS(CS, "active", "1")
+            CS = db.db_csInsertRecord(ContentName, CreatedBy)
+            If db.db_csOk(CS) Then
+                Id = db.db_GetCSInteger(CS, "ID")
+                Call db.db_setCS(CS, "name", PageName)
+                Call db.db_setCS(CS, "active", "1")
                 If True Then
-                    Call app.db_setCS(CS, "ccGuid", pageGuid)
+                    Call db.db_setCS(CS, "ccGuid", pageGuid)
                 End If
-                Call app.csv_SaveCSRecord(CS)
-                Call main_PublishEdit("Page Content", Id)
+                Call db.db_SaveCSRecord(CS)
+                Call workflow_PublishEdit("Page Content", Id)
             End If
-            Call app.db_csClose(CS)
+            Call db.db_csClose(CS)
             '
             main_CreatePageGetID = Id
             '
@@ -26484,7 +26459,7 @@ ErrorTrap:
             Dim NameOK As Boolean
             Dim SectionNameTry As String
             '
-            If (main_PageErrorCount = 0) And EncodeBoolean(app.siteProperty_getBoolean("AllowAutoHomeSectionOnce", False)) Then
+            If (main_PageErrorCount = 0) And EncodeBoolean(db.siteProperty_getBoolean("AllowAutoHomeSectionOnce", False)) Then
                 '
                 SectionTemplateID = pageManager_LoadTemplateGetID(0)
                 '
@@ -26497,47 +26472,47 @@ ErrorTrap:
                     If LoopPtr <> 0 Then
                         SectionNameTry = SectionName & " " & (LoopPtr + 1)
                     End If
-                    CS = app.db_csOpen("Site Sections", "name=" & app.db_EncodeSQLText(SectionNameTry), , ,, , , "ID")
-                    NameOK = Not app.db_csOk(CS)
-                    Call app.db_csClose(CS)
+                    CS = db.db_csOpen("Site Sections", "name=" & db.db_EncodeSQLText(SectionNameTry), , ,, , , "ID")
+                    NameOK = Not db.db_csOk(CS)
+                    Call db.db_csClose(CS)
                     LoopPtr = LoopPtr + 1
                 Loop
                 '
-                CS = app.db_csInsertRecord("Site Sections")
-                If app.db_csOk(CS) Then
-                    SectionID = app.db_GetCSInteger(CS, "ID")
-                    Call app.db_setCS(CS, "Name", SectionNameTry)
-                    Call app.db_setCS(CS, "Caption", DefaultLandingSectionName)
-                    Call app.db_setCS(CS, "SortOrder", -1)
-                    Call app.db_setCS(CS, "HideMenu", False)
-                    Call app.db_setCS(CS, "contentid", SectionContentID)
-                    Call app.db_setCS(CS, "TemplateID", SectionTemplateID)
+                CS = db.db_csInsertRecord("Site Sections")
+                If db.db_csOk(CS) Then
+                    SectionID = db.db_GetCSInteger(CS, "ID")
+                    Call db.db_setCS(CS, "Name", SectionNameTry)
+                    Call db.db_setCS(CS, "Caption", DefaultLandingSectionName)
+                    Call db.db_setCS(CS, "SortOrder", -1)
+                    Call db.db_setCS(CS, "HideMenu", False)
+                    Call db.db_setCS(CS, "contentid", SectionContentID)
+                    Call db.db_setCS(CS, "TemplateID", SectionTemplateID)
                     If True Then
-                        Call app.db_setCS(CS, "RootPageID", rootPageId)
+                        Call db.db_setCS(CS, "RootPageID", rootPageId)
                     End If
                     If True Then
-                        Call app.db_setCS(CS, "ccGuid", DefaultLandingSectionGuid)
+                        Call db.db_setCS(CS, "ccGuid", DefaultLandingSectionGuid)
                     End If
                 End If
-                Call app.db_csClose(CS)
+                Call db.db_csClose(CS)
                 Call pageManager_cache_siteSection_clear()
                 '
                 ' main_Get the Default Menu ID
                 '
-                CS = app.db_csOpen("Dynamic Menus", "(name='Default')", "ID", , ,, , "ID")
-                If app.db_csOk(CS) Then
-                    DefaultMenuID = app.db_GetCSInteger(CS, "ID")
+                CS = db.db_csOpen("Dynamic Menus", "(name='Default')", "ID", , ,, , "ID")
+                If db.db_csOk(CS) Then
+                    DefaultMenuID = db.db_GetCSInteger(CS, "ID")
                 End If
-                Call app.db_csClose(CS)
+                Call db.db_csClose(CS)
                 '
                 ' Add the new landing section to the default menu
                 '
-                CS = app.db_csInsertRecord("Dynamic Menu Section Rules")
-                If app.db_csOk(CS) Then
-                    Call app.db_setCS(CS, "DynamicMenuID", DefaultMenuID)
-                    Call app.db_setCS(CS, "SectionID", SectionID)
+                CS = db.db_csInsertRecord("Dynamic Menu Section Rules")
+                If db.db_csOk(CS) Then
+                    Call db.db_setCS(CS, "DynamicMenuID", DefaultMenuID)
+                    Call db.db_setCS(CS, "SectionID", SectionID)
                 End If
-                Call app.db_csClose(CS)
+                Call db.db_csClose(CS)
                 '
                 main_GetLandingPageID_CreateLandingSectionReturnID = SectionID
             End If
@@ -26565,7 +26540,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Sub
             '
-            Call app.db_RollBackCS(EncodeInteger(CSPointer))
+            Call db.db_RollBackCS(EncodeInteger(CSPointer))
             '
             Exit Sub
 ErrorTrap:
@@ -26604,9 +26579,9 @@ ErrorTrap:
                         & " and M.GroupID=R.GroupID" _
                         & " and R.Active<>0" _
                         & " and M.Active<>0" _
-                        & " and ((M.DateExpires is null)or(M.DateExpires>" & app.db_EncodeSQLDate(main_PageStartTime) & "))"
+                        & " and ((M.DateExpires is null)or(M.DateExpires>" & db.db_EncodeSQLDate(main_PageStartTime) & "))"
                     SQL = main_GetSQLSelect("", "ccmemberRules M,ccSectionBlockRules R", "M.ID", SQLWhere, , , 1)
-                    CS = app.db_csOpenSql(SQL)
+                    CS = db.db_csOpenSql(SQL)
                     'SQL = "select ID" _
                     '    & " from ccMemberRules M,ccSectionBlockRules R" _
                     '    & " where M.MemberID=" & memberID _
@@ -26625,8 +26600,8 @@ ErrorTrap:
                     '    & " and M.Active<>0" _
                     '    & " and ((M.DateExpires is null)or(M.DateExpires>" & main_SQlPageStartTime & "))"
                     'CS = app.db_openCsSql(SQL)
-                    main_isSectionBlocked = Not (app.db_csOk(CS))
-                    Call app.db_csClose(CS)
+                    main_isSectionBlocked = Not (db.db_csOk(CS))
+                    Call db.db_csClose(CS)
                 End If
             End If
 
@@ -26675,11 +26650,11 @@ ErrorTrap:
                 '
                 ' First try main_ContentWatch table for a link
                 '
-                CSPointer = app.db_csOpen("Content Watch", "ContentRecordKey=" & app.db_EncodeSQLText(ContentRecordKey), , , ,, , "Link,Clicks")
-                If app.db_csOk(CSPointer) Then
-                    main_GetLinkByContentRecordKey = app.db_GetCSText(CSPointer, "Link")
+                CSPointer = db.db_csOpen("Content Watch", "ContentRecordKey=" & db.db_EncodeSQLText(ContentRecordKey), , , ,, , "Link,Clicks")
+                If db.db_csOk(CSPointer) Then
+                    main_GetLinkByContentRecordKey = db.db_GetCSText(CSPointer, "Link")
                 End If
-                Call app.db_csClose(CSPointer)
+                Call db.db_csClose(CSPointer)
                 '
                 If main_GetLinkByContentRecordKey = "" Then
                     '
@@ -26694,43 +26669,43 @@ ErrorTrap:
                             If ContentName <> "" And RecordID <> 0 Then
                                 If db_GetContentTablename(ContentName) = "ccPageContent" Then
                                     CSPointer = db_csOpen(ContentName, RecordID, , , "TemplateID,ParentID")
-                                    If app.db_csOk(CSPointer) Then
+                                    If db.db_csOk(CSPointer) Then
                                         recordfound = True
-                                        templateId = app.db_GetCSInteger(CSPointer, "TemplateID")
-                                        ParentID = app.db_GetCSInteger(CSPointer, "ParentID")
+                                        templateId = db.db_GetCSInteger(CSPointer, "TemplateID")
+                                        ParentID = db.db_GetCSInteger(CSPointer, "ParentID")
                                     End If
-                                    Call app.db_csClose(CSPointer)
+                                    Call db.db_csClose(CSPointer)
                                     If Not recordfound Then
                                         '
                                         ' This content record does not exist - remove any records with this ContentRecordKey pointer
                                         '
                                         'Call app.db_DeleteContentRecords("Topic Rules", "ContentRecordKey=" & encodeSQLText(ContentRecordKey))
                                         'Call app.db_DeleteContentRecords("Topic Habits", "ContentRecordKey=" & encodeSQLText(ContentRecordKey))
-                                        Call app.db_DeleteContentRecords("Content Watch", "ContentRecordKey=" & app.db_EncodeSQLText(ContentRecordKey))
+                                        Call db.db_DeleteContentRecords("Content Watch", "ContentRecordKey=" & db.db_EncodeSQLText(ContentRecordKey))
                                         Call metaData_DeleteContentTracking(ContentName, RecordID, True)
                                     Else
 
                                         If templateId <> 0 Then
                                             CSPointer = db_csOpen("Page Templates", templateId, , , "Link")
-                                            If app.db_csOk(CSPointer) Then
-                                                main_GetLinkByContentRecordKey = app.db_GetCSText(CSPointer, "Link")
+                                            If db.db_csOk(CSPointer) Then
+                                                main_GetLinkByContentRecordKey = db.db_GetCSText(CSPointer, "Link")
                                             End If
-                                            Call app.db_csClose(CSPointer)
+                                            Call db.db_csClose(CSPointer)
                                         End If
                                         If main_GetLinkByContentRecordKey = "" And ParentID <> 0 Then
                                             TableName = db_GetContentTablename(ContentName)
                                             DataSource = main_GetContentDataSource(ContentName)
-                                            CSPointer = app.db_openCsSql_rev(DataSource, "Select ContentControlID from " & TableName & " where ID=" & RecordID)
-                                            If app.db_csOk(CSPointer) Then
-                                                ParentContentID = EncodeInteger(app.db_GetCSText(CSPointer, "ContentControlID"))
+                                            CSPointer = db.db_openCsSql_rev(DataSource, "Select ContentControlID from " & TableName & " where ID=" & RecordID)
+                                            If db.db_csOk(CSPointer) Then
+                                                ParentContentID = EncodeInteger(db.db_GetCSText(CSPointer, "ContentControlID"))
                                             End If
-                                            Call app.db_csClose(CSPointer)
+                                            Call db.db_csClose(CSPointer)
                                             If ParentContentID <> 0 Then
                                                 main_GetLinkByContentRecordKey = main_GetLinkByContentRecordKey(CStr(ParentContentID & "." & ParentID), "")
                                             End If
                                         End If
                                         If main_GetLinkByContentRecordKey = "" Then
-                                            DefaultTemplateLink = app.siteProperty_getText("SectionLandingLink", app.RootWebPath & app.siteProperty_ServerPageDefault)
+                                            DefaultTemplateLink = db.siteProperty_getText("SectionLandingLink", db.RootWebPath & db.siteProperty_ServerPageDefault)
                                         End If
                                     End If
                                 End If
@@ -26747,7 +26722,7 @@ ErrorTrap:
                 main_GetLinkByContentRecordKey = DefaultLink
             End If
             '
-            main_GetLinkByContentRecordKey = EncodeAppRootPath(main_GetLinkByContentRecordKey, web_requestVirtualFilePath, app.RootWebPath, web.requestDomain)
+            main_GetLinkByContentRecordKey = EncodeAppRootPath(main_GetLinkByContentRecordKey, web_requestVirtualFilePath, db.RootWebPath, web.requestDomain)
             '
             Exit Function
             '
@@ -26774,28 +26749,28 @@ ErrorTrap:
                 CS = main_OpenCSContentWatchList(ListName, SortField, True)
             End If
             '
-            If app.db_csOk(CS) Then
+            If db.db_csOk(CS) Then
                 ContentID = main_GetContentID("Content Watch")
-                Do While app.db_csOk(CS)
-                    Link = main_GetCSText(CS, "link")
-                    LinkLabel = main_GetCSText(CS, "LinkLabel")
-                    RecordID = app.db_GetCSInteger(CS, "ID")
+                Do While db.db_csOk(CS)
+                    Link = db.db_GetCSText(CS, "link")
+                    LinkLabel = db.db_GetCSText(CS, "LinkLabel")
+                    RecordID = db.db_GetCSInteger(CS, "ID")
                     If (LinkLabel <> "") Then
                         main_GetWatchList = main_GetWatchList & cr & "<li id=""main_ContentWatch" & RecordID & """ class=""ccListItem"">"
                         If (Link <> "") Then
-                            main_GetWatchList = main_GetWatchList & "<a href=""http://" & main_ServerDomain & app.RootWebPath & web_requestPage & "?rc=" & ContentID & "&ri=" & RecordID & """>" & LinkLabel & "</a>"
+                            main_GetWatchList = main_GetWatchList & "<a href=""http://" & main_ServerDomain & db.RootWebPath & web_requestPage & "?rc=" & ContentID & "&ri=" & RecordID & """>" & LinkLabel & "</a>"
                         Else
                             main_GetWatchList = main_GetWatchList & LinkLabel
                         End If
                         main_GetWatchList = main_GetWatchList & "</li>"
                     End If
-                    Call app.db_csGoNext(CS)
+                    Call db.db_csGoNext(CS)
                 Loop
                 If main_GetWatchList <> "" Then
                     main_GetWatchList = html_GetContentCopy("Watch List Caption: " & ListName, ListName, userId, True, user_isAuthenticated) & cr & "<ul class=""ccWatchList"">" & kmaIndent(main_GetWatchList) & cr & "</ul>"
                 End If
             End If
-            Call app.db_csClose(CS)
+            Call db.db_csClose(CS)
             '
             If main_VisitProperty_AllowAdvancedEditor Then
                 main_GetWatchList = main_GetEditWrapper("Watch List [" & ListName & "]", main_GetWatchList)
@@ -26935,12 +26910,12 @@ ErrorTrap:
             If Not IsInDelimitedString(UsedIDString, CStr(RecordID), ",") Then
                 ContentName = main_GetContentNameByID(ContentID)
                 CS = db_csOpen(ContentName, RecordID, False, False)
-                If app.db_csOk(CS) Then
-                    HasParentID = app.db_IsCSFieldSupported(CS, "ParentID")
-                    RecordContentID = app.db_GetCSInteger(CS, "ContentControlID")
+                If db.db_csOk(CS) Then
+                    HasParentID = db.db_IsCSFieldSupported(CS, "ParentID")
+                    RecordContentID = db.db_GetCSInteger(CS, "ContentControlID")
                     RecordContentName = main_GetContentNameByID(RecordContentID)
                 End If
-                Call app.db_csClose(CS)
+                Call db.db_csClose(CS)
                 If RecordContentName <> "" Then
                     '
                     '
@@ -26951,21 +26926,21 @@ ErrorTrap:
                     ' either Workflow on non-workflow - it changes everything
                     '
                     SQL = "update " & RecordTableName & " set ContentControlID=" & NewContentControlID & " where ID=" & RecordID & " or EditSourceID=" & RecordID
-                    Call app.executeSql(SQL, DataSourceName)
+                    Call db.executeSql(SQL, DataSourceName)
                     If HasParentID Then
                         SQL = "select contentcontrolid,ID from " & RecordTableName & " where ParentID=" & RecordID
-                        CS = app.db_openCsSql_rev(DataSourceName, SQL)
-                        Do While app.db_csOk(CS)
-                            Call main_SetContentControl(app.db_GetCSInteger(CS, "contentcontrolid"), app.db_GetCSInteger(CS, "ID"), NewContentControlID, UsedIDString & "," & RecordID)
-                            app.db_csGoNext(CS)
+                        CS = db.db_openCsSql_rev(DataSourceName, SQL)
+                        Do While db.db_csOk(CS)
+                            Call main_SetContentControl(db.db_GetCSInteger(CS, "contentcontrolid"), db.db_GetCSInteger(CS, "ID"), NewContentControlID, UsedIDString & "," & RecordID)
+                            db.db_csGoNext(CS)
                         Loop
-                        Call app.db_csClose(CS)
+                        Call db.db_csClose(CS)
                     End If
                     '
                     ' fix content watch
                     '
                     SQL = "update ccContentWatch set ContentID=" & NewContentControlID & ", ContentRecordKey='" & NewContentControlID & "." & RecordID & "' where ContentID=" & ContentID & " and RecordID=" & RecordID
-                    Call app.executeSql(SQL)
+                    Call db.executeSql(SQL)
                     '            '
                     '            ' fix Topic Rules
                     '            '
@@ -27168,11 +27143,11 @@ ErrorTrap:
             Dim CS As Integer
             Dim PageID As Integer
             '
-            CS = app.db_csOpen("Copy Content", "name=" & app.db_EncodeSQLText(ContentBlockCopyName), "ID", , , , , "Copy,ID")
-            If app.db_csOk(CS) Then
-                main_GetDefaultBlockMessage = app.db_GetCS(CS, "Copy")
+            CS = db.db_csOpen("Copy Content", "name=" & db.db_EncodeSQLText(ContentBlockCopyName), "ID", , , , , "Copy,ID")
+            If db.db_csOk(CS) Then
+                main_GetDefaultBlockMessage = db.db_GetCS(CS, "Copy")
             End If
-            Call app.db_csClose(CS)
+            Call db.db_csClose(CS)
             '
             ' ----- Do not allow blank message - if still nothing, create default
             '
@@ -27182,12 +27157,12 @@ ErrorTrap:
             '
             ' ----- Create Copy Content Record for future
             '
-            CS = app.db_csInsertRecord("Copy Content")
-            If app.db_csOk(CS) Then
-                Call app.db_setCS(CS, "Name", ContentBlockCopyName)
-                Call app.db_setCS(CS, "Copy", main_GetDefaultBlockMessage)
-                Call app.csv_SaveCSRecord(CS)
-                Call main_PublishEdit("Copy Content", EncodeInteger(app.db_GetCS(CS, "ID")))
+            CS = db.db_csInsertRecord("Copy Content")
+            If db.db_csOk(CS) Then
+                Call db.db_setCS(CS, "Name", ContentBlockCopyName)
+                Call db.db_setCS(CS, "Copy", main_GetDefaultBlockMessage)
+                Call db.db_SaveCSRecord(CS)
+                Call workflow_PublishEdit("Copy Content", EncodeInteger(db.db_GetCS(CS, "ID")))
             End If
             '
             Exit Function
@@ -27351,13 +27326,13 @@ ErrorTrap:
             '
             IsRetry = (web_GetStreamInteger2("ContensiveFormPageID") <> 0)
             '
-            CS = app.db_csOpen("Form Pages", "name=" & app.db_EncodeSQLText(FormPageName))
-            If app.db_csOk(CS) Then
-                FormPageID = app.db_GetCSInteger(CS, "ID")
-                Formhtml = main_GetCSText(CS, "Body")
-                FormInstructions = main_GetCSText(CS, "Instructions")
+            CS = db.db_csOpen("Form Pages", "name=" & db.db_EncodeSQLText(FormPageName))
+            If db.db_csOk(CS) Then
+                FormPageID = db.db_GetCSInteger(CS, "ID")
+                Formhtml = db.db_GetCSText(CS, "Body")
+                FormInstructions = db.db_GetCSText(CS, "Instructions")
             End If
-            Call app.db_csClose(CS)
+            Call db.db_csClose(CS)
             f = main_LoadFormPageInstructions(FormInstructions, Formhtml)
             '
             '
@@ -27376,14 +27351,14 @@ ErrorTrap:
                             Else
                                 CaptionSpan = "<span>"
                             End If
-                            If Not app.db_csOk(CSPeople) Then
+                            If Not db.db_csOk(CSPeople) Then
                                 CSPeople = db_csOpen("people", userId)
                             End If
                             Caption = .Caption
                             If .REquired Or EncodeBoolean(db_GetContentFieldProperty("People", .PeopleField, "Required")) Then
                                 Caption = "*" & Caption
                             End If
-                            If app.db_csOk(CSPeople) Then
+                            If db.db_csOk(CSPeople) Then
                                 Body = f.RepeatCell
                                 Body = Replace(Body, "{{CAPTION}}", CaptionSpan & Caption & "</span>", , , vbTextCompare)
                                 Body = Replace(Body, "{{FIELD}}", html_GetFormInputCS(CSPeople, "People", .PeopleField), , , vbTextCompare)
@@ -27404,7 +27379,7 @@ ErrorTrap:
                     End Select
                 End With
             Next
-            Call app.db_csClose(CSPeople)
+            Call db.db_csClose(CSPeople)
             If HasRequiredFields Then
                 Body = f.RepeatCell
                 Body = Replace(Body, "{{CAPTION}}", "&nbsp;", , , vbTextCompare)
@@ -27459,11 +27434,11 @@ ErrorTrap:
             ' main_Get the instructions from the record
             '
             CS = db_csOpen("Form Pages", FormPageID)
-            If app.db_csOk(CS) Then
-                Formhtml = main_GetCSText(CS, "Body")
-                FormInstructions = main_GetCSText(CS, "Instructions")
+            If db.db_csOk(CS) Then
+                Formhtml = db.db_GetCSText(CS, "Body")
+                FormInstructions = db.db_GetCSText(CS, "Instructions")
             End If
-            Call app.db_csClose(CS)
+            Call db.db_csClose(CS)
             If FormInstructions <> "" Then
                 '
                 ' Load the instructions
@@ -27486,12 +27461,12 @@ ErrorTrap:
                                 '
                                 FormValue = doc_getText(.PeopleField)
                                 If (FormValue <> "") And EncodeBoolean(db_GetContentFieldProperty("people", .PeopleField, "uniquename")) Then
-                                    SQL = "select count(*) from ccMembers where " & .PeopleField & "=" & app.db_EncodeSQLText(FormValue)
-                                    CS = app.db_csOpenSql(SQL)
-                                    If app.db_csOk(CS) Then
-                                        Success = app.db_GetCSInteger(CS, "cnt") = 0
+                                    SQL = "select count(*) from ccMembers where " & .PeopleField & "=" & db.db_EncodeSQLText(FormValue)
+                                    CS = db.db_csOpenSql(SQL)
+                                    If db.db_csOk(CS) Then
+                                        Success = db.db_GetCSInteger(CS, "cnt") = 0
                                     End If
-                                    Call app.db_csClose(CS)
+                                    Call db.db_csClose(CS)
                                     If Not Success Then
                                         error_AddUserError("The field [" & .Caption & "] must be unique, and the value [" & html_EncodeHTML(FormValue) & "] has already been used.")
                                     End If
@@ -27500,31 +27475,31 @@ ErrorTrap:
                                     Success = False
                                     error_AddUserError("The field [" & html_EncodeHTML(.Caption) & "] is required.")
                                 Else
-                                    If Not app.db_csOk(CSPeople) Then
+                                    If Not db.db_csOk(CSPeople) Then
                                         CSPeople = db_csOpen("people", userId)
                                     End If
-                                    If app.db_csOk(CSPeople) Then
+                                    If db.db_csOk(CSPeople) Then
                                         Select Case UCase(.PeopleField)
                                             Case "NAME"
                                                 PeopleName = FormValue
-                                                Call app.db_setCS(CSPeople, .PeopleField, FormValue)
+                                                Call db.db_setCS(CSPeople, .PeopleField, FormValue)
                                             Case "FIRSTNAME"
                                                 PeopleFirstName = FormValue
-                                                Call app.db_setCS(CSPeople, .PeopleField, FormValue)
+                                                Call db.db_setCS(CSPeople, .PeopleField, FormValue)
                                             Case "LASTNAME"
                                                 PeopleLastName = FormValue
-                                                Call app.db_setCS(CSPeople, .PeopleField, FormValue)
+                                                Call db.db_setCS(CSPeople, .PeopleField, FormValue)
                                             Case "EMAIL"
                                                 PeopleEmail = FormValue
-                                                Call app.db_setCS(CSPeople, .PeopleField, FormValue)
+                                                Call db.db_setCS(CSPeople, .PeopleField, FormValue)
                                             Case "USERNAME"
                                                 PeopleUsername = FormValue
-                                                Call app.db_setCS(CSPeople, .PeopleField, FormValue)
+                                                Call db.db_setCS(CSPeople, .PeopleField, FormValue)
                                             Case "PASSWORD"
                                                 PeoplePassword = FormValue
-                                                Call app.db_setCS(CSPeople, .PeopleField, FormValue)
+                                                Call db.db_setCS(CSPeople, .PeopleField, FormValue)
                                             Case Else
-                                                Call app.db_setCS(CSPeople, .PeopleField, FormValue)
+                                                Call db.db_setCS(CSPeople, .PeopleField, FormValue)
                                         End Select
                                     End If
                                 End If
@@ -27546,11 +27521,11 @@ ErrorTrap:
                 ' Create People Name
                 '
                 If PeopleName = "" And PeopleFirstName <> "" And PeopleLastName <> "" Then
-                    If app.db_csOk(CSPeople) Then
-                        Call app.db_setCS(CSPeople, "name", PeopleFirstName & " " & PeopleLastName)
+                    If db.db_csOk(CSPeople) Then
+                        Call db.db_setCS(CSPeople, "name", PeopleFirstName & " " & PeopleLastName)
                     End If
                 End If
-                Call app.db_csClose(CSPeople)
+                Call db.db_csClose(CSPeople)
                 '
                 ' AuthenticationOnFormProcess requires Username/Password and must be valid
                 '
@@ -27565,7 +27540,7 @@ ErrorTrap:
                     ' Join Group requested by page that created form
                     '
                     Dim tokenDate As Date
-                    Call security_decodeToken(doc_getText("SuccessID"), app.config.privateKey, GroupIDToJoinOnSuccess, tokenDate)
+                    Call security_decodeToken(doc_getText("SuccessID"), db.config.privateKey, GroupIDToJoinOnSuccess, tokenDate)
                     'GroupIDToJoinOnSuccess = main_DecodeKeyNumber(main_GetStreamText2("SuccessID"))
                     If GroupIDToJoinOnSuccess <> 0 Then
                         Call main_AddGroupMember(group_GetGroupName(GroupIDToJoinOnSuccess))
@@ -27602,24 +27577,24 @@ ErrorTrap:
             Dim GroupNameList As String
             Dim Copy As String
             '
-            Call app.db_DeleteContentRecords("Form Pages", "name=" & app.db_EncodeSQLText("Registration Form"))
-            CS = app.db_csOpen("Form Pages", "name=" & app.db_EncodeSQLText("Registration Form"))
-            If Not app.db_csOk(CS) Then
+            Call db.db_DeleteContentRecords("Form Pages", "name=" & db.db_EncodeSQLText("Registration Form"))
+            CS = db.db_csOpen("Form Pages", "name=" & db.db_EncodeSQLText("Registration Form"))
+            If Not db.db_csOk(CS) Then
                 '
                 ' create Version 1 template - just to main_Get it started
                 '
-                Call app.db_csClose(CS)
+                Call db.db_csClose(CS)
                 GroupNameList = "Registered"
-                CS = app.db_csInsertRecord("Form Pages")
-                If app.db_csOk(CS) Then
-                    Call app.db_setCS(CS, "name", "Registration Form")
+                CS = db.db_csInsertRecord("Form Pages")
+                If db.db_csOk(CS) Then
+                    Call db.db_setCS(CS, "name", "Registration Form")
                     Copy = "" _
                         & vbCrLf & "<table border=""0"" cellpadding=""2"" cellspacing=""0"" width=""100%"">" _
                         & vbCrLf & "{{REPEATSTART}}<tr><td align=right style=""height:22px;"">{{CAPTION}}&nbsp;</td><td align=left>{{FIELD}}</td></tr>{{REPEATEND}}" _
                         & vbCrLf & "<tr><td align=right><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=135 height=1></td><td width=""100%"">&nbsp;</td></tr>" _
                         & vbCrLf & "<tr><td colspan=2>&nbsp;<br>" & main_GetPanelButtons(ButtonRegister, "Button") & "</td></tr>" _
                         & vbCrLf & "</table>"
-                    Call app.db_setCS(CS, "Body", Copy)
+                    Call db.db_setCS(CS, "Body", Copy)
                     Copy = "" _
                         & "1" _
                         & vbCrLf & GroupNameList _
@@ -27630,10 +27605,10 @@ ErrorTrap:
                         & vbCrLf & "1,Phone,true,Phone" _
                         & vbCrLf & "2,Please keep me informed of news and events,false,Subscribers" _
                         & ""
-                    Call app.db_setCS(CS, "Instructions", Copy)
+                    Call db.db_setCS(CS, "Instructions", Copy)
                 End If
             End If
-            Call app.db_csClose(CS)
+            Call db.db_csClose(CS)
             '
             Exit Sub
             '
@@ -27687,11 +27662,11 @@ ErrorTrap:
             Dim CompatibilitySpanAroundButton As Boolean
             '
             IsAuthoring = user_isEditing("Dynamic Menus")
-            DefaultTemplateLink = app.RootWebPath & web_requestPage
+            DefaultTemplateLink = db.RootWebPath & web_requestPage
             If False Then '.292" Then
                 CompatibilitySpanAroundButton = True
             Else
-                CompatibilitySpanAroundButton = app.siteProperty_getBoolean("Compatibility Dynamic Menu Span Around Button", False)
+                CompatibilitySpanAroundButton = db.siteProperty_getBoolean("Compatibility Dynamic Menu Span Around Button", False)
             End If
             '
             ' Check for MenuID - if present, arguments are in the Dynamic Menu content - else it is old, and they are in the addonOption_String
@@ -27723,42 +27698,42 @@ ErrorTrap:
                 ' Open the Menu
                 '
                 CS = db_csOpen("Dynamic Menus", MenuID)
-                If Not app.db_csOk(CS) Then
+                If Not db.db_csOk(CS) Then
                     '
                     ' ID was given, but no found in Db
                     '
-                    Call app.db_csClose(CS)
+                    Call db.db_csClose(CS)
                     CS = db_csOpen("Dynamic Menus", main_VerifyDynamicMenu("Default"))
                 End If
-                If app.db_csOk(CS) Then
+                If db.db_csOk(CS) Then
                     '
                     ' setup arguments from Content
                     '
                     EditLink = main_GetCSRecordEditLink(CS)
-                    MenuName = main_GetCSText(CS, "Name")
-                    MenuDepth = app.db_GetCSInteger(CS, "Depth")
-                    MenuStylePrefix = main_GetCSText(CS, "StylePrefix")
-                    MenuDelimiter = main_GetCSText(CS, "Delimiter")
-                    FlyoutOnHover = main_GetCSBoolean(CS, "FlyoutOnHover").ToString
+                    MenuName = db.db_GetCSText(CS, "Name")
+                    MenuDepth = db.db_GetCSInteger(CS, "Depth")
+                    MenuStylePrefix = db.db_GetCSText(CS, "StylePrefix")
+                    MenuDelimiter = db.db_GetCSText(CS, "Delimiter")
+                    FlyoutOnHover = db.db_GetCSBoolean(CS, "FlyoutOnHover").ToString
                     ' LookupList should return the text for the value saved - to be compatible with the old hardcoded text
-                    FlyoutDirection = app.db_GetCS(CS, "FlyoutDirection")
-                    Layout = app.db_GetCS(CS, "Layout")
+                    FlyoutDirection = db.db_GetCS(CS, "FlyoutDirection")
+                    Layout = db.db_GetCS(CS, "Layout")
                     MenuStyle = 0
                     '
                     ' Add exclusive styles
                     '
                     If True Then
-                        StylesFilename = main_GetCSText(CS, "StylesFilename")
+                        StylesFilename = db.db_GetCSText(CS, "StylesFilename")
                         If StylesFilename <> "" Then
                             If LCase(Right(StylesFilename, 4)) <> ".css" Then
                                 Call handleLegacyError15("Dynamic Menu [" & MenuName & "] StylesFilename is not a '.css' file, and will not display correct. Check that the field is setup as a CSSFile.", "main_GetDynamicMenu")
                             Else
-                                Call main_AddStylesheetLink2(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, StylesFilename), "dynamic menu")
+                                Call main_AddStylesheetLink2(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, StylesFilename), "dynamic menu")
                             End If
                         End If
                     End If
                 End If
-                Call app.db_csClose(CS)
+                Call db.db_csClose(CS)
             Else
                 '
                 ' Old style menu - main_Get arguments from AC tag
@@ -27908,7 +27883,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Sub
             '
-            If Not app.db_csOk(CSPointer) Then
+            If Not db.db_csOk(CSPointer) Then
                 Call handleLegacyError24("ContentSetPointer is invalid, empty, or end-of-file")
             ElseIf Trim(FieldName) = "" Then
                 Call handleLegacyError24("FieldName is invalid or blank")
@@ -27917,39 +27892,39 @@ ErrorTrap:
                 If LocalRequestName = "" Then
                     LocalRequestName = FieldName
                 End If
-                Select Case app.db_GetCSFieldTypeId(CSPointer, FieldName)
+                Select Case db.db_GetCSFieldTypeId(CSPointer, FieldName)
                     Case FieldTypeIdBoolean
                         '
                         ' Boolean
                         '
-                        Call app.db_setCS(CSPointer, FieldName, main_GetStreamBoolean2(LocalRequestName))
+                        Call db.db_setCS(CSPointer, FieldName, main_GetStreamBoolean2(LocalRequestName))
                     Case FieldTypeIdCurrency, FieldTypeIdFloat, FieldTypeIdInteger, FieldTypeIdLookup, FieldTypeIdManyToMany
                         '
                         ' Numbers
                         '
-                        Call app.db_setCS(CSPointer, FieldName, main_GetStreamNumber2(LocalRequestName))
+                        Call db.db_setCS(CSPointer, FieldName, main_GetStreamNumber2(LocalRequestName))
                     Case FieldTypeIdDate
                         '
                         ' Date
                         '
-                        Call app.db_setCS(CSPointer, FieldName, doc_getDate(LocalRequestName))
+                        Call db.db_setCS(CSPointer, FieldName, doc_getDate(LocalRequestName))
                     Case FieldTypeIdFile, FieldTypeIdFileImage
                         '
                         '
                         '
                         Filename = doc_getText(LocalRequestName)
                         If Filename <> "" Then
-                            Path = main_GetCSFilename(CSPointer, FieldName, Filename)
-                            Call app.db_SetCSField(CSPointer, FieldName, Path)
+                            Path = db.db_GetCSFilename(CSPointer, FieldName, Filename)
+                            Call db.db_SetCSField(CSPointer, FieldName, Path)
                             Path = Replace(Path, "\", "/")
                             Path = Replace(Path, "/" & Filename, "")
-                            Call web_ProcessFormInputFile2(LocalRequestName, app.appRootFiles, Path)
+                            Call web_ProcessFormInputFile2(LocalRequestName, db.appRootFiles, Path)
                         End If
                     Case Else
                         '
                         ' text files
                         '
-                        Call app.db_setCS(CSPointer, FieldName, doc_getText(LocalRequestName))
+                        Call db.db_setCS(CSPointer, FieldName, doc_getText(LocalRequestName))
                 End Select
             End If
 
@@ -28004,23 +27979,23 @@ ErrorTrap:
         Private Function main_GetStyleTagPublic() As String
             Dim StyleSN As Integer
             '
-            If (True) And EncodeBoolean(app.siteProperty_getBoolean("Allow CSS Reset", False)) Then
+            If (True) And EncodeBoolean(db.siteProperty_getBoolean("Allow CSS Reset", False)) Then
                 main_GetStyleTagPublic = main_GetStyleTagPublic & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & web_requestProtocol & main_ServerDomain & "/cclib/styles/ccreset.css"" >"
             End If
-            StyleSN = EncodeInteger(app.siteProperty_getText("StylesheetSerialNumber", "0"))
+            StyleSN = EncodeInteger(db.siteProperty_getText("StylesheetSerialNumber", "0"))
             If StyleSN < 0 Then
                 '
                 ' Linked Styles
                 ' Bump the Style Serial Number so next fetch is not cached
                 '
                 StyleSN = 1
-                Call app.siteProperty_set("StylesheetSerialNumber", CStr(StyleSN))
+                Call db.siteProperty_set("StylesheetSerialNumber", CStr(StyleSN))
                 '
                 ' Save new public stylesheet
                 '
                 'Dim kmafs As New fileSystemClass
-                Call app.cdnFiles.SaveFile(app.convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), csv_getStyleSheetProcessed)
-                Call app.cdnFiles.SaveFile(app.convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css"), csv_getStyleSheetDefault)
+                Call db.cdnFiles.SaveFile(db.convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), csv_getStyleSheetProcessed)
+                Call db.cdnFiles.SaveFile(db.convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css"), csv_getStyleSheetDefault)
 
             End If
             If (StyleSN = 0) Then
@@ -28028,7 +28003,7 @@ ErrorTrap:
                 ' Put styles inline if requested, and if there has been an upgrade
                 '
                 main_GetStyleTagPublic = main_GetStyleTagPublic & cr & StyleSheetStart & main_GetStyleSheet() & cr & StyleSheetEnd
-            ElseIf (app.dataBuildVersion <> cp.Version()) Then
+            ElseIf (db.dataBuildVersion <> cp.Version()) Then
                 '
                 ' Put styles inline if requested, and if there has been an upgrade
                 '
@@ -28037,7 +28012,7 @@ ErrorTrap:
                 '
                 ' cached stylesheet
                 '
-                main_GetStyleTagPublic = main_GetStyleTagPublic & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & web_requestProtocol & main_ServerDomain & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, "templates/Public" & StyleSN & ".css") & """ >"
+                main_GetStyleTagPublic = main_GetStyleTagPublic & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & web_requestProtocol & main_ServerDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, "templates/Public" & StyleSN & ".css") & """ >"
             End If
         End Function
         '
@@ -28046,10 +28021,10 @@ ErrorTrap:
         Private Function main_GetStyleTagAdmin() As String
             Dim StyleSN As Integer
             '
-            StyleSN = EncodeInteger(app.siteProperty_getText("StylesheetSerialNumber", "0"))
+            StyleSN = EncodeInteger(db.siteProperty_getText("StylesheetSerialNumber", "0"))
             If StyleSN = 0 Then
                 main_GetStyleTagAdmin = cr & StyleSheetStart & main_GetStyleSheetDefault() & cr & StyleSheetEnd
-            ElseIf (app.dataBuildVersion <> cp.Version()) Then
+            ElseIf (db.dataBuildVersion <> cp.Version()) Then
                 main_GetStyleTagAdmin = cr & "<!-- styles forced inline because database upgrade needed -->" & StyleSheetStart & main_GetStyleSheetDefault() & cr & StyleSheetEnd
             Else
                 If StyleSN < 0 Then
@@ -28058,15 +28033,15 @@ ErrorTrap:
                     ' Bump the Style Serial Number so next fetch is not cached
                     '
                     StyleSN = 1
-                    Call app.siteProperty_set("StylesheetSerialNumber", CStr(StyleSN))
+                    Call db.siteProperty_set("StylesheetSerialNumber", CStr(StyleSN))
                     '
                     ' Save new public stylesheet
                     '
                     'Dim kmafs As New fileSystemClass
-                    Call app.cdnFiles.SaveFile(app.convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), csv_getStyleSheetProcessed)
-                    Call app.cdnFiles.SaveFile(app.convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css"), csv_getStyleSheetDefault)
+                    Call db.cdnFiles.SaveFile(db.convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), csv_getStyleSheetProcessed)
+                    Call db.cdnFiles.SaveFile(db.convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css"), csv_getStyleSheetDefault)
                 End If
-                main_GetStyleTagAdmin = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & web_requestProtocol & main_ServerDomain & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, "templates/Admin" & StyleSN & ".css") & """ >"
+                main_GetStyleTagAdmin = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & web_requestProtocol & main_ServerDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, "templates/Admin" & StyleSN & ".css") & """ >"
             End If
         End Function
         '
@@ -28074,9 +28049,9 @@ ErrorTrap:
         '
         Private Function main_GetLandingLink() As String
             If pageManager_LandingLink = "" Then
-                pageManager_LandingLink = app.siteProperty_getText("SectionLandingLink", app.RootWebPath & app.siteProperty_ServerPageDefault)
+                pageManager_LandingLink = db.siteProperty_getText("SectionLandingLink", db.RootWebPath & db.siteProperty_ServerPageDefault)
                 pageManager_LandingLink = ConvertLinkToShortLink(pageManager_LandingLink, web.requestDomain, web_requestVirtualFilePath)
-                pageManager_LandingLink = EncodeAppRootPath(pageManager_LandingLink, web_requestVirtualFilePath, app.RootWebPath, web.requestDomain)
+                pageManager_LandingLink = EncodeAppRootPath(pageManager_LandingLink, web_requestVirtualFilePath, db.RootWebPath, web.requestDomain)
             End If
             main_GetLandingLink = pageManager_LandingLink
         End Function
@@ -28310,13 +28285,13 @@ ErrorTrap:
                 CaptionFieldName = encodeEmptyText(CaptionFieldName, "name")
                 If PrimaryContentName = "" Or SecondaryContentName = "" Or RulesContentName = "" Or RulesPrimaryFieldname = "" Or RulesSecondaryFieldName = "" Then
                     returnHtml = "[Checklist not configured]"
-                    handleException(New Exception("Creating checklist, all required fields were not supplied, Caption=[" & CaptionFieldName & "], PrimaryContentName=[" & PrimaryContentName & "], SecondaryContentName=[" & SecondaryContentName & "], RulesContentName=[" & RulesContentName & "], RulesPrimaryFieldName=[" & RulesPrimaryFieldname & "], RulesSecondaryFieldName=[" & RulesSecondaryFieldName & "]"))
+                    handleExceptionAndRethrow(New Exception("Creating checklist, all required fields were not supplied, Caption=[" & CaptionFieldName & "], PrimaryContentName=[" & PrimaryContentName & "], SecondaryContentName=[" & SecondaryContentName & "], RulesContentName=[" & RulesContentName & "], RulesPrimaryFieldName=[" & RulesPrimaryFieldname & "], RulesSecondaryFieldName=[" & RulesSecondaryFieldName & "]"))
                 Else
                     '
                     ' ----- Gather all the SecondaryContent that associates to the PrimaryContent
                     '
                     PrimaryContentID = main_GetContentID(PrimaryContentName)
-                    SecondaryCDef = app.metaData.getCdef(SecondaryContentName)
+                    SecondaryCDef = metaData.getCdef(SecondaryContentName)
                     SecondaryTablename = SecondaryCDef.ContentTableName
                     SecondaryContentID = SecondaryCDef.Id
                     ContentIDList.Add(SecondaryContentID)
@@ -28375,29 +28350,29 @@ ErrorTrap:
                             If SecondaryContentSelectCriteria <> "" Then
                                 SQL &= "AND(" & SecondaryContentSelectCriteria & ")"
                             End If
-                            If SecondaryCDef.AllowWorkflowAuthoring And app.siteProperty_AllowWorkflowAuthoring Then
+                            If SecondaryCDef.AllowWorkflowAuthoring And db.siteProperty_AllowWorkflowAuthoring Then
                                 SQL &= "and(" & SecondaryTablename & ".editsourceid is null)"
                             End If
-                            CS = app.db_csOpenSql(SQL)
-                            If app.db_csOk(CS) Then
+                            CS = db.db_csOpenSql(SQL)
+                            If db.db_csOk(CS) Then
                                 If True Then
                                     main_MemberShipSize = 10
                                     ReDim main_MemberShip(main_MemberShipSize)
                                     ReDim main_MemberShipRuleCopy(main_MemberShipSize)
-                                    Do While app.db_csOk(CS)
+                                    Do While db.db_csOk(CS)
                                         If main_MemberShipCount >= main_MemberShipSize Then
                                             main_MemberShipSize = main_MemberShipSize + 10
                                             ReDim Preserve main_MemberShip(main_MemberShipSize)
                                             ReDim Preserve main_MemberShipRuleCopy(main_MemberShipSize)
                                         End If
-                                        main_MemberShip(main_MemberShipCount) = app.db_GetCSInteger(CS, "ID")
-                                        main_MemberShipRuleCopy(main_MemberShipCount) = app.db_GetCSText(CS, "RuleCopy")
+                                        main_MemberShip(main_MemberShipCount) = db.db_GetCSInteger(CS, "ID")
+                                        main_MemberShipRuleCopy(main_MemberShipCount) = db.db_GetCSText(CS, "RuleCopy")
                                         main_MemberShipCount = main_MemberShipCount + 1
-                                        app.db_csGoNext(CS)
+                                        db.db_csGoNext(CS)
                                     Loop
                                 End If
                             End If
-                            app.db_csClose(CS)
+                            db.db_csClose(CS)
                         End If
                         '
                         ' ----- Gather all the Secondary Records, sorted by ContentName
@@ -28426,7 +28401,7 @@ ErrorTrap:
                                 & " And (AllowedContent.Active<>" & SQLFalse & ")" _
                                 & " And (" & SecondaryTablename & ".ContentControlID IN (" & String.Join(",", ContentIDList) & "))"
                         End If
-                        If SecondaryCDef.AllowWorkflowAuthoring And app.siteProperty_AllowWorkflowAuthoring Then
+                        If SecondaryCDef.AllowWorkflowAuthoring And db.siteProperty_AllowWorkflowAuthoring Then
                             SQL &= "and(" & SecondaryTablename & ".editsourceid is null)"
                         End If
                         If SecondaryContentSelectCriteria <> "" Then
@@ -28444,8 +28419,8 @@ ErrorTrap:
                             SQL &= "Folders.Name,Folders.ID,"
                         End If
                         SQL &= SecondaryTablename & "." & CaptionFieldName
-                        CS = app.db_csOpenSql(SQL)
-                        If Not app.db_csOk(CS) Then
+                        CS = db.db_csOpenSql(SQL)
+                        If Not db.db_csOk(CS) Then
                             returnHtml = "(No choices are available.)"
                         Else
                             If True Then
@@ -28457,19 +28432,19 @@ ErrorTrap:
                                 DivCnt = 0
                                 CanSeeHiddenFields = user_isDeveloper()
                                 DivName = TagName & ".All"
-                                Do While app.db_csOk(CS)
-                                    OptionName = app.db_GetCSText(CS, "OptionName")
+                                Do While db.db_csOk(CS)
+                                    OptionName = db.db_GetCSText(CS, "OptionName")
                                     If (Mid(OptionName, 1, 1) <> "_") Or CanSeeHiddenFields Then
                                         '
                                         ' Current checkbox is visible
                                         '
-                                        CurrentFolderID = app.db_GetCSInteger(CS, "ContentCategoryID")
+                                        CurrentFolderID = db.db_GetCSInteger(CS, "ContentCategoryID")
                                         If IsContentCategoriesSupported And (CurrentFolderID <> OpenFolderID) Then
                                             '
                                             ' Content Category mode, new folderID - end the previous div and start a new one
                                             '
                                             OpenFolderID = CurrentFolderID
-                                            ContentFolderName = main_GetCSText(CS, "ContentFolderName")
+                                            ContentFolderName = db.db_GetCSText(CS, "ContentFolderName")
                                             DivID = TagName & ".ContentCategoryID" & CurrentFolderID
                                             If DivCnt = 0 Then
                                                 '
@@ -28499,10 +28474,10 @@ ErrorTrap:
                                             DivCheckBoxCnt = 0
                                         End If
 
-                                        RecordID = app.db_GetCSInteger(CS, "ID")
-                                        AllowRuleCopy = app.db_GetCSBoolean(CS, "AllowRuleCopy")
-                                        RuleCopyCaption = app.db_GetCSText(CS, "RuleCopyCaption")
-                                        OptionCaption = app.db_GetCSText(CS, "OptionCaption")
+                                        RecordID = db.db_GetCSInteger(CS, "ID")
+                                        AllowRuleCopy = db.db_GetCSBoolean(CS, "AllowRuleCopy")
+                                        RuleCopyCaption = db.db_GetCSText(CS, "RuleCopyCaption")
+                                        OptionCaption = db.db_GetCSText(CS, "OptionCaption")
                                         If OptionCaption = "" Then
                                             OptionCaption = OptionName
                                         End If
@@ -28566,20 +28541,20 @@ ErrorTrap:
                                         CheckBoxCnt = CheckBoxCnt + 1
                                         DivCheckBoxCnt = DivCheckBoxCnt + 1
                                     End If
-                                    app.db_csGoNext(CS)
+                                    db.db_csGoNext(CS)
                                 Loop
                                 returnHtml &= EndDiv
                                 returnHtml &= "<input type=""hidden"" name=""" & TagName & ".RowCount"" value=""" & CheckBoxCnt & """>" & vbCrLf
                             End If
                         End If
-                        app.db_csClose(CS)
+                        db.db_csClose(CS)
                         Call main_AddHeadScriptCode(main_HeadScriptCode, "CheckList Categories")
                     End If
                     'End If
                     main_CheckListCnt = main_CheckListCnt + 1
                 End If
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
             Return returnHtml
         End Function
@@ -28624,7 +28599,7 @@ ErrorTrap:
                 LinkBase = web_RefreshQueryString
                 BakeName = "ContentFolderNav"
                 If Not IsAuthoringMode Then
-                    '          main_GetFormInputCheckListCategories = app.cache.cache_readBake(BakeName)
+                    '          main_GetFormInputCheckListCategories = cache.cache_readBake(BakeName)
                 End If
 
                 Dim s As String
@@ -28632,11 +28607,11 @@ ErrorTrap:
                 If main_GetFormInputCheckListCategories = "" Then
                     EmptyDivID = TagName & ".empty"
                     SQL = main_GetSQLSelect("", "ccContentCategories", "ID,ContentCategoryID,Name", , "Name")
-                    CS = app.db_csOpenSql(SQL)
-                    Do While app.db_csOk(CS)
-                        Caption = main_GetCSText(CS, "name")
-                        Id = app.db_GetCSInteger(CS, "ID")
-                        CurrentFolderID = app.db_GetCSInteger(CS, "ContentCategoryID")
+                    CS = db.db_csOpenSql(SQL)
+                    Do While db.db_csOk(CS)
+                        Caption = db.db_GetCSText(CS, "name")
+                        Id = db.db_GetCSInteger(CS, "ID")
+                        CurrentFolderID = db.db_GetCSInteger(CS, "ContentCategoryID")
                         '
                         Caption = Replace(Caption, " ", "&nbsp;")
                         If FirstCaption = "" Then
@@ -28650,9 +28625,9 @@ ErrorTrap:
                         s = s & cr & "<li class=""ccAdminSmall ccPanel""><a href=""#"" onclick=""" & JSSwitch & """>" & Caption & "</a></li>"
                         'Call Tree.AddEntry(CStr(Id), CStr(CurrentFolderID), , , Link, Caption, JSSwitch)
                         'Call Tree.AddEntry(CStr(ID), CStr(CurrentFolderID), , , Link, Caption, "switchContentFolderDiv( '" & TagName & ".ContentCategoryID" & ID & "', OldFolder" & main_CheckListCnt & ",'" & TagName & ".ContentCaption'," & JSCaption & "); OldFolder" & main_CheckListCnt & "='" & TagName & ".ContentCategoryID" & ID & "';")
-                        Call app.db_csGoNext(CS)
+                        Call db.db_csGoNext(CS)
                     Loop
-                    Call app.db_csClose(CS)
+                    Call db.db_csClose(CS)
                     LeftPane = cr & "<ul>" & kmaIndent(s) & cr & "</ul>"
                     'LeftPane = Tree.GetTree(CStr(0), OpenMenuName)
                     '
@@ -28671,7 +28646,7 @@ ErrorTrap:
                     ' + Add Category
                     '
                     If main_IsContentManager("Content Categories") Then
-                        LeftPane = LeftPane & cr & "<div class=""caption""><a href=""" & app.siteProperty_AdminURL & "?editreferer=" & EncodeRequestVariable("?" & web_RefreshQueryString) & "&cid=" & main_GetContentID("Content Categories") & "&af=4&aa=2"">+&nbsp;Add&nbsp;Category</a></div>"
+                        LeftPane = LeftPane & cr & "<div class=""caption""><a href=""" & db.siteProperty_AdminURL & "?editreferer=" & EncodeRequestVariable("?" & web_RefreshQueryString) & "&cid=" & main_GetContentID("Content Categories") & "&af=4&aa=2"">+&nbsp;Add&nbsp;Category</a></div>"
                     End If
                     '
                     LeftPane = cr & "<div class=""ccCategoryListCon"">" & kmaIndent(LeftPane) & cr & "</div>"
@@ -28696,7 +28671,7 @@ ErrorTrap:
                         & "</table>" _
                         & "</div>"
                     If Not IsAuthoringMode Then
-                        Call app.cache.SetKey(BakeName, main_GetFormInputCheckListCategories, "Content Categories," & PrimaryContentName & "," & SecondaryContentName & "," & RulesContentName)
+                        Call cache.SetKey(BakeName, main_GetFormInputCheckListCategories, "Content Categories," & PrimaryContentName & "," & SecondaryContentName & "," & RulesContentName)
                     End If
                     '
                     ' initialize with all open
@@ -29170,7 +29145,7 @@ ErrorTrap:
             ' Load cache
             '
             On Error Resume Next
-            cacheTest = app.cache.GetObject(Of Object())(cache_linkAlias_cacheName)
+            cacheTest = cache.GetObject(Of Object())(cache_linkAlias_cacheName)
             If Not pagemanager_IsWorkflowRendering() Then
                 If Not IsNothing(cacheTest) Then
                     cacheArray = DirectCast(cacheTest, Object())
@@ -29198,7 +29173,7 @@ ErrorTrap:
             On Error GoTo ErrorTrap
             If cache_linkAliasCnt = 0 Then
                 Dim rs As DataTable
-                rs = app.executeSql("select " & cache_linkAlias_fieldList & " from ccLinkAliases where (active<>0) order by id desc")
+                rs = db.executeSql("select " & cache_linkAlias_fieldList & " from ccLinkAliases where (active<>0) order by id desc")
                 If rs.Rows.Count > 0 Then
                     cache_linkAlias_NameIndex = New coreKeyPtrIndexClass
                     cache_linkAlias_PageIdQSSIndex = New coreKeyPtrIndexClass
@@ -29262,7 +29237,7 @@ ErrorTrap:
             cacheArray(0) = cache_linkAlias
             cacheArray(1) = cache_linkAlias_PageIdQSSIndex.exportPropertyBag
             cacheArray(2) = cache_linkAlias_NameIndex.exportPropertyBag
-            Call app.cache.SetKey(cache_linkAlias_cacheName, cacheArray, "link aliases")
+            Call cache.SetKey(cache_linkAlias_cacheName, cacheArray, "link aliases")
             '
             Exit Sub
 ErrorTrap:
@@ -29276,7 +29251,7 @@ ErrorTrap:
             '
             cache_linkAliasCnt = 0
             cache_linkAlias = {}
-            Call app.cache.SetKey(cache_linkAlias_cacheName, cache_linkAlias)
+            Call cache.SetKey(cache_linkAlias_cacheName, cache_linkAlias)
             '
             Exit Sub
             '
@@ -29347,7 +29322,7 @@ ErrorTrap:
             Dim Key As String
             '
             main_GetLinkAliasByPageID = DefaultLink
-            If app.siteProperty_allowLinkAlias Then
+            If db.siteProperty_allowLinkAlias Then
                 Ptr = cache_linkAlias_getPtrByPageIdQss(PageID, QueryStringSuffix)
                 If Ptr >= 0 Then
                     main_GetLinkAliasByPageID = EncodeText(cache_linkAlias(1, Ptr))
@@ -29373,7 +29348,7 @@ ErrorTrap:
             '
             Dim Ptr As Integer
             '
-            If (True) And (app.siteProperty_allowLinkAlias) Then
+            If (True) And (db.siteProperty_allowLinkAlias) Then
                 If cache_linkAliasCnt = 0 Then
                     Call cache_linkAlias_load()
                 End If
@@ -29411,10 +29386,10 @@ ErrorTrap:
                     '
                     ' no domain page not found, use site default
                     '
-                    pageId = app.siteProperty_getinteger("PageNotFoundPageID", 0)
+                    pageId = db.siteProperty_getinteger("PageNotFoundPageID", 0)
                 End If
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
             Return pageId
         End Function
@@ -29457,8 +29432,8 @@ ErrorTrap:
                     '
                     ' Set link
                     '
-                    Link = main_GetPageLink4(PageNotFoundPageID, "", True, False)
-                    DefaultLink = main_GetPageLink4(0, "", True, False)
+                    Link = pageManager_GetPageLink4(PageNotFoundPageID, "", True, False)
+                    DefaultLink = pageManager_GetPageLink4(0, "", True, False)
                     If Link <> DefaultLink Then
                     Else
                         adminMessage = adminMessage & "</p><p>The current 'Page Not Found' could not be used. It is not valid, or it is not associated with a valid site section. To configure a valid 'Page Not Found' page, first create the page as a child page on your site and check the 'Page Not Found' checkbox on it's control tab. The Landing Page was used."
@@ -29530,16 +29505,16 @@ ErrorTrap:
                     '
                     ' try the domain landing page first
                     '
-                    CS = app.db_csOpen("Domains", "(name=" & app.db_EncodeSQLText(web.requestDomain) & ")", , , , , , "RootPageID")
-                    If app.db_csOk(CS) Then
-                        pageManager_LandingPageID = EncodeInteger(main_GetCSText(CS, "RootPageID"))
+                    CS = db.db_csOpen("Domains", "(name=" & db.db_EncodeSQLText(web.requestDomain) & ")", , , , , , "RootPageID")
+                    If db.db_csOk(CS) Then
+                        pageManager_LandingPageID = EncodeInteger(db.db_GetCSText(CS, "RootPageID"))
                     End If
-                    Call app.db_csClose(CS)
+                    Call db.db_csClose(CS)
                     If pageManager_LandingPageID = 0 Then
                         '
                         ' try the site property landing page id
                         '
-                        pageManager_LandingPageID = app.siteProperty_getinteger("LandingPageID", 0)
+                        pageManager_LandingPageID = db.siteProperty_getinteger("LandingPageID", 0)
                     End If
                     If pageManager_LandingPageID = 0 Then
                         '
@@ -29555,7 +29530,7 @@ ErrorTrap:
                 End If
                 landingPageid = pageManager_LandingPageID
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
             Return landingPageid
         End Function
@@ -29717,9 +29692,9 @@ ErrorTrap:
             RightPane = "Style Tag Editor"
             TempFilename = "AppCache\StyleTemp" & GetRandomInteger() & ".css"
             '
-            StyleFile = app.cdnFiles.ReadFile(TempFilename)
+            StyleFile = db.cdnFiles.ReadFile(TempFilename)
             If StyleFile <> "" Then
-                Call app.appRootFiles.SaveFile(TempFilename, StyleCopy)
+                Call db.appRootFiles.SaveFile(TempFilename, StyleCopy)
                 'Call main_CopyVirtualFile(StylesFilename, TempFilename)
                 '
                 ' remove crlf
@@ -29833,7 +29808,7 @@ ErrorTrap:
             '
             On Error Resume Next
             If Not main_IsWorkflowRendering Then
-                arrayTest = app.cache.GetObject(Of Object())(pageManager_cache_pageContent_cacheName)
+                arrayTest = cache.GetObject(Of Object())(pageManager_cache_pageContent_cacheName)
                 If Not IsNothing(arrayTest) Then
                     arrayData = DirectCast(arrayTest, Object())
                     If Not IsNothing(arrayData) Then
@@ -29870,7 +29845,7 @@ ErrorTrap:
                 '
                 SelectList = pageManager_cache_pageContent_fieldList
                 Criteria = ""
-                cache_pageContent = app.csv_GetContentRows("Page Content", Criteria, , False, SystemMemberID, (main_IsWorkflowRendering Or main_IsQuickEditing), , SelectList)
+                cache_pageContent = db.db_GetContentRows("Page Content", Criteria, , False, SystemMemberID, (main_IsWorkflowRendering Or main_IsQuickEditing), , SelectList)
                 If (cache_pageContent.Length > 0) Then
                     pageManager_cache_pageContent_rows = UBound(cache_pageContent, 2) + 1
                     If pageManager_cache_pageContent_rows > 0 Then
@@ -29934,7 +29909,7 @@ ErrorTrap:
                 cacheArray(1) = pageManager_cache_pageContent_idIndex.exportPropertyBag
                 cacheArray(2) = pageManager_cache_pageContent_nameIndex.exportPropertyBag
                 cacheArray(3) = pageManager_cache_pageContent_parentIdIndex.exportPropertyBag
-                Call app.cache.SetKey(pageManager_cache_pageContent_cacheName, cacheArray)
+                Call cache.SetKey(pageManager_cache_pageContent_cacheName, cacheArray)
             End If
             '
             Exit Sub
@@ -30108,14 +30083,14 @@ ErrorTrap:
                     End If
                 Next
                 Criteria = "ID=" & PageID
-                CS = app.db_csOpen("Page Content", Criteria, , False, ,,, SelectList)
-                If Not app.db_csOk(CS) Then
+                CS = db.db_csOpen("Page Content", Criteria, , False, ,,, SelectList)
+                If Not db.db_csOk(CS) Then
                     '
                     ' Page Not Found
                     '
                     Call pageManager_cache_pageContent_removeRow(PageID, main_IsWorkflowRendering, main_IsQuickEditing)
                 Else
-                    PCCRow = app.csv_GetCSRows(CS)
+                    PCCRow = db.db_GetCSRows(CS)
                     '
                     ' page was found in the Db - find the entry in PCC
                     '
@@ -30153,7 +30128,7 @@ ErrorTrap:
                     '
                     Call pageManager_cache_pageContent_save()
                 End If
-                Call app.db_csClose(CS)
+                Call db.db_csClose(CS)
             End If
             '
             Exit Sub
@@ -30215,7 +30190,7 @@ ErrorTrap:
                     End If
                 End If
                 If Not main_IsWorkflowRendering Then
-                    Call app.cache.SetKey("PCC", cache_pageContent)
+                    Call cache.SetKey("PCC", cache_pageContent)
                 End If
             End If
             '
@@ -30523,7 +30498,7 @@ ErrorTrap:
             '
             On Error Resume Next
             If Not pagemanager_IsWorkflowRendering() Then
-                cacheTest = app.cache.GetObject(Of Object())(pageManager_cache_siteSection_cacheName)
+                cacheTest = cache.GetObject(Of Object())(pageManager_cache_siteSection_cacheName)
                 If Not IsNothing(cacheTest) Then
                     cacheObject = DirectCast(cacheTest, Object())
                     If Not IsNothing(cacheObject) Then
@@ -30556,7 +30531,7 @@ ErrorTrap:
             On Error GoTo ErrorTrap
             If pageManager_cache_siteSection_rows = 0 Then
                 SelectList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,BlockSection,RootPageID,JSOnLoad,JSHead,JSEndBody,JSFilename"
-                cache_siteSection = app.csv_GetContentRows("Site Sections", "(active<>0)", , False, SystemMemberID, (pagemanager_IsWorkflowRendering()), , SelectList)
+                cache_siteSection = db.db_GetContentRows("Site Sections", "(active<>0)", , False, SystemMemberID, (pagemanager_IsWorkflowRendering()), , SelectList)
                 pageManager_cache_siteSection_rows = UBound(cache_siteSection, 2) + 1
                 For Ptr = 0 To pageManager_cache_siteSection_rows - 1
                     '
@@ -30605,7 +30580,7 @@ ErrorTrap:
             cacheArray(1) = pageManager_cache_siteSection_IDIndex.exportPropertyBag
             cacheArray(2) = pageManager_cache_siteSection_RootPageIDIndex.exportPropertyBag
             cacheArray(3) = pageManager_cache_siteSection_NameIndex.exportPropertyBag
-            Call app.cache.SetKey(pageManager_cache_siteSection_cacheName, cacheArray)
+            Call cache.SetKey(pageManager_cache_siteSection_cacheName, cacheArray)
             '
             Exit Sub
 ErrorTrap:
@@ -30648,10 +30623,10 @@ ErrorTrap:
         Friend Sub pageManager_cache_siteSection_clear()
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("pageManager_cache_siteSection_clear")
             '
-            Call app.cache.invalidateTagList2("site sections")
+            Call cache.invalidateTagList2("site sections")
             cache_siteSection = {}
             pageManager_cache_siteSection_rows = 0
-            Call app.cache.SetKey(pageManager_cache_siteSection_cacheName, cache_siteSection)
+            Call cache.SetKey(pageManager_cache_siteSection_cacheName, cache_siteSection)
             'Call cmc_siteSectionCache_clear
             '
             Exit Sub
@@ -30708,7 +30683,7 @@ ErrorTrap:
             '
             On Error Resume Next
             If Not pagemanager_IsWorkflowRendering() Then
-                arrayTest = app.cache.GetObject(Of Object())(pageManager_cache_pageTemplate_cacheName)
+                arrayTest = cache.GetObject(Of Object())(pageManager_cache_pageTemplate_cacheName)
                 If Not IsNothing(arrayTest) Then
                     arrayData = DirectCast(arrayTest, Object())
                     If Not IsNothing(arrayData) Then
@@ -30750,7 +30725,7 @@ ErrorTrap:
                     & " Left Join ccSharedStylesTemplateRules r on r.templateid=t.id" _
                     & " where (t.active<>0)" _
                     & " order by t.id"
-                Dim dt As DataTable = app.executeSql(SQL)
+                Dim dt As DataTable = db.executeSql(SQL)
                 If dt.Rows.Count > 0 Then
                     For Each rsDr As DataRow In dt.Rows
                         templateId = EncodeInteger(rsDr("ID"))
@@ -30799,7 +30774,7 @@ ErrorTrap:
                             ' gather domains for this templates
                             '
                             SQL = "select domainid from ccDomainTemplateRules where templateid=" & templateId
-                            Dim dtdomains As DataTable = app.executeSql(SQL)
+                            Dim dtdomains As DataTable = db.executeSql(SQL)
                             If dtdomains.Rows.Count > 0 Then
                                 cacheArray(TC_DomainIdList, Ptr) = EncodeText(dtdomains.Rows.Item(0))
                                 'cacheArray(TC_DomainIdList, Ptr) = rsdomains.GetString(StringFormatEnum.adClipString, , "", ",")
@@ -30846,7 +30821,7 @@ ErrorTrap:
             '
             cacheArray(0) = cache_pageTemplate
             cacheArray(1) = pageManager_cache_pageTemplate_contentIdindex.exportPropertyBag
-            Call app.cache.SetKey(pageManager_cache_pageTemplate_cacheName, cacheArray)
+            Call cache.SetKey(pageManager_cache_pageTemplate_cacheName, cacheArray)
             '
             Exit Sub
 ErrorTrap:
@@ -30860,7 +30835,7 @@ ErrorTrap:
             '
             pageManager_cache_pageTemplate_rows = 0
             cache_pageTemplate = {}
-            Call app.cache.SetKey(pageManager_cache_pageTemplate_cacheName, cache_pageTemplate)
+            Call cache.SetKey(pageManager_cache_pageTemplate_cacheName, cache_pageTemplate)
             '
             Exit Sub
             '
@@ -30963,7 +30938,7 @@ ErrorTrap:
                             Link = "/" & Link
                         End If
                         Link = ConvertLinkToShortLink(Link, web.requestDomain, web_requestVirtualFilePath)
-                        Link = EncodeAppRootPath(Link, web_requestVirtualFilePath, app.RootWebPath, web.requestDomain)
+                        Link = EncodeAppRootPath(Link, web_requestVirtualFilePath, db.RootWebPath, web.requestDomain)
                         If templateSecure And (Not web.requestSecure) Then
                             '
                             ' Short Link, and IsSecure checked but current page is not secure
@@ -30985,7 +30960,7 @@ ErrorTrap:
                         '
                         ' Secure template but current page is not secure - return default link with ssl
                         '
-                        Link = "https://" & web.requestDomain & app.RootWebPath & app.siteProperty_ServerPageDefault
+                        Link = "https://" & web.requestDomain & db.RootWebPath & db.siteProperty_ServerPageDefault
                     ElseIf web.requestSecure And (Not templateSecure) Then
                         ' (*E) comment out this
                         '
@@ -30997,7 +30972,7 @@ ErrorTrap:
                         ' what is happening here is a page is set secure, it redirects to the secure link then this
                         ' happens during the secure page draw.
                         '
-                        Link = "http://" & web.requestDomain & app.RootWebPath & app.siteProperty_ServerPageDefault
+                        Link = "http://" & web.requestDomain & db.RootWebPath & db.siteProperty_ServerPageDefault
                     End If
                 End If
                 main_GetTCLink = Link
@@ -31050,7 +31025,7 @@ ErrorTrap:
             Dim DateExpires As Date
             Dim datetext As String
             '
-            main_GetMobileBrowserList = EncodeText(app.cache.GetObject(Of String)("MobileBrowserList"))
+            main_GetMobileBrowserList = EncodeText(cache.GetObject(Of String)("MobileBrowserList"))
             If main_GetMobileBrowserList <> "" Then
                 datetext = getLine(main_GetMobileBrowserList)
                 If EncodeDate(datetext) < Now() Then
@@ -31066,7 +31041,7 @@ ErrorTrap:
                     'Call app.publicFiles.SaveFile(Filename, main_GetMobileBrowserList)
                 End If
                 datetext = Now.AddHours(1).ToString
-                Call app.cache.SetKey("MobileBrowserList", datetext & vbCrLf & main_GetMobileBrowserList)
+                Call cache.SetKey("MobileBrowserList", datetext & vbCrLf & main_GetMobileBrowserList)
             End If
             '
             Exit Function
@@ -31125,7 +31100,7 @@ ErrorTrap:
         ' main_DeleteChildRecords
         '========================================================================
         '
-        Public Function main_DeleteChildRecords(ByVal ContentName As String, ByVal RecordID As Integer, Optional ByVal ReturnListWithoutDelete As Boolean = False) As String
+        Public Function pageManager_DeleteChildRecords(ByVal ContentName As String, ByVal RecordID As Integer, Optional ByVal ReturnListWithoutDelete As Boolean = False) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("DeleteChildRecords")
             '
             Dim QuickEditing As Boolean
@@ -31143,24 +31118,24 @@ ErrorTrap:
             '
             ' For now, the child delete only works in non-workflow
             '
-            CS = app.db_csOpen(ContentName, "parentid=" & RecordID, , , , ,, "ID")
-            Do While app.db_csOk(CS)
-                main_DeleteChildRecords = main_DeleteChildRecords & "," & app.db_GetCSInteger(CS, "ID")
-                app.db_csGoNext(CS)
+            CS = db.db_csOpen(ContentName, "parentid=" & RecordID, , , , ,, "ID")
+            Do While db.db_csOk(CS)
+                pageManager_DeleteChildRecords = pageManager_DeleteChildRecords & "," & db.db_GetCSInteger(CS, "ID")
+                db.db_csGoNext(CS)
             Loop
-            Call app.db_csClose(CS)
-            If main_DeleteChildRecords <> "" Then
-                main_DeleteChildRecords = Mid(main_DeleteChildRecords, 2)
+            Call db.db_csClose(CS)
+            If pageManager_DeleteChildRecords <> "" Then
+                pageManager_DeleteChildRecords = Mid(pageManager_DeleteChildRecords, 2)
                 '
                 ' main_Get a list of all pages, but do not delete anything yet
                 '
-                IDs = Split(main_DeleteChildRecords, ",")
+                IDs = Split(pageManager_DeleteChildRecords, ",")
                 IDCnt = UBound(IDs) + 1
                 SingleEntry = (IDCnt = 1)
                 For Ptr = 0 To IDCnt - 1
-                    ChildList = main_DeleteChildRecords(ContentName, EncodeInteger(IDs(Ptr)), True)
+                    ChildList = pageManager_DeleteChildRecords(ContentName, EncodeInteger(IDs(Ptr)), True)
                     If ChildList <> "" Then
-                        main_DeleteChildRecords = main_DeleteChildRecords & "," & ChildList
+                        pageManager_DeleteChildRecords = pageManager_DeleteChildRecords & "," & ChildList
                         SingleEntry = False
                     End If
                 Next
@@ -31168,12 +31143,12 @@ ErrorTrap:
                     '
                     ' Do the actual delete
                     '
-                    IDs = Split(main_DeleteChildRecords, ",")
+                    IDs = Split(pageManager_DeleteChildRecords, ",")
                     IDCnt = UBound(IDs) + 1
                     SingleEntry = (IDCnt = 1)
                     QuickEditing = user_isQuickEditing("page content")
                     For Ptr = 0 To IDCnt - 1
-                        Call main_DeleteContentRecord("page content", EncodeInteger(IDs(Ptr)))
+                        Call db_DeleteContentRecord("page content", EncodeInteger(IDs(Ptr)))
                         Call pageManager_cache_pageContent_removeRow(EncodeInteger(IDs(Ptr)), pagemanager_IsWorkflowRendering, QuickEditing)
                     Next
                 End If
@@ -31239,10 +31214,10 @@ ErrorTrap:
                     '
                     'hint = hint & ",110"
                     CS = db_csOpenRecord("people", RecordID, , , "Name,OrganizationID")
-                    If app.db_csOk(CS) Then
-                        ActivityLogOrganizationID = app.db_GetCSInteger(CS, "OrganizationID")
+                    If db.db_csOk(CS) Then
+                        ActivityLogOrganizationID = db.db_GetCSInteger(CS, "OrganizationID")
                     End If
-                    Call app.db_csClose(CS)
+                    Call db.db_csClose(CS)
                     If IsDelete Then
                         Call main_LogActivity2("deleting user #" & RecordID & " (" & RecordName & ")", RecordID, ActivityLogOrganizationID)
                     Else
@@ -31265,11 +31240,11 @@ ErrorTrap:
                     'hint = hint & ",130"
                     Select Case LCase(RecordName)
                         Case "allowlinkalias"
-                            Call app.cache.invalidateTagList2("Page Content")
+                            Call cache.invalidateTagList2("Page Content")
                         Case "sectionlandinglink"
-                            Call app.cache.invalidateTagList2("Page Content")
+                            Call cache.invalidateTagList2("Page Content")
                         Case siteproperty_serverPageDefault_name
-                            Call app.cache.invalidateTagList2("Page Content")
+                            Call cache.invalidateTagList2("Page Content")
                     End Select
                 Case "ccpagecontent"
                     '
@@ -31279,7 +31254,7 @@ ErrorTrap:
                     If RecordParentID > 0 Then
                         Call pageManager_cache_pageContent_updateRow(RecordParentID, False, False)
                         If Not IsDelete Then
-                            Call app.executeSql("update ccpagecontent set ChildPagesfound=1 where ID=" & RecordParentID)
+                            Call db.executeSql("update ccpagecontent set ChildPagesfound=1 where ID=" & RecordParentID)
                         End If
                     End If
                     '
@@ -31289,7 +31264,7 @@ ErrorTrap:
                         '
                         ' If this was a section's root page, clear the rootpageid so a new page will be created
                         '
-                        Call app.executeSql("update ccsections set RootPageID=0 where RootPageID=" & RecordID)
+                        Call db.executeSql("update ccsections set RootPageID=0 where RootPageID=" & RecordID)
                         Call pageManager_cache_siteSection_clear()
                         '
                         ' Clear the Landing page and page not found site properties
@@ -31297,17 +31272,17 @@ ErrorTrap:
 
                         If LCase(TableName) = "ccpagecontent" Then
                             Call pageManager_cache_pageContent_removeRow(RecordID, pagemanager_IsWorkflowRendering, False)
-                            If RecordID = EncodeInteger(app.siteProperty_getText("PageNotFoundPageID", "0")) Then
-                                Call app.siteProperty_set("PageNotFoundPageID", "0")
+                            If RecordID = EncodeInteger(db.siteProperty_getText("PageNotFoundPageID", "0")) Then
+                                Call db.siteProperty_set("PageNotFoundPageID", "0")
                             End If
-                            If RecordID = EncodeInteger(app.siteProperty_getText("LandingPageID", "0")) Then
-                                Call app.siteProperty_set("LandingPageID", "0")
+                            If RecordID = EncodeInteger(db.siteProperty_getText("LandingPageID", "0")) Then
+                                Call db.siteProperty_set("LandingPageID", "0")
                             End If
                         End If
                         '
                         ' Delete Link Alias entries with this PageID
                         '
-                        Call app.executeSql("delete from cclinkAliases where PageID=" & RecordID)
+                        Call db.executeSql("delete from cclinkAliases where PageID=" & RecordID)
                         Call cache_linkAlias_clear()
                     Else
                         '
@@ -31331,27 +31306,27 @@ ErrorTrap:
                     '
                     'hint = hint & ",160"
                     CS = db_csOpen("Site Sections", RecordID)
-                    If app.db_csOk(CS) Then
-                        PageContentID = app.db_GetCSInteger(CS, "ContentID")
+                    If db.db_csOk(CS) Then
+                        PageContentID = db.db_GetCSInteger(CS, "ContentID")
                         If PageContentID = 0 Then
                             PageContentID = main_GetContentID("Page Content")
-                            Call app.db_setCS(CS, "ContentID", PageContentID)
+                            Call db.db_setCS(CS, "ContentID", PageContentID)
                         End If
-                        rootPageId = app.db_GetCSInteger(CS, "RootPageID")
+                        rootPageId = db.db_GetCSInteger(CS, "RootPageID")
                         If rootPageId = 0 Then
-                            PageName = main_GetCSText(CS, "Name")
+                            PageName = db.db_GetCSText(CS, "Name")
                             If PageName = "" Then
-                                PageName = "Page " & app.db_GetCSInteger(CS, "ID")
+                                PageName = "Page " & db.db_GetCSInteger(CS, "ID")
                             End If
                             pageContentName = main_GetContentNameByID(PageContentID)
                             If pageContentName = "" Then
                                 pageContentName = "Page Content"
                             End If
-                            Call app.db_setCS(CS, "RootPageID", main_CreatePageGetID(PageName, "Page Content", userId, ""))
+                            Call db.db_setCS(CS, "RootPageID", main_CreatePageGetID(PageName, "Page Content", userId, ""))
                             Call pageManager_cache_pageContent_clear()
                         End If
                     End If
-                    Call app.db_csClose(CS)
+                    Call db.db_csClose(CS)
                     Call pageManager_cache_siteSection_clear()
                 Case "ccaggregatefunctions"
                     '
@@ -31379,30 +31354,30 @@ ErrorTrap:
                     ' if a AltSizeList is blank, make large,medium,small and thumbnails
                     '
                     'hint = hint & ",180"
-                    If (True) And (EncodeBoolean(app.siteProperty_getBoolean("ImageAllowSFResize", True))) Then
+                    If (True) And (EncodeBoolean(db.siteProperty_getBoolean("ImageAllowSFResize", True))) Then
                         If Not IsDelete Then
                             CS = db_csOpen("library files", RecordID)
-                            If app.db_csOk(CS) Then
-                                Filename = app.db_GetCS(CS, "filename")
+                            If db.db_csOk(CS) Then
+                                Filename = db.db_GetCS(CS, "filename")
                                 Pos = InStrRev(Filename, "/")
                                 If Pos > 0 Then
                                     FilePath = Mid(Filename, 1, Pos)
                                     Filename = Mid(Filename, Pos + 1)
                                 End If
-                                Call app.db_setCS(CS, "filesize", main_GetFileSize(app.appRootFiles.rootLocalFolderPath & FilePath & Filename))
+                                Call db.db_setCS(CS, "filesize", main_GetFileSize(db.appRootFiles.rootLocalFolderPath & FilePath & Filename))
                                 Pos = InStrRev(Filename, ".")
                                 If Pos > 0 Then
                                     FilenameExt = Mid(Filename, Pos + 1)
                                     FilenameNoExt = Mid(Filename, 1, Pos - 1)
                                     If InStr(1, "jpg,gif,png", FilenameExt, vbTextCompare) <> 0 Then
                                         sf = New coreImageEditClass
-                                        If sf.load(app.appRootFiles.rootLocalFolderPath & FilePath & Filename) Then
+                                        If sf.load(db.appRootFiles.rootLocalFolderPath & FilePath & Filename) Then
                                             '
                                             '
                                             '
-                                            Call app.db_setCS(CS, "height", sf.height)
-                                            Call app.db_setCS(CS, "width", sf.width)
-                                            AltSizeList = main_GetCSText(CS, "AltSizeList")
+                                            Call db.db_setCS(CS, "height", sf.height)
+                                            Call db.db_setCS(CS, "width", sf.width)
+                                            AltSizeList = db.db_GetCSText(CS, "AltSizeList")
                                             RebuildSizes = (AltSizeList = "")
                                             If RebuildSizes Then
                                                 AltSizeList = ""
@@ -31412,7 +31387,7 @@ ErrorTrap:
                                                 If sf.width >= 640 Then
                                                     sf.height = CInt(sf.height * (640 / sf.width))
                                                     sf.width = 640
-                                                    Call sf.save(app.appRootFiles.rootLocalFolderPath & FilePath & FilenameNoExt & "-640x" & sf.height & "." & FilenameExt)
+                                                    Call sf.save(db.appRootFiles.rootLocalFolderPath & FilePath & FilenameNoExt & "-640x" & sf.height & "." & FilenameExt)
                                                     AltSizeList = AltSizeList & vbCrLf & "640x" & sf.height
                                                 End If
                                                 '
@@ -31421,7 +31396,7 @@ ErrorTrap:
                                                 If sf.width >= 320 Then
                                                     sf.height = CInt(sf.height * (320 / sf.width))
                                                     sf.width = 320
-                                                    Call sf.save(app.appRootFiles.rootLocalFolderPath & FilePath & FilenameNoExt & "-320x" & sf.height & "." & FilenameExt)
+                                                    Call sf.save(db.appRootFiles.rootLocalFolderPath & FilePath & FilenameNoExt & "-320x" & sf.height & "." & FilenameExt)
 
                                                     AltSizeList = AltSizeList & vbCrLf & "320x" & sf.height
                                                 End If
@@ -31431,7 +31406,7 @@ ErrorTrap:
                                                 If sf.width >= 160 Then
                                                     sf.height = CInt(sf.height * (160 / sf.width))
                                                     sf.width = 160
-                                                    Call sf.save(app.appRootFiles.rootLocalFolderPath & FilePath & FilenameNoExt & "-160x" & sf.height & "." & FilenameExt)
+                                                    Call sf.save(db.appRootFiles.rootLocalFolderPath & FilePath & FilenameNoExt & "-160x" & sf.height & "." & FilenameExt)
                                                     AltSizeList = AltSizeList & vbCrLf & "160x" & sf.height
                                                 End If
                                                 '
@@ -31440,10 +31415,10 @@ ErrorTrap:
                                                 If sf.width >= 80 Then
                                                     sf.height = CInt(sf.height * (80 / sf.width))
                                                     sf.width = 80
-                                                    Call sf.save(app.appRootFiles.rootLocalFolderPath & FilePath & FilenameNoExt & "-180x" & sf.height & "." & FilenameExt)
+                                                    Call sf.save(db.appRootFiles.rootLocalFolderPath & FilePath & FilenameNoExt & "-180x" & sf.height & "." & FilenameExt)
                                                     AltSizeList = AltSizeList & vbCrLf & "80x" & sf.height
                                                 End If
-                                                Call app.db_setCS(CS, "AltSizeList", AltSizeList)
+                                                Call db.db_setCS(CS, "AltSizeList", AltSizeList)
                                             End If
                                             Call sf.Dispose()
                                             sf = Nothing
@@ -31457,7 +31432,7 @@ ErrorTrap:
                                         '                                Else
                                         '                                    Err.Clear
                                         '                                End If
-                                        '                                AltSizeList = main_GetCSText(CS, "AltSizeList")
+                                        '                                AltSizeList = db.db_GetCSText(CS, "AltSizeList")
                                         '                                RebuildSizes = (AltSizeList = "")
                                         '                                If RebuildSizes Then
                                         '                                    AltSizeList = ""
@@ -31503,7 +31478,7 @@ ErrorTrap:
                                     End If
                                 End If
                             End If
-                            Call app.db_csClose(CS)
+                            Call db.db_csClose(CS)
                         End If
                     End If
                     Call cache_libraryFiles_clear()
@@ -31518,19 +31493,19 @@ ErrorTrap:
             'hint = hint & ",190"
             If True Then
                 'hint = hint & ",200 content=[" & ContentID & "]"
-                CS = app.db_csOpen("Add-on Content Trigger Rules", "ContentID=" & ContentID, , , , , , "addonid")
+                CS = db.db_csOpen("Add-on Content Trigger Rules", "ContentID=" & ContentID, , , , , , "addonid")
                 Option_String = "" _
                     & vbCrLf & "action=contentchange" _
                     & vbCrLf & "contentid=" & ContentID _
                     & vbCrLf & "recordid=" & RecordID _
                     & ""
-                Do While app.db_csOk(CS)
-                    addonId = app.db_GetCSInteger(CS, "Addonid")
+                Do While db.db_csOk(CS)
+                    addonId = db.db_GetCSInteger(CS, "Addonid")
                     'hint = hint & ",210 addonid=[" & addonId & "]"
                     Call executeAddonAsProcess(CStr(addonId), Option_String)
-                    Call app.db_csGoNext(CS)
+                    Call db.db_csGoNext(CS)
                 Loop
-                Call app.db_csClose(CS)
+                Call db.db_csClose(CS)
             End If
             '
             Exit Sub
@@ -31593,7 +31568,7 @@ ErrorTrap:
             Else
                 BakeName = "SharedStyleMap-Public"
             End If
-            MapList = EncodeText(app.cache.GetObject(Of String)(BakeName))
+            MapList = EncodeText(cache.GetObject(Of String)(BakeName))
             If MapList = "" Then
                 '
                 ' BuildMap
@@ -31609,32 +31584,32 @@ ErrorTrap:
                         & " left join ccSharedStyles i on i.id=r.IncludedStyleID)" _
                         & " where ( s.active<>0 )and((i.active is null)or(i.active<>0))"
                 End If
-                CS = app.db_csOpenSql(SQL)
+                CS = db.db_csOpenSql(SQL)
                 LastStyleID = 0
-                Do While app.db_csOk(CS)
-                    styleId = app.db_GetCSInteger(CS, "ID")
+                Do While db.db_csOk(CS)
+                    styleId = db.db_GetCSInteger(CS, "ID")
                     If styleId <> LastStyleID Then
-                        Filename = app.db_GetCS(CS, "StyleFilename")
-                        Prefix = Replace(main_encodeHTML(app.db_GetCS(CS, "Prefix")), ",", "&#44;")
-                        Suffix = Replace(main_encodeHTML(app.db_GetCS(CS, "Suffix")), ",", "&#44;")
-                        If (Not main_IsAdminSite) And main_GetCSBoolean(CS, "alwaysinclude") Then
+                        Filename = db.db_GetCS(CS, "StyleFilename")
+                        Prefix = Replace(main_encodeHTML(db.db_GetCS(CS, "Prefix")), ",", "&#44;")
+                        Suffix = Replace(main_encodeHTML(db.db_GetCS(CS, "Suffix")), ",", "&#44;")
+                        If (Not main_IsAdminSite) And db.db_GetCSBoolean(CS, "alwaysinclude") Then
                             MapList = MapList & vbCrLf & "0" & vbTab & Filename & "<" & Prefix & "<" & Suffix
                         Else
                             MapList = MapList & vbCrLf & styleId & vbTab & Filename & "<" & Prefix & "<" & Suffix
                         End If
                     End If
-                    IncludedStyleFilename = main_GetCSText(CS, "iStylefilename")
-                    Prefix = main_encodeHTML(app.db_GetCS(CS, "iPrefix"))
-                    Suffix = main_encodeHTML(app.db_GetCS(CS, "iSuffix"))
+                    IncludedStyleFilename = db.db_GetCSText(CS, "iStylefilename")
+                    Prefix = main_encodeHTML(db.db_GetCS(CS, "iPrefix"))
+                    Suffix = main_encodeHTML(db.db_GetCS(CS, "iSuffix"))
                     If IncludedStyleFilename <> "" Then
                         MapList = MapList & "," & IncludedStyleFilename & "<" & Prefix & "<" & Suffix
                     End If
-                    Call app.db_csGoNext(CS)
+                    Call db.db_csGoNext(CS)
                 Loop
                 If MapList = "" Then
                     MapList = ","
                 End If
-                Call app.cache.SetKey(BakeName, MapList, "Shared Styles")
+                Call cache.SetKey(BakeName, MapList, "Shared Styles")
             End If
             If (MapList <> "") And (MapList <> ",") Then
                 Srcs = Split(SharedStyleIDList, ",")
@@ -31935,19 +31910,19 @@ ErrorTrap:
                 DataSourceName = main_GetContentDataSource(ContentName)
                 TableName = db_GetContentTablename(ContentName)
                 '
-                SQL = "update " & TableName & " set DateReviewed=" & app.db_EncodeSQLDate(main_PageStartTime)
+                SQL = "update " & TableName & " set DateReviewed=" & db.db_EncodeSQLDate(main_PageStartTime)
                 If main_IsContentFieldSupported(ContentName, "ReviewedBy") Then
                     SQL &= ",ReviewedBy=" & userId
                 End If
                 '
                 ' Mark the live record
                 '
-                Call app.executeSql(SQL, DataSourceName & " where id=" & RecordID)
+                Call db.executeSql(SQL, DataSourceName & " where id=" & RecordID)
                 '
                 ' Mark the edit record if in workflow
                 '
                 If main_IsContentFieldSupported(ContentName, "editsourceid") Then
-                    Call app.executeSql(SQL, DataSourceName & " where (editsourceid=" & RecordID & ")and(editarchive=0)")
+                    Call db.executeSql(SQL, DataSourceName & " where (editsourceid=" & RecordID & ")and(editarchive=0)")
                 End If
             End If
         End Sub
@@ -32129,20 +32104,20 @@ ErrorTrap:
                 ' main_Get values out of the remote query record
                 '
                 If gv.status = GoogleVisualizationStatusEnum.OK Then
-                    CS = app.db_csOpen("Remote Queries", "((VisitId=" & main_VisitId & ")and(remotekey=" & app.db_EncodeSQLText(RemoteKey) & "))")
-                    If app.db_csOk(CS) Then
+                    CS = db.db_csOpen("Remote Queries", "((VisitId=" & main_VisitId & ")and(remotekey=" & db.db_EncodeSQLText(RemoteKey) & "))")
+                    If db.db_csOk(CS) Then
                         '
                         ' Use user definied query
                         '
-                        SQLQuery = main_GetCSText(CS, "sqlquery")
-                        DataSource = main_GetDataSourceByID(app.db_GetCSInteger(CS, "datasourceid"))
-                        maxRows = app.db_GetCSInteger(CS, "maxrows")
-                        QueryType = app.db_GetCSInteger(CS, "QueryTypeID")
-                        ContentName = app.db_GetCS(CS, "ContentID")
-                        Criteria = main_GetCSText(CS, "Criteria")
-                        SortFieldList = main_GetCSText(CS, "SortFieldList")
-                        AllowInactiveRecords2 = main_GetCSBoolean(CS, "AllowInactiveRecords")
-                        SelectFieldList = main_GetCSText(CS, "SelectFieldList")
+                        SQLQuery = db.db_GetCSText(CS, "sqlquery")
+                        DataSource = main_GetDataSourceByID(db.db_GetCSInteger(CS, "datasourceid"))
+                        maxRows = db.db_GetCSInteger(CS, "maxrows")
+                        QueryType = db.db_GetCSInteger(CS, "QueryTypeID")
+                        ContentName = db.db_GetCS(CS, "ContentID")
+                        Criteria = db.db_GetCSText(CS, "Criteria")
+                        SortFieldList = db.db_GetCSText(CS, "SortFieldList")
+                        AllowInactiveRecords2 = db.db_GetCSBoolean(CS, "AllowInactiveRecords")
+                        SelectFieldList = db.db_GetCSText(CS, "SelectFieldList")
                         SetPairString = ""
                     Else
                         '
@@ -32182,7 +32157,7 @@ ErrorTrap:
                                 '    gv.errors(Ptr) = "query not found"
                         End Select
                     End If
-                    Call app.db_csClose(CS)
+                    Call db.db_csClose(CS)
                     '
                     If gv.status = GoogleVisualizationStatusEnum.OK Then
                         Select Case QueryType
@@ -32327,8 +32302,8 @@ ErrorTrap:
                                 '
                                 ' Open the content and cycle through each setPair
                                 '
-                                CS = app.db_csOpen(ContentName, Criteria, SortFieldList, AllowInactiveRecords2, , ,, SelectFieldList)
-                                If app.db_csOk(CS) Then
+                                CS = db.db_csOpen(ContentName, Criteria, SortFieldList, AllowInactiveRecords2, , ,, SelectFieldList)
+                                If db.db_csOk(CS) Then
                                     '
                                     ' update by looping through the args and setting name=values
                                     '
@@ -32341,15 +32316,15 @@ ErrorTrap:
                                                 FieldName = DecodeResponseVariable(Mid(SetPairs(Ptr), 1, Pos - 1))
                                                 If Not main_IsContentFieldSupported(ContentName, FieldName) Then
                                                     Dim errorMessage As String = "result, QueryTypeUpdateContent, key [" & RemoteKey & "], bad field [" & FieldName & "] skipped"
-                                                    Call handleException(New ApplicationException(errorMessage))
+                                                    Call handleExceptionAndRethrow(New ApplicationException(errorMessage))
                                                 Else
-                                                    Call app.db_setCS(CS, FieldName, FieldValue)
+                                                    Call db.db_setCS(CS, FieldName, FieldValue)
                                                 End If
                                             End If
                                         End If
                                     Next
                                 End If
-                                Call app.db_csClose(CS)
+                                Call db.db_csClose(CS)
                                 'Case QueryTypeInsertContent
                                 '    '
                                 '    ' !!!! only allow inbound hits with a referrer from this site - later use the aggregate access table
@@ -32369,7 +32344,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
             Return result
         End Function
@@ -32388,18 +32363,18 @@ ErrorTrap:
                 maxRows = 1000
             End If
             CS = db_InsertCSContent("Remote Queries")
-            If app.db_csOk(CS) Then
+            If db.db_csOk(CS) Then
                 RemoteKey = Guid.NewGuid.ToString()
                 DataSourceID = main_GetRecordID("Data Sources", DataSourceName)
-                Call app.db_setCS(CS, "remotekey", RemoteKey)
-                Call app.db_setCS(CS, "datasourceid", DataSourceID)
-                Call app.db_setCS(CS, "sqlquery", SQL)
-                Call app.db_setCS(CS, "maxRows", maxRows)
-                Call app.db_setCS(CS, "dateexpires", app.db_EncodeSQLDate(main_PageStartTime.AddDays(1)))
-                Call app.db_setCS(CS, "QueryTypeID", QueryTypeSQL)
-                Call app.db_setCS(CS, "VisitId", main_VisitId)
+                Call db.db_setCS(CS, "remotekey", RemoteKey)
+                Call db.db_setCS(CS, "datasourceid", DataSourceID)
+                Call db.db_setCS(CS, "sqlquery", SQL)
+                Call db.db_setCS(CS, "maxRows", maxRows)
+                Call db.db_setCS(CS, "dateexpires", db.db_EncodeSQLDate(main_PageStartTime.AddDays(1)))
+                Call db.db_setCS(CS, "QueryTypeID", QueryTypeSQL)
+                Call db.db_setCS(CS, "VisitId", main_VisitId)
             End If
-            Call app.db_csClose(CS)
+            Call db.db_csClose(CS)
             '
             main_GetRemoteQueryKey = RemoteKey
             '
@@ -32499,9 +32474,9 @@ ErrorTrap:
         '
         Private Sub appendLogPageNotFound(PageNotFoundLink As String)
             Try
-                Call appendLog("""" & FormatDateTime(main_PageStartTime, vbGeneralDate) & """,""App=" & app.config.name & """,""main_VisitId=" & main_VisitId & """,""" & PageNotFoundLink & """,""Referrer=" & web.requestReferrer & """", "performance", "pagenotfound")
+                Call appendLog("""" & FormatDateTime(main_PageStartTime, vbGeneralDate) & """,""App=" & db.config.name & """,""main_VisitId=" & main_VisitId & """,""" & PageNotFoundLink & """,""Referrer=" & web.requestReferrer & """", "performance", "pagenotfound")
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '
@@ -32509,7 +32484,7 @@ ErrorTrap:
         '
         Public ReadOnly Property main_docType() As String
             Get
-                Return app.siteProperty_docTypeDeclaration()
+                Return db.siteProperty_docTypeDeclaration()
             End Get
         End Property
         '
@@ -32517,7 +32492,7 @@ ErrorTrap:
         '
         Public ReadOnly Property main_DocTypeAdmin() As String
             Get
-                Return app.siteProperty_docTypeDeclarationAdmin
+                Return db.siteProperty_docTypeDeclarationAdmin
             End Get
         End Property
         '
@@ -32966,7 +32941,7 @@ ErrorTrap:
         '
         Private Function main_GetFileSize(ByVal VirtualFilePathPage As String) As Integer
             'Dim kmafs As New fileSystemClass
-            Dim files As IO.FileInfo() = app.appRootFiles.GetFolderFiles(VirtualFilePathPage)
+            Dim files As IO.FileInfo() = db.appRootFiles.GetFolderFiles(VirtualFilePathPage)
             Return CInt(files(0).Length)
 
 
@@ -33093,7 +33068,7 @@ ErrorTrap:
                         ContentName = "Page Content"
                     End If
                     If autoPrintText = "" Then
-                        autoPrintText = app.siteProperty_getText("AllowAutoPrintDialog", "1")
+                        autoPrintText = db.siteProperty_getText("AllowAutoPrintDialog", "1")
                     End If
                     If RootPageName = "" Then
                         blockSiteWithLogin = False
@@ -33105,11 +33080,11 @@ ErrorTrap:
                         '
                         ' 5/12/2008 - converted to RootPageID call because we do not use RootPageName anymore
                         '
-                        allowPageWithoutSectionDisplay = EncodeBoolean(app.siteProperty_getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default))
+                        allowPageWithoutSectionDisplay = EncodeBoolean(db.siteProperty_getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default))
                         If Not allowPageWithoutSectionDisplay Then
                             allowPageWithoutSectionDisplay = main_IsContentManager(ContentName)
                         End If
-                        PageCopy = main_GetHtmlBody_GetSection_GetContent(PageID, rootPageId, ContentName, OrderByClause, False, False, False, 0, app.siteProperty_UseContentWatchLink, allowPageWithoutSectionDisplay)
+                        PageCopy = main_GetHtmlBody_GetSection_GetContent(PageID, rootPageId, ContentName, OrderByClause, False, False, False, 0, db.siteProperty_UseContentWatchLink, allowPageWithoutSectionDisplay)
                         If pageManager_RedirectLink <> "" Then
                             Call web_Redirect2(pageManager_RedirectLink, pageManager_RedirectReason, False)
                         End If
@@ -33294,21 +33269,21 @@ ErrorTrap:
                     On Error Resume Next
                     Err.Clear()
                     InsertTestOK = False
-                    CS = app.db_csInsertRecord("Trap Log")
-                    If Not app.db_csOk(CS) Then
+                    CS = db.db_csInsertRecord("Trap Log")
+                    If Not db.db_csOk(CS) Then
                         Call handleLegacyError10(KmaErrorInternal, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was not OK.", "Init", False, True)
                         Call main_IncrementErrorCount()
                     Else
                         InsertTestOK = True
-                        TrapID = app.db_GetCSInteger(CS, "ID")
+                        TrapID = db.db_GetCSInteger(CS, "ID")
                     End If
-                    Call app.db_csClose(CS)
+                    Call db.db_csClose(CS)
                     If InsertTestOK Then
                         If TrapID = 0 Then
                             Call handleLegacyError10(KmaErrorInternal, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was OK, but ID=0.", "Init", False, True)
                             Call main_IncrementErrorCount()
                         Else
-                            Call main_DeleteContentRecord("Trap Log", TrapID)
+                            Call db_DeleteContentRecord("Trap Log", TrapID)
                         End If
                     End If
                     If Err.Number <> 0 Then
@@ -33354,11 +33329,11 @@ ErrorTrap:
                         ' main_Get the page
                         '
                         rootPageId = main_GetRecordID("Page Content", Name)
-                        allowPageWithoutSectionDisplay = EncodeBoolean(app.siteProperty_getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default))
+                        allowPageWithoutSectionDisplay = EncodeBoolean(db.siteProperty_getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default))
                         If Not allowPageWithoutSectionDisplay Then
                             allowPageWithoutSectionDisplay = main_IsContentManager(ContentName)
                         End If
-                        Copy = main_GetHtmlBody_GetSection_GetContent(PageID, rootPageId, "Page Content", "", True, True, False, 0, app.siteProperty_UseContentWatchLink, allowPageWithoutSectionDisplay)
+                        Copy = main_GetHtmlBody_GetSection_GetContent(PageID, rootPageId, "Page Content", "", True, True, False, 0, db.siteProperty_UseContentWatchLink, allowPageWithoutSectionDisplay)
                         'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2g")
                         Copy = Copy & main_GetEndOfBody(False, True, False, False)
                         Copy = Replace(Copy, "'", "'+""'""+'")
@@ -33463,41 +33438,41 @@ ErrorTrap:
                         '
                         ' Confirm the order
                         '
-                        CS = app.db_csOpen("Orders", "(ID=" & ConfirmOrderID & ") and ((OrderCompleted=0)or(OrderCompleted is Null))")
-                        If app.db_csOk(CS) Then
-                            Call app.db_setCS(CS, "OrderCompleted", True)
-                            Call app.db_setCS(CS, "DateCompleted", main_PageStartTime)
-                            Call app.db_setCS(CS, "ccAuthCode", doc_getText("txn_id"))
-                            Call app.db_setCS(CS, "ccActionCode", doc_getText("payment_status"))
-                            Call app.db_setCS(CS, "ccRefCode", doc_getText("pending_reason"))
-                            Call app.db_setCS(CS, "PayMethod", "PayPal " & doc_getText("payment_type"))
-                            Call app.db_setCS(CS, "ShipName", doc_getText("first_name") & " " & doc_getText("last_name"))
-                            Call app.db_setCS(CS, "ShipAddress", doc_getText("address_street"))
-                            Call app.db_setCS(CS, "ShipCity", doc_getText("address_city"))
-                            Call app.db_setCS(CS, "ShipState", doc_getText("address_state"))
-                            Call app.db_setCS(CS, "ShipZip", doc_getText("address_zip"))
-                            Call app.db_setCS(CS, "BilleMail", doc_getText("payer_email"))
-                            Call app.db_setCS(CS, "ContentControlID", main_GetContentID("Orders Completed"))
-                            Call app.csv_SaveCSRecord(CS)
+                        CS = db.db_csOpen("Orders", "(ID=" & ConfirmOrderID & ") and ((OrderCompleted=0)or(OrderCompleted is Null))")
+                        If db.db_csOk(CS) Then
+                            Call db.db_setCS(CS, "OrderCompleted", True)
+                            Call db.db_setCS(CS, "DateCompleted", main_PageStartTime)
+                            Call db.db_setCS(CS, "ccAuthCode", doc_getText("txn_id"))
+                            Call db.db_setCS(CS, "ccActionCode", doc_getText("payment_status"))
+                            Call db.db_setCS(CS, "ccRefCode", doc_getText("pending_reason"))
+                            Call db.db_setCS(CS, "PayMethod", "PayPal " & doc_getText("payment_type"))
+                            Call db.db_setCS(CS, "ShipName", doc_getText("first_name") & " " & doc_getText("last_name"))
+                            Call db.db_setCS(CS, "ShipAddress", doc_getText("address_street"))
+                            Call db.db_setCS(CS, "ShipCity", doc_getText("address_city"))
+                            Call db.db_setCS(CS, "ShipState", doc_getText("address_state"))
+                            Call db.db_setCS(CS, "ShipZip", doc_getText("address_zip"))
+                            Call db.db_setCS(CS, "BilleMail", doc_getText("payer_email"))
+                            Call db.db_setCS(CS, "ContentControlID", main_GetContentID("Orders Completed"))
+                            Call db.db_SaveCSRecord(CS)
                         End If
-                        Call app.db_csClose(CS)
+                        Call db.db_csClose(CS)
                         '
                         ' Empty the cart
                         '
-                        CS = app.db_csOpen("Visitors", "OrderID=" & ConfirmOrderID)
-                        If app.db_csOk(CS) Then
-                            Call app.db_setCS(CS, "OrderID", 0)
-                            Call app.csv_SaveCSRecord(CS)
+                        CS = db.db_csOpen("Visitors", "OrderID=" & ConfirmOrderID)
+                        If db.db_csOk(CS) Then
+                            Call db.db_setCS(CS, "OrderID", 0)
+                            Call db.db_SaveCSRecord(CS)
                         End If
-                        Call app.db_csClose(CS)
+                        Call db.db_csClose(CS)
                         '
                         ' TEmp fix until HardCodedPage is complete
                         '
-                        Recipient = app.siteProperty_getText("EmailOrderNotifyAddress", app.siteProperty_EmailAdmin)
+                        Recipient = db.siteProperty_getText("EmailOrderNotifyAddress", db.siteProperty_EmailAdmin)
                         If InStr(EncodeText(Recipient), "@") = 0 Then
                             Call handleLegacyError12("Init", "PayPal confirmation Order Process Notification email was not sent because EmailOrderNotifyAddress SiteProperty is not valid")
                         Else
-                            Sender = app.siteProperty_getText("EmailOrderFromAddress")
+                            Sender = db.siteProperty_getText("EmailOrderFromAddress")
                             subject = main_ServerDomain & " Online Order Pending, #" & ConfirmOrderID
                             Message = "<p>An order confirmation has been recieved from PayPal for " & main_ServerDomain & "</p>"
                             Call main_SendEmail(Recipient, Sender, subject, Message, , False, True)
@@ -33554,12 +33529,12 @@ ErrorTrap:
             Else
                 intContentName = main_GetContentNameByID(ContentID)
                 If intContentName <> "" Then
-                    CSPointer = app.db_csOpen(intContentName, "ID=" & intRecordId)
-                    If Not app.db_csOk(CSPointer) Then
+                    CSPointer = db.db_csOpen(intContentName, "ID=" & intRecordId)
+                    If Not db.db_csOk(CSPointer) Then
                         PanelCopy = SpanClassAdminNormal & "The information you have selected can not be accessed.</span>"
                         EditorPanel = EditorPanel & main_GetPanel(PanelCopy)
                     Else
-                        Copy = app.db_GetCS(CSPointer, strFieldName)
+                        Copy = db.db_GetCS(CSPointer, strFieldName)
                         EditorPanel = EditorPanel & html_GetFormInputHidden("Type", FormTypeActiveEditor)
                         EditorPanel = EditorPanel & html_GetFormInputHidden("cid", ContentID)
                         EditorPanel = EditorPanel & html_GetFormInputHidden("ID", intRecordId)
@@ -33629,11 +33604,11 @@ ErrorTrap:
                     '
                     ContentName = main_GetContentNameByID(ContentID)
                     If ContentName <> "" Then
-                        CS = app.db_csOpen(ContentName, "ID=" & app.db_EncodeSQLNumber(RecordID), , False)
-                        If app.db_csOk(CS) Then
-                            Call app.db_setCS(CS, FieldName, ContentCopy)
+                        CS = db.db_csOpen(ContentName, "ID=" & db.db_EncodeSQLNumber(RecordID), , False)
+                        If db.db_csOk(CS) Then
+                            Call db.db_setCS(CS, FieldName, ContentCopy)
                         End If
-                        Call app.db_csClose(CS)
+                        Call db.db_csClose(CS)
                     End If
             End Select
             '
@@ -33682,30 +33657,30 @@ ErrorTrap:
             s = Content
             SelectFieldList = "name,copytext,javascriptonload,javascriptbodyend,stylesfilename,otherheadtags,JSFilename,targetString"
             CS = db_csOpen("Wrappers", WrapperID, , , SelectFieldList)
-            If app.db_csOk(CS) Then
-                Wrapper = main_GetCSText(CS, "copytext")
-                wrapperName = main_GetCSText(CS, "name")
-                TargetString = main_GetCSText(CS, "targetString")
+            If db.db_csOk(CS) Then
+                Wrapper = db.db_GetCSText(CS, "copytext")
+                wrapperName = db.db_GetCSText(CS, "name")
+                TargetString = db.db_GetCSText(CS, "targetString")
                 '
                 SourceComment = "wrapper " & wrapperName
                 If WrapperSourceForComment <> "" Then
                     SourceComment = SourceComment & " for " & WrapperSourceForComment
                 End If
-                Call main_AddOnLoadJavascript2(main_GetCSText(CS, "javascriptonload"), SourceComment)
-                Call main_AddEndOfBodyJavascript2(main_GetCSText(CS, "javascriptbodyend"), SourceComment)
-                Call main_AddHeadTag2(main_GetCSText(CS, "OtherHeadTags"), SourceComment)
+                Call main_AddOnLoadJavascript2(db.db_GetCSText(CS, "javascriptonload"), SourceComment)
+                Call main_AddEndOfBodyJavascript2(db.db_GetCSText(CS, "javascriptbodyend"), SourceComment)
+                Call main_AddHeadTag2(db.db_GetCSText(CS, "OtherHeadTags"), SourceComment)
                 '
-                JSFilename = main_GetCSText(CS, "jsfilename")
+                JSFilename = db.db_GetCSText(CS, "jsfilename")
                 If JSFilename <> "" Then
-                    JSFilename = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, JSFilename)
+                    JSFilename = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, JSFilename)
                     Call main_AddHeadScriptLink(JSFilename, SourceComment)
                 End If
-                Copy = main_GetCSText(CS, "stylesfilename")
+                Copy = db.db_GetCSText(CS, "stylesfilename")
                 If Copy <> "" Then
                     If InStr(1, Copy, "://") <> 0 Then
                     ElseIf Left(Copy, 1) = "/" Then
                     Else
-                        Copy = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, Copy)
+                        Copy = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, Copy)
                     End If
                     Call main_AddStylesheetLink2(Copy, SourceComment)
                 End If
@@ -33722,7 +33697,7 @@ ErrorTrap:
                     End If
                 End If
             End If
-            Call app.db_csClose(CS)
+            Call db.db_csClose(CS)
             '
             executeAddon_WrapContent = s
             '
@@ -33794,15 +33769,15 @@ ErrorTrap:
                                 SQL = "SELECT ccGroupRules.ContentID" _
                                     & " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupID = ccMemberRules.GroupID" _
                                     & " WHERE (" _
-                                        & "(ccMemberRules.MemberID=" & app.db_EncodeSQLNumber(userId) & ")" _
+                                        & "(ccMemberRules.MemberID=" & db.db_EncodeSQLNumber(userId) & ")" _
                                         & " AND(ccMemberRules.active<>0)" _
                                         & " AND(ccGroupRules.active<>0)" _
                                         & " AND(ccGroupRules.ContentID Is not Null)" _
-                                        & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & app.db_EncodeSQLDate(main_PageStartTime) & "))" _
+                                        & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & db.db_EncodeSQLDate(main_PageStartTime) & "))" _
                                         & ");"
-                                CS = app.db_csOpenSql(SQL)
-                                property_user_isContentManagerOfAnything = app.db_csOk(CS)
-                                app.db_csClose(CS)
+                                CS = db.db_csOpenSql(SQL)
+                                property_user_isContentManagerOfAnything = db.db_csOk(CS)
+                                db.db_csClose(CS)
                                 '
                                 property_user_isContentManagerOfAnything_isLoaded = True
                             End If
@@ -33816,7 +33791,7 @@ ErrorTrap:
                     Call main_GetContentAccessRights(ContentName, returnIsContentManager, notImplemented_allowAdd, notImplemented_allowDelete)
                 End If
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
             Return returnIsContentManager
         End Function
@@ -33856,7 +33831,7 @@ ErrorTrap:
                         '
                         ' admin is content manager if the CDef is not developer only
                         '
-                        CDef = app.metaData.getCdef(ContentName)
+                        CDef = metaData.getCdef(ContentName)
                         If CDef.Id <> 0 Then
                             If Not CDef.DeveloperOnly Then
                                 returnAllowEdit = True
@@ -33873,7 +33848,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '
@@ -33928,19 +33903,19 @@ ErrorTrap:
                 SQL = "SELECT ccGroupRules.ContentID,allowAdd,allowDelete" _
                     & " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupID = ccMemberRules.GroupID" _
                     & " WHERE (" _
-                        & " (ccMemberRules.MemberID=" & app.db_EncodeSQLNumber(userId) & ")" _
+                        & " (ccMemberRules.MemberID=" & db.db_EncodeSQLNumber(userId) & ")" _
                         & " AND(ccMemberRules.active<>0)" _
                         & " AND(ccGroupRules.active<>0)" _
                         & " AND(ccGroupRules.ContentID=" & ContentID & ")" _
-                        & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & app.db_EncodeSQLDate(main_PageStartTime) & "))" _
+                        & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & db.db_EncodeSQLDate(main_PageStartTime) & "))" _
                         & ");"
-                CSPointer = app.db_csOpenSql(SQL)
-                If app.db_csOk(CSPointer) Then
+                CSPointer = db.db_csOpenSql(SQL)
+                If db.db_csOk(CSPointer) Then
                     returnAllowEdit = True
-                    returnAllowAdd = main_GetCSBoolean(CSPointer, "allowAdd")
-                    returnAllowDelete = main_GetCSBoolean(CSPointer, "allowDelete")
+                    returnAllowAdd = db.db_GetCSBoolean(CSPointer, "allowAdd")
+                    returnAllowDelete = db.db_GetCSBoolean(CSPointer, "allowDelete")
                 End If
-                app.db_csClose(CSPointer)
+                db.db_csClose(CSPointer)
                 '
                 If Not returnAllowEdit Then
                     '
@@ -33948,7 +33923,7 @@ ErrorTrap:
                     '
                     ContentName = main_GetContentNameByID(ContentID)
                     If ContentName <> "" Then
-                        CDef = app.metaData.getCdef(ContentName)
+                        CDef = metaData.getCdef(ContentName)
                         ParentID = CDef.parentID
                         If ParentID > 0 Then
                             Call main_GetContentAccessRights_NonAdminByContentId(ParentID, returnAllowEdit, returnAllowAdd, returnAllowDelete, usedContentIdList & "," & CStr(ContentID))
@@ -34052,7 +34027,7 @@ ErrorTrap:
                     If HtmlValue = "" Then
                         main_GetFormInputField = html_GetFormInputFile2(InputName, HtmlId, HtmlClass)
                     Else
-                        main_GetFormInputField = main_GetFormInputField & "<a href=""http://" & EncodeURL(web.requestDomain & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & GetFilename(HtmlValue) & "]</A>"
+                        main_GetFormInputField = main_GetFormInputField & "<a href=""http://" & EncodeURL(web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & GetFilename(HtmlValue) & "]</A>"
                         main_GetFormInputField = main_GetFormInputField & "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & html_GetFormInputCheckBox2(InputName & ".Delete", False)
                         main_GetFormInputField = main_GetFormInputField & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & html_GetFormInputFile2(InputName, HtmlId, HtmlClass)
                     End If
@@ -34074,7 +34049,7 @@ ErrorTrap:
                     If HtmlValue = "" Then
                         main_GetFormInputField = html_GetFormInputFile2(InputName, HtmlId, HtmlClass)
                     Else
-                        main_GetFormInputField = main_GetFormInputField & "<a href=""http://" & EncodeURL(web.requestDomain & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & GetFilename(HtmlValue) & "]</A>"
+                        main_GetFormInputField = main_GetFormInputField & "<a href=""http://" & EncodeURL(web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & GetFilename(HtmlValue) & "]</A>"
                         main_GetFormInputField = main_GetFormInputField & "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & html_GetFormInputCheckBox2(InputName & ".Delete", False)
                         main_GetFormInputField = main_GetFormInputField & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & html_GetFormInputFile2(InputName, HtmlId, HtmlClass)
                     End If
@@ -34109,7 +34084,7 @@ ErrorTrap:
                     '
                     '
                     '
-                    CDef = app.metaData.getCdef(ContentName)
+                    CDef = metaData.getCdef(ContentName)
                     LookupContentName = ""
                     With CDef
                         For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In CDef.fields
@@ -34136,7 +34111,7 @@ ErrorTrap:
                     '
                     '
                     '
-                    CDef = app.metaData.getCdef(ContentName)
+                    CDef = metaData.getCdef(ContentName)
                     With CDef.fields(FieldName.ToLower())
                         MTMContent0 = main_GetContentNameByID(.contentId)
                         MTMContent1 = main_GetContentNameByID(.manyToManyContentID)
@@ -34211,7 +34186,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            handleException(New Exception("Unexpected exception"))
+            handleExceptionAndRethrow(New Exception("Unexpected exception"))
             '
         End Function
         '
@@ -34235,7 +34210,7 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            handleException(New Exception("Unexpected exception"))
+            handleExceptionAndRethrow(New Exception("Unexpected exception"))
             '
         End Function
         '
@@ -34332,7 +34307,7 @@ ErrorTrap:
                 ' AC StartBlockText
                 '
                 IconIDControlString = "AC," & ACTypeAggregateFunction & ",0,Block Text,"
-                IconImg = GetAddonIconImg(app.siteProperty_AdminURL, 0, 0, 0, True, IconIDControlString, "", app.config.cdnFilesNetprefix, "Text Block Start", "Block text to all except selected groups starting at this point", "", 0)
+                IconImg = GetAddonIconImg(db.siteProperty_AdminURL, 0, 0, 0, True, IconIDControlString, "", db.config.cdnFilesNetprefix, "Text Block Start", "Block text to all except selected groups starting at this point", "", 0)
                 IconImg = EncodeJavascript(IconImg)
                 Items(ItemsCnt) = "['Block Text','" & IconImg & "']"
                 Call Index.setPtr("Block Text", ItemsCnt)
@@ -34341,7 +34316,7 @@ ErrorTrap:
                 ' AC EndBlockText
                 '
                 IconIDControlString = "AC," & ACTypeAggregateFunction & ",0,Block Text End,"
-                IconImg = GetAddonIconImg(app.siteProperty_AdminURL, 0, 0, 0, True, IconIDControlString, "", app.config.cdnFilesNetprefix, "Text Block End", "End of text block", "", 0)
+                IconImg = GetAddonIconImg(db.siteProperty_AdminURL, 0, 0, 0, True, IconIDControlString, "", db.config.cdnFilesNetprefix, "Text Block End", "End of text block", "", 0)
                 IconImg = EncodeJavascript(IconImg)
                 Items(ItemsCnt) = "['Block Text End','" & IconImg & "']"
                 Call Index.setPtr("Block Text", ItemsCnt)
@@ -34358,7 +34333,7 @@ ErrorTrap:
                     FieldList = db_GetContentProperty("people", "SelectFieldList")
                     FieldList = Replace(FieldList, ",", "|")
                     IconIDControlString = "AC,PERSONALIZATION,0,Personalization,field=[" & FieldList & "]"
-                    IconImg = GetAddonIconImg(app.siteProperty_AdminURL, 0, 0, 0, True, IconIDControlString, "", app.config.cdnFilesNetprefix, "Any Personalization Field", "Renders as any Personalization Field", "", 0)
+                    IconImg = GetAddonIconImg(db.siteProperty_AdminURL, 0, 0, 0, True, IconIDControlString, "", db.config.cdnFilesNetprefix, "Any Personalization Field", "Renders as any Personalization Field", "", 0)
                     IconImg = EncodeJavascript(IconImg)
                     Items(ItemsCnt) = "['Personalization','" & IconImg & "']"
                     Call Index.setPtr("Personalization", ItemsCnt)
@@ -34373,7 +34348,7 @@ ErrorTrap:
                         '   Need a more consistant solution later
                         '
                         IconIDControlString = "AC," & ACTypeTemplateContent & ",0,Template Content,"
-                        IconImg = GetAddonIconImg(app.siteProperty_AdminURL, 52, 64, 0, False, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", app.config.cdnFilesNetprefix, "Content Box", "Renders as the content for a template", "", 0)
+                        IconImg = GetAddonIconImg(db.siteProperty_AdminURL, 52, 64, 0, False, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", db.config.cdnFilesNetprefix, "Content Box", "Renders as the content for a template", "", 0)
                         IconImg = EncodeJavascript(IconImg)
                         Items(ItemsCnt) = "['Content Box','" & IconImg & "']"
                         'Items(ItemsCnt) = "['Template Content','<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Content"" id=""AC," & ACTypeTemplateContent & ",0,Template Content,"" src=""/ccLib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>']"
@@ -34381,7 +34356,7 @@ ErrorTrap:
                         ItemsCnt = ItemsCnt + 1
                         '
                         IconIDControlString = "AC," & ACTypeTemplateText & ",0,Template Text,Name=Default"
-                        IconImg = GetAddonIconImg(app.siteProperty_AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", app.config.cdnFilesNetprefix, "Template Text", "Renders as a template text block", "", 0)
+                        IconImg = GetAddonIconImg(db.siteProperty_AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", db.config.cdnFilesNetprefix, "Template Text", "Renders as a template text block", "", 0)
                         IconImg = EncodeJavascript(IconImg)
                         Items(ItemsCnt) = "['Template Text','" & IconImg & "']"
                         'Items(ItemsCnt) = "['Template Text','<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Text"" id=""AC," & ACTypeTemplateText & ",0,Template Text,Name=Default"" src=""/ccLib/images/ACTemplateTextIcon.gif"" WIDTH=52 HEIGHT=52>']"
@@ -34394,14 +34369,14 @@ ErrorTrap:
                     '
                     ' Watch Lists
                     '
-                    CSLists = app.db_csOpen("Content Watch Lists", , "Name,ID", , , , , "Name,ID", 20, 1)
-                    If app.db_csOk(CSLists) Then
-                        Do While app.db_csOk(CSLists)
-                            FieldName = Trim(main_GetCSText(CSLists, "name"))
+                    CSLists = db.db_csOpen("Content Watch Lists", , "Name,ID", , , , , "Name,ID", 20, 1)
+                    If db.db_csOk(CSLists) Then
+                        Do While db.db_csOk(CSLists)
+                            FieldName = Trim(db.db_GetCSText(CSLists, "name"))
                             If FieldName <> "" Then
                                 FieldCaption = "Watch List [" & FieldName & "]"
                                 IconIDControlString = "AC,WATCHLIST,0," & FieldName & ",ListName=" & FieldName & "&SortField=[DateAdded|Link|LinkLabel|Clicks|WhatsNewDateExpires]&SortDirection=Z-A[A-Z|Z-A]"
-                                IconImg = GetAddonIconImg(app.siteProperty_AdminURL, 0, 0, 0, True, IconIDControlString, "", app.config.cdnFilesNetprefix, FieldCaption, "Rendered as the " & FieldCaption, "", 0)
+                                IconImg = GetAddonIconImg(db.siteProperty_AdminURL, 0, 0, 0, True, IconIDControlString, "", db.config.cdnFilesNetprefix, FieldCaption, "Rendered as the " & FieldCaption, "", 0)
                                 IconImg = EncodeJavascript(IconImg)
                                 FieldCaption = EncodeJavascript(FieldCaption)
                                 Items(ItemsCnt) = "['" & FieldCaption & "','" & IconImg & "']"
@@ -34413,10 +34388,10 @@ ErrorTrap:
                                     ReDim Preserve Items(ItemsSize)
                                 End If
                             End If
-                            app.db_csGoNext(CSLists)
+                            db.db_csGoNext(CSLists)
                         Loop
                     End If
-                    Call app.db_csClose(CSLists)
+                    Call db.db_csClose(CSLists)
                 End If
                 '
                 ' ----- Add-ons (AC Aggregate Functions)
@@ -34452,32 +34427,32 @@ ErrorTrap:
                     End If
                     AddonContentName = "Add-ons"
                     SelectList = "Name,Link,ID,ArgumentList,ObjectProgramID,IconFilename,IconWidth,IconHeight,IconSprites,IsInline,ccguid"
-                    CSAddons = app.db_csOpen(AddonContentName, Criteria, "Name,ID", , , , , SelectList)
-                    If app.db_csOk(CSAddons) Then
-                        Do While app.db_csOk(CSAddons)
-                            AddonGuid = main_GetCSText(CSAddons, "ccguid")
-                            ObjectProgramID2 = main_GetCSText(CSAddons, "ObjectProgramID")
+                    CSAddons = db.db_csOpen(AddonContentName, Criteria, "Name,ID", , , , , SelectList)
+                    If db.db_csOk(CSAddons) Then
+                        Do While db.db_csOk(CSAddons)
+                            AddonGuid = db.db_GetCSText(CSAddons, "ccguid")
+                            ObjectProgramID2 = db.db_GetCSText(CSAddons, "ObjectProgramID")
                             If (ContentType = csv_contentTypeEnum.contentTypeEmail) And (ObjectProgramID2 <> "") Then
                                 '
                                 ' Block activex addons from email
                                 '
                                 ObjectProgramID2 = ObjectProgramID2
                             Else
-                                AddonName = Trim(app.db_GetCS(CSAddons, "name"))
+                                AddonName = Trim(db.db_GetCS(CSAddons, "name"))
                                 If AddonName <> "" And (AddonName <> LastAddonName) Then
                                     '
                                     ' Icon (fieldtyperesourcelink)
                                     '
-                                    IsInline = main_GetCSBoolean(CSAddons, "IsInline")
-                                    IconFilename = app.db_GetCS(CSAddons, "Iconfilename")
+                                    IsInline = db.db_GetCSBoolean(CSAddons, "IsInline")
+                                    IconFilename = db.db_GetCS(CSAddons, "Iconfilename")
                                     If IconFilename = "" Then
                                         IconWidth = 0
                                         IconHeight = 0
                                         IconSprites = 0
                                     Else
-                                        IconWidth = app.db_GetCSInteger(CSAddons, "IconWidth")
-                                        IconHeight = app.db_GetCSInteger(CSAddons, "IconHeight")
-                                        IconSprites = app.db_GetCSInteger(CSAddons, "IconSprites")
+                                        IconWidth = db.db_GetCSInteger(CSAddons, "IconWidth")
+                                        IconHeight = db.db_GetCSInteger(CSAddons, "IconHeight")
+                                        IconSprites = db.db_GetCSInteger(CSAddons, "IconSprites")
                                     End If
                                     '
                                     ' Calculate DefaultAddonOption_String
@@ -34486,7 +34461,7 @@ ErrorTrap:
                                     If UseAjaxDefaultAddonOptions Then
                                         DefaultAddonOption_String = ""
                                     Else
-                                        ArgumentList = Trim(app.db_GetCS(CSAddons, "ArgumentList"))
+                                        ArgumentList = Trim(db.db_GetCS(CSAddons, "ArgumentList"))
                                         DefaultAddonOption_String = main_GetDefaultAddonOption_String(ArgumentList, AddonGuid, IsInline)
                                         DefaultAddonOption_String = main_encodeHTML(DefaultAddonOption_String)
                                     End If
@@ -34497,7 +34472,7 @@ ErrorTrap:
                                     '
                                     LastAddonName = AddonName
                                     IconIDControlString = "AC,AGGREGATEFUNCTION,0," & AddonName & "," & DefaultAddonOption_String & "," & AddonGuid
-                                    IconImg = GetAddonIconImg(app.siteProperty_AdminURL, IconWidth, IconHeight, IconSprites, IsInline, IconIDControlString, IconFilename, app.config.cdnFilesNetprefix, AddonName, "Rendered as the Add-on [" & AddonName & "]", "", 0)
+                                    IconImg = GetAddonIconImg(db.siteProperty_AdminURL, IconWidth, IconHeight, IconSprites, IsInline, IconIDControlString, IconFilename, db.config.cdnFilesNetprefix, AddonName, "Rendered as the Add-on [" & AddonName & "]", "", 0)
                                     Items(ItemsCnt) = "['" & EncodeJavascript(AddonName) & "','" & EncodeJavascript(IconImg) & "']"
                                     Call Index.setPtr(AddonName, ItemsCnt)
                                     ItemsCnt = ItemsCnt + 1
@@ -34507,10 +34482,10 @@ ErrorTrap:
                                     End If
                                 End If
                             End If
-                            app.db_csGoNext(CSAddons)
+                            db.db_csGoNext(CSAddons)
                         Loop
                     End If
-                    Call app.db_csClose(CSAddons)
+                    Call db.db_csClose(CSAddons)
                 End If
                 '
                 ' Build output sting in alphabetical order by name
@@ -34696,7 +34671,7 @@ ErrorTrap:
                     & " from ccFieldTypes t" _
                     & " left join ccaggregatefunctions a on a.id=t.editorAddonId" _
                     & " where (t.active<>0)and(a.active<>0) order by t.id"
-                RS = app.executeSql(SQL)
+                RS = db.executeSql(SQL)
                 For Each dr As DataRow In RS.Rows
                     fieldTypeID = EncodeInteger(dr("id"))
                     If (fieldTypeID <= FieldTypeIdMax) Then
@@ -34753,7 +34728,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            handleLegacyError3(app.config.name, "", "dll", "cpCoreClass", "main_GetNvaValue", Err.Number, Err.Source, Err.Description, True, False, "")
+            handleLegacyError3(db.config.name, "", "dll", "cpCoreClass", "main_GetNvaValue", Err.Number, Err.Source, Err.Description, True, False, "")
         End Function
         '
         '
@@ -34764,15 +34739,15 @@ ErrorTrap:
             'Dim kmafs As New fileSystemClass
             '
             main_guessDefaultPage = "index.php"
-            If Not app.appRootFiles.checkFile(cluster.config.clusterPhysicalPath & app.config.appRootPath & main_guessDefaultPage) Then
+            If Not db.appRootFiles.checkFile(cluster.config.clusterPhysicalPath & db.config.appRootPath & main_guessDefaultPage) Then
                 main_guessDefaultPage = "index.asp"
-                If Not app.appRootFiles.checkFile(cluster.config.clusterPhysicalPath & app.config.appRootPath & main_guessDefaultPage) Then
+                If Not db.appRootFiles.checkFile(cluster.config.clusterPhysicalPath & db.config.appRootPath & main_guessDefaultPage) Then
                     main_guessDefaultPage = "default.asp"
-                    If Not app.appRootFiles.checkFile(cluster.config.clusterPhysicalPath & app.config.appRootPath & main_guessDefaultPage) Then
+                    If Not db.appRootFiles.checkFile(cluster.config.clusterPhysicalPath & db.config.appRootPath & main_guessDefaultPage) Then
                         main_guessDefaultPage = "default.aspx"
-                        If Not app.appRootFiles.checkFile(cluster.config.clusterPhysicalPath & app.config.appRootPath & main_guessDefaultPage) Then
+                        If Not db.appRootFiles.checkFile(cluster.config.clusterPhysicalPath & db.config.appRootPath & main_guessDefaultPage) Then
                             main_guessDefaultPage = "index.php"
-                            If Not app.appRootFiles.checkFile(cluster.config.clusterPhysicalPath & app.config.appRootPath & main_guessDefaultPage) Then
+                            If Not db.appRootFiles.checkFile(cluster.config.clusterPhysicalPath & db.config.appRootPath & main_guessDefaultPage) Then
                                 main_guessDefaultPage = ""
                             End If
                         End If
@@ -34783,7 +34758,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            handleLegacyError3(app.config.name, "", "dll", "cpCoreClass", "main_guessDefaultPage", Err.Number, Err.Source, Err.Description, True, False, "")
+            handleLegacyError3(db.config.name, "", "dll", "cpCoreClass", "main_guessDefaultPage", Err.Number, Err.Source, Err.Description, True, False, "")
         End Function
         '
         ' Verify a link from the template link field to be used as a Template Link
@@ -34800,7 +34775,7 @@ ErrorTrap:
                     '
                     ' protocol provided, do not fixup
                     '
-                    main_verifyTemplateLink = EncodeAppRootPath(main_verifyTemplateLink, web_requestVirtualFilePath, app.RootWebPath, web.requestDomain)
+                    main_verifyTemplateLink = EncodeAppRootPath(main_verifyTemplateLink, web_requestVirtualFilePath, db.RootWebPath, web.requestDomain)
                 Else
                     '
                     ' no protocol, convert to short link
@@ -34812,7 +34787,7 @@ ErrorTrap:
                         main_verifyTemplateLink = "/" & main_verifyTemplateLink
                     End If
                     main_verifyTemplateLink = ConvertLinkToShortLink(main_verifyTemplateLink, web.requestDomain, web_requestVirtualFilePath)
-                    main_verifyTemplateLink = EncodeAppRootPath(main_verifyTemplateLink, web_requestVirtualFilePath, app.RootWebPath, web.requestDomain)
+                    main_verifyTemplateLink = EncodeAppRootPath(main_verifyTemplateLink, web_requestVirtualFilePath, db.RootWebPath, web.requestDomain)
                 End If
             End If
             '
@@ -34836,23 +34811,23 @@ ErrorTrap:
                 Const cacheName = "Domain Content List Cache"
                 '
                 If Not serverDomainList_localLoaded Then
-                    serverDomainList_local = DirectCast(app.cache.GetObject(Of List(Of String))(cacheName), List(Of String))
+                    serverDomainList_local = DirectCast(cache.GetObject(Of List(Of String))(cacheName), List(Of String))
                     If (serverDomainList_local Is Nothing) Then
                         '
                         ' recreate (non-default) domain table list
                         '
                         serverDomainList_local = New List(Of String)
-                        serverDomainList_local.Add(app.config.domainList(0))
+                        serverDomainList_local.Add(db.config.domainList(0))
                         '
                         ' select all Normal domains (non-Forward)
                         ' add extra comma in front so cache is never empty - so if returns empty we know it flushed
                         '
                         SQL = "select name from ccDomains where typeId=1"
-                        dt = app.executeSql(SQL)
+                        dt = db.executeSql(SQL)
                         For Each dr As DataRow In dt.Rows
                             serverDomainList_local.Add(dr(0).ToString)
                         Next
-                        Call app.cache.SetKey(cacheName, serverDomainList_local, "domains")
+                        Call cache.SetKey(cacheName, serverDomainList_local, "domains")
                     End If
                     serverDomainList_localLoaded = True
                 End If
@@ -34873,19 +34848,19 @@ ErrorTrap:
                 Const cacheName = "Domain Content Cross List Cache"
                 '
                 If Not main_Private_ServerDomainCrossList_Loaded Then
-                    main_Private_ServerDomainCrossList = EncodeText(app.cache.GetObject(Of String)(cacheName))
+                    main_Private_ServerDomainCrossList = EncodeText(cache.GetObject(Of String)(cacheName))
                     If True And (main_Private_ServerDomainCrossList = "") Then
                         main_Private_ServerDomainCrossList = ","
                         SQL = "select name from ccDomains where (typeId=1)and(allowCrossLogin<>0)"
-                        Dim dt As DataTable = app.executeSql(SQL)
+                        Dim dt As DataTable = db.executeSql(SQL)
                         For Each dr As DataRow In dt.Rows
                             main_Private_ServerDomainCrossList &= dr(0).ToString
                         Next
-                        Call app.cache.SetKey(cacheName, main_Private_ServerDomainCrossList, "domains")
+                        Call cache.SetKey(cacheName, main_Private_ServerDomainCrossList, "domains")
                     End If
                     main_Private_ServerDomainCrossList_Loaded = True
                 End If
-                main_ServerDomainCrossList = app.config.domainList(0) & main_Private_ServerDomainCrossList
+                main_ServerDomainCrossList = db.config.domainList(0) & main_Private_ServerDomainCrossList
             End Get
         End Property
 
@@ -34897,27 +34872,27 @@ ErrorTrap:
             '
             Dim CS As Integer
             '
-            CS = app.db_csOpen("page templates", "name=" & app.db_EncodeSQLText(TemplateDefaultName), "ID", , , , , "id")
-            If app.db_csOk(CS) Then
-                main_GetDefaultTemplateId = app.db_GetCSInteger(CS, "ID")
+            CS = db.db_csOpen("page templates", "name=" & db.db_EncodeSQLText(TemplateDefaultName), "ID", , , , , "id")
+            If db.db_csOk(CS) Then
+                main_GetDefaultTemplateId = db.db_GetCSInteger(CS, "ID")
             End If
-            Call app.db_csClose(CS)
+            Call db.db_csClose(CS)
             '
             ' ----- if default template not found, create a simple default template
             '
             If main_GetDefaultTemplateId = 0 Then
-                CS = app.db_csInsertRecord("Page Templates")
-                If app.db_csOk(CS) Then
-                    main_GetDefaultTemplateId = app.db_GetCSInteger(CS, "ID")
-                    Call app.db_setCS(CS, "name", TemplateDefaultName)
-                    Call app.db_setCS(CS, "Link", "")
+                CS = db.db_csInsertRecord("Page Templates")
+                If db.db_csOk(CS) Then
+                    main_GetDefaultTemplateId = db.db_GetCSInteger(CS, "ID")
+                    Call db.db_setCS(CS, "name", TemplateDefaultName)
+                    Call db.db_setCS(CS, "Link", "")
                     If True Then
-                        Call app.db_setCS(CS, "BodyHTML", pageManager_TemplateBody)
+                        Call db.db_setCS(CS, "BodyHTML", pageManager_TemplateBody)
                     End If
                     If True Then
-                        Call app.db_setCS(CS, "ccGuid", DefaultTemplateGuid)
+                        Call db.db_setCS(CS, "ccGuid", DefaultTemplateGuid)
                     End If
-                    Call app.db_csClose(CS)
+                    Call db.db_csClose(CS)
                 End If
             End If
             '
@@ -35079,7 +35054,7 @@ ErrorTrap:
             Try
                 returnStatus = email_send3(EncodeText(ToAddress), EncodeText(FromAddress), EncodeText(SubjectMessage), EncodeText(BodyMessage), "", "", "", Immediate, EncodeBoolean(HTML), EncodeInteger(optionalEmailIdForLog))
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
             Return returnStatus
         End Function
@@ -35126,22 +35101,22 @@ ErrorTrap:
                 Dim layoutError As String
                 '
                 CS = db_csOpen("email", EmailID)
-                If Not app.db_csOk(CS) Then
+                If Not db.db_csOk(CS) Then
                     Call error_AddUserError("There was a problem sending the email confirmation. The email record could not be found.")
                 Else
-                    EmailSubject = app.db_GetCS(CS, "Subject")
-                    EmailBody = app.db_GetCS(CS, "copyFilename")
+                    EmailSubject = db.db_GetCS(CS, "Subject")
+                    EmailBody = db.db_GetCS(CS, "copyFilename")
                     '
                     ' merge in template
                     '
                     EmailTemplate = ""
-                    EMailTemplateID = app.db_GetCSInteger(CS, "EmailTemplateID")
+                    EMailTemplateID = db.db_GetCSInteger(CS, "EmailTemplateID")
                     If EMailTemplateID <> 0 Then
                         CSTemplate = db_csOpen("Email Templates", EMailTemplateID, , , "BodyHTML")
-                        If app.db_csOk(CSTemplate) Then
-                            EmailTemplate = app.db_GetCS(CSTemplate, "BodyHTML")
+                        If db.db_csOk(CSTemplate) Then
+                            EmailTemplate = db.db_GetCS(CSTemplate, "BodyHTML")
                         End If
-                        Call app.db_csClose(CSTemplate)
+                        Call db.db_csClose(CSTemplate)
                     End If
                     '
                     ' styles
@@ -35151,29 +35126,29 @@ ErrorTrap:
                     '
                     ' spam footer
                     '
-                    If app.db_GetCSBoolean(CS, "AllowSpamFooter") Then
+                    If db.db_GetCSBoolean(CS, "AllowSpamFooter") Then
                         '
                         ' This field is default true, and non-authorable
                         ' It will be true in all cases, except a possible unforseen exception
                         '
-                        EmailBody = EmailBody & "<div style=""clear:both;padding:10px;"">" & main_GetLinkedText("<a href=""" & html_EncodeHTML(web_requestProtocol & web.requestDomain & app.RootWebPath & app.siteProperty_ServerPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", app.siteProperty_getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
+                        EmailBody = EmailBody & "<div style=""clear:both;padding:10px;"">" & main_GetLinkedText("<a href=""" & html_EncodeHTML(web_requestProtocol & web.requestDomain & db.RootWebPath & db.siteProperty_ServerPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", db.siteProperty_getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
                         EmailBody = Replace(EmailBody, "#member_email#", "UserEmailAddress")
                     End If
                     '
                     ' Confirm footer
                     '
                     SQL = main_GetGroupEmailSQL(False, EmailID)
-                    'SQL = main_GetGroupEmailSQL(main_GetCSBoolean(CS, "ToAll"), EmailID)
-                    CSPeople = app.db_csOpenSql(SQL)
-                    If Not app.db_csOk(CSPeople) Then
+                    'SQL = main_GetGroupEmailSQL(db.db_GetCSBoolean(CS, "ToAll"), EmailID)
+                    CSPeople = db.db_csOpenSql(SQL)
+                    If Not db.db_csOk(CSPeople) Then
                         error_AddUserError("There are no valid recipients of this email, other than the confirmation address. Either no groups or topics were selected, or those selections contain no people with both a valid email addresses and 'Allow Group Email' enabled.")
                     Else
                         'TotalList = TotalList & "--- all recipients ---" & BR
                         LastEmail = "empty"
-                        Do While app.db_csOk(CSPeople)
-                            Email = app.db_GetCS(CSPeople, "email")
-                            EMailName = app.db_GetCS(CSPeople, "name")
-                            EmailMemberID = app.db_GetCSInteger(CSPeople, "ID")
+                        Do While db.db_csOk(CSPeople)
+                            Email = db.db_GetCS(CSPeople, "email")
+                            EMailName = db.db_GetCS(CSPeople, "name")
+                            EmailMemberID = db.db_GetCSInteger(CSPeople, "ID")
                             If EMailName = "" Then
                                 EMailName = "no name (member id " & EmailMemberID & ")"
                             End If
@@ -35205,11 +35180,11 @@ ErrorTrap:
                             TotalList = TotalList & EmailLine & BR
                             LastEmail = Email
                             TotalCnt = TotalCnt + 1
-                            Call app.db_csGoNext(CSPeople)
+                            Call db.db_csGoNext(CSPeople)
                         Loop
                         'TotalList = TotalList & "--- end all recipients ---" & BR
                     End If
-                    Call app.db_csClose(CSPeople)
+                    Call db.db_csClose(CSPeople)
                     '
                     If DupCnt = 1 Then
                         Call error_AddUserError("There is 1 duplicate email address. See the test email for details.")
@@ -35247,15 +35222,15 @@ ErrorTrap:
                         error_AddUserError("No confirmation email was send because a Confirmation member is not selected")
                     Else
                         EmailBody = EmailBody & "<div style=""clear:both;padding:10px;margin:10px;border:1px dashed #888;"">Administrator<br><br>" & ConfirmFooter & "</div>"
-                        EmailStatus = sendMemberEmail3(ConfirmationMemberID, main_GetCSText(CS, "FromAddress"), EmailSubject, EmailBody, True, True, EmailID, EmailTemplate, False)
+                        EmailStatus = sendMemberEmail3(ConfirmationMemberID, db.db_GetCSText(CS, "FromAddress"), EmailSubject, EmailBody, True, True, EmailID, EmailTemplate, False)
                         If EmailStatus <> "ok" Then
                             error_AddUserError(EmailStatus)
                         End If
                     End If
                 End If
-                Call app.db_csClose(CS)
+                Call db.db_csClose(CS)
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '
@@ -35286,7 +35261,7 @@ ErrorTrap:
             MethodName = "main_SendFormEmail"
             '
             If ((InStr(iSendTo, "@") = 0)) Then
-                iSendTo = app.siteProperty_getText("TrapEmail")
+                iSendTo = db.siteProperty_getText("TrapEmail")
                 iSendSubject = "EmailForm with bad Sendto address"
                 Message = "Subject: " & iSendSubject
                 Message = Message & vbCrLf
@@ -35359,7 +35334,7 @@ ErrorTrap:
             '
             ' Fix links for HTML send - must do it now before encodehtml so eid links will attach
             '
-            rootUrl = "http://" & main_ServerDomain & app.RootWebPath
+            rootUrl = "http://" & main_ServerDomain & db.RootWebPath
             iBodySource = ConvertLinksToAbsolute(iBodySource, rootUrl)
             '
             ' Build the list of groups
@@ -35385,18 +35360,18 @@ ErrorTrap:
                 '
                 SQL = "SELECT DISTINCT ccMembers.ID" _
                     & " FROM (ccMembers LEFT JOIN ccMemberRules ON ccMembers.ID = ccMemberRules.MemberID) LEFT JOIN ccgroups ON ccMemberRules.GroupID = ccgroups.ID" _
-                    & " WHERE (((ccMembers.Active)<>0) AND ((ccMembers.AllowBulkEmail)<>0) AND ((ccMemberRules.Active)<>0) AND ((ccgroups.Active)<>0) AND ((ccgroups.AllowBulkEmail)<>0)AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & app.db_EncodeSQLDate(main_PageStartTime) & ")) AND ("
+                    & " WHERE (((ccMembers.Active)<>0) AND ((ccMembers.AllowBulkEmail)<>0) AND ((ccMemberRules.Active)<>0) AND ((ccgroups.Active)<>0) AND ((ccgroups.AllowBulkEmail)<>0)AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & db.db_EncodeSQLDate(main_PageStartTime) & ")) AND ("
                 For GroupPointer = 0 To GroupCount - 1
                     If GroupPointer = 0 Then
-                        SQL &= "(ccgroups.Name=" & app.db_EncodeSQLText(Groups(GroupPointer)) & ")"
+                        SQL &= "(ccgroups.Name=" & db.db_EncodeSQLText(Groups(GroupPointer)) & ")"
                     Else
-                        SQL &= "OR(ccgroups.Name=" & app.db_EncodeSQLText(Groups(GroupPointer)) & ")"
+                        SQL &= "OR(ccgroups.Name=" & db.db_EncodeSQLText(Groups(GroupPointer)) & ")"
                     End If
                 Next
                 SQL &= "));"
-                CSPointer = app.db_csOpenSql(SQL)
-                Do While app.db_csOk(CSPointer)
-                    ToMemberID = EncodeInteger(app.db_GetCSInteger(CSPointer, "ID"))
+                CSPointer = db.db_csOpenSql(SQL)
+                Do While db.db_csOk(CSPointer)
+                    ToMemberID = EncodeInteger(db.db_GetCSInteger(CSPointer, "ID"))
                     iSubject = iSubjectSource
                     iBody = iBodySource
                     '
@@ -35405,7 +35380,7 @@ ErrorTrap:
                     ' send
                     '
                     Call sendMemberEmail3(ToMemberID, iFromAddress, iSubject, iBody, iImmediate, iHTML, 0, "", False)
-                    Call app.db_csGoNext(CSPointer)
+                    Call db.db_csGoNext(CSPointer)
                 Loop
             End If
             '
@@ -35442,16 +35417,7 @@ ErrorTrap:
             main_GetGroupEmailSQL = email_getGroupEmailSQL(False, EmailID)
             Exit Function
         End Function
-        '
-        '========================================================================
-        ' Opens a ContentSet with the Members of a group
-        '   Returns and integer that points into the ContentSet array
-        '   If there was a problem, it returns -1
-        '========================================================================
-        '
-        Private Function main_openCsGroupUsers(GroupName As String, IsList As Boolean, Optional Criteria As String = "", Optional SortFieldList As String = "", Optional ActiveOnly As Boolean = False, Optional PageSize As Integer = 1000, Optional PageNumber As Integer = 1) As Integer
-            main_openCsGroupUsers = app.csv_OpenCSGroupUsers(EncodeText(GroupName), IsList, EncodeText(Criteria), EncodeText(SortFieldList), ActiveOnly, EncodeInteger(PageSize), EncodeInteger(PageNumber))
-        End Function
+
         '
         '========================================================================
         ' ----- Get an XML nodes attribute based on its name
@@ -35892,14 +35858,14 @@ ErrorTrap:
                     OtherHeadTags = EncodeText(cache_addons.addonList(addonCachePtr).addonCache_OtherHeadTags)
                     JSFilename = EncodeText(cache_addons.addonList(addonCachePtr).addonCache_JSFilename)
                     If JSFilename <> "" Then
-                        JSFilename = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, JSFilename)
+                        JSFilename = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, JSFilename)
                     End If
                 End If
                 If Not String.IsNullOrEmpty(ProgramID) Then
                     '
                     ' addons with activeX components are deprecated
                     '
-                    handleException(New ApplicationException("This add-on [#" & addonId & ", " & AddonName & "] is no longer supported because it contains an active-X component."))
+                    handleExceptionAndRethrow(New ApplicationException("This add-on [#" & addonId & ", " & AddonName & "] is no longer supported because it contains an active-X component."))
                 Else
                     '
                     '----------------------------------------------------------------------------------------------------
@@ -35924,15 +35890,15 @@ ErrorTrap:
                         ' Get Modules
                         '
                         SQL = "select c.code from ccScriptingModules c left join ccAddonScriptingModuleRules r on r.ScriptingModuleID=c.id where r.Addonid=" & addonId & " order by c.sortorder"
-                        CSRules = app.db_openCsSql_rev("default", SQL)
-                        Do While app.db_csOk(CSRules)
-                            CodeFilename = app.db_GetCS(CSRules, "code")
+                        CSRules = db.db_openCsSql_rev("default", SQL)
+                        Do While db.db_csOk(CSRules)
+                            CodeFilename = db.db_GetCS(CSRules, "code")
                             If CodeFilename <> "" Then
-                                ScriptingCode = ScriptingCode & vbCrLf & app.cdnFiles.ReadFile(CodeFilename)
+                                ScriptingCode = ScriptingCode & vbCrLf & db.cdnFiles.ReadFile(CodeFilename)
                             End If
-                            Call app.db_csGoNext(CSRules)
+                            Call db.db_csGoNext(CSRules)
                         Loop
-                        Call app.db_csClose(CSRules)
+                        Call db.db_csClose(CSRules)
                     End If
                     '
                     '----------------------------------------------------------------------------------------------------
@@ -36301,7 +36267,7 @@ ErrorTrap:
                                     '
                                     ' web-only
                                     '
-                                    Link = web_requestProtocol & web.requestDomain & app.RootWebPath & app.siteProperty_ServerPageDefault
+                                    Link = web_requestProtocol & web.requestDomain & db.RootWebPath & db.siteProperty_ServerPageDefault
                                     If InStr(1, Link, "?") = 0 Then
                                         Link = Link & "?"
                                     Else
@@ -36385,10 +36351,10 @@ ErrorTrap:
                                         Call main_AddEndOfBodyJavascript2(JSBodyEnd, AddedByName)
                                         Call main_AddHeadScriptLink(JSFilename, AddedByName)
                                         If DefaultStylesFilename <> "" Then
-                                            Call main_AddStylesheetLink2(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
+                                            Call main_AddStylesheetLink2(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
                                         End If
                                         If CustomStylesFilename <> "" Then
-                                            Call main_AddStylesheetLink2(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
+                                            Call main_AddStylesheetLink2(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
                                         End If
                                     End If
                                 End If
@@ -36532,7 +36498,7 @@ ErrorTrap:
                                         Try
                                             ScriptContent = executeAddon_executeScript4(ScriptingLanguage, ScriptingCode, ScriptingEntryPoint, errorMessageForAdmin, ScriptingTimeout, "Addon [" & AddonName & "]", ReplaceCnt, ReplaceNames, ReplaceValues)
                                         Catch ex As Exception
-                                            handleException(ex, "There was an error executing the script component of Add-on [" & AddonName & "], AddonOptionString [" & WorkingOptionString & "]. The details of this error follow.</p><p>" & errorMessageForAdmin & "")
+                                            handleExceptionAndRethrow(ex, "There was an error executing the script component of Add-on [" & AddonName & "], AddonOptionString [" & WorkingOptionString & "]. The details of this error follow.</p><p>" & errorMessageForAdmin & "")
                                         End Try
                                     End If
                                     '
@@ -36544,11 +36510,11 @@ ErrorTrap:
                                     If DotNetClassFullName <> "" Then
                                         '
                                         Dim csTmp As Integer
-                                        csTmp = app.db_openCsSql_rev("default", "select ccGuid from ccAddonCollections where id=" & addonCollectionId)
-                                        If app.db_csOk(csTmp) Then
-                                            CollectionGuid = app.db_GetCSText(csTmp, "ccGuid")
+                                        csTmp = db.db_openCsSql_rev("default", "select ccGuid from ccAddonCollections where id=" & addonCollectionId)
+                                        If db.db_csOk(csTmp) Then
+                                            CollectionGuid = db.db_GetCSText(csTmp, "ccGuid")
                                         End If
-                                        Call app.db_csClose(csTmp)
+                                        Call db.db_csClose(csTmp)
                                         '
                                         AssemblyContent = executeAddon_executeAssembly(addonId, AddonName, DotNetClassFullName, CollectionGuid, Nothing, errorMessageForAdmin)
                                         If (errorMessageForAdmin <> "") Then
@@ -36625,9 +36591,9 @@ ErrorTrap:
                                                 ' use assumptions
                                                 '
                                                 If Mid(WorkingLink, 1, 1) = "/" Then
-                                                    WorkingLink = "http://" & app.config.domainList(0) & WorkingLink
+                                                    WorkingLink = "http://" & db.config.domainList(0) & WorkingLink
                                                 Else
-                                                    WorkingLink = "http://" & app.config.domainList(0) & "/" & WorkingLink
+                                                    WorkingLink = "http://" & db.config.domainList(0) & "/" & WorkingLink
                                                 End If
                                             End If
                                         End If
@@ -36680,7 +36646,7 @@ ErrorTrap:
                                         End If
                                     End If
                                     Link = modifyLinkQuery(Link, RequestNameJSForm, "1", True)
-                                    Link = EncodeAppRootPath(Link, web_requestVirtualFilePath, app.RootWebPath, web.requestDomain)
+                                    Link = EncodeAppRootPath(Link, web_requestVirtualFilePath, db.RootWebPath, web.requestDomain)
                                     ScriptCallbackContent = "<SCRIPT LANGUAGE=""JAVASCRIPT"" SRC=""" & Link & """></SCRIPT>"
                                 End If
                                 '
@@ -36703,10 +36669,10 @@ ErrorTrap:
                                         Call main_AddEndOfBodyJavascript2(JSBodyEnd, AddedByName)
                                         Call main_AddHeadScriptLink(JSFilename, AddedByName)
                                         If DefaultStylesFilename <> "" Then
-                                            Call main_AddStylesheetLink2(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
+                                            Call main_AddStylesheetLink2(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
                                         End If
                                         If CustomStylesFilename <> "" Then
-                                            Call main_AddStylesheetLink2(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
+                                            Call main_AddStylesheetLink2(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
                                         End If
                                     End If
                                 End If
@@ -36875,7 +36841,7 @@ ErrorTrap:
                                         If (addonId <> 0) Then
                                             If main_VisitProperty_AllowAdvancedEditor Then
                                                 AddonEditIcon = GetIconSprite("", 0, "/ccLib/images/tooledit.png", 22, 22, "Edit the " & AddonName & " Add-on", "Edit the " & AddonName & " Add-on", "", True, "")
-                                                AddonEditIcon = "<a href=""" & app.siteProperty_AdminURL & "?cid=" & metaData_GetContentID("add-ons") & "&id=" & addonId & "&af=4&aa=2&ad=1"" tabindex=""-1"">" & AddonEditIcon & "</a>"
+                                                AddonEditIcon = "<a href=""" & db.siteProperty_AdminURL & "?cid=" & metaData_GetContentID("add-ons") & "&id=" & addonId & "&af=4&aa=2&ad=1"" tabindex=""-1"">" & AddonEditIcon & "</a>"
                                                 InstanceSettingsEditIcon = executeAddon_getInstanceBubble(AddonName, AddonOptionExpandedConstructor, HostContentName, HostRecordID, HostFieldName, ACInstanceID, Context, DialogList)
                                                 AddonStylesEditIcon = executeAddon_getAddonStylesBubble(addonId, DialogList)
                                                 HTMLViewerEditIcon = executeAddon_getHTMLViewerBubble(addonId, "editWrapper" & main_EditWrapperCnt, DialogList)
@@ -36932,7 +36898,10 @@ exitNoError:
                 pageManager_PageAddonCnt = pageManager_PageAddonCnt + 1
                 executeAddon = s
             Catch ex As Exception
-                handleException(ex)
+                '
+                ' protect environment from addon error
+                '
+                handleExceptionAndNoThrow(ex)
             End Try
         End Function
         '
@@ -37062,74 +37031,74 @@ exitNoError:
                                                                     If FieldValue <> "" Then
                                                                         FieldValue = EncodeInteger(FieldValue).ToString
                                                                     End If
-                                                                    Call app.siteProperty_set(FieldName, FieldValue)
+                                                                    Call db.siteProperty_set(FieldName, FieldValue)
                                                                 Case "boolean"
                                                                     '
                                                                     If FieldValue <> "" Then
                                                                         FieldValue = EncodeBoolean(FieldValue).ToString
                                                                     End If
-                                                                    Call app.siteProperty_set(FieldName, FieldValue)
+                                                                    Call db.siteProperty_set(FieldName, FieldValue)
                                                                 Case "float"
                                                                     '
                                                                     If FieldValue <> "" Then
                                                                         FieldValue = EncodeNumber(FieldValue).ToString
                                                                     End If
-                                                                    Call app.siteProperty_set(FieldName, FieldValue)
+                                                                    Call db.siteProperty_set(FieldName, FieldValue)
                                                                 Case "date"
                                                                     '
                                                                     If FieldValue <> "" Then
                                                                         FieldValue = EncodeDate(FieldValue).ToString
                                                                     End If
-                                                                    Call app.siteProperty_set(FieldName, FieldValue)
+                                                                    Call db.siteProperty_set(FieldName, FieldValue)
                                                                 Case "file", "imagefile"
                                                                     '
                                                                     If doc_getBoolean(FieldName & ".DeleteFlag") Then
-                                                                        Call app.siteProperty_set(FieldName, "")
+                                                                        Call db.siteProperty_set(FieldName, "")
                                                                     End If
                                                                     If FieldValue <> "" Then
                                                                         VirtualFilePath = "Settings/" & FieldName
                                                                         Call web_ProcessFormInputFile(FieldName, VirtualFilePath)
                                                                         FieldValue = VirtualFilePath & "/" & FieldValue
-                                                                        Call app.siteProperty_set(FieldName, FieldValue)
+                                                                        Call db.siteProperty_set(FieldName, FieldValue)
                                                                     End If
                                                                 Case "textfile"
                                                                     '
                                                                     DefaultFilename = "Settings/" & FieldName & ".txt"
-                                                                    Filename = app.siteProperty_getText(FieldName, DefaultFilename)
+                                                                    Filename = db.siteProperty_getText(FieldName, DefaultFilename)
                                                                     If Filename = "" Then
                                                                         Filename = DefaultFilename
-                                                                        Call app.siteProperty_set(FieldName, DefaultFilename)
+                                                                        Call db.siteProperty_set(FieldName, DefaultFilename)
                                                                     End If
-                                                                    Call app.appRootFiles.SaveFile(Filename, FieldValue)
+                                                                    Call db.appRootFiles.SaveFile(Filename, FieldValue)
                                                                 Case "cssfile"
                                                                     '
                                                                     DefaultFilename = "Settings/" & FieldName & ".css"
-                                                                    Filename = app.siteProperty_getText(FieldName, DefaultFilename)
+                                                                    Filename = db.siteProperty_getText(FieldName, DefaultFilename)
                                                                     If Filename = "" Then
                                                                         Filename = DefaultFilename
-                                                                        Call app.siteProperty_set(FieldName, DefaultFilename)
+                                                                        Call db.siteProperty_set(FieldName, DefaultFilename)
                                                                     End If
-                                                                    Call app.appRootFiles.SaveFile(Filename, FieldValue)
+                                                                    Call db.appRootFiles.SaveFile(Filename, FieldValue)
                                                                 Case "xmlfile"
                                                                     '
                                                                     DefaultFilename = "Settings/" & FieldName & ".xml"
-                                                                    Filename = app.siteProperty_getText(FieldName, DefaultFilename)
+                                                                    Filename = db.siteProperty_getText(FieldName, DefaultFilename)
                                                                     If Filename = "" Then
                                                                         Filename = DefaultFilename
-                                                                        Call app.siteProperty_set(FieldName, DefaultFilename)
+                                                                        Call db.siteProperty_set(FieldName, DefaultFilename)
                                                                     End If
-                                                                    Call app.appRootFiles.SaveFile(Filename, FieldValue)
+                                                                    Call db.appRootFiles.SaveFile(Filename, FieldValue)
                                                                 Case "currency"
                                                                     '
                                                                     If FieldValue <> "" Then
                                                                         FieldValue = EncodeNumber(FieldValue).ToString
                                                                         FieldValue = FormatCurrency(FieldValue)
                                                                     End If
-                                                                    Call app.siteProperty_set(FieldName, FieldValue)
+                                                                    Call db.siteProperty_set(FieldName, FieldValue)
                                                                 Case "link"
-                                                                    Call app.siteProperty_set(FieldName, FieldValue)
+                                                                    Call db.siteProperty_set(FieldName, FieldValue)
                                                                 Case Else
-                                                                    Call app.siteProperty_set(FieldName, FieldValue)
+                                                                    Call db.siteProperty_set(FieldName, FieldValue)
                                                             End Select
                                                         Case "copycontent"
                                                             '
@@ -37148,27 +37117,27 @@ exitNoError:
                                                                     FieldValue = doc_getText(FieldName)
                                                                 End If
 
-                                                                CS = app.db_csOpen("Copy Content", "name=" & app.db_EncodeSQLText(FieldName), "ID")
-                                                                If Not app.db_csOk(CS) Then
-                                                                    Call app.db_csClose(CS)
-                                                                    CS = app.db_csInsertRecord("Copy Content", userId)
+                                                                CS = db.db_csOpen("Copy Content", "name=" & db.db_EncodeSQLText(FieldName), "ID")
+                                                                If Not db.db_csOk(CS) Then
+                                                                    Call db.db_csClose(CS)
+                                                                    CS = db.db_csInsertRecord("Copy Content", userId)
                                                                 End If
-                                                                If app.db_csOk(CS) Then
-                                                                    Call app.db_setCS(CS, "name", FieldName)
+                                                                If db.db_csOk(CS) Then
+                                                                    Call db.db_setCS(CS, "name", FieldName)
                                                                     '
                                                                     ' Set copy
                                                                     '
-                                                                    Call app.db_setCS(CS, "copy", FieldValue)
+                                                                    Call db.db_setCS(CS, "copy", FieldValue)
                                                                     '
                                                                     ' delete duplicates
                                                                     '
-                                                                    Call app.db_csGoNext(CS)
-                                                                    Do While app.db_csOk(CS)
-                                                                        Call app.csv_DeleteCSRecord(CS)
-                                                                        Call app.db_csGoNext(CS)
+                                                                    Call db.db_csGoNext(CS)
+                                                                    Do While db.db_csOk(CS)
+                                                                        Call db.db_DeleteCSRecord(CS)
+                                                                        Call db.db_csGoNext(CS)
                                                                     Loop
                                                                 End If
-                                                                Call app.db_csClose(CS)
+                                                                Call db.db_csClose(CS)
                                                             End If
 
                                                         Case "filecontent"
@@ -37180,7 +37149,7 @@ exitNoError:
                                                                 FieldName = csv_GetXMLAttribute(IsFound, TabNode, "name", "")
                                                                 fieldfilename = csv_GetXMLAttribute(IsFound, TabNode, "filename", "")
                                                                 FieldValue = doc_getText(FieldName)
-                                                                Call app.appRootFiles.SaveFile(fieldfilename, FieldValue)
+                                                                Call db.appRootFiles.SaveFile(fieldfilename, FieldValue)
                                                             End If
                                                         Case "dbquery"
                                                             '
@@ -37244,12 +37213,12 @@ exitNoError:
                                                             FieldDescription = csv_GetXMLAttribute(IsFound, TabNode, "description", "")
                                                             FieldAddon = csv_GetXMLAttribute(IsFound, TabNode, "EditorAddon", "")
                                                             FieldDefaultValue = TabNode.InnerText
-                                                            FieldValue = app.siteProperty_getText(FieldName, FieldDefaultValue)
+                                                            FieldValue = db.siteProperty_getText(FieldName, FieldDefaultValue)
                                                             If FieldAddon <> "" Then
                                                                 '
                                                                 ' Use Editor Addon
                                                                 '
-                                                                OptionString = "FieldName=" & FieldName & "&FieldValue=" & csv_EncodeAddonOptionArgument(app.siteProperty_getText(FieldName, FieldDefaultValue))
+                                                                OptionString = "FieldName=" & FieldName & "&FieldValue=" & csv_EncodeAddonOptionArgument(db.siteProperty_getText(FieldName, FieldDefaultValue))
                                                                 Copy = main_GetAddonContent(0, FieldAddon, OptionString, addonContextEnum.ContextAdmin, "", 0, "", 0)
                                                             ElseIf FieldSelector <> "" Then
                                                                 '
@@ -37296,7 +37265,7 @@ exitNoError:
                                                                             If FieldValue = "" Then
                                                                                 Copy = html_GetFormInputFile(FieldName)
                                                                             Else
-                                                                                NonEncodedLink = web.requestDomain & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, FieldValue)
+                                                                                NonEncodedLink = web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, FieldValue)
                                                                                 EncodedLink = EncodeURL(NonEncodedLink)
                                                                                 Copy = "" _
                                                                                     & "<a href=""http://" & EncodedLink & """ target=""_blank"">[" & GetFilename(FieldValue) & "]</A>" _
@@ -37320,7 +37289,7 @@ exitNoError:
                                                                         If FieldReadOnly Then
                                                                             Copy = FieldValue & html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
-                                                                            FieldValue = app.cdnFiles.ReadFile(FieldValue)
+                                                                            FieldValue = db.cdnFiles.ReadFile(FieldValue)
                                                                             If FieldHTML Then
                                                                                 Copy = html_GetFormInputHTML(FieldName, FieldValue)
                                                                             Else
@@ -37381,20 +37350,20 @@ exitNoError:
                                                             FieldDescription = csv_GetXMLAttribute(IsFound, TabNode, "description", "")
                                                             FieldHTML = EncodeBoolean(csv_GetXMLAttribute(IsFound, TabNode, "html", ""))
                                                             '
-                                                            CS = app.db_csOpen("Copy Content", "Name=" & app.db_EncodeSQLText(FieldName), "ID", , , , , "id,name,Copy")
-                                                            If Not app.db_csOk(CS) Then
-                                                                Call app.db_csClose(CS)
-                                                                CS = app.db_csInsertRecord("Copy Content", userId)
-                                                                If app.db_csOk(CS) Then
-                                                                    RecordID = app.db_GetCSInteger(CS, "ID")
-                                                                    Call app.db_setCS(CS, "name", FieldName)
-                                                                    Call app.db_setCS(CS, "copy", EncodeText(TabNode.InnerText))
-                                                                    Call app.csv_SaveCSRecord(CS)
-                                                                    Call app.csv_PublishEdit("Copy Content", RecordID, userId)
+                                                            CS = db.db_csOpen("Copy Content", "Name=" & db.db_EncodeSQLText(FieldName), "ID", , , , , "id,name,Copy")
+                                                            If Not db.db_csOk(CS) Then
+                                                                Call db.db_csClose(CS)
+                                                                CS = db.db_csInsertRecord("Copy Content", userId)
+                                                                If db.db_csOk(CS) Then
+                                                                    RecordID = db.db_GetCSInteger(CS, "ID")
+                                                                    Call db.db_setCS(CS, "name", FieldName)
+                                                                    Call db.db_setCS(CS, "copy", EncodeText(TabNode.InnerText))
+                                                                    Call db.db_SaveCSRecord(CS)
+                                                                    Call db.workflow_PublishEdit("Copy Content", RecordID, userId)
                                                                 End If
                                                             End If
-                                                            If app.db_csOk(CS) Then
-                                                                FieldValue = app.db_GetCSText(CS, "copy")
+                                                            If db.db_csOk(CS) Then
+                                                                FieldValue = db.db_GetCSText(CS, "copy")
                                                             End If
                                                             If FieldReadOnly Then
                                                                 '
@@ -37427,10 +37396,10 @@ exitNoError:
                                                         FieldDefaultValue = TabNode.InnerText
                                                         Copy = ""
                                                         If fieldfilename <> "" Then
-                                                            If app.appRootFiles.checkFile(fieldfilename) Then
+                                                            If db.appRootFiles.checkFile(fieldfilename) Then
                                                                 Copy = FieldDefaultValue
                                                             Else
-                                                                Copy = app.cdnFiles.ReadFile(fieldfilename)
+                                                                Copy = db.cdnFiles.ReadFile(fieldfilename)
                                                             End If
                                                             If Not FieldReadOnly Then
                                                                 Copy = main_GetFormInputTextExpandable(FieldName, Copy, 10)
@@ -37456,7 +37425,7 @@ exitNoError:
                                                         Dim rs As DataTable
                                                         If FieldSQL <> "" Then
                                                             Try
-                                                                rs = app.executeSql(FieldSQL, FieldDataSource, , SQLPageSize)
+                                                                rs = db.executeSql(FieldSQL, FieldDataSource, , SQLPageSize)
                                                                 'RS = app.csv_ExecuteSQLCommand(FieldDataSource, FieldSQL, 30, SQLPageSize, 1)
 
                                                             Catch ex As Exception
@@ -37886,7 +37855,7 @@ ErrorTrap:
                     Else
                         return_errorMessage &= ", no scripting error"
                     End If
-                    handleException(ex, return_errorMessage)
+                    handleExceptionAndRethrow(ex, return_errorMessage)
                 End Try
                 If String.IsNullOrEmpty(return_errorMessage) Then
                     If True Then
@@ -37913,7 +37882,7 @@ ErrorTrap:
                                         Else
                                             return_errorMessage &= ", no scripting error"
                                         End If
-                                        handleException(ex, return_errorMessage)
+                                        handleExceptionAndRethrow(ex, return_errorMessage)
                                     End Try
                                     If String.IsNullOrEmpty(return_errorMessage) Then
                                         '
@@ -37967,7 +37936,7 @@ ErrorTrap:
                                             Else
                                                 return_errorMessage = return_errorMessage & ", " & GetErrString()
                                             End If
-                                            handleException(ex, return_errorMessage)
+                                            handleExceptionAndRethrow(ex, return_errorMessage)
                                         End Try
                                     End If
                                 End If
@@ -37976,7 +37945,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
         End Function
         '
@@ -38001,7 +37970,7 @@ ErrorTrap:
                     '
                     ' try app /bin folder
                     '
-                    addonAppRootPath = app.privateFiles.joinPath(app.appRootFiles.rootLocalFolderPath, "bin\")
+                    addonAppRootPath = db.privateFiles.joinPath(db.appRootFiles.rootLocalFolderPath, "bin\")
                     result = executeAddon_executeAssembly_byFilePath(addonId, AddonCaption, addonAppRootPath, AssemblyClassFullName, True, AddonFound, return_ErrorMessageForAdmin)
                     If Not AddonFound Then
                         '
@@ -38016,8 +37985,8 @@ ErrorTrap:
                             If (String.IsNullOrEmpty(AddonVersionPath)) Then
                                 Throw New ApplicationException("The assembly for addon [" & AddonCaption & "] could not be executed because it's assembly could not be found in cclibCommonAssemblies, and no collection folder was found.")
                             Else
-                                AddonPath = app.privateFiles.joinPath(Me.app.getAddonPath(), AddonVersionPath)
-                                appAddonPath = app.privateFiles.joinPath(app.privateFiles.rootLocalFolderPath, AddonPath)
+                                AddonPath = db.privateFiles.joinPath(Me.db.getAddonPath(), AddonVersionPath)
+                                appAddonPath = db.privateFiles.joinPath(db.privateFiles.rootLocalFolderPath, AddonPath)
                                 result = executeAddon_executeAssembly_byFilePath(addonId, AddonCaption, appAddonPath, AssemblyClassFullName, False, AddonFound, return_ErrorMessageForAdmin)
                                 If (Not AddonFound) Then
                                     '
@@ -38036,7 +38005,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
                 Throw ex
             End Try
             Return result
@@ -38166,7 +38135,7 @@ ErrorTrap:
                                     ' problem loading types
                                     '
                                     detailedErrorMessage = "While locating assembly for addon [" & AddonDisplayName & "], there was an error loading types for assembly [" & testAssemblyType.FullName & "]. This assembly was skipped and should be removed from the folder [" & fullPath & "]"
-                                    handleException(ex, detailedErrorMessage)
+                                    handleExceptionAndRethrow(ex, detailedErrorMessage)
                                 End Try
                             End If
                         Catch ex As Reflection.ReflectionTypeLoadException
@@ -38205,7 +38174,7 @@ ErrorTrap:
                 '    End If
                 'End If
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
             Return returnValue
         End Function
@@ -38305,12 +38274,12 @@ ErrorTrap:
             '-----------------------------------------------------------------
             '
             'hint = hint & ",030"
-            appendLogWithLegacyRow(app.config.name, "start: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
+            appendLogWithLegacyRow(db.config.name, "start: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
             '
             ' runAtServer = New runAtServerClass(Me)
             ' must nva encode because that is what the server-execute command expects
             cmdQueryString = "" _
-                    & "appname=" & csv_encodeNvaArgument(EncodeRequestVariable(app.config.name)) _
+                    & "appname=" & csv_encodeNvaArgument(EncodeRequestVariable(db.config.name)) _
                     & "&AddonID=" & CStr(addonId) _
                     & "&OptionString=" & csv_encodeNvaArgument(EncodeRequestVariable(OptionString))
             'hint = hint & ",035"
@@ -38322,7 +38291,7 @@ ErrorTrap:
             Call taskScheduler.addTaskToQueue(Me, taskQueueCommandEnumModule.runAddon, cmdDetail, False)
             'Call runAtServer.executeCmd("RunProcess", cmdQueryString)
             '
-            appendLogWithLegacyRow(app.config.name, "end: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
+            appendLogWithLegacyRow(db.config.name, "end: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
             '
             Exit Function
 ErrorTrap:
@@ -38330,7 +38299,7 @@ ErrorTrap:
             ErrSource = Err.Source
             ErrDescription = Err.Description
             Call Err.Clear()
-            appendLogWithLegacyRow(app.config.name, "errortrap exit(" & (GetTickCount - ProcessStartTick) & " msec): execute now, addon [" & AddonIDGuidOrName & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
+            appendLogWithLegacyRow(db.config.name, "errortrap exit(" & (GetTickCount - ProcessStartTick) & " msec): execute now, addon [" & AddonIDGuidOrName & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
             Call handleLegacyError4(ErrNumber, ErrSource, ErrDescription, "unknownMethodNameLegacyCall" & ", hint=" & hint, True)
         End Function
         '
@@ -38468,7 +38437,7 @@ ErrorTrap:
                         '
                         CopyContent = "This addon does not support instance options."
                         CopyContent = "<div style=""width:400px;background-color:transparent;"" class=""ccAdminSmall"">" & CopyContent & "</div>"
-                    ElseIf (Context <> addonContextEnum.ContextAdmin) And (app.siteProperty_AllowWorkflowAuthoring And Not main_VisitProperty_AllowWorkflowRendering) Then
+                    ElseIf (Context <> addonContextEnum.ContextAdmin) And (db.siteProperty_AllowWorkflowAuthoring And Not main_VisitProperty_AllowWorkflowRendering) Then
                         '
                         ' workflow with no rendering (or within admin site)
                         '
@@ -38715,12 +38684,12 @@ ErrorTrap:
             If user_isAuthenticated() And True Then
                 If user_isEditingAnything() Then
                     CS = db_csOpen("Add-ons", addonId)
-                    If app.db_csOk(CS) Then
-                        AddonName = main_GetCSText(CS, "name")
-                        StyleSheet = app.db_GetCS(CS, "CustomStylesFilename")
-                        DefaultStylesheet = app.db_GetCS(CS, "StylesFilename")
+                    If db.db_csOk(CS) Then
+                        AddonName = db.db_GetCSText(CS, "name")
+                        StyleSheet = db.db_GetCS(CS, "CustomStylesFilename")
+                        DefaultStylesheet = db.db_GetCS(CS, "StylesFilename")
                     End If
-                    Call app.db_csClose(CS)
+                    Call db.db_csClose(CS)
                     '
                     CopyHeader = CopyHeader _
                         & "<div class=""ccHeaderCon"">" _
@@ -38829,7 +38798,7 @@ ErrorTrap:
             '
             If user_isAuthenticated() Then
                 If user_isEditingAnything() Then
-                    StyleSN = EncodeInteger(app.siteProperty_getText("StylesheetSerialNumber", "0"))
+                    StyleSN = EncodeInteger(db.siteProperty_getText("StylesheetSerialNumber", "0"))
                     main_HelpViewerButtonID = "HelpBubble" & pageManager_HelpCodeCount
                     InnerCopy = helpCopy
                     If InnerCopy = "" Then
@@ -38938,7 +38907,7 @@ ErrorTrap:
             '
             If user_isAuthenticated() Then
                 If user_isEditingAnything() Then
-                    StyleSN = EncodeInteger(app.siteProperty_getText("StylesheetSerialNumber", "0"))
+                    StyleSN = EncodeInteger(db.siteProperty_getText("StylesheetSerialNumber", "0"))
                     HTMLViewerBubbleID = "HelpBubble" & pageManager_HelpCodeCount
                     '
                     CopyHeader = CopyHeader _
@@ -39141,74 +39110,74 @@ ErrorTrap:
                                                                     If FieldValue <> "" Then
                                                                         FieldValue = EncodeInteger(FieldValue).ToString
                                                                     End If
-                                                                    Call app.siteProperty_set(FieldName, FieldValue)
+                                                                    Call db.siteProperty_set(FieldName, FieldValue)
                                                                 Case "boolean"
                                                                     '
                                                                     If FieldValue <> "" Then
                                                                         FieldValue = EncodeBoolean(FieldValue).ToString
                                                                     End If
-                                                                    Call app.siteProperty_set(FieldName, FieldValue)
+                                                                    Call db.siteProperty_set(FieldName, FieldValue)
                                                                 Case "float"
                                                                     '
                                                                     If FieldValue <> "" Then
                                                                         FieldValue = EncodeNumber(FieldValue).ToString
                                                                     End If
-                                                                    Call app.siteProperty_set(FieldName, FieldValue)
+                                                                    Call db.siteProperty_set(FieldName, FieldValue)
                                                                 Case "date"
                                                                     '
                                                                     If FieldValue <> "" Then
                                                                         FieldValue = EncodeDate(FieldValue).ToString
                                                                     End If
-                                                                    Call app.siteProperty_set(FieldName, FieldValue)
+                                                                    Call db.siteProperty_set(FieldName, FieldValue)
                                                                 Case "file", "imagefile"
                                                                     '
                                                                     If main_GetStreamBoolean2(FieldName & ".DeleteFlag") Then
-                                                                        Call app.siteProperty_set(FieldName, "")
+                                                                        Call db.siteProperty_set(FieldName, "")
                                                                     End If
                                                                     If FieldValue <> "" Then
                                                                         VirtualFilePath = "Settings/" & FieldName
                                                                         Call web_ProcessFormInputFile(FieldName, VirtualFilePath)
                                                                         FieldValue = VirtualFilePath & "/" & FieldValue
-                                                                        Call app.siteProperty_set(FieldName, FieldValue)
+                                                                        Call db.siteProperty_set(FieldName, FieldValue)
                                                                     End If
                                                                 Case "textfile"
                                                                     '
                                                                     DefaultFilename = "Settings/" & FieldName & ".txt"
-                                                                    Filename = app.siteProperty_getText(FieldName, DefaultFilename)
+                                                                    Filename = db.siteProperty_getText(FieldName, DefaultFilename)
                                                                     If Filename = "" Then
                                                                         Filename = DefaultFilename
-                                                                        Call app.siteProperty_set(FieldName, DefaultFilename)
+                                                                        Call db.siteProperty_set(FieldName, DefaultFilename)
                                                                     End If
-                                                                    Call app.appRootFiles.SaveFile(Filename, FieldValue)
+                                                                    Call db.appRootFiles.SaveFile(Filename, FieldValue)
                                                                 Case "cssfile"
                                                                     '
                                                                     DefaultFilename = "Settings/" & FieldName & ".css"
-                                                                    Filename = app.siteProperty_getText(FieldName, DefaultFilename)
+                                                                    Filename = db.siteProperty_getText(FieldName, DefaultFilename)
                                                                     If Filename = "" Then
                                                                         Filename = DefaultFilename
-                                                                        Call app.siteProperty_set(FieldName, DefaultFilename)
+                                                                        Call db.siteProperty_set(FieldName, DefaultFilename)
                                                                     End If
-                                                                    Call app.appRootFiles.SaveFile(Filename, FieldValue)
+                                                                    Call db.appRootFiles.SaveFile(Filename, FieldValue)
                                                                 Case "xmlfile"
                                                                     '
                                                                     DefaultFilename = "Settings/" & FieldName & ".xml"
-                                                                    Filename = app.siteProperty_getText(FieldName, DefaultFilename)
+                                                                    Filename = db.siteProperty_getText(FieldName, DefaultFilename)
                                                                     If Filename = "" Then
                                                                         Filename = DefaultFilename
-                                                                        Call app.siteProperty_set(FieldName, DefaultFilename)
+                                                                        Call db.siteProperty_set(FieldName, DefaultFilename)
                                                                     End If
-                                                                    Call app.appRootFiles.SaveFile(Filename, FieldValue)
+                                                                    Call db.appRootFiles.SaveFile(Filename, FieldValue)
                                                                 Case "currency"
                                                                     '
                                                                     If FieldValue <> "" Then
                                                                         FieldValue = EncodeNumber(FieldValue).ToString
                                                                         FieldValue = FormatCurrency(FieldValue)
                                                                     End If
-                                                                    Call app.siteProperty_set(FieldName, FieldValue)
+                                                                    Call db.siteProperty_set(FieldName, FieldValue)
                                                                 Case "link"
-                                                                    Call app.siteProperty_set(FieldName, FieldValue)
+                                                                    Call db.siteProperty_set(FieldName, FieldValue)
                                                                 Case Else
-                                                                    Call app.siteProperty_set(FieldName, FieldValue)
+                                                                    Call db.siteProperty_set(FieldName, FieldValue)
                                                             End Select
                                                         Case "copycontent"
                                                             '
@@ -39227,27 +39196,27 @@ ErrorTrap:
                                                                     FieldValue = doc_getText(FieldName)
                                                                 End If
 
-                                                                CS = app.db_csOpen("Copy Content", "name=" & app.db_EncodeSQLText(FieldName), "ID")
-                                                                If Not app.db_csOk(CS) Then
-                                                                    Call app.db_csClose(CS)
-                                                                    CS = app.db_csInsertRecord("Copy Content")
+                                                                CS = db.db_csOpen("Copy Content", "name=" & db.db_EncodeSQLText(FieldName), "ID")
+                                                                If Not db.db_csOk(CS) Then
+                                                                    Call db.db_csClose(CS)
+                                                                    CS = db.db_csInsertRecord("Copy Content")
                                                                 End If
-                                                                If app.db_csOk(CS) Then
-                                                                    Call app.db_setCS(CS, "name", FieldName)
+                                                                If db.db_csOk(CS) Then
+                                                                    Call db.db_setCS(CS, "name", FieldName)
                                                                     '
                                                                     ' Set copy
                                                                     '
-                                                                    Call app.db_setCS(CS, "copy", FieldValue)
+                                                                    Call db.db_setCS(CS, "copy", FieldValue)
                                                                     '
                                                                     ' delete duplicates
                                                                     '
-                                                                    Call app.db_csGoNext(CS)
-                                                                    Do While app.db_csOk(CS)
+                                                                    Call db.db_csGoNext(CS)
+                                                                    Do While db.db_csOk(CS)
                                                                         Call db_DeleteCSRecord(CS)
-                                                                        Call app.db_csGoNext(CS)
+                                                                        Call db.db_csGoNext(CS)
                                                                     Loop
                                                                 End If
-                                                                Call app.db_csClose(CS)
+                                                                Call db.db_csClose(CS)
                                                             End If
 
                                                         Case "filecontent"
@@ -39259,7 +39228,7 @@ ErrorTrap:
                                                                 FieldName = main_GetXMLAttribute(IsFound, TabNode, "name", "")
                                                                 fieldfilename = main_GetXMLAttribute(IsFound, TabNode, "filename", "")
                                                                 FieldValue = doc_getText(FieldName)
-                                                                Call app.appRootFiles.SaveFile(fieldfilename, FieldValue)
+                                                                Call db.appRootFiles.SaveFile(fieldfilename, FieldValue)
                                                             End If
                                                         Case "dbquery"
                                                             '
@@ -39320,7 +39289,7 @@ ErrorTrap:
                                                             FieldDescription = main_GetXMLAttribute(IsFound, TabNode, "description", "")
                                                             FieldAddon = main_GetXMLAttribute(IsFound, TabNode, "EditorAddon", "")
                                                             FieldDefaultValue = TabNode.InnerText
-                                                            FieldValue = app.siteProperty_getText(FieldName, FieldDefaultValue)
+                                                            FieldValue = db.siteProperty_getText(FieldName, FieldDefaultValue)
                                                             '                                                    If FieldReadOnly Then
                                                             '                                                        '
                                                             '                                                        ' Read only = no editor
@@ -39332,7 +39301,7 @@ ErrorTrap:
                                                                 '
                                                                 ' Use Editor Addon
                                                                 '
-                                                                Option_String = "FieldName=" & FieldName & "&FieldValue=" & main_EncodeAddonOptionArgument(app.siteProperty_getText(FieldName, FieldDefaultValue))
+                                                                Option_String = "FieldName=" & FieldName & "&FieldValue=" & main_EncodeAddonOptionArgument(db.siteProperty_getText(FieldName, FieldDefaultValue))
                                                                 Copy = main_GetAddonContent(0, FieldAddon, Option_String, addonContextEnum.ContextAdmin, "", 0, "", 0)
                                                             ElseIf FieldSelector <> "" Then
                                                                 '
@@ -39379,7 +39348,7 @@ ErrorTrap:
                                                                             If FieldValue = "" Then
                                                                                 Copy = html_GetFormInputFile(FieldName)
                                                                             Else
-                                                                                NonEncodedLink = web.requestDomain & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, FieldValue)
+                                                                                NonEncodedLink = web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, FieldValue)
                                                                                 EncodedLink = EncodeURL(NonEncodedLink)
                                                                                 Copy = "" _
                                                                                     & "<a href=""http://" & EncodedLink & """ target=""_blank"">[" & GetFilename(FieldValue) & "]</A>" _
@@ -39403,7 +39372,7 @@ ErrorTrap:
                                                                         If FieldReadOnly Then
                                                                             Copy = FieldValue & html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
-                                                                            FieldValue = app.cdnFiles.ReadFile(FieldValue)
+                                                                            FieldValue = db.cdnFiles.ReadFile(FieldValue)
                                                                             If FieldHTML Then
                                                                                 Copy = html_GetFormInputHTML(FieldName, FieldValue)
                                                                             Else
@@ -39462,20 +39431,20 @@ ErrorTrap:
                                                             FieldDescription = main_GetXMLAttribute(IsFound, TabNode, "description", "")
                                                             FieldHTML = EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "html", ""))
                                                             '
-                                                            CS = app.db_csOpen("Copy Content", "Name=" & db_EncodeSQLText(FieldName), "ID", , , , , "Copy")
-                                                            If Not app.db_csOk(CS) Then
-                                                                Call app.db_csClose(CS)
-                                                                CS = app.db_csInsertRecord("Copy Content")
-                                                                If app.db_csOk(CS) Then
-                                                                    RecordID = app.db_GetCSInteger(CS, "ID")
-                                                                    Call app.db_setCS(CS, "name", FieldName)
-                                                                    Call app.db_setCS(CS, "copy", EncodeText(TabNode.InnerText))
-                                                                    Call app.csv_SaveCSRecord(CS)
-                                                                    Call main_PublishEdit("Copy Content", RecordID)
+                                                            CS = db.db_csOpen("Copy Content", "Name=" & db_EncodeSQLText(FieldName), "ID", , , , , "Copy")
+                                                            If Not db.db_csOk(CS) Then
+                                                                Call db.db_csClose(CS)
+                                                                CS = db.db_csInsertRecord("Copy Content")
+                                                                If db.db_csOk(CS) Then
+                                                                    RecordID = db.db_GetCSInteger(CS, "ID")
+                                                                    Call db.db_setCS(CS, "name", FieldName)
+                                                                    Call db.db_setCS(CS, "copy", EncodeText(TabNode.InnerText))
+                                                                    Call db.db_SaveCSRecord(CS)
+                                                                    Call workflow_PublishEdit("Copy Content", RecordID)
                                                                 End If
                                                             End If
-                                                            If app.db_csOk(CS) Then
-                                                                FieldValue = main_GetCSText(CS, "copy")
+                                                            If db.db_csOk(CS) Then
+                                                                FieldValue = db.db_GetCSText(CS, "copy")
                                                             End If
                                                             If FieldReadOnly Then
                                                                 '
@@ -39508,10 +39477,10 @@ ErrorTrap:
                                                         FieldDefaultValue = TabNode.InnerText
                                                         Copy = ""
                                                         If fieldfilename <> "" Then
-                                                            If app.appRootFiles.checkFile(fieldfilename) Then
+                                                            If db.appRootFiles.checkFile(fieldfilename) Then
                                                                 Copy = FieldDefaultValue
                                                             Else
-                                                                Copy = app.cdnFiles.ReadFile(fieldfilename)
+                                                                Copy = db.cdnFiles.ReadFile(fieldfilename)
                                                             End If
                                                             If Not FieldReadOnly Then
                                                                 Copy = main_GetFormInputTextExpandable(FieldName, Copy, 10)
@@ -39538,7 +39507,7 @@ ErrorTrap:
 
                                                         If FieldSQL <> "" Then
                                                             Try
-                                                                dt = app.executeSql(FieldSQL, FieldDataSource, , SQLPageSize)
+                                                                dt = db.executeSql(FieldSQL, FieldDataSource, , SQLPageSize)
                                                             Catch ex As Exception
                                                                 ErrorDescription = ex.ToString
                                                                 loadOK = False
@@ -39876,7 +39845,7 @@ ErrorTrap:
                     ' Load cached addonCache
                     '
                     Try
-                        cacheTest = app.cache.GetObject(Of cache_addonsClass)(cache_addon_cacheName)
+                        cacheTest = cache.GetObject(Of cache_addonsClass)(cache_addon_cacheName)
                         If Not IsNothing(cacheTest) Then
                             cache_addons = DirectCast(cacheTest, cache_addonsClass)
                             If Not IsNothing(cache_addons) Then
@@ -39904,7 +39873,7 @@ ErrorTrap:
                         onBodyEndCnt = 0
                         SQL = "select " & cache_addon2_fieldList & " from ccAggregateFunctions where (active<>0) order by id"
                         'hint = hint & ", addonCache IsEmpty - Db select"
-                        Using dt As DataTable = app.executeSql(SQL)
+                        Using dt As DataTable = db.executeSql(SQL)
                             If dt.Rows.Count > 0 Then
                                 addonPtr = 0
                                 For Each dr As DataRow In dt.Rows
@@ -40013,7 +39982,7 @@ ErrorTrap:
                     Call handleLegacyError15(hint, "cache_addon_load")
                 End If
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
                 'Call main_HandleClassError_RevArgs(Err.Number, Err.Source, Err.Description & " Hint=[" & hint & "]", "cache_addon_load", True, False)
             End Try
         End Sub
@@ -40034,8 +40003,8 @@ ErrorTrap:
             Call cache_addons.guidIndex.getPtr("test")
             cache_addons.propertyBag_guidIndex = cache_addons.guidIndex.exportPropertyBag()
             '
-            Call app.cache.SetKey(cache_addon_cacheName, cache_addons, "add-ons")
-            'Call app.cache.cache_saveRaw(cache_addon_cacheName, cache_addons)
+            Call cache.SetKey(cache_addon_cacheName, cache_addons, "add-ons")
+            'Call cache.cache_saveRaw(cache_addon_cacheName, cache_addons)
             '
             Exit Sub
 ErrorTrap:
@@ -40061,7 +40030,7 @@ ErrorTrap:
             cache_addons.propertyBag_guidIndex = ""
             cache_addons.propertyBag_idIndex = ""
             cache_addons.propertyBag_nameIndex = ""
-            Call app.cache.SetKey(cache_addon_cacheName, cache_addons, "add-ons")
+            Call cache.SetKey(cache_addon_cacheName, cache_addons, "add-ons")
             '
             Exit Sub
             '
@@ -40117,7 +40086,7 @@ ErrorTrap:
                     addonCacheRowOK = False
                     SQL = "select " & cache_addon2_fieldList & " from ccaggregatefunctions where id=" & RecordID
                     addon = New addonClass
-                    dt = app.executeSql(SQL)
+                    dt = db.executeSql(SQL)
                     If dt.Rows.Count > 0 Then
                         With dt.Rows(0)
                             addon.addonCache_Id = EncodeInteger(.Item(0))
@@ -40166,7 +40135,7 @@ ErrorTrap:
                     End If
                     Call dt.Dispose()
                     'hint = hint & ", 4 RowPtr=[" & addonPtr & "], sql=[" & SQL & "]"
-                    addonCacheRow = convertDataTabletoArray(app.executeSql(SQL))
+                    addonCacheRow = convertDataTabletoArray(db.executeSql(SQL))
 
                     'RS = app.csv_OpenRSSQL_Internal("Default", SQL, 120, 1, 1, False, CursorLocationEnum.adUseClient, LockTypeEnum.ADLOCKOptimistic, CursorTypeEnum.ADOPENForwardOnly)
                     'If (isDataTableOk(rs)) Then
@@ -40260,12 +40229,12 @@ ErrorTrap:
                     '
                     ' This addonId is missing from cache - try to load it from Db
                     '
-                    sqlCriteria = "(id=" & app.db_EncodeSQLNumber(addonNameGuidOrId) & ")or(name=" & app.db_EncodeSQLText(addonNameGuidOrId) & ")or(ccguid=" & app.db_EncodeSQLText(addonNameGuidOrId) & ")"
-                    CS = app.db_csOpen("add-ons", sqlCriteria)
-                    If app.db_csOk(CS) Then
-                        addonId = app.db_GetCSInteger(CS, "id")
+                    sqlCriteria = "(id=" & db.db_EncodeSQLNumber(addonNameGuidOrId) & ")or(name=" & db.db_EncodeSQLText(addonNameGuidOrId) & ")or(ccguid=" & db.db_EncodeSQLText(addonNameGuidOrId) & ")"
+                    CS = db.db_csOpen("add-ons", sqlCriteria)
+                    If db.db_csOk(CS) Then
+                        addonId = db.db_GetCSInteger(CS, "id")
                     End If
-                    Call app.db_csClose(CS)
+                    Call db.db_csClose(CS)
                     If addonId > 0 Then
                         Call cache_addon_updateRow(addonId)
                         Call cache_addon_load()
@@ -40316,7 +40285,7 @@ ErrorTrap:
             cache_addonIncludeRules = New addonIncludeRulesClass
             'cache_addonIncludeRules.itemCnt = 0
             'cache_addonIncludeRules.item = {}
-            Call app.cache.SetKey(cache_addonIncludeRules_cacheName, cache_addonIncludeRules.item)
+            Call cache.SetKey(cache_addonIncludeRules_cacheName, cache_addonIncludeRules.item)
             '
             Exit Sub
             '
@@ -40334,10 +40303,10 @@ ErrorTrap:
             '
             Call cache_addonIncludeRules.addonIdIndex.getPtr("test")
             '
-            Call app.cache.SetKey(cache_addonIncludeRules_cacheName, cache_addonIncludeRules)
+            Call cache.SetKey(cache_addonIncludeRules_cacheName, cache_addonIncludeRules)
             'cacheArray(0) = cache_addonIncludeRules.item
             'cacheArray(1) = cache_addonIncludeRules.addonIdIndex.exportPropertyBag
-            'Call app.cache.cache_save(cache_addonIncludeRules_cacheName, cacheArray)
+            'Call cache.cache_save(cache_addonIncludeRules_cacheName, cacheArray)
             '
             Exit Sub
 ErrorTrap:
@@ -40380,7 +40349,7 @@ ErrorTrap:
             '
             On Error Resume Next
             If Not pagemanager_IsWorkflowRendering() Then
-                cacheTest = app.cache.GetObject(Of addonIncludeRulesClass)(cache_addonIncludeRules_cacheName)
+                cacheTest = cache.GetObject(Of addonIncludeRulesClass)(cache_addonIncludeRules_cacheName)
                 If TypeOf cacheTest Is addonIncludeRulesClass Then
                     cache_addonIncludeRules = DirectCast(cacheTest, addonIncludeRulesClass)
                 End If
@@ -40418,7 +40387,7 @@ ErrorTrap:
                 '
                 'hint = hint & ",20 cnt=0 rebuild"
                 SQL = "select " & cache_addonIncludeRules_fieldList & " from ccaddonIncludeRules where (active<>0) order by id"
-                cache_addonIncludeRules.item = convertDataTabletoArray(app.executeSql(SQL))
+                cache_addonIncludeRules.item = convertDataTabletoArray(db.executeSql(SQL))
                 'hint = hint & ",21"
                 If True Then
                     'hint = hint & ",22"
@@ -40497,16 +40466,16 @@ ErrorTrap:
             '
             ' Load cache
             '
-            cacheValue = DirectCast(app.cache.GetObject(Of String)(cache_linkForward_cacheName), String)
+            cacheValue = DirectCast(cache.GetObject(Of String)(cache_linkForward_cacheName), String)
             If cacheValue = "" Then
-                RS = app.executeSql("select sourceLink from ccLinkForwards where (sourceLink<>'')and(DestinationLink<>'')and(active<>0) order by id desc")
+                RS = db.executeSql("select sourceLink from ccLinkForwards where (sourceLink<>'')and(DestinationLink<>'')and(active<>0) order by id desc")
                 For Each dr As DataRow In RS.Rows
                     cacheValue &= "," & dr.Item("sourceLink").ToString
                 Next
                 If cacheValue <> "" Then
                     cacheValue = Replace(cacheValue, "\", "/")
-                    Call app.cache.SetKey(cache_linkForward_cacheName, cacheValue)
-                    'Call app.cache.cache_savex("dummyValue", "dummyKey")
+                    Call cache.SetKey(cache_linkForward_cacheName, cacheValue)
+                    'Call cache.cache_savex("dummyValue", "dummyKey")
                 End If
             End If
             '
@@ -40533,7 +40502,7 @@ ErrorTrap:
             '
             cache_libraryFilesCnt = 0
             cache_libraryFiles = {}
-            Call app.cache.SetKey(cache_LibraryFiles_cacheName, cache_libraryFiles)
+            Call cache.SetKey(cache_LibraryFiles_cacheName, cache_libraryFiles)
             '
             Exit Sub
             '
@@ -40555,7 +40524,7 @@ ErrorTrap:
             '
             cacheArray(0) = cache_libraryFiles
             cacheArray(1) = cache_libraryFilesIdIndex.exportPropertyBag
-            Call app.cache.SetKey(cache_LibraryFiles_cacheName, cacheArray)
+            Call cache.SetKey(cache_LibraryFiles_cacheName, cacheArray)
             '
             Exit Sub
 ErrorTrap:
@@ -40598,7 +40567,7 @@ ErrorTrap:
                 cache_libraryFilesIdIndex = New coreKeyPtrIndexClass
                 cache_libraryFilesCnt = 0
                 '
-                cacheTest = app.cache.GetObject(Of Object())(cache_LibraryFiles_cacheName)
+                cacheTest = cache.GetObject(Of Object())(cache_LibraryFiles_cacheName)
                 If Not IsNothing(cacheTest) Then
                     cacheArray = DirectCast(cacheTest, Object())
                     cache_libraryFiles = DirectCast(cacheArray(0), String(,))
@@ -40613,7 +40582,7 @@ ErrorTrap:
                     '
                     'hint = hint & ",cnt=0 rebuild"
                     SQL = "select " & cache_LibraryFiles_fieldList & " from cclibraryFiles where (active<>0) order by id"
-                    cache_libraryFiles = convertDataTabletoArray(app.executeSql(SQL))
+                    cache_libraryFiles = convertDataTabletoArray(db.executeSql(SQL))
                     '    RS = app.csv_OpenRSSQL_Internal("Default", SQL, 120, 1000, 1, False, CursorLocationEnum.adUseClient, LockTypeEnum.adLockOptimistic, CursorTypeEnum.adOpenForwardOnly)
                     'cacheLoaded = False
                     'If (isDataTableOk(rs)) Then
@@ -41414,7 +41383,7 @@ ErrorTrap:
                     '
                     If Not main_ServerPagePrintVersion Then
                         LocalTemplateBody = html_executeContentCommands(Nothing, LocalTemplateBody, addonContextEnum.ContextTemplate, userId, user_isAuthenticated, layoutError)
-                        returnHtmlBody = returnHtmlBody & encodeContent9(LocalTemplateBody, userId, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", web_requestProtocol & web.requestDomain, False, app.siteProperty_DefaultWrapperID, PageContent, addonContextEnum.ContextTemplate)
+                        returnHtmlBody = returnHtmlBody & encodeContent9(LocalTemplateBody, userId, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", web_requestProtocol & web.requestDomain, False, db.siteProperty_DefaultWrapperID, PageContent, addonContextEnum.ContextTemplate)
                         'returnHtmlBody = returnHtmlBody & EncodeContent8(LocalTemplateBody, memberID, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", main_ServerProtocol, False, app.SiteProperty_DefaultWrapperID, PageContent, ContextTemplate)
                     End If
                     '
@@ -41469,7 +41438,7 @@ ErrorTrap:
                     '
                     ' Make it pretty for those who care
                     '
-                    If EncodeBoolean(app.siteProperty_getBoolean("AutoHTMLFormatting", False)) Then
+                    If EncodeBoolean(db.siteProperty_getBoolean("AutoHTMLFormatting", False)) Then
                         IndentCnt = 0
                         Parse = New coreHtmlParseClass(Me)
                         Call Parse.Load(returnHtmlBody)
@@ -41575,7 +41544,7 @@ ErrorTrap:
                 End If
                 '
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
             Return returnHtmlBody
         End Function
@@ -41593,7 +41562,7 @@ ErrorTrap:
             Dim returnHtml As String
             '
             Dim UseContentWatchLink As Boolean
-            UseContentWatchLink = app.siteProperty_UseContentWatchLink
+            UseContentWatchLink = db.siteProperty_UseContentWatchLink
             Dim test As String
             Dim Copy As String
             Dim allowPageWithoutSectionDislay As Boolean
@@ -41724,7 +41693,7 @@ ErrorTrap:
                     Call main_AddEndOfBodyJavascript2(EncodeText(cache_siteSection(SSC_JSEndBody, Ptr)), "site section")
                     JSFilename = EncodeText(cache_siteSection(SSC_JSFilename, Ptr))
                     If JSFilename <> "" Then
-                        JSFilename = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, JSFilename)
+                        JSFilename = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, JSFilename)
                         Call main_AddHeadScriptLink(JSFilename, "site section")
                     End If
                 End If
@@ -41760,7 +41729,7 @@ ErrorTrap:
                     Call main_AddEndOfBodyJavascript2(EncodeText(cache_siteSection(SSC_JSEndBody, Ptr)), "site section")
                     JSFilename = EncodeText(cache_siteSection(SSC_JSFilename, Ptr))
                     If JSFilename <> "" Then
-                        JSFilename = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, JSFilename)
+                        JSFilename = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, JSFilename)
                         Call main_AddHeadScriptLink(JSFilename, "site section")
                     End If
                 End If
@@ -41777,7 +41746,7 @@ ErrorTrap:
                         ' OK to create page here because section has a good record with a 0 RootPageID (this is not AutoHomeCreate)
                         '
                         rootPageId = main_CreatePageGetID(SectionName, "Page Content", SystemMemberID, "")
-                        Call app.executeSql("update ccsections set RootPageID=" & rootPageId & " where id=" & SectionID)
+                        Call db.executeSql("update ccsections set RootPageID=" & rootPageId & " where id=" & SectionID)
                         Call pageManager_cache_siteSection_clear()
                         main_AdminWarning = "<p>This page was created automatically because the section [" & SectionName & "] was requested, and it did not reference a page. Use the links below to edit the new page.</p>"
                         main_AdminWarningPageID = rootPageId
@@ -41828,7 +41797,7 @@ ErrorTrap:
                 '
                 ' Orphan Page -- Section could not be determined
                 '
-                allowPageWithoutSectionDislay = EncodeBoolean(app.siteProperty_getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default))
+                allowPageWithoutSectionDislay = EncodeBoolean(db.siteProperty_getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default))
                 allowPageWithoutSectionDislay = True
                 Call appendLog("hardcoded allowPageWithoutSectionDislay in getHtmlBody_getSection")
                 If Not allowPageWithoutSectionDislay Then
@@ -41857,37 +41826,37 @@ ErrorTrap:
                         ' Legacy - Page linked by PageName
                         '
                         SectionName = LegacyLandingPageName
-                        SectionCriteria = "Name = " & app.db_EncodeSQLText(SectionName)
+                        SectionCriteria = "Name = " & db.db_EncodeSQLText(SectionName)
                     End If
                     '
                     ' main_Get Landing Section
                     '
-                    CSSection = app.db_csOpen("Site Sections", SectionCriteria, "ID", , ,, , SectionFieldList)
+                    CSSection = db.db_csOpen("Site Sections", SectionCriteria, "ID", , ,, , SectionFieldList)
                     '
                     ' try something new - if no landing section, use a "dummy" section with no blocking, etc.
                     '
-                    If Not app.db_csOk(CSSection) Then
+                    If Not db.db_csOk(CSSection) Then
                         SectionID = 0
                         SectionName = ""
                         SectionTemplateID = 0
                         SectionContentID = 0
                         SectionBlock = False
                     Else
-                        SectionID = app.db_GetCSInteger(CSSection, "ID")
-                        SectionName = app.db_GetCSText(CSSection, "name")
-                        SectionTemplateID = app.db_GetCSInteger(CSSection, "TemplateID")
-                        SectionContentID = app.db_GetCSInteger(CSSection, "ContentID")
-                        SectionBlock = app.db_GetCSBoolean(CSSection, "BlockSection")
-                        Call main_AddOnLoadJavascript2(app.db_GetCSText(CSSection, "JSOnLoad"), "site section")
-                        Call main_AddHeadScriptCode(app.db_GetCSText(CSSection, "JSHead"), "site section")
-                        Call main_AddEndOfBodyJavascript2(app.db_GetCSText(CSSection, "JSEndBody"), "site section")
-                        JSFilename = app.db_GetCSText(CSSection, "JSFilename")
+                        SectionID = db.db_GetCSInteger(CSSection, "ID")
+                        SectionName = db.db_GetCSText(CSSection, "name")
+                        SectionTemplateID = db.db_GetCSInteger(CSSection, "TemplateID")
+                        SectionContentID = db.db_GetCSInteger(CSSection, "ContentID")
+                        SectionBlock = db.db_GetCSBoolean(CSSection, "BlockSection")
+                        Call main_AddOnLoadJavascript2(db.db_GetCSText(CSSection, "JSOnLoad"), "site section")
+                        Call main_AddHeadScriptCode(db.db_GetCSText(CSSection, "JSHead"), "site section")
+                        Call main_AddEndOfBodyJavascript2(db.db_GetCSText(CSSection, "JSEndBody"), "site section")
+                        JSFilename = db.db_GetCSText(CSSection, "JSFilename")
                         If JSFilename <> "" Then
-                            JSFilename = web_requestPage & web.requestDomain & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, JSFilename)
+                            JSFilename = web_requestPage & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, JSFilename)
                             Call main_AddHeadScriptLink(JSFilename, "site section")
                         End If
                     End If
-                    Call app.db_csClose(CSSection)
+                    Call db.db_csClose(CSSection)
                     '
                     ' ????? if no landing section, lets try a dummy section
                     '
@@ -42061,7 +42030,7 @@ ErrorTrap:
                         '
                         If TCPtr >= 0 Then
                             If main_VisitBrowserIsMobile Then
-                                If EncodeBoolean(app.siteProperty_getBoolean("AllowMobileTemplates", False)) Then
+                                If EncodeBoolean(db.siteProperty_getBoolean("AllowMobileTemplates", False)) Then
                                     '
                                     ' set Mobile Template
                                     '
@@ -42087,7 +42056,7 @@ ErrorTrap:
                             pageManager_TemplateBodyTag = EncodeText(cache_pageTemplate(TC_BodyTag, TCPtr))
                             JSFilename = EncodeText(cache_pageTemplate(TC_JSInHeadFilename, TCPtr))
                             If JSFilename <> "" Then
-                                JSFilename = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, JSFilename)
+                                JSFilename = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, JSFilename)
                                 Call main_AddHeadScriptLink(JSFilename, "template")
                             End If
                             '
@@ -42097,7 +42066,7 @@ ErrorTrap:
                                 If LCase(Right(StylesFilename, 4)) <> ".css" Then
                                     Call handleLegacyError15("Template [" & pageManager_TemplateName & "] StylesFilename is not a '.css' file, and will not display correct. Check that the field is setup as a CSSFile.", "main_GetHtmlBody_GetSection")
                                 Else
-                                    main_MetaContent_TemplateStyleSheetTag = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(app.config.cdnFilesNetprefix, StylesFilename) & """ >"
+                                    main_MetaContent_TemplateStyleSheetTag = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, StylesFilename) & """ >"
                                 End If
                             End If
                             '
@@ -42121,7 +42090,7 @@ ErrorTrap:
                         ' Verify Template Link matches the current page
                         '
                         If pageManager_RedirectLink = "" Then
-                            If (TCPtr >= 0) And (app.siteProperty_AllowTemplateLinkVerification) Then
+                            If (TCPtr >= 0) And (db.siteProperty_AllowTemplateLinkVerification) Then
                                 PCCPtr = pageManager_cache_pageContent_getPtr(main_RenderedPageID, pagemanager_IsWorkflowRendering, user_isQuickEditing(""))
                                 '$$$$$ must check for PPtr<0
                                 SecureLink_CurrentURL = (Left(LCase(main_ServerLink), 8) = "https://")
@@ -42185,7 +42154,7 @@ ErrorTrap:
                                         '
                                         CurrentLink = Replace(CurrentLink, "https://", "http://", 1, -1, vbTextCompare)
                                         CurrentLink = ConvertLinkToShortLink(CurrentLink, web.requestDomain, web_requestVirtualFilePath)
-                                        CurrentLink = EncodeAppRootPath(CurrentLink, web_requestVirtualFilePath, app.RootWebPath, web.requestDomain)
+                                        CurrentLink = EncodeAppRootPath(CurrentLink, web_requestVirtualFilePath, db.RootWebPath, web.requestDomain)
                                         LinkSplit = Split(CurrentLink, "?")
                                         CurrentLinkNoQuery = LinkSplit(0)
                                         If (SecureLink_CurrentURL <> SecureLink_Required) Or (UCase(templateLink) <> UCase(CurrentLinkNoQuery)) Then
@@ -42194,7 +42163,7 @@ ErrorTrap:
                                             ' This is NOT a pagenotfound - but a correctable condition that can not be avoided
                                             ' The pageid has as hard tamplate that must be redirected
                                             '
-                                            pageManager_RedirectLink = main_GetPageLink4(PageID, "", True, False)
+                                            pageManager_RedirectLink = pageManager_GetPageLink4(PageID, "", True, False)
                                             If SecureLink_Required Then
                                                 '
                                                 ' Redirect to Secure
@@ -42544,7 +42513,7 @@ ErrorTrap:
                 If (pageManager_RedirectLink = "") Then
                     Link = EncodeText(cache_pageContent(PCC_Link, main_RenderCache_CurrentPage_PCCPtr))
                     If (Link <> "") Then
-                        Call app.executeSql("update ccpagecontent set clicks=clicks+1 where id=" & main_RenderedPageID)
+                        Call db.executeSql("update ccpagecontent set clicks=clicks+1 where id=" & main_RenderedPageID)
                         pageManager_RedirectLink = Link
                         pageManager_RedirectReason = "Redirect required because this page (PageRecordID=" & main_RenderedPageID & ") has a Link Override [" & pageManager_RedirectLink & "]."
                     End If
@@ -42580,19 +42549,19 @@ ErrorTrap:
                             & " FROM (ccPageContentBlockRules" _
                             & " LEFT JOIN ccgroups ON ccPageContentBlockRules.GroupID = ccgroups.ID)" _
                             & " LEFT JOIN ccMemberRules ON ccgroups.ID = ccMemberRules.GroupID" _
-                            & " WHERE (((ccMemberRules.MemberID)=" & app.db_EncodeSQLNumber(userId) & ")" _
+                            & " WHERE (((ccMemberRules.MemberID)=" & db.db_EncodeSQLNumber(userId) & ")" _
                             & " AND ((ccPageContentBlockRules.RecordID) In (" & BlockedRecordIDList & "))" _
                             & " AND ((ccPageContentBlockRules.Active)<>0)" _
                             & " AND ((ccgroups.Active)<>0)" _
                             & " AND ((ccMemberRules.Active)<>0)" _
-                            & " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" & app.db_EncodeSQLDate(main_PageStartTime) & "));"
-                        CS = app.db_csOpenSql(SQL)
+                            & " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" & db.db_EncodeSQLDate(main_PageStartTime) & "));"
+                        CS = db.db_csOpenSql(SQL)
                         BlockedRecordIDList = "," & BlockedRecordIDList
-                        Do While app.db_csOk(CS)
-                            BlockedRecordIDList = Replace(BlockedRecordIDList, "," & app.db_GetCSText(CS, "RecordID"), "")
-                            app.db_csGoNext(CS)
+                        Do While db.db_csOk(CS)
+                            BlockedRecordIDList = Replace(BlockedRecordIDList, "," & db.db_GetCSText(CS, "RecordID"), "")
+                            db.db_csGoNext(CS)
                         Loop
-                        Call app.db_csClose(CS)
+                        Call db.db_csClose(CS)
                         If BlockedRecordIDList <> "" Then
                             '
                             ' ##### remove the leading comma
@@ -42608,19 +42577,19 @@ ErrorTrap:
                                 & " AND ((ccGroupRules.Active)<>0)" _
                                 & " AND ((ManagementGroups.Active)<>0)" _
                                 & " AND ((ManagementMemberRules.Active)<>0)" _
-                                & " AND ((ManagementMemberRules.DateExpires) Is Null Or (ManagementMemberRules.DateExpires)>" & app.db_EncodeSQLDate(main_PageStartTime) & ")" _
+                                & " AND ((ManagementMemberRules.DateExpires) Is Null Or (ManagementMemberRules.DateExpires)>" & db.db_EncodeSQLDate(main_PageStartTime) & ")" _
                                 & " AND ((ManagementMemberRules.MemberID)=" & userId & " ));"
-                            CS = app.db_csOpenSql(SQL)
-                            Do While app.db_csOk(CS)
-                                BlockedRecordIDList = Replace(BlockedRecordIDList, "," & app.db_GetCSText(CS, "RecordID"), "")
-                                app.db_csGoNext(CS)
+                            CS = db.db_csOpenSql(SQL)
+                            Do While db.db_csOk(CS)
+                                BlockedRecordIDList = Replace(BlockedRecordIDList, "," & db.db_GetCSText(CS, "RecordID"), "")
+                                db.db_csGoNext(CS)
                             Loop
-                            Call app.db_csClose(CS)
+                            Call db.db_csClose(CS)
                         End If
                         If BlockedRecordIDList <> "" Then
                             ContentBlocked = True
                         End If
-                        Call app.db_csClose(CS)
+                        Call db.db_csClose(CS)
                     End If
                 End If
                 '
@@ -42635,13 +42604,13 @@ ErrorTrap:
                         If BlockedPageRecordID <> 0 Then
                             '$$$$$ cache this
                             CS = db_csOpen("Page Content", BlockedPageRecordID, , , "CustomBlockMessage,BlockSourceID,RegistrationGroupID,ContentPadding")
-                            If app.db_csOk(CS) Then
-                                BlockSourceID = app.db_GetCSInteger(CS, "BlockSourceID")
-                                ContentPadding = app.db_GetCSInteger(CS, "ContentPadding")
-                                CustomBlockMessageFilename = main_GetCSText(CS, "CustomBlockMessage")
-                                RegistrationGroupID = app.db_GetCSInteger(CS, "RegistrationGroupID")
+                            If db.db_csOk(CS) Then
+                                BlockSourceID = db.db_GetCSInteger(CS, "BlockSourceID")
+                                ContentPadding = db.db_GetCSInteger(CS, "ContentPadding")
+                                CustomBlockMessageFilename = db.db_GetCSText(CS, "CustomBlockMessage")
+                                RegistrationGroupID = db.db_GetCSInteger(CS, "RegistrationGroupID")
                             End If
-                            Call app.db_csClose(CS)
+                            Call db.db_csClose(CS)
                         End If
                     End If
                     '
@@ -42652,7 +42621,7 @@ ErrorTrap:
                             '
                             ' ----- Custom Message
                             '
-                            returnHtml = app.cdnFiles.ReadFile(CustomBlockMessageFilename)
+                            returnHtml = db.cdnFiles.ReadFile(CustomBlockMessageFilename)
                         Case main_BlockSourceLogin
                             '
                             ' ----- Login page
@@ -42766,7 +42735,7 @@ ErrorTrap:
                     ' Encode the copy
                     '
                     returnHtml = html_executeContentCommands(Nothing, returnHtml, addonContextEnum.ContextPage, userId, user_isAuthenticated, layoutError)
-                    returnHtml = encodeContent9(returnHtml, userId, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & web.requestDomain, False, app.siteProperty_DefaultWrapperID, "", addonContextEnum.ContextPage)
+                    returnHtml = encodeContent9(returnHtml, userId, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & web.requestDomain, False, db.siteProperty_DefaultWrapperID, "", addonContextEnum.ContextPage)
                     'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, 0, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
                     RQS = web_RefreshQueryString
                     If RQS <> "" Then
@@ -42812,15 +42781,15 @@ ErrorTrap:
                             ' Link authoring, workflow rendering -> do encoding, but no tracking
                             '
                             returnHtml = html_executeContentCommands(Nothing, returnHtml, addonContextEnum.ContextPage, userId, user_isAuthenticated, layoutError)
-                            returnHtml = encodeContent9(returnHtml, userId, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & web.requestDomain, False, app.siteProperty_DefaultWrapperID, "", addonContextEnum.ContextPage)
+                            returnHtml = encodeContent9(returnHtml, userId, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & web.requestDomain, False, db.siteProperty_DefaultWrapperID, "", addonContextEnum.ContextPage)
                         ElseIf main_ServerPagePrintVersion Then
                             '
                             ' Printer Version -> personalize and count viewings, no tracking
                             '
                             returnHtml = html_executeContentCommands(Nothing, returnHtml, addonContextEnum.ContextPage, userId, user_isAuthenticated, layoutError)
-                            returnHtml = encodeContent9(returnHtml, userId, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & web.requestDomain, False, app.siteProperty_DefaultWrapperID, "", addonContextEnum.ContextPage)
+                            returnHtml = encodeContent9(returnHtml, userId, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & web.requestDomain, False, db.siteProperty_DefaultWrapperID, "", addonContextEnum.ContextPage)
                             'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
-                            Call app.executeSql("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & main_RenderedPageID)
+                            Call db.executeSql("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & main_RenderedPageID)
                             'Call app.csv_SetCS(CS, "Viewings", app.csv_GetCSInteger(CS, "Viewings") + 1)
                         Else
                             '
@@ -42831,11 +42800,11 @@ ErrorTrap:
                             ' so a stray blocktext does not truncate the html
                             '!!!!!!!!!!!!!!!!!!!!!!!!!
                             returnHtml = html_executeContentCommands(Nothing, returnHtml, addonContextEnum.ContextPage, userId, user_isAuthenticated, layoutError)
-                            returnHtml = encodeContent9(returnHtml, userId, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & web.requestDomain, False, app.siteProperty_DefaultWrapperID, "", addonContextEnum.ContextPage)
+                            returnHtml = encodeContent9(returnHtml, userId, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & web.requestDomain, False, db.siteProperty_DefaultWrapperID, "", addonContextEnum.ContextPage)
                             'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
                             'Call main_TrackContent(main_RenderCache_CurrentPage_ContentName, main_RenderedPageID)
                             'Call main_TrackContentSet(CS)
-                            Call app.executeSql("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & main_RenderedPageID)
+                            Call db.executeSql("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & main_RenderedPageID)
                             'Call app.csv_SetCS(CS, "Viewings", app.csv_GetCSInteger(CS, "Viewings") + 1)
                         End If
                         '
@@ -42872,7 +42841,7 @@ ErrorTrap:
                                 Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Authenticated", CStr(visit_isAuthenticated), True)
                                 Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Referrer", main_VisitReferer, False)
                                 Body = Body & kmaEndTable
-                                Call sendMemberEmail3(contactMemberID, app.siteProperty_getText("EmailFromAddress", "info@" & main_ServerDomain), "Page Hit Notification", Body, False, True, 0, "", False)
+                                Call sendMemberEmail3(contactMemberID, db.siteProperty_getText("EmailFromAddress", "info@" & main_ServerDomain), "Page Hit Notification", Body, False, True, 0, "", False)
                             End If
                         End If
                         '
@@ -42973,7 +42942,7 @@ ErrorTrap:
                     Call main_AddOnLoadJavascript2(JSOnLoad, "page content")
                     Call main_AddHeadScriptCode(JSHead, "page content")
                     If JSFilename <> "" Then
-                        Call main_AddHeadScriptLink(csv_getVirtualFileLink(app.config.cdnFilesNetprefix, JSFilename), "page content")
+                        Call main_AddHeadScriptLink(csv_getVirtualFileLink(db.config.cdnFilesNetprefix, JSFilename), "page content")
                     End If
                     Call main_AddEndOfBodyJavascript2(JSEndBody, "page content")
                     '
@@ -43233,12 +43202,12 @@ ErrorTrap:
                     '            Else
                     '' $$$$$ remove main_oldCacheRS_cs, use pccPtr
                     '                'hint = hint & ",190"
-                    '                'main_RenderedPageName = main_GetCSText(main_oldCacheRS_cs, "name")
+                    '                'main_RenderedPageName = db.db_GetCSText(main_oldCacheRS_cs, "name")
                     '' $$$$$ this should just be the pcc field list
                     '                'SelectFieldList = app.db_GetCSSelectFieldList(main_oldCacheRS_cs)
                     '' $$$$$ remove all uses of main_oldCacheRS_FieldNames/main_oldCacheRS_FieldValues
                     '                'main_oldCacheRS_FieldNames = Split(SelectFieldList, ",")
-                    '                'main_oldCacheRS_FieldValues = main_GetCSRow(main_oldCacheRS_cs)
+                    '                'main_oldCacheRS_FieldValues = db.db_GetCSRow(main_oldCacheRS_cs)
                     '                'For Pointer = 0 To UBound(main_oldCacheRS_FieldValues)
                     '                '    main_oldCacheRS_FieldValues(Pointer) = Replace(Replace(main_oldCacheRS_FieldValues(Pointer), vbTab, ""), vbCrLf, "")
                     '                'Next
@@ -43539,7 +43508,7 @@ ErrorTrap:
                 'headline = app.csv_GetCS(CSPointer, "Headline")
                 copyFilename = EncodeText(cache_pageContent(PCC_CopyFilename, main_RenderCache_CurrentPage_PCCPtr))
                 If copyFilename <> "" Then
-                    Copy = app.cdnFiles.ReadFile(copyFilename)
+                    Copy = db.cdnFiles.ReadFile(copyFilename)
                 End If
                 'copy = app.csv_GetCS(CSPointer, "copyFilename")
                 allowSeeAlso = EncodeBoolean(cache_pageContent(pcc_allowSeeAlso, main_RenderCache_CurrentPage_PCCPtr))
@@ -43574,8 +43543,8 @@ ErrorTrap:
                     '
                     ' ----- Print Heading if not at root Page
                     '
-                    BreadCrumbPrefix = app.siteProperty_getText("BreadCrumbPrefix", "Return to")
-                    BreadCrumbDelimiter = app.siteProperty_getText("BreadCrumbDelimiter", " &gt; ")
+                    BreadCrumbPrefix = db.siteProperty_getText("BreadCrumbPrefix", "Return to")
+                    BreadCrumbDelimiter = db.siteProperty_getText("BreadCrumbDelimiter", " &gt; ")
                     breadCrumb = main_GetHtmlBody_GetSection_GetContentBox_ReturnLink(RootPageContentName, parentPageID, rootPageId, "", ArchivePage, BreadCrumbDelimiter)
                     If breadCrumb <> "" Then
                         breadCrumb = cr & "<p class=""ccPageListNavigation"">" & BreadCrumbPrefix & " " & breadCrumb & "</p>"
@@ -43606,7 +43575,7 @@ ErrorTrap:
                             '                    QueryString = ModifyQueryString(QueryString, RequestNameContent, RootPageContentName, True)
                             '                    QueryString = ModifyQueryString(QueryString, RequestNameOrderByClause, OrderByClause, True)
                             '                    QueryString = ModifyQueryString(QueryString, RequestNameHardCodedPage, HardCodedPagePrinterVersion, True)
-                            Caption = app.siteProperty_getText("PagePrinterVersionCaption", "Printer Version")
+                            Caption = db.siteProperty_getText("PagePrinterVersionCaption", "Printer Version")
                             Caption = Replace(Caption, " ", "&nbsp;")
                             IconRow = IconRow & cr & "&nbsp;&nbsp;<a href=""" & html_EncodeHTML(web_requestPage & "?" & QueryString) & """ target=""_blank""><img alt=""image"" src=""/ccLib/images/IconSmallPrinter.gif"" width=""13"" height=""13"" border=""0"" align=""absmiddle""></a>&nbsp<a href=""" & html_EncodeHTML(web_requestPage & "?" & QueryString) & """ target=""_blank"" style=""text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;"">" & Caption & "</a>"
                         End If
@@ -43616,7 +43585,7 @@ ErrorTrap:
                                 QueryString = "?" & QueryString
                             End If
                             EmailBody = web_requestProtocol & web.requestDomain & web.requestPathPage & QueryString
-                            Caption = app.siteProperty_getText("PageAllowEmailCaption", "Email This Page")
+                            Caption = db.siteProperty_getText("PageAllowEmailCaption", "Email This Page")
                             Caption = Replace(Caption, " ", "&nbsp;")
                             IconRow = IconRow & cr & "&nbsp;&nbsp;<a HREF=""mailto:?SUBJECT=You might be interested in this&amp;BODY=" & EmailBody & """><img alt=""image"" src=""/ccLib/images/IconSmallEmail.gif"" width=""13"" height=""13"" border=""0"" align=""absmiddle""></a>&nbsp;<a HREF=""mailto:?SUBJECT=You might be interested in this&amp;BODY=" & EmailBody & """ style=""text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;"">" & Caption & "</a>"
                         End If
@@ -43650,7 +43619,7 @@ ErrorTrap:
                         'hint = hint & ",043"
                         ' an html field can be added to an html stream. a non-html field should be html encoded before being added.
                         headline = main_encodeHTML(headline)
-                        If EncodeBoolean(app.siteProperty_getBoolean("PageHeadlineUseccHeadline", False)) Then
+                        If EncodeBoolean(db.siteProperty_getBoolean("PageHeadlineUseccHeadline", False)) Then
                             Cell = Cell & cr & "<p>" & AddSpan(headline, "ccHeadline") & "</p>"
                         Else
                             Cell = Cell & cr & "<h1>" & headline & "</h1>"
@@ -43694,7 +43663,7 @@ ErrorTrap:
                         'hint = hint & ",048"
                         ChildListInstanceOptions = EncodeText(cache_pageContent(PCC_ChildListInstanceOptions, main_RenderCache_CurrentPage_PCCPtr))
                         'hint = hint & ",049"
-                        Cell = Cell & executeAddon_legacy2(app.siteProperty_ChildListAddonID, "", ChildListInstanceOptions, addonContextEnum.ContextPage, ContentName, PageID, "", PageChildListInstanceID, False, app.siteProperty_DefaultWrapperID, "", AddonStatusOK, Nothing)
+                        Cell = Cell & executeAddon_legacy2(db.siteProperty_ChildListAddonID, "", ChildListInstanceOptions, addonContextEnum.ContextPage, ContentName, PageID, "", PageChildListInstanceID, False, db.siteProperty_DefaultWrapperID, "", AddonStatusOK, Nothing)
                     End If
                 End If
                 '
@@ -43775,13 +43744,13 @@ ErrorTrap:
                 '
                 'hint = hint & ",070"
                 If allowMessageFooter Then
-                    pageContentMessageFooter = app.siteProperty_getText("PageContentMessageFooter", "")
+                    pageContentMessageFooter = db.siteProperty_getText("PageContentMessageFooter", "")
                     If (pageContentMessageFooter <> "") Then
                         s = s & cr & "<p>" & pageContentMessageFooter & "</p>"
                     End If
                 End If
             End If
-            Call app.db_csClose(CS)
+            Call db.db_csClose(CS)
             'hint = hint & ",080"
             main_GetHtmlBody_GetSection_GetContentBox_Live_Body = s
             '
@@ -43859,7 +43828,7 @@ ErrorTrap:
             '
             RecordID = EncodeInteger(cache_pageContent(PCC_ID, main_RenderCache_CurrentPage_PCCPtr))
             ParentID = EncodeInteger(cache_pageContent(PCC_ParentID, main_RenderCache_CurrentPage_PCCPtr))
-            CDef = app.metaData.getCdef(LiveRecordContentName)
+            CDef = metaData.getCdef(LiveRecordContentName)
             '
             ' main_Get Authoring Status and permissions
             '
@@ -43983,7 +43952,7 @@ ErrorTrap:
             ' ----- Child pages
             '
             ChildListInstanceOptions = EncodeText(cache_pageContent(PCC_ChildListInstanceOptions, main_RenderCache_CurrentPage_PCCPtr))
-            PageList = executeAddon_legacy2(app.siteProperty_ChildListAddonID, "", ChildListInstanceOptions, addonContextEnum.ContextPage, ContentName, RecordID, "", PageChildListInstanceID, False, -1, "", AddonStatusOK, Nothing)
+            PageList = executeAddon_legacy2(db.siteProperty_ChildListAddonID, "", ChildListInstanceOptions, addonContextEnum.ContextPage, ContentName, RecordID, "", PageChildListInstanceID, False, -1, "", AddonStatusOK, Nothing)
             If InStr(1, PageList, "<ul", vbTextCompare) = 0 Then
                 PageList = "(there are no child pages)"
             End If
@@ -44049,7 +44018,7 @@ ErrorTrap:
             dateArchive = EncodeDate(cache_pageContent(PCC_DateArchive, main_RenderCache_CurrentPage_PCCPtr))
             copyFilename = EncodeText(cache_pageContent(PCC_CopyFilename, main_RenderCache_CurrentPage_PCCPtr))
             If copyFilename <> "" Then
-                Copy = app.cdnFiles.ReadFile(copyFilename)
+                Copy = db.cdnFiles.ReadFile(copyFilename)
             End If
             '
             ' ----- Page Copy
@@ -44099,7 +44068,7 @@ ErrorTrap:
                 If pageCaption = "" Then
                     pageCaption = EncodeText(cache_pageContent(PCC_Name, PCCPtr))
                 End If
-                Link = main_GetPageLink4(PageID, "", True, False)
+                Link = pageManager_GetPageLink4(PageID, "", True, False)
                 If returnHtml <> "" Then
                     returnHtml = BreadCrumbDelimiter & returnHtml
                 End If
@@ -44127,7 +44096,7 @@ ErrorTrap:
                 Dim addonRoute As String = ""
                 Dim routeTest As String
                 Dim workingRoute As String
-                Dim adminRoute As String = app.config.adminRoute.ToLower
+                Dim adminRoute As String = db.config.adminRoute.ToLower
                 Dim AjaxFunction As String = doc_getText(RequestNameAjaxFunction)
                 Dim AjaxFastFunction As String = doc_getText(RequestNameAjaxFastFunction)
                 Dim RemoteMethodFromQueryString As String = doc_getText(RequestNameRemoteMethodAddon)
@@ -44235,28 +44204,28 @@ ErrorTrap:
                                         '
                                         ' Not from this site
                                         '
-                                        If EncodeBoolean(app.siteProperty_getBoolean("AllowAggregateAccessBlocking", False)) Then
-                                            cs = app.db_csOpen("Aggregate Access", "Link=" & db_EncodeSQLText(refHost), , False, , , , "active")
-                                            If Not app.db_csOk(cs) Then
+                                        If EncodeBoolean(db.siteProperty_getBoolean("AllowAggregateAccessBlocking", False)) Then
+                                            cs = db.db_csOpen("Aggregate Access", "Link=" & db_EncodeSQLText(refHost), , False, , , , "active")
+                                            If Not db.db_csOk(cs) Then
                                                 '
                                                 ' no record, add an inactive record and throw error
                                                 '
-                                                Call app.db_csClose(cs)
-                                                cs = app.db_csInsertRecord("Aggregate Access")
-                                                If app.db_csOk(cs) Then
-                                                    Call app.db_setCS(cs, "Name", refHost)
-                                                    Call app.db_setCS(cs, "Link", refHost)
-                                                    Call app.db_setCS(cs, "active", False)
+                                                Call db.db_csClose(cs)
+                                                cs = db.db_csInsertRecord("Aggregate Access")
+                                                If db.db_csOk(cs) Then
+                                                    Call db.db_setCS(cs, "Name", refHost)
+                                                    Call db.db_setCS(cs, "Link", refHost)
+                                                    Call db.db_setCS(cs, "active", False)
                                                 End If
-                                                Call app.db_csClose(cs)
+                                                Call db.db_csClose(cs)
                                                 Call handleLegacyError12("Init", "Add-on call from [" & refHost & "] was blocked because this domain is not in the Aggregate Access Content. An inactive record was added. To allow this domain access, mark the record active.")
                                                 docOpen = False '--- should be disposed by caller --- Call dispose
                                                 Return _docBuffer
-                                            ElseIf Not app.db_GetCSBoolean(cs, "active") Then
+                                            ElseIf Not db.db_GetCSBoolean(cs, "active") Then
                                                 '
                                                 ' inactive record, throw error
                                                 '
-                                                Call app.db_csClose(cs)
+                                                Call db.db_csClose(cs)
                                                 Call handleLegacyError12("Init", "Add-on call from [" & refHost & "] was blocked because this domain is not active in the Aggregate Access Content. To allow this domain access, mark the record active.")
                                                 docOpen = False '--- should be disposed by caller --- Call dispose
                                                 Return _docBuffer
@@ -44264,7 +44233,7 @@ ErrorTrap:
                                                 '
                                                 ' Active record, allow hit
                                                 '
-                                                Call app.db_csClose(cs)
+                                                Call db.db_csClose(cs)
                                             End If
                                         End If
                                     End If
@@ -44371,7 +44340,7 @@ ErrorTrap:
                                         & " f.ID = " & fieldId _
                                         & ""
                                     Dim dt As DataTable
-                                    dt = app.executeSql(Sql)
+                                    dt = db.executeSql(Sql)
                                     If dt.Rows.Count > 0 Then
                                         For Each rsDr As DataRow In dt.Rows
                                             addonDefaultEditorName = "&nbsp;(" & EncodeText(rsDr("name")) & ")"
@@ -44389,7 +44358,7 @@ ErrorTrap:
                                         & " left join ccAggregateFunctions a on a.id=r.AddonId)" _
                                         & " where f.id=" & fieldId
 
-                                    dt = app.executeSql(Sql)
+                                    dt = db.executeSql(Sql)
                                     If dt.Rows.Count > 0 Then
                                         For Each rsDr As DataRow In dt.Rows
                                             Dim addonId As Integer = EncodeInteger(rsDr("addonid"))
@@ -44430,15 +44399,15 @@ ErrorTrap:
                                     '
                                     Dim AddonGuid As String = doc_getText("guid")
                                     '$$$$$ cache this
-                                    Dim CS As Integer = app.db_csOpen("add-ons", "ccguid=" & app.db_EncodeSQLText(AddonGuid))
+                                    Dim CS As Integer = db.db_csOpen("add-ons", "ccguid=" & db.db_EncodeSQLText(AddonGuid))
                                     Dim addonArgumentList As String = ""
                                     Dim addonIsInline As Boolean = False
-                                    If app.db_csOk(CS) Then
-                                        addonArgumentList = main_GetCSText(CS, "argumentlist")
-                                        addonIsInline = main_GetCSBoolean(CS, "IsInline")
+                                    If db.db_csOk(CS) Then
+                                        addonArgumentList = db.db_GetCSText(CS, "argumentlist")
+                                        addonIsInline = db.db_GetCSBoolean(CS, "IsInline")
                                         returnResult = main_GetDefaultAddonOption_String(addonArgumentList, AddonGuid, addonIsInline)
                                     End If
-                                    Call app.db_csClose(CS)
+                                    Call db.db_csClose(CS)
                                 Case AjaxSetVisitProperty
                                     '
                                     ' 7/7/2009 - Moved from HardCodedPages - sets a visit property from the cj object
@@ -44508,7 +44477,7 @@ ErrorTrap:
                                     If ContentID = 0 Then
                                         returnResult = "No filter is available"
                                     Else
-                                        Dim cdef As coreMetaDataClass.CDefClass = app.metaData.getCdef(ContentID)
+                                        Dim cdef As coreMetaDataClass.CDefClass = metaData.getCdef(ContentID)
                                         returnResult = adminSite.GetForm_IndexFilterContent(cdef)
                                     End If
                                     adminSite = Nothing
@@ -44554,14 +44523,14 @@ ErrorTrap:
                             ' ----- Email open detected. Log it and redirect to a 1x1 spacer
                             '
                             EmailMemberID = web_GetStreamInteger2(RequestNameEmailMemberID)
-                            CSLog = app.db_csInsertRecord("Email Log")
-                            If app.db_csOk(CSLog) Then
-                                Call app.db_setCS(CSLog, "Name", "Opened " & CStr(main_PageStartTime))
-                                Call app.db_setCS(CSLog, "EmailDropID", recordid)
-                                Call app.db_setCS(CSLog, "MemberID", EmailMemberID)
-                                Call app.db_setCS(CSLog, "LogType", EmailLogTypeOpen)
+                            CSLog = db.db_csInsertRecord("Email Log")
+                            If db.db_csOk(CSLog) Then
+                                Call db.db_setCS(CSLog, "Name", "Opened " & CStr(main_PageStartTime))
+                                Call db.db_setCS(CSLog, "EmailDropID", recordid)
+                                Call db.db_setCS(CSLog, "MemberID", EmailMemberID)
+                                Call db.db_setCS(CSLog, "LogType", EmailLogTypeOpen)
                             End If
-                            Call app.db_csClose(CSLog)
+                            Call db.db_csClose(CSLog)
                             RedirectLink = web_requestProtocol & web.requestDomain & "/ccLib/images/spacer.gif"
                             Call web_Redirect2(RedirectLink, "Group Email Open hit, redirecting to a dummy image", False)
                         End If
@@ -44573,15 +44542,15 @@ ErrorTrap:
                             ' ----- Email click detected. Log it.
                             '
                             EmailMemberID = web_GetStreamInteger2(RequestNameEmailMemberID)
-                            CSLog = app.db_csInsertRecord("Email Log")
-                            If app.db_csOk(CSLog) Then
-                                Call app.db_setCS(CSLog, "Name", "Clicked " & CStr(main_PageStartTime))
-                                Call app.db_setCS(CSLog, "EmailDropID", emailDropId)
-                                Call app.db_setCS(CSLog, "MemberID", EmailMemberID)
-                                Call app.db_setCS(CSLog, "VisitId", main_VisitId)
-                                Call app.db_setCS(CSLog, "LogType", EmailLogTypeClick)
+                            CSLog = db.db_csInsertRecord("Email Log")
+                            If db.db_csOk(CSLog) Then
+                                Call db.db_setCS(CSLog, "Name", "Clicked " & CStr(main_PageStartTime))
+                                Call db.db_setCS(CSLog, "EmailDropID", emailDropId)
+                                Call db.db_setCS(CSLog, "MemberID", EmailMemberID)
+                                Call db.db_setCS(CSLog, "VisitId", main_VisitId)
+                                Call db.db_setCS(CSLog, "LogType", EmailLogTypeClick)
                             End If
-                            Call app.db_csClose(CSLog)
+                            Call db.db_csClose(CSLog)
                         End If
                         If EmailSpamBlock <> "" Then
                             '
@@ -44589,12 +44558,12 @@ ErrorTrap:
                             '
                             Call addToEmailBlockList_InternalOnly(EmailSpamBlock)
                             '
-                            CSLog = app.db_csOpen("people", "email=" & app.db_EncodeSQLText(EmailSpamBlock), , , , , , "AllowBulkEmail")
-                            Do While app.db_csOk(CSLog)
-                                Call app.db_setCS(CSLog, "AllowBulkEmail", False)
-                                Call app.db_csGoNext(CSLog)
+                            CSLog = db.db_csOpen("people", "email=" & db.db_EncodeSQLText(EmailSpamBlock), , , , , , "AllowBulkEmail")
+                            Do While db.db_csOk(CSLog)
+                                Call db.db_setCS(CSLog, "AllowBulkEmail", False)
+                                Call db.db_csGoNext(CSLog)
                             Loop
-                            Call app.db_csClose(CSLog)
+                            Call db.db_csClose(CSLog)
                             '
                             ' ----- Make a log entry to track the result of this email drop
                             '
@@ -44604,15 +44573,15 @@ ErrorTrap:
                                 ' ----- Email click detected. Log it.
                                 '
                                 EmailMemberID = web_GetStreamInteger2(RequestNameEmailMemberID)
-                                CSLog = app.db_csInsertRecord("Email Log")
-                                If app.db_csOk(CSLog) Then
-                                    Call app.db_setCS(CSLog, "Name", "Email Block Request " & CStr(main_PageStartTime))
-                                    Call app.db_setCS(CSLog, "EmailDropID", emailDropId)
-                                    Call app.db_setCS(CSLog, "MemberID", EmailMemberID)
-                                    Call app.db_setCS(CSLog, "VisitId", main_VisitId)
-                                    Call app.db_setCS(CSLog, "LogType", EmailLogTypeBlockRequest)
+                                CSLog = db.db_csInsertRecord("Email Log")
+                                If db.db_csOk(CSLog) Then
+                                    Call db.db_setCS(CSLog, "Name", "Email Block Request " & CStr(main_PageStartTime))
+                                    Call db.db_setCS(CSLog, "EmailDropID", emailDropId)
+                                    Call db.db_setCS(CSLog, "MemberID", EmailMemberID)
+                                    Call db.db_setCS(CSLog, "VisitId", main_VisitId)
+                                    Call db.db_setCS(CSLog, "LogType", EmailLogTypeBlockRequest)
                                 End If
-                                Call app.db_csClose(CSLog)
+                                Call db.db_csClose(CSLog)
                             End If
                             Call web_Redirect2(web_requestProtocol & web.requestDomain & "/cclib/popup/EmailBlocked.htm", "Group Email Spam Block hit. Redirecting to EmailBlocked page.", False)
                         End If
@@ -44640,25 +44609,25 @@ ErrorTrap:
                                         '
                                         ' Save the site sites
                                         '
-                                        Call app.appRootFiles.SaveFile(DynamicStylesFilename, doc_getText("SiteStyles"))
+                                        Call db.appRootFiles.SaveFile(DynamicStylesFilename, doc_getText("SiteStyles"))
                                         If main_GetStreamBoolean2(RequestNameInlineStyles) Then
                                             '
                                             ' Inline Styles
                                             '
-                                            Call app.siteProperty_set("StylesheetSerialNumber", "0")
+                                            Call db.siteProperty_set("StylesheetSerialNumber", "0")
                                         Else
                                             '
                                             ' Linked Styles
                                             ' Bump the Style Serial Number so next fetch is not cached
                                             '
-                                            StyleSN = app.siteProperty_getinteger("StylesheetSerialNumber", 0)
+                                            StyleSN = db.siteProperty_getinteger("StylesheetSerialNumber", 0)
                                             StyleSN = StyleSN + 1
-                                            Call app.siteProperty_set("StylesheetSerialNumber", EncodeText(StyleSN))
+                                            Call db.siteProperty_set("StylesheetSerialNumber", EncodeText(StyleSN))
                                             '
                                             ' Save new public stylesheet
                                             '
-                                            Call app.appRootFiles.SaveFile("templates\Public" & StyleSN & ".css", main_GetStyleSheet)
-                                            Call app.appRootFiles.SaveFile("templates\Admin" & StyleSN & ".css", main_GetStyleSheetDefault)
+                                            Call db.appRootFiles.SaveFile("templates\Public" & StyleSN & ".css", main_GetStyleSheet)
+                                            Call db.appRootFiles.SaveFile("templates\Admin" & StyleSN & ".css", main_GetStyleSheetDefault)
                                         End If
                                     End If
                                 Case FormTypeAddonStyleEditor
@@ -44673,22 +44642,22 @@ ErrorTrap:
                                         Dim cs As Integer
                                         addonId = web_GetStreamInteger2("AddonID")
                                         cs = db_csOpen("Add-ons", addonId)
-                                        If app.db_csOk(cs) Then
-                                            Call app.db_setCS(cs, "CustomStylesFilename", doc_getText("CustomStyles"))
+                                        If db.db_csOk(cs) Then
+                                            Call db.db_setCS(cs, "CustomStylesFilename", doc_getText("CustomStyles"))
                                         End If
-                                        Call app.db_csClose(cs)
+                                        Call db.db_csClose(cs)
                                         '
                                         ' Clear Caches
                                         '
                                         Call pageManager_cache_pageContent_clear()
                                         Call pageManager_cache_pageTemplate_clear()
                                         Call pageManager_cache_siteSection_clear()
-                                        Call app.cache.invalidateTagList2("")
+                                        Call cache.invalidateTagList2("")
                                         If contentName <> "" Then
-                                            Call app.cache.invalidateTagList2(contentName)
+                                            Call cache.invalidateTagList2(contentName)
                                             tableName = db_GetContentTablename(contentName)
                                             If LCase(tableName) = "cctemplates" Then
-                                                Call app.cache.SetKey(pageManager_cache_pageTemplate_cacheName, nothingObject)
+                                                Call cache.SetKey(pageManager_cache_pageTemplate_cacheName, nothingObject)
                                                 Call pageManager_cache_pageTemplate_load()
                                             End If
                                         End If
@@ -44872,10 +44841,10 @@ ErrorTrap:
                     '
                     ' REFACTOR - cluster mode is not associated to an application, so no cache/sql, but the keyPtrCacheClass runs sql and uses cache, but this must be used in cluster mode
                     '
-                    cache_addonStyleRules = New coreCacheKeyPtrClass(app, cacheNameAddonStyleRules, sqlAddonStyles)
+                    cache_addonStyleRules = New coreCacheKeyPtrClass(Me, cacheNameAddonStyleRules, sqlAddonStyles)
                 End If
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '
@@ -45043,11 +45012,11 @@ ErrorTrap:
             Try
                 Dim inputStream As IO.Stream = iisContext.Request.InputStream
             Catch ex As httpException
-                Call handleException(ex)
+                Call handleExceptionAndRethrow(ex)
                 error_AddUserError(ex.Message)
                 postError = True
             Catch ex As Exception
-                Call handleException(ex)
+                Call handleExceptionAndRethrow(ex)
                 error_AddUserError(ex.Message)
                 postError = True
             End Try
@@ -45082,7 +45051,7 @@ ErrorTrap:
                                     tmpFilename = instanceId & ptrText & ".bin"
                                     deleteOnDisposeFileList.Add(tmpFilename)
                                     '0formname=formname&0filename=filename&0type=fileType&0file=tempfile&0error=errors&0size=fileSize
-                                    Using fileStream As System.IO.FileStream = System.IO.File.OpenWrite(app.privateFiles.rootLocalFolderPath & tmpFilename)
+                                    Using fileStream As System.IO.FileStream = System.IO.File.OpenWrite(db.privateFiles.rootLocalFolderPath & tmpFilename)
                                         file.Data.CopyTo(fileStream)
                                     End Using
                                     web.requestFormFiles = "" _
@@ -45125,7 +45094,7 @@ ErrorTrap:
                         '    filestream.Write(buffer, 0, bytes);
                         '}
                     Catch ex As Exception
-                        handleException(ex, "Exception processing multipart form input")
+                        handleExceptionAndRethrow(ex, "Exception processing multipart form input")
                     End Try
                 Else
                     '
@@ -45210,7 +45179,7 @@ ErrorTrap:
                     '
                     If deleteOnDisposeFileList.Count > 0 Then
                         For Each filename As String In deleteOnDisposeFileList
-                            app.privateFiles.DeleteFile(filename)
+                            db.privateFiles.DeleteFile(filename)
                         Next
                     End If
                     '
@@ -45239,7 +45208,7 @@ ErrorTrap:
                         End If
                         Form = main_ServerFormOriginal
                         If Form <> "" Then
-                            If EncodeBoolean(app.siteProperty_getBoolean("Block Viewing Form Field", False)) Then
+                            If EncodeBoolean(db.siteProperty_getBoolean("Block Viewing Form Field", False)) Then
                                 Form = "[blocked]"
                             End If
                         End If
@@ -45247,40 +45216,48 @@ ErrorTrap:
                         SQL = "INSERT INTO ccViewings (" _
                             & FieldNames _
                             & ")VALUES(" _
-                            & " " & app.db_EncodeSQLText(ViewingName) _
-                            & "," & app.db_EncodeSQLNumber(main_VisitId) _
-                            & "," & app.db_EncodeSQLNumber(userId) _
-                            & "," & app.db_EncodeSQLText(web.requestDomain) _
-                            & "," & app.db_EncodeSQLText(web_requestPath) _
-                            & "," & app.db_EncodeSQLText(web_requestPage) _
-                            & "," & app.db_EncodeSQLText(Left(web.requestQueryString, 255)) _
-                            & "," & app.db_EncodeSQLText(Left(Form, 255)) _
-                            & "," & app.db_EncodeSQLText(Left(web.requestReferrer, 255)) _
-                            & "," & app.db_EncodeSQLDate(main_PageStartTime) _
-                            & "," & app.db_EncodeSQLBoolean(main_VisitStateOK) _
-                            & "," & app.db_EncodeSQLNumber(main_GetContentID("Viewings")) _
-                            & "," & app.db_EncodeSQLNumber(GetTickCount - main_PageStartTickCount) _
+                            & " " & db.db_EncodeSQLText(ViewingName) _
+                            & "," & db.db_EncodeSQLNumber(main_VisitId) _
+                            & "," & db.db_EncodeSQLNumber(userId) _
+                            & "," & db.db_EncodeSQLText(web.requestDomain) _
+                            & "," & db.db_EncodeSQLText(web_requestPath) _
+                            & "," & db.db_EncodeSQLText(web_requestPage) _
+                            & "," & db.db_EncodeSQLText(Left(web.requestQueryString, 255)) _
+                            & "," & db.db_EncodeSQLText(Left(Form, 255)) _
+                            & "," & db.db_EncodeSQLText(Left(web.requestReferrer, 255)) _
+                            & "," & db.db_EncodeSQLDate(main_PageStartTime) _
+                            & "," & db.db_EncodeSQLBoolean(main_VisitStateOK) _
+                            & "," & db.db_EncodeSQLNumber(main_GetContentID("Viewings")) _
+                            & "," & db.db_EncodeSQLNumber(GetTickCount - main_PageStartTickCount) _
                             & ",1" _
-                            & "," & app.db_EncodeSQLNumber(CSMax) _
-                            & "," & app.db_EncodeSQLNumber(PageID)
+                            & "," & db.db_EncodeSQLNumber(CSMax) _
+                            & "," & db.db_EncodeSQLNumber(PageID)
                         If True Then
-                            SQL &= "," & app.db_EncodeSQLBoolean(web_PageExcludeFromAnalytics)
+                            SQL &= "," & db.db_EncodeSQLBoolean(web_PageExcludeFromAnalytics)
                         End If
                         If True Then
-                            SQL &= "," & app.db_EncodeSQLText(main_MetaContent_Title)
+                            SQL &= "," & db.db_EncodeSQLText(main_MetaContent_Title)
                         End If
                         SQL &= ");"
-                        Call app.executeSql(SQL)
+                        Call db.executeSql(SQL)
                     End If
                     '
                     ' ----- dispose objects created here
                     '
-                    If Not (_app Is Nothing) Then
-                        Call _app.Dispose()
+                    If Not (_cache Is Nothing) Then
+                        Call _cache.Dispose()
+                    End If
+                    '
+                    If Not (_db Is Nothing) Then
+                        Call _db.Dispose()
                     End If
                     '
                     If Not (_cluster Is Nothing) Then
                         Call _cluster.Dispose()
+                    End If
+                    '
+                    If Not (_metaData Is Nothing) Then
+                        _metaData.Dispose()
                     End If
                     '
                     _isDisposed = True
@@ -45335,8 +45312,8 @@ ErrorTrap:
                 Dim iisResetRequired As Boolean = False
                 '
                 If returnUserError = "" Then
-                    If app.privateFiles.checkPath(privateFolder) Then
-                        returnOk = addonInstall.InstallCollectionFromPrivateFolder(builder, app.dataBuildVersion, privateFolder, iisResetRequired, app.config.name, returnUserError, installedCollectionGuid, False)
+                    If db.privateFiles.checkPath(privateFolder) Then
+                        returnOk = addonInstall.InstallCollectionFromPrivateFolder(builder, db.dataBuildVersion, privateFolder, iisResetRequired, db.config.name, returnUserError, installedCollectionGuid, False)
                         'If iisResetRequired Then
                         '    Dim sitebuilder As New builderClass(Me)
                         '    sitebuilder.web.reset()
@@ -45344,8 +45321,8 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                handleException(ex)
-                If Not app.siteProperty_trapErrors Then
+                handleExceptionAndRethrow(ex)
+                If Not db.siteProperty_trapErrors Then
                     Throw New ApplicationException("rethrow", ex)
                 End If
             End Try
@@ -45549,7 +45526,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
             Return returnHtmlList
         End Function
@@ -45612,11 +45589,21 @@ ErrorTrap:
         End Sub
         Private _handlingExceptionRecursionBlock As Boolean = False
         '
-        Public Sub handleException(ByVal ex As Exception, ByVal cause As String)
+        Public Sub handleExceptionAndRethrow(ByVal ex As Exception, ByVal cause As String)
+            Call handleException(ex, cause, 2)
+            Throw ex
+        End Sub
+        '
+        Public Sub handleExceptionAndRethrow(ByVal ex As Exception)
+            Call handleException(ex, "n/a", 2)
+            Throw ex
+        End Sub
+        '
+        Public Sub handleExceptionAndNoThrow(ByVal ex As Exception, ByVal cause As String)
             Call handleException(ex, cause, 2)
         End Sub
         '
-        Public Sub handleException(ByVal ex As Exception)
+        Public Sub handleExceptionAndNoThrow(ByVal ex As Exception)
             Call handleException(ex, "n/a", 2)
         End Sub
         '
@@ -45983,26 +45970,26 @@ ErrorTrap:
                 Dim sql As String
                 Dim createkey As Integer
                 Dim cid As Integer
-                Dim sqlGroupName As String = app.db_EncodeSQLText(groupName)
+                Dim sqlGroupName As String = db.db_EncodeSQLText(groupName)
                 '
-                dt = app.executeSql("SELECT ID FROM CCGROUPS WHERE NAME=" & sqlGroupName & "")
+                dt = db.executeSql("SELECT ID FROM CCGROUPS WHERE NAME=" & sqlGroupName & "")
                 If dt.Rows.Count > 0 Then
                     returnGroupId = EncodeInteger(dt.Rows(0).Item("ID"))
                 Else
-                    cid = app.metaData.getContentId("groups")
+                    cid = metaData.getContentId("groups")
                     createkey = GetRandomInteger()
                     sql = "insert into ccgroups (contentcontrolid,active,createkey,name,caption) values (" & cid & ",1," & createkey & "," & sqlGroupName & "," & sqlGroupName & ")"
-                    Call app.executeSql(sql)
+                    Call db.executeSql(sql)
                     '
                     sql = "select top 1 id from ccgroups where createkey=" & createkey & " order by id desc"
-                    dt = app.executeSql(sql)
+                    dt = db.executeSql(sql)
                     If dt.Rows.Count > 0 Then
                         returnGroupId = EncodeInteger(dt.Rows(0).Item(0))
                     End If
                 End If
                 dt.Dispose()
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
             Return returnGroupId
         End Function
@@ -46020,12 +46007,12 @@ ErrorTrap:
                 '
                 Dim cs As Contensive.BaseClasses.CPCSBaseClass = cp.CSNew
                 Dim IsAlreadyThere As Boolean = False
-                Dim sqlCriteria As String = app.db_getNameIdOrGuidSqlCriteria(GroupNameOrGuid)
+                Dim sqlCriteria As String = db.db_getNameIdOrGuidSqlCriteria(GroupNameOrGuid)
                 Dim groupName As String
                 Dim groupGuid As String
                 '
                 If (GroupNameOrGuid = "") Then
-                    handleException(New ApplicationException("A group cannot be added with a blank name"))
+                    handleExceptionAndRethrow(New ApplicationException("A group cannot be added with a blank name"))
                 Else
                     cs.Open("Groups", sqlCriteria, , False, "id")
                     IsAlreadyThere = cs.OK
@@ -46033,7 +46020,7 @@ ErrorTrap:
                     If Not IsAlreadyThere Then
                         Call cs.Insert("Groups")
                         If Not cs.OK Then
-                            handleException(New ApplicationException("There was an error inserting a new group record"))
+                            handleExceptionAndRethrow(New ApplicationException("There was an error inserting a new group record"))
                         Else
                             returnGroupId = cs.GetInteger("id")
                             If cp.Utils.isGuid(GroupNameOrGuid) Then
@@ -46055,7 +46042,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                handleException(ex, "Unexpected error in cp.group.add()")
+                handleExceptionAndRethrow(ex, "Unexpected error in cp.group.add()")
             End Try
             Return returnGroupId
         End Function
@@ -46072,7 +46059,7 @@ ErrorTrap:
                 '
                 If True Then
                     If (groupId < 1) Then
-                        handleException(New ApplicationException("Could not find or create the group with id [" & groupId & "]"))
+                        handleExceptionAndRethrow(New ApplicationException("Could not find or create the group with id [" & groupId & "]"))
                     Else
                         If userId = 0 Then
                             userId = cp.User.Id
@@ -46085,7 +46072,7 @@ ErrorTrap:
                         End If
                         If Not CS.OK Then
                             groupName = db_GetRecordName("groups", groupId)
-                            handleException(New ApplicationException("Could not find or create the Member Rule to add this member [" & userId & "] to the Group [" & groupId & ", " & groupName & "]"))
+                            handleExceptionAndRethrow(New ApplicationException("Could not find or create the Member Rule to add this member [" & userId & "] to the Group [" & groupId & ", " & groupName & "]"))
                         Else
                             Call CS.SetField("active", "1")
                             Call CS.SetField("memberid", userId.ToString)
@@ -46100,7 +46087,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
         End Sub
         Public Sub group_AddUser(ByVal groupNameOrGuid As String, Optional ByVal userId As Integer = 0, Optional ByVal dateExpires As Date = #12:00:00 AM#)
@@ -46110,13 +46097,13 @@ ErrorTrap:
                 Dim CS As Contensive.BaseClasses.CPCSBaseClass
                 '
                 If groupNameOrGuid <> "" Then
-                    GroupID = app.getRecordID("groups", groupNameOrGuid)
+                    GroupID = db.getRecordID("groups", groupNameOrGuid)
                     If (GroupID < 1) Then
                         Call group_add2(groupNameOrGuid)
-                        GroupID = app.getRecordID("groups", groupNameOrGuid)
+                        GroupID = db.getRecordID("groups", groupNameOrGuid)
                     End If
                     If (GroupID < 1) Then
-                        handleException(New ApplicationException("Could not find or create the group [" & groupNameOrGuid & "]"))
+                        handleExceptionAndRethrow(New ApplicationException("Could not find or create the group [" & groupNameOrGuid & "]"))
                     Else
                         If userId = 0 Then
                             userId = cp.User.Id
@@ -46128,7 +46115,7 @@ ErrorTrap:
                             Call CS.Insert("Member Rules")
                         End If
                         If Not CS.OK Then
-                            handleException(New ApplicationException("Could not find or create the Member Rule to add this member [" & userId & "] to the Group [" & GroupID & ", " & groupNameOrGuid & "]"))
+                            handleExceptionAndRethrow(New ApplicationException("Could not find or create the Member Rule to add this member [" & userId & "] to the Group [" & GroupID & ", " & groupNameOrGuid & "]"))
                         Else
                             Call CS.SetField("active", "1")
                             Call CS.SetField("memberid", userId.ToString)
@@ -46143,7 +46130,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '
@@ -46158,7 +46145,7 @@ ErrorTrap:
             Try
                 returnIsGuid = (Len(guid) = 38) And (Left(guid, 1) = "{") And (Right(guid, 1) = "}")
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
             Return returnIsGuid
         End Function
@@ -46170,16 +46157,17 @@ ErrorTrap:
         ''' <param name="GroupNameIdOrGuid"></param>
         Friend Sub group_delete(ByVal GroupNameIdOrGuid As String)
             Try
-                Dim sqlCriteria As String = app.db_getNameIdOrGuidSqlCriteria(GroupNameIdOrGuid)
+                Dim sqlCriteria As String = db.db_getNameIdOrGuidSqlCriteria(GroupNameIdOrGuid)
                 If sqlCriteria <> "" Then
-                    Call cp.Content.Delete("Groups", sqlCriteria)
+                    Call cp.Content.DeleteRecords("Groups", sqlCriteria)
                 End If
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '
-        '==========
+        '============================================================================
+        '
         Friend Function common_getHttpRequest(url As String) As IO.Stream
             Dim returnstream As IO.Stream = Nothing
             Try
@@ -46191,7 +46179,7 @@ ErrorTrap:
                 response = rq.GetResponse()
                 returnstream = response.GetResponseStream()
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
             Return returnstream
         End Function
@@ -46212,22 +46200,22 @@ ErrorTrap:
                 '
                 ' honestly, not sure what to do with 'return_ErrorMessage'
                 '
-                CS = app.db_csOpen("copy content", "Name=" & app.db_EncodeSQLText(CopyName), "ID", , 0, , , "Name,ID,Copy,modifiedBy")
-                If Not app.db_csOk(CS) Then
-                    Call app.db_csClose(CS)
-                    CS = app.db_csInsertRecord("copy content", 0)
-                    If app.db_csOk(CS) Then
-                        RecordID = app.db_GetCSInteger(CS, "ID")
-                        Call app.db_setCS(CS, "name", CopyName)
-                        Call app.db_setCS(CS, "copy", EncodeText(DefaultContent))
-                        Call app.csv_SaveCSRecord(CS)
-                        Call app.csv_PublishEdit("copy content", RecordID, 0)
+                CS = db.db_csOpen("copy content", "Name=" & db.db_EncodeSQLText(CopyName), "ID", , 0, , , "Name,ID,Copy,modifiedBy")
+                If Not db.db_csOk(CS) Then
+                    Call db.db_csClose(CS)
+                    CS = db.db_csInsertRecord("copy content", 0)
+                    If db.db_csOk(CS) Then
+                        RecordID = db.db_GetCSInteger(CS, "ID")
+                        Call db.db_setCS(CS, "name", CopyName)
+                        Call db.db_setCS(CS, "copy", EncodeText(DefaultContent))
+                        Call db.db_SaveCSRecord(CS)
+                        Call db.workflow_PublishEdit("copy content", RecordID, 0)
                     End If
                 End If
-                If app.db_csOk(CS) Then
-                    RecordID = app.db_GetCSInteger(CS, "ID")
-                    contactPeopleId = app.db_GetCSInteger(CS, "modifiedBy")
-                    returnCopy = app.db_GetCS(CS, "Copy")
+                If db.db_csOk(CS) Then
+                    RecordID = db.db_GetCSInteger(CS, "ID")
+                    contactPeopleId = db.db_GetCSInteger(CS, "modifiedBy")
+                    returnCopy = db.db_GetCS(CS, "Copy")
                     returnCopy = html_executeContentCommands(Nothing, returnCopy, addonContextEnum.ContextPage, personalizationPeopleId, personalizationIsAuthenticated, Return_ErrorMessage)
                     returnCopy = html_encodeContent10(returnCopy, personalizationPeopleId, "copy content", RecordID, contactPeopleId, False, False, True, True, False, True, "", "", False, 0, "", addonContextEnum.ContextPage, False, Nothing, False)
                     '
@@ -46240,11 +46228,70 @@ ErrorTrap:
                         End If
                     End If
                 End If
-                Call app.db_csClose(CS)
+                Call db.db_csClose(CS)
             Catch ex As Exception
-                handleException(ex)
+                handleExceptionAndRethrow(ex)
             End Try
             Return returnCopy
         End Function
+        '
+        '============================================================================
+        '
+        Public Shared Function db_encodeSqlTableName(sourceName As String) As String
+            Dim returnName As String = ""
+            Const FirstCharSafeString As String = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            Const SafeString As String = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_@#"
+            Try
+                Dim src As String
+                Dim TestChr As String
+                Dim Ptr As Integer = 0
+                '
+                ' remove nonsafe URL characters
+                '
+                src = sourceName
+                returnName = ""
+                ' first character
+                Do While Ptr < src.Length
+                    TestChr = src.Substring(Ptr, 1)
+                    Ptr += 1
+                    If FirstCharSafeString.IndexOf(TestChr) >= 0 Then
+                        returnName &= TestChr
+                        Exit Do
+                    End If
+                Loop
+                ' non-first character
+                Do While Ptr < src.Length
+                    TestChr = src.Substring(Ptr, 1)
+                    Ptr += 1
+                    If SafeString.IndexOf(TestChr) >= 0 Then
+                        returnName &= TestChr
+                    End If
+                Loop
+            Catch ex As Exception
+                ' shared method, rethrow error
+                Throw New ApplicationException("Exception in db_encodeSqlTableName(" & sourceName & ")", ex)
+            End Try
+            Return returnName
+        End Function
+    End Class
+    '====================================================================================================
+    '====================================================================================================
+    Public Class cpCoreTests
+        <Fact> Public Sub db_encodeSqlTableNameTest()
+            ' arrange
+            ' act
+            ' assert
+            Assert.Equal("", cpCoreClass.db_encodeSqlTableName(""))
+            Assert.Equal("", cpCoreClass.db_encodeSqlTableName("-----"))
+            Assert.Equal("", cpCoreClass.db_encodeSqlTableName("01234567879"))
+            Assert.Equal("a", cpCoreClass.db_encodeSqlTableName("a"))
+            Assert.Equal("aa", cpCoreClass.db_encodeSqlTableName("a a"))
+            Assert.Equal("aA", cpCoreClass.db_encodeSqlTableName(" aA"))
+            Assert.Equal("aA", cpCoreClass.db_encodeSqlTableName(" aA "))
+            Assert.Equal("aA", cpCoreClass.db_encodeSqlTableName("aA "))
+            Assert.Equal("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", cpCoreClass.db_encodeSqlTableName("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+            Assert.Equal("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_@#", cpCoreClass.db_encodeSqlTableName("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_@#"))
+            '
+        End Sub
     End Class
 End Namespace

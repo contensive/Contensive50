@@ -1,16 +1,11 @@
+
+Option Explicit On
+Option Strict On
 '
 ' documentation should be in a new project that inherits these classes. The class names should be the object names in the actual cp project
 '
 Namespace Contensive.BaseClasses
     Public MustInherit Class CPContentBaseClass
-        'Public Sub New(ByVal cmcObj As Contensive.Core.cpCoreClass, ByRef CPParent As CPBaseClass)
-        ''' <summary>
-        ''' Delete records based from a table based on a content name and SQL criteria.
-        ''' </summary>
-        ''' <param name="ContentName"></param>
-        ''' <param name="SQLCriteria"></param>
-        ''' <remarks></remarks>
-        Public MustOverride Sub Delete(ByVal ContentName As String, ByVal SQLCriteria As String)
         ''' <summary>
         ''' Get the string from the 'Copy Content' record based on it's name. If the record does not exist it is created with the default value provided.
         ''' </summary>
@@ -214,7 +209,48 @@ Namespace Contensive.BaseClasses
         ''' <param name="ContentName"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public MustOverride Function AddRecord(ByVal ContentName) As Integer
+        Public MustOverride Function AddRecord(ByVal ContentName As String) As Integer
+        Public MustOverride Function AddRecord(ByVal ContentName As String, ByVal recordName As String) As Integer
+        ''' <summary>
+        ''' Delete records based from a table based on a content name and SQL criteria.
+        ''' </summary>
+        ''' <param name="ContentName"></param>
+        ''' <param name="SQLCriteria"></param>
+        ''' <remarks></remarks>
+        '''
+        Public MustOverride Sub DeleteRecords(ByVal ContentName As String, ByVal SQLCriteria As String)
+        ''' <summary>
+        ''' Create a new content with sqlTable, return the contentId
+        ''' </summary>
+        ''' <param name="ContentName"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public MustOverride Function AddContent(ByVal ContentName As String) As Integer
+        Public MustOverride Function AddContent(ByVal ContentName As String, sqlTableName As String) As Integer
+        Public MustOverride Function AddContent(ByVal ContentName As String, sqlTableName As String, dataSource As String) As Integer
+        ''' <summary>
+        ''' Create a new field in an existing content, return the fieldid
+        ''' </summary>
+        ''' <param name="ContentName"></param>
+        ''' <param name="FieldName"></param>
+        ''' <param name="FieldType"></param>
+        ''' <returns></returns>
+        Public MustOverride Function AddContentField(ByVal ContentName As String, FieldName As String, FieldType As Integer) As Integer
+        ''' <summary>
+        ''' Delete a content from the system, sqlTable is left intact. Use db.DeleteTable to drop the table
+        ''' </summary>
+        ''' <param name="ContentName"></param>
+        ''' <remarks></remarks>
+        Public MustOverride Sub DeleteContent(ByVal ContentName As String)
+        ''' <summary>
+        ''' Delete records based from a table based on a content name and SQL criteria.
+        ''' </summary>
+        ''' <param name="ContentName"></param>
+        ''' <param name="SQLCriteria"></param>
+        ''' <remarks></remarks>
+        '''
+        <Obsolete("Delete is deprecated, please use DeleteRecord instead.", True)>
+        Public MustOverride Sub Delete(ByVal ContentName As String, ByVal SQLCriteria As String)
         ''' <summary>
         ''' Returns a linked icon to the admin list page for the content
         ''' </summary>

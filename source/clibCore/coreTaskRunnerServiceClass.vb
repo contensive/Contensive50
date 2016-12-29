@@ -93,7 +93,7 @@ Namespace Contensive
                 processTimer.Enabled = False
             Catch ex As Exception
                 Using cp As New CPClass
-                    cp.core.handleException(ex)
+                    cp.core.handleExceptionAndRethrow(ex)
                 End Using
             End Try
         End Sub
@@ -117,7 +117,7 @@ Namespace Contensive
                 processTimer.Enabled = True
             Catch ex As Exception
                 Using cp As New CPClass
-                    cp.core.handleException(ex)
+                    cp.core.handleExceptionAndRethrow(ex)
                 End Using
             End Try
             Return returnStartedOk
@@ -157,7 +157,7 @@ Namespace Contensive
                 End If
             Catch ex As Exception
                 Using cp As New CPClass
-                    cp.core.handleException(ex)
+                    cp.core.handleExceptionAndRethrow(ex)
                 End Using
             End Try
         End Sub
@@ -189,7 +189,7 @@ Namespace Contensive
                     ' query tasks that need to be run
                     '
                     Using cpSite As New CPClass(AppName)
-                        If cpSite.core.app.status = applicationStatusEnum.ApplicationStatusReady Then
+                        If cpSite.core.db.status = applicationStatusEnum.ApplicationStatusReady Then
                             'hint &= ",app [" & AppName & "] is running, setup cp and cmc"
                             '
                             ' Execute Processes
@@ -203,18 +203,18 @@ Namespace Contensive
                                     recordsRemaining = False
                                     sql = "" _
                                     & vbCrLf & " BEGIN TRANSACTION" _
-                                    & vbCrLf & " update cctasks set cmdRunner=" & cpSite.core.app.db_EncodeSQLText(runnerGuid) & " where id in (select top 1 id from cctasks where (cmdRunner is null)and(datestarted is null))" _
+                                    & vbCrLf & " update cctasks set cmdRunner=" & cpSite.core.db.db_EncodeSQLText(runnerGuid) & " where id in (select top 1 id from cctasks where (cmdRunner is null)and(datestarted is null))" _
                                     & vbCrLf & " COMMIT TRANSACTION"
-                                    cpSite.core.app.executeSql(sql)
-                                    CS = cpSite.core.app.db_csOpen("tasks", "(cmdRunner=" & cpSite.core.app.db_EncodeSQLText(runnerGuid) & ")and(datestarted is null)", "id")
-                                    If cpSite.core.app.db_csOk(CS) Then
+                                    cpSite.core.db.executeSql(sql)
+                                    CS = cpSite.core.db.db_csOpen("tasks", "(cmdRunner=" & cpSite.core.db.db_EncodeSQLText(runnerGuid) & ")and(datestarted is null)", "id")
+                                    If cpSite.core.db.db_csOk(CS) Then
                                         Dim json As New System.Web.Script.Serialization.JavaScriptSerializer
                                         recordsRemaining = True
-                                        Call cpSite.core.app.db_setCS(CS, "datestarted", Now())
-                                        Call cpSite.core.app.db_SaveCS(CS)
+                                        Call cpSite.core.db.db_setCS(CS, "datestarted", Now())
+                                        Call cpSite.core.db.db_SaveCS(CS)
                                         '
-                                        command = cpSite.core.app.db_GetCSText(CS, "command")
-                                        cmdDetailText = cpSite.core.app.db_GetCSText(CS, "cmdDetail")
+                                        command = cpSite.core.db.db_GetCSText(CS, "command")
+                                        cmdDetailText = cpSite.core.db.db_GetCSText(CS, "cmdDetail")
                                         cmdDetail = json.Deserialize(Of cmdDetailClass)(cmdDetailText)
                                         '
                                         appendLog("taskRunnerService.runTasks, command=[" & command & "], cmdDetailText=[" & cmdDetailText & "]")
@@ -224,16 +224,16 @@ Namespace Contensive
                                                 Call cpSite.core.executeAddon(cmdDetail.addonId, cmdDetail.docProperties, cpCoreClass.addonContextEnum.ContextSimple)
                                         End Select
                                     End If
-                                    cpSite.core.app.db_csClose(CS)
+                                    cpSite.core.db.db_csClose(CS)
                                 Loop While recordsRemaining
                             Catch ex As Exception
-                                cpClusterCore.handleException(ex)
+                                cpClusterCore.handleExceptionAndRethrow(ex)
                             End Try
                         End If
                     End Using
                 Next
             Catch ex As Exception
-                cpClusterCore.handleException(ex)
+                cpClusterCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '

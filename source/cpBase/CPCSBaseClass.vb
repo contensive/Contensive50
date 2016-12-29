@@ -42,7 +42,7 @@ Namespace Contensive.BaseClasses
         ''' <summary>
         ''' Opens a record set with user records that are in a Group
         ''' </summary>
-        ''' <param name="GroupList"></param>
+        ''' <param name="GroupName"></param>
         ''' <param name="SQLCriteria"></param>
         ''' <param name="SortFieldList"></param>
         ''' <param name="ActiveOnly"></param>
@@ -50,9 +50,9 @@ Namespace Contensive.BaseClasses
         ''' <param name="PageNumber"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public MustOverride Function OpenGroupUsers(ByVal GroupList As String, Optional ByVal SQLCriteria As String = "", Optional ByVal SortFieldList As String = "", Optional ByVal ActiveOnly As Boolean = True, Optional ByVal PageSize As Integer = 10, Optional ByVal PageNumber As Integer = 1) As Boolean
+        Public MustOverride Function OpenGroupUsers(ByVal GroupName As String, Optional ByVal SQLCriteria As String = "", Optional ByVal SortFieldList As String = "", Optional ByVal ActiveOnly As Boolean = True, Optional ByVal PageSize As Integer = 10, Optional ByVal PageNumber As Integer = 1) As Boolean
         ''' <summary>
-        ''' deprecated. Use OpenGroupUsers.
+        ''' Opens a record set with user records that are in a Group
         ''' </summary>
         ''' <param name="GroupList"></param>
         ''' <param name="SQLCriteria"></param>
@@ -62,7 +62,20 @@ Namespace Contensive.BaseClasses
         ''' <param name="PageNumber"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public MustOverride Function OpenGroupListUsers(ByVal GroupList As String, Optional ByVal SQLCriteria As String = "", Optional ByVal SortFieldList As String = "", Optional ByVal ActiveOnly As Boolean = True, Optional ByVal PageSize As Integer = 10, Optional ByVal PageNumber As Integer = 1) As Boolean
+        Public MustOverride Function OpenGroupUsers(ByVal GroupList As List(Of String), Optional ByVal SQLCriteria As String = "", Optional ByVal SortFieldList As String = "", Optional ByVal ActiveOnly As Boolean = True, Optional ByVal PageSize As Integer = 10, Optional ByVal PageNumber As Integer = 1) As Boolean
+        ''' <summary>
+        ''' deprecated. Use OpenGroupUsers.
+        ''' </summary>
+        ''' <param name="GroupCommaList"></param>
+        ''' <param name="SQLCriteria"></param>
+        ''' <param name="SortFieldList"></param>
+        ''' <param name="ActiveOnly"></param>
+        ''' <param name="PageSize"></param>
+        ''' <param name="PageNumber"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        <Obsolete("Use OpenGroupUsers instead. The GroupCommaList is a comma delimited list of groups and cannot handle group names that include a comma.", False)>
+        Public MustOverride Function OpenGroupListUsers(ByVal GroupCommaList As String, Optional ByVal SQLCriteria As String = "", Optional ByVal SortFieldList As String = "", Optional ByVal ActiveOnly As Boolean = True, Optional ByVal PageSize As Integer = 10, Optional ByVal PageNumber As Integer = 1) As Boolean
         ''' <summary>
         ''' Opens a record set based on an sql statement
         ''' </summary>
@@ -214,6 +227,11 @@ Namespace Contensive.BaseClasses
         ''' <remarks></remarks>
         Public MustOverride Sub GoNext()
         ''' <summary>
+        ''' Move to the next record in a result set and return true if the row is valid.
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public MustOverride Function NextOK() As Boolean
+        ''' <summary>
         ''' Returns true if there is valid data in the current row of the result set.
         ''' </summary>
         ''' <returns></returns>
@@ -230,6 +248,7 @@ Namespace Contensive.BaseClasses
         ''' <param name="FieldName"></param>
         ''' <param name="FieldValue"></param>
         ''' <remarks></remarks>
+        Public MustOverride Sub SetField(ByVal FieldName As String, ByVal FieldValue As Object)
         Public MustOverride Sub SetField(ByVal FieldName As String, ByVal FieldValue As String)
         ''' <summary>
         ''' 

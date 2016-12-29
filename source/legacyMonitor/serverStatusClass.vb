@@ -181,7 +181,7 @@ Namespace Contensive.Core
                         '
                         Content = Content & StatusLine(0, "")
                         Content = Content & StatusLine(0, "Log Check")
-                        LogFileStruct = cpCore.app.appRootFiles.GetFolderFiles(getProgramFilesPath() & "logs")
+                        LogFileStruct = cpCore.db.appRootFiles.GetFolderFiles(getProgramFilesPath() & "logs")
                         For Each logFile As IO.FileInfo In LogFileStruct
                             If logFile.Length > LargestLogSize Then
                                 LargestLogSize = EncodeInteger(logFile.Length)
@@ -205,7 +205,7 @@ Namespace Contensive.Core
                         '
                         Content = Content & StatusLine(0, "")
                         Content = Content & StatusLine(0, "Alarms Log Check")
-                        LogFileStruct = cpCore.app.appRootFiles.GetFolderFiles(getProgramFilesPath() & "\logs\alarms")
+                        LogFileStruct = cpCore.db.appRootFiles.GetFolderFiles(getProgramFilesPath() & "\logs\alarms")
                         If LogFileStruct.Count = 0 Then
                             Content = Content & StatusLine(1, "No alarm logs.")
                         Else
@@ -233,11 +233,11 @@ Namespace Contensive.Core
                             For Each kvp As KeyValuePair(Of String, appConfigClass) In cpCore.cluster.config.apps
                                 AppName = kvp.Value.name
                                 cpApp = New CPClass(AppName)
-                                If cpApp.core.app.config.allowSiteMonitor Then
+                                If cpApp.core.db.config.allowSiteMonitor Then
 
 
                                     'hint = "Checking status for application [" & AppName & "]"
-                                    Select Case cpApp.core.app.status
+                                    Select Case cpApp.core.db.status
                                         Case coreCommonModule.applicationStatusEnum.ApplicationStatusConnectionObjectFailure
                                             ReDim Preserve errors(ErrorCount)
                                             errors(ErrorCount) = ("[" & AppName & "] ERROR - Contensive returned Connection Object failure")
@@ -353,7 +353,7 @@ Namespace Contensive.Core
                                                 '
                                                 'hint = "Get AppServices object for [" & AppName & "]"
                                                 Content = Content & StatusLine(2, "Contensive Version [" & cp.Version & "]")
-                                                Content = Content & StatusLine(2, "Data Build Version [" & cpCore.app.dataBuildVersion & "]")
+                                                Content = Content & StatusLine(2, "Data Build Version [" & cpCore.db.dataBuildVersion & "]")
                                                 Content = Content & StatusLine(2, "Active Connections [" & "AppServices.ConnectionsActive" & "]")
                                                 Content = Content & StatusLine(2, "Started [" & "AppServices.DateStarted" & "]")
                                                 Content = Content & StatusLine(2, "Hits [" & "AppServices.HitCounter" & "]")

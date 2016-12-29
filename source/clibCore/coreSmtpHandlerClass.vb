@@ -121,7 +121,7 @@ Namespace Contensive.Core
                         ' ----- Update Email Result Log
                         '
                         If ResultLogPathPage <> "" Then
-                            Call cpCore.app.appRootFiles.appendFile(ResultLogPathPage, CStr(Now()) & " delivery attempted to " & EmailTo & "," & SendResult & vbCrLf)
+                            Call cpCore.db.appRootFiles.appendFile(ResultLogPathPage, CStr(Now()) & " delivery attempted to " & EmailTo & "," & SendResult & vbCrLf)
                         End If
                         '
                         ' ----- Update the System Email Log
@@ -132,7 +132,7 @@ Namespace Contensive.Core
                 End If
                 '
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
                 'Mailer = Nothing
                 'converthtmlToText = Nothing
                 sendEmail5 = "There was an unexpected error sending the email."
@@ -182,7 +182,7 @@ Namespace Contensive.Core
             Copy = Copy & EncodeText(BodyMessage)
             Filename = "Out" & CStr(GetRandomInteger()) & ".txt"
             '
-            Call cpCore.app.appRootFiles.SaveFile(iEmailOutPath & Filename, Copy)
+            Call cpCore.db.appRootFiles.SaveFile(iEmailOutPath & Filename, Copy)
             '
             If Err.Number <> 0 Then
                 Call HandleClassTrapError("AddQueue", True)
@@ -248,13 +248,13 @@ ErrorTrap:
                 iEmailOutPath = "emailout\"
             End If
             '
-            FileList = cpCore.app.appRootFiles.GetFolderFiles(iEmailOutPath)
+            FileList = cpCore.db.appRootFiles.GetFolderFiles(iEmailOutPath)
             For Each file As IO.FileInfo In FileList
-                Copy = cpCore.app.appRootFiles.ReadFile(iEmailOutPath & Filename)
+                Copy = cpCore.db.appRootFiles.ReadFile(iEmailOutPath & Filename)
                 '
                 ' No - no way to manage all the files for now. Later work up something
                 'Call cpCore.app.publicFiles.CopyFile(iEmailOutPath & Filename, iEmailOutPath & "sent\" & Filename)
-                cpCore.app.appRootFiles.DeleteFile(iEmailOutPath & Filename)
+                cpCore.db.appRootFiles.DeleteFile(iEmailOutPath & Filename)
                 '
                 ' Decode the file into the email arguments
                 '
@@ -327,7 +327,7 @@ ErrorTrap:
                     Body = Mid(Body, EOL + 2)
                 End If
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return line
         End Function

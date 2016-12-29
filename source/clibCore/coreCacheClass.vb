@@ -41,8 +41,8 @@ Namespace Contensive.Core
                         If cpCore.cluster.config.isLocalCache Then
                             Throw New NotImplementedException("local cache not implemented yet")
                         Else
-                            If cpCore.app.config.enableCache Then
-                                Dim rawCacheName As String = encodeCacheKey(cpCore.app.config.name & "-" & key)
+                            If cpCore.db.config.enableCache Then
+                                Dim rawCacheName As String = encodeCacheKey(cpCore.db.config.name & "-" & key)
                                 returnObj = cacheClient.Get(rawCacheName)
                                 '
                                 'appendCacheLog("readRaw(" & key & "), result=[" & returnObj.ToString & "")
@@ -99,7 +99,7 @@ Namespace Contensive.Core
             Catch ex As Exception
                 '
                 appendCacheLog(logMsg & ", exception exit")
-                cpCore.handleException(ex, "Exception in cacheClass newNew constructor")
+                cpCore.handleExceptionAndRethrow(ex, "Exception in cacheClass newNew constructor")
             End Try
         End Sub
         '
@@ -149,11 +149,11 @@ Namespace Contensive.Core
                         Throw New NotImplementedException("Local cache mode is not implemented yet")
                         'cp.Cache.Save(encodeCacheKey(Key), dataString, , invalidationDate)
                     Else
-                        Call cacheClient.Store(Enyim.Caching.Memcached.StoreMode.Set, encodeCacheKey(cpCore.app.config.name & "-" & Key), data, invalidationDate)
+                        Call cacheClient.Store(Enyim.Caching.Memcached.StoreMode.Set, encodeCacheKey(cpCore.db.config.name & "-" & Key), data, invalidationDate)
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '
@@ -187,15 +187,15 @@ Namespace Contensive.Core
                 End If
 
                 If (String.IsNullOrEmpty(Key)) Then
-                    cpCore.handleException(New Exception("key cannot be empty"))
+                    cpCore.handleExceptionAndRethrow(New Exception("key cannot be empty"))
                 ElseIf (invalidationDate <= Now()) Then
-                    cpCore.handleException(New Exception("invalidationDate must be > current date/time"))
+                    cpCore.handleExceptionAndRethrow(New Exception("invalidationDate must be > current date/time"))
                 Else
                     allowSave = False
                     If cacheData Is Nothing Then
                         allowSave = True
                     ElseIf Not cacheData.GetType.IsSerializable Then
-                        cpCore.handleException(New Exception("Data object must be serializable"))
+                        cpCore.handleExceptionAndRethrow(New Exception("Data object must be serializable"))
                     Else
                         allowSave = True
                     End If
@@ -204,7 +204,7 @@ Namespace Contensive.Core
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '
@@ -220,7 +220,7 @@ Namespace Contensive.Core
             Try
                 Call SetKey(key, cacheObject, invalidationDateDefault, New List(Of String))
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '
@@ -257,7 +257,7 @@ Namespace Contensive.Core
                 End If
             Catch ex As Exception
                 Try
-                    cpCore.handleException(ex)
+                    cpCore.handleExceptionAndRethrow(ex)
                 Catch errObj As Exception
                 End Try
             End Try
@@ -289,7 +289,7 @@ Namespace Contensive.Core
                 End If
             Catch ex As Exception
                 Try
-                    cpCore.handleException(ex)
+                    cpCore.handleExceptionAndRethrow(ex)
                 Catch errObj As Exception
                 End Try
             End Try
@@ -309,7 +309,7 @@ Namespace Contensive.Core
                 Call SetKey(key, cacheObject, invalidationDateDefault, invalidationTagList)
             Catch ex As Exception
                 Try
-                    cpCore.handleException(ex)
+                    cpCore.handleExceptionAndRethrow(ex)
                 Catch errObj As Exception
                 End Try
             End Try
@@ -333,7 +333,7 @@ Namespace Contensive.Core
                 Call SetKey(key, cacheObject, invalidationDateDefault, invalidationTagList)
             Catch ex As Exception
                 Try
-                    cpCore.handleException(ex)
+                    cpCore.handleExceptionAndRethrow(ex)
                 Catch errObj As Exception
                 End Try
             End Try
@@ -353,7 +353,7 @@ Namespace Contensive.Core
                 invalidateAll()
             Catch ex As Exception
                 Try
-                    cpCore.handleException(ex)
+                    cpCore.handleExceptionAndRethrow(ex)
                 Catch errObj As Exception
                 End Try
             End Try
@@ -388,7 +388,7 @@ Namespace Contensive.Core
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return returnTagInvalidationDate
         End Function
@@ -404,7 +404,7 @@ Namespace Contensive.Core
                 Call SetKeyRaw("globalInvalidationDate", Now(), Now().AddYears(10))
                 _globalInvalidationDateLoaded = False
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
         ''
@@ -442,7 +442,7 @@ Namespace Contensive.Core
                 '
                 appendCacheLog("invalidateTag(" & tag & "), tagInvalidationDateCacheName [" & cacheName & "]")
                 '
-                If cpCore.app.config.enableCache Then
+                If cpCore.db.config.enableCache Then
                     If Not String.IsNullOrEmpty(tag) Then
                         '
                         ' set the tags invalidation date
@@ -451,7 +451,7 @@ Namespace Contensive.Core
                         '
                         ' test if this tag is a content name
                         '
-                        cdef = cpCore.app.metaData.getCdef(tag)
+                        cdef = cpCore.metaData.getCdef(tag)
                         If Not cdef Is Nothing Then
                             '
                             ' Invalidate all child cdef
@@ -459,7 +459,7 @@ Namespace Contensive.Core
                             If cdef.childIdList.Count > 0 Then
                                 For Each childId As Integer In cdef.childIdList
                                     Dim childCdef As coreMetaDataClass.CDefClass
-                                    childCdef = cpCore.app.metaData.getCdef(childId)
+                                    childCdef = cpCore.metaData.getCdef(childId)
                                     If Not childCdef Is Nothing Then
                                         cacheName = getTagInvalidationDateCacheName(childCdef.Name)
                                         SetKeyRaw(cacheName, Now, Now.AddDays(invalidationDaysDefault))
@@ -470,7 +470,7 @@ Namespace Contensive.Core
                             ' Now go up to the top-most parent
                             '
                             Do While cdef.parentID > 0
-                                cdef = cpCore.app.metaData.getCdef(cdef.parentID)
+                                cdef = cpCore.metaData.getCdef(cdef.parentID)
                                 If Not cdef Is Nothing Then
                                     cacheName = getTagInvalidationDateCacheName(cdef.Name)
                                     SetKeyRaw(cacheName, Now, Now.AddDays(invalidationDaysDefault))
@@ -480,7 +480,7 @@ Namespace Contensive.Core
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '
@@ -494,7 +494,7 @@ Namespace Contensive.Core
                 Dim tag As String
                 Dim Pointer As Integer
                 '
-                If cpCore.app.config.enableCache Then
+                If cpCore.db.config.enableCache Then
                     If tagList <> "" Then
                         tags = Split(tagList, ",")
                         For Pointer = 0 To UBound(tags)
@@ -506,7 +506,7 @@ Namespace Contensive.Core
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '
@@ -524,7 +524,7 @@ Namespace Contensive.Core
                     Next
                 End If
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '
@@ -545,16 +545,15 @@ Namespace Contensive.Core
         '=======================================================================
         Private Sub appendCacheLog(line As String)
             Try
-                cpCore.appendLog(line)
-                'cpCore.appendLog("pid(" & Process.GetCurrentProcess().Id.ToString.PadLeft(4, "0"c) & "),thread(" & Threading.Thread.CurrentThread.ManagedThreadId.ToString.PadLeft(4, "0"c) & ")" & vbTab & line, cacheLogPrefix)
+                'cpCore.appendLog(line)
             Catch ex As Exception
-                ' ignore logging errors
+                cpCore.handleExceptionAndNoThrow(New ApplicationException("appendCacheLog exception", ex))
             End Try
         End Sub
         '
         Private ReadOnly Property allowCache As Boolean
             Get
-                Return cpCore.app.config.enableCache
+                Return cpCore.db.config.enableCache
             End Get
         End Property
         ''
@@ -739,17 +738,21 @@ Namespace Contensive.Core
                             ' if this data is newer that the last global invalidation, continue
                             '
                             Dim tagInvalidationDate As Date
-                            For Each tag As String In cacheData.tagList
-                                tagInvalidationDate = getTagInvalidationDate(tag)
-                                dateCompare = tagInvalidationDate.CompareTo(cacheData.saveDate)
-                                Dim ticks As Long = ((tagInvalidationDate - cacheData.saveDate).Ticks)
-                                appendCacheLog("GetObject(" & key & "), tagInvalidationDate[" & tagInvalidationDate & "], cacheData.saveDate[" & cacheData.saveDate & "], dateCompare[" & dateCompare & "], tick diff [" & ticks & "]")
-                                If (dateCompare >= 0) Then
-                                    invalidate = True
-                                    appendCacheLog("GetObject(" & key & "), invalidated")
-                                    Exit For
-                                End If
-                            Next
+                            If cacheData.tagList.Count = 0 Then
+                                appendCacheLog("GetObject(" & key & "), no taglist found")
+                            Else
+                                For Each tag As String In cacheData.tagList
+                                    tagInvalidationDate = getTagInvalidationDate(tag)
+                                    dateCompare = tagInvalidationDate.CompareTo(cacheData.saveDate)
+                                    Dim ticks As Long = ((tagInvalidationDate - cacheData.saveDate).Ticks)
+                                    appendCacheLog("GetObject(" & key & "), tagInvalidationDate[" & tagInvalidationDate & "], cacheData.saveDate[" & cacheData.saveDate & "], dateCompare[" & dateCompare & "], tick diff [" & ticks & "]")
+                                    If (dateCompare >= 0) Then
+                                        invalidate = True
+                                        appendCacheLog("GetObject(" & key & "), invalidated")
+                                        Exit For
+                                    End If
+                                Next
+                            End If
                             If Not invalidate Then
                                 appendCacheLog("GetObject(" & key & "), valid")
                                 If TypeOf cacheData.data Is resultType Then
@@ -762,7 +765,7 @@ Namespace Contensive.Core
                 End If
             Catch ex As Exception
                 appendCacheLog("GetObject(" & key & "), exception[" & ex.Message & "]")
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return returnObject
         End Function
@@ -777,7 +780,7 @@ Namespace Contensive.Core
                 'Return True
                 Dim propertyFound As Boolean = False
                 If Not siteProperty_AllowCache_LocalLoaded Then
-                    siteProperty_AllowCache_Local = EncodeBoolean(cpCore.app.siteProperty_getText_noCache("AllowBake", "0", propertyFound))
+                    siteProperty_AllowCache_Local = EncodeBoolean(cpCore.db.siteProperty_getText_noCache("AllowBake", "0", propertyFound))
                     siteProperty_AllowCache_LocalLoaded = True
                 End If
                 siteProperty_AllowCache_SpecialCaseNotCached = siteProperty_AllowCache_Local

@@ -87,7 +87,7 @@ Namespace Contensive.Core
                             Call MSxml.LoadXml(XMLSource)
                     End Select
                 Catch ex As Exception
-                    Call cpCore.handleException(ex)
+                    Call cpCore.handleExceptionAndRethrow(ex)
                     loadOK = False
                 End Try
                 If loadOK Then
@@ -118,7 +118,7 @@ Namespace Contensive.Core
             '
             Exit Function
 ErrorTrap:
-            Call cpCore.handleException(New Exception("unexpected exception"))
+            Call cpCore.handleExceptionAndRethrow(New Exception("unexpected exception"))
         End Function
         '
         '
@@ -136,7 +136,7 @@ ErrorTrap:
         '
         '
         Public Sub LoadFile(ByVal Filename As String)
-            Call Load(cpCore.app.appRootFiles.ReadFile(Filename), 0)
+            Call Load(cpCore.db.appRootFiles.ReadFile(Filename), 0)
         End Sub
         '
         ' Get Name
@@ -457,7 +457,7 @@ ErrorTrap:
         '
         '
         Public Sub SaveFile(ByVal Filename As String)
-            Call cpCore.app.appRootFiles.SaveFile(Filename, XML)
+            Call cpCore.db.appRootFiles.SaveFile(Filename, XML)
         End Sub
         '
         '

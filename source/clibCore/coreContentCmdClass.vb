@@ -304,7 +304,7 @@ Namespace Contensive.Core
                 '
                 returnValue = dst
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return returnValue
         End Function
@@ -401,7 +401,7 @@ Namespace Contensive.Core
                         Try
                             cmdDictionary = DirectCast(cpCore.main_parseJSON(cmdSrc), Dictionary(Of String, Object))
                         Catch ex As Exception
-                            cpCore.handleException(ex, "Error parsing JSON command list [" & GetErrString() & "]")
+                            cpCore.handleExceptionAndRethrow(ex, "Error parsing JSON command list [" & GetErrString() & "]")
                         End Try
                         If True Then
                             'End If
@@ -667,7 +667,7 @@ Namespace Contensive.Core
                                 Next
                                 If ArgName <> "" Then
                                     'CmdAccumulator = cpCore.main_GetContentCopy(ArgName, "copy content")
-                                    Dim dt As DataTable = cpCore.app.executeSql("select layout from ccLayouts where name=" & cpCore.app.db_EncodeSQLText(ArgName))
+                                    Dim dt As DataTable = cpCore.db.executeSql("select layout from ccLayouts where name=" & cpCore.db.db_EncodeSQLText(ArgName))
                                     If Not (dt Is Nothing) Then
                                         CmdAccumulator = EncodeText(dt.Rows(0).Item("layout"))
                                     End If
@@ -691,7 +691,7 @@ Namespace Contensive.Core
                                     End Select
                                 Next
                                 If ArgName <> "" Then
-                                    CmdAccumulator = cpCore.app.appRootFiles.ReadFile(ArgName)
+                                    CmdAccumulator = cpCore.db.appRootFiles.ReadFile(ArgName)
                                 End If
                             Case "import"
                                 '
@@ -711,7 +711,7 @@ Namespace Contensive.Core
                                     End Select
                                 Next
                                 If ArgName <> "" Then
-                                    CmdAccumulator = cpCore.app.appRootFiles.ReadFile(ArgName)
+                                    CmdAccumulator = cpCore.db.appRootFiles.ReadFile(ArgName)
                                     If CmdAccumulator <> "" Then
                                         importHead = GetTagInnerHTML(CmdAccumulator, "head", False)
                                         If importHead <> "" Then
@@ -933,7 +933,7 @@ Namespace Contensive.Core
                 '
                 ExecuteAllCmdLists_Execute = CmdAccumulator
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return returnValue
         End Function

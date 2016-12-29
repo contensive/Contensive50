@@ -35,7 +35,7 @@ Namespace Contensive.Core
             Try
                 returnResult = hashEncode.ComputeHash(password, "SHA512", Nothing)
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return returnResult
         End Function
@@ -51,7 +51,7 @@ Namespace Contensive.Core
             Try
                 returnResult = hashEncode.VerifyHash(sourceToTest, "SHA512", encryptedTaken)
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return returnResult
         End Function
@@ -86,7 +86,7 @@ Namespace Contensive.Core
                     returnResult = Convert.ToBase64String(Buffer)
                 End If
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return returnResult
         End Function
@@ -119,11 +119,11 @@ Namespace Contensive.Core
                         ' Transform and return the string.
                         returnResult = System.Text.ASCIIEncoding.ASCII.GetString(DESDecrypt.TransformFinalBlock(buffer, 0, buffer.Length))
                     Catch ex As Exception
-                        cpCore.handleException(ex)
+                        cpCore.handleExceptionAndRethrow(ex)
                     End Try
                 End If
             Catch ex As Exception
-                cpCore.handleException(ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return returnResult
         End Function

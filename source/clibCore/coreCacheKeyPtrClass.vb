@@ -13,7 +13,7 @@ Namespace Contensive.Core
         ' loads with cache. if cache is empty, it loads on demand
         ' when cleared, loads on demand
         '
-        Private app As coreAppClass
+        Private cpCore As cpCoreClass
         Private cacheName As String
         '
         Public sqlLoad As String
@@ -25,9 +25,9 @@ Namespace Contensive.Core
         End Class
         Private dataStore As New dataStoreClass
         '
-        Public Sub New(app As coreAppClass, cacheName As String, sqlLoadKeyValue As String)
+        Public Sub New(cpCore As cpCoreClass, cacheName As String, sqlLoadKeyValue As String)
             MyBase.New()
-            Me.app = app
+            Me.cpCore = cpCore
             Me.cacheName = cacheName
             Me.sqlLoad = sqlLoadKeyValue
             dataStore = New dataStoreClass
@@ -43,7 +43,7 @@ Namespace Contensive.Core
                 dataStore.loaded = False
                 dataStore.dataList.Clear()
                 dataStore.keyPtrIndex = New coreKeyPtrIndexClass
-                Call app.cache.SetKey(cacheName & "-dataList", dataStore.dataList)
+                Call cpCore.cache.SetKey(cacheName & "-dataList", dataStore.dataList)
             Catch ex As Exception
                 Throw New ApplicationException("Exception in cacheKeyPtrClass.clear", ex)
             End Try
@@ -120,7 +120,7 @@ Namespace Contensive.Core
                 If Not dataStore.loaded Then
                     Try
                         needsToReload = True
-                        dataStore = DirectCast(app.cache.GetObject(Of dataStoreClass)(cacheName), dataStoreClass)
+                        dataStore = DirectCast(cpCore.cache.GetObject(Of dataStoreClass)(cacheName), dataStoreClass)
                     Catch ex As Exception
                         needsToReload = True
                     End Try
@@ -136,7 +136,7 @@ Namespace Contensive.Core
                         dataStore = New dataStoreClass
                         dataStore.dataList = New List(Of String)
                         dataStore.keyPtrIndex = New coreKeyPtrIndexClass
-                        Using dt As DataTable = app.executeSql(sqlLoad)
+                        Using dt As DataTable = cpCore.db.executeSql(sqlLoad)
                             Ptr = 0
                             For Each dr As DataRow In dt.Rows
                                 dataStore.keyPtrIndex.setPtr(dr.Item(0).ToString, Ptr)
@@ -168,7 +168,7 @@ Namespace Contensive.Core
             Try
                 If dataStore.loaded Then '
                     Call dataStore.keyPtrIndex.getPtr("test")
-                    Call app.cache.SetKey(cacheName, dataStore)
+                    Call cpCore.cache.SetKey(cacheName, dataStore)
                 End If
             Catch ex As Exception
                 Throw New ApplicationException("Exception in cacheKeyPtrClass.save", ex)
