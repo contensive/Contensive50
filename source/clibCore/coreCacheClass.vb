@@ -41,8 +41,8 @@ Namespace Contensive.Core
                         If cpCore.cluster.config.isLocalCache Then
                             Throw New NotImplementedException("local cache not implemented yet")
                         Else
-                            If cpCore.db.config.enableCache Then
-                                Dim rawCacheName As String = encodeCacheKey(cpCore.db.config.name & "-" & key)
+                            If cpCore.appConfig.enableCache Then
+                                Dim rawCacheName As String = encodeCacheKey(cpCore.appConfig.name & "-" & key)
                                 returnObj = cacheClient.Get(rawCacheName)
                                 '
                                 'appendCacheLog("readRaw(" & key & "), result=[" & returnObj.ToString & "")
@@ -149,7 +149,7 @@ Namespace Contensive.Core
                         Throw New NotImplementedException("Local cache mode is not implemented yet")
                         'cp.Cache.Save(encodeCacheKey(Key), dataString, , invalidationDate)
                     Else
-                        Call cacheClient.Store(Enyim.Caching.Memcached.StoreMode.Set, encodeCacheKey(cpCore.db.config.name & "-" & Key), data, invalidationDate)
+                        Call cacheClient.Store(Enyim.Caching.Memcached.StoreMode.Set, encodeCacheKey(cpCore.appConfig.name & "-" & Key), data, invalidationDate)
                     End If
                 End If
             Catch ex As Exception
@@ -442,7 +442,7 @@ Namespace Contensive.Core
                 '
                 appendCacheLog("invalidateTag(" & tag & "), tagInvalidationDateCacheName [" & cacheName & "]")
                 '
-                If cpCore.db.config.enableCache Then
+                If cpCore.appConfig.enableCache Then
                     If Not String.IsNullOrEmpty(tag) Then
                         '
                         ' set the tags invalidation date
@@ -494,7 +494,7 @@ Namespace Contensive.Core
                 Dim tag As String
                 Dim Pointer As Integer
                 '
-                If cpCore.db.config.enableCache Then
+                If cpCore.appConfig.enableCache Then
                     If tagList <> "" Then
                         tags = Split(tagList, ",")
                         For Pointer = 0 To UBound(tags)
@@ -553,7 +553,7 @@ Namespace Contensive.Core
         '
         Private ReadOnly Property allowCache As Boolean
             Get
-                Return cpCore.db.config.enableCache
+                Return cpCore.appConfig.enableCache
             End Get
         End Property
         ''
@@ -780,7 +780,7 @@ Namespace Contensive.Core
                 'Return True
                 Dim propertyFound As Boolean = False
                 If Not siteProperty_AllowCache_LocalLoaded Then
-                    siteProperty_AllowCache_Local = EncodeBoolean(cpCore.db.siteProperty_getText_noCache("AllowBake", "0", propertyFound))
+                    siteProperty_AllowCache_Local = EncodeBoolean(cpCore.siteProperties.getText_noCache("AllowBake", "0", propertyFound))
                     siteProperty_AllowCache_LocalLoaded = True
                 End If
                 siteProperty_AllowCache_SpecialCaseNotCached = siteProperty_AllowCache_Local

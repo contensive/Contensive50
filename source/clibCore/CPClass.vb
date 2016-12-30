@@ -130,7 +130,7 @@ Namespace Contensive.Core
         '
         Public ReadOnly Property status As applicationStatusEnum
             Get
-                Return core.db.status
+                Return core.appStatus
             End Get
         End Property
         '
@@ -138,7 +138,7 @@ Namespace Contensive.Core
         '
         Public ReadOnly Property statusMessage As String
             Get
-                Return GetApplicationStatusMessage(core.db.status)
+                Return GetApplicationStatusMessage(core.appStatus)
             End Get
         End Property
         '
@@ -160,10 +160,8 @@ Namespace Contensive.Core
             Get
                 If (core Is Nothing) Then
                     Return False
-                ElseIf (core.db Is Nothing) Then
-                    Return False
                 Else
-                    Return (core.db.status = applicationStatusEnum.ApplicationStatusReady)
+                    Return (core.appStatus = applicationStatusEnum.ApplicationStatusReady)
                 End If
             End Get
         End Property
@@ -216,7 +214,7 @@ Namespace Contensive.Core
                         Dim LegacyOptionString As String = MyDoc.getLegacyOptionStringFromVar()
                         result = core.executeAddon_legacy4(addonId.ToString(), LegacyOptionString, addonContext, Nothing)
                     End If
-                    result = core.executeAddon(addonId, "", "", addonContext, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", core.userId, core.visit_isAuthenticated)
+                    result = core.executeAddon(addonId, "", "", addonContext, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", core.user.userId, core.visit_isAuthenticated)
                 End If
                 '
             Catch ex As Exception

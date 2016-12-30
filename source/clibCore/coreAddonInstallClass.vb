@@ -38,7 +38,7 @@ Namespace Contensive.Core
             ''dim buildversion As String
             '
             'BuildVersion = cpCore.app.DataBuildVersion_DontUseThis
-            Criteria = "(Name = " & cpCore.db.db_EncodeSQLText(EntryName) & ")"
+            Criteria = "(Name = " & cpCore.db.encodeSQLText(EntryName) & ")"
             If ParentID = 0 Then
                 Criteria = Criteria & "And((parentid=0)Or(parentid Is null))"
             Else
@@ -88,7 +88,7 @@ Namespace Contensive.Core
             '
             Exit Function
 ErrorTrap:
-            Call HandleClassTrapError(cpCore.db.config.name, Err.Number, Err.Source, Err.Description, "GetNavigatorID", True, False)
+            Call HandleClassTrapError(cpCore.appConfig.name, Err.Number, Err.Source, Err.Description, "GetNavigatorID", True, False)
         End Function
         '
         '====================================================================================================
@@ -125,7 +125,7 @@ ErrorTrap:
                 Dim downloadRetry As Integer
                 Const downloadRetryMax As Integer = 3
                 '
-                Call AppendClassLogFile(cpCore.db.config.name, "downloadCollectionFiles", "downloading collection [" & CollectionGuid & "]")
+                Call appendInstallLog(cpCore.appConfig.name, "downloadCollectionFiles", "downloading collection [" & CollectionGuid & "]")
                 '
                 '---------------------------------------------------------------------------------------------------------------
                 ' Request the Download file for this collection
@@ -156,7 +156,7 @@ ErrorTrap:
                         downloadDelay += 2000
                         return_ErrorMessage = "There was an error while requesting the download details for collection [" & CollectionGuid & "]"
                         DownloadCollectionFiles = False
-                        Call AppendClassLogFile("Server", "AddonInstallClass", errorPrefix & "There was a parse error reading the response [" & ex.ToString() & "]")
+                        Call appendInstallLog("Server", "AddonInstallClass", errorPrefix & "There was a parse error reading the response [" & ex.ToString() & "]")
                     End Try
                     downloadRetry += 1
                 Loop While (downloadRetry < downloadRetryMax)
@@ -168,7 +168,7 @@ ErrorTrap:
                         If (LCase(Doc.DocumentElement.Name) <> LCase(DownloadFileRootNode)) Then
                             return_ErrorMessage = "The collection file from the server was Not valid for collection [" & CollectionGuid & "]"
                             DownloadCollectionFiles = False
-                            Call AppendClassLogFile("Server", "AddonInstallClass", errorPrefix & "The response has a basename [" & Doc.DocumentElement.Name & "] but [" & DownloadFileRootNode & "] was expected.")
+                            Call appendInstallLog("Server", "AddonInstallClass", errorPrefix & "The response has a basename [" & Doc.DocumentElement.Name & "] but [" & DownloadFileRootNode & "] was expected.")
                         Else
                             '
                             '------------------------------------------------------------------
@@ -177,7 +177,7 @@ ErrorTrap:
                             '
                             If Doc.DocumentElement.ChildNodes.Count = 0 Then
                                 return_ErrorMessage = "The collection library status file from the server has a valid basename, but no childnodes."
-                                Call AppendClassLogFile("Server", "AddonInstallClass", errorPrefix & "The collection library status file from the server has a valid basename, but no childnodes. The collection was probably Not found")
+                                Call appendInstallLog("Server", "AddonInstallClass", errorPrefix & "The collection library status file from the server has a valid basename, but no childnodes. The collection was probably Not found")
                                 DownloadCollectionFiles = False
                             Else
                                 With Doc.DocumentElement
@@ -199,7 +199,7 @@ ErrorTrap:
                                                             Collectionname = CDefInterfaces.InnerText
                                                         Case "help"
                                                             'CollectionHelp = CDefInterfaces.innerText
-                                                            Call cpCore.db.privateFiles.SaveFile(WorkingFolder & "Collection.hlp", CDefInterfaces.InnerText)
+                                                            Call cpCore.privateFiles.SaveFile(WorkingFolder & "Collection.hlp", CDefInterfaces.InnerText)
                                                         Case "guid"
                                                             CollectionGuid = CDefInterfaces.InnerText
                                                         Case "lastchangedate"
@@ -215,10 +215,10 @@ ErrorTrap:
                                                                     '
                                                                     ' Skip this file because the collecion file link has no slash (no file)
                                                                     '
-                                                                    Call AppendClassLogFile("Server", "DownloadCollection", errorPrefix & "Collection [" & Collectionname & "] was Not installed because the Collection File Link does Not point to a valid file [" & CollectionFileLink & "]")
+                                                                    Call appendInstallLog("Server", "DownloadCollection", errorPrefix & "Collection [" & Collectionname & "] was Not installed because the Collection File Link does Not point to a valid file [" & CollectionFileLink & "]")
                                                                 Else
                                                                     CollectionFilePath = WorkingFolder & Mid(CollectionFileLink, Pos + 1)
-                                                                    Call cpCore.db.privateFiles.SaveRemoteFile(CollectionFileLink, CollectionFilePath)
+                                                                    Call cpCore.privateFiles.SaveRemoteFile(CollectionFileLink, CollectionFilePath)
                                                                     ' BuildCollectionFolder takes care of the unzipping.
                                                                     'If LCase(Right(CollectionFilePath, 4)) = ".zip" Then
                                                                     '    Call UnzipAndDeleteFile_AndWait(CollectionFilePath)
@@ -242,7 +242,7 @@ ErrorTrap:
                                                             Next
                                                             If ResourceLink = "" Then
                                                                 UserError = "There was an error processing a collection in the download file [" & Collectionname & "]. An ActiveXDll node with filename [" & ResourceFilename & "] contained no 'Link' attribute."
-                                                                Call AppendClassLogFile("Server", "AddonInstallClass", errorPrefix & UserError)
+                                                                Call appendInstallLog("Server", "AddonInstallClass", errorPrefix & UserError)
                                                             Else
                                                                 If ResourceFilename = "" Then
                                                                     '
@@ -255,9 +255,9 @@ ErrorTrap:
                                                                 End If
                                                                 If ResourceFilename = "" Then
                                                                     UserError = "There was an error processing a collection in the download file [" & Collectionname & "]. The ActiveX filename attribute was empty, and the filename could not be read from the link [" & ResourceLink & "]."
-                                                                    Call AppendClassLogFile("Server", "DownloadCollectionFiles", errorPrefix & UserError)
+                                                                    Call appendInstallLog("Server", "DownloadCollectionFiles", errorPrefix & UserError)
                                                                 Else
-                                                                    Call cpCore.db.privateFiles.SaveRemoteFile(ResourceLink, WorkingFolder & ResourceFilename)
+                                                                    Call cpCore.privateFiles.SaveRemoteFile(ResourceLink, WorkingFolder & ResourceFilename)
                                                                 End If
                                                             End If
                                                     End Select
@@ -266,7 +266,7 @@ ErrorTrap:
                                     Next
                                 End With
                                 If CollectionFileCnt = 0 Then
-                                    Call AppendClassLogFile("Server", "DownloadCollectionFiles", errorPrefix & "The collection was requested and downloaded, but was not installed because the download file did not have a collection root node.")
+                                    Call appendInstallLog("Server", "DownloadCollectionFiles", errorPrefix & "The collection was requested and downloaded, but was not installed because the download file did not have a collection root node.")
                                 End If
                             End If
                         End If
@@ -334,15 +334,15 @@ ErrorTrap:
                     '
                     ' Download all files for this collection and build the collection folder(s)
                     '
-                    WorkingFolder = cpCore.db.getAddonPath() & "temp_" & GetRandomInteger() & "\"
-                    Call cpCore.db.privateFiles.createPath(WorkingFolder)
+                    WorkingFolder = cpCore.getAddonPath() & "temp_" & GetRandomInteger() & "\"
+                    Call cpCore.privateFiles.createPath(WorkingFolder)
                     '
                     UpgradeOK = DownloadCollectionFiles(WorkingFolder, CollectionGuid, return_IISResetRequired, return_RegisterList, CollectionLastChangeDate, return_ErrorMessage)
                     If UpgradeOK Then
                         UpgradeOK = BuildLocalCollectionFolder(WorkingFolder, return_IISResetRequired, return_RegisterList, CollectionLastChangeDate, CollectionGuid, return_ErrorMessage, False)
                     End If
                     '
-                    Call cpCore.db.privateFiles.DeleteFileFolder(WorkingFolder)
+                    Call cpCore.privateFiles.DeleteFileFolder(WorkingFolder)
                 End If
                 '
                 ' Upgrade the server from the collection files
@@ -409,7 +409,7 @@ ErrorTrap:
                     Catch ex As Exception
                         If allowLogging Then cpCore.appendLog("UpgradeAllLocalCollectionsFromLib3(), parse error reading collections.xml")
                         Copy = "Error loading privateFiles\addons\Collections.xml"
-                        Call AppendClassLogFile("Server", "UpgradeAllLocalCollecionFilesFileLib2", Copy)
+                        Call appendInstallLog("Server", "UpgradeAllLocalCollecionFilesFileLib2", Copy)
                         return_ErrorMessage = return_ErrorMessage & "<P>" & Copy & "</P>"
                         returnOk = False
                     End Try
@@ -418,7 +418,7 @@ ErrorTrap:
                             If allowLogging Then cpCore.appendLog("UpgradeAllLocalCollectionsFromLib3(), The addons\Collections.xml file has an invalid root node")
                             Copy = "The addons\Collections.xml has an invalid root node, [" & LocalCollections.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected."
                             'Copy = "The LocalCollections file [" & App.Path & "\Addons\Collections.xml] has an invalid root node, [" & LocalCollections.DocumentElement.name & "] was received and [" & CollectionListRootNode & "] was expected."
-                            Call AppendClassLogFile("Server", "UpgradeAllLocalCollecionFilesFileLib2", Copy)
+                            Call appendInstallLog("Server", "UpgradeAllLocalCollecionFilesFileLib2", Copy)
                             return_ErrorMessage = return_ErrorMessage & "<P>" & Copy & "</P>"
                             returnOk = False
                         Else
@@ -485,7 +485,7 @@ ErrorTrap:
                                                 cpCore.appendLog("UpgradeAllLocalCollectionsFromLib3(), Error downloading or loading GetCollectionList from Support.")
                                             End If
                                             Copy = "Error downloading or loading GetCollectionList from Support."
-                                            Call AppendClassLogFile("Server", "UpgradeAllLocalCollecionFilesFileLib2", Copy & ", the request was [" & SupportURL & "]")
+                                            Call appendInstallLog("Server", "UpgradeAllLocalCollecionFilesFileLib2", Copy & ", the request was [" & SupportURL & "]")
                                             return_ErrorMessage = return_ErrorMessage & "<P>" & Copy & "</P>"
                                             returnOk = False
                                             loadOK = False
@@ -495,7 +495,7 @@ ErrorTrap:
                                                 If LCase(LibraryCollections.DocumentElement.Name) <> LCase(CollectionListRootNode) Then
                                                     Copy = "The GetCollectionList support site remote method returned an xml file with an invalid root node, [" & LibraryCollections.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected."
                                                     If allowLogging Then cpCore.appendLog("UpgradeAllLocalCollectionsFromLib3(), " & Copy)
-                                                    Call AppendClassLogFile("Server", "UpgradeAllLocalCollecionFilesFileLib2", Copy & ", the request was [" & SupportURL & "]")
+                                                    Call appendInstallLog("Server", "UpgradeAllLocalCollecionFilesFileLib2", Copy & ", the request was [" & SupportURL & "]")
                                                     return_ErrorMessage = return_ErrorMessage & "<P>" & Copy & "</P>"
                                                     returnOk = False
                                                 Else
@@ -596,13 +596,13 @@ ErrorTrap:
                                                                                                 '
                                                                                                 ' LibLastChangeDate <>0, and it is > local lastchangedate
                                                                                                 '
-                                                                                                WorkingFolder = cpCore.db.getAddonPath() & "\temp_" & GetRandomInteger() & "\"
+                                                                                                WorkingFolder = cpCore.getAddonPath() & "\temp_" & GetRandomInteger() & "\"
                                                                                                 If allowLogging Then cpCore.appendLog("UpgradeAllLocalCollectionsFromLib3(), matching library collection is newer, start upgrade [" & WorkingFolder & "].")
-                                                                                                Call AppendClassLogFile("server", "UpgradeAllLocalCollectionsFromLib3", "Upgrading Collection [" & LibGUID & "], Library name [" & LibName & "], because LocalChangeDate [" & LocalLastChangeDate & "] < LibraryChangeDate [" & LibLastChangeDate & "]")
+                                                                                                Call appendInstallLog("server", "UpgradeAllLocalCollectionsFromLib3", "Upgrading Collection [" & LibGUID & "], Library name [" & LibName & "], because LocalChangeDate [" & LocalLastChangeDate & "] < LibraryChangeDate [" & LibLastChangeDate & "]")
                                                                                                 '
                                                                                                 ' Upgrade Needed
                                                                                                 '
-                                                                                                Call cpCore.db.privateFiles.createPath(WorkingFolder)
+                                                                                                Call cpCore.privateFiles.createPath(WorkingFolder)
                                                                                                 '
                                                                                                 returnOk = DownloadCollectionFiles(WorkingFolder, LibGUID, return_IISResetRequired, return_RegisterList, CollectionLastChangeDate, return_ErrorMessage)
                                                                                                 If allowLogging Then cpCore.appendLog("UpgradeAllLocalCollectionsFromLib3(), DownloadCollectionFiles returned " & returnOk)
@@ -614,7 +614,7 @@ ErrorTrap:
                                                                                                 If allowLogging Then
                                                                                                     cpCore.appendLog("UpgradeAllLocalCollectionsFromLib3(), working folder not deleted because debugging. Delete tmp folders when finished.")
                                                                                                 Else
-                                                                                                    Call cpCore.db.privateFiles.DeleteFileFolder(WorkingFolder)
+                                                                                                    Call cpCore.privateFiles.DeleteFileFolder(WorkingFolder)
                                                                                                 End If
                                                                                                 '
                                                                                                 ' Upgrade the apps from the collection files, do not install on any apps
@@ -628,7 +628,7 @@ ErrorTrap:
                                                                                                 '
                                                                                                 If Not returnOk Then
                                                                                                     If allowLogging Then cpCore.appendLog("UpgradeAllLocalCollectionsFromLib3(), for this local collection, process returned " & returnOk)
-                                                                                                    Call AppendClassLogFile("server", "UpgradeAllLocalCollectionsFromLib3", "There was a problem upgrading Collection [" & LibGUID & "], Library name [" & LibName & "], error message [" & return_ErrorMessage & "], will clear error and continue with the next collection, the request was [" & SupportURL & "]")
+                                                                                                    Call appendInstallLog("server", "UpgradeAllLocalCollectionsFromLib3", "There was a problem upgrading Collection [" & LibGUID & "], Library name [" & LibName & "], error message [" & return_ErrorMessage & "], will clear error and continue with the next collection, the request was [" & SupportURL & "]")
                                                                                                     returnOk = True
                                                                                                 End If
                                                                                             End If
@@ -638,7 +638,7 @@ ErrorTrap:
                                                                                             localCollectionUpToDate = True
                                                                                             '
                                                                                             If Not returnOk Then
-                                                                                                Call AppendClassLogFile("server", "UpgradeAllLocalCollectionsFromLib3", "There was a problem upgrading Collection [" & LibGUID & "], Library name [" & LibName & "], error message [" & return_ErrorMessage & "], will clear error and continue with the next collection")
+                                                                                                Call appendInstallLog("server", "UpgradeAllLocalCollectionsFromLib3", "There was a problem upgrading Collection [" & LibGUID & "], Library name [" & LibName & "], error message [" & return_ErrorMessage & "], will clear error and continue with the next collection")
                                                                                                 returnOk = True
                                                                                             End If
                                                                                         End If
@@ -726,44 +726,44 @@ ErrorTrap:
             '
             If allowLogging Then cpCore.appendLog("BuildLocalCollectionFolder(), Enter")
             '
-            If Not cpCore.db.privateFiles.checkPath(privateFolderPath) Then
+            If Not cpCore.privateFiles.checkPath(privateFolderPath) Then
                 '
                 ' The working folder is not there
                 '
                 return_ErrorMessage = "<p>There was a problem with the installation. The installation folder is not valid.</p>"
                 If allowLogging Then cpCore.appendLog("BuildLocalCollectionFolder(), " & return_ErrorMessage)
-                Call AppendClassLogFile("Server", "AddonInstallClass", "BuildLocalCollectionFolder, CheckFileFolder was false for the private folder [" & privateFolderPath & "]")
+                Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, CheckFileFolder was false for the private folder [" & privateFolderPath & "]")
             Else
-                Call AppendClassLogFile("Server", "AddonInstallClass", "BuildLocalCollectionFolder, processing files in private folder [" & privateFolderPath & "]")
-                SrcFileNamelist = cpCore.db.privateFiles.GetFolderFiles(privateFolderPath)
+                Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, processing files in private folder [" & privateFolderPath & "]")
+                SrcFileNamelist = cpCore.privateFiles.GetFolderFiles(privateFolderPath)
                 For Each file As IO.FileInfo In SrcFileNamelist
                     If file.Extension = ".zip" Then
                         '
                         ZipFileFound = True
-                        Call cpCore.db.privateFiles.UnzipFile(privateFolderPath & file.Name)
-                        Call cpCore.db.privateFiles.DeleteFile(privateFolderPath & file.Name)
+                        Call cpCore.privateFiles.UnzipFile(privateFolderPath & file.Name)
+                        Call cpCore.privateFiles.DeleteFile(privateFolderPath & file.Name)
                     End If
                 Next
                 '
                 ' Now get all the unzipped files
                 '
-                SrcFileNamelist = cpCore.db.privateFiles.GetFolderFiles(privateFolderPath)
+                SrcFileNamelist = cpCore.privateFiles.GetFolderFiles(privateFolderPath)
                 If True Then
                     '
                     ' Process all non-zip files
                     '
                     For Each file As IO.FileInfo In SrcFileNamelist
                         Filename = file.Name
-                        Call AppendClassLogFile("Server", "AddonInstallClass", "BuildLocalCollectionFolder, processing files, filename=[" & Filename & "]")
+                        Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, processing files, filename=[" & Filename & "]")
                         If LCase(Right(Filename, 4)) = ".xml" Then
                             '
-                            Call AppendClassLogFile("Server", "AddonInstallClass", "BuildLocalCollectionFolder, processing xml file [" & Filename & "]")
+                            Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, processing xml file [" & Filename & "]")
                             'hint = hint & ",320"
                             CollectionFile = New XmlDocument
 
                             Dim loadOk = True
                             Try
-                                Call CollectionFile.Load(cpCore.db.privateFiles.rootLocalFolderPath & privateFolderPath & Filename)
+                                Call CollectionFile.Load(cpCore.privateFiles.rootLocalFolderPath & privateFolderPath & Filename)
                             Catch ex As Exception
                                 '
                                 ' There was a parse error in this xml file. Set the return message and the flag
@@ -771,7 +771,7 @@ ErrorTrap:
                                 '
                                 'hint = hint & ",330"
                                 return_ErrorMessage = "<p>There was a problem with the Collection File for this addon.</p>"
-                                Call AppendClassLogFile("Server", "AddonInstallClass", "BuildLocalCollectionFolder, error reading collection [" & privateFolderPath & Filename & "]")
+                                Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, error reading collection [" & privateFolderPath & Filename & "]")
                                 'StatusOK = False
                                 loadOk = False
                             End Try
@@ -782,7 +782,7 @@ ErrorTrap:
                                     '
                                     ' Not a problem, this is just not a collection file
                                     '
-                                    Call AppendClassLogFile("Server", "AddonInstallClass", "BuildLocalCollectionFolder, xml base name wrong [" & CollectionFileBaseName & "]")
+                                    Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, xml base name wrong [" & CollectionFileBaseName & "]")
                                 Else
                                     '
                                     ' Collection File
@@ -796,7 +796,7 @@ ErrorTrap:
                                             '
                                             'hint = hint & ",430"
                                             return_ErrorMessage = "<p>There was a problem with this Collection. The collection file does not have a collection name.</p>"
-                                            Call AppendClassLogFile("Server", "AddonInstallClass", "BuildLocalCollectionFolder, collection has no name")
+                                            Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, collection has no name")
                                             'StatusOK = False
                                         Else
                                             '
@@ -837,13 +837,13 @@ ErrorTrap:
                                                 CollectionFolderName = Replace(CollectionFolderName, " ", "")
                                                 CollectionFolderName = Collectionname & "_" & CollectionFolderName
                                             End If
-                                            CollectionFolder = cpCore.db.getAddonPath() & CollectionFolderName & "\"
-                                            If Not cpCore.db.privateFiles.checkPath(CollectionFolder) Then
+                                            CollectionFolder = cpCore.getAddonPath() & CollectionFolderName & "\"
+                                            If Not cpCore.privateFiles.checkPath(CollectionFolder) Then
                                                 '
                                                 ' Create collection folder
                                                 '
                                                 'hint = hint & ",470"
-                                                Call cpCore.db.privateFiles.createPath(CollectionFolder)
+                                                Call cpCore.privateFiles.createPath(CollectionFolder)
                                             End If
                                             '
                                             ' create a collection 'version' folder for these new files
@@ -868,15 +868,15 @@ ErrorTrap:
                                             If (NowPart < 10) Then TimeStamp &= "0"
                                             TimeStamp &= NowPart.ToString()
                                             CollectionVersionFolderName = CollectionFolderName & "\" & TimeStamp
-                                            CollectionVersionFolder = cpCore.db.getAddonPath() & "\" & CollectionVersionFolderName & "\"
-                                            Call cpCore.db.privateFiles.createPath(CollectionVersionFolder)
+                                            CollectionVersionFolder = cpCore.getAddonPath() & "\" & CollectionVersionFolderName & "\"
+                                            Call cpCore.privateFiles.createPath(CollectionVersionFolder)
                                             '
                                             ' copy all files from source to CollectionVersionFolder
                                             '
                                             WorkingPath = Left(privateFolderPath, Len(privateFolderPath) - 1)
                                             CollectionVersionPath = Left(CollectionVersionFolder, Len(CollectionVersionFolder) - 1)
 
-                                            Call cpCore.db.privateFiles.copyFolder(WorkingPath, CollectionVersionPath)
+                                            Call cpCore.privateFiles.copyFolder(WorkingPath, CollectionVersionPath)
                                             'StatusOK = True
                                             '
                                             ' Install activeX and search for importcollections
@@ -897,13 +897,13 @@ ErrorTrap:
                                                             ' filename is blank
                                                             '
                                                             'hint = hint & ",511"
-                                                        ElseIf Not cpCore.db.privateFiles.checkFile(PathFilename) Then
+                                                        ElseIf Not cpCore.privateFiles.checkFile(PathFilename) Then
                                                             '
                                                             ' resource is not here
                                                             '
                                                             'hint = hint & ",513"
                                                             return_ErrorMessage = "<p>There was a problem with the Collection File. The resource referenced in the collection file [" & Filename & "] was not included in the resource files.</p>"
-                                                            Call AppendClassLogFile("Server", "AddonInstallClass", "BuildLocalCollectionFolder, The resource referenced in the collection file [" & Filename & "] was not included in the resource files.")
+                                                            Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, The resource referenced in the collection file [" & Filename & "] was not included in the resource files.")
                                                             'StatusOK = False
                                                         Else
                                                             Select Case ResourceType
@@ -969,13 +969,13 @@ ErrorTrap:
                                                                                         ' file is already installed
                                                                                         '
                                                                                         'hint = hint & ",534"
-                                                                                    ElseIf Not cpCore.db.privateFiles.checkFile(PathFilename) Then
+                                                                                    ElseIf Not cpCore.privateFiles.checkFile(PathFilename) Then
                                                                                         '
                                                                                         ' the file is not here
                                                                                         '
                                                                                         'hint = hint & ",535"
                                                                                         return_ErrorMessage = "<p>There was a problem with the Collection File. The executable resource referenced in the collection file [" & Filename & "] was not included in the resource files.</p>"
-                                                                                        Call AppendClassLogFile("Server", "AddonInstallClass", "BuildLocalCollectionFolder, Page Interface [" & AOName & "], the file specified in the 'ACTIVEXDLL' element of the XML Collection [" & Filename & "] could not be found. Please check that it is provided with the collection and is spelled correctly.")
+                                                                                        Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, Page Interface [" & AOName & "], the file specified in the 'ACTIVEXDLL' element of the XML Collection [" & Filename & "] could not be found. Please check that it is provided with the collection and is spelled correctly.")
                                                                                         'StatusOK = False
                                                                                     Else
                                                                                         '
@@ -1001,7 +1001,7 @@ ErrorTrap:
                                                         If ChildCollectionGUID = "" Then
                                                             ChildCollectionGUID = CDefSection.InnerText
                                                         End If
-                                                        Call AppendClassLogFile("Server", "AddonInstallClass", "BuildLocalCollectionFolder, getCollection or importcollection, childCollectionName [" & ChildCollectionName & "], childCollectionGuid [" & ChildCollectionGUID & "]")
+                                                        Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, getCollection or importcollection, childCollectionName [" & ChildCollectionName & "], childCollectionGuid [" & ChildCollectionGUID & "]")
                                                         If InStr(1, privateFolderPath, ChildCollectionGUID, vbTextCompare) = 0 Then
                                                             If ChildCollectionGUID = "" Then
                                                                 '
@@ -1009,10 +1009,10 @@ ErrorTrap:
                                                                 '
                                                                 'hint = hint & ",590"
                                                                 return_ErrorMessage = "The installation can not continue because an imported collection [" & ChildCollectionName & "] could not be downloaded because it does not include a valid GUID."
-                                                                Call AppendClassLogFile("Server", "AddonInstallClass", "BuildLocalCollectionFolder, return message [" & return_ErrorMessage & "]")
+                                                                Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, return message [" & return_ErrorMessage & "]")
                                                                 'StatusOK = False
                                                             ElseIf GetCollectionPath(ChildCollectionGUID) = "" Then
-                                                                Call AppendClassLogFile("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], not found so needs to be installed")
+                                                                Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], not found so needs to be installed")
                                                                 '
                                                                 ' If it is not already installed, download and install it also
                                                                 '
@@ -1022,20 +1022,20 @@ ErrorTrap:
                                                                 '
                                                                 StatusOK = DownloadCollectionFiles(ChildWorkingFolder, ChildCollectionGUID, Return_IISResetRequired, Return_RegisterList, ChildCollectionLastChangeDate, return_ErrorMessage)
                                                                 If Not StatusOK Then
-                                                                    Call AppendClassLogFile("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], downloadCollectionFiles returned error state, message [" & return_ErrorMessage & "]")
+                                                                    Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], downloadCollectionFiles returned error state, message [" & return_ErrorMessage & "]")
                                                                     If return_ErrorMessage = "" Then
                                                                         return_ErrorMessage = "The installation can not continue because there was an unknown error while downloading the necessary collection file, guid [" & ChildCollectionGUID & "]."
                                                                     Else
                                                                         return_ErrorMessage = "The installation can not continue because there was an error while downloading the necessary collection file, guid [" & ChildCollectionGUID & "]. The error was [" & return_ErrorMessage & "]"
                                                                     End If
                                                                 Else
-                                                                    Call AppendClassLogFile("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], downloadCollectionFiles returned OK")
+                                                                    Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], downloadCollectionFiles returned OK")
                                                                     '
                                                                     ' install the downloaded file
                                                                     '
                                                                     StatusOK = BuildLocalCollectionFolder(ChildWorkingFolder, Return_IISResetRequired, Return_RegisterList, ChildCollectionLastChangeDate, ChildCollectionGUID, return_ErrorMessage, allowLogging)
                                                                     If Not StatusOK Then
-                                                                        Call AppendClassLogFile("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], BuildLocalCollectionFolder returned error state, message [" & return_ErrorMessage & "]")
+                                                                        Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], BuildLocalCollectionFolder returned error state, message [" & return_ErrorMessage & "]")
                                                                         If return_ErrorMessage = "" Then
                                                                             return_ErrorMessage = "The installation can not continue because there was an unknown error installing the included collection file, guid [" & ChildCollectionGUID & "]."
                                                                         Else
@@ -1049,7 +1049,7 @@ ErrorTrap:
                                                                 '
                                                                 '
                                                                 '
-                                                                Call AppendClassLogFile("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], already installed")
+                                                                Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], already installed")
                                                             End If
                                                         End If
                                                 End Select
@@ -1100,10 +1100,10 @@ ErrorTrap:
                 '
                 ' there was an error processing the collection, be sure to save description in the log
                 '
-                Call AppendClassLogFile("Server", "AddonInstallClass", "BuildLocalCollectionFolder, ERROR Exiting, ErrorMessage [" & return_ErrorMessage & "]")
+                Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, ERROR Exiting, ErrorMessage [" & return_ErrorMessage & "]")
             End If
             '
-            Call AppendClassLogFile("Server", "AddonInstallClass", "BuildLocalCollectionFolder, Exiting with ErrorMessage [" & return_ErrorMessage & "]")
+            Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, Exiting with ErrorMessage [" & return_ErrorMessage & "]")
             '
             BuildLocalCollectionFolder = (return_ErrorMessage = "")
             return_CollectionGUID = CollectionGuid
@@ -1315,11 +1315,11 @@ ErrorTrap:
                         '
                         ' Search Local Collection Folder for collection config file (xml file)
                         '
-                        CollectionVersionFolder = cpCore.db.getAddonPath() & CollectionVersionFolderName & "\"
+                        CollectionVersionFolder = cpCore.getAddonPath() & CollectionVersionFolderName & "\"
                         'CollectionVersionFolder = GetProgramPath & "\Addons\" & CollectionVersionFolderName & "\"
                         CollectionHelp = ""
                         CollectionHelpLink = ""
-                        srcFileInfoArray = cpCore.db.privateFiles.GetFolderFiles(CollectionVersionFolder)
+                        srcFileInfoArray = cpCore.privateFiles.GetFolderFiles(CollectionVersionFolder)
                         If srcFileInfoArray.Count = 0 Then
                             UpgradeOK = False
                             return_ErrorMessage = return_ErrorMessage & "<P>The collection was not installed because the folder containing the Add-on's resources was empty.</P>"
@@ -1330,7 +1330,7 @@ ErrorTrap:
                                 '
                                 For Each file As IO.FileInfo In srcFileInfoArray
                                     If LCase(file.Name) = "collection.hlp" Then
-                                        CollectionHelp = CollectionHelp & cpCore.db.privateFiles.ReadFile(CollectionVersionFolder & file.Name)
+                                        CollectionHelp = CollectionHelp & cpCore.privateFiles.ReadFile(CollectionVersionFolder & file.Name)
                                     End If
                                 Next
                                 '
@@ -1345,13 +1345,13 @@ ErrorTrap:
                                         CollectionFilename = Filename
                                         Dim loadOK As Boolean = True
                                         Try
-                                            Call Doc.Load(cpCore.db.privateFiles.rootLocalFolderPath & CollectionVersionFolder & Filename)
+                                            Call Doc.Load(cpCore.privateFiles.rootLocalFolderPath & CollectionVersionFolder & Filename)
                                         Catch ex As Exception
                                             '
                                             ' error - Need a way to reach the user that submitted the file
                                             '
                                             UserError = "There was an error reading the Meta data file."
-                                            Call AppendClassLogFile(cpCore.db.config.name, "AddonInstallClass", "UpgradeAddFromLocalCollection, UserError [" & UserError & "]")
+                                            Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAddFromLocalCollection, UserError [" & UserError & "]")
                                             UpgradeOK = False
                                             return_ErrorMessage = return_ErrorMessage & "<P>The collection was not installed because the xml collection file has an error</P>"
                                             loadOK = False
@@ -1370,7 +1370,7 @@ ErrorTrap:
                                                         ' ----- Error condition -- it must have a collection name
                                                         '
                                                         'Call AppendAddonLog("UpgradeAppFromLocalCollection, collection has no name")
-                                                        Call AppendClassLogFile(cpCore.db.config.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, collection has no name")
+                                                        Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, collection has no name")
                                                         UpgradeOK = False
                                                         return_ErrorMessage = return_ErrorMessage & "<P>The collection was not installed because the collection name in the xml collection file is blank</P>"
                                                     Else
@@ -1391,7 +1391,7 @@ ErrorTrap:
                                                             '
                                                             '
                                                             UpgradeOK = False
-                                                            Call AppendClassLogFile(cpCore.db.config.name, "", "UpgradeAppFromLocalCollection, Local Collection file contains a different GUID for [" & Collectionname & "] then Collections.xml")
+                                                            Call appendInstallLog(cpCore.appConfig.name, "", "UpgradeAppFromLocalCollection, Local Collection file contains a different GUID for [" & Collectionname & "] then Collections.xml")
                                                             return_ErrorMessage = return_ErrorMessage & "<P>The collection was not installed because the unique number identifying the collection, called the guid, does not match the collection requested.</P>"
                                                         Else
                                                             If CollectionGuid = "" Then
@@ -1410,7 +1410,7 @@ ErrorTrap:
                                                             '-------------------------------------------------------------------------------
                                                             '
                                                             'CollectionAddOnCnt = 0
-                                                            Call AppendClassLogFile(cpCore.db.config.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 1")
+                                                            Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 1")
                                                             wwwFileList = ""
                                                             ContentFileList = ""
                                                             ExecFileList = ""
@@ -1423,7 +1423,7 @@ ErrorTrap:
                                                                         ResourceType = LCase(GetXMLAttribute(IsFound, CDefSection, "type", ""))
                                                                         ResourcePath = LCase(GetXMLAttribute(IsFound, CDefSection, "path", ""))
                                                                         Filename = LCase(GetXMLAttribute(IsFound, CDefSection, "name", ""))
-                                                                        Call AppendClassLogFile(cpCore.db.config.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 1, resource found, name [" & Filename & "], type [" & ResourceType & "], path [" & ResourcePath & "]")
+                                                                        Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 1, resource found, name [" & Filename & "], type [" & ResourceType & "], path [" & ResourcePath & "]")
                                                                         Filename = Replace(Filename, "/", "\")
                                                                         SrcPath = ""
                                                                         DstPath = ResourcePath
@@ -1463,19 +1463,19 @@ ErrorTrap:
                                                                         Select Case ResourceType
                                                                             Case "www"
                                                                                 wwwFileList = wwwFileList & vbCrLf & DstFilePath & Filename
-                                                                                Call AppendClassLogFile(cpCore.db.config.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, copying file to www, src [" & CollectionVersionFolder & SrcPath & "], dst [" & cpCore.cluster.config.clusterPhysicalPath & cpCore.db.config.appRootPath & DstFilePath & "].")
-                                                                                Call cpCore.db.privateFiles.copyFile(CollectionVersionFolder & SrcPath & Filename, DstFilePath & Filename, cpCore.db.appRootFiles)
+                                                                                Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, copying file to www, src [" & CollectionVersionFolder & SrcPath & "], dst [" & cpCore.cluster.config.clusterPhysicalPath & cpCore.appConfig.appRootFilesPath & DstFilePath & "].")
+                                                                                Call cpCore.privateFiles.copyFile(CollectionVersionFolder & SrcPath & Filename, DstFilePath & Filename, cpCore.appRootFiles)
                                                                                 If LCase(Right(Filename, 4)) = ".zip" Then
-                                                                                    Call AppendClassLogFile(cpCore.db.config.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, unzipping www file [" & cpCore.cluster.config.clusterPhysicalPath & cpCore.db.config.appRootPath & DstFilePath & Filename & "].")
-                                                                                    Call cpCore.db.privateFiles.UnzipFile(DstFilePath & Filename)
+                                                                                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, unzipping www file [" & cpCore.cluster.config.clusterPhysicalPath & cpCore.appConfig.appRootFilesPath & DstFilePath & Filename & "].")
+                                                                                    Call cpCore.privateFiles.UnzipFile(DstFilePath & Filename)
                                                                                 End If
                                                                             Case "file", "content"
                                                                                 ContentFileList = ContentFileList & vbCrLf & DstFilePath & Filename
-                                                                                Call AppendClassLogFile(cpCore.db.config.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, copying file to content, src [" & CollectionVersionFolder & SrcPath & "], dst [" & DstFilePath & "].")
-                                                                                Call cpCore.db.privateFiles.copyFile(CollectionVersionFolder & SrcPath & Filename, DstFilePath & Filename, cpCore.db.cdnFiles)
+                                                                                Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, copying file to content, src [" & CollectionVersionFolder & SrcPath & "], dst [" & DstFilePath & "].")
+                                                                                Call cpCore.privateFiles.copyFile(CollectionVersionFolder & SrcPath & Filename, DstFilePath & Filename, cpCore.cdnFiles)
                                                                                 If LCase(Right(Filename, 4)) = ".zip" Then
-                                                                                    Call AppendClassLogFile(cpCore.db.config.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, unzipping content file [" & DstFilePath & Filename & "].")
-                                                                                    Call cpCore.db.cdnFiles.UnzipFile(DstFilePath & Filename)
+                                                                                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, unzipping content file [" & DstFilePath & Filename & "].")
+                                                                                    Call cpCore.cdnFiles.UnzipFile(DstFilePath & Filename)
                                                                                 End If
                                                                             Case Else
                                                                                 ExecFileList = ExecFileList & vbCrLf & Filename
@@ -1493,15 +1493,15 @@ ErrorTrap:
                                                                             '
                                                                             ' circular import detected, this collection is already imported
                                                                             '
-                                                                            Call AppendClassLogFile(cpCore.db.config.name, "UpgradeAppFromLocalCollection", "Circular import detected. This collection attempts to import a collection that had previously been imported. A collection can not import itself. The collection is [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1. The collection to be imported is [" & ChildCollectionName & "], GUID [" & ChildCollectionGUID & "]")
+                                                                            Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "Circular import detected. This collection attempts to import a collection that had previously been imported. A collection can not import itself. The collection is [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1. The collection to be imported is [" & ChildCollectionName & "], GUID [" & ChildCollectionGUID & "]")
                                                                         Else
-                                                                            Call AppendClassLogFile(cpCore.db.config.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 1, import collection found, name [" & ChildCollectionName & "], guid [" & ChildCollectionGUID & "]")
+                                                                            Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 1, import collection found, name [" & ChildCollectionName & "], guid [" & ChildCollectionGUID & "]")
                                                                             If True Then
                                                                                 Call installCollectionFromRemoteRepo(ChildCollectionGUID, "", return_IISResetRequired, return_RegisterList, return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild)
                                                                             Else
                                                                                 If ChildCollectionGUID = "" Then
                                                                                     status = "The importcollection node [" & ChildCollectionName & "] can not be upgraded because it does not include a valid guid."
-                                                                                    Call AppendClassLogFile(cpCore.db.config.name, "UpgradeAppFromLocalCollection", status)
+                                                                                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", status)
                                                                                 Else
                                                                                     '
                                                                                     ' This import occurred while upgrading an application from the local collections (Db upgrade or AddonManager)
@@ -1540,20 +1540,20 @@ ErrorTrap:
                                                             '-------------------------------------------------------------------------------
                                                             '
                                                             OKToInstall = False
-                                                            Call AppendClassLogFile(cpCore.db.config.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 1 done, create collection record.")
-                                                            CSCollection = cpCore.db.db_csOpen("Add-on Collections", "(" & AddonGuidFieldName & "=" & cpCore.db.db_EncodeSQLText(CollectionGuid) & ")")
+                                                            Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 1 done, create collection record.")
+                                                            CSCollection = cpCore.db.db_csOpen("Add-on Collections", "(" & AddonGuidFieldName & "=" & cpCore.db.encodeSQLText(CollectionGuid) & ")")
                                                             If cpCore.db.db_csOk(CSCollection) Then
                                                                 '
                                                                 ' Upgrade addon
                                                                 '
                                                                 If CollectionLastChangeDate = Date.MinValue Then
-                                                                    Call AppendClassLogFile(cpCore.db.config.name, "UpgradeAppFromLocalCollectionCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], App has the collection, but the new version has no lastchangedate, so it will upgrade to this unknown (manual) version.")
+                                                                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollectionCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], App has the collection, but the new version has no lastchangedate, so it will upgrade to this unknown (manual) version.")
                                                                     OKToInstall = True
                                                                 ElseIf (cpCore.db.db_GetCSDate(CSCollection, "lastchangedate") < CollectionLastChangeDate) Then
-                                                                    Call AppendClassLogFile(cpCore.db.config.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], App has an older version of collection. It will be upgraded.")
+                                                                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], App has an older version of collection. It will be upgraded.")
                                                                     OKToInstall = True
                                                                 Else
-                                                                    Call AppendClassLogFile(cpCore.db.config.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], App has an up-to-date version of collection. It will not be upgraded, but all imports in the new version will be checked.")
+                                                                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], App has an up-to-date version of collection. It will not be upgraded, but all imports in the new version will be checked.")
                                                                     OKToInstall = False
                                                                 End If
                                                             Else
@@ -1563,7 +1563,7 @@ ErrorTrap:
                                                                 Call cpCore.db.db_csClose(CSCollection)
                                                                 'Call AppendClassLogFile(cmc.appEnvironment.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Creating a new collection record for Collection [" & Collectionname & "], GUID [" & CollectionGuid & "]")
                                                                 CSCollection = cpCore.db.db_csInsertRecord("Add-on Collections", 0)
-                                                                Call AppendClassLogFile(cpCore.db.config.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], App does not have this collection so it will be installed.")
+                                                                Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], App does not have this collection so it will be installed.")
                                                                 OKToInstall = True
                                                             End If
                                                             If Not OKToInstall Then
@@ -1672,13 +1672,13 @@ ErrorTrap:
                                                                                     FilePath = Mid(FilePath, 17)
                                                                                     ContentFileList = ContentFileList & vbCrLf & Mid(PathFilename, 16)
 
-                                                                                    Call cpCore.db.privateFiles.copyFile(CollectionVersionFolder & FilePath & Filename, FilePath & Filename)
+                                                                                    Call cpCore.privateFiles.copyFile(CollectionVersionFolder & FilePath & Filename, FilePath & Filename)
                                                                                 Else
                                                                                     '
                                                                                     ' www file
                                                                                     '
                                                                                     wwwFileList = wwwFileList & vbCrLf & PathFilename
-                                                                                    Call cpCore.db.privateFiles.copyFile(CollectionVersionFolder & FilePath & Filename, FilePath & Filename, cpCore.db.appRootFiles)
+                                                                                    Call cpCore.privateFiles.copyFile(CollectionVersionFolder & FilePath & Filename, FilePath & Filename, cpCore.appRootFiles)
                                                                                 End If
                                                                             End If
                                                                         Next
@@ -1703,7 +1703,7 @@ ErrorTrap:
                                                                     '-------------------------------------------------------------------------------
                                                                     '
                                                                     CollectionWrapper = ""
-                                                                    Call AppendClassLogFile(cpCore.db.config.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 2")
+                                                                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 2")
                                                                     For Each CDefSection In .ChildNodes
                                                                         Select Case LCase(CDefSection.Name)
                                                                             Case "contensivecdef"
@@ -1753,7 +1753,7 @@ ErrorTrap:
                                                                             ' error - Need a way to reach the user that submitted the file
                                                                             '
                                                                             UserError = "There was an error reading the Meta data file."
-                                                                            Call AppendClassLogFile(cpCore.db.config.name, "UpgradeAppFromtLocalCollection", "Creating navigator entries, there was an error parsing the portion of the collection that contains cdef. Navigator entry creation was aborted. [" & UserError & "]")
+                                                                            Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromtLocalCollection", "Creating navigator entries, there was an error parsing the portion of the collection that contains cdef. Navigator entry creation was aborted. [" & UserError & "]")
                                                                             UpgradeOK = False
                                                                             return_ErrorMessage = return_ErrorMessage & "<P>The collection was not installed because the xml collection file has an error.</P>"
                                                                             loadOK = False
@@ -1810,7 +1810,7 @@ ErrorTrap:
                                                                     '   process seperate so another pass can create any lookup data from these records
                                                                     '-------------------------------------------------------------------------------
                                                                     '
-                                                                    Call AppendClassLogFile(cpCore.db.config.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 3")
+                                                                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 3")
                                                                     For Each CDefSection In .ChildNodes
                                                                         Select Case LCase(CDefSection.Name)
                                                                             Case "data"
@@ -1825,14 +1825,14 @@ ErrorTrap:
                                                                                         '
                                                                                         ContentName = GetXMLAttribute(IsFound, ContentNode, "content", "")
                                                                                         If ContentName = "" Then
-                                                                                            Call AppendClassLogFile(cpCore.db.config.name, "UpgradeAppFromLocalCollection", "Collection file contains a data.record node with a blank content attribute.")
+                                                                                            Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "Collection file contains a data.record node with a blank content attribute.")
                                                                                             UpgradeOK = False
                                                                                             return_ErrorMessage = return_ErrorMessage & "<P>Collection file contains a data.record node with a blank content attribute.</P>"
                                                                                         Else
                                                                                             ContentRecordGuid = GetXMLAttribute(IsFound, ContentNode, "guid", "")
                                                                                             ContentRecordName = GetXMLAttribute(IsFound, ContentNode, "name", "")
                                                                                             If (ContentRecordGuid = "") And (ContentRecordName = "") Then
-                                                                                                Call AppendClassLogFile(cpCore.db.config.name, "UpgradeAppFromLocalCollection", "Collection file contains a data record node with neither guid nor name. It must have either a name or a guid attribute. The content is [" & ContentName & "]")
+                                                                                                Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "Collection file contains a data record node with neither guid nor name. It must have either a name or a guid attribute. The content is [" & ContentName & "]")
                                                                                                 UpgradeOK = False
                                                                                                 return_ErrorMessage = return_ErrorMessage & "<P>The collection was not installed because the Collection file contains a data record node with neither name nor guid. This is not allowed. The content is [" & ContentName & "].</P>"
                                                                                             Else
@@ -1841,9 +1841,9 @@ ErrorTrap:
                                                                                                 '
                                                                                                 CDef = cpCore.metaData.getCdef(ContentName)
                                                                                                 If ContentRecordGuid <> "" Then
-                                                                                                    CS = cpCore.db.db_csOpen(ContentName, "ccguid=" & cpCore.db.db_EncodeSQLText(ContentRecordGuid))
+                                                                                                    CS = cpCore.db.db_csOpen(ContentName, "ccguid=" & cpCore.db.encodeSQLText(ContentRecordGuid))
                                                                                                 Else
-                                                                                                    CS = cpCore.db.db_csOpen(ContentName, "name=" & cpCore.db.db_EncodeSQLText(ContentRecordName))
+                                                                                                    CS = cpCore.db.db_csOpen(ContentName, "name=" & cpCore.db.encodeSQLText(ContentRecordName))
                                                                                                 End If
                                                                                                 Dim recordfound As Boolean
 
@@ -1887,7 +1887,7 @@ ErrorTrap:
                                                                                                     ' add this error to the front, and abort -- let them try to fix it
                                                                                                     '
                                                                                                     ErrDescription = Err.Description
-                                                                                                    Call HandleClassTrapError(cpCore.db.config.name, Err.Number, Err.Source, Err.Description, "UpgradeAppFromLocalCollection", False, True)
+                                                                                                    Call HandleClassTrapError(cpCore.appConfig.name, Err.Number, Err.Source, Err.Description, "UpgradeAppFromLocalCollection", False, True)
                                                                                                     Err.Clear()
                                                                                                     return_ErrorMessage = "<P>There was a problem saving an imported record in record [" & ContentName & "] named [" & ContentRecordName & "]. There error was [" & ErrDescription & "]. Please fix the problem and try again.</P>" & return_ErrorMessage
                                                                                                     installCollectionFromLocalRepo = False
@@ -1905,7 +1905,7 @@ ErrorTrap:
                                                                     ' ----- Pass 4, process fields in data nodes
                                                                     '-------------------------------------------------------------------------------
                                                                     '
-                                                                    Call AppendClassLogFile(cpCore.db.config.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 4")
+                                                                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 4")
                                                                     For Each CDefSection In .ChildNodes
                                                                         Select Case LCase(CDefSection.Name)
                                                                             Case "data"
@@ -1922,7 +1922,7 @@ ErrorTrap:
                                                                                         '
                                                                                         ContentName = GetXMLAttribute(IsFound, ContentNode, "content", "")
                                                                                         If ContentName = "" Then
-                                                                                            Call AppendClassLogFile(cpCore.db.config.name, "UpgradeAppFromLocalCollection", "Collection file contains a data.record node with a blank content attribute.")
+                                                                                            Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "Collection file contains a data.record node with a blank content attribute.")
                                                                                             UpgradeOK = False
                                                                                             return_ErrorMessage = return_ErrorMessage & "<P>Collection file contains a data.record node with a blank content attribute.</P>"
                                                                                         Else
@@ -1931,9 +1931,9 @@ ErrorTrap:
                                                                                             If (ContentRecordGuid <> "") Or (ContentRecordName <> "") Then
                                                                                                 CDef = cpCore.metaData.getCdef(ContentName)
                                                                                                 If ContentRecordGuid <> "" Then
-                                                                                                    CS = cpCore.db.db_csOpen(ContentName, "ccguid=" & cpCore.db.db_EncodeSQLText(ContentRecordGuid))
+                                                                                                    CS = cpCore.db.db_csOpen(ContentName, "ccguid=" & cpCore.db.encodeSQLText(ContentRecordGuid))
                                                                                                 Else
-                                                                                                    CS = cpCore.db.db_csOpen(ContentName, "name=" & cpCore.db.db_EncodeSQLText(ContentRecordName))
+                                                                                                    CS = cpCore.db.db_csOpen(ContentName, "name=" & cpCore.db.encodeSQLText(ContentRecordName))
                                                                                                 End If
                                                                                                 If Not cpCore.db.db_csOk(CS) Then
                                                                                                     CS = CS
@@ -2021,7 +2021,7 @@ ErrorTrap:
                                                                                                     ' add this error to the front, and abort -- let them try to fix it
                                                                                                     '
                                                                                                     ErrDescription = Err.Description
-                                                                                                    Call HandleClassTrapError(cpCore.db.config.name, Err.Number, Err.Source, Err.Description, "UpgradeAppFromLocalCollection", False, True)
+                                                                                                    Call HandleClassTrapError(cpCore.appConfig.name, Err.Number, Err.Source, Err.Description, "UpgradeAppFromLocalCollection", False, True)
                                                                                                     Err.Clear()
                                                                                                     return_ErrorMessage = "<P>There was a problem saving an imported record in record [" & ContentName & "] named [" & ContentRecordName & "]. There error was [" & ErrDescription & "]. Please fix the problem and try again.</P>" & return_ErrorMessage
                                                                                                     installCollectionFromLocalRepo = False
@@ -2042,7 +2042,7 @@ ErrorTrap:
                                                                     ' Process all non-import <Collection> nodes
                                                                     '-------------------------------------------------------------------------------
                                                                     '
-                                                                    Call AppendClassLogFile(cpCore.db.config.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 5")
+                                                                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 5")
                                                                     For Each CDefSection In .ChildNodes
                                                                         Select Case LCase(CDefSection.Name)
                                                                             Case "cdef", "data", "help", "resource", "helplink"
@@ -2061,7 +2061,7 @@ ErrorTrap:
                                                                                 End If
                                                                                 If ChildCollectionGUID <> "" Then
                                                                                     ChildCollectionID = 0
-                                                                                    CS = cpCore.db.db_csOpen("Add-on Collections", "ccguid=" & cpCore.db.db_EncodeSQLText(ChildCollectionGUID), , , , , , "id")
+                                                                                    CS = cpCore.db.db_csOpen("Add-on Collections", "ccguid=" & cpCore.db.encodeSQLText(ChildCollectionGUID), , , , , , "id")
                                                                                     If cpCore.db.db_csOk(CS) Then
                                                                                         ChildCollectionID = cpCore.db.db_GetCSInteger(CS, "id")
                                                                                     End If
@@ -2088,23 +2088,23 @@ ErrorTrap:
                                                                                 If ScriptingGuid = "" Then
                                                                                     ScriptingGuid = ScriptingName
                                                                                 End If
-                                                                                Criteria = "(ccguid=" & cpCore.db.db_EncodeSQLText(ScriptingGuid) & ")"
+                                                                                Criteria = "(ccguid=" & cpCore.db.encodeSQLText(ScriptingGuid) & ")"
                                                                                 ScriptingModuleID = 0
                                                                                 CS = cpCore.db.db_csOpen("Scripting Modules", Criteria)
                                                                                 If cpCore.db.db_csOk(CS) Then
                                                                                     '
                                                                                     ' Update the Addon
                                                                                     '
-                                                                                    Call AppendClassLogFile(cpCore.db.config.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, GUID match with existing scripting module, Updating module [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
+                                                                                    Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, GUID match with existing scripting module, Updating module [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
                                                                                 Else
                                                                                     '
                                                                                     ' not found by GUID - search name against name to update legacy Add-ons
                                                                                     '
                                                                                     Call cpCore.db.db_csClose(CS)
-                                                                                    Criteria = "(name=" & cpCore.db.db_EncodeSQLText(ScriptingName) & ")and(ccguid is null)"
+                                                                                    Criteria = "(name=" & cpCore.db.encodeSQLText(ScriptingName) & ")and(ccguid is null)"
                                                                                     CS = cpCore.db.db_csOpen("Scripting Modules", Criteria)
                                                                                     If cpCore.db.db_csOk(CS) Then
-                                                                                        Call AppendClassLogFile(cpCore.db.config.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Scripting Module matched an existing Module that has no GUID, Updating to [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
+                                                                                        Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Scripting Module matched an existing Module that has no GUID, Updating to [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
                                                                                     End If
                                                                                 End If
                                                                                 If Not cpCore.db.db_csOk(CS) Then
@@ -2114,14 +2114,14 @@ ErrorTrap:
                                                                                     Call cpCore.db.db_csClose(CS)
                                                                                     CS = cpCore.db.db_csInsertRecord("Scripting Modules", 0)
                                                                                     If cpCore.db.db_csOk(CS) Then
-                                                                                        Call AppendClassLogFile(cpCore.db.config.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Creating new Scripting Module [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
+                                                                                        Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Creating new Scripting Module [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
                                                                                     End If
                                                                                 End If
                                                                                 If Not cpCore.db.db_csOk(CS) Then
                                                                                     '
                                                                                     ' Could not create new
                                                                                     '
-                                                                                    Call AppendClassLogFile(cpCore.db.config.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Scripting Module could not be created, skipping Scripting Module [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
+                                                                                    Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Scripting Module could not be created, skipping Scripting Module [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
                                                                                 Else
                                                                                     ScriptingModuleID = cpCore.db.db_GetCSInteger(CS, "ID")
                                                                                     Call cpCore.db.db_setCS(CS, "code", CDefSection.InnerText)
@@ -2154,23 +2154,23 @@ ErrorTrap:
                                                                                 If nodeGuid = "" Then
                                                                                     nodeGuid = NodeName
                                                                                 End If
-                                                                                Criteria = "(ccguid=" & cpCore.db.db_EncodeSQLText(nodeGuid) & ")"
+                                                                                Criteria = "(ccguid=" & cpCore.db.encodeSQLText(nodeGuid) & ")"
                                                                                 ScriptingModuleID = 0
                                                                                 CS = cpCore.db.db_csOpen("Shared Styles", Criteria)
                                                                                 If cpCore.db.db_csOk(CS) Then
                                                                                     '
                                                                                     ' Update the Addon
                                                                                     '
-                                                                                    Call AppendClassLogFile(cpCore.db.config.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, GUID match with existing shared style, Updating [" & NodeName & "], Guid [" & nodeGuid & "]")
+                                                                                    Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, GUID match with existing shared style, Updating [" & NodeName & "], Guid [" & nodeGuid & "]")
                                                                                 Else
                                                                                     '
                                                                                     ' not found by GUID - search name against name to update legacy Add-ons
                                                                                     '
                                                                                     Call cpCore.db.db_csClose(CS)
-                                                                                    Criteria = "(name=" & cpCore.db.db_EncodeSQLText(NodeName) & ")and(ccguid is null)"
+                                                                                    Criteria = "(name=" & cpCore.db.encodeSQLText(NodeName) & ")and(ccguid is null)"
                                                                                     CS = cpCore.db.db_csOpen("shared styles", Criteria)
                                                                                     If cpCore.db.db_csOk(CS) Then
-                                                                                        Call AppendClassLogFile(cpCore.db.config.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, shared style matched an existing Module that has no GUID, Updating to [" & NodeName & "], Guid [" & nodeGuid & "]")
+                                                                                        Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, shared style matched an existing Module that has no GUID, Updating to [" & NodeName & "], Guid [" & nodeGuid & "]")
                                                                                     End If
                                                                                 End If
                                                                                 If Not cpCore.db.db_csOk(CS) Then
@@ -2180,14 +2180,14 @@ ErrorTrap:
                                                                                     Call cpCore.db.db_csClose(CS)
                                                                                     CS = cpCore.db.db_csInsertRecord("shared styles", 0)
                                                                                     If cpCore.db.db_csOk(CS) Then
-                                                                                        Call AppendClassLogFile(cpCore.db.config.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Creating new shared style [" & NodeName & "], Guid [" & nodeGuid & "]")
+                                                                                        Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Creating new shared style [" & NodeName & "], Guid [" & nodeGuid & "]")
                                                                                     End If
                                                                                 End If
                                                                                 If Not cpCore.db.db_csOk(CS) Then
                                                                                     '
                                                                                     ' Could not create new
                                                                                     '
-                                                                                    Call AppendClassLogFile(cpCore.db.config.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, shared style could not be created, skipping shared style [" & NodeName & "], Guid [" & nodeGuid & "]")
+                                                                                    Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, shared style could not be created, skipping shared style [" & NodeName & "], Guid [" & nodeGuid & "]")
                                                                                 Else
                                                                                     sharedStyleId = cpCore.db.db_GetCSInteger(CS, "ID")
                                                                                     Call cpCore.db.db_setCS(CS, "StyleFilename", CDefSection.InnerText)
@@ -2225,7 +2225,7 @@ ErrorTrap:
                                                                                 ' Unknown node in collection file
                                                                                 '
                                                                                 OtherXML = OtherXML & vbCrLf & CDefSection.OuterXml
-                                                                                Call AppendClassLogFile(cpCore.db.config.name, "UpgradeAppFromtLocalCollection", "Addon Collection for [" & Collectionname & "] contained an unknown node [" & CDefSection.Name & "]. This node will be ignored.")
+                                                                                Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromtLocalCollection", "Addon Collection for [" & Collectionname & "] contained an unknown node [" & CDefSection.Name & "]. This node will be ignored.")
                                                                         End Select
                                                                     Next
                                                                     '
@@ -2237,7 +2237,7 @@ ErrorTrap:
                                                                     ' process include add-on node of add-on nodes
                                                                     '-------------------------------------------------------------------------------
                                                                     '
-                                                                    Call AppendClassLogFile(cpCore.db.config.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 6")
+                                                                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 6")
                                                                     For Each CDefSection In .ChildNodes
                                                                         Select Case LCase(CDefSection.Name)
                                                                             Case "addon", "add-on"
@@ -2265,7 +2265,7 @@ ErrorTrap:
                                                             Call cpCore.db.db_csClose(CSCollection)
                                                         End If
                                                         '
-                                                        Call AppendClassLogFile(cpCore.db.config.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], upgrade complete, flush cache")
+                                                        Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], upgrade complete, flush cache")
                                                         '
                                                         ' import complete, flush caches
                                                         '
@@ -2293,7 +2293,7 @@ ErrorTrap:
                 '
                 ' Log error and exit with failure. This way any other upgrading will still continue
                 '
-                Call HandleClassTrapError(cpCore.db.config.name, Err.Number, Err.Source, Err.Description, "UpgradeAppFromLocalCollection", True, True)
+                Call HandleClassTrapError(cpCore.appConfig.name, Err.Number, Err.Source, Err.Description, "UpgradeAppFromLocalCollection", True, True)
                 Err.Clear()
                 If return_ErrorMessage = "" Then
                     return_ErrorMessage = "There was an unexpected error while installing this collection."
@@ -2321,10 +2321,10 @@ ErrorTrap:
                 Dim Pos As Integer
                 Dim FolderList As IO.DirectoryInfo()
                 '
-                collectionFilePathFilename = cpCore.db.getAddonPath & "Collections.xml"
-                returnXml = cpCore.db.privateFiles.ReadFile(collectionFilePathFilename)
+                collectionFilePathFilename = cpCore.getAddonPath & "Collections.xml"
+                returnXml = cpCore.privateFiles.ReadFile(collectionFilePathFilename)
                 If returnXml = "" Then
-                    FolderList = cpCore.db.privateFiles.getFolders(cpCore.db.getAddonPath)
+                    FolderList = cpCore.privateFiles.getFolders(cpCore.getAddonPath)
                     If FolderList.Count > 0 Then
                         For Each folder As IO.DirectoryInfo In FolderList
                             FolderName = folder.Name
@@ -2338,7 +2338,7 @@ ErrorTrap:
                                         Collectionname = Left(FolderName, Len(FolderName) - Len(CollectionGuid) - 1)
                                         CollectionGuid = Mid(CollectionGuid, 1, 8) & "-" & Mid(CollectionGuid, 9, 4) & "-" & Mid(CollectionGuid, 13, 4) & "-" & Mid(CollectionGuid, 17, 4) & "-" & Mid(CollectionGuid, 21)
                                         CollectionGuid = "{" & CollectionGuid & "}"
-                                        SubFolderList = cpCore.db.privateFiles.getFolders(cpCore.db.getAddonPath() & "\" & FolderName)
+                                        SubFolderList = cpCore.privateFiles.getFolders(cpCore.getAddonPath() & "\" & FolderName)
                                         If SubFolderList.Count > 0 Then
                                             SubFolder = SubFolderList(SubFolderList.Count - 1)
                                             FolderName = FolderName & "\" & SubFolder.Name
@@ -2359,7 +2359,7 @@ ErrorTrap:
                         Next
                     End If
                     returnXml = "<CollectionList>" & returnXml & vbCrLf & "</CollectionList>"
-                    Call cpCore.db.privateFiles.SaveFile(collectionFilePathFilename, returnXml)
+                    Call cpCore.privateFiles.SaveFile(collectionFilePathFilename, returnXml)
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -2388,11 +2388,11 @@ ErrorTrap:
             Try
                 Call Doc.LoadXml(getCollectionListFile())
             Catch ex As Exception
-                Call AppendClassLogFile("Server", "", "UpdateConfig, Error loading Collections.xml file.")
+                Call appendInstallLog("Server", "", "UpdateConfig, Error loading Collections.xml file.")
             End Try
             If loadOK Then
                 If LCase(Doc.DocumentElement.Name) <> LCase(CollectionListRootNode) Then
-                    Call AppendClassLogFile("Server", "", "UpdateConfig, The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.")
+                    Call appendInstallLog("Server", "", "UpdateConfig, The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.")
                 Else
                     With Doc.DocumentElement
                         If LCase(.Name) = "collectionlist" Then
@@ -2449,9 +2449,9 @@ ErrorTrap:
                             '
                             ' Save the result
                             '
-                            LocalFilename = cpCore.db.getAddonPath() & "Collections.xml"
+                            LocalFilename = cpCore.getAddonPath() & "Collections.xml"
                             'LocalFilename = GetProgramPath & "\Addons\Collections.xml"
-                            Call Doc.Save(cpCore.db.privateFiles.rootLocalFolderPath & LocalFilename)
+                            Call Doc.Save(cpCore.privateFiles.rootLocalFolderPath & LocalFilename)
                         End If
                     End With
                 End If
@@ -2501,12 +2501,12 @@ ErrorTrap:
                     Call Doc.LoadXml(getCollectionListFile())
                 Catch ex As Exception
                     'hint = hint & ",parse error"
-                    Call AppendClassLogFile("Server", "", "GetCollectionConfig, Hint=[" & hint & "], Error loading Collections.xml file.")
+                    Call appendInstallLog("Server", "", "GetCollectionConfig, Hint=[" & hint & "], Error loading Collections.xml file.")
                     loadOK = False
                 End Try
                 If loadOK Then
                     If LCase(Doc.DocumentElement.Name) <> LCase(CollectionListRootNode) Then
-                        Call AppendClassLogFile("Server", "GetCollectionConfig", "Hint=[" & hint & "], The Collections.xml file has an invalid root node")
+                        Call appendInstallLog("Server", "GetCollectionConfig", "Hint=[" & hint & "], The Collections.xml file has an invalid root node")
                     Else
                         With Doc.DocumentElement
                             If True Then
@@ -2572,14 +2572,14 @@ ErrorTrap:
                     '
                     ' BuildLocal failed, log it and do not upgrade
                     '
-                    Call AppendClassLogFile(TargetInstallAppName, "AddonInstallClass.InstallCollectionFilesFromFolder3", "BuildLocalCollectionFolder returned false with Error Message [" & return_ErrorMessage & "], exiting without calling UpgradeAllAppsFromLocalCollection")
+                    Call appendInstallLog(TargetInstallAppName, "AddonInstallClass.InstallCollectionFilesFromFolder3", "BuildLocalCollectionFolder returned false with Error Message [" & return_ErrorMessage & "], exiting without calling UpgradeAllAppsFromLocalCollection")
                 Else
                     returnSuccess = installCollectionFromLocalRepo(builder, return_IISResetRequired, return_CollectionGUID, cpCore.db.dataBuildVersion, return_ErrorMessage, ignoreRefactorOut, "", IsNewBuild)
                     If Not returnSuccess Then
                         '
                         ' Upgrade all apps failed
                         '
-                        Call AppendClassLogFile(TargetInstallAppName, "InstallCollectionFilesFromPrivateFolder", "UpgradeAllAppsFromLocalCollection returned false with Error Message [" & return_ErrorMessage & "].")
+                        Call appendInstallLog(TargetInstallAppName, "InstallCollectionFilesFromPrivateFolder", "UpgradeAllAppsFromLocalCollection returned false with Error Message [" & return_ErrorMessage & "].")
                     Else
                         returnSuccess = True
                     End If
@@ -2597,9 +2597,9 @@ ErrorTrap:
             Dim CS As Integer
             '
             If True Then
-                CS = cpCore.db.db_csOpen("Navigator Entries", "ccguid=" & cpCore.db.db_EncodeSQLText(ccGuid), "ID", , , , , "ID")
+                CS = cpCore.db.db_csOpen("Navigator Entries", "ccguid=" & cpCore.db.encodeSQLText(ccGuid), "ID", , , , , "ID")
             ElseIf cpCore.db.db_IsSQLTableField("default", "ccMenuEntries", "navguid") Then
-                CS = cpCore.db.db_csOpen("Navigator Entries", "navguid=" & cpCore.db.db_EncodeSQLText(ccGuid), "ID", , , , , "ID")
+                CS = cpCore.db.db_csOpen("Navigator Entries", "navguid=" & cpCore.db.encodeSQLText(ccGuid), "ID", , , , , "ID")
             End If
             If cpCore.db.db_csOk(CS) Then
                 GetNavIDByGuid = cpCore.db.db_GetCSInteger(CS, "id")
@@ -2641,8 +2641,8 @@ ErrorTrap:
                 DstFolder = Left(DstFolder, Len(DstFolder) - 1)
             End If
             '
-            If cpCore.db.privateFiles.checkPath(SrcFolder) Then
-                FileInfoArray = cpCore.db.privateFiles.GetFolderFiles(SrcFolder)
+            If cpCore.privateFiles.checkPath(SrcFolder) Then
+                FileInfoArray = cpCore.privateFiles.GetFolderFiles(SrcFolder)
                 For Each file As IO.FileInfo In FileInfoArray
                     If (file.Extension = "dll") Or (file.Extension = "exe") Or (file.Extension = "zip") Then
                         '
@@ -2658,13 +2658,13 @@ ErrorTrap:
                         '
                         ' copy this file to destination
                         '
-                        Call cpCore.db.privateFiles.copyFile(SrcPath & file.Name, DstPath & file.Name, cpCore.db.appRootFiles)
+                        Call cpCore.privateFiles.copyFile(SrcPath & file.Name, DstPath & file.Name, cpCore.appRootFiles)
                     End If
                 Next
                 '
                 ' copy folders to dst
                 '
-                FolderInfoArray = cpCore.db.privateFiles.getFolders(SrcFolder)
+                FolderInfoArray = cpCore.privateFiles.getFolders(SrcFolder)
                 For Each folder As IO.DirectoryInfo In FolderInfoArray
                     If (InStr(1, "," & BlockFolderList & ",", "," & folder.Name & ",", vbTextCompare) = 0) Then
                         Call CopyInstallToDst(SrcPath & folder.Name & "\", DstPath & folder.Name & "\", BlockFileList, "")
@@ -2699,8 +2699,8 @@ ErrorTrap:
                 SrcFolder = Left(SrcFolder, Len(SrcFolder) - 1)
             End If
             '
-            If cpCore.db.privateFiles.checkPath(SrcFolder) Then
-                FileInfoArray = cpCore.db.privateFiles.GetFolderFiles(SrcFolder)
+            If cpCore.privateFiles.checkPath(SrcFolder) Then
+                FileInfoArray = cpCore.privateFiles.GetFolderFiles(SrcFolder)
                 For Each file As IO.FileInfo In FileInfoArray
                     If (InStr(1, "," & ExcludeFileList & ",", "," & file.Name & ",", vbTextCompare) <> 0) Then
                         '
@@ -2722,7 +2722,7 @@ ErrorTrap:
                 '
                 ' copy folders to dst
                 '
-                FolderInfoArray = cpCore.db.privateFiles.getFolders(SrcFolder)
+                FolderInfoArray = cpCore.privateFiles.getFolders(SrcFolder)
                 For Each folder As IO.DirectoryInfo In FolderInfoArray
                     GetCollectionFileList = GetCollectionFileList & GetCollectionFileList(SrcPath, SubFolder & folder.Name & "\", ExcludeFileList)
                 Next
@@ -2867,22 +2867,22 @@ ErrorTrap:
                     If navTypeId = 0 Then
                         navTypeId = NavTypeIDAddon
                     End If
-                    Criteria = "(" & AddonGuidFieldName & "=" & cpCore.db.db_EncodeSQLText(addonGuid) & ")"
+                    Criteria = "(" & AddonGuidFieldName & "=" & cpCore.db.encodeSQLText(addonGuid) & ")"
                     CS = cpCore.db.db_csOpen("Add-ons", Criteria, , False)
                     If cpCore.db.db_csOk(CS) Then
                         '
                         ' Update the Addon
                         '
-                        Call AppendClassLogFile(cpCore.db.config.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, GUID match with existing Add-on, Updating Add-on [" & addonName & "], Guid [" & addonGuid & "]")
+                        Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, GUID match with existing Add-on, Updating Add-on [" & addonName & "], Guid [" & addonGuid & "]")
                     Else
                         '
                         ' not found by GUID - search name against name to update legacy Add-ons
                         '
                         Call cpCore.db.db_csClose(CS)
-                        Criteria = "(name=" & cpCore.db.db_EncodeSQLText(addonName) & ")and(" & AddonGuidFieldName & " is null)"
+                        Criteria = "(name=" & cpCore.db.encodeSQLText(addonName) & ")and(" & AddonGuidFieldName & " is null)"
                         CS = cpCore.db.db_csOpen("Add-ons", Criteria, , False)
                         If cpCore.db.db_csOk(CS) Then
-                            Call AppendClassLogFile(cpCore.db.config.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Add-on name matched an existing Add-on that has no GUID, Updating legacy Aggregate Function to Add-on [" & addonName & "], Guid [" & addonGuid & "]")
+                            Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Add-on name matched an existing Add-on that has no GUID, Updating legacy Aggregate Function to Add-on [" & addonName & "], Guid [" & addonGuid & "]")
                         End If
                     End If
                     If Not cpCore.db.db_csOk(CS) Then
@@ -2892,14 +2892,14 @@ ErrorTrap:
                         Call cpCore.db.db_csClose(CS)
                         CS = cpCore.db.db_csInsertRecord("Add-ons", 0)
                         If cpCore.db.db_csOk(CS) Then
-                            Call AppendClassLogFile(cpCore.db.config.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Creating new Add-on [" & addonName & "], Guid [" & addonGuid & "]")
+                            Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Creating new Add-on [" & addonName & "], Guid [" & addonGuid & "]")
                         End If
                     End If
                     If Not cpCore.db.db_csOk(CS) Then
                         '
                         ' Could not create new Add-on
                         '
-                        Call AppendClassLogFile(cpCore.db.config.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Add-on could not be created, skipping Add-on [" & addonName & "], Guid [" & addonGuid & "]")
+                        Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Add-on could not be created, skipping Add-on [" & addonName & "], Guid [" & addonGuid & "]")
                     Else
                         addonId = cpCore.db.db_GetCSInteger(CS, "ID")
                         '
@@ -2964,11 +2964,11 @@ ErrorTrap:
                                                             ContentNameorGuid = GetXMLAttribute(IsFound, TriggerNode, "name", "")
                                                         End If
                                                     End If
-                                                    Criteria = "(ccguid=" & cpCore.db.db_EncodeSQLText(ContentNameorGuid) & ")"
+                                                    Criteria = "(ccguid=" & cpCore.db.encodeSQLText(ContentNameorGuid) & ")"
                                                     CS2 = cpCore.db.db_csOpen("Content", Criteria)
                                                     If Not cpCore.db.db_csOk(CS2) Then
                                                         Call cpCore.db.db_csClose(CS2)
-                                                        Criteria = "(ccguid is null)and(name=" & cpCore.db.db_EncodeSQLText(ContentNameorGuid) & ")"
+                                                        Criteria = "(ccguid is null)and(name=" & cpCore.db.encodeSQLText(ContentNameorGuid) & ")"
                                                         CS2 = cpCore.db.db_csOpen("content", Criteria)
                                                     End If
                                                     If cpCore.db.db_csOk(CS2) Then
@@ -3031,11 +3031,11 @@ ErrorTrap:
                                                             ScriptingNameorGuid = GetXMLAttribute(IsFound, ScriptingNode, "name", "")
                                                         End If
                                                     End If
-                                                    Criteria = "(ccguid=" & cpCore.db.db_EncodeSQLText(ScriptingNameorGuid) & ")"
+                                                    Criteria = "(ccguid=" & cpCore.db.encodeSQLText(ScriptingNameorGuid) & ")"
                                                     CS2 = cpCore.db.db_csOpen("Scripting Modules", Criteria)
                                                     If Not cpCore.db.db_csOk(CS2) Then
                                                         Call cpCore.db.db_csClose(CS2)
-                                                        Criteria = "(ccguid is null)and(name=" & cpCore.db.db_EncodeSQLText(ScriptingNameorGuid) & ")"
+                                                        Criteria = "(ccguid is null)and(name=" & cpCore.db.encodeSQLText(ScriptingNameorGuid) & ")"
                                                         CS2 = cpCore.db.db_csOpen("Scripting Modules", Criteria)
                                                     End If
                                                     If cpCore.db.db_csOk(CS2) Then
@@ -3119,11 +3119,11 @@ ErrorTrap:
                                         If nodeNameOrGuid = "" Then
                                             nodeNameOrGuid = GetXMLAttribute(IsFound, PageInterface, "name", "")
                                         End If
-                                        Criteria = "(ccguid=" & cpCore.db.db_EncodeSQLText(nodeNameOrGuid) & ")"
+                                        Criteria = "(ccguid=" & cpCore.db.encodeSQLText(nodeNameOrGuid) & ")"
                                         CS2 = cpCore.db.db_csOpen("shared styles", Criteria)
                                         If Not cpCore.db.db_csOk(CS2) Then
                                             Call cpCore.db.db_csClose(CS2)
-                                            Criteria = "(ccguid is null)and(name=" & cpCore.db.db_EncodeSQLText(nodeNameOrGuid) & ")"
+                                            Criteria = "(ccguid is null)and(name=" & cpCore.db.encodeSQLText(nodeNameOrGuid) & ")"
                                             CS2 = cpCore.db.db_csOpen("shared styles", Criteria)
                                         End If
                                         If cpCore.db.db_csOk(CS2) Then
@@ -3319,11 +3319,11 @@ ErrorTrap:
                                                                     Criteria = ""
                                                                     If TestGuid <> "" Then
                                                                         If TestGuid = addonGuid Then
-                                                                            Criteria = "(" & AddonGuidFieldName & "=" & cpCore.db.db_EncodeSQLText(SrcAddonGuid) & ")"
+                                                                            Criteria = "(" & AddonGuidFieldName & "=" & cpCore.db.encodeSQLText(SrcAddonGuid) & ")"
                                                                         End If
                                                                     ElseIf TestName <> "" Then
                                                                         If TestName = addonName Then
-                                                                            Criteria = "(name=" & cpCore.db.db_EncodeSQLText(SrcAddonName) & ")"
+                                                                            Criteria = "(name=" & cpCore.db.encodeSQLText(SrcAddonName) & ")"
                                                                         End If
                                                                     End If
                                                                     If Criteria <> "" Then
@@ -3336,7 +3336,7 @@ ErrorTrap:
                                                                         AddRule = False
                                                                         If SrcAddonID = 0 Then
                                                                             UserError = "The add-on being installed is referenced by another add-on in collection [], but this add-on could not be found by the respoective criteria [" & Criteria & "]"
-                                                                            Call AppendClassLogFile(cpCore.db.config.name, "AddonInstallClass", "UpgradeAddFromLocalCollection_InstallAddonNode, UserError [" & UserError & "]")
+                                                                            Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAddFromLocalCollection_InstallAddonNode, UserError [" & UserError & "]")
                                                                         Else
                                                                             CS2 = cpCore.db.db_openCsSql_rev("default", "select ID from ccAddonIncludeRules where Addonid=" & SrcAddonID & " and IncludedAddonID=" & addonId)
                                                                             AddRule = Not cpCore.db.db_csOk(CS2)
@@ -3450,26 +3450,26 @@ ErrorTrap:
                     AOGuid = AOName
                 End If
                 AddOnType = GetXMLAttribute(IsFound, AddonNode, "type", "")
-                Criteria = "(" & AddonGuidFieldName & "=" & cpCore.db.db_EncodeSQLText(AOGuid) & ")"
+                Criteria = "(" & AddonGuidFieldName & "=" & cpCore.db.encodeSQLText(AOGuid) & ")"
                 CS = cpCore.db.db_csOpen("Add-ons", Criteria, , False)
                 If cpCore.db.db_csOk(CS) Then
                     '
                     ' Update the Addon
                     '
-                    Call AppendClassLogFile(cpCore.db.config.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, GUID match with existing Add-on, Updating Add-on [" & AOName & "], Guid [" & AOGuid & "]")
+                    Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, GUID match with existing Add-on, Updating Add-on [" & AOName & "], Guid [" & AOGuid & "]")
                 Else
                     '
                     ' not found by GUID - search name against name to update legacy Add-ons
                     '
                     Call cpCore.db.db_csClose(CS)
-                    Criteria = "(name=" & cpCore.db.db_EncodeSQLText(AOName) & ")and(" & AddonGuidFieldName & " is null)"
+                    Criteria = "(name=" & cpCore.db.encodeSQLText(AOName) & ")and(" & AddonGuidFieldName & " is null)"
                     CS = cpCore.db.db_csOpen("Add-ons", Criteria, , False)
                 End If
                 If Not cpCore.db.db_csOk(CS) Then
                     '
                     ' Could not find add-on
                     '
-                    Call AppendClassLogFile(cpCore.db.config.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Add-on could not be created, skipping Add-on [" & AOName & "], Guid [" & AOGuid & "]")
+                    Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Add-on could not be created, skipping Add-on [" & AOName & "], Guid [" & AOGuid & "]")
                 Else
                     addonId = cpCore.db.db_GetCSInteger(CS, "ID")
                     ArgumentList = ""
@@ -3489,12 +3489,12 @@ ErrorTrap:
                                         IncludeAddonID = 0
                                         Criteria = ""
                                         If IncludeAddonGuid <> "" Then
-                                            Criteria = AddonGuidFieldName & "=" & cpCore.db.db_EncodeSQLText(IncludeAddonGuid)
+                                            Criteria = AddonGuidFieldName & "=" & cpCore.db.encodeSQLText(IncludeAddonGuid)
                                             If IncludeAddonName = "" Then
                                                 IncludeAddonName = "Add-on " & IncludeAddonGuid
                                             End If
                                         ElseIf IncludeAddonName <> "" Then
-                                            Criteria = "(name=" & cpCore.db.db_EncodeSQLText(IncludeAddonName) & ")"
+                                            Criteria = "(name=" & cpCore.db.encodeSQLText(IncludeAddonName) & ")"
                                         End If
                                         If Criteria <> "" Then
                                             CS2 = cpCore.db.db_csOpen("Add-ons", Criteria)
@@ -3505,7 +3505,7 @@ ErrorTrap:
                                             AddRule = False
                                             If IncludeAddonID = 0 Then
                                                 UserError = "The include add-on [" & IncludeAddonName & "] could not be added because it was not found. If it is in the collection being installed, it must appear before any add-ons that include it."
-                                                Call AppendClassLogFile(cpCore.db.config.name, "AddonInstallClass", "UpgradeAddFromLocalCollection_InstallAddonNode, UserError [" & UserError & "]")
+                                                Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAddFromLocalCollection_InstallAddonNode, UserError [" & UserError & "]")
                                                 ReturnUpgradeOK = False
                                                 ReturnErrorMessage = ReturnErrorMessage & "<P>The collection was not installed because the add-on [" & AOName & "] requires an included add-on [" & IncludeAddonName & "] which could not be found. If it is in the collection being installed, it must appear before any add-ons that include it.</P>"
                                             Else
@@ -4045,12 +4045,10 @@ ErrorTrap:
         '   Append Log File
         '===========================================================================
         '
-        Private Sub AppendClassLogFile(ByVal ApplicationName As String, ByVal Method As String, ByVal LogMessage As String)
-            '
-            'Call App.LogEvent("addonInstallClass.AppendClassLogFile called from " & Method)
+        Private Sub appendInstallLog(ByVal ApplicationName As String, ByVal Method As String, ByVal LogMessage As String)
             '
             Console.WriteLine(Method & ", " & LogMessage)
-            cpCore.appendLogWithLegacyRow(ApplicationName, LogMessage, "dll", "AddonInstallClass", Method, 0, "", "", False, True, "", "AddonInstall", "")
+            cpCore.appendLogWithLegacyRow(ApplicationName, LogMessage, "dll", "AddonInstallClass", Method, 0, "", "", False, True, "", "Install", "")
             '
         End Sub
         '
@@ -4072,7 +4070,7 @@ ErrorTrap:
                     '
                     ' special case, with base collection, first do just a pass with the cdef nodes, to build out a new site
                     '
-                    Call AppendClassLogFile(cpCore.db.config.name, "installBaseCollection", "Special case -- installing base collection on new site, run cdef first")
+                    Call appendInstallLog(cpCore.appConfig.name, "installBaseCollection", "Special case -- installing base collection on new site, run cdef first")
                     '
                     Dim CollectionWorking As New MiniCollectionClass
                     Dim CollectionNew As New MiniCollectionClass
@@ -4090,12 +4088,12 @@ ErrorTrap:
                 '
                 ' now treat as a regular collection and install - to pickup everything else 
                 '
-                cpCore.db.privateFiles.createPath(tmpFolderPath)
-                cpCore.cluster.clusterFiles.copyFile("clibResources\baseCollection.xml", tmpFolderPath & "baseCollection.xml", cpCore.db.privateFiles)
-                If Not InstallCollectionFromPrivateFolder(builder, ignoreString, tmpFolderPath, ignoreBoolean, cpCore.db.config.name, returnErrorMessage, ignoreString, isNewBuild) Then
+                cpCore.privateFiles.createPath(tmpFolderPath)
+                cpCore.cluster.clusterFiles.copyFile("clibResources\baseCollection.xml", tmpFolderPath & "baseCollection.xml", cpCore.privateFiles)
+                If Not InstallCollectionFromPrivateFolder(builder, ignoreString, tmpFolderPath, ignoreBoolean, cpCore.appConfig.name, returnErrorMessage, ignoreString, isNewBuild) Then
                     Throw New ApplicationException(returnErrorMessage)
                 End If
-                cpCore.db.privateFiles.DeleteFileFolder(tmpFolderPath)
+                cpCore.privateFiles.DeleteFileFolder(tmpFolderPath)
                 ''
                 'If isNewBuild Then
                 '    '
@@ -4138,21 +4136,21 @@ ErrorTrap:
                 '
                 ' ----- Import any CDef files, allowing for changes
                 '
-                Call AppendClassLogFile(cpCore.db.config.name, "ImportCDefData", "Application: " & cpCore.db.config.name & ", Importing Collection Data")
+                Call appendInstallLog(cpCore.appConfig.name, "ImportCDefData", "Application: " & cpCore.appConfig.name & ", Importing Collection Data")
                 '
-                Call AppendClassLogFile(cpCore.db.config.name, "ImportCDefData", "Application: " & cpCore.db.config.name & ", ImportCDefData, creating ApplicationCollection")
+                Call appendInstallLog(cpCore.appConfig.name, "ImportCDefData", "Application: " & cpCore.appConfig.name & ", ImportCDefData, creating ApplicationCollection")
                 miniCollectionWorking = installCollection_GetApplicationMiniCollection(isNewBuild)
                 '
-                Call AppendClassLogFile(cpCore.db.config.name, "ImportCDefData", "Application: " & cpCore.db.config.name & ", ImportCDefData, loading collectionfile data (length=" & Len(XMLText) & ") to CollectionNew")
+                Call appendInstallLog(cpCore.appConfig.name, "ImportCDefData", "Application: " & cpCore.appConfig.name & ", ImportCDefData, loading collectionfile data (length=" & Len(XMLText) & ") to CollectionNew")
                 Call installCollection_LoadXmlToMiniCollection(XMLText, miniCollectionToAdd, isBaseCollection, False, isNewBuild, miniCollectionWorking)
                 '
-                Call AppendClassLogFile(cpCore.db.config.name, "ImportCDefData", "Application: " & cpCore.db.config.name & ", ImportCDefData, calling AddSrcToDst")
+                Call appendInstallLog(cpCore.appConfig.name, "ImportCDefData", "Application: " & cpCore.appConfig.name & ", ImportCDefData, calling AddSrcToDst")
                 Call installCollection_AddMiniCollectionSrcToDst(miniCollectionWorking, miniCollectionToAdd, True)
                 '
-                Call AppendClassLogFile(cpCore.db.config.name, "ImportCDefData", "Application: " & cpCore.db.config.name & ", ImportCDefData, calling BuildDbFromCollection")
+                Call appendInstallLog(cpCore.appConfig.name, "ImportCDefData", "Application: " & cpCore.appConfig.name & ", ImportCDefData, calling BuildDbFromCollection")
                 Call installCollection_BuildDbFromMiniCollection(miniCollectionWorking, return_IISResetRequired, cpCore.db.dataBuildVersion, isNewBuild)
                 '
-                Call AppendClassLogFile(cpCore.db.config.name, "ImportCDefData", "Application: " & cpCore.db.config.name & ", ImportCDefData done, returning Return_IISResetRequired=" & return_IISResetRequired)
+                Call appendInstallLog(cpCore.appConfig.name, "ImportCDefData", "Application: " & cpCore.appConfig.name & ", ImportCDefData done, returning Return_IISResetRequired=" & return_IISResetRequired)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -4218,7 +4216,7 @@ ErrorTrap:
                 Dim NodeName As String
                 Dim FieldChildNode As XmlNode
                 '
-                Call AppendClassLogFile(cpCore.db.config.name, "UpgradeCDef_LoadDataToCollection", "Application: " & cpCore.db.config.name & ", UpgradeCDef_LoadDataToCollection")
+                Call appendInstallLog(cpCore.appConfig.name, "UpgradeCDef_LoadDataToCollection", "Application: " & cpCore.appConfig.name & ", UpgradeCDef_LoadDataToCollection")
                 '
                 returnCollection = New MiniCollectionClass()
                 '
@@ -4244,7 +4242,7 @@ ErrorTrap:
                             'hint = "get collection name"
                             Collectionname = GetXMLAttribute(Found, srcXmlDom.DocumentElement, "name", "")
                             If Collectionname = "" Then
-                                Call AppendClassLogFile(cpCore.db.config.name, "UpgradeCDef_LoadDataToCollection", "UpgradeCDef_LoadDataToCollection, Application: " & cpCore.db.config.name & ", Collection has no name")
+                                Call appendInstallLog(cpCore.appConfig.name, "UpgradeCDef_LoadDataToCollection", "UpgradeCDef_LoadDataToCollection, Application: " & cpCore.appConfig.name & ", Collection has no name")
                             Else
                                 'Call AppendClassLogFile(cpcore.app.config.name,"UpgradeCDef_LoadDataToCollection", "UpgradeCDef_LoadDataToCollection, Application: " & cpcore.app.appEnvironment.name & ", Collection: " & Collectionname)
                             End If
@@ -4275,7 +4273,7 @@ ErrorTrap:
                                         ContentName = GetXMLAttribute(Found, CDef_Node, "name", "")
                                         contentNameLc = LCase(ContentName)
                                         If ContentName = "" Then
-                                            cpCore.handleLegacyError3(cpCore.db.config.name, "collection file contains a CDEF node with no name attribute. This is not allowed.", "dll", "builderClass", "UpgradeCDef_LoadDataToCollection", 0, "", "", False, True, "")
+                                            cpCore.handleLegacyError3(cpCore.appConfig.name, "collection file contains a CDEF node with no name attribute. This is not allowed.", "dll", "builderClass", "UpgradeCDef_LoadDataToCollection", 0, "", "", False, True, "")
                                         Else
                                             '
                                             ' setup a cdef from the application collection to use as a default for missing attributes (for inherited cdef)
@@ -4764,22 +4762,22 @@ ErrorTrap:
                 Dim builder As New coreBuilderClass(cpCore)
                 Dim InstallCollectionList As String = ""                 'Collections to Install when upgrade is complete
                 '
-                Call AppendClassLogFile(cpCore.db.config.name, "UpgradeCDef_BuildDbFromCollection", "Application: " & cpCore.db.config.name & ", UpgradeCDef_BuildDbFromCollection")
+                Call appendInstallLog(cpCore.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "Application: " & cpCore.appConfig.name & ", UpgradeCDef_BuildDbFromCollection")
                 '
                 ' save current value of AllowContentAutoLoad and set it false (handled seperately here )
                 '
                 Dim AllowContentAutoLoad As Boolean
-                AllowContentAutoLoad = (cpCore.db.siteProperty_getBoolean("allowcontentautoload", True))
-                Call cpCore.db.siteProperty_set("AllowContentAutoLoad", False)
+                AllowContentAutoLoad = (cpCore.siteProperties.getBoolean("allowcontentautoload", True))
+                Call cpCore.siteProperties.setProperty("AllowContentAutoLoad", False)
                 '
                 '----------------------------------------------------------------------------------------------------------------------
-                Call AppendClassLogFile(cpCore.db.config.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 0.5: verify core sql tables")
+                Call appendInstallLog(cpCore.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 0.5: verify core sql tables")
                 '----------------------------------------------------------------------------------------------------------------------
                 '
                 'Call VerifyCoreTables()
                 '
                 '----------------------------------------------------------------------------------------------------------------------
-                Call AppendClassLogFile(cpCore.db.config.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 1: create SQL tables in default datasource")
+                Call appendInstallLog(cpCore.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 1: create SQL tables in default datasource")
                 '----------------------------------------------------------------------------------------------------------------------
                 '
                 UsedTables = ""
@@ -4789,7 +4787,7 @@ ErrorTrap:
                         ContentName = workingCdef.Name
                         With workingCdef
                             If .dataChanged Then
-                                Call AppendClassLogFile(cpCore.db.config.name, "UpgradeCDef_BuildDbFromCollection", "creating sql table [" & .ContentTableName & "], datasource [" & .ContentDataSourceName & "]")
+                                Call appendInstallLog(cpCore.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "creating sql table [" & .ContentTableName & "], datasource [" & .ContentDataSourceName & "]")
                                 If LCase(.ContentDataSourceName) = "default" Or .ContentDataSourceName = "" Then
                                     TableName = .ContentTableName
                                     If InStr(1, "," & UsedTables & ",", "," & TableName & ",", vbTextCompare) <> 0 Then
@@ -4806,7 +4804,7 @@ ErrorTrap:
                     cpCore.cache.invalidateAll()
                     '
                     '----------------------------------------------------------------------------------------------------------------------
-                    Call AppendClassLogFile(cpCore.db.config.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 2: Verify all CDef names in ccContent so GetContentID calls will succeed")
+                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 2: Verify all CDef names in ccContent so GetContentID calls will succeed")
                     '----------------------------------------------------------------------------------------------------------------------
                     '
                     NodeCount = 0
@@ -4823,10 +4821,10 @@ ErrorTrap:
                         ContentName = workingCdef.Name
                         If workingCdef.dataChanged Then
                             With workingCdef
-                                Call AppendClassLogFile(cpCore.db.config.name, "UpgradeCDef_BuildDbFromCollection", "adding cdef name [" & .Name & "]")
+                                Call appendInstallLog(cpCore.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "adding cdef name [" & .Name & "]")
                                 ContentName = .Name
                                 If InStr(1, "," & UsedTables & ",", "," & ContentName & ",", vbTextCompare) = 0 Then
-                                    SQL = "Insert into ccContent (name,active,createkey)values(" & cpCore.db.db_EncodeSQLText(ContentName) & ",1,0);"
+                                    SQL = "Insert into ccContent (name,active,createkey)values(" & cpCore.db.encodeSQLText(ContentName) & ",1,0);"
                                     Call cpCore.db.executeSql(SQL)
                                     UsedTables = UsedTables & "," & ContentName
                                     RequireReload = True
@@ -4838,13 +4836,13 @@ ErrorTrap:
                     cpCore.cache.invalidateAll()
                     '        '
                     '----------------------------------------------------------------------------------------------------------------------
-                    Call AppendClassLogFile(cpCore.db.config.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 3: Load datasources")
+                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 3: Load datasources")
                     '----------------------------------------------------------------------------------------------------------------------
                     '
                     Call cpCore.metaData.loadMetaCache_DataSources()
                     '
                     '----------------------------------------------------------------------------------------------------------------------
-                    Call AppendClassLogFile(cpCore.db.config.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 4: Verify content records required for Content Server")
+                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 4: Verify content records required for Content Server")
                     '----------------------------------------------------------------------------------------------------------------------
                     '
                     Call VerifySortMethods()
@@ -4853,7 +4851,7 @@ ErrorTrap:
                     cpCore.cache.invalidateAll()
                     '
                     '----------------------------------------------------------------------------------------------------------------------
-                    Call AppendClassLogFile(cpCore.db.config.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 5: verify 'Content' content definition")
+                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 5: verify 'Content' content definition")
                     '----------------------------------------------------------------------------------------------------------------------
                     '
                     For Each keypairvalue In .CDef
@@ -4862,7 +4860,7 @@ ErrorTrap:
                         With workingCdef
                             ContentName = LCase(.Name)
                             If ContentName = "content" Then
-                                Call AppendClassLogFile(cpCore.db.config.name, "UpgradeCDef_BuildDbFromCollection", "adding cdef [" & .Name & "]")
+                                Call appendInstallLog(cpCore.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "adding cdef [" & .Name & "]")
                                 '
                                 ' stop the errors here, so a bad field does not block the upgrade
                                 '
@@ -4877,7 +4875,7 @@ ErrorTrap:
                     cpCore.cache.invalidateAll()
                     '
                     '----------------------------------------------------------------------------------------------------------------------
-                    Call AppendClassLogFile(cpCore.db.config.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 6.1: Verify all definitions and fields")
+                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 6.1: Verify all definitions and fields")
                     '----------------------------------------------------------------------------------------------------------------------
                     '
                     RequireReload = False
@@ -4890,7 +4888,7 @@ ErrorTrap:
                                     ContentName = ContentName
                                 End If
                                 If LCase(ContentName) <> "content" Then
-                                    Call AppendClassLogFile(cpCore.db.config.name, "UpgradeCDef_BuildDbFromCollection", "adding cdef [" & .Name & "]")
+                                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "adding cdef [" & .Name & "]")
                                     '
                                     ' stop the errors here, so a bad field does not block the upgrade
                                     '
@@ -4905,7 +4903,7 @@ ErrorTrap:
                     cpCore.cache.invalidateAll()
                     '
                     '----------------------------------------------------------------------------------------------------------------------
-                    Call AppendClassLogFile(cpCore.db.config.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 6.2: Verify all field help")
+                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 6.2: Verify all field help")
                     '----------------------------------------------------------------------------------------------------------------------
                     '
                     FieldHelpCID = cpCore.db.getRecordID("content", "Content Field Help")
@@ -4918,14 +4916,14 @@ ErrorTrap:
                             With .CDef(ContentName.ToLower).fields(FieldName.ToLower)
                                 If .HelpChanged Then
                                     fieldId = 0
-                                    SQL = "select f.id from ccfields f left join cccontent c on c.id=f.contentid where (f.name=" & cpCore.db.db_EncodeSQLText(FieldName) & ")and(c.name=" & cpCore.db.db_EncodeSQLText(ContentName) & ") order by f.id"
+                                    SQL = "select f.id from ccfields f left join cccontent c on c.id=f.contentid where (f.name=" & cpCore.db.encodeSQLText(FieldName) & ")and(c.name=" & cpCore.db.encodeSQLText(ContentName) & ") order by f.id"
                                     rs = cpCore.db.executeSql(SQL)
                                     If isDataTableOk(rs) Then
                                         fieldId = EncodeInteger(cpCore.db.db_getDataRowColumnName(rs.Rows(0), "id"))
                                     End If
                                     rs.Dispose()
                                     If fieldId = 0 Then
-                                        cpCore.handleLegacyError3(cpCore.db.config.name, "Can not update help field for content [" & ContentName & "], field [" & FieldName & "] because the field was not found in the Db.", "dll", "builderClass", "UpgradeCDef_BuildDbFromCollection", 0, "", "", False, True, "")
+                                        cpCore.handleLegacyError3(cpCore.appConfig.name, "Can not update help field for content [" & ContentName & "], field [" & FieldName & "] because the field was not found in the Db.", "dll", "builderClass", "UpgradeCDef_BuildDbFromCollection", 0, "", "", False, True, "")
                                     Else
                                         SQL = "select id from ccfieldhelp where fieldid=" & fieldId & " order by id"
                                         rs = cpCore.db.executeSql(SQL)
@@ -4943,7 +4941,7 @@ ErrorTrap:
                                                     Copy = Copy
                                                 End If
                                             End If
-                                            SQL = "update ccfieldhelp set active=1,contentcontrolid=" & FieldHelpCID & ",fieldid=" & fieldId & ",helpdefault=" & cpCore.db.db_EncodeSQLText(Copy) & " where id=" & FieldHelpID
+                                            SQL = "update ccfieldhelp set active=1,contentcontrolid=" & FieldHelpCID & ",fieldid=" & fieldId & ",helpdefault=" & cpCore.db.encodeSQLText(Copy) & " where id=" & FieldHelpID
                                             Call cpCore.db.executeSql(SQL)
                                         End If
                                     End If
@@ -4955,13 +4953,13 @@ ErrorTrap:
                     cpCore.cache.invalidateAll()
                     '
                     '----------------------------------------------------------------------------------------------------------------------
-                    Call AppendClassLogFile(cpCore.db.config.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 7: create SQL indexes")
+                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 7: create SQL indexes")
                     '----------------------------------------------------------------------------------------------------------------------
                     '
                     For Ptr = 0 To .SQLIndexCnt - 1
                         With .SQLIndexes(Ptr)
                             If .dataChanged Then
-                                Call AppendClassLogFile(cpCore.db.config.name, "UpgradeCDef_BuildDbFromCollection", "creating index [" & .IndexName & "], fields [" & .FieldNameList & "], on table [" & .TableName & "]")
+                                Call appendInstallLog(cpCore.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "creating index [" & .IndexName & "], fields [" & .FieldNameList & "], on table [" & .TableName & "]")
                                 '
                                 ' stop the errors here, so a bad field does not block the upgrade
                                 '
@@ -4974,7 +4972,7 @@ ErrorTrap:
                     cpCore.cache.invalidateAll()
                     '
                     '----------------------------------------------------------------------------------------------------------------------
-                    Call AppendClassLogFile(cpCore.db.config.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 8a: Verify All Menu Names, then all Menus")
+                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 8a: Verify All Menu Names, then all Menus")
                     '----------------------------------------------------------------------------------------------------------------------
                     '
                     For Ptr = 0 To .MenuCnt - 1
@@ -4991,11 +4989,11 @@ ErrorTrap:
                                     If (.Name = "Advanced") And (.menuNameSpace = "Settings") Then
                                         .Name = .Name
                                     End If
-                                    Call AppendClassLogFile(cpCore.db.config.name, "UpgradeCDef_BuildDbFromCollection", "creating navigator entry [" & .Name & "], namespace [" & .menuNameSpace & "], guid [" & .Guid & "]")
+                                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "creating navigator entry [" & .Name & "], namespace [" & .menuNameSpace & "], guid [" & .Guid & "]")
                                     Call csv_VerifyNavigatorEntry4(.Guid, .menuNameSpace, .Name, .ContentName, .LinkPage, .SortOrder, .AdminOnly, .DeveloperOnly, .NewWindow, .Active, ContentName, .AddonName, .NavIconType, .NavIconTitle, 0)
                                 Else
                                     ContentName = "Menu Entries"
-                                    Call AppendClassLogFile(cpCore.db.config.name, "UpgradeCDef_BuildDbFromCollection", "creating menu entry [" & .Name & "], parentname [" & .ParentName & "]")
+                                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "creating menu entry [" & .Name & "], parentname [" & .ParentName & "]")
                                     Call builder.admin_VerifyMenuEntry(.ParentName, .Name, .ContentName, .LinkPage, .SortOrder, .AdminOnly, .DeveloperOnly, .NewWindow, .Active, ContentName, .AddonName)
                                 End If
                             End If
@@ -5028,7 +5026,7 @@ ErrorTrap:
                     'End If
                     '
                     '----------------------------------------------------------------------------------------------------------------------
-                    Call AppendClassLogFile(cpCore.db.config.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 8d: Verify Import Collections")
+                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 8d: Verify Import Collections")
                     '----------------------------------------------------------------------------------------------------------------------
                     '
                     If Collection.ImportCnt > 0 Then
@@ -5048,9 +5046,9 @@ ErrorTrap:
                     Dim CollectionPath As String = ""
                     Dim lastChangeDate As New Date
                     Dim ignoreRefactor As Boolean = False
-                    Call AppendClassLogFile("", "", "Installing Add-on Collections gathered during upgrade")
+                    Call appendInstallLog("", "", "Installing Add-on Collections gathered during upgrade")
                     If InstallCollectionList = "" Then
-                        Call AppendClassLogFile(cpCore.db.config.name, "", "No Add-on collections added during upgrade")
+                        Call appendInstallLog(cpCore.appConfig.name, "", "No Add-on collections added during upgrade")
                     Else
                         errorMessage = ""
                         Guids = Split(InstallCollectionList, ",")
@@ -5071,7 +5069,7 @@ ErrorTrap:
                                     Dim addonInstallOk As Boolean
                                     addonInstallOk = installCollectionFromRemoteRepo(Guid, BuildVersion, ignoreRefactor, "", errorMessage, "", isNewBuild)
                                     If Not addonInstallOk Then
-                                        cpCore.handleLegacyError3(cpCore.db.config.name, "Error upgrading Addon Collection [" & Guid & "], " & errorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
+                                        cpCore.handleLegacyError3(cpCore.appConfig.name, "Error upgrading Addon Collection [" & Guid & "], " & errorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                                     End If
 
                                 End If
@@ -5080,12 +5078,12 @@ ErrorTrap:
                     End If
                     '
                     '----------------------------------------------------------------------------------------------------------------------
-                    Call AppendClassLogFile(cpCore.db.config.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 9: Verify Styles")
+                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "CDef Load, stage 9: Verify Styles")
                     '----------------------------------------------------------------------------------------------------------------------
                     '
                     NodeCount = 0
                     If .StyleCnt > 0 Then
-                        SiteStyles = cpCore.db.cdnFiles.ReadFile("templates/styles.css")
+                        SiteStyles = cpCore.cdnFiles.ReadFile("templates/styles.css")
                         If Trim(SiteStyles) <> "" Then
                             '
                             ' Split with an extra character at the end to guarantee there is an extra split at the end
@@ -5145,11 +5143,11 @@ ErrorTrap:
                             & vbCrLf & "*/" _
                             & vbCrLf & StyleSheetAdd
                         End If
-                        Call cpCore.db.appRootFiles.SaveFile("templates/styles.css", SiteStyles)
+                        Call cpCore.appRootFiles.SaveFile("templates/styles.css", SiteStyles)
                         '
                         ' Update stylesheet cache
                         '
-                        Call cpCore.db.siteProperty_set("StylesheetSerialNumber", "-1")
+                        Call cpCore.siteProperties.setProperty("StylesheetSerialNumber", "-1")
                     End If
                     '
                     '-------------------------------------------------------------------------------------------------
@@ -5180,7 +5178,7 @@ ErrorTrap:
                 '
                 ' Pop value back into property
                 '
-                Call cpCore.db.siteProperty_set("AllowContentAutoLoad", CStr(AllowContentAutoLoad))
+                Call cpCore.siteProperties.setProperty("AllowContentAutoLoad", CStr(AllowContentAutoLoad))
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -5207,12 +5205,12 @@ ErrorTrap:
                 Dim ContentIsBaseContent As Boolean
                 Dim builder As New coreBuilderClass(cpCore)
                 '
-                Call AppendClassLogFile(cpCore.db.config.name, "AddCDefToDb", "Application: " & cpCore.db.config.name & ", UpgradeCDef_BuildDbFromCollection_AddCDefToDb")
+                Call appendInstallLog(cpCore.appConfig.name, "AddCDefToDb", "Application: " & cpCore.appConfig.name & ", UpgradeCDef_BuildDbFromCollection_AddCDefToDb")
                 '
                 If Not (False) Then
                     With cdef
                         '
-                        Call AppendClassLogFile(cpCore.db.config.name, "AddCDefToDb", "Upgrading CDef [" & .Name & "]")
+                        Call appendInstallLog(cpCore.appConfig.name, "AddCDefToDb", "Upgrading CDef [" & .Name & "]")
                         '
                         ContentID = 0
                         ContentName = .Name
@@ -5226,7 +5224,7 @@ ErrorTrap:
                         '
                         ' get contentid and protect content with IsBaseContent true
                         '
-                        SQL = cpCore.db.db_GetSQLSelect("default", "ccContent", "ID,IsBaseContent", "name=" & cpCore.db.db_EncodeSQLText(ContentName), "ID", , 1)
+                        SQL = cpCore.db.db_GetSQLSelect("default", "ccContent", "ID,IsBaseContent", "name=" & cpCore.db.encodeSQLText(ContentName), "ID", , 1)
                         rs = cpCore.db.executeSql(SQL)
                         If (isDataTableOk(rs)) Then
                             If rs.Rows.Count > 0 Then
@@ -5247,7 +5245,7 @@ ErrorTrap:
                                 '
                                 ' Can not update a base content with a non-base content
                                 '
-                                cpCore.handleLegacyError3(cpCore.db.config.name, "Warning: An attempt was made to update Content Definition [" & .Name & "] from base to non-base. This should only happen when a base cdef is removed from the base collection.", "dll", "builderClass", "UpgradeCDef_BuildDbFromCollection_AddCDefToDb", 0, "", "", False, True, "")
+                                cpCore.handleLegacyError3(cpCore.appConfig.name, "Warning: An attempt was made to update Content Definition [" & .Name & "] from base to non-base. This should only happen when a base cdef is removed from the base collection.", "dll", "builderClass", "UpgradeCDef_BuildDbFromCollection_AddCDefToDb", 0, "", "", False, True, "")
                             End If
                             '
                             ' ----- update definition (use SingleRecord as an update flag)
@@ -5278,14 +5276,14 @@ ErrorTrap:
                                     , .installedByCollectionGuid
                                     )
                             If ContentID = 0 Then
-                                Call AppendClassLogFile(cpCore.db.config.name, "AddCDefToDb", "Could not determine contentid after createcontent3 for [" & ContentName & "], upgrade for this cdef aborted.")
+                                Call appendInstallLog(cpCore.appConfig.name, "AddCDefToDb", "Could not determine contentid after createcontent3 for [" & ContentName & "], upgrade for this cdef aborted.")
                             Else
                                 '
                                 ' ----- Other fields not in the csv call
                                 '
                                 EditorGroupID = 0
                                 If .EditorGroupName <> "" Then
-                                    rs = cpCore.db.executeSql("select ID from ccGroups where name=" & cpCore.db.db_EncodeSQLText(.EditorGroupName))
+                                    rs = cpCore.db.executeSql("select ID from ccGroups where name=" & cpCore.db.encodeSQLText(.EditorGroupName))
                                     If (isDataTableOk(rs)) Then
                                         If rs.Rows.Count > 0 Then
                                             EditorGroupID = EncodeInteger(cpCore.db.db_getDataRowColumnName(rs.Rows(0), "ID"))
@@ -5308,7 +5306,7 @@ ErrorTrap:
                             '
                             ' CAn not add fields if there is no content record
                             '
-                            cpCore.handleLegacyError3(cpCore.db.config.name, "Can not add field records to content [" & ContentName & "] because the content definition was not found", "dll", "builderClass", "UpgradeCDef_BuildDbFromCollection_AddCDefToDb", 0, "", "", False, True, "")
+                            cpCore.handleLegacyError3(cpCore.appConfig.name, "Can not add field records to content [" & ContentName & "] because the content definition was not found", "dll", "builderClass", "UpgradeCDef_BuildDbFromCollection_AddCDefToDb", 0, "", "", False, True, "")
                         Else
                             '
                             '
@@ -5341,8 +5339,8 @@ ErrorTrap:
                                                 & " set fieldid=" & fieldId _
                                                 & ",active=1" _
                                                 & ",contentcontrolid=" & FieldHelpCID _
-                                                & ",helpdefault=" & cpCore.db.db_EncodeSQLText(.HelpDefault) _
-                                                & ",helpcustom=" & cpCore.db.db_EncodeSQLText(.HelpCustom) _
+                                                & ",helpdefault=" & cpCore.db.encodeSQLText(.HelpDefault) _
+                                                & ",helpcustom=" & cpCore.db.encodeSQLText(.HelpCustom) _
                                                 & " where id=" & FieldHelpID
                                             Call cpCore.db.executeSql(SQL)
                                         End If
@@ -5462,7 +5460,7 @@ ErrorTrap:
                 '   if the is no CollectionDst for the CollectionSrc, add it and set okToUpdateDstFromSrc
                 ' -------------------------------------------------------------------------------------------------
                 '
-                Call AppendClassLogFile(cpCore.db.config.name, "UpgradeCDef_AddSrcToDst", "Application: " & cpCore.db.config.name & ", UpgradeCDef_AddSrcToDst")
+                Call appendInstallLog(cpCore.appConfig.name, "UpgradeCDef_AddSrcToDst", "Application: " & cpCore.appConfig.name & ", UpgradeCDef_AddSrcToDst")
                 'Call AppendClassLogFile(cpcore.app.config.name,"UpgradeCDef_AddSrcToDst", "CollectionSrc.CDefCnt=" & CollectionSrc.CDefCnt)
                 ''
                 DebugName = "admin menuing"
@@ -5601,14 +5599,14 @@ ErrorTrap:
                                     ' Dst is a base CDef, Src is not. This update is not allowed. Log it and skip the Add
                                     '
                                     Copy = "An attempt was made to update a Base Content Definition [" & DstName & "] from a collection that is not the Base Collection. This is not allowed."
-                                    Call AppendClassLogFile(cpCore.db.config.name, "UpgradeCDef_AddSrcToDst", "UpgradeCDef_AddSrcToDst, " & Copy)
-                                    cpCore.handleLegacyError3(cpCore.db.config.name, Copy, "dll", "builderClass", "UpgradeCDef_AddSrcToDst", 0, "", "", False, True, "")
+                                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeCDef_AddSrcToDst", "UpgradeCDef_AddSrcToDst, " & Copy)
+                                    cpCore.handleLegacyError3(cpCore.appConfig.name, Copy, "dll", "builderClass", "UpgradeCDef_AddSrcToDst", 0, "", "", False, True, "")
                                     okToUpdateDstFromSrc = False
                                 Else
                                     '
                                     ' Just log the change for tracking
                                     '
-                                    Call AppendClassLogFile(cpCore.db.config.name, "UpgradeCDef_AddSrcToDst", "UpgradeCDef_AddSrcToDst, (Logging only) While merging two collections (probably application and an upgrade), one or more attributes for a content definition or field were different, first change was CDef=" & SrcContentName & ", field=" & n)
+                                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeCDef_AddSrcToDst", "UpgradeCDef_AddSrcToDst, (Logging only) While merging two collections (probably application and an upgrade), one or more attributes for a content definition or field were different, first change was CDef=" & SrcContentName & ", field=" & n)
                                 End If
                             End If
                         End If
@@ -6263,35 +6261,11 @@ ErrorTrap:
                     '
                     ExportFilename = "cdef_export_" & CStr(GetRandomInteger()) & ".xml"
                     ExportPathPage = "tmp\" & ExportFilename
-                    Call cpCore.db.exportApplicationCDefXml(ExportPathPage, True)
-                    CollectionData = cpCore.db.privateFiles.ReadFile(ExportPathPage)
-                    Call cpCore.db.privateFiles.DeleteFile(ExportPathPage)
+                    Call exportApplicationCDefXml(ExportPathPage, True)
+                    CollectionData = cpCore.privateFiles.ReadFile(ExportPathPage)
+                    Call cpCore.privateFiles.DeleteFile(ExportPathPage)
                     Call installCollection_LoadXmlToMiniCollection(CollectionData, returnColl, False, False, isNewBuild, New MiniCollectionClass)
                 End If
-                'If Not ApplicationCollectionLoaded Then
-                '    '
-                '    ' set this true first, because this routine calls LoadDataToCDef, which uses the application collection
-                '    ' as its default. Setting this true first means GetApplicationCollection will return a blank
-                '    ' collection until it is loaded correctly.
-                '    '
-                '    ApplicationCollectionLoaded = True
-                '    If Not isNewBuild Then
-                '        '
-                '        ' if this is not an empty database, get the application collection, else return empty
-                '        '
-                '        ExportFilename = "Tmp_CDef_Export_" & CStr(GetRandomInteger()) & ".xml"
-                '        ExportPathPage = "CDef\" & ExportFilename
-                '        Call cpCore.app.exportApplicationCDefXml(ExportPathPage, True)
-                '        CollectionData = cpCore.app.privateFiles.ReadFile(ExportPathPage)
-                '        Call AppendClassLogFile(cpCore.app.config.name, "GetApplicationCollection", "block cdef temp file removal")
-                '        '
-                '        ' debug --------------------------
-                '        '
-                '        ' add this back --- Call cpcore.app.publicFiles.DeleteFile(ExportPathPage)
-                '        Call AppendClassLogFile(cpCore.app.config.name, "GetApplicationCollection", "Application: " & cpCore.app.config.name & ", loading application collection")
-                '        Call UpgradeCDef_LoadDataToCollection(CollectionData, returnColl, False, False, isNewBuild, New CollectionClass)
-                '    End If
-                'End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -6411,13 +6385,13 @@ ErrorTrap:
                 Dim dt As DataTable
                 Dim sqlList As New sqlFieldListClass
                 '
-                Call sqlList.add("name", cpCore.db.db_EncodeSQLText(Name))
+                Call sqlList.add("name", cpCore.db.encodeSQLText(Name))
                 Call sqlList.add("CreatedBy", "0")
-                Call sqlList.add("OrderByClause", cpCore.db.db_EncodeSQLText(OrderByCriteria))
+                Call sqlList.add("OrderByClause", cpCore.db.encodeSQLText(OrderByCriteria))
                 Call sqlList.add("active", SQLTrue)
                 Call sqlList.add("ContentControlID", cpCore.db.db_GetContentID("Sort Methods").ToString())
                 '
-                dt = cpCore.db.db_openTable("Default", "ccSortMethods", "Name=" & cpCore.db.db_EncodeSQLText(Name), "ID", "ID", 1)
+                dt = cpCore.db.db_openTable("Default", "ccSortMethods", "Name=" & cpCore.db.encodeSQLText(Name), "ID", "ID", 1)
                 If dt.Rows.Count > 0 Then
                     '
                     ' update sort method
@@ -6441,7 +6415,7 @@ ErrorTrap:
         Friend Sub VerifySortMethods()
             Try
                 '
-                Call AppendClassLogFile(cpCore.db.config.name, "VerifySortMethods", "Verify Sort Records")
+                Call appendInstallLog(cpCore.appConfig.name, "VerifySortMethods", "Verify Sort Records")
                 '
                 Call VerifySortMethod("By Name", "Name")
                 Call VerifySortMethod("By Alpha Sort Order Field", "SortOrder")
@@ -6620,13 +6594,13 @@ ErrorTrap:
                     SupportNavIcon = cpCore.db.metaData_IsContentFieldSupported(MenuContentName, "NavIconType")
                     addonId = 0
                     If SupportAddonID And (AddonName <> "") Then
-                        CS = cpCore.db.db_csOpen(AddonContentName, "name=" & cpCore.db.db_EncodeSQLText(AddonName), "ID", False, , , , "ID", 1)
+                        CS = cpCore.db.db_csOpen(AddonContentName, "name=" & cpCore.db.encodeSQLText(AddonName), "ID", False, , , , "ID", 1)
                         If cpCore.db.db_csOk(CS) Then
                             addonId = cpCore.db.db_GetCSInteger(CS, "ID")
                         End If
                         Call cpCore.db.db_csClose(CS)
                     End If
-                    ParentID = csv_GetParentIDFromNameSpace(MenuContentName, menuNameSpace)
+                    ParentID = getParentIDFromNameSpace(MenuContentName, menuNameSpace)
                     ContentID = -1
                     If ContentName <> "" Then
                         ContentID = cpCore.db.db_GetContentID(ContentName)
@@ -6642,12 +6616,12 @@ ErrorTrap:
                             '
                             ' ----- Find match by menuNameSpace
                             '
-                            CSEntry = cpCore.db.db_csOpen(MenuContentName, "(name=" & cpCore.db.db_EncodeSQLText(EntryName) & ")and(Parentid=" & ParentID & ")and((" & GuidFieldName & " is null)or(" & GuidFieldName & "=''))", "ID", True, , , , SelectList)
+                            CSEntry = cpCore.db.db_csOpen(MenuContentName, "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(Parentid=" & ParentID & ")and((" & GuidFieldName & " is null)or(" & GuidFieldName & "=''))", "ID", True, , , , SelectList)
                         Else
                             '
                             ' ----- Find match by guid
                             '
-                            CSEntry = cpCore.db.db_csOpen(MenuContentName, "(" & GuidFieldName & "=" & cpCore.db.db_EncodeSQLText(ccGuid) & ")", "ID", True, , , , SelectList)
+                            CSEntry = cpCore.db.db_csOpen(MenuContentName, "(" & GuidFieldName & "=" & cpCore.db.encodeSQLText(ccGuid) & ")", "ID", True, , , , SelectList)
                         End If
                         If Not cpCore.db.db_csOk(CSEntry) Then
                             '
@@ -6660,10 +6634,10 @@ ErrorTrap:
                     If Not cpCore.db.db_csOk(CSEntry) Then
                         If ParentID = 0 Then
                             ' 12/19/2008 change to ActiveOnly - because if there is a non-guid entry, it is marked inactive. We only want to update the active entries
-                            Criteria = Criteria & "And(name=" & cpCore.db.db_EncodeSQLText(EntryName) & ")and(ParentID is null)"
+                            Criteria = Criteria & "And(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(ParentID is null)"
                         Else
                             ' 12/19/2008 change to ActiveOnly - because if there is a non-guid entry, it is marked inactive. We only want to update the active entries
-                            Criteria = Criteria & "And(name=" & cpCore.db.db_EncodeSQLText(EntryName) & ")and(ParentID=" & ParentID & ")"
+                            Criteria = Criteria & "And(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(ParentID=" & ParentID & ")"
                         End If
                         CSEntry = cpCore.db.db_csOpen(MenuContentName, Mid(Criteria, 4), "ID", True, , , , SelectList)
                     End If
@@ -6681,11 +6655,11 @@ ErrorTrap:
                             '
                             DupFound = False
                         ElseIf ParentID = 0 Then
-                            CSEntry = cpCore.db.db_csOpen(MenuContentName, "(name=" & cpCore.db.db_EncodeSQLText(EntryName) & ")and(ParentID is null)", "ID", False, , , , SelectList)
+                            CSEntry = cpCore.db.db_csOpen(MenuContentName, "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(ParentID is null)", "ID", False, , , , SelectList)
                             DupFound = cpCore.db.db_csOk(CSEntry)
                             cpCore.db.db_csClose(CSEntry)
                         Else
-                            CSEntry = cpCore.db.db_csOpen(MenuContentName, "(name=" & cpCore.db.db_EncodeSQLText(EntryName) & ")and(ParentID=" & ParentID & ")", "ID", False, , , , SelectList)
+                            CSEntry = cpCore.db.db_csOpen(MenuContentName, "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(ParentID=" & ParentID & ")", "ID", False, , , , SelectList)
                             DupFound = cpCore.db.db_csOk(CSEntry)
                             cpCore.db.db_csClose(CSEntry)
                         End If
@@ -6755,9 +6729,9 @@ ErrorTrap:
                     '
                     If EntryID <> 0 Then
                         If ParentID = 0 Then
-                            CSEntry = cpCore.db.db_openCsSql_rev("default", "select * from ccMenuEntries where (parentid is null)and(name=" & cpCore.db.db_EncodeSQLText(EntryName) & ")and(id<>" & EntryID & ")")
+                            CSEntry = cpCore.db.db_openCsSql_rev("default", "select * from ccMenuEntries where (parentid is null)and(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(id<>" & EntryID & ")")
                         Else
-                            CSEntry = cpCore.db.db_openCsSql_rev("default", "select * from ccMenuEntries where (parentid=" & ParentID & ")and(name=" & cpCore.db.db_EncodeSQLText(EntryName) & ")and(id<>" & EntryID & ")")
+                            CSEntry = cpCore.db.db_openCsSql_rev("default", "select * from ccMenuEntries where (parentid=" & ParentID & ")and(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(id<>" & EntryID & ")")
                         End If
                         Do While cpCore.db.db_csOk(CSEntry)
                             DuplicateID = cpCore.db.db_GetCSInteger(CSEntry, "ID")
@@ -6790,7 +6764,7 @@ ErrorTrap:
                 MethodName = "csv_VerifyAggregateScript"
                 '
                 ContentName = "Aggregate Function Scripts"
-                CSEntry = cpCore.db.db_csOpen(ContentName, "(name=" & cpCore.db.db_EncodeSQLText(Name) & ")", , False, , , , "Name,Link,ObjectProgramID,ArgumentList,SortOrder")
+                CSEntry = cpCore.db.db_csOpen(ContentName, "(name=" & cpCore.db.encodeSQLText(Name) & ")", , False, , , , "Name,Link,ObjectProgramID,ArgumentList,SortOrder")
                 '
                 ' If no current entry, create one
                 '
@@ -6834,7 +6808,7 @@ ErrorTrap:
                 MethodName = "csv_VerifyAggregateReplacement2"
                 '
                 ContentName = "Aggregate Function Replacements"
-                CSEntry = cpCore.db.db_csOpen(ContentName, "(name=" & cpCore.db.db_EncodeSQLText(Name) & ")", , False, , , , "Name,Copy,SortOrder,ArgumentList")
+                CSEntry = cpCore.db.db_csOpen(ContentName, "(name=" & cpCore.db.encodeSQLText(Name) & ")", , False, , , , "Name,Copy,SortOrder,ArgumentList")
                 '
                 ' If no current entry, create one
                 '
@@ -6872,7 +6846,7 @@ ErrorTrap:
                 ' Locate current entry
                 '
                 ContentName = "Aggregate Function Objects"
-                CSEntry = cpCore.db.db_csOpen(ContentName, "(name=" & cpCore.db.db_EncodeSQLText(Name) & ")", , False, , , , "Name,Link,ObjectProgramID,ArgumentList,SortOrder")
+                CSEntry = cpCore.db.db_csOpen(ContentName, "(name=" & cpCore.db.encodeSQLText(Name) & ")", , False, , , , "Name,Link,ObjectProgramID,ArgumentList,SortOrder")
                 '
                 ' If no current entry, create one
                 '
@@ -6896,7 +6870,7 @@ ErrorTrap:
         '
         '
         '
-        Public Function csv_GetParentIDFromNameSpace(ByVal ContentName As String, ByVal menuNameSpace As String) As Integer
+        Public Function getParentIDFromNameSpace(ByVal ContentName As String, ByVal menuNameSpace As String) As Integer
             Try
                 '
                 Dim Parents() As String
@@ -6913,9 +6887,9 @@ ErrorTrap:
                     For Ptr = 0 To UBound(Parents)
                         RecordName = Parents(Ptr)
                         If ParentID = 0 Then
-                            Criteria = "(name=" & cpCore.db.db_EncodeSQLText(RecordName) & ")and(Parentid is null)"
+                            Criteria = "(name=" & cpCore.db.encodeSQLText(RecordName) & ")and(Parentid is null)"
                         Else
-                            Criteria = "(name=" & cpCore.db.db_EncodeSQLText(RecordName) & ")and(Parentid=" & ParentID & ")"
+                            Criteria = "(name=" & cpCore.db.encodeSQLText(RecordName) & ")and(Parentid=" & ParentID & ")"
                         End If
                         RecordID = 0
                         ' 12/19/2008 change to ActiveOnly - because if there is a non-guid entry, it is marked inactive. We only want to attach to the active entries
@@ -6939,19 +6913,28 @@ ErrorTrap:
                     Next
                 End If
                 '
-                csv_GetParentIDFromNameSpace = ParentID
+                getParentIDFromNameSpace = ParentID
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Function
-        ' delete when done
         '
-        Private Sub profileLogMethodExit(ByVal ignore As String)
-            '
+        '========================================================================
+        '
+        '========================================================================
+        '
+        Public Sub exportApplicationCDefXml(ByVal privateFilesPathFilename As String, ByVal IncludeBaseFields As Boolean)
+            Try
+                Dim XML As coreXmlToolsClass
+                Dim Content As String
+                '
+                XML = New coreXmlToolsClass(cpCore)
+                Content = XML.GetXMLContentDefinition3("", IncludeBaseFields)
+                Call cpCore.privateFiles.SaveFile(privateFilesPathFilename, Content)
+                XML = Nothing
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
         End Sub
-        '
-        Private Function profileLogMethodEnter(ByVal ignore As String) As String
-            '
-        End Function
     End Class
 End Namespace

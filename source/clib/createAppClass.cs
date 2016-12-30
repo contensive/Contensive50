@@ -306,7 +306,7 @@ namespace  Contensive.Core {
                         //
                         // Local Mode, compatible with v4.1, cdn in appRoot folder as /" + appName + "/files/
                         //
-                        appConfig.appRootPath = "apps\\" + appName + "\\appRoot";
+                        appConfig.appRootFilesPath = "apps\\" + appName + "\\appRoot";
                         appConfig.cdnFilesPath = "apps\\" + appName + "\\appRoot\\" + appName + "\\files\\";
                         appConfig.privateFilesPath = "apps\\" + appName + "\\privateFiles";
                         appConfig.cdnFilesNetprefix = "/" + appName + "/files/";
@@ -316,7 +316,7 @@ namespace  Contensive.Core {
                         //
                         // Local Mode, cdn in appRoot folder as /cdn/
                         //
-                        appConfig.appRootPath = "apps\\" + appName + "\\appRoot";
+                        appConfig.appRootFilesPath = "apps\\" + appName + "\\appRoot";
                         appConfig.cdnFilesPath = "apps\\" + appName + "\\appRoot\\cdn\\";
                         appConfig.privateFilesPath = "apps\\" + appName + "\\privateFiles";
                         appConfig.cdnFilesNetprefix = "/cdn/";
@@ -332,7 +332,7 @@ namespace  Contensive.Core {
                         {
                             cdnDomainName = "cdn." + appName + ".com";
                         }
-                        appConfig.appRootPath = "apps\\" + appName + "\\appRoot";
+                        appConfig.appRootFilesPath = "apps\\" + appName + "\\appRoot";
                         appConfig.cdnFilesPath = "apps\\" + appName + "\\cdnFiles";
                         appConfig.privateFilesPath = "apps\\" + appName + "\\privateFiles";
                         appConfig.cdnFilesNetprefix = cdnDomainName + "\\";
@@ -347,7 +347,7 @@ namespace  Contensive.Core {
                         {
                             cdnDomainName = "cdn." + appName + ".com";
                         }
-                        appConfig.appRootPath = "apps\\" + appName + "\\appRoot";
+                        appConfig.appRootFilesPath = "apps\\" + appName + "\\appRoot";
                         appConfig.cdnFilesPath = "apps\\" + appName + "\\cdnFiles";
                         appConfig.privateFilesPath = "apps\\" + appName + "\\privateFiles";
                         appConfig.cdnFilesNetprefix = cdnDomainName + "\\";
@@ -401,7 +401,7 @@ namespace  Contensive.Core {
                     }
                 }
                 builder.upgrade(true);
-                cpNewApp.core.db.siteProperty_set(Contensive.Core.coreCommonModule.siteproperty_serverPageDefault_name, iisDefaultDoc);
+                cpNewApp.core.siteProperties.setProperty(Contensive.Core.coreCommonModule.siteproperty_serverPageDefault_name, iisDefaultDoc);
                 cpNewApp.Dispose();
             }
             catch (Exception ex)

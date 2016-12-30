@@ -17,7 +17,7 @@ Imports Contensive.Core.coreCommonModule
 ' as object to as object
 
 Namespace Contensive.Core
-    Public Class coreHtmlToolsClass
+    Public Class coreHtmlClass
         '
         Private cpCore As cpCoreClass
         '
@@ -30,40 +30,6 @@ Namespace Contensive.Core
         Public Sub New(cpCore As cpCoreClass)
             Me.cpCore = cpCore
         End Sub
-        '
-        '==============================================================================
-        Public Function isGuid(ignore As Object, Source As String) As Boolean
-            Dim returnValue As Boolean = False
-            Try
-                If (Len(Source) = 38) And (Left(Source, 1) = "{") And (Right(Source, 1) = "}") Then
-                    '
-                    ' Good to go
-                    '
-                    returnValue = True
-                ElseIf (Len(Source) = 36) And (InStr(1, Source, " ") = 0) Then
-                    '
-                    ' might be valid with the brackets, add them
-                    '
-                    returnValue = True
-                    'source = "{" & source & "}"
-                ElseIf (Len(Source) = 32) Then
-                    '
-                    ' might be valid with the brackets and the dashes, add them
-                    '
-                    returnValue = True
-                    'source = "{" & Mid(source, 1, 8) & "-" & Mid(source, 9, 4) & "-" & Mid(source, 13, 4) & "-" & Mid(source, 17, 4) & "-" & Mid(source, 21) & "}"
-                Else
-                    '
-                    ' not valid
-                    '
-                    returnValue = False
-                    '        source = ""
-                End If
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
-            Return returnValue
-        End Function
         '
         '====================================================================================================
         ''' <summary>

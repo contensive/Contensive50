@@ -15,7 +15,7 @@ Namespace Contensive.Core
         Public enabled As Boolean
         Public privateKey As String                     ' rename hashKey
         Public defaultConnectionString As String
-        Public appRootPath As String                    ' path relative to clusterPhysicalPath
+        Public appRootFilesPath As String               ' path relative to clusterPhysicalPath
         Public cdnFilesPath As String                   ' path relative to clusterPhysicalPath
         Public privateFilesPath As String               ' path relative to clusterPhysicalPath
         Public cdnFilesNetprefix As String              ' in some cases (like legacy), cdnFiles are iis virtual folder mapped to appRoot (/files/). Some cases this is a URL (http:\\cdn.domain.com pointing to s3)

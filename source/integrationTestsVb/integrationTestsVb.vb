@@ -183,6 +183,10 @@ Namespace integrationTests
             End Try
         End Sub
         '
+        <Fact> Public Sub mynewtest()
+            Assert.Equal("asdf", "wert")
+        End Sub
+        '
         '====================================================================================================
         ' unit test - cp.blockNew
         '

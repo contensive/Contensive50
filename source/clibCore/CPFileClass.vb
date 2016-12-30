@@ -21,7 +21,7 @@ Namespace Contensive.Core
         Public Const EventsId As String = "8757DE11-C04D-4765-B46B-458E281BAE19"
 #End Region
         '
-        Private core As Contensive.Core.cpCoreClass
+        Private cpCore As Contensive.Core.cpCoreClass
         Protected disposed As Boolean = False
         '
         Private _cdnFiles As CPFileSystemClass
@@ -36,13 +36,13 @@ Namespace Contensive.Core
         ''' <param name="core"></param>
         Public Sub New(ByVal core As Contensive.Core.cpCoreClass)
             MyBase.New()
-            Me.core = core
+            Me.cpCore = core
         End Sub
         '
         Public Overrides ReadOnly Property cdnFiles() As CPFileSystemBaseClass
             Get
                 If (_cdnFiles Is Nothing) Then
-                    _cdnFiles = New CPFileSystemClass(core, core.db.cdnFiles)
+                    _cdnFiles = New CPFileSystemClass(cpCore, cpCore.cdnFiles)
                 End If
                 Return _cdnFiles
             End Get
@@ -51,7 +51,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property appRootFiles() As CPFileSystemBaseClass
             Get
                 If (_appRootFiles Is Nothing) Then
-                    _appRootFiles = New CPFileSystemClass(core, core.db.appRootFiles)
+                    _appRootFiles = New CPFileSystemClass(cpCore, cpCore.appRootFiles)
                 End If
                 Return _appRootFiles
             End Get
@@ -60,7 +60,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property privateFiles() As CPFileSystemBaseClass
             Get
                 If (_privateFiles Is Nothing) Then
-                    _privateFiles = New CPFileSystemClass(core, core.db.privateFiles)
+                    _privateFiles = New CPFileSystemClass(cpCore, cpCore.privateFiles)
                 End If
                 Return _privateFiles
             End Get
@@ -69,7 +69,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property serverFiles() As CPFileSystemBaseClass
             Get
                 If (_serverFiles Is Nothing) Then
-                    _serverFiles = New CPFileSystemClass(core, core.db.serverFiles)
+                    _serverFiles = New CPFileSystemClass(cpCore, cpCore.serverFiles)
                 End If
                 Return _serverFiles
             End Get
@@ -90,7 +90,7 @@ Namespace Contensive.Core
                     If Not (_appRootFiles Is Nothing) Then _appRootFiles.Dispose()
                     If Not (_privateFiles Is Nothing) Then _privateFiles.Dispose()
                     If Not (_serverFiles Is Nothing) Then _serverFiles.Dispose()
-                    core = Nothing
+                    cpCore = Nothing
                 End If
                 '
                 ' Add code here to release the unmanaged resource.
@@ -107,7 +107,7 @@ Namespace Contensive.Core
         ''' <returns></returns>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
         Public Overrides Function getVirtualFileLink(virtualFilename As String) As String
-            Return core.csv_getVirtualFileLink(core.db.config.cdnFilesNetprefix, virtualFilename)
+            Return cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, virtualFilename)
         End Function
         '
         '==========================================================================================
@@ -170,7 +170,7 @@ Namespace Contensive.Core
         ''' <returns></returns>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
         Public Overrides Function read(ByVal filename As String) As String
-            Return core.db.appRootFiles.ReadFile(filename)
+            Return cpCore.appRootFiles.ReadFile(filename)
         End Function
         '
         '==========================================================================================
@@ -239,7 +239,7 @@ Namespace Contensive.Core
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
         Public Overrides Function fileList(ByVal folderName As String, Optional ByVal pageSize As Integer = 0, Optional ByVal pageNumber As Integer = 1) As String
             Dim fi As IO.FileInfo() = serverFiles.fileList(folderName)
-            Return core.cluster.clusterFiles.convertFileINfoArrayToParseString(fi)
+            Return cpCore.cluster.clusterFiles.convertFileINfoArrayToParseString(fi)
         End Function
         '
         '==========================================================================================
@@ -251,7 +251,7 @@ Namespace Contensive.Core
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
         Public Overrides Function folderList(ByVal folderName As String) As String
             Dim di As IO.DirectoryInfo() = serverFiles.folderList(folderName)
-            Return core.cluster.clusterFiles.convertDirectoryInfoArrayToParseString(di)
+            Return cpCore.cluster.clusterFiles.convertDirectoryInfoArrayToParseString(di)
         End Function
         '
         '==========================================================================================

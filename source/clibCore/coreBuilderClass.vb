@@ -59,10 +59,10 @@ Namespace Contensive.Core
                 If Not web_existsSite(appName) Then
                     '
                     Using iisManager As ServerManager = New ServerManager()
-                        cpCore.db.appRootFiles.SaveFile("deleteMe.txt", "Temp document to create path")
-                        cpCore.db.appRootFiles.DeleteFile("deleteMe.txt")
+                        cpCore.appRootFiles.SaveFile("deleteMe.txt", "Temp document to create path")
+                        cpCore.appRootFiles.DeleteFile("deleteMe.txt")
                         bindinginformation = "*:80:" & DomainName
-                        mySite = iisManager.Sites.Add(appName, "http", bindinginformation, cpCore.cluster.config.clusterPhysicalPath & cpCore.db.config.appRootPath)
+                        mySite = iisManager.Sites.Add(appName, "http", bindinginformation, cpCore.cluster.config.clusterPhysicalPath & cpCore.appConfig.appRootFilesPath)
                         'iisManager.Sites.Item(0).)
                         bindinginformation = "*:80:" & appName
                         mySite.Bindings.Add(bindinginformation, "http")
@@ -415,7 +415,7 @@ Namespace Contensive.Core
                     '---------------------------------------------------------------------
                     '
                     If isNewBuild Then
-                        cpCore.db.siteProperty_set("publicFileContentPathPrefix", "/contentFiles/")
+                        cpCore.siteProperties.setProperty("publicFileContentPathPrefix", "/contentFiles/")
                         '
                         ' add the root developer
                         '
@@ -435,12 +435,12 @@ Namespace Contensive.Core
                         '
                         ' Copy default styles into Template Styles
                         '
-                        Call cpCore.db.appRootFiles.copyFile("ccLib\Config\Styles.css", "Templates\Styles.css")
+                        Call cpCore.appRootFiles.copyFile("ccLib\Config\Styles.css", "Templates\Styles.css")
                         '
                         ' set build version so a scratch build will not go through data conversion
                         '
                         DataBuildVersion = cpCore.version()
-                        Call cpCore.db.siteProperty_set("BuildVersion", cpCore.version)
+                        Call cpCore.siteProperties.setProperty("BuildVersion", cpCore.version)
                         cpCore.db.dataBuildVersion_LocalLoaded = False
                     End If
                     '
@@ -506,47 +506,47 @@ Namespace Contensive.Core
                         '    Call cpCore.app.siteProperty_set(siteproperty_serverPageDefault_name, defaultDoc)
                         'End If
                         '
-                        Copy = cpCore.db.siteProperty_getText("AllowAutoHomeSectionOnce", EncodeText(isNewBuild))
-                        Copy = cpCore.db.siteProperty_getText("AllowAutoLogin", "False")
-                        Copy = cpCore.db.siteProperty_getText("AllowBake", "True")
-                        Copy = cpCore.db.siteProperty_getText("AllowChildMenuHeadline", "True")
-                        Copy = cpCore.db.siteProperty_getText("AllowContentAutoLoad", "True")
-                        Copy = cpCore.db.siteProperty_getText("AllowContentSpider", "False")
-                        Copy = cpCore.db.siteProperty_getText("AllowContentWatchLinkUpdate", "True")
-                        Copy = cpCore.db.siteProperty_getText("AllowDuplicateUsernames", "False")
-                        Copy = cpCore.db.siteProperty_getText("ConvertContentText2HTML", "False")
-                        Copy = cpCore.db.siteProperty_getText("AllowMemberJoin", "False")
-                        Copy = cpCore.db.siteProperty_getText("AllowPasswordEmail", "True")
-                        Copy = cpCore.db.siteProperty_getText("AllowPathBlocking", "True")
-                        Copy = cpCore.db.siteProperty_getText("AllowPopupErrors", "True")
-                        Copy = cpCore.db.siteProperty_getText("AllowTestPointLogging", "False")
-                        Copy = cpCore.db.siteProperty_getText("AllowTestPointPrinting", "False")
-                        Copy = cpCore.db.siteProperty_getText("AllowTransactionLog", "False")
-                        Copy = cpCore.db.siteProperty_getText("AllowTrapEmail", "True")
-                        Copy = cpCore.db.siteProperty_getText("AllowTrapLog", "True")
-                        Copy = cpCore.db.siteProperty_getText("AllowWorkflowAuthoring", "False")
-                        Copy = cpCore.db.siteProperty_getText("ArchiveAllowFileClean", "False")
-                        Copy = cpCore.db.siteProperty_getText("ArchiveRecordAgeDays", "90")
-                        Copy = cpCore.db.siteProperty_getText("ArchiveTimeOfDay", "2:00:00 AM")
-                        Copy = cpCore.db.siteProperty_getText("BreadCrumbDelimiter", "&nbsp;&gt;&nbsp;")
-                        Copy = cpCore.db.siteProperty_getText("CalendarYearLimit", "1")
-                        Copy = cpCore.db.siteProperty_getText("ContentPageCompatibility21", "false")
-                        Copy = cpCore.db.siteProperty_getText("DefaultFormInputHTMLHeight", "500")
-                        Copy = cpCore.db.siteProperty_getText("DefaultFormInputTextHeight", "1")
-                        Copy = cpCore.db.siteProperty_getText("DefaultFormInputWidth", "60")
-                        Copy = cpCore.db.siteProperty_getText("EditLockTimeout", "5")
-                        Copy = cpCore.db.siteProperty_getText("EmailAdmin", "webmaster@" & cpCore.db.config.domainList(0))
-                        Copy = cpCore.db.siteProperty_getText("EmailFromAddress", "webmaster@" & cpCore.db.config.domainList(0))
-                        Copy = cpCore.db.siteProperty_getText("EmailPublishSubmitFrom", "webmaster@" & cpCore.db.config.domainList(0))
-                        Copy = cpCore.db.siteProperty_getText("Language", "English")
-                        Copy = cpCore.db.siteProperty_getText("PageContentMessageFooter", "Copyright " & cpCore.db.config.domainList(0))
-                        Copy = cpCore.db.siteProperty_getText("SelectFieldLimit", "4000")
-                        Copy = cpCore.db.siteProperty_getText("SelectFieldWidthLimit", "100")
-                        Copy = cpCore.db.siteProperty_getText("SMTPServer", "127.0.0.1")
-                        Copy = cpCore.db.siteProperty_getText("TextSearchEndTag", "<!-- TextSearchEnd -->")
-                        Copy = cpCore.db.siteProperty_getText("TextSearchStartTag", "<!-- TextSearchStart -->")
-                        Copy = cpCore.db.siteProperty_getText("TrapEmail", "")
-                        Copy = cpCore.db.siteProperty_getText("TrapErrors", "0")
+                        Copy = cpCore.siteProperties.getText("AllowAutoHomeSectionOnce", EncodeText(isNewBuild))
+                        Copy = cpCore.siteProperties.getText("AllowAutoLogin", "False")
+                        Copy = cpCore.siteProperties.getText("AllowBake", "True")
+                        Copy = cpCore.siteProperties.getText("AllowChildMenuHeadline", "True")
+                        Copy = cpCore.siteProperties.getText("AllowContentAutoLoad", "True")
+                        Copy = cpCore.siteProperties.getText("AllowContentSpider", "False")
+                        Copy = cpCore.siteProperties.getText("AllowContentWatchLinkUpdate", "True")
+                        Copy = cpCore.siteProperties.getText("AllowDuplicateUsernames", "False")
+                        Copy = cpCore.siteProperties.getText("ConvertContentText2HTML", "False")
+                        Copy = cpCore.siteProperties.getText("AllowMemberJoin", "False")
+                        Copy = cpCore.siteProperties.getText("AllowPasswordEmail", "True")
+                        Copy = cpCore.siteProperties.getText("AllowPathBlocking", "True")
+                        Copy = cpCore.siteProperties.getText("AllowPopupErrors", "True")
+                        Copy = cpCore.siteProperties.getText("AllowTestPointLogging", "False")
+                        Copy = cpCore.siteProperties.getText("AllowTestPointPrinting", "False")
+                        Copy = cpCore.siteProperties.getText("AllowTransactionLog", "False")
+                        Copy = cpCore.siteProperties.getText("AllowTrapEmail", "True")
+                        Copy = cpCore.siteProperties.getText("AllowTrapLog", "True")
+                        Copy = cpCore.siteProperties.getText("AllowWorkflowAuthoring", "False")
+                        Copy = cpCore.siteProperties.getText("ArchiveAllowFileClean", "False")
+                        Copy = cpCore.siteProperties.getText("ArchiveRecordAgeDays", "90")
+                        Copy = cpCore.siteProperties.getText("ArchiveTimeOfDay", "2:00:00 AM")
+                        Copy = cpCore.siteProperties.getText("BreadCrumbDelimiter", "&nbsp;&gt;&nbsp;")
+                        Copy = cpCore.siteProperties.getText("CalendarYearLimit", "1")
+                        Copy = cpCore.siteProperties.getText("ContentPageCompatibility21", "false")
+                        Copy = cpCore.siteProperties.getText("DefaultFormInputHTMLHeight", "500")
+                        Copy = cpCore.siteProperties.getText("DefaultFormInputTextHeight", "1")
+                        Copy = cpCore.siteProperties.getText("DefaultFormInputWidth", "60")
+                        Copy = cpCore.siteProperties.getText("EditLockTimeout", "5")
+                        Copy = cpCore.siteProperties.getText("EmailAdmin", "webmaster@" & cpCore.appConfig.domainList(0))
+                        Copy = cpCore.siteProperties.getText("EmailFromAddress", "webmaster@" & cpCore.appConfig.domainList(0))
+                        Copy = cpCore.siteProperties.getText("EmailPublishSubmitFrom", "webmaster@" & cpCore.appConfig.domainList(0))
+                        Copy = cpCore.siteProperties.getText("Language", "English")
+                        Copy = cpCore.siteProperties.getText("PageContentMessageFooter", "Copyright " & cpCore.appConfig.domainList(0))
+                        Copy = cpCore.siteProperties.getText("SelectFieldLimit", "4000")
+                        Copy = cpCore.siteProperties.getText("SelectFieldWidthLimit", "100")
+                        Copy = cpCore.siteProperties.getText("SMTPServer", "127.0.0.1")
+                        Copy = cpCore.siteProperties.getText("TextSearchEndTag", "<!-- TextSearchEnd -->")
+                        Copy = cpCore.siteProperties.getText("TextSearchStartTag", "<!-- TextSearchStart -->")
+                        Copy = cpCore.siteProperties.getText("TrapEmail", "")
+                        Copy = cpCore.siteProperties.getText("TrapErrors", "0")
                     End If
                     '
                     '---------------------------------------------------------------------
@@ -554,10 +554,10 @@ Namespace Contensive.Core
                     '---------------------------------------------------------------------
 
                     '
-                    StyleSN = (cpCore.db.siteProperty_getinteger("StylesheetSerialNumber"))
+                    StyleSN = (cpCore.siteProperties.getinteger("StylesheetSerialNumber"))
                     If StyleSN > 0 Then
                         StyleSN = StyleSN + 1
-                        Call cpCore.db.siteProperty_set("StylesheetSerialNumber", CStr(StyleSN))
+                        Call cpCore.siteProperties.setProperty("StylesheetSerialNumber", CStr(StyleSN))
                         ' too lazy
                         'Call cpcore.app.publicFiles.SaveFile(cpcore.app.csv_getPhysicalFilename("templates\Public" & StyleSN & ".css"), cpcore.app.csv_getStyleSheetProcessed)
                         'Call cpcore.app.publicFiles.SaveFile(cpcore.app.csv_getPhysicalFilename("templates\Admin" & StyleSN & ".css", cpcore.app.csv_getStyleSheetDefault)
@@ -573,7 +573,7 @@ Namespace Contensive.Core
                     '
                     If True Then
                         Call appendUpgradeLog("Internal upgrade complete, set Buildversion to " & cpCore.version)
-                        Call cpCore.db.siteProperty_set("BuildVersion", cpCore.version)
+                        Call cpCore.siteProperties.setProperty("BuildVersion", cpCore.version)
                         cpCore.db.dataBuildVersion_LocalLoaded = False
                         '
                         '---------------------------------------------------------------------
@@ -595,9 +595,9 @@ Namespace Contensive.Core
                             UpgradeOK = addonInstall.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(ErrorMessage, "", IISResetRequired, isNewBuild)
                             classLogFolder = saveLogFolder
                             If ErrorMessage <> "" Then
-                                cpCore.handleLegacyError3(cpCore.db.config.name, "During UpgradeAllLocalCollectionsFromLib3 call, " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
+                                cpCore.handleLegacyError3(cpCore.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             ElseIf Not UpgradeOK Then
-                                cpCore.handleLegacyError3(cpCore.db.config.name, "During UpgradeAllLocalCollectionsFromLib3 call, NotOK was returned without an error message", "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
+                                cpCore.handleLegacyError3(cpCore.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, NotOK was returned without an error message", "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             End If
                             ''
                             ''---------------------------------------------------------------------
@@ -655,7 +655,7 @@ Namespace Contensive.Core
                                 Call Doc.LoadXml(addonInstall.getCollectionListFile)
                                 If True Then
                                     If LCase(Doc.DocumentElement.Name) <> LCase(CollectionListRootNode) Then
-                                        cpCore.handleLegacyError3(cpCore.db.config.name, "Error loading Collection config file. The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.", "dll", "builderClass", "Upgrade", 0, "", "", False, True, "")
+                                        cpCore.handleLegacyError3(cpCore.appConfig.name, "Error loading Collection config file. The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.", "dll", "builderClass", "Upgrade", 0, "", "", False, True, "")
                                     Else
                                         With Doc.DocumentElement
                                             If LCase(.Name) = "collectionlist" Then
@@ -685,7 +685,7 @@ Namespace Contensive.Core
                                                                 ' app version has no lastchangedate
                                                                 '
                                                                 upgradeCollection = True
-                                                                Call appendUpgradeLog(cpCore.db.config.name, MethodName, "Upgrading collection " & dt.Rows(rowptr).Item("name").ToString & " because the collection installed in the application has no LastChangeDate. It may have been installed manually.")
+                                                                Call appendUpgradeLog(cpCore.appConfig.name, MethodName, "Upgrading collection " & dt.Rows(rowptr).Item("name").ToString & " because the collection installed in the application has no LastChangeDate. It may have been installed manually.")
                                                             Else
                                                                 '
                                                                 ' compare to last change date in collection config file
@@ -711,7 +711,7 @@ Namespace Contensive.Core
                                                                         Call appendUpgradeLog("...local collection found")
                                                                         If LocalLastChangeDate <> Date.MinValue Then
                                                                             If LocalLastChangeDate > LastChangeDate Then
-                                                                                Call appendUpgradeLog(cpCore.db.config.name, MethodName, "Upgrading collection " & dt.Rows(rowptr).Item("name").ToString() & " because the collection in the local server store has a newer LastChangeDate than the collection installed on this application.")
+                                                                                Call appendUpgradeLog(cpCore.appConfig.name, MethodName, "Upgrading collection " & dt.Rows(rowptr).Item("name").ToString() & " because the collection in the local server store has a newer LastChangeDate than the collection installed on this application.")
                                                                                 upgradeCollection = True
                                                                             End If
                                                                         End If
@@ -747,7 +747,7 @@ Namespace Contensive.Core
                                 End If
 
                             Catch ex9 As Exception
-                                Call handleClassException(ex9, cpCore.db.config.name, MethodName) ' "upgrade2")
+                                Call handleClassException(ex9, cpCore.appConfig.name, MethodName) ' "upgrade2")
                             End Try
                             '
                             ' done
@@ -1411,28 +1411,6 @@ Namespace Contensive.Core
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
-        '
-        '=============================================================================
-        '   Get a ContentID from the ContentName using just the tables
-        '=============================================================================
-        '
-        Private Function GetContentID(ByVal ContentName As String) As Integer
-            Dim returnContentId As Integer = 0
-            Try
-                '
-                Dim dt As DataTable
-                '
-                GetContentID = 0
-                dt = cpCore.db.executeSql("Select ID from ccContent where name=" & cpCore.db.db_EncodeSQLText(ContentName))
-                If dt.Rows.Count > 0 Then
-                    GetContentID = EncodeInteger(dt.Rows(0).Item("id"))
-                End If
-                dt.Dispose()
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
-            Return returnContentId
-        End Function
         '        '
         '        ' Get the Menu for FormInputHTML
         '        '
@@ -1474,12 +1452,12 @@ Namespace Contensive.Core
                 Dim tableName As String = cdef.ContentTableName
                 Dim cid As Integer = cdef.Id
                 '
-                dt = cpCore.db.executeSql("SELECT ID FROM " & tableName & " WHERE NAME=" & cpCore.db.db_EncodeSQLText(Name) & ";")
+                dt = cpCore.db.executeSql("SELECT ID FROM " & tableName & " WHERE NAME=" & cpCore.db.encodeSQLText(Name) & ";")
                 If dt.Rows.Count = 0 Then
                     ' cid = GetContentID(ContentName)
                     'tableName = cpcore.app.csv_GetContentTablename(ContentName)
                     sql1 = "insert into " & tableName & " (contentcontrolid,createkey,active,name"
-                    sql2 = ") values (" & cid & ",0," & cpCore.db.db_EncodeSQLBoolean(Active) & "," & cpCore.db.db_EncodeSQLText(Name)
+                    sql2 = ") values (" & cid & ",0," & cpCore.db.db_EncodeSQLBoolean(Active) & "," & cpCore.db.encodeSQLText(Name)
                     sql3 = ")"
                     If CodeFieldName <> "" Then
                         sql1 &= "," & CodeFieldName
@@ -1714,7 +1692,7 @@ Namespace Contensive.Core
                 '---------------------------------------------------------------------
                 '
                 If False Then
-                    Call appendUpgradeLogAddStep(cpCore.db.config.name, "Upgrade_Conversion", "4.2.414, convert all ccaggregateFunctions to add-ons")
+                    Call appendUpgradeLogAddStep(cpCore.appConfig.name, "Upgrade_Conversion", "4.2.414, convert all ccaggregateFunctions to add-ons")
                     '
                     ' remove all non add-on contentdefs for ccaggregatefunctions
                     '
@@ -1734,7 +1712,7 @@ Namespace Contensive.Core
                 ' ----- Roll the style sheet cache if it is setup
                 '---------------------------------------------------------------------
                 '
-                Call cpCore.db.siteProperty_set("StylesheetSerialNumber", CStr(-1))
+                Call cpCore.siteProperties.setProperty("StylesheetSerialNumber", CStr(-1))
                 '
                 ' ----- Reload CSv
                 '
@@ -1763,7 +1741,7 @@ Namespace Contensive.Core
                 '
                 MethodName = "VerifyTableCoreFields"
                 '
-                Call appendUpgradeLogAddStep(cpCore.db.config.name, MethodName, "Verify core fields in all tables registered in [Tables] content.")
+                Call appendUpgradeLogAddStep(cpCore.appConfig.name, MethodName, "Verify core fields in all tables registered in [Tables] content.")
                 '
                 SQL = "SELECT ccDataSources.Name as DataSourceName, ccDataSources.ID as DataSourceID, ccDataSources.Active as DataSourceActive, ccTables.Name as TableName" _
                 & " FROM ccTables LEFT JOIN ccDataSources ON ccTables.DataSourceID = ccDataSources.ID" _
@@ -1797,7 +1775,7 @@ Namespace Contensive.Core
         Friend Sub VerifyScriptingRecords()
             Try
                 '
-                Call appendUpgradeLogAddStep(cpCore.db.config.name, "VerifyScriptingRecords", "Verify Scripting Records.")
+                Call appendUpgradeLogAddStep(cpCore.appConfig.name, "VerifyScriptingRecords", "Verify Scripting Records.")
                 '
                 Call VerifyRecord("Scripting Languages", "VBScript", "", "")
                 Call VerifyRecord("Scripting Languages", "JScript", "", "")
@@ -1813,7 +1791,7 @@ Namespace Contensive.Core
         Friend Sub VerifyLanguageRecords()
             Try
                 '
-                Call appendUpgradeLogAddStep(cpCore.db.config.name, "VerifyLanguageRecords", "Verify Language Records.")
+                Call appendUpgradeLogAddStep(cpCore.appConfig.name, "VerifyLanguageRecords", "Verify Language Records.")
                 '
                 Call VerifyRecord("Languages", "English", "HTTP_Accept_Language", "'en'")
                 Call VerifyRecord("Languages", "Spanish", "HTTP_Accept_Language", "'es'")
@@ -1832,7 +1810,7 @@ Namespace Contensive.Core
                 Dim CS As Integer
                 Dim dt As DataTable
                 '
-                Call appendUpgradeLogAddStep(cpCore.db.config.name, "VerifyLibraryFolders", "Verify Library Folders: Images and Downloads")
+                Call appendUpgradeLogAddStep(cpCore.appConfig.name, "VerifyLibraryFolders", "Verify Library Folders: Images and Downloads")
                 '
                 dt = cpCore.db.executeSql("select id from cclibraryfiles")
                 If dt.Rows.Count = 0 Then
@@ -1995,7 +1973,7 @@ Namespace Contensive.Core
                 '
                 Dim rs As DataTable
                 '
-                rs = cpCore.db.executeSql("Select ID from " & TableName & " where name=" & cpCore.db.db_EncodeSQLText(RecordName))
+                rs = cpCore.db.executeSql("Select ID from " & TableName & " where name=" & cpCore.db.encodeSQLText(RecordName))
                 If isDataTableOk(rs) Then
                     GetIDBYName = EncodeInteger(rs.Rows(0).Item("ID"))
                 End If
@@ -2106,7 +2084,7 @@ Namespace Contensive.Core
                 Dim CS As Integer
                 Const ContentName = "States"
                 '
-                CS = cpCore.db.db_csOpen(ContentName, "name=" & cpCore.db.db_EncodeSQLText(Name), , False)
+                CS = cpCore.db.db_csOpen(ContentName, "name=" & cpCore.db.encodeSQLText(Name), , False)
                 If Not cpCore.db.db_csOk(CS) Then
                     '
                     ' create new record
@@ -2138,7 +2116,7 @@ Namespace Contensive.Core
         Friend Sub VerifyStates()
             Try
                 '
-                Call appendUpgradeLogAddStep(cpCore.db.config.name, "VerifyStates", "Verify States")
+                Call appendUpgradeLogAddStep(cpCore.appConfig.name, "VerifyStates", "Verify States")
                 '
                 Dim CountryID As Integer
                 '
@@ -2213,7 +2191,7 @@ Namespace Contensive.Core
                 Dim CS As Integer
                 Dim Active As Boolean
                 '
-                CS = cpCore.db.db_csOpen("Countries", "name=" & cpCore.db.db_EncodeSQLText(Name))
+                CS = cpCore.db.db_csOpen("Countries", "name=" & cpCore.db.encodeSQLText(Name))
                 If Not cpCore.db.db_csOk(CS) Then
                     Call cpCore.db.db_csClose(CS)
                     CS = cpCore.db.db_csInsertRecord("Countries", SystemMemberID)
@@ -2249,9 +2227,9 @@ Namespace Contensive.Core
                 Dim Name As String
                 'Dim fs As New fileSystemClass
                 '
-                Call appendUpgradeLogAddStep(cpCore.db.config.name, "VerifyCountries", "Verify Countries")
+                Call appendUpgradeLogAddStep(cpCore.appConfig.name, "VerifyCountries", "Verify Countries")
                 '
-                list = cpCore.db.appRootFiles.ReadFile("cclib\config\isoCountryList.txt")
+                list = cpCore.appRootFiles.ReadFile("cclib\config\isoCountryList.txt")
                 Rows = Split(list, vbCrLf)
                 For RowPtr = 0 To UBound(Rows)
                     Row = Rows(RowPtr)
@@ -2279,7 +2257,7 @@ Namespace Contensive.Core
                 Dim GroupID As Integer
                 Dim SQL As String
                 '
-                Call appendUpgradeLogAddStep(cpCore.db.config.name, "VerifyDefaultGroups", "Verify Default Groups")
+                Call appendUpgradeLogAddStep(cpCore.appConfig.name, "VerifyDefaultGroups", "Verify Default Groups")
                 '
                 GroupID = cpCore.group_add("Content Editors")
                 SQL = "Update ccContent Set EditorGroupID=" & cpCore.db.db_EncodeSQLNumber(GroupID) & " where EditorGroupID is null;"
@@ -2431,7 +2409,7 @@ Namespace Contensive.Core
         ''
         ''
         Public Sub ReplaceAddonWithCollection(ByVal AddonProgramID As String, ByVal CollectionGuid As String, ByRef return_IISResetRequired As Boolean, ByRef return_RegisterList As String)
-            Dim ex As New Exception("todo") : Call handleClassException(ex, cpCore.db.config.name, "methodNameFPO") ' KmaErrorInternal, "dll", "builderClass.ReplaceAddonWithCollection is deprecated", "ReplaceAddonWithCollection", True, True)
+            Dim ex As New Exception("todo") : Call handleClassException(ex, cpCore.appConfig.name, "methodNameFPO") ' KmaErrorInternal, "dll", "builderClass.ReplaceAddonWithCollection is deprecated", "ReplaceAddonWithCollection", True, True)
         End Sub
         '    On Error GoTo ErrorTrap
         '    '
@@ -2469,7 +2447,7 @@ Namespace Contensive.Core
             Try
                 '
                 If Not False Then
-                    Call appendUpgradeLogAddStep(cpCore.db.config.name, "VerifyCoreTables", "Verify Core SQL Tables")
+                    Call appendUpgradeLogAddStep(cpCore.appConfig.name, "VerifyCoreTables", "Verify Core SQL Tables")
                     '
                     Call cpCore.db.db_CreateSQLTable("Default", "ccDataSources")
                     Call cpCore.db.db_CreateSQLTableField("Default", "ccDataSources", "typeId", FieldTypeIdInteger)
@@ -2665,7 +2643,7 @@ Namespace Contensive.Core
                 Else
                     SelectList = SelectList & ",AddonID"
                     If AddonName <> "" Then
-                        CS = cpCore.db.db_csOpen(AddonContentName, "name=" & cpCore.db.db_EncodeSQLText(AddonName), "ID", False, , , , "ID", 1)
+                        CS = cpCore.db.db_csOpen(AddonContentName, "name=" & cpCore.db.encodeSQLText(AddonName), "ID", False, , , , "ID", 1)
                         If cpCore.db.db_csOk(CS) Then
                             addonId = (cpCore.db.db_GetCSInteger(CS, "ID"))
                         End If
@@ -2681,7 +2659,7 @@ Namespace Contensive.Core
                 '
                 ParentID = 0
                 If ParentName <> "" Then
-                    CS = cpCore.db.db_csOpen(MenuContentName, "name=" & cpCore.db.db_EncodeSQLText(ParentName), "ID", False, , , , "ID", 1)
+                    CS = cpCore.db.db_csOpen(MenuContentName, "name=" & cpCore.db.encodeSQLText(ParentName), "ID", False, , , , "ID", 1)
                     If cpCore.db.db_csOk(CS) Then
                         ParentID = (cpCore.db.db_GetCSInteger(CS, "ID"))
                     End If
@@ -2697,7 +2675,7 @@ Namespace Contensive.Core
                 '
                 ' Locate current entry
                 '
-                CSEntry = cpCore.db.db_csOpen(MenuContentName, "(name=" & cpCore.db.db_EncodeSQLText(EntryName) & ")", "ID", False, , , , SelectList)
+                CSEntry = cpCore.db.db_csOpen(MenuContentName, "(name=" & cpCore.db.encodeSQLText(EntryName) & ")", "ID", False, , , , SelectList)
                 '
                 ' If no current entry, create one
                 '
@@ -2782,7 +2760,7 @@ Namespace Contensive.Core
                         '
                         ' get contentId, guid, IsBaseContent
                         '
-                        SQL = "select ID,ccguid,IsBaseContent  from ccContent where (name=" & cpCore.db.db_EncodeSQLText(ContentName) & ") order by id;"
+                        SQL = "select ID,ccguid,IsBaseContent  from ccContent where (name=" & cpCore.db.encodeSQLText(ContentName) & ") order by id;"
                         dt = cpCore.db.executeSql(SQL)
                         If dt.Rows.Count > 0 Then
                             returnContentId = EncodeInteger(dt.Rows(0).Item("ID"))
@@ -2808,7 +2786,7 @@ Namespace Contensive.Core
                         ' get parentId
                         '
                         If Not String.IsNullOrEmpty(ParentName) Then
-                            SQL = "select id from ccContent where (name=" & cpCore.db.db_EncodeSQLText(ParentName) & ") order by id;"
+                            SQL = "select id from ccContent where (name=" & cpCore.db.encodeSQLText(ParentName) & ") order by id;"
                             dt = cpCore.db.executeSql(SQL)
                             If dt.Rows.Count > 0 Then
                                 parentId = EncodeInteger(dt.Rows(0).Item(0))
@@ -2820,7 +2798,7 @@ Namespace Contensive.Core
                         '
                         InstalledByCollectionID = 0
                         If (installedByCollectionGuid <> "") Then
-                            SQL = "select id from ccAddonCollections where ccGuid=" & cpCore.db.db_EncodeSQLText(installedByCollectionGuid)
+                            SQL = "select id from ccAddonCollections where ccGuid=" & cpCore.db.encodeSQLText(installedByCollectionGuid)
                             dt = cpCore.db.executeSql(SQL)
                             If dt.Rows.Count > 0 Then
                                 InstalledByCollectionID = EncodeInteger(dt.Rows(0).Item("ID"))
@@ -2845,7 +2823,7 @@ Namespace Contensive.Core
                             '
                             ' ----- Get the Table Definition ID, create one if missing
                             '
-                            SQL = "SELECT ID from ccTables where (active<>0) and (name=" & cpCore.db.db_EncodeSQLText(TableName) & ");"
+                            SQL = "SELECT ID from ccTables where (active<>0) and (name=" & cpCore.db.encodeSQLText(TableName) & ");"
                             dt = cpCore.db.executeSql(SQL)
                             If dt.Rows.Count <= 0 Then
                                 '
@@ -2864,7 +2842,7 @@ Namespace Contensive.Core
                                 TableID = cpCore.db.db_InsertTableRecordGetID("Default", "ccTables", SystemMemberID)
                                 '
                                 sqlList = New sqlFieldListClass
-                                sqlList.add("name", cpCore.db.db_EncodeSQLText(TableName))
+                                sqlList.add("name", cpCore.db.encodeSQLText(TableName))
                                 sqlList.add("active", SQLTrue)
                                 sqlList.add("DATASOURCEID", cpCore.db.db_EncodeSQLNumber(DataSourceID))
                                 sqlList.add("CONTENTCONTROLID", cpCore.db.db_EncodeSQLNumber(cpCore.db.db_GetContentID("Tables")))
@@ -2883,7 +2861,7 @@ Namespace Contensive.Core
                             If iDefaultSortMethod = "" Then
                                 DefaultSortMethodID = 0
                             Else
-                                dt = cpCore.db.db_openTable("Default", "ccSortMethods", "(name=" & cpCore.db.db_EncodeSQLText(iDefaultSortMethod) & ")and(active<>0)", "ID", "ID", 1, 1)
+                                dt = cpCore.db.db_openTable("Default", "ccSortMethods", "(name=" & cpCore.db.encodeSQLText(iDefaultSortMethod) & ")and(active<>0)", "ID", "ID", 1, 1)
                                 If dt.Rows.Count > 0 Then
                                     DefaultSortMethodID = EncodeInteger(dt.Rows(0).Item("ID"))
                                 End If
@@ -2892,7 +2870,7 @@ Namespace Contensive.Core
                                 '
                                 ' fallback - maybe they put the orderbyclause in (common mistake)
                                 '
-                                dt = cpCore.db.db_openTable("Default", "ccSortMethods", "(OrderByClause=" & cpCore.db.db_EncodeSQLText(iDefaultSortMethod) & ")and(active<>0)", "ID", "ID", 1, 1)
+                                dt = cpCore.db.db_openTable("Default", "ccSortMethods", "(OrderByClause=" & cpCore.db.encodeSQLText(iDefaultSortMethod) & ")and(active<>0)", "ID", "ID", 1, 1)
                                 If dt.Rows.Count > 0 Then
                                     DefaultSortMethodID = EncodeInteger(dt.Rows(0).Item("ID"))
                                 End If
@@ -2905,7 +2883,7 @@ Namespace Contensive.Core
                             ' ----- update record
                             '
                             sqlList = New sqlFieldListClass
-                            Call sqlList.add("name", cpCore.db.db_EncodeSQLText(ContentName))
+                            Call sqlList.add("name", cpCore.db.encodeSQLText(ContentName))
                             Call sqlList.add("CREATEKEY", "0")
                             Call sqlList.add("active", cpCore.db.db_EncodeSQLBoolean(Active))
                             Call sqlList.add("ContentControlID", cpCore.db.db_EncodeSQLNumber(ContentIDofContent))
@@ -2916,7 +2894,7 @@ Namespace Contensive.Core
                             Call sqlList.add("AdminOnly", cpCore.db.db_EncodeSQLBoolean(AdminOnly))
                             Call sqlList.add("ParentID", cpCore.db.db_EncodeSQLNumber(parentId))
                             Call sqlList.add("DefaultSortMethodID", cpCore.db.db_EncodeSQLNumber(DefaultSortMethodID))
-                            Call sqlList.add("DropDownFieldList", cpCore.db.db_EncodeSQLText(encodeEmptyText(DropDownFieldList, "Name")))
+                            Call sqlList.add("DropDownFieldList", cpCore.db.encodeSQLText(encodeEmptyText(DropDownFieldList, "Name")))
                             Call sqlList.add("ContentTableID", cpCore.db.db_EncodeSQLNumber(TableID))
                             Call sqlList.add("AuthoringTableID", cpCore.db.db_EncodeSQLNumber(TableID))
                             Call sqlList.add("ModifiedDate", cpCore.db.db_EncodeSQLDate(Now))
@@ -2927,7 +2905,7 @@ Namespace Contensive.Core
                             Call sqlList.add("AllowTopicRules", cpCore.db.db_EncodeSQLBoolean(AllowTopicRules))
                             Call sqlList.add("AllowContentChildTool", cpCore.db.db_EncodeSQLBoolean(AllowContentChildTool))
                             Call sqlList.add("AllowMetaContent", cpCore.db.db_EncodeSQLBoolean(AllowMetaContent))
-                            Call sqlList.add("IconLink", cpCore.db.db_EncodeSQLText(encodeEmptyText(IconLink, "")))
+                            Call sqlList.add("IconLink", cpCore.db.encodeSQLText(encodeEmptyText(IconLink, "")))
                             Call sqlList.add("IconHeight", cpCore.db.db_EncodeSQLNumber(IconHeight))
                             Call sqlList.add("IconWidth", cpCore.db.db_EncodeSQLNumber(IconWidth))
                             Call sqlList.add("IconSprites", cpCore.db.db_EncodeSQLNumber(IconSprites))
@@ -2938,7 +2916,7 @@ Namespace Contensive.Core
                                     ' hard one - only update guid if the tables supports it, and it the new guid is not blank
                                     ' if the new guid does no match te old guid
                                     '
-                                    Call sqlList.add("ccGuid", cpCore.db.db_EncodeSQLText(NewGuid))
+                                    Call sqlList.add("ccGuid", cpCore.db.encodeSQLText(NewGuid))
                                 ElseIf (NewGuid <> "") And (LcContentGuid <> LCase(NewGuid)) Then
                                     '
                                     ' new guid does not match current guid
@@ -3459,7 +3437,7 @@ Namespace Contensive.Core
                 '
                 ContentID = -1
                 TableID = 0
-                SQL = "select ID,ContentTableID from ccContent where name=" & cpCore.db.db_EncodeSQLText(ContentName) & ";"
+                SQL = "select ID,ContentTableID from ccContent where name=" & cpCore.db.encodeSQLText(ContentName) & ";"
                 rs = cpCore.db.executeSql(SQL)
                 If isDataTableOk(rs) Then
                     ContentID = EncodeInteger(cpCore.db.db_getDataRowColumnName(rs.Rows(0), "ID"))
@@ -3470,7 +3448,7 @@ Namespace Contensive.Core
                 '
                 RecordID = 0
                 RecordIsBaseField = False
-                SQL = "select ID,IsBaseField from ccFields where (ContentID=" & cpCore.db.db_EncodeSQLNumber(ContentID) & ")and(name=" & cpCore.db.db_EncodeSQLText(field.nameLc) & ");"
+                SQL = "select ID,IsBaseField from ccFields where (ContentID=" & cpCore.db.db_EncodeSQLNumber(ContentID) & ")and(name=" & cpCore.db.encodeSQLText(field.nameLc) & ");"
                 rs = cpCore.db.executeSql(SQL)
                 If isDataTableOk(rs) Then
                     isNewFieldRecord = False
@@ -3485,7 +3463,7 @@ Namespace Contensive.Core
                     '
                     ' This update is not allowed
                     '
-                    cpCore.handleLegacyError2("cpCoreClass", "csv_VerifyCDefField_ReturnID", cpCore.db.config.name & ", Warning, a Base field Is being updated To non-base. This should only happen When a base field Is removed from the base collection. Content [" & ContentName & "], field [" & field.nameLc & "].")
+                    cpCore.handleLegacyError2("cpCoreClass", "csv_VerifyCDefField_ReturnID", cpCore.appConfig.name & ", Warning, a Base field Is being updated To non-base. This should only happen When a base field Is removed from the base collection. Content [" & ContentName & "], field [" & field.nameLc & "].")
                 End If
                 If True Then
                     'FieldAdminOnly = field.adminOnly
@@ -3604,7 +3582,7 @@ Namespace Contensive.Core
                             '
                             InstalledByCollectionID = 0
                             If (installedByCollectionGuid <> "") Then
-                                rs = cpCore.db.executeSql("Select id from ccAddonCollections where ccguid=" & cpCore.db.db_EncodeSQLText(installedByCollectionGuid) & ";")
+                                rs = cpCore.db.executeSql("Select id from ccAddonCollections where ccguid=" & cpCore.db.encodeSQLText(installedByCollectionGuid) & ";")
                                 If isDataTableOk(rs) Then
                                     InstalledByCollectionID = EncodeInteger(cpCore.db.db_getDataRowColumnName(rs.Rows(0), "Id"))
                                 End If
@@ -3636,7 +3614,7 @@ Namespace Contensive.Core
                             Call sqlList.add("MODIFIEDBY", cpCore.db.db_EncodeSQLNumber(SystemMemberID)) ' Pointer)
                             Call sqlList.add("MODIFIEDDATE", cpCore.db.db_EncodeSQLDate(Now)) ' Pointer)
                             Call sqlList.add("TYPE", cpCore.db.db_EncodeSQLNumber(fieldTypeId)) ' Pointer)
-                            Call sqlList.add("CAPTION", cpCore.db.db_EncodeSQLText(FieldCaption)) ' Pointer)
+                            Call sqlList.add("CAPTION", cpCore.db.encodeSQLText(FieldCaption)) ' Pointer)
                             Call sqlList.add("ReadOnly", cpCore.db.db_EncodeSQLBoolean(FieldReadOnly)) ' Pointer)
                             Call sqlList.add("LOOKUPCONTENTID", cpCore.db.db_EncodeSQLNumber(LookupContentID)) ' Pointer)
                             Call sqlList.add("REQUIRED", cpCore.db.db_EncodeSQLBoolean(FieldRequired)) ' Pointer)
@@ -3646,34 +3624,34 @@ Namespace Contensive.Core
                             Call sqlList.add("ADMINONLY", cpCore.db.db_EncodeSQLBoolean(field.adminOnly)) ' Pointer)
                             Call sqlList.add("DEVELOPERONLY", cpCore.db.db_EncodeSQLBoolean(FieldDeveloperOnly)) ' Pointer)
                             Call sqlList.add("CONTENTCONTROLID", cpCore.db.db_EncodeSQLNumber(cpCore.db.db_GetContentID("Content Fields"))) ' Pointer)
-                            Call sqlList.add("DefaultValue", cpCore.db.db_EncodeSQLText(DefaultValue)) ' Pointer)
+                            Call sqlList.add("DefaultValue", cpCore.db.encodeSQLText(DefaultValue)) ' Pointer)
                             Call sqlList.add("HTMLCONTENT", cpCore.db.db_EncodeSQLBoolean(HTMLContent)) ' Pointer)
                             Call sqlList.add("NOTEDITABLE", cpCore.db.db_EncodeSQLBoolean(NotEditable)) ' Pointer)
                             Call sqlList.add("AUTHORABLE", cpCore.db.db_EncodeSQLBoolean(FieldAuthorable)) ' Pointer)
                             Call sqlList.add("EDITARCHIVE", SQLFalse) ' Pointer)
                             Call sqlList.add("EDITBLANK", SQLFalse) ' Pointer)
                             Call sqlList.add("INDEXCOLUMN", cpCore.db.db_EncodeSQLNumber(field.indexColumn)) ' Pointer)
-                            Call sqlList.add("INDEXWIDTH", cpCore.db.db_EncodeSQLText(AdminIndexWidth)) ' Pointer)
+                            Call sqlList.add("INDEXWIDTH", cpCore.db.encodeSQLText(AdminIndexWidth)) ' Pointer)
                             Call sqlList.add("INDEXSORTPRIORITY", cpCore.db.db_EncodeSQLNumber(AdminIndexSort)) ' Pointer)
                             Call sqlList.add("REDIRECTCONTENTID", cpCore.db.db_EncodeSQLNumber(RedirectContentID)) ' Pointer)
-                            Call sqlList.add("REDIRECTID", cpCore.db.db_EncodeSQLText(RedirectIDField)) ' Pointer)
-                            Call sqlList.add("REDIRECTPATH", cpCore.db.db_EncodeSQLText(RedirectPath)) ' Pointer)
+                            Call sqlList.add("REDIRECTID", cpCore.db.encodeSQLText(RedirectIDField)) ' Pointer)
+                            Call sqlList.add("REDIRECTPATH", cpCore.db.encodeSQLText(RedirectPath)) ' Pointer)
                             Call sqlList.add("UNIQUENAME", cpCore.db.db_EncodeSQLBoolean(UniqueName)) ' Pointer)
                             Call sqlList.add("RSSTITLEFIELD", cpCore.db.db_EncodeSQLBoolean(RSSTitle)) ' Pointer)
                             Call sqlList.add("RSSDESCRIPTIONFIELD", cpCore.db.db_EncodeSQLBoolean(RSSDescription)) ' Pointer)
                             Call sqlList.add("MEMBERSELECTGROUPID", cpCore.db.db_EncodeSQLNumber(MemberSelectGroupID)) ' Pointer)
                             Call sqlList.add("installedByCollectionId", cpCore.db.db_EncodeSQLNumber(InstalledByCollectionID)) ' Pointer)
-                            Call sqlList.add("EDITTAB", cpCore.db.db_EncodeSQLText(EditTab)) ' Pointer)
+                            Call sqlList.add("EDITTAB", cpCore.db.encodeSQLText(EditTab)) ' Pointer)
                             Call sqlList.add("SCRAMBLE", cpCore.db.db_EncodeSQLBoolean(Scramble)) ' Pointer)
-                            Call sqlList.add("LOOKUPLIST", cpCore.db.db_EncodeSQLText(LookupList)) ' Pointer)
+                            Call sqlList.add("LOOKUPLIST", cpCore.db.encodeSQLText(LookupList)) ' Pointer)
                             Call sqlList.add("MANYTOMANYCONTENTID", cpCore.db.db_EncodeSQLNumber(ManyToManyContentID)) ' Pointer)
                             Call sqlList.add("MANYTOMANYRULECONTENTID", cpCore.db.db_EncodeSQLNumber(ManyToManyRuleContentID)) ' Pointer)
-                            Call sqlList.add("MANYTOMANYRULEPRIMARYFIELD", cpCore.db.db_EncodeSQLText(ManyToManyRulePrimaryField)) ' Pointer)
-                            Call sqlList.add("MANYTOMANYRULESECONDARYFIELD", cpCore.db.db_EncodeSQLText(ManyToManyRuleSecondaryField)) ' Pointer)
+                            Call sqlList.add("MANYTOMANYRULEPRIMARYFIELD", cpCore.db.encodeSQLText(ManyToManyRulePrimaryField)) ' Pointer)
+                            Call sqlList.add("MANYTOMANYRULESECONDARYFIELD", cpCore.db.encodeSQLText(ManyToManyRuleSecondaryField)) ' Pointer)
                             Call sqlList.add("ISBASEFIELD", cpCore.db.db_EncodeSQLBoolean(IsBaseField)) ' Pointer)
                             '
                             If RecordID = 0 Then
-                                Call sqlList.add("NAME", cpCore.db.db_EncodeSQLText(field.nameLc)) ' Pointer)
+                                Call sqlList.add("NAME", cpCore.db.encodeSQLText(field.nameLc)) ' Pointer)
                                 Call sqlList.add("CONTENTID", cpCore.db.db_EncodeSQLNumber(ContentID)) ' Pointer)
                                 Call sqlList.add("CREATEKEY", "0") ' Pointer)
                                 Call sqlList.add("DATEADDED", cpCore.db.db_EncodeSQLDate(Now)) ' Pointer)
@@ -3787,7 +3765,7 @@ Namespace Contensive.Core
                             ContentIsNew = True
                             Call metaData_CreateContent4(True, DataSourceName, TableName, ContentName)
                             'ContentID = csv_GetContentID(ContentName)
-                            SQL = "Select ID from ccContent where name=" & cpCore.db.db_EncodeSQLText(ContentName)
+                            SQL = "Select ID from ccContent where name=" & cpCore.db.encodeSQLText(ContentName)
                             Dim rsContent As DataTable
                             rsContent = cpCore.db.executeSql(SQL)
                             If rsContent.Rows.Count = 0 Then
@@ -3834,7 +3812,7 @@ Namespace Contensive.Core
                                 '
                                 ' touch field so upgrade does not delete it
                                 '
-                                Call cpCore.db.executeSql("update ccFields Set CreateKey=0 where (Contentid=" & ContentID & ") And (name = " & cpCore.db.db_EncodeSQLText(UcaseTableColumnName) & ")")
+                                Call cpCore.db.executeSql("update ccFields Set CreateKey=0 where (Contentid=" & ContentID & ") And (name = " & cpCore.db.encodeSQLText(UcaseTableColumnName) & ")")
                             End If
                         Next
                     End If

@@ -18,14 +18,69 @@ Namespace Contensive.Core
         '   objects passed by constructor - do not dispose
         '------------------------------------------------------------------------
         '
-        Private applicationName As String                       ' constructor -- name specified in constructor
         Private cp As CPClass                                   ' constructor -- top-level cp
+        Public Property appConfig As appConfigClass             ' configuration loaded during construction
+        Public Property appStatus As applicationStatusEnum      ' status of application
+        '
+        ' application storage
+        '
         Private deleteOnDisposeFileList As New List(Of String)              ' tmp file list of files that need to be deleted during dispose
+        Private Const www_requestRootPath As String = "/"
         '
         ' if this instance is a webRole, retain pointer for callbacks
         '
-        Public isWebRoleIis As Boolean = False                ' set true if ASP objects are available
         Private iisContext As System.Web.HttpContext
+        '
+        '===================================================================================================
+        ''' <summary>
+        ''' siteProperties object
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public ReadOnly Property user() As coreUserClass
+            Get
+                If (_user Is Nothing) Then
+                    _user = New coreUserClass(Me)
+                End If
+                Return _user
+            End Get
+        End Property
+        Private _user As coreUserClass = Nothing
+        '
+        '===================================================================================================
+        ''' <summary>
+        ''' siteProperties object
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public ReadOnly Property siteProperties() As coreSitePropertiesClass
+            Get
+                If (_siteProperties Is Nothing) Then
+                    _siteProperties = New coreSitePropertiesClass(Me)
+                End If
+                Return _siteProperties
+            End Get
+        End Property
+        Private _siteProperties As coreSitePropertiesClass = Nothing
+        '
+        '===================================================================================================
+        ''' <summary>
+        ''' returns the cache object.
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public ReadOnly Property workflow() As coreWorkflowClass
+            Get
+                If (_workflow Is Nothing) Then
+                    _workflow = New coreWorkflowClass(Me)
+                End If
+                Return _workflow
+            End Get
+        End Property
+        Private _workflow As coreWorkflowClass = Nothing
         '
         '===================================================================================================
         ''' <summary>
@@ -82,8 +137,8 @@ Namespace Contensive.Core
         ''' <remarks>_app created duirng init(), after cp.context() is loaded</remarks>
         Public ReadOnly Property db As coreDbClass
             Get
-                If (_db Is Nothing) And (Not String.IsNullOrEmpty(applicationName)) Then
-                    _db = New coreDbClass(Me, applicationName)
+                If (_db Is Nothing) And (Not String.IsNullOrEmpty(appConfig.name)) Then
+                    _db = New coreDbClass(Me, appConfig.name)
                 End If
                 Return _db
             End Get
@@ -94,7 +149,6 @@ Namespace Contensive.Core
         ' document being constructed
         '-----------------------------------------------------------------------
         '
-        Public docHandle As Integer = 0                     ' Unique value for this page used in communication
         Public docOpen As Boolean = False                   ' when true, you can write to the output stream
         Friend docExceptionList As List(Of String)
         '
@@ -204,6 +258,14 @@ Namespace Contensive.Core
         '' ----- Site configuration
         ''------------------------------------------------------------------------
         ''
+        '
+        '-----------------------------------------------------------------------
+        ' ----- Member Functionality
+        '-----------------------------------------------------------------------
+        '
+        Public web_MemberAction As Integer = 0              ' action to be performed during init
+        Public main_MemberButton As String = ""            ' button pressed from previous form
+        '
         Public main_AdminMessage As String = ""          ' For more information message
         '
         'Public main_WebClientVersion As String = ""       ' set in class initialize
@@ -212,10 +274,7 @@ Namespace Contensive.Core
         Private main_Private_StateString_In As String = ""    ' main_StateString from the incoming QS - Used to carry main_VisitId when cookies dont work (JSForms for example)
         Private main_Private_StateString_Out As String = ""   ' main_StateString to be set in outbound QS when needed - Used to carry main_VisitId when cookies dont work (JSForms for example)
         '
-        Const main_maxVisitLoginAttempts = 20
-        Private main_loginFormDefaultProcessed As Boolean = False       ' prevent main_ProcessLoginFormDefault from running twice (multiple user messages, popups, etc.)
-        '
-        Private visit_initialized As Boolean = False                ' true when visit has been initialized
+        Friend visit_initialized As Boolean = False                ' true when visit has been initialized
         '
         Public main_VisitId As Integer = 0                      ' Index into the visits table
         Public main_VisitName As String = ""                  '
@@ -242,9 +301,9 @@ Namespace Contensive.Core
         '
         ' see main_VisitorForceBrowserMobile
         '
-        Private main_VisitStateOK As Boolean = False             ' if false, page is out of state (sequence)
-        Private main_VisitMemberID As Integer = 0               ' MemberID for the current visit (memberid=0 means untracked guest)
-        Private main_VisitTimeToLastHit As Integer = 0          ' seconds from first hit to last hit
+        Public main_VisitStateOK As Boolean = False             ' if false, page is out of state (sequence)
+        Public main_VisitMemberID As Integer = 0               ' MemberID for the current visit (memberid=0 means untracked guest)
+        Public main_VisitTimeToLastHit As Integer = 0          ' seconds from first hit to last hit
         '
         '-----------------------------------------------------------------------
         ' ----- visitor (computer) values
@@ -258,57 +317,9 @@ Namespace Contensive.Core
         Public main_VisitorForceBrowserMobile As Integer = 0           ' 0 = not set -- use Browser detect each time, 1 = Force Mobile, 2 = Force not Mobile
         '
         '-----------------------------------------------------------------------
-        ' ----- user globals
-        '-----------------------------------------------------------------------
-        '
-        Friend userId As Integer = 0                     ' ID into member table  (memberid=0 means untracked guest)
-        Friend userName As String = ""                 '
-        Friend userIsAdmin As Boolean = False              '
-        Friend userIsDeveloper As Boolean = False          '
-        Friend userOrganizationId As Integer = 0         ' The members Organization
-        Friend userLanguageId As Integer = 0             '
-        Friend userLanguage As String = ""             '
-        Friend userIsNew As Boolean = False                ' stored in visit record - Is this the first visit for this member
-        Friend userEmail As String = ""               '
-        '
-        Friend user_allowBulkEmail As Boolean = False      ' Allow bulk mail
-        Friend userAllowToolsPanel As Boolean = False    '
-        Friend user_autoLogin As Boolean = False         ' if true, and setup AllowAutoLogin then use cookie to login
-        Friend user_adminMenuModeID As Integer = 0     '
-        '
-        Friend userAdded As Boolean = False              ' depricated - true only during the page that the join was completed - use for redirections and GroupAdds
-        Friend userUsername As String = ""
-        Friend userPassword As String = ""
-        Friend userContentControlID As Integer = 0
-        '
-        Friend userStyleFilename As String = ""          ' if not empty, add to head
-        Friend userExcludeFromAnalytics As Boolean = False   ' if true, future visits will be marked exclude from analytics
-        '
-        '----------------------------------------------------------------------------------------------------
-        '
-        Private loginForm_Username As String = ""       ' Values entered with the login form
-        Private loginForm_Password As String = ""       '   =
-        Private loginForm_Email As String = ""          '   =
-        Private loginForm_AutoLogin As Boolean = False    '   =
-        '
-        '-----------------------------------------------------------------------
         '   On demand loads
         '       used only when main_visitInitializedd is true
         '-----------------------------------------------------------------------
-        '
-        ' Private iMemberLanguage as object              ' populated on demand from main_MemberLanguageID
-        '
-        Private property_user_isAdmin As Boolean = False               ' true if member is administrator
-        Private property_user_isAdmin_isLoaded As Boolean = False              ' true if main_IsAdminCache is initialized
-        '
-        Private property_user_isMember As Boolean = False
-        Private property_user_isMember_isLoaded As Boolean = False
-        '
-        Private property_user_isAuthenticated As Boolean = False
-        Private property_user_isAuthenticated_isLoaded As Boolean = False
-        '
-        Private property_user_isDeveloper As Boolean = False
-        Private property_user_isDeveloper_isLoaded As Boolean = False
         '
         Private property_visit_allowEditing As Boolean
         Private property_visit_allowEditing_isLoaded As Boolean = False
@@ -328,8 +339,8 @@ Namespace Contensive.Core
         Private property_visit_allowHelpIcon_Local As Boolean
         Private property_visit_allowHelpIcon_isLoaded As Boolean = False
         '
-        Private property_user_isContentManagerOfAnything As Boolean
-        Private property_user_isContentManagerOfAnything_isLoaded As Boolean = False
+        Public property_user_isContentManagerOfAnything As Boolean
+        Public property_user_isContentManagerOfAnything_isLoaded As Boolean = False
         '
         '-----------------------------------------------------------------------
         ' ----- Help Subsystem
@@ -345,70 +356,11 @@ Namespace Contensive.Core
         Private pageManager_HelpDialogCnt As Integer = 0
         '
         '-----------------------------------------------------------------------
-        ' ----- Edit Lock info
-        '-----------------------------------------------------------------------
-        '
-        Private main_EditLockContentRecordKey_Local As String = ""
-        Private main_EditLockStatus_Local As Boolean = False
-        Private main_EditLockMemberID_Local As Integer = 0
-        Private main_EditLockMemberName_Local As String = ""
-        Private main_EditLockDateExpires_Local As Date = New Date().MinValue
-        '
-        '-----------------------------------------------------------------------
-        ' ----- Member Private
-        '-----------------------------------------------------------------------
-        '
-        Private user_Active As Boolean = False           '
-        Private user_visits As Integer = 0                '
-        Private user_lastVisit As Date = New Date().MinValue             ' The last visit by the Member (the beginning of this visit
-        '
-        Private user_company As String = ""
-        Private main_MemberTitle As String = ""
-        Private main_MemberAddress As String = ""
-        Private main_MemberCity As String = ""
-        Private main_MemberState As String = ""
-        Private main_MemberZip As String = ""
-        Private main_MemberCountry As String = ""
-        '
-        Private main_MemberPhone As String = ""
-        Private main_MemberFax As String = ""
-        '
-        '-----------------------------------------------------------------------
-        ' ----- Member Functionality
-        '-----------------------------------------------------------------------
-        '
-        Public web_MemberAction As Integer = 0              ' action to be performed during init
-        Public main_MemberButton As String = ""            ' button pressed from previous form
-        '
-        '-----------------------------------------------------------------------
-        ' ----- Member Commerce properties
-        '-----------------------------------------------------------------------
-        '
-        Public user_billEmail As String = ""          ' Billing Address for purchases
-        Public user_billPhone As String = ""          '
-        Public user_billFax As String = ""            '
-        Public main_MemberBillCompany As String = ""        '
-        Public main_MemberBillAddress As String = ""        '
-        Public main_MemberBillCity As String = ""           '
-        Public main_MemberBillState As String = ""         '
-        Public main_MemberBillZip As String = ""            '
-        Public main_MemberBillCountry As String = ""       '
-        '
-        Public main_MemberShipName As String = ""          ' Mailing Address
-        Public main_MemberShipCompany As String = ""           '
-        Public main_MemberShipAddress As String = ""          '
-        Public main_MemberShipCity As String = ""          '
-        Public main_MemberShipState As String = ""        '
-        Public main_MemberShipZip As String = ""           '
-        Public main_MemberShipCountry As String = ""         '
-        Public main_MemberShipPhone As String = ""        '
-        '
-        '-----------------------------------------------------------------------
         ' ----- appTimer
         '   
         '-----------------------------------------------------------------------
         '
-        Private main_PageStartTickCount As Integer = 0
+        Private constructorTickCount As Integer = 0
         Const main_TPStackPointerMax = 20
         Private main_TPStackPointer As Integer = 0 '
         Private main_TPStack(20) As String     '
@@ -483,10 +435,7 @@ Namespace Contensive.Core
         Public web_requestPage As String = ""                 ' The page part of the current URI
         '   A - index.asp
         '   B - index.asp
-        'Public app.RootPath As String = ""          ' The path to the root of the current site (working.Kma.net/ntf/thing/index.asp is /ntf/)
-        '   A - /ntf/
-        '   B - /
-        Public web_requestAppPath As String = ""              ' The path from the AppRootPath of the current URI (working.Kma.net/ntf/index.asp is thing/)
+        'Public web_requestAppPath As String = ""              ' The path from the AppRootPath of the current URI (working.Kma.net/ntf/index.asp is thing/)
         '   A - thing/
         '   B - thing/
         'Public app.siteProperty_publicFileContentPathPrefix As String = ""             ' The path to the sites file storage
@@ -539,7 +488,7 @@ Namespace Contensive.Core
         Const web_OutStreamJavaScript = 1
         Private main_IsStreamWritten As Boolean = False       ' true when anything has been writeAltBuffered.
         '
-        Private Structure inStreamType2
+        Public Structure inStreamType2
             Dim Name As String
             Dim Value As String
             Dim NameValue As String
@@ -551,10 +500,10 @@ Namespace Contensive.Core
             Dim fileType As String
         End Structure
 
-        Private web_InStreamArray() As inStreamType2
-        Private web_InStreamArraySize As Integer = 0
-        Private web_InStreamArrayCount As Integer = 0
-        Private main_InStreamArrayLoaded As Boolean = False
+        Public web_InStreamArray() As inStreamType2
+        Public web_InStreamArraySize As Integer = 0
+        Public web_InStreamArrayCount As Integer = 0
+        Public main_InStreamArrayLoaded As Boolean = False
         '
         Private main_CookieArray() As inStreamType2
         Private web_CookieArraySize As Integer = 0
@@ -636,17 +585,13 @@ Namespace Contensive.Core
         Public main_IconFolderUp As String = ""
         '
         '------------------------------------------------------------------------
-        ' ----- local cache to speed up main_IsContentManager
+        ' ----- local cache to speed up user.main_IsContentManager
         '------------------------------------------------------------------------
         '
         Private main_GetContentAccessRights_NotList As String = ""                  ' If ContentId in this list, they are not a content manager
         Private main_GetContentAccessRights_List As String = ""                     ' If ContentId in this list, they are a content manager
         Private main_GetContentAccessRights_AllowAddList As String = ""             ' If in _List, test this for allowAdd
         Private main_GetContentAccessRights_AllowDeleteList As String = ""          ' If in _List, test this for allowDelete
-        '
-        Private main_IsEditingCallCnt As Integer = 0
-        Private main_IsEditingContentList As String = ""
-        Private main_IsNotEditingContentList As String = ""
         '
         '------------------------------------------------------------------------
         ' ----- Meta Content variables
@@ -1061,6 +1006,14 @@ Namespace Contensive.Core
         Public visitPropertyCache As corePropertyCacheClass
         Public visitorPropertyCache As corePropertyCacheClass
         Public userPropertyCache As corePropertyCacheClass
+        '
+        ' file systems
+        '
+        Public Property serverFiles As coreFileSystemClass           ' files written directly to the local server
+        Public Property appRootFiles As coreFileSystemClass         ' wwwRoot path for the app server, both local and scale modes
+        Public Property privateFiles As coreFileSystemClass         ' path not available to web interface, local: physcial storage location, scale mode mirror location
+        Public Property cdnFiles As coreFileSystemClass             ' file uploads etc. Local mode this should point to appRoot folder (or a virtual folder in appRoot). Scale mode it goes to an s3 mirror
+
         ''
         '' ---
         ''
@@ -1500,7 +1453,7 @@ Namespace Contensive.Core
                 '--------------------------------------------------------------------------
                 '
                 'app = New appServicesClass(cp, initApplicationName)
-                If (db.status <> applicationStatusEnum.ApplicationStatusReady) Then
+                If (appStatus <> applicationStatusEnum.ApplicationStatusReady) Then
                     '
                     ' did not initialize correctly
                     '
@@ -1805,18 +1758,9 @@ Namespace Contensive.Core
                     ' ----- initialize server connection
                     '--------------------------------------------------------------------------
                     '
-                    ''hint = "initialize server connection"
-                    '
                     If app_domainDbList.Contains("*") Then
                         main_ServerMultiDomainMode = True
                     End If
-                    '
-                    ' count the hit
-                    '
-                    If Not (_db Is Nothing) Then
-                        Call db.IncrementHitCounter()
-                    End If
-
                     '
                     TestHookValue = doc_getText(RequestNameTestHook)
                     main_ForceTrap = False
@@ -1843,7 +1787,7 @@ Namespace Contensive.Core
                         'Call AppendLog("main_init(), 1630 - exit for cookie key detected/processed")
                         '
                         Dim cookieDetectDate As Date = New Date
-                        Call security_decodeToken(CookieDetectKey, db.config.privateKey, CookieDetectVisitId, cookieDetectDate)
+                        Call security_decodeToken(CookieDetectKey, appConfig.privateKey, CookieDetectVisitId, cookieDetectDate)
                         'CookieDetectVisitId = main_DecodeKeyNumber(CookieDetectKey)
                         If CookieDetectVisitId <> 0 Then
                             Call db.executeSql("update ccvisits set CookieSupport=1 where id=" & CookieDetectVisitId)
@@ -1870,8 +1814,8 @@ Namespace Contensive.Core
                     '
                     ' set main_ServerDomainPrmary to the first valid defaultDomain entry
                     '
-                    If db.config.domainList.Count > 0 Then
-                        main_ServerDomainPrimary = db.config.domainList(0)
+                    If appConfig.domainList.Count > 0 Then
+                        main_ServerDomainPrimary = appConfig.domainList(0)
                     Else
                         main_ServerDomainPrimary = ""
                     End If
@@ -1923,7 +1867,7 @@ Namespace Contensive.Core
                     '
                     ' verify app config domainlist is in the domainlist cache
                     '
-                    For Each domain As String In db.config.domainList
+                    For Each domain As String In appConfig.domainList
                         If Not domainDetailsList.ContainsKey(domain.ToLower()) Then
                             Dim domainDetailsNew As New domainDetailsClass
                             domainDetailsNew.name = domain
@@ -1968,7 +1912,7 @@ Namespace Contensive.Core
                             '
                             ' set visited true
                             '
-                            SQL = "update ccdomains set visited=1 where name=" & db.db_EncodeSQLText(web.requestDomain)
+                            SQL = "update ccdomains set visited=1 where name=" & db.encodeSQLText(web.requestDomain)
                             Call db.executeSql(SQL)
                             Call cache.SetKey("domainContentList", "", "domains")
                         End If
@@ -1976,7 +1920,7 @@ Namespace Contensive.Core
                             '
                             ' normal domain, leave it
                             '
-                        ElseIf InStr(1, web.requestPathPage, db.siteProperty_AdminURL, vbTextCompare) <> 0 Then
+                        ElseIf InStr(1, web.requestPathPage, siteProperties.adminURL, vbTextCompare) <> 0 Then
                             '
                             ' forwarding does not work in the admin site
                             '
@@ -2061,27 +2005,11 @@ Namespace Contensive.Core
                     End If
 
                     '
-                    properties_site__AllowVisitTracking = db.siteProperty_getBoolean("allowVisitTracking", True)
+                    properties_site__AllowVisitTracking = siteProperties.getBoolean("allowVisitTracking", True)
                     '
-                    If db.RootWebPath <> "/" Then
-                        If Right(db.RootWebPath, 1) <> "/" Then
-                            db.RootWebPath = db.RootWebPath & "/"
-                        End If
-                        If Left(db.RootWebPath, 1) <> "/" Then
-                            db.RootWebPath = "/" & db.RootWebPath
-                        End If
-                        '
-                        ' Fix possible case difference between VirtualPath and AppRootPath
-                        '
-                        web_requestVirtualFilePath = Left(db.RootWebPath, Len(db.RootWebPath) - 1)
-                    Else
-                        '
-                        ' This site is not virtual hosted, just use the Init application name.
-                        '
-                        web_requestVirtualFilePath = "/" & db.config.name
-                    End If
+                    web_requestVirtualFilePath = "/" & appConfig.name
                     '
-                    web_requestContentWatchPrefix = web_requestProtocol & web.requestDomain & db.RootWebPath
+                    web_requestContentWatchPrefix = web_requestProtocol & web.requestDomain & www_requestRootPath
                     web_requestContentWatchPrefix = Mid(web_requestContentWatchPrefix, 1, Len(web_requestContentWatchPrefix) - 1)
                     '
                     'ServerSocketLoaded = False
@@ -2092,35 +2020,35 @@ Namespace Contensive.Core
                     '
                     '
                     web_requestPath = "/"
-                    web_requestPage = db.siteProperty_ServerPageDefault
+                    web_requestPage = siteProperties.serverPageDefault
                     TextStartPointer = InStrRev(web.requestPathPage, "/")
                     If TextStartPointer <> 0 Then
                         web_requestPath = Mid(web.requestPathPage, 1, TextStartPointer)
                         web_requestPage = Mid(web.requestPathPage, TextStartPointer + 1)
                     End If
-                    web_requestAppPath = Mid(web_requestPath, Len(db.RootWebPath) + 1)
-                    web_requestSecureURLRoot = "https://" & main_ServerDomain & db.RootWebPath
-                    '
-                    ' ----- If virtual site, check RootPath case against current URL
-                    '
-                    If db.RootWebPath <> "/" Then
-                        PathTest = Left(web_requestPath, Len(db.RootWebPath))
-                        If PathTest <> db.RootWebPath Then
-                            '
-                            ' Case mismatch, redirect to correct case so cookies will be valid
-                            '
-                            'Call AppendLog("main_init(), 1810 - exit for rootpath mismatch (?)")
-                            '
-                            If web.requestQueryString = "" Then
-                                Link = web_requestProtocol & main_ServerDomain & db.RootWebPath & web_requestAppPath & web_requestPage
-                            Else
-                                Link = web_requestProtocol & main_ServerDomain & db.RootWebPath & web_requestAppPath & web_requestPage & "?" & web.requestQueryString
-                            End If
-                            Call web_Redirect2(Link, "Redirecting because this site is configured to only run in the path [" & db.RootWebPath & "]. See the IIS Virtual Folder property of the Contensive Application Manager.", False)
-                            docOpen = False '--- should be disposed by caller --- Call dispose
-                            Return docOpen
-                        End If
-                    End If
+                    ' web_requestAppPath = Mid(web_requestPath, Len(appRootPath) + 1)
+                    web_requestSecureURLRoot = "https://" & main_ServerDomain & www_requestRootPath
+                    ''
+                    '' ----- If virtual site, check RootPath case against current URL
+                    ''
+                    'If appRootPath <> "/" Then
+                    '    PathTest = Left(web_requestPath, Len(appRootPath))
+                    '    If PathTest <> appRootPath Then
+                    '        '
+                    '        ' Case mismatch, redirect to correct case so cookies will be valid
+                    '        '
+                    '        'Call AppendLog("main_init(), 1810 - exit for rootpath mismatch (?)")
+                    '        '
+                    '        If web.requestQueryString = "" Then
+                    '            Link = web_requestProtocol & main_ServerDomain & appRootPath & web_requestAppPath & web_requestPage
+                    '        Else
+                    '            Link = web_requestProtocol & main_ServerDomain & appRootPath & web_requestAppPath & web_requestPage & "?" & web.requestQueryString
+                    '        End If
+                    '        Call web_Redirect2(Link, "Redirecting because this site is configured to only run in the path [" & appRootPath & "]. See the IIS Virtual Folder property of the Contensive Application Manager.", False)
+                    '        docOpen = False '--- should be disposed by caller --- Call dispose
+                    '        Return docOpen
+                    '    End If
+                    'End If
                     '
                     ' ----- main_RefreshQueryString
                     '
@@ -2135,7 +2063,7 @@ Namespace Contensive.Core
                     '
                     ' ----- Create Server Link property
                     '
-                    main_ServerLink = web_requestProtocol & web.requestDomain & db.RootWebPath & web_requestAppPath & web_requestPage
+                    main_ServerLink = web_requestProtocol & web.requestDomain & www_requestRootPath & web_requestPath & web_requestPage
                     If web.requestQueryString <> "" Then
                         main_ServerLink = main_ServerLink & "?" & web.requestQueryString
                     End If
@@ -2149,7 +2077,7 @@ Namespace Contensive.Core
                     '
                     ' ----- Style tag
                     '
-                    main_AdminMessage = "For more information, please contact the <a href=""mailto:" & db.siteProperty_EmailAdmin & "?subject=Re: " & main_ServerDomain & """>Site Administrator</A>."
+                    main_AdminMessage = "For more information, please contact the <a href=""mailto:" & siteProperties.emailAdmin & "?subject=Re: " & main_ServerDomain & """>Site Administrator</A>."
 
                     '
                     '
@@ -2165,7 +2093,7 @@ Namespace Contensive.Core
                     ' ----- Create Server Link property
                     '--------------------------------------------------------------------------
                     '
-                    main_ServerLink = web_requestProtocol & web.requestDomain & db.RootWebPath & web_requestAppPath & web_requestPage
+                    main_ServerLink = web_requestProtocol & web.requestDomain & www_requestRootPath & web_requestPath & web_requestPage
                     If web.requestQueryString <> "" Then
                         main_ServerLink = main_ServerLink & "?" & web.requestQueryString
                     End If
@@ -2193,13 +2121,13 @@ Namespace Contensive.Core
                     '
                     ' ----- Verify virtual path is not used on non-virtual sites
                     '
-                    If (RedirectLink = "") And (db.RootWebPath = "/") And (InStr(1, web_requestPath, web_requestVirtualFilePath & "/", vbTextCompare) = 1) Then
+                    If (RedirectLink = "") And (www_requestRootPath = "/") And (InStr(1, web_requestPath, web_requestVirtualFilePath & "/", vbTextCompare) = 1) Then
                         Copy = "Redirecting because this site can not be run in the path [" & web_requestVirtualFilePath & "]"
-                        web_requestAppPath = Replace(web_requestAppPath, db.config.name & "/", "", , , vbTextCompare)
+                        web_requestPath = Replace(web_requestPath, appConfig.name & "/", "", , , vbTextCompare)
                         If web.requestQueryString <> "" Then
-                            Call web_Redirect2(web_requestProtocol & main_ServerDomain & db.RootWebPath & web_requestAppPath & web_requestPage & "?" & web.requestQueryString, Copy, False)
+                            Call web_Redirect2(web_requestProtocol & main_ServerDomain & www_requestRootPath & web_requestPath & web_requestPage & "?" & web.requestQueryString, Copy, False)
                         Else
-                            Call web_Redirect2(web_requestProtocol & main_ServerDomain & db.RootWebPath & web_requestAppPath & web_requestPage, Copy, False)
+                            Call web_Redirect2(web_requestProtocol & main_ServerDomain & www_requestRootPath & web_requestPath & web_requestPage, Copy, False)
                         End If
                     End If
                     '
@@ -2576,7 +2504,7 @@ ErrorTrap:
             '
             SQL = "SELECT ccContent.Name AS ContentName, ccTables.Name AS TableName, ccContent.ID AS ContentID" _
                 & " FROM ccContent LEFT JOIN ccTables ON ccContent.ContentTableID = ccTables.ID" _
-                & " WHERE ccTables.Name=" & db.db_EncodeSQLText(TableName) & ";"
+                & " WHERE ccTables.Name=" & db.encodeSQLText(TableName) & ";"
             Const dtColumnContentName As Integer = 0
             Const dtColumnTableName As Integer = 1
             Const dtColumnContentId As Integer = 2
@@ -2634,10 +2562,12 @@ ErrorTrap:
                         ContentID = EncodeInteger(dt(dtColumnContentId))
                         For Each dc As DataColumn In dtTargetTable.Rows
                             TableFieldName = dc.ColumnName
-                            SQL = "SELECT * FROM ccFields where (ContentID=" & ContentID & ")and(name=" & db.db_EncodeSQLText(TableFieldName) & ")"
+                            SQL = "SELECT * FROM ccFields where (ContentID=" & ContentID & ")and(name=" & db.encodeSQLText(TableFieldName) & ")"
                             Dim dtField As DataTable = db.executeSql(SQL, "Default")
                             If dtField.Rows.Count = 0 Then
-                                Call db_CreateContentFieldFromTableField(ContentName, dc.ColumnName, EncodeInteger(dc.DataType))
+                                Dim bulder As New coreBuilderClass(Me)
+                                Call bulder.db_CreateContentFieldFromTableField(ContentName, dc.ColumnName, EncodeInteger(dc.DataType))
+                                'Call db_CreateContentFieldFromTableField(ContentName, dc.ColumnName, EncodeInteger(dc.DataType))
                             End If
                         Next
                     Next
@@ -2844,7 +2774,7 @@ ErrorTrap:
                     ' Test for from-address / to-address matches
                     '
                     If LCase(FromAddress) = LCase(ToAddress) Then
-                        FromAddress = db.siteProperty_getText("EmailFromAddress", "")
+                        FromAddress = siteProperties.getText("EmailFromAddress", "")
                         If FromAddress = "" Then
                             '
                             '
@@ -2868,7 +2798,7 @@ ErrorTrap:
                         '
                         ' Fix links for HTML send
                         '
-                        rootUrl = "http://" & db.config.domainList(0) & "/"
+                        rootUrl = "http://" & appConfig.domainList(0) & "/"
                         BodyMessage = ConvertLinksToAbsolute(BodyMessage, rootUrl)
                         '
                         ' compose body
@@ -2884,9 +2814,9 @@ ErrorTrap:
                             & BodyMessage _
                             & "</body>" _
                             & "</html>"
-                        returnStatus = EmailHandler.sendEmail5(ToAddress, FromAddress, SubjectMessage, BodyMessage, BounceAddress, ReplyToAddress, iResultLogPathPage, db.siteProperty_getText("SMTPServer", "SMTP.YourServer.Com"), isImmediate, isHTML, "")
+                        returnStatus = EmailHandler.sendEmail5(ToAddress, FromAddress, SubjectMessage, BodyMessage, BounceAddress, ReplyToAddress, iResultLogPathPage, siteProperties.getText("SMTPServer", "SMTP.YourServer.Com"), isImmediate, isHTML, "")
                     Else
-                        returnStatus = EmailHandler.sendEmail5(ToAddress, FromAddress, SubjectMessage, BodyMessage, BounceAddress, ReplyToAddress, iResultLogPathPage, db.siteProperty_getText("SMTPServer", "SMTP.YourServer.Com"), isImmediate, isHTML, "")
+                        returnStatus = EmailHandler.sendEmail5(ToAddress, FromAddress, SubjectMessage, BodyMessage, BounceAddress, ReplyToAddress, iResultLogPathPage, siteProperties.getText("SMTPServer", "SMTP.YourServer.Com"), isImmediate, isHTML, "")
                     End If
                     If (returnStatus = "") Then
                         returnStatus = WarningMsg
@@ -2935,7 +2865,7 @@ ErrorTrap:
             'MethodName = "csv_FilterDomainName"
             '
             filterDomainName = Link
-            csv_DomainName = db.config.domainList(0)
+            csv_DomainName = appConfig.domainList(0)
             If InStr(1, csv_DomainName, ",") <> 0 Then
                 csv_DomainName = Mid(csv_DomainName, 1, InStr(1, csv_DomainName, ",") - 1)
             End If
@@ -2951,28 +2881,6 @@ ErrorTrap:
 ErrorTrap:
             Call handleLegacyError4(Err.Number, Err.Source, Err.Description, MethodName, True)
         End Function
-        '
-        Public Sub db_CreateContent4(ByVal Active As Boolean, ByVal DataSourceName As String, ByVal TableName As String, ByVal ContentName As String, Optional ByVal AdminOnly As Boolean = False, Optional ByVal DeveloperOnly As Boolean = False, Optional ByVal AllowAdd As Boolean = True, Optional ByVal AllowDelete As Boolean = True, Optional ByVal ParentContentName As String = "", Optional ByVal DefaultSortMethod As String = "", Optional ByVal DropDownFieldList As String = "", Optional ByVal AllowWorkflowAuthoring As Boolean = False, Optional ByVal AllowCalendarEvents As Boolean = False, Optional ByVal AllowContentTracking As Boolean = False, Optional ByVal AllowTopicRules As Boolean = False, Optional ByVal AllowContentChildTool As Boolean = False, Optional ByVal AllowMetaContent As Boolean = False, Optional ByVal IconLink As String = "", Optional ByVal IconWidth As Integer = 0, Optional ByVal IconHeight As Integer = 0, Optional ByVal IconSprites As Integer = 0, Optional ByVal ccGuid As String = "", Optional ByVal IsBaseContent As Boolean = False, Optional ByVal installedByCollectionGuid As String = "")
-
-            Dim bulder As New coreBuilderClass(Me)
-            Call bulder.metaData_CreateContent4(Active, DataSourceName, TableName, ContentName, AdminOnly)
-
-        End Sub
-        '
-        '   Patch -- returns true if the cdef field exists
-        '
-        Private Function db_isCdefField(ByVal ContentID As Integer, ByVal FieldName As String) As Boolean
-            Return db.db_isCdefField(ContentID, FieldName)
-        End Function
-        '
-        '========================================================================
-        ' Define a Content Definition Field based only on what is known from a SQL table
-        '========================================================================
-        '
-        Public Sub db_CreateContentFieldFromTableField(ByVal ContentName As String, ByVal FieldName As String, ByVal ADOFieldType As Integer)
-            Dim bulder As New coreBuilderClass(Me)
-            Call bulder.db_CreateContentFieldFromTableField(ContentName, FieldName, ADOFieldType)
-        End Sub
         '
         '========================================================================
         '
@@ -3055,7 +2963,7 @@ ErrorTrap:
         '
         Public ReadOnly Property app_rootWebPath() As String
             Get
-                app_rootWebPath = db.RootWebPath
+                app_rootWebPath = www_requestRootPath
             End Get
         End Property
         '
@@ -3063,28 +2971,11 @@ ErrorTrap:
         '
         Public ReadOnly Property app_domainList() As String
             Get
-                app_domainList = db.config.domainList(0)
+                app_domainList = appConfig.domainList(0)
             End Get
 
 
         End Property
-        '
-        Public ReadOnly Property error_ErrorCount() As Integer
-            Get
-                error_ErrorCount = 0
-                If Not (_db Is Nothing) Then
-                    error_ErrorCount = db.ErrorCount
-                End If
-
-            End Get
-        End Property
-
-        '
-        Public Sub error_IncrementErrorCount()
-            If Not (_db Is Nothing) Then
-                Call db.IncrementErrorCount()
-            End If
-        End Sub
         '
         '========================================================================
         '   Returns true if the field exists in the table
@@ -3151,7 +3042,7 @@ ErrorTrap:
         '       Entries are unique by their name and their Parent
         '=============================================================================
         '
-        Public Sub admin_CreateAdminMenu(ByVal ParentName As String, ByVal EntryName As String, ByVal ContentName As String, ByVal LinkPage As String, ByVal SortOrder As String, Optional ByVal AdminOnly As Boolean = False, Optional ByVal DeveloperOnly As Boolean = False, Optional ByVal NewWindow As Boolean = False)
+        Public Sub admin_CreateAdminMenu2(ByVal ParentName As String, ByVal EntryName As String, ByVal ContentName As String, ByVal LinkPage As String, ByVal SortOrder As String, Optional ByVal AdminOnly As Boolean = False, Optional ByVal DeveloperOnly As Boolean = False, Optional ByVal NewWindow As Boolean = False)
             Call admin_VerifyAdminMenu(ParentName, EntryName, ContentName, LinkPage, SortOrder, AdminOnly, DeveloperOnly, NewWindow, True)
         End Sub
         '
@@ -3164,18 +3055,6 @@ ErrorTrap:
             Dim builder As New coreBuilderClass(Me)
             Call builder.admin_VerifyMenuEntry(ParentName, EntryName, ContentName, LinkPage, SortOrder, AdminOnly, DeveloperOnly, NewWindow, Active, "Menu Entries", "")
         End Sub
-        '
-        ' Share the appServices csv_LicenseKey so upgrade has access to create root user password
-        '
-        Friend ReadOnly Property security_LicenseKey() As String
-            Get
-                If Not (_db Is Nothing) Then
-                    Return db.LicenseKey
-                End If
-                Return ""
-            End Get
-        End Property
-
         '
         '========================================================================
         ' License Field Descriptions
@@ -3225,7 +3104,7 @@ ErrorTrap:
         Public Function security_encodeToken(ByVal keyInteger As Integer, ByVal keyDate As Date) As String
             Dim returnToken As String = ""
             Try
-                Dim encrypt As New coreSecurityClass(Me, db.config.privateKey)
+                Dim encrypt As New coreSecurityClass(Me, appConfig.privateKey)
                 Dim sourceText As String = keyInteger.ToString & vbTab & keyDate.ToString
                 returnToken = encrypt.twoWayEncrypt(sourceText)
             Catch ex As Exception
@@ -3262,7 +3141,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function html_EncodeActiveContent4(ByVal Source As String, ByVal PeopleID As Integer, ByVal ContextContentName As String, ByVal ContextRecordID As Integer, ByVal ContextContactPeopleID As Integer, ByVal AddLinkEID As Boolean, ByVal EncodeCachableTags As Boolean, ByVal EncodeImages As Boolean, ByVal EncodeEditIcons As Boolean, ByVal EncodeNonCachableTags As Boolean, ByVal AddAnchorQuery As String, ByVal ProtocolHostString As String, ByVal IsEmailContent As Boolean, ByVal AdminURL As String) As String
-            html_EncodeActiveContent4 = html_EncodeActiveContent_Internal(Source, PeopleID, ContextContentName, ContextRecordID, ContextContactPeopleID, AddLinkEID, EncodeCachableTags, EncodeImages, EncodeEditIcons, EncodeNonCachableTags, AddAnchorQuery, ProtocolHostString, IsEmailContent, AdminURL, user_isAuthenticated)
+            html_EncodeActiveContent4 = html_EncodeActiveContent_Internal(Source, PeopleID, ContextContentName, ContextRecordID, ContextContactPeopleID, AddLinkEID, EncodeCachableTags, EncodeImages, EncodeEditIcons, EncodeNonCachableTags, AddAnchorQuery, ProtocolHostString, IsEmailContent, AdminURL, user.user_isAuthenticated)
         End Function
         '
         '========================================================================
@@ -3270,7 +3149,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function html_EncodeActiveContent5(ByVal Source As String, ByVal PeopleID As Integer, ByVal ContextContentName As String, ByVal ContextRecordID As Integer, ByVal ContextContactPeopleID As Integer, ByVal AddLinkEID As Boolean, ByVal EncodeCachableTags As Boolean, ByVal EncodeImages As Boolean, ByVal EncodeEditIcons As Boolean, ByVal EncodeNonCachableTags As Boolean, ByVal AddAnchorQuery As String, ByVal ProtocolHostString As String, ByVal IsEmailContent As Boolean, ByVal AdminURL As String, ByVal personalizationIsAuthenticated As Boolean, ByVal Context As addonContextEnum) As String
-            html_EncodeActiveContent5 = html_EncodeActiveContent_Internal(Source, PeopleID, ContextContentName, ContextRecordID, ContextContactPeopleID, AddLinkEID, EncodeCachableTags, EncodeImages, EncodeEditIcons, EncodeNonCachableTags, AddAnchorQuery, ProtocolHostString, IsEmailContent, AdminURL, user_isAuthenticated, Context)
+            html_EncodeActiveContent5 = html_EncodeActiveContent_Internal(Source, PeopleID, ContextContentName, ContextRecordID, ContextContactPeopleID, AddLinkEID, EncodeCachableTags, EncodeImages, EncodeEditIcons, EncodeNonCachableTags, AddAnchorQuery, ProtocolHostString, IsEmailContent, AdminURL, user.user_isAuthenticated, Context)
         End Function
         '
         '========================================================================
@@ -3563,7 +3442,7 @@ ErrorTrap:
             '    ' convert template body if provided - this is the content that replaces the content box addon
             '    '
             '    TemplateBodyContent = Mid(TemplateBodyContent, Pos)
-            '    LayoutEngineOptionString = "data=" & csv_EncodeAddonOptionArgument(TemplateBodyContent)
+            '    LayoutEngineOptionString = "data=" & encodeNvaArgument(TemplateBodyContent)
             '    TemplateBodyContent = csv_ExecuteActiveX("aoPrimitives.StructuredDataClass", "Structured Data Engine", nothing, LayoutEngineOptionString, "data=(structured data)", LayoutErrorMessage)
             'End If
             Pos = InStr(1, workingContent, "<?contensive", vbTextCompare)
@@ -3573,7 +3452,7 @@ ErrorTrap:
                 '' convert content if provided
                 ''
                 'workingContent = Mid(workingContent, Pos)
-                'LayoutEngineOptionString = "data=" & csv_EncodeAddonOptionArgument(workingContent)
+                'LayoutEngineOptionString = "data=" & encodeNvaArgument(workingContent)
                 'Dim structuredData As New core_primitivesStructuredDataClass(Me)
                 'workingContent = structuredData.execute()
                 'workingContent = csv_ExecuteActiveX("aoPrimitives.StructuredDataClass", "Structured Data Engine", LayoutEngineOptionString, "data=(structured data)", LayoutErrorMessage)
@@ -3662,7 +3541,7 @@ ErrorTrap:
                 If KmaHTML.ElementCount > 0 Then
                     ElementPointer = 0
                     workingContent = ""
-                    serverFilePath = ProtocolHostString & "/" & db.config.name & "/files/"
+                    serverFilePath = ProtocolHostString & "/" & appConfig.name & "/files/"
                     Stream = New coreFastStringClass
                     Do While ElementPointer < KmaHTML.ElementCount
                         Copy = KmaHTML.Text(ElementPointer)
@@ -3726,7 +3605,7 @@ ErrorTrap:
                                                             'Link = Mid(Link, Pos + 1)
                                                         End If
                                                     End If
-                                                    If (Link = "") Or (InStr(1, "," & db.config.domainList(0) & ",", "," & Link & ",", vbTextCompare) <> 0) Then
+                                                    If (Link = "") Or (InStr(1, "," & appConfig.domainList(0) & ",", "," & Link & ",", vbTextCompare) <> 0) Then
                                                         'If InStr(1, app.config.domainList(0), Value, vbTextCompare) <> 0 Then
                                                         '
                                                         ' ----- link is for this site
@@ -3863,7 +3742,7 @@ ErrorTrap:
                                                 ' Handle in webclient
                                                 '
                                                 ' removed sort method because all child pages are read in together in the order set by the parent - improve this later
-                                                Copy = "{{" & ACTypeChildList & "?name=" & csv_EncodeAddonOptionArgument(ListName) & "}}"
+                                                Copy = "{{" & ACTypeChildList & "?name=" & encodeNvaArgument(ListName) & "}}"
                                             End If
                                         Case ACTypeContact
                                             '
@@ -3994,7 +3873,7 @@ ErrorTrap:
                                                             '
                                                             Copy = ""
                                                             GroupIDList = csv_GetAddonOptionStringValue("AllowGroups", addonOptionString)
-                                                            If (Not user_isMemberOfGroupIdList2(personalizationPeopleId, True, GroupIDList, True)) Then
+                                                            If (Not user.user_isMemberOfGroupIdList2(personalizationPeopleId, True, GroupIDList, True)) Then
                                                                 '
                                                                 ' Block content if not allowed
                                                                 '
@@ -4047,9 +3926,9 @@ ErrorTrap:
                                                         SelectList = "Name,Link,ID,ArgumentList,ObjectProgramID,IconFilename,IconWidth,IconHeight,IconSprites,IsInline,ccGuid"
                                                     End If
                                                     If ACGuid <> "" Then
-                                                        Criteria = "ccguid=" & db.db_EncodeSQLText(ACGuid)
+                                                        Criteria = "ccguid=" & db.encodeSQLText(ACGuid)
                                                     Else
-                                                        Criteria = "name=" & db.db_EncodeSQLText(UCaseACName)
+                                                        Criteria = "name=" & db.encodeSQLText(UCaseACName)
                                                     End If
                                                     CS = db.db_csOpen(AddonContentName, Criteria, "Name,ID", , , , , SelectList)
                                                     If db.db_csOk(CS) Then
@@ -4139,7 +4018,7 @@ ErrorTrap:
                                                                 ' since AddonOptionString is encoded, InstanceOptionValue will be also
                                                                 InstanceOptionValue = csv_GetAddonOptionStringValue(SrcOptionName, addonOptionString)
                                                                 'InstanceOptionValue = csv_GetAddonOption(SrcOptionName, AddonOptionString)
-                                                                ResultOptionSelector = pageManager_GetAddonSelector(SrcOptionName, csv_EncodeAddonOptionArgument(InstanceOptionValue), SrcOptionSelector)
+                                                                ResultOptionSelector = pageManager_GetAddonSelector(SrcOptionName, encodeNvaArgument(InstanceOptionValue), SrcOptionSelector)
                                                                 'ResultOptionSelector = csv_GetAddonSelector(SrcOptionName, InstanceOptionValue, SrcOptionValueSelector)
                                                                 ResultOptionListHTMLEncoded = ResultOptionListHTMLEncoded & "&" & ResultOptionSelector
                                                             End If
@@ -4150,7 +4029,7 @@ ErrorTrap:
                                                     End If
                                                     ACNameCaption = Replace(ACName, """", "")
                                                     ACNameCaption = html_EncodeHTML(ACNameCaption)
-                                                    IDControlString = "AC," & ACType & "," & NotUsedID & "," & csv_EncodeAddonOptionArgument(ACName) & "," & ResultOptionListHTMLEncoded & "," & ACGuid
+                                                    IDControlString = "AC," & ACType & "," & NotUsedID & "," & encodeNvaArgument(ACName) & "," & ResultOptionListHTMLEncoded & "," & ACGuid
                                                     Copy = GetAddonIconImg(AdminURL, IconWidth, IconHeight, IconSprites, AddonIsInline, IDControlString, IconFilename, serverFilePath, IconAlt, IconTitle, ACInstanceID, 0)
                                                 ElseIf EncodeNonCachableTags Then
                                                     '
@@ -4301,7 +4180,7 @@ ErrorTrap:
                                                 '                                        End If
                                                 '                                        Call app.csv_CloseCS(CS)
                                                 '
-                                                Copy = "<a href=""" & ProtocolHostString & db.RootWebPath & db.siteProperty_ServerPageDefault & "?" & RequestNameDownloadID & "=" & ACAttrRecordID & """ target=""_blank""><img src=""" & ProtocolHostString & "/cclib/images/IconDownload3.gif"" width=""16"" height=""16"" border=""0"" alt=""" & ACAttrAlt & """></a>"
+                                                Copy = "<a href=""" & ProtocolHostString & www_requestRootPath & siteProperties.serverPageDefault & "?" & RequestNameDownloadID & "=" & ACAttrRecordID & """ target=""_blank""><img src=""" & ProtocolHostString & "/cclib/images/IconDownload3.gif"" width=""16"" height=""16"" border=""0"" alt=""" & ACAttrAlt & """></a>"
                                             End If
                                         Case ACTypeTemplateContent
                                             '
@@ -4354,7 +4233,7 @@ ErrorTrap:
                                                 If TextName = "" Then
                                                     TextName = "Default"
                                                 End If
-                                                Copy = "{{" & ACTypeTemplateText & "?name=" & csv_EncodeAddonOptionArgument(TextName) & "&new=" & csv_EncodeAddonOptionArgument(NewName) & "}}"
+                                                Copy = "{{" & ACTypeTemplateText & "?name=" & encodeNvaArgument(TextName) & "&new=" & encodeNvaArgument(NewName) & "}}"
                                                 ' ***** can not add it here, if a web hit, it must be encoded from the web client for aggr objects
                                                 'Copy = csv_GetContentCopy(TextName, "Copy Content", "", personalizationpeopleId)
                                             End If
@@ -4372,9 +4251,9 @@ ErrorTrap:
                                             If Pos > 0 Then
                                                 NewName = Mid(addonOptionString, Pos + 8)
                                                 Dim IsOK As Boolean
-                                                IsOK = (NewName = csv_EncodeAddonOptionArgument(NewName))
+                                                IsOK = (NewName = encodeNvaArgument(NewName))
                                                 If Not IsOK Then
-                                                    addonOptionString = Left(addonOptionString, Pos - 1) & "MenuNew=" & csv_EncodeAddonOptionArgument(NewName)
+                                                    addonOptionString = Left(addonOptionString, Pos - 1) & "MenuNew=" & encodeNvaArgument(NewName)
                                                 End If
                                             End If
                                             NotUsedID = 0
@@ -4676,7 +4555,7 @@ ErrorTrap:
                                         If AttributeCount > 0 Then
                                             ImageID = DHTML.ElementAttribute(ElementPointer, "id")
                                             ImageSrcOriginal = DHTML.ElementAttribute(ElementPointer, "src")
-                                            VirtualFilePathBad = db.config.name & "/files/"
+                                            VirtualFilePathBad = appConfig.name & "/files/"
                                             serverFilePath = "/" & VirtualFilePathBad
                                             If Left(LCase(ImageSrcOriginal), Len(VirtualFilePathBad)) = LCase(VirtualFilePathBad) Then
                                                 '
@@ -4960,7 +4839,7 @@ ErrorTrap:
                                                     End If
                                                 End If
                                             ElseIf InStr(1, ImageSrc, "cclibraryfiles", vbTextCompare) <> 0 Then
-                                                ImageAllowSFResize = EncodeBoolean(db.siteProperty_getBoolean("ImageAllowSFResize", True))
+                                                ImageAllowSFResize = EncodeBoolean(siteProperties.getBoolean("ImageAllowSFResize", True))
                                                 If ImageAllowSFResize And True Then
                                                     '
                                                     ' if it is a real image, check for resize
@@ -5182,7 +5061,7 @@ ErrorTrap:
                                                                                                     '
                                                                                                     ' image load failed, use raw filename
                                                                                                     '
-                                                                                                    handleLegacyError3(db.config.name, "Error while loading image to resize, [" & RecordVirtualFilename & "]", "dll", "cpCoreClass", "DecodeAciveContent", Err.Number, Err.Source, Err.Description, False, True, "")
+                                                                                                    handleLegacyError3(appConfig.name, "Error while loading image to resize, [" & RecordVirtualFilename & "]", "dll", "cpCoreClass", "DecodeAciveContent", Err.Number, Err.Source, Err.Description, False, True, "")
                                                                                                     Err.Clear()
                                                                                                     NewImageFilename = ImageFilename
                                                                                                 Else
@@ -5241,7 +5120,7 @@ ErrorTrap:
                                                                                                     ' Update image record
                                                                                                     '
                                                                                                     RecordAltSizeList = RecordAltSizeList & vbCrLf & ImageAltSize
-                                                                                                    recordUpdateSql = recordUpdateSql & ",altsizelist=" & db.db_EncodeSQLText(RecordAltSizeList)
+                                                                                                    recordUpdateSql = recordUpdateSql & ",altsizelist=" & db.encodeSQLText(RecordAltSizeList)
                                                                                                     'Call app.csv_SetCS(CS, "altsizelist", RecordAltSizeList)
                                                                                                 End If
                                                                                                 '
@@ -5396,7 +5275,7 @@ ErrorTrap:
             '
             SQL = "SELECT ccContentWatch.ID AS ID, ccContentWatch.Link as Link, ccContentWatch.LinkLabel as LinkLabel, ccContentWatch.SortOrder as SortOrder, ccContentWatch.DateAdded as DateAdded, ccContentWatch.ContentID as ContentID, ccContentWatch.RecordID as RecordID, ccContentWatch.ModifiedDate as ModifiedDate" _
                 & " FROM (ccContentWatchLists LEFT JOIN ccContentWatchListRules ON ccContentWatchLists.ID = ccContentWatchListRules.ContentWatchListID) LEFT JOIN ccContentWatch ON ccContentWatchListRules.ContentWatchID = ccContentWatch.ID" _
-                & " WHERE (((ccContentWatchLists.Name)=" & db.db_EncodeSQLText(ListName) & ")" _
+                & " WHERE (((ccContentWatchLists.Name)=" & db.encodeSQLText(ListName) & ")" _
                     & "AND ((ccContentWatchLists.Active)<>0)" _
                     & "AND ((ccContentWatchListRules.Active)<>0)" _
                     & "AND ((ccContentWatch.Active)<>0)" _
@@ -5410,7 +5289,7 @@ ErrorTrap:
                 '
                 ' Check if listname exists
                 '
-                CS = db.db_csOpen("Content Watch Lists", "name=" & db.db_EncodeSQLText(ListName), "ID", , , , , "ID")
+                CS = db.db_csOpen("Content Watch Lists", "name=" & db.encodeSQLText(ListName), "ID", , , , , "ID")
                 If Not db.db_csOk(CS) Then
                     Call db.db_csClose(CS)
                     CS = db.db_csInsertRecord("Content Watch Lists", 0)
@@ -5567,7 +5446,7 @@ ErrorTrap:
                     iMenuName = "Default"
                 End If
                 '
-                CS = db.db_openCsSql_rev("default", "select ID from ccDynamicMenus where name=" & db.db_EncodeSQLText(iMenuName))
+                CS = db.db_openCsSql_rev("default", "select ID from ccDynamicMenus where name=" & db.encodeSQLText(iMenuName))
                 If db.db_csOk(CS) Then
                     csv_VerifyDynamicMenu = db.db_GetCSInteger(CS, "ID")
                 End If
@@ -5753,7 +5632,7 @@ ErrorTrap:
                     & vbCrLf & "/*" _
                     & vbCrLf & "Site Styles" _
                     & vbCrLf & "*/" _
-                    & vbCrLf & RemoveStyleTags(db.cdnFiles.ReadFile("templates\styles.css"))
+                    & vbCrLf & RemoveStyleTags(cdnFiles.ReadFile("templates\styles.css"))
                 '
                 ' shared styles marked AlwaysInclude
                 '
@@ -5773,7 +5652,7 @@ ErrorTrap:
                                     & vbCrLf & "/*" _
                                     & vbCrLf & "Shared Style " & StyleName & " marked always include" _
                                     & vbCrLf & "*/" _
-                                    & vbCrLf & RemoveStyleTags(db.cdnFiles.ReadFile(Filename))
+                                    & vbCrLf & RemoveStyleTags(cdnFiles.ReadFile(Filename))
                             End If
                         End If
                     Next
@@ -5796,7 +5675,7 @@ ErrorTrap:
                                     & vbCrLf & "/*" _
                                     & vbCrLf & "Template Styles" _
                                     & vbCrLf & "*/" _
-                                    & vbCrLf & RemoveStyleTags(db.cdnFiles.ReadFile(Filename))
+                                    & vbCrLf & RemoveStyleTags(cdnFiles.ReadFile(Filename))
                             End If
 
                         Next
@@ -5820,7 +5699,7 @@ ErrorTrap:
                                     & vbCrLf & "/*" _
                                     & vbCrLf & "Shared Style " & StyleName & " included in template" _
                                     & vbCrLf & "*/" _
-                                    & vbCrLf & RemoveStyleTags(db.cdnFiles.ReadFile(Filename))
+                                    & vbCrLf & RemoveStyleTags(cdnFiles.ReadFile(Filename))
                             End If
                         End If
                     End If
@@ -5847,7 +5726,7 @@ ErrorTrap:
                                         & vbCrLf & "/*" _
                                         & vbCrLf & "Email Styles" _
                                         & vbCrLf & "*/" _
-                                        & vbCrLf & RemoveStyleTags(db.cdnFiles.ReadFile(Filename))
+                                        & vbCrLf & RemoveStyleTags(cdnFiles.ReadFile(Filename))
                                 End If
                             End If
                         Next
@@ -5869,7 +5748,7 @@ ErrorTrap:
                                     & vbCrLf & "/*" _
                                     & vbCrLf & "Shared Styles included in email" _
                                     & vbCrLf & "*/" _
-                                    & vbCrLf & RemoveStyleTags(db.cdnFiles.ReadFile(Filename))
+                                    & vbCrLf & RemoveStyleTags(cdnFiles.ReadFile(Filename))
                             End If
                         End If
                     Next
@@ -5919,18 +5798,18 @@ ErrorTrap:
         Public Function csv_getStyleSheetDefault() As String
             On Error GoTo ErrorTrap 'Const Tn = "csv_getStyleSheetDefault" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
-            If (True) And EncodeBoolean(db.siteProperty_getBoolean("Allow CSS Reset", False)) Then
+            If (True) And EncodeBoolean(siteProperties.getBoolean("Allow CSS Reset", False)) Then
                 csv_getStyleSheetDefault = csv_getStyleSheetDefault _
                     & vbCrLf & "/*" _
                     & vbCrLf & "Reset Styles" _
                     & vbCrLf & "*/" _
-                    & vbCrLf & RemoveStyleTags(db.appRootFiles.ReadFile("\cclib\styles\ccreset.css"))
+                    & vbCrLf & RemoveStyleTags(appRootFiles.ReadFile("\cclib\styles\ccreset.css"))
             End If
             csv_getStyleSheetDefault = csv_getStyleSheetDefault _
                 & vbCrLf & "/*" _
                 & vbCrLf & "Contensive Styles" _
                 & vbCrLf & "*/" _
-                & vbCrLf & RemoveStyleTags(db.appRootFiles.ReadFile("\cclib\styles\" & defaultStyleFilename))
+                & vbCrLf & RemoveStyleTags(appRootFiles.ReadFile("\cclib\styles\" & defaultStyleFilename))
             '
             Exit Function
 ErrorTrap:
@@ -6163,7 +6042,7 @@ ErrorTrap:
                                 ElseIf Len(RecordName) > 50 Then
                                     RecordName = Left(RecordName, 50) & "..."
                                 End If
-                                RecordName = csv_EncodeAddonOptionArgument(RecordName)
+                                RecordName = encodeNvaArgument(RecordName)
                                 list = list & "|" & RecordName
                                 If IncludeID Then
                                     list = list & ":" & RecordID
@@ -6185,8 +6064,8 @@ ErrorTrap:
             '
             ' Build output string
             '
-            'csv_GetAddonSelector = csv_EncodeAddonOptionArgument(SrcOptionName)
-            pageManager_GetAddonSelector = html_EncodeHTML(csv_EncodeAddonOptionArgument(SrcOptionName)) & "="
+            'csv_GetAddonSelector = encodeNvaArgument(SrcOptionName)
+            pageManager_GetAddonSelector = html_EncodeHTML(encodeNvaArgument(SrcOptionName)) & "="
             If InstanceOptionValue_AddonEncoded <> "" Then
                 pageManager_GetAddonSelector = pageManager_GetAddonSelector & html_EncodeHTML(InstanceOptionValue_AddonEncoded)
             End If
@@ -6204,109 +6083,6 @@ ErrorTrap:
                 '
                 '
                 pageManager_GetAddonSelector = pageManager_GetAddonSelector & "[" & list & "]" & SrcSelectorSuffix
-            End If
-            '
-            Exit Function
-            '
-ErrorTrap:
-            handleExceptionAndRethrow(New Exception("Unexpected exception"))
-        End Function
-        '
-        '===============================================================================================================================
-        '   Is Group Member of a GroupIDList
-        '   admins are always returned true
-        '===============================================================================================================================
-        '
-        Public Function user_isMemberOfGroupIdList(ByVal MemberID As Integer, ByVal isAuthenticated As Boolean, ByVal GroupIDList As String) As Boolean
-            user_isMemberOfGroupIdList = user_isMemberOfGroupIdList2(MemberID, isAuthenticated, GroupIDList, True)
-        End Function
-        '
-        '===============================================================================================================================
-        '   Is Group Member of a GroupIDList
-        '===============================================================================================================================
-        '
-        Public Function user_isMemberOfGroupIdList2(ByVal MemberID As Integer, ByVal isAuthenticated As Boolean, ByVal GroupIDList As String, ByVal adminReturnsTrue As Boolean) As Boolean
-            On Error GoTo ErrorTrap 'Const Tn = "IsGroupIDListMember" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Dim CS As Integer
-            Dim SQL As String
-            Dim Criteria As String
-            Dim WorkingIDList As String
-            '
-            user_isMemberOfGroupIdList2 = False
-            If isAuthenticated Then
-                WorkingIDList = GroupIDList
-                WorkingIDList = Replace(WorkingIDList, " ", "")
-                Do While InStr(1, WorkingIDList, ",,") <> 0
-                    WorkingIDList = Replace(WorkingIDList, ",,", ",")
-                Loop
-                If (WorkingIDList <> "") Then
-                    If Left(WorkingIDList, 1) = "," Then
-                        If Len(WorkingIDList) <= 1 Then
-                            WorkingIDList = ""
-                        Else
-                            WorkingIDList = Mid(WorkingIDList, 2)
-                        End If
-                    End If
-                End If
-                If (WorkingIDList <> "") Then
-                    If Right(WorkingIDList, 1) = "," Then
-                        If Len(WorkingIDList) <= 1 Then
-                            WorkingIDList = ""
-                        Else
-                            WorkingIDList = Mid(WorkingIDList, 1, Len(WorkingIDList) - 1)
-                        End If
-                    End If
-                End If
-                If (WorkingIDList = "") Then
-                    If adminReturnsTrue Then
-                        '
-                        ' check if memberid is admin
-                        '
-                        SQL = "select top 1 m.id" _
-                            & " from ccmembers m" _
-                            & " where" _
-                            & " (m.id=" & MemberID & ")" _
-                            & " and(m.active<>0)" _
-                            & " and(" _
-                                & " (m.admin<>0)" _
-                                & " or(m.developer<>0)" _
-                            & " )" _
-                            & " "
-                        CS = db.db_openCsSql_rev("default", SQL)
-                        user_isMemberOfGroupIdList2 = db.db_csOk(CS)
-                        Call db.db_csClose(CS)
-                    End If
-                Else
-                    '
-                    ' check if they are admin or in the group list
-                    '
-                    If InStr(1, WorkingIDList, ",") <> 0 Then
-                        Criteria = "r.GroupID in (" & WorkingIDList & ")"
-                    Else
-                        Criteria = "r.GroupID=" & WorkingIDList
-                    End If
-                    Criteria = "" _
-                        & "(" & Criteria & ")" _
-                        & " and(r.id is not null)" _
-                        & " and((r.DateExpires is null)or(r.DateExpires>" & db.db_EncodeSQLDate(Now) & "))" _
-                        & " "
-                    If adminReturnsTrue Then
-                        Criteria = "(" & Criteria & ")or(m.admin<>0)or(m.developer<>0)"
-                    End If
-                    Criteria = "" _
-                        & "(" & Criteria & ")" _
-                        & " and(m.active<>0)" _
-                        & " and(m.id=" & MemberID & ")" _
-                    '
-                    SQL = "select top 1 m.id" _
-                        & " from ccmembers m" _
-                        & " left join ccMemberRules r on r.Memberid=m.id" _
-                        & " where" & Criteria
-                    CS = db.db_openCsSql_rev("default", SQL)
-                    user_isMemberOfGroupIdList2 = db.db_csOk(CS)
-                    Call db.db_csClose(CS)
-                End If
             End If
             '
             Exit Function
@@ -6336,7 +6112,7 @@ ErrorTrap:
             Dim Filename As String
             '
             If Not email_BlockList_LocalLoaded Then
-                Filename = "Config\SMTPBlockList_" & db.config.name & ".txt"
+                Filename = "Config\SMTPBlockList_" & appConfig.name & ".txt"
                 email_BlockList_Local = cluster.clusterFiles.ReadFile(Filename)
                 email_BlockList_LocalLoaded = True
             End If
@@ -6365,7 +6141,7 @@ ErrorTrap:
                 ' add them to the list
                 '
                 email_BlockList_Local = getEmailBlockList_InternalOnly() & vbCrLf & EmailAddress & vbTab & Now()
-                Call cluster.clusterFiles.SaveFile("Config\SMTPBlockList_" & db.config.name & ".txt", email_BlockList_Local)
+                Call cluster.clusterFiles.SaveFile("Config\SMTPBlockList_" & appConfig.name & ".txt", email_BlockList_Local)
                 email_BlockList_LocalLoaded = False
             End If
         End Sub
@@ -6614,7 +6390,7 @@ ErrorTrap:
             csv_GetAddonOption = ""
             If WorkingString <> "" Then
                 TargetName = LCase(OptionName)
-                'targetName = LCase(csv_EncodeAddonOptionArgument(OptionName))
+                'targetName = LCase(encodeNvaArgument(OptionName))
                 Options = Split(OptionString, "&")
                 'Options = Split(OptionString, vbCrLf)
                 For Ptr = 0 To UBound(Options)
@@ -6628,7 +6404,7 @@ ErrorTrap:
                             TestName = Trim(Mid(TestName, 1, Len(TestName) - 1))
                         Loop
                         If TestName = TargetName Then
-                            csv_GetAddonOption = common_DecodeAddonOptionArgument(Trim(Mid(Options(Ptr), Pos + 1)))
+                            csv_GetAddonOption = decodeNvaArgument(Trim(Mid(Options(Ptr), Pos + 1)))
                             'csv_GetAddonOption = Trim(Mid(Options(Ptr), Pos + 1))
                             Exit For
                         End If
@@ -6938,9 +6714,9 @@ ErrorTrap:
             ''hint = "csv_EncodeContentUpgrades enter"
             html_EncodeContentUpgrades = Source
             '
-            ContentFilesLinkPrefix = "/" & db.config.name & "/files/"
+            ContentFilesLinkPrefix = "/" & appConfig.name & "/files/"
             ResourceLibraryLinkPrefix = ContentFilesLinkPrefix & "ccLibraryFiles/"
-            ImageAllowUpdate = EncodeBoolean(db.siteProperty_getBoolean("ImageAllowUpdate", True))
+            ImageAllowUpdate = EncodeBoolean(siteProperties.getBoolean("ImageAllowUpdate", True))
             ImageAllowUpdate = ImageAllowUpdate And (InStr(1, Source, ResourceLibraryLinkPrefix, vbTextCompare) <> 0)
             If ImageAllowUpdate Then
                 '
@@ -7333,7 +7109,7 @@ ErrorTrap:
                 html_EncodeContentUpgrades = Replace(html_EncodeContentUpgrades, "{{content}}", "<AC type=""" & ACTypeTemplateContent & """>", , , vbTextCompare)
             End If
             '
-            'Call main_testPoint(hint)
+            'Call main_cpcore.testPoint(hint)
             '
             Exit Function
 ErrorTrap:
@@ -7352,7 +7128,7 @@ ErrorTrap:
                 '
                 ' error, do nothing but log
                 '
-                handleLegacyError3(db.config.name, "Attempt to resize an image to 0,0. This is not allowed.", "dll", "cpCoreClass", "csv_ResizeImage2", KmaErrorInternal, "", "", False, True, "")
+                handleLegacyError3(appConfig.name, "Attempt to resize an image to 0,0. This is not allowed.", "dll", "cpCoreClass", "csv_ResizeImage2", KmaErrorInternal, "", "", False, True, "")
             Else
                 If sf.load(SrcFilename) Then
                     If Width = 0 Then
@@ -7380,7 +7156,7 @@ ErrorTrap:
             Try
                 Dim Algorithm As Integer
                 '
-                Algorithm = EncodeInteger(db.siteProperty_getText("ImageResizeSFAlgorithm", "5"))
+                Algorithm = EncodeInteger(siteProperties.getText("ImageResizeSFAlgorithm", "5"))
                 Call image_ResizeImage2(SrcFilename, DstFilename, Width, Height, DirectCast(Algorithm, csv_SfImageResizeAlgorithms))
             Catch ex As Exception
                 handleExceptionAndRethrow(ex)
@@ -7462,25 +7238,25 @@ ErrorTrap:
         Public Function csv_ProcessStyleSheet(Source As String) As String
             csv_ProcessStyleSheet = Source
         End Function
-        '
-        '------------------------------------------------------------------------------------------------------------
-        '   encode an argument to be used in an addonOptionString
-        '       optionstring is "name = value &"
-        '       can be Arg0,Arg1,Arg2,Arg3,Name=Value&Name=Value[Option1|Option2]descriptor
-        '------------------------------------------------------------------------------------------------------------
-        '
-        Public Function csv_EncodeAddonOptionArgument(Arg As String) As String
-            csv_EncodeAddonOptionArgument = csv_encodeNvaArgument(Arg)
-        End Function
-        '
-        '------------------------------------------------------------------------------------------------------------
-        '   Decodes an argument parsed from an AddonOptionString for all non-allowed characters
-        '       AddonOptionString is a & delimited string of name=value[selector]descriptor
-        '------------------------------------------------------------------------------------------------------------
-        '
-        Public Function common_DecodeAddonOptionArgument(EncodedArg As String) As String
-            common_DecodeAddonOptionArgument = csv_decodeNvaArgument(EncodedArg)
-        End Function
+        ''
+        ''------------------------------------------------------------------------------------------------------------
+        ''   encode an argument to be used in an addonOptionString
+        ''       optionstring is "name = value &"
+        ''       can be Arg0,Arg1,Arg2,Arg3,Name=Value&Name=Value[Option1|Option2]descriptor
+        ''------------------------------------------------------------------------------------------------------------
+        ''
+        'Public Function encodeNvaArgument(Arg As String) As String
+        '    encodeNvaArgument = encodeNvaArgument(Arg)
+        'End Function
+        ''
+        ''------------------------------------------------------------------------------------------------------------
+        ''   Decodes an argument parsed from an AddonOptionString for all non-allowed characters
+        ''       AddonOptionString is a & delimited string of name=value[selector]descriptor
+        ''------------------------------------------------------------------------------------------------------------
+        ''
+        'Public Function decodeNvaArgument(EncodedArg As String) As String
+        '    decodeNvaArgument = decodeNvaArgument(EncodedArg)
+        'End Function
         '
         '=================================================================================================================
         '   csv_GetAddonOptionStringValue
@@ -7501,7 +7277,7 @@ ErrorTrap:
             If Pos > 0 Then
                 s = Left(s, Pos - 1)
             End If
-            s = common_DecodeAddonOptionArgument(s)
+            s = decodeNvaArgument(s)
             '
             csv_GetAddonOptionStringValue = Trim(s)
             '
@@ -7551,8 +7327,8 @@ ErrorTrap:
             '
             warningId = 0
             SQL = "select top 1 ID from ccSiteWarnings" _
-                & " where (generalKey=" & db.db_EncodeSQLText(generalKey) & ")" _
-                & " and(specificKey=" & db.db_EncodeSQLText(specificKey) & ")" _
+                & " where (generalKey=" & db.encodeSQLText(generalKey) & ")" _
+                & " and(specificKey=" & db.encodeSQLText(specificKey) & ")" _
                 & ""
             Dim dt As DataTable
             dt = db.executeSql(SQL)
@@ -7597,46 +7373,26 @@ ErrorTrap:
         Public Sub csv_reportAlarm(Cause As String)
             Call appendLog(Cause, "Alarms", "alarm")
         End Sub
-        '
-        '------------------------------------------------------------------------------------------------------------
-        '   encode an argument to be used in a 'name=value&' string
-        '       - ohter characters are reserved to do further parsing, see encodeNvaArgument
-        '------------------------------------------------------------------------------------------------------------
-        '
-        Public Function csv_encodeNvaArgument(Arg As String) As String
-            csv_encodeNvaArgument = encodeNvaArgument(Arg)
-        End Function
-        '
-        '------------------------------------------------------------------------------------------------------------
-        '   decode an argument that came from parsing a name or value from a 'name=value&' string
-        '       split on '&', then on '=', then decode each of the two arguments from either side
-        '       - other characters are reserved to do further parsing, see encodeNvaArgument
-        '------------------------------------------------------------------------------------------------------------
-        '
-        Public Function csv_decodeNvaArgument(EncodedArg As String) As String
-            csv_decodeNvaArgument = decodeNvaArgument(EncodedArg)
-        End Function
-        '
-        '=================================================================================================================
-        '   csv_getNvaValue
-        '       gets the value from a simple 'name=value&' list, assuming it was assembled using csv_encodeNvaArgument
-        '=================================================================================================================
-        '
-        Public Function common_getNvaValue(Name As String, nvaEncodedString As String) As String
-            On Error GoTo ErrorTrap
-            '
-            Dim s As String
-            Dim encodedName As String
-            '
-            encodedName = csv_encodeNvaArgument(Name)
-            s = getSimpleNameValue(encodedName, nvaEncodedString, "", "&")
-            s = common_DecodeAddonOptionArgument(s)
-            common_getNvaValue = Trim(s)
-            '
-            Exit Function
-ErrorTrap:
-            handleLegacyError3(db.config.name, "", "dll", "cpCoreClass", "csv_getNvaValue", Err.Number, Err.Source, Err.Description, True, False, "")
-        End Function
+        ''
+        ''------------------------------------------------------------------------------------------------------------
+        ''   encode an argument to be used in a 'name=value&' string
+        ''       - ohter characters are reserved to do further parsing, see encodeNvaArgument
+        ''------------------------------------------------------------------------------------------------------------
+        ''
+        'Public Function encodeNvaArgument(Arg As String) As String
+        '    encodeNvaArgument = encodeNvaArgument(Arg)
+        'End Function
+        ''
+        ''------------------------------------------------------------------------------------------------------------
+        ''   decode an argument that came from parsing a name or value from a 'name=value&' string
+        ''       split on '&', then on '=', then decode each of the two arguments from either side
+        ''       - other characters are reserved to do further parsing, see encodeNvaArgument
+        ''------------------------------------------------------------------------------------------------------------
+        ''
+        'Public Function decodeNvaArgument(EncodedArg As String) As String
+        '    decodeNvaArgument = decodeNvaArgument(EncodedArg)
+        'End Function
+
         '
         '=================================================================================================================================================
         '   csv_addLinkAlias
@@ -7685,7 +7441,7 @@ ErrorTrap:
             'dim buildversion As String
             '
             If (True) Then
-                AllowLinkAlias = EncodeBoolean(db.siteProperty_getBoolean("allowLinkAlias", False))
+                AllowLinkAlias = EncodeBoolean(siteProperties.getBoolean("allowLinkAlias", False))
                 WorkingLinkAlias = linkAlias
                 If (WorkingLinkAlias <> "") Then
                     '
@@ -7723,7 +7479,7 @@ ErrorTrap:
                             WorkingLinkAlias = "/" & WorkingLinkAlias
                         End If
                         '
-                        If LCase(WorkingLinkAlias) = LCase("/" & db.config.name) Then
+                        If LCase(WorkingLinkAlias) = LCase("/" & appConfig.name) Then
                             '
                             ' This alias points to the cclib folder
                             '
@@ -7741,7 +7497,7 @@ ErrorTrap:
                                     & "The Link Alias being created (" & WorkingLinkAlias & ") can not be used because there is a virtual directory in your website directory that already uses this name." _
                                     & " Please change it to ensure the Link Alias is unique. To set or change the Link Alias, use the Link Alias tab and select a name not used by another page."
                             End If
-                        ElseIf db.appRootFiles.checkPath(cluster.config.clusterPhysicalPath & db.config.appRootPath & "\" & Mid(WorkingLinkAlias, 2)) Then
+                        ElseIf appRootFiles.checkPath(cluster.config.clusterPhysicalPath & appConfig.appRootFilesPath & "\" & Mid(WorkingLinkAlias, 2)) Then
                             '
                             ' This alias points to a different link, call it an error
                             '
@@ -7762,7 +7518,7 @@ ErrorTrap:
                                 '
                                 FieldList = "Name,PageID,'' as QueryStringSuffix"
                             End If
-                            CS = db.db_csOpen("Link Aliases", "name=" & db.db_EncodeSQLText(WorkingLinkAlias), , , , , , FieldList)
+                            CS = db.db_csOpen("Link Aliases", "name=" & db.encodeSQLText(WorkingLinkAlias), , , , , , FieldList)
                             If Not db.db_csOk(CS) Then
                                 '
                                 ' Alias not found, create a Link Aliases
@@ -7922,13 +7678,13 @@ ErrorTrap:
             Dim iPersonalizationPeopleId As Integer
             iPersonalizationPeopleId = personalizationPeopleId
             If iPersonalizationPeopleId = 0 Then
-                iPersonalizationPeopleId = userId
+                iPersonalizationPeopleId = user.userId
             End If
             '
             returnValue = Source
             'hint = "csv_EncodeContent9 enter"
             If returnValue <> "" Then
-                AdminURL = db.siteProperty_AdminURL
+                AdminURL = siteProperties.adminURL
                 '
                 '--------
                 ' cut-paste from csv_EncodeContent8
@@ -7937,7 +7693,7 @@ ErrorTrap:
                 ' ----- Do EncodeCRLF Conversion
                 '
                 'hint = hint & ",010"
-                If EncodeBoolean(db.siteProperty_getBoolean("ConvertContentCRLF2BR", False)) And (Not PlainText) Then
+                If EncodeBoolean(siteProperties.getBoolean("ConvertContentCRLF2BR", False)) And (Not PlainText) Then
                     returnValue = Replace(returnValue, vbCr, "")
                     returnValue = Replace(returnValue, vbLf, "<br>")
                 End If
@@ -8043,7 +7799,7 @@ ErrorTrap:
                                             ' Dynamic Menu
                                             '
                                             'hint = hint & ",320"
-                                            returnValue = returnValue & main_GetDynamicMenu(addonOptionString, db.siteProperty_UseContentWatchLink)
+                                            returnValue = returnValue & main_GetDynamicMenu(addonOptionString, siteProperties.useContentWatchLink)
                                         Case ACTypeWatchList
                                             '
                                             ' Watch List
@@ -8219,7 +7975,7 @@ ErrorTrap:
                         If InStr(1, Copy, "://") <> 0 Then
                         ElseIf Left(Copy, 1) = "/" Then
                         Else
-                            Copy = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, Copy)
+                            Copy = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, Copy)
                         End If
                         Call main_AddHeadScriptLink(Copy, "embedded content")
                         Copy = csv_GetEncodeContent_JSFilename()
@@ -8236,7 +7992,7 @@ ErrorTrap:
                         If InStr(1, Copy, "://") <> 0 Then
                         ElseIf Left(Copy, 1) = "/" Then
                         Else
-                            Copy = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, Copy)
+                            Copy = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, Copy)
                         End If
                         Call main_AddStylesheetLink2(Copy, "")
                         Copy = csv_GetEncodeContent_StyleFilenames()
@@ -8303,18 +8059,18 @@ ErrorTrap:
                         ' encode subject
                         '
                         subjectEncoded = html_executeContentCommands(Nothing, subjectEncoded, addonContextEnum.contextEmail, ToMemberID, True, layoutError)
-                        subjectEncoded = html_encodeContent10(subjectEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & db.config.domainList(0), True, 0, "", addonContextEnum.contextEmail, True, Nothing, False)
+                        subjectEncoded = html_encodeContent10(subjectEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & appConfig.domainList(0), True, 0, "", addonContextEnum.contextEmail, True, Nothing, False)
                         '
                         ' encode Body
                         '
                         bodyEncoded = html_executeContentCommands(Nothing, bodyEncoded, addonContextEnum.contextEmail, ToMemberID, True, layoutError)
-                        bodyEncoded = html_encodeContent10(bodyEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & db.config.domainList(0), True, 0, "", addonContextEnum.contextEmail, True, Nothing, False)
+                        bodyEncoded = html_encodeContent10(bodyEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & appConfig.domainList(0), True, 0, "", addonContextEnum.contextEmail, True, Nothing, False)
                         '
                         ' encode template
                         '
                         If (templateEncoded <> "") Then
                             templateEncoded = html_executeContentCommands(Nothing, templateEncoded, addonContextEnum.contextEmail, ToMemberID, True, layoutError)
-                            templateEncoded = html_encodeContent10(templateEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & db.config.domainList(0), True, 0, "", addonContextEnum.contextEmail, True, Nothing, False)
+                            templateEncoded = html_encodeContent10(templateEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & appConfig.domainList(0), True, 0, "", addonContextEnum.contextEmail, True, Nothing, False)
                             '
                             If (InStr(1, templateEncoded, fpoContentBox) <> 0) Then
                                 bodyEncoded = Replace(templateEncoded, fpoContentBox, bodyEncoded)
@@ -8443,7 +8199,7 @@ ErrorTrap:
             Else
                 SelectList = "ID,TestMemberID,FromAddress,Subject,copyfilename,AddLinkEID,AllowSpamFooter,0 as EmailTemplateID"
             End If
-            CSEmail = db.db_csOpen("System Email", "name=" & db.db_EncodeSQLText(EMailName), "ID", , , , , SelectList)
+            CSEmail = db.db_csOpen("System Email", "name=" & db.encodeSQLText(EMailName), "ID", , , , , SelectList)
             If Not db.db_csOk(CSEmail) Then
                 '
                 ' ----- Email was not found
@@ -8452,7 +8208,7 @@ ErrorTrap:
                 CSEmail = db.db_csInsertRecord("System Email")
                 Call db.db_setCS(CSEmail, "name", EMailName)
                 Call db.db_setCS(CSEmail, "Subject", EMailName)
-                Call db.db_setCS(CSEmail, "FromAddress", db.siteProperty_getText("EmailAdmin", "webmaster@" & db.config.domainList(0)))
+                Call db.db_setCS(CSEmail, "FromAddress", siteProperties.getText("EmailAdmin", "webmaster@" & appConfig.domainList(0)))
                 'Call app.csv_SetCS(CSEmail, "caption", EmailName)
                 Call db.db_csClose(CSEmail)
                 Call Err.Raise(KmaErrorInternal, "dll", "No system email was found with the name [" & EMailName & "]. A new email blank was created but not sent.")
@@ -8466,7 +8222,7 @@ ErrorTrap:
                 EmailSubjectSource = db.db_GetCSText(CSEmail, "Subject")
                 EmailBodySource = db.db_GetCS(CSEmail, "copyfilename") & AdditionalCopy
                 EmailAllowLinkEID = db.db_GetCSBoolean(CSEmail, "AddLinkEID")
-                BounceAddress = db.siteProperty_getText("EmailBounceAddress", "")
+                BounceAddress = siteProperties.getText("EmailBounceAddress", "")
                 If BounceAddress = "" Then
                     BounceAddress = EmailFrom
                 End If
@@ -8497,7 +8253,7 @@ ErrorTrap:
                     ' This field is default true, and non-authorable
                     ' It will be true in all cases, except a possible unforseen exception
                     '
-                    EmailTemplateSource = EmailTemplateSource & "<div style=""clear: both;padding:10px;"">" & csv_GetLinkedText("<a href=""" & html_EncodeHTML("http://" & db.config.domainList(0) & "/" & db.siteProperty_ServerPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", db.siteProperty_getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
+                    EmailTemplateSource = EmailTemplateSource & "<div style=""clear: both;padding:10px;"">" & csv_GetLinkedText("<a href=""" & html_EncodeHTML("http://" & appConfig.domainList(0) & "/" & siteProperties.serverPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
                 End If
                 '
                 ' --- Send message to the additional member
@@ -8594,7 +8350,7 @@ ErrorTrap:
                         ConfirmBody = ConfirmBody & "--- end of list ---" & BR
                         ConfirmBody = ConfirmBody & "</div>"
                         '
-                        EmailStatus = sendMemberEmail3(EmailToConfirmationMemberID, EmailFrom, "System Email confirmation from " & db.config.domainList(0), ConfirmBody, False, True, EmailRecordID, "", False)
+                        EmailStatus = sendMemberEmail3(EmailToConfirmationMemberID, EmailFrom, "System Email confirmation from " & appConfig.domainList(0), ConfirmBody, False, True, EmailRecordID, "", False)
                         If isAdmin And (EmailStatus <> "") Then
                             returnString = "Administrator: There was a problem sending the confirmation email, " & EmailStatus
                         End If
@@ -8700,7 +8456,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function csv_getPhysicalFilename(ByVal VirtualFilename As String) As String
-            Return db.convertCdnUrlToCdnPathFilename(VirtualFilename)
+            Return convertCdnUrlToCdnPathFilename(VirtualFilename)
         End Function
         '
         '========================================================================
@@ -8759,7 +8515,7 @@ ErrorTrap:
                     ' Sest to blank
                     '
                     AllowChange = True
-                ElseIf UCase(Newusername) <> UCase(userUsername) Then
+                ElseIf UCase(Newusername) <> UCase(user.userUsername) Then
                     '
                     ' ----- username changed, check if change is allowed
                     '
@@ -8769,7 +8525,7 @@ ErrorTrap:
                     End If
                 End If
                 If AllowChange Then
-                    CSMember = db.db_csOpen("people", "id=" & db.db_EncodeSQLNumber(userId))
+                    CSMember = db.db_csOpen("people", "id=" & db.db_EncodeSQLNumber(user.userId))
                     If Not db.db_csOk(CSMember) Then
                         Call error_AddUserError("There was a problem locating your account record. No changes were saved.")
                         ' if user error, it goes back to the hardcodedpage
@@ -8789,7 +8545,7 @@ ErrorTrap:
                                     FieldName = field.nameLc
                                     FieldValue = doc_getText(FieldName)
                                     If FieldValue <> "" Then
-                                        CSTest = db.db_csOpen(ContentName, "(" & FieldName & "=" & db.db_EncodeSQLText(FieldValue) & ")and(ID<>" & userId & ")")
+                                        CSTest = db.db_csOpen(ContentName, "(" & FieldName & "=" & db.encodeSQLText(FieldValue) & ")and(ID<>" & user.userId & ")")
                                         If db.db_csOk(CSTest) Then
                                             Call error_AddUserError("The field '" & FieldName & "' must be unique, and another account has already used '" & FieldValue & "'")
                                         End If
@@ -8854,10 +8610,10 @@ ErrorTrap:
                             Call main_ProcessFormMyProfile_UpdateFieldBoolean(CSMember, "AllowBulkEmail")
                             Call main_ProcessFormMyProfile_UpdateField(CSMember, "LanguageID")
 
-                            If EncodeBoolean(db.siteProperty_getBoolean("AllowAutoLogin", False)) Then
+                            If EncodeBoolean(siteProperties.getBoolean("AllowAutoLogin", False)) Then
                                 Call main_ProcessFormMyProfile_UpdateFieldBoolean(CSMember, "AutoLogin")
                             End If
-                            If main_IsContentManager() Then
+                            If user.main_IsContentManager() Then
                                 Call main_ProcessFormMyProfile_UpdateFieldBoolean(CSMember, "AllowToolsPanel")
                             End If
                             '
@@ -8867,7 +8623,7 @@ ErrorTrap:
                             '
                             ' --- Update Group Records
                             '
-                            Call main_ProcessCheckList("MemberRules", "Members", EncodeText(userId), "Groups", "Member Rules", "MemberID", "GroupID")
+                            Call main_ProcessCheckList("MemberRules", "Members", EncodeText(user.userId), "Groups", "Member Rules", "MemberID", "GroupID")
                             '
                             '
                             '
@@ -8906,7 +8662,7 @@ ErrorTrap:
             '
             FieldValue = doc_getText(FieldName)
             If db.db_GetCSText(CSMember, FieldName) <> FieldValue Then
-                Call main_LogActivity2("profile changed " & FieldName, userId, userOrganizationId)
+                Call main_LogActivity2("profile changed " & FieldName, user.userId, user.userOrganizationId)
                 Call db.db_setCS(CSMember, FieldName, FieldValue)
             End If
             Exit Sub
@@ -8928,7 +8684,7 @@ ErrorTrap:
             '
             FieldValue = main_GetStreamBoolean2(FieldName)
             If db.db_GetCSBoolean(CSMember, FieldName) <> FieldValue Then
-                Call main_LogActivity2("profile changed " & FieldName, userId, userOrganizationId)
+                Call main_LogActivity2("profile changed " & FieldName, user.userId, user.userOrganizationId)
                 Call db.db_setCS(CSMember, FieldName, FieldValue)
             End If
             Exit Sub
@@ -9001,7 +8757,7 @@ ErrorTrap:
                 Else
                     ShortLink = NonEncodedLink
                     ShortLink = ConvertLinkToShortLink(ShortLink, web.requestDomain, web_requestVirtualFilePath)
-                    ShortLink = EncodeAppRootPath(ShortLink, web_requestVirtualFilePath, db.RootWebPath, web.requestDomain)
+                    ShortLink = EncodeAppRootPath(ShortLink, web_requestVirtualFilePath, www_requestRootPath, web.requestDomain)
                     FullLink = web_requestProtocol & web.requestDomain & ShortLink
                 End If
                 If (NonEncodedLink = "") Then
@@ -9027,7 +8783,7 @@ ErrorTrap:
                     '
                     Call appendLogPageNotFound(web.requestLinkSource)
                     If ShortLink <> "" Then
-                        Call db.executeSql("Update ccContentWatch set link=null where link=" & db.db_EncodeSQLText(ShortLink))
+                        Call db.executeSql("Update ccContentWatch set link=null where link=" & db.encodeSQLText(ShortLink))
                     End If
                     '
                     If main_PageTestPointPrinting Then
@@ -9074,7 +8830,7 @@ ErrorTrap:
                         Call main_ClearStream()
                         EncodedLink = EncodeURL(NonEncodedLink)
 
-                        If isWebRoleIis Then
+                        If (Not iisContext Is Nothing) Then
                             '
                             ' redirect and release application. HOWEVER -- the thread will continue so use responseOpen=false to abort as much activity as possible
                             '
@@ -9127,7 +8883,7 @@ ErrorTrap:
                         Call main_JavaStream_Add(EncodeText(Message))
                     Case Else
 
-                        If isWebRoleIis Then
+                        If (iisContext IsNot Nothing) Then
                             main_IsStreamWritten = True
                             Call iisContext.Response.Write(EncodeText(Message))
                         Else
@@ -9167,7 +8923,7 @@ ErrorTrap:
             MethodName = "main_addResponseCookie"
             '
             If docOpen And docBufferEnabled Then
-                If (isMissing(domain)) And domainDetails.allowCrossLogin And EncodeBoolean(db.siteProperty_getBoolean("Write Cookies to All Domains", True)) Then
+                If (isMissing(domain)) And domainDetails.allowCrossLogin And EncodeBoolean(siteProperties.getBoolean("Write Cookies to All Domains", True)) Then
                     '
                     ' no domain provided, new mode
                     '   - write cookie for current domains
@@ -9186,7 +8942,7 @@ ErrorTrap:
                                 '
                                 ' current domain, set cookie
                                 '
-                                If isWebRoleIis Then
+                                If (iisContext IsNot Nothing) Then
                                     '
                                     ' Pass cookie to asp (compatibility)
                                     '
@@ -9267,7 +9023,7 @@ ErrorTrap:
                     '
                     ' Legacy mode - if no domain given just leave it off
                     '
-                    If isWebRoleIis Then
+                    If (iisContext IsNot Nothing) Then
                         '
                         ' Pass cookie to asp (compatibility)
                         '
@@ -9565,13 +9321,13 @@ ErrorTrap:
                 '
                 ' write to stream
                 '
-                ElapsedTime = CSng(GetTickCount - main_PageStartTickCount) / 1000
+                ElapsedTime = CSng(GetTickCount - constructorTickCount) / 1000
                 iMessage = EncodeText(Message)
                 iMessage = Format((ElapsedTime), "00.000") & " - " & New String(TestPointTabChr, main_TestPointIndent) & iMessage
                 main_testPointMessage = main_testPointMessage & "<nobr>" & iMessage & "</nobr><br >"
                 'writeAltBuffer ("<nobr>" & iMessage & "</nobr><br >")
             End If
-            If db.siteProperty_AllowTestPointLogging Then
+            If siteProperties.allowTestPointLogging Then
                 '
                 ' write to debug log in virtual files - to read from a test verbose viewer
                 '
@@ -9581,7 +9337,7 @@ ErrorTrap:
                 iMessage = Replace(iMessage, vbLf, " ")
                 iMessage = FormatDateTime(Now, vbShortTime) & vbTab & Format((ElapsedTime), "00.000") & vbTab & main_VisitId & vbTab & iMessage
                 '
-                Call appendLog(iMessage, "", "testPoints_" & db.config.name)
+                Call appendLog(iMessage, "", "testPoints_" & appConfig.name)
             End If
             Exit Sub
             '
@@ -9837,14 +9593,14 @@ ErrorTrap:
                     RowMax = RowCnt - 1
                 End If
                 '
-                If RowCnt > db.siteProperty_SelectFieldLimit Then
+                If RowCnt > siteProperties.selectFieldLimit Then
                     '
                     ' Selection is too big
                     '
                     Call error_AddUserError("The drop down list for " & ContentName & " called " & MenuName & " is too long to display. The site administrator has been notified and the problem will be resolved shortly. To fix this issue temporarily, go to the admin tab of the Preferences page and set the Select Field Limit larger than " & RowCnt & ".")
                     '                    handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
 
-                    handleExceptionAndRethrow(New Exception("Error creating select list from content [" & ContentName & "] called [" & MenuName & "]. Selection of [" & RowCnt & "] records exceeds [" & db.siteProperty_SelectFieldLimit & "], the current Site Property SelectFieldLimit."))
+                    handleExceptionAndRethrow(New Exception("Error creating select list from content [" & ContentName & "] called [" & MenuName & "]. Selection of [" & RowCnt & "] records exceeds [" & siteProperties.selectFieldLimit & "], the current Site Property SelectFieldLimit."))
                     main_GetFormInputSelect2 = main_GetFormInputSelect2 & html_GetFormInputHidden(MenuNameFPO, CurrentValue)
                     If CurrentValue = 0 Then
                         main_GetFormInputSelect2 = main_GetFormInputText2(MenuName, "0")
@@ -9993,9 +9749,9 @@ ErrorTrap:
                                     Call FastString.Add("selected")
                                     SelectedFound = True
                                 End If
-                                If db.siteProperty_SelectFieldWidthLimit <> 0 Then
-                                    If Len(Copy) > db.siteProperty_SelectFieldWidthLimit Then
-                                        Copy = Left(Copy, db.siteProperty_SelectFieldWidthLimit) & "...+"
+                                If siteProperties.selectFieldWidthLimit <> 0 Then
+                                    If Len(Copy) > siteProperties.selectFieldWidthLimit Then
+                                        Copy = Left(Copy, siteProperties.selectFieldWidthLimit) & "...+"
                                     End If
                                 End If
                                 Call FastString.Add(">" & html_EncodeHTML(Copy) & "</option>")
@@ -10028,9 +9784,9 @@ ErrorTrap:
                                     End If
                                     Call FastString.Add(vbCrLf & "<option value=""" & RecordID & """ selected")
                                     SelectedFound = True
-                                    If db.siteProperty_SelectFieldWidthLimit <> 0 Then
-                                        If Len(Copy) > db.siteProperty_SelectFieldWidthLimit Then
-                                            Copy = Left(Copy, db.siteProperty_SelectFieldWidthLimit) & "...+"
+                                    If siteProperties.selectFieldWidthLimit <> 0 Then
+                                        If Len(Copy) > siteProperties.selectFieldWidthLimit Then
+                                            Copy = Left(Copy, siteProperties.selectFieldWidthLimit) & "...+"
                                         End If
                                     End If
                                     Call FastString.Add(">" & html_EncodeHTML(Copy) & "</option>")
@@ -10188,11 +9944,11 @@ ErrorTrap:
                 '        End If
                 '        Call app.db_closeCS(CSPointer)
                 '
-                If RowMax > db.siteProperty_SelectFieldLimit Then
+                If RowMax > siteProperties.selectFieldLimit Then
                     '
                     ' Selection is too big
                     '
-                    handleExceptionAndRethrow(New Exception("While building a group members list for group [" & group_GetGroupName(GroupID) & "], too many rows were selected. [" & RowMax & "] records exceeds [" & db.siteProperty_SelectFieldLimit & "], the current Site Property app.SiteProperty_SelectFieldLimit."))
+                    handleExceptionAndRethrow(New Exception("While building a group members list for group [" & group_GetGroupName(GroupID) & "], too many rows were selected. [" & RowMax & "] records exceeds [" & siteProperties.selectFieldLimit & "], the current Site Property app.SiteProperty_SelectFieldLimit."))
                     main_GetFormInputMemberSelect2 = main_GetFormInputMemberSelect2 & html_GetFormInputHidden(MenuNameFPO, iCurrentValue)
                     If iCurrentValue <> 0 Then
                         CSPointer = db_csOpen("people", iCurrentValue)
@@ -10362,9 +10118,9 @@ ErrorTrap:
                                         Call FastString.Add("selected")
                                         SelectedFound = True
                                     End If
-                                    If db.siteProperty_SelectFieldWidthLimit <> 0 Then
-                                        If Len(Copy) > db.siteProperty_SelectFieldWidthLimit Then
-                                            Copy = Left(Copy, db.siteProperty_SelectFieldWidthLimit) & "...+"
+                                    If siteProperties.selectFieldWidthLimit <> 0 Then
+                                        If Len(Copy) > siteProperties.selectFieldWidthLimit Then
+                                            Copy = Left(Copy, siteProperties.selectFieldWidthLimit) & "...+"
                                         End If
                                     End If
                                     Call FastString.Add(">" & Copy & "</option>")
@@ -10429,7 +10185,7 @@ ErrorTrap:
             Dim TagID As String
             Dim SelectFieldWidthLimit As Integer
             '
-            SelectFieldWidthLimit = db.siteProperty_SelectFieldWidthLimit
+            SelectFieldWidthLimit = siteProperties.selectFieldWidthLimit
             If SelectFieldWidthLimit = 0 Then
                 SelectFieldWidthLimit = 256
             End If
@@ -10486,11 +10242,11 @@ ErrorTrap:
             Dim Link As String
             Dim IconFilename As String
             '
-            If EncodeBoolean(db.siteProperty_getBoolean("AllowLoginIcon", True)) Then
+            If EncodeBoolean(siteProperties.getBoolean("AllowLoginIcon", True)) Then
                 main_GetLoginLink = main_GetLoginLink & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"">"
                 main_GetLoginLink = main_GetLoginLink & "<tr><td align=""right"">"
-                If main_IsContentManager() Then
-                    main_GetLoginLink = main_GetLoginLink & "<a href=""" & html_EncodeHTML(db.siteProperty_AdminURL) & """ target=""_blank"">"
+                If user.main_IsContentManager() Then
+                    main_GetLoginLink = main_GetLoginLink & "<a href=""" & html_EncodeHTML(siteProperties.adminURL) & """ target=""_blank"">"
                 Else
                     Link = web_requestPage & "?" & web_RefreshQueryString
                     Link = modifyLinkQuery(Link, RequestNameHardCodedPage, HardCodedPageLogin, True)
@@ -10498,11 +10254,11 @@ ErrorTrap:
                     main_GetLoginLink = main_GetLoginLink & "<a href=""" & html_EncodeHTML(Link) & """ >"
                 End If
                 If (main_LoginIconFilename <> "") Then
-                    main_GetLoginLink = main_GetLoginLink & "<img alt=""Login"" src=""" & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, main_LoginIconFilename) & """ border=""0"" >"
+                    main_GetLoginLink = main_GetLoginLink & "<img alt=""Login"" src=""" & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, main_LoginIconFilename) & """ border=""0"" >"
                 Else
-                    IconFilename = db.siteProperty_getText("LoginIconFilename", "/ccLib/images/ccLibLogin.GIF")
+                    IconFilename = siteProperties.getText("LoginIconFilename", "/ccLib/images/ccLibLogin.GIF")
                     If LCase(Mid(IconFilename, 1, 7)) <> "/cclib/" Then
-                        IconFilename = csv_getVirtualFileLink(db.config.cdnFilesNetprefix, IconFilename)
+                        IconFilename = csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, IconFilename)
                     End If
                     main_GetLoginLink = main_GetLoginLink & "<img alt=""Login"" src=""" & IconFilename & """ border=""0"" >"
                 End If
@@ -10586,7 +10342,7 @@ ErrorTrap:
                     '
                     ToolsPanel = ""
                     s = ""
-                    RenderTimeString = Format((GetTickCount - main_PageStartTickCount) / 1000, "0.000")
+                    RenderTimeString = Format((GetTickCount - constructorTickCount) / 1000, "0.000")
                     '
                     ' ----- Developer debug counters
                     '
@@ -10606,7 +10362,7 @@ ErrorTrap:
                     If main_ServerPagePrintVersion Then
                         autoPrintText = doc_getText("AutoPrint")
                         If autoPrintText = "" Then
-                            autoPrintText = db.siteProperty_getText("AllowAutoPrintDialog", "1")
+                            autoPrintText = siteProperties.getText("AllowAutoPrintDialog", "1")
                         End If
                         If EncodeBoolean(autoPrintText) Then
                             Call main_AddOnLoadJavascript2("window.print(); window.close()", "Print Page")
@@ -10616,7 +10372,7 @@ ErrorTrap:
                     ' -- print what is needed
                     '
                     If (Not BlockNonContentExtras) And (Not main_ServerPagePrintVersion) Then
-                        If main_IsContentManager() And userAllowToolsPanel Then
+                        If user.main_IsContentManager() And user.userAllowToolsPanel Then
                             If AllowTools Then
                                 s = s & main_GetToolsPanel()
                             End If
@@ -10636,7 +10392,7 @@ ErrorTrap:
                     ' ----- Popup USER errors
                     '
                     If (Not BlockNonContentExtras) And error_IsUserError() Then
-                        AllowPopupErrors = EncodeBoolean(db.siteProperty_getBoolean("AllowPopupErrors", True))
+                        AllowPopupErrors = EncodeBoolean(siteProperties.getBoolean("AllowPopupErrors", True))
                         If AllowPopupErrors Then
                             's = s & main_GetPopupMessage("<div style=""margin:20px;"">" & main_GetUserError() & "</div>", 300, 200, False)
                         End If
@@ -10652,8 +10408,8 @@ ErrorTrap:
                     '
                     ' ----- popup error if this is a developer
                     '
-                    If (Not BlockNonContentExtras) And user_isDeveloper() Then
-                        AllowPopupTraps = EncodeBoolean(db.siteProperty_getBoolean("AllowPopupTraps", True))
+                    If (Not BlockNonContentExtras) And user.user_isDeveloper() Then
+                        AllowPopupTraps = EncodeBoolean(siteProperties.getBoolean("AllowPopupTraps", True))
                         If AllowPopupTraps Then
                             If main_PageErrorWithoutCsv Then
                                 main_TrapLogMessage = "" _
@@ -10740,7 +10496,7 @@ ErrorTrap:
                                     If Parts(1) <> "" Then
                                         headTags = headTags & cr & decodeHtml(Parts(1))
                                     End If
-                                    headTags = headTags & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, Parts(0)) & """ >"
+                                    headTags = headTags & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, Parts(0)) & """ >"
                                     If Parts(2) <> "" Then
                                         headTags = headTags & cr & decodeHtml(Parts(2))
                                     End If
@@ -10752,11 +10508,11 @@ ErrorTrap:
                     '
                     ' ----- Add Member Stylesheet if left over
                     '
-                    If userStyleFilename <> "" Then
-                        Copy = db.cdnFiles.ReadFile(userStyleFilename)
+                    If user.userStyleFilename <> "" Then
+                        Copy = cdnFiles.ReadFile(user.userStyleFilename)
                         headTags = headTags & cr & "<style type=""text/css"">" & Copy & "</style>"
                         'JS = JS & vbCrLf & vbTab & "cjAddHeadTag('<style type=""text/css"">" & Copy & "</style>');"
-                        userStyleFilename = ""
+                        user.userStyleFilename = ""
                     End If
                     '
                     ' ----- Add any left over head tags
@@ -11307,8 +11063,8 @@ ErrorTrap:
             '
             MethodName = "main_GetToolsPanel"
             '
-            If userAllowToolsPanel Then
-                ShowLegacyToolsPanel = (False) Or (EncodeBoolean(db.siteProperty_getBoolean("AllowLegacyToolsPanel", True)))
+            If user.userAllowToolsPanel Then
+                ShowLegacyToolsPanel = (False) Or (EncodeBoolean(siteProperties.getBoolean("AllowLegacyToolsPanel", True)))
                 '
                 ' --- Link Panel - used for both Legacy Tools Panel, and without it
                 '
@@ -11317,10 +11073,10 @@ ErrorTrap:
                 LinkPanel.Add("Contensive " & cp.Version() & " | ")
                 LinkPanel.Add(FormatDateTime(main_PageStartTime) & " | ")
                 LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""http://support.Contensive.com/"">Support</A> | ")
-                LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html_EncodeHTML(db.siteProperty_AdminURL) & """>Admin Home</A> | ")
+                LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html_EncodeHTML(siteProperties.adminURL) & """>Admin Home</A> | ")
                 LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html_EncodeHTML("http://" & main_ServerDomain) & """>Public Home</A> | ")
-                LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & html_EncodeHTML(db.siteProperty_AdminURL & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
-                If EncodeBoolean(db.siteProperty_getBoolean("AllowMobileTemplates", False)) Then
+                LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & html_EncodeHTML(siteProperties.adminURL & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
+                If EncodeBoolean(siteProperties.getBoolean("AllowMobileTemplates", False)) Then
                     If main_VisitBrowserIsMobile Then
                         QS = web_RefreshQueryString
                         QS = ModifyQueryString(QS, "method", "forcenonmobile")
@@ -11408,7 +11164,7 @@ ErrorTrap:
                         '
                         helpLink = ""
                         'helpLink = main_GetHelpLink(9, "Enable Workflow Rendering", "Control the display of workflow rendering. With workflow rendering enabled, any changes saved to content records that have not been published will be visible for your review.")
-                        If db.siteProperty_AllowWorkflowAuthoring Then
+                        If siteProperties.allowWorkflowAuthoring Then
                             iValueBoolean = main_VisitProperty_AllowWorkflowRendering
                             Tag = html_GetFormInputCheckBox2(WorkflowTagID, iValueBoolean, WorkflowTagID)
                             OptionsPanel = OptionsPanel _
@@ -11427,14 +11183,14 @@ ErrorTrap:
                         '
                         ' Create Path Block Row
                         '
-                        If user_isDeveloper() Then
+                        If user.user_isDeveloper() Then
                             TagID = "CreatePathBlock"
-                            If db.siteProperty_AllowPathBlocking Then
+                            If siteProperties.allowPathBlocking Then
                                 '
                                 ' Path blocking allowed
                                 '
                                 'OptionsPanel = OptionsPanel & SpanClassAdminSmall & "<LABEL for=""" & TagID & """>"
-                                CS = db.db_csOpen("Paths", "name=" & db.db_EncodeSQLText("/" & web_requestAppPath), , , , , , "ID")
+                                CS = db.db_csOpen("Paths", "name=" & db.encodeSQLText(web_requestPath), , , , , , "ID")
                                 If db.db_csOk(CS) Then
                                     PathID = (db.db_GetCSInteger(CS, "ID"))
                                 End If
@@ -11443,12 +11199,12 @@ ErrorTrap:
                                     '
                                     ' Path is blocked
                                     '
-                                    Tag = html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [/" & web_requestAppPath & "] [<a href=""" & html_EncodeHTML(db.siteProperty_AdminURL & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & main_GetContentID("paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
+                                    Tag = html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [" & web_requestPath & "] [<a href=""" & html_EncodeHTML(siteProperties.adminURL & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & main_GetContentID("paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
                                 Else
                                     '
                                     ' Path is not blocked
                                     '
-                                    Tag = html_GetFormInputCheckBox2(TagID, False, TagID) & "&nbsp;Block this path [/" & web_requestAppPath & "]</LABEL>"
+                                    Tag = html_GetFormInputCheckBox2(TagID, False, TagID) & "&nbsp;Block this path [" & web_requestPath & "]</LABEL>"
                                 End If
                                 helpLink = ""
                                 'helpLink = main_GetHelpLink(10, "Enable Debugging", "Debugging is a developer only debugging tool. With Debugging enabled, ccLib.TestPoints(...) will print, ErrorTrapping will be displayed, redirections are blocked, and more.")
@@ -11470,10 +11226,10 @@ ErrorTrap:
                     '
                     ' ----- Create the Login Panel
                     '
-                    If Trim(userName) = "" Then
-                        Copy = "You are logged in as member #" & userId & "."
+                    If Trim(user.userName) = "" Then
+                        Copy = "You are logged in as member #" & user.userId & "."
                     Else
-                        Copy = "You are logged in as " & userName & "."
+                        Copy = "You are logged in as " & user.userName & "."
                     End If
                     LoginPanel = LoginPanel & "" _
                         & cr & "<div class=""ccAdminSmall"">" _
@@ -11483,7 +11239,7 @@ ErrorTrap:
                     ' Username
                     '
                     Dim Caption As String
-                    If EncodeBoolean(db.siteProperty_getBoolean("allowEmailLogin", False)) Then
+                    If EncodeBoolean(siteProperties.getBoolean("allowEmailLogin", False)) Then
                         Caption = "Username&nbsp;or&nbsp;Email"
                     Else
                         Caption = "Username"
@@ -11496,7 +11252,7 @@ ErrorTrap:
                     '
                     ' Username
                     '
-                    If EncodeBoolean(db.siteProperty_getBoolean("allownopasswordLogin", False)) Then
+                    If EncodeBoolean(siteProperties.getBoolean("allownopasswordLogin", False)) Then
                         Caption = "Password&nbsp;(optional)"
                     Else
                         Caption = "Password"
@@ -11509,7 +11265,7 @@ ErrorTrap:
                     '
                     ' Autologin checkbox
                     '
-                    If EncodeBoolean(db.siteProperty_getBoolean("AllowAutoLogin", False)) Then
+                    If EncodeBoolean(siteProperties.getBoolean("AllowAutoLogin", False)) Then
                         If main_VisitCookieSupport Then
                             TagID = "autologin"
                             LoginPanel = LoginPanel & "" _
@@ -11564,9 +11320,9 @@ ErrorTrap:
                     LinkPanel.Add("Contensive " & cp.Version() & " | ")
                     LinkPanel.Add(FormatDateTime(main_PageStartTime) & " | ")
                     LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""http: //support.Contensive.com/"">Support</A> | ")
-                    LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html_EncodeHTML(db.siteProperty_AdminURL) & """>Admin Home</A> | ")
+                    LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html_EncodeHTML(siteProperties.adminURL) & """>Admin Home</A> | ")
                     LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html_EncodeHTML("http://" & main_ServerDomain) & """>Public Home</A> | ")
-                    LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & html_EncodeHTML(db.siteProperty_AdminURL & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
+                    LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & html_EncodeHTML(siteProperties.adminURL & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
                     LinkPanel.Add("</span>")
                     '
                     '
@@ -11581,8 +11337,8 @@ ErrorTrap:
                         & cr2 & "</tr>"
                     '
                     DebugPanel = DebugPanel & main_DebugPanelRow("DOM", "<a class=""ccAdminLink"" href=""/cclib/clientside/DOMViewer.htm"" target=""_blank"">Click</A>")
-                    DebugPanel = DebugPanel & main_DebugPanelRow("Trap Errors", html_EncodeHTML(db.siteProperty_trapErrors.ToString))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("Trap Email", html_EncodeHTML(db.siteProperty_getText("TrapEmail")))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Trap Errors", html_EncodeHTML(siteProperties.trapErrors.ToString))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Trap Email", html_EncodeHTML(siteProperties.getText("TrapEmail")))
                     DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerLink", html_EncodeHTML(main_ServerLink))
                     DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerDomain", html_EncodeHTML(main_ServerDomain))
                     DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerProtocol", html_EncodeHTML(web_requestProtocol))
@@ -11625,31 +11381,30 @@ ErrorTrap:
                         Copy = Mid(Copy, 8)
                     End If
                     DebugPanel = DebugPanel & main_DebugPanelRow("ServerForm", Copy)
-                    DebugPanel = DebugPanel & main_DebugPanelRow("ServerAppRootPath", html_EncodeHTML(db.RootWebPath))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("ServerAppPath", html_EncodeHTML(web_requestAppPath))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("serverFilePath", html_EncodeHTML(db.config.cdnFilesNetprefix))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("ServerReferrer", html_EncodeHTML(web.requestReferrer))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("ServerCookies", html_EncodeHTML(web.requestCookies))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("VisitId", "<a href=""" & db.siteProperty_AdminURL & "?cid=" & main_GetContentID("visits") & "&af=4&id=" & main_VisitId & """>" & main_VisitId & "</a>")
-                    DebugPanel = DebugPanel & main_DebugPanelRow("VisitStartDateValue", EncodeText(main_VisitStartDateValue))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("VisitStartTime", EncodeText(main_VisitStartTime))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("VisitLastTime", EncodeText(main_VisitLastTime))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("VisitCookieSupport", EncodeText(main_VisitCookieSupport))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("VisitPages", EncodeText(main_VisitPages))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("VisitorID", "<a href=""" & db.siteProperty_AdminURL & "?cid=" & main_GetContentID("visitors") & "&af=4&id=" & main_VisitorID & """>" & main_VisitorID & "</a>")
-                    DebugPanel = DebugPanel & main_DebugPanelRow("VisitorNew", EncodeText(main_VisitorNew))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("MemberID", "<a href=""" & db.siteProperty_AdminURL & "?cid=" & main_GetContentID("people") & "&af=4&id=" & userId & """>" & userId & "</a>")
-                    DebugPanel = DebugPanel & main_DebugPanelRow("MemberName", html_EncodeHTML(userName))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("MemberNew", EncodeText(userIsNew))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("Member Language", userLanguage)
-                    DebugPanel = DebugPanel & main_DebugPanelRow("Page", "<a href=""" & db.siteProperty_AdminURL & "?cid=" & main_GetContentID("page content") & "&af=4&id=" & main_RenderedPageID & """>" & main_RenderedPageID & ", " & main_RenderedPageName & "</a>")
-                    DebugPanel = DebugPanel & main_DebugPanelRow("Section", "<a href=""" & db.siteProperty_AdminURL & "?cid=" & main_GetContentID("site sections") & "&af=4&id=" & main_RenderedSectionID & """>" & main_RenderedSectionID & ", " & main_RenderedSectionName & "</a>")
-                    DebugPanel = DebugPanel & main_DebugPanelRow("Template", "<a href=""" & db.siteProperty_AdminURL & "?cid=" & main_GetContentID("page templates") & "&af=4&id=" & main_RenderedTemplateID & """>" & main_RenderedTemplateID & ", " & main_RenderedTemplateName & "</a>")
-                    DebugPanel = DebugPanel & main_DebugPanelRow("Domain", "<a href=""" & db.siteProperty_AdminURL & "?cid=" & main_GetContentID("domains") & "&af=4&id=" & domainDetails.id & """>" & domainDetails.id & ", " & main_ServerDomain & "</a>")
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Request Path", html_EncodeHTML(web_requestPath))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("CDN Files Path", html_EncodeHTML(appConfig.cdnFilesNetprefix))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Referrer", html_EncodeHTML(web.requestReferrer))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Cookies", html_EncodeHTML(web.requestCookies))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Visit Id", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("visits") & "&af=4&id=" & main_VisitId & """>" & main_VisitId & "</a>")
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Visit Start Date", EncodeText(main_VisitStartDateValue))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Visit Start Time", EncodeText(main_VisitStartTime))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Visit Last Time", EncodeText(main_VisitLastTime))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Visit Cookies Supported", EncodeText(main_VisitCookieSupport))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Visit Pages", EncodeText(main_VisitPages))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Visitor ID", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("visitors") & "&af=4&id=" & main_VisitorID & """>" & main_VisitorID & "</a>")
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Visitor New", EncodeText(main_VisitorNew))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Member ID", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("people") & "&af=4&id=" & user.userId & """>" & user.userId & "</a>")
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Member Name", html_EncodeHTML(user.userName))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Member New", EncodeText(user.userIsNew))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Member Language", user.userLanguage)
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Page", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("page content") & "&af=4&id=" & main_RenderedPageID & """>" & main_RenderedPageID & ", " & main_RenderedPageName & "</a>")
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Section", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("site sections") & "&af=4&id=" & main_RenderedSectionID & """>" & main_RenderedSectionID & ", " & main_RenderedSectionName & "</a>")
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Template", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("page templates") & "&af=4&id=" & main_RenderedTemplateID & """>" & main_RenderedTemplateID & ", " & main_RenderedTemplateName & "</a>")
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Domain", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("domains") & "&af=4&id=" & domainDetails.id & """>" & domainDetails.id & ", " & main_ServerDomain & "</a>")
                     DebugPanel = DebugPanel & main_DebugPanelRow("Template Reason", pageManager_TemplateReason)
                     DebugPanel = DebugPanel & main_DebugPanelRow("ProcessID", GetProcessID.ToString())
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Krnl ProcessID", encodeText(csv_HostServiceProcessID))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("Render Time &gt;= ", Format((GetTickCount - main_PageStartTickCount) / 1000, "0.000") & " sec")
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Render Time &gt;= ", Format((GetTickCount - constructorTickCount) / 1000, "0.000") & " sec")
                     If True Then
                         VisitHrs = CInt(main_VisitTimeToLastHit / 3600)
                         VisitMin = CInt(main_VisitTimeToLastHit / 60) - (60 * VisitHrs)
@@ -11801,7 +11556,7 @@ ErrorTrap:
                     '
                     ' ----- Set authoring only for valid ContentName
                     '
-                    IsEditingLocal = user_isEditing(iContentName)
+                    IsEditingLocal = user.user_isEditing(iContentName)
                 Else
                     '
                     ' ----- if iContentName was bad, maybe they put table in, no authoring
@@ -11819,7 +11574,7 @@ ErrorTrap:
                                 SeeAlsoLink = web_requestProtocol & SeeAlsoLink
                             End If
                             If IsEditingLocal Then
-                                main_GetSeeAlso = main_GetSeeAlso & main_GetRecordEditLink2("See Also", (db.db_GetCSInteger(CS, "ID")), False, "", user_isEditing("See Also"))
+                                main_GetSeeAlso = main_GetSeeAlso & main_GetRecordEditLink2("See Also", (db.db_GetCSInteger(CS, "ID")), False, "", user.user_isEditing("See Also"))
                             End If
                             main_GetSeeAlso = main_GetSeeAlso & "<a href=""" & html_EncodeHTML(SeeAlsoLink) & """ target=""_blank"">" & (db.db_GetCSText(CS, "Name")) & "</A>"
                             Copy = (db.db_GetCSText(CS, "Brief"))
@@ -11954,7 +11709,7 @@ ErrorTrap:
                     Copy = "[the content of this page is not available]" & BR
                     If db.db_csOk(CS) Then
                         Copy = (db.db_GetCS(CS, "copyFilename"))
-                        'Copy = main_EncodeContent5(Copy, userId, iContentName, iRecordID, 0, False, False, True, True, False, True, "", "", False, 0)
+                        'Copy = main_EncodeContent5(Copy, user.userid, iContentName, iRecordID, 0, False, False, True, True, False, True, "", "", False, 0)
                     End If
                     NoteCopy = NoteCopy & Copy & BR
                     Call db.db_csClose(CS)
@@ -11976,14 +11731,14 @@ ErrorTrap:
                     '
                     ' ----- From Name
                     '
-                    Copy = userName
+                    Copy = user.userName
                     Panel = Panel & "<td align=""right"" width=""100""><p>Your Name</p></td>"
                     Panel = Panel & "<td align=""left""><input type=""text"" name=""NoteFromName"" value=""" & html_EncodeHTML(Copy) & """></span></td>"
                     Panel = Panel & "</tr><tr>"
                     '
                     ' ----- From Email address
                     '
-                    Copy = userEmail
+                    Copy = user.userEmail
                     Panel = Panel & "<td align=""right"" width=""100""><p>Your Email</p></td>"
                     Panel = Panel & "<td align=""left""><input type=""text"" name=""NoteFromEmail"" value=""" & html_EncodeHTML(Copy) & """></span></td>"
                     Panel = Panel & "</tr><tr>"
@@ -12089,7 +11844,7 @@ ErrorTrap:
                 & " FROM (ccContentWatchLists" _
                     & " LEFT JOIN ccContentWatchListRules ON ccContentWatchLists.ID = ccContentWatchListRules.ContentWatchListID)" _
                     & " LEFT JOIN ccContentWatch ON ccContentWatchListRules.ContentWatchID = ccContentWatch.ID" _
-                & " WHERE (((ccContentWatchLists.Name)=" & db.db_EncodeSQLText(ListName) & ")" _
+                & " WHERE (((ccContentWatchLists.Name)=" & db.encodeSQLText(ListName) & ")" _
                     & "AND ((ccContentWatchLists.Active)<>0)" _
                     & "AND ((ccContentWatchListRules.Active)<>0)" _
                     & "AND ((ccContentWatch.Active)<>0)" _
@@ -12103,7 +11858,7 @@ ErrorTrap:
                 '
                 ' Check if listname exists
                 '
-                CS = db.db_csOpen("Content Watch Lists", "name=" & db.db_EncodeSQLText(ListName), "ID", , , , , "ID")
+                CS = db.db_csOpen("Content Watch Lists", "name=" & db.encodeSQLText(ListName), "ID", , , , , "ID")
                 If Not db.db_csOk(CS) Then
                     Call db.db_csClose(CS)
                     CS = db.db_csInsertRecord("Content Watch Lists")
@@ -12173,111 +11928,6 @@ ErrorTrap:
         End Function
         '
         '========================================================================
-        ' Member Open
-        '   Attempts to open the Member record based on the iRecordID
-        '   If successful, MemberID is set to the iRecordID
-        '========================================================================
-        '
-        Public Sub main_OpenMember(RecordID As Integer)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("OpenMember")
-            '
-            'If Not (true) Then Exit Sub
-            '
-            Dim CS As Integer
-            Dim MethodName As String
-            Dim iRecordID As Integer
-            '
-            iRecordID = EncodeInteger(RecordID)
-            '
-            MethodName = "main_OpenMember"
-            '
-            If iRecordID <> 0 Then
-                '
-                ' attempt to read in Member record if logged on
-                ' dont just do main_CheckMember() -- in case a pretty login is needed
-                '
-                CS = db_csOpenRecord("People", iRecordID)
-                If Not db.db_csOk(CS) Then
-                Else
-                    userId = (db.db_GetCSInteger(CS, "ID"))
-                    userName = (db.db_GetCSText(CS, "Name"))
-                    userIsDeveloper = (db.db_GetCSBoolean(CS, "Developer"))
-                    userIsAdmin = (db.db_GetCSBoolean(CS, "Admin"))
-                    userContentControlID = (db.db_GetCSInteger(CS, "ContentControlID"))
-                    userOrganizationId = (db.db_GetCSInteger(CS, "OrganizationID"))
-                    userLanguageId = (db.db_GetCSInteger(CS, "LanguageID"))
-                    userLanguage = (main_GetCSEncodedField(CS, "LanguageID"))
-                    '
-                    '  main_MemberCompany = main_GetCSField_Internal(CS, "Company")
-                    '  main_MemberTitle = main_GetCSField_Internal(CS, "Title")
-                    '  main_MemberAddress = main_GetCSField_Internal(CS, "Address")
-                    '  main_MemberCity = main_GetCSField_Internal(CS, "City")
-                    '  main_MemberState = main_GetCSField_Internal(CS, "State")
-                    '  main_MemberZip = main_GetCSField_Internal(CS, "Zip")
-                    '  main_MemberCountry = main_GetCSField_Internal(CS, "Country")
-                    '  MemberEmail = main_GetCSField_Internal(CS, "Email")
-                    '  main_MemberPhone = main_GetCSField_Internal(CS, "Phone")
-                    '
-                    main_MemberShipName = (db.db_GetCSText(CS, "ShipName"))
-                    main_MemberShipCompany = (db.db_GetCSText(CS, "ShipCompany"))
-                    main_MemberShipAddress = (db.db_GetCSText(CS, "ShipAddress"))
-                    main_MemberShipCity = (db.db_GetCSText(CS, "ShipCity"))
-                    main_MemberShipState = (db.db_GetCSText(CS, "ShipState"))
-                    main_MemberShipZip = (db.db_GetCSText(CS, "ShipZip"))
-                    main_MemberShipCountry = (db.db_GetCSText(CS, "ShipCountry"))
-                    main_MemberShipPhone = (db.db_GetCSText(CS, "ShipPhone"))
-                    '
-                    main_MemberBillCompany = (db.db_GetCSText(CS, "BillCompany"))
-                    main_MemberBillAddress = (db.db_GetCSText(CS, "BillAddress"))
-                    main_MemberBillCity = (db.db_GetCSText(CS, "BillCity"))
-                    main_MemberBillState = (db.db_GetCSText(CS, "BillState"))
-                    main_MemberBillZip = (db.db_GetCSText(CS, "BillZip"))
-                    main_MemberBillCountry = (db.db_GetCSText(CS, "BillCountry"))
-                    user_billEmail = (db.db_GetCSText(CS, "BillEmail"))
-                    user_billPhone = (db.db_GetCSText(CS, "BillPhone"))
-                    user_billFax = (db.db_GetCSText(CS, "BillFax"))
-                    '
-                    user_allowBulkEmail = (db.db_GetCSBoolean(CS, "AllowBulkEmail"))
-                    userAllowToolsPanel = (db.db_GetCSBoolean(CS, "AllowToolsPanel"))
-                    user_adminMenuModeID = (db.db_GetCSInteger(CS, "AdminMenuModeID"))
-                    user_autoLogin = (db.db_GetCSBoolean(CS, "AutoLogin"))
-                    ' 6/18/2009 - removed notes from base
-                    '            MemberSendNotes = (app.csv_GetCSBoolean(CS, "SendNotes"))
-                    '
-                    If True Then
-                        userStyleFilename = db.db_GetCSText(CS, "StyleFilename")
-                        If userStyleFilename <> "" Then
-                            Call main_AddStylesheetLink(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, userStyleFilename))
-                        End If
-                    End If
-                    If True Then
-                        userExcludeFromAnalytics = db.db_GetCSBoolean(CS, "ExcludeFromAnalytics")
-                    End If
-                    '
-                    '
-                    ' Removed
-                    '
-                    '  Member_AllowLinkAuthoring = (app.csv_GetCSBoolean(CS, "AllowAdminLinks"))
-                    '  main_MemberVisits = main_GetCSField_Internal(CS, "Visits")
-                    '  main_MemberLastVisit = main_GetCSField_Internal(CS, "LastVisit")
-                    '  MemberActive = main_GetCSField_Internal(CS, "Active")
-                    '  main_MemberUsername = main_GetCSField_Internal(CS, "username")
-                    '  main_MemberPassword = main_GetCSField_Internal(CS, "Password")
-                    '
-                End If
-                Call db.db_csClose(CS)
-            End If
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18(MethodName)
-            '
-        End Sub
-        '
-        '========================================================================
         '   Print the login form in an intercept page
         '========================================================================
         '
@@ -12305,7 +11955,7 @@ ErrorTrap:
             If forceDefaultLogin Then
                 Body = main_GetLoginForm_Default()
             Else
-                Body = user_GetLoginForm()
+                Body = user.user_GetLoginForm()
             End If
             Body = "" _
                 & cr & "<p class=""ccAdminNormal"">You are attempting to enter an access controlled area. Continue only if you have authority to enter this area. Information about your visit will be recorded for security purposes.</p>" _
@@ -12379,7 +12029,7 @@ ErrorTrap:
             needLoginForm = True
             formType = doc_getText("type")
             If formType = FormTypeLogin Then
-                If user_ProcessLoginFormDefault() Then
+                If user.user_ProcessLoginFormDefault() Then
                     returnHtml = ""
                     needLoginForm = False
                 End If
@@ -12394,7 +12044,7 @@ ErrorTrap:
                 '
                 ' ----- Error Messages
                 '
-                If EncodeBoolean(db.siteProperty_getBoolean("allowEmailLogin", False)) Then
+                If EncodeBoolean(siteProperties.getBoolean("allowEmailLogin", False)) Then
                     usernameMsg = "<b>To login, enter your username or email address with your password.</b></p>"
                 Else
                     usernameMsg = "<b>To login, enter your username and password.</b></p>"
@@ -12406,7 +12056,7 @@ ErrorTrap:
                 '
                 ' ----- Username
                 '
-                If EncodeBoolean(db.siteProperty_getBoolean("allowEmailLogin", False)) Then
+                If EncodeBoolean(siteProperties.getBoolean("allowEmailLogin", False)) Then
                     Caption = "Username&nbsp;or&nbsp;Email"
                 Else
                     Caption = "Username"
@@ -12415,12 +12065,12 @@ ErrorTrap:
                 loginForm = loginForm _
                     & cr & "<tr>" _
                     & cr2 & "<td style=""text-align:right;vertical-align:middle;width:30%;padding:4px"" align=""right"" width=""30%"">" & SpanClassAdminNormal & Caption & "&nbsp;</span></td>" _
-                    & cr2 & "<td style=""text-align:left;vertical-align:middle;width:70%;padding:4px"" align=""left""  width=""70%""><input ID=""LoginUsernameInput"" NAME=""" & "username"" VALUE=""" & html_EncodeHTML(loginForm_Username) & """ SIZE=""20"" MAXLENGTH=""50"" ></td>" _
+                    & cr2 & "<td style=""text-align:left;vertical-align:middle;width:70%;padding:4px"" align=""left""  width=""70%""><input ID=""LoginUsernameInput"" NAME=""" & "username"" VALUE=""" & html_EncodeHTML(user.loginForm_Username) & """ SIZE=""20"" MAXLENGTH=""50"" ></td>" _
                     & cr & "</tr>"
                 '
                 ' ----- Password
                 '
-                If EncodeBoolean(db.siteProperty_getBoolean("allowNoPasswordLogin", False)) Then
+                If EncodeBoolean(siteProperties.getBoolean("allowNoPasswordLogin", False)) Then
                     Caption = "Password&nbsp;(optional)"
                 Else
                     Caption = "Password"
@@ -12434,7 +12084,7 @@ ErrorTrap:
                 '
                 ' ----- autologin support
                 '
-                If EncodeBoolean(db.siteProperty_getBoolean("AllowAutoLogin", False)) Then
+                If EncodeBoolean(siteProperties.getBoolean("AllowAutoLogin", False)) Then
                     loginForm = loginForm _
                         & cr & "<tr>" _
                         & cr2 & "<td align=""right"">&nbsp;</td>" _
@@ -12460,7 +12110,7 @@ ErrorTrap:
                     & ""
                 loginForm = loginForm _
                     & html_GetFormInputHidden("Type", FormTypeLogin) _
-                    & html_GetFormInputHidden("email", loginForm_Email) _
+                    & html_GetFormInputHidden("email", user.loginForm_Email) _
                     & main_GetPanelButtons(ButtonLogin, "Button") _
                     & ""
                 loginForm = "" _
@@ -12485,12 +12135,12 @@ ErrorTrap:
                 '
                 ' ----- Password Form
                 '
-                If EncodeBoolean(db.siteProperty_getBoolean("allowPasswordEmail", True)) Then
+                If EncodeBoolean(siteProperties.getBoolean("allowPasswordEmail", True)) Then
                     Panel = "" _
                         & Panel _
                         & cr & "<p class=""ccAdminNormal""><b>Forget your password?</b></p>" _
                         & cr & "<p class=""ccAdminNormal"">If you are a member of the system and can not remember your password, enter your email address below and we will email your matching username and password.</p>" _
-                        & user_GetSendPasswordForm() _
+                        & user.user_GetSendPasswordForm() _
                         & ""
                 End If
                 '
@@ -12534,7 +12184,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function main_GetLoginPanel() As String
-            main_GetLoginPanel = user_GetLoginForm()
+            main_GetLoginPanel = user.user_GetLoginForm()
         End Function
         '
         '========================================================================
@@ -12553,7 +12203,7 @@ ErrorTrap:
             '
             MethodName = "main_CheckMember"
             '
-            If Not user_isAuthenticated() Then
+            If Not user.user_isAuthenticated() Then
                 Call writeAltBuffer(main_GetLoginPage2(False))
                 Call main_CloseStream()
             End If
@@ -12606,7 +12256,7 @@ ErrorTrap:
                 '
                 ' ----- check if the iUsername is in use (con not use main_OpenContent because active tested)
                 '
-                CS = db.db_csOpen("People", "(Username=" & db.db_EncodeSQLText(iUsername) & ")", , False)
+                CS = db.db_csOpen("People", "(Username=" & db.encodeSQLText(iUsername) & ")", , False)
                 If db.db_csOk(CS) Then
                     '
                     ' ----- iUsername is taken
@@ -12618,9 +12268,9 @@ ErrorTrap:
                     '
                     ' ----- Create the new people with whatever you got
                     '
-                    Call user_CreateUser()
+                    Call user.user_CreateUser()
                     '
-                    CSPointer = db.db_csOpen("people", "ID=" & db.db_EncodeSQLNumber(userId))
+                    CSPointer = db.db_csOpen("people", "ID=" & db.db_EncodeSQLNumber(user.userId))
                     If db.db_csOk(CSPointer) Then
                         Call db.db_setCS(CSPointer, "Username", iUsername)
                         Call db.db_setCS(CSPointer, "password", iPassword)
@@ -12628,206 +12278,10 @@ ErrorTrap:
                         Call db.db_setCS(CSPointer, "ContentControlID", main_GetContentID("Members"))
                     End If
                     Call db.db_csClose(CSPointer)
-                    main_CreateMember = userId
+                    main_CreateMember = user.userId
                 End If
             End If
             '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18(MethodName)
-            '
-        End Function
-        '
-        '=============================================================================
-        '   main_SaveMember()
-        '       Saves the member properties that are loaded during main_OpenMember
-        '=============================================================================
-        '
-        Public Sub user_SaveMember()
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SaveMember")
-            '
-            'If Not (true) Then Exit Sub
-            '
-            Dim SQL As String
-            Dim CS As Integer
-            Dim MethodName As String
-            '
-            MethodName = "main_SaveMember"
-            '
-            If visit_initialized Then
-                If (userId > 0) Then
-                    SQL = "UPDATE ccMembers SET " _
-                        & " Name=" & db.db_EncodeSQLText(userName) _
-                        & ",username=" & db.db_EncodeSQLText(userUsername) _
-                        & ",email=" & db.db_EncodeSQLText(userEmail) _
-                        & ",password=" & db.db_EncodeSQLText(userPassword) _
-                        & ",OrganizationID=" & db.db_EncodeSQLNumber(userOrganizationId) _
-                        & ",LanguageID=" & db.db_EncodeSQLNumber(userLanguageId) _
-                        & ",Active=" & db.db_EncodeSQLBoolean(user_Active) _
-                        & ",Company=" & db.db_EncodeSQLText(user_company) _
-                        & ",Visits=" & db.db_EncodeSQLNumber(user_visits) _
-                        & ",LastVisit=" & db.db_EncodeSQLDate(user_lastVisit) _
-                        & ",AllowBulkEmail=" & db.db_EncodeSQLBoolean(user_allowBulkEmail) _
-                        & ",AdminMenuModeID=" & db.db_EncodeSQLNumber(user_adminMenuModeID) _
-                        & ",AutoLogin=" & db.db_EncodeSQLBoolean(user_autoLogin)
-                    ' 6/18/2009 - removed notes from base
-                    '           & ",SendNotes=" & encodeSQLBoolean(MemberSendNotes)
-                    SQL &= "" _
-                        & ",BillEmail=" & db.db_EncodeSQLText(user_billEmail) _
-                        & ",BillPhone=" & db.db_EncodeSQLText(user_billPhone) _
-                        & ",BillFax=" & db.db_EncodeSQLText(user_billFax) _
-                        & ",BillCompany=" & db.db_EncodeSQLText(main_MemberBillCompany) _
-                        & ",BillAddress=" & db.db_EncodeSQLText(main_MemberBillAddress) _
-                        & ",BillCity=" & db.db_EncodeSQLText(main_MemberBillCity) _
-                        & ",BillState=" & db.db_EncodeSQLText(main_MemberBillState) _
-                        & ",BillZip=" & db.db_EncodeSQLText(main_MemberBillZip) _
-                        & ",BillCountry=" & db.db_EncodeSQLText(main_MemberBillCountry)
-                    SQL &= "" _
-                        & ",ShipName=" & db.db_EncodeSQLText(main_MemberShipName) _
-                        & ",ShipCompany=" & db.db_EncodeSQLText(main_MemberShipCompany) _
-                        & ",ShipAddress=" & db.db_EncodeSQLText(main_MemberShipAddress) _
-                        & ",ShipCity=" & db.db_EncodeSQLText(main_MemberShipCity) _
-                        & ",ShipState=" & db.db_EncodeSQLText(main_MemberShipState) _
-                        & ",ShipZip=" & db.db_EncodeSQLText(main_MemberShipZip) _
-                        & ",ShipCountry=" & db.db_EncodeSQLText(main_MemberShipCountry) _
-                        & ",ShipPhone=" & db.db_EncodeSQLText(main_MemberShipPhone)
-                    If True Then
-                        SQL &= ",ExcludeFromAnalytics=" & db.db_EncodeSQLBoolean(userExcludeFromAnalytics)
-                    End If
-                    SQL &= " WHERE ID=" & userId & ";"
-                    Call db.executeSql(SQL)
-                End If
-            End If
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18(MethodName)
-            '
-        End Sub
-        '
-        '=============================================================================
-        '------- 9/3/2012
-        '   main_GetLoginForm - returns either the default login form, or the one selected
-        '   main_GetLoginPanel - just returns main_GetLoginForm
-        '   main_GetLoginPage - wraps main_GetLoginForm
-        '=============================================================================
-        '
-        Public Function user_GetLoginForm() As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetLoginForm")
-            '
-            Dim loginAddonID As Integer
-            Dim returnHtml As String
-            Dim isAddonOk As Boolean
-            Dim QS As String
-            '
-            loginAddonID = EncodeInteger(db.siteProperty_getText("Login Page AddonID", "0"))
-            If loginAddonID <> 0 Then
-                '
-                ' Custom Login
-                '
-                returnHtml = executeAddon_legacy2(loginAddonID, "", "", addonContextEnum.ContextPage, "", 0, "", "", False, 0, "", isAddonOk, Nothing)
-                If Not isAddonOk Then
-                    loginAddonID = 0
-                ElseIf (returnHtml = "") And (isAddonOk) Then
-                    '
-                    ' login successful, redirect back to this page (without a method)
-                    '
-                    QS = web_RefreshQueryString
-                    QS = ModifyQueryString(QS, "method", "")
-                    QS = ModifyQueryString(QS, "RequestBinary", "")
-                    '
-                    Call web_Redirect2("?" & QS, "Login form success", False)
-                End If
-            End If
-            If loginAddonID = 0 Then
-                '
-                ' ----- When page loads, set focus on login username
-                '
-                returnHtml = main_GetLoginForm_Default()
-            End If
-            '
-            user_GetLoginForm = returnHtml
-            '
-            Exit Function
-            '
-ErrorTrap:
-            Call handleLegacyError18("main_GetLoginForm")
-        End Function
-        '
-        '=============================================================================
-        ' Print a simple email password form
-        '=============================================================================
-        '
-        Public Function user_GetSendPasswordForm() As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetSendPasswordForm")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim s As String
-            Dim RequestElementVariant As Object
-            Dim MethodName As String
-            Dim ButtonList As String
-            Dim ButtonPanel As String
-            Dim QueryString As String
-            Dim Pointer As Integer
-            '
-            MethodName = "main_GetSendPasswordForm"
-            '
-            If EncodeBoolean(db.siteProperty_getBoolean("allowPasswordEmail", True)) Then
-                s = "" _
-                    & cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"">" _
-                    & cr2 & "<tr>" _
-                    & cr3 & "<td style=""text-align:right;vertical-align:middle;width:30%;padding:4px"" align=""right"" width=""30%"">" & SpanClassAdminNormal & "Email</span></td>" _
-                    & cr3 & "<td style=""text-align:left;vertical-align:middle;width:70%;padding:4px"" align=""left""  width=""70%""><input NAME=""" & "email"" VALUE=""" & html_EncodeHTML(loginForm_Email) & """ SIZE=""20"" MAXLENGTH=""50""></td>" _
-                    & cr2 & "</tr>" _
-                    & cr2 & "<tr>" _
-                    & cr3 & "<td colspan=""2"">&nbsp;</td>" _
-                    & cr2 & "</tr>" _
-                    & cr2 & "<tr>" _
-                    & cr3 & "<td colspan=""2"">" _
-                    & kmaIndent(kmaIndent(main_GetPanelButtons(ButtonSendPassword, "Button"))) _
-                    & cr3 & "</td>" _
-                    & cr2 & "</tr>" _
-                    & cr & "</table>" _
-                    & ""
-                '
-                ' write out all of the form input (except state) to hidden fields so they can be read after login
-                '
-                '
-                s = "" _
-                    & s _
-                    & html_GetFormInputHidden("Type", FormTypeSendPassword) _
-                    & ""
-                If web_InStreamArrayCount > 0 Then
-                    For Pointer = 0 To web_InStreamArrayCount - 1
-                        With web_InStreamArray(Pointer)
-                            If .IsForm Then
-                                Select Case UCase(.Name)
-                                    Case "S", "MA", "MB", "USERNAME", "PASSWORD", "EMAIL"
-                                    Case Else
-                                        s = s & html_GetFormInputHidden(.Name, .Value)
-                                End Select
-                            End If
-                        End With
-                    Next
-                End If
-                '
-                QueryString = web_RefreshQueryString
-                QueryString = ModifyQueryString(QueryString, "S", "")
-                QueryString = ModifyQueryString(QueryString, "ccIPage", "")
-                s = "" _
-                    & main_GetFormStart(QueryString) _
-                    & kmaIndent(s) _
-                    & cr & "</form>" _
-                    & ""
-            End If
-            user_GetSendPasswordForm = s
             Exit Function
             '
             ' ----- Error Trap
@@ -12861,7 +12315,7 @@ ErrorTrap:
         '            '
         '            MethodName = "main_GetJoinForm"
         '            '
-        '            CSPeople = app.db_csOpen("people", "ID=" & userId)
+        '            CSPeople = app.db_csOpen("people", "ID=" & user.userid)
         '            If Not app.db_csOk(CSPeople) Then
         '                '
         '                ' ----- could not open people, can not continue
@@ -12869,7 +12323,7 @@ ErrorTrap:
         '                Call handleLegacyError14(MethodName, "main_GetJoinForm, could not open the guest identity")
         '            Else
         '                If True Then
-        '                    If user_isRecognized() And Not user_isAuthenticated() Then
+        '                    If user.user_isRecognized() And Not user.user_isAuthenticated() Then
         '                        '
         '                        ' ----- Recognized but Not authenticated
         '                        '
@@ -12959,7 +12413,7 @@ ErrorTrap:
         '            '
         '            MethodName = "main_GetMyProfileForm"
         '            '
-        '            If Not user_isAuthenticated() Then
+        '            If Not user.user_isAuthenticated() Then
         '                Call error_AddUserError("You can not edit your MyAccount page until you have logged in.")
         '            Else
         '                CSMember = main_OpenContent("People", "ID=" & app.db_EncodeSQLNumber(iPeopleID))
@@ -13036,7 +12490,7 @@ ErrorTrap:
         '                    If EncodeBoolean(app.siteProperty_getBoolean("AllowAutoLogin", False)) Then
         '                        s.Add(main_GetMyProfileForm_RowCS(CSMember, "People", "autologin", "This site allows automatic login. If this box is check, you will enable this function for your member account.", RowCount) & vbCrLf)
         '                    End If
-        '                    If main_IsContentManager() Then
+        '                    If user.main_IsContentManager() Then
         '                        s.Add(main_GetMyProfileForm_RowCS(CSMember, "People", "allowtoolspanel", "If checked, a tools panel appears at the bottom of every active page with acceStream to key administrative functions.", RowCount) & vbCrLf)
         '                    End If
         '                    s.Add(TableClose)
@@ -13065,7 +12519,7 @@ ErrorTrap:
         '                    '
         '                    s = New coreFastStringClass
         '                    s.Add(TableOpen)
-        '                    s.Add(main_GetMyProfileForm_Row("Member Number", EncodeText(userId)) & vbCrLf)
+        '                    s.Add(main_GetMyProfileForm_Row("Member Number", EncodeText(user.userid)) & vbCrLf)
         '                    s.Add(main_GetMyProfileForm_Row("Visitor Number", EncodeText(main_VisitorID)) & vbCrLf)
         '                    s.Add(main_GetMyProfileForm_Row("Visit Number", EncodeText(main_VisitId)) & vbCrLf)
         '                    CSLastVisit = app.db_csOpen("Visits", "MemberID=" & iPeopleID, "ID DESC")
@@ -13134,7 +12588,7 @@ ErrorTrap:
             '
             MethodName = "main_Get_old_MyProfileForm"
             '
-            If Not user_isAuthenticated() Then
+            If Not user.user_isAuthenticated() Then
                 Call error_AddUserError("You can not edit your MyAccount page until you have logged in.")
             Else
                 CSMember = main_OpenContent("People", "ID=" & db.db_EncodeSQLNumber(iPeopleID))
@@ -13211,10 +12665,10 @@ ErrorTrap:
                     ' 6/18/2009 - removed notes from base
                     '            Stream.Add( main_GetMyProfileForm_RowCS(CSMember, "People", "sendnotes", "If checked, notes sent to you as a site member will be emailed. Otherwise, they are available only when you have logged on.", RowCount) & vbcrlf )
                     Stream.Add(main_GetMyProfileForm_RowCS(CSMember, "People", "LanguageID", "", RowCount) & vbCrLf)
-                    If EncodeBoolean(db.siteProperty_getBoolean("AllowAutoLogin", False)) Then
+                    If EncodeBoolean(siteProperties.getBoolean("AllowAutoLogin", False)) Then
                         Stream.Add(main_GetMyProfileForm_RowCS(CSMember, "People", "autologin", "This site allows automatic login. If this box is check, you will enable this function for your member account.", RowCount) & vbCrLf)
                     End If
-                    If main_IsContentManager() Then
+                    If user.main_IsContentManager() Then
                         Stream.Add(main_GetMyProfileForm_RowCS(CSMember, "People", "allowtoolspanel", "If checked, a tools panel appears at the bottom of every active page with acceStream to key administrative functions.", RowCount) & vbCrLf)
                     End If
                     '
@@ -13236,7 +12690,7 @@ ErrorTrap:
                     ' ----- Records
                     '
                     Stream.Add("<tr><td colspan=""2"">" & SpanClassAdminNormal & "<b>Statistics</b></span><br ><img src=""/ccLib/images/black.gif"" width=""100%"" height=""1"" ></td></tr>" & vbCrLf)
-                    Stream.Add(main_GetMyProfileForm_Row("Member Number", EncodeText(userId)) & vbCrLf)
+                    Stream.Add(main_GetMyProfileForm_Row("Member Number", EncodeText(user.userId)) & vbCrLf)
                     Stream.Add(main_GetMyProfileForm_Row("Visitor Number", EncodeText(main_VisitorID)) & vbCrLf)
                     Stream.Add(main_GetMyProfileForm_Row("Visit Number", EncodeText(main_VisitId)) & vbCrLf)
                     CSLastVisit = db.db_csOpen("Visits", "MemberID=" & iPeopleID, "ID DESC")
@@ -13378,7 +12832,7 @@ ErrorTrap:
             '
             SQL = "SELECT ccTopics.Name as Name, Sum( ccTopicHabits.Score ) as Score" _
                 & " FROM ccTopics LEFT JOIN ccTopicHabits ON ccTopics.ID = ccTopicHabits.TopicID" _
-                & " WHERE (((ccTopics.Active)<>0) AND ((ccTopicHabits.MemberID)=" & userId & ")) OR (((ccTopics.Active)<>0) AND ((ccTopicHabits.MemberID) Is Null))" _
+                & " WHERE (((ccTopics.Active)<>0) AND ((ccTopicHabits.MemberID)=" & user.userId & ")) OR (((ccTopics.Active)<>0) AND ((ccTopicHabits.MemberID) Is Null))" _
                 & " Group By ccTopics.name" _
                 & " Order by ccTopics.Name"
             CS = db.db_csOpenSql(SQL)
@@ -13427,11 +12881,11 @@ ErrorTrap:
             '
             MethodName = "main_GetMyProfileForm_Groups"
             '
-            If Not user_isAdmin() Then
+            If Not user.user_isAdmin() Then
                 PublicJoinCriteria = "ccgroups.PublicJoin<>0"
             End If
             '
-            GroupList = main_GetFormInputCheckList("MemberRules", "People", userId, "Groups", "Member Rules", "MemberID", "GroupID", PublicJoinCriteria, "Caption")
+            GroupList = main_GetFormInputCheckList("MemberRules", "People", user.userId, "Groups", "Member Rules", "MemberID", "GroupID", PublicJoinCriteria, "Caption")
             If GroupList = "" Then
                 GroupList = "<div>There are no public groups</div>"
             End If
@@ -13470,7 +12924,7 @@ ErrorTrap:
                 '
                 ' ----- main_Get the Group ID
                 '
-                dt = db.executeSql("select top 1 id from ccGroups where name=" & db.db_EncodeSQLText(iGroupName))
+                dt = db.executeSql("select top 1 id from ccGroups where name=" & db.encodeSQLText(iGroupName))
                 If dt.Rows.Count > 0 Then
                     main_GetGroupID = EncodeInteger(dt.Rows(0).Item(0))
                 End If
@@ -13541,7 +12995,7 @@ ErrorTrap:
             '
             group_Add = -1
             Dim dt As DataTable
-            dt = db.executeSql("SELECT ID FROM ccgroups WHERE NAME=" & db.db_EncodeSQLText(iGroupName))
+            dt = db.executeSql("SELECT ID FROM ccgroups WHERE NAME=" & db.encodeSQLText(iGroupName))
             If dt.Rows.Count > 0 Then
                 group_Add = EncodeInteger(dt.Rows(0).Item(0))
             Else
@@ -13572,7 +13026,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Sub
             '
-            Call db.db_DeleteContentRecords("Groups", "name=" & db.db_EncodeSQLText(GroupName))
+            Call db.db_DeleteContentRecords("Groups", "name=" & db.encodeSQLText(GroupName))
             '
             Exit Sub
             '
@@ -13808,7 +13262,7 @@ ErrorTrap:
             '
             ' ----- Test if the page has been preloaded
             '
-            contentPage = main_GetHtmlBody_GetSection_GetContent(pageId, rootPageId, iContentName, iOrderByClause, AllowChildPageList, AllowReturnLink, False, 0, db.siteProperty_UseContentWatchLink, False)
+            contentPage = main_GetHtmlBody_GetSection_GetContent(pageId, rootPageId, iContentName, iOrderByClause, AllowChildPageList, AllowReturnLink, False, 0, siteProperties.useContentWatchLink, False)
             main_GetContentPage = main_GetEditWrapper(iContentName, contentPage)
             '
             ' ----- Redirect if required
@@ -13864,7 +13318,7 @@ ErrorTrap:
                 rootPageId = main_GetRecordID(iContentName, iRootPageName)
             End If
             '
-            main_GetContentPageArchive = main_GetHtmlBody_GetSection_GetContent(PageRecordID, rootPageId, iContentName, EncodeText(OrderByClause), True, True, True, 0, db.siteProperty_UseContentWatchLink, False)
+            main_GetContentPageArchive = main_GetHtmlBody_GetSection_GetContent(PageRecordID, rootPageId, iContentName, EncodeText(OrderByClause), True, True, True, 0, siteProperties.useContentWatchLink, False)
             '
             If pageManager_RedirectLink <> "" Then
                 Call web_Redirect2(pageManager_RedirectLink, "Redirecting due to a main_GetContentPageArchive condition. (" & pageManager_RedirectReason & ")", pageManager_RedirectBecausePageNotFound)
@@ -13907,7 +13361,7 @@ ErrorTrap:
             MenuStyleLocal = encodeEmptyInteger(MenuStyle, 1)
             StyleSheetPrefixLocal = encodeEmptyText(StyleSheetPrefix, "ccFlyout")
             IMenuImage = encodeEmptyText(MenuImage, "")
-            UseContentWatchLink = db.siteProperty_UseContentWatchLink
+            UseContentWatchLink = siteProperties.useContentWatchLink
             '
             main_GetContentPageMenu = main_GetSectionMenu_NameMenu(RootPageNameLocal, ContentNameLocal, PageLink, RootPageRecordID, DepthLimit, MenuStyleLocal, StyleSheetPrefixLocal, IMenuImage, IMenuImage, "", 0, UseContentWatchLink)
             '
@@ -13967,7 +13421,7 @@ ErrorTrap:
                     ContentControlID = (db.db_GetCSInteger(iCSPointer, "contentcontrolid"))
                     ContentName = main_GetContentNameByID(ContentControlID)
                     If ContentName <> "" Then
-                        main_GetCSRecordEditLink = main_GetRecordEditLink2(ContentName, RecordID, EncodeBoolean(AllowCut), RecordName, user_isEditing(ContentName))
+                        main_GetCSRecordEditLink = main_GetRecordEditLink2(ContentName, RecordID, EncodeBoolean(AllowCut), RecordName, user.user_isEditing(ContentName))
                     End If
                 End If
             End If
@@ -14113,12 +13567,12 @@ ErrorTrap:
                 '
                 iWidth = Width
                 If (iWidth <= 0) Then
-                    iWidth = db.siteProperty_DefaultFormInputWidth
+                    iWidth = siteProperties.defaultFormInputWidth
                 End If
                 '
                 iHeight = Height
                 If (iHeight <= 0) Then
-                    iHeight = db.siteProperty_DefaultFormInputTextHeight
+                    iHeight = siteProperties.defaultFormInputTextHeight
                 End If
                 '
                 If Disabled Then
@@ -14146,7 +13600,7 @@ ErrorTrap:
         '
         Public Function main_GetFormInputTextExpandable(ByVal TagName As String, Optional ByVal Value As String = "", Optional ByVal Rows As Integer = 0, Optional ByVal styleWidth As String = "100%", Optional ByVal Id As String = "", Optional ByVal PasswordField As Boolean = False) As String
             If Rows = 0 Then
-                Rows = db.siteProperty_DefaultFormInputTextHeight
+                Rows = siteProperties.defaultFormInputTextHeight
             End If
             main_GetFormInputTextExpandable = main_GetFormInputTextExpandable2(TagName, Value, Rows, styleWidth, Id, PasswordField, False, "")
         End Function
@@ -14464,7 +13918,7 @@ ErrorTrap:
             If db.db_csOk(CS) Then
                 SectionName = ""
                 GroupCount = 0
-                CanSeeHiddenFields = user_isDeveloper()
+                CanSeeHiddenFields = user.user_isDeveloper()
                 Do While db.db_csOk(CS)
                     GroupName = db.db_GetCSText(CS, "GroupName")
                     If (Mid(GroupName, 1, 1) <> "_") Or CanSeeHiddenFields Then
@@ -14599,7 +14053,7 @@ ErrorTrap:
                                 Case FieldTypeIdFileHTMLPrivate
                                     FieldValueText = EncodeText(FieldValueVariant)
                                     If FieldValueText <> "" Then
-                                        FieldValueText = db.privateFiles.ReadFile(FieldValueText)
+                                        FieldValueText = privateFiles.ReadFile(FieldValueText)
                                     End If
                                     If FieldReadOnly Then
                                         returnResult = FieldValueText
@@ -14613,7 +14067,7 @@ ErrorTrap:
                                 Case FieldTypeIdFileTextPrivate
                                     FieldValueText = EncodeText(FieldValueVariant)
                                     If FieldValueText <> "" Then
-                                        FieldValueText = db.privateFiles.ReadFile(FieldValueText)
+                                        FieldValueText = privateFiles.ReadFile(FieldValueText)
                                     End If
                                     If FieldReadOnly Then
                                         returnResult = FieldValueText
@@ -14627,7 +14081,7 @@ ErrorTrap:
                                 Case FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript
                                     FieldValueText = EncodeText(FieldValueVariant)
                                     If FieldValueText <> "" Then
-                                        FieldValueText = db.cdnFiles.ReadFile(FieldValueText)
+                                        FieldValueText = cdnFiles.ReadFile(FieldValueText)
                                     End If
                                     If FieldReadOnly Then
                                         returnResult = FieldValueText
@@ -14677,7 +14131,7 @@ ErrorTrap:
                                     If FieldReadOnly Then
                                         returnResult = FieldValueText
                                     Else
-                                        returnResult = "<img src=""" & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, FieldValueText) & """><BR >change: " & html_GetFormInputFile(FieldName, EncodeText(FieldValueVariant))
+                                        returnResult = "<img src=""" & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, FieldValueText) & """><BR >change: " & html_GetFormInputFile(FieldName, EncodeText(FieldValueVariant))
                                     End If
                                 '
                                 '
@@ -14973,7 +14427,7 @@ ErrorTrap:
                     '
                     ' ----- People and member content export
                     '
-                    If Not user_isAdmin() Then
+                    If Not user.user_isAdmin() Then
                         Call sb.Append("Warning: You must be a site administrator to export this information.")
                     Else
                         CSPointer = db.db_csOpen(iContentName, , "ID", False, , , ,, PageSize, PageNumber)
@@ -15031,7 +14485,7 @@ ErrorTrap:
                     '
                     ' ----- All other content
                     '
-                    If Not main_IsContentManager(iContentName) Then
+                    If Not user.main_IsContentManager(iContentName) Then
                         Call sb.Append("Error: You must be a content manager to export this data.")
                     Else
                         CSPointer = db.db_csOpen(iContentName, , "ID", False, , , ,, PageSize, PageNumber)
@@ -15042,12 +14496,12 @@ ErrorTrap:
                             Delimiter = ""
                             FieldNameVariant = db.db_GetCSFirstFieldName(CSPointer)
                             Do While (FieldNameVariant <> "")
-                                Call db.appRootFiles.appendFile(TestFilename, Delimiter & """" & FieldNameVariant & """")
+                                Call appRootFiles.appendFile(TestFilename, Delimiter & """" & FieldNameVariant & """")
                                 Delimiter = ","
                                 FieldNameVariant = db.db_GetCSNextFieldName(CSPointer)
                                 '''DoEvents
                             Loop
-                            Call db.appRootFiles.appendFile(TestFilename, vbCrLf)
+                            Call appRootFiles.appendFile(TestFilename, vbCrLf)
                         End If
                         '
                         ' ----- print out the values
@@ -15071,19 +14525,19 @@ ErrorTrap:
                                     Copy = Replace(Copy, vbCr, " ")
                                     Copy = Replace(Copy, vbLf, " ")
                                 End If
-                                Call db.appRootFiles.appendFile(TestFilename, Delimiter & """" & Copy & """")
+                                Call appRootFiles.appendFile(TestFilename, Delimiter & """" & Copy & """")
                                 Delimiter = ","
                                 FieldNameVariant = db.db_GetCSNextFieldName(CSPointer)
                                 '''DoEvents
                             Loop
-                            Call db.appRootFiles.appendFile(TestFilename, vbCrLf)
+                            Call appRootFiles.appendFile(TestFilename, vbCrLf)
                             Call db.db_csGoNext(CSPointer)
                             '''DoEvents
                         Loop
                     End If
             End Select
-            GetAsciiExport = db.appRootFiles.ReadFile(TestFilename)
-            Call db.appRootFiles.DeleteFile(TestFilename)
+            GetAsciiExport = appRootFiles.ReadFile(TestFilename)
+            Call appRootFiles.DeleteFile(TestFilename)
             Exit Function
             '
             ' ----- Error Trap
@@ -15202,7 +14656,7 @@ ErrorTrap:
         Public Sub main_FlushStream()
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("FlushStream")
             '
-            If isWebRoleIis Then
+            If (iisContext IsNot Nothing) Then
                 '
                 ' ASP flush
                 '
@@ -15298,22 +14752,22 @@ ErrorTrap:
                         & " LastVisitTime=" & db.db_EncodeSQLDate(main_PageStartTime) _
                         & ",PageVisits=" & main_VisitPages _
                         & ",VisitorID=" & main_VisitorID _
-                        & ",Name=" & db.db_EncodeSQLText(main_VisitName) _
+                        & ",Name=" & db.encodeSQLText(main_VisitName) _
                         & ",VisitorNew=" & db.db_EncodeSQLBoolean(main_VisitorNew) _
                         & ",MemberID=" & main_VisitMemberID _
                         & ",CookieSupport=" & db.db_EncodeSQLBoolean(main_VisitCookieSupport) _
                         & ",LoginAttempts=" & main_VisitLoginAttempts _
                         & ",VisitAuthenticated=" & db.db_EncodeSQLBoolean(visit_isAuthenticated) _
-                        & ",MemberNew=" & db.db_EncodeSQLBoolean(userIsNew) _
+                        & ",MemberNew=" & db.db_EncodeSQLBoolean(user.userIsNew) _
                         & ",StartTime=" & db.db_EncodeSQLDate(main_VisitStartTime) _
                         & ",StartDateValue=" & main_VisitStartDateValue _
                         & ",DateAdded=" & db.db_EncodeSQLDate(main_VisitStartTime) _
-                        & ",Remote_Addr=" & db.db_EncodeSQLText(web.requestRemoteIP) _
-                        & ",Browser=" & db.db_EncodeSQLText(Left(web.requestBrowser, 255)) _
-                        & ",HTTP_Via=" & db.db_EncodeSQLText(Left(web.requestHTTPVia, 255)) _
-                        & ",HTTP_From=" & db.db_EncodeSQLText(Left(web.requestHTTPFrom, 255)) _
-                        & ",HTTP_REFERER=" & db.db_EncodeSQLText(Left(main_VisitRefererHost, 255)) _
-                        & ",RefererPathPage=" & db.db_EncodeSQLText(Left(main_VisitRefererPathPage, 255))
+                        & ",Remote_Addr=" & db.encodeSQLText(web.requestRemoteIP) _
+                        & ",Browser=" & db.encodeSQLText(Left(web.requestBrowser, 255)) _
+                        & ",HTTP_Via=" & db.encodeSQLText(Left(web.requestHTTPVia, 255)) _
+                        & ",HTTP_From=" & db.encodeSQLText(Left(web.requestHTTPFrom, 255)) _
+                        & ",HTTP_REFERER=" & db.encodeSQLText(Left(main_VisitRefererHost, 255)) _
+                        & ",RefererPathPage=" & db.encodeSQLText(Left(main_VisitRefererPathPage, 255))
                 Else
                     '
                     ' non-First page of the visit, save only what can change
@@ -15325,7 +14779,7 @@ ErrorTrap:
                         & ",CookieSupport=" & db.db_EncodeSQLBoolean(main_VisitCookieSupport) _
                         & ",LoginAttempts=" & main_VisitLoginAttempts _
                         & ",VisitAuthenticated=" & db.db_EncodeSQLBoolean(visit_isAuthenticated) _
-                        & ",MemberNew=" & db.db_EncodeSQLBoolean(userIsNew)
+                        & ",MemberNew=" & db.db_EncodeSQLBoolean(user.userIsNew)
                 End If
                 If True Then
                     SQL &= ",TimeToLastHit=" & db.db_EncodeSQLNumber(main_VisitTimeToLastHit)
@@ -15372,14 +14826,14 @@ ErrorTrap:
             If visit_initialized Then
                 If True Then
                     SQL = "UPDATE ccVisitors SET " _
-                        & " Name = " & db.db_EncodeSQLText(main_VisitorName) _
+                        & " Name = " & db.encodeSQLText(main_VisitorName) _
                         & ",MemberID = " & db.db_EncodeSQLNumber(main_VisitorMemberID) _
                         & ",OrderID = " & db.db_EncodeSQLNumber(main_VisitorOrderID) _
                         & ",ForceBrowserMobile = " & db.db_EncodeSQLNumber(main_VisitorForceBrowserMobile) _
                         & " WHERE ID=" & main_VisitorID & ";"
                 Else
                     SQL = "UPDATE ccVisitors SET " _
-                        & " Name = " & db.db_EncodeSQLText(main_VisitorName) _
+                        & " Name = " & db.encodeSQLText(main_VisitorName) _
                         & ",MemberID = " & db.db_EncodeSQLNumber(main_VisitorMemberID) _
                         & ",OrderID = " & db.db_EncodeSQLNumber(main_VisitorOrderID) _
                         & " WHERE ID=" & main_VisitorID & ";"
@@ -15439,7 +14893,7 @@ ErrorTrap:
         '   main_AllowVisitTracking - if true a cookie will be written and the visit tracked
         '========================================================================
         '
-        Private Sub web_init_initVisit(ByVal main_AllowVisitTracking As Boolean)
+        Public Sub web_init_initVisit(ByVal main_AllowVisitTracking As Boolean)
             Try
                 Dim NeedToWriteVisitCookie As Boolean
                 Dim TrackGuests As Boolean
@@ -15473,7 +14927,7 @@ ErrorTrap:
                 Dim AuthDomain As String
                 Dim main_appNameCookiePrefix As String
                 '
-                main_appNameCookiePrefix = LCase(main_encodeCookieName(db.config.name))
+                main_appNameCookiePrefix = LCase(main_encodeCookieName(appConfig.name))
 
                 ' ----- Visit Defaults
                 '
@@ -15498,13 +14952,13 @@ ErrorTrap:
                 ' ----- Member Defaults
                 '
                 'hint = "020"
-                userId = 0
-                userName = "Guest"
-                userAdded = False
-                userIsNew = False
+                user.userId = 0
+                user.userName = "Guest"
+                user.userAdded = False
+                user.userIsNew = False
                 MemberChanges = False
-                userStyleFilename = ""
-                userExcludeFromAnalytics = False
+                user.userStyleFilename = ""
+                user.userExcludeFromAnalytics = False
                 '
                 ' ----- Decode Browser User-Agent string to main_VisitName, main_VisitIsBot, main_VisitIsBadBot, etc
                 '
@@ -15522,17 +14976,17 @@ ErrorTrap:
                 MemberLinkLoginID = 0
                 MemberLinkRecognizeID = 0
                 If (MemberLinkinEID <> "") Then
-                    If EncodeBoolean(db.siteProperty_getBoolean("AllowLinkLogin", True)) Then
+                    If EncodeBoolean(siteProperties.getBoolean("AllowLinkLogin", True)) Then
                         '
                         ' Link Login
                         '
-                        Call security_decodeToken(MemberLinkinEID, db.config.privateKey, MemberLinkLoginID, tokenDate)
+                        Call security_decodeToken(MemberLinkinEID, appConfig.privateKey, MemberLinkLoginID, tokenDate)
                         'MemberLinkLoginID = main_DecodeKeyNumber(MemberLinkinEID)
-                    ElseIf EncodeBoolean(db.siteProperty_getBoolean("AllowLinkRecognize", True)) Then
+                    ElseIf EncodeBoolean(siteProperties.getBoolean("AllowLinkRecognize", True)) Then
                         '
                         ' Link Recognize
                         '
-                        Call security_decodeToken(MemberLinkinEID, db.config.privateKey, MemberLinkRecognizeID, tokenDate)
+                        Call security_decodeToken(MemberLinkinEID, appConfig.privateKey, MemberLinkRecognizeID, tokenDate)
                         'MemberLinkRecognizeID = main_DecodeKeyNumber(MemberLinkinEID)
                     Else
                         '
@@ -15548,7 +15002,7 @@ ErrorTrap:
                     '
                     'hint = "210"
                     If (CookieVisit <> "") Then
-                        Call security_decodeToken(CookieVisit, db.config.privateKey, main_VisitId, main_VisitLastTimeFromCookie)
+                        Call security_decodeToken(CookieVisit, appConfig.privateKey, main_VisitId, main_VisitLastTimeFromCookie)
                         'main_VisitId = main_DecodeKeyNumber(CookieVisit)
                         If main_VisitId = 0 Then
                             '
@@ -15707,7 +15161,7 @@ ErrorTrap:
                                 main_VisitReferer = (db.db_GetCSText(CS, "VisitHTTP_REFERER"))
                                 main_VisitLoginAttempts = (db.db_GetCSInteger(CS, "VisitLoginAttempts"))
                                 main_VisitorNew = (db.db_GetCSBoolean(CS, "VisitVisitorNew"))
-                                userIsNew = (db.db_GetCSBoolean(CS, "VisitMemberNew"))
+                                user.userIsNew = (db.db_GetCSBoolean(CS, "VisitMemberNew"))
                                 web.requestRemoteIP = (db.db_GetCSText(CS, "VisitREMOTE_ADDR"))
                                 web.requestBrowser = (db.db_GetCSText(CS, "VisitBrowser"))
                                 main_VisitTimeToLastHit = 0
@@ -15726,46 +15180,46 @@ ErrorTrap:
                                 '--------------------------------------------------------------------------
                                 '
                                 'hint = "260"
-                                userId = db.db_GetCSInteger(CS, "MemberID")
-                                user_Active = db.db_GetCSBoolean(CS, "MemberActive")
+                                user.userId = db.db_GetCSInteger(CS, "MemberID")
+                                user.user_Active = db.db_GetCSBoolean(CS, "MemberActive")
                                 'MemberActive = encodeBoolean(MemberActive)
-                                If (userId = 0) Or (Not user_Active) Then
+                                If (user.userId = 0) Or (Not user.user_Active) Then
                                     '
                                     'Call AppendLog("main_InitVisit(), 2455")
                                     '
                                     ' ----- problem with Member account, main_Get a new one
                                     '
                                     'hint = "261"
-                                    userId = 0
+                                    user.userId = 0
                                 Else
                                     '
                                     'Call AppendLog("main_InitVisit(), 2460")
                                     '
                                     'hint = "262"
-                                    userName = (db.db_GetCSText(CS, "MemberName"))
-                                    userIsDeveloper = (db.db_GetCSBoolean(CS, "MemberDeveloper"))
-                                    userIsAdmin = (db.db_GetCSBoolean(CS, "MemberAdmin"))
-                                    userContentControlID = (db.db_GetCSInteger(CS, "MemberContentControlID"))
-                                    user_allowBulkEmail = (db.db_GetCSBoolean(CS, "MemberAllowBulkEmail"))
-                                    userAllowToolsPanel = (db.db_GetCSBoolean(CS, "MemberAllowToolsPanel"))
-                                    user_adminMenuModeID = db.db_GetCSInteger(CS, "MemberAdminMenuModeID")
-                                    user_autoLogin = (db.db_GetCSBoolean(CS, "MemberAutoLogin"))
+                                    user.userName = (db.db_GetCSText(CS, "MemberName"))
+                                    user.userIsDeveloper = (db.db_GetCSBoolean(CS, "MemberDeveloper"))
+                                    user.userIsAdmin = (db.db_GetCSBoolean(CS, "MemberAdmin"))
+                                    user.userContentControlID = (db.db_GetCSInteger(CS, "MemberContentControlID"))
+                                    user.user_allowBulkEmail = (db.db_GetCSBoolean(CS, "MemberAllowBulkEmail"))
+                                    user.userAllowToolsPanel = (db.db_GetCSBoolean(CS, "MemberAllowToolsPanel"))
+                                    user.user_adminMenuModeID = db.db_GetCSInteger(CS, "MemberAdminMenuModeID")
+                                    user.user_autoLogin = (db.db_GetCSBoolean(CS, "MemberAutoLogin"))
                                     ' 6/18/2009 notes was removed from base
                                     '                        MemberSendNotes = (app.csv_GetCSBoolean(CS, "MemberSendNotes"))
-                                    userUsername = (db.db_GetCSText(CS, "MemberUsername"))
-                                    userPassword = (db.db_GetCSText(CS, "MemberPassword"))
-                                    userLanguageId = (db.db_GetCSInteger(CS, "MemberLanguageID"))
-                                    userLanguage = (db.db_GetCSText(CS, "MemberLanguage"))
-                                    userOrganizationId = (db.db_GetCSInteger(CS, "MemberOrganizationID"))
-                                    userStyleFilename = db.db_GetCSText(CS, "MemberStyleFilename")
-                                    userExcludeFromAnalytics = (db.db_GetCSBoolean(CS, "MemberExcludeFromAnalytics"))
+                                    user.userUsername = (db.db_GetCSText(CS, "MemberUsername"))
+                                    user.userPassword = (db.db_GetCSText(CS, "MemberPassword"))
+                                    user.userLanguageId = (db.db_GetCSInteger(CS, "MemberLanguageID"))
+                                    user.userLanguage = (db.db_GetCSText(CS, "MemberLanguage"))
+                                    user.userOrganizationId = (db.db_GetCSInteger(CS, "MemberOrganizationID"))
+                                    user.userStyleFilename = db.db_GetCSText(CS, "MemberStyleFilename")
+                                    user.userExcludeFromAnalytics = (db.db_GetCSBoolean(CS, "MemberExcludeFromAnalytics"))
                                     '
                                     ' ----- consider removing
                                     '
-                                    userEmail = (db.db_GetCSText(CS, "MemberEmail"))
-                                    user_company = (db.db_GetCSText(CS, "MemberCompany"))
-                                    user_visits = (db.db_GetCSInteger(CS, "MemberVisits"))
-                                    user_lastVisit = (db.db_GetCSDate(CS, "MemberLastVisit"))
+                                    user.userEmail = (db.db_GetCSText(CS, "MemberEmail"))
+                                    user.user_company = (db.db_GetCSText(CS, "MemberCompany"))
+                                    user.user_visits = (db.db_GetCSInteger(CS, "MemberVisits"))
+                                    user.user_lastVisit = (db.db_GetCSDate(CS, "MemberLastVisit"))
                                 End If
                                 '
                                 '--------------------------------------------------------------------------
@@ -15799,7 +15253,7 @@ ErrorTrap:
                         ' ----- create new visit record
                         '
                         'hint = "310"
-                        main_VisitId = db.metaData_InsertContentRecordGetID("Visits", userId)
+                        main_VisitId = db.metaData_InsertContentRecordGetID("Visits", user.userId)
                         If (main_VisitId < 1) Then
                             main_VisitId = 0
                             handleExceptionAndRethrow(New Exception("Internal error, new visit record could not be selected."))
@@ -15840,12 +15294,12 @@ ErrorTrap:
                         '
                         'Call AppendLog("main_InitVisit(), 2480")
                         '
-                        If EncodeBoolean(db.siteProperty_getBoolean("AllowAutoRecognize", True)) Then
+                        If EncodeBoolean(siteProperties.getBoolean("AllowAutoRecognize", True)) Then
                             '
                             'Call AppendLog("main_InitVisit(), 2485")
                             '
                             'hint = "340"
-                            Call security_decodeToken(CookieVisitor, db.config.privateKey, main_VisitorID, tokenDate)
+                            Call security_decodeToken(CookieVisitor, appConfig.privateKey, main_VisitorID, tokenDate)
                             'main_VisitorID = main_DecodeKeyNumber(CookieVisitor)
                             If main_VisitorID <> 0 Then
                                 '
@@ -15890,7 +15344,7 @@ ErrorTrap:
                             '
                             ' Visitor Fields
                             '
-                            main_VisitorID = db.metaData_InsertContentRecordGetID("Visitors", userId)
+                            main_VisitorID = db.metaData_InsertContentRecordGetID("Visitors", user.userId)
                             If (main_VisitorID < 1) Then
                                 Call handleLegacyError14(MethodName, "main_InitVisit, could not create new visitor")
                                 main_VisitorID = 0
@@ -15919,13 +15373,13 @@ ErrorTrap:
                             ' ----- recognize by the main_VisitorMemberID
                             '
                             'hint = "510"
-                            If useer_RecognizeMemberByID(main_VisitorMemberID) Then
+                            If user.user_RecognizeMemberByID(main_VisitorMemberID) Then
                                 '
                                 ' ----- if successful, now test for autologin (authentication)
                                 '
                                 'hint = "520"
 
-                                If (EncodeBoolean(db.siteProperty_getBoolean("AllowAutoLogin", False))) And (user_autoLogin) And main_VisitCookieSupport Then
+                                If (EncodeBoolean(siteProperties.getBoolean("AllowAutoLogin", False))) And (user.user_autoLogin) And main_VisitCookieSupport Then
                                     '
                                     ' ----- they allow it, now Check if they were logged in on their last visit
                                     '
@@ -15937,8 +15391,8 @@ ErrorTrap:
                                             '
                                             ' ----- yes, go ahead with autologin
                                             '
-                                            If user_LoginMemberByID(userId) Then
-                                                Call main_LogActivity2("autologin", userId, userOrganizationId)
+                                            If user.user_LoginMemberByID(user.userId) Then
+                                                Call main_LogActivity2("autologin", user.userId, user.userOrganizationId)
                                                 VisitorChanges = True
                                                 MemberChanges = True
                                             End If
@@ -15950,7 +15404,7 @@ ErrorTrap:
                                     ' Recognized, not auto login
                                     '
                                     'hint = "540"
-                                    Call main_LogActivity2("recognized", userId, userOrganizationId)
+                                    Call main_LogActivity2("recognized", user.userId, user.userOrganizationId)
                                 End If
                             End If
                         End If
@@ -15961,7 +15415,7 @@ ErrorTrap:
                         '
                         'hint = "600"
                         If main_AllowVisitTracking Then
-                            Call inet_addResponseCookie(main_appNameCookiePrefix & main_cookieNameVisitor, security_encodeToken(main_VisitorID, main_VisitStartTime), main_VisitStartTime.AddYears(1), , db.RootWebPath, False)
+                            Call inet_addResponseCookie(main_appNameCookiePrefix & main_cookieNameVisitor, security_encodeToken(main_VisitorID, main_VisitStartTime), main_VisitStartTime.AddYears(1), , appConfig.appRootFilesPath, False)
                         End If
                         '
                         '--------------------------------------------------------------------------
@@ -15983,15 +15437,15 @@ ErrorTrap:
                         '
                         ' Link Login
                         '
-                        If user_LoginMemberByID(MemberLinkLoginID) Then
-                            Call main_LogActivity2("link login with eid " & MemberLinkinEID, userId, userOrganizationId)
+                        If user.user_LoginMemberByID(MemberLinkLoginID) Then
+                            Call main_LogActivity2("link login with eid " & MemberLinkinEID, user.userId, user.userOrganizationId)
                         End If
                     ElseIf (MemberLinkRecognizeID <> 0) Then
                         '
                         ' Link Recognize
                         '
-                        Call useer_RecognizeMemberByID(MemberLinkRecognizeID)
-                        Call main_LogActivity2("link recognize with eid " & MemberLinkinEID, userId, userOrganizationId)
+                        Call user.user_RecognizeMemberByID(MemberLinkRecognizeID)
+                        Call main_LogActivity2("link recognize with eid " & MemberLinkinEID, user.userId, user.userOrganizationId)
                     End If
                     '
                     '-----------------------------------------------------------------------------------
@@ -16001,7 +15455,7 @@ ErrorTrap:
                     'Call AppendLog("main_InitVisit(), 2496")
                     '
                     'hint = "800"
-                    If (userId < 1) Then
+                    If (user.userId < 1) Then
                         '
                         ' No user created
                         '
@@ -16014,38 +15468,38 @@ ErrorTrap:
                             '
                             ' not upgraded, just create user like it did before
                             '
-                            Call user_CreateUser()
+                            Call user.user_CreateUser()
                         Else
                             '
                             ' upgraded, determine the kind of tracking - experimental build set to true
                             '
-                            TrackGuests = EncodeBoolean(db.siteProperty_getBoolean("track guests", False))
+                            TrackGuests = EncodeBoolean(siteProperties.getBoolean("track guests", False))
                             If Not TrackGuests Then
                                 '
                                 ' do not track guests at all
                                 '
-                                Call user_CreateUserDefaults(DefaultMemberName)
+                                Call user.user_CreateUserDefaults(DefaultMemberName)
                             Else
                                 If main_VisitCookieSupport Then
                                     '
                                     ' cookies supported, not first hit and not spider
                                     '
-                                    Call user_CreateUser()
+                                    Call user.user_CreateUser()
                                 Else
                                     '
                                     ' upgraded, set it to the site property - experimental build set to true
                                     '
-                                    TrackGuestsWithoutCookies = EncodeBoolean(db.siteProperty_getBoolean("track guests without cookies", False))
+                                    TrackGuestsWithoutCookies = EncodeBoolean(siteProperties.getBoolean("track guests without cookies", False))
                                     If TrackGuestsWithoutCookies Then
                                         '
                                         ' compatibiltiy mode - create people for non-cookies too
                                         '
-                                        Call user_CreateUser()
+                                        Call user.user_CreateUser()
                                     Else
                                         '
                                         ' set defaults for people record
                                         '
-                                        Call user_CreateUserDefaults(DefaultMemberName)
+                                        Call user.user_CreateUserDefaults(DefaultMemberName)
                                     End If
                                 End If
                             End If
@@ -16063,12 +15517,12 @@ ErrorTrap:
                         '
                         ' First page of this visit, verify the member language
                         '
-                        If (userLanguageId < 1) Or (userLanguage = "") Then
+                        If (user.userLanguageId < 1) Or (user.userLanguage = "") Then
                             '
                             ' No member language, set member language from browser language
                             '
-                            Call web_GetBrowserLanguage(userLanguageId, userLanguage)
-                            If userLanguageId > 0 Then
+                            Call web_GetBrowserLanguage(user.userLanguageId, user.userLanguage)
+                            If user.userLanguageId > 0 Then
                                 '
                                 ' Browser Language worked
                                 '
@@ -16077,41 +15531,41 @@ ErrorTrap:
                                 '
                                 ' Still no match, main_Get the default language
                                 '
-                                userLanguage = db.siteProperty_getText("Language", "English")
-                                If userLanguage <> "English" Then
+                                user.userLanguage = siteProperties.getText("Language", "English")
+                                If user.userLanguage <> "English" Then
                                     '
                                     ' Handle the non-English case first, so if there is a problem, fall back is English
                                     '
-                                    CS = db.db_csOpen("Languages", "name=" & db.db_EncodeSQLText(userLanguage))
+                                    CS = db.db_csOpen("Languages", "name=" & db.encodeSQLText(user.userLanguage))
                                     If db.db_csOk(CS) Then
-                                        userLanguageId = db.db_GetCSInteger(CS, "ID")
+                                        user.userLanguageId = db.db_GetCSInteger(CS, "ID")
                                         MemberChanges = True
                                     End If
                                     Call db.db_csClose(CS)
-                                    If userLanguageId = 0 Then
+                                    If user.userLanguageId = 0 Then
                                         '
                                         ' non-English Language is not in Language Table, set default to english
                                         '
-                                        userLanguage = "English"
-                                        Call db.siteProperty_set("Language", userLanguage)
+                                        user.userLanguage = "English"
+                                        Call siteProperties.setProperty("Language", user.userLanguage)
                                     End If
                                 End If
-                                If userLanguage = "English" Then
-                                    CS = db.db_csOpen("Languages", "name=" & db.db_EncodeSQLText(userLanguage))
+                                If user.userLanguage = "English" Then
+                                    CS = db.db_csOpen("Languages", "name=" & db.encodeSQLText(user.userLanguage))
                                     If db.db_csOk(CS) Then
-                                        userLanguageId = db.db_GetCSInteger(CS, "ID")
+                                        user.userLanguageId = db.db_GetCSInteger(CS, "ID")
                                         MemberChanges = True
                                     End If
                                     Call db.db_csClose(CS)
-                                    If userLanguageId < 1 Then
+                                    If user.userLanguageId < 1 Then
                                         '
                                         ' English is not in Language table, add it, and set it in Member
                                         '
                                         CS = db.db_csInsertRecord("Languages")
                                         If db.db_csOk(CS) Then
-                                            userLanguageId = db.db_GetCSInteger(CS, "ID")
-                                            userLanguage = "English"
-                                            Call db.db_setCS(CS, "Name", userLanguage)
+                                            user.userLanguageId = db.db_GetCSInteger(CS, "ID")
+                                            user.userLanguage = "English"
+                                            Call db.db_setCS(CS, "Name", user.userLanguage)
                                             Call db.db_setCS(CS, "HTTP_Accept_LANGUAGE", "en")
                                             MemberChanges = True
                                         End If
@@ -16130,7 +15584,7 @@ ErrorTrap:
                     '
                     ' can not count main_VisitCookieSupport yet, since a new visit will not show cookie support until the ajax hit
                     'hint = "910"
-                    main_VisitExcludeFromAnalytics = main_VisitExcludeFromAnalytics Or main_VisitIsBot Or userExcludeFromAnalytics Or userIsAdmin Or userIsDeveloper
+                    main_VisitExcludeFromAnalytics = main_VisitExcludeFromAnalytics Or main_VisitIsBot Or user.userExcludeFromAnalytics Or user.userIsAdmin Or user.userIsDeveloper
                     '
                     ' Update Page count
                     '
@@ -16155,7 +15609,7 @@ ErrorTrap:
                     '
                     'hint = "950"
                     If MemberChanges Then
-                        Call user_SaveMemberBase()
+                        Call user.user_SaveMemberBase()
                     End If
                     '
                     ' ----- send visit cookie if supported or first page
@@ -16194,7 +15648,7 @@ ErrorTrap:
                 '---------------------------------------------------------------------------------
                 '
                 CookieVisit = security_encodeToken(main_VisitId, main_PageStartTime)
-                Call inet_addResponseCookie(main_appNameCookiePrefix & main_cookieNameVisit, CookieVisit, , , db.RootWebPath, False)
+                Call inet_addResponseCookie(main_appNameCookiePrefix & main_cookieNameVisit, CookieVisit, , , appConfig.appRootFilesPath, False)
             Catch ex As Exception
                 handleExceptionAndRethrow(ex)
             End Try
@@ -16465,7 +15919,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            main_GetFolderList = db.appRootFiles.getFolderList(EncodeText(FolderPath))
+            main_GetFolderList = appRootFiles.getFolderList(EncodeText(FolderPath))
             '
             Exit Function
             '
@@ -16522,7 +15976,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            main_GetVirtualFolderList = db.cdnFiles.getFolderList(EncodeText(FolderPath))
+            main_GetVirtualFolderList = cdnFiles.getFolderList(EncodeText(FolderPath))
             '
             Exit Function
             '
@@ -16612,7 +16066,7 @@ ErrorTrap:
                     handleExceptionAndRethrow(New Exception("Invalid ContentName [" & iContentName & "] or RecordID [" & EncodeText(RecordID) & "]"))
                 End If
             Else
-                Call db.db_DeleteContentRecord(iContentName, iRecordID, userId)
+                Call db.db_DeleteContentRecord(iContentName, iRecordID, user.userId)
             End If
             Call main_ProcessSpecialCaseAfterSave(True, iContentName, iRecordID, "", 0, False)
             Exit Sub
@@ -16654,7 +16108,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function metaData_InsertContentRecordGetID(ByVal ContentName As String) As Integer
-            metaData_InsertContentRecordGetID = db.metaData_InsertContentRecordGetID(EncodeText(ContentName), userId)
+            metaData_InsertContentRecordGetID = db.metaData_InsertContentRecordGetID(EncodeText(ContentName), user.userId)
         End Function
         '
         '=============================================================================
@@ -16668,7 +16122,7 @@ ErrorTrap:
         '=============================================================================
         '
         Public Sub db_CreateContentFromSQLTable(ByVal DataSourceName As String, ByVal TableName As String, ByVal ContentName As String)
-            Call db_CreateContentFromSQLTable(DataSourceName, TableName, ContentName, userId)
+            Call db_CreateContentFromSQLTable(DataSourceName, TableName, ContentName, user.userId)
         End Sub
         '
         '=============================================================================
@@ -16679,7 +16133,7 @@ ErrorTrap:
         '=============================================================================
         '
         Public Sub metaData_CreateContentChild(ByVal ChildContentName As String, ByVal ParentContentName As String)
-            Call metaData.CreateContentChild(EncodeText(ChildContentName), EncodeText(ParentContentName), userId)
+            Call metaData.CreateContentChild(EncodeText(ChildContentName), EncodeText(ParentContentName), user.userId)
         End Sub
         '
         ' ----- alternate name
@@ -16687,418 +16141,6 @@ ErrorTrap:
         Public Function db_InsertCSContent(ByVal ContentName As String) As Integer
             db_InsertCSContent = db.db_csInsertRecord(EncodeText(ContentName))
         End Function
-        '
-        '========================================================================
-        ' Member Login (by username and password)
-        '
-        '   See main_GetLoginMemberID and main_LoginMemberByID
-        '========================================================================
-        '
-        Public Function user_LoginMember(ByVal loginFieldValue As String, ByVal Password As String, Optional ByVal AllowAutoLogin As Boolean = False) As Boolean
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("LoginMember")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim MethodName As String
-            Dim iLoginFieldValue As String
-            Dim iPassword As String
-            Dim LocalMemberID As Integer
-            '
-            iLoginFieldValue = EncodeText(loginFieldValue)
-            iPassword = EncodeText(Password)
-            '
-            MethodName = "LoginMember"
-            '
-            user_LoginMember = False
-            LocalMemberID = main_GetLoginMemberID(iLoginFieldValue, iPassword)
-            If LocalMemberID <> 0 Then
-                user_LoginMember = user_LoginMemberByID(LocalMemberID, AllowAutoLogin)
-                If user_LoginMember Then
-                    Call main_LogActivity2("successful password login", userId, userOrganizationId)
-                    property_user_isContentManagerOfAnything_isLoaded = False
-                    property_user_isAdmin_isLoaded = False
-                    property_user_isMember_isLoaded = False
-                    property_user_isAuthenticated_isLoaded = False
-                Else
-                    Call main_LogActivity2("unsuccessful login (loginField:" & iLoginFieldValue & "/password:" & iPassword & ")", userId, userOrganizationId)
-                End If
-            End If
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18(MethodName)
-            '
-        End Function
-        '
-        '========================================================================
-        '   Member Login By ID
-        '
-        '========================================================================
-        '
-        Public Function user_LoginMemberByID(ByVal RecordID As Integer, Optional ByVal AllowAutoLogin As Boolean = False) As Boolean
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("LoginMemberByID")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim MethodName As String
-            Dim CS As Integer
-            Dim iRecordID As Integer
-            '
-            MethodName = "main_LoginMemberByID"
-            '
-            iRecordID = EncodeInteger(RecordID)
-            user_LoginMemberByID = useer_RecognizeMemberByID(iRecordID)
-            If user_LoginMemberByID Then
-                '
-                ' Log them in
-                '
-                visit_isAuthenticated = True
-                Call main_SaveVisit()
-                property_user_isAdmin_isLoaded = False
-                property_user_isMember_isLoaded = False
-                property_user_isAuthenticated_isLoaded = False
-                property_user_isDeveloper_isLoaded = False
-                '
-                ' Write Cookies in case Visit Tracking is off
-                '
-                If main_VisitStartTime = Date.MinValue Then
-                    main_VisitStartTime = main_PageStartTime
-                End If
-                If Not EncodeBoolean(db.siteProperty_getBoolean("allowVisitTracking", True)) Then
-                    Call web_init_initVisit(True)
-                End If
-                '
-                ' Change autologin if included, selected, and allowed
-                '
-                If Not isMissing(AllowAutoLogin) Then
-                    If AllowAutoLogin Xor user_autoLogin Then
-                        If EncodeBoolean(db.siteProperty_getBoolean("AllowAutoLogin", False)) Then
-                            CS = db_csOpenRecord("people", iRecordID)
-                            If db.db_csOk(CS) Then
-                                Call db.db_setCS(CS, "AutoLogin", AllowAutoLogin)
-                            End If
-                            Call db.db_csClose(CS)
-                        End If
-                    End If
-                End If
-            End If
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18(MethodName)
-            '
-        End Function
-        '
-        '========================================================================
-        '   main_SetMemberIdentity
-        '
-        '   See RecognizeMember for details
-        '========================================================================
-        '
-        Public Function user_SetMemberIdentity(Optional ByVal Criteria As String = "") As Boolean
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SetMemberIdentity")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim CSPointer As Integer
-            Dim MethodName As String
-            Dim CS As Integer
-            '
-            MethodName = "main_SetMemberIdentity"
-            '
-            ' ----- Member is attempting a login
-            '
-            user_SetMemberIdentity = False
-            CS = db.db_csOpen("people", Criteria, , , , , , "ID")
-            If db.db_csOk(CS) Then
-                user_SetMemberIdentity = useer_RecognizeMemberByID(db.db_GetCSInteger(CS, "ID"))
-            End If
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18(MethodName)
-            '
-        End Function
-        '
-        '========================================================================
-        '   RecognizeMember
-        '
-        '   the current member to be non-authenticated, but recognized
-        '========================================================================
-        '
-        Public Function useer_RecognizeMemberByID(ByVal RecordID As Integer) As Boolean
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("RecognizeMemberByID")
-            '
-            'If Not (true) Then Exit Function
-            Dim CSPointer As Integer
-            '
-            Dim MethodName As String
-            Dim CS As Integer
-            Dim SQL As String
-            '
-            MethodName = "main_RecognizeMemberByID"
-            '
-            useer_RecognizeMemberByID = False
-            SQL = "select" _
-                & " ccMembers.*" _
-                & " ,ccLanguages.name as LanguageName" _
-                & " from" _
-                & " ccMembers" _
-                & " left join ccLanguages on ccMembers.LanguageID=ccLanguages.ID" _
-                & " where" _
-                & " (ccMembers.active<>" & SQLFalse & ")" _
-                & " and(ccMembers.ID=" & RecordID & ")"
-            If True Then
-                SQL &= "" _
-                    & " and((ccMembers.dateExpires is null)or(ccMembers.dateExpires>" & db.db_EncodeSQLDate(Now) & "))" _
-                    & ""
-            End If
-            CS = db.db_csOpenSql(SQL)
-            If db.db_csOk(CS) Then
-                If main_VisitId = 0 Then
-                    '
-                    ' Visit was blocked during init, init the visit now
-                    '
-                    Call web_init_initVisit(True)
-                End If
-                '
-                ' ----- Member was recognized
-                '
-                userId = (db.db_GetCSInteger(CS, "ID"))
-                userName = (db.db_GetCSText(CS, "Name"))
-                userUsername = (db.db_GetCSText(CS, "username"))
-                userEmail = (db.db_GetCSText(CS, "Email"))
-                userPassword = (db.db_GetCSText(CS, "Password"))
-                userOrganizationId = (db.db_GetCSInteger(CS, "OrganizationID"))
-                userLanguageId = (db.db_GetCSInteger(CS, "LanguageID"))
-                user_Active = (db.db_GetCSBoolean(CS, "Active"))
-                user_company = (db.db_GetCSText(CS, "Company"))
-                user_visits = (db.db_GetCSInteger(CS, "Visits"))
-                user_lastVisit = (db.db_GetCSDate(CS, "LastVisit"))
-                user_allowBulkEmail = (db.db_GetCSBoolean(CS, "AllowBulkEmail"))
-                userAllowToolsPanel = (db.db_GetCSBoolean(CS, "AllowToolsPanel"))
-                user_adminMenuModeID = (db.db_GetCSInteger(CS, "AdminMenuModeID"))
-                user_autoLogin = (db.db_GetCSBoolean(CS, "AutoLogin"))
-                ' 6/18/2009 notes was removed from base
-                '        MemberSendNotes = (app.csv_GetCSBoolean(CS, "SendNotes"))
-                userIsDeveloper = (db.db_GetCSBoolean(CS, "Developer"))
-                userIsAdmin = (db.db_GetCSBoolean(CS, "Admin"))
-                userContentControlID = (db.db_GetCSInteger(CS, "ContentControlID"))
-                userLanguageId = (db.db_GetCSInteger(CS, "LanguageID"))
-                userLanguage = (db.db_GetCSText(CS, "LanguageName"))
-                If True Then
-                    userStyleFilename = db.db_GetCSText(CS, "StyleFilename")
-                    If userStyleFilename <> "" Then
-                        Call main_AddStylesheetLink(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, userStyleFilename))
-                    End If
-                End If
-                If True Then
-                    userExcludeFromAnalytics = db.db_GetCSBoolean(CS, "ExcludeFromAnalytics")
-                End If
-                '
-                user_visits = user_visits + 1
-                If user_visits = 1 Then
-                    userIsNew = True
-                Else
-                    userIsNew = False
-                End If
-                user_lastVisit = main_PageStartTime
-                main_VisitMemberID = userId
-                main_VisitLoginAttempts = 0
-                main_VisitorMemberID = userId
-                main_VisitExcludeFromAnalytics = main_VisitExcludeFromAnalytics Or main_VisitIsBot Or userExcludeFromAnalytics Or userIsAdmin Or userIsDeveloper
-                Call main_SaveVisit()
-                Call main_SaveVisitor()
-                Call user_SaveMemberBase()
-                useer_RecognizeMemberByID = True
-            End If
-            Call db.db_csClose(CS)
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18(MethodName)
-            '
-        End Function
-        '
-        '========================================================================
-        ' ----- Create a new default user and save it
-        '       If failure, MemberID is 0
-        '       If successful, main_VisitMemberID and main_VisitorMemberID must be set to MemberID
-        '========================================================================
-        '
-        Public Sub user_CreateUser()
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("CreateUser")
-            '
-            'If Not (true) Then Exit Sub
-            '
-            Dim CSMember As Integer
-            Dim CSlanguage As Integer
-            Dim MethodName As String
-            Dim DefaultLanguage As String
-            Dim DefaultVisitName As String
-            Dim ignore0 As Boolean
-            Dim Ignore1 As Boolean
-            '
-            MethodName = "main_CreateUser"
-            '
-            Call user_CreateUserDefaults(main_VisitName)
-            '
-            userId = 0
-            CSMember = db.db_csInsertRecord("people")
-            If Not db.db_csOk(CSMember) Then
-                Call handleLegacyError14(MethodName, "main_CreateUser, Error inserting new people record, could not main_CreateUser")
-            Else
-                userId = db.db_GetCSInteger(CSMember, "id")
-                If DefaultVisitName <> "" Then
-                    userName = DefaultVisitName
-                    Call db.db_setCS(CSMember, "name", userName)
-                End If
-                '
-                ' Created By Visit
-                '
-                If True Then
-                    Call db.db_setCS(CSMember, "CreatedByVisit", True)
-                End If
-                '
-                user_Active = True
-                Call db.db_setCS(CSMember, "active", user_Active)
-                '
-                user_visits = 1
-                Call db.db_setCS(CSMember, "Visits", user_visits)
-                '
-                user_lastVisit = main_PageStartTime
-                Call db.db_setCS(CSMember, "LastVisit", user_lastVisit)
-                '
-                '
-                CSlanguage = db_csOpenRecord("Languages", web_GetBrowserLanguageID, , , "Name")
-                If db.db_csOk(CSlanguage) Then
-                    userLanguageId = db.db_GetCSInteger(CSlanguage, "ID")
-                    userLanguage = db.db_GetCSText(CSlanguage, "Name")
-                    Call db.db_setCS(CSMember, "LanguageID", userLanguageId)
-                End If
-                Call db.db_csClose(CSlanguage)
-                '
-                userAdded = True
-                userIsNew = True
-                userStyleFilename = ""
-                userExcludeFromAnalytics = False
-                '
-                Call db.db_csClose(CSMember)
-                '
-                main_VisitMemberID = userId
-                main_VisitorMemberID = userId
-                visit_isAuthenticated = False
-                Call main_SaveVisit()
-                Call main_SaveVisitor()
-                '
-                property_user_isAdmin_isLoaded = False
-                property_user_isMember_isLoaded = False
-                property_user_isAuthenticated_isLoaded = False
-                property_user_isDeveloper_isLoaded = False
-            End If
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError13(MethodName)
-        End Sub
-        '
-        '========================================================================
-        '   Creates the internal records for the user, but does not create
-        '   a people record to save them
-        '========================================================================
-        '
-        Friend Sub user_CreateUserDefaults(ByVal DefaultName As String)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("CreateUserDefaults")
-            '
-            'If Not (true) Then Exit Sub
-            '
-            Dim CSMember As Integer
-            Dim CSlanguage As Integer
-            Dim MethodName As String
-            Dim DefaultLanguage As String
-            Dim DefaultMemberName As String
-            '
-            MethodName = "main_CreateUserDefaults"
-            '
-            userId = 0
-            userId = 0
-            userName = DefaultName
-            userIsAdmin = False
-            userIsDeveloper = False
-            userOrganizationId = 0
-            userLanguageId = 0
-            userLanguage = ""
-            userIsNew = False
-            userEmail = ""
-            user_allowBulkEmail = False
-            userAllowToolsPanel = False
-            user_autoLogin = False
-            user_adminMenuModeID = 0
-            loginForm_Username = ""
-            loginForm_Password = ""
-            loginForm_Email = ""
-            loginForm_AutoLogin = False
-            userAdded = False
-            userUsername = ""
-            userPassword = ""
-            userContentControlID = 0
-            user_Active = False
-            user_visits = 0
-            user_lastVisit = main_VisitStartTime
-            user_company = ""
-            main_MemberTitle = ""
-            main_MemberAddress = ""
-            main_MemberCity = ""
-            main_MemberState = ""
-            main_MemberZip = ""
-            main_MemberCountry = ""
-            main_MemberPhone = ""
-            main_MemberFax = ""
-            '
-            user_Active = True
-            '
-            user_visits = 1
-            '
-            user_lastVisit = main_PageStartTime
-            '
-            '
-            CSlanguage = db_csOpenRecord("Languages", web_GetBrowserLanguageID, , , "Name")
-            If db.db_csOk(CSlanguage) Then
-                userLanguageId = db.db_GetCSInteger(CSlanguage, "ID")
-                userLanguage = db.db_GetCSText(CSlanguage, "Name")
-            End If
-            Call db.db_csClose(CSlanguage)
-            '
-            userAdded = True
-            userIsNew = True
-            userStyleFilename = ""
-            userExcludeFromAnalytics = False
-            '
-            property_user_isAdmin_isLoaded = False
-            property_user_isMember_isLoaded = False
-            property_user_isAuthenticated_isLoaded = False
-            property_user_isDeveloper_isLoaded = False
-            'End If
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError13(MethodName)
-        End Sub
         '
         '========================================================================
         '   Determine the current persons Language
@@ -17152,7 +16194,7 @@ ErrorTrap:
                         AcceptLanguage = Mid(AcceptLanguage, 1, DashPosition - 1)
                     End If
                     If Len(AcceptLanguage) > 0 Then
-                        CS = db.db_csOpen("languages", "HTTP_Accept_LANGUAGE=" & db.db_EncodeSQLText(AcceptLanguage), , , , , , "ID", 1)
+                        CS = db.db_csOpen("languages", "HTTP_Accept_LANGUAGE=" & db.encodeSQLText(AcceptLanguage), , , , , , "ID", 1)
                         If db.db_csOk(CS) Then
                             LanguageID = db.db_GetCSInteger(CS, "ID")
                             LanguageName = db.db_GetCSText(CS, "Name")
@@ -17167,7 +16209,7 @@ ErrorTrap:
                 '
                 ' ----- no matching browser language, use site default
                 '
-                CS = db.db_csOpen("languages", "name=" & db.db_EncodeSQLText(db.siteProperty_Language), , , , , , "ID", 1)
+                CS = db.db_csOpen("languages", "name=" & db.encodeSQLText(siteProperties.language), , , , , , "ID", 1)
                 If db.db_csOk(CS) Then
                     LanguageID = db.db_GetCSInteger(CS, "ID")
                     LanguageName = db.db_GetCSText(CS, "Name")
@@ -17183,295 +16225,6 @@ ErrorTrap:
             '
         End Sub
         '
-        '=============================================================================
-        '   main_SaveMemberBase()
-        '       Saves the current Member record to the database
-        '=============================================================================
-        '
-        Public Sub user_SaveMemberBase()
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SaveMemberBase")
-            '
-            'If Not (true) Then Exit Sub
-            '
-            Dim SQL As String
-            Dim UsernameName As String
-            Dim MethodName As String
-            '
-            MethodName = "main_SaveMemberBase"
-            '
-            If visit_initialized Then
-                If (userId > 0) Then
-                    SQL = "UPDATE ccMembers SET " _
-                        & " Name=" & db.db_EncodeSQLText(userName) _
-                        & ",username=" & db.db_EncodeSQLText(userUsername) _
-                        & ",email=" & db.db_EncodeSQLText(userEmail) _
-                        & ",password=" & db.db_EncodeSQLText(userPassword) _
-                        & ",OrganizationID=" & db.db_EncodeSQLNumber(userOrganizationId) _
-                        & ",LanguageID=" & db.db_EncodeSQLNumber(userLanguageId) _
-                        & ",Active=" & db.db_EncodeSQLBoolean(user_Active) _
-                        & ",Company=" & db.db_EncodeSQLText(user_company) _
-                        & ",Visits=" & db.db_EncodeSQLNumber(user_visits) _
-                        & ",LastVisit=" & db.db_EncodeSQLDate(user_lastVisit) _
-                        & ",AllowBulkEmail=" & db.db_EncodeSQLBoolean(user_allowBulkEmail) _
-                        & ",AllowToolsPanel=" & db.db_EncodeSQLBoolean(userAllowToolsPanel) _
-                        & ",AdminMenuModeID=" & db.db_EncodeSQLNumber(user_adminMenuModeID) _
-                        & ",AutoLogin=" & db.db_EncodeSQLBoolean(user_autoLogin)
-
-                    ' 6/18/2009 notes was removed from base
-                    '            & ",SendNotes=" & encodeSQLBoolean(MemberSendNotes)
-                    If True Then
-                        SQL &= ",ExcludeFromAnalytics=" & db.db_EncodeSQLBoolean(userExcludeFromAnalytics)
-                    End If
-                    SQL &= " WHERE ID=" & userId & ";"
-                    Call db.executeSql(SQL)
-                End If
-            End If
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18(MethodName)
-            '
-        End Sub
-        '
-        '========================================================================
-        ' Member Logout
-        '   Create and assign a guest Member identity
-        '========================================================================
-        '
-        Public Sub security_LogoutMember()
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("LogoutMember")
-            '
-            'If Not (true) Then Exit Sub
-            '
-            Dim CS As Integer
-            '
-            Call main_LogActivity2("logout", userId, userOrganizationId)
-            '
-            ' Clear MemberID for this page
-            '
-            Call user_CreateUser()
-            '
-            ' Clear cached permissions
-            '
-            property_user_isAdmin_isLoaded = False              ' true if main_IsAdminCache is initialized
-            property_user_isMember_isLoaded = False
-            property_user_isAuthenticated_isLoaded = False
-            property_user_isDeveloper_isLoaded = False
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18("main_LogoutMember")
-        End Sub
-        '
-        '=============================================================================
-        ' Send the Member his username and password
-        '=============================================================================
-        '
-        Public Function security_SendMemberPassword(ByVal Email As Object) As Boolean
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SendMemberPassword")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim sqlCriteria As String
-            Dim Message As String
-            Dim CS As Integer
-            Dim MethodName As String
-            Dim workingEmail As String
-            Dim FromAddress As String
-            Dim subject As String
-            Dim allowEmailLogin As Boolean
-            Dim Password As String
-            Dim Username As String
-            Dim updateUser As Boolean
-            Dim atPtr As Integer
-            Dim Cnt As Integer
-            Dim Index As Integer
-            Dim EMailName As String
-            Dim usernameOK As Boolean
-            Dim recordCnt As Integer
-            Dim hint As String
-            Dim Ptr As Integer
-            '
-            Const passwordChrs = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345678999999"
-            Const passwordChrsLength = 62
-            '
-            'hint = "100"
-            workingEmail = EncodeText(Email)
-            '
-            MethodName = "main_SendMemberPassword"
-            '
-            security_SendMemberPassword = False
-            If workingEmail = "" Then
-                'hint = "110"
-                error_AddUserError("Please enter your email address before requesting your username and password.")
-            Else
-                'hint = "120"
-                atPtr = InStr(1, workingEmail, "@")
-                If atPtr < 2 Then
-                    '
-                    ' email not valid
-                    '
-                    'hint = "130"
-                    error_AddUserError("Please enter a valid email address before requesting your username and password.")
-                Else
-                    'hint = "140"
-                    EMailName = Mid(workingEmail, 1, atPtr - 1)
-                    '
-                    Call main_LogActivity2("password request for email " & workingEmail, userId, userOrganizationId)
-                    '
-                    allowEmailLogin = db.siteProperty_getBoolean("allowEmailLogin", False)
-                    recordCnt = 0
-                    sqlCriteria = "(email=" & db.db_EncodeSQLText(workingEmail) & ")"
-                    If True Then
-                        sqlCriteria = sqlCriteria & "and((dateExpires is null)or(dateExpires>" & db.db_EncodeSQLDate(Now) & "))"
-                    End If
-                    CS = db.db_csOpen("People", sqlCriteria, "ID", , , ,, "username,password", 1)
-                    If Not db.db_csOk(CS) Then
-                        '
-                        ' valid login account for this email not found
-                        '
-                        If (LCase(Mid(workingEmail, atPtr + 1)) = "contensive.com") Then
-                            '
-                            ' look for expired account to renew
-                            '
-                            Call db.db_csClose(CS)
-                            CS = db.db_csOpen("People", "((email=" & db.db_EncodeSQLText(workingEmail) & "))", "ID", , , , , , 1)
-                            If db.db_csOk(CS) Then
-                                '
-                                ' renew this old record
-                                '
-                                'hint = "150"
-                                Call db.db_SetCSField(CS, "developer", "1")
-                                Call db.db_SetCSField(CS, "admin", "1")
-                                Call db.db_SetCSField(CS, "dateExpires", Now.AddDays(7).Date.ToString)
-                            Else
-                                '
-                                ' inject support record
-                                '
-                                'hint = "150"
-                                Call db.db_csClose(CS)
-                                CS = db.db_csInsertRecord("people")
-                                Call db.db_SetCSField(CS, "name", "Contensive Support")
-                                Call db.db_SetCSField(CS, "email", workingEmail)
-                                Call db.db_SetCSField(CS, "developer", "1")
-                                Call db.db_SetCSField(CS, "admin", "1")
-                                Call db.db_SetCSField(CS, "dateExpires", Now.AddDays(7).Date.ToString)
-                            End If
-                            Call db.db_SaveCSRecord(CS)
-                        Else
-                            'hint = "155"
-                            error_AddUserError("No current user was found matching this email address. Please try again. ")
-                        End If
-                    End If
-                    If db.db_csOk(CS) Then
-                        'hint = "160"
-                        FromAddress = db.siteProperty_getText("EmailFromAddress", "info@" & main_ServerDomain)
-                        subject = "Password Request at " & main_ServerDomain
-                        Message = ""
-                        Do While db.db_csOk(CS)
-                            'hint = "170"
-                            updateUser = False
-                            If Message = "" Then
-                                'hint = "180"
-                                Message = "This email was sent in reply to a request at " & main_ServerDomain & " for the username and password associated with this email address. "
-                                Message = Message & "If this request was made by you, please return to the login screen and use the following:" & vbCrLf
-                                Message = Message & vbCrLf
-                            Else
-                                'hint = "190"
-                                Message = Message & vbCrLf
-                                Message = Message & "Additional user accounts with the same email address: " & vbCrLf
-                            End If
-                            '
-                            ' username
-                            '
-                            'hint = "200"
-                            Username = db.db_GetCSText(CS, "Username")
-                            usernameOK = True
-                            If Not allowEmailLogin Then
-                                'hint = "210"
-                                If Username <> Trim(Username) Then
-                                    'hint = "220"
-                                    Username = Trim(Username)
-                                    updateUser = True
-                                End If
-                                If Username = "" Then
-                                    'hint = "230"
-                                    'username = emailName & Int(Rnd() * 9999)
-                                    usernameOK = False
-                                    Ptr = 0
-                                    Do While Not usernameOK And (Ptr < 100)
-                                        'hint = "240"
-                                        Username = EMailName & Int(Rnd() * 9999)
-                                        usernameOK = Not main_IsLoginOK(Username, "test")
-                                        Ptr = Ptr + 1
-                                    Loop
-                                    'hint = "250"
-                                    If usernameOK Then
-                                        updateUser = True
-                                    End If
-                                End If
-                                'hint = "260"
-                                Message = Message & " username: " & Username & vbCrLf
-                            End If
-                            'hint = "270"
-                            If usernameOK Then
-                                '
-                                ' password
-                                '
-                                'hint = "280"
-                                Password = db.db_GetCSText(CS, "Password")
-                                If Trim(Password) <> Password Then
-                                    'hint = "290"
-                                    Password = Trim(Password)
-                                    updateUser = True
-                                End If
-                                'hint = "300"
-                                If Password = "" Then
-                                    'hint = "310"
-                                    For Ptr = 0 To 8
-                                        'hint = "320"
-                                        Index = CInt(Rnd() * passwordChrsLength)
-                                        Password = Password & Mid(passwordChrs, Index, 1)
-                                    Next
-                                    'hint = "330"
-                                    updateUser = True
-                                End If
-                                'hint = "340"
-                                Message = Message & " password: " & Password & vbCrLf
-                                security_SendMemberPassword = True
-                                If updateUser Then
-                                    'hint = "350"
-                                    Call db.db_setCS(CS, "username", Username)
-                                    Call db.db_setCS(CS, "password", Password)
-                                End If
-                                recordCnt = recordCnt + 1
-                            End If
-                            db.db_csGoNext(CS)
-                        Loop
-                    End If
-                End If
-            End If
-            'hint = "360"
-            If security_SendMemberPassword Then
-                Call main_SendEmail(workingEmail, FromAddress, subject, Message, , True, False)
-                '    main_ClosePageHTML = main_ClosePageHTML & main_GetPopupMessage(app.publicFiles.ReadFile("ccLib\Popup\PasswordSent.htm"), 300, 300, "no")
-            End If
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18(MethodName)
-            '
-        End Function
-        '
         '========================================================================
         ' main_GetRecordEditLink( iContentName, iRecordID )
         '
@@ -17480,7 +16233,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function main_GetRecordEditLink(ByVal ContentName As String, ByVal RecordID As Integer, Optional ByVal AllowCut As Boolean = False) As String
-            main_GetRecordEditLink = main_GetRecordEditLink2(ContentName, RecordID, EncodeBoolean(AllowCut), "", user_isEditing(EncodeText(ContentName)))
+            main_GetRecordEditLink = main_GetRecordEditLink2(ContentName, RecordID, EncodeBoolean(AllowCut), "", user.user_isEditing(EncodeText(ContentName)))
         End Function
         '
         '========================================================================
@@ -17546,7 +16299,7 @@ ErrorTrap:
                             & "<a" _
                             & " class=""ccRecordEditLink"" " _
                             & " TabIndex=-1" _
-                            & " href=""" & html_EncodeHTML(db.siteProperty_AdminURL & "?cid=" & ContentID & "&id=" & iRecordID & "&af=4&aa=2&ad=1") & """"
+                            & " href=""" & html_EncodeHTML(siteProperties.adminURL & "?cid=" & ContentID & "&id=" & iRecordID & "&af=4&aa=2&ad=1") & """"
                         If Not main_ReturnAfterEdit Then
                             main_GetRecordEditLink2 = main_GetRecordEditLink2 & " target=""_blank"""
                         End If
@@ -17666,7 +16419,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function main_GetRecordAddLink(ByVal ContentName As String, ByVal PresetNameValueList As String, Optional ByVal AllowPaste As Boolean = False) As String
-            main_GetRecordAddLink = main_GetRecordAddLink2(EncodeText(ContentName), EncodeText(PresetNameValueList), AllowPaste, user_isEditing(EncodeText(ContentName)))
+            main_GetRecordAddLink = main_GetRecordAddLink2(EncodeText(ContentName), EncodeText(PresetNameValueList), AllowPaste, user.user_isEditing(EncodeText(ContentName)))
         End Function
         '
         '========================================================================
@@ -17732,7 +16485,7 @@ ErrorTrap:
                     Call db.db_csClose(csChildContent)
                     '
                     If Not useFlyout Then
-                        Link = db.siteProperty_AdminURL & "?cid=" & iContentID & "&af=4&aa=2&ad=1"
+                        Link = siteProperties.adminURL & "?cid=" & iContentID & "&af=4&aa=2&ad=1"
                         If PresetNameValueList <> "" Then
                             Link = Link & "&wc=" & main_EncodeRequestVariable(PresetNameValueList)
                         End If
@@ -17960,14 +16713,14 @@ ErrorTrap:
                     ' ----- Select the Content Record for the Menu Entry selected
                     '
                     ContentRecordFound = False
-                    If user_isAdmin() Then
+                    If user.user_isAdmin() Then
                         '
                         ' ----- admin member, they have access, main_Get ContentID and set markers true
                         '
                         SQL = "SELECT ID as ContentID, AllowAdd as ContentAllowAdd, 1 as GroupRulesAllowAdd, null as MemberRulesDateExpires" _
                             & " FROM ccContent" _
                             & " WHERE (" _
-                            & " (ccContent.Name=" & db.db_EncodeSQLText(ContentName) & ")" _
+                            & " (ccContent.Name=" & db.encodeSQLText(ContentName) & ")" _
                             & " AND(ccContent.active<>0)" _
                             & " );"
                         CS = db.db_csOpenSql(SQL)
@@ -17994,14 +16747,14 @@ ErrorTrap:
                                 & " LEFT JOIN ccMemberRules ON ccgroups.ID=ccMemberRules.GroupID)" _
                                 & " LEFT JOIN ccMembers ON ccMemberRules.MemberID=ccMembers.ID" _
                             & " WHERE (" _
-                            & " (ccContent.Name=" & db.db_EncodeSQLText(ContentName) & ")" _
+                            & " (ccContent.Name=" & db.encodeSQLText(ContentName) & ")" _
                             & " AND(ccContent.active<>0)" _
                             & " AND(ccGroupRules.active<>0)" _
                             & " AND(ccMemberRules.active<>0)" _
                             & " AND((ccMemberRules.DateExpires is Null)or(ccMemberRules.DateExpires>" & db.db_EncodeSQLDate(main_PageStartTime) & "))" _
                             & " AND(ccgroups.active<>0)" _
                             & " AND(ccMembers.active<>0)" _
-                            & " AND(ccMembers.ID=" & userId & ")" _
+                            & " AND(ccMembers.ID=" & user.userId & ")" _
                             & " );"
                         CS = db.db_csOpenSql(SQL)
                         If db.db_csOk(CS) Then
@@ -18039,7 +16792,7 @@ ErrorTrap:
                         ButtonCaption = ContentName
                         main_GetRecordAddLink_AddMenuEntry = MenuName
                         If ContentAllowAdd And GroupRulesAllowAdd And MemberRulesAllow Then
-                            Link = db.siteProperty_AdminURL & "?cid=" & ContentID & "&af=4&aa=2&ad=1"
+                            Link = siteProperties.adminURL & "?cid=" & ContentID & "&af=4&aa=2&ad=1"
                             If PresetNameValueList <> "" Then
                                 Dim NameValueList As String
                                 NameValueList = PresetNameValueList
@@ -18107,7 +16860,7 @@ ErrorTrap:
             ContentName = main_GetContentNameByID(ContentID)
             If ContentName <> "" Then
                 If Not IsNull(RecordIDVariant) Then
-                    main_GetRecordEditLinkByContent = main_GetRecordEditLink2(ContentName, EncodeInteger(RecordIDVariant), False, "", user_isEditing(ContentName))
+                    main_GetRecordEditLinkByContent = main_GetRecordEditLink2(ContentName, EncodeInteger(RecordIDVariant), False, "", user.user_isEditing(ContentName))
                 Else
                     main_GetRecordEditLinkByContent = main_GetRecordAddLink(ContentName, Criteria)
                 End If
@@ -18269,19 +17022,19 @@ ErrorTrap:
                     ' use addon editor
                     '
                     addonOption_String = "" _
-                        & "editorName=" & main_EncodeAddonOptionArgument(htmlName) _
-                        & "&editorValue=" & main_EncodeAddonOptionArgument(DefaultValue) _
+                        & "editorName=" & encodeNvaArgument(htmlName) _
+                        & "&editorValue=" & encodeNvaArgument(DefaultValue) _
                         & "&editorFieldType=" & FieldTypeIdHTML _
                         & "&editorReadOnly=" & readOnlyfield _
                         & "&editorWidth=" & styleWidth _
                         & "&editorHeight=" & styleHeight _
                         & ""
                     addonOption_String = addonOption_String _
-                        & "&editorAllowResourceLibrary=" & main_EncodeAddonOptionArgument(CStr(allowResourceLibrary)) _
-                        & "&editorAllowActiveContent=" & main_EncodeAddonOptionArgument(CStr(allowActiveContent)) _
-                        & "&editorAddonList=" & main_EncodeAddonOptionArgument(addonListJSON) _
-                        & "&editorStyles=" & main_EncodeAddonOptionArgument(styleList) _
-                        & "&editorStyleOptions=" & main_EncodeAddonOptionArgument(styleOptionList) _
+                        & "&editorAllowResourceLibrary=" & encodeNvaArgument(CStr(allowResourceLibrary)) _
+                        & "&editorAllowActiveContent=" & encodeNvaArgument(CStr(allowActiveContent)) _
+                        & "&editorAddonList=" & encodeNvaArgument(addonListJSON) _
+                        & "&editorStyles=" & encodeNvaArgument(styleList) _
+                        & "&editorStyleOptions=" & encodeNvaArgument(styleOptionList) _
                         & ""
                     returnHtml = executeAddon_legacy4(FieldTypeDefaultEditorAddonId.ToString, addonOption_String, addonContextEnum.ContextEditor)
                 End If
@@ -18318,7 +17071,7 @@ ErrorTrap:
             '
             ' ----- Read in and save the Member profile values from the tools panel
             '
-            If (userId > 0) Then
+            If (user.userId > 0) Then
                 If Not error_IsUserError() Then
                     Button = doc_getText("mb")
                     Select Case Button
@@ -18326,19 +17079,19 @@ ErrorTrap:
                             '
                             ' Logout - This can only come from the Horizonal Tool Bar
                             '
-                            Call security_LogoutMember()
+                            Call user.security_LogoutMember()
                         Case ButtonLogin
                             '
                             ' Login - This can only come from the Horizonal Tool Bar
                             '
-                            Call user_ProcessLoginFormDefault()
+                            Call user.user_ProcessLoginFormDefault()
                         Case ButtonApply
                             '
                             ' Apply
                             '
-                            loginForm_Username = doc_getText("username")
-                            If loginForm_Username <> "" Then
-                                Call user_ProcessLoginFormDefault()
+                            user.loginForm_Username = doc_getText("username")
+                            If user.loginForm_Username <> "" Then
+                                Call user.user_ProcessLoginFormDefault()
                             End If
                             '
                             ' ----- AllowAdminLinks
@@ -18365,12 +17118,12 @@ ErrorTrap:
                             '
                             Call properties_SetVisitProperty("AllowDebugging", EncodeText(main_GetStreamBoolean2("AllowDebugging")))
                             property_visit_allowDebugging_isLoaded = False
-                            If user_isDeveloper() Then
+                            If user.user_isDeveloper() Then
                                 '
                                 ' ----- Create Path Block record, if requested
                                 '
                                 CreatePathBlock = main_GetStreamBoolean2("CreatePathBlock")
-                                CS = db.db_csOpen("Paths", "name=" & db.db_EncodeSQLText("/" & web_requestAppPath))
+                                CS = db.db_csOpen("Paths", "name=" & db.encodeSQLText(web_requestPath))
                                 PathID = 0
                                 If db.db_csOk(CS) Then
                                     PathID = db.db_GetCSInteger(CS, "id")
@@ -18382,7 +17135,7 @@ ErrorTrap:
                                     '
                                     CS = db.db_csInsertRecord("Paths")
                                     If db.db_csOk(CS) Then
-                                        Call db.db_setCS(CS, "name", "/" & web_requestAppPath)
+                                        Call db.db_setCS(CS, "name", web_requestPath)
                                         Call db.db_setCS(CS, "active", 1)
                                     End If
                                     Call db.db_csClose(CS)
@@ -18396,87 +17149,6 @@ ErrorTrap:
                     End Select
                 End If
             End If
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18(MethodName)
-            '
-        End Sub
-        '
-        '========================================================================
-        ' ----- Process the login form
-        '========================================================================
-        '
-        Private Function user_ProcessLoginFormDefault() As Boolean
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("ProcessLoginFormDefault")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim MethodName As String
-            Dim Button As String
-            Dim CS As Integer
-            Dim LoginErrorMessage As String
-            Dim LocalMemberID As Integer
-            '
-            MethodName = "main_ProcessLoginFormDefault()"
-            user_ProcessLoginFormDefault = False
-            '
-            If Not main_loginFormDefaultProcessed Then
-                '
-                ' Processing can happen
-                '   1) early in init() -- legacy
-                '   2) as well as at the front of main_GetLoginForm - to support addon Login forms
-                ' This flag prevents the default form from processing twice
-                '
-                main_loginFormDefaultProcessed = True
-                loginForm_Username = doc_getText("username")
-                loginForm_Password = doc_getText("password")
-                loginForm_AutoLogin = main_GetStreamBoolean2("autologin")
-                '
-                If (main_VisitLoginAttempts < main_maxVisitLoginAttempts) And (main_VisitCookieSupport) Then
-                    LocalMemberID = main_GetLoginMemberID(loginForm_Username, loginForm_Password)
-                    If LocalMemberID = 0 Then
-                        main_VisitLoginAttempts = main_VisitLoginAttempts + 1
-                        Call main_SaveVisit()
-                    Else
-                        user_ProcessLoginFormDefault = user_LoginMemberByID(LocalMemberID, loginForm_AutoLogin)
-                        If user_ProcessLoginFormDefault Then
-                            Call main_LogActivity2("successful username/password login", userId, userOrganizationId)
-                        Else
-                            Call main_LogActivity2("bad username/password login", userId, userOrganizationId)
-                        End If
-                    End If
-                End If
-            End If
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18(MethodName)
-        End Function
-        '
-        '========================================================================
-        ' ----- Process the send password form
-        '========================================================================
-        '
-        Private Sub user_ProcessFormSendPassword()
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("ProcessFormSendPassword")
-            '
-            'If Not (true) Then Exit Sub
-            '
-            Dim MethodName As String
-            '
-            MethodName = "main_ProcessFormSendPassword()"
-            '
-            ' ----- lookup a Member account and send the username/password
-            '
-            loginForm_Email = doc_getText("email")
-            Call security_SendMemberPassword(loginForm_Email)
             '
             Exit Sub
             '
@@ -18544,7 +17216,7 @@ ErrorTrap:
                 ' ----- Page Content Child List Add-on
                 '
                 If (RecordID <> 0) And (True) Then
-                    CSAddon = db_csOpen("Add-ons", db.siteProperty_ChildListAddonID)
+                    CSAddon = db_csOpen("Add-ons", siteProperties.childListAddonID)
                     FoundAddon = False
                     If db.db_csOk(CSAddon) Then
                         FoundAddon = True
@@ -18577,7 +17249,7 @@ ErrorTrap:
                                 For OptionPtr = 0 To OptionCnt - 1
                                     ArgValue = doc_getText(ArgName & OptionPtr)
                                     If ArgValue <> "" Then
-                                        ArgValueAddonEncoded = ArgValueAddonEncoded & "," & main_EncodeAddonOptionArgument(ArgValue)
+                                        ArgValueAddonEncoded = ArgValueAddonEncoded & "," & encodeNvaArgument(ArgValue)
                                     End If
                                 Next
                                 If ArgValueAddonEncoded <> "" Then
@@ -18585,9 +17257,9 @@ ErrorTrap:
                                 End If
                             Else
                                 ArgValue = doc_getText(ArgName)
-                                ArgValueAddonEncoded = main_EncodeAddonOptionArgument(ArgValue)
+                                ArgValueAddonEncoded = encodeNvaArgument(ArgValue)
                             End If
-                            addonOption_String = addonOption_String & "&" & main_EncodeAddonOptionArgument(ArgName) & "=" & ArgValueAddonEncoded
+                            addonOption_String = addonOption_String & "&" & encodeNvaArgument(ArgName) & "=" & ArgValueAddonEncoded
                         Next
                         If addonOption_String <> "" Then
                             addonOption_String = Mid(addonOption_String, 2)
@@ -18595,7 +17267,7 @@ ErrorTrap:
                     End If
                     Call db.db_csClose(CSAddon)
                     ' ????? need to test
-                    Call db.executeSql("update ccpagecontent set ChildListInstanceOptions=" & db.db_EncodeSQLText(addonOption_String) & " where id=" & RecordID)
+                    Call db.executeSql("update ccpagecontent set ChildListInstanceOptions=" & db.encodeSQLText(addonOption_String) & " where id=" & RecordID)
                     needToClearCache = True
                     'CS = main_OpenCSContentRecord("page content", RecordID)
                     'If app.csv_IsCSOK(CS) Then
@@ -18674,7 +17346,7 @@ ErrorTrap:
                                 For OptionPtr = 0 To OptionCnt - 1
                                     ArgValue = doc_getText(ArgName & OptionPtr)
                                     If ArgValue <> "" Then
-                                        ArgValueAddonEncoded = ArgValueAddonEncoded & "," & main_EncodeAddonOptionArgument(ArgValue)
+                                        ArgValueAddonEncoded = ArgValueAddonEncoded & "," & encodeNvaArgument(ArgValue)
                                     End If
                                 Next
                                 If ArgValueAddonEncoded <> "" Then
@@ -18682,9 +17354,9 @@ ErrorTrap:
                                 End If
                             Else
                                 ArgValue = doc_getText(ArgName)
-                                ArgValueAddonEncoded = main_EncodeAddonOptionArgument(ArgValue)
+                                ArgValueAddonEncoded = encodeNvaArgument(ArgValue)
                             End If
-                            addonOption_String = addonOption_String & "&" & main_EncodeAddonOptionArgument(ArgName) & "=" & ArgValueAddonEncoded
+                            addonOption_String = addonOption_String & "&" & encodeNvaArgument(ArgName) & "=" & ArgValueAddonEncoded
                         End If
                     Next
                     If addonOption_String <> "" Then
@@ -18799,7 +17471,7 @@ ErrorTrap:
                                                     For OptionPtr = 0 To OptionCnt - 1
                                                         ArgValue = doc_getText(ArgName & OptionPtr)
                                                         If ArgValue <> "" Then
-                                                            ArgValueAddonEncoded = ArgValueAddonEncoded & "," & main_EncodeAddonOptionArgument(ArgValue)
+                                                            ArgValueAddonEncoded = ArgValueAddonEncoded & "," & encodeNvaArgument(ArgValue)
                                                         End If
                                                     Next
                                                     If ArgValueAddonEncoded <> "" Then
@@ -18807,10 +17479,10 @@ ErrorTrap:
                                                     End If
                                                 Else
                                                     ArgValue = doc_getText(ArgName)
-                                                    ArgValueAddonEncoded = main_EncodeAddonOptionArgument(ArgValue)
+                                                    ArgValueAddonEncoded = encodeNvaArgument(ArgValue)
                                                 End If
 
-                                                addonOption_String = addonOption_String & "&" & main_EncodeAddonOptionArgument(ArgName) & "=" & ArgValueAddonEncoded
+                                                addonOption_String = addonOption_String & "&" & encodeNvaArgument(ArgName) & "=" & ArgValueAddonEncoded
                                             End If
                                         Next
                                         If addonOption_String <> "" Then
@@ -18906,7 +17578,7 @@ ErrorTrap:
                         If RecordID > 0 Then
                             HelpCaption = doc_getText("helpcaption")
                             HelpMessage = doc_getText("helptext")
-                            SQL = "update ccfields set caption=" & db.db_EncodeSQLText(HelpCaption) & ",HelpMessage=" & db.db_EncodeSQLText(HelpMessage) & " where id=" & RecordID
+                            SQL = "update ccfields set caption=" & db.encodeSQLText(HelpCaption) & ",HelpMessage=" & db.encodeSQLText(HelpMessage) & " where id=" & RecordID
                             Call db.executeSql(SQL)
                             cache.invalidateAll()
                             metaData.clear()
@@ -18921,70 +17593,6 @@ ErrorTrap:
 ErrorTrap:
             Call handleLegacyError18(MethodName)
             '
-        End Sub
-        '
-        '========================================================================
-        ' ----- Process the send password form
-        '========================================================================
-        '
-        Private Sub user_ProcessFormJoin()
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("ProcessFormJoin")
-            '
-            'If Not (true) Then Exit Sub
-            '
-            Dim MethodName As String
-            Dim ErrorMessage As String
-            Dim CS As Integer
-            Dim ChangeMade As Boolean
-            Dim FirstName As String
-            Dim LastName As String
-            Dim FullName As String
-            Dim Email As String
-            '
-            MethodName = "main_ProcessFormJoin()"
-            '
-            ' ----- add a username and password for this guest
-            '
-            loginForm_Username = doc_getText("username")
-            loginForm_Password = doc_getText("password")
-            '
-            If Not EncodeBoolean(db.siteProperty_getBoolean("AllowMemberJoin", False)) Then
-                error_AddUserError("This site does not accept public main_MemberShip.")
-            Else
-                If Not main_IsNewLoginOK(loginForm_Username, loginForm_Password, ErrorMessage) Then
-                    Call error_AddUserError(ErrorMessage)
-                Else
-                    If Not error_IsUserError() Then
-                        CS = db.db_csOpen("people", "ID=" & db.db_EncodeSQLNumber(userId))
-                        If Not db.db_csOk(CS) Then
-                            handleExceptionAndRethrow(New Exception("Could not open the current members account to set the username and password."))
-                        Else
-                            If (db.db_GetCSText(CS, "username") <> "") Or (db.db_GetCSText(CS, "password") <> "") Or (db.db_GetCSBoolean(CS, "admin")) Or (db.db_GetCSBoolean(CS, "developer")) Then
-                                '
-                                ' if the current account can be logged into, you can not join 'into' it
-                                '
-                                Call security_LogoutMember()
-                            End If
-                            FirstName = doc_getText("firstname")
-                            LastName = doc_getText("firstname")
-                            FullName = FirstName & " " & LastName
-                            Email = doc_getText("email")
-                            Call db.db_setCS(CS, "FirstName", FirstName)
-                            Call db.db_setCS(CS, "LastName", LastName)
-                            Call db.db_setCS(CS, "Name", FullName)
-                            Call db.db_setCS(CS, "username", loginForm_Username)
-                            Call db.db_setCS(CS, "password", loginForm_Password)
-                            Call user_LoginMemberByID(userId)
-                        End If
-                        Call db.db_csClose(CS)
-                    End If
-                End If
-            End If
-            Call cache.invalidateTagList2("People")
-            '
-            Exit Sub
-ErrorTrap:
-            Call handleLegacyError18(MethodName)
         End Sub
         '
         '========================================================================
@@ -19119,7 +17727,7 @@ ErrorTrap:
                 iMenuName = EncodeText(MenuName)
                 '
                 '
-                MenuFlyoutIcon = db.siteProperty_getText("MenuFlyoutIcon", DefaultIcon)
+                MenuFlyoutIcon = siteProperties.getText("MenuFlyoutIcon", DefaultIcon)
                 If MenuFlyoutIcon <> DefaultIcon Then
                     main_MenuSystem.MenuFlyoutIcon = MenuFlyoutIcon
                 End If
@@ -19170,7 +17778,7 @@ ErrorTrap:
             If Not (main_MenuSystem Is Nothing) Then
                 menu_MenuSystemCloseCount = menu_MenuSystemCloseCount + 1
                 menu_GetClose = menu_GetClose & main_MenuSystem.GetMenuClose()
-                MenuFlyoutIcon = db.siteProperty_getText("MenuFlyoutIcon", "&#187;")
+                MenuFlyoutIcon = siteProperties.getText("MenuFlyoutIcon", "&#187;")
                 If MenuFlyoutIcon <> "&#187;" Then
                     menu_GetClose = Replace(menu_GetClose, "&#187;</a>", MenuFlyoutIcon & "</a>")
                 End If
@@ -19203,7 +17811,7 @@ ErrorTrap:
             Dim returnProperty As String = DefaultValue
             Try
                 If TargetMemberID = SystemMemberID Then
-                    returnProperty = userPropertyCache.getProperty(PropertyName, DefaultValue, userId)
+                    returnProperty = userPropertyCache.getProperty(PropertyName, DefaultValue, user.userId)
                 Else
                     returnProperty = userPropertyCache.getProperty(PropertyName, DefaultValue, TargetMemberID)
                 End If
@@ -19224,7 +17832,7 @@ ErrorTrap:
         Public Sub properties_SetMemberProperty2(ByVal PropertyName As String, ByVal Value As String, Optional ByVal TargetMemberID As Integer = SystemMemberID)
             Try
                 If TargetMemberID = SystemMemberID Then
-                    Call userPropertyCache.setProperty(PropertyName, Value, userId)
+                    Call userPropertyCache.setProperty(PropertyName, Value, user.userId)
                 Else
                     Call userPropertyCache.setProperty(PropertyName, Value, TargetMemberID)
                 End If
@@ -19735,7 +18343,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            db_csOpenRecord = db.db_csOpen(ContentName, "(ID=" & db.db_EncodeSQLNumber(RecordID) & ")", , False, userId, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
+            db_csOpenRecord = db.db_csOpen(ContentName, "(ID=" & db.db_EncodeSQLNumber(RecordID) & ")", , False, user.userId, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
             '
             Exit Function
             '
@@ -19760,7 +18368,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            db_csOpen = db.db_csOpen(EncodeText(ContentName), "(ID=" & db.db_EncodeSQLNumber(RecordID) & ")", , False, userId, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
+            db_csOpen = db.db_csOpen(EncodeText(ContentName), "(ID=" & db.db_EncodeSQLNumber(RecordID) & ")", , False, user.userId, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
             '
             Exit Function
             '
@@ -19778,98 +18386,13 @@ ErrorTrap:
         Public Function pagemanager_IsWorkflowRendering() As Boolean
             Dim returnIs As Boolean = False
             Try
-                If main_IsContentManager() Then
+                If user.main_IsContentManager() Then
                     pagemanager_IsWorkflowRendering = main_VisitProperty_AllowWorkflowRendering
                 End If
             Catch ex As Exception
                 handleExceptionAndRethrow(ex)
             End Try
             Return returnIs
-        End Function
-        '
-        '========================================================================
-        ' ----- Returns true if the visitor is an admin, or authenticated and in the group named
-        '========================================================================
-        '
-        Public Function user_IsGroupMember(ByVal GroupName As String, Optional ByVal checkMemberID As Integer = 0) As Boolean
-            Dim iMemberID As Integer
-            iMemberID = EncodeInteger(checkMemberID)
-            If iMemberID = 0 Then
-                iMemberID = userId
-            End If
-            user_IsGroupMember = user_IsGroupListMember2("," & main_GetGroupID(EncodeText(GroupName)), iMemberID, True)
-        End Function
-        '
-        '========================================================================
-        ' ----- Returns true if the visitor is a member, and in the group named
-        '========================================================================
-        '
-        Public Function user_IsGroupMember2(ByVal GroupName As String, Optional ByVal checkMemberID As Integer = 0, Optional ByVal adminReturnsTrue As Boolean = False) As Boolean
-            Dim iMemberID As Integer
-            iMemberID = checkMemberID
-            If iMemberID = 0 Then
-                iMemberID = userId
-            End If
-            user_IsGroupMember2 = user_IsGroupListMember2("," & main_GetGroupID(EncodeText(GroupName)), iMemberID, adminReturnsTrue)
-        End Function
-
-        '
-        '========================================================================
-        ' ----- Returns true if the visitor is an admin, or authenticated and in the group list
-        '========================================================================
-        '
-        Public Function user_IsGroupListMember2(ByVal GroupIDList As String, Optional ByVal checkMemberID As Integer = 0, Optional ByVal adminReturnsTrue As Boolean = False) As Boolean
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("IsGroupListMember2")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim MethodName As String
-            Dim iCheckMemberID As Integer
-            '
-            MethodName = "IsGroupListMember2"
-            iCheckMemberID = checkMemberID
-            If iCheckMemberID = 0 Then
-                iCheckMemberID = userId
-            End If
-            'iCheckMemberID = encodeMissingInteger(checkMemberID, memberID)
-            user_IsGroupListMember2 = user_isMemberOfGroupIdList2(iCheckMemberID, user_isAuthenticated(), GroupIDList, adminReturnsTrue)
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18(MethodName)
-            '
-        End Function
-        '
-        '========================================================================
-        '   IsMember
-        '   true if the user is authenticated and is a trusted people (member content)
-        '========================================================================
-        '
-        Public Function user_IsMember() As Boolean
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("IsMember")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim MethodName As String
-            '
-            MethodName = "IsMember"
-            '
-            If (Not property_user_isMember_isLoaded) And (visit_initialized) Then
-                property_user_isMember = user_isAuthenticated() And db_IsWithinContent(userContentControlID, main_GetContentID("members"))
-                property_user_isMember_isLoaded = True
-            End If
-            user_IsMember = property_user_isMember
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18(MethodName)
-            '
         End Function
         '
         '========================================================================
@@ -19896,218 +18419,6 @@ ErrorTrap:
             Call handleLegacyError18(MethodName)
             '
         End Function
-        '
-        '========================================================================
-        '   IsGuest
-        '       A guest is a first time visitor
-        '========================================================================
-        '
-        Public Function user_IsGuest() As Boolean
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("IsGuest")
-            '
-            'If Not (true) Then Exit Function
-            '
-            user_IsGuest = Not user_IsMember()
-            '
-            Exit Function
-            '
-ErrorTrap:
-            Call handleLegacyError18("IsGuest")
-        End Function
-        '
-        '========================================================================
-        '   main_IsRecognized
-        '   true if the person has a member record from a previous visit
-        '   this may be because they are authenticated, or the person may
-        '   have returned without authentication, but they are using thier
-        '   member record because it was recognized from their cookie.
-        '========================================================================
-        '
-        Public Function user_isRecognized() As Boolean
-            user_isRecognized = (Not userIsNew)
-        End Function
-        '
-        '========================================================================
-        '   main_IsAuthenticated
-        '   true if the person has logged in (must be member)
-        '========================================================================
-        '
-        Public Function user_isAuthenticated() As Boolean
-            Return visit_isAuthenticated
-        End Function
-        '
-        '========================================================================
-        ' main_IsEditing( ContentName )
-        '   True if the current visitor is authoring the content specified
-        '   If main_IsContentManager2( ContentName ) and Allow Authoring then true
-        '========================================================================
-        '
-        Public Function user_isEditingAnything() As Boolean
-            Return user_isEditing("")
-        End Function
-        '
-        '========================================================================
-        ' main_IsEditing( ContentName )
-        '   True if the current visitor is authoring the content specified
-        '   If main_IsContentManager2( ContentName ) and Allow Authoring then true
-        '========================================================================
-        '
-        Public Function user_isEditing(ByVal ContentNameOrId As String) As Boolean
-            Dim returnResult As Boolean = False
-            Try
-                If Not (_db Is Nothing) Then
-                    Dim localContentNameOrId As String
-                    Dim cacheTestName As String
-                    '
-                    main_IsEditingCallCnt = main_IsEditingCallCnt + 1
-                    If Not visit_initialized Then
-                        Call testPoint("...visit not initialized")
-                    Else
-                        '
-                        ' always false until visit loaded
-                        '
-                        localContentNameOrId = EncodeText(ContentNameOrId)
-                        cacheTestName = localContentNameOrId
-                        If cacheTestName = "" Then
-                            cacheTestName = "iseditingall"
-                        End If
-                        cacheTestName = LCase(cacheTestName)
-                        If IsInDelimitedString(main_IsEditingContentList, cacheTestName, ",") Then
-                            Call testPoint("...is in main_IsEditingContentList")
-                            returnResult = True
-                        ElseIf IsInDelimitedString(main_IsNotEditingContentList, cacheTestName, ",") Then
-                            Call testPoint("...is in main_IsNotEditingContentList")
-                        Else
-                            If user_isAuthenticated() Then
-                                If Not main_ServerPagePrintVersion Then
-                                    If (main_VisitProperty_AllowEditing Or main_VisitProperty_AllowAdvancedEditor) Then
-                                        If localContentNameOrId <> "" Then
-                                            If IsNumeric(localContentNameOrId) Then
-                                                localContentNameOrId = main_GetContentNameByID(EncodeInteger(localContentNameOrId))
-                                            End If
-                                        End If
-                                        returnResult = main_IsContentManager(localContentNameOrId)
-                                    End If
-                                End If
-                            End If
-                            If returnResult Then
-                                main_IsEditingContentList = main_IsEditingContentList & "," & cacheTestName
-                            Else
-                                main_IsNotEditingContentList = main_IsNotEditingContentList & "," & cacheTestName
-                            End If
-                        End If
-                    End If
-                End If
-            Catch ex As Exception
-                handleExceptionAndRethrow(ex)
-            End Try
-            Return returnResult
-        End Function
-        '
-        '========================================================================
-        ' main_IsQuickEditing( ContentName )
-        '   True if the current visitor is authoring the content specified
-        '   If main_IsContentManager2( ContentName ) and Allow Authoring then true
-        '========================================================================
-        '
-        Public Function user_isQuickEditing(ByVal ContentName As String) As Boolean
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("IsQuickEditing")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim MethodName As String
-            '
-            MethodName = "main_IsQuickEditing"
-            '
-            ' save the visit property hit if not contentmanager
-            '
-            If (Not main_ServerPagePrintVersion) Then
-                If main_IsContentManager(EncodeText(ContentName)) Then
-                    user_isQuickEditing = main_VisitProperty_AllowQuickEditor
-                End If
-            End If
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18(MethodName)
-            '
-        End Function
-        '
-        '========================================================================
-        ' main_IsAdvancedEditing( ContentName )
-        '   True if the current visitor is authoring the content specified
-        '   If main_IsContentManager2( ContentName ) and Allow Authoring then true
-        '========================================================================
-        '
-        Public Function user_IsAdvancedEditing(ByVal ContentName As String) As Boolean
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("IsAdvancedEditing")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim MethodName As String
-            '
-            MethodName = "main_IsAdvancedEditing"
-            '
-            ' save the visit property hit if not contentmanager
-            '
-            If (Not main_ServerPagePrintVersion) Then
-                If main_IsContentManager(EncodeText(ContentName)) Then
-                    user_IsAdvancedEditing = main_VisitProperty_AllowAdvancedEditor
-                End If
-            End If
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18(MethodName)
-            '
-        End Function
-        '
-        '========================================================================
-        '   main_IsAdmin
-        '   true if:
-        '       Is Authenticated
-        '       Is Member
-        '       Member has admin or developer status
-        '========================================================================
-        '
-        Public Function user_isAdmin() As Boolean
-            Dim returnIs As Boolean = False
-            Try
-                If (Not property_user_isAdmin_isLoaded) And visit_initialized Then
-                    property_user_isAdmin = user_isAuthenticated() And (userIsAdmin Or userIsDeveloper)
-                    property_user_isAdmin_isLoaded = True
-                End If
-                returnIs = property_user_isAdmin
-            Catch ex As Exception
-                handleExceptionAndRethrow(ex)
-            End Try
-            Return returnIs
-        End Function
-        '
-        '========================================================================
-        '   main_IsDeveloper
-        '========================================================================
-        '
-        Public Function user_isDeveloper() As Boolean
-            Dim returnIs As Boolean = False
-            Try
-                If (Not property_user_isDeveloper_isLoaded) And visit_initialized Then
-                    property_user_isDeveloper = (user_isAuthenticated() And userIsDeveloper)
-                    property_user_isDeveloper_isLoaded = True
-                End If
-                returnIs = property_user_isDeveloper
-            Catch ex As Exception
-                handleExceptionAndRethrow(ex)
-            End Try
-            Return returnIs
-        End Function
-
         '
         '
         '
@@ -20173,7 +18484,7 @@ ErrorTrap:
             '
             MethodName = "main_EncodeSQLText( " & iSourceText & " )"
             '
-            db_EncodeSQLText = db.db_EncodeSQLText(iSourceText)
+            db_EncodeSQLText = db.encodeSQLText(iSourceText)
             '
             Exit Function
             '
@@ -20230,7 +18541,7 @@ ErrorTrap:
             '
             MethodName = "main_GetAuthoringStatus"
             '
-            Call db.workflow_GetAuthoringStatus(ContentName, RecordID, IsSubmitted, IsApproved, SubmittedName, ApprovedName, IsInserted, IsDeleted, IsModified, ModifiedName, ModifiedDate, SubmittedDate, ApprovedDate)
+            Call workflow.getAuthoringStatus(ContentName, RecordID, IsSubmitted, IsApproved, SubmittedName, ApprovedName, IsInserted, IsDeleted, IsModified, ModifiedName, ModifiedDate, SubmittedDate, ApprovedDate)
             '
             Exit Sub
             '
@@ -20280,7 +18591,7 @@ ErrorTrap:
             ' main_Get Authoring Workflow Status
             '
             If RecordID <> 0 Then
-                Call db.workflow_GetAuthoringStatus(ContentName, RecordID, IsSubmitted, IsApproved, SubmittedName, ApprovedName, IsInserted, IsDeleted, IsModified, ModifiedName, ModifiedDate, SubmittedDate, ApprovedDate)
+                Call workflow.getAuthoringStatus(ContentName, RecordID, IsSubmitted, IsApproved, SubmittedName, ApprovedName, IsInserted, IsDeleted, IsModified, ModifiedName, ModifiedDate, SubmittedDate, ApprovedDate)
             End If
             '
             ' main_Get Content Definition
@@ -20295,7 +18606,7 @@ ErrorTrap:
                 '
                 AllowCancel = True
                 readOnlyField = True
-            ElseIf (Not db.siteProperty_AllowWorkflowAuthoring) Or (Not CDef.AllowWorkflowAuthoring) Then
+            ElseIf (Not siteProperties.allowWorkflowAuthoring) Or (Not CDef.AllowWorkflowAuthoring) Then
                 '
                 ' No Workflow Authoring
                 '
@@ -20307,7 +18618,7 @@ ErrorTrap:
                 If (CDef.AllowAdd) And (Not IsInserted) Then
                     AllowInsert = True
                 End If
-            ElseIf user_isAdmin() Then
+            ElseIf user.user_isAdmin() Then
                 '
                 ' Workflow, Admin
                 '
@@ -20464,18 +18775,18 @@ ErrorTrap:
             '
             MethodName = "main_SendPublishSubmitNotice"
             '
-            FromAddress = db.siteProperty_getText("EmailPublishSubmitFrom", db.siteProperty_EmailAdmin)
+            FromAddress = siteProperties.getText("EmailPublishSubmitFrom", siteProperties.emailAdmin)
             CDef = metaData.getCdef(ContentName)
-            Link = db.siteProperty_AdminURL & "?af=" & AdminFormPublishing
+            Link = siteProperties.adminURL & "?af=" & AdminFormPublishing
             Copy = Msg_AuthoringSubmittedNotification
             Copy = Replace(Copy, "<DOMAINNAME>", "<a href=""" & html_EncodeHTML(Link) & """>" & main_ServerDomain & "</a>")
             Copy = Replace(Copy, "<RECORDNAME>", RecordName)
             Copy = Replace(Copy, "<CONTENTNAME>", ContentName)
             Copy = Replace(Copy, "<RECORDID>", RecordID.ToString)
             Copy = Replace(Copy, "<SUBMITTEDDATE>", main_PageStartTime.ToString)
-            Copy = Replace(Copy, "<SUBMITTEDNAME>", userName)
+            Copy = Replace(Copy, "<SUBMITTEDNAME>", user.userName)
             '
-            Call main_SendGroupEmail(db.siteProperty_getText("WorkflowEditorGroup", "Content Editors"), FromAddress, "Authoring Submitted Notification", Copy, False, True)
+            Call main_SendGroupEmail(siteProperties.getText("WorkflowEditorGroup", "Content Editors"), FromAddress, "Authoring Submitted Notification", Copy, False, True)
             '
             Exit Sub
             '
@@ -20499,7 +18810,7 @@ ErrorTrap:
             MethodName = "main_GetTableID"
             '
             db_GetTableID = -1
-            CS = db.db_csOpenSql("Select ID from ccTables where name=" & db.db_EncodeSQLText(TableName), , 1)
+            CS = db.db_csOpenSql("Select ID from ccTables where name=" & db.encodeSQLText(TableName), , 1)
             If db.db_csOk(CS) Then
                 db_GetTableID = db.db_GetCSInteger(CS, "ID")
             End If
@@ -20535,7 +18846,7 @@ ErrorTrap:
             MethodName = "main_GetAuthoringStatusMessage"
             '
             main_EditLockExpiresMinutes = CInt((main_EditLockExpires - main_PageStartTime).TotalMinutes)
-            If Not db.siteProperty_AllowWorkflowAuthoring Then
+            If Not siteProperties.allowWorkflowAuthoring Then
                 '
                 ' ----- site does not support workflow authoring
                 '
@@ -20569,7 +18880,7 @@ ErrorTrap:
                     '
                     ' Approved
                     '
-                    If user_isAdmin() Then
+                    If user.user_isAdmin() Then
                         Copy = Replace(Msg_AuthoringApprovedAdmin, "<EDITNAME>", ApprovedBy)
                         main_GetAuthoringStatusMessage &= Delimiter & Copy
                         Delimiter = "<BR >"
@@ -20582,7 +18893,7 @@ ErrorTrap:
                     '
                     ' Submitted
                     '
-                    If user_isAdmin() Then
+                    If user.user_isAdmin() Then
                         Copy = Replace(Msg_AuthoringSubmittedAdmin, "<EDITNAME>", SubmittedBy)
                         main_GetAuthoringStatusMessage &= Delimiter & Copy
                         Delimiter = "<BR >"
@@ -20607,7 +18918,7 @@ ErrorTrap:
                     '
                     ' modified, submitted or approved
                     '
-                    If user_isAdmin() Then
+                    If user.user_isAdmin() Then
                         If RecordEditLocked Then
                             Copy = Replace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
                             Copy = Replace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
@@ -20720,8 +19031,8 @@ ErrorTrap:
             MethodName = "main_GetLoginMemberID"
             '
             main_GetLoginMemberID = 0
-            allowEmailLogin = EncodeBoolean(db.siteProperty_getBoolean("allowEmailLogin", False))
-            allowNoPasswordLogin = EncodeBoolean(db.siteProperty_getBoolean("allowNoPasswordLogin", False))
+            allowEmailLogin = EncodeBoolean(siteProperties.getBoolean("allowEmailLogin", False))
+            allowNoPasswordLogin = EncodeBoolean(siteProperties.getBoolean("allowNoPasswordLogin", False))
             If iLoginFieldValue = "" Then
                 '
                 ' ----- loginFieldValue blank, stop here
@@ -20736,7 +19047,7 @@ ErrorTrap:
                 ' ----- password blank, stop here
                 '
                 Call error_AddUserError("A valid login requires a non-blank password.")
-            ElseIf (main_VisitLoginAttempts >= main_maxVisitLoginAttempts) Then
+            ElseIf (main_VisitLoginAttempts >= user.main_maxVisitLoginAttempts) Then
                 '
                 ' ----- already tried 5 times
                 '
@@ -20746,12 +19057,12 @@ ErrorTrap:
                     '
                     ' login by username or email
                     '
-                    Criteria = "((username=" & db.db_EncodeSQLText(iLoginFieldValue) & ")or(email=" & db.db_EncodeSQLText(iLoginFieldValue) & "))"
+                    Criteria = "((username=" & db.encodeSQLText(iLoginFieldValue) & ")or(email=" & db.encodeSQLText(iLoginFieldValue) & "))"
                 Else
                     '
                     ' login by username only
                     '
-                    Criteria = "(username=" & db.db_EncodeSQLText(iLoginFieldValue) & ")"
+                    Criteria = "(username=" & db.encodeSQLText(iLoginFieldValue) & ")"
                 End If
                 If True Then
                     Criteria = Criteria & "and((dateExpires is null)or(dateExpires>" & db.db_EncodeSQLDate(Now()) & "))"
@@ -20762,7 +19073,7 @@ ErrorTrap:
                     ' ----- loginFieldValue not found, stop here
                     '
                     Call error_AddUserError(badLoginUserError)
-                ElseIf (Not EncodeBoolean(db.siteProperty_getBoolean("AllowDuplicateUsernames", False))) And (db.db_GetCSRowCount(CS) > 1) Then
+                ElseIf (Not EncodeBoolean(siteProperties.getBoolean("AllowDuplicateUsernames", False))) And (db.db_GetCSRowCount(CS) > 1) Then
                     '
                     ' ----- AllowDuplicates is false, and there are more then one record
                     '
@@ -20874,7 +19185,7 @@ ErrorTrap:
                 '        errorMessage = "You currently have cookie support disabled in your browser. Without cookies, your browser can not support the level of security required to login."
             Else
 
-                CSPointer = db.db_csOpen("People", "username=" & db.db_EncodeSQLText(iUsername), , False, , , , "ID", 2)
+                CSPointer = db.db_csOpen("People", "username=" & db.encodeSQLText(iUsername), , False, , , , "ID", 2)
                 If db.db_csOk(CSPointer) Then
                     '
                     ' ----- username was found, stop here
@@ -20902,7 +19213,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            main_GetFormSendPassword = user_GetSendPasswordForm()
+            main_GetFormSendPassword = user.user_GetSendPasswordForm()
             '
             Exit Function
 ErrorTrap:
@@ -21080,7 +19391,7 @@ ErrorTrap:
                         '
                         ' Record exists and is needed, update the rule copy
                         '
-                        SQL = "update " & rulesTablename & " set rulecopy=" & db.db_EncodeSQLText(RuleCopy) & " where id=" & RuleId
+                        SQL = "update " & rulesTablename & " set rulecopy=" & db.encodeSQLText(RuleCopy) & " where id=" & RuleId
                         Call db.executeSql(SQL)
                     ElseIf RuleNeeded And (Not RuleFound) Then
                         '
@@ -21183,7 +19494,7 @@ ErrorTrap:
                 RecordID = db.db_GetCSInteger(CSPointer, "id")
                 ContentName = main_GetContentNameByID(db.db_GetCSInteger(CSPointer, "contentcontrolId"))
             End If
-            main_GetCSEncodedField = html_encodeContent10(db.db_GetCS(EncodeInteger(CSPointer), EncodeText(FieldName)), userId, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & web.requestDomain, False, 0, "", addonContextEnum.ContextPage, user_isAuthenticated, Nothing, user_isEditingAnything)
+            main_GetCSEncodedField = html_encodeContent10(db.db_GetCS(EncodeInteger(CSPointer), EncodeText(FieldName)), user.userId, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & web.requestDomain, False, 0, "", addonContextEnum.ContextPage, user.user_isAuthenticated, Nothing, user.user_isEditingAnything)
             Exit Function
             '
             ' ----- Error Trap
@@ -21259,129 +19570,26 @@ ErrorTrap:
                 db_GetCSSource = db.db_GetCSSource(iCS)
             End If
         End Function
-        '
-        '========================================================================
-        '   Aborts any edits for this record
-        '========================================================================
-        '
-        Public Sub workflow_AbortEdit(ByVal ContentName As String, ByVal RecordID As Integer)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("AbortEdit")
-            '
-            'If Not (true) Then Exit Sub
-            '
-            Call db.workflow_AbortEdit(EncodeText(ContentName), EncodeInteger(RecordID), userId)
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18("main_AbortEdit")
-        End Sub
-        '
-        '========================================================================
-        '   Aborts any edits for this record
-        '========================================================================
-        '
-        Public Sub workflow_PublishEdit(ByVal ContentName As String, ByVal RecordID As Integer)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("PublishEdit")
-            '
-            'If Not (true) Then Exit Sub
-            '
-            Call db.workflow_PublishEdit(EncodeText(ContentName), EncodeInteger(RecordID), userId)
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18("main_PublishEdit")
-            '
-        End Sub
-        '
-        '========================================================================
-        '   Approves any edits for this record
-        '========================================================================
-        '
-        Public Sub workflow_ApproveEdit(ByVal ContentName As String, ByVal RecordID As Integer)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("ApproveEdit")
-            '
-            'If Not (true) Then Exit Sub
-            Call db.workflow_ApproveEdit(EncodeText(ContentName), EncodeInteger(RecordID), userId)
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18("main_ApproveEdit")
-            '
-        End Sub
-        '
-        '========================================================================
-        '   Submits any edits for this record
-        '========================================================================
-        '
-        Public Sub main_SubmitEdit(ByVal ContentName As String, ByVal RecordID As Integer)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SubmitEdit")
-            '
-            'If Not (true) Then Exit Sub
-            '
-            Call db.workflow_SubmitEdit(EncodeText(ContentName), EncodeInteger(RecordID), userId)
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18("main_SubmitEdit")
-            '
-        End Sub
         '        '
         '        '========================================================================
-        '        ' ----- main_Get the menu link for the menu name specified
+        '        '   Aborts any edits for this record
         '        '========================================================================
         '        '
-        '        Public Function main_GetCalendar(Optional ByVal CalendarName As String = "") As String
-        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetCalendar")
+        '        Public Sub workflow.workflow_AbortEdit(ByVal ContentName As String, ByVal RecordID As Integer)
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("AbortEdit")
         '            '
-        '            'If Not (true) Then Exit Function
+        '            'If Not (true) Then Exit Sub
         '            '
-        '            main_GetCalendar = main_GetAddonContent(0, "Calendar", "", addonContextEnum.ContextPage, "", 0, "", 0)
+        '            Call db.workflow.workflow_AbortEdit(EncodeText(ContentName), EncodeInteger(RecordID), user.userid)
         '            '
-        '            Exit Function
+        '            Exit Sub
         '            '
         '            ' ----- Error Trap
         '            '
         'ErrorTrap:
-        '            'Set CalendarSystem = Nothing
-        '            Call handleLegacyError18("main_GetCalendar")
-        '        End Function
-        '
-        '=========================================================================================
-        '   Determine if this Content Definition is run on a table that supports
-        '   Workflow authoring. Only the ContentTable is checked, it is assumed that the
-        '   AuthoringTable is a copy of the ContentTable
-        '=========================================================================================
-        '
-        Public Function main_IsWorkflowAuthoringCompatible(ByVal ContentName As String) As Boolean
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("IsWorkflowAuthoringCompatible")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim TableName As String
-            '
-            main_IsWorkflowAuthoringCompatible = EncodeBoolean(db_GetContentProperty(EncodeText(ContentName), "ALLOWWORKFLOWAUTHORING"))
-            '
-            '    TableName = main_GetContentTablename(ContentName)
-            '    If UCase(TableName) = "CCPAGECONTENT" Then
-            '        IsWorkflowAuthoringCompatible = True
-            '        End If
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("IsWorkflowAuthoringCompatible")
-        End Function
+        '            Call handleLegacyError18("main_AbortEdit")
+        '        End Sub
+
         '        '
         '        '
         '        '
@@ -21425,7 +19633,7 @@ ErrorTrap:
         '
         Public ReadOnly Property main_VisitProperty_AllowHelpIcon() As Boolean
             Get
-                If user_isAuthenticated() Then
+                If user.user_isAuthenticated() Then
                     If Not property_visit_allowHelpIcon_isLoaded Then
                         property_visit_allowHelpIcon_Local = EncodeBoolean(properties_GetVisitProperty("AllowHelpIcon", "False"))
                         property_visit_allowHelpIcon_isLoaded = True
@@ -21440,7 +19648,7 @@ ErrorTrap:
         '
         Public ReadOnly Property main_VisitProperty_AllowEditing() As Boolean
             Get
-                If user_isAuthenticated() Then
+                If user.user_isAuthenticated() Then
                     If Not property_visit_allowEditing_isLoaded Then
                         property_visit_allowEditing = EncodeBoolean(properties_GetVisitProperty("AllowEditing", "0"))
                         property_visit_allowEditing_isLoaded = True
@@ -21464,7 +19672,7 @@ ErrorTrap:
         '
         Public ReadOnly Property main_VisitProperty_AllowQuickEditor() As Boolean
             Get
-                If user_isAuthenticated() Then
+                If user.user_isAuthenticated() Then
                     If Not property_visit_allowQuickEditor_isLoaded Then
                         property_visit_allowQuickEditor = EncodeBoolean(properties_GetVisitProperty("AllowQuickEditor", "0"))
                         property_visit_allowQuickEditor_isLoaded = True
@@ -21480,7 +19688,7 @@ ErrorTrap:
         '
         Public ReadOnly Property main_VisitProperty_AllowAdvancedEditor() As Boolean
             Get
-                If user_isAuthenticated() Then
+                If user.user_isAuthenticated() Then
                     If Not property_visit_allowAdvancedEditor_isLoaded Then
                         property_visit_allowAdvancedEditor = EncodeBoolean(properties_GetVisitProperty("AllowAdvancedEditor", "0"))
                         property_visit_allowAdvancedEditor_isLoaded = True
@@ -21505,7 +19713,7 @@ ErrorTrap:
         '
         Public ReadOnly Property main_VisitProperty_AllowWorkflowRendering() As Boolean
             Get
-                If user_isAuthenticated() Then
+                If user.user_isAuthenticated() Then
                     If Not property_visit_allowWorkflowRendering_isLoaded Then
                         property_visit_allowWorkflowRendering = EncodeBoolean(properties_GetVisitProperty("AllowWorkflowRendering", "0"))
                         property_visit_allowWorkflowRendering_isLoaded = True
@@ -21521,7 +19729,7 @@ ErrorTrap:
         Public ReadOnly Property main_VisitProperty_AllowDebugging() As Boolean
             Get
                 main_VisitProperty_AllowDebugging = False
-                If user_isAuthenticated() Then
+                If user.user_isAuthenticated() Then
                     If Not property_visit_allowDebugging_isLoaded Then
                         property_visit_allowDebugging_Local = EncodeBoolean(properties_GetVisitProperty("AllowDebugging", "0"))
                         property_visit_allowDebugging_isLoaded = True
@@ -21532,236 +19740,6 @@ ErrorTrap:
             End Get
         End Property
         '
-        '========================================================================
-        ' main_InsertContentRecordGetID_Fast
-        '   Inserts a record into a content table.
-        '   Returns the ID of the record, 0 if error
-        '========================================================================
-        '
-        Public Function main_InsertContentRecordGetID_Fast(ByVal ContentName As String) As Integer
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00314")
-            '
-            'If Not (true) Then Exit Function
-            '
-            main_InsertContentRecordGetID_Fast = db.metaData_InsertContentRecordGetID(ContentName, userId)
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError13("main_InsertContentRecordGetID_Fast(" & ContentName & ")")
-        End Function
-        '
-        '========================================================================
-        '   Increment the application error count
-        '========================================================================
-        '
-        Public Sub main_IncrementErrorCount()
-            If True Then
-                Call error_IncrementErrorCount()
-            End If
-        End Sub
-        '
-        '========================================================================
-        '   2.1 Compatibility
-        '========================================================================
-        '
-        Public Sub main_QueueEmail(ByVal ToAddress As String, ByVal FromAddress As String, ByVal subject As String, ByVal Body As String)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00316")
-            '
-            'If Not (true) Then Exit Sub
-            '
-            Call main_SendEmail(ToAddress, FromAddress, subject, Body, , False, False)
-            '
-            Exit Sub
-ErrorTrap:
-            Call handleLegacyError18("main_QueueEmail")
-        End Sub
-        '            '
-        '            '========================================================================
-        '            '   2.1 Compatibility
-        '            '========================================================================
-        '            '
-        '        Public Sub main_QxueueSQL(ByVal DataSourceName As String, ByVal SQL As String)
-        '            On Error GoTo ErrorTrap : ''Dim th as integer : th = profileLogMethodEnter("Proc00317")
-        '            '
-        '            'If Not (true) Then Exit Sub
-        '            Call app.executeSql(SQL, DataSourceName)
-        '            '
-        '            Exit Sub
-        'ErrorTrap:
-        '            Call main_HandleClassErrorAndResume_TrapPatch1("main_QueueSQL")
-        '        End Sub
-        '
-        '========================================================================
-        '   3.0 Compatibility
-        '========================================================================
-        '
-        Public Function main_ReadStreamEncodeText(ByVal Key As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00318")
-            '
-            'If Not (true) Then Exit Function
-            '
-            main_ReadStreamEncodeText = doc_getText(EncodeText(Key))
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("ReadStreamEncodeText")
-        End Function
-        '
-        '========================================================================
-        '   3.0 Compatibility
-        '========================================================================
-        '
-        Public Function main_ReadStreamEncodeBoolean(ByVal Key As String) As Boolean
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00319")
-            '
-            'If Not (true) Then Exit Function
-            '
-            main_ReadStreamEncodeBoolean = main_GetStreamBoolean2(EncodeText(Key))
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("ReadStreamEncodeBoolean")
-        End Function
-        '
-        '========================================================================
-        '   3.0 Compatibility
-        '========================================================================
-        '
-        Public Function main_ReadStreamEncodeDate(ByVal Key As String) As Date
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00320")
-            '
-            'If Not (true) Then Exit Function
-            '
-            main_ReadStreamEncodeDate = doc_getDate(EncodeText(Key))
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("ReadStreamEncodeDate")
-        End Function
-        '
-        '========================================================================
-        '   3.0 Compatibility
-        '========================================================================
-        '
-        Public Function main_ReadStreamEncodeInteger(ByVal Key As String) As Integer
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00321")
-            '
-            'If Not (true) Then Exit Function
-            '
-            main_ReadStreamEncodeInteger = web_GetStreamInteger2(EncodeText(Key))
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("ReadStreamEncodeInteger")
-        End Function
-        '
-        '========================================================================
-        '   3.0 Compatibility
-        '========================================================================
-        '
-        Public Function main_ReadStreamEncodeNumber(ByVal Key As String) As Double
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00322")
-            '
-            'If Not (true) Then Exit Function
-            '
-            main_ReadStreamEncodeNumber = main_GetStreamNumber2(EncodeText(Key))
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("ReadStreamEncodeNumber")
-        End Function
-        '
-        '========================================================================
-        '   3.0 Compatibility
-        '========================================================================
-        '
-        Public Function main_GetMissing(ByVal InputValue As String, ByVal DefaultValue As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00323")
-            '
-            'If Not (true) Then Exit Function
-            '
-            main_GetMissing = encodeEmptyText(InputValue, DefaultValue)
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("main_GetMissing")
-        End Function
-        '
-        '========================================================================
-        '   3.0 Compatibility
-        '========================================================================
-        '
-        Public Function main_GetText(ByVal InputValue As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00324")
-            '
-            'If Not (true) Then Exit Function
-            '
-            main_GetText = EncodeText(InputValue)
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("main_GetText")
-        End Function
-        '
-        '========================================================================
-        '   3.0 Compatibility
-        '========================================================================
-        '
-        Public Function main_GetNumber(ByVal InputValue As String) As Double
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00325")
-            '
-            'If Not (true) Then Exit Function
-            '
-            main_GetNumber = EncodeNumber(InputValue)
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("main_GetNumber")
-        End Function
-        '
-        '========================================================================
-        '   3.0 Compatibility
-        '========================================================================
-        '
-        Public Function main_GetBoolean(ByVal InputValue As String) As Boolean
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00326")
-            '
-            'If Not (true) Then Exit Function
-            '
-            main_GetBoolean = EncodeBoolean(InputValue)
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("main_GetBoolean")
-        End Function
-        '
-        '========================================================================
-        '   3.0 Compatibility
-        '========================================================================
-        '
-        Public Function main_GetDate(ByVal InputValue As String) As Date
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00327")
-            '
-            'If Not (true) Then Exit Function
-            '
-            main_GetDate = EncodeDate(InputValue)
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("main_GetDate")
-        End Function
-        '
-        '========================================================================
-        '   3.0 Compatibility
-        '========================================================================
-        '
-        Public Function main_GetYesNo(ByVal InputValue As String) As String
-            Return main_GetYesNo(EncodeBoolean(InputValue))
-        End Function
-        '
         Public Function main_GetYesNo(ByVal InputValue As Boolean) As String
             If InputValue Then
                 Return "Yes"
@@ -21769,141 +19747,6 @@ ErrorTrap:
                 Return "No"
             End If
         End Function
-        '
-        '========================================================================
-        '   Returns true if the record is locked to the current member
-        '========================================================================
-        '
-        Public Function db_GetEditLockStatus(ByVal ContentName As String, ByVal RecordID As Integer) As Boolean
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00334")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim ReturnMemberID As Integer
-            Dim ReturnDateExpires As Date
-            Dim returnStatus As Boolean
-            '
-            main_EditLockContentRecordKey_Local = (ContentName & EncodeText(RecordID))
-            main_EditLockDateExpires_Local = Date.MinValue
-            main_EditLockMemberID_Local = 0
-            main_EditLockMemberName_Local = ""
-            main_EditLockStatus_Local = False
-            '
-            returnStatus = db.workflow_GetEditLock(EncodeText(ContentName), EncodeInteger(RecordID), ReturnMemberID, ReturnDateExpires)
-            If returnStatus And (ReturnMemberID <> userId) Then
-                main_EditLockStatus_Local = True
-                main_EditLockDateExpires_Local = ReturnDateExpires
-                main_EditLockMemberID_Local = ReturnMemberID
-                main_EditLockMemberName_Local = ""
-                db_GetEditLockStatus = main_EditLockStatus_Local
-            End If
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("main_GetEditLockStatus")
-        End Function
-        '
-        '========================================================================
-        '   Edit Lock Handling
-        '========================================================================
-        '
-        Public Function db_GetEditLockMemberName(ByVal ContentName As String, ByVal RecordID As Integer) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00335")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim main_EditLocked As Boolean
-            Dim main_EditLockMemberID As Integer
-            Dim main_EditLockDateExpires As Date
-            Dim CS As Integer
-            '
-            If (main_EditLockContentRecordKey_Local <> (ContentName & EncodeText(RecordID))) Then
-                Call db_GetEditLockStatus(ContentName, RecordID)
-            End If
-            If main_EditLockStatus_Local Then
-                If main_EditLockMemberName_Local = "" Then
-                    If main_EditLockMemberID_Local <> 0 Then
-                        CS = db_csOpenRecord("people", main_EditLockMemberID_Local)
-                        If db.db_csOk(CS) Then
-                            main_EditLockMemberName_Local = db.db_GetCSText(CS, "name")
-                        End If
-                        Call db.db_csClose(CS)
-                    End If
-                    If main_EditLockMemberName_Local = "" Then
-                        main_EditLockMemberName_Local = "unknown"
-                    End If
-                End If
-                db_GetEditLockMemberName = main_EditLockMemberName_Local
-            End If
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("main_GetEditLockMemberName")
-        End Function
-        '
-        '========================================================================
-        '   Edit Lock Handling
-        '========================================================================
-        '
-        Public Function db_GetEditLockDateExpires(ByVal ContentName As String, ByVal RecordID As Integer) As Date
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00336")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim main_EditLocked As Boolean
-            Dim main_EditLockMemberID As Integer
-            Dim main_EditLockDateExpires As Date
-            Dim CS As Integer
-            '
-            If (main_EditLockContentRecordKey_Local <> (ContentName & EncodeText(RecordID))) Then
-                Call db_GetEditLockStatus(ContentName, RecordID)
-            End If
-            If main_EditLockStatus_Local Then
-                db_GetEditLockDateExpires = main_EditLockDateExpires_Local
-            End If
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("main_GetEditLockDateExpires")
-        End Function
-        '
-        '========================================================================
-        '   Sets the edit lock for this record
-        '========================================================================
-        '
-        Public Sub main_SetEditLock(ByVal ContentName As String, ByVal RecordID As Integer)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00337")
-            '
-            'If Not (true) Then Exit Sub
-            '
-            Call db.workflow_SetEditLock(EncodeText(ContentName), EncodeInteger(RecordID), userId)
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18("main_SetEditLock")
-            '
-        End Sub
-        '
-        '========================================================================
-        '   Clears the edit lock for this record
-        '========================================================================
-        '
-        Public Sub db_ClearEditLock(ByVal ContentName As String, ByVal RecordID As Integer)
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00338")
-            '
-            'If Not (true) Then Exit Sub
-            '
-            Call db.workflow_ClearEditLock(EncodeText(ContentName), EncodeInteger(RecordID), userId)
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18("main_ClearEditLock")
-            '
-        End Sub
         '
         '========================================================================
         '   Returns Content Page fields as strings
@@ -22039,7 +19882,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Sub
             '
-            Call admin_CreateAdminMenu(ParentName, EntryName, ContentName, LinkPage, SortOrder, AdminOnly, DeveloperOnly, NewWindow)
+            Call admin_CreateAdminMenu2(ParentName, EntryName, ContentName, LinkPage, SortOrder, AdminOnly, DeveloperOnly, NewWindow)
             Exit Sub
             '
             ' ----- Error Trap
@@ -22085,7 +19928,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function web_ProcessFormInputFile(ByVal TagName As String, Optional ByVal VirtualFilePath As String = "") As String
-            web_ProcessFormInputFile = web_ProcessFormInputFile2(TagName, db.appRootFiles, VirtualFilePath)
+            web_ProcessFormInputFile = web_ProcessFormInputFile2(TagName, appRootFiles, VirtualFilePath)
         End Function
         '
         '========================================================================
@@ -22140,7 +19983,7 @@ ErrorTrap:
                                 '
                                 ' copy tmp private files to the appropriate folder in the destination file system
                                 '
-                                Call db.privateFiles.copyFile(.tmpPrivatefile, web_ProcessFormInputFile2, files)
+                                Call privateFiles.copyFile(.tmpPrivatefile, web_ProcessFormInputFile2, files)
                             Else
                                 Call files.SaveFile(web_ProcessFormInputFile2, .FileContent)
                             End If
@@ -22161,7 +20004,7 @@ ErrorTrap:
         '   2.1 compatibility
         '
         Public Function user_IsAuthoring(ByVal ContentName As String) As Boolean
-            user_IsAuthoring = user_isEditing(ContentName)
+            Return user.user_isEditing(ContentName)
         End Function
 
         '
@@ -22471,8 +20314,8 @@ ErrorTrap:
             End If
             MenuID = csv_VerifyDynamicMenu(MenuNameLocal)
             '
-            DefaultTemplateLink = db.siteProperty_getText("SectionLandingLink", db.RootWebPath & db.siteProperty_ServerPageDefault)
-            pageManager_GetSectionMenuNamed = pageManager_GetSectionMenu(DepthLimit, MenuStyle, StyleSheetPrefixLocal, DefaultTemplateLink, MenuID, MenuNameLocal, db.siteProperty_UseContentWatchLink)
+            DefaultTemplateLink = siteProperties.getText("SectionLandingLink", www_requestRootPath & siteProperties.serverPageDefault)
+            pageManager_GetSectionMenuNamed = pageManager_GetSectionMenu(DepthLimit, MenuStyle, StyleSheetPrefixLocal, DefaultTemplateLink, MenuID, MenuNameLocal, siteProperties.useContentWatchLink)
             pageManager_GetSectionMenuNamed = main_GetEditWrapper("Section Menu", pageManager_GetSectionMenuNamed)
             '
             If pageManager_RedirectLink <> "" Then
@@ -22507,7 +20350,7 @@ ErrorTrap:
             '
             ' Lookup link in main_ContentWatch
             '
-            CSPointer = db.db_csOpen("Content Watch", "ContentRecordKey=" & db.db_EncodeSQLText(ContentRecordKey), , , , , , "Link,Clicks")
+            CSPointer = db.db_csOpen("Content Watch", "ContentRecordKey=" & db.encodeSQLText(ContentRecordKey), , , , , , "Link,Clicks")
             If db.db_csOk(CSPointer) Then
                 main_GetContentWatchLinkByKey = db.db_GetCSText(CSPointer, "Link")
                 If EncodeBoolean(IncrementClicks) Then
@@ -22518,7 +20361,7 @@ ErrorTrap:
             End If
             Call db.db_csClose(CSPointer)
             '
-            main_GetContentWatchLinkByKey = EncodeAppRootPath(main_GetContentWatchLinkByKey, web_requestVirtualFilePath, db.RootWebPath, web.requestDomain)
+            main_GetContentWatchLinkByKey = EncodeAppRootPath(main_GetContentWatchLinkByKey, web_requestVirtualFilePath, www_requestRootPath, web.requestDomain)
             '
             Exit Function
             '
@@ -22584,7 +20427,7 @@ ErrorTrap:
             '
             ' BuildVersion = app.dataBuildVersion
             main_GetContentBoxWrapper = Content
-            If (EncodeBoolean(db.siteProperty_getBoolean("Compatibility ContentBox Pad With Table", False))) Then
+            If (EncodeBoolean(siteProperties.getBoolean("Compatibility ContentBox Pad With Table", False))) Then
                 '
                 If ContentPadding > 0 Then
                     '
@@ -22680,15 +20523,15 @@ ErrorTrap:
             RecordID = (web_GetStreamInteger2("ID"))
             ContentName = doc_getText("ContentName")
             Button = doc_getText("Button")
-            iIsAdmin = user_isAdmin()
+            iIsAdmin = user.user_isAdmin()
             '
-            If (Button <> "") And (RecordID <> 0) And (ContentName <> "") And (main_IsContentManager(ContentName)) Then
-                main_WorkflowSupport = db.siteProperty_AllowWorkflowAuthoring And main_IsWorkflowAuthoringCompatible(ContentName)
+            If (Button <> "") And (RecordID <> 0) And (ContentName <> "") And (user.main_IsContentManager(ContentName)) Then
+                main_WorkflowSupport = siteProperties.allowWorkflowAuthoring And workflow.isWorkflowAuthoringCompatible(ContentName)
                 Call pageManager_GetAuthoringStatus(ContentName, RecordID, IsSubmitted, IsApproved, SubmittedMemberName, ApprovedMemberName, IsInserted, IsDeleted, IsModified, ModifiedMemberName, ModifiedDate, SubmittedDate, ApprovedDate)
-                IsEditLocked = db_GetEditLockStatus(ContentName, RecordID)
-                main_EditLockMemberName = db_GetEditLockMemberName(ContentName, RecordID)
-                main_EditLockDateExpires = db_GetEditLockDateExpires(ContentName, RecordID)
-                Call db_ClearEditLock(ContentName, RecordID)
+                IsEditLocked = workflow.GetEditLockStatus(ContentName, RecordID)
+                main_EditLockMemberName = workflow.GetEditLockMemberName(ContentName, RecordID)
+                main_EditLockDateExpires = workflow.GetEditLockDateExpires(ContentName, RecordID)
+                Call workflow.ClearEditLock(ContentName, RecordID)
                 '
                 ' tough case, in Quick mode, lets mark the record reviewed, no matter what button they push, except cancel
                 '
@@ -22755,7 +20598,7 @@ ErrorTrap:
                         End If
                         Call db.db_csClose(CSBlock)
                         '
-                        Call main_SetEditLock(ContentName, RecordID)
+                        Call workflow.SetEditLock(ContentName, RecordID)
                         '
                         If Not SaveButNoChanges Then
                             Call main_ProcessSpecialCaseAfterSave(False, ContentName, RecordID, RecordName, RecordParentID, False)
@@ -22772,8 +20615,8 @@ ErrorTrap:
                     If db.db_csOk(CSBlock) Then
                         Call db.db_setCS(CSBlock, "active", True)
                         Call db.db_setCS(CSBlock, "ParentID", RecordID)
-                        Call db.db_setCS(CSBlock, "contactmemberid", userId)
-                        Call db.db_setCS(CSBlock, "name", "New Page added " & main_PageStartTime & " by " & userName)
+                        Call db.db_setCS(CSBlock, "contactmemberid", user.userId)
+                        Call db.db_setCS(CSBlock, "name", "New Page added " & main_PageStartTime & " by " & user.userName)
                         Call db.db_setCS(CSBlock, "copyFilename", "")
                         RecordID = db.db_GetCSInteger(CSBlock, "ID")
                         Call db.db_SaveCSRecord(CSBlock)
@@ -22783,7 +20626,7 @@ ErrorTrap:
                         If main_WorkflowSupport Then
                             If Not pagemanager_IsWorkflowRendering() Then
                                 Link = modifyLinkQuery(Link, "main_AdminWarningMsg", "This new unpublished page has been added and Workflow Rendering has been enabled so you can edit this page.", True)
-                                Call db.siteProperty_set("AllowWorkflowRendering", True)
+                                Call siteProperties.setProperty("AllowWorkflowRendering", True)
                             End If
                         End If
                         Call web_Redirect2(Link, "Redirecting because a new page has been added with the quick editor.", False)
@@ -22808,8 +20651,8 @@ ErrorTrap:
                         If db.db_csOk(CSBlock) Then
                             Call db.db_setCS(CSBlock, "active", True)
                             Call db.db_setCS(CSBlock, "ParentID", ParentID)
-                            Call db.db_setCS(CSBlock, "contactmemberid", userId)
-                            Call db.db_setCS(CSBlock, "name", "New Page added " & main_PageStartTime & " by " & userName)
+                            Call db.db_setCS(CSBlock, "contactmemberid", user.userId)
+                            Call db.db_setCS(CSBlock, "name", "New Page added " & main_PageStartTime & " by " & user.userName)
                             Call db.db_setCS(CSBlock, "copyFilename", "")
                             RecordID = db.db_GetCSInteger(CSBlock, "ID")
                             Call db.db_SaveCSRecord(CSBlock)
@@ -22819,7 +20662,7 @@ ErrorTrap:
                             If main_WorkflowSupport Then
                                 If Not pagemanager_IsWorkflowRendering() Then
                                     Link = modifyLinkQuery(Link, "main_AdminWarningMsg", "This new unpublished page has been added and Workflow Rendering has been enabled so you can edit this page.", True)
-                                    Call db.siteProperty_set("AllowWorkflowRendering", True)
+                                    Call siteProperties.setProperty("AllowWorkflowRendering", True)
                                 End If
                             End If
                             Call web_Redirect2(Link, "Redirecting because a new page has been added with the quick editor.", False)
@@ -22857,10 +20700,10 @@ ErrorTrap:
                 End If
                 '
                 If (Button = ButtonAbortEdit) Then
-                    Call workflow_AbortEdit(ContentName, RecordID)
+                    Call workflow.abortEdit2(ContentName, RecordID, user.userId)
                 End If
                 If (Button = ButtonPublishSubmit) Then
-                    Call main_SubmitEdit(ContentName, RecordID)
+                    Call workflow.main_SubmitEdit(ContentName, RecordID)
                     Call pageManager_SendPublishSubmitNotice(ContentName, RecordID, "")
                 End If
                 If (Not error_IsUserError()) And ((Button = ButtonOK) Or (Button = ButtonCancel) Or (Button = ButtonPublish)) Then
@@ -22874,11 +20717,11 @@ ErrorTrap:
                     ' ----- Admin only functions
                     '
                     If (Button = ButtonPublish) Then
-                        Call workflow_PublishEdit(ContentName, RecordID)
+                        Call workflow.publishEdit(ContentName, RecordID)
                         Call cache.invalidateTagList2(ContentName)
                     End If
                     If (Button = ButtonPublishApprove) Then
-                        Call workflow_ApproveEdit(ContentName, RecordID)
+                        Call workflow.approveEdit(ContentName, RecordID)
                     End If
                 End If
             End If
@@ -22974,7 +20817,7 @@ ErrorTrap:
                         '
                         AllowInMenus = True
                         LinkWorking = DefaultLink
-                        LinkWorking = EncodeAppRootPath(LinkWorking, web_requestVirtualFilePath, db.RootWebPath, web.requestDomain)
+                        LinkWorking = EncodeAppRootPath(LinkWorking, web_requestVirtualFilePath, www_requestRootPath, web.requestDomain)
                         LinkWorking = modifyLinkQuery(LinkWorking, "bid", "", False)
                         MenuNamePrefix = EncodeText(GetRandomInteger) & "_"
                         MenuID = 0
@@ -23184,7 +21027,7 @@ ErrorTrap:
                         AllowInMenus = True
                         LinkWorking = DefaultLink
                         LinkWorkingNoRedirect = LinkWorking
-                        LinkWorking = EncodeAppRootPath(LinkWorking, web_requestVirtualFilePath, db.RootWebPath, web.requestDomain)
+                        LinkWorking = EncodeAppRootPath(LinkWorking, web_requestVirtualFilePath, www_requestRootPath, web.requestDomain)
                         LinkWorking = modifyLinkQuery(LinkWorking, "bid", "", False)
                         MenuNamePrefix = EncodeText(GetRandomInteger) & "_"
                         ' ***** just want to know what would happen here
@@ -23674,7 +21517,7 @@ ErrorTrap:
             '
             archiveLink = web.requestPathPage
             archiveLink = ConvertLinkToShortLink(archiveLink, web.requestDomain, web_requestVirtualFilePath)
-            archiveLink = EncodeAppRootPath(archiveLink, web_requestVirtualFilePath, db.RootWebPath, web.requestDomain)
+            archiveLink = EncodeAppRootPath(archiveLink, web_requestVirtualFilePath, www_requestRootPath, web.requestDomain)
             '
             For childBranchPtr = 0 To main_RenderCache_ChildBranch_PCCPtrCnt - 1
                 PCCPtr = EncodeInteger(main_RenderCache_ChildBranch_PCCPtrs(childBranchPtr))
@@ -23693,7 +21536,7 @@ ErrorTrap:
                 End If
                 pageParentListName = EncodeText(cache_pageContent(PCC_ParentListName, PCCPtr))
                 pageEditLink = ""
-                If user_isEditing(ContentName) Then
+                If user.user_isEditing(ContentName) Then
                     pageEditLink = main_GetRecordEditLink2(ContentName, PageID, True, PageName, True)
                 End If
                 pageAllowInChildLists = EncodeBoolean(cache_pageContent(PCC_AllowInChildLists, PCCPtr))
@@ -23801,7 +21644,7 @@ ErrorTrap:
                     ' if AllowBrief is false, BriefFilename is not loaded
                     '
                     If (pageBriefFilename <> "") And (pageAllowBrief) Then
-                        Brief = Trim(db.cdnFiles.ReadFile(pageBriefFilename))
+                        Brief = Trim(cdnFiles.ReadFile(pageBriefFilename))
                         If Brief <> "" Then
                             ActiveList = ActiveList & "<div class=""ccListCopy"">" & Brief & "</div>"
                         End If
@@ -23900,7 +21743,7 @@ ErrorTrap:
             PageContentCID = main_GetContentID("Page Content")
             If (True) Then
                 SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,BlockSection,RootPageID"
-                ShowHiddenMenu = user_isEditingAnything()
+                ShowHiddenMenu = user.user_isEditingAnything()
                 'ShowHiddenMenu = main_IsEditing("Site Sections")
                 If IsAllSectionsMenuMode Then
                     '
@@ -23936,7 +21779,7 @@ ErrorTrap:
                 ' Multiple Menus with ccDynamicMenuSectionRules
                 '
                 SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,BlockSection,0 as RootPageID"
-                ShowHiddenMenu = user_isEditingAnything()
+                ShowHiddenMenu = user.user_isEditingAnything()
                 'ShowHiddenMenu = main_IsEditing("Site Sections")
                 If IsAllSectionsMenuMode Then
                     '
@@ -23970,7 +21813,7 @@ ErrorTrap:
                 '
                 SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,BlockSection,0 as RootPageID"
                 Criteria = ""
-                ShowHiddenMenu = user_isEditingAnything()
+                ShowHiddenMenu = user.user_isEditingAnything()
                 'ShowHiddenMenu = main_IsEditing("Site Sections")
                 CSSections = db.db_csOpen("Site Sections", Criteria, , , , ,, SelectFieldList)
             ElseIf db_IsSQLTableField("Default", "ccSections", "MenuImageOverFilename") Then
@@ -23979,7 +21822,7 @@ ErrorTrap:
                 '
                 SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,0 as BlockSection,0 as RootPageID"
                 Criteria = ""
-                ShowHiddenMenu = user_isEditingAnything()
+                ShowHiddenMenu = user.user_isEditingAnything()
                 'ShowHiddenMenu = main_IsEditing("Site Sections")
                 CSSections = db.db_csOpen("Site Sections", Criteria, , , , ,, SelectFieldList)
             ElseIf db_IsSQLTableField("Default", "ccSections", "HideMenu") Then
@@ -23988,7 +21831,7 @@ ErrorTrap:
                 '
                 SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,'' as MenuImageOverFilename,HideMenu,0 as BlockSection,0 as RootPageID"
                 Criteria = ""
-                ShowHiddenMenu = user_isEditingAnything()
+                ShowHiddenMenu = user.user_isEditingAnything()
                 'ShowHiddenMenu = main_IsEditing("Site Sections")
                 CSSections = db.db_csOpen("Site Sections", Criteria, , , , ,, SelectFieldList)
             Else
@@ -24005,12 +21848,12 @@ ErrorTrap:
                     SectionName = Trim(db.db_GetCSText(CSSections, "Name"))
                     If SectionName = "" Then
                         SectionName = "Section " & SectionID
-                        Call db.executeSql("update ccSections set Name=" & db.db_EncodeSQLText(SectionName) & " where ID=" & SectionID)
+                        Call db.executeSql("update ccSections set Name=" & db.encodeSQLText(SectionName) & " where ID=" & SectionID)
                     End If
                     SectionCaption = db.db_GetCSText(CSSections, "Caption")
                     If SectionCaption = "" Then
                         SectionCaption = SectionName
-                        Call db.executeSql("update ccSections set Caption=" & db.db_EncodeSQLText(SectionCaption) & " where ID=" & SectionID)
+                        Call db.executeSql("update ccSections set Caption=" & db.encodeSQLText(SectionCaption) & " where ID=" & SectionID)
                     End If
                     If HideMenu Then
                         SectionCaption = "[Hidden: " & SectionCaption & "]"
@@ -24033,11 +21876,11 @@ ErrorTrap:
                     End If
                     MenuImage = db.db_GetCSText(CSSections, "MenuImageFilename")
                     If MenuImage <> "" Then
-                        MenuImage = csv_getVirtualFileLink(db.config.cdnFilesNetprefix, MenuImage)
+                        MenuImage = csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, MenuImage)
                     End If
                     MenuImageOver = db.db_GetCSText(CSSections, "MenuImageOverFilename")
                     If MenuImageOver <> "" Then
-                        MenuImageOver = csv_getVirtualFileLink(db.config.cdnFilesNetprefix, MenuImageOver)
+                        MenuImageOver = csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, MenuImageOver)
                     End If
                     '
                     ' main_Get Root Page for templateID
@@ -24102,7 +21945,7 @@ ErrorTrap:
                         If Link = "" Then
                             Link = DefaultTemplateLink
                         End If
-                        AuthoringTag = main_GetRecordEditLink2("Site Sections", SectionID, False, SectionName, user_isEditing("Site Sections"))
+                        AuthoringTag = main_GetRecordEditLink2("Site Sections", SectionID, False, SectionName, user.user_isEditing("Site Sections"))
                         Link = modifyLinkQuery(Link, "sid", CStr(SectionID), True)
                         '
                         ' main_Get Menu, remove crlf, and parse the line with crlf
@@ -24127,8 +21970,8 @@ ErrorTrap:
             End If
             Call db.db_csClose(CSSections)
             '
-            pageManager_GetSectionMenu = html_executeContentCommands(Nothing, pageManager_GetSectionMenu, addonContextEnum.ContextPage, userId, user_isAuthenticated, layoutError)
-            pageManager_GetSectionMenu = html_encodeContent10(pageManager_GetSectionMenu, userId, "", 0, 0, False, False, True, True, False, True, "", "http://" & web.requestDomain, False, 0, "", addonContextEnum.ContextPage, user_isAuthenticated, Nothing, user_isEditingAnything)
+            pageManager_GetSectionMenu = html_executeContentCommands(Nothing, pageManager_GetSectionMenu, addonContextEnum.ContextPage, user.userId, user.user_isAuthenticated, layoutError)
+            pageManager_GetSectionMenu = html_encodeContent10(pageManager_GetSectionMenu, user.userId, "", 0, 0, False, False, True, True, False, True, "", "http://" & web.requestDomain, False, 0, "", addonContextEnum.ContextPage, user.user_isAuthenticated, Nothing, user.user_isEditingAnything)
             'pageManager_GetSectionMenu = main_EncodeContent5(pageManager_GetSectionMenu, memberID, "", 0, 0, False, False, True, True, False, True, "", "", False, 0)
             '
             Exit Function
@@ -24147,9 +21990,9 @@ ErrorTrap:
             Dim CS As Integer
             Dim SQL As String
             '
-            If user_isAdmin() Then
+            If user.user_isAdmin() Then
                 pageManager_BypassContentBlock = True
-            ElseIf main_IsContentManager(main_GetContentNameByID(ContentID)) Then
+            ElseIf user.main_IsContentManager(main_GetContentNameByID(ContentID)) Then
                 pageManager_BypassContentBlock = True
             Else
                 SQL = "SELECT ccMemberRules.MemberID" _
@@ -24159,7 +22002,7 @@ ErrorTrap:
                     & " AND ((ccgroups.Active)<>0)" _
                     & " AND ((ccMemberRules.Active)<>0)" _
                     & " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" & db.db_EncodeSQLDate(main_PageStartTime) & ")" _
-                    & " AND ((ccMemberRules.MemberID)=" & userId & "));"
+                    & " AND ((ccMemberRules.MemberID)=" & user.userId & "));"
                 CS = db.db_csOpenSql(SQL)
                 pageManager_BypassContentBlock = db.db_csOk(CS)
                 Call db.db_csClose(CS)
@@ -24173,7 +22016,7 @@ ErrorTrap:
         '
         '
         Public Function main_EncodeAppRootPath(ByVal Link As String) As String
-            main_EncodeAppRootPath = EncodeAppRootPath(EncodeText(Link), web_requestVirtualFilePath, db.RootWebPath, web.requestDomain)
+            main_EncodeAppRootPath = EncodeAppRootPath(EncodeText(Link), web_requestVirtualFilePath, www_requestRootPath, web.requestDomain)
         End Function
         '
         '
@@ -24310,7 +22153,7 @@ ErrorTrap:
             '
             Dim PCCPtr As Integer
             '
-            PCCPtr = pageManager_cache_pageContent_getPtr(PageID, pagemanager_IsWorkflowRendering, user_isQuickEditing(""))
+            PCCPtr = pageManager_cache_pageContent_getPtr(PageID, pagemanager_IsWorkflowRendering, user.user_isQuickEditing(""))
             If PCCPtr >= 0 Then
                 PageName2 = EncodeText(cache_pageContent(PCC_Name, PCCPtr))
                 ParentID = EncodeInteger(cache_pageContent(PCC_ParentID, PCCPtr))
@@ -24476,11 +22319,11 @@ ErrorTrap:
             Dim templateId As Integer
             Dim templateDomain As String
             '
-            Call main_GetPageArgs(PageID, pagemanager_IsWorkflowRendering, user_isQuickEditing(""), ContentControlID, templateId, ParentID, MenuLinkOverRide, IsRootPage, SectionID, PageIsSecure, "")
+            Call main_GetPageArgs(PageID, pagemanager_IsWorkflowRendering, user.user_isQuickEditing(""), ContentControlID, templateId, ParentID, MenuLinkOverRide, IsRootPage, SectionID, PageIsSecure, "")
             '
             ' main_Get defaultpathpage
             '
-            defaultPathPage = db.siteProperty_ServerPageDefault
+            defaultPathPage = siteProperties.serverPageDefault
             If defaultPathPage <> "" Then
                 Pos = InStr(1, defaultPathPage, "?")
                 If Pos <> 0 Then
@@ -24538,7 +22381,7 @@ ErrorTrap:
                 '
                 ' ----- templateLink is blank
                 '
-                If AllowLinkAliasIfEnabled And db.siteProperty_allowLinkAlias Then
+                If AllowLinkAliasIfEnabled And siteProperties.allowLinkAlias Then
                     If cache_linkAliasCnt = 0 Then
                         Call cache_linkAlias_load()
                     End If
@@ -24683,7 +22526,7 @@ ErrorTrap:
             Dim PCCPtr As Integer
             Dim PageIsSecure As Boolean
             '
-            Call main_GetPageArgs(PageID, pagemanager_IsWorkflowRendering, user_isQuickEditing(""), CCID, templateId, ParentID, MenuLinkOverRide, IsRootPage, SectionID, PageIsSecure, "")
+            Call main_GetPageArgs(PageID, pagemanager_IsWorkflowRendering, user.user_isQuickEditing(""), CCID, templateId, ParentID, MenuLinkOverRide, IsRootPage, SectionID, PageIsSecure, "")
             '    PCCPtr = pageManager_cache_pageContent_getPtr(PageID, main_IsWorkflowRendering, main_IsQuickEditing(""))
             '    If PCCPtr >= 0 Then
             '        PageFound = True
@@ -24706,9 +22549,9 @@ ErrorTrap:
             '
             ' Convert default page to default link
             '
-            DefaultLink = db.siteProperty_ServerPageDefault
+            DefaultLink = siteProperties.serverPageDefault
             If Mid(DefaultLink, 1, 1) <> "/" Then
-                DefaultLink = "/" & db.siteProperty_ServerPageDefault
+                DefaultLink = "/" & siteProperties.serverPageDefault
             End If
             '
             main_GetPageDynamicLink = main_GetPageDynamicLinkWithArgs(CCID, PageID, DefaultLink, IsRootPage, templateId, SectionID, MenuLinkOverRide, UseContentWatchLink)
@@ -24784,7 +22627,7 @@ ErrorTrap:
             End If
             ' ##### if the default is long, leave it long -- move this to just the content watch tree
             'main_GetPageDynamicLinkWithArgs = ConvertLinkToShortLink(main_GetPageDynamicLinkWithArgs, main_ServerHost, main_ServerVirtualPath)
-            main_GetPageDynamicLinkWithArgs = EncodeAppRootPath(main_GetPageDynamicLinkWithArgs, web_requestVirtualFilePath, db.RootWebPath, web.requestDomain)
+            main_GetPageDynamicLinkWithArgs = EncodeAppRootPath(main_GetPageDynamicLinkWithArgs, web_requestVirtualFilePath, www_requestRootPath, web.requestDomain)
             '
             Exit Function
             '
@@ -24895,7 +22738,7 @@ ErrorTrap:
                         ' ----- attempt to use the site's default template
                         '
                         Call db.db_csClose(CS)
-                        CS = db.db_csOpen(ContentName, "name=" & db.db_EncodeSQLText(TemplateDefaultName), "ID", , , , , FieldList)
+                        CS = db.db_csOpen(ContentName, "name=" & db.encodeSQLText(TemplateDefaultName), "ID", , , , , FieldList)
                     End If
                     If db.db_csOk(CS) Then
                         main_RenderedTemplateID = db.db_GetCSInteger(CS, "ID")
@@ -25405,8 +23248,8 @@ ErrorTrap:
                     '--------------------------------------------------------------------------
                     '
                     If web_GetStreamInteger2("ContensiveUserForm") = 1 Then
-                        Dim FromAddress As String = db.siteProperty_getText("EmailFromAddress", "info@" & main_ServerDomain)
-                        Call main_SendFormEmail(db.siteProperty_EmailAdmin, FromAddress, "Form Submitted on " & web_requestReferer)
+                        Dim FromAddress As String = siteProperties.getText("EmailFromAddress", "info@" & main_ServerDomain)
+                        Call main_SendFormEmail(siteProperties.emailAdmin, FromAddress, "Form Submitted on " & web_requestReferer)
                         If True Then
                             Dim cs As Integer = db.db_csInsertRecord("User Form Response")
                             If db.db_csOk(cs) Then
@@ -25471,7 +23314,7 @@ ErrorTrap:
                     '--------------------------------------------------------------------------
                     '
                     If doc_getText("tpmode") <> "" Then
-                        Call db.siteProperty_set("ToolsPanelMode", web_GetStreamInteger2("tpmode"))
+                        Call siteProperties.setProperty("ToolsPanelMode", web_GetStreamInteger2("tpmode"))
                     End If
                     '
                     '--------------------------------------------------------------------------
@@ -25487,7 +23330,7 @@ ErrorTrap:
                         Dim RecordEID As String = doc_getText(RequestNameLibraryFileID)
                         If (RecordEID <> "") Then
                             Dim tokenDate As Date
-                            Call security_decodeToken(RecordEID, db.config.privateKey, downloadId, tokenDate)
+                            Call security_decodeToken(RecordEID, appConfig.privateKey, downloadId, tokenDate)
                             'downloadId = main_DecodeKeyNumber(RecordEID)
                         End If
                         If downloadId <> 0 Then
@@ -25509,13 +23352,13 @@ ErrorTrap:
                                 If db.db_csOk(CSPointer) Then
                                     Call db.db_setCS(CSPointer, "FileID", downloadId)
                                     Call db.db_setCS(CSPointer, "VisitId", main_VisitId)
-                                    Call db.db_setCS(CSPointer, "MemberID", userId)
+                                    Call db.db_setCS(CSPointer, "MemberID", user.userId)
                                 End If
                                 Call db.db_csClose(CSPointer)
                                 '
                                 ' ----- and go
                                 '
-                                Call web_Redirect2(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, link), "Redirecting because the active download request variable is set to a valid Library Files record. Library File Log has been appended.", False)
+                                Call web_Redirect2(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, link), "Redirecting because the active download request variable is set to a valid Library Files record. Library File Log has been appended.", False)
                             End If
                         End If
                     End If
@@ -25549,7 +23392,7 @@ ErrorTrap:
                         ElseIf (ClipBoard = "") Then
                             ' state not working...
                         Else
-                            If Not main_IsContentManager(ClipParentContentName) Then
+                            If Not user.main_IsContentManager(ClipParentContentName) Then
                                 Call error_AddUserError("The paste operation failed because you are not a content manager of the Clip Parent")
                             Else
                                 '
@@ -25643,7 +23486,7 @@ ErrorTrap:
                                                     End If
                                                     Call db.db_csClose(CSClip)
                                                     Call pageManager_cache_pageContent_clear()
-                                                    If (db.siteProperty_AllowWorkflowAuthoring And main_IsWorkflowAuthoringCompatible(ClipChildContentName)) Then
+                                                    If (siteProperties.allowWorkflowAuthoring And workflow.isWorkflowAuthoringCompatible(ClipChildContentName)) Then
                                                         '
                                                         ' Workflow editing
                                                         '
@@ -25749,19 +23592,19 @@ ErrorTrap:
                                 If cache_linkForward <> "" Then
                                     If 0 < InStr(1, cache_linkForward, "," & web.requestPathPage & ",", vbTextCompare) Then
                                         isLinkForward = True
-                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & db.db_EncodeSQLText(web.requestPathPage) & ")"
+                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & db.encodeSQLText(web.requestPathPage) & ")"
                                     ElseIf 0 < InStr(1, cache_linkForward, "," & web.requestPathPage & "/,", vbTextCompare) Then
                                         isLinkForward = True
-                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & db.db_EncodeSQLText(web.requestPathPage & "/") & ")"
+                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & db.encodeSQLText(web.requestPathPage & "/") & ")"
                                     ElseIf 0 < InStr(1, cache_linkForward, "," & LinkNoProtocol & ",", vbTextCompare) Then
                                         isLinkForward = True
-                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & db.db_EncodeSQLText(LinkNoProtocol) & ")"
+                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & db.encodeSQLText(LinkNoProtocol) & ")"
                                     ElseIf 0 < InStr(1, cache_linkForward, "," & LinkFullPath & ",", vbTextCompare) Then
                                         isLinkForward = True
-                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & db.db_EncodeSQLText(LinkFullPath) & ")"
+                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & db.encodeSQLText(LinkFullPath) & ")"
                                     ElseIf 0 < InStr(1, cache_linkForward, "," & LinkFullPathNoSlash & ",", vbTextCompare) Then
                                         isLinkForward = True
-                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & db.db_EncodeSQLText(LinkFullPathNoSlash) & ")"
+                                        LinkForwardCriteria = "(active<>0)and(SourceLink=" & db.encodeSQLText(LinkFullPathNoSlash) & ")"
                                     End If
                                     If isLinkForward Then
                                         '
@@ -25836,7 +23679,7 @@ ErrorTrap:
                                             '
                                             ' Handle Favicon.ico when the client did not recognize the meta tag
                                             '
-                                            Dim Filename As String = db.siteProperty_getText("FaviconFilename", "")
+                                            Dim Filename As String = siteProperties.getText("FaviconFilename", "")
                                             If Filename = "" Then
                                                 '
                                                 ' no favicon, 404 the call
@@ -25846,7 +23689,7 @@ ErrorTrap:
                                                 docOpen = False '--- should be disposed by caller --- Call dispose
                                                 Return _docBuffer
                                             Else
-                                                Call web_Redirect2(csv_getVirtualFileLink(db.config.cdnFilesNetprefix, Filename), "favicon request", False)
+                                                Call web_Redirect2(csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, Filename), "favicon request", False)
                                                 docOpen = False '--- should be disposed by caller --- Call dispose
                                                 Return _docBuffer
                                             End If
@@ -25860,14 +23703,14 @@ ErrorTrap:
                                             '
                                             Dim Filename As String = "config/RobotsTxtBase.txt"
                                             ' set this way because the preferences page needs a filename in a site property (enhance later)
-                                            Call db.siteProperty_set("RobotsTxtFilename", Filename)
-                                            Dim Content As String = db.cdnFiles.ReadFile(Filename)
+                                            Call siteProperties.setProperty("RobotsTxtFilename", Filename)
+                                            Dim Content As String = cdnFiles.ReadFile(Filename)
                                             If Content = "" Then
                                                 '
                                                 ' save default robots.txt
                                                 '
                                                 Content = "User-agent: *" & vbCrLf & "Disallow: /admin/" & vbCrLf & "Disallow: /images/"
-                                                Call db.appRootFiles.SaveFile(Filename, Content)
+                                                Call appRootFiles.SaveFile(Filename, Content)
                                             End If
                                             Content = Content & cache_addons.robotsTxt
                                             Call web_setResponseContentType("text/plain")
@@ -25878,7 +23721,7 @@ ErrorTrap:
                                         '
                                         ' No Link Forward, no Link Alias, no RemoteMethodFromPage, not Robots.txt
                                         '
-                                        If (main_PageErrorCount = 0) And EncodeBoolean(db.siteProperty_getBoolean("LinkForwardAutoInsert", False)) And (Not IsInLinkForwardTable) Then
+                                        If (main_PageErrorCount = 0) And EncodeBoolean(siteProperties.getBoolean("LinkForwardAutoInsert", False)) And (Not IsInLinkForwardTable) Then
                                             '
                                             ' Add a new Link Forward entry
                                             '
@@ -25904,13 +23747,13 @@ ErrorTrap:
                     '
                     ' ----- do anonymous access blocking
                     '
-                    If Not user_isAuthenticated() Then
-                        If (web_requestPath <> "/") And InStr(1, db.siteProperty_AdminURL, web_requestPath, vbTextCompare) <> 0 Then
+                    If Not user.user_isAuthenticated() Then
+                        If (web_requestPath <> "/") And InStr(1, siteProperties.adminURL, web_requestPath, vbTextCompare) <> 0 Then
                             '
                             ' admin page is excluded from custom blocking
                             '
                         Else
-                            Dim AnonymousUserResponseID As Integer = EncodeInteger(db.siteProperty_getText("AnonymousUserResponseID", "0"))
+                            Dim AnonymousUserResponseID As Integer = EncodeInteger(siteProperties.getText("AnonymousUserResponseID", "0"))
                             Select Case AnonymousUserResponseID
                                 Case 1
                                     '
@@ -25932,7 +23775,7 @@ ErrorTrap:
                                     '
                                     Call main_SetMetaContent(0, 0)
                                     Call main_AddOnLoadJavascript2("document.body.style.overflow='scroll'", "Anonymous User Block")
-                                    Dim Copy As String = cr & html_GetContentCopy("AnonymousUserResponseCopy", "<p style=""width:250px;margin:100px auto auto auto;"">The site is currently not available for anonymous access.</p>", userId, True, user_isAuthenticated)
+                                    Dim Copy As String = cr & html_GetContentCopy("AnonymousUserResponseCopy", "<p style=""width:250px;margin:100px auto auto auto;"">The site is currently not available for anonymous access.</p>", user.userId, True, user.user_isAuthenticated)
                                     ' -- already encoded
                                     'Copy = EncodeContentForWeb(Copy, "copy content", 0, "", 0)
                                     Copy = "" _
@@ -25959,9 +23802,9 @@ ErrorTrap:
                     '
                     ' run the appropriate body addon
                     '
-                    bodyAddonId = EncodeInteger(db.siteProperty_getText("Html Body AddonId", "0"))
+                    bodyAddonId = EncodeInteger(siteProperties.getText("Html Body AddonId", "0"))
                     If bodyAddonId <> 0 Then
-                        htmlBody = executeAddon(bodyAddonId, "", "", addonContextEnum.ContextPage, "", 0, "", "", False, 0, "", bodyAddonStatusOK, Nothing, "", Nothing, "", userId, user_isAuthenticated)
+                        htmlBody = executeAddon(bodyAddonId, "", "", addonContextEnum.ContextPage, "", 0, "", "", False, 0, "", bodyAddonStatusOK, Nothing, "", Nothing, "", user.userId, user.user_isAuthenticated)
                     Else
                         htmlBody = main_GetHtmlBody()
                     End If
@@ -26002,7 +23845,7 @@ ErrorTrap:
                     '
                     '--------------------------------------------------------------------------
                     '
-                    If LCase(web.requestPathPage) = LCase(db.RootWebPath & db.siteProperty_ServerPageDefault) Then
+                    If LCase(web.requestPathPage) = LCase(www_requestRootPath & siteProperties.serverPageDefault) Then
                         '
                         ' This is a 404 caused by Contensive returning a 404
                         '   possibly because the pageid was not found or was inactive.
@@ -26047,7 +23890,7 @@ ErrorTrap:
                                 '
                                 main_ServerReferrerURL = main_ServerReferrerURL & web_requestPage
                             Else
-                                main_ServerReferrerURL = main_ServerReferrerURL & db.siteProperty_ServerPageDefault
+                                main_ServerReferrerURL = main_ServerReferrerURL & siteProperties.serverPageDefault
                             End If
                         End If
                         Dim linkDst As String
@@ -26085,7 +23928,7 @@ ErrorTrap:
                             Call appendLogPageNotFound(web.requestLinkSource)
                             Call web_setResponseStatus("404 Not Found")
                             Call main_mergeInStream("bid=" & main_GetPageNotFoundPageId())
-                            If user_isAdmin() Then
+                            If user.user_isAdmin() Then
                                 main_AdminWarning = PageNotFoundReason
                                 main_AdminWarningPageID = 0
                                 main_AdminWarningSectionID = 0
@@ -26162,7 +24005,7 @@ ErrorTrap:
             ' stylesheets first -- for performance
             ' put stylesheets inline without processing
             '
-            If (True) And EncodeBoolean(db.siteProperty_getBoolean("Allow CSS Reset", False)) Then
+            If (True) And EncodeBoolean(siteProperties.getBoolean("Allow CSS Reset", False)) Then
                 '
                 ' reset styles
                 '
@@ -26173,7 +24016,7 @@ ErrorTrap:
                 '
                 ' site styles
                 '
-                main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, "templates/styles.css") & """ >"
+                main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, "templates/styles.css") & """ >"
             End If
             '
             ' Template shared styles
@@ -26189,7 +24032,7 @@ ErrorTrap:
                         If Parts(1) <> "" Then
                             main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & decodeHtml(Parts(1))
                         End If
-                        main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, Parts(0)) & """ >"
+                        main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, Parts(0)) & """ >"
                         If Parts(2) <> "" Then
                             main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & decodeHtml(Parts(2))
                         End If
@@ -26213,9 +24056,9 @@ ErrorTrap:
             '
             ' Member Styles
             '
-            If userStyleFilename <> "" Then
-                Call main_AddStylesheetLink2(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, userStyleFilename), "member style")
-                userStyleFilename = ""
+            If user.userStyleFilename <> "" Then
+                Call main_AddStylesheetLink2(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, user.userStyleFilename), "member style")
+                user.userStyleFilename = ""
             End If
             '
             ' meta content
@@ -26237,20 +24080,20 @@ ErrorTrap:
             '
             ' favicon
             '
-            VirtualFilename = db.siteProperty_getText("faviconfilename")
+            VirtualFilename = siteProperties.getText("faviconfilename")
             If VirtualFilename <> "" Then
                 Pos = InStrRev(VirtualFilename, ".")
                 If Pos > 0 Then
                     Ext = LCase(Mid(VirtualFilename, Pos))
                     Select Case Ext
                         Case ".ico"
-                            main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/vnd.microsoft.icon"" href=""" & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, VirtualFilename) & """ >"
+                            main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/vnd.microsoft.icon"" href=""" & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
                         Case ".png"
-                            main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/png"" href=""" & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, VirtualFilename) & """ >"
+                            main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/png"" href=""" & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
                         Case ".gif"
-                            main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/gif"" href=""" & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, VirtualFilename) & """ >"
+                            main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/gif"" href=""" & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
                         Case ".jpg"
-                            main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/jpg"" href=""" & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, VirtualFilename) & """ >"
+                            main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/jpg"" href=""" & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
                     End Select
                 End If
             End If
@@ -26258,7 +24101,7 @@ ErrorTrap:
             ' misc caching, etc
             '
             Dim encoding As String
-            encoding = html_EncodeHTML(db.siteProperty_getText("Site Character Encoding", "utf-8"))
+            encoding = html_EncodeHTML(siteProperties.getText("Site Character Encoding", "utf-8"))
             main_GetHTMLInternalHead = main_GetHTMLInternalHead _
                 & OtherHeadTags _
                 & cr & "<meta http-equiv=""content-type"" content=""text/html; charset=" & encoding & """ >" _
@@ -26381,7 +24224,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            If user_isEditing("") Or user_isAdmin() Then
+            If user.user_isEditing("") Or user.user_isAdmin() Then
                 main_GetAdminHintWrapper = main_GetAdminHintWrapper & web_GetLegacySiteStyles()
                 main_GetAdminHintWrapper = main_GetAdminHintWrapper _
                     & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccHintWrapper"">" _
@@ -26430,7 +24273,7 @@ ErrorTrap:
                     Call db.db_setCS(CS, "ccGuid", pageGuid)
                 End If
                 Call db.db_SaveCSRecord(CS)
-                Call workflow_PublishEdit("Page Content", Id)
+                Call workflow.publishEdit("Page Content", Id)
             End If
             Call db.db_csClose(CS)
             '
@@ -26459,7 +24302,7 @@ ErrorTrap:
             Dim NameOK As Boolean
             Dim SectionNameTry As String
             '
-            If (main_PageErrorCount = 0) And EncodeBoolean(db.siteProperty_getBoolean("AllowAutoHomeSectionOnce", False)) Then
+            If (main_PageErrorCount = 0) And EncodeBoolean(siteProperties.getBoolean("AllowAutoHomeSectionOnce", False)) Then
                 '
                 SectionTemplateID = pageManager_LoadTemplateGetID(0)
                 '
@@ -26472,7 +24315,7 @@ ErrorTrap:
                     If LoopPtr <> 0 Then
                         SectionNameTry = SectionName & " " & (LoopPtr + 1)
                     End If
-                    CS = db.db_csOpen("Site Sections", "name=" & db.db_EncodeSQLText(SectionNameTry), , ,, , , "ID")
+                    CS = db.db_csOpen("Site Sections", "name=" & db.encodeSQLText(SectionNameTry), , ,, , , "ID")
                     NameOK = Not db.db_csOk(CS)
                     Call db.db_csClose(CS)
                     LoopPtr = LoopPtr + 1
@@ -26560,12 +24403,12 @@ ErrorTrap:
             main_isSectionBlocked = False
             If AllowSectionBlocking Then
                 main_isSectionBlocked = True
-                If user_isAdmin() Then
+                If user.user_isAdmin() Then
                     '
                     ' Admin always main_Gets in
                     '
                     main_isSectionBlocked = False
-                ElseIf Not user_isAuthenticated() Then
+                ElseIf Not user.user_isAuthenticated() Then
                     '
                     ' not authenticated never main_Gets in
                     '
@@ -26574,7 +24417,7 @@ ErrorTrap:
                     ' check if this member is in one of the SectionRule groups
                     '
                     SQLWhere = "" _
-                        & " M.MemberID=" & userId _
+                        & " M.MemberID=" & user.userId _
                         & " and R.SectionID=" & SectionID _
                         & " and M.GroupID=R.GroupID" _
                         & " and R.Active<>0" _
@@ -26616,7 +24459,7 @@ ErrorTrap:
         Public Sub main_RequestTask(ByVal Command As String, ByVal SQL As String, ByVal ExportName As String, ByVal Filename As String)
             On Error GoTo ErrorTrap 'Const Tn = "RequestTask" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
-            Call tasks_RequestTask(EncodeText(Command), EncodeText(SQL), EncodeText(ExportName), EncodeText(Filename), EncodeInteger(userId))
+            Call tasks_RequestTask(EncodeText(Command), EncodeText(SQL), EncodeText(ExportName), EncodeText(Filename), EncodeInteger(user.userId))
             '
             Exit Sub
 ErrorTrap:
@@ -26650,7 +24493,7 @@ ErrorTrap:
                 '
                 ' First try main_ContentWatch table for a link
                 '
-                CSPointer = db.db_csOpen("Content Watch", "ContentRecordKey=" & db.db_EncodeSQLText(ContentRecordKey), , , ,, , "Link,Clicks")
+                CSPointer = db.db_csOpen("Content Watch", "ContentRecordKey=" & db.encodeSQLText(ContentRecordKey), , , ,, , "Link,Clicks")
                 If db.db_csOk(CSPointer) Then
                     main_GetLinkByContentRecordKey = db.db_GetCSText(CSPointer, "Link")
                 End If
@@ -26681,7 +24524,7 @@ ErrorTrap:
                                         '
                                         'Call app.db_DeleteContentRecords("Topic Rules", "ContentRecordKey=" & encodeSQLText(ContentRecordKey))
                                         'Call app.db_DeleteContentRecords("Topic Habits", "ContentRecordKey=" & encodeSQLText(ContentRecordKey))
-                                        Call db.db_DeleteContentRecords("Content Watch", "ContentRecordKey=" & db.db_EncodeSQLText(ContentRecordKey))
+                                        Call db.db_DeleteContentRecords("Content Watch", "ContentRecordKey=" & db.encodeSQLText(ContentRecordKey))
                                         Call metaData_DeleteContentTracking(ContentName, RecordID, True)
                                     Else
 
@@ -26705,7 +24548,7 @@ ErrorTrap:
                                             End If
                                         End If
                                         If main_GetLinkByContentRecordKey = "" Then
-                                            DefaultTemplateLink = db.siteProperty_getText("SectionLandingLink", db.RootWebPath & db.siteProperty_ServerPageDefault)
+                                            DefaultTemplateLink = siteProperties.getText("SectionLandingLink", www_requestRootPath & siteProperties.serverPageDefault)
                                         End If
                                     End If
                                 End If
@@ -26722,7 +24565,7 @@ ErrorTrap:
                 main_GetLinkByContentRecordKey = DefaultLink
             End If
             '
-            main_GetLinkByContentRecordKey = EncodeAppRootPath(main_GetLinkByContentRecordKey, web_requestVirtualFilePath, db.RootWebPath, web.requestDomain)
+            main_GetLinkByContentRecordKey = EncodeAppRootPath(main_GetLinkByContentRecordKey, web_requestVirtualFilePath, www_requestRootPath, web.requestDomain)
             '
             Exit Function
             '
@@ -26758,7 +24601,7 @@ ErrorTrap:
                     If (LinkLabel <> "") Then
                         main_GetWatchList = main_GetWatchList & cr & "<li id=""main_ContentWatch" & RecordID & """ class=""ccListItem"">"
                         If (Link <> "") Then
-                            main_GetWatchList = main_GetWatchList & "<a href=""http://" & main_ServerDomain & db.RootWebPath & web_requestPage & "?rc=" & ContentID & "&ri=" & RecordID & """>" & LinkLabel & "</a>"
+                            main_GetWatchList = main_GetWatchList & "<a href=""http://" & main_ServerDomain & www_requestRootPath & web_requestPage & "?rc=" & ContentID & "&ri=" & RecordID & """>" & LinkLabel & "</a>"
                         Else
                             main_GetWatchList = main_GetWatchList & LinkLabel
                         End If
@@ -26767,7 +24610,7 @@ ErrorTrap:
                     Call db.db_csGoNext(CS)
                 Loop
                 If main_GetWatchList <> "" Then
-                    main_GetWatchList = html_GetContentCopy("Watch List Caption: " & ListName, ListName, userId, True, user_isAuthenticated) & cr & "<ul class=""ccWatchList"">" & kmaIndent(main_GetWatchList) & cr & "</ul>"
+                    main_GetWatchList = html_GetContentCopy("Watch List Caption: " & ListName, ListName, user.userId, True, user.user_isAuthenticated) & cr & "<ul class=""ccWatchList"">" & kmaIndent(main_GetWatchList) & cr & "</ul>"
                 End If
             End If
             Call db.db_csClose(CS)
@@ -27143,7 +24986,7 @@ ErrorTrap:
             Dim CS As Integer
             Dim PageID As Integer
             '
-            CS = db.db_csOpen("Copy Content", "name=" & db.db_EncodeSQLText(ContentBlockCopyName), "ID", , , , , "Copy,ID")
+            CS = db.db_csOpen("Copy Content", "name=" & db.encodeSQLText(ContentBlockCopyName), "ID", , , , , "Copy,ID")
             If db.db_csOk(CS) Then
                 main_GetDefaultBlockMessage = db.db_GetCS(CS, "Copy")
             End If
@@ -27162,7 +25005,7 @@ ErrorTrap:
                 Call db.db_setCS(CS, "Name", ContentBlockCopyName)
                 Call db.db_setCS(CS, "Copy", main_GetDefaultBlockMessage)
                 Call db.db_SaveCSRecord(CS)
-                Call workflow_PublishEdit("Copy Content", EncodeInteger(db.db_GetCS(CS, "ID")))
+                Call workflow.publishEdit("Copy Content", EncodeInteger(db.db_GetCS(CS, "ID")))
             End If
             '
             Exit Function
@@ -27326,7 +25169,7 @@ ErrorTrap:
             '
             IsRetry = (web_GetStreamInteger2("ContensiveFormPageID") <> 0)
             '
-            CS = db.db_csOpen("Form Pages", "name=" & db.db_EncodeSQLText(FormPageName))
+            CS = db.db_csOpen("Form Pages", "name=" & db.encodeSQLText(FormPageName))
             If db.db_csOk(CS) Then
                 FormPageID = db.db_GetCSInteger(CS, "ID")
                 Formhtml = db.db_GetCSText(CS, "Body")
@@ -27352,7 +25195,7 @@ ErrorTrap:
                                 CaptionSpan = "<span>"
                             End If
                             If Not db.db_csOk(CSPeople) Then
-                                CSPeople = db_csOpen("people", userId)
+                                CSPeople = db_csOpen("people", user.userId)
                             End If
                             Caption = .Caption
                             If .REquired Or EncodeBoolean(db_GetContentFieldProperty("People", .PeopleField, "Required")) Then
@@ -27369,7 +25212,7 @@ ErrorTrap:
                             '
                             ' Group main_MemberShip
                             '
-                            GroupValue = user_IsGroupMember(.GroupName)
+                            GroupValue = user.user_IsGroupMember(.GroupName)
                             Body = f.RepeatCell
                             Body = Replace(Body, "{{CAPTION}}", html_GetFormInputCheckBox2("Group" & .GroupName, GroupValue), , , vbTextCompare)
                             Body = Replace(Body, "{{FIELD}}", .Caption)
@@ -27444,11 +25287,11 @@ ErrorTrap:
                 ' Load the instructions
                 '
                 f = main_LoadFormPageInstructions(FormInstructions, Formhtml)
-                If f.AuthenticateOnFormProcess And Not user_isAuthenticated() And user_isRecognized() Then
+                If f.AuthenticateOnFormProcess And Not user.user_isAuthenticated() And user.user_isRecognized() Then
                     '
                     ' If this form will authenticate when done, and their is a current, non-authenticated account -- logout first
                     '
-                    Call security_LogoutMember()
+                    Call user.security_LogoutMember()
                 End If
                 CSPeople = -1
                 Success = True
@@ -27461,7 +25304,7 @@ ErrorTrap:
                                 '
                                 FormValue = doc_getText(.PeopleField)
                                 If (FormValue <> "") And EncodeBoolean(db_GetContentFieldProperty("people", .PeopleField, "uniquename")) Then
-                                    SQL = "select count(*) from ccMembers where " & .PeopleField & "=" & db.db_EncodeSQLText(FormValue)
+                                    SQL = "select count(*) from ccMembers where " & .PeopleField & "=" & db.encodeSQLText(FormValue)
                                     CS = db.db_csOpenSql(SQL)
                                     If db.db_csOk(CS) Then
                                         Success = db.db_GetCSInteger(CS, "cnt") = 0
@@ -27476,7 +25319,7 @@ ErrorTrap:
                                     error_AddUserError("The field [" & html_EncodeHTML(.Caption) & "] is required.")
                                 Else
                                     If Not db.db_csOk(CSPeople) Then
-                                        CSPeople = db_csOpen("people", userId)
+                                        CSPeople = db_csOpen("people", user.userId)
                                     End If
                                     If db.db_csOk(CSPeople) Then
                                         Select Case UCase(.PeopleField)
@@ -27508,7 +25351,7 @@ ErrorTrap:
                                 ' Group main_MemberShip
                                 '
                                 IsInGroup = main_GetStreamBoolean2("Group" & .GroupName)
-                                WasInGroup = user_IsGroupMember(.GroupName)
+                                WasInGroup = user.user_IsGroupMember(.GroupName)
                                 If WasInGroup And Not IsInGroup Then
                                     main_DeleteGroupMember(.GroupName)
                                 ElseIf IsInGroup And Not WasInGroup Then
@@ -27534,13 +25377,13 @@ ErrorTrap:
                     ' Authenticate
                     '
                     If f.AuthenticateOnFormProcess Then
-                        Call user_LoginMemberByID(userId)
+                        Call user.user_LoginMemberByID(user.userId)
                     End If
                     '
                     ' Join Group requested by page that created form
                     '
                     Dim tokenDate As Date
-                    Call security_decodeToken(doc_getText("SuccessID"), db.config.privateKey, GroupIDToJoinOnSuccess, tokenDate)
+                    Call security_decodeToken(doc_getText("SuccessID"), appConfig.privateKey, GroupIDToJoinOnSuccess, tokenDate)
                     'GroupIDToJoinOnSuccess = main_DecodeKeyNumber(main_GetStreamText2("SuccessID"))
                     If GroupIDToJoinOnSuccess <> 0 Then
                         Call main_AddGroupMember(group_GetGroupName(GroupIDToJoinOnSuccess))
@@ -27577,8 +25420,8 @@ ErrorTrap:
             Dim GroupNameList As String
             Dim Copy As String
             '
-            Call db.db_DeleteContentRecords("Form Pages", "name=" & db.db_EncodeSQLText("Registration Form"))
-            CS = db.db_csOpen("Form Pages", "name=" & db.db_EncodeSQLText("Registration Form"))
+            Call db.db_DeleteContentRecords("Form Pages", "name=" & db.encodeSQLText("Registration Form"))
+            CS = db.db_csOpen("Form Pages", "name=" & db.encodeSQLText("Registration Form"))
             If Not db.db_csOk(CS) Then
                 '
                 ' create Version 1 template - just to main_Get it started
@@ -27661,12 +25504,12 @@ ErrorTrap:
             Dim IsOldMenu As Boolean
             Dim CompatibilitySpanAroundButton As Boolean
             '
-            IsAuthoring = user_isEditing("Dynamic Menus")
-            DefaultTemplateLink = db.RootWebPath & web_requestPage
+            IsAuthoring = user.user_isEditing("Dynamic Menus")
+            DefaultTemplateLink = www_requestRootPath & web_requestPage
             If False Then '.292" Then
                 CompatibilitySpanAroundButton = True
             Else
-                CompatibilitySpanAroundButton = db.siteProperty_getBoolean("Compatibility Dynamic Menu Span Around Button", False)
+                CompatibilitySpanAroundButton = siteProperties.getBoolean("Compatibility Dynamic Menu Span Around Button", False)
             End If
             '
             ' Check for MenuID - if present, arguments are in the Dynamic Menu content - else it is old, and they are in the addonOption_String
@@ -27728,7 +25571,7 @@ ErrorTrap:
                             If LCase(Right(StylesFilename, 4)) <> ".css" Then
                                 Call handleLegacyError15("Dynamic Menu [" & MenuName & "] StylesFilename is not a '.css' file, and will not display correct. Check that the field is setup as a CSSFile.", "main_GetDynamicMenu")
                             Else
-                                Call main_AddStylesheetLink2(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, StylesFilename), "dynamic menu")
+                                Call main_AddStylesheetLink2(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, StylesFilename), "dynamic menu")
                             End If
                         End If
                     End If
@@ -27809,7 +25652,7 @@ ErrorTrap:
                 End If
             End If
             main_GetDynamicMenu = PreButton & Replace(main_GetDynamicMenu, vbCrLf, PostButton & MenuDelimiter & PreButton) & PostButton
-            If user_IsAdvancedEditing("") Then
+            If user.user_IsAdvancedEditing("") Then
                 main_GetDynamicMenu = "<div style=""border-bottom:1px dashed #404040; padding:5px;margin-bottom:5px;"">Dynamic Menu [" & MenuName & "]" & EditLink & "</div><div>" & main_GetDynamicMenu & "</div>"
             End If
             '
@@ -27918,7 +25761,7 @@ ErrorTrap:
                             Call db.db_SetCSField(CSPointer, FieldName, Path)
                             Path = Replace(Path, "\", "/")
                             Path = Replace(Path, "/" & Filename, "")
-                            Call web_ProcessFormInputFile2(LocalRequestName, db.appRootFiles, Path)
+                            Call web_ProcessFormInputFile2(LocalRequestName, appRootFiles, Path)
                         End If
                     Case Else
                         '
@@ -27979,23 +25822,23 @@ ErrorTrap:
         Private Function main_GetStyleTagPublic() As String
             Dim StyleSN As Integer
             '
-            If (True) And EncodeBoolean(db.siteProperty_getBoolean("Allow CSS Reset", False)) Then
+            If (True) And EncodeBoolean(siteProperties.getBoolean("Allow CSS Reset", False)) Then
                 main_GetStyleTagPublic = main_GetStyleTagPublic & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & web_requestProtocol & main_ServerDomain & "/cclib/styles/ccreset.css"" >"
             End If
-            StyleSN = EncodeInteger(db.siteProperty_getText("StylesheetSerialNumber", "0"))
+            StyleSN = EncodeInteger(siteProperties.getText("StylesheetSerialNumber", "0"))
             If StyleSN < 0 Then
                 '
                 ' Linked Styles
                 ' Bump the Style Serial Number so next fetch is not cached
                 '
                 StyleSN = 1
-                Call db.siteProperty_set("StylesheetSerialNumber", CStr(StyleSN))
+                Call siteProperties.setProperty("StylesheetSerialNumber", CStr(StyleSN))
                 '
                 ' Save new public stylesheet
                 '
                 'Dim kmafs As New fileSystemClass
-                Call db.cdnFiles.SaveFile(db.convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), csv_getStyleSheetProcessed)
-                Call db.cdnFiles.SaveFile(db.convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css"), csv_getStyleSheetDefault)
+                Call cdnFiles.SaveFile(convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), csv_getStyleSheetProcessed)
+                Call cdnFiles.SaveFile(convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css"), csv_getStyleSheetDefault)
 
             End If
             If (StyleSN = 0) Then
@@ -28012,7 +25855,7 @@ ErrorTrap:
                 '
                 ' cached stylesheet
                 '
-                main_GetStyleTagPublic = main_GetStyleTagPublic & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & web_requestProtocol & main_ServerDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, "templates/Public" & StyleSN & ".css") & """ >"
+                main_GetStyleTagPublic = main_GetStyleTagPublic & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & web_requestProtocol & main_ServerDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, "templates/Public" & StyleSN & ".css") & """ >"
             End If
         End Function
         '
@@ -28021,7 +25864,7 @@ ErrorTrap:
         Private Function main_GetStyleTagAdmin() As String
             Dim StyleSN As Integer
             '
-            StyleSN = EncodeInteger(db.siteProperty_getText("StylesheetSerialNumber", "0"))
+            StyleSN = EncodeInteger(siteProperties.getText("StylesheetSerialNumber", "0"))
             If StyleSN = 0 Then
                 main_GetStyleTagAdmin = cr & StyleSheetStart & main_GetStyleSheetDefault() & cr & StyleSheetEnd
             ElseIf (db.dataBuildVersion <> cp.Version()) Then
@@ -28033,15 +25876,15 @@ ErrorTrap:
                     ' Bump the Style Serial Number so next fetch is not cached
                     '
                     StyleSN = 1
-                    Call db.siteProperty_set("StylesheetSerialNumber", CStr(StyleSN))
+                    Call siteProperties.setProperty("StylesheetSerialNumber", CStr(StyleSN))
                     '
                     ' Save new public stylesheet
                     '
                     'Dim kmafs As New fileSystemClass
-                    Call db.cdnFiles.SaveFile(db.convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), csv_getStyleSheetProcessed)
-                    Call db.cdnFiles.SaveFile(db.convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css"), csv_getStyleSheetDefault)
+                    Call cdnFiles.SaveFile(convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), csv_getStyleSheetProcessed)
+                    Call cdnFiles.SaveFile(convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css"), csv_getStyleSheetDefault)
                 End If
-                main_GetStyleTagAdmin = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & web_requestProtocol & main_ServerDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, "templates/Admin" & StyleSN & ".css") & """ >"
+                main_GetStyleTagAdmin = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & web_requestProtocol & main_ServerDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, "templates/Admin" & StyleSN & ".css") & """ >"
             End If
         End Function
         '
@@ -28049,9 +25892,9 @@ ErrorTrap:
         '
         Private Function main_GetLandingLink() As String
             If pageManager_LandingLink = "" Then
-                pageManager_LandingLink = db.siteProperty_getText("SectionLandingLink", db.RootWebPath & db.siteProperty_ServerPageDefault)
+                pageManager_LandingLink = siteProperties.getText("SectionLandingLink", www_requestRootPath & siteProperties.serverPageDefault)
                 pageManager_LandingLink = ConvertLinkToShortLink(pageManager_LandingLink, web.requestDomain, web_requestVirtualFilePath)
-                pageManager_LandingLink = EncodeAppRootPath(pageManager_LandingLink, web_requestVirtualFilePath, db.RootWebPath, web.requestDomain)
+                pageManager_LandingLink = EncodeAppRootPath(pageManager_LandingLink, web_requestVirtualFilePath, www_requestRootPath, web.requestDomain)
             End If
             main_GetLandingLink = pageManager_LandingLink
         End Function
@@ -28067,7 +25910,7 @@ ErrorTrap:
             '
             Dim returnValue As String
             '
-            returnValue = html_encodeContent10(Source, personalizationPeopleId, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, IsEmailContent, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, user_isAuthenticated, Nothing, user_isEditingAnything)
+            returnValue = html_encodeContent10(Source, personalizationPeopleId, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, IsEmailContent, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, user.user_isAuthenticated, Nothing, user.user_isEditingAnything)
             '
             encodeContent9 = returnValue
             '
@@ -28178,7 +26021,7 @@ ErrorTrap:
         Public Function encodeContentForWeb(Source As String, ContextContentName As String, ContextRecordID As Integer, Ignore_BasePath As String, WrapperID As Integer) As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("EncodeContentForWeb")
             '
-            encodeContentForWeb = encodeContent9(Source, userId, ContextContentName, ContextRecordID, 0, False, False, True, True, False, True, "", "", False, WrapperID, "", addonContextEnum.ContextPage)
+            encodeContentForWeb = encodeContent9(Source, user.userId, ContextContentName, ContextRecordID, 0, False, False, True, True, False, True, "", "", False, WrapperID, "", addonContextEnum.ContextPage)
             '
             Exit Function
 ErrorTrap:
@@ -28350,7 +26193,7 @@ ErrorTrap:
                             If SecondaryContentSelectCriteria <> "" Then
                                 SQL &= "AND(" & SecondaryContentSelectCriteria & ")"
                             End If
-                            If SecondaryCDef.AllowWorkflowAuthoring And db.siteProperty_AllowWorkflowAuthoring Then
+                            If SecondaryCDef.AllowWorkflowAuthoring And siteProperties.allowWorkflowAuthoring Then
                                 SQL &= "and(" & SecondaryTablename & ".editsourceid is null)"
                             End If
                             CS = db.db_csOpenSql(SQL)
@@ -28401,7 +26244,7 @@ ErrorTrap:
                                 & " And (AllowedContent.Active<>" & SQLFalse & ")" _
                                 & " And (" & SecondaryTablename & ".ContentControlID IN (" & String.Join(",", ContentIDList) & "))"
                         End If
-                        If SecondaryCDef.AllowWorkflowAuthoring And db.siteProperty_AllowWorkflowAuthoring Then
+                        If SecondaryCDef.AllowWorkflowAuthoring And siteProperties.allowWorkflowAuthoring Then
                             SQL &= "and(" & SecondaryTablename & ".editsourceid is null)"
                         End If
                         If SecondaryContentSelectCriteria <> "" Then
@@ -28430,7 +26273,7 @@ ErrorTrap:
                                 CheckBoxCnt = 0
                                 DivCheckBoxCnt = 0
                                 DivCnt = 0
-                                CanSeeHiddenFields = user_isDeveloper()
+                                CanSeeHiddenFields = user.user_isDeveloper()
                                 DivName = TagName & ".All"
                                 Do While db.db_csOk(CS)
                                     OptionName = db.db_GetCSText(CS, "OptionName")
@@ -28645,8 +26488,8 @@ ErrorTrap:
                     '
                     ' + Add Category
                     '
-                    If main_IsContentManager("Content Categories") Then
-                        LeftPane = LeftPane & cr & "<div class=""caption""><a href=""" & db.siteProperty_AdminURL & "?editreferer=" & EncodeRequestVariable("?" & web_RefreshQueryString) & "&cid=" & main_GetContentID("Content Categories") & "&af=4&aa=2"">+&nbsp;Add&nbsp;Category</a></div>"
+                    If user.main_IsContentManager("Content Categories") Then
+                        LeftPane = LeftPane & cr & "<div class=""caption""><a href=""" & siteProperties.adminURL & "?editreferer=" & EncodeRequestVariable("?" & web_RefreshQueryString) & "&cid=" & main_GetContentID("Content Categories") & "&af=4&aa=2"">+&nbsp;Add&nbsp;Category</a></div>"
                     End If
                     '
                     LeftPane = cr & "<div class=""ccCategoryListCon"">" & kmaIndent(LeftPane) & cr & "</div>"
@@ -29076,7 +26919,7 @@ ErrorTrap:
             '
             Dim IsAuthoring As Boolean
             '
-            IsAuthoring = user_isEditingAnything()
+            IsAuthoring = user.user_isEditingAnything()
             If Not IsAuthoring Then
                 main_GetEditWrapper = Content
             Else
@@ -29322,7 +27165,7 @@ ErrorTrap:
             Dim Key As String
             '
             main_GetLinkAliasByPageID = DefaultLink
-            If db.siteProperty_allowLinkAlias Then
+            If siteProperties.allowLinkAlias Then
                 Ptr = cache_linkAlias_getPtrByPageIdQss(PageID, QueryStringSuffix)
                 If Ptr >= 0 Then
                     main_GetLinkAliasByPageID = EncodeText(cache_linkAlias(1, Ptr))
@@ -29348,7 +27191,7 @@ ErrorTrap:
             '
             Dim Ptr As Integer
             '
-            If (True) And (db.siteProperty_allowLinkAlias) Then
+            If (True) And (siteProperties.allowLinkAlias) Then
                 If cache_linkAliasCnt = 0 Then
                     Call cache_linkAlias_load()
                 End If
@@ -29386,7 +27229,7 @@ ErrorTrap:
                     '
                     ' no domain page not found, use site default
                     '
-                    pageId = db.siteProperty_getinteger("PageNotFoundPageID", 0)
+                    pageId = siteProperties.getinteger("PageNotFoundPageID", 0)
                 End If
             Catch ex As Exception
                 handleExceptionAndRethrow(ex)
@@ -29443,7 +27286,7 @@ ErrorTrap:
             '
             ' Add the Admin Message to the link
             '
-            If user_isAdmin() Then
+            If user.user_isAdmin() Then
                 If PageNotFoundLink = "" Then
                     PageNotFoundLink = main_ServerLink
                 End If
@@ -29505,7 +27348,7 @@ ErrorTrap:
                     '
                     ' try the domain landing page first
                     '
-                    CS = db.db_csOpen("Domains", "(name=" & db.db_EncodeSQLText(web.requestDomain) & ")", , , , , , "RootPageID")
+                    CS = db.db_csOpen("Domains", "(name=" & db.encodeSQLText(web.requestDomain) & ")", , , , , , "RootPageID")
                     If db.db_csOk(CS) Then
                         pageManager_LandingPageID = EncodeInteger(db.db_GetCSText(CS, "RootPageID"))
                     End If
@@ -29514,7 +27357,7 @@ ErrorTrap:
                         '
                         ' try the site property landing page id
                         '
-                        pageManager_LandingPageID = db.siteProperty_getinteger("LandingPageID", 0)
+                        pageManager_LandingPageID = siteProperties.getinteger("LandingPageID", 0)
                     End If
                     If pageManager_LandingPageID = 0 Then
                         '
@@ -29611,7 +27454,7 @@ ErrorTrap:
         '       see main_executeAddon for explaination of string parsing
         '
         '       use main_GetAddonOption to main_Get a value from an AddonOptionList
-        '       use main_DecodeAddonOptionArgument( main_GetArgument( name, string, default, "&" )) for AddonOptionStrings
+        '       use decodeNvaArgument( main_GetArgument( name, string, default, "&" )) for AddonOptionStrings
         '=================================================================================
         '
         Public Function main_GetAggrOption(Name As String, Option_String As String) As String
@@ -29692,9 +27535,9 @@ ErrorTrap:
             RightPane = "Style Tag Editor"
             TempFilename = "AppCache\StyleTemp" & GetRandomInteger() & ".css"
             '
-            StyleFile = db.cdnFiles.ReadFile(TempFilename)
+            StyleFile = cdnFiles.ReadFile(TempFilename)
             If StyleFile <> "" Then
-                Call db.appRootFiles.SaveFile(TempFilename, StyleCopy)
+                Call appRootFiles.SaveFile(TempFilename, StyleCopy)
                 'Call main_CopyVirtualFile(StylesFilename, TempFilename)
                 '
                 ' remove crlf
@@ -30938,7 +28781,7 @@ ErrorTrap:
                             Link = "/" & Link
                         End If
                         Link = ConvertLinkToShortLink(Link, web.requestDomain, web_requestVirtualFilePath)
-                        Link = EncodeAppRootPath(Link, web_requestVirtualFilePath, db.RootWebPath, web.requestDomain)
+                        Link = EncodeAppRootPath(Link, web_requestVirtualFilePath, www_requestRootPath, web.requestDomain)
                         If templateSecure And (Not web.requestSecure) Then
                             '
                             ' Short Link, and IsSecure checked but current page is not secure
@@ -30960,7 +28803,7 @@ ErrorTrap:
                         '
                         ' Secure template but current page is not secure - return default link with ssl
                         '
-                        Link = "https://" & web.requestDomain & db.RootWebPath & db.siteProperty_ServerPageDefault
+                        Link = "https://" & web.requestDomain & www_requestRootPath & siteProperties.serverPageDefault
                     ElseIf web.requestSecure And (Not templateSecure) Then
                         ' (*E) comment out this
                         '
@@ -30972,7 +28815,7 @@ ErrorTrap:
                         ' what is happening here is a page is set secure, it redirects to the secure link then this
                         ' happens during the secure page draw.
                         '
-                        Link = "http://" & web.requestDomain & db.RootWebPath & db.siteProperty_ServerPageDefault
+                        Link = "http://" & web.requestDomain & www_requestRootPath & siteProperties.serverPageDefault
                     End If
                 End If
                 main_GetTCLink = Link
@@ -31087,7 +28930,7 @@ ErrorTrap:
             If Pos > 0 Then
                 s = Left(s, Pos - 1)
             End If
-            s = main_DecodeAddonOptionArgument(s)
+            s = decodeNvaArgument(s)
             '
             main_GetAddonOptionConstructorValue = s
             '
@@ -31146,7 +28989,7 @@ ErrorTrap:
                     IDs = Split(pageManager_DeleteChildRecords, ",")
                     IDCnt = UBound(IDs) + 1
                     SingleEntry = (IDCnt = 1)
-                    QuickEditing = user_isQuickEditing("page content")
+                    QuickEditing = user.user_isQuickEditing("page content")
                     For Ptr = 0 To IDCnt - 1
                         Call db_DeleteContentRecord("page content", EncodeInteger(IDs(Ptr)))
                         Call pageManager_cache_pageContent_removeRow(EncodeInteger(IDs(Ptr)), pagemanager_IsWorkflowRendering, QuickEditing)
@@ -31272,11 +29115,11 @@ ErrorTrap:
 
                         If LCase(TableName) = "ccpagecontent" Then
                             Call pageManager_cache_pageContent_removeRow(RecordID, pagemanager_IsWorkflowRendering, False)
-                            If RecordID = EncodeInteger(db.siteProperty_getText("PageNotFoundPageID", "0")) Then
-                                Call db.siteProperty_set("PageNotFoundPageID", "0")
+                            If RecordID = EncodeInteger(siteProperties.getText("PageNotFoundPageID", "0")) Then
+                                Call siteProperties.setProperty("PageNotFoundPageID", "0")
                             End If
-                            If RecordID = EncodeInteger(db.siteProperty_getText("LandingPageID", "0")) Then
-                                Call db.siteProperty_set("LandingPageID", "0")
+                            If RecordID = EncodeInteger(siteProperties.getText("LandingPageID", "0")) Then
+                                Call siteProperties.setProperty("LandingPageID", "0")
                             End If
                         End If
                         '
@@ -31322,7 +29165,7 @@ ErrorTrap:
                             If pageContentName = "" Then
                                 pageContentName = "Page Content"
                             End If
-                            Call db.db_setCS(CS, "RootPageID", main_CreatePageGetID(PageName, "Page Content", userId, ""))
+                            Call db.db_setCS(CS, "RootPageID", main_CreatePageGetID(PageName, "Page Content", user.userId, ""))
                             Call pageManager_cache_pageContent_clear()
                         End If
                     End If
@@ -31354,7 +29197,7 @@ ErrorTrap:
                     ' if a AltSizeList is blank, make large,medium,small and thumbnails
                     '
                     'hint = hint & ",180"
-                    If (True) And (EncodeBoolean(db.siteProperty_getBoolean("ImageAllowSFResize", True))) Then
+                    If (True) And (EncodeBoolean(siteProperties.getBoolean("ImageAllowSFResize", True))) Then
                         If Not IsDelete Then
                             CS = db_csOpen("library files", RecordID)
                             If db.db_csOk(CS) Then
@@ -31364,14 +29207,14 @@ ErrorTrap:
                                     FilePath = Mid(Filename, 1, Pos)
                                     Filename = Mid(Filename, Pos + 1)
                                 End If
-                                Call db.db_setCS(CS, "filesize", main_GetFileSize(db.appRootFiles.rootLocalFolderPath & FilePath & Filename))
+                                Call db.db_setCS(CS, "filesize", main_GetFileSize(appRootFiles.rootLocalFolderPath & FilePath & Filename))
                                 Pos = InStrRev(Filename, ".")
                                 If Pos > 0 Then
                                     FilenameExt = Mid(Filename, Pos + 1)
                                     FilenameNoExt = Mid(Filename, 1, Pos - 1)
                                     If InStr(1, "jpg,gif,png", FilenameExt, vbTextCompare) <> 0 Then
                                         sf = New coreImageEditClass
-                                        If sf.load(db.appRootFiles.rootLocalFolderPath & FilePath & Filename) Then
+                                        If sf.load(appRootFiles.rootLocalFolderPath & FilePath & Filename) Then
                                             '
                                             '
                                             '
@@ -31387,7 +29230,7 @@ ErrorTrap:
                                                 If sf.width >= 640 Then
                                                     sf.height = CInt(sf.height * (640 / sf.width))
                                                     sf.width = 640
-                                                    Call sf.save(db.appRootFiles.rootLocalFolderPath & FilePath & FilenameNoExt & "-640x" & sf.height & "." & FilenameExt)
+                                                    Call sf.save(appRootFiles.rootLocalFolderPath & FilePath & FilenameNoExt & "-640x" & sf.height & "." & FilenameExt)
                                                     AltSizeList = AltSizeList & vbCrLf & "640x" & sf.height
                                                 End If
                                                 '
@@ -31396,7 +29239,7 @@ ErrorTrap:
                                                 If sf.width >= 320 Then
                                                     sf.height = CInt(sf.height * (320 / sf.width))
                                                     sf.width = 320
-                                                    Call sf.save(db.appRootFiles.rootLocalFolderPath & FilePath & FilenameNoExt & "-320x" & sf.height & "." & FilenameExt)
+                                                    Call sf.save(appRootFiles.rootLocalFolderPath & FilePath & FilenameNoExt & "-320x" & sf.height & "." & FilenameExt)
 
                                                     AltSizeList = AltSizeList & vbCrLf & "320x" & sf.height
                                                 End If
@@ -31406,7 +29249,7 @@ ErrorTrap:
                                                 If sf.width >= 160 Then
                                                     sf.height = CInt(sf.height * (160 / sf.width))
                                                     sf.width = 160
-                                                    Call sf.save(db.appRootFiles.rootLocalFolderPath & FilePath & FilenameNoExt & "-160x" & sf.height & "." & FilenameExt)
+                                                    Call sf.save(appRootFiles.rootLocalFolderPath & FilePath & FilenameNoExt & "-160x" & sf.height & "." & FilenameExt)
                                                     AltSizeList = AltSizeList & vbCrLf & "160x" & sf.height
                                                 End If
                                                 '
@@ -31415,7 +29258,7 @@ ErrorTrap:
                                                 If sf.width >= 80 Then
                                                     sf.height = CInt(sf.height * (80 / sf.width))
                                                     sf.width = 80
-                                                    Call sf.save(db.appRootFiles.rootLocalFolderPath & FilePath & FilenameNoExt & "-180x" & sf.height & "." & FilenameExt)
+                                                    Call sf.save(appRootFiles.rootLocalFolderPath & FilePath & FilenameNoExt & "-180x" & sf.height & "." & FilenameExt)
                                                     AltSizeList = AltSizeList & vbCrLf & "80x" & sf.height
                                                 End If
                                                 Call db.db_setCS(CS, "AltSizeList", AltSizeList)
@@ -31912,7 +29755,7 @@ ErrorTrap:
                 '
                 SQL = "update " & TableName & " set DateReviewed=" & db.db_EncodeSQLDate(main_PageStartTime)
                 If main_IsContentFieldSupported(ContentName, "ReviewedBy") Then
-                    SQL &= ",ReviewedBy=" & userId
+                    SQL &= ",ReviewedBy=" & user.userId
                 End If
                 '
                 ' Mark the live record
@@ -31973,7 +29816,7 @@ ErrorTrap:
         '
         '
         Public Sub main_LogActivity2(Message As String, SubjectMemberID As Integer, SubjectOrganizationID As Integer)
-            Call logActivity(Message, userId, SubjectMemberID, SubjectOrganizationID, main_ServerLink, main_VisitorID, main_VisitId)
+            Call logActivity(Message, user.userId, SubjectMemberID, SubjectOrganizationID, main_ServerLink, main_VisitorID, main_VisitId)
         End Sub
         '
         '=================================================================================================
@@ -32104,7 +29947,7 @@ ErrorTrap:
                 ' main_Get values out of the remote query record
                 '
                 If gv.status = GoogleVisualizationStatusEnum.OK Then
-                    CS = db.db_csOpen("Remote Queries", "((VisitId=" & main_VisitId & ")and(remotekey=" & db.db_EncodeSQLText(RemoteKey) & "))")
+                    CS = db.db_csOpen("Remote Queries", "((VisitId=" & main_VisitId & ")and(remotekey=" & db.encodeSQLText(RemoteKey) & "))")
                     If db.db_csOk(CS) Then
                         '
                         ' Use user definied query
@@ -32128,7 +29971,7 @@ ErrorTrap:
                                 '
                                 ' developers editing field help
                                 '
-                                If Not userIsDeveloper Then
+                                If Not user.userIsDeveloper Then
                                     gv.status = GoogleVisualizationStatusEnum.ErrorStatus
                                     If IsArray(gv.errors) Then
                                         Ptr = 0
@@ -32474,7 +30317,7 @@ ErrorTrap:
         '
         Private Sub appendLogPageNotFound(PageNotFoundLink As String)
             Try
-                Call appendLog("""" & FormatDateTime(main_PageStartTime, vbGeneralDate) & """,""App=" & db.config.name & """,""main_VisitId=" & main_VisitId & """,""" & PageNotFoundLink & """,""Referrer=" & web.requestReferrer & """", "performance", "pagenotfound")
+                Call appendLog("""" & FormatDateTime(main_PageStartTime, vbGeneralDate) & """,""App=" & appConfig.name & """,""main_VisitId=" & main_VisitId & """,""" & PageNotFoundLink & """,""Referrer=" & web.requestReferrer & """", "performance", "pagenotfound")
             Catch ex As Exception
                 handleExceptionAndRethrow(ex)
             End Try
@@ -32484,7 +30327,7 @@ ErrorTrap:
         '
         Public ReadOnly Property main_docType() As String
             Get
-                Return db.siteProperty_docTypeDeclaration()
+                Return siteProperties.docTypeDeclaration()
             End Get
         End Property
         '
@@ -32492,7 +30335,7 @@ ErrorTrap:
         '
         Public ReadOnly Property main_DocTypeAdmin() As String
             Get
-                Return db.siteProperty_docTypeDeclarationAdmin
+                Return siteProperties.docTypeDeclarationAdmin
             End Get
         End Property
         '
@@ -32941,7 +30784,7 @@ ErrorTrap:
         '
         Private Function main_GetFileSize(ByVal VirtualFilePathPage As String) As Integer
             'Dim kmafs As New fileSystemClass
-            Dim files As IO.FileInfo() = db.appRootFiles.GetFolderFiles(VirtualFilePathPage)
+            Dim files As IO.FileInfo() = appRootFiles.GetFolderFiles(VirtualFilePathPage)
             Return CInt(files(0).Length)
 
 
@@ -33045,7 +30888,7 @@ ErrorTrap:
                     '
                     Email = doc_getText("email")
                     If Email <> "" Then
-                        Call security_SendMemberPassword(Email)
+                        Call user.security_SendMemberPassword(Email)
                         Copy = "" _
                             & "<div style=""width:300px;margin:100px auto 0 auto;"">" _
                             & "<p>An attempt to send login information for email address '" & Email & "' has been made.</p>" _
@@ -33068,7 +30911,7 @@ ErrorTrap:
                         ContentName = "Page Content"
                     End If
                     If autoPrintText = "" Then
-                        autoPrintText = db.siteProperty_getText("AllowAutoPrintDialog", "1")
+                        autoPrintText = siteProperties.getText("AllowAutoPrintDialog", "1")
                     End If
                     If RootPageName = "" Then
                         blockSiteWithLogin = False
@@ -33080,11 +30923,11 @@ ErrorTrap:
                         '
                         ' 5/12/2008 - converted to RootPageID call because we do not use RootPageName anymore
                         '
-                        allowPageWithoutSectionDisplay = EncodeBoolean(db.siteProperty_getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default))
+                        allowPageWithoutSectionDisplay = EncodeBoolean(siteProperties.getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default))
                         If Not allowPageWithoutSectionDisplay Then
-                            allowPageWithoutSectionDisplay = main_IsContentManager(ContentName)
+                            allowPageWithoutSectionDisplay = user.main_IsContentManager(ContentName)
                         End If
-                        PageCopy = main_GetHtmlBody_GetSection_GetContent(PageID, rootPageId, ContentName, OrderByClause, False, False, False, 0, db.siteProperty_UseContentWatchLink, allowPageWithoutSectionDisplay)
+                        PageCopy = main_GetHtmlBody_GetSection_GetContent(PageID, rootPageId, ContentName, OrderByClause, False, False, False, 0, siteProperties.useContentWatchLink, allowPageWithoutSectionDisplay)
                         If pageManager_RedirectLink <> "" Then
                             Call web_Redirect2(pageManager_RedirectLink, pageManager_RedirectReason, False)
                         End If
@@ -33212,7 +31055,7 @@ ErrorTrap:
                     ' Because you want the form created to save the refresh values
                     '
                     If UCase(HardCodedPage) = "LOGOUTLOGIN" Then
-                        Call security_LogoutMember()
+                        Call user.security_LogoutMember()
                     End If
                     web_RefreshQueryString = web.requestQueryString
                     'Call main_AddRefreshQueryString("method", "")
@@ -33223,7 +31066,7 @@ ErrorTrap:
                     '
                     ' ----- logout the current member
                     '
-                    Call security_LogoutMember()
+                    Call user.security_LogoutMember()
                     executeRoute_hardCodedPage = False
                 Case HardCodedPageSiteExplorer
                     '
@@ -33272,7 +31115,6 @@ ErrorTrap:
                     CS = db.db_csInsertRecord("Trap Log")
                     If Not db.db_csOk(CS) Then
                         Call handleLegacyError10(KmaErrorInternal, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was not OK.", "Init", False, True)
-                        Call main_IncrementErrorCount()
                     Else
                         InsertTestOK = True
                         TrapID = db.db_GetCSInteger(CS, "ID")
@@ -33281,14 +31123,12 @@ ErrorTrap:
                     If InsertTestOK Then
                         If TrapID = 0 Then
                             Call handleLegacyError10(KmaErrorInternal, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was OK, but ID=0.", "Init", False, True)
-                            Call main_IncrementErrorCount()
                         Else
                             Call db_DeleteContentRecord("Trap Log", TrapID)
                         End If
                     End If
                     If Err.Number <> 0 Then
                         Call handleLegacyError10(KmaErrorInternal, "dll", "Error during Status. After traplog insert, " & GetErrString(Err), "Init", False, True)
-                        Call main_IncrementErrorCount()
                         Err.Clear()
                     End If
                     '
@@ -33329,11 +31169,11 @@ ErrorTrap:
                         ' main_Get the page
                         '
                         rootPageId = main_GetRecordID("Page Content", Name)
-                        allowPageWithoutSectionDisplay = EncodeBoolean(db.siteProperty_getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default))
+                        allowPageWithoutSectionDisplay = EncodeBoolean(siteProperties.getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default))
                         If Not allowPageWithoutSectionDisplay Then
-                            allowPageWithoutSectionDisplay = main_IsContentManager(ContentName)
+                            allowPageWithoutSectionDisplay = user.main_IsContentManager(ContentName)
                         End If
-                        Copy = main_GetHtmlBody_GetSection_GetContent(PageID, rootPageId, "Page Content", "", True, True, False, 0, db.siteProperty_UseContentWatchLink, allowPageWithoutSectionDisplay)
+                        Copy = main_GetHtmlBody_GetSection_GetContent(PageID, rootPageId, "Page Content", "", True, True, False, 0, siteProperties.useContentWatchLink, allowPageWithoutSectionDisplay)
                         'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2g")
                         Copy = Copy & main_GetEndOfBody(False, True, False, False)
                         Copy = Replace(Copy, "'", "'+""'""+'")
@@ -33354,12 +31194,12 @@ ErrorTrap:
                     '
                     web_BlockClosePageCopyright = True
                     Copy = Copy & "<p align=""center""><CENTER>"
-                    If Not user_isAuthenticated() Then
+                    If Not user.user_isAuthenticated() Then
                         Copy = Copy & main_GetLoginPanel()
-                    ElseIf main_IsContentManager("Page Content") Then
+                    ElseIf user.main_IsContentManager("Page Content") Then
                         'Copy = Copy & main_GetToolsPanel
                     Else
-                        Copy = Copy & "You are currently logged in as " & userName & ". To logout, click <a HREF=""" & web_ServerFormActionURL & "?Method=logout"" rel=""nofollow"">Here</A>."
+                        Copy = Copy & "You are currently logged in as " & user.userName & ". To logout, click <a HREF=""" & web_ServerFormActionURL & "?Method=logout"" rel=""nofollow"">Here</A>."
                     End If
                     'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2h")
                     Copy = Copy & main_GetEndOfBody(True, True, False, False)
@@ -33398,7 +31238,7 @@ ErrorTrap:
                     '   Should be a remote method in commerce
                     '----------------------------------------------------
                     '
-                    If Not user_isAdmin() Then
+                    If Not user.user_isAdmin() Then
                         '
                         ' Administrator required
                         '
@@ -33468,11 +31308,11 @@ ErrorTrap:
                         '
                         ' TEmp fix until HardCodedPage is complete
                         '
-                        Recipient = db.siteProperty_getText("EmailOrderNotifyAddress", db.siteProperty_EmailAdmin)
+                        Recipient = siteProperties.getText("EmailOrderNotifyAddress", siteProperties.emailAdmin)
                         If InStr(EncodeText(Recipient), "@") = 0 Then
                             Call handleLegacyError12("Init", "PayPal confirmation Order Process Notification email was not sent because EmailOrderNotifyAddress SiteProperty is not valid")
                         Else
-                            Sender = db.siteProperty_getText("EmailOrderFromAddress")
+                            Sender = siteProperties.getText("EmailOrderFromAddress")
                             subject = main_ServerDomain & " Online Order Pending, #" & ConfirmOrderID
                             Message = "<p>An order confirmation has been recieved from PayPal for " & main_ServerDomain & "</p>"
                             Call main_SendEmail(Recipient, Sender, subject, Message, , False, True)
@@ -33672,7 +31512,7 @@ ErrorTrap:
                 '
                 JSFilename = db.db_GetCSText(CS, "jsfilename")
                 If JSFilename <> "" Then
-                    JSFilename = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, JSFilename)
+                    JSFilename = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, JSFilename)
                     Call main_AddHeadScriptLink(JSFilename, SourceComment)
                 End If
                 Copy = db.db_GetCSText(CS, "stylesfilename")
@@ -33680,7 +31520,7 @@ ErrorTrap:
                     If InStr(1, Copy, "://") <> 0 Then
                     ElseIf Left(Copy, 1) = "/" Then
                     Else
-                        Copy = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, Copy)
+                        Copy = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, Copy)
                     End If
                     Call main_AddStylesheetLink2(Copy, SourceComment)
                 End If
@@ -33740,63 +31580,6 @@ ErrorTrap:
         End Sub
         '
         '========================================================================
-        ' main_IsContentManager2
-        '   If ContentName is missing, returns true if this is an authenticated member with
-        '       content management over anything
-        '   If ContentName is given, it only tests this content
-        '========================================================================
-        '
-        Public Function main_IsContentManager(Optional ByVal ContentName As String = "") As Boolean
-            Dim returnIsContentManager = False
-            Try
-                Dim SQL As String
-                Dim CS As Integer
-                Dim ContentID As Integer
-                Dim CDef As coreMetaDataClass.CDefClass
-                Dim notImplemented_allowAdd As Boolean
-                Dim notImplemented_allowDelete As Boolean
-                '
-                returnIsContentManager = False
-                If ContentName = "" Then
-                    If user_isAuthenticated() Then
-                        If user_isAdmin() Then
-                            returnIsContentManager = True
-                        Else
-                            '
-                            ' Is a CM for any content def
-                            '
-                            If Not property_user_isContentManagerOfAnything_isLoaded Then
-                                SQL = "SELECT ccGroupRules.ContentID" _
-                                    & " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupID = ccMemberRules.GroupID" _
-                                    & " WHERE (" _
-                                        & "(ccMemberRules.MemberID=" & db.db_EncodeSQLNumber(userId) & ")" _
-                                        & " AND(ccMemberRules.active<>0)" _
-                                        & " AND(ccGroupRules.active<>0)" _
-                                        & " AND(ccGroupRules.ContentID Is not Null)" _
-                                        & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & db.db_EncodeSQLDate(main_PageStartTime) & "))" _
-                                        & ");"
-                                CS = db.db_csOpenSql(SQL)
-                                property_user_isContentManagerOfAnything = db.db_csOk(CS)
-                                db.db_csClose(CS)
-                                '
-                                property_user_isContentManagerOfAnything_isLoaded = True
-                            End If
-                            returnIsContentManager = property_user_isContentManagerOfAnything
-                        End If
-                    End If
-                Else
-                    '
-                    ' Specific Content called out
-                    '
-                    Call main_GetContentAccessRights(ContentName, returnIsContentManager, notImplemented_allowAdd, notImplemented_allowDelete)
-                End If
-            Catch ex As Exception
-                handleExceptionAndRethrow(ex)
-            End Try
-            Return returnIsContentManager
-        End Function
-        '
-        '========================================================================
         ' main_GetContentAccessRights( ContentIdOrName, returnAllowEdit, returnAllowAdd, returnAllowDelete )
         '
         '========================================================================
@@ -33812,22 +31595,22 @@ ErrorTrap:
                 returnAllowAdd = False
                 returnAllowDelete = False
                 If True Then
-                    If Not user_isAuthenticated() Then
+                    If Not user.user_isAuthenticated() Then
                         '
                         ' no authenticated, you are not a conent manager
                         '
                     ElseIf ContentName = "" Then
                         '
-                        ' no content given, do not handle the general case -- use main_IsContentManager2()
+                        ' no content given, do not handle the general case -- use user.main_IsContentManager2()
                         '
-                    ElseIf user_isDeveloper() Then
+                    ElseIf user.user_isDeveloper() Then
                         '
                         ' developers are always content managers
                         '
                         returnAllowEdit = True
                         returnAllowAdd = True
                         returnAllowDelete = True
-                    ElseIf user_isAdmin() Then
+                    ElseIf user.user_isAdmin() Then
                         '
                         ' admin is content manager if the CDef is not developer only
                         '
@@ -33903,7 +31686,7 @@ ErrorTrap:
                 SQL = "SELECT ccGroupRules.ContentID,allowAdd,allowDelete" _
                     & " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupID = ccMemberRules.GroupID" _
                     & " WHERE (" _
-                        & " (ccMemberRules.MemberID=" & db.db_EncodeSQLNumber(userId) & ")" _
+                        & " (ccMemberRules.MemberID=" & db.db_EncodeSQLNumber(user.userId) & ")" _
                         & " AND(ccMemberRules.active<>0)" _
                         & " AND(ccGroupRules.active<>0)" _
                         & " AND(ccGroupRules.ContentID=" & ContentID & ")" _
@@ -34027,7 +31810,7 @@ ErrorTrap:
                     If HtmlValue = "" Then
                         main_GetFormInputField = html_GetFormInputFile2(InputName, HtmlId, HtmlClass)
                     Else
-                        main_GetFormInputField = main_GetFormInputField & "<a href=""http://" & EncodeURL(web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & GetFilename(HtmlValue) & "]</A>"
+                        main_GetFormInputField = main_GetFormInputField & "<a href=""http://" & EncodeURL(web.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & GetFilename(HtmlValue) & "]</A>"
                         main_GetFormInputField = main_GetFormInputField & "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & html_GetFormInputCheckBox2(InputName & ".Delete", False)
                         main_GetFormInputField = main_GetFormInputField & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & html_GetFormInputFile2(InputName, HtmlId, HtmlClass)
                     End If
@@ -34049,7 +31832,7 @@ ErrorTrap:
                     If HtmlValue = "" Then
                         main_GetFormInputField = html_GetFormInputFile2(InputName, HtmlId, HtmlClass)
                     Else
-                        main_GetFormInputField = main_GetFormInputField & "<a href=""http://" & EncodeURL(web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & GetFilename(HtmlValue) & "]</A>"
+                        main_GetFormInputField = main_GetFormInputField & "<a href=""http://" & EncodeURL(web.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & GetFilename(HtmlValue) & "]</A>"
                         main_GetFormInputField = main_GetFormInputField & "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & html_GetFormInputCheckBox2(InputName & ".Delete", False)
                         main_GetFormInputField = main_GetFormInputField & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & html_GetFormInputFile2(InputName, HtmlId, HtmlClass)
                     End If
@@ -34307,7 +32090,7 @@ ErrorTrap:
                 ' AC StartBlockText
                 '
                 IconIDControlString = "AC," & ACTypeAggregateFunction & ",0,Block Text,"
-                IconImg = GetAddonIconImg(db.siteProperty_AdminURL, 0, 0, 0, True, IconIDControlString, "", db.config.cdnFilesNetprefix, "Text Block Start", "Block text to all except selected groups starting at this point", "", 0)
+                IconImg = GetAddonIconImg(siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", appConfig.cdnFilesNetprefix, "Text Block Start", "Block text to all except selected groups starting at this point", "", 0)
                 IconImg = EncodeJavascript(IconImg)
                 Items(ItemsCnt) = "['Block Text','" & IconImg & "']"
                 Call Index.setPtr("Block Text", ItemsCnt)
@@ -34316,7 +32099,7 @@ ErrorTrap:
                 ' AC EndBlockText
                 '
                 IconIDControlString = "AC," & ACTypeAggregateFunction & ",0,Block Text End,"
-                IconImg = GetAddonIconImg(db.siteProperty_AdminURL, 0, 0, 0, True, IconIDControlString, "", db.config.cdnFilesNetprefix, "Text Block End", "End of text block", "", 0)
+                IconImg = GetAddonIconImg(siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", appConfig.cdnFilesNetprefix, "Text Block End", "End of text block", "", 0)
                 IconImg = EncodeJavascript(IconImg)
                 Items(ItemsCnt) = "['Block Text End','" & IconImg & "']"
                 Call Index.setPtr("Block Text", ItemsCnt)
@@ -34333,7 +32116,7 @@ ErrorTrap:
                     FieldList = db_GetContentProperty("people", "SelectFieldList")
                     FieldList = Replace(FieldList, ",", "|")
                     IconIDControlString = "AC,PERSONALIZATION,0,Personalization,field=[" & FieldList & "]"
-                    IconImg = GetAddonIconImg(db.siteProperty_AdminURL, 0, 0, 0, True, IconIDControlString, "", db.config.cdnFilesNetprefix, "Any Personalization Field", "Renders as any Personalization Field", "", 0)
+                    IconImg = GetAddonIconImg(siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", appConfig.cdnFilesNetprefix, "Any Personalization Field", "Renders as any Personalization Field", "", 0)
                     IconImg = EncodeJavascript(IconImg)
                     Items(ItemsCnt) = "['Personalization','" & IconImg & "']"
                     Call Index.setPtr("Personalization", ItemsCnt)
@@ -34348,7 +32131,7 @@ ErrorTrap:
                         '   Need a more consistant solution later
                         '
                         IconIDControlString = "AC," & ACTypeTemplateContent & ",0,Template Content,"
-                        IconImg = GetAddonIconImg(db.siteProperty_AdminURL, 52, 64, 0, False, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", db.config.cdnFilesNetprefix, "Content Box", "Renders as the content for a template", "", 0)
+                        IconImg = GetAddonIconImg(siteProperties.adminURL, 52, 64, 0, False, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", appConfig.cdnFilesNetprefix, "Content Box", "Renders as the content for a template", "", 0)
                         IconImg = EncodeJavascript(IconImg)
                         Items(ItemsCnt) = "['Content Box','" & IconImg & "']"
                         'Items(ItemsCnt) = "['Template Content','<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Content"" id=""AC," & ACTypeTemplateContent & ",0,Template Content,"" src=""/ccLib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>']"
@@ -34356,7 +32139,7 @@ ErrorTrap:
                         ItemsCnt = ItemsCnt + 1
                         '
                         IconIDControlString = "AC," & ACTypeTemplateText & ",0,Template Text,Name=Default"
-                        IconImg = GetAddonIconImg(db.siteProperty_AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", db.config.cdnFilesNetprefix, "Template Text", "Renders as a template text block", "", 0)
+                        IconImg = GetAddonIconImg(siteProperties.adminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", appConfig.cdnFilesNetprefix, "Template Text", "Renders as a template text block", "", 0)
                         IconImg = EncodeJavascript(IconImg)
                         Items(ItemsCnt) = "['Template Text','" & IconImg & "']"
                         'Items(ItemsCnt) = "['Template Text','<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Text"" id=""AC," & ACTypeTemplateText & ",0,Template Text,Name=Default"" src=""/ccLib/images/ACTemplateTextIcon.gif"" WIDTH=52 HEIGHT=52>']"
@@ -34376,7 +32159,7 @@ ErrorTrap:
                             If FieldName <> "" Then
                                 FieldCaption = "Watch List [" & FieldName & "]"
                                 IconIDControlString = "AC,WATCHLIST,0," & FieldName & ",ListName=" & FieldName & "&SortField=[DateAdded|Link|LinkLabel|Clicks|WhatsNewDateExpires]&SortDirection=Z-A[A-Z|Z-A]"
-                                IconImg = GetAddonIconImg(db.siteProperty_AdminURL, 0, 0, 0, True, IconIDControlString, "", db.config.cdnFilesNetprefix, FieldCaption, "Rendered as the " & FieldCaption, "", 0)
+                                IconImg = GetAddonIconImg(siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", appConfig.cdnFilesNetprefix, FieldCaption, "Rendered as the " & FieldCaption, "", 0)
                                 IconImg = EncodeJavascript(IconImg)
                                 FieldCaption = EncodeJavascript(FieldCaption)
                                 Items(ItemsCnt) = "['" & FieldCaption & "','" & IconImg & "']"
@@ -34472,7 +32255,7 @@ ErrorTrap:
                                     '
                                     LastAddonName = AddonName
                                     IconIDControlString = "AC,AGGREGATEFUNCTION,0," & AddonName & "," & DefaultAddonOption_String & "," & AddonGuid
-                                    IconImg = GetAddonIconImg(db.siteProperty_AdminURL, IconWidth, IconHeight, IconSprites, IsInline, IconIDControlString, IconFilename, db.config.cdnFilesNetprefix, AddonName, "Rendered as the Add-on [" & AddonName & "]", "", 0)
+                                    IconImg = GetAddonIconImg(siteProperties.adminURL, IconWidth, IconHeight, IconSprites, IsInline, IconIDControlString, IconFilename, appConfig.cdnFilesNetprefix, AddonName, "Rendered as the Add-on [" & AddonName & "]", "", 0)
                                     Items(ItemsCnt) = "['" & EncodeJavascript(AddonName) & "','" & EncodeJavascript(IconImg) & "']"
                                     Call Index.setPtr(AddonName, ItemsCnt)
                                     ItemsCnt = ItemsCnt + 1
@@ -34601,8 +32384,8 @@ ErrorTrap:
                         ' Encode AddonOption format
                         '
                         'main_GetAddonSelector expects value to be encoded, but not name
-                        'OptionName = main_EncodeAddonOptionArgument(OptionName)
-                        OptionValue = main_EncodeAddonOptionArgument(OptionValue)
+                        'OptionName = encodeNvaArgument(OptionName)
+                        OptionValue = encodeNvaArgument(OptionValue)
                         '
                         ' rejoin
                         '
@@ -34627,24 +32410,15 @@ ErrorTrap:
 ErrorTrap:
             Call handleLegacyError11("main_GetDefaultAddonOption_String", "trap")
         End Function
-        '
-        '========================================================================
-        '   Encode a string to be used as either a name or value in an optionstring (name=value&name=value&etc)
-        '       use this to create a string by encoding the name and then adding to the string
-        '========================================================================
-        '
-        Public Function main_EncodeAddonOptionArgument(ByVal argToEncode As String) As String
-            main_EncodeAddonOptionArgument = csv_EncodeAddonOptionArgument(argToEncode)
-        End Function
-        '
-        '========================================================================
-        '   Decode a string to be used as either a name or value in an optionstring (name=value&name=value&etc)
-        '       use this when parsing a string to main_Get the name or value from the string
-        '========================================================================
-        '
-        Public Function main_DecodeAddonOptionArgument(ByVal EncodedArg As String) As String
-            main_DecodeAddonOptionArgument = common_DecodeAddonOptionArgument(EncodedArg)
-        End Function
+        ''
+        ''========================================================================
+        ''   Encode a string to be used as either a name or value in an optionstring (name=value&name=value&etc)
+        ''       use this to create a string by encoding the name and then adding to the string
+        ''========================================================================
+        ''
+        'Public Function encodeNvaArgument(ByVal argToEncode As String) As String
+        '    encodeNvaArgument = encodeNvaArgument(argToEncode)
+        'End Function
         '
         '========================================================================
         ' main_Get FieldEditorList
@@ -34723,12 +32497,12 @@ ErrorTrap:
             '
             encodedName = encodeNvaArgument(Name)
             s = getSimpleNameValue(encodedName, nvaEncodedString, "", "&")
-            s = main_DecodeAddonOptionArgument(s)
+            s = decodeNvaArgument(s)
             main_GetNvaValue = Trim(s)
             '
             Exit Function
 ErrorTrap:
-            handleLegacyError3(db.config.name, "", "dll", "cpCoreClass", "main_GetNvaValue", Err.Number, Err.Source, Err.Description, True, False, "")
+            handleLegacyError3(appConfig.name, "", "dll", "cpCoreClass", "main_GetNvaValue", Err.Number, Err.Source, Err.Description, True, False, "")
         End Function
         '
         '
@@ -34739,15 +32513,15 @@ ErrorTrap:
             'Dim kmafs As New fileSystemClass
             '
             main_guessDefaultPage = "index.php"
-            If Not db.appRootFiles.checkFile(cluster.config.clusterPhysicalPath & db.config.appRootPath & main_guessDefaultPage) Then
+            If Not appRootFiles.checkFile(cluster.config.clusterPhysicalPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
                 main_guessDefaultPage = "index.asp"
-                If Not db.appRootFiles.checkFile(cluster.config.clusterPhysicalPath & db.config.appRootPath & main_guessDefaultPage) Then
+                If Not appRootFiles.checkFile(cluster.config.clusterPhysicalPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
                     main_guessDefaultPage = "default.asp"
-                    If Not db.appRootFiles.checkFile(cluster.config.clusterPhysicalPath & db.config.appRootPath & main_guessDefaultPage) Then
+                    If Not appRootFiles.checkFile(cluster.config.clusterPhysicalPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
                         main_guessDefaultPage = "default.aspx"
-                        If Not db.appRootFiles.checkFile(cluster.config.clusterPhysicalPath & db.config.appRootPath & main_guessDefaultPage) Then
+                        If Not appRootFiles.checkFile(cluster.config.clusterPhysicalPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
                             main_guessDefaultPage = "index.php"
-                            If Not db.appRootFiles.checkFile(cluster.config.clusterPhysicalPath & db.config.appRootPath & main_guessDefaultPage) Then
+                            If Not appRootFiles.checkFile(cluster.config.clusterPhysicalPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
                                 main_guessDefaultPage = ""
                             End If
                         End If
@@ -34758,7 +32532,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            handleLegacyError3(db.config.name, "", "dll", "cpCoreClass", "main_guessDefaultPage", Err.Number, Err.Source, Err.Description, True, False, "")
+            handleLegacyError3(appConfig.name, "", "dll", "cpCoreClass", "main_guessDefaultPage", Err.Number, Err.Source, Err.Description, True, False, "")
         End Function
         '
         ' Verify a link from the template link field to be used as a Template Link
@@ -34775,7 +32549,7 @@ ErrorTrap:
                     '
                     ' protocol provided, do not fixup
                     '
-                    main_verifyTemplateLink = EncodeAppRootPath(main_verifyTemplateLink, web_requestVirtualFilePath, db.RootWebPath, web.requestDomain)
+                    main_verifyTemplateLink = EncodeAppRootPath(main_verifyTemplateLink, web_requestVirtualFilePath, www_requestRootPath, web.requestDomain)
                 Else
                     '
                     ' no protocol, convert to short link
@@ -34787,7 +32561,7 @@ ErrorTrap:
                         main_verifyTemplateLink = "/" & main_verifyTemplateLink
                     End If
                     main_verifyTemplateLink = ConvertLinkToShortLink(main_verifyTemplateLink, web.requestDomain, web_requestVirtualFilePath)
-                    main_verifyTemplateLink = EncodeAppRootPath(main_verifyTemplateLink, web_requestVirtualFilePath, db.RootWebPath, web.requestDomain)
+                    main_verifyTemplateLink = EncodeAppRootPath(main_verifyTemplateLink, web_requestVirtualFilePath, www_requestRootPath, web.requestDomain)
                 End If
             End If
             '
@@ -34817,7 +32591,7 @@ ErrorTrap:
                         ' recreate (non-default) domain table list
                         '
                         serverDomainList_local = New List(Of String)
-                        serverDomainList_local.Add(db.config.domainList(0))
+                        serverDomainList_local.Add(appConfig.domainList(0))
                         '
                         ' select all Normal domains (non-Forward)
                         ' add extra comma in front so cache is never empty - so if returns empty we know it flushed
@@ -34860,7 +32634,7 @@ ErrorTrap:
                     End If
                     main_Private_ServerDomainCrossList_Loaded = True
                 End If
-                main_ServerDomainCrossList = db.config.domainList(0) & main_Private_ServerDomainCrossList
+                main_ServerDomainCrossList = appConfig.domainList(0) & main_Private_ServerDomainCrossList
             End Get
         End Property
 
@@ -34872,7 +32646,7 @@ ErrorTrap:
             '
             Dim CS As Integer
             '
-            CS = db.db_csOpen("page templates", "name=" & db.db_EncodeSQLText(TemplateDefaultName), "ID", , , , , "id")
+            CS = db.db_csOpen("page templates", "name=" & db.encodeSQLText(TemplateDefaultName), "ID", , , , , "id")
             If db.db_csOk(CS) Then
                 main_GetDefaultTemplateId = db.db_GetCSInteger(CS, "ID")
             End If
@@ -35131,7 +32905,7 @@ ErrorTrap:
                         ' This field is default true, and non-authorable
                         ' It will be true in all cases, except a possible unforseen exception
                         '
-                        EmailBody = EmailBody & "<div style=""clear:both;padding:10px;"">" & main_GetLinkedText("<a href=""" & html_EncodeHTML(web_requestProtocol & web.requestDomain & db.RootWebPath & db.siteProperty_ServerPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", db.siteProperty_getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
+                        EmailBody = EmailBody & "<div style=""clear:both;padding:10px;"">" & main_GetLinkedText("<a href=""" & html_EncodeHTML(web_requestProtocol & web.requestDomain & www_requestRootPath & siteProperties.serverPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
                         EmailBody = Replace(EmailBody, "#member_email#", "UserEmailAddress")
                     End If
                     '
@@ -35261,7 +33035,7 @@ ErrorTrap:
             MethodName = "main_SendFormEmail"
             '
             If ((InStr(iSendTo, "@") = 0)) Then
-                iSendTo = db.siteProperty_getText("TrapEmail")
+                iSendTo = siteProperties.getText("TrapEmail")
                 iSendSubject = "EmailForm with bad Sendto address"
                 Message = "Subject: " & iSendSubject
                 Message = Message & vbCrLf
@@ -35334,7 +33108,7 @@ ErrorTrap:
             '
             ' Fix links for HTML send - must do it now before encodehtml so eid links will attach
             '
-            rootUrl = "http://" & main_ServerDomain & db.RootWebPath
+            rootUrl = "http://" & main_ServerDomain & www_requestRootPath
             iBodySource = ConvertLinksToAbsolute(iBodySource, rootUrl)
             '
             ' Build the list of groups
@@ -35363,9 +33137,9 @@ ErrorTrap:
                     & " WHERE (((ccMembers.Active)<>0) AND ((ccMembers.AllowBulkEmail)<>0) AND ((ccMemberRules.Active)<>0) AND ((ccgroups.Active)<>0) AND ((ccgroups.AllowBulkEmail)<>0)AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & db.db_EncodeSQLDate(main_PageStartTime) & ")) AND ("
                 For GroupPointer = 0 To GroupCount - 1
                     If GroupPointer = 0 Then
-                        SQL &= "(ccgroups.Name=" & db.db_EncodeSQLText(Groups(GroupPointer)) & ")"
+                        SQL &= "(ccgroups.Name=" & db.encodeSQLText(Groups(GroupPointer)) & ")"
                     Else
-                        SQL &= "OR(ccgroups.Name=" & db.db_EncodeSQLText(Groups(GroupPointer)) & ")"
+                        SQL &= "OR(ccgroups.Name=" & db.encodeSQLText(Groups(GroupPointer)) & ")"
                     End If
                 Next
                 SQL &= "));"
@@ -35402,7 +33176,7 @@ ErrorTrap:
             Dim EmailStatus As String
             '
             EmailStatus = csv_SendSystemEmail(EncodeText(EMailName), EncodeText(AdditionalCopy), EncodeInteger(AdditionalMemberID))
-            If user_isAdmin() And (EmailStatus <> "") Then
+            If user.user_isAdmin() And (EmailStatus <> "") Then
                 error_AddUserError("Administrator: There was a problem sending the confirmation email, " & EmailStatus)
             End If
             Exit Sub
@@ -35461,7 +33235,7 @@ ErrorTrap:
         '
         '   Argument field in addons is encode as "AddonOptionConstructor"
         '   the input argument OptionString to executeAddon is encoded as "OptionString"
-        '       delmited with "&" and all elements encoded with csv_EncodeAddonOptionArgument
+        '       delmited with "&" and all elements encoded with encodeNvaArgument
         '   the optionstring passed to addons is like OptionString encoding, except it is crlf delimited
         '       only ever decode with main_GetAddonOption( name, string )
         '
@@ -35486,9 +33260,9 @@ ErrorTrap:
         '           value = csv_GetAddonOption( OptionString )
         '           csv_DecodeAddonOptionArgument(RemoveSelector(GetArgument(name,string,default,"&")))
         '       To add a value to the string
-        '           s = s & "&" & csv_EncodeAddonOptionArgument(name) & "=" & csv_EncodeAddonOptionArgument(value)
+        '           s = s & "&" & encodeNvaArgument(name) & "=" & encodeNvaArgument(value)
         '       "&" delimits the name=value pairs
-        '       csv_EncodeAddonOptionArgument() is used to encode each name and value
+        '       encodeNvaArgument() is used to encode each name and value
         '       csv_DecodeAddonOptionArgument() is used to decode each name and value
         '       Previously, I wrote:
         '           this is the name=value&name=value set of arguments that come from the AC tag in the content
@@ -35772,8 +33546,8 @@ ErrorTrap:
                     '
                     ' just in case - during transition from cpCoreClass to csv, in case a call is missing.
                     '
-                    personalizationPeopleId = userId
-                    personalizationIsAuthenticated = user_isAuthenticated()
+                    personalizationPeopleId = user.userId
+                    personalizationIsAuthenticated = user.user_isAuthenticated()
                 End If
                 '
                 ' ----- Set WorkingOptionString to what came in from the tag of the object
@@ -35858,7 +33632,7 @@ ErrorTrap:
                     OtherHeadTags = EncodeText(cache_addons.addonList(addonCachePtr).addonCache_OtherHeadTags)
                     JSFilename = EncodeText(cache_addons.addonList(addonCachePtr).addonCache_JSFilename)
                     If JSFilename <> "" Then
-                        JSFilename = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, JSFilename)
+                        JSFilename = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, JSFilename)
                     End If
                 End If
                 If Not String.IsNullOrEmpty(ProgramID) Then
@@ -35894,7 +33668,7 @@ ErrorTrap:
                         Do While db.db_csOk(CSRules)
                             CodeFilename = db.db_GetCS(CSRules, "code")
                             If CodeFilename <> "" Then
-                                ScriptingCode = ScriptingCode & vbCrLf & db.cdnFiles.ReadFile(CodeFilename)
+                                ScriptingCode = ScriptingCode & vbCrLf & cdnFiles.ReadFile(CodeFilename)
                             End If
                             Call db.db_csGoNext(CSRules)
                         Loop
@@ -35953,7 +33727,7 @@ ErrorTrap:
                             GroupIDList = csv_GetAddonOption("AllowGroups", WorkingOptionString)
                             GroupIDList = Trim(GroupIDList)
                             ' not webonly anymore
-                            If Not user_isMemberOfGroupIdList(personalizationPeopleId, personalizationIsAuthenticated, GroupIDList) Then
+                            If Not user.user_isMemberOfGroupIdList(personalizationPeopleId, personalizationIsAuthenticated, GroupIDList) Then
                                 HTMLContent = BlockTextStartMarker
                             End If
                             'If isMainOk Then
@@ -36007,7 +33781,7 @@ ErrorTrap:
                             '
                             ' Block all output even on error
                             '
-                        ElseIf user_isAdmin() Or main_IsContentManager("Page Content") Then
+                        ElseIf user.user_isAdmin() Or user.main_IsContentManager("Page Content") Then
                             '
                             ' Provide hint to administrators
                             '
@@ -36059,7 +33833,7 @@ ErrorTrap:
                             If IncludeEditWrapper Then
                                 IncludeEditWrapper = IncludeEditWrapper _
                                     And (main_VisitProperty_AllowAdvancedEditor _
-                                    And ((Context = addonContextEnum.ContextAdmin) Or user_isEditing(HostContentName)))
+                                    And ((Context = addonContextEnum.ContextAdmin) Or user.user_isEditing(HostContentName)))
                                 'IncludeEditWrapper = IncludeEditWrapper _
                                 '    And ( _
                                 '        ( _
@@ -36120,8 +33894,8 @@ ErrorTrap:
                                             ' the Addon Encoded Instance OptionString
                                             ' So, as I parse it for use in the add-on, I need to unencode it
                                             '
-                                            .Name = Trim(common_DecodeAddonOptionArgument(.Name))
-                                            .Value = common_DecodeAddonOptionArgument(.Value)
+                                            .Name = Trim(decodeNvaArgument(.Name))
+                                            .Value = decodeNvaArgument(.Value)
                                             '
                                             '
                                             If LCase(.Name) = "wrapper" Then
@@ -36267,7 +34041,7 @@ ErrorTrap:
                                     '
                                     ' web-only
                                     '
-                                    Link = web_requestProtocol & web.requestDomain & db.RootWebPath & db.siteProperty_ServerPageDefault
+                                    Link = web_requestProtocol & web.requestDomain & www_requestRootPath & siteProperties.serverPageDefault
                                     If InStr(1, Link, "?") = 0 Then
                                         Link = Link & "?"
                                     Else
@@ -36351,10 +34125,10 @@ ErrorTrap:
                                         Call main_AddEndOfBodyJavascript2(JSBodyEnd, AddedByName)
                                         Call main_AddHeadScriptLink(JSFilename, AddedByName)
                                         If DefaultStylesFilename <> "" Then
-                                            Call main_AddStylesheetLink2(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
+                                            Call main_AddStylesheetLink2(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
                                         End If
                                         If CustomStylesFilename <> "" Then
-                                            Call main_AddStylesheetLink2(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
+                                            Call main_AddStylesheetLink2(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
                                         End If
                                     End If
                                 End If
@@ -36529,7 +34303,7 @@ ErrorTrap:
                                                 '
                                                 ' Block all output even on error
                                                 '
-                                            ElseIf user_isAdmin() Then
+                                            ElseIf user.user_isAdmin() Then
                                                 '
                                                 ' Provide hint to administrators
                                                 '
@@ -36591,9 +34365,9 @@ ErrorTrap:
                                                 ' use assumptions
                                                 '
                                                 If Mid(WorkingLink, 1, 1) = "/" Then
-                                                    WorkingLink = "http://" & db.config.domainList(0) & WorkingLink
+                                                    WorkingLink = "http://" & appConfig.domainList(0) & WorkingLink
                                                 Else
-                                                    WorkingLink = "http://" & db.config.domainList(0) & "/" & WorkingLink
+                                                    WorkingLink = "http://" & appConfig.domainList(0) & "/" & WorkingLink
                                                 End If
                                             End If
                                         End If
@@ -36646,7 +34420,7 @@ ErrorTrap:
                                         End If
                                     End If
                                     Link = modifyLinkQuery(Link, RequestNameJSForm, "1", True)
-                                    Link = EncodeAppRootPath(Link, web_requestVirtualFilePath, db.RootWebPath, web.requestDomain)
+                                    Link = EncodeAppRootPath(Link, web_requestVirtualFilePath, www_requestRootPath, web.requestDomain)
                                     ScriptCallbackContent = "<SCRIPT LANGUAGE=""JAVASCRIPT"" SRC=""" & Link & """></SCRIPT>"
                                 End If
                                 '
@@ -36669,10 +34443,10 @@ ErrorTrap:
                                         Call main_AddEndOfBodyJavascript2(JSBodyEnd, AddedByName)
                                         Call main_AddHeadScriptLink(JSFilename, AddedByName)
                                         If DefaultStylesFilename <> "" Then
-                                            Call main_AddStylesheetLink2(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
+                                            Call main_AddStylesheetLink2(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
                                         End If
                                         If CustomStylesFilename <> "" Then
-                                            Call main_AddStylesheetLink2(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
+                                            Call main_AddStylesheetLink2(web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
                                         End If
                                     End If
                                 End If
@@ -36742,7 +34516,7 @@ ErrorTrap:
                                     '' and return its result
                                     ''
                                     's = Mid(s, Pos)
-                                    'LayoutEngineOptionString = "data=" & csv_EncodeAddonOptionArgument(s)
+                                    'LayoutEngineOptionString = "data=" & encodeNvaArgument(s)
                                     'Dim structuredData As New core_primitivesStructuredDataClass(Me)
                                     's = structuredData.execute()
                                     's = csv_ExecuteActiveX("aoPrimitives.StructuredDataClass", "Structured Data Engine", LayoutEngineOptionString, "data=(structured data)", errorMessageForAdmin)
@@ -36754,7 +34528,7 @@ ErrorTrap:
                                     '        '
                                     '        ' Block all output even on error
                                     '        '
-                                    '    ElseIf user_isAdmin() Then
+                                    '    ElseIf user.user_isAdmin() Then
                                     '        '
                                     '        ' Provide hint to administrators
                                     '        '
@@ -36841,7 +34615,7 @@ ErrorTrap:
                                         If (addonId <> 0) Then
                                             If main_VisitProperty_AllowAdvancedEditor Then
                                                 AddonEditIcon = GetIconSprite("", 0, "/ccLib/images/tooledit.png", 22, 22, "Edit the " & AddonName & " Add-on", "Edit the " & AddonName & " Add-on", "", True, "")
-                                                AddonEditIcon = "<a href=""" & db.siteProperty_AdminURL & "?cid=" & metaData_GetContentID("add-ons") & "&id=" & addonId & "&af=4&aa=2&ad=1"" tabindex=""-1"">" & AddonEditIcon & "</a>"
+                                                AddonEditIcon = "<a href=""" & siteProperties.adminURL & "?cid=" & metaData_GetContentID("add-ons") & "&id=" & addonId & "&af=4&aa=2&ad=1"" tabindex=""-1"">" & AddonEditIcon & "</a>"
                                                 InstanceSettingsEditIcon = executeAddon_getInstanceBubble(AddonName, AddonOptionExpandedConstructor, HostContentName, HostRecordID, HostFieldName, ACInstanceID, Context, DialogList)
                                                 AddonStylesEditIcon = executeAddon_getAddonStylesBubble(addonId, DialogList)
                                                 HTMLViewerEditIcon = executeAddon_getHTMLViewerBubble(addonId, "editWrapper" & main_EditWrapperCnt, DialogList)
@@ -36983,7 +34757,7 @@ exitNoError:
                 '
                 return_ExitRequest = True
                 Exit Function
-            ElseIf Not user_isAdmin() Then
+            ElseIf Not user.user_isAdmin() Then
                 '
                 ' Not Admin Error
                 '
@@ -37031,74 +34805,74 @@ exitNoError:
                                                                     If FieldValue <> "" Then
                                                                         FieldValue = EncodeInteger(FieldValue).ToString
                                                                     End If
-                                                                    Call db.siteProperty_set(FieldName, FieldValue)
+                                                                    Call siteProperties.setProperty(FieldName, FieldValue)
                                                                 Case "boolean"
                                                                     '
                                                                     If FieldValue <> "" Then
                                                                         FieldValue = EncodeBoolean(FieldValue).ToString
                                                                     End If
-                                                                    Call db.siteProperty_set(FieldName, FieldValue)
+                                                                    Call siteProperties.setProperty(FieldName, FieldValue)
                                                                 Case "float"
                                                                     '
                                                                     If FieldValue <> "" Then
                                                                         FieldValue = EncodeNumber(FieldValue).ToString
                                                                     End If
-                                                                    Call db.siteProperty_set(FieldName, FieldValue)
+                                                                    Call siteProperties.setProperty(FieldName, FieldValue)
                                                                 Case "date"
                                                                     '
                                                                     If FieldValue <> "" Then
                                                                         FieldValue = EncodeDate(FieldValue).ToString
                                                                     End If
-                                                                    Call db.siteProperty_set(FieldName, FieldValue)
+                                                                    Call siteProperties.setProperty(FieldName, FieldValue)
                                                                 Case "file", "imagefile"
                                                                     '
                                                                     If doc_getBoolean(FieldName & ".DeleteFlag") Then
-                                                                        Call db.siteProperty_set(FieldName, "")
+                                                                        Call siteProperties.setProperty(FieldName, "")
                                                                     End If
                                                                     If FieldValue <> "" Then
                                                                         VirtualFilePath = "Settings/" & FieldName
                                                                         Call web_ProcessFormInputFile(FieldName, VirtualFilePath)
                                                                         FieldValue = VirtualFilePath & "/" & FieldValue
-                                                                        Call db.siteProperty_set(FieldName, FieldValue)
+                                                                        Call siteProperties.setProperty(FieldName, FieldValue)
                                                                     End If
                                                                 Case "textfile"
                                                                     '
                                                                     DefaultFilename = "Settings/" & FieldName & ".txt"
-                                                                    Filename = db.siteProperty_getText(FieldName, DefaultFilename)
+                                                                    Filename = siteProperties.getText(FieldName, DefaultFilename)
                                                                     If Filename = "" Then
                                                                         Filename = DefaultFilename
-                                                                        Call db.siteProperty_set(FieldName, DefaultFilename)
+                                                                        Call siteProperties.setProperty(FieldName, DefaultFilename)
                                                                     End If
-                                                                    Call db.appRootFiles.SaveFile(Filename, FieldValue)
+                                                                    Call appRootFiles.SaveFile(Filename, FieldValue)
                                                                 Case "cssfile"
                                                                     '
                                                                     DefaultFilename = "Settings/" & FieldName & ".css"
-                                                                    Filename = db.siteProperty_getText(FieldName, DefaultFilename)
+                                                                    Filename = siteProperties.getText(FieldName, DefaultFilename)
                                                                     If Filename = "" Then
                                                                         Filename = DefaultFilename
-                                                                        Call db.siteProperty_set(FieldName, DefaultFilename)
+                                                                        Call siteProperties.setProperty(FieldName, DefaultFilename)
                                                                     End If
-                                                                    Call db.appRootFiles.SaveFile(Filename, FieldValue)
+                                                                    Call appRootFiles.SaveFile(Filename, FieldValue)
                                                                 Case "xmlfile"
                                                                     '
                                                                     DefaultFilename = "Settings/" & FieldName & ".xml"
-                                                                    Filename = db.siteProperty_getText(FieldName, DefaultFilename)
+                                                                    Filename = siteProperties.getText(FieldName, DefaultFilename)
                                                                     If Filename = "" Then
                                                                         Filename = DefaultFilename
-                                                                        Call db.siteProperty_set(FieldName, DefaultFilename)
+                                                                        Call siteProperties.setProperty(FieldName, DefaultFilename)
                                                                     End If
-                                                                    Call db.appRootFiles.SaveFile(Filename, FieldValue)
+                                                                    Call appRootFiles.SaveFile(Filename, FieldValue)
                                                                 Case "currency"
                                                                     '
                                                                     If FieldValue <> "" Then
                                                                         FieldValue = EncodeNumber(FieldValue).ToString
                                                                         FieldValue = FormatCurrency(FieldValue)
                                                                     End If
-                                                                    Call db.siteProperty_set(FieldName, FieldValue)
+                                                                    Call siteProperties.setProperty(FieldName, FieldValue)
                                                                 Case "link"
-                                                                    Call db.siteProperty_set(FieldName, FieldValue)
+                                                                    Call siteProperties.setProperty(FieldName, FieldValue)
                                                                 Case Else
-                                                                    Call db.siteProperty_set(FieldName, FieldValue)
+                                                                    Call siteProperties.setProperty(FieldName, FieldValue)
                                                             End Select
                                                         Case "copycontent"
                                                             '
@@ -37117,10 +34891,10 @@ exitNoError:
                                                                     FieldValue = doc_getText(FieldName)
                                                                 End If
 
-                                                                CS = db.db_csOpen("Copy Content", "name=" & db.db_EncodeSQLText(FieldName), "ID")
+                                                                CS = db.db_csOpen("Copy Content", "name=" & db.encodeSQLText(FieldName), "ID")
                                                                 If Not db.db_csOk(CS) Then
                                                                     Call db.db_csClose(CS)
-                                                                    CS = db.db_csInsertRecord("Copy Content", userId)
+                                                                    CS = db.db_csInsertRecord("Copy Content", user.userId)
                                                                 End If
                                                                 If db.db_csOk(CS) Then
                                                                     Call db.db_setCS(CS, "name", FieldName)
@@ -37149,7 +34923,7 @@ exitNoError:
                                                                 FieldName = csv_GetXMLAttribute(IsFound, TabNode, "name", "")
                                                                 fieldfilename = csv_GetXMLAttribute(IsFound, TabNode, "filename", "")
                                                                 FieldValue = doc_getText(FieldName)
-                                                                Call db.appRootFiles.SaveFile(fieldfilename, FieldValue)
+                                                                Call appRootFiles.SaveFile(fieldfilename, FieldValue)
                                                             End If
                                                         Case "dbquery"
                                                             '
@@ -37213,12 +34987,12 @@ exitNoError:
                                                             FieldDescription = csv_GetXMLAttribute(IsFound, TabNode, "description", "")
                                                             FieldAddon = csv_GetXMLAttribute(IsFound, TabNode, "EditorAddon", "")
                                                             FieldDefaultValue = TabNode.InnerText
-                                                            FieldValue = db.siteProperty_getText(FieldName, FieldDefaultValue)
+                                                            FieldValue = siteProperties.getText(FieldName, FieldDefaultValue)
                                                             If FieldAddon <> "" Then
                                                                 '
                                                                 ' Use Editor Addon
                                                                 '
-                                                                OptionString = "FieldName=" & FieldName & "&FieldValue=" & csv_EncodeAddonOptionArgument(db.siteProperty_getText(FieldName, FieldDefaultValue))
+                                                                OptionString = "FieldName=" & FieldName & "&FieldValue=" & encodeNvaArgument(siteProperties.getText(FieldName, FieldDefaultValue))
                                                                 Copy = main_GetAddonContent(0, FieldAddon, OptionString, addonContextEnum.ContextAdmin, "", 0, "", 0)
                                                             ElseIf FieldSelector <> "" Then
                                                                 '
@@ -37265,7 +35039,7 @@ exitNoError:
                                                                             If FieldValue = "" Then
                                                                                 Copy = html_GetFormInputFile(FieldName)
                                                                             Else
-                                                                                NonEncodedLink = web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, FieldValue)
+                                                                                NonEncodedLink = web.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, FieldValue)
                                                                                 EncodedLink = EncodeURL(NonEncodedLink)
                                                                                 Copy = "" _
                                                                                     & "<a href=""http://" & EncodedLink & """ target=""_blank"">[" & GetFilename(FieldValue) & "]</A>" _
@@ -37289,7 +35063,7 @@ exitNoError:
                                                                         If FieldReadOnly Then
                                                                             Copy = FieldValue & html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
-                                                                            FieldValue = db.cdnFiles.ReadFile(FieldValue)
+                                                                            FieldValue = cdnFiles.ReadFile(FieldValue)
                                                                             If FieldHTML Then
                                                                                 Copy = html_GetFormInputHTML(FieldName, FieldValue)
                                                                             Else
@@ -37350,16 +35124,16 @@ exitNoError:
                                                             FieldDescription = csv_GetXMLAttribute(IsFound, TabNode, "description", "")
                                                             FieldHTML = EncodeBoolean(csv_GetXMLAttribute(IsFound, TabNode, "html", ""))
                                                             '
-                                                            CS = db.db_csOpen("Copy Content", "Name=" & db.db_EncodeSQLText(FieldName), "ID", , , , , "id,name,Copy")
+                                                            CS = db.db_csOpen("Copy Content", "Name=" & db.encodeSQLText(FieldName), "ID", , , , , "id,name,Copy")
                                                             If Not db.db_csOk(CS) Then
                                                                 Call db.db_csClose(CS)
-                                                                CS = db.db_csInsertRecord("Copy Content", userId)
+                                                                CS = db.db_csInsertRecord("Copy Content", user.userId)
                                                                 If db.db_csOk(CS) Then
                                                                     RecordID = db.db_GetCSInteger(CS, "ID")
                                                                     Call db.db_setCS(CS, "name", FieldName)
                                                                     Call db.db_setCS(CS, "copy", EncodeText(TabNode.InnerText))
                                                                     Call db.db_SaveCSRecord(CS)
-                                                                    Call db.workflow_PublishEdit("Copy Content", RecordID, userId)
+                                                                    Call workflow.publishEdit("Copy Content", RecordID)
                                                                 End If
                                                             End If
                                                             If db.db_csOk(CS) Then
@@ -37396,10 +35170,10 @@ exitNoError:
                                                         FieldDefaultValue = TabNode.InnerText
                                                         Copy = ""
                                                         If fieldfilename <> "" Then
-                                                            If db.appRootFiles.checkFile(fieldfilename) Then
+                                                            If appRootFiles.checkFile(fieldfilename) Then
                                                                 Copy = FieldDefaultValue
                                                             Else
-                                                                Copy = db.cdnFiles.ReadFile(fieldfilename)
+                                                                Copy = cdnFiles.ReadFile(fieldfilename)
                                                             End If
                                                             If Not FieldReadOnly Then
                                                                 Copy = main_GetFormInputTextExpandable(FieldName, Copy, 10)
@@ -37624,7 +35398,7 @@ ErrorTrap:
                     LCaseOptionDefault = Mid(LCaseOptionDefault, PosEqual + 1)
                 End If
 
-                LCaseOptionDefault = common_DecodeAddonOptionArgument(LCaseOptionDefault)
+                LCaseOptionDefault = decodeNvaArgument(LCaseOptionDefault)
                 ExpandedSelector = Mid(ExpandedSelector, Pos + 1)
                 Pos = InStr(1, ExpandedSelector, "]")
                 If Pos > 0 Then
@@ -37641,11 +35415,11 @@ ErrorTrap:
                     If OptionValue_AddonEncoded <> "" Then
                         Pos = InStr(1, OptionValue_AddonEncoded, ":")
                         If Pos = 0 Then
-                            OptionValue = common_DecodeAddonOptionArgument(OptionValue_AddonEncoded)
+                            OptionValue = decodeNvaArgument(OptionValue_AddonEncoded)
                             OptionCaption = OptionValue
                         Else
-                            OptionCaption = common_DecodeAddonOptionArgument(Mid(OptionValue_AddonEncoded, 1, Pos - 1))
-                            OptionValue = common_DecodeAddonOptionArgument(Mid(OptionValue_AddonEncoded, Pos + 1))
+                            OptionCaption = decodeNvaArgument(Mid(OptionValue_AddonEncoded, 1, Pos - 1))
+                            OptionValue = decodeNvaArgument(Mid(OptionValue_AddonEncoded, Pos + 1))
                         End If
                         Select Case OptionSuffix
                             Case "checkbox"
@@ -37699,7 +35473,7 @@ ErrorTrap:
                 ' Create Text executeAddon_getFormContent_decodeSelector
                 '
 
-                selector = common_DecodeAddonOptionArgument(selector)
+                selector = decodeNvaArgument(selector)
                 executeAddon_getFormContent_decodeSelector = main_GetFormInputText2(SitePropertyName, selector, 1, 20)
             End If
 
@@ -37970,7 +35744,7 @@ ErrorTrap:
                     '
                     ' try app /bin folder
                     '
-                    addonAppRootPath = db.privateFiles.joinPath(db.appRootFiles.rootLocalFolderPath, "bin\")
+                    addonAppRootPath = privateFiles.joinPath(appRootFiles.rootLocalFolderPath, "bin\")
                     result = executeAddon_executeAssembly_byFilePath(addonId, AddonCaption, addonAppRootPath, AssemblyClassFullName, True, AddonFound, return_ErrorMessageForAdmin)
                     If Not AddonFound Then
                         '
@@ -37985,8 +35759,8 @@ ErrorTrap:
                             If (String.IsNullOrEmpty(AddonVersionPath)) Then
                                 Throw New ApplicationException("The assembly for addon [" & AddonCaption & "] could not be executed because it's assembly could not be found in cclibCommonAssemblies, and no collection folder was found.")
                             Else
-                                AddonPath = db.privateFiles.joinPath(Me.db.getAddonPath(), AddonVersionPath)
-                                appAddonPath = db.privateFiles.joinPath(db.privateFiles.rootLocalFolderPath, AddonPath)
+                                AddonPath = privateFiles.joinPath(Me.getAddonPath(), AddonVersionPath)
+                                appAddonPath = privateFiles.joinPath(privateFiles.rootLocalFolderPath, AddonPath)
                                 result = executeAddon_executeAssembly_byFilePath(addonId, AddonCaption, appAddonPath, AssemblyClassFullName, False, AddonFound, return_ErrorMessageForAdmin)
                                 If (Not AddonFound) Then
                                     '
@@ -38192,7 +35966,7 @@ ErrorTrap:
         '
         '   OptionString
         '       can be & delimited or crlf delimited
-        '       must be addonencoded with call csv_EncodeAddonOptionArgument
+        '       must be addonencoded with call encodeNvaArgument
         '
         '   nothingObject
         '       cp should be set during csv_OpenConnection3 -- do not pass it around in the arguments
@@ -38274,14 +36048,14 @@ ErrorTrap:
             '-----------------------------------------------------------------
             '
             'hint = hint & ",030"
-            appendLogWithLegacyRow(db.config.name, "start: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
+            appendLogWithLegacyRow(appConfig.name, "start: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
             '
             ' runAtServer = New runAtServerClass(Me)
             ' must nva encode because that is what the server-execute command expects
             cmdQueryString = "" _
-                    & "appname=" & csv_encodeNvaArgument(EncodeRequestVariable(db.config.name)) _
+                    & "appname=" & encodeNvaArgument(EncodeRequestVariable(appConfig.name)) _
                     & "&AddonID=" & CStr(addonId) _
-                    & "&OptionString=" & csv_encodeNvaArgument(EncodeRequestVariable(OptionString))
+                    & "&OptionString=" & encodeNvaArgument(EncodeRequestVariable(OptionString))
             'hint = hint & ",035"
             Dim taskScheduler As New coreTaskSchedulerServiceClass()
             Dim cmdDetail As New cmdDetailClass
@@ -38291,7 +36065,7 @@ ErrorTrap:
             Call taskScheduler.addTaskToQueue(Me, taskQueueCommandEnumModule.runAddon, cmdDetail, False)
             'Call runAtServer.executeCmd("RunProcess", cmdQueryString)
             '
-            appendLogWithLegacyRow(db.config.name, "end: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
+            appendLogWithLegacyRow(appConfig.name, "end: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
             '
             Exit Function
 ErrorTrap:
@@ -38299,7 +36073,7 @@ ErrorTrap:
             ErrSource = Err.Source
             ErrDescription = Err.Description
             Call Err.Clear()
-            appendLogWithLegacyRow(db.config.name, "errortrap exit(" & (GetTickCount - ProcessStartTick) & " msec): execute now, addon [" & AddonIDGuidOrName & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
+            appendLogWithLegacyRow(appConfig.name, "errortrap exit(" & (GetTickCount - ProcessStartTick) & " msec): execute now, addon [" & AddonIDGuidOrName & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
             Call handleLegacyError4(ErrNumber, ErrSource, ErrDescription, "unknownMethodNameLegacyCall" & ", hint=" & hint, True)
         End Function
         '
@@ -38379,7 +36153,7 @@ ErrorTrap:
         '=============================================================================================================
         '
         Friend Function executeAddon_legacy2(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal Option_String As String, ByVal Context As addonContextEnum, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal IsIncludeAddon As Boolean, ByVal DefaultWrapperID As Integer, ByVal ignore_TemplateCaseOnly_PageContent As String, ByRef return_StatusOK As Boolean, ByVal nothingObject As Object, Optional ByVal AddonInUseIdList As String = "") As String
-            executeAddon_legacy2 = executeAddon(addonId, AddonNameOrGuid, Option_String, Context, HostContentName, HostRecordID, HostFieldName, ACInstanceID, IsIncludeAddon, DefaultWrapperID, ignore_TemplateCaseOnly_PageContent, return_StatusOK, nothingObject, AddonInUseIdList, Nothing, main_page_IncludedAddonIDList, userId, user_isAuthenticated)
+            executeAddon_legacy2 = executeAddon(addonId, AddonNameOrGuid, Option_String, Context, HostContentName, HostRecordID, HostFieldName, ACInstanceID, IsIncludeAddon, DefaultWrapperID, ignore_TemplateCaseOnly_PageContent, return_StatusOK, nothingObject, AddonInUseIdList, Nothing, main_page_IncludedAddonIDList, user.userId, user.user_isAuthenticated)
         End Function
         '
         '===============================================================================================================================================
@@ -38414,8 +36188,8 @@ ErrorTrap:
             Dim Ptr As Integer
             Dim Pos As Integer
             '
-            If user_isAuthenticated() And ((ACInstanceID = "-2") Or (ACInstanceID = "-1") Or (ACInstanceID = "0") Or (RecordID <> 0)) Then
-                If user_isEditingAnything() Then
+            If user.user_isAuthenticated() And ((ACInstanceID = "-2") Or (ACInstanceID = "-1") Or (ACInstanceID = "0") Or (RecordID <> 0)) Then
+                If user.user_isEditingAnything() Then
                     CopyHeader = CopyHeader _
                         & "<div class=""ccHeaderCon"">" _
                         & "<table border=0 cellpadding=0 cellspacing=0 width=""100%"">" _
@@ -38437,7 +36211,7 @@ ErrorTrap:
                         '
                         CopyContent = "This addon does not support instance options."
                         CopyContent = "<div style=""width:400px;background-color:transparent;"" class=""ccAdminSmall"">" & CopyContent & "</div>"
-                    ElseIf (Context <> addonContextEnum.ContextAdmin) And (db.siteProperty_AllowWorkflowAuthoring And Not main_VisitProperty_AllowWorkflowRendering) Then
+                    ElseIf (Context <> addonContextEnum.ContextAdmin) And (siteProperties.allowWorkflowAuthoring And Not main_VisitProperty_AllowWorkflowRendering) Then
                         '
                         ' workflow with no rendering (or within admin site)
                         '
@@ -38473,16 +36247,16 @@ ErrorTrap:
                                 End If
                                 OptionName = Trim(Left(OptionName, Pos - 1))
                             End If
-                            OptionName = main_DecodeAddonOptionArgument(OptionName)
+                            OptionName = decodeNvaArgument(OptionName)
                             Pos = InStr(1, OptionSelector, "[")
                             If Pos <> 0 Then
                                 '
                                 ' List of Options, might be select, radio, checkbox, resourcelink
                                 '
                                 OptionDefault = Mid(OptionSelector, 1, Pos - 1)
-                                OptionDefault = main_DecodeAddonOptionArgument(OptionDefault)
+                                OptionDefault = decodeNvaArgument(OptionDefault)
                                 LCaseOptionDefault = LCase(OptionDefault)
-                                'LCaseOptionDefault = main_DecodeAddonOptionArgument(LCaseOptionDefault)
+                                'LCaseOptionDefault = decodeNvaArgument(LCaseOptionDefault)
 
                                 OptionSelector = Mid(OptionSelector, Pos + 1)
                                 Pos = InStr(1, OptionSelector, "]")
@@ -38500,11 +36274,11 @@ ErrorTrap:
                                     If OptionValue_AddonEncoded <> "" Then
                                         Pos = InStr(1, OptionValue_AddonEncoded, ":")
                                         If Pos = 0 Then
-                                            OptionValue = main_DecodeAddonOptionArgument(OptionValue_AddonEncoded)
+                                            OptionValue = decodeNvaArgument(OptionValue_AddonEncoded)
                                             OptionCaption = OptionValue
                                         Else
-                                            OptionCaption = main_DecodeAddonOptionArgument(Mid(OptionValue_AddonEncoded, 1, Pos - 1))
-                                            OptionValue = main_DecodeAddonOptionArgument(Mid(OptionValue_AddonEncoded, Pos + 1))
+                                            OptionCaption = decodeNvaArgument(Mid(OptionValue_AddonEncoded, 1, Pos - 1))
+                                            OptionValue = decodeNvaArgument(Mid(OptionValue_AddonEncoded, Pos + 1))
                                         End If
                                         Select Case OptionSuffix
                                             Case "checkbox"
@@ -38565,7 +36339,7 @@ ErrorTrap:
                                         '
                                         ' Create text box linked to resource library
                                         '
-                                        OptionDefault = main_DecodeAddonOptionArgument(OptionDefault)
+                                        OptionDefault = decodeNvaArgument(OptionDefault)
                                         FormInput = "" _
                                             & main_GetFormInputText2(OptionName, OptionDefault, 1, 20) _
                                             & "&nbsp;<a href=""#"" onClick=""OpenResourceLinkWindow( '" & OptionName & "' ) ;return false;""><img src=""/ccLib/images/ResourceLink1616.gif"" width=16 height=16 border=0 alt=""Link to a resource"" title=""Link to a resource""></a>"
@@ -38589,7 +36363,7 @@ ErrorTrap:
                                 ' Create Text FormInput
                                 '
 
-                                OptionSelector = main_DecodeAddonOptionArgument(OptionSelector)
+                                OptionSelector = decodeNvaArgument(OptionSelector)
                                 FormInput = main_GetFormInputText2(OptionName, OptionSelector, 1, 20)
                             End If
                             CopyContent = CopyContent _
@@ -38681,8 +36455,8 @@ ErrorTrap:
             Dim CS As Integer
             Dim AddonName As String
             '
-            If user_isAuthenticated() And True Then
-                If user_isEditingAnything() Then
+            If user.user_isAuthenticated() And True Then
+                If user.user_isEditingAnything() Then
                     CS = db_csOpen("Add-ons", addonId)
                     If db.db_csOk(CS) Then
                         AddonName = db.db_GetCSText(CS, "name")
@@ -38796,9 +36570,9 @@ ErrorTrap:
             Dim InnerCopy As String
             Dim CollectionCopy As String
             '
-            If user_isAuthenticated() Then
-                If user_isEditingAnything() Then
-                    StyleSN = EncodeInteger(db.siteProperty_getText("StylesheetSerialNumber", "0"))
+            If user.user_isAuthenticated() Then
+                If user.user_isEditingAnything() Then
+                    StyleSN = EncodeInteger(siteProperties.getText("StylesheetSerialNumber", "0"))
                     main_HelpViewerButtonID = "HelpBubble" & pageManager_HelpCodeCount
                     InnerCopy = helpCopy
                     If InnerCopy = "" Then
@@ -38905,9 +36679,9 @@ ErrorTrap:
             Dim StyleSN As Integer
             Dim HTMLViewerBubbleID As String
             '
-            If user_isAuthenticated() Then
-                If user_isEditingAnything() Then
-                    StyleSN = EncodeInteger(db.siteProperty_getText("StylesheetSerialNumber", "0"))
+            If user.user_isAuthenticated() Then
+                If user.user_isEditingAnything() Then
+                    StyleSN = EncodeInteger(siteProperties.getText("StylesheetSerialNumber", "0"))
                     HTMLViewerBubbleID = "HelpBubble" & pageManager_HelpCodeCount
                     '
                     CopyHeader = CopyHeader _
@@ -39046,7 +36820,7 @@ ErrorTrap:
                 '
                 return_ExitRequest = True
                 Exit Function
-            ElseIf Not user_isAdmin() Then
+            ElseIf Not user.user_isAdmin() Then
                 '
                 ' Not Admin Error
                 '
@@ -39110,74 +36884,74 @@ ErrorTrap:
                                                                     If FieldValue <> "" Then
                                                                         FieldValue = EncodeInteger(FieldValue).ToString
                                                                     End If
-                                                                    Call db.siteProperty_set(FieldName, FieldValue)
+                                                                    Call siteProperties.setProperty(FieldName, FieldValue)
                                                                 Case "boolean"
                                                                     '
                                                                     If FieldValue <> "" Then
                                                                         FieldValue = EncodeBoolean(FieldValue).ToString
                                                                     End If
-                                                                    Call db.siteProperty_set(FieldName, FieldValue)
+                                                                    Call siteProperties.setProperty(FieldName, FieldValue)
                                                                 Case "float"
                                                                     '
                                                                     If FieldValue <> "" Then
                                                                         FieldValue = EncodeNumber(FieldValue).ToString
                                                                     End If
-                                                                    Call db.siteProperty_set(FieldName, FieldValue)
+                                                                    Call siteProperties.setProperty(FieldName, FieldValue)
                                                                 Case "date"
                                                                     '
                                                                     If FieldValue <> "" Then
                                                                         FieldValue = EncodeDate(FieldValue).ToString
                                                                     End If
-                                                                    Call db.siteProperty_set(FieldName, FieldValue)
+                                                                    Call siteProperties.setProperty(FieldName, FieldValue)
                                                                 Case "file", "imagefile"
                                                                     '
                                                                     If main_GetStreamBoolean2(FieldName & ".DeleteFlag") Then
-                                                                        Call db.siteProperty_set(FieldName, "")
+                                                                        Call siteProperties.setProperty(FieldName, "")
                                                                     End If
                                                                     If FieldValue <> "" Then
                                                                         VirtualFilePath = "Settings/" & FieldName
                                                                         Call web_ProcessFormInputFile(FieldName, VirtualFilePath)
                                                                         FieldValue = VirtualFilePath & "/" & FieldValue
-                                                                        Call db.siteProperty_set(FieldName, FieldValue)
+                                                                        Call siteProperties.setProperty(FieldName, FieldValue)
                                                                     End If
                                                                 Case "textfile"
                                                                     '
                                                                     DefaultFilename = "Settings/" & FieldName & ".txt"
-                                                                    Filename = db.siteProperty_getText(FieldName, DefaultFilename)
+                                                                    Filename = siteProperties.getText(FieldName, DefaultFilename)
                                                                     If Filename = "" Then
                                                                         Filename = DefaultFilename
-                                                                        Call db.siteProperty_set(FieldName, DefaultFilename)
+                                                                        Call siteProperties.setProperty(FieldName, DefaultFilename)
                                                                     End If
-                                                                    Call db.appRootFiles.SaveFile(Filename, FieldValue)
+                                                                    Call appRootFiles.SaveFile(Filename, FieldValue)
                                                                 Case "cssfile"
                                                                     '
                                                                     DefaultFilename = "Settings/" & FieldName & ".css"
-                                                                    Filename = db.siteProperty_getText(FieldName, DefaultFilename)
+                                                                    Filename = siteProperties.getText(FieldName, DefaultFilename)
                                                                     If Filename = "" Then
                                                                         Filename = DefaultFilename
-                                                                        Call db.siteProperty_set(FieldName, DefaultFilename)
+                                                                        Call siteProperties.setProperty(FieldName, DefaultFilename)
                                                                     End If
-                                                                    Call db.appRootFiles.SaveFile(Filename, FieldValue)
+                                                                    Call appRootFiles.SaveFile(Filename, FieldValue)
                                                                 Case "xmlfile"
                                                                     '
                                                                     DefaultFilename = "Settings/" & FieldName & ".xml"
-                                                                    Filename = db.siteProperty_getText(FieldName, DefaultFilename)
+                                                                    Filename = siteProperties.getText(FieldName, DefaultFilename)
                                                                     If Filename = "" Then
                                                                         Filename = DefaultFilename
-                                                                        Call db.siteProperty_set(FieldName, DefaultFilename)
+                                                                        Call siteProperties.setProperty(FieldName, DefaultFilename)
                                                                     End If
-                                                                    Call db.appRootFiles.SaveFile(Filename, FieldValue)
+                                                                    Call appRootFiles.SaveFile(Filename, FieldValue)
                                                                 Case "currency"
                                                                     '
                                                                     If FieldValue <> "" Then
                                                                         FieldValue = EncodeNumber(FieldValue).ToString
                                                                         FieldValue = FormatCurrency(FieldValue)
                                                                     End If
-                                                                    Call db.siteProperty_set(FieldName, FieldValue)
+                                                                    Call siteProperties.setProperty(FieldName, FieldValue)
                                                                 Case "link"
-                                                                    Call db.siteProperty_set(FieldName, FieldValue)
+                                                                    Call siteProperties.setProperty(FieldName, FieldValue)
                                                                 Case Else
-                                                                    Call db.siteProperty_set(FieldName, FieldValue)
+                                                                    Call siteProperties.setProperty(FieldName, FieldValue)
                                                             End Select
                                                         Case "copycontent"
                                                             '
@@ -39196,7 +36970,7 @@ ErrorTrap:
                                                                     FieldValue = doc_getText(FieldName)
                                                                 End If
 
-                                                                CS = db.db_csOpen("Copy Content", "name=" & db.db_EncodeSQLText(FieldName), "ID")
+                                                                CS = db.db_csOpen("Copy Content", "name=" & db.encodeSQLText(FieldName), "ID")
                                                                 If Not db.db_csOk(CS) Then
                                                                     Call db.db_csClose(CS)
                                                                     CS = db.db_csInsertRecord("Copy Content")
@@ -39228,7 +37002,7 @@ ErrorTrap:
                                                                 FieldName = main_GetXMLAttribute(IsFound, TabNode, "name", "")
                                                                 fieldfilename = main_GetXMLAttribute(IsFound, TabNode, "filename", "")
                                                                 FieldValue = doc_getText(FieldName)
-                                                                Call db.appRootFiles.SaveFile(fieldfilename, FieldValue)
+                                                                Call appRootFiles.SaveFile(fieldfilename, FieldValue)
                                                             End If
                                                         Case "dbquery"
                                                             '
@@ -39289,7 +37063,7 @@ ErrorTrap:
                                                             FieldDescription = main_GetXMLAttribute(IsFound, TabNode, "description", "")
                                                             FieldAddon = main_GetXMLAttribute(IsFound, TabNode, "EditorAddon", "")
                                                             FieldDefaultValue = TabNode.InnerText
-                                                            FieldValue = db.siteProperty_getText(FieldName, FieldDefaultValue)
+                                                            FieldValue = siteProperties.getText(FieldName, FieldDefaultValue)
                                                             '                                                    If FieldReadOnly Then
                                                             '                                                        '
                                                             '                                                        ' Read only = no editor
@@ -39301,7 +37075,7 @@ ErrorTrap:
                                                                 '
                                                                 ' Use Editor Addon
                                                                 '
-                                                                Option_String = "FieldName=" & FieldName & "&FieldValue=" & main_EncodeAddonOptionArgument(db.siteProperty_getText(FieldName, FieldDefaultValue))
+                                                                Option_String = "FieldName=" & FieldName & "&FieldValue=" & encodeNvaArgument(siteProperties.getText(FieldName, FieldDefaultValue))
                                                                 Copy = main_GetAddonContent(0, FieldAddon, Option_String, addonContextEnum.ContextAdmin, "", 0, "", 0)
                                                             ElseIf FieldSelector <> "" Then
                                                                 '
@@ -39348,7 +37122,7 @@ ErrorTrap:
                                                                             If FieldValue = "" Then
                                                                                 Copy = html_GetFormInputFile(FieldName)
                                                                             Else
-                                                                                NonEncodedLink = web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, FieldValue)
+                                                                                NonEncodedLink = web.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, FieldValue)
                                                                                 EncodedLink = EncodeURL(NonEncodedLink)
                                                                                 Copy = "" _
                                                                                     & "<a href=""http://" & EncodedLink & """ target=""_blank"">[" & GetFilename(FieldValue) & "]</A>" _
@@ -39372,7 +37146,7 @@ ErrorTrap:
                                                                         If FieldReadOnly Then
                                                                             Copy = FieldValue & html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
-                                                                            FieldValue = db.cdnFiles.ReadFile(FieldValue)
+                                                                            FieldValue = cdnFiles.ReadFile(FieldValue)
                                                                             If FieldHTML Then
                                                                                 Copy = html_GetFormInputHTML(FieldName, FieldValue)
                                                                             Else
@@ -39440,7 +37214,7 @@ ErrorTrap:
                                                                     Call db.db_setCS(CS, "name", FieldName)
                                                                     Call db.db_setCS(CS, "copy", EncodeText(TabNode.InnerText))
                                                                     Call db.db_SaveCSRecord(CS)
-                                                                    Call workflow_PublishEdit("Copy Content", RecordID)
+                                                                    Call workflow.publishEdit("Copy Content", RecordID)
                                                                 End If
                                                             End If
                                                             If db.db_csOk(CS) Then
@@ -39477,10 +37251,10 @@ ErrorTrap:
                                                         FieldDefaultValue = TabNode.InnerText
                                                         Copy = ""
                                                         If fieldfilename <> "" Then
-                                                            If db.appRootFiles.checkFile(fieldfilename) Then
+                                                            If appRootFiles.checkFile(fieldfilename) Then
                                                                 Copy = FieldDefaultValue
                                                             Else
-                                                                Copy = db.cdnFiles.ReadFile(fieldfilename)
+                                                                Copy = cdnFiles.ReadFile(fieldfilename)
                                                             End If
                                                             If Not FieldReadOnly Then
                                                                 Copy = main_GetFormInputTextExpandable(FieldName, Copy, 10)
@@ -39707,7 +37481,7 @@ ErrorTrap:
                     LCaseOptionDefault = Mid(LCaseOptionDefault, PosEqual + 1)
                 End If
 
-                LCaseOptionDefault = main_DecodeAddonOptionArgument(LCaseOptionDefault)
+                LCaseOptionDefault = decodeNvaArgument(LCaseOptionDefault)
                 ExpandedSelector = Mid(ExpandedSelector, Pos + 1)
                 Pos = InStr(1, ExpandedSelector, "]")
                 If Pos > 0 Then
@@ -39724,11 +37498,11 @@ ErrorTrap:
                     If OptionValue_AddonEncoded <> "" Then
                         Pos = InStr(1, OptionValue_AddonEncoded, ":")
                         If Pos = 0 Then
-                            OptionValue = main_DecodeAddonOptionArgument(OptionValue_AddonEncoded)
+                            OptionValue = decodeNvaArgument(OptionValue_AddonEncoded)
                             OptionCaption = OptionValue
                         Else
-                            OptionCaption = main_DecodeAddonOptionArgument(Mid(OptionValue_AddonEncoded, 1, Pos - 1))
-                            OptionValue = main_DecodeAddonOptionArgument(Mid(OptionValue_AddonEncoded, Pos + 1))
+                            OptionCaption = decodeNvaArgument(Mid(OptionValue_AddonEncoded, 1, Pos - 1))
+                            OptionValue = decodeNvaArgument(Mid(OptionValue_AddonEncoded, Pos + 1))
                         End If
                         Select Case OptionSuffix
                             Case "checkbox"
@@ -39782,7 +37556,7 @@ ErrorTrap:
                 ' Create Text executeAddon_GetFormContent_decodeSelector
                 '
 
-                selector = main_DecodeAddonOptionArgument(selector)
+                selector = decodeNvaArgument(selector)
                 executeAddon_getFormContent_decodeSelector = main_GetFormInputText2(SitePropertyName, selector, 1, 20)
             End If
 
@@ -40229,7 +38003,7 @@ ErrorTrap:
                     '
                     ' This addonId is missing from cache - try to load it from Db
                     '
-                    sqlCriteria = "(id=" & db.db_EncodeSQLNumber(addonNameGuidOrId) & ")or(name=" & db.db_EncodeSQLText(addonNameGuidOrId) & ")or(ccguid=" & db.db_EncodeSQLText(addonNameGuidOrId) & ")"
+                    sqlCriteria = "(id=" & db.db_EncodeSQLNumber(addonNameGuidOrId) & ")or(name=" & db.encodeSQLText(addonNameGuidOrId) & ")or(ccguid=" & db.encodeSQLText(addonNameGuidOrId) & ")"
                     CS = db.db_csOpen("add-ons", sqlCriteria)
                     If db.db_csOk(CS) Then
                         addonId = db.db_GetCSInteger(CS, "id")
@@ -40757,7 +38531,7 @@ ErrorTrap:
                         '
                         ContentName = main_GetContentNameByID(ContentControlID)
                         If ContentName <> "" Then
-                            If (Not main_RenderCache_CurrentPage_IsQuickEditing) And user_isQuickEditing(ContentName) Then
+                            If (Not main_RenderCache_CurrentPage_IsQuickEditing) And user.user_isQuickEditing(ContentName) Then
                                 main_RenderCache_CurrentPage_IsQuickEditing = True
                                 reloadPage = True
                             End If
@@ -40841,8 +38615,8 @@ ErrorTrap:
                 main_RenderCache_CurrentPage_IsRootPage = (main_RenderedPageID = rootPageId) And (main_RenderedParentID = 0)
                 main_RenderCache_CurrentPage_ContentId = EncodeInteger(cache_pageContent(PCC_ContentControlID, main_RenderCache_CurrentPage_PCCPtr))
                 main_RenderCache_CurrentPage_ContentName = main_GetContentNameByID(main_RenderCache_CurrentPage_ContentId)
-                main_RenderCache_CurrentPage_IsEditing = user_isEditing(main_RenderCache_CurrentPage_ContentName)
-                main_RenderCache_CurrentPage_IsQuickEditing = user_isQuickEditing(main_RenderCache_CurrentPage_ContentName)
+                main_RenderCache_CurrentPage_IsEditing = user.user_isEditing(main_RenderCache_CurrentPage_ContentName)
+                main_RenderCache_CurrentPage_IsQuickEditing = user.user_isQuickEditing(main_RenderCache_CurrentPage_ContentName)
                 main_RenderCache_CurrentPage_IsAuthoring = main_RenderCache_CurrentPage_IsEditing Or main_RenderCache_CurrentPage_IsQuickEditing
                 main_MetaContent_NoFollow = EncodeBoolean(cache_pageContent(PCC_AllowMetaContentNoFollow, main_RenderCache_CurrentPage_PCCPtr)) Or main_MetaContent_NoFollow
                 '
@@ -41085,7 +38859,7 @@ ErrorTrap:
                         ParentContentID = EncodeInteger(cache_pageContent(PCC_ContentControlID, parentPCCPtr))
                         ParentContentName = main_GetContentNameByID(ParentContentID)
                         If ParentContentName <> "" Then
-                            IsParentEditing = user_isEditing(ParentContentName)
+                            IsParentEditing = user.user_isEditing(ParentContentName)
                         End If
                     End If
                 End If
@@ -41382,8 +39156,8 @@ ErrorTrap:
                     ' ----- Encode Template
                     '
                     If Not main_ServerPagePrintVersion Then
-                        LocalTemplateBody = html_executeContentCommands(Nothing, LocalTemplateBody, addonContextEnum.ContextTemplate, userId, user_isAuthenticated, layoutError)
-                        returnHtmlBody = returnHtmlBody & encodeContent9(LocalTemplateBody, userId, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", web_requestProtocol & web.requestDomain, False, db.siteProperty_DefaultWrapperID, PageContent, addonContextEnum.ContextTemplate)
+                        LocalTemplateBody = html_executeContentCommands(Nothing, LocalTemplateBody, addonContextEnum.ContextTemplate, user.userId, user.user_isAuthenticated, layoutError)
+                        returnHtmlBody = returnHtmlBody & encodeContent9(LocalTemplateBody, user.userId, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", web_requestProtocol & web.requestDomain, False, siteProperties.defaultWrapperID, PageContent, addonContextEnum.ContextTemplate)
                         'returnHtmlBody = returnHtmlBody & EncodeContent8(LocalTemplateBody, memberID, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", main_ServerProtocol, False, app.SiteProperty_DefaultWrapperID, PageContent, ContextTemplate)
                     End If
                     '
@@ -41397,7 +39171,7 @@ ErrorTrap:
                     '
                     ' ----- Add tools Panel
                     '
-                    If Not user_isAuthenticated() Then
+                    If Not user.user_isAuthenticated() Then
                         '
                         ' not logged in
                         '
@@ -41405,8 +39179,8 @@ ErrorTrap:
                         '
                         ' Add template editing
                         '
-                        If main_VisitProperty_AllowAdvancedEditor And user_isEditing("Page Templates") Then
-                            returnHtmlBody = main_GetEditWrapper("Page Template [" & LocalTemplateName & "]", main_GetRecordEditLink2("Page Templates", LocalTemplateID, False, LocalTemplateName, user_isEditing("Page Templates")) & returnHtmlBody)
+                        If main_VisitProperty_AllowAdvancedEditor And user.user_isEditing("Page Templates") Then
+                            returnHtmlBody = main_GetEditWrapper("Page Template [" & LocalTemplateName & "]", main_GetRecordEditLink2("Page Templates", LocalTemplateID, False, LocalTemplateName, user.user_isEditing("Page Templates")) & returnHtmlBody)
                         End If
                     End If
                     '
@@ -41438,7 +39212,7 @@ ErrorTrap:
                     '
                     ' Make it pretty for those who care
                     '
-                    If EncodeBoolean(db.siteProperty_getBoolean("AutoHTMLFormatting", False)) Then
+                    If EncodeBoolean(siteProperties.getBoolean("AutoHTMLFormatting", False)) Then
                         IndentCnt = 0
                         Parse = New coreHtmlParseClass(Me)
                         Call Parse.Load(returnHtmlBody)
@@ -41562,7 +39336,7 @@ ErrorTrap:
             Dim returnHtml As String
             '
             Dim UseContentWatchLink As Boolean
-            UseContentWatchLink = db.siteProperty_UseContentWatchLink
+            UseContentWatchLink = siteProperties.useContentWatchLink
             Dim test As String
             Dim Copy As String
             Dim allowPageWithoutSectionDislay As Boolean
@@ -41693,7 +39467,7 @@ ErrorTrap:
                     Call main_AddEndOfBodyJavascript2(EncodeText(cache_siteSection(SSC_JSEndBody, Ptr)), "site section")
                     JSFilename = EncodeText(cache_siteSection(SSC_JSFilename, Ptr))
                     If JSFilename <> "" Then
-                        JSFilename = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, JSFilename)
+                        JSFilename = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, JSFilename)
                         Call main_AddHeadScriptLink(JSFilename, "site section")
                     End If
                 End If
@@ -41729,7 +39503,7 @@ ErrorTrap:
                     Call main_AddEndOfBodyJavascript2(EncodeText(cache_siteSection(SSC_JSEndBody, Ptr)), "site section")
                     JSFilename = EncodeText(cache_siteSection(SSC_JSFilename, Ptr))
                     If JSFilename <> "" Then
-                        JSFilename = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, JSFilename)
+                        JSFilename = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, JSFilename)
                         Call main_AddHeadScriptLink(JSFilename, "site section")
                     End If
                 End If
@@ -41797,7 +39571,7 @@ ErrorTrap:
                 '
                 ' Orphan Page -- Section could not be determined
                 '
-                allowPageWithoutSectionDislay = EncodeBoolean(db.siteProperty_getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default))
+                allowPageWithoutSectionDislay = EncodeBoolean(siteProperties.getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default))
                 allowPageWithoutSectionDislay = True
                 Call appendLog("hardcoded allowPageWithoutSectionDislay in getHtmlBody_getSection")
                 If Not allowPageWithoutSectionDislay Then
@@ -41826,7 +39600,7 @@ ErrorTrap:
                         ' Legacy - Page linked by PageName
                         '
                         SectionName = LegacyLandingPageName
-                        SectionCriteria = "Name = " & db.db_EncodeSQLText(SectionName)
+                        SectionCriteria = "Name = " & db.encodeSQLText(SectionName)
                     End If
                     '
                     ' main_Get Landing Section
@@ -41852,7 +39626,7 @@ ErrorTrap:
                         Call main_AddEndOfBodyJavascript2(db.db_GetCSText(CSSection, "JSEndBody"), "site section")
                         JSFilename = db.db_GetCSText(CSSection, "JSFilename")
                         If JSFilename <> "" Then
-                            JSFilename = web_requestPage & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, JSFilename)
+                            JSFilename = web_requestPage & web.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, JSFilename)
                             Call main_AddHeadScriptLink(JSFilename, "site section")
                         End If
                     End If
@@ -42030,7 +39804,7 @@ ErrorTrap:
                         '
                         If TCPtr >= 0 Then
                             If main_VisitBrowserIsMobile Then
-                                If EncodeBoolean(db.siteProperty_getBoolean("AllowMobileTemplates", False)) Then
+                                If EncodeBoolean(siteProperties.getBoolean("AllowMobileTemplates", False)) Then
                                     '
                                     ' set Mobile Template
                                     '
@@ -42056,7 +39830,7 @@ ErrorTrap:
                             pageManager_TemplateBodyTag = EncodeText(cache_pageTemplate(TC_BodyTag, TCPtr))
                             JSFilename = EncodeText(cache_pageTemplate(TC_JSInHeadFilename, TCPtr))
                             If JSFilename <> "" Then
-                                JSFilename = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, JSFilename)
+                                JSFilename = web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, JSFilename)
                                 Call main_AddHeadScriptLink(JSFilename, "template")
                             End If
                             '
@@ -42066,7 +39840,7 @@ ErrorTrap:
                                 If LCase(Right(StylesFilename, 4)) <> ".css" Then
                                     Call handleLegacyError15("Template [" & pageManager_TemplateName & "] StylesFilename is not a '.css' file, and will not display correct. Check that the field is setup as a CSSFile.", "main_GetHtmlBody_GetSection")
                                 Else
-                                    main_MetaContent_TemplateStyleSheetTag = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(db.config.cdnFilesNetprefix, StylesFilename) & """ >"
+                                    main_MetaContent_TemplateStyleSheetTag = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & web_requestProtocol & web.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, StylesFilename) & """ >"
                                 End If
                             End If
                             '
@@ -42090,8 +39864,8 @@ ErrorTrap:
                         ' Verify Template Link matches the current page
                         '
                         If pageManager_RedirectLink = "" Then
-                            If (TCPtr >= 0) And (db.siteProperty_AllowTemplateLinkVerification) Then
-                                PCCPtr = pageManager_cache_pageContent_getPtr(main_RenderedPageID, pagemanager_IsWorkflowRendering, user_isQuickEditing(""))
+                            If (TCPtr >= 0) And (siteProperties.allowTemplateLinkVerification) Then
+                                PCCPtr = pageManager_cache_pageContent_getPtr(main_RenderedPageID, pagemanager_IsWorkflowRendering, user.user_isQuickEditing(""))
                                 '$$$$$ must check for PPtr<0
                                 SecureLink_CurrentURL = (Left(LCase(main_ServerLink), 8) = "https://")
                                 SecureLink_Template_Required = EncodeBoolean(cache_pageTemplate(TC_IsSecure, TCPtr))
@@ -42154,7 +39928,7 @@ ErrorTrap:
                                         '
                                         CurrentLink = Replace(CurrentLink, "https://", "http://", 1, -1, vbTextCompare)
                                         CurrentLink = ConvertLinkToShortLink(CurrentLink, web.requestDomain, web_requestVirtualFilePath)
-                                        CurrentLink = EncodeAppRootPath(CurrentLink, web_requestVirtualFilePath, db.RootWebPath, web.requestDomain)
+                                        CurrentLink = EncodeAppRootPath(CurrentLink, web_requestVirtualFilePath, www_requestRootPath, web.requestDomain)
                                         LinkSplit = Split(CurrentLink, "?")
                                         CurrentLinkNoQuery = LinkSplit(0)
                                         If (SecureLink_CurrentURL <> SecureLink_Required) Or (UCase(templateLink) <> UCase(CurrentLinkNoQuery)) Then
@@ -42267,17 +40041,17 @@ ErrorTrap:
             '------------------------------------------------------------------------------------
             '
             'hint = "8"
-            If user_isAdmin() And main_AdminWarning <> "" Then
+            If user.user_isAdmin() And main_AdminWarning <> "" Then
                 '
                 ' Display Admin Warnings with Edits for record errors
                 '
                 If main_AdminWarningPageID <> 0 Then
-                    main_AdminWarning = main_AdminWarning & "</p>" & main_GetRecordEditLink2("Page Content", main_AdminWarningPageID, True, "Page " & main_AdminWarningPageID, user_isAdmin()) & "&nbsp;Edit the page<p>"
+                    main_AdminWarning = main_AdminWarning & "</p>" & main_GetRecordEditLink2("Page Content", main_AdminWarningPageID, True, "Page " & main_AdminWarningPageID, user.user_isAdmin()) & "&nbsp;Edit the page<p>"
                     main_AdminWarningPageID = 0
                 End If
                 '
                 If main_AdminWarningSectionID <> 0 Then
-                    main_AdminWarning = main_AdminWarning & "</p>" & main_GetRecordEditLink2("Site Sections", main_AdminWarningSectionID, True, "Section " & main_AdminWarningSectionID, user_isAdmin()) & "&nbsp;Edit the section<p>"
+                    main_AdminWarning = main_AdminWarning & "</p>" & main_GetRecordEditLink2("Site Sections", main_AdminWarningSectionID, True, "Section " & main_AdminWarningSectionID, user.user_isAdmin()) & "&nbsp;Edit the section<p>"
                     main_AdminWarningSectionID = 0
                 End If
                 returnHtml = "" _
@@ -42320,7 +40094,7 @@ ErrorTrap:
                 rootPageId = PageID
             Else
                 If pageManager_cache_pageContent_rows = 0 Then
-                    Call pageManager_cache_pageContent_load(pagemanager_IsWorkflowRendering, user_isQuickEditing(""))
+                    Call pageManager_cache_pageContent_load(pagemanager_IsWorkflowRendering, user.user_isQuickEditing(""))
                 End If
                 Ptr = pageManager_cache_pageContent_idIndex.getPtr(CStr(PageID))
                 If Ptr >= 0 Then
@@ -42532,11 +40306,11 @@ ErrorTrap:
                 '---------------------------------------------------------------------------------
                 '
                 If (BlockedRecordIDList <> "") Then
-                    If user_isAdmin() Then
+                    If user.user_isAdmin() Then
                         '
                         ' Administrators are never blocked
                         '
-                    ElseIf (Not user_isAuthenticated()) Then
+                    ElseIf (Not user.user_isAuthenticated()) Then
                         '
                         ' non-authenticated are always blocked
                         '
@@ -42549,7 +40323,7 @@ ErrorTrap:
                             & " FROM (ccPageContentBlockRules" _
                             & " LEFT JOIN ccgroups ON ccPageContentBlockRules.GroupID = ccgroups.ID)" _
                             & " LEFT JOIN ccMemberRules ON ccgroups.ID = ccMemberRules.GroupID" _
-                            & " WHERE (((ccMemberRules.MemberID)=" & db.db_EncodeSQLNumber(userId) & ")" _
+                            & " WHERE (((ccMemberRules.MemberID)=" & db.db_EncodeSQLNumber(user.userId) & ")" _
                             & " AND ((ccPageContentBlockRules.RecordID) In (" & BlockedRecordIDList & "))" _
                             & " AND ((ccPageContentBlockRules.Active)<>0)" _
                             & " AND ((ccgroups.Active)<>0)" _
@@ -42578,7 +40352,7 @@ ErrorTrap:
                                 & " AND ((ManagementGroups.Active)<>0)" _
                                 & " AND ((ManagementMemberRules.Active)<>0)" _
                                 & " AND ((ManagementMemberRules.DateExpires) Is Null Or (ManagementMemberRules.DateExpires)>" & db.db_EncodeSQLDate(main_PageStartTime) & ")" _
-                                & " AND ((ManagementMemberRules.MemberID)=" & userId & " ));"
+                                & " AND ((ManagementMemberRules.MemberID)=" & user.userId & " ));"
                             CS = db.db_csOpenSql(SQL)
                             Do While db.db_csOk(CS)
                                 BlockedRecordIDList = Replace(BlockedRecordIDList, "," & db.db_GetCSText(CS, "RecordID"), "")
@@ -42621,38 +40395,38 @@ ErrorTrap:
                             '
                             ' ----- Custom Message
                             '
-                            returnHtml = db.cdnFiles.ReadFile(CustomBlockMessageFilename)
+                            returnHtml = cdnFiles.ReadFile(CustomBlockMessageFilename)
                         Case main_BlockSourceLogin
                             '
                             ' ----- Login page
                             '
-                            If Not user_isAuthenticated() Then
-                                If Not user_isRecognized() Then
+                            If Not user.user_isAuthenticated() Then
+                                If Not user.user_isRecognized() Then
                                     '
                                     ' not recognized
                                     '
                                     BlockCopy = "" _
                                         & "<p>This content has limited access. If you have an account, please login using this form.</p>" _
                                         & ""
-                                    BlockForm = user_GetLoginForm()
+                                    BlockForm = user.user_GetLoginForm()
                                 Else
                                     '
                                     ' recognized, not authenticated
                                     '
                                     BlockCopy = "" _
-                                        & "<p>This content has limited access. You were recognized as ""<b>" & userName & "</b>"", but you need to login to continue. To login to this account or another, please use this form.</p>" _
+                                        & "<p>This content has limited access. You were recognized as ""<b>" & user.userName & "</b>"", but you need to login to continue. To login to this account or another, please use this form.</p>" _
                                         & ""
-                                    BlockForm = user_GetLoginForm()
+                                    BlockForm = user.user_GetLoginForm()
                                 End If
                             Else
                                 '
                                 ' authenticated
                                 '
                                 BlockCopy = "" _
-                                    & "<p>You are currently logged in as ""<b>" & userName & "</b>"". If this is not you, please <a href=""?" & web_RefreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
+                                    & "<p>You are currently logged in as ""<b>" & user.userName & "</b>"". If this is not you, please <a href=""?" & web_RefreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
                                     & "<p>This account does not have access to this content. If you want to login with a different account, please use this form.</p>" _
                                     & ""
-                                BlockForm = user_GetLoginForm()
+                                BlockForm = user.user_GetLoginForm()
                             End If
                             returnHtml = "" _
                                 & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td align=center>" _
@@ -42669,7 +40443,7 @@ ErrorTrap:
                                 '
                                 ' login subform form
                                 '
-                                BlockForm = user_GetLoginForm()
+                                BlockForm = user.user_GetLoginForm()
                                 BlockCopy = "" _
                                     & "<p>This content has limited access. If you have an account, please login using this form.</p>" _
                                     & "<p>If you do not have an account, <a href=?" & web_RefreshQueryString & "&subform=0>click here to register</a>.</p>" _
@@ -42678,13 +40452,13 @@ ErrorTrap:
                                 '
                                 ' Register Form
                                 '
-                                If Not user_isAuthenticated() And user_isRecognized() Then
+                                If Not user.user_isAuthenticated() And user.user_isRecognized() Then
                                     '
                                     ' Can not take the chance, if you go to a registration page, and you are recognized but not auth -- logout first
                                     '
-                                    Call security_LogoutMember()
+                                    Call user.security_LogoutMember()
                                 End If
-                                If Not user_isAuthenticated() Then
+                                If Not user.user_isAuthenticated() Then
                                     '
                                     ' Not Authenticated
                                     '
@@ -42694,7 +40468,7 @@ ErrorTrap:
                                         & ""
                                 Else
                                     BlockCopy = "" _
-                                        & "<p>You are currently logged in as ""<b>" & userName & "</b>"". If this is not you, please <a href=""?" & web_RefreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
+                                        & "<p>You are currently logged in as ""<b>" & user.userName & "</b>"". If this is not you, please <a href=""?" & web_RefreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
                                         & "<p>This account does not have access to this content. To view this content, please complete this form.</p>" _
                                         & ""
                                 End If
@@ -42734,8 +40508,8 @@ ErrorTrap:
                     '
                     ' Encode the copy
                     '
-                    returnHtml = html_executeContentCommands(Nothing, returnHtml, addonContextEnum.ContextPage, userId, user_isAuthenticated, layoutError)
-                    returnHtml = encodeContent9(returnHtml, userId, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & web.requestDomain, False, db.siteProperty_DefaultWrapperID, "", addonContextEnum.ContextPage)
+                    returnHtml = html_executeContentCommands(Nothing, returnHtml, addonContextEnum.ContextPage, user.userId, user.user_isAuthenticated, layoutError)
+                    returnHtml = encodeContent9(returnHtml, user.userId, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & web.requestDomain, False, siteProperties.defaultWrapperID, "", addonContextEnum.ContextPage)
                     'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, 0, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
                     RQS = web_RefreshQueryString
                     If RQS <> "" Then
@@ -42776,18 +40550,18 @@ ErrorTrap:
                         contactMemberID = EncodeInteger(cache_pageContent(PCC_ContactMemberID, main_RenderCache_CurrentPage_PCCPtr))
                         pageViewings = EncodeInteger(cache_pageContent(PCC_Viewings, main_RenderCache_CurrentPage_PCCPtr))
                         'contactMemberID = app.csv_GetCSInteger(CS, "ContactMemberID")
-                        If user_isEditing(main_RenderCache_CurrentPage_ContentName) Or main_VisitProperty_AllowWorkflowRendering Then
+                        If user.user_isEditing(main_RenderCache_CurrentPage_ContentName) Or main_VisitProperty_AllowWorkflowRendering Then
                             '
                             ' Link authoring, workflow rendering -> do encoding, but no tracking
                             '
-                            returnHtml = html_executeContentCommands(Nothing, returnHtml, addonContextEnum.ContextPage, userId, user_isAuthenticated, layoutError)
-                            returnHtml = encodeContent9(returnHtml, userId, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & web.requestDomain, False, db.siteProperty_DefaultWrapperID, "", addonContextEnum.ContextPage)
+                            returnHtml = html_executeContentCommands(Nothing, returnHtml, addonContextEnum.ContextPage, user.userId, user.user_isAuthenticated, layoutError)
+                            returnHtml = encodeContent9(returnHtml, user.userId, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & web.requestDomain, False, siteProperties.defaultWrapperID, "", addonContextEnum.ContextPage)
                         ElseIf main_ServerPagePrintVersion Then
                             '
                             ' Printer Version -> personalize and count viewings, no tracking
                             '
-                            returnHtml = html_executeContentCommands(Nothing, returnHtml, addonContextEnum.ContextPage, userId, user_isAuthenticated, layoutError)
-                            returnHtml = encodeContent9(returnHtml, userId, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & web.requestDomain, False, db.siteProperty_DefaultWrapperID, "", addonContextEnum.ContextPage)
+                            returnHtml = html_executeContentCommands(Nothing, returnHtml, addonContextEnum.ContextPage, user.userId, user.user_isAuthenticated, layoutError)
+                            returnHtml = encodeContent9(returnHtml, user.userId, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & web.requestDomain, False, siteProperties.defaultWrapperID, "", addonContextEnum.ContextPage)
                             'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
                             Call db.executeSql("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & main_RenderedPageID)
                             'Call app.csv_SetCS(CS, "Viewings", app.csv_GetCSInteger(CS, "Viewings") + 1)
@@ -42799,8 +40573,8 @@ ErrorTrap:
                             ' this should be done before the contentbox is added
                             ' so a stray blocktext does not truncate the html
                             '!!!!!!!!!!!!!!!!!!!!!!!!!
-                            returnHtml = html_executeContentCommands(Nothing, returnHtml, addonContextEnum.ContextPage, userId, user_isAuthenticated, layoutError)
-                            returnHtml = encodeContent9(returnHtml, userId, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & web.requestDomain, False, db.siteProperty_DefaultWrapperID, "", addonContextEnum.ContextPage)
+                            returnHtml = html_executeContentCommands(Nothing, returnHtml, addonContextEnum.ContextPage, user.userId, user.user_isAuthenticated, layoutError)
+                            returnHtml = encodeContent9(returnHtml, user.userId, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & web.requestDomain, False, siteProperties.defaultWrapperID, "", addonContextEnum.ContextPage)
                             'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
                             'Call main_TrackContent(main_RenderCache_CurrentPage_ContentName, main_RenderedPageID)
                             'Call main_TrackContentSet(CS)
@@ -42831,8 +40605,8 @@ ErrorTrap:
                                 Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Domain", main_ServerDomain, True)
                                 Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Link", main_ServerLink, False)
                                 Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Page Name", PageName, True)
-                                Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Member Name", userName, False)
-                                Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Member #", CStr(userId), True)
+                                Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Member Name", user.userName, False)
+                                Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Member #", CStr(user.userId), True)
                                 Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Start Time", CStr(main_VisitStartTime), False)
                                 Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit #", CStr(main_VisitId), True)
                                 Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit IP", web.requestRemoteIP, False)
@@ -42841,7 +40615,7 @@ ErrorTrap:
                                 Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Authenticated", CStr(visit_isAuthenticated), True)
                                 Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Referrer", main_VisitReferer, False)
                                 Body = Body & kmaEndTable
-                                Call sendMemberEmail3(contactMemberID, db.siteProperty_getText("EmailFromAddress", "info@" & main_ServerDomain), "Page Hit Notification", Body, False, True, 0, "", False)
+                                Call sendMemberEmail3(contactMemberID, siteProperties.getText("EmailFromAddress", "info@" & main_ServerDomain), "Page Hit Notification", Body, False, True, 0, "", False)
                             End If
                         End If
                         '
@@ -42868,7 +40642,7 @@ ErrorTrap:
                                 ' Always
                                 '
                                 If SystemEMailID <> 0 Then
-                                    Call main_SendSystemEmail(main_GetRecordName("System Email", SystemEMailID), "", userId)
+                                    Call main_SendSystemEmail(main_GetRecordName("System Email", SystemEMailID), "", user.userId)
                                 End If
                                 If main_AddGroupID <> 0 Then
                                     Call main_AddGroupMember(group_GetGroupName(main_AddGroupID))
@@ -42881,9 +40655,9 @@ ErrorTrap:
                                 ' If in Condition Group
                                 '
                                 If ConditionGroupID <> 0 Then
-                                    If user_IsGroupMember(group_GetGroupName(ConditionGroupID)) Then
+                                    If user.user_IsGroupMember(group_GetGroupName(ConditionGroupID)) Then
                                         If SystemEMailID <> 0 Then
-                                            Call main_SendSystemEmail(main_GetRecordName("System Email", SystemEMailID), "", userId)
+                                            Call main_SendSystemEmail(main_GetRecordName("System Email", SystemEMailID), "", user.userId)
                                         End If
                                         If main_AddGroupID <> 0 Then
                                             Call main_AddGroupMember(group_GetGroupName(main_AddGroupID))
@@ -42898,7 +40672,7 @@ ErrorTrap:
                                 ' If not in Condition Group
                                 '
                                 If ConditionGroupID <> 0 Then
-                                    If Not user_IsGroupMember(group_GetGroupName(ConditionGroupID)) Then
+                                    If Not user.user_IsGroupMember(group_GetGroupName(ConditionGroupID)) Then
                                         If main_AddGroupID <> 0 Then
                                             Call main_AddGroupMember(group_GetGroupName(main_AddGroupID))
                                         End If
@@ -42906,7 +40680,7 @@ ErrorTrap:
                                             Call main_DeleteGroupMember(group_GetGroupName(RemoveGroupID))
                                         End If
                                         If SystemEMailID <> 0 Then
-                                            Call main_SendSystemEmail(main_GetRecordName("System Email", SystemEMailID), "", userId)
+                                            Call main_SendSystemEmail(main_GetRecordName("System Email", SystemEMailID), "", user.userId)
                                         End If
                                     End If
                                 End If
@@ -42942,7 +40716,7 @@ ErrorTrap:
                     Call main_AddOnLoadJavascript2(JSOnLoad, "page content")
                     Call main_AddHeadScriptCode(JSHead, "page content")
                     If JSFilename <> "" Then
-                        Call main_AddHeadScriptLink(csv_getVirtualFileLink(db.config.cdnFilesNetprefix, JSFilename), "page content")
+                        Call main_AddHeadScriptLink(csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, JSFilename), "page content")
                     End If
                     Call main_AddEndOfBodyJavascript2(JSEndBody, "page content")
                     '
@@ -43009,12 +40783,12 @@ ErrorTrap:
             If main_AdminWarning <> "" Then
                 '
                 If main_AdminWarningPageID <> 0 Then
-                    main_AdminWarning = main_AdminWarning & "</p>" & main_GetRecordEditLink2("Page Content", main_AdminWarningPageID, True, "Page " & main_AdminWarningPageID, user_isAdmin()) & "&nbsp;Edit the page<p>"
+                    main_AdminWarning = main_AdminWarning & "</p>" & main_GetRecordEditLink2("Page Content", main_AdminWarningPageID, True, "Page " & main_AdminWarningPageID, user.user_isAdmin()) & "&nbsp;Edit the page<p>"
                     main_AdminWarningPageID = 0
                 End If
                 '
                 If main_AdminWarningSectionID <> 0 Then
-                    main_AdminWarning = main_AdminWarning & "</p>" & main_GetRecordEditLink2("Site Sections", main_AdminWarningSectionID, True, "Section " & main_AdminWarningSectionID, user_isAdmin()) & "&nbsp;Edit the section<p>"
+                    main_AdminWarning = main_AdminWarning & "</p>" & main_GetRecordEditLink2("Site Sections", main_AdminWarningSectionID, True, "Section " & main_AdminWarningSectionID, user.user_isAdmin()) & "&nbsp;Edit the section<p>"
                     main_AdminWarningSectionID = 0
                 End If
 
@@ -43036,7 +40810,7 @@ ErrorTrap:
             ErrString = GetErrString(Err)
             Call handleLegacyError19("main_GetHtmlBody_GetSection_GetContent", "Trap", Err_Number, Err_Source, Err_Description, True)
             Err.Clear()
-            If user_isAdmin() Then
+            If user.user_isAdmin() Then
                 '
                 ' Put up an admin hint
                 '
@@ -43151,7 +40925,7 @@ ErrorTrap:
                             '????? test this
                             'hint = hint & ",110"
                             currentPageContentName = main_GetContentNameByID(EncodeInteger(cache_pageContent(PCC_ContentControlID, main_RenderCache_CurrentPage_PCCPtr)))
-                            If main_IsContentManager(currentPageContentName) Then
+                            If user.main_IsContentManager(currentPageContentName) Then
                                 '
                                 ' allow page without section because this is a content manager -- but give them a message
                                 '
@@ -43218,16 +40992,16 @@ ErrorTrap:
                     ' $$$$$ remove main_oldCacheRS_cs, use pccPtr
                     'hint = hint & ",200"
                     '????? test - this was a routine placed in-line
-                    iIsEditing = user_isEditing(main_RenderCache_CurrentPage_ContentName)
+                    iIsEditing = user.user_isEditing(main_RenderCache_CurrentPage_ContentName)
                     '
                     ' ----- Render the Body
                     '
                     LiveBody = main_GetHtmlBody_GetSection_GetContentBox_Live_Body(main_RenderCache_CurrentPage_ContentName, main_RenderCache_CurrentPage_ContentId, OrderByClause, AllowChildPageList, False, rootPageId, AllowReturnLink, RootPageContentName, ArchivePages)
-                    If user_IsAdvancedEditing("") Then
+                    If user.user_IsAdvancedEditing("") Then
                         returnHtml = returnHtml & main_GetRecordEditLink(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage)) & LiveBody
                     ElseIf iIsEditing Then
                         PageName = EncodeText(cache_pageContent(PCC_Name, main_RenderCache_CurrentPage_PCCPtr))
-                        EditLink = main_GetRecordEditLink2(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage), PageName, user_isEditing(ContentName))
+                        EditLink = main_GetRecordEditLink2(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage), PageName, user.user_isEditing(ContentName))
                         returnHtml = returnHtml & main_GetEditWrapper("", main_GetRecordEditLink(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage)) & LiveBody)
                     Else
                         returnHtml = returnHtml & LiveBody
@@ -43508,7 +41282,7 @@ ErrorTrap:
                 'headline = app.csv_GetCS(CSPointer, "Headline")
                 copyFilename = EncodeText(cache_pageContent(PCC_CopyFilename, main_RenderCache_CurrentPage_PCCPtr))
                 If copyFilename <> "" Then
-                    Copy = db.cdnFiles.ReadFile(copyFilename)
+                    Copy = cdnFiles.ReadFile(copyFilename)
                 End If
                 'copy = app.csv_GetCS(CSPointer, "copyFilename")
                 allowSeeAlso = EncodeBoolean(cache_pageContent(pcc_allowSeeAlso, main_RenderCache_CurrentPage_PCCPtr))
@@ -43543,8 +41317,8 @@ ErrorTrap:
                     '
                     ' ----- Print Heading if not at root Page
                     '
-                    BreadCrumbPrefix = db.siteProperty_getText("BreadCrumbPrefix", "Return to")
-                    BreadCrumbDelimiter = db.siteProperty_getText("BreadCrumbDelimiter", " &gt; ")
+                    BreadCrumbPrefix = siteProperties.getText("BreadCrumbPrefix", "Return to")
+                    BreadCrumbDelimiter = siteProperties.getText("BreadCrumbDelimiter", " &gt; ")
                     breadCrumb = main_GetHtmlBody_GetSection_GetContentBox_ReturnLink(RootPageContentName, parentPageID, rootPageId, "", ArchivePage, BreadCrumbDelimiter)
                     If breadCrumb <> "" Then
                         breadCrumb = cr & "<p class=""ccPageListNavigation"">" & BreadCrumbPrefix & " " & breadCrumb & "</p>"
@@ -43575,7 +41349,7 @@ ErrorTrap:
                             '                    QueryString = ModifyQueryString(QueryString, RequestNameContent, RootPageContentName, True)
                             '                    QueryString = ModifyQueryString(QueryString, RequestNameOrderByClause, OrderByClause, True)
                             '                    QueryString = ModifyQueryString(QueryString, RequestNameHardCodedPage, HardCodedPagePrinterVersion, True)
-                            Caption = db.siteProperty_getText("PagePrinterVersionCaption", "Printer Version")
+                            Caption = siteProperties.getText("PagePrinterVersionCaption", "Printer Version")
                             Caption = Replace(Caption, " ", "&nbsp;")
                             IconRow = IconRow & cr & "&nbsp;&nbsp;<a href=""" & html_EncodeHTML(web_requestPage & "?" & QueryString) & """ target=""_blank""><img alt=""image"" src=""/ccLib/images/IconSmallPrinter.gif"" width=""13"" height=""13"" border=""0"" align=""absmiddle""></a>&nbsp<a href=""" & html_EncodeHTML(web_requestPage & "?" & QueryString) & """ target=""_blank"" style=""text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;"">" & Caption & "</a>"
                         End If
@@ -43585,7 +41359,7 @@ ErrorTrap:
                                 QueryString = "?" & QueryString
                             End If
                             EmailBody = web_requestProtocol & web.requestDomain & web.requestPathPage & QueryString
-                            Caption = db.siteProperty_getText("PageAllowEmailCaption", "Email This Page")
+                            Caption = siteProperties.getText("PageAllowEmailCaption", "Email This Page")
                             Caption = Replace(Caption, " ", "&nbsp;")
                             IconRow = IconRow & cr & "&nbsp;&nbsp;<a HREF=""mailto:?SUBJECT=You might be interested in this&amp;BODY=" & EmailBody & """><img alt=""image"" src=""/ccLib/images/IconSmallEmail.gif"" width=""13"" height=""13"" border=""0"" align=""absmiddle""></a>&nbsp;<a HREF=""mailto:?SUBJECT=You might be interested in this&amp;BODY=" & EmailBody & """ style=""text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;"">" & Caption & "</a>"
                         End If
@@ -43619,7 +41393,7 @@ ErrorTrap:
                         'hint = hint & ",043"
                         ' an html field can be added to an html stream. a non-html field should be html encoded before being added.
                         headline = main_encodeHTML(headline)
-                        If EncodeBoolean(db.siteProperty_getBoolean("PageHeadlineUseccHeadline", False)) Then
+                        If EncodeBoolean(siteProperties.getBoolean("PageHeadlineUseccHeadline", False)) Then
                             Cell = Cell & cr & "<p>" & AddSpan(headline, "ccHeadline") & "</p>"
                         Else
                             Cell = Cell & cr & "<h1>" & headline & "</h1>"
@@ -43638,7 +41412,7 @@ ErrorTrap:
                         '
                         ' Page copy is empty if  Links Enabled put in a blank line to separate edit from add tag
                         '
-                        If user_isEditing(main_RenderCache_CurrentPage_ContentName) Then
+                        If user.user_isEditing(main_RenderCache_CurrentPage_ContentName) Then
                             Body = cr & "<p><!-- Empty Content Placeholder --></p>"
                         End If
                     Else
@@ -43655,7 +41429,7 @@ ErrorTrap:
                     ' ----- Child pages
                     '
                     'hint = hint & ",046"
-                    If allowChildListComposite Or user_isEditingAnything() Then
+                    If allowChildListComposite Or user.user_isEditingAnything() Then
                         'hint = hint & ",047"
                         If Not allowChildListComposite Then
                             Cell = Cell & main_GetAdminHintWrapper("Automatic Child List display is disabled for this page. It is displayed here because you are in editing mode. To enable automatic child list display, see the features tab for this page.")
@@ -43663,7 +41437,7 @@ ErrorTrap:
                         'hint = hint & ",048"
                         ChildListInstanceOptions = EncodeText(cache_pageContent(PCC_ChildListInstanceOptions, main_RenderCache_CurrentPage_PCCPtr))
                         'hint = hint & ",049"
-                        Cell = Cell & executeAddon_legacy2(db.siteProperty_ChildListAddonID, "", ChildListInstanceOptions, addonContextEnum.ContextPage, ContentName, PageID, "", PageChildListInstanceID, False, db.siteProperty_DefaultWrapperID, "", AddonStatusOK, Nothing)
+                        Cell = Cell & executeAddon_legacy2(siteProperties.childListAddonID, "", ChildListInstanceOptions, addonContextEnum.ContextPage, ContentName, PageID, "", PageChildListInstanceID, False, siteProperties.defaultWrapperID, "", AddonStatusOK, Nothing)
                     End If
                 End If
                 '
@@ -43704,7 +41478,7 @@ ErrorTrap:
                 'hint = hint & ",060"
                 If (LastModified <> Date.MinValue) And allowLastModifiedFooter Then
                     s = s & cr & "<p>This page was last modified " & FormatDateTime(LastModified)
-                    If user_isAdmin() Then
+                    If user.user_isAdmin() Then
                         If ModifiedBy = 0 Then
                             s = s & " (admin only: modified by unknown)"
                         Else
@@ -43724,7 +41498,7 @@ ErrorTrap:
                 If True Then
                     If (DateReviewed <> Date.MinValue) And allowReviewedFooter Then
                         s = s & cr & "<p>This page was last reviewed " & FormatDateTime(DateReviewed, vbLongDate)
-                        If user_isAdmin() Then
+                        If user.user_isAdmin() Then
                             If ReviewedBy = 0 Then
                                 s = s & " (by unknown)"
                             Else
@@ -43744,7 +41518,7 @@ ErrorTrap:
                 '
                 'hint = hint & ",070"
                 If allowMessageFooter Then
-                    pageContentMessageFooter = db.siteProperty_getText("PageContentMessageFooter", "")
+                    pageContentMessageFooter = siteProperties.getText("PageContentMessageFooter", "")
                     If (pageContentMessageFooter <> "") Then
                         s = s & cr & "<p>" & pageContentMessageFooter & "</p>"
                     End If
@@ -43832,10 +41606,10 @@ ErrorTrap:
             '
             ' main_Get Authoring Status and permissions
             '
-            IsEditLocked = db_GetEditLockStatus(LiveRecordContentName, RecordID)
+            IsEditLocked = workflow.GetEditLockStatus(LiveRecordContentName, RecordID)
             If IsEditLocked Then
-                main_EditLockMemberName = db_GetEditLockMemberName(LiveRecordContentName, RecordID)
-                main_EditLockDateExpires = EncodeDate(db_GetEditLockMemberName(LiveRecordContentName, RecordID))
+                main_EditLockMemberName = workflow.GetEditLockMemberName(LiveRecordContentName, RecordID)
+                main_EditLockDateExpires = EncodeDate(workflow.GetEditLockMemberName(LiveRecordContentName, RecordID))
             End If
             Call pageManager_GetAuthoringStatus(LiveRecordContentName, RecordID, IsSubmitted, IsApproved, SubmittedMemberName, ApprovedMemberName, IsInserted, IsDeleted, IsModified, ModifiedMemberName, ModifiedDate, SubmittedDate, ApprovedDate)
             Call pageManager_GetAuthoringPermissions(LiveRecordContentName, RecordID, AllowInsert, AllowCancel, allowSave, AllowDelete, AllowPublish, AllowAbort, AllowSubmit, AllowApprove, readOnlyField)
@@ -43852,7 +41626,7 @@ ErrorTrap:
             '
             ' Set Editing Authoring Control
             '
-            Call main_SetEditLock(LiveRecordContentName, RecordID)
+            Call workflow.SetEditLock(LiveRecordContentName, RecordID)
             '
             '
             ' SubPanel: Authoring Status
@@ -43952,7 +41726,7 @@ ErrorTrap:
             ' ----- Child pages
             '
             ChildListInstanceOptions = EncodeText(cache_pageContent(PCC_ChildListInstanceOptions, main_RenderCache_CurrentPage_PCCPtr))
-            PageList = executeAddon_legacy2(db.siteProperty_ChildListAddonID, "", ChildListInstanceOptions, addonContextEnum.ContextPage, ContentName, RecordID, "", PageChildListInstanceID, False, -1, "", AddonStatusOK, Nothing)
+            PageList = executeAddon_legacy2(siteProperties.childListAddonID, "", ChildListInstanceOptions, addonContextEnum.ContextPage, ContentName, RecordID, "", PageChildListInstanceID, False, -1, "", AddonStatusOK, Nothing)
             If InStr(1, PageList, "<ul", vbTextCompare) = 0 Then
                 PageList = "(there are no child pages)"
             End If
@@ -44018,7 +41792,7 @@ ErrorTrap:
             dateArchive = EncodeDate(cache_pageContent(PCC_DateArchive, main_RenderCache_CurrentPage_PCCPtr))
             copyFilename = EncodeText(cache_pageContent(PCC_CopyFilename, main_RenderCache_CurrentPage_PCCPtr))
             If copyFilename <> "" Then
-                Copy = db.cdnFiles.ReadFile(copyFilename)
+                Copy = cdnFiles.ReadFile(copyFilename)
             End If
             '
             ' ----- Page Copy
@@ -44096,7 +41870,7 @@ ErrorTrap:
                 Dim addonRoute As String = ""
                 Dim routeTest As String
                 Dim workingRoute As String
-                Dim adminRoute As String = db.config.adminRoute.ToLower
+                Dim adminRoute As String = appConfig.adminRoute.ToLower
                 Dim AjaxFunction As String = doc_getText(RequestNameAjaxFunction)
                 Dim AjaxFastFunction As String = doc_getText(RequestNameAjaxFastFunction)
                 Dim RemoteMethodFromQueryString As String = doc_getText(RequestNameRemoteMethodAddon)
@@ -44204,7 +41978,7 @@ ErrorTrap:
                                         '
                                         ' Not from this site
                                         '
-                                        If EncodeBoolean(db.siteProperty_getBoolean("AllowAggregateAccessBlocking", False)) Then
+                                        If EncodeBoolean(siteProperties.getBoolean("AllowAggregateAccessBlocking", False)) Then
                                             cs = db.db_csOpen("Aggregate Access", "Link=" & db_EncodeSQLText(refHost), , False, , , , "active")
                                             If Not db.db_csOk(cs) Then
                                                 '
@@ -44275,7 +42049,7 @@ ErrorTrap:
                             ' remote methods are add-ons
                             '
                             Dim AddonStatusOK As Boolean = True
-                            returnResult = executeAddon(0, addonRoute, Option_String, addonContextEnum.ContextRemoteMethod, HostContentName, hostRecordId, "", "0", False, 0, "", AddonStatusOK, Nothing, "", Nothing, "", userId, user_isAuthenticated)
+                            returnResult = executeAddon(0, addonRoute, Option_String, addonContextEnum.ContextRemoteMethod, HostContentName, hostRecordId, "", "0", False, 0, "", AddonStatusOK, Nothing, "", Nothing, "", user.userId, user.user_isAuthenticated)
                         End If
                         '
                         ' deliver styles, javascript and other head tags as javascript appends
@@ -44399,7 +42173,7 @@ ErrorTrap:
                                     '
                                     Dim AddonGuid As String = doc_getText("guid")
                                     '$$$$$ cache this
-                                    Dim CS As Integer = db.db_csOpen("add-ons", "ccguid=" & db.db_EncodeSQLText(AddonGuid))
+                                    Dim CS As Integer = db.db_csOpen("add-ons", "ccguid=" & db.encodeSQLText(AddonGuid))
                                     Dim addonArgumentList As String = ""
                                     Dim addonIsInline As Boolean = False
                                     If db.db_csOk(CS) Then
@@ -44558,7 +42332,7 @@ ErrorTrap:
                             '
                             Call addToEmailBlockList_InternalOnly(EmailSpamBlock)
                             '
-                            CSLog = db.db_csOpen("people", "email=" & db.db_EncodeSQLText(EmailSpamBlock), , , , , , "AllowBulkEmail")
+                            CSLog = db.db_csOpen("people", "email=" & db.encodeSQLText(EmailSpamBlock), , , , , , "AllowBulkEmail")
                             Do While db.db_csOk(CSLog)
                                 Call db.db_setCS(CSLog, "AllowBulkEmail", False)
                                 Call db.db_csGoNext(CSLog)
@@ -44605,36 +42379,36 @@ ErrorTrap:
                             Call main_SetMetaContent(0, 0)
                             Select Case formType
                                 Case FormTypeSiteStyleEditor
-                                    If user_isAuthenticated() And user_isAdmin() Then
+                                    If user.user_isAuthenticated() And user.user_isAdmin() Then
                                         '
                                         ' Save the site sites
                                         '
-                                        Call db.appRootFiles.SaveFile(DynamicStylesFilename, doc_getText("SiteStyles"))
+                                        Call appRootFiles.SaveFile(DynamicStylesFilename, doc_getText("SiteStyles"))
                                         If main_GetStreamBoolean2(RequestNameInlineStyles) Then
                                             '
                                             ' Inline Styles
                                             '
-                                            Call db.siteProperty_set("StylesheetSerialNumber", "0")
+                                            Call siteProperties.setProperty("StylesheetSerialNumber", "0")
                                         Else
                                             '
                                             ' Linked Styles
                                             ' Bump the Style Serial Number so next fetch is not cached
                                             '
-                                            StyleSN = db.siteProperty_getinteger("StylesheetSerialNumber", 0)
+                                            StyleSN = siteProperties.getinteger("StylesheetSerialNumber", 0)
                                             StyleSN = StyleSN + 1
-                                            Call db.siteProperty_set("StylesheetSerialNumber", EncodeText(StyleSN))
+                                            Call siteProperties.setProperty("StylesheetSerialNumber", EncodeText(StyleSN))
                                             '
                                             ' Save new public stylesheet
                                             '
-                                            Call db.appRootFiles.SaveFile("templates\Public" & StyleSN & ".css", main_GetStyleSheet)
-                                            Call db.appRootFiles.SaveFile("templates\Admin" & StyleSN & ".css", main_GetStyleSheetDefault)
+                                            Call appRootFiles.SaveFile("templates\Public" & StyleSN & ".css", main_GetStyleSheet)
+                                            Call appRootFiles.SaveFile("templates\Admin" & StyleSN & ".css", main_GetStyleSheetDefault)
                                         End If
                                     End If
                                 Case FormTypeAddonStyleEditor
                                     '
                                     ' save custom styles
                                     '
-                                    If user_isAuthenticated() And user_isAdmin() Then
+                                    If user.user_isAuthenticated() And user.user_isAdmin() Then
                                         Dim addonId As Integer
                                         Dim contentName As String = ""
                                         Dim tableName As String
@@ -44676,17 +42450,17 @@ ErrorTrap:
                                     '
                                     '
                                     '
-                                    Call user_ProcessFormJoin()
+                                    Call user.user_ProcessFormJoin()
                                 Case FormTypeSendPassword
                                     '
                                     '
                                     '
-                                    Call user_ProcessFormSendPassword()
+                                    Call user.user_ProcessFormSendPassword()
                                 Case FormTypeLogin, "l09H58a195"
                                     '
                                     '
                                     '
-                                    Call user_ProcessLoginFormDefault()
+                                    Call user.user_ProcessLoginFormDefault()
                             'Case FormTypeMyProfile
                             '    '
                             '    '
@@ -44765,7 +42539,7 @@ ErrorTrap:
                         '
                         ' REFACTOR -- when admin code is broken cleanly into an addon, run it through execute
                         '
-                        'returnResult = executeAddon(0, adminSiteAddonGuid, "", addonContextEnum.ContextAdmin, "", 0, "", "", False, 0, "", returnStatusOK, Nothing, "", Nothing, "", userId, visit_isAuthenticated)
+                        'returnResult = executeAddon(0, adminSiteAddonGuid, "", addonContextEnum.ContextAdmin, "", 0, "", "", False, 0, "", returnStatusOK, Nothing, "", Nothing, "", user.userid, visit_isAuthenticated)
                         '
                         ' until then, run it as an internal class
                         '
@@ -44784,7 +42558,7 @@ ErrorTrap:
                         Dim defaultAddonId As Integer = cp.Site.GetInteger("Default Route AddonId")
                         If defaultAddonId <> 0 Then
                             Dim addonStatusOk As Boolean = False
-                            returnResult = executeAddon(defaultAddonId, "", "", addonContextEnum.ContextPage, "", 0, "", "", False, 0, "", addonStatusOk, Nothing, "", Nothing, "", userId, visit_isAuthenticated)
+                            returnResult = executeAddon(defaultAddonId, "", "", addonContextEnum.ContextPage, "", 0, "", "", False, 0, "", addonStatusOk, Nothing, "", Nothing, "", user.userId, visit_isAuthenticated)
                         End If
                         'returnResult = addonToBe_pageManager()
                     End If
@@ -44807,21 +42581,17 @@ ErrorTrap:
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <remarks></remarks>
-        Private Sub constructorCommonInitialize()
+        Private Sub constructorCommonInitialize(appName As String)
             Try
                 '
                 ' refactor - I think the app should be initialized right here, as soon as the appname and permissions are set
                 '   and appName should be set only through the new app( appName )
                 '
-                ' appName = My.MySettings.ConfigurationManager.AppSettings("appName")
-                docHandle = common_GetRandomLong_Internal()
-                'main_TrapLogFilename = "TrapLogs\" & Format(docHandle, "0000000000") & ".txt"
-                main_PageStartTickCount = GetTickCount
+                constructorTickCount = GetTickCount
                 web_InitCounter = 0
                 main_ClosePageCounter = 0
                 allowDebugLog = True
                 main_PageStartTime = Now()
-                'main_SqlPageStartTime = app.db_EncodeSQLDate(main_PageStartTime)
                 main_PageTestPointPrinting = True
                 main_AllowCookielessDetection = True
                 main_LoginIconFilename = ""
@@ -44831,15 +42601,70 @@ ErrorTrap:
                 main_IconFolderOpen = "/ccLib/images/main_IconFolderOpen.gif"
                 main_IconFolderUp = "/ccLib/images/main_IconFolderOpen.gif"
                 '
-                ' initialize properties only used for applications (not cluster mode cp)
-                '
-                visitPropertyCache = New corePropertyCacheClass(Me, PropertyTypeVisit)
-                visitorPropertyCache = New corePropertyCacheClass(Me, PropertyTypeVisitor)
-                userPropertyCache = New corePropertyCacheClass(Me, PropertyTypeMember)
-                '
-                If (Not String.IsNullOrEmpty(applicationName)) Then
+                If (Not String.IsNullOrEmpty(appName)) Then
                     '
                     ' REFACTOR - cluster mode is not associated to an application, so no cache/sql, but the keyPtrCacheClass runs sql and uses cache, but this must be used in cluster mode
+                    '
+                    appStatus = applicationStatusEnum.ApplicationStatusLoading
+                    '
+                    If (cluster Is Nothing) Then
+                        '
+                        ' cannot continue with the cluster created
+                        '
+                        Throw New ApplicationException("appServices constructor failed because clusterServices are not valid.")
+                    Else
+                        If (Not cluster.config.apps.ContainsKey(appName.ToLower())) Then
+                            '
+                            ' application now configured
+                            '
+                            appConfig = New appConfigClass()
+                            appStatus = applicationStatusEnum.ApplicationStatusAppConfigNotValid
+                            Throw New Exception("application [" & appName & "] was not found in this cluster.")
+                        Else
+                            appConfig = cluster.config.apps(appName.ToLower())
+                        End If
+                        '
+                        If InStr(1, appConfig.domainList(0), ",") > 1 Then
+                            '
+                            ' if first entry in domain list is comma delimited, save only the first entry
+                            '
+                            appConfig.domainList(0) = Mid(appConfig.domainList(0), 1, InStr(1, appConfig.domainList(0), ",") - 1)
+                        End If
+                        '
+                        ' initialize datasource
+                        '
+                        db.db_AddDataSource("Default", -1, cluster.config.defaultDataSourceODBCConnectionString)
+                        '
+                        ' REFACTOR - this was removed because during debug is costs 300msec, and only helps case with small edge case of Db loss -- test that case for risks
+                        '
+                        appStatus = applicationStatusEnum.ApplicationStatusReady
+                    End If
+                    '
+                    ' initialize properties only used for applications (not cluster mode cp)
+                    '
+                    visitPropertyCache = New corePropertyCacheClass(Me, PropertyTypeVisit)
+                    visitorPropertyCache = New corePropertyCacheClass(Me, PropertyTypeVisitor)
+                    userPropertyCache = New corePropertyCacheClass(Me, PropertyTypeMember)
+                    '
+                    ' initialie filesystem, public and rivate now, setup virtual when site property is available
+                    '
+                    If cluster.config.isLocal Then
+                        '
+                        ' local server -- everything is ephemeral
+                        '
+                        serverFiles = New coreFileSystemClass(Me, cluster.config, coreFileSystemClass.fileSyncModeEnum.noSync, "")
+                        appRootFiles = New coreFileSystemClass(Me, cluster.config, coreFileSystemClass.fileSyncModeEnum.noSync, cluster.config.clusterPhysicalPath & appConfig.appRootFilesPath)
+                        privateFiles = New coreFileSystemClass(Me, cluster.config, coreFileSystemClass.fileSyncModeEnum.noSync, cluster.config.clusterPhysicalPath & appConfig.privateFilesPath)
+                        cdnFiles = New coreFileSystemClass(Me, cluster.config, coreFileSystemClass.fileSyncModeEnum.noSync, cluster.config.clusterPhysicalPath & appConfig.cdnFilesPath)
+                    Else
+                        '
+                        ' cluster mode - each filesystem is configured accordingly
+                        '
+                        serverFiles = New coreFileSystemClass(Me, cluster.config, coreFileSystemClass.fileSyncModeEnum.noSync, "")
+                        appRootFiles = New coreFileSystemClass(Me, cluster.config, coreFileSystemClass.fileSyncModeEnum.activeSync, cluster.config.clusterPhysicalPath & appConfig.appRootFilesPath)
+                        privateFiles = New coreFileSystemClass(Me, cluster.config, coreFileSystemClass.fileSyncModeEnum.passiveSync, cluster.config.clusterPhysicalPath & appConfig.privateFilesPath)
+                        cdnFiles = New coreFileSystemClass(Me, cluster.config, coreFileSystemClass.fileSyncModeEnum.passiveSync, cluster.config.clusterPhysicalPath & appConfig.cdnFilesPath)
+                    End If
                     '
                     cache_addonStyleRules = New coreCacheKeyPtrClass(Me, cacheNameAddonStyleRules, sqlAddonStyles)
                 End If
@@ -44856,9 +42681,9 @@ ErrorTrap:
         ''' <remarks></remarks>
         Friend Sub New(cp As CPClass)
             MyBase.New()
-            Me.applicationName = ""
             Me.cp = cp
-            constructorCommonInitialize()
+            iisContext = Nothing
+            constructorCommonInitialize("")
         End Sub
         '
         '====================================================================================================
@@ -44869,9 +42694,9 @@ ErrorTrap:
         ''' <remarks></remarks>
         Friend Sub New(cp As CPClass, applicationName As String)
             MyBase.New()
-            Me.applicationName = applicationName
             Me.cp = cp
-            constructorCommonInitialize()
+            iisContext = Nothing
+            constructorCommonInitialize(applicationName)
         End Sub
         '====================================================================================================
         ''' <summary>
@@ -44881,13 +42706,11 @@ ErrorTrap:
         ''' <remarks></remarks>
         Friend Sub New(cp As CPClass, applicationName As String, httpContext As System.Web.HttpContext)
             MyBase.New()
-            Me.applicationName = applicationName
             Me.cp = cp
-            constructorCommonInitialize()
+            constructorCommonInitialize(applicationName)
             '
             ' web client initialize
             '
-            isWebRoleIis = True
             iisContext = httpContext
             Dim NewKey As String
             Dim isMultipartPost As Boolean
@@ -45051,7 +42874,7 @@ ErrorTrap:
                                     tmpFilename = instanceId & ptrText & ".bin"
                                     deleteOnDisposeFileList.Add(tmpFilename)
                                     '0formname=formname&0filename=filename&0type=fileType&0file=tempfile&0error=errors&0size=fileSize
-                                    Using fileStream As System.IO.FileStream = System.IO.File.OpenWrite(db.privateFiles.rootLocalFolderPath & tmpFilename)
+                                    Using fileStream As System.IO.FileStream = System.IO.File.OpenWrite(privateFiles.rootLocalFolderPath & tmpFilename)
                                         file.Data.CopyTo(fileStream)
                                     End Using
                                     web.requestFormFiles = "" _
@@ -45135,10 +42958,6 @@ ErrorTrap:
             End If
             web.requestCookies = c
             '
-            ' refactor --
-            ' cp.initAppExecuteRoute calls cpCore.initApp, then cpCore.executeRoute, which calles wither cpCore.executePageManager or cpCore.executeAdmin
-            ' convoluted because initApp has legacy code that executes some routes.
-            '
             Call web_Init()
         End Sub
         '
@@ -45179,7 +42998,7 @@ ErrorTrap:
                     '
                     If deleteOnDisposeFileList.Count > 0 Then
                         For Each filename As String In deleteOnDisposeFileList
-                            db.privateFiles.DeleteFile(filename)
+                            privateFiles.DeleteFile(filename)
                         Next
                     End If
                     '
@@ -45208,7 +43027,7 @@ ErrorTrap:
                         End If
                         Form = main_ServerFormOriginal
                         If Form <> "" Then
-                            If EncodeBoolean(db.siteProperty_getBoolean("Block Viewing Form Field", False)) Then
+                            If EncodeBoolean(siteProperties.getBoolean("Block Viewing Form Field", False)) Then
                                 Form = "[blocked]"
                             End If
                         End If
@@ -45216,19 +43035,19 @@ ErrorTrap:
                         SQL = "INSERT INTO ccViewings (" _
                             & FieldNames _
                             & ")VALUES(" _
-                            & " " & db.db_EncodeSQLText(ViewingName) _
+                            & " " & db.encodeSQLText(ViewingName) _
                             & "," & db.db_EncodeSQLNumber(main_VisitId) _
-                            & "," & db.db_EncodeSQLNumber(userId) _
-                            & "," & db.db_EncodeSQLText(web.requestDomain) _
-                            & "," & db.db_EncodeSQLText(web_requestPath) _
-                            & "," & db.db_EncodeSQLText(web_requestPage) _
-                            & "," & db.db_EncodeSQLText(Left(web.requestQueryString, 255)) _
-                            & "," & db.db_EncodeSQLText(Left(Form, 255)) _
-                            & "," & db.db_EncodeSQLText(Left(web.requestReferrer, 255)) _
+                            & "," & db.db_EncodeSQLNumber(user.userId) _
+                            & "," & db.encodeSQLText(web.requestDomain) _
+                            & "," & db.encodeSQLText(web_requestPath) _
+                            & "," & db.encodeSQLText(web_requestPage) _
+                            & "," & db.encodeSQLText(Left(web.requestQueryString, 255)) _
+                            & "," & db.encodeSQLText(Left(Form, 255)) _
+                            & "," & db.encodeSQLText(Left(web.requestReferrer, 255)) _
                             & "," & db.db_EncodeSQLDate(main_PageStartTime) _
                             & "," & db.db_EncodeSQLBoolean(main_VisitStateOK) _
                             & "," & db.db_EncodeSQLNumber(main_GetContentID("Viewings")) _
-                            & "," & db.db_EncodeSQLNumber(GetTickCount - main_PageStartTickCount) _
+                            & "," & db.db_EncodeSQLNumber(GetTickCount - constructorTickCount) _
                             & ",1" _
                             & "," & db.db_EncodeSQLNumber(CSMax) _
                             & "," & db.db_EncodeSQLNumber(PageID)
@@ -45236,7 +43055,7 @@ ErrorTrap:
                             SQL &= "," & db.db_EncodeSQLBoolean(web_PageExcludeFromAnalytics)
                         End If
                         If True Then
-                            SQL &= "," & db.db_EncodeSQLText(main_MetaContent_Title)
+                            SQL &= "," & db.encodeSQLText(main_MetaContent_Title)
                         End If
                         SQL &= ");"
                         Call db.executeSql(SQL)
@@ -45268,16 +43087,6 @@ ErrorTrap:
         End Sub
         Private _isDisposed As Boolean = False                        ' true after disposed is called, means the page is closed and nothing more can happen
         '
-        ''====================================================================================================
-        ''' <summary>
-        ''' write to console log
-        ''' </summary>
-        ''' <param name="copy"></param>
-        Private Sub common_debugLog(copy As String)
-            If allowDebugLog Then
-                Console.WriteLine("cpCoreClass-" & copy)
-            End If
-        End Sub
         '
         '====================================================================================================
         ''' <summary>
@@ -45312,8 +43121,8 @@ ErrorTrap:
                 Dim iisResetRequired As Boolean = False
                 '
                 If returnUserError = "" Then
-                    If db.privateFiles.checkPath(privateFolder) Then
-                        returnOk = addonInstall.InstallCollectionFromPrivateFolder(builder, db.dataBuildVersion, privateFolder, iisResetRequired, db.config.name, returnUserError, installedCollectionGuid, False)
+                    If privateFiles.checkPath(privateFolder) Then
+                        returnOk = addonInstall.InstallCollectionFromPrivateFolder(builder, db.dataBuildVersion, privateFolder, iisResetRequired, appConfig.name, returnUserError, installedCollectionGuid, False)
                         'If iisResetRequired Then
                         '    Dim sitebuilder As New builderClass(Me)
                         '    sitebuilder.web.reset()
@@ -45322,7 +43131,7 @@ ErrorTrap:
                 End If
             Catch ex As Exception
                 handleExceptionAndRethrow(ex)
-                If Not db.siteProperty_trapErrors Then
+                If Not siteProperties.trapErrors Then
                     Throw New ApplicationException("rethrow", ex)
                 End If
             End Try
@@ -45417,7 +43226,7 @@ ErrorTrap:
                                         End Using
                                     End If
                                     'System.IO.File.AppendAllText(absFile, absContent)
-                                    'Call cpCore.cluster.files.appendFile(absFile, absContent)
+                                    'Call cluster.files.appendFile(absFile, absContent)
                                     'My.Computer.FileSystem.WriteAllText(LCase(PathFilenameNoExt & FileSuffix & ".log"), LogFileCopyPrep(FormatDateTime(Now(), vbGeneralDate)) & vbTab & threadName & vbTab & LogLine & vbCrLf, True)
                                 Catch ex As IO.IOException
                                     '
@@ -45447,7 +43256,7 @@ ErrorTrap:
                 ' cannot use execption handler because this routine is called by handleException
                 '
             Finally
-                'Call cpCore.cluster.files.Dispose()
+                'Call cluster.files.Dispose()
             End Try
         End Sub
         '
@@ -45970,7 +43779,7 @@ ErrorTrap:
                 Dim sql As String
                 Dim createkey As Integer
                 Dim cid As Integer
-                Dim sqlGroupName As String = db.db_EncodeSQLText(groupName)
+                Dim sqlGroupName As String = db.encodeSQLText(groupName)
                 '
                 dt = db.executeSql("SELECT ID FROM CCGROUPS WHERE NAME=" & sqlGroupName & "")
                 If dt.Rows.Count > 0 Then
@@ -46007,7 +43816,7 @@ ErrorTrap:
                 '
                 Dim cs As Contensive.BaseClasses.CPCSBaseClass = cp.CSNew
                 Dim IsAlreadyThere As Boolean = False
-                Dim sqlCriteria As String = db.db_getNameIdOrGuidSqlCriteria(GroupNameOrGuid)
+                Dim sqlCriteria As String = db.getNameIdOrGuidSqlCriteria(GroupNameOrGuid)
                 Dim groupName As String
                 Dim groupGuid As String
                 '
@@ -46051,7 +43860,7 @@ ErrorTrap:
         '
         ' Add User
         '
-        Public Sub group_addUser(ByVal groupId As Integer, Optional ByVal userId As Integer = 0, Optional ByVal dateExpires As Date = #12:00:00 AM#)
+        Public Sub group_addUser(ByVal groupId As Integer, Optional ByVal userid As Integer = 0, Optional ByVal dateExpires As Date = #12:00:00 AM#)
             Try
                 '
                 Dim CS As Contensive.BaseClasses.CPCSBaseClass
@@ -46061,21 +43870,21 @@ ErrorTrap:
                     If (groupId < 1) Then
                         handleExceptionAndRethrow(New ApplicationException("Could not find or create the group with id [" & groupId & "]"))
                     Else
-                        If userId = 0 Then
-                            userId = cp.User.Id
+                        If userid = 0 Then
+                            userid = cp.User.Id
                         End If
                         CS = cp.CSNew()
-                        CS.Open("Member Rules", "(MemberID=" & userId.ToString & ")and(GroupID=" & groupId.ToString & ")", , False)
+                        CS.Open("Member Rules", "(MemberID=" & userid.ToString & ")and(GroupID=" & groupId.ToString & ")", , False)
                         If Not CS.OK Then
                             Call CS.Close()
                             Call CS.Insert("Member Rules")
                         End If
                         If Not CS.OK Then
                             groupName = db_GetRecordName("groups", groupId)
-                            handleExceptionAndRethrow(New ApplicationException("Could not find or create the Member Rule to add this member [" & userId & "] to the Group [" & groupId & ", " & groupName & "]"))
+                            handleExceptionAndRethrow(New ApplicationException("Could not find or create the Member Rule to add this member [" & userid & "] to the Group [" & groupId & ", " & groupName & "]"))
                         Else
                             Call CS.SetField("active", "1")
-                            Call CS.SetField("memberid", userId.ToString)
+                            Call CS.SetField("memberid", userid.ToString)
                             Call CS.SetField("groupid", groupId.ToString)
                             If dateExpires <> #12:00:00 AM# Then
                                 Call CS.SetField("DateExpires", dateExpires.ToString)
@@ -46090,7 +43899,7 @@ ErrorTrap:
                 handleExceptionAndRethrow(ex)
             End Try
         End Sub
-        Public Sub group_AddUser(ByVal groupNameOrGuid As String, Optional ByVal userId As Integer = 0, Optional ByVal dateExpires As Date = #12:00:00 AM#)
+        Public Sub group_AddUser(ByVal groupNameOrGuid As String, Optional ByVal userid As Integer = 0, Optional ByVal dateExpires As Date = #12:00:00 AM#)
             Try
                 '
                 Dim GroupID As Integer
@@ -46105,20 +43914,20 @@ ErrorTrap:
                     If (GroupID < 1) Then
                         handleExceptionAndRethrow(New ApplicationException("Could not find or create the group [" & groupNameOrGuid & "]"))
                     Else
-                        If userId = 0 Then
-                            userId = cp.User.Id
+                        If user.userId = 0 Then
+                            user.userId = cp.User.Id
                         End If
                         CS = cp.CSNew()
-                        CS.Open("Member Rules", "(MemberID=" & userId.ToString & ")and(GroupID=" & GroupID.ToString & ")", , False)
+                        CS.Open("Member Rules", "(MemberID=" & user.userId.ToString & ")and(GroupID=" & GroupID.ToString & ")", , False)
                         If Not CS.OK Then
                             Call CS.Close()
                             Call CS.Insert("Member Rules")
                         End If
                         If Not CS.OK Then
-                            handleExceptionAndRethrow(New ApplicationException("Could not find or create the Member Rule to add this member [" & userId & "] to the Group [" & GroupID & ", " & groupNameOrGuid & "]"))
+                            handleExceptionAndRethrow(New ApplicationException("Could not find or create the Member Rule to add this member [" & user.userId & "] to the Group [" & GroupID & ", " & groupNameOrGuid & "]"))
                         Else
                             Call CS.SetField("active", "1")
-                            Call CS.SetField("memberid", userId.ToString)
+                            Call CS.SetField("memberid", user.userId.ToString)
                             Call CS.SetField("groupid", GroupID.ToString)
                             If dateExpires <> #12:00:00 AM# Then
                                 Call CS.SetField("DateExpires", dateExpires.ToString)
@@ -46157,7 +43966,7 @@ ErrorTrap:
         ''' <param name="GroupNameIdOrGuid"></param>
         Friend Sub group_delete(ByVal GroupNameIdOrGuid As String)
             Try
-                Dim sqlCriteria As String = db.db_getNameIdOrGuidSqlCriteria(GroupNameIdOrGuid)
+                Dim sqlCriteria As String = db.getNameIdOrGuidSqlCriteria(GroupNameIdOrGuid)
                 If sqlCriteria <> "" Then
                     Call cp.Content.DeleteRecords("Groups", sqlCriteria)
                 End If
@@ -46200,7 +44009,7 @@ ErrorTrap:
                 '
                 ' honestly, not sure what to do with 'return_ErrorMessage'
                 '
-                CS = db.db_csOpen("copy content", "Name=" & db.db_EncodeSQLText(CopyName), "ID", , 0, , , "Name,ID,Copy,modifiedBy")
+                CS = db.db_csOpen("copy content", "Name=" & db.encodeSQLText(CopyName), "ID", , 0, , , "Name,ID,Copy,modifiedBy")
                 If Not db.db_csOk(CS) Then
                     Call db.db_csClose(CS)
                     CS = db.db_csInsertRecord("copy content", 0)
@@ -46209,7 +44018,7 @@ ErrorTrap:
                         Call db.db_setCS(CS, "name", CopyName)
                         Call db.db_setCS(CS, "copy", EncodeText(DefaultContent))
                         Call db.db_SaveCSRecord(CS)
-                        Call db.workflow_PublishEdit("copy content", RecordID, 0)
+                        Call workflow.publishEdit("copy content", RecordID)
                     End If
                 End If
                 If db.db_csOk(CS) Then
@@ -46220,7 +44029,7 @@ ErrorTrap:
                     returnCopy = html_encodeContent10(returnCopy, personalizationPeopleId, "copy content", RecordID, contactPeopleId, False, False, True, True, False, True, "", "", False, 0, "", addonContextEnum.ContextPage, False, Nothing, False)
                     '
                     If True Then
-                        If user_isEditingAnything() Then
+                        If user.user_isEditingAnything() Then
                             returnCopy = main_GetCSRecordEditLink(CS, False) & returnCopy
                             If AllowEditWrapper Then
                                 returnCopy = main_GetEditWrapper("copy content", returnCopy)
@@ -46272,6 +44081,12 @@ ErrorTrap:
                 Throw New ApplicationException("Exception in db_encodeSqlTableName(" & sourceName & ")", ex)
             End Try
             Return returnName
+        End Function
+        '
+        '
+        '
+        Public Function getAddonPath() As String
+            Return "addons\"
         End Function
     End Class
     '====================================================================================================

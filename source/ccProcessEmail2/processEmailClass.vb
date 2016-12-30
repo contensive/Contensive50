@@ -94,8 +94,8 @@ ErrorTrap:
             Dim appStatus As Integer
             '
             'hint = "1"
-            appName = cpCore.db.config.name
-            appStatus = cpCore.db.status
+            appName = cpCore.appConfig.name
+            appStatus = cpCore.appStatus
             'hint = "3"
             If (appStatus = applicationStatusEnum.ApplicationStatusReady) Or (appStatus = applicationStatusEnum.ApplicationStatusUpgrading) Then
                 Using cp As New CPClass(appName)
@@ -106,8 +106,8 @@ ErrorTrap:
                         '
                         'hint = "4"
                         cpCore.db.db_SQLCommandTimeout = 120
-                        EmailServiceLastCheck = EncodeDate(cpCore.db.siteProperty_getText("EmailServiceLastCheck", 0))
-                        Call cpCore.db.siteProperty_set("EmailServiceLastCheck", CStr(Now()))
+                        EmailServiceLastCheck = EncodeDate(cpCore.siteProperties.getText("EmailServiceLastCheck", 0))
+                        Call cpCore.siteProperties.setProperty("EmailServiceLastCheck", CStr(Now()))
                         'buildversion = cpCore.app.GetSiteProperty("BuildVersion", 0, 0)
                         IsNewHour = (Now - EmailServiceLastCheck).TotalHours > 1
                         IsNewDay = Int(EmailServiceLastCheck) <> Int(Now())
@@ -197,7 +197,7 @@ ErrorTrap:
                 SQLTablePeople = cpCore.metaData_GetContentTablename2("People")
                 SQLTableMemberRules = cpCore.metaData_GetContentTablename2("Member Rules")
                 SQLTableGroups = cpCore.metaData_GetContentTablename2("Groups")
-                BounceAddress = cpCore.db.siteProperty_getText("EmailBounceAddress", "")
+                BounceAddress = cpCore.siteProperties.getText("EmailBounceAddress", "")
                 siteStyles = cpCore.csv_getStyleSheetProcessed()
                 '
                 Do While cpCore.db.db_csOk(CSEmail)
@@ -329,7 +329,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            cpCore.handleLegacyError3(cpCore.db.config.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_GroupEmail", Err.Number, Err.Source, Err.Description, True, True, "")
+            cpCore.handleLegacyError3(cpCore.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_GroupEmail", Err.Number, Err.Source, Err.Description, True, True, "")
             Err.Clear()
         End Sub
         '
@@ -387,7 +387,7 @@ ErrorTrap:
             SQLTablePeople = cpCore.metaData_GetContentTablename2("People")
             SQLTableMemberRules = cpCore.metaData_GetContentTablename2("Member Rules")
             SQLTableGroups = cpCore.metaData_GetContentTablename2("Groups")
-            BounceAddress = cpCore.db.siteProperty_getText("EmailBounceAddress", "")
+            BounceAddress = cpCore.siteProperties.getText("EmailBounceAddress", "")
             siteStyles = cpCore.csv_getStyleSheetProcessed()
             '
             rightNow = Now()
@@ -585,7 +585,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            cpCore.handleLegacyError3(cpCore.db.config.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_ConditionalEmail", Err.Number, Err.Source, Err.Description, True, True, "")
+            cpCore.handleLegacyError3(cpCore.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_ConditionalEmail", Err.Number, Err.Source, Err.Description, True, True, "")
             Err.Clear()
         End Sub
         '
@@ -662,10 +662,10 @@ ErrorTrap:
                     If cpCore.db.db_csOk(CSPeople) Then
                         ToAddress = cpCore.db.db_GetCS(CSPeople, "Email")
                         EmailToName = cpCore.db.db_GetCS(CSPeople, "Name")
-                        ServerPageDefault = cpCore.db.siteProperty_getText(siteproperty_serverPageDefault_name, siteproperty_serverPageDefault_defaultValue)
+                        ServerPageDefault = cpCore.siteProperties.getText(siteproperty_serverPageDefault_name, siteproperty_serverPageDefault_defaultValue)
                         RootURL = PrimaryLink & cpCore.app_rootWebPath
                         If EmailDropID <> 0 Then
-                            Select Case (cpCore.db.siteProperty_getinteger("GroupEmailOpenTriggerMethod", 0))
+                            Select Case (cpCore.siteProperties.getinteger("GroupEmailOpenTriggerMethod", 0))
                                 Case 1
                                     OpenTriggerCode = "<link rel=""stylesheet"" type=""text/css"" href=""" & RootURL & ServerPageDefault & "?" & RequestNameEmailOpenCssFlag & "=" & EmailDropID & "&" & RequestNameEmailMemberID & "=#member_id#"">"
                                 Case Else
@@ -726,7 +726,7 @@ ErrorTrap:
                             '
                             ' non-authorable, default true - leave it as an option in case there is an important exception
                             '
-                            EmailBodyEncoded = EmailBodyEncoded & "<div style=""padding:10px;"">" & GetLinkedText("<a href=""" & RootURL & ServerPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#&" & RequestNameEmailBlockRequestDropID & "=" & EmailDropID & """>", cpCore.db.siteProperty_getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
+                            EmailBodyEncoded = EmailBodyEncoded & "<div style=""padding:10px;"">" & GetLinkedText("<a href=""" & RootURL & ServerPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#&" & RequestNameEmailBlockRequestDropID & "=" & EmailDropID & """>", cpCore.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
                         End If
                         '
                         ' open trigger under footer (so it does not shake as the image comes in)
@@ -772,7 +772,7 @@ ErrorTrap:
                 End If
                 'Call cpCore.app.db_closeCS(CSLog)
             Catch ex As Exception
-                cpCore.handleLegacyError3(cpCore.db.config.name, "trap error", "App.EXEName", "ProcessEmailClass", "SendEmailRecord", Err.Number, Err.Source, Err.Description, True, True, "")
+                cpCore.handleLegacyError3(cpCore.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "SendEmailRecord", Err.Number, Err.Source, Err.Description, True, True, "")
                 Err.Clear()
             Finally
                 Call cpCore.db.db_csClose(CSPeople)
@@ -800,7 +800,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            cpCore.handleLegacyError3(cpCore.db.config.name, "trap error", "App.EXEName", "ProcessEmailClass", "GetPrimaryDomainName", Err.Number, Err.Source, Err.Description, True, True, "")
+            cpCore.handleLegacyError3(cpCore.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "GetPrimaryDomainName", Err.Number, Err.Source, Err.Description, True, True, "")
             Err.Clear()
         End Function
         '
@@ -825,7 +825,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            cpCore.handleLegacyError3(cpCore.db.config.name, "trap error", "App.EXEName", "ProcessEmailClass", "GetEmailTemplate", Err.Number, Err.Source, Err.Description, True, True, "")
+            cpCore.handleLegacyError3(cpCore.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "GetEmailTemplate", Err.Number, Err.Source, Err.Description, True, True, "")
             Err.Clear()
         End Function
         '

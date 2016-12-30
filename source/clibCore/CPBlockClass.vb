@@ -23,7 +23,7 @@ Namespace Contensive.Core
         Private cpCore As Contensive.Core.cpCoreClass
         Private cp As CPClass
         Private accum As String
-        Private htmlTools As coreHtmlToolsClass
+        Private htmlTools As coreHtmlClass
         Protected disposed As Boolean = False
         '
         ' Constructor - Initialize the Main and Csv objects
@@ -35,7 +35,7 @@ Namespace Contensive.Core
                 cp = cpParent
                 cpCore = cp.core
                 Try
-                    htmlTools = New coreHtmlToolsClass(cpCore)
+                    htmlTools = New coreHtmlClass(cpCore)
                 Catch ex As Exception
                     cp.core.handleExceptionAndRethrow(ex, "Error creating object aoPrimitives.HtmlToolsClass during cp.block constructor.")
                 End Try

@@ -155,9 +155,9 @@ Namespace Contensive.Core
             ' ----- Read config file
             '
             ConfigFilename = "HouseKeepConfig.txt"
-            Config = cp.core.db.privateFiles.ReadFile("config\" & ConfigFilename)
+            Config = cp.core.privateFiles.ReadFile("config\" & ConfigFilename)
             If Config = "" Then
-                Config = cp.core.db.privateFiles.ReadFile("" & ConfigFilename)
+                Config = cp.core.privateFiles.ReadFile("" & ConfigFilename)
             End If
             If Config <> "" Then
                 ConfigLines = Split(Config, vbCrLf)
@@ -185,7 +185,7 @@ Namespace Contensive.Core
             Content = "" _
                 & "lastcheck=" & rightNow & vbCrLf _
                 & "serverhousekeeptime=" & ServerHousekeepTime & vbCrLf
-            Call cp.core.db.privateFiles.SaveFile("config\" & ConfigFilename, Content)
+            Call cp.core.privateFiles.SaveFile("config\" & ConfigFilename, Content)
             '
             ' ----- Run Server Housekeep
             '
@@ -208,7 +208,7 @@ Namespace Contensive.Core
                 FolderName = "Logs"
                 Call HousekeepLogFolder("server", FolderName)
                 '
-                Dim subDir As New System.IO.DirectoryInfo(cp.core.db.privateFiles.rootLocalFolderPath & "\logs\")
+                Dim subDir As New System.IO.DirectoryInfo(cp.core.privateFiles.rootLocalFolderPath & "\logs\")
                 For Each SubDirInfo As System.IO.DirectoryInfo In subDir.GetDirectories
                     FolderName = "logs\" & SubDirInfo.Name
                 Call HousekeepLogFolder("server", FolderName)
@@ -313,10 +313,10 @@ Namespace Contensive.Core
                                 '
                                 ' Get ArchiveAgeDays - use this as the oldest data they care about
                                 '
-                                VisitArchiveAgeDays = EncodeInteger(cp.core.db.siteProperty_getText("ArchiveRecordAgeDays", "365"))
+                                VisitArchiveAgeDays = EncodeInteger(cp.core.siteproperties.getText("ArchiveRecordAgeDays", "365"))
                                 If (VisitArchiveAgeDays < 2) Then
                                     VisitArchiveAgeDays = 2
-                                    Call cp.core.db.siteProperty_set("ArchiveRecordAgeDays", "2")
+                                    Call cp.core.siteproperties.setProperty("ArchiveRecordAgeDays", "2")
                                 End If
                                 VisitArchiveDate = rightNow.AddDays(-VisitArchiveAgeDays).Date
                                 OldestVisitSummaryWeCareAbout = Int(Now) - 120
@@ -327,18 +327,18 @@ Namespace Contensive.Core
                                 '
                                 ' Get GuestArchiveAgeDays
                                 '
-                                GuestArchiveAgeDays = EncodeInteger(cp.core.db.siteProperty_getText("ArchivePeopleAgeDays", "2"))
+                                GuestArchiveAgeDays = EncodeInteger(cp.core.siteproperties.getText("ArchivePeopleAgeDays", "2"))
                                 If (GuestArchiveAgeDays < 2) Then
                                     GuestArchiveAgeDays = 2
-                                    Call cp.core.db.siteProperty_set("ArchivePeopleAgeDays", CStr(GuestArchiveAgeDays))
+                                    Call cp.core.siteproperties.setProperty("ArchivePeopleAgeDays", CStr(GuestArchiveAgeDays))
                                 End If
                                 '
                                 ' Get EmailDropArchiveAgeDays
                                 '
-                                EmailDropArchiveAgeDays = EncodeInteger(cp.core.db.siteProperty_getText("ArchiveEmailDropAgeDays", "90"))
+                                EmailDropArchiveAgeDays = EncodeInteger(cp.core.siteproperties.getText("ArchiveEmailDropAgeDays", "90"))
                                 If (EmailDropArchiveAgeDays < 2) Then
                                     EmailDropArchiveAgeDays = 2
-                                    Call cp.core.db.siteProperty_set("ArchiveEmailDropAgeDays", CStr(EmailDropArchiveAgeDays))
+                                    Call cp.core.siteproperties.setProperty("ArchiveEmailDropAgeDays", CStr(EmailDropArchiveAgeDays))
                                 End If
                                 '
                                 ' Do non-optional housekeeping
@@ -348,7 +348,7 @@ Namespace Contensive.Core
                                         '
                                         ' Move Archived pages from their current parent to their archive parent
                                         '
-                                        Call AppendClassLog(appName, "HouseKeep", "Archive update for pages on [" & cp.core.db.config.name & "]")
+                                        Call AppendClassLog(appName, "HouseKeep", "Archive update for pages on [" & cp.core.appConfig.name & "]")
                                         SQL = "select * from ccpagecontent where (( DateArchive is not null )and(DateArchive<" & SQLNow & "))and(active<>0)"
                                         CS = cp.core.db.db_openCsSql_rev("default", SQL)
                                         Do While cp.core.db.db_csOk(CS)
@@ -548,9 +548,9 @@ Namespace Contensive.Core
                                     CS = cp.core.db.db_openCsSql_rev("default", SQL)
                                     If cp.core.db.db_csOk(CS) Then
                                         LastTimeSummaryWasRun = cp.core.db.db_GetCSDate(CS, "DateAdded")
-                                        Call AppendClassLog(cp.core.db.config.name, "HouseKeep", "Update hourly visit summary, last time summary was run was [" & LastTimeSummaryWasRun & "]")
+                                        Call AppendClassLog(cp.core.appConfig.name, "HouseKeep", "Update hourly visit summary, last time summary was run was [" & LastTimeSummaryWasRun & "]")
                                     Else
-                                        Call AppendClassLog(cp.core.db.config.name, "HouseKeep", "Update hourly visit summary, no hourly summaries were found, set start to [" & LastTimeSummaryWasRun & "]")
+                                        Call AppendClassLog(cp.core.appConfig.name, "HouseKeep", "Update hourly visit summary, no hourly summaries were found, set start to [" & LastTimeSummaryWasRun & "]")
                                     End If
                                     Call cp.core.db.db_csClose(CS)
                                     NextSummaryStartDate = LastTimeSummaryWasRun
@@ -572,7 +572,7 @@ Namespace Contensive.Core
                                         OldestDateAdded = cp.core.db.db_GetCSDate(CS, "DateAdded")
                                         If OldestDateAdded < NextSummaryStartDate Then
                                             NextSummaryStartDate = OldestDateAdded
-                                            Call AppendClassLog(cp.core.db.config.name, "HouseKeep", "Update hourly visit summary, found a visit with the last viewing during the past hour. It started [" & OldestDateAdded & "], before the last summary was run.")
+                                            Call AppendClassLog(cp.core.appConfig.name, "HouseKeep", "Update hourly visit summary, found a visit with the last viewing during the past hour. It started [" & OldestDateAdded & "], before the last summary was run.")
                                         End If
                                     End If
                                     Call cp.core.db.db_csClose(CS)
@@ -599,13 +599,13 @@ Namespace Contensive.Core
                                         End If
                                     Next
                                     If (DateofMissingSummary <> Date.MinValue) And (DateofMissingSummary < NextSummaryStartDate) Then
-                                        Call AppendClassLog(cp.core.db.config.name, "HouseKeep", "Found a missing hourly period in the visit summary table [" & DateofMissingSummary & "], it only has [" & HoursPerDay & "] hourly summaries.")
+                                        Call AppendClassLog(cp.core.appConfig.name, "HouseKeep", "Found a missing hourly period in the visit summary table [" & DateofMissingSummary & "], it only has [" & HoursPerDay & "] hourly summaries.")
                                         NextSummaryStartDate = DateofMissingSummary
                                     End If
                                     '
                                     ' Now summarize all visits during all hourly periods between OldestDateAdded and the previous Hour
                                     '
-                                    Call AppendClassLog(cp.core.db.config.name, "HouseKeep", "Summaryize visits hourly, starting [" & NextSummaryStartDate & "]")
+                                    Call AppendClassLog(cp.core.appConfig.name, "HouseKeep", "Summaryize visits hourly, starting [" & NextSummaryStartDate & "]")
                                     PeriodStep = CDbl(1) / CDbl(24)
                                     'PeriodStart = (Int(OldestDateAdded * 24) / 24)
                                     Call HouseKeep_VisitSummary(NextSummaryStartDate, rightNow, 1, cp.core.db.dataBuildVersion, OldestVisitSummaryWeCareAbout)
@@ -624,14 +624,14 @@ Namespace Contensive.Core
                                     '
                                     ' Check for site's archive time of day
                                     '
-                                    AlarmTimeString = cp.core.db.siteProperty_getText("ArchiveTimeOfDay", "12:00:00 AM")
+                                    AlarmTimeString = cp.core.siteproperties.getText("ArchiveTimeOfDay", "12:00:00 AM")
                                     If AlarmTimeString = "" Then
                                         AlarmTimeString = "12:00:00 AM"
-                                        Call cp.core.db.siteProperty_set("ArchiveTimeOfDate", AlarmTimeString)
+                                        Call cp.core.siteproperties.setProperty("ArchiveTimeOfDate", AlarmTimeString)
                                     End If
                                     If Not IsDate(AlarmTimeString) Then
                                         AlarmTimeString = "12:00:00 AM"
-                                        Call cp.core.db.siteProperty_set("ArchiveTimeOfDate", AlarmTimeString)
+                                        Call cp.core.siteproperties.setProperty("ArchiveTimeOfDate", AlarmTimeString)
                                     End If
                                     AlarmTimeMinutesSinceMidnight = EncodeDate(AlarmTimeString).TimeOfDay.TotalMinutes
                                     minutesSinceMidnight = rightNow.TimeOfDay.TotalMinutes
@@ -736,8 +736,8 @@ ErrorTrap:
             Yesterday = rightNow.AddDays(-1).Date
             MidnightTwoDaysAgo = rightNow.AddDays(-2).Date
             thirtyDaysAgo = rightNow.AddDays(-30).Date
-            appName = cp.core.db.config.name
-            ArchiveDeleteNoCookie = EncodeBoolean(cp.core.db.siteProperty_getText("ArchiveDeleteNoCookie", "1"))
+            appName = cp.core.appConfig.name
+            ArchiveDeleteNoCookie = EncodeBoolean(cp.core.siteproperties.getText("ArchiveDeleteNoCookie", "1"))
             DataSourceType = cp.core.db.db_GetDataSourceType("default")
             TimeoutSave = cp.core.db.db_SQLCommandTimeout
             cp.core.db.db_SQLCommandTimeout = 1800
@@ -1534,7 +1534,7 @@ ErrorTrap:
             '
             ' Content TextFile types with no controlling record
             '
-            If EncodeBoolean(cp.core.db.siteProperty_getText("ArchiveAllowFileClean", "false")) Then
+            If EncodeBoolean(cp.core.siteproperties.getText("ArchiveAllowFileClean", "false")) Then
                 '
                 Dim DSType As Integer
                 DSType = cp.core.db.db_GetDataSourceType("")
@@ -1551,7 +1551,7 @@ ErrorTrap:
                     FieldName = cp.core.db.db_GetCSText(CS, "FieldName")
                     TableName = cp.core.db.db_GetCSText(CS, "TableName")
                     PathName = TableName & "\" & FieldName
-                    FileList = cp.core.db.cdnFiles.GetFolderFiles(PathName)
+                    FileList = cp.core.cdnFiles.GetFolderFiles(PathName)
                     If FileList.Count > 0 Then
                         On Error Resume Next
                         SQL = "CREATE INDEX temp" & FieldName & " ON " & TableName & " (" & FieldName & ")"
@@ -1563,14 +1563,14 @@ ErrorTrap:
                             VirtualLink = Replace(VirtualFileName, "\", "/")
                             FileSize = file.Length
                             If FileSize = 0 Then
-                                SQL = "update " & TableName & " set " & FieldName & "=null where (" & FieldName & "=" & cp.core.db.db_EncodeSQLText(VirtualFileName) & ")or(" & FieldName & "=" & cp.core.db.db_EncodeSQLText(VirtualLink) & ")"
+                                SQL = "update " & TableName & " set " & FieldName & "=null where (" & FieldName & "=" & cp.core.db.encodeSQLText(VirtualFileName) & ")or(" & FieldName & "=" & cp.core.db.encodeSQLText(VirtualLink) & ")"
                                 Call cp.core.db.executeSql(SQL)
-                                Call cp.core.db.cdnFiles.DeleteFile(VirtualFileName)
+                                Call cp.core.cdnFiles.DeleteFile(VirtualFileName)
                             Else
-                                SQL = "SELECT ID FROM " & TableName & " WHERE (" & FieldName & "=" & cp.core.db.db_EncodeSQLText(VirtualFileName) & ")or(" & FieldName & "=" & cp.core.db.db_EncodeSQLText(VirtualLink) & ")"
+                                SQL = "SELECT ID FROM " & TableName & " WHERE (" & FieldName & "=" & cp.core.db.encodeSQLText(VirtualFileName) & ")or(" & FieldName & "=" & cp.core.db.encodeSQLText(VirtualLink) & ")"
                                 CSTest = cp.core.db.db_openCsSql_rev("default", SQL)
                                 If Not cp.core.db.db_csOk(CSTest) Then
-                                    Call cp.core.db.cdnFiles.DeleteFile(VirtualFileName)
+                                    Call cp.core.cdnFiles.DeleteFile(VirtualFileName)
                                 End If
                                 Call cp.core.db.db_csClose(CSTest)
                             End If
@@ -1742,12 +1742,12 @@ ErrorTrap:
             '
             'VisitArchiveAgeDays = encodeInteger(cp.Core.csv_GetSiteProperty("ArchiveRecordAgeDays", "0"))
             If True Then
-                appName = cp.core.db.config.name
+                appName = cp.core.appConfig.name
                 DeleteBeforeDateSQL = cp.core.db.db_EncodeSQLDate(DeleteBeforeDate)
                 '
                 ' Visits older then archive age
                 '
-                Call AppendClassLog(cp.core.db.config.name, "HouseKeep_App_Daily_RemoveVisitRecords(" & appName & ")", "Deleting visits before [" & DeleteBeforeDateSQL & "]")
+                Call AppendClassLog(cp.core.appConfig.name, "HouseKeep_App_Daily_RemoveVisitRecords(" & appName & ")", "Deleting visits before [" & DeleteBeforeDateSQL & "]")
                 Call cp.core.db_DeleteTableRecordChunks("default", "ccVisits", "(DateAdded<" & DeleteBeforeDateSQL & ")", 1000, 10000)
                 '
                 ' Viewings with visits before the first
@@ -1862,7 +1862,7 @@ ErrorTrap:
             '
             'VisitArchiveAgeDays = encodeInteger(cp.Core.csv_GetSiteProperty("ArchiveRecordAgeDays", "0"))
             If True Then
-                appName = cp.core.db.config.name
+                appName = cp.core.appConfig.name
                 DeleteBeforeDateSQL = cp.core.db.db_EncodeSQLDate(DeleteBeforeDate)
                 '        '
                 '        ' Visits older then archive age
@@ -2066,7 +2066,7 @@ ErrorTrap:
             'Dim AddonInstall As New addonInstallClass
             '
             If BuildVersion < cp.Version Then
-                Call HandleClassInternalError(cp.core.db.config.name, "HouseKeep_VisitSummary", KmaErrorInternal, "Can not summarize analytics until this site's data needs been upgraded.")
+                Call HandleClassInternalError(cp.core.appConfig.name, "HouseKeep_VisitSummary", KmaErrorInternal, "Can not summarize analytics until this site's data needs been upgraded.")
             Else
                 PeriodStart = StartTimeDate
                 If PeriodStart < OldestVisitSummaryWeCareAbout Then
@@ -2277,7 +2277,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call HandleClassTrapError(cp.core.db.config.name, "HouseKeep_VisitSummary", "Trap", True)
+            Call HandleClassTrapError(cp.core.appConfig.name, "HouseKeep_VisitSummary", "Trap", True)
             Err.Clear()
         End Sub
         '
@@ -2310,7 +2310,7 @@ ErrorTrap:
             FileList = cp.core.cluster.clusterFiles.GetFolderFiles(FolderName)
             For Each file As IO.FileInfo In FileList
                 If file.CreationTime < LogDate Then
-                    cp.core.db.privateFiles.DeleteFile(FolderName & "\" & file.Name)
+                    cp.core.privateFiles.DeleteFile(FolderName & "\" & file.Name)
                 End If
             Next
             '
@@ -2346,17 +2346,17 @@ ErrorTrap:
             Dim FileArrayPointer As Integer
             Dim FileSplit() As String
             '
-            Call AppendClassLog(cp.core.db.config.name, "HouseKeep_App_Daily_LogFolder(" & cp.core.db.config.name & ")", "Deleting files from folder [" & FolderName & "] older than " & LastMonth)
-            FileList = cp.core.db.privateFiles.GetFolderFiles(FolderName)
+            Call AppendClassLog(cp.core.appConfig.name, "HouseKeep_App_Daily_LogFolder(" & cp.core.appConfig.name & ")", "Deleting files from folder [" & FolderName & "] older than " & LastMonth)
+            FileList = cp.core.privateFiles.GetFolderFiles(FolderName)
             For Each file As IO.FileInfo In FileList
                 If file.CreationTime < LastMonth Then
-                    Call cp.core.db.privateFiles.DeleteFile(FolderName & "/" & file.Name)
+                    Call cp.core.privateFiles.DeleteFile(FolderName & "/" & file.Name)
                 End If
             Next
             Exit Sub
             '
 ErrorTrap:
-            Call HandleClassTrapError(cp.core.db.config.name, "HouseKeepLogFolder", "Trap", True)
+            Call HandleClassTrapError(cp.core.appConfig.name, "HouseKeepLogFolder", "Trap", True)
             Err.Clear()
         End Sub
         '
@@ -2389,19 +2389,19 @@ ErrorTrap:
                                             '
                                             ' Read in the interfaces and save to Add-ons
                                             '
-                                            Call cp.core.db.privateFiles.SaveFile("config\VisitNameList.txt", Copy)
+                                            Call cp.core.privateFiles.SaveFile("config\VisitNameList.txt", Copy)
                                             'Call cp.Core.app.privateFiles.SaveFile(getAppPath & "\config\DefaultBotNameList.txt", copy)
                                         Case "masteremailbouncefilters"
                                             '
                                             ' save the updated filters file
                                             '
-                                            Call cp.core.db.privateFiles.SaveFile("config\EmailBounceFilters.txt", Copy)
+                                            Call cp.core.privateFiles.SaveFile("config\EmailBounceFilters.txt", Copy)
                                             'Call cp.Core.app.privateFiles.SaveFile(getAppPath & "\cclib\config\Filters.txt", copy)
                                         Case "mastermobilebrowserlist"
                                             '
                                             ' save the updated filters file
                                             '
-                                            Call cp.core.db.privateFiles.SaveFile("config\MobileBrowserList.txt", Copy)
+                                            Call cp.core.privateFiles.SaveFile("config\MobileBrowserList.txt", Copy)
                                     End Select
                                 Next
                             End With
@@ -2535,7 +2535,7 @@ ErrorTrap:
 
             '
             If BuildVersion < cp.Version Then
-                Call HandleClassInternalError(cp.core.db.config.name, "HouseKeep_PageViewSummary", KmaErrorInternal, "Can not summarize analytics until this site's data needs been upgraded.")
+                Call HandleClassInternalError(cp.core.appConfig.name, "HouseKeep_PageViewSummary", KmaErrorInternal, "Can not summarize analytics until this site's data needs been upgraded.")
             Else
                 PeriodStart = StartTimeDate
                 If PeriodStart < OldestVisitSummaryWeCareAbout Then
@@ -2590,7 +2590,7 @@ ErrorTrap:
                         '
                         ' no hits found - add or update a single record for this day so we know it has been calculated
                         '
-                        CS = cp.core.db.db_csOpen("Page View Summary", "(timeduration=" & HourDuration & ")and(DateNumber=" & DateNumber & ")and(TimeNumber=" & TimeNumber & ")and(pageid=" & PageID & ")and(pagetitle=" & cp.core.db.db_EncodeSQLText(PageTitle) & ")")
+                        CS = cp.core.db.db_csOpen("Page View Summary", "(timeduration=" & HourDuration & ")and(DateNumber=" & DateNumber & ")and(TimeNumber=" & TimeNumber & ")and(pageid=" & PageID & ")and(pagetitle=" & cp.core.db.encodeSQLText(PageTitle) & ")")
                         If Not cp.core.db.db_csOk(CS) Then
                             Call cp.core.db.db_csClose(CS)
                             CS = cp.core.db.db_csInsertRecord("Page View Summary")
@@ -2628,7 +2628,7 @@ ErrorTrap:
                                 & " and((h.ExcludeFromAnalytics is null)or(h.ExcludeFromAnalytics=0))" _
                                 & ""
                             If PageTitle <> "" Then
-                                baseCriteria = baseCriteria & "and(h.pagetitle=" & cp.core.db.db_EncodeSQLText(PageTitle) & ")"
+                                baseCriteria = baseCriteria & "and(h.pagetitle=" & cp.core.db.encodeSQLText(PageTitle) & ")"
                             End If
                             '
                             ' Total Page Views
@@ -2704,7 +2704,7 @@ ErrorTrap:
                             '
                             ' Add or update the Visit Summary Record
                             '
-                            CS = cp.core.db.db_csOpen("Page View Summary", "(timeduration=" & HourDuration & ")and(DateNumber=" & DateNumber & ")and(TimeNumber=" & TimeNumber & ")and(pageid=" & PageID & ")and(pagetitle=" & cp.core.db.db_EncodeSQLText(PageTitle) & ")")
+                            CS = cp.core.db.db_csOpen("Page View Summary", "(timeduration=" & HourDuration & ")and(DateNumber=" & DateNumber & ")and(TimeNumber=" & TimeNumber & ")and(pageid=" & PageID & ")and(pagetitle=" & cp.core.db.encodeSQLText(PageTitle) & ")")
                             If Not cp.core.db.db_csOk(CS) Then
                                 Call cp.core.db.db_csClose(CS)
                                 CS = cp.core.db.db_csInsertRecord("Page View Summary")
@@ -2744,7 +2744,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call HandleClassTrapError(cp.Core.db.config.name, "HouseKeep_PageViewSummary", "Trap", True)
+            Call HandleClassTrapError(cp.Core.appConfig.name, "HouseKeep_PageViewSummary", "Trap", True)
             Err.Clear()
         End Sub
         '
@@ -2778,7 +2778,7 @@ ErrorTrap:
                 '
                 Dim loadOK As Boolean = True
                 Try
-                    collectionFileFilename = cp.core.db.getAddonPath & "Collections.xml"
+                    collectionFileFilename = cp.core.getAddonPath & "Collections.xml"
                     Call Doc.LoadXml(collectionFileFilename)
                 Catch ex As Exception
                     'hint = hint & ",parse error"
@@ -2849,11 +2849,11 @@ ErrorTrap:
                                             '
                                         Else
                                             CollectionRootPath = Left(CollectionRootPath, Pos - 1)
-                                            Path = cp.core.db.getAddonPath() & "\" & CollectionRootPath & "\"
+                                            Path = cp.core.getAddonPath() & "\" & CollectionRootPath & "\"
                                             'Path = GetProgramPath & "\addons\" & CollectionRootPath & "\"
                                             'On Error Resume Next
-                                            If cp.core.db.privateFiles.checkPath(Path) Then
-                                                FolderList = cp.core.db.privateFiles.getFolders(Path)
+                                            If cp.core.privateFiles.checkPath(Path) Then
+                                                FolderList = cp.core.privateFiles.getFolders(Path)
                                                 If Err.Number <> 0 Then
                                                     Err.Clear()
                                                 End If
@@ -2913,7 +2913,7 @@ ErrorTrap:
                                                         Else
                                                             If FolderPtr < (FolderList.Count - 3) Then
                                                                 Call AppendClassLog("Server", "RegisterAddonFolder", "....Deleting path because non-active and not one of the newest 2 [" & Path & dir.Name & "]")
-                                                                Call cp.core.db.privateFiles.DeleteFileFolder(Path & dir.Name)
+                                                                Call cp.core.privateFiles.DeleteFileFolder(Path & dir.Name)
                                                             End If
                                                         End If
                                                     End If

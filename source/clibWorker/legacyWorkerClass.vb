@@ -986,7 +986,7 @@ Namespace Contensive
                                 Else
                                     'fs = New fileSystemClass
                                     'Call cpCore.app.publicFiles.DeleteFile(DstFile)
-                                    Call cpCore.db.appRootFiles.copyFile(SrcFile, DstFile)
+                                    Call cpCore.appRootFiles.copyFile(SrcFile, DstFile)
                                     returnString = "ok"
                                 End If
                             End If
@@ -1000,7 +1000,7 @@ Namespace Contensive
                                 returnString = "ERROR: file is empty"
                             Else
                                 'fs = New fileSystemClass
-                                Call cpCore.db.appRootFiles.DeleteFile(File)
+                                Call cpCore.appRootFiles.DeleteFile(File)
                                 returnString = "ok"
                             End If
                             '
@@ -1012,7 +1012,7 @@ Namespace Contensive
                                 returnString = "ERROR: Folder is empty"
                             Else
                                 'fs = New fileSystemClass
-                                Call cpCore.db.appRootFiles.createPath(FolderPath)
+                                Call cpCore.appRootFiles.createPath(FolderPath)
                                 returnString = "ok"
                             End If
                             '
@@ -1024,7 +1024,7 @@ Namespace Contensive
                                 returnString = "ERROR: Folder is empty"
                             Else
                                 'fs = New fileSystemClass
-                                Call cpCore.db.appRootFiles.DeleteFileFolder(FolderPath)
+                                Call cpCore.appRootFiles.DeleteFileFolder(FolderPath)
                                 returnString = "ok"
                             End If
                             '
@@ -1256,7 +1256,7 @@ Namespace Contensive
                     ' permissions issue -- this is a root process - maybe the token will be saved in a configuration file
                     '
                     cpSite = New CPClass(AppName)
-                    If cpSite.core.db.status = applicationStatusEnum.ApplicationStatusReady Then
+                    If cpSite.core.appStatus = applicationStatusEnum.ApplicationStatusReady Then
                         hint &= ",app [" & AppName & "] is running, setup cp and cmc"
                         '
                         ' Execute Processes
@@ -1296,7 +1296,7 @@ Namespace Contensive
                                     '
                                     Call cpSite.core.db.db_setCS(CS, "ProcessRunOnce", False)
                                     Call cpSite.core.db.db_setCS(CS, "ProcessNextRun", NextRun)
-                                    Call addAsyncCmd(cpCore, "runprocess appname=""" & cpSite.core.db.config.name & """ addonid=""" & ProcessID & """", True)
+                                    Call addAsyncCmd(cpCore, "runprocess appname=""" & cpSite.core.appConfig.name & """ addonid=""" & ProcessID & """", True)
                                     'Call addAsyncCmd(cp,"runprocess appname=""" & cpSite.core.appEnvironment.name & """ addonname=""" & ProcessName & """", True)
                                 ElseIf cpSite.core.db.db_GetCSDate(CS, "ProcessNextRun") = Date.MinValue Then
                                     '
@@ -1307,7 +1307,7 @@ Namespace Contensive
                                     '
                                     ' All is OK, triggered on NextRun, Cycle RightNow
                                     '
-                                    Call addAsyncCmd(cpCore, "runprocess appname=""" & cpSite.core.db.config.name & """ addonid=""" & ProcessID & """", True)
+                                    Call addAsyncCmd(cpCore, "runprocess appname=""" & cpSite.core.appConfig.name & """ addonid=""" & ProcessID & """", True)
                                     Call cpSite.core.db.db_setCS(CS, "ProcessNextRun", NextRun)
                                 End If
                                 Call cpSite.core.db.db_csGoNext(CS)

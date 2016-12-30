@@ -146,7 +146,7 @@ Namespace Contensive.Core
         '
         '
         Public Overrides Function EncodeSQLText(ByVal SourceText As String) As String
-            Return cp.core.db.db_EncodeSQLText(SourceText)
+            Return cp.core.db.encodeSQLText(SourceText)
         End Function
         '
         '

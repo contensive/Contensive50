@@ -137,9 +137,9 @@ Namespace Contensive.Core
                     '
                     ' ----- redirect back to the root
                     '
-                    Call cpCore.web_Redirect2(cpCore.db.siteProperty_AdminURL, "Addon Manager, Cancel Button Pressed", False)
+                    Call cpCore.web_Redirect2(cpCore.siteProperties.adminURL, "Addon Manager, Cancel Button Pressed", False)
                 Else
-                    If Not cpCore.user_isAdmin Then
+                    If Not cpCore.user.user_isAdmin Then
                         '
                         ' ----- Put up error message
                         '
@@ -459,15 +459,15 @@ Namespace Contensive.Core
                             ' Reinstall core collection
                             '---------------------------------------------------------------------------------------------
                             '
-                            If cpCore.user_isDeveloper() And cpCore.doc_getBoolean("InstallCore") Then
-                                UpgradeOK = addonInstall.installCollectionFromRemoteRepo("{8DAABAE6-8E45-4CEE-A42C-B02D180E799B}", cpCore.db.config.name, IISResetRequired, RegisterList, ErrorMessage, "", False)
+                            If cpCore.user.user_isDeveloper() And cpCore.doc_getBoolean("InstallCore") Then
+                                UpgradeOK = addonInstall.installCollectionFromRemoteRepo("{8DAABAE6-8E45-4CEE-A42C-B02D180E799B}", cpCore.appConfig.name, IISResetRequired, RegisterList, ErrorMessage, "", False)
                             End If
                             '
                             '---------------------------------------------------------------------------------------------
                             ' Upload new collection files
                             '---------------------------------------------------------------------------------------------
                             '
-                            CollectionFilePathPage = cpCore.web_ProcessFormInputFile2("MetaFile", cpCore.db.privateFiles, InstallFolder)
+                            CollectionFilePathPage = cpCore.web_ProcessFormInputFile2("MetaFile", cpCore.privateFiles, InstallFolder)
                             '
                             ' Process the MetaFile
                             '
@@ -475,15 +475,15 @@ Namespace Contensive.Core
                                 status = status & "<br>Uploaded collection file [" & CollectionFilePathPage & "]"
                                 CollectionFilename = Mid(Replace(CollectionFilePathPage, InstallFolder, ""), 2)
                                 '
-                                cpCore.appendLog("app [" & cpCore.db.config.name & "], Uploading new collection file, member=[#" & cpCore.userId & ", " & cpCore.userName & "], CollectionFilename [" & CollectionFilename & "]")
+                                cpCore.appendLog("app [" & cpCore.appConfig.name & "], Uploading new collection file, member=[#" & cpCore.user.userId & ", " & cpCore.user.userName & "], CollectionFilename [" & CollectionFilename & "]")
                                 '
                                 UploadsCnt = cpCore.web_GetStreamInteger2("UploadCount")
                                 ReDim Uploads(UploadsCnt)
                                 For Ptr = 0 To UploadsCnt - 1
-                                    UploadPathPage = cpCore.web_ProcessFormInputFile2("Upload" & Ptr, cpCore.db.privateFiles, InstallFolder)
+                                    UploadPathPage = cpCore.web_ProcessFormInputFile2("Upload" & Ptr, cpCore.privateFiles, InstallFolder)
                                     If UploadPathPage <> "" Then
                                         Uploads(Ptr) = Mid(Replace(UploadPathPage, InstallFolder, ""), 2)
-                                        Call HandleClassAppendLog("AddonManager", " app=" & cpCore.db.config.name & ", Member=" & cpCore.userName & " (" & cpCore.userId & "), Uploads=" & Uploads(Ptr))
+                                        Call HandleClassAppendLog("AddonManager", " app=" & cpCore.appConfig.name & ", Member=" & cpCore.user.userName & " (" & cpCore.user.userId & "), Uploads=" & Uploads(Ptr))
                                         status = status & "<br>Uploaded collection file [" & Uploads(Ptr) & "]"
                                     End If
                                 Next
@@ -502,7 +502,7 @@ Namespace Contensive.Core
                             Cnt = UBound(LibGuids) + 1
                             For Ptr = 0 To Cnt - 1
                                 RegisterList = ""
-                                UpgradeOK = addonInstall.installCollectionFromRemoteRepo(LibGuids(Ptr), cpCore.db.config.name, IISResetRequired, RegisterList, ErrorMessage, "", False)
+                                UpgradeOK = addonInstall.installCollectionFromRemoteRepo(LibGuids(Ptr), cpCore.appConfig.name, IISResetRequired, RegisterList, ErrorMessage, "", False)
                                 If Not UpgradeOK Then
                                     '
                                     ' block the reset because we will loose the error message
@@ -526,8 +526,8 @@ Namespace Contensive.Core
                         '
                         If AllowInstallFromFolder Then
                             'InstallFolder = cpcore.asv.config.physicalFilePath & InstallFolderName & "\"
-                            If cpCore.db.privateFiles.checkPath(privateFilesInstallPath) Then
-                                UpgradeOK = addonInstall.InstallCollectionFromPrivateFolder(builder, cpCore.db.dataBuildVersion, privateFilesInstallPath, IISResetRequired, cpCore.db.config.name, ErrorMessage, InstalledCollectionGuid, False)
+                            If cpCore.privateFiles.checkPath(privateFilesInstallPath) Then
+                                UpgradeOK = addonInstall.InstallCollectionFromPrivateFolder(builder, cpCore.db.dataBuildVersion, privateFilesInstallPath, IISResetRequired, cpCore.appConfig.name, ErrorMessage, InstalledCollectionGuid, False)
                                 If Not UpgradeOK Then
                                     If ErrorMessage = "" Then
                                         cpCore.error_AddUserError("The Add-on Collection did not install correctly, but no detailed error message was given.")
@@ -540,8 +540,8 @@ Namespace Contensive.Core
                         '
                         ' and delete the install folder if it was created
                         '
-                        If cpCore.db.privateFiles.checkPath(privateFilesInstallPath) Then
-                            Call cpCore.db.privateFiles.DeleteFileFolder(privateFilesInstallPath)
+                        If cpCore.privateFiles.checkPath(privateFilesInstallPath) Then
+                            Call cpCore.privateFiles.DeleteFileFolder(privateFilesInstallPath)
                         End If
                         '
                         ' --------------------------------------------------------------------------------
@@ -549,7 +549,7 @@ Namespace Contensive.Core
                         ' --------------------------------------------------------------------------------
                         '
                         If InstalledCollectionGuid <> "" Then
-                            CS = cpCore.db.db_csOpen("Add-on Collections", GuidFieldName & "=" & cpCore.db.db_EncodeSQLText(InstalledCollectionGuid))
+                            CS = cpCore.db.db_csOpen("Add-on Collections", GuidFieldName & "=" & cpCore.db.encodeSQLText(InstalledCollectionGuid))
                             If cpCore.db.db_csOk(CS) Then
                                 InstalledCollectionID = cpCore.db.db_GetCSInteger(CS, "ID")
                             End If
@@ -584,7 +584,7 @@ Namespace Contensive.Core
                         ' --------------------------------------------------------------------------------
                         '
                         If (InstalledCollectionID <> 0) And (Not cpCore.error_IsUserError) Then
-                            Call cpCore.web_Redirect2(cpCore.db.siteProperty_AdminURL & "?helpcollectionid=" & InstalledCollectionID, "Redirecting to help page after collection installation", False)
+                            Call cpCore.web_Redirect2(cpCore.siteProperties.adminURL & "?helpcollectionid=" & InstalledCollectionID, "Redirecting to help page after collection installation", False)
                         End If
                         '
                         ' --------------------------------------------------------------------------------
@@ -728,7 +728,7 @@ Namespace Contensive.Core
                                                             Cells3(RowPtr, 3) = CollectionDescription & "&nbsp;"
                                                         Else
                                                             IsOnServer = EncodeBoolean(InStr(1, OnServerGuidList, CollectionGuid, vbTextCompare))
-                                                            CS = cpCore.db.db_csOpen("Add-on Collections", GuidFieldName & "=" & cpCore.db.db_EncodeSQLText(CollectionGuid), , , , , , "ID")
+                                                            CS = cpCore.db.db_csOpen("Add-on Collections", GuidFieldName & "=" & cpCore.db.encodeSQLText(CollectionGuid), , , , , , "ID")
                                                             IsOnSite = cpCore.db.db_csOk(CS)
                                                             Call cpCore.db.db_csClose(CS)
                                                             If IsOnSite Then
@@ -827,7 +827,7 @@ Namespace Contensive.Core
                                     ' before system attribute
                                     '
                                     CS = cpCore.db.db_csOpen("Add-on Collections", , "Name")
-                                ElseIf Not cpCore.user_isDeveloper Then
+                                ElseIf Not cpCore.user.user_isDeveloper Then
                                     '
                                     ' non-developers
                                     '
@@ -868,7 +868,7 @@ Namespace Contensive.Core
                                     Call Body.Add("<p>Add-on upload is disabled because your site database needs to be updated.</p>")
                                 Else
                                     Call Body.Add(Adminui.EditTableOpen)
-                                    If cpCore.user_isDeveloper Then
+                                    If cpCore.user.user_isDeveloper Then
                                         Call Body.Add(Adminui.GetEditRow(cpCore.html_GetFormInputCheckBox2("InstallCore"), "Reinstall Core Collection", "", False, False, ""))
                                     End If
                                     Call Body.Add(Adminui.GetEditRow(cpCore.html_GetFormInputFile("MetaFile"), "Add-on Collection File(s)", "", True, False, ""))
@@ -924,9 +924,9 @@ Namespace Contensive.Core
             Dim EntryID As Integer
             '
             If EntryParentID = 0 Then
-                CS = cpCore.db.db_csOpen("Navigator Entries", "(name=" & cpCore.db.db_EncodeSQLText(EntryName) & ")and((parentID is null)or(parentid=0))")
+                CS = cpCore.db.db_csOpen("Navigator Entries", "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and((parentID is null)or(parentid=0))")
             Else
-                CS = cpCore.db.db_csOpen("Navigator Entries", "(name=" & cpCore.db.db_EncodeSQLText(EntryName) & ")and(parentID=" & cpCore.db.db_EncodeSQLNumber(EntryParentID) & ")")
+                CS = cpCore.db.db_csOpen("Navigator Entries", "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(parentID=" & cpCore.db.db_EncodeSQLNumber(EntryParentID) & ")")
             End If
             If cpCore.db.db_csOk(CS) Then
                 EntryID = cpCore.db.db_GetCSInteger(CS, "ID")
@@ -988,7 +988,7 @@ ErrorTrap:
         '
         '
         Private Sub HandleClassAppendLog(ByVal MethodName As String, ByVal Context As String)
-            cpCore.appendLogWithLegacyRow(cpCore.db.config.name, Context, "dll", "AddonManClass", MethodName, 0, "", "", False, True, cpCore.main_ServerLink, "", "")
+            cpCore.appendLogWithLegacyRow(cpCore.appConfig.name, Context, "dll", "AddonManClass", MethodName, 0, "", "", False, True, cpCore.main_ServerLink, "", "")
 
         End Sub
         '
@@ -998,7 +998,7 @@ ErrorTrap:
         '
         Private Sub HandleClassTrapError(ByVal MethodName As String, Optional ByVal Context As String = "context unknown")
             '
-            cpCore.handleLegacyError3(cpCore.db.config.name, Context, "dll", "AddonManClass", MethodName, Err.Number, Err.Source, Err.Description, True, False, cpCore.main_ServerLink)
+            cpCore.handleLegacyError3(cpCore.appConfig.name, Context, "dll", "AddonManClass", MethodName, Err.Number, Err.Source, Err.Description, True, False, cpCore.main_ServerLink)
             '
         End Sub
         '
@@ -1026,14 +1026,14 @@ ErrorTrap:
                     ParentNameSpace = Mid(menuNameSpace, 1, Pos - 1)
                 End If
                 If ParentNameSpace = "" Then
-                    CS = cpCore.db.db_csOpen(ContentName, "(name=" & cpCore.db.db_EncodeSQLText(ParentName) & ")and((parentid is null)or(parentid=0))", "ID", , , , , "ID")
+                    CS = cpCore.db.db_csOpen(ContentName, "(name=" & cpCore.db.encodeSQLText(ParentName) & ")and((parentid is null)or(parentid=0))", "ID", , , , , "ID")
                     If cpCore.db.db_csOk(CS) Then
                         GetParentIDFromNameSpace = cpCore.db.db_GetCSInteger(CS, "ID")
                     End If
                     Call cpCore.db.db_csClose(CS)
                 Else
                     ParentID = GetParentIDFromNameSpace(ContentName, ParentNameSpace)
-                    CS = cpCore.db.db_csOpen(ContentName, "(name=" & cpCore.db.db_EncodeSQLText(ParentName) & ")and(parentid=" & ParentID & ")", "ID", , , , , "ID")
+                    CS = cpCore.db.db_csOpen(ContentName, "(name=" & cpCore.db.encodeSQLText(ParentName) & ")and(parentid=" & ParentID & ")", "ID", , , , , "ID")
                     If cpCore.db.db_csOk(CS) Then
                         GetParentIDFromNameSpace = cpCore.db.db_GetCSInteger(CS, "ID")
                     End If

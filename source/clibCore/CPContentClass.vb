@@ -54,13 +54,13 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetCopy(ByVal CopyName As String, Optional ByVal DefaultContent As String = "") As String
-            GetCopy = cpCore.html_GetContentCopy(CopyName, DefaultContent, cpCore.userId, True, cpCore.user_isAuthenticated)
+            GetCopy = cpCore.html_GetContentCopy(CopyName, DefaultContent, cpCore.user.userId, True, cpCore.user.user_isAuthenticated)
         End Function
         '
         '====================================================================================================
         '
         Public Overrides Function GetCopy(ByVal CopyName As String, ByVal DefaultContent As String, ByVal personalizationPeopleId As Integer) As String
-            GetCopy = cpCore.html_GetContentCopy(CopyName, DefaultContent, personalizationPeopleId, True, cpCore.user_isAuthenticated)
+            GetCopy = cpCore.html_GetContentCopy(CopyName, DefaultContent, personalizationPeopleId, True, cpCore.user.user_isAuthenticated)
         End Function
         '
         '====================================================================================================
@@ -168,7 +168,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function IsLocked(ByVal ContentName As String, ByVal RecordID As String) As Boolean 'Inherits CPContentBaseClass.IsLocked
-            Return cpCore.db.workflow_IsRecordLocked(ContentName, RecordID, 0)
+            Return cpCore.workflow.isRecordLocked(ContentName, RecordID, 0)
         End Function
         '
         '====================================================================================================
@@ -189,25 +189,25 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Sub PublishEdit(ByVal ContentName As String, ByVal RecordID As Integer) 'Inherits CPContentBaseClass.PublishEdit
-            Call cpCore.db.workflow_PublishEdit(ContentName, RecordID, 0)
+            Call cpCore.workflow.publishEdit(ContentName, RecordID, 0)
         End Sub
         '
         '====================================================================================================
         '
         Public Overrides Sub SubmitEdit(ByVal ContentName As String, ByVal RecordID As Integer) 'Inherits CPContentBaseClass.SubmitEdit
-            Call cpCore.db.workflow_PublishEdit(ContentName, RecordID, 0)
+            Call cpCore.workflow.submitEdit2(ContentName, RecordID, 0)
         End Sub
         '
         '====================================================================================================
         '
         Public Overrides Sub AbortEdit(ByVal ContentName As String, ByVal RecordId As Integer) 'Inherits CPContentBaseClass.AbortEdit
-            Call cpCore.db.workflow_AbortEdit(ContentName, RecordId, 0)
+            Call cpCore.workflow.abortEdit2(ContentName, RecordId, 0)
         End Sub
         '
         '====================================================================================================
         '
         Public Overrides Sub ApproveEdit(ByVal ContentName As String, ByVal RecordId As Integer) 'Inherits CPContentBaseClass.ApproveEdit
-            Call cpCore.db.workflow_ApproveEdit(ContentName, RecordId, 0)
+            Call cpCore.workflow.approveEdit(ContentName, RecordId, 0)
         End Sub
         '
         '====================================================================================================

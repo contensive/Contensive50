@@ -172,7 +172,7 @@ Namespace Contensive.Core
             Dim RowBuffer As String = ""
             Dim appName As String
             '
-            appName = cpCore.db.config.name
+            appName = cpCore.appConfig.name
             CS = cpCore.db.db_openCsSql_rev(DataSource, SQL)
             If cpCore.db.db_csOk(CS) Then
                 '
@@ -196,7 +196,7 @@ Namespace Contensive.Core
                 Loop
                 ReDim Preserve FieldNames(FieldNameCnt - 1)
                 If RowBuffer <> "" Then
-                    Call cpCore.db.cdnFiles.appendFile(Filename, Mid(RowBuffer, 2) & vbCrLf)
+                    Call cpCore.cdnFiles.appendFile(Filename, Mid(RowBuffer, 2) & vbCrLf)
                     '
                     ' ----- print out the values
                     '
@@ -213,7 +213,7 @@ Namespace Contensive.Core
                             RowBuffer = RowBuffer & ",""" & Copy & """"
                             'DoEvents()
                         Next
-                        Call cpCore.db.cdnFiles.appendFile(Filename, Mid(RowBuffer, 2) & vbCrLf)
+                        Call cpCore.cdnFiles.appendFile(Filename, Mid(RowBuffer, 2) & vbCrLf)
                         Call cpCore.db.db_csGoNext(CS)
                         'DoEvents()
                     Loop
@@ -249,7 +249,7 @@ ErrorTrap:
             Dim RowBuffer As String
             Dim appName As String
             '
-            appName = cpCore.db.config.name
+            appName = cpCore.appConfig.name
             CS = cpCore.db.db_openCsSql_rev(DataSource, SQL)
             If cpCore.db.db_csOk(CS) Then
                 '
@@ -272,7 +272,7 @@ ErrorTrap:
                 FieldNameCnt = FieldNameCnt - 1
                 ReDim Preserve FieldNames(FieldNameCnt)
                 If FieldNameCnt > 0 Then
-                    Call cpCore.db.cdnFiles.appendFile(Filename, "<Content>" & vbCrLf)
+                    Call cpCore.cdnFiles.appendFile(Filename, "<Content>" & vbCrLf)
                     '
                     ' ----- print out the values
                     '
@@ -293,11 +293,11 @@ ErrorTrap:
                             'DoEvents()
                         Next
                         RowBuffer = RowBuffer & "</Record>"
-                        Call cpCore.db.cdnFiles.appendFile(Filename, RowBuffer & vbCrLf)
+                        Call cpCore.cdnFiles.appendFile(Filename, RowBuffer & vbCrLf)
                         Call cpCore.db.db_csGoNext(CS)
                         'DoEvents()
                     Loop
-                    Call cpCore.db.cdnFiles.appendFile(Filename, "</Content>" & vbCrLf)
+                    Call cpCore.cdnFiles.appendFile(Filename, "</Content>" & vbCrLf)
                 End If
             End If
             '

@@ -99,7 +99,7 @@ namespace Contensive.Core
                                         Console.WriteLine("----------app name: " + app.name);
                                         Console.WriteLine("\tenabled: " + app.enabled);
                                         Console.WriteLine("\tadminRoute: " + app.adminRoute);
-                                        Console.WriteLine("\tappRootPath: " + app.appRootPath);
+                                        Console.WriteLine("\tappRootPath: " + app.appRootFilesPath);
                                         Console.WriteLine("\tprivateFilesPath: " + app.privateFilesPath);
                                         Console.WriteLine("\tcdnFilesPath: " + app.cdnFilesPath);
                                         Console.WriteLine("\tcdnFilesNetprefix: " + app.cdnFilesNetprefix);

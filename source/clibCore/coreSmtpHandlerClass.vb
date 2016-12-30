@@ -121,7 +121,7 @@ Namespace Contensive.Core
                         ' ----- Update Email Result Log
                         '
                         If ResultLogPathPage <> "" Then
-                            Call cpCore.db.appRootFiles.appendFile(ResultLogPathPage, CStr(Now()) & " delivery attempted to " & EmailTo & "," & SendResult & vbCrLf)
+                            Call cpCore.appRootFiles.appendFile(ResultLogPathPage, CStr(Now()) & " delivery attempted to " & EmailTo & "," & SendResult & vbCrLf)
                         End If
                         '
                         ' ----- Update the System Email Log
@@ -182,7 +182,7 @@ Namespace Contensive.Core
             Copy = Copy & EncodeText(BodyMessage)
             Filename = "Out" & CStr(GetRandomInteger()) & ".txt"
             '
-            Call cpCore.db.appRootFiles.SaveFile(iEmailOutPath & Filename, Copy)
+            Call cpCore.appRootFiles.SaveFile(iEmailOutPath & Filename, Copy)
             '
             If Err.Number <> 0 Then
                 Call HandleClassTrapError("AddQueue", True)
@@ -248,13 +248,13 @@ ErrorTrap:
                 iEmailOutPath = "emailout\"
             End If
             '
-            FileList = cpCore.db.appRootFiles.GetFolderFiles(iEmailOutPath)
+            FileList = cpCore.appRootFiles.GetFolderFiles(iEmailOutPath)
             For Each file As IO.FileInfo In FileList
-                Copy = cpCore.db.appRootFiles.ReadFile(iEmailOutPath & Filename)
+                Copy = cpCore.appRootFiles.ReadFile(iEmailOutPath & Filename)
                 '
                 ' No - no way to manage all the files for now. Later work up something
                 'Call cpCore.app.publicFiles.CopyFile(iEmailOutPath & Filename, iEmailOutPath & "sent\" & Filename)
-                cpCore.db.appRootFiles.DeleteFile(iEmailOutPath & Filename)
+                cpCore.appRootFiles.DeleteFile(iEmailOutPath & Filename)
                 '
                 ' Decode the file into the email arguments
                 '

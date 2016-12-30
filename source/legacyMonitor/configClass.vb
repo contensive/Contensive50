@@ -63,11 +63,11 @@ Namespace Contensive
             ' Get config file defaults
             '
             Filename = "config\MonitorConfig.txt"
-            config = cpCore.db.appRootFiles.ReadFile(Filename)
+            config = cpCore.appRootFiles.ReadFile(Filename)
             If config = "" Then
-                config = cpCore.db.appRootFiles.ReadFile("MonitorConfig.txt")
+                config = cpCore.appRootFiles.ReadFile("MonitorConfig.txt")
                 If config <> "" Then
-                    Call cpCore.db.appRootFiles.SaveFile(Filename, config)
+                    Call cpCore.appRootFiles.SaveFile(Filename, config)
                 End If
             End If
             If config <> "" Then
@@ -212,7 +212,7 @@ Namespace Contensive
                 & vbCrLf & "// If there is a problem with one of the sites, the monitor page will diplay information about that error. This code will be sent to the browser (or monitor service) for this page. For instance, '200 OK' represents a good status, '500 Server Error' might represent an error." _
                 & vbCrLf & "//" _
                 & vbCrLf & "httpStatusOnError = " & httpStatusOnError
-            Call cpCore.db.appRootFiles.SaveFile(Filename, config)
+            Call cpCore.appRootFiles.SaveFile(Filename, config)
             '
             Exit Sub
             '

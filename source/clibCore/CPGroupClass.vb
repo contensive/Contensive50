@@ -99,7 +99,7 @@ Namespace Contensive.Core
                 If IsNumeric(GroupNameIdOrGuid) Then
                     returnText = cpCore.db_GetRecordName("groups", EncodeInteger(GroupNameIdOrGuid))
                 Else
-                    Dim sqlCriteria As String = cpCore.db.db_getNameIdOrGuidSqlCriteria(GroupNameIdOrGuid)
+                    Dim sqlCriteria As String = cpCore.db.getNameIdOrGuidSqlCriteria(GroupNameIdOrGuid)
                     Dim cs As CPCSClass = cp.CSNew()
                     If cs.Open("groups", sqlCriteria, , , "name") Then
                         returnText = cs.GetText("name")

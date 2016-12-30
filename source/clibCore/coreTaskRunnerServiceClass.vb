@@ -189,7 +189,7 @@ Namespace Contensive
                     ' query tasks that need to be run
                     '
                     Using cpSite As New CPClass(AppName)
-                        If cpSite.core.db.status = applicationStatusEnum.ApplicationStatusReady Then
+                        If cpSite.core.appStatus = applicationStatusEnum.ApplicationStatusReady Then
                             'hint &= ",app [" & AppName & "] is running, setup cp and cmc"
                             '
                             ' Execute Processes
@@ -203,10 +203,10 @@ Namespace Contensive
                                     recordsRemaining = False
                                     sql = "" _
                                     & vbCrLf & " BEGIN TRANSACTION" _
-                                    & vbCrLf & " update cctasks set cmdRunner=" & cpSite.core.db.db_EncodeSQLText(runnerGuid) & " where id in (select top 1 id from cctasks where (cmdRunner is null)and(datestarted is null))" _
+                                    & vbCrLf & " update cctasks set cmdRunner=" & cpSite.core.db.encodeSQLText(runnerGuid) & " where id in (select top 1 id from cctasks where (cmdRunner is null)and(datestarted is null))" _
                                     & vbCrLf & " COMMIT TRANSACTION"
                                     cpSite.core.db.executeSql(sql)
-                                    CS = cpSite.core.db.db_csOpen("tasks", "(cmdRunner=" & cpSite.core.db.db_EncodeSQLText(runnerGuid) & ")and(datestarted is null)", "id")
+                                    CS = cpSite.core.db.db_csOpen("tasks", "(cmdRunner=" & cpSite.core.db.encodeSQLText(runnerGuid) & ")and(datestarted is null)", "id")
                                     If cpSite.core.db.db_csOk(CS) Then
                                         Dim json As New System.Web.Script.Serialization.JavaScriptSerializer
                                         recordsRemaining = True

@@ -321,7 +321,7 @@ Namespace Contensive.Core
                 '
                 Dim CmdAccumulator As String
                 Dim CS As CPCSBaseClass
-                Dim htmlTools As coreHtmlToolsClass
+                Dim htmlTools As coreHtmlClass
                 Dim argField As String
                 Dim importHead As String
                 Dim argFind As String
@@ -350,7 +350,7 @@ Namespace Contensive.Core
                 Dim trimming As Boolean
                 Dim addonStatusOK As Boolean
                 '
-                htmlTools = New coreHtmlToolsClass(cpCore)
+                htmlTools = New coreHtmlClass(cpCore)
                 '
                 cmdSrc = Trim(cmdSrc)
                 whiteChrs = vbCr & vbLf & vbTab & " "
@@ -626,7 +626,7 @@ Namespace Contensive.Core
                                     End Select
                                 Next
                                 If ArgName <> "" Then
-                                    CmdAccumulator = cpCore.html_GetContentCopy(ArgName, "copy content", cpCore.userId, True, cpCore.user_isAuthenticated)
+                                    CmdAccumulator = cpCore.html_GetContentCopy(ArgName, "copy content", cpCore.user.userId, True, cpCore.user.user_isAuthenticated)
                                 End If
                             Case "opencopy"
                                 '
@@ -646,7 +646,7 @@ Namespace Contensive.Core
                                     End Select
                                 Next
                                 If ArgName <> "" Then
-                                    CmdAccumulator = cpCore.html_GetContentCopy(ArgName, "copy content", cpCore.userId, True, cpCore.user_isAuthenticated)
+                                    CmdAccumulator = cpCore.html_GetContentCopy(ArgName, "copy content", cpCore.user.userId, True, cpCore.user.user_isAuthenticated)
                                 End If
                             Case "openlayout"
                                 '
@@ -667,7 +667,7 @@ Namespace Contensive.Core
                                 Next
                                 If ArgName <> "" Then
                                     'CmdAccumulator = cpCore.main_GetContentCopy(ArgName, "copy content")
-                                    Dim dt As DataTable = cpCore.db.executeSql("select layout from ccLayouts where name=" & cpCore.db.db_EncodeSQLText(ArgName))
+                                    Dim dt As DataTable = cpCore.db.executeSql("select layout from ccLayouts where name=" & cpCore.db.encodeSQLText(ArgName))
                                     If Not (dt Is Nothing) Then
                                         CmdAccumulator = EncodeText(dt.Rows(0).Item("layout"))
                                     End If
@@ -691,7 +691,7 @@ Namespace Contensive.Core
                                     End Select
                                 Next
                                 If ArgName <> "" Then
-                                    CmdAccumulator = cpCore.db.appRootFiles.ReadFile(ArgName)
+                                    CmdAccumulator = cpCore.appRootFiles.ReadFile(ArgName)
                                 End If
                             Case "import"
                                 '
@@ -711,7 +711,7 @@ Namespace Contensive.Core
                                     End Select
                                 Next
                                 If ArgName <> "" Then
-                                    CmdAccumulator = cpCore.db.appRootFiles.ReadFile(ArgName)
+                                    CmdAccumulator = cpCore.appRootFiles.ReadFile(ArgName)
                                     If CmdAccumulator <> "" Then
                                         importHead = GetTagInnerHTML(CmdAccumulator, "head", False)
                                         If importHead <> "" Then
@@ -900,10 +900,10 @@ Namespace Contensive.Core
                                         Case "guid"
                                             ArgGuid = kvp.Value.ToString()
                                         Case Else
-                                            ArgOptionString &= "&" & cpCore.csv_EncodeAddonOptionArgument(EncodeText(kvp.Key.ToString())) & "=" & cpCore.csv_EncodeAddonOptionArgument(EncodeText(kvp.Value.ToString()))
+                                            ArgOptionString &= "&" & encodeNvaArgument(EncodeText(kvp.Key.ToString())) & "=" & encodeNvaArgument(EncodeText(kvp.Value.ToString()))
                                     End Select
                                 Next
-                                ArgOptionString &= "&cmdAccumulator=" & cpCore.csv_EncodeAddonOptionArgument(CmdAccumulator)
+                                ArgOptionString &= "&cmdAccumulator=" & encodeNvaArgument(CmdAccumulator)
                                 ArgOptionString = Mid(ArgOptionString, 2)
                                 CmdAccumulator = cpCore.executeAddon(0, addonName, ArgOptionString, Context, "", 0, "", "", False, 0, "", addonStatusOK, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
                             Case Else
@@ -920,10 +920,10 @@ Namespace Contensive.Core
                                         Case "guid"
                                             ArgGuid = kvp.Value.ToString()
                                         Case Else
-                                            ArgOptionString &= "&" & cpCore.csv_EncodeAddonOptionArgument(EncodeText(kvp.Key)) & "=" & cpCore.csv_EncodeAddonOptionArgument(EncodeText(kvp.Value.ToString()))
+                                            ArgOptionString &= "&" & encodeNvaArgument(EncodeText(kvp.Key)) & "=" & encodeNvaArgument(EncodeText(kvp.Value.ToString()))
                                     End Select
                                 Next
-                                ArgOptionString = ArgOptionString & "&cmdAccumulator=" & cpCore.csv_EncodeAddonOptionArgument(CmdAccumulator)
+                                ArgOptionString = ArgOptionString & "&cmdAccumulator=" & encodeNvaArgument(CmdAccumulator)
                                 ArgOptionString = Mid(ArgOptionString, 2)
                                 CmdAccumulator = cpCore.executeAddon(0, addonName, ArgOptionString, Context, "", 0, "", "", False, 0, "", addonStatusOK, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
                                 'CmdAccumulator = mainOrNothing.ExecuteAddon3(addonName, ArgOptionString, Context)

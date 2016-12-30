@@ -42,8 +42,8 @@ Namespace Contensive.Addons
                 '
                 SaveContent = "" _
                     & Now() _
-                    & vbCrLf & "member.name:" & cpCore.userName _
-                    & vbCrLf & "member.id:" & cpCore.userId _
+                    & vbCrLf & "member.name:" & cpCore.user.userName _
+                    & vbCrLf & "member.id:" & cpCore.user.userId _
                     & vbCrLf & "visit.id:" & cpCore.main_VisitId _
                     & vbCrLf & "url:" & cpCore.main_ServerLink _
                     & vbCrLf & "url source:" & cpCore.web.requestLinkSource
@@ -63,7 +63,7 @@ Namespace Contensive.Addons
                         & vbCrLf & BinaryHeaderString _
                         & vbCrLf
                 End If
-                cpCore.appendLog(SaveContent, "admin", cpCore.db.config.name & "-request-")
+                cpCore.appendLog(SaveContent, "admin", cpCore.appConfig.name & "-request-")
                 '
                 ' main_Get Content
                 '
@@ -105,8 +105,8 @@ Namespace Contensive.Addons
                 '
                 SaveContent &= "" _
                     & Now() _
-                    & vbCrLf & "member.name:" & cpCore.userName _
-                    & vbCrLf & "member.id:" & cpCore.userId _
+                    & vbCrLf & "member.name:" & cpCore.user.userName _
+                    & vbCrLf & "member.id:" & cpCore.user.userId _
                     & vbCrLf & "visit.id:" & cpCore.main_VisitId _
                     & vbCrLf & "url:" & cpCore.main_ServerLink _
                     & vbCrLf & "url source:" & cpCore.web.requestLinkSource _
@@ -222,7 +222,7 @@ Namespace Contensive.Addons
             JavaScriptString = ""
             ContentWatchLoaded = False
             editRecord.Loaded = False
-            UseContentWatchLink = cpCore.db.siteProperty_UseContentWatchLink
+            UseContentWatchLink = cpCore.siteProperties.useContentWatchLink
             Call cpCore.main_AddOnLoadJavascript2("document.getElementsByTagName('BODY')[0].onclick = BodyOnClick;", "Contensive")
             Call cpCore.executeAddon_legacy4(adminCommonAddonGuid)
             '
@@ -236,12 +236,12 @@ leak200:
                 '
                 ' ----- no stream anyway, do nothing
                 '
-            ElseIf Not cpCore.user_isAuthenticated Then
+            ElseIf Not cpCore.user.user_isAuthenticated Then
                 '
                 ' --- must be authenticated to continue
                 '
                 Stream.Add(cpCore.main_GetLoginPage2(False))
-            ElseIf Not cpCore.main_IsContentManager Then
+            ElseIf Not cpCore.user.main_IsContentManager Then
                 '
                 ' --- member must have proper access to continue
                 '
@@ -249,9 +249,9 @@ leak200:
                     & "<p>" & SpanClassAdminNormal _
                     & "You are attempting to enter an area which your account does not have access." _
                     & cr & "<ul class=""ccList"">" _
-                    & cr & "<li class=""ccListItem"">To return to the public web site, use your back button, or <a href=""" & cpCore.db.RootWebPath & """>Click Here</A>." _
-                    & cr & "<li class=""ccListItem"">To login under a different account, <a href=""" & cpCore.db.config.adminRoute & "?method=logout"" rel=""nofollow"">Click Here</A>" _
-                    & cr & "<li class=""ccListItem"">To have your account access changed to include this area, please contact the <a href=""mailto:" & cpCore.db.siteProperty_getText("EmailAdmin") & """>system administrator</A>. " _
+                    & cr & "<li class=""ccListItem"">To return to the public web site, use your back button, or <a href=""" & cpCore.appConfig.appRootFilesPath & """>Click Here</A>." _
+                    & cr & "<li class=""ccListItem"">To login under a different account, <a href=""" & cpCore.appConfig.adminRoute & "?method=logout"" rel=""nofollow"">Click Here</A>" _
+                    & cr & "<li class=""ccListItem"">To have your account access changed to include this area, please contact the <a href=""mailto:" & cpCore.siteProperties.getText("EmailAdmin") & """>system administrator</A>. " _
                     & cr & "</ul>" _
                     & "</span></p>" _
                     & ""
@@ -300,7 +300,7 @@ leak200:
                 '-------------------------------------------------------------------------------
                 '
                 If editRecord.id <> 0 Then
-                    Call cpCore.db_ClearEditLock(AdminContent.Name, editRecord.id)
+                    Call cpCore.workflow.ClearEditLock(AdminContent.Name, editRecord.id)
                 End If
                 '
                 If (AdminForm < 1) Then
@@ -504,16 +504,16 @@ leak200:
                             Call cpCore.web_addRefreshQueryString("addonguid", AddonGuid)
                             '$$$$$ cache this
                             If True Then ' 3.4.060" Then
-                                CS = cpCore.db.db_csOpen("Add-ons", "ccguid=" & cpCore.db.db_EncodeSQLText(AddonGuid))
+                                CS = cpCore.db.db_csOpen("Add-ons", "ccguid=" & cpCore.db.encodeSQLText(AddonGuid))
                             Else
-                                CS = cpCore.db.db_csOpen("Add-ons", "aoguid=" & cpCore.db.db_EncodeSQLText(AddonGuid))
+                                CS = cpCore.db.db_csOpen("Add-ons", "aoguid=" & cpCore.db.encodeSQLText(AddonGuid))
                             End If
                             If Not cpCore.db.db_csOk(CS) Then
                                 Call cpCore.error_AddUserError("The Add-on you requested could not be found by its guid " & AddonGuid)
                             End If
                         ElseIf AddonName <> "" Then
                             Call cpCore.web_addRefreshQueryString("addonname", AddonName)
-                            CS = cpCore.db.db_csOpen("Add-ons", "name=" & cpCore.db.db_EncodeSQLText(AddonName))
+                            CS = cpCore.db.db_csOpen("Add-ons", "name=" & cpCore.db.encodeSQLText(AddonName))
                             If Not cpCore.db.db_csOk(CS) Then
                                 Call cpCore.error_AddUserError("The Add-on you requested could not be found by its name " & AddonName)
                             End If
@@ -665,7 +665,7 @@ ErrorTrap:
             UserAllowContentEdit = True
             UserAllowContentAdd = True
             UserAllowContentDelete = True
-            If Not cpCore.user_isAdmin() Then
+            If Not cpCore.user.user_isAdmin() Then
                 If (adminContent.Id > 0) Then
                     UserAllowContentEdit = userHasContentAccess(adminContent.Id)
                 End If
@@ -750,14 +750,14 @@ ErrorTrap:
             '
             AdminMenuModeID = cpCore.web_GetStreamInteger2("mm")
             If AdminMenuModeID = 0 Then
-                AdminMenuModeID = cpCore.user_adminMenuModeID
+                AdminMenuModeID = cpCore.user.user_adminMenuModeID
             End If
             If AdminMenuModeID = 0 Then
                 AdminMenuModeID = AdminMenuModeLeft
             End If
-            If cpCore.user_adminMenuModeID <> AdminMenuModeID Then
-                cpCore.user_adminMenuModeID = AdminMenuModeID
-                Call cpCore.user_SaveMember()
+            If cpCore.user.user_adminMenuModeID <> AdminMenuModeID Then
+                cpCore.user.user_adminMenuModeID = AdminMenuModeID
+                Call cpCore.user.user_SaveMember()
             End If
             '    '
             '    ' ----- FieldName
@@ -987,7 +987,7 @@ ErrorTrap:
                                 If cpCore.main_GetStreamBoolean2("Row" & RowPtr) Then
                                     RecordID = cpCore.web_GetStreamInteger2("RowID" & RowPtr)
                                     ContentName = cpCore.doc_getText("RowContentName" & RowPtr)
-                                    Call cpCore.workflow_PublishEdit(ContentName, RecordID)
+                                    Call cpCore.workflow.publishEdit(ContentName, RecordID)
                                     Call cpCore.main_ProcessSpecialCaseAfterSave(False, ContentName, RecordID, "", 0, UseContentWatchLink)
                                     Call cpCore.cache.invalidateTagList2(ContentName)
                                     Call cpCore.db.executeSql("delete from ccAuthoringControls where recordid=" & RecordID & " and Contentid=" & cpCore.main_GetContentID(ContentName))
@@ -1003,7 +1003,7 @@ ErrorTrap:
                                 RecordID = cpCore.db.db_GetCSInteger(CS, "RecordID")
                                 ContentName = cpCore.main_GetContentNameByID(ContentID)
                                 If ContentName <> "" Then
-                                    Call cpCore.workflow_PublishEdit(ContentName, RecordID)
+                                    Call cpCore.workflow.publishEdit(ContentName, RecordID)
                                     Call cpCore.main_ProcessSpecialCaseAfterSave(False, ContentName, RecordID, "", 0, UseContentWatchLink)
                                     Call cpCore.cache.invalidateTagList2(ContentName)
                                 End If
@@ -1024,7 +1024,7 @@ ErrorTrap:
                                 If Not cpCore.error_IsUserError Then
                                     'no - if WF, on process on publish
                                     'Call ProcessSpecialCaseAfterSave(false,AdminContent.Name, EditRecord.ID, EditRecord.Name, EditRecord.ParentID, UseContentWatchLink)
-                                    Call cpCore.workflow_ApproveEdit(adminContent.Name, editRecord.id)
+                                    Call cpCore.workflow.approveEdit(adminContent.Name, editRecord.id)
                                 Else
                                     AdminForm = AdminSourceForm
                                 End If
@@ -1043,7 +1043,7 @@ ErrorTrap:
                                 If Not cpCore.error_IsUserError Then
                                     'no - if WF, on process on publish
                                     'Call ProcessSpecialCaseAfterSave(false,AdminContent.Name, EditRecord.ID, EditRecord.Name, EditRecord.ParentID, UseContentWatchLink)
-                                    Call cpCore.main_SubmitEdit(adminContent.Name, editRecord.id)
+                                    Call cpCore.workflow.main_SubmitEdit(adminContent.Name, editRecord.id)
                                     Call cpCore.pageManager_SendPublishSubmitNotice(adminContent.Name, editRecord.id, editRecord.nameLc)
                                 Else
                                     AdminForm = AdminSourceForm
@@ -1058,7 +1058,7 @@ ErrorTrap:
                             Call LoadEditResponse(adminContent, editRecord)
                             Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
                             If Not cpCore.error_IsUserError Then
-                                Call cpCore.workflow_PublishEdit(adminContent.Name, editRecord.id)
+                                Call cpCore.workflow.publishEdit(adminContent.Name, editRecord.id)
                                 CS = cpCore.db_csOpen(adminContent.Name, editRecord.id)
                                 Dim IsDeleted As Boolean
                                 IsDeleted = Not cpCore.db.db_csOk(CS)
@@ -1072,7 +1072,7 @@ ErrorTrap:
                             '
                             ' --- copy live record over edit record
                             '
-                            Call cpCore.workflow_AbortEdit(adminContent.Name, editRecord.id)
+                            Call cpCore.workflow.abortEdit2(adminContent.Name, editRecord.id, cpCore.user.userId)
                             Call cpCore.main_ProcessSpecialCaseAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                             If MenuDepth > 0 Then
                                 '
@@ -1162,7 +1162,7 @@ ErrorTrap:
                                 Call LoadEditRecord(adminContent, editRecord)
                                 Call LoadEditResponse(adminContent, editRecord)
                                 Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
-                                If Not (adminContent.AllowWorkflowAuthoring And cpCore.db.siteProperty_AllowWorkflowAuthoring) Then
+                                If Not (adminContent.AllowWorkflowAuthoring And cpCore.siteProperties.allowWorkflowAuthoring) Then
                                     Call cpCore.main_ProcessSpecialCaseAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                                 End If
                             End If
@@ -1178,7 +1178,7 @@ ErrorTrap:
                                 Call LoadEditRecord(adminContent, editRecord)
                                 Call LoadEditResponse(adminContent, editRecord)
                                 Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
-                                If Not (adminContent.AllowWorkflowAuthoring And cpCore.db.siteProperty_AllowWorkflowAuthoring) Then
+                                If Not (adminContent.AllowWorkflowAuthoring And cpCore.siteProperties.allowWorkflowAuthoring) Then
                                     Call cpCore.main_ProcessSpecialCaseAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                                 End If
                                 editRecord.id = 0
@@ -1201,7 +1201,7 @@ ErrorTrap:
                                     Call LoadEditRecord(adminContent, editRecord)
                                     Call LoadEditResponse(adminContent, editRecord)
                                     Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
-                                    If Not (adminContent.AllowWorkflowAuthoring And cpCore.db.siteProperty_AllowWorkflowAuthoring) Then
+                                    If Not (adminContent.AllowWorkflowAuthoring And cpCore.siteProperties.allowWorkflowAuthoring) Then
                                         Call cpCore.main_ProcessSpecialCaseAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                                     End If
                                     Call ProcessActionDuplicate(adminContent, editRecord)
@@ -1221,7 +1221,7 @@ ErrorTrap:
                                 Call LoadEditRecord(adminContent, editRecord)
                                 Call LoadEditResponse(adminContent, editRecord)
                                 Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
-                                If Not (adminContent.AllowWorkflowAuthoring And cpCore.db.siteProperty_AllowWorkflowAuthoring) Then
+                                If Not (adminContent.AllowWorkflowAuthoring And cpCore.siteProperties.allowWorkflowAuthoring) Then
                                     Call cpCore.main_ProcessSpecialCaseAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                                 End If
                                 If Not cpCore.error_IsUserError Then
@@ -1282,7 +1282,7 @@ ErrorTrap:
                                 Call LoadEditRecord(adminContent, editRecord)
                                 Call LoadEditResponse(adminContent, editRecord)
                                 Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
-                                If Not (adminContent.AllowWorkflowAuthoring And cpCore.db.siteProperty_AllowWorkflowAuthoring) Then
+                                If Not (adminContent.AllowWorkflowAuthoring And cpCore.siteProperties.allowWorkflowAuthoring) Then
                                     Call cpCore.main_ProcessSpecialCaseAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                                 End If
                                 If Not cpCore.error_IsUserError Then
@@ -1313,7 +1313,7 @@ ErrorTrap:
                                 Call LoadEditRecord(adminContent, editRecord)
                                 Call LoadEditResponse(adminContent, editRecord)
                                 Call ProcessActionSave(adminContent, editRecord, UseContentWatchLink)
-                                If Not (adminContent.AllowWorkflowAuthoring And cpCore.db.siteProperty_AllowWorkflowAuthoring) Then
+                                If Not (adminContent.AllowWorkflowAuthoring And cpCore.siteProperties.allowWorkflowAuthoring) Then
                                     Call cpCore.main_ProcessSpecialCaseAfterSave(False, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
                                 End If
                                 '
@@ -1358,11 +1358,11 @@ ErrorTrap:
                                             '
                                             If LCase(adminContent.ContentTableName) = "ccpagecontent" Then
                                                 Call cpCore.pageManager_cache_pageContent_removeRow(RecordID, False, False)
-                                                If RecordID = (cpCore.db.siteProperty_getinteger("PageNotFoundPageID", 0)) Then
-                                                    Call cpCore.db.siteProperty_getText("PageNotFoundPageID", "0")
+                                                If RecordID = (cpCore.siteProperties.getinteger("PageNotFoundPageID", 0)) Then
+                                                    Call cpCore.siteProperties.getText("PageNotFoundPageID", "0")
                                                 End If
-                                                If RecordID = (cpCore.db.siteProperty_getinteger("LandingPageID", 0)) Then
-                                                    Call cpCore.db.siteProperty_getText("LandingPageID", "0")
+                                                If RecordID = (cpCore.siteProperties.getinteger("LandingPageID", 0)) Then
+                                                    Call cpCore.siteProperties.getText("LandingPageID", "0")
                                                 End If
                                             End If
                                         End If
@@ -1728,10 +1728,10 @@ ErrorTrap:
                 ' ----- Set Edit Lock
                 '
                 If editRecord.id <> 0 Then
-                    editRecord.EditLock = cpCore.db_GetEditLockStatus(adminContent.Name, editRecord.id)
+                    editRecord.EditLock = cpCore.workflow.GetEditLockStatus(adminContent.Name, editRecord.id)
                     If editRecord.EditLock Then
-                        editRecord.EditLockMemberName = cpCore.db_GetEditLockMemberName(adminContent.Name, editRecord.id)
-                        editRecord.EditLockExpires = cpCore.db_GetEditLockDateExpires(adminContent.Name, editRecord.id)
+                        editRecord.EditLockMemberName = cpCore.workflow.GetEditLockMemberName(adminContent.Name, editRecord.id)
+                        editRecord.EditLockExpires = cpCore.workflow.GetEditLockDateExpires(adminContent.Name, editRecord.id)
                     End If
                 End If
                 '
@@ -1744,7 +1744,7 @@ ErrorTrap:
                 ' ----- Set Read Only: if non-developer tries to edit a developer record
                 '
                 If UCase(adminContent.ContentTableName) = UCase("ccMembers") Then
-                    If Not cpCore.user_isDeveloper Then
+                    If Not cpCore.user.user_isDeveloper Then
                         If editRecord.fieldsLc.ContainsKey("developer") Then
                             If EncodeBoolean(editRecord.fieldsLc.Item("developer").value) Then
                                 editRecord.Read_Only = True
@@ -1758,7 +1758,7 @@ ErrorTrap:
                 ' ----- Now make sure this record is locked from anyone else
                 '
                 If Not (editRecord.Read_Only) Then
-                    Call cpCore.main_SetEditLock(adminContent.Name, editRecord.id)
+                    Call cpCore.workflow.SetEditLock(adminContent.Name, editRecord.id)
                 End If
                 editRecord.Loaded = True
             End If
@@ -1891,11 +1891,11 @@ ErrorTrap:
                             '    .readonlyfield = True
                             '    .Required = False
                             Case "MODIFIEDBY"
-                                editrecord.fieldsLc(field.nameLc).value = cpCore.userId
+                                editrecord.fieldsLc(field.nameLc).value = cpCore.user.userId
                                 '    .readonlyfield = True
                                 '    .Required = False
                             Case "CREATEDBY"
-                                editrecord.fieldsLc(field.nameLc).value = cpCore.userId
+                                editrecord.fieldsLc(field.nameLc).value = cpCore.user.userId
                                 '    .readonlyfield = True
                                 '    .Required = False
                                 'Case "DATEADDED"
@@ -2037,7 +2037,7 @@ ErrorTrap:
                     '##### if not workflow authoring, just point them both to the same data
                     '##### that way throughout the code, just use the appropriate CS, and the data works
                     'CSLiveRecord = -1
-                    WorkflowAuthoring = cpCore.db.siteProperty_AllowWorkflowAuthoring And adminContent.AllowWorkflowAuthoring
+                    WorkflowAuthoring = cpCore.siteProperties.allowWorkflowAuthoring And adminContent.AllowWorkflowAuthoring
                     If WorkflowAuthoring Then
                         '
                         ' 32467-852: check for duplicate edit records
@@ -2256,21 +2256,21 @@ ErrorTrap:
                 '
                 If AllowAdminFieldCheck() And (FormFieldListToBeLoaded <> ",") Then
                     Call cpCore.error_AddUserError("There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The following fields where Not found [" & Mid(FormFieldListToBeLoaded, 2, Len(FormFieldListToBeLoaded) - 2) & "].")
-                    cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.db.config.name & ", There were fields In the fieldlist sent out To the browser that did Not Return, [" & Mid(FormFieldListToBeLoaded, 2, Len(FormFieldListToBeLoaded) - 2) & "]")
+                    cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.appConfig.name & ", There were fields In the fieldlist sent out To the browser that did Not Return, [" & Mid(FormFieldListToBeLoaded, 2, Len(FormFieldListToBeLoaded) - 2) & "]")
                 Else
                     '
                     ' if page content, check for the 'pagenotfound','landingpageid' checkboxes in control tab
                     '
                     If LCase(adminContent.ContentTableName) = "ccpagecontent" Then
                         '
-                        PageNotFoundPageID = (cpCore.db.siteProperty_getinteger("PageNotFoundPageID", 0))
+                        PageNotFoundPageID = (cpCore.siteProperties.getinteger("PageNotFoundPageID", 0))
                         If cpCore.main_GetStreamBoolean2("PageNotFound") Then
                             editRecord.SetPageNotFoundPageID = True
                         ElseIf editRecord.id = PageNotFoundPageID Then
-                            Call cpCore.db.siteProperty_set("PageNotFoundPageID", "0")
+                            Call cpCore.siteProperties.setProperty("PageNotFoundPageID", "0")
                         End If
                         '
-                        LandingPageID = (cpCore.db.siteProperty_getinteger("LandingPageID", 0))
+                        LandingPageID = (cpCore.siteProperties.getinteger("LandingPageID", 0))
                         If cpCore.main_GetStreamBoolean2("LandingPageID") Then
                             editRecord.SetLandingPageID = True
                         ElseIf (editRecord.id = 0) Then
@@ -2428,7 +2428,7 @@ ErrorTrap:
                                         '
                                         Call cpCore.error_AddUserError("There has been an Error reading the response from your browser. Please Try again, taking care Not To submit the page until your browser has finished loading. If this Error occurs again, please report this problem To your site administrator. The first Error was [" & FieldName & " Not found]. There may have been others.")
                                     End If
-                                    cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.db.config.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
+                                    cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
                                     Exit Sub
                                 End If
                             End If
@@ -2456,7 +2456,7 @@ ErrorTrap:
                             If AllowAdminFieldCheck() Then
                                 If (Not InResponse) And (Not InEmptyFieldList) Then
                                     Call cpCore.error_AddUserError("There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [" & FieldName & " Not found].")
-                                    cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.db.config.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
+                                    cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
                                     Exit Sub
                                 End If
                             End If
@@ -2483,7 +2483,7 @@ ErrorTrap:
                             If AllowAdminFieldCheck() Then
                                 If (Not InResponse) And (Not InEmptyFieldList) Then
                                     Call cpCore.error_AddUserError("There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [" & FieldName & " Not found].")
-                                    cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.db.config.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
+                                    cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
                                     Exit Sub
                                 End If
                             End If
@@ -2522,12 +2522,12 @@ ErrorTrap:
                                 ' (many to many is handled during save)
                                 '
                                 ResponseFieldValueIsOKToSave = False
-                            ElseIf (.adminOnly) And (Not cpCore.user_isAdmin) Then
+                            ElseIf (.adminOnly) And (Not cpCore.user.user_isAdmin) Then
                                 '
                                 ' non-admin and admin only field, leave current value
                                 '
                                 ResponseFieldValueIsOKToSave = False
-                            ElseIf (.developerOnly) And (Not cpCore.user_isDeveloper) Then
+                            ElseIf (.developerOnly) And (Not cpCore.user.user_isDeveloper) Then
                                 '
                                 ' non-developer and developer only field, leave current value
                                 '
@@ -2554,7 +2554,7 @@ ErrorTrap:
                                 ' Was sent out non-blank, and no response back, flag error and leave the current value to a retry
                                 '
                                 Call cpCore.error_AddUserError("There has been an Error reading the response from your browser. The field [" & .caption & "]" & TabCopy & " was missing. Please Try your change again. If this Error happens repeatedly, please report this problem To your site administrator.")
-                                cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.db.config.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
+                                cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
                                 ResponseFieldValueIsOKToSave = False
                             Else
                                 '
@@ -2753,10 +2753,10 @@ ErrorTrap:
                                 '
                                 If LCase(adminContent.ContentTableName) = "ccmembers" Then
                                     If LCase(.nameLc) = "username" Then
-                                        blockDuplicateUsername = Not (cpCore.db.siteProperty_getBoolean("allowduplicateusername", False))
+                                        blockDuplicateUsername = Not (cpCore.siteProperties.getBoolean("allowduplicateusername", False))
                                     End If
                                     If LCase(.nameLc) = "email" Then
-                                        blockDuplicateEmail = (cpCore.db.siteProperty_getBoolean("allowemaillogin", False))
+                                        blockDuplicateEmail = (cpCore.siteProperties.getBoolean("allowemaillogin", False))
                                     End If
                                 End If
                                 If (blockDuplicateUsername Or blockDuplicateEmail Or .UniqueName) And (Not ResponseFieldIsEmpty) Then
@@ -3071,7 +3071,7 @@ ErrorTrap:
             '
             isDupError = False
             If adminContent.fields.ContainsKey("linklalias") Then
-                If cpCore.db.siteProperty_allowLinkAlias Then
+                If cpCore.siteProperties.allowLinkAlias Then
                     'If AdminContent.fields(FieldPtr).Authorable Then
                     'If Not AdminContent.fields(FieldPtr).Authorable Then
                     linkAlias = cpCore.doc_getText("linkalias")
@@ -3085,9 +3085,9 @@ ErrorTrap:
                     End If
                     If (linkAlias <> "") Then
                         If OverRideDuplicate Then
-                            Call cpCore.db.executeSql("update " & adminContent.ContentTableName & " set linkalias=null where ( linkalias=" & cpCore.db.db_EncodeSQLText(linkAlias) & ") and (id<>" & editRecord.id & ")")
+                            Call cpCore.db.executeSql("update " & adminContent.ContentTableName & " set linkalias=null where ( linkalias=" & cpCore.db.encodeSQLText(linkAlias) & ") and (id<>" & editRecord.id & ")")
                         Else
-                            CS = cpCore.db.db_csOpen(adminContent.Name, "( linkalias=" & cpCore.db.db_EncodeSQLText(linkAlias) & ")and(id<>" & editRecord.id & ")and(editsourceid is null)")
+                            CS = cpCore.db.db_csOpen(adminContent.Name, "( linkalias=" & cpCore.db.encodeSQLText(linkAlias) & ")and(id<>" & editRecord.id & ")and(editsourceid is null)")
                             If cpCore.db.db_csOk(CS) Then
                                 isDupError = True
                                 Call cpCore.error_AddUserError("The Link Alias you entered can not be used because another record uses this value [" & linkAlias & "]. Enter a different Link Alias, or check the Override Duplicates checkbox in the Link Alias tab.")
@@ -3212,7 +3212,7 @@ ErrorTrap:
                 ' If There is an error, block the save
                 '
                 AdminAction = AdminActionNop
-            ElseIf Not cpCore.main_IsContentManager(adminContent.Name) Then
+            ElseIf Not cpCore.user.main_IsContentManager(adminContent.Name) Then
                 '
                 ' save blocked by BlockCurrentRecord
                 '
@@ -3371,7 +3371,7 @@ ErrorTrap:
                                             Path = Replace(Path, "\", "/")
                                             Path = Replace(Path, "/" & FieldValueText, "")
                                             Call cpCore.db.db_SetCSField(CSEditRecord, FieldName, Filename)
-                                            Call cpCore.web_ProcessFormInputFile2(FieldName, cpCore.db.appRootFiles, Path)
+                                            Call cpCore.web_ProcessFormInputFile2(FieldName, cpCore.appRootFiles, Path)
                                             RecordChanged = True
                                             FieldChanged = True
                                         End If
@@ -3505,18 +3505,18 @@ ErrorTrap:
                     ' ----- Clear/Set PageNotFound
                     '
                     If editRecord.SetPageNotFoundPageID Then
-                        Call cpCore.db.siteProperty_set("PageNotFoundPageID", EncodeText(editRecord.id))
+                        Call cpCore.siteProperties.setProperty("PageNotFoundPageID", EncodeText(editRecord.id))
                     End If
                     '
                     ' ----- Clear/Set LandingPageID
                     '
                     If editRecord.SetLandingPageID Then
-                        Call cpCore.db.siteProperty_set("LandingPageID", EncodeText(editRecord.id))
+                        Call cpCore.siteProperties.setProperty("LandingPageID", EncodeText(editRecord.id))
                     End If
                     '
                     ' ----- clear/set authoring controls
                     '
-                    Call cpCore.db_ClearEditLock(adminContent.Name, editRecord.id)
+                    Call cpCore.workflow.ClearEditLock(adminContent.Name, editRecord.id)
                     '
                     ' ----- if admin content is changed, reload the admincontent data in case this is a save, and not an OK
                     '
@@ -3526,7 +3526,7 @@ ErrorTrap:
                         adminContent = cpCore.metaData.getCdef(editRecord.contentControlId_Name)
                         adminContent.Id = adminContent.Id
                         adminContent.Name = adminContent.Name
-                        AdminContentWorkflowAuthoring = cpCore.db.siteProperty_AllowWorkflowAuthoring And adminContent.AllowWorkflowAuthoring
+                        AdminContentWorkflowAuthoring = cpCore.siteProperties.allowWorkflowAuthoring And adminContent.AllowWorkflowAuthoring
                     End If
                 End If
                 editRecord.Saved = True
@@ -3577,7 +3577,7 @@ ErrorTrap:
                 '
                 ContentName = cpCore.main_GetContentNameByID(ContentID)
                 If ContentName <> "" Then
-                    returnHas = cpCore.main_IsContentManager(ContentName)
+                    returnHas = cpCore.user.main_IsContentManager(ContentName)
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -3660,8 +3660,8 @@ ErrorTrap:
                             ' rw( "n/a" )
                             Filename = cpCore.db.db_GetCS(CS, .nameLc)
                             If Filename <> "" Then
-                                Copy = cpCore.db.cdnFiles.ReadFile(Filename)
-                                Copy = cpCore.html_encodeContent10(Copy, cpCore.userId, "", 0, 0, True, False, False, False, True, False, "", "", IsEmailContent, 0, "", cpCoreClass.addonContextEnum.ContextAdmin, cpCore.user_isAuthenticated, Nothing, cpCore.user_isEditingAnything)
+                                Copy = cpCore.cdnFiles.ReadFile(Filename)
+                                Copy = cpCore.html_encodeContent10(Copy, cpCore.user.userId, "", 0, 0, True, False, False, False, True, False, "", "", IsEmailContent, 0, "", cpCoreClass.addonContextEnum.ContextAdmin, cpCore.user.user_isAuthenticated, Nothing, cpCore.user.user_isEditingAnything)
                                 Stream.Add(Copy)
                             End If
                         Case FieldTypeIdRedirect, FieldTypeIdManyToMany
@@ -3798,7 +3798,7 @@ ErrorTrap:
                 Dim allowSave As Boolean
                 '
                 CustomDescription = ""
-                AllowajaxTabs = (cpCore.db.siteProperty_getBoolean("AllowAjaxEditTabBeta", False))
+                AllowajaxTabs = (cpCore.siteProperties.getBoolean("AllowAjaxEditTabBeta", False))
                 '
                 If (cpCore.error_IsUserError And editRecord.Loaded) Then
                     '
@@ -3876,10 +3876,10 @@ ErrorTrap:
                     '
                     ' Test for 100Mb available in Content Files drive
                     '
-                    If cpCore.db.appRootFiles.getDriveFreeSpace() < 1.0E+8! Then
+                    If cpCore.appRootFiles.getDriveFreeSpace() < 1.0E+8! Then
                         Call cpCore.error_AddUserError("The server drive holding data for this site may not have enough free space to complete this edit operation. If you attempt to save, your data may be lost. Please contact the site administrator.")
                     End If
-                    If cpCore.db.privateFiles.getDriveFreeSpace() < 1.0E+8! Then
+                    If cpCore.privateFiles.getDriveFreeSpace() < 1.0E+8! Then
                         Call cpCore.error_AddUserError("The server drive holding data for this site may not have enough free space to complete this edit operation. If you attempt to save, your data may be lost. Please contact the site administrator.")
                     End If
                 End If
@@ -3935,7 +3935,7 @@ ErrorTrap:
                         ' landing page case
                         '
                         '$$$$$ problem -- could be landing page based on domain, not property
-                        LandingPageID = (cpCore.db.siteProperty_getinteger("LandingPageID", 0))
+                        LandingPageID = (cpCore.siteProperties.getinteger("LandingPageID", 0))
                         If LandingPageID = 0 Then
                             '
                             ' The call generated a user error because the landingpageid could not be determined
@@ -4226,7 +4226,7 @@ ErrorTrap:
                 '
                 Select Case UCase(adminContent.ContentTableName)
                     Case UCase("ccMembers")
-                        If Not (cpCore.user_isAdmin) Then
+                        If Not (cpCore.user.user_isAdmin) Then
                             '
                             ' Must be admin
                             '
@@ -4252,7 +4252,7 @@ ErrorTrap:
                         End If
                     '
                     Case "CCPATHS"
-                        If Not (cpCore.user_isAdmin) Then
+                        If Not (cpCore.user.user_isAdmin) Then
                             '
                             ' Must be admin
                             '
@@ -4283,12 +4283,12 @@ ErrorTrap:
                         ConditionalEmailCID = cpCore.main_GetContentID("Conditional Email")
                         LastSendTestDate = Date.MinValue
                         If True Then ' 3.4.201" Then
-                            AllowEmailSendWithoutTest = (cpCore.db.siteProperty_getBoolean("AllowEmailSendWithoutTest", False))
+                            AllowEmailSendWithoutTest = (cpCore.siteProperties.getBoolean("AllowEmailSendWithoutTest", False))
                             If editRecord.fieldsLc.ContainsKey("lastsendtestdate") Then
                                 LastSendTestDate = EncodeDate(editRecord.fieldsLc("lastsendtestdate").value)
                             End If
                         End If
-                        If Not (cpCore.user_isAdmin) Then
+                        If Not (cpCore.user.user_isAdmin) Then
                             '
                             ' Must be admin
                             '
@@ -4303,7 +4303,7 @@ ErrorTrap:
                             EmailSubmitted = False
                             If editRecord.id <> 0 Then
                                 If editRecord.fieldsLc.ContainsKey("testmemberid") Then
-                                    editRecord.fieldsLc.Item("testmemberid").value = cpCore.userId
+                                    editRecord.fieldsLc.Item("testmemberid").value = cpCore.user.userId
                                 End If
                             End If
                             EditSectionButtonBar = ""
@@ -4312,7 +4312,7 @@ ErrorTrap:
                             Else
                                 EditSectionButtonBar = EditSectionButtonBar & cpCore.html_GetFormButton(ButtonCancel, , , "Return processSubmit(this)")
                             End If
-                            If (AllowDelete) And (cpCore.user_isDeveloper) Then
+                            If (AllowDelete) And (cpCore.user.user_isDeveloper) Then
                                 EditSectionButtonBar = EditSectionButtonBar & cpCore.html_GetFormButton(ButtonDeleteEmail, , , "If(!DeleteCheck())Return False;")
                             End If
                             If (Not EmailSubmitted) And (Not EmailSent) Then
@@ -4327,8 +4327,8 @@ ErrorTrap:
                             Call Stream.Add(EditSectionButtonBar)
                             Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                             Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
-                            Call Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Groups", GetForm_Edit_EmailRules(adminContent, editRecord, editRecord.Read_Only And (Not cpCore.user_isDeveloper)), allowAdminTabs))
-                            Call Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Topics", GetForm_Edit_EmailTopics(adminContent, editRecord, editRecord.Read_Only And (Not cpCore.user_isDeveloper)), allowAdminTabs))
+                            Call Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Groups", GetForm_Edit_EmailRules(adminContent, editRecord, editRecord.Read_Only And (Not cpCore.user.user_isDeveloper)), allowAdminTabs))
+                            Call Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Topics", GetForm_Edit_EmailTopics(adminContent, editRecord, editRecord.Read_Only And (Not cpCore.user.user_isDeveloper)), allowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Bounce&nbsp;Control", GetForm_Edit_EmailBounceStatus(), allowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                             If allowAdminTabs Then
@@ -4343,7 +4343,7 @@ ErrorTrap:
                             EmailSubmitted = False
                             If editRecord.id <> 0 Then
                                 If editRecord.fieldsLc.ContainsKey("testmemberid") Then
-                                    editRecord.fieldsLc.Item("testmemberid").value = cpCore.userId
+                                    editRecord.fieldsLc.Item("testmemberid").value = cpCore.user.userId
                                 End If
                                 If editRecord.fieldsLc.ContainsKey("submitted") Then
                                     EmailSubmitted = EncodeBoolean(editRecord.fieldsLc.Item("submitted").value)
@@ -4397,7 +4397,7 @@ ErrorTrap:
                             EmailSent = False
                             If editRecord.id <> 0 Then
                                 If editRecord.fieldsLc.ContainsKey("testmemberid") Then
-                                    editRecord.fieldsLc.Item("testmemberid").value = cpCore.userId
+                                    editRecord.fieldsLc.Item("testmemberid").value = cpCore.user.userId
                                 End If
                                 If editRecord.fieldsLc.ContainsKey("submitted") Then
                                     EmailSubmitted = EncodeBoolean(editRecord.fieldsLc.Item("submitted").value)
@@ -4442,7 +4442,7 @@ ErrorTrap:
                             Call Stream.Add(EditSectionButtonBar)
                         End If
                     Case "CCCONTENT"
-                        If Not (cpCore.user_isAdmin) Then
+                        If Not (cpCore.user.user_isAdmin) Then
                             '
                             ' Must be admin
                             '
@@ -4688,8 +4688,8 @@ ErrorTrap:
                 '
                 '
                 '
-                Call cpCore.web_Redirect2(cpCore.db.siteProperty_AdminURL, "StaticPublishControl, Cancel Button Pressed", False)
-            ElseIf Not cpCore.user_isAdmin Then
+                Call cpCore.web_Redirect2(cpCore.siteProperties.adminURL, "StaticPublishControl, Cancel Button Pressed", False)
+            ElseIf Not cpCore.user.user_isAdmin Then
                 '
                 '
                 '
@@ -4700,11 +4700,11 @@ ErrorTrap:
                 '
                 ' Set defaults
                 '
-                EDGCreateSnapShot = (cpCore.db.siteProperty_getBoolean("EDGCreateSnapShot", True))
-                EDGPublishToProduction = (cpCore.db.siteProperty_getBoolean("EDGPublishToProduction", True))
-                EDGPublishNow = (cpCore.db.siteProperty_getBoolean("EDGPublishNow"))
-                EDGAuthUsername = cpCore.db.siteProperty_getText("EDGAuthUsername", "")
-                EDGAuthPassword = cpCore.db.siteProperty_getText("EDGAuthPassword", "")
+                EDGCreateSnapShot = (cpCore.siteProperties.getBoolean("EDGCreateSnapShot", True))
+                EDGPublishToProduction = (cpCore.siteProperties.getBoolean("EDGPublishToProduction", True))
+                EDGPublishNow = (cpCore.siteProperties.getBoolean("EDGPublishNow"))
+                EDGAuthUsername = cpCore.siteProperties.getText("EDGAuthUsername", "")
+                EDGAuthPassword = cpCore.siteProperties.getText("EDGAuthPassword", "")
                 '
                 ' Process Requests
                 '
@@ -4714,27 +4714,27 @@ ErrorTrap:
                         ' Save form values
                         '
                         EDGAuthUsername = cpCore.doc_getText("EDGAuthUsername")
-                        Call cpCore.db.siteProperty_set("EDGAuthUsername", EDGAuthUsername)
+                        Call cpCore.siteProperties.setProperty("EDGAuthUsername", EDGAuthUsername)
                         '
                         EDGAuthPassword = cpCore.doc_getText("EDGAuthPassword")
-                        Call cpCore.db.siteProperty_set("EDGAuthPassword", EDGAuthPassword)
+                        Call cpCore.siteProperties.setProperty("EDGAuthPassword", EDGAuthPassword)
                         '
                         EDGCreateSnapShot = cpCore.main_GetStreamBoolean2("EDGCreateSnapShot")
-                        Call cpCore.db.siteProperty_set("EDGCreateSnapShot", EncodeText(EDGCreateSnapShot))
+                        Call cpCore.siteProperties.setProperty("EDGCreateSnapShot", EncodeText(EDGCreateSnapShot))
                         '
                         EDGPublishToProduction = cpCore.main_GetStreamBoolean2("EDGPublishToProduction")
-                        Call cpCore.db.siteProperty_set("EDGPublishToProduction", EncodeText(EDGPublishToProduction))
+                        Call cpCore.siteProperties.setProperty("EDGPublishToProduction", EncodeText(EDGPublishToProduction))
                         '
                         ' Begin Publish
                         '
                         EDGPublishNow = (EDGCreateSnapShot Or EDGPublishToProduction)
-                        Call cpCore.db.siteProperty_set("EDGPublishNow", EncodeText(EDGPublishNow))
+                        Call cpCore.siteProperties.setProperty("EDGPublishNow", EncodeText(EDGPublishNow))
                     Case ButtonAbort
                         '
                         ' Abort Publish
                         '
                         EDGPublishNow = False
-                        Call cpCore.db.siteProperty_set("EDGPublishNow", EncodeText(EDGPublishNow))
+                        Call cpCore.siteProperties.setProperty("EDGPublishNow", EncodeText(EDGPublishNow))
                     Case ButtonRefresh
                         '
                         ' Refresh (no action)
@@ -4752,7 +4752,7 @@ ErrorTrap:
                 '
                 ' ----- activity
                 '
-                Copy = EncodeText(cpCore.db.siteProperty_getText("EDGPublishStatus", "Waiting"))
+                Copy = EncodeText(cpCore.siteProperties.getText("EDGPublishStatus", "Waiting"))
                 Call Content.Add(Adminui.GetEditRow(Copy, "Activity", "", False, False, ""))
                 '
                 ' ----- Pages Found
@@ -4788,7 +4788,7 @@ ErrorTrap:
                     Copy = EncodeText(cpCore.db.db_GetCSInteger(CSPointer, "PagesFound"))
                 End If
                 Call cpCore.db.db_csClose(CSPointer)
-                Call Content.Add(Adminui.GetEditRow("<a href=""" & html_EncodeHTML(cpCore.db.config.adminRoute & "?" & QueryString) & """ target=""_blank"">" & SpanClassAdminNormal & Copy & "</a>", "Bad Links", "", False, False, ""))
+                Call Content.Add(Adminui.GetEditRow("<a href=""" & html_EncodeHTML(cpCore.appConfig.adminRoute & "?" & QueryString) & """ target=""_blank"">" & SpanClassAdminNormal & Copy & "</a>", "Bad Links", "", False, False, ""))
                 '
                 ' ----- Options
                 '
@@ -4935,8 +4935,8 @@ ErrorTrap:
                 '
                 '
                 '
-                Call cpCore.web_Redirect2(cpCore.db.siteProperty_AdminURL, "Admin Publish, Cancel Button Pressed", False)
-            ElseIf Not cpCore.user_isAdmin Then
+                Call cpCore.web_Redirect2(cpCore.siteProperties.adminURL, "Admin Publish, Cancel Button Pressed", False)
+            ElseIf Not cpCore.user.user_isAdmin Then
                 '
                 '
                 '
@@ -5405,7 +5405,7 @@ ErrorTrap:
                                 Caption = "&nbsp;**" & Caption
                             Else
                                 If (LCase(.nameLc) = "email") Then
-                                    If (LCase(adminContent.ContentTableName) = "ccmembers") And ((cpCore.db.siteProperty_getBoolean("allowemaillogin", False))) Then
+                                    If (LCase(adminContent.ContentTableName) = "ccmembers") And ((cpCore.siteProperties.getBoolean("allowemaillogin", False))) Then
                                         Caption = "&nbsp;***" & Caption
                                         needUniqueEmailMessage = True
                                     End If
@@ -5455,7 +5455,7 @@ ErrorTrap:
                             ' Special Case - ccemail table Alloweid should be disabled if siteproperty AllowLinkLogin is false
                             '
                             If LCase(adminContent.ContentTableName) = "ccemail" And LCase(FieldName) = "allowlinkeid" Then
-                                If Not (cpCore.db.siteProperty_getBoolean("AllowLinkLogin", True)) Then
+                                If Not (cpCore.siteProperties.getBoolean("AllowLinkLogin", True)) Then
                                     '.ValueVariant = "0"
                                     FieldValueObject = "0"
                                     FieldReadOnly = True
@@ -5498,8 +5498,8 @@ ErrorTrap:
                                 ' note: &editorFieldType should be deprecated
                                 '
                                 addonOptionString = "" _
-                                    & "editorName=" & cpCore.main_EncodeAddonOptionArgument(FormFieldLCaseName) _
-                                    & "&editorValue=" & cpCore.main_EncodeAddonOptionArgument(FieldValueText) _
+                                    & "editorName=" & encodeNvaArgument(FormFieldLCaseName) _
+                                    & "&editorValue=" & encodeNvaArgument(FieldValueText) _
                                     & "&editorFieldId=" & fieldId _
                                     & "&editorFieldType=" & fieldTypeId _
                                     & "&editorReadOnly=" & editorReadOnly _
@@ -5516,9 +5516,9 @@ ErrorTrap:
 
                                     addonOptionString = addonOptionString _
                                         & "&editorAllowActiveContent=1" _
-                                        & "&editorAddonList=" & cpCore.main_EncodeAddonOptionArgument(editorAddonListJSON) _
-                                        & "&editorStyles=" & cpCore.main_EncodeAddonOptionArgument(styleList) _
-                                        & "&editorStyleOptions=" & cpCore.main_EncodeAddonOptionArgument(styleOptionList) _
+                                        & "&editorAddonList=" & encodeNvaArgument(editorAddonListJSON) _
+                                        & "&editorStyles=" & encodeNvaArgument(styleList) _
+                                        & "&editorStyleOptions=" & encodeNvaArgument(styleOptionList) _
                                         & ""
                                 End If
 
@@ -5579,7 +5579,7 @@ ErrorTrap:
                                     ' ----- Default Editor, Redirect fields (the same for normal/readonly/spelling)
                                     '--------------------------------------------------------------------------------------------
                                     '
-                                    RedirectPath = cpCore.db.config.adminRoute
+                                    RedirectPath = cpCore.appConfig.adminRoute
                                     If .RedirectPath <> "" Then
                                         RedirectPath = .RedirectPath
                                     End If
@@ -5632,7 +5632,7 @@ ErrorTrap:
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
                                             FieldValueText = EncodeText(FieldValueObject)
-                                            NonEncodedLink = cpCore.web.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.db.config.cdnFilesNetprefix, FieldValueText)
+                                            NonEncodedLink = cpCore.web.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, FieldValueText)
                                             EncodedLink = EncodeURL(NonEncodedLink)
                                             EditorString &= (cpCore.html_GetFormInputHidden(FormFieldLCaseName, ""))
                                             If FieldValueText = "" Then
@@ -5893,7 +5893,7 @@ ErrorTrap:
                                             If FieldValueText = "" Then
                                                 EditorString &= (cpCore.html_GetFormInputFile2(FormFieldLCaseName, , "file"))
                                             Else
-                                                NonEncodedLink = cpCore.web.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.db.config.cdnFilesNetprefix, FieldValueText)
+                                                NonEncodedLink = cpCore.web.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, FieldValueText)
                                                 EncodedLink = EncodeURL(NonEncodedLink)
                                                 EditorString &= ("&nbsp;<a href=""http://" & EncodedLink & """ target=""_blank"">" & SpanClassAdminSmall & "[" & GetFilename(FieldValueText) & "]</A>")
                                                 EditorString &= ("&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & cpCore.html_GetFormInputCheckBox2(FormFieldLCaseName & ".DeleteFlag", False))
@@ -6276,7 +6276,7 @@ ErrorTrap:
                             ' field help
                             '------------------------------------------------------------------------------------------------------------
                             '
-                            If cpCore.user_isAdmin Then
+                            If cpCore.user.user_isAdmin Then
                                 '
                                 ' Admin view
                                 '
@@ -6458,7 +6458,7 @@ ErrorTrap:
                     Call LoadContentTrackingResponse(adminContent, editRecord)
                     '        Call LoadAndSaveCalendarEvents
                 End If
-                CSLists = cpCore.db.db_csOpen("Content Watch Lists", "name<>" & cpCore.db.db_EncodeSQLText(""), "ID")
+                CSLists = cpCore.db.db_csOpen("Content Watch Lists", "name<>" & cpCore.db.encodeSQLText(""), "ID")
                 If cpCore.db.db_csOk(CSLists) Then
                     '
                     ' ----- Open the panel
@@ -6504,7 +6504,7 @@ ErrorTrap:
                     If editRecord.Read_Only Then
                         HTMLFieldString = cpCore.main_encodeHTML(ContentWatchLinkLabel)
                     Else
-                        HTMLFieldString = cpCore.main_GetFormInputText2("ContentWatchLinkLabel", ContentWatchLinkLabel, 1, cpCore.db.siteProperty_DefaultFormInputWidth)
+                        HTMLFieldString = cpCore.main_GetFormInputText2("ContentWatchLinkLabel", ContentWatchLinkLabel, 1, cpCore.siteProperties.defaultFormInputWidth)
                         'HTMLFieldString = "<textarea rows=""1"" name=""ContentWatchLinkLabel"" cols=""" & cpCore.app.SiteProperty_DefaultFormInputWidth & """>" & ContentWatchLinkLabel & "</textarea>"
                     End If
                     Call FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Caption", "This caption is displayed on all Content Watch Lists, linked to the location on the web site where this content is displayed. RSS feeds created from Content Watch Lists will use this caption as the record title if not other field is selected in the Content Definition.", False, True, "ContentWatchLinkLabel"))
@@ -6518,7 +6518,7 @@ ErrorTrap:
                     If editRecord.Read_Only Then
                         HTMLFieldString = cpCore.main_encodeHTML(Copy)
                     Else
-                        HTMLFieldString = cpCore.html_GetFormInputDate("ContentWatchExpires", Copy, cpCore.db.siteProperty_DefaultFormInputWidth.ToString)
+                        HTMLFieldString = cpCore.html_GetFormInputDate("ContentWatchExpires", Copy, cpCore.siteProperties.defaultFormInputWidth.ToString)
                         'HTMLFieldString = "<textarea rows=""1"" name=""ContentWatchExpires"" cols=""" & cpCore.app.SiteProperty_DefaultFormInputWidth & """>" & Copy & "</textarea>"
                     End If
                     Call FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Expires", "When this record is included in a What's New list, this record is blocked from the list after this date.", False, False, ""))
@@ -6658,8 +6658,8 @@ ErrorTrap:
                     ' Landing Page
                     '
                     Copy = "If selected, this page will be displayed when a user comes to your website with just your domain name and no other page is requested. This is called your default Landing Page. Only one page on the site can be the default Landing Page. If you want a unique Landing Page for a specific domain name, add it in the 'Domains' content and the default will not be used for that docpCore.main_"
-                    Checked = ((editRecord.id <> 0) And (editRecord.id = (cpCore.db.siteProperty_getinteger("LandingPageID", 0))))
-                    If cpCore.user_isAdmin Then
+                    Checked = ((editRecord.id <> 0) And (editRecord.id = (cpCore.siteProperties.getinteger("LandingPageID", 0))))
+                    If cpCore.user.user_isAdmin Then
                         HTMLFieldString = cpCore.html_GetFormInputCheckBox2("LandingPageID", Checked)
                     Else
                         HTMLFieldString = "<b>" & GetYesNo(Checked) & "</b>" & cpCore.main_GetFormInputHidden("LandingPageID", Checked)
@@ -6670,8 +6670,8 @@ ErrorTrap:
                     ' Page Not Found
                     '
                     Copy = "If selected, this content will be displayed when a page can not be found. Only one page on the site can be marked."
-                    Checked = ((editRecord.id <> 0) And (editRecord.id = (cpCore.db.siteProperty_getinteger("PageNotFoundPageID", 0))))
-                    If cpCore.user_isAdmin Then
+                    Checked = ((editRecord.id <> 0) And (editRecord.id = (cpCore.siteProperties.getinteger("PageNotFoundPageID", 0))))
+                    If cpCore.user.user_isAdmin Then
                         HTMLFieldString = cpCore.html_GetFormInputCheckBox2("PageNotFound", Checked)
                     Else
                         HTMLFieldString = "<b>" & GetYesNo(Checked) & "</b>" & cpCore.main_GetFormInputHidden("PageNotFound", Checked)
@@ -6752,7 +6752,7 @@ ErrorTrap:
                         '
                         ' field is read-only except for developers
                         '
-                        If cpCore.user_isDeveloper() Then
+                        If cpCore.user.user_isDeveloper() Then
                             HTMLFieldString = cpCore.main_GetFormInputText2("ccguid", HTMLFieldString, , , , , False) & ""
                         Else
                             HTMLFieldString = cpCore.main_GetFormInputText2("ccguid", HTMLFieldString, , , , , True) & cpCore.html_GetFormInputHidden("ccguid", HTMLFieldString)
@@ -6775,14 +6775,14 @@ ErrorTrap:
                 '
                 FieldHelp = ""
                 If UCase(adminContent.ContentTableName) = UCase("ccMembers") Then
-                    AllowEID = (cpCore.db.siteProperty_getBoolean("AllowLinkLogin", True)) Or (cpCore.db.siteProperty_getBoolean("AllowLinkRecognize", True))
+                    AllowEID = (cpCore.siteProperties.getBoolean("AllowLinkLogin", True)) Or (cpCore.siteProperties.getBoolean("AllowLinkRecognize", True))
                     If (Not AllowEID) Then
                         HTMLFieldString = "(link login and link recognize are disabled in security preferences)"
                     ElseIf editRecord.id = 0 Then
                         HTMLFieldString = "(available after save)"
                     Else
                         EID = EncodeText(cpCore.security_encodeToken(editRecord.id, cpCore.main_PageStartTime))
-                        If (cpCore.db.siteProperty_getBoolean("AllowLinkLogin", True)) Then
+                        If (cpCore.siteProperties.getBoolean("AllowLinkLogin", True)) Then
                             HTMLFieldString = EID
                             'HTMLFieldString = EID _
                             '            & "<div>Any visitor who hits the site with eid=" & EID & " will be logged in as this member.</div>"
@@ -6816,7 +6816,7 @@ ErrorTrap:
                         '
                         '
                         '
-                        If Not cpCore.user_isAdmin Then
+                        If Not cpCore.user.user_isAdmin Then
                             HTMLFieldString = HTMLFieldString & cpCore.html_GetFormInputHidden("ContentControlID", FieldValueInteger)
                         Else
                             RecordContentName = editRecord.contentControlId_Name
@@ -6856,7 +6856,7 @@ ErrorTrap:
                                 End If
 
                             End If
-                            If cpCore.user_isAdmin() And (LimitContentSelectToThisID = 0) Then
+                            If cpCore.user.user_isAdmin() And (LimitContentSelectToThisID = 0) Then
                                 '
                                 ' administrator, and either ( no parentid or does not support it), let them select any content compatible with the table
                                 '
@@ -6873,7 +6873,7 @@ ErrorTrap:
                                 Do While cpCore.db.db_csOk(CSPointer)
                                     ChildCID = cpCore.db.db_GetCSInteger(CSPointer, "ID")
                                     If (cpCore.db_IsWithinContent(ChildCID, LimitContentSelectToThisID)) Then
-                                        If (cpCore.user_isAdmin) Or (cpCore.main_IsContentManager(cpCore.main_GetContentNameByID(ChildCID))) Then
+                                        If (cpCore.user.user_isAdmin) Or (cpCore.user.main_IsContentManager(cpCore.main_GetContentNameByID(ChildCID))) Then
                                             CIDList = CIDList & "," & ChildCID
                                         End If
                                     End If
@@ -7065,7 +7065,7 @@ ErrorTrap:
                     ' List of Options, might be select, radio or checkbox
                     '
                     LCaseOptionDefault = LCase(Mid(ExpandedSelector, 1, Pos - 1))
-                    LCaseOptionDefault = cpCore.main_DecodeAddonOptionArgument(LCaseOptionDefault)
+                    LCaseOptionDefault = decodeNvaArgument(LCaseOptionDefault)
 
                     ExpandedSelector = Mid(ExpandedSelector, Pos + 1)
                     Pos = InStr(1, ExpandedSelector, "]")
@@ -7083,11 +7083,11 @@ ErrorTrap:
                         If OptionValue_AddonEncoded <> "" Then
                             Pos = InStr(1, OptionValue_AddonEncoded, ":")
                             If Pos = 0 Then
-                                OptionValue = cpCore.main_DecodeAddonOptionArgument(OptionValue_AddonEncoded)
+                                OptionValue = decodeNvaArgument(OptionValue_AddonEncoded)
                                 OptionCaption = OptionValue
                             Else
-                                OptionCaption = cpCore.main_DecodeAddonOptionArgument(Mid(OptionValue_AddonEncoded, 1, Pos - 1))
-                                OptionValue = cpCore.main_DecodeAddonOptionArgument(Mid(OptionValue_AddonEncoded, Pos + 1))
+                                OptionCaption = decodeNvaArgument(Mid(OptionValue_AddonEncoded, 1, Pos - 1))
+                                OptionValue = decodeNvaArgument(Mid(OptionValue_AddonEncoded, Pos + 1))
                             End If
                             Select Case OptionSuffix
                                 Case "checkbox"
@@ -7143,7 +7143,7 @@ ErrorTrap:
                     ' Create Text HTMLFieldString
                     '
 
-                    selector = cpCore.main_DecodeAddonOptionArgument(selector)
+                    selector = decodeNvaArgument(selector)
                     HTMLFieldString = cpCore.main_GetFormInputText2(SitePropertyName, selector, 1, 20)
                 End If
                 '--------------
@@ -7182,10 +7182,10 @@ ErrorTrap:
             addonId = 0
             If (cpCore.main_VisitId = cpCore.web_GetStreamInteger2(RequestNameDashboardReset)) Then
                 '$$$$$ cache this
-                CS = cpCore.db.db_csOpen("Add-ons", "ccguid=" & cpCore.db.db_EncodeSQLText(DashboardAddonGuid))
+                CS = cpCore.db.db_csOpen("Add-ons", "ccguid=" & cpCore.db.encodeSQLText(DashboardAddonGuid))
                 If cpCore.db.db_csOk(CS) Then
                     addonId = cpCore.db.db_GetCSInteger(CS, "id")
-                    Call cpCore.db.siteProperty_set("AdminRootAddonID", EncodeText(addonId))
+                    Call cpCore.siteProperties.setProperty("AdminRootAddonID", EncodeText(addonId))
                 End If
                 Call cpCore.db.db_csClose(CS)
             End If
@@ -7193,7 +7193,7 @@ ErrorTrap:
                 '
                 ' Get AdminRootAddon
                 '
-                AddonIDText = cpCore.db.siteProperty_getText("AdminRootAddonID", "")
+                AddonIDText = cpCore.siteProperties.getText("AdminRootAddonID", "")
                 If AddonIDText = "" Then
                     '
                     ' the desktop is likely unset, auto set it to dashboard
@@ -7218,7 +7218,7 @@ ErrorTrap:
                         ' it was set, but the add-on is not available, auto set to dashboard
                         '
                         addonId = -1
-                        Call cpCore.db.siteProperty_set("AdminRootAddonID", "")
+                        Call cpCore.siteProperties.setProperty("AdminRootAddonID", "")
                     End If
                     Call cpCore.db.db_csClose(CS)
                 End If
@@ -7227,10 +7227,10 @@ ErrorTrap:
                     ' This has never been set, try to get the dashboard ID
                     '
                     '$$$$$ cache this
-                    CS = cpCore.db.db_csOpen("Add-ons", "ccguid=" & cpCore.db.db_EncodeSQLText(DashboardAddonGuid))
+                    CS = cpCore.db.db_csOpen("Add-ons", "ccguid=" & cpCore.db.encodeSQLText(DashboardAddonGuid))
                     If cpCore.db.db_csOk(CS) Then
                         addonId = cpCore.db.db_GetCSInteger(CS, "id")
-                        Call cpCore.db.siteProperty_set("AdminRootAddonID", EncodeText(addonId))
+                        Call cpCore.siteProperties.setProperty("AdminRootAddonID", EncodeText(addonId))
                     End If
                     Call cpCore.db.db_csClose(CS)
                 End If
@@ -7255,7 +7255,7 @@ ErrorTrap:
                     & vbCrLf & "<div><a href=http://www.Contensive.com target=_blank><img style=""border:1px solid #000;"" src=""/ccLib/images/ContensiveAdminLogo.GIF"" border=0 ></A></div>" _
                     & vbCrLf & "<div><strong>Contensive/" & cpCore.version & "</strong></div>" _
                     & vbCrLf & "<div style=""clear:both;height:18px;margin-top:10px""><div style=""float:left;width:200px;"">Domain Name</div><div style=""float:left;"">" & cpCore.main_ServerDomain & "</div></div>" _
-                    & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;"">Login Member Name</div><div style=""float:left;"">" & cpCore.userName & "</div></div>" _
+                    & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;"">Login Member Name</div><div style=""float:left;"">" & cpCore.user.userName & "</div></div>" _
                     & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;"">Quick Reports</div><div style=""float:left;""><a Href=""?" & RequestNameAdminForm & "=" & AdminFormQuickStats & """>Real-Time Activity</A></div></div>" _
                     & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;""><a Href=""?" & RequestNameDashboardReset & "=" & cpCore.main_VisitId & """>Run Dashboard</A></div></div>"
                 '
@@ -7327,7 +7327,7 @@ ErrorTrap:
                 PageCount = cpCore.db.db_GetCSNumber(CS, "pageCount")
                 Stream.Add("<tr>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "All Visits</span></td>")
-                Stream.Add("<td style=""width:150px;border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & html_EncodeHTML(cpCore.db.config.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&DateFrom=" & cpCore.main_PageStartTime & "&DateTo=" & cpCore.main_PageStartTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
+                Stream.Add("<td style=""width:150px;border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & html_EncodeHTML(cpCore.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&DateFrom=" & cpCore.main_PageStartTime & "&DateTo=" & cpCore.main_PageStartTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "This includes all visitors to the website, including guests, bots and administrators. Pages/visit includes page hits and not ajax or remote method hits.</span></td>")
                 Stream.Add("</tr>")
             End If
@@ -7342,7 +7342,7 @@ ErrorTrap:
                 PageCount = cpCore.db.db_GetCSNumber(CS, "pageCount")
                 Stream.Add("<tr>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "Non-bot Visits</span></td>")
-                Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & html_EncodeHTML(cpCore.db.config.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&DateFrom=" & cpCore.main_PageStartTime.ToShortDateString & "&DateTo=" & cpCore.main_PageStartTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
+                Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & html_EncodeHTML(cpCore.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&DateFrom=" & cpCore.main_PageStartTime.ToShortDateString & "&DateTo=" & cpCore.main_PageStartTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "This excludes hits from visitors identified as bots. Pages/visit includes page hits and not ajax or remote method hits.</span></td>")
                 Stream.Add("</tr>")
             End If
@@ -7357,7 +7357,7 @@ ErrorTrap:
                 PageCount = cpCore.db.db_GetCSNumber(CS, "pageCount")
                 Stream.Add("<tr>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "Visits by New Visitors</span></td>")
-                Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & html_EncodeHTML(cpCore.db.config.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&ExcludeOldVisitors=1&DateFrom=" & cpCore.main_PageStartTime.ToShortDateString & "&DateTo=" & cpCore.main_PageStartTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
+                Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & html_EncodeHTML(cpCore.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&ExcludeOldVisitors=1&DateFrom=" & cpCore.main_PageStartTime.ToShortDateString & "&DateTo=" & cpCore.main_PageStartTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "This includes only new visitors not identified as bots. Pages/visit includes page hits and not ajax or remote method hits.</span></td>")
                 Stream.Add("</tr>")
             End If
@@ -7389,11 +7389,11 @@ ErrorTrap:
                     Do While cpCore.db.db_csOk(CS)
                         VisitID = cpCore.db.db_GetCSInteger(CS, "VisitID")
                         Panel = Panel & "<tr class=""" & RowColor & """>"
-                        Panel = Panel & "<td align=""left"">" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & html_EncodeHTML(cpCore.db.config.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=16&MemberID=" & cpCore.db.db_GetCSInteger(CS, "MemberID")) & """>" & cpCore.db.db_GetCS(CS, "MemberName") & "</A></span></td>"
+                        Panel = Panel & "<td align=""left"">" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & html_EncodeHTML(cpCore.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=16&MemberID=" & cpCore.db.db_GetCSInteger(CS, "MemberID")) & """>" & cpCore.db.db_GetCS(CS, "MemberName") & "</A></span></td>"
                         Panel = Panel & "<td align=""left"">" & SpanClassAdminNormal & cpCore.db.db_GetCS(CS, "Remote_Addr") & "</span></td>"
                         Panel = Panel & "<td align=""left"">" & SpanClassAdminNormal & FormatDateTime(cpCore.db.db_GetCSDate(CS, "LastVisitTime"), vbLongTime) & "</span></td>"
-                        Panel = Panel & "<td align=""right"">" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.db.config.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=10&VisitID=" & VisitID & """>" & cpCore.db.db_GetCS(CS, "PageVisits") & "</A></span></td>"
-                        Panel = Panel & "<td align=""right"">" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.db.config.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=17&VisitID=" & VisitID & """>" & VisitID & "</A></span></td>"
+                        Panel = Panel & "<td align=""right"">" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=10&VisitID=" & VisitID & """>" & cpCore.db.db_GetCS(CS, "PageVisits") & "</A></span></td>"
+                        Panel = Panel & "<td align=""right"">" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=17&VisitID=" & VisitID & """>" & VisitID & "</A></span></td>"
                         Panel = Panel & "<td align=""left"">" & SpanClassAdminNormal & "&nbsp;" & cpCore.db.db_GetCSText(CS, "referer") & "</span></td>"
                         Panel = Panel & "</tr>"
                         If RowColor = "ccPanelRowEven" Then
@@ -7572,7 +7572,7 @@ ErrorTrap:
             ' Link Alias value from the admin data
             '
             TabDescription = "Link Aliases are URLs used for this content that are more friendly to users and search engines. If you set the Link Alias field, this name will be used on the URL for this page. If you leave the Link Alias blank, the page name will be used. Below is a list of names that have been used previously and are still active. All of these entries when used in the URL will resolve to this page. The first entry in this list will be used to create dynamic menus on the site. To move an entry to the top, type it into the Link Alias field and save."
-            If Not cpCore.db.siteProperty_allowLinkAlias Then
+            If Not cpCore.siteProperties.allowLinkAlias Then
                 '
                 ' Disabled
                 '
@@ -7917,9 +7917,9 @@ ErrorTrap:
             Dim Adminui As New coreAdminUIClass(cpCore)
             '
             f.Add(Adminui.GetEditRow("<a href=?" & RequestNameAdminForm & "=28 target=_blank>Open in New Window</a>", "Email Control", "The settings in this section can be modified with the Email Control page."))
-            f.Add(Adminui.GetEditRow(cpCore.db.siteProperty_getText("EmailBounceAddress", ""), "Bounce Email Address", "All bounced emails will be sent to this address automatically. This must be a valid email account, and you should either use Contensive Bounce processing to capture the emails, or manually remove them from the account yourself."))
-            f.Add(Adminui.GetEditRow(GetYesNo(EncodeBoolean(cpCore.db.siteProperty_getBoolean("AllowEmailBounceProcessing", False))), "Allow Bounce Email Processing", "If checked, Contensive will periodically retrieve all the email from the POP email account and take action on the membefr account that sent the email."))
-            Select Case cpCore.db.siteProperty_getText("EMAILBOUNCEPROCESSACTION", "0")
+            f.Add(Adminui.GetEditRow(cpCore.siteProperties.getText("EmailBounceAddress", ""), "Bounce Email Address", "All bounced emails will be sent to this address automatically. This must be a valid email account, and you should either use Contensive Bounce processing to capture the emails, or manually remove them from the account yourself."))
+            f.Add(Adminui.GetEditRow(GetYesNo(EncodeBoolean(cpCore.siteProperties.getBoolean("AllowEmailBounceProcessing", False))), "Allow Bounce Email Processing", "If checked, Contensive will periodically retrieve all the email from the POP email account and take action on the membefr account that sent the email."))
+            Select Case cpCore.siteProperties.getText("EMAILBOUNCEPROCESSACTION", "0")
                 Case "1"
                     Copy = "Clear the Allow Group Email field for all members with a matching Email address"
                 Case "2"
@@ -7930,7 +7930,7 @@ ErrorTrap:
                     Copy = "Do Nothing"
             End Select
             f.Add(Adminui.GetEditRow(Copy, "Bounce Email Action", "When an email is determined to be a bounce, this action will taken against member with that email address."))
-            f.Add(Adminui.GetEditRow(cpCore.db.siteProperty_getText("POPServerStatus"), "Last Email Retrieve Status", "This is the status of the last POP email retrieval attempted."))
+            f.Add(Adminui.GetEditRow(cpCore.siteProperties.getText("POPServerStatus"), "Last Email Retrieve Status", "This is the status of the last POP email retrieval attempted."))
             '
             GetForm_Edit_EmailBounceStatus = Adminui.GetEditPanel((Not allowAdminTabs), "Bounced Email Handling", "", Adminui.EditTableOpen & f.Text & Adminui.EditTableClose)
             EditSectionPanelCount = EditSectionPanelCount + 1
@@ -8030,7 +8030,7 @@ ErrorTrap:
                 f.Add(Adminui.EditTableOpen)
                 SectionName = ""
                 GroupCount = 0
-                CanSeeHiddenGroups = cpCore.user_isDeveloper
+                CanSeeHiddenGroups = cpCore.user.user_isDeveloper
                 Do While cpCore.db.db_csOk(CS)
                     GroupName = cpCore.db.db_GetCS(CS, "GroupName")
                     If (Mid(GroupName, 1, 1) <> "_") Or CanSeeHiddenGroups Then
@@ -8150,8 +8150,8 @@ ErrorTrap:
             Call FastString.Add("<td valign=""top"" align=""right"">&nbsp;</td>")
             Call FastString.Add("<td colspan=""2"" class=""ccAdminEditField"" align=""left"">" & SpanClassAdminNormal)
             Call FastString.Add("<ul class=""ccList"">")
-            Call FastString.Add("<li class=""ccListItem""><a target=""_blank"" href=""" & cpCore.db.config.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&MemberID=" & editRecord.id & "&DateTo=" & Int(cpCore.main_PageStartTime.ToOADate) & "&DateFrom=" & Int(cpCore.main_PageStartTime.ToOADate) - 365 & """>All visits from this person</A></LI>")
-            Call FastString.Add("<li class=""ccListItem""><a target=""_blank"" href=""" & cpCore.db.config.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=13&MemberID=" & editRecord.id & "&DateTo=" & Int(CDbl(cpCore.main_PageStartTime.ToOADate)) & "&DateFrom=" & Int(CDbl(cpCore.main_PageStartTime.ToOADate) - 365) & """>All orders from this person</A></LI>")
+            Call FastString.Add("<li class=""ccListItem""><a target=""_blank"" href=""" & cpCore.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&MemberID=" & editRecord.id & "&DateTo=" & Int(cpCore.main_PageStartTime.ToOADate) & "&DateFrom=" & Int(cpCore.main_PageStartTime.ToOADate) - 365 & """>All visits from this person</A></LI>")
+            Call FastString.Add("<li class=""ccListItem""><a target=""_blank"" href=""" & cpCore.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=13&MemberID=" & editRecord.id & "&DateTo=" & Int(CDbl(cpCore.main_PageStartTime.ToOADate)) & "&DateFrom=" & Int(CDbl(cpCore.main_PageStartTime.ToOADate) - 365) & """>All orders from this person</A></LI>")
             Call FastString.Add("</ul>")
             Call FastString.Add("</span></td></tr>")
             GetForm_Edit_MemberReports = Adminui.GetEditPanel((Not allowAdminTabs), "Contensive Reporting", "", Adminui.EditTableOpen & FastString.Text & Adminui.EditTableClose)
@@ -8618,7 +8618,7 @@ ErrorTrap:
             Dim FastString As coreFastStringClass
             Dim Adminui As New coreAdminUIClass(cpCore)
             '
-            If cpCore.user_isAdmin Then
+            If cpCore.user.user_isAdmin Then
                 '
                 ' ----- Open the panel
                 '
@@ -8890,7 +8890,7 @@ ErrorTrap:
                 '
                 CS = GetMenuCSPointer("(ccMenuEntries.ParentID is null)or(ccMenuEntries.ParentID=0)", MenuEntryContentName)
                 If cpCore.db.db_csOk(CS) Then
-                    IsAdminLocal = cpCore.user_isAdmin
+                    IsAdminLocal = cpCore.user.user_isAdmin
                     If Not IsAdminLocal Then
                         ContentManagementList.AddRange(cpCore.metaData.getEditableCdefIdList())
                     End If
@@ -8984,7 +8984,7 @@ ErrorTrap:
                             MenuName = "[Link]"
                         End If
                         If MenuPage = "" Then
-                            MenuPage = cpCore.db.siteProperty_ServerPageDefault
+                            MenuPage = cpCore.siteProperties.serverPageDefault
                         End If
                         If MenuContentID > 0 Then
                             MenuPage = modifyLinkQuery(MenuPage, "cid", CStr(MenuContentID), True)
@@ -9088,7 +9088,7 @@ ErrorTrap:
                                 MenuName = "[Link]"
                             End If
                             If MenuPage = "" Then
-                                MenuPage = cpCore.db.siteProperty_ServerPageDefault
+                                MenuPage = cpCore.siteProperties.serverPageDefault
                             End If
                             If InStr(MenuPage, "?") = 0 Then
                                 MenuPage = MenuPage & "?s=0"
@@ -9144,7 +9144,7 @@ ErrorTrap:
                 '
                 ' create the with-menu version
                 '
-                LeftSide = cpCore.db.siteProperty_getText("AdminHeaderHTML", "Contensive Administration Site")
+                LeftSide = cpCore.siteProperties.getText("AdminHeaderHTML", "Contensive Administration Site")
                 RightSide = cpCore.main_PageStartTime & "&nbsp;"
                 '
                 ' AdminTabs
@@ -9152,10 +9152,10 @@ ErrorTrap:
                 QS = cpCore.web_RefreshQueryString
                 If allowAdminTabs Then
                     QS = ModifyQueryString(QS, "tabs", "0", True)
-                    RightSide = RightSide & GetActiveImage(cpCore.db.config.adminRoute & "?" & QS, "Disable Tabs", "LibButtonNoTabs.GIF", "LibButtonNoTabsRev.GIF", "Disable Tabs", "16", "16", "", "", "")
+                    RightSide = RightSide & GetActiveImage(cpCore.appConfig.adminRoute & "?" & QS, "Disable Tabs", "LibButtonNoTabs.GIF", "LibButtonNoTabsRev.GIF", "Disable Tabs", "16", "16", "", "", "")
                 Else
                     QS = ModifyQueryString(QS, "tabs", "1", True)
-                    RightSide = RightSide & GetActiveImage(cpCore.db.config.adminRoute & "?" & QS, "Enable Tabs", "LibButtonTabs.GIF", "LibButtonTabsRev.GIF", "Enable Tabs", "16", "16", "", "", "")
+                    RightSide = RightSide & GetActiveImage(cpCore.appConfig.adminRoute & "?" & QS, "Enable Tabs", "LibButtonTabs.GIF", "LibButtonTabsRev.GIF", "Enable Tabs", "16", "16", "", "", "")
                 End If
                 '
                 ' Menu Mode
@@ -9165,17 +9165,17 @@ ErrorTrap:
                     RightSide = RightSide & "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""16"" >"
                     If AdminMenuModeID = AdminMenuModeTop Then
                         QS = ModifyQueryString(QS, "mm", "1", True)
-                        RightSide = RightSide & GetActiveImage(cpCore.db.config.adminRoute & "?" & QS, "Use Navigator", "LibButtonMenuTop.GIF", "LibButtonMenuTopOver.GIF", "Use Navigator", "16", "16", "", "", "")
+                        RightSide = RightSide & GetActiveImage(cpCore.appConfig.adminRoute & "?" & QS, "Use Navigator", "LibButtonMenuTop.GIF", "LibButtonMenuTopOver.GIF", "Use Navigator", "16", "16", "", "", "")
                     Else
                         QS = ModifyQueryString(QS, "mm", "2", True)
-                        RightSide = RightSide & GetActiveImage(cpCore.db.config.adminRoute & "?" & QS, "Use Dropdown Menus", "LibButtonMenuLeft.GIF", "LibButtonMenuLeftOver.GIF", "Use Dropdown Menus", "16", "16", "", "", "")
+                        RightSide = RightSide & GetActiveImage(cpCore.appConfig.adminRoute & "?" & QS, "Use Dropdown Menus", "LibButtonMenuLeft.GIF", "LibButtonMenuLeftOver.GIF", "Use Dropdown Menus", "16", "16", "", "", "")
                     End If
                 End If
                 '
                 ' Refresh Button
                 '
                 RightSide = RightSide & "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""16"" >"
-                RightSide = RightSide & GetActiveImage(cpCore.db.config.adminRoute & "?" & cpCore.web_RefreshQueryString, "Refresh", "LibButtonRefresh.GIF", "LibButtonRefreshOver.GIF", "Refresh", "16", "16", "", "", "")
+                RightSide = RightSide & GetActiveImage(cpCore.appConfig.adminRoute & "?" & cpCore.web_RefreshQueryString, "Refresh", "LibButtonRefresh.GIF", "LibButtonRefreshOver.GIF", "Refresh", "16", "16", "", "", "")
                 '
                 ' Assemble header
                 '
@@ -9363,11 +9363,11 @@ ErrorTrap:
                 Criteria = Criteria & "AND" & cpCore.db_GetContentControlCriteria(MenuContentName)
             End If
             iParentCriteria = encodeEmptyText(ParentCriteria, "")
-            If cpCore.user_isDeveloper Then
+            If cpCore.user.user_isDeveloper Then
                 '
                 ' ----- Developer
                 '
-            ElseIf cpCore.user_isAdmin Then
+            ElseIf cpCore.user.user_isAdmin Then
                 '
                 ' ----- Administrator
                 '
@@ -9530,10 +9530,10 @@ ErrorTrap:
                 GetMenuLink = LinkPage
                 If GetMenuLink <> "" Then
                     If Mid(GetMenuLink, 1, 1) = "?" Or Mid(GetMenuLink, 1, 1) = "#" Then
-                        GetMenuLink = cpCore.db.siteProperty_AdminURL & GetMenuLink
+                        GetMenuLink = cpCore.siteProperties.adminURL & GetMenuLink
                     End If
                 Else
-                    GetMenuLink = cpCore.db.siteProperty_AdminURL
+                    GetMenuLink = cpCore.siteProperties.adminURL
                 End If
                 ContentID = EncodeInteger(LinkCID)
                 If ContentID <> 0 Then
@@ -9723,16 +9723,16 @@ ErrorTrap:
                         Select Case AdminButton
                             Case ButtonSave, ButtonOK
                                 '
-                                Call cpCore.db.siteProperty_set("Allow CSS Reset", cpCore.main_GetStreamBoolean2(RequestNameAllowCSSReset))
-                                Call cpCore.db.cdnFiles.SaveFile(DynamicStylesFilename, cpCore.doc_getText("StyleEditor"))
+                                Call cpCore.siteProperties.setProperty("Allow CSS Reset", cpCore.main_GetStreamBoolean2(RequestNameAllowCSSReset))
+                                Call cpCore.cdnFiles.SaveFile(DynamicStylesFilename, cpCore.doc_getText("StyleEditor"))
                                 If cpCore.main_GetStreamBoolean2(RequestNameInlineStyles) Then
                                     '
                                     ' Inline Styles
                                     '
-                                    Call cpCore.db.siteProperty_set("StylesheetSerialNumber", "0")
+                                    Call cpCore.siteProperties.setProperty("StylesheetSerialNumber", "0")
                                 Else
                                     ' mark to rebuild next fetch
-                                    Call cpCore.db.siteProperty_set("StylesheetSerialNumber", "-1")
+                                    Call cpCore.siteProperties.setProperty("StylesheetSerialNumber", "-1")
                                     ''
                                     '' Linked Styles
                                     '' Bump the Style Serial Number so next fetch is not cached
@@ -9752,12 +9752,12 @@ ErrorTrap:
                                 ' delete all templateid based editorstylerule files, build on-demand
                                 '
                                 EditorStyleRulesFilename = Replace(EditorStyleRulesFilenamePattern, "$templateid$", "0", , , vbTextCompare)
-                                Call cpCore.db.cdnFiles.DeleteFile(EditorStyleRulesFilename)
+                                Call cpCore.cdnFiles.DeleteFile(EditorStyleRulesFilename)
                                 '
                                 CS = cpCore.db.db_openCsSql_rev("default", "select id from cctemplates")
                                 Do While cpCore.db.db_csOk(CS)
                                     EditorStyleRulesFilename = Replace(EditorStyleRulesFilenamePattern, "$templateid$", cpCore.main_GetCS2Text(CS, "ID"), , , vbTextCompare)
-                                    Call cpCore.db.cdnFiles.DeleteFile(EditorStyleRulesFilename)
+                                    Call cpCore.cdnFiles.DeleteFile(EditorStyleRulesFilename)
                                     Call cpCore.db.db_csGoNext(CS)
                                 Loop
                                 Call cpCore.db.db_csClose(CS)
@@ -9929,8 +9929,8 @@ ErrorTrap:
                             '
                             ' field has some kind of restriction
                             '
-                            If Not cpCore.userIsDeveloper Then
-                                If Not cpCore.userIsAdmin Then
+                            If Not cpCore.user.userIsDeveloper Then
+                                If Not cpCore.user.userIsAdmin Then
                                     '
                                     ' you are not admin
                                     '
@@ -10110,12 +10110,12 @@ ErrorTrap:
                             '
                             Call SaveEditRecord(adminContent, editRecord)
                             If (LCase(editRecord.nameLc) = "allowlinkalias") Then
-                                If (cpCore.db.siteProperty_getBoolean("AllowLinkAlias")) Then
+                                If (cpCore.siteProperties.getBoolean("AllowLinkAlias")) Then
                                     If False Then
                                         '
                                         ' Must upgrade
                                         '
-                                        Call cpCore.db.siteProperty_set("AllowLinkAlias", "0")
+                                        Call cpCore.siteProperties.setProperty("AllowLinkAlias", "0")
                                         Call cpCore.error_AddUserError("Link Alias entries for your pages can not be created because your site database needs to be upgraded.")
                                     Else
                                         '
@@ -10152,7 +10152,7 @@ ErrorTrap:
                             Call SaveContentTracking(adminContent, editRecord)
                             '
                             EditorStyleRulesFilename = Replace(EditorStyleRulesFilenamePattern, "$templateid$", editRecord.id.ToString, , , vbTextCompare)
-                            Call cpCore.db.privateFiles.DeleteFile(EditorStyleRulesFilename)
+                            Call cpCore.privateFiles.DeleteFile(EditorStyleRulesFilename)
                         Case "CCSHAREDSTYLES"
                             '
                             ' save and clear editorstylerules for any template
@@ -10166,12 +10166,12 @@ ErrorTrap:
                             Call SaveContentTracking(adminContent, editRecord)
                             '
                             EditorStyleRulesFilename = Replace(EditorStyleRulesFilenamePattern, "$templateid$", "0", , , vbTextCompare)
-                            Call cpCore.db.cdnFiles.DeleteFile(EditorStyleRulesFilename)
+                            Call cpCore.cdnFiles.DeleteFile(EditorStyleRulesFilename)
                             '
                             CS = cpCore.db.db_openCsSql_rev("default", "select id from cctemplates")
                             Do While cpCore.db.db_csOk(CS)
                                 EditorStyleRulesFilename = Replace(EditorStyleRulesFilenamePattern, "$templateid$", cpCore.main_GetCS2Text(CS, "ID"), , , vbTextCompare)
-                                Call cpCore.db.cdnFiles.DeleteFile(EditorStyleRulesFilename)
+                                Call cpCore.cdnFiles.DeleteFile(EditorStyleRulesFilename)
                                 Call cpCore.db.db_csGoNext(CS)
                             Loop
                             Call cpCore.db.db_csClose(CS)
@@ -10280,7 +10280,7 @@ ErrorTrap:
                                 Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
                                 With field
                                     If LCase(.nameLc) = "email" Then
-                                        If (LCase(adminContent.ContentTableName) = "ccmembers") And (EncodeBoolean(cpCore.db.siteProperty_getBoolean("allowemaillogin", False))) Then
+                                        If (LCase(adminContent.ContentTableName) = "ccmembers") And (EncodeBoolean(cpCore.siteProperties.getBoolean("allowemaillogin", False))) Then
                                             editRecord.fieldsLc(.nameLc).value = ""
                                         End If
                                     End If
@@ -10349,7 +10349,7 @@ ErrorTrap:
                 '
                 ' ----- Get the baked version
                 '
-                BakeName = "AdminMenu" & Format(cpCore.userId, "00000000")
+                BakeName = "AdminMenu" & Format(cpCore.user.userId, "00000000")
                 GetMenuTopMode = EncodeText(cpCore.cache.GetObject(Of String)(BakeName))
                 MenuDelimiterPosition = InStr(1, GetMenuTopMode, MenuDelimiter, vbTextCompare)
                 If MenuDelimiterPosition > 1 Then
@@ -10366,7 +10366,7 @@ ErrorTrap:
                         '
                         ' There are menu items to bake
                         '
-                        IsAdminLocal = cpCore.user_isAdmin
+                        IsAdminLocal = cpCore.user.user_isAdmin
                         If Not IsAdminLocal Then
                             '
                             ' content managers, need the ContentManagementList
@@ -10391,7 +10391,7 @@ ErrorTrap:
                             If AccessOK Then
                                 Link = GetMenuLink(cpCore.db.db_GetCS(CSMenus, "LinkPage"), ContentID)
                                 If InStr(1, Link, "?") = 1 Then
-                                    Link = cpCore.db.config.adminRoute & Link
+                                    Link = cpCore.appConfig.adminRoute & Link
                                 End If
                             Else
                                 Link = ""
@@ -10628,8 +10628,8 @@ ErrorTrap:
                 '
                 '
                 '
-                Call cpCore.web_Redirect2(cpCore.db.siteProperty_AdminURL, "GetContentChildTool, Cancel Button Pressed", False)
-            ElseIf Not cpCore.user_isAdmin Then
+                Call cpCore.web_Redirect2(cpCore.siteProperties.adminURL, "GetContentChildTool, Cancel Button Pressed", False)
+            ElseIf Not cpCore.user.user_isAdmin Then
                 '
                 '
                 '
@@ -10674,7 +10674,7 @@ ErrorTrap:
                         ' Create Group and Rule
                         '
                         If NewGroup And (NewGroupName <> "") Then
-                            CS = cpCore.db.db_csOpen("Groups", "name=" & cpCore.db.db_EncodeSQLText(NewGroupName))
+                            CS = cpCore.db.db_csOpen("Groups", "name=" & cpCore.db.encodeSQLText(NewGroupName))
                             If cpCore.db.db_csOk(CS) Then
                                 Description = Description _
                                     & "<div>Group [" & NewGroupName & "] already exists, using existing group.</div>"
@@ -10947,8 +10947,8 @@ ErrorTrap:
                 '
                 '
                 '
-                Call cpCore.web_Redirect2(cpCore.db.siteProperty_AdminURL, "HouseKeepingControl, Cancel Button Pressed", False)
-            ElseIf Not cpCore.user_isAdmin Then
+                Call cpCore.web_Redirect2(cpCore.siteProperties.adminURL, "HouseKeepingControl, Cancel Button Pressed", False)
+            ElseIf Not cpCore.user.user_isAdmin Then
                 '
                 '
                 '
@@ -10960,9 +10960,9 @@ ErrorTrap:
                 '
                 ' Set defaults
                 '
-                ArchiveRecordAgeDays = (cpCore.db.siteProperty_getinteger("ArchiveRecordAgeDays", 0))
-                ArchiveTimeOfDay = cpCore.db.siteProperty_getText("ArchiveTimeOfDay", "12:00:00 AM")
-                ArchiveAllowFileClean = (cpCore.db.siteProperty_getBoolean("ArchiveAllowFileClean", False))
+                ArchiveRecordAgeDays = (cpCore.siteProperties.getinteger("ArchiveRecordAgeDays", 0))
+                ArchiveTimeOfDay = cpCore.siteProperties.getText("ArchiveTimeOfDay", "12:00:00 AM")
+                ArchiveAllowFileClean = (cpCore.siteProperties.getBoolean("ArchiveAllowFileClean", False))
                 'ArchiveAllowLogClean = encodeBoolean(cpCore.main_GetSiteProperty2("ArchiveAllowLogClean", False))
 
                 '
@@ -10972,17 +10972,17 @@ ErrorTrap:
                     Case ButtonOK, ButtonSave
                         '
                         ArchiveRecordAgeDays = cpCore.web_GetStreamInteger2("ArchiveRecordAgeDays")
-                        Call cpCore.db.siteProperty_set("ArchiveRecordAgeDays", EncodeText(ArchiveRecordAgeDays))
+                        Call cpCore.siteProperties.setProperty("ArchiveRecordAgeDays", EncodeText(ArchiveRecordAgeDays))
                         '
                         ArchiveTimeOfDay = cpCore.doc_getText("ArchiveTimeOfDay")
-                        Call cpCore.db.siteProperty_set("ArchiveTimeOfDay", ArchiveTimeOfDay)
+                        Call cpCore.siteProperties.setProperty("ArchiveTimeOfDay", ArchiveTimeOfDay)
                         '
                         ArchiveAllowFileClean = cpCore.main_GetStreamBoolean2("ArchiveAllowFileClean")
-                        Call cpCore.db.siteProperty_set("ArchiveAllowFileClean", EncodeText(ArchiveAllowFileClean))
+                        Call cpCore.siteProperties.setProperty("ArchiveAllowFileClean", EncodeText(ArchiveAllowFileClean))
                 End Select
                 '
                 If Button = ButtonOK Then
-                    Call cpCore.web_Redirect2(cpCore.db.siteProperty_AdminURL, "StaticPublishControl, OK Button Pressed", False)
+                    Call cpCore.web_Redirect2(cpCore.siteProperties.adminURL, "StaticPublishControl, OK Button Pressed", False)
                 End If
                 '
                 ' ----- Status
@@ -11097,13 +11097,13 @@ ErrorTrap:
             Dim CurrentValue As String
             '
             If readOnlyField Then
-                GetPropertyHTMLControl = "<div style=""border:1px solid #808080; padding:20px;"">" & decodeHtml(cpCore.db.siteProperty_getText(Name, DefaultValue)) & "</div>"
+                GetPropertyHTMLControl = "<div style=""border:1px solid #808080; padding:20px;"">" & decodeHtml(cpCore.siteProperties.getText(Name, DefaultValue)) & "</div>"
             ElseIf ProcessRequest Then
                 CurrentValue = cpCore.doc_getText(Name)
-                Call cpCore.db.siteProperty_set(Name, CurrentValue)
+                Call cpCore.siteProperties.setProperty(Name, CurrentValue)
                 GetPropertyHTMLControl = cpCore.html_GetFormInputHTML(Name, CurrentValue)
             Else
-                CurrentValue = cpCore.db.siteProperty_getText(Name, DefaultValue)
+                CurrentValue = cpCore.siteProperties.getText(Name, DefaultValue)
                 GetPropertyHTMLControl = cpCore.html_GetFormInputHTML(Name, CurrentValue)
             End If
             Exit Function
@@ -11155,8 +11155,8 @@ ErrorTrap:
                 '
                 '
                 '
-                Call cpCore.web_Redirect2(cpCore.db.siteProperty_AdminURL, "StyleEditor, Cancel Button Pressed", False)
-            ElseIf Not cpCore.user_isAdmin Then
+                Call cpCore.web_Redirect2(cpCore.siteProperties.adminURL, "StyleEditor, Cancel Button Pressed", False)
+            ElseIf Not cpCore.user.user_isAdmin Then
                 '
                 '
                 '
@@ -11166,10 +11166,10 @@ ErrorTrap:
                 'StyleSN = encodeInteger(cpCore.main_GetSiteProperty2("StylesheetSerialNumber", false ))
                 AllowCSSReset = False
                 If True Then ' 4.1.101" Then
-                    AllowCSSReset = (cpCore.db.siteProperty_getBoolean("Allow CSS Reset", False))
+                    AllowCSSReset = (cpCore.siteProperties.getBoolean("Allow CSS Reset", False))
                 End If
                 '
-                Copy = cpCore.main_GetFormInputTextExpandable("StyleEditor", cpCore.db.cdnFiles.ReadFile(DynamicStylesFilename), 20)
+                Copy = cpCore.main_GetFormInputTextExpandable("StyleEditor", cpCore.cdnFiles.ReadFile(DynamicStylesFilename), 20)
                 Copy = Replace(Copy, " cols=""100""", " style=""width:100%;""", , , vbTextCompare)
                 Copy = "" _
                     & "<div style=""padding:10px;"">" & cpCore.html_GetFormInputCheckBox2(RequestNameAllowCSSReset, AllowCSSReset) & "&nbsp;Include Contensive reset styles</div>" _
@@ -11217,7 +11217,7 @@ ErrorTrap:
             '
             Const ContentName = "Copy Content"
             '
-            CS = cpCore.db.db_csOpen(ContentName, "Name=" & cpCore.db.db_EncodeSQLText(CopyName))
+            CS = cpCore.db.db_csOpen(ContentName, "Name=" & cpCore.db.encodeSQLText(CopyName))
             If cpCore.db.db_csOk(CS) Then
                 RecordID = cpCore.db.db_GetCSInteger(CS, "ID")
                 Copy = cpCore.db.db_GetCSText(CS, "copy")
@@ -11513,10 +11513,10 @@ ErrorTrap:
             '
             Button = cpCore.doc_getText(RequestNameButton)
             If Button = ButtonCancel Then
-                Call cpCore.web_Redirect2(cpCore.db.siteProperty_AdminURL, "Downloads, Cancel Button Pressed", False)
+                Call cpCore.web_Redirect2(cpCore.siteProperties.adminURL, "Downloads, Cancel Button Pressed", False)
             End If
             '
-            If Not cpCore.user_isAdmin() Then
+            If Not cpCore.user.user_isAdmin() Then
                 '
                 ' Must be a developer
                 '
@@ -11634,7 +11634,7 @@ ErrorTrap:
                 If PageNumber = 0 Then
                     PageNumber = 1
                 End If
-                AdminURL = cpCore.db.siteProperty_AdminURL
+                AdminURL = cpCore.siteProperties.adminURL
                 TopCount = PageNumber * PageSize
                 '
                 ' Setup Headings
@@ -11680,7 +11680,7 @@ ErrorTrap:
                     RowPointer = 1
                 Else
                     DataRowCount = cpCore.db.db_GetCSRowCount(CS)
-                    LinkPrefix = "<a href=""" & cpCore.db.config.cdnFilesNetprefix
+                    LinkPrefix = "<a href=""" & cpCore.appConfig.cdnFilesNetprefix
                     LinkSuffix = """ target=_blank>Available</a>"
                     Do While cpCore.db.db_csOk(CS) And (RowPointer < PageSize)
                         RecordID = cpCore.db.db_GetCSInteger(CS, "ID")
@@ -11945,7 +11945,7 @@ ErrorTrap:
                             ' Ajax Tab
                             '
                             'AjaxLink = "/admin/index.asp?"
-                            AjaxLink = cpCore.db.siteProperty_AdminURL & "?" _
+                            AjaxLink = cpCore.siteProperties.adminURL & "?" _
                             & RequestNameAjaxFunction & "=" & AjaxGetFormEditTabContent _
                             & "&ID=" & editRecord.id _
                             & "&CID=" & adminContent.Id _
@@ -12200,7 +12200,7 @@ ErrorTrap:
                 SQLFieldName = "SQLQuery"
             End If
             '
-            If Not cpCore.user_isAdmin() Then
+            If Not cpCore.user.user_isAdmin() Then
                 '
                 ' Must be a developer
                 '
@@ -12212,7 +12212,7 @@ ErrorTrap:
                 If Button <> "" Then
                     Select Case Button
                         Case ButtonCancel
-                            Call cpCore.web_Redirect2(cpCore.db.siteProperty_AdminURL, "CustomReports, Cancel Button Pressed", False)
+                            Call cpCore.web_Redirect2(cpCore.siteProperties.adminURL, "CustomReports, Cancel Button Pressed", False)
                             'Call cpCore.main_Redirect2(encodeAppRootPath(cpCore.main_GetSiteProperty2("AdminURL"), cpCore.main_ServerVirtualPath, cpCore.app.RootPath, cpCore.main_ServerHost))
                         Case ButtonDelete
                             RowCnt = cpCore.web_GetStreamInteger2("RowCnt")
@@ -12286,7 +12286,7 @@ ErrorTrap:
                 If PageNumber = 0 Then
                     PageNumber = 1
                 End If
-                AdminURL = cpCore.db.siteProperty_AdminURL
+                AdminURL = cpCore.siteProperties.adminURL
                 TopCount = PageNumber * PageSize
                 '
                 ' Setup Headings
@@ -12518,7 +12518,7 @@ ErrorTrap:
                         "This content [" & adminContent.Name & "] cannot be accessed because it has no fields. Please contact your application developer for more assistance." _
                         , "Content [" & adminContent.Name & "] has no field records."
                         ))
-                ElseIf (adminContent.DeveloperOnly And (Not cpCore.user_isDeveloper)) Then
+                ElseIf (adminContent.DeveloperOnly And (Not cpCore.user.user_isDeveloper)) Then
                     '
                     ' Developer Content and not developer
                     '
@@ -12674,7 +12674,7 @@ ErrorTrap:
                                 End If
                                 SubTitlePart = ""
                                 If .LastEditedByMe Then
-                                    SubTitlePart = SubTitlePart & " by " & cpCore.userName
+                                    SubTitlePart = SubTitlePart & " by " & cpCore.user.userName
                                 End If
                                 If .LastEditedPast30Days Then
                                     SubTitlePart = SubTitlePart & " in the past 30 days"
@@ -12908,7 +12908,7 @@ ErrorTrap:
                                 '
                                 'if this is a current sort ,add the reverse flag
                                 '
-                                ButtonHref = cpCore.db.config.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormIndex & "&SetSortField=" & FieldName & "&RT=0&" & RequestNameTitleExtension & "=" & cpCore.main_EncodeRequestVariable(TitleExtension) & "&cid=" & adminContent.Id & "&ad=" & MenuDepth
+                                ButtonHref = cpCore.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormIndex & "&SetSortField=" & FieldName & "&RT=0&" & RequestNameTitleExtension & "=" & cpCore.main_EncodeRequestVariable(TitleExtension) & "&cid=" & adminContent.Id & "&ad=" & MenuDepth
                                 For Each sortKvp In IndexConfig.Sorts
                                     Dim sort As indexConfigSortClass = sortKvp.Value
 
@@ -12991,7 +12991,7 @@ ErrorTrap:
                                     ' --- Edit button column
                                     '
                                     DataTable_DataRows &= "<td align=center " & RowColor & ">"
-                                    URI = cpCore.db.config.adminRoute _
+                                    URI = cpCore.appConfig.adminRoute _
                                         & "?" & RequestNameAdminAction & "=" & AdminActionNop _
                                         & "&id=" & RecordID _
                                         & "&" & RequestNameTitleExtension & "=" & cpCore.main_EncodeRequestVariable(TitleExtension) _
@@ -13283,7 +13283,7 @@ ErrorTrap:
                         returnContent &= "<div class=""ccFilterHead"">Remove&nbsp;Filters</div>"
                         QS = RQS
                         QS = ModifyQueryString(QS, "IndexFilterRemoveAll", "1")
-                        Link = cpCore.db.siteProperty_AdminURL & "?" & QS
+                        Link = cpCore.siteProperties.adminURL & "?" & QS
                         returnContent &= "<div class=""ccFilterSubHead""><a class=""ccFilterLink"" href=""" & Link & """><img src=""/ccLib/images/delete1313.gif"" width=13 height=13 border=0 style=""vertical-align:middle;"">&nbsp;Remove All</a></div>"
                         '
                         ' Last Edited Edited by me
@@ -13292,25 +13292,25 @@ ErrorTrap:
                         If .LastEditedByMe Then
                             QS = RQS
                             QS = ModifyQueryString(QS, "IndexFilterLastEditedByMe", CStr(0), True)
-                            Link = cpCore.db.siteProperty_AdminURL & "?" & QS
+                            Link = cpCore.siteProperties.adminURL & "?" & QS
                             SubFilterList = SubFilterList & "<div class=""ccFilterIndent ccFilterList""><a class=""ccFilterLink"" href=""" & Link & """><img src=""/ccLib/images/delete1313.gif"" width=13 height=13 border=0 style=""vertical-align:middle;"">By&nbsp;Me</a></div>"
                         End If
                         If .LastEditedToday Then
                             QS = RQS
                             QS = ModifyQueryString(QS, "IndexFilterLastEditedToday", CStr(0), True)
-                            Link = cpCore.db.siteProperty_AdminURL & "?" & QS
+                            Link = cpCore.siteProperties.adminURL & "?" & QS
                             SubFilterList = SubFilterList & "<div class=""ccFilterIndent ccFilterList""><a class=""ccFilterLink"" href=""" & Link & """><img src=""/ccLib/images/delete1313.gif"" width=13 height=13 border=0 style=""vertical-align:middle;"">Today</a></div>"
                         End If
                         If .LastEditedPast7Days Then
                             QS = RQS
                             QS = ModifyQueryString(QS, "IndexFilterLastEditedPast7Days", CStr(0), True)
-                            Link = cpCore.db.siteProperty_AdminURL & "?" & QS
+                            Link = cpCore.siteProperties.adminURL & "?" & QS
                             SubFilterList = SubFilterList & "<div class=""ccFilterIndent ccFilterList""><a class=""ccFilterLink"" href=""" & Link & """><img src=""/ccLib/images/delete1313.gif"" width=13 height=13 border=0 style=""vertical-align:middle;"">Past Week</a></div>"
                         End If
                         If .LastEditedPast30Days Then
                             QS = RQS
                             QS = ModifyQueryString(QS, "IndexFilterLastEditedPast30Days", CStr(0), True)
-                            Link = cpCore.db.siteProperty_AdminURL & "?" & QS
+                            Link = cpCore.siteProperties.adminURL & "?" & QS
                             SubFilterList = SubFilterList & "<div class=""ccFilterIndent ccFilterList""><a class=""ccFilterLink"" href=""" & Link & """><img src=""/ccLib/images/delete1313.gif"" width=13 height=13 border=0 style=""vertical-align:middle;"">Past 30 Days</a></div>"
                         End If
                         If SubFilterList <> "" Then
@@ -13325,7 +13325,7 @@ ErrorTrap:
                             SubContentName = cpCore.main_GetContentNameByID(.SubCDefID)
                             QS = RQS
                             QS = ModifyQueryString(QS, "IndexFilterRemoveCDef", CStr(.SubCDefID))
-                            Link = cpCore.db.siteProperty_AdminURL & "?" & QS
+                            Link = cpCore.siteProperties.adminURL & "?" & QS
                             SubFilterList = SubFilterList & "<div class=""ccFilterIndent""><a class=""ccFilterLink"" href=""" & Link & """><img src=""/ccLib/images/delete1313.gif"" width=13 height=13 border=0 style=""vertical-align:middle;"">" & SubContentName & "</a></div>"
                         End If
                         If SubFilterList <> "" Then
@@ -13345,7 +13345,7 @@ ErrorTrap:
                                     End If
                                     QS = RQS
                                     QS = ModifyQueryString(QS, "IndexFilterRemoveGroup", .GroupList(Ptr))
-                                    Link = cpCore.db.siteProperty_AdminURL & "?" & QS
+                                    Link = cpCore.siteProperties.adminURL & "?" & QS
                                     SubFilterList = SubFilterList & "<div class=""ccFilterIndent""><a class=""ccFilterLink"" href=""" & Link & """><img src=""/ccLib/images/delete1313.gif"" width=13 height=13 border=0 style=""vertical-align:middle;"">" & GroupName & "</a></div>"
                                 End If
                             Next
@@ -13360,7 +13360,7 @@ ErrorTrap:
                         If .ActiveOnly Then
                             QS = RQS
                             QS = ModifyQueryString(QS, "IndexFilterActiveOnly", CStr(0), True)
-                            Link = cpCore.db.siteProperty_AdminURL & "?" & QS
+                            Link = cpCore.siteProperties.adminURL & "?" & QS
                             SubFilterList = SubFilterList & "<div class=""ccFilterIndent ccFilterList""><a class=""ccFilterLink"" href=""" & Link & """><img src=""/ccLib/images/delete1313.gif"" width=13 height=13 border=0 style=""vertical-align:middle;"">Active&nbsp;Only</a></div>"
                         End If
                         If SubFilterList <> "" Then
@@ -13375,7 +13375,7 @@ ErrorTrap:
                             returnContent &= "<div class=""ccFilterSubHead"">Content&nbsp;Category</div>"
                             QS = RQS
                             QS = ModifyQueryString(QS, "IndexFilterCategoryID", CStr(0), True)
-                            Link = cpCore.db.siteProperty_AdminURL & "?" & QS
+                            Link = cpCore.siteProperties.adminURL & "?" & QS
                             returnContent &= "<div class=""ccFilterIndent""><a class=""ccFilterLink"" href=""" & Link & """><img src=""/ccLib/images/delete1313.gif"" width=13 height=13 border=0 style=""vertical-align:middle;"">&nbsp;" & Copy & "</a></div>"
                         End If
                         '
@@ -13386,7 +13386,7 @@ ErrorTrap:
                             FieldCaption = EncodeText(cpCore.db_GetContentFieldProperty(ContentName, findWord.Name, "caption"))
                             QS = RQS
                             QS = ModifyQueryString(QS, "IndexFilterRemoveFind", findWord.Name)
-                            Link = cpCore.db.siteProperty_AdminURL & "?" & QS
+                            Link = cpCore.siteProperties.adminURL & "?" & QS
                             Select Case findWord.MatchOption
                                 Case FindWordMatchEnum.matchincludes
                                     returnContent &= "<div class=""ccFilterIndent""><a class=""ccFilterLink"" href=""" & Link & """><img src=""/ccLib/images/delete1313.gif"" width=13 height=13 border=0 style=""vertical-align:middle;"">&nbsp;" & FieldCaption & "&nbsp;includes&nbsp;'" & findWord.Value & "'</a></div>"
@@ -13438,7 +13438,7 @@ ErrorTrap:
                             JSCaption = EncodeJavascript(Caption)
                             QS = RQS
                             QS = ModifyQueryString(QS, "SetIndexFilterCategoryID", CStr(Id), True)
-                            Link = cpCore.db.siteProperty_AdminURL & "?" & QS
+                            Link = cpCore.siteProperties.adminURL & "?" & QS
                             lis = lis & cr & "<li class=""ccAdminSmall ccPanel""><a href=""" & Link & """>" & Caption & "</a></li>"
                             'Call Tree.AddEntry(CStr(Id), CStr(CurrentFolderID), , , Link, Caption)
                         End If
@@ -13462,25 +13462,25 @@ ErrorTrap:
                     If Not .LastEditedByMe Then
                         QS = RQS
                         QS = ModifyQueryString(QS, "IndexFilterLastEditedByMe", "1", True)
-                        Link = cpCore.db.siteProperty_AdminURL & "?" & QS
+                        Link = cpCore.siteProperties.adminURL & "?" & QS
                         SubFilterList = SubFilterList & "<div class=""ccFilterIndent""><a class=""ccFilterLink"" href=""" & Link & """>By&nbsp;Me</a></div>"
                     End If
                     If Not .LastEditedToday Then
                         QS = RQS
                         QS = ModifyQueryString(QS, "IndexFilterLastEditedToday", "1", True)
-                        Link = cpCore.db.siteProperty_AdminURL & "?" & QS
+                        Link = cpCore.siteProperties.adminURL & "?" & QS
                         SubFilterList = SubFilterList & "<div class=""ccFilterIndent""><a class=""ccFilterLink"" href=""" & Link & """>Today</a></div>"
                     End If
                     If Not .LastEditedPast7Days Then
                         QS = RQS
                         QS = ModifyQueryString(QS, "IndexFilterLastEditedPast7Days", "1", True)
-                        Link = cpCore.db.siteProperty_AdminURL & "?" & QS
+                        Link = cpCore.siteProperties.adminURL & "?" & QS
                         SubFilterList = SubFilterList & "<div class=""ccFilterIndent""><a class=""ccFilterLink"" href=""" & Link & """>Past Week</a></div>"
                     End If
                     If Not .LastEditedPast30Days Then
                         QS = RQS
                         QS = ModifyQueryString(QS, "IndexFilterLastEditedPast30Days", "1", True)
-                        Link = cpCore.db.siteProperty_AdminURL & "?" & QS
+                        Link = cpCore.siteProperties.adminURL & "?" & QS
                         SubFilterList = SubFilterList & "<div class=""ccFilterIndent""><a class=""ccFilterLink"" href=""" & Link & """>Past 30 Days</a></div>"
                     End If
                     If SubFilterList <> "" Then
@@ -13503,7 +13503,7 @@ ErrorTrap:
                                         Caption = "<span style=""white-space:nowrap;"">" & cpCore.main_GetContentNameByID(subContentID) & "</span>"
                                         QS = RQS
                                         QS = ModifyQueryString(QS, "IndexFilterAddCDef", CStr(subContentID), True)
-                                        Link = cpCore.db.siteProperty_AdminURL & "?" & QS
+                                        Link = cpCore.siteProperties.adminURL & "?" & QS
                                         SubFilterList = SubFilterList & "<div class=""ccFilterIndent""><a class=""ccFilterLink"" href=""" & Link & """>" & Caption & "</a></div>"
                                     End If
                                 End If
@@ -13550,7 +13550,7 @@ ErrorTrap:
                                 Else
                                     QS = ModifyQueryString(QS, "IndexFilterAddGroup", CStr(RecordID), True)
                                 End If
-                                Link = cpCore.db.siteProperty_AdminURL & "?" & QS
+                                Link = cpCore.siteProperties.adminURL & "?" & QS
                                 SubFilterList = SubFilterList & "<div class=""ccFilterIndent""><a class=""ccFilterLink"" href=""" & Link & """>" & Caption & "</a></div>"
                             End If
                             cpCore.db.db_csGoNext(CS)
@@ -13566,7 +13566,7 @@ ErrorTrap:
                     If Not .ActiveOnly Then
                         QS = RQS
                         QS = ModifyQueryString(QS, "IndexFilterActiveOnly", "1", True)
-                        Link = cpCore.db.siteProperty_AdminURL & "?" & QS
+                        Link = cpCore.siteProperties.adminURL & "?" & QS
                         SubFilterList = SubFilterList & "<div class=""ccFilterIndent""><a class=""ccFilterLink"" href=""" & Link & """>Active&nbsp;Only</a></div>"
                     End If
                     If SubFilterList <> "" Then
@@ -13579,7 +13579,7 @@ ErrorTrap:
                     '
                     QS = RQS
                     QS = ModifyQueryString(QS, RequestNameAdminSubForm, AdminFormIndex_SubFormAdvancedSearch, True)
-                    Link = cpCore.db.siteProperty_AdminURL & "?" & QS
+                    Link = cpCore.siteProperties.adminURL & "?" & QS
                     returnContent &= "<div class=""ccFilterHead""><a class=""ccFilterLink"" href=""" & Link & """>Advanced&nbsp;Search</a></div>"
                     '
                     returnContent &= "<div style=""border-bottom:1px dotted #808080;"">&nbsp;</div>"
@@ -13588,7 +13588,7 @@ ErrorTrap:
                     '
                     QS = RQS
                     QS = ModifyQueryString(QS, RequestNameAdminSubForm, AdminFormIndex_SubFormSetColumns, True)
-                    Link = cpCore.db.siteProperty_AdminURL & "?" & QS
+                    Link = cpCore.siteProperties.adminURL & "?" & QS
                     returnContent &= "<div class=""ccFilterHead""><a class=""ccFilterLink"" href=""" & Link & """>Set&nbsp;Columns</a></div>"
                     '
                     returnContent &= "<div style=""border-bottom:1px dotted #808080;"">&nbsp;</div>"
@@ -13597,7 +13597,7 @@ ErrorTrap:
                     '
                     QS = RQS
                     QS = ModifyQueryString(QS, RequestNameAdminForm, AdminFormImportWizard, True)
-                    Link = cpCore.db.siteProperty_AdminURL & "?" & QS
+                    Link = cpCore.siteProperties.adminURL & "?" & QS
                     returnContent &= "<div class=""ccFilterHead""><a class=""ccFilterLink"" href=""" & Link & """>Import</a></div>"
                     '
                     returnContent &= "<div style=""border-bottom:1px dotted #808080;"">&nbsp;</div>"
@@ -13606,7 +13606,7 @@ ErrorTrap:
                     '
                     QS = RQS
                     QS = ModifyQueryString(QS, RequestNameAdminSubForm, AdminFormIndex_SubFormExport, True)
-                    Link = cpCore.db.siteProperty_AdminURL & "?" & QS
+                    Link = cpCore.siteProperties.adminURL & "?" & QS
                     returnContent &= "<div class=""ccFilterHead""><a class=""ccFilterLink"" href=""" & Link & """>Export</a></div>"
                     '
                     returnContent &= "<div style=""border-bottom:1px dotted #808080;"">&nbsp;</div>"
@@ -15123,7 +15123,7 @@ ErrorTrap:
                 '
                 Call cpCore.main_GetContentAccessRights(adminContent.Name, allowContentEdit, allowContentAdd, allowContentDelete)
                 If Not allowContentEdit Then
-                    'If Not cpCore.main_IsContentManager2(AdminContent.Name) Then
+                    'If Not cpCore.user.main_IsContentManager2(AdminContent.Name) Then
                     '
                     ' You must be a content manager of this content to use this tool
                     '
@@ -15152,7 +15152,7 @@ ErrorTrap:
                         End If
                     End If
                     If ExportName = "" Then
-                        ExportName = adminContent.Name & " export for " & cpCore.userName
+                        ExportName = adminContent.Name & " export for " & cpCore.user.userName
                     End If
                     '
                     ' Get the SQL parts
@@ -15245,7 +15245,7 @@ ErrorTrap:
                                 & cr2 & "<td class=""exportTblCaption"">Record Limit</td>" _
                                 & cr2 & "<td class=""exportTblInput"">" & cpCore.main_GetFormInputText2("RecordLimit", RecordLimitText) & "</td>" _
                                 & cr & "</tr>"
-                            If cpCore.user_isDeveloper Then
+                            If cpCore.user.user_isDeveloper Then
                                 Content = Content _
                                     & cr & "<tr>" _
                                     & cr2 & "<td class=""exportTblCaption"">Results SQL</td>" _
@@ -15269,7 +15269,7 @@ ErrorTrap:
                                 & cpCore.html_GetFormInputHidden(RequestNameAdminSubForm, AdminFormIndex_SubFormExport) _
                                 & ""
                             ButtonList = ButtonCancel & "," & ButtonRequestDownload
-                            If cpCore.user_isDeveloper Then
+                            If cpCore.user.user_isDeveloper Then
                                 ButtonList = ButtonList & "," & ButtonRefresh
                             End If
                         End If
@@ -15430,8 +15430,8 @@ ErrorTrap:
                     '
                     ' Block contentautoload, then force a load at the end
                     '
-                    AllowContentAutoLoad = (cpCore.db.siteProperty_getBoolean("AllowContentAutoLoad", True))
-                    Call cpCore.db.siteProperty_set("AllowContentAutoLoad", False)
+                    AllowContentAutoLoad = (cpCore.siteProperties.getBoolean("AllowContentAutoLoad", True))
+                    Call cpCore.siteProperties.setProperty("AllowContentAutoLoad", False)
                     '
                     ' Make sure the FieldNameToAdd is not-inherited, if not, create new field
                     '
@@ -15443,7 +15443,7 @@ ErrorTrap:
                                 If field.inherited Then
                                     SourceContentID = field.contentId
                                     SourceName = field.nameLc
-                                    CSSource = cpCore.db.db_csOpen("Content Fields", "(ContentID=" & SourceContentID & ")and(Name=" & cpCore.db.db_EncodeSQLText(SourceName) & ")")
+                                    CSSource = cpCore.db.db_csOpen("Content Fields", "(ContentID=" & SourceContentID & ")and(Name=" & cpCore.db.encodeSQLText(SourceName) & ")")
                                     If cpCore.db.db_csOk(CSSource) Then
                                         CSTarget = cpCore.db.db_csInsertRecord("Content Fields")
                                         If cpCore.db.db_csOk(CSTarget) Then
@@ -15468,7 +15468,7 @@ ErrorTrap:
                         If field.inherited Then
                             SourceContentID = field.contentId
                             SourceName = field.nameLc
-                            CSSource = cpCore.db.db_csOpen("Content Fields", "(ContentID=" & SourceContentID & ")and(Name=" & cpCore.db.db_EncodeSQLText(SourceName) & ")")
+                            CSSource = cpCore.db.db_csOpen("Content Fields", "(ContentID=" & SourceContentID & ")and(Name=" & cpCore.db.encodeSQLText(SourceName) & ")")
                             If cpCore.db.db_csOk(CSSource) Then
                                 CSTarget = cpCore.db.db_csInsertRecord("Content Fields")
                                 If cpCore.db.db_csOk(CSTarget) Then
@@ -15861,7 +15861,7 @@ ErrorTrap:
             'FormPanel = FormPanel & cpCore.main_GetFormInputSelect2("ContentID", ContentID, "Content")
             'Call Stream.Add(cpCore.main_GetPanel(FormPanel))
             ''
-            Call cpCore.db.siteProperty_set("AllowContentAutoLoad", EncodeText(AllowContentAutoLoad))
+            Call cpCore.siteProperties.setProperty("AllowContentAutoLoad", EncodeText(AllowContentAutoLoad))
             'Stream.Add( cpCore.main_GetFormInputHidden("NeedToReloadConfig", NeedToReloadConfig))
 
             Content = "" _
@@ -16017,7 +16017,7 @@ ErrorTrap:
                 '
                 ' From here down will return a form
                 '
-                If Not cpCore.user_isAdmin Then
+                If Not cpCore.user.user_isAdmin Then
                     '
                     ' Does not have permission
                     '
@@ -16033,7 +16033,7 @@ ErrorTrap:
                         '
                         ' Save the Previous edits
                         '
-                        Call cpCore.db.siteProperty_set("Editor Background Color", cpCore.doc_getText("editorbackgroundcolor"))
+                        Call cpCore.siteProperties.setProperty("Editor Background Color", cpCore.doc_getText("editorbackgroundcolor"))
                         '
                         For Ptr = 0 To UBound(DefaultFeatures)
                             FeatureName = DefaultFeatures(Ptr)
@@ -16056,17 +16056,17 @@ ErrorTrap:
                                 End If
                             End If
                         Next
-                        Call cpCore.db.privateFiles.SaveFile(InnovaEditorFeaturefilename, "admin:" & AdminList & vbCrLf & "contentmanager:" & CMList & vbCrLf & "public:" & PublicList)
+                        Call cpCore.privateFiles.SaveFile(InnovaEditorFeaturefilename, "admin:" & AdminList & vbCrLf & "contentmanager:" & CMList & vbCrLf & "public:" & PublicList)
                         '
                         ' Clear the editor style rules template cache so next edit gets new background color
                         '
                         EditorStyleRulesFilename = Replace(EditorStyleRulesFilenamePattern, "$templateid$", "0", , , vbTextCompare)
-                        Call cpCore.db.privateFiles.DeleteFile(EditorStyleRulesFilename)
+                        Call cpCore.privateFiles.DeleteFile(EditorStyleRulesFilename)
                         '
                         CS = cpCore.db.db_openCsSql_rev("default", "select id from cctemplates")
                         Do While cpCore.db.db_csOk(CS)
                             EditorStyleRulesFilename = Replace(EditorStyleRulesFilenamePattern, "$templateid$", cpCore.main_GetCS2Text(CS, "ID"), , , vbTextCompare)
-                            Call cpCore.db.privateFiles.DeleteFile(EditorStyleRulesFilename)
+                            Call cpCore.privateFiles.DeleteFile(EditorStyleRulesFilename)
                             Call cpCore.db.db_csGoNext(CS)
                         Loop
                         Call cpCore.db.db_csClose(CS)
@@ -16081,10 +16081,10 @@ ErrorTrap:
                         '
                         ' Draw the form
                         '
-                        FeatureList = cpCore.db.cdnFiles.ReadFile(InnovaEditorFeaturefilename)
+                        FeatureList = cpCore.cdnFiles.ReadFile(InnovaEditorFeaturefilename)
                         If FeatureList = "" Then
                             FeatureList = cpCore.cluster.clusterFiles.ReadFile("ccLib\" & "Config\DefaultEditorConfig.txt")
-                            Call cpCore.db.privateFiles.SaveFile(InnovaEditorFeaturefilename, FeatureList)
+                            Call cpCore.privateFiles.SaveFile(InnovaEditorFeaturefilename, FeatureList)
                         End If
                         If FeatureList = "" Then
                             FeatureList = "admin:" & InnovaEditorFeatureList & vbCrLf & "contentmanager:" & InnovaEditorFeatureList & vbCrLf & "public:" & InnovaEditorPublicFeatureList
@@ -16132,7 +16132,7 @@ ErrorTrap:
                         Next
                         Copy = "" _
                             & vbCrLf & "<div><b>body background style color</b> (default='white')</div>" _
-                            & vbCrLf & "<div>" & cpCore.main_GetFormInputText2("editorbackgroundcolor", cpCore.db.siteProperty_getText("Editor Background Color", "white")) & "</div>" _
+                            & vbCrLf & "<div>" & cpCore.main_GetFormInputText2("editorbackgroundcolor", cpCore.siteProperties.getText("Editor Background Color", "white")) & "</div>" _
                             & vbCrLf & "<div>&nbsp;</div>" _
                             & vbCrLf & "<div><b>Toolbar features available</b></div>" _
                             & vbCrLf & "<table border=""0"" cellpadding=""4"" cellspacing=""0"" width=""500px"" align=left>" & kmaIndent(Copy) & vbCrLf & kmaEndTable
@@ -16176,7 +16176,7 @@ ErrorTrap:
                 ' Cancel just exits with no content
                 '
                 Exit Function
-            ElseIf Not cpCore.user_isAdmin Then
+            ElseIf Not cpCore.user.user_isAdmin Then
                 '
                 ' Not Admin Error
                 '
@@ -16187,7 +16187,7 @@ ErrorTrap:
                 '
                 ' Set defaults
                 '
-                AllowAutoLogin = (cpCore.db.siteProperty_getBoolean("AllowAutoLogin", True))
+                AllowAutoLogin = (cpCore.siteProperties.getBoolean("AllowAutoLogin", True))
                 '
                 ' Process Requests
                 '
@@ -16198,7 +16198,7 @@ ErrorTrap:
                         '
                         AllowAutoLogin = cpCore.main_GetStreamBoolean2("AllowAutoLogin")
                         '
-                        Call cpCore.db.siteProperty_set("AllowAutoLogin", EncodeText(AllowAutoLogin))
+                        Call cpCore.siteProperties.setProperty("AllowAutoLogin", EncodeText(AllowAutoLogin))
                 End Select
                 If (Button = ButtonOK) Then
                     '
@@ -16661,7 +16661,7 @@ ErrorTrap:
                     ' Cancel just exits with no content
                     '
                     Exit Function
-                ElseIf Not cpCore.user_isAdmin Then
+                ElseIf Not cpCore.user.user_isAdmin Then
                     '
                     ' Not Admin Error
                     '
@@ -16743,7 +16743,7 @@ ErrorTrap:
                 ' Cancel just exits with no content
                 '
                 Exit Function
-            ElseIf Not cpCore.user_isAdmin Then
+            ElseIf Not cpCore.user.user_isAdmin Then
                 '
                 ' Not Admin Error
                 '
@@ -16773,7 +16773,7 @@ ErrorTrap:
                                 If Keyword <> "" Then
                                     'Dim dt As DataTable
 
-                                    dt = cpCore.db.executeSql("select top 1 ID from ccMetaKeywords where name=" & cpCore.db.db_EncodeSQLText(Keyword))
+                                    dt = cpCore.db.executeSql("select top 1 ID from ccMetaKeywords where name=" & cpCore.db.encodeSQLText(Keyword))
                                     If dt.Rows.Count = 0 Then
                                         CS = cpCore.db.db_csInsertRecord("Meta Keywords")
                                         If cpCore.db.db_csOk(CS) Then
@@ -16828,7 +16828,7 @@ ErrorTrap:
         Private Function AllowAdminFieldCheck() As Boolean
             If Not AllowAdminFieldCheck_LocalLoaded Then
                 AllowAdminFieldCheck_LocalLoaded = True
-                AllowAdminFieldCheck_Local = (cpCore.db.siteProperty_getBoolean("AllowAdminFieldCheck", True))
+                AllowAdminFieldCheck_Local = (cpCore.siteProperties.getBoolean("AllowAdminFieldCheck", True))
             End If
             AllowAdminFieldCheck = AllowAdminFieldCheck_Local
         End Function
@@ -16873,7 +16873,7 @@ ErrorTrap:
                         IconHeight = cpCore.db.db_GetCSInteger(CS, "IconHeight")
                         IconSprites = cpCore.db.db_GetCSInteger(CS, "IconSprites")
                         IconIsInline = cpCore.db.db_GetCSBoolean(CS, "IsInline")
-                        IconImg = GetAddonIconImg(cpCore.db.siteProperty_AdminURL, IconWidth, IconHeight, IconSprites, IconIsInline, "", IconFilename, cpCore.db.config.cdnFilesNetprefix, AddonName, AddonName, "", 0)
+                        IconImg = GetAddonIconImg(cpCore.siteProperties.adminURL, IconWidth, IconHeight, IconSprites, IconIsInline, "", IconFilename, cpCore.appConfig.cdnFilesNetprefix, AddonName, AddonName, "", 0)
                         helpLink = cpCore.db.db_GetCS(CS, "helpLink")
                     End If
                     Call cpCore.db.db_csClose(CS)
@@ -17082,7 +17082,7 @@ ErrorTrap:
                 '
                 ' ----- Go through fields and create select and leftjoin sections of sql first
                 '
-                SupportWorkflowFields = cpCore.main_IsWorkflowAuthoringCompatible(adminContent.Name) And cpCore.db.siteProperty_AllowWorkflowAuthoring
+                SupportWorkflowFields = cpCore.workflow.isWorkflowAuthoringCompatible(adminContent.Name) And cpCore.siteProperties.allowWorkflowAuthoring
                 '
                 ' ----- Workflow Fields
                 '
@@ -17290,7 +17290,7 @@ ErrorTrap:
                 ' Where Clause: edited by me
                 '
                 If IndexConfig.LastEditedByMe Then
-                    return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".ModifiedBy=" & cpCore.userId & ")"
+                    return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".ModifiedBy=" & cpCore.user.userId & ")"
                 End If
                 '
                 ' Where Clause: edited today
@@ -17441,9 +17441,9 @@ ErrorTrap:
                                                             Case FindWordMatchEnum.MatchNotEmpty
                                                                 return_SQLWhere &= "AND(LookupTable" & FieldPtr & ".ID is not null)"
                                                             Case FindWordMatchEnum.MatchEquals
-                                                                return_SQLWhere &= "AND(LookupTable" & FieldPtr & ".Name=" & cpCore.db.db_EncodeSQLText(FindWordValue) & ")"
+                                                                return_SQLWhere &= "AND(LookupTable" & FieldPtr & ".Name=" & cpCore.db.encodeSQLText(FindWordValue) & ")"
                                                             Case FindWordMatchEnum.matchincludes
-                                                                return_SQLWhere &= "AND(LookupTable" & FieldPtr & ".Name LIKE " & cpCore.db.db_EncodeSQLText("%" & FindWordValue & "%") & ")"
+                                                                return_SQLWhere &= "AND(LookupTable" & FieldPtr & ".Name LIKE " & cpCore.db.encodeSQLText("%" & FindWordValue & "%") & ")"
                                                         End Select
                                                     ElseIf .lookupList <> "" Then
                                                         '
@@ -17495,11 +17495,11 @@ ErrorTrap:
                                                         Case FindWordMatchEnum.MatchNotEmpty
                                                             return_SQLWhere &= "AND(" & adminContent.ContentTableName & "." & FindWordName & " is not null)"
                                                         Case FindWordMatchEnum.matchincludes
-                                                            FindWordValue = cpCore.db.db_EncodeSQLText(FindWordValue)
+                                                            FindWordValue = cpCore.db.encodeSQLText(FindWordValue)
                                                             FindWordValue = Mid(FindWordValue, 2, Len(FindWordValue) - 2)
                                                             return_SQLWhere &= "AND(" & adminContent.ContentTableName & "." & FindWordName & " LIKE '%" & FindWordValue & "%')"
                                                         Case FindWordMatchEnum.MatchEquals
-                                                            return_SQLWhere &= "AND(" & adminContent.ContentTableName & "." & FindWordName & "=" & cpCore.db.db_EncodeSQLText(FindWordValue) & ")"
+                                                            return_SQLWhere &= "AND(" & adminContent.ContentTableName & "." & FindWordName & "=" & cpCore.db.encodeSQLText(FindWordValue) & ")"
                                                     End Select
                                                     Exit For
                                             End Select
@@ -17556,7 +17556,7 @@ ErrorTrap:
             Dim ParentID As Integer
             '
             Found = False
-            SQL = "select h.HelpDefault,h.HelpCustom from ccfieldhelp h left join ccfields f on f.id=h.fieldid where f.contentid=" & ContentID & " and f.name=" & cpCore.db.db_EncodeSQLText(FieldName)
+            SQL = "select h.HelpDefault,h.HelpCustom from ccfieldhelp h left join ccfields f on f.id=h.fieldid where f.contentid=" & ContentID & " and f.name=" & cpCore.db.encodeSQLText(FieldName)
             CS = cpCore.db.db_csOpenSql(SQL)
             If cpCore.db.db_csOk(CS) Then
                 Found = True

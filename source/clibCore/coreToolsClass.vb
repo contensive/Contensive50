@@ -206,12 +206,12 @@ Namespace Contensive.Core
                 '
                 ' Cancel to the admin site
                 '
-                Call cpCore.main_Redirect(cpCore.db.siteProperty_getText("AdminURL", "/admin/"))
+                Call cpCore.main_Redirect(cpCore.siteProperties.getText("AdminURL", "/admin/"))
             End If
             '
             ' ----- Check permissions
             '
-            If Not cpCore.user_isAdmin Then
+            If Not cpCore.user.user_isAdmin Then
                 '
                 ' You must be admin to use this feature
                 '
@@ -253,7 +253,7 @@ Namespace Contensive.Core
                     '
                     ' Cancel
                     '
-                    Call cpCore.main_Redirect(cpCore.db.siteProperty_getText("AdminURL", "/admin/"))
+                    Call cpCore.main_Redirect(cpCore.siteProperties.getText("AdminURL", "/admin/"))
                     'If AdminFormTool = AdminFormToolRoot Then
                     '    '
                     '    ' Cancel to the admin site
@@ -511,8 +511,8 @@ ErrorTrap:
                     '
                     ' Save the form changes
                     '
-                    AllowContentAutoLoad = (cpCore.db.siteProperty_getBoolean("AllowContentAutoLoad", True))
-                    Call cpCore.db.siteProperty_set("AllowContentAutoLoad", False)
+                    AllowContentAutoLoad = (cpCore.siteProperties.getBoolean("AllowContentAutoLoad", True))
+                    Call cpCore.siteProperties.setProperty("AllowContentAutoLoad", False)
                     '
                     ' ----- Save the input
                     '
@@ -603,11 +603,11 @@ ErrorTrap:
                                                     Call cpCore.db.executeSql(SQL, DataSourceName)
                                                 End If
                                                 SQL = "Update ccFields" _
-                                                & " Set name=" & cpCore.db.db_EncodeSQLText(formFieldName) _
+                                                & " Set name=" & cpCore.db.encodeSQLText(formFieldName) _
                                                 & ",type=" & formFieldTypeId _
-                                                & ",caption=" & cpCore.db.db_EncodeSQLText(cpCore.doc_getText("dtfaCaption." & RecordPointer)) _
-                                                & ",DefaultValue=" & cpCore.db.db_EncodeSQLText(cpCore.doc_getText("dtfaDefaultValue." & RecordPointer)) _
-                                                & ",EditSortPriority=" & cpCore.db.db_EncodeSQLText(EncodeText(cpCore.doc_getInteger("dtfaEditSortPriority." & RecordPointer))) _
+                                                & ",caption=" & cpCore.db.encodeSQLText(cpCore.doc_getText("dtfaCaption." & RecordPointer)) _
+                                                & ",DefaultValue=" & cpCore.db.encodeSQLText(cpCore.doc_getText("dtfaDefaultValue." & RecordPointer)) _
+                                                & ",EditSortPriority=" & cpCore.db.encodeSQLText(EncodeText(cpCore.doc_getInteger("dtfaEditSortPriority." & RecordPointer))) _
                                                 & ",Active=" & cpCore.db.db_EncodeSQLBoolean(cpCore.doc_getBoolean("dtfaActive." & RecordPointer)) _
                                                 & ",ReadOnly=" & cpCore.db.db_EncodeSQLBoolean(cpCore.doc_getBoolean("dtfaReadOnly." & RecordPointer)) _
                                                 & ",Authorable=" & cpCore.db.db_EncodeSQLBoolean(cpCore.doc_getBoolean("dtfaAuthorable." & RecordPointer)) _
@@ -616,13 +616,13 @@ ErrorTrap:
                                                 & ",TextBuffered=" & cpCore.db.db_EncodeSQLBoolean(cpCore.doc_getBoolean("dtfaTextBuffered." & RecordPointer)) _
                                                 & ",Password=" & cpCore.db.db_EncodeSQLBoolean(cpCore.doc_getBoolean("dtfaPassword." & RecordPointer)) _
                                                 & ",HTMLContent=" & cpCore.db.db_EncodeSQLBoolean(cpCore.doc_getBoolean("dtfaHTMLContent." & RecordPointer)) _
-                                                & ",EditTab=" & cpCore.db.db_EncodeSQLText(cpCore.doc_getText("dtfaEditTab." & RecordPointer)) _
+                                                & ",EditTab=" & cpCore.db.encodeSQLText(cpCore.doc_getText("dtfaEditTab." & RecordPointer)) _
                                                 & ",Scramble=" & cpCore.db.db_EncodeSQLBoolean(cpCore.doc_getBoolean("dtfaScramble." & RecordPointer)) _
                                                 & ""
-                                                If cpCore.user_isAdmin Then
+                                                If cpCore.user.user_isAdmin Then
                                                     SQL &= ",adminonly=" & cpCore.db.db_EncodeSQLBoolean(cpCore.doc_getBoolean("dtfaAdminOnly." & RecordPointer))
                                                 End If
-                                                If cpCore.user_isDeveloper Then
+                                                If cpCore.user.user_isDeveloper Then
                                                     SQL &= ",DeveloperOnly=" & cpCore.db.db_EncodeSQLBoolean(cpCore.doc_getBoolean("dtfaDeveloperOnly." & RecordPointer))
                                                 End If
                                                 SQL &= " where ID=" & formFieldId
@@ -687,7 +687,7 @@ ErrorTrap:
                 ' ----- Restore Content Autoload site property
                 '
                 If AllowContentAutoLoad Then
-                    Call cpCore.db.siteProperty_set("AllowContentAutoLoad", AllowContentAutoLoad)
+                    Call cpCore.siteProperties.setProperty("AllowContentAutoLoad", AllowContentAutoLoad)
                 End If
                 '
                 ' ----- Cancel or Save, reload CDef and go
@@ -994,13 +994,13 @@ ErrorTrap:
                             '
                             ' Admin Only
                             '
-                            If cpCore.user_isAdmin Then
+                            If cpCore.user.user_isAdmin Then
                                 streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaAdminOnly." & RecordCount, EncodeText(.adminOnly), .inherited))
                             End If
                             '
                             ' Developer Only
                             '
-                            If cpCore.user_isDeveloper Then
+                            If cpCore.user.user_isDeveloper Then
                                 streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaDeveloperOnly." & RecordCount, EncodeText(.developerOnly), .inherited))
                             End If
                             '
@@ -1195,10 +1195,10 @@ ErrorTrap:
                 '
                 SQLFilename = cpCore.properties_user_getText("SQLArchive")
                 If SQLFilename = "" Then
-                    SQLFilename = "SQLArchive" & Format(cpCore.userId, "000000000") & ".txt"
+                    SQLFilename = "SQLArchive" & Format(cpCore.user.userId, "000000000") & ".txt"
                     Call cpCore.properties_SetMemberProperty2("SQLArchive", SQLFilename)
                 End If
-                SQLArchive = cpCore.db.cdnFiles.ReadFile(SQLFilename)
+                SQLArchive = cpCore.cdnFiles.ReadFile(SQLFilename)
                 '
                 ' Read in arguments if available
                 '
@@ -1241,7 +1241,7 @@ ErrorTrap:
                         Do While (LineCounter < 10) And (SQLArchiveOld <> "")
                             SQLArchive = SQLArchive & getLine(SQLArchiveOld) & vbCrLf
                         Loop
-                        Call cpCore.db.appRootFiles.SaveFile(SQLFilename, SQLArchive)
+                        Call cpCore.appRootFiles.SaveFile(SQLFilename, SQLArchive)
                     End If
                     '
                     ' Run the SQL
@@ -1337,7 +1337,7 @@ ErrorTrap:
                 Call Stream.Add("&nbsp;<INPUT TYPE=""Text"" TabIndex=-1 NAME=""SQLRows"" SIZE=""3"" VALUE=""" & SQLRows & """ ID=""""  onchange=""SQL.rows=SQLRows.value; return true""> Rows")
                 Call Stream.Add("<br><br>Data Source<br>" & cpCore.main_GetFormInputSelect("DataSourceID", DataSourceID, "Data Sources", "", "Default"))
                 '
-                SelectFieldWidthLimit = cpCore.db.siteProperty_getinteger("SelectFieldWidthLimit", 200)
+                SelectFieldWidthLimit = cpCore.siteProperties.getinteger("SelectFieldWidthLimit", 200)
                 If SQLArchive <> "" Then
                     Call Stream.Add("<br><br>Previous Queries<br>")
                     Call Stream.Add("<select size=""1"" name=""SQLList"" ID=""SQLList"" onChange=""SQL.value=SQLList.value"">")
@@ -1427,14 +1427,14 @@ ErrorTrap:
                     ContentID = cpCore.main_GetContentID(ContentName)
                     ParentNavID = cpCore.main_GetRecordID("Navigator Entries", "Manage Site Content")
                     If ParentNavID <> 0 Then
-                        CS = cpCore.db.db_csOpen("Navigator Entries", "(name=" & cpCore.db.db_EncodeSQLText("Advanced") & ")and(parentid=" & ParentNavID & ")")
+                        CS = cpCore.db.db_csOpen("Navigator Entries", "(name=" & cpCore.db.encodeSQLText("Advanced") & ")and(parentid=" & ParentNavID & ")")
                         ParentNavID = 0
                         If cpCore.db.db_csOk(CS) Then
                             ParentNavID = cpCore.db.db_GetCSInteger(CS, "ID")
                         End If
                         Call cpCore.db.db_csClose(CS)
                         If ParentNavID <> 0 Then
-                            CS = cpCore.db.db_csOpen("Navigator Entries", "(name=" & cpCore.db.db_EncodeSQLText(ContentName) & ")and(parentid=" & NavID & ")")
+                            CS = cpCore.db.db_csOpen("Navigator Entries", "(name=" & cpCore.db.encodeSQLText(ContentName) & ")and(parentid=" & NavID & ")")
                             If Not cpCore.db.db_csOk(CS) Then
                                 Call cpCore.db.db_csClose(CS)
                                 CS = cpCore.db.db_csInsertRecord("Navigator Entries")
@@ -1593,8 +1593,8 @@ ErrorTrap:
                     '
                     ' Block contentautoload, then force a load at the end
                     '
-                    AllowContentAutoLoad = (cpCore.db.siteProperty_getBoolean("AllowContentAutoLoad", True))
-                    Call cpCore.db.siteProperty_set("AllowContentAutoLoad", False)
+                    AllowContentAutoLoad = (cpCore.siteProperties.getBoolean("AllowContentAutoLoad", True))
+                    Call cpCore.siteProperties.setProperty("AllowContentAutoLoad", False)
                     '
                     ' Make sure the FieldNameToAdd is not-inherited, if not, create new field
                     '
@@ -1606,7 +1606,7 @@ ErrorTrap:
                                 If field.inherited Then
                                     SourceContentID = field.contentId
                                     SourceName = field.nameLc
-                                    CSSource = cpCore.db.db_csOpen("Content Fields", "(ContentID=" & SourceContentID & ")and(Name=" & cpCore.db.db_EncodeSQLText(SourceName) & ")")
+                                    CSSource = cpCore.db.db_csOpen("Content Fields", "(ContentID=" & SourceContentID & ")and(Name=" & cpCore.db.encodeSQLText(SourceName) & ")")
                                     If cpCore.db.db_csOk(CSSource) Then
                                         CSTarget = cpCore.db.db_csInsertRecord("Content Fields")
                                         If cpCore.db.db_csOk(CSTarget) Then
@@ -1632,7 +1632,7 @@ ErrorTrap:
                         If field.inherited Then
                             SourceContentID = field.contentId
                             SourceName = field.nameLc
-                            CSSource = cpCore.db.db_csOpen("Content Fields", "(ContentID=" & SourceContentID & ")and(Name=" & cpCore.db.db_EncodeSQLText(SourceName) & ")")
+                            CSSource = cpCore.db.db_csOpen("Content Fields", "(ContentID=" & SourceContentID & ")and(Name=" & cpCore.db.encodeSQLText(SourceName) & ")")
                             If cpCore.db.db_csOk(CSSource) Then
                                 CSTarget = cpCore.db.db_csInsertRecord("Content Fields")
                                 If cpCore.db.db_csOk(CSTarget) Then
@@ -2108,7 +2108,7 @@ ErrorTrap:
             FormPanel = FormPanel & cpCore.main_GetFormInputSelect("ContentID", ContentID, "Content")
             Call Stream.Add(cpCore.main_GetPanel(FormPanel))
             '
-            Call cpCore.db.siteProperty_set("AllowContentAutoLoad", AllowContentAutoLoad)
+            Call cpCore.siteProperties.setProperty("AllowContentAutoLoad", AllowContentAutoLoad)
             Stream.Add(cpCore.main_GetFormInputHidden("ReloadCDef", ReloadCDef))
 
             GetForm_ConfigureListing = OpenFormTable(ButtonList) & Stream.Text & CloseFormTable(ButtonList)
@@ -2206,7 +2206,7 @@ ErrorTrap:
                             ' ----- Set Field Type
                             '
                             ContentID = Local_GetContentID(DiagArgument(DiagAction, 1))
-                            CS = cpCore.db.db_csOpen("Content Fields", "(ContentID=" & ContentID & ")and(Name=" & cpCore.db.db_EncodeSQLText(DiagArgument(DiagAction, 2)) & ")")
+                            CS = cpCore.db.db_csOpen("Content Fields", "(ContentID=" & ContentID & ")and(Name=" & cpCore.db.encodeSQLText(DiagArgument(DiagAction, 2)) & ")")
                             If cpCore.db.db_csOk(CS) Then
                                 Call cpCore.db.db_setCS(CS, "Type", DiagArgument(DiagAction, 3))
                             End If
@@ -2217,7 +2217,7 @@ ErrorTrap:
                             ' ----- Set Field Inactive
                             '
                             ContentID = Local_GetContentID(DiagArgument(DiagAction, 1))
-                            CS = cpCore.db.db_csOpen("Content Fields", "(ContentID=" & ContentID & ")and(Name=" & cpCore.db.db_EncodeSQLText(DiagArgument(DiagAction, 2)) & ")")
+                            CS = cpCore.db.db_csOpen("Content Fields", "(ContentID=" & ContentID & ")and(Name=" & cpCore.db.encodeSQLText(DiagArgument(DiagAction, 2)) & ")")
                             If cpCore.db.db_csOk(CS) Then
                                 Call cpCore.db.db_setCS(CS, "active", 0)
                             End If
@@ -2233,7 +2233,7 @@ ErrorTrap:
                             'end case
                         Case DiagActionContentDeDupe
                             ContentName = DiagArgument(DiagAction, 1)
-                            CS = cpCore.db.db_csOpen("Content", "name=" & cpCore.db.db_EncodeSQLText(ContentName), "ID")
+                            CS = cpCore.db.db_csOpen("Content", "name=" & cpCore.db.encodeSQLText(ContentName), "ID")
                             If cpCore.db.db_csOk(CS) Then
                                 Call cpCore.db.db_csGoNext(CS)
                                 Do While cpCore.db.db_csOk(CS)
@@ -2274,7 +2274,7 @@ ErrorTrap:
                 '
                 ' Process input
                 '
-                If Not cpCore.db.siteProperty_trapErrors Then
+                If Not cpCore.siteProperties.trapErrors Then
                     '
                     ' TrapErrors must be true to run this tools
                     '
@@ -3138,7 +3138,7 @@ ErrorTrap:
             Dim dt As DataTable
             '
             Local_GetContentID = 0
-            dt = cpCore.db.executeSql("Select ID from ccContent where name=" & cpCore.db.db_EncodeSQLText(ContentName))
+            dt = cpCore.db.executeSql("Select ID from ccContent where name=" & cpCore.db.encodeSQLText(ContentName))
             If dt.Rows.Count > 0 Then
                 Local_GetContentID = EncodeInteger(dt.Rows(0).Item(0))
             End If
@@ -3184,7 +3184,7 @@ ErrorTrap:
             Dim RS As DataTable
             '
             Local_GetContentTableName = ""
-            RS = cpCore.db.executeSql("Select ccTables.Name as TableName from ccContent Left Join ccTables on ccContent.ContentTableID=ccTables.ID where ccContent.name=" & cpCore.db.db_EncodeSQLText(ContentName))
+            RS = cpCore.db.executeSql("Select ccTables.Name as TableName from ccContent Left Join ccTables on ccContent.ContentTableID=ccTables.ID where ccContent.name=" & cpCore.db.encodeSQLText(ContentName))
             If RS.Rows.Count > 0 Then
                 Local_GetContentTableName = EncodeText(RS.Rows(0).Item(0))
             End If
@@ -3211,7 +3211,7 @@ ErrorTrap:
             SQL = "Select ccDataSources.Name" _
                     & " from ( ccContent Left Join ccTables on ccContent.ContentTableID=ccTables.ID )" _
                     & " Left Join ccDataSources on ccTables.DataSourceID=ccDataSources.ID" _
-                    & " where ccContent.name=" & cpCore.db.db_EncodeSQLText(ContentName)
+                    & " where ccContent.name=" & cpCore.db.encodeSQLText(ContentName)
             RS = cpCore.db.executeSql(SQL)
             If isDataTableOk(RS) Then
                 Local_GetContentDataSource = EncodeText(RS.Rows(0).Item("Name"))
@@ -3902,7 +3902,7 @@ ErrorTrap:
                 '
 
                 Call cpCore.web_setResponseContentType("text/text")
-                Call cpCore.writeAltBuffer(cpCore.db.appRootFiles.ReadFile(cpCore.doc_getText("SourceFile")))
+                Call cpCore.writeAltBuffer(cpCore.appRootFiles.ReadFile(cpCore.doc_getText("SourceFile")))
                 Call cpCore.main_CloseStream()
                 'GetForm_LogFiles_Details = cpCore.app.publicFiles.ReadFile(cpCore.main_GetStreamText2("SourceFile"))
             Else
@@ -3937,7 +3937,7 @@ ErrorTrap:
                 '
                 ' Files
                 '
-                SourceFolders = cpCore.db.appRootFiles.convertFileINfoArrayToParseString(cpCore.db.appRootFiles.GetFolderFiles(StartPath & CurrentPath))
+                SourceFolders = cpCore.appRootFiles.convertFileINfoArrayToParseString(cpCore.appRootFiles.GetFolderFiles(StartPath & CurrentPath))
                 If SourceFolders = "" Then
                     FileSize = ""
                     FileDate = ""
@@ -4057,7 +4057,7 @@ ErrorTrap:
             ButtonList = ButtonCancel & "," & ButtonRestartContensiveApplication
             Stream.Add(GetTitle("Load Content Definitions", "This tool stops and restarts the Contensive Application controlling this website. If you restart, the site will be unavailable for up to a minute while the site is stopped and restarted. If the site does not restart, you will need to contact a site administrator to have the Contensive Server restarted."))
             '
-            If Not cpCore.user_isAdmin Then
+            If Not cpCore.user.user_isAdmin Then
                 '
                 GetForm_Restart = "<P>You must be an administrator to use this tool.</P>"
                 '
@@ -4069,7 +4069,7 @@ ErrorTrap:
                 '
                 ' Restart
                 '
-                cpCore.appendLogWithLegacyRow(cpCore.db.config.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " & cpCore.userName & " (" & cpCore.userId & ") restarted using the Restart tool", False, True, cpCore.main_ServerLink, "", "")
+                cpCore.appendLogWithLegacyRow(cpCore.appConfig.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " & cpCore.user.userName & " (" & cpCore.user.userId & ") restarted using the Restart tool", False, True, cpCore.main_ServerLink, "", "")
                 'runAtServer = New runAtServerClass(cpCore)
                 Call cpCore.main_Redirect("/ccLib/Popup/WaitForIISReset.htm")
                 Call Threading.Thread.Sleep(2000)
@@ -4237,7 +4237,7 @@ ErrorTrap:
                 ' Restart
                 '
                 Call Stream.Add("<br>Loading Templates...")
-                Call Stream.Add(ImportTemplates(Replace(cpCore.cluster.config.clusterPhysicalPath & cpCore.db.config.appRootPath & cpCore.db.RootWebPath, "/", "\"), "", AllowBodyHTML, AllowScriptLink, AllowImageImport, AllowStyleImport))
+                Call Stream.Add(ImportTemplates(Replace(cpCore.cluster.config.clusterPhysicalPath & cpCore.appConfig.appRootFilesPath & cpCore.appConfig.appRootFilesPath, "/", "\"), "", AllowBodyHTML, AllowScriptLink, AllowImageImport, AllowStyleImport))
                 Call Stream.Add("<br>Templates loaded")
             End If
             '
@@ -4295,7 +4295,7 @@ ErrorTrap:
             Dim Copy As String
             'dim buildversion As String
             '
-            FileList = cpCore.db.appRootFiles.convertFileINfoArrayToParseString(cpCore.db.appRootFiles.GetFolderFiles(FileRootPath & AppPath))
+            FileList = cpCore.appRootFiles.convertFileINfoArrayToParseString(cpCore.appRootFiles.GetFolderFiles(FileRootPath & AppPath))
             Files = Split(FileList, vbCrLf)
             For Ptr = 0 To UBound(Files)
                 FileDetailString = Files(Ptr)
@@ -4316,7 +4316,7 @@ ErrorTrap:
 
                     End If
                     '
-                    CS = cpCore.db.db_csOpen("Page Templates", "Link=" & cpCore.db.db_EncodeSQLText(Link))
+                    CS = cpCore.db.db_csOpen("Page Templates", "Link=" & cpCore.db.encodeSQLText(Link))
                     If Not cpCore.db.db_csOk(CS) Then
                         Call cpCore.db.db_csClose(CS)
                         CS = cpCore.db.db_csInsertRecord("Page Templates")
@@ -4330,7 +4330,7 @@ ErrorTrap:
                     '
                     ' HTML, import body
                     '
-                    PageSource = cpCore.db.appRootFiles.ReadFile(Filename)
+                    PageSource = cpCore.appRootFiles.ReadFile(Filename)
                     PageSource = cpCore.main_GetBody(PageSource)
                     Link = Replace(AppPath & Filename, "\", "/")
                     TemplateName = Replace(Link, "/", "-")
@@ -4343,7 +4343,7 @@ ErrorTrap:
                         '
                         ImportTemplates = ImportTemplates & "<br>Create Soft Template from source [" & Link & "]"
                         '
-                        CS = cpCore.db.db_csOpen("Page Templates", "Source=" & cpCore.db.db_EncodeSQLText(Link))
+                        CS = cpCore.db.db_csOpen("Page Templates", "Source=" & cpCore.db.encodeSQLText(Link))
                         If Not cpCore.db.db_csOk(CS) Then
                             Call cpCore.db.db_csClose(CS)
                             CS = cpCore.db.db_csInsertRecord("Page Templates")
@@ -4371,15 +4371,15 @@ ErrorTrap:
                     '
                     Dim DynamicFilename As String
                     DynamicFilename = "templates\styles.css"
-                    Copy = cpCore.db.appRootFiles.ReadFile(DynamicFilename)
+                    Copy = cpCore.appRootFiles.ReadFile(DynamicFilename)
                     Copy = RemoveStyleTags(Copy)
                     Copy = Copy _
                             & vbCrLf _
                             & vbCrLf & "/* Import of " & FileRootPath & AppPath & Filename & "*/" _
                             & vbCrLf _
                             & vbCrLf
-                    Copy = Copy & RemoveStyleTags(cpCore.db.appRootFiles.ReadFile(Filename))
-                    Call cpCore.db.appRootFiles.SaveFile(DynamicFilename, Copy)
+                    Copy = Copy & RemoveStyleTags(cpCore.appRootFiles.ReadFile(Filename))
+                    Call cpCore.appRootFiles.SaveFile(DynamicFilename, Copy)
                 End If
             Next
             '
@@ -4420,7 +4420,7 @@ ErrorTrap:
             Dim ParentContentName As String
             Dim ParentID As Integer
             '
-            CSContent = cpCore.db.db_csOpen("Content", "name=" & cpCore.db.db_EncodeSQLText(ContentName))
+            CSContent = cpCore.db.db_csOpen("Content", "name=" & cpCore.db.encodeSQLText(ContentName))
             If cpCore.db.db_csOk(CSContent) Then
                 '
                 ' Start with parent CDef
@@ -4576,7 +4576,7 @@ ErrorTrap:
             'InstanceOptionString = cpCore.main_GetMemberProperty("Addon [File Manager] Options", "")
             Content = cpCore.executeAddon_legacy1(0, "{B966103C-DBF4-4655-856A-3D204DEF6B21}", InstanceOptionString, cpCore.addonContextEnum.ContextAdmin, "", 0, "", "-2", -1)
             'If Content = "" Then
-            '    IsContentManager = cpCore.main_IsContentManager()
+            '    IsContentManager = cpCore.user.main_IsContentManager()
             '    Content = FileView.GetContentFileView2( "", IsContentManager, IsContentManager, True, False, True, False)
             'End If
             Description = "Manage files and folders within the virtual content file area."
@@ -4613,7 +4613,7 @@ ErrorTrap:
             'InstanceOptionString = cpCore.main_GetMemberProperty("Addon [File Manager] Options", "")
             Content = cpCore.executeAddon_legacy1(0, "{B966103C-DBF4-4655-856A-3D204DEF6B21}", InstanceOptionString, cpCore.addonContextEnum.ContextAdmin, "", 0, "", "-2", -1)
             'If Content = "" Then
-            '    IsContentManager = cpCore.main_IsContentManager()
+            '    IsContentManager = cpCore.user.main_IsContentManager()
             '    Content = FileView.GetContentFileView2( "", IsContentManager, IsContentManager, True, False, True, False)
             'End If
             Description = "Manage files and folders within the Website's file area."
@@ -4659,7 +4659,7 @@ ErrorTrap:
             '
             Button = cpCore.doc_getText("button")
             '
-            IsDeveloper = cpCore.user_isDeveloper()
+            IsDeveloper = cpCore.user.user_isDeveloper()
             If Button = ButtonFindAndReplace Then
                 RowCnt = cpCore.doc_getInteger("CDefRowCnt")
                 If RowCnt > 0 Then
@@ -4679,7 +4679,7 @@ ErrorTrap:
                     ReplaceText = cpCore.doc_getText("ReplaceText")
                     'runAtServer.ipAddress = "127.0.0.1"
                     'runAtServer.port = "4531"
-                    QS = "app=" & encodeNvaArgument(cpCore.db.config.name) & "&FindText=" & encodeNvaArgument(FindText) & "&ReplaceText=" & encodeNvaArgument(ReplaceText) & "&CDefNameList=" & encodeNvaArgument(CDefList)
+                    QS = "app=" & encodeNvaArgument(cpCore.appConfig.name) & "&FindText=" & encodeNvaArgument(FindText) & "&ReplaceText=" & encodeNvaArgument(ReplaceText) & "&CDefNameList=" & encodeNvaArgument(CDefList)
 
                     Throw New NotImplementedException("GetForm_FindAndReplace")
                     Dim taskScheduler As New coreTaskSchedulerServiceClass()
@@ -4774,7 +4774,7 @@ ErrorTrap:
                 '
                 '
                 '
-                cpCore.appendLogWithLegacyRow(cpCore.db.config.name, "Resetting IIS", "dll", "ToolsClass", "GetForm_IISReset", 0, "dll", "Warning: member " & cpCore.userName & " (" & cpCore.userId & ") executed an IISReset using the IISReset tool", False, True, cpCore.main_ServerLink, "", "")
+                cpCore.appendLogWithLegacyRow(cpCore.appConfig.name, "Resetting IIS", "dll", "ToolsClass", "GetForm_IISReset", 0, "dll", "Warning: member " & cpCore.user.userName & " (" & cpCore.user.userId & ") executed an IISReset using the IISReset tool", False, True, cpCore.main_ServerLink, "", "")
                 'runAtServer = New runAtServerClass(cpCore)
                 Call cpCore.main_Redirect("/ccLib/Popup/WaitForIISReset.htm")
                 Call Threading.Thread.Sleep(2000)

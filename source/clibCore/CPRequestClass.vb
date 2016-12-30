@@ -236,7 +236,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Language() As String 'Inherits BaseClasses.CPRequestBaseClass.Language
             Get
                 If True Then
-                    Return cpCore.userLanguage
+                    Return cpCore.user.userLanguage
                 Else
                     Return ""
                 End If

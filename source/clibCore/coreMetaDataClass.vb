@@ -1972,12 +1972,12 @@ Namespace Contensive.Core
                 ' Database needs to be updated - Until this upgrade, Request Follow Allow
                 ' After upgrade, Allow Follows Request
                 '
-                Call cpCore.db.siteProperty_set("RequestWorkflowAuthoring", cpCore.db.siteProperty_getText("AllowWorkflowAuthoring", "0"))
+                Call cpCore.siteProperties.setProperty("RequestWorkflowAuthoring", cpCore.siteProperties.getText("AllowWorkflowAuthoring", "0"))
             Else
                 '
                 ' Database is up-to-date, Set Allow from state of Request
                 '
-                Call cpCore.db.siteProperty_set("AllowWorkflowAuthoring", cpCore.db.siteProperty_getText("RequestWorkflowAuthoring", "0"))
+                Call cpCore.siteProperties.setProperty("AllowWorkflowAuthoring", cpCore.siteProperties.getText("RequestWorkflowAuthoring", "0"))
             End If
             '
             Dim dt As DataTable
@@ -1998,7 +1998,7 @@ Namespace Contensive.Core
                         ContentID = .Id
                     End With
                     If (ContentName <> "") And (ContentTableName <> "") And (ContentDataSourceName <> "") Then
-                        If Not ((cpCore.db.siteProperty_AllowWorkflowAuthoring) And (cdef.AllowWorkflowAuthoring)) Then
+                        If Not ((cpCore.siteProperties.allowWorkflowAuthoring) And (cdef.AllowWorkflowAuthoring)) Then
                             '
                             ' Not Authoring - delete edit and archive records
                             '
@@ -2068,11 +2068,11 @@ Namespace Contensive.Core
                                                                     EditFilename = csv_GetVirtualFilenameByTable(AuthoringTableName, field.nameLc, EditRecordID, "", field.fieldTypeId)
                                                                     FieldValueVariant = EditFilename
                                                                     If EditFilename <> "" Then
-                                                                        Copy = cpCore.db.privateFiles.ReadFile(cpCore.db.convertCdnUrlToCdnPathFilename(EditFilename))
+                                                                        Copy = cpCore.privateFiles.ReadFile(convertCdnUrlToCdnPathFilename(EditFilename))
                                                                     End If
                                                                     'Copy = contentFiles.ReadFile(LiveFilename)
                                                                     If Copy <> "" Then
-                                                                        Call cpCore.db.privateFiles.SaveFile(cpCore.db.convertCdnUrlToCdnPathFilename(EditFilename), Copy)
+                                                                        Call cpCore.privateFiles.SaveFile(convertCdnUrlToCdnPathFilename(EditFilename), Copy)
                                                                         'Call publicFiles.SaveFile(EditFilename, Copy)
                                                                     End If
                                                                 End If
@@ -2087,11 +2087,11 @@ Namespace Contensive.Core
                                                                     EditFilename = csv_GetVirtualFilenameByTable(AuthoringTableName, field.nameLc, EditRecordID, "", field.fieldTypeId)
                                                                     FieldValueVariant = EditFilename
                                                                     If EditFilename <> "" Then
-                                                                        Copy = cpCore.db.cdnFiles.ReadFile(cpCore.db.convertCdnUrlToCdnPathFilename(EditFilename))
+                                                                        Copy = cpCore.cdnFiles.ReadFile(convertCdnUrlToCdnPathFilename(EditFilename))
                                                                     End If
                                                                     'Copy = contentFiles.ReadFile(LiveFilename)
                                                                     If Copy <> "" Then
-                                                                        Call cpCore.db.cdnFiles.SaveFile(cpCore.db.convertCdnUrlToCdnPathFilename(EditFilename), Copy)
+                                                                        Call cpCore.cdnFiles.SaveFile(convertCdnUrlToCdnPathFilename(EditFilename), Copy)
                                                                         'Call publicFiles.SaveFile(EditFilename, Copy)
                                                                     End If
                                                                 End If
@@ -2265,7 +2265,7 @@ ErrorTrap:
                 & " Left Join ccGroupRules on ccMemberRules.GroupID=ccGroupRules.GroupID)" _
                 & " Left Join ccContent on ccGroupRules.ContentID=ccContent.ID)" _
                 & " WHERE" _
-                    & " (ccMemberRules.MemberID=" & cpCore.userId & ")" _
+                    & " (ccMemberRules.MemberID=" & cpCore.user.userId & ")" _
                     & " AND(ccGroupRules.Active<>0)" _
                     & " AND(ccContent.Active<>0)" _
                     & " AND(ccMemberRules.Active<>0)"
@@ -2402,7 +2402,7 @@ ErrorTrap:
         ''' <param name="contentNameOrGuid"></param>
         Public Sub deleteContent(contentNameOrGuid As String)
             Try
-                cpCore.db.executeSql("delete from cccontent where (name=" & cpCore.db.db_EncodeSQLText(contentNameOrGuid) & ")or(ccguid=" & cpCore.db.db_EncodeSQLText(contentNameOrGuid) & ")")
+                cpCore.db.executeSql("delete from cccontent where (name=" & cpCore.db.encodeSQLText(contentNameOrGuid) & ")or(ccguid=" & cpCore.db.encodeSQLText(contentNameOrGuid) & ")")
                 cpCore.cache.invalidateTag("content")
                 cpCore.metaData.clear()
             Catch ex As Exception
@@ -2460,7 +2460,7 @@ ErrorTrap:
                 '
                 ' ----- check if child already exists
                 '
-                SQL = "select ID from ccContent where name=" & cpCore.db.db_EncodeSQLText(ChildContentName) & ";"
+                SQL = "select ID from ccContent where name=" & cpCore.db.encodeSQLText(ChildContentName) & ";"
                 rs = cpCore.db.executeSql(SQL)
                 If isDataTableOk(rs) Then
                     ChildContentID = EncodeInteger(cpCore.db.db_getDataRowColumnName(rs.Rows(0), "ID"))
@@ -2480,7 +2480,7 @@ ErrorTrap:
                     '
                     ' Get ContentID of parent
                     '
-                    SQL = "select ID from ccContent where name=" & cpCore.db.db_EncodeSQLText(ParentContentName) & ";"
+                    SQL = "select ID from ccContent where name=" & cpCore.db.encodeSQLText(ParentContentName) & ";"
                     rs = cpCore.db.executeSql(SQL, DataSourceName)
                     If isDataTableOk(rs) Then
                         ParentContentID = EncodeInteger(cpCore.db.db_getDataRowColumnName(rs.Rows(0), "ID"))

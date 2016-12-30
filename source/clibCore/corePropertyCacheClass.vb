@@ -72,7 +72,7 @@ Namespace Contensive.Core
                 '
                 ' save the value in the property that was found
                 '
-                Call db.executeSql("update ccProperties set FieldValue=" & db.db_EncodeSQLText(PropertyValue) & ",ModifiedDate=" & SQLNow & " where id=" & RecordID)
+                Call db.executeSql("update ccProperties set FieldValue=" & db.encodeSQLText(PropertyValue) & ",ModifiedDate=" & SQLNow & " where id=" & RecordID)
             End If
             '
 

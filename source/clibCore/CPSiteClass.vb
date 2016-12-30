@@ -53,20 +53,20 @@ Namespace Contensive.Core
         '
         Public Overrides ReadOnly Property Name() As String 'Inherits BaseClasses.CPSiteBaseClass.Name
             Get
-                Return cpCore.db.config.name
+                Return cpCore.appConfig.name
             End Get
         End Property
         '
         '
         '
         Public Overrides Sub SetProperty(ByVal FieldName As String, ByVal FieldValue As String) 'Inherits BaseClasses.CPSiteBaseClass.SetProperty
-            Call cpCore.db.siteProperty_set(FieldName, FieldValue)
+            Call cpCore.siteProperties.setProperty(FieldName, FieldValue)
         End Sub
         '
         '
         '
         Public Overrides Function GetProperty(ByVal FieldName As String, Optional ByVal DefaultValue As String = "") As String 'Inherits BaseClasses.CPSiteBaseClass.GetProperty
-            Return cpCore.db.siteProperty_getText(FieldName, DefaultValue)
+            Return cpCore.siteProperties.getText(FieldName, DefaultValue)
         End Function
         '
         '=======================================================================================================
@@ -126,7 +126,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property PhysicalFilePath() As String 'Inherits BaseClasses.CPSiteBaseClass.PhysicalFilePath
             Get
                 'cpCore.handleException(New ApplicationException("PhysicalFilePath is no longer supported. Use cp.file.cdnFiles instead to support scale modes"))
-                Return cpCore.db.cdnFiles.rootLocalFolderPath
+                Return cpCore.cdnFiles.rootLocalFolderPath
             End Get
         End Property
         '
@@ -136,7 +136,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property PhysicalInstallPath() As String 'Inherits BaseClasses.CPSiteBaseClass.PhysicalInstallPath
             Get
                 'cpCore.handleException(New ApplicationException("physicalInstallPath is no longer supported"))
-                Return cpCore.db.privateFiles.rootLocalFolderPath
+                Return cpCore.privateFiles.rootLocalFolderPath
             End Get
         End Property
         '
@@ -146,7 +146,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property PhysicalWWWPath() As String 'Inherits BaseClasses.CPSiteBaseClass.PhysicalWWWPath
             Get
                 'cpCore.handleException(New ApplicationException("PhysicalFilePath is no longer supported. Use cp.file.appRootFiles instead to support scale modes"))
-                Return cpCore.db.appRootFiles.rootLocalFolderPath
+                Return cpCore.appRootFiles.rootLocalFolderPath
             End Get
         End Property
         '
@@ -160,11 +160,8 @@ Namespace Contensive.Core
 
         Public Overrides ReadOnly Property AppPath() As String 'Inherits BaseClasses.CPSiteBaseClass.AppPath
             Get
-                If False Then
-                    Return ""
-                Else
-                    Return cpCore.web_requestAppPath
-                End If
+                Return AppRootPath
+                'Return cpCore.web_requestAppPath
             End Get
         End Property
         '
@@ -175,7 +172,7 @@ Namespace Contensive.Core
                 If False Then
                     Return "/"
                 Else
-                    Return cpCore.db.RootWebPath
+                    Return cpCore.appConfig.appRootFilesPath
                 End If
             End Get
         End Property
@@ -228,7 +225,7 @@ Namespace Contensive.Core
         '
         Public Overrides ReadOnly Property FilePath() As String 'Inherits BaseClasses.CPSiteBaseClass.FilePath
             Get
-                Return cpCore.db.config.cdnFilesNetprefix ' "/" & cpCore.app.config.name & "/files/"
+                Return cpCore.appConfig.cdnFilesNetprefix ' "/" & cpCore.app.config.name & "/files/"
             End Get
         End Property
         '
@@ -239,7 +236,7 @@ Namespace Contensive.Core
                 If False Then
                     Return GetProperty(siteproperty_serverPageDefault_name, "")
                 Else
-                    Return cpCore.db.siteProperty_ServerPageDefault
+                    Return cpCore.siteProperties.serverPageDefault
                 End If
             End Get
         End Property
@@ -248,7 +245,7 @@ Namespace Contensive.Core
         '
         Public Overrides ReadOnly Property VirtualPath() As String 'Inherits BaseClasses.CPSiteBaseClass.VirtualPath
             Get
-                Return "/" & cpCore.db.config.name
+                Return "/" & cpCore.appConfig.name
             End Get
         End Property
         '

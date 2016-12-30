@@ -63,8 +63,8 @@ Namespace Contensive.Core
                 Cmd = "IISReset.exe"
                 arg = "/restart >> """ & LogFilename & """"
                 Call runProcess(cpCore, Cmd, arg, True)
-                Copy = cpCore.db.privateFiles.ReadFile(LogFilename)
-                Call cpCore.db.privateFiles.DeleteFile(LogFilename)
+                Copy = cpCore.privateFiles.ReadFile(LogFilename)
+                Call cpCore.privateFiles.DeleteFile(LogFilename)
                 Copy = Replace(Copy, vbCrLf, "\n")
                 Copy = Replace(Copy, vbCr, "\n")
                 Copy = Replace(Copy, vbLf, "\n")
@@ -89,8 +89,8 @@ Namespace Contensive.Core
                 LogFilename = "Temp\" & EncodeText(GetRandomInteger()) & ".Log"
                 Cmd = "%comspec% /c IISReset /stop >> """ & LogFilename & """"
                 Call runProcess(cpCore, Cmd, , True)
-                Copy = cpCore.db.privateFiles.ReadFile(LogFilename)
-                Call cpCore.db.privateFiles.DeleteFile(LogFilename)
+                Copy = cpCore.privateFiles.ReadFile(LogFilename)
+                Call cpCore.privateFiles.DeleteFile(LogFilename)
                 Copy = Replace(Copy, vbCrLf, "\n")
                 Copy = Replace(Copy, vbCr, "\n")
                 Copy = Replace(Copy, vbLf, "\n")
@@ -115,8 +115,8 @@ Namespace Contensive.Core
                 Call Randomize()
                 Cmd = "%comspec% /c IISReset /start >> """ & LogFilename & """"
                 Call runProcess(cpCore, Cmd, , True)
-                Copy = cpCore.db.privateFiles.ReadFile(LogFilename)
-                Call cpCore.db.privateFiles.DeleteFile(LogFilename)
+                Copy = cpCore.privateFiles.ReadFile(LogFilename)
+                Call cpCore.privateFiles.DeleteFile(LogFilename)
                 Copy = Replace(Copy, vbCrLf, "\n")
                 Copy = Replace(Copy, vbCr, "\n")
                 Copy = Replace(Copy, vbLf, "\n")

@@ -185,7 +185,7 @@ Namespace Contensive
                     appendLog(cpClusterCore, "taskScheduler.scheduleTasks, app=[" & AppName & "]")
                     '
                     Using cpSite As New CPClass(AppName)
-                        If cpSite.core.db.status = applicationStatusEnum.ApplicationStatusReady Then
+                        If cpSite.core.appStatus = applicationStatusEnum.ApplicationStatusReady Then
                             '
                             ' Execute Processes
                             '
@@ -276,7 +276,7 @@ Namespace Contensive
                 Dim cmdDetailJson As String = cpSiteCore.common_jsonSerialize(cmdDetail)
                 Dim cs As Integer
                 '
-                appendLog(cpSiteCore, "taskScheduler.addTaskToQueue, application=[" & cpSiteCore.db.config.name & "], command=[" & Command & "], cmdDetail=[" & cmdDetailJson & "]")
+                appendLog(cpSiteCore, "taskScheduler.addTaskToQueue, application=[" & cpSiteCore.appConfig.name & "], command=[" & Command & "], cmdDetail=[" & cmdDetailJson & "]")
                 '
                 returnTaskAdded = True
                 LcaseCommand = LCase(Command)
@@ -284,7 +284,7 @@ Namespace Contensive
                     '
                     ' Search for a duplicate
                     '
-                    sql = "select top 1 id from cctasks where ((command=" & cpSiteCore.db.db_EncodeSQLText(Command) & ")and(cmdDetail=" & cmdDetailJson & "))"
+                    sql = "select top 1 id from cctasks where ((command=" & cpSiteCore.db.encodeSQLText(Command) & ")and(cmdDetail=" & cmdDetailJson & "))"
                     cs = cpSiteCore.db.db_csOpenSql(sql)
                     If cpSiteCore.db.db_csOk(cs) Then
                         returnTaskAdded = False

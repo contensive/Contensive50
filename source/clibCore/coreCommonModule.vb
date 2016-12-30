@@ -6855,15 +6855,6 @@ ErrorTrap:
             GetURLEncoder = CStr(Int(1 + (Rnd() * 8))) & CStr(Int(1 + (Rnd() * 8))) & CStr(Int(1000000000 + (Rnd() * 899999999)))
         End Function
         '
-        '==========================================================================================================================
-        '   To convert from site license to server licenses, we still need the URLEncoder in the site license
-        '   This routine generates a site license that is just the URL encoder.
-        '==========================================================================================================================
-        '
-        Public Function GetSiteLicenseKey() As String
-            GetSiteLicenseKey = "00000-00000-00000-" & GetURLEncoder()
-        End Function
-        '
         '
         '
         Public Function getIpAddressList() As String
@@ -7341,6 +7332,58 @@ ErrorTrap:
                 Throw New ApplicationException("Unexpected exception in normalizeRoute(route=[" & route & "])", ex)
             End Try
             Return normalizedRoute
+        End Function
+        '
+        '========================================================================
+        '   converts a virtual file into a filename
+        '       - in local mode, the cdnFiles can be mapped to a virtual folder in appRoot
+        '           -- see appConfig.cdnFilesVirtualFolder
+        '       convert all / to \
+        '       if it includes "://", it is a root file
+        '       if it starts with "/", it is already root relative
+        '       else (if it start with a file or a path), add the publicFileContentPathPrefix
+        '========================================================================
+        '
+        Public Function convertCdnUrlToCdnPathFilename(ByVal cdnUrl As String) As String
+            '
+            ' this routine was originally written to handle modes that were not adopted (content file absolute and relative URLs)
+            ' leave it here as a simple slash converter in case other conversions are needed later
+            '
+            Return Replace(cdnUrl, "/", "\")
+        End Function
+        '
+        '==============================================================================
+        Public Function isGuid(ignore As Object, Source As String) As Boolean
+            Dim returnValue As Boolean = False
+            Try
+                If (Len(Source) = 38) And (Left(Source, 1) = "{") And (Right(Source, 1) = "}") Then
+                    '
+                    ' Good to go
+                    '
+                    returnValue = True
+                ElseIf (Len(Source) = 36) And (InStr(1, Source, " ") = 0) Then
+                    '
+                    ' might be valid with the brackets, add them
+                    '
+                    returnValue = True
+                    'source = "{" & source & "}"
+                ElseIf (Len(Source) = 32) Then
+                    '
+                    ' might be valid with the brackets and the dashes, add them
+                    '
+                    returnValue = True
+                    'source = "{" & Mid(source, 1, 8) & "-" & Mid(source, 9, 4) & "-" & Mid(source, 13, 4) & "-" & Mid(source, 17, 4) & "-" & Mid(source, 21) & "}"
+                Else
+                    '
+                    ' not valid
+                    '
+                    returnValue = False
+                    '        source = ""
+                End If
+            Catch ex As Exception
+                Throw New ApplicationException("Exception in isGuid", ex)
+            End Try
+            Return returnValue
         End Function
     End Module
     '

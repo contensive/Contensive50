@@ -28,14 +28,9 @@ Namespace Contensive.Core
         '
         '------------------------------------------------------------------------------------------------------------------------
         ' internal storage
-        '   these objects is deserialized during constructor
-        '   appConfig has static setup values like file system endpoints and Db connection string
-        '   appProperties has dynamic values and is serialized and saved when changed
-        '   include properties saved in appConfig file, settings not editable online.
         '------------------------------------------------------------------------------------------------------------------------
         '
         Private constructed As Boolean = False                                  ' set true when contructor is finished 
-        'Private cacheEnabled As Boolean = True                                 ' set true when configured and tested - if false all cache calls disabled
         '
         ' on Db success, verified set true. If error and not verified, a simple test is run. on failure, Db disabled 
         '
@@ -43,7 +38,6 @@ Namespace Contensive.Core
         Private dbEnabled As Boolean = True                                    ' set true when configured and tested - else db calls are skipped
         '
         Public Const csv_DefaultPageSize = 9999
-        Private Const csv_AllowAutocsv_ClearContentTimeStamp = True
         '
         ' Private structures that can stay until this class is converted
         '
@@ -51,84 +45,12 @@ Namespace Contensive.Core
         '
         Const csv_AllowWorkflowErrors = False
         '
-        '-----------------------------------------------------------------------------------------------
-        '
-        Public Property config As appConfigClass
-        Public Property status As applicationStatusEnum
-        '
-        ' file systems
-        '
-        Public Property serverFiles As coreFileSystemClass           ' files written directly to the local server
-        Public Property appRootFiles As coreFileSystemClass         ' wwwRoot path for the app server, both local and scale modes
-        Public Property privateFiles As coreFileSystemClass         ' path not available to web interface, local: physcial storage location, scale mode mirror location
-        Public Property cdnFiles As coreFileSystemClass             ' file uploads etc. Local mode this should point to appRoot folder (or a virtual folder in appRoot). Scale mode it goes to an s3 mirror
-        '
         '------------------------------------------------------------------------------------------------------------------------
         ' simple lazy cached values
         '------------------------------------------------------------------------------------------------------------------------
         '
         Private dataBuildVersion_Local As String
         Friend dataBuildVersion_LocalLoaded As Boolean = False
-        '
-        Private siteProperty_allowLinkAlias_Local As Boolean
-        Private siteProperty_allowLinkAlias_LocalLoaded As Boolean = False
-        '
-        ' Site Property Buffer
-        '
-        Private siteProperty_ChildListAddonID_Local As Integer
-        Private siteProperty_ChildListAddonID_LocalLoaded As Boolean = False
-        '
-        Private siteProperty_DocTypeAdmin_Local As String
-        Private siteProperty_DocTypeAdmin_LocalLoaded As Boolean = False
-        '
-        Private siteProperty_DocType_Local As String
-        Private siteProperty_DocType_LocalLoaded As Boolean = False
-        '
-        Private siteProperty_DefaultWrapperID_local As Integer
-        Private siteProperty_DefaultWrapperID_LocalLoaded As Boolean = False
-        '
-        Private siteProperty_UseContentWatchLink_local As Boolean
-        Private siteProperty_UseContentWatchLink_LocalLoaded As Boolean = False
-        '
-        Private siteProperty_AllowTemplateLinkVerification_Local As Boolean
-        Private siteProperty_AllowTemplateLinkVerification_LocalLoaded As Boolean = False
-        '
-        Private siteProperty_AllowTestPointLogging_Local As Boolean
-        Private siteProperty_AllowTestPointLogging_LocalLoaded As Boolean = False
-        '
-        Private siteProperty_DefaultFormInputWidth_Local As Integer
-        Private siteProperty_DefaultFormInputWidth_LocalLoaded As Boolean = False
-        '
-        Private siteProperty_SelectFieldWidthLimit_Local As Integer
-        Private siteProperty_SelectFieldWidthLimit_LocalLoaded As Boolean = False
-        '
-        Private siteProperty_SelectFieldLimit_Local As Integer
-        Private siteProperty_SelectFieldLimit_LocalLoaded As Boolean
-        '
-        Private siteProperty_DefaultFormInputTextHeight_Local As Integer
-        Private siteProperty_DefaultFormInputTextHeight_LocalLoaded As Boolean
-        '
-        Private siteProperty_EmailAdmin_Local As String
-        Private siteProperty_EmailAdmin_LocalLoaded As Boolean = False
-        '
-        Private siteProperty_Language_Local As String
-        Private siteProperty_Language_LocalLoaded As Boolean = False
-        '
-        Private siteProperty_AdminURL_Local As String
-        Private siteProperty_AdminURL_LocalLoaded As Boolean = False
-        '
-        Private siteProperty_CalendarYearLimit_Local As Integer
-        Private siteProperty_CalendarYearLimit_LocalLoaded As Boolean = False
-        ''
-        '
-        Private siteProperty_DefaultFormInputHTMLHeight_Local As Integer
-        Private siteProperty_DefaultFormInputHTMLHeight_LocalLoaded As Boolean = False
-        '
-        Private siteProperty_AllowWorkflowAuthoring_Local As Boolean
-        Private siteProperty_AllowWorkflowAuthoring_LocalLoaded As Boolean = False
-        '
-        Private siteProperty_AllowPathBlocking_Local As Boolean
-        Private siteProperty_AllowPathBlocking_LocalLoaded As Boolean = False
         ''
         Private db_ContentSet() As ContentSetType2
         Public csv_ContentSetCount As Integer       ' The number of elements being used
@@ -166,33 +88,11 @@ Namespace Contensive.Core
         ' Set true in ccCsvrv LoadContentDefinition
         ' Checked here, waits for up to 5 seconds
         '
-        ' Tokens - TakeTokens returns true, if already taken, reutrns false. When done, ReturnTokens
-        '
-        Private Tokens() As String
-        Private TokenSize As Integer
-        Private TokenCount As Integer
-        '
-        ' keepers
-        '
-        Public HitCounter As Integer
-        Public StatusPauseExpiration As Date            ' if paused, the application will resume automatically after this time
-        Public Progress As String                       ' Use for long commands to show movement (like upgrade)
-        Public PhysicalFilePath As String
-        Public PhysicalWWWPath As String
-        Public DefaultConnectionString As String
-        Public LicenseKey As String
-        Public DomainName As String
-        Public RootWebPath As String
-        Public ConnectionsActive As Integer
-        'Public ConnectionHandleCount As Integer            ' The connection handles created
-        Public ErrorCount As Integer                       ' Errors since last start
-        Public QueryStringExcludeList As String       ' Strings that will be excluded from spider and contentwatch
-        Public AbortActivity As Boolean                 ' Signal to stop all activity for a shutdown
-        '
         '   SQL Timeouts
         '
         Public db_SQLTimeout As Integer
         Public csv_SlowSQLThreshholdMSec As Integer        '
+        Public DefaultConnectionString As String
         '
         'Public DataBuildVersion_DontUseThis As String               ' the build version of the database, valid only after start
         '
@@ -286,21 +186,6 @@ Namespace Contensive.Core
             Dim SelectTableFieldList As String      ' comma delimited list of all fields selected, in the form table.field
             'Rows as object                     ' getRows read during csv_InitContentSetResult
         End Structure
-        ''
-        'Private cdefServices.CDefName() As String
-        'Private cdefServices.CDefID() As Integer
-        '
-        Private Structure EditLockType
-            Public Key As String
-            Public MemberID As Integer
-            Public DateExpires As Date
-        End Structure
-        '
-        Private EditLockArray() As EditLockType
-        Private EditLockCount As Integer
-        Private AbuseCheckBuffer As String
-        Public AbuseCheckLimit As Integer
-        Public AbuseCheckPeriod As Integer
         '
         ' Tracing - Debugging
         '
@@ -343,82 +228,11 @@ Namespace Contensive.Core
                 '   eventually, setup public properties as indivisual lazyCache
                 '
                 Me.cpCore = cpCore
-                status = applicationStatusEnum.ApplicationStatusLoading
+                constructed = True
                 ReDim db_dataSources(0)
                 db_dataSources(0) = New dataSourceClass()
-                '
-                If (cpCore.cluster Is Nothing) Then
-                    '
-                    ' cannot continue with the cluster created
-                    '
-                    Throw New ApplicationException("appServices constructor failed because clusterServices are not valid.")
-                Else
-                    Dim propertyValue As String = ""
-                    Dim needToLoadCdefCache As Boolean = True
-                    '
-                    db_SQLTimeout = 30
-                    csv_SlowSQLThreshholdMSec = 1000
-                    DomainName = "www.DomainName.com"
-                    RootWebPath = "/"
-                    AllowMonitoring = False
-                    LicenseKey = GetSiteLicenseKey()
-                    If (Not cpCore.cluster.config.apps.ContainsKey(appName.ToLower())) Then
-                        '
-                        ' application now configured
-                        '
-                        config = New appConfigClass()
-                        status = applicationStatusEnum.ApplicationStatusAppConfigNotValid
-                        Throw New Exception("application [" & appName & "] was not found in this cluster.")
-                    Else
-                        config = cpCore.cluster.config.apps(appName.ToLower())
-                    End If
-                    '
-                    If InStr(1, config.domainList(0), ",") > 1 Then
-                        '
-                        ' if first entry in domain list is comma delimited, save only the first entry
-                        '
-                        config.domainList(0) = Mid(config.domainList(0), 1, InStr(1, config.domainList(0), ",") - 1)
-                    End If
-                    '
-                    ' initialie filesystem, public and rivate now, setup virtual when site property is available
-                    '
-                    If cpCore.cluster.config.isLocal Then
-                        '
-                        ' local server -- everything is ephemeral
-                        '
-                        serverFiles = New coreFileSystemClass(cpCore, cpCore.cluster.config, coreFileSystemClass.fileSyncModeEnum.noSync, "")
-                        appRootFiles = New coreFileSystemClass(cpCore, cpCore.cluster.config, coreFileSystemClass.fileSyncModeEnum.noSync, cpCore.cluster.config.clusterPhysicalPath & config.appRootPath)
-                        privateFiles = New coreFileSystemClass(cpCore, cpCore.cluster.config, coreFileSystemClass.fileSyncModeEnum.noSync, cpCore.cluster.config.clusterPhysicalPath & config.privateFilesPath)
-                        cdnFiles = New coreFileSystemClass(cpCore, cpCore.cluster.config, coreFileSystemClass.fileSyncModeEnum.noSync, cpCore.cluster.config.clusterPhysicalPath & config.cdnFilesPath)
-                    Else
-                        '
-                        ' cluster mode - each filesystem is configured accordingly
-                        '
-                        serverFiles = New coreFileSystemClass(cpCore, cpCore.cluster.config, coreFileSystemClass.fileSyncModeEnum.noSync, "")
-                        appRootFiles = New coreFileSystemClass(cpCore, cpCore.cluster.config, coreFileSystemClass.fileSyncModeEnum.activeSync, cpCore.cluster.config.clusterPhysicalPath & config.appRootPath)
-                        privateFiles = New coreFileSystemClass(cpCore, cpCore.cluster.config, coreFileSystemClass.fileSyncModeEnum.passiveSync, cpCore.cluster.config.clusterPhysicalPath & config.privateFilesPath)
-                        cdnFiles = New coreFileSystemClass(cpCore, cpCore.cluster.config, coreFileSystemClass.fileSyncModeEnum.passiveSync, cpCore.cluster.config.clusterPhysicalPath & config.cdnFilesPath)
-                    End If
-                    '
-                    ' initialize datasource
-                    '
-                    db_AddDataSource("Default", -1, DefaultConnectionString)
-                    '
-                    ' REFACTOR - this was removed because during debug is costs 300msec, and only helps case with small edge case of Db loss -- test that case for risks
-                    '
-                    status = applicationStatusEnum.ApplicationStatusReady
-                    '
-                    'If Not cpCore.cluster.checkDatabaseExists(appName) Then
-                    '    '
-                    '    ' database does not exist
-                    '    '
-                    '    status = applicationStatusEnum.ApplicationStatusDbNotFound
-                    'Else
-                    '    'Call cpcore.metaData.load()
-                    '    status = applicationStatusEnum.ApplicationStatusReady
-                    'End If
-                End If
-                constructed = True
+                db_SQLTimeout = 30
+                csv_SlowSQLThreshholdMSec = 1000
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
                 Throw (ex)
@@ -538,24 +352,11 @@ Namespace Contensive.Core
         '========================================================================
         '
         Public Function GetDataSourceByPointer(ByVal DataSourcePointer As Integer) As dataSourceClass
-            On Error GoTo ErrorTrap
-
-            'Const Tn = "AppServicesClass.GetDataSourceByPointer" : Call logMethodEntry(Tn) : ''Dim th as integer : th = TimerTraceStart(Tn)
-
-            '
+            Dim DataSource As dataSourceClass = Nothing
             If DataSourcePointer >= 0 Then
-                GetDataSourceByPointer = db_dataSources(DataSourcePointer)
+                DataSource = db_dataSources(DataSourcePointer)
             End If
-            '
-
-            'Call logMethodExit(Tn) : Call TimerTraceStop(th)
-
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassError1(config.name, "GetDataSourceByPointer")
+            Return DataSource
         End Function
         '
         '========================================================================
@@ -564,11 +365,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function GetDataSourceByID(ByVal DataSourceID As Integer) As dataSourceClass
-            On Error GoTo ErrorTrap
-
-            'Const Tn = "AppServicesClass.GetDataSourceByID" : Call logMethodEntry(Tn) : ''Dim th as integer : th = TimerTraceStart(Tn)
-
-            '
+            Dim DataSource As dataSourceClass = Nothing
             Dim DataSourcePointer As Integer
             '
             If db_dataSources.Length > 0 Then
@@ -577,19 +374,9 @@ ErrorTrap:
                         GetDataSourceByID = db_dataSources(db_dataSources.Length)
                         Exit For
                     End If
-                    ''''DoEvents
                 Next
             End If
-            '
-
-            'Call logMethodExit(Tn) : Call TimerTraceStop(th)
-
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassError1(config.name, "GetDataSourceByID")
+            Return DataSource
         End Function
         '
         '========================================================================
@@ -618,37 +405,6 @@ ErrorTrap:
             End Try
             Return returnDataSource
         End Function
-        '
-        '========================================================================
-        '   Increment HitCount
-        '========================================================================
-        '
-        Public Sub IncrementHitCounter()
-            On Error GoTo ErrorTrap
-
-            'Const Tn = "AppServicesClass.IncrementHitCounter" : Call logMethodEntry(Tn) : ''Dim th as integer : th = TimerTraceStart(Tn)
-
-            '
-            HitCounter = HitCounter + 1
-            '
-
-            'Call logMethodExit(Tn) : Call TimerTraceStop(th)
-
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassError1(config.name, "IncrementHitCounter")
-        End Sub
-        '
-        '========================================================================
-        '   Increment HitCount
-        '========================================================================
-        '
-        Public Sub IncrementErrorCount()
-            ErrorCount += 1
-        End Sub
         '        '
         '        '========================================================================
         '        '   Open a Connection
@@ -750,7 +506,7 @@ ErrorTrap:
         '        Dim tableName As String = ""
         '        Dim sql As String
         '        '
-        '        If config.enableCache Then
+        '        If db.config.enableCache Then
         '            If Not String.IsNullOrEmpty(tag) Then
         '                '
         '                ' get it from raw cache
@@ -808,160 +564,6 @@ ErrorTrap:
         '        cpCore.handleException(ex)
         '    End Try
         'End Sub
-        '
-        '=================================================================================
-        '
-        '=================================================================================
-        '
-        Public Sub workflow_SetEditLock2(ByVal ContentName As String, ByVal RecordID As Integer, ByVal MemberID As Integer, Optional ByVal ClearLock As Boolean = False)
-            On Error GoTo ErrorTrap
-
-            'Const Tn = "AppServicesClass.SetEditLock" : Call logMethodEntry(Tn) : ''Dim th as integer : th = TimerTraceStart(Tn)
-
-            '
-            Dim SourcePointer As Integer
-            Dim EditLockDetailArray As Object
-            Dim LockDateExpires As Date
-            Dim LockContentName As String
-            Dim LockRecordID As Integer
-            Dim LockMemberID As Integer
-            Dim EditLockKey As Integer
-            Dim EditLockTimeoutMinutes As Double
-            'Dim EditLockTimeoutDays As Double
-            Dim DestinationBuffer As String
-            Dim LockFound As Boolean
-            Dim EditLockDateExpires As Date
-            Dim SourceKey As String
-            Dim SourceDateExpires As Date
-            Dim DestinationPointer As Integer
-            Dim StringBuffer As String
-            Dim EditLockKey2 As String
-            '
-            If (ContentName <> "") And (RecordID <> 0) Then
-                EditLockKey2 = UCase(ContentName & "," & CStr(RecordID))
-                StringBuffer = siteProperty_getText("EditLockTimeout", "5")
-                EditLockTimeoutMinutes = EncodeNumber(StringBuffer)
-                'EditLockTimeoutDays = (EditLockTimeoutMinutes / 60 / 24)
-                EditLockDateExpires = Now.AddMinutes(EditLockTimeoutMinutes)
-                If EditLockCount > 0 Then
-                    For SourcePointer = 0 To EditLockCount - 1
-                        If AbortActivity Then
-                            Exit For
-                        End If
-                        SourceKey = EditLockArray(SourcePointer).Key
-                        SourceDateExpires = EditLockArray(SourcePointer).DateExpires
-                        If SourceKey = EditLockKey2 Then
-                            '
-                            ' This edit lock was found
-                            '
-                            LockFound = True
-                            If EditLockArray(SourcePointer).MemberID <> MemberID Then
-                                '
-                                ' This member did not create the lock, he can not change it either
-                                '
-                                If (SourcePointer <> DestinationPointer) Then
-                                    EditLockArray(DestinationPointer).Key = SourceKey
-                                    EditLockArray(DestinationPointer).MemberID = MemberID
-                                    EditLockArray(DestinationPointer).DateExpires = SourceDateExpires
-                                End If
-                                DestinationPointer = DestinationPointer + 1
-                            ElseIf Not ClearLock Then
-                                '
-                                ' This lock created by this member, he can change it
-                                '
-                                EditLockArray(DestinationPointer).Key = SourceKey
-                                EditLockArray(DestinationPointer).MemberID = MemberID
-                                EditLockArray(DestinationPointer).DateExpires = EditLockDateExpires
-                                DestinationPointer = DestinationPointer + 1
-                            End If
-                        ElseIf (SourceDateExpires >= EditLockDateExpires) Then
-                            '
-                            ' Lock not expired, move it if needed
-                            '
-                            If (SourcePointer <> DestinationPointer) Then
-                                EditLockArray(DestinationPointer).Key = SourceKey
-                                EditLockArray(DestinationPointer).MemberID = MemberID
-                                EditLockArray(DestinationPointer).DateExpires = SourceDateExpires
-                            End If
-                            DestinationPointer = DestinationPointer + 1
-                        End If
-                        '''DoEvents()
-                    Next
-                End If
-                If (Not LockFound) And (Not ClearLock) Then
-                    '
-                    ' Lock not found, add it
-                    '
-                    If EditLockCount > 0 Then
-                        If (DestinationPointer > UBound(EditLockArray)) Then
-                            ReDim Preserve EditLockArray(DestinationPointer + 10)
-                        End If
-                    Else
-                        ReDim Preserve EditLockArray(10)
-                    End If
-                    EditLockArray(DestinationPointer).Key = EditLockKey2
-                    EditLockArray(DestinationPointer).MemberID = MemberID
-                    EditLockArray(DestinationPointer).DateExpires = EditLockDateExpires
-                    DestinationPointer = DestinationPointer + 1
-                End If
-                EditLockCount = DestinationPointer
-            End If
-
-            'Call logMethodExit(Tn) : Call TimerTraceStop(th)
-
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassError1(config.name, "SetEditLock")
-        End Sub
-        '
-        '=================================================================================
-        '   Returns true if this content/record is locked
-        '       if true, the ReturnMemberID is the member that locked it
-        '           and ReturnDteExpires is the date when it will be released
-        '=================================================================================
-        '
-        Public Function workflow_GetEditLock2(ByVal ContentName As String, ByVal RecordID As Integer, ByRef ReturnMemberID As Integer, ByRef ReturnDateExpires As Date) As Boolean
-            On Error GoTo ErrorTrap
-
-            'Const Tn = "AppServicesClass.GetEditLock" : Call logMethodEntry(Tn) : ''Dim th as integer : th = TimerTraceStart(Tn)
-
-            '
-            Dim SourcePointer As Integer
-            Dim EditLockKey As Integer
-            Dim EditLockKey2 As String
-            Dim DateNow As Date
-            '
-            If (ContentName <> "") And (RecordID <> 0) And (EditLockCount > 0) Then
-                EditLockKey2 = UCase(ContentName & "," & CStr(RecordID))
-                DateNow = Now
-                For SourcePointer = 0 To EditLockCount - 1
-                    If AbortActivity Then
-                        Exit For
-                    End If
-                    If (EditLockArray(SourcePointer).Key = EditLockKey2) Then
-                        ReturnMemberID = EditLockArray(SourcePointer).MemberID
-                        ReturnDateExpires = EditLockArray(SourcePointer).DateExpires
-                        If ReturnDateExpires > Now() Then
-                            workflow_GetEditLock2 = True
-                        End If
-                        Exit For
-                    End If
-                    '''DoEvents()
-                Next
-            End If
-
-            'Call logMethodExit(Tn) : Call TimerTraceStop(th)
-
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassError1(config.name, "GetEditLock")
-        End Function
 
         Public Property ConnectionString() As String
             Get
@@ -982,7 +584,7 @@ ErrorTrap:
         '
         Public Function executeSql(ByVal sql As String, Optional ByVal dataSourceName As String = "", Optional ByVal startRecord As Integer = 0, Optional ByVal maxRecords As Integer = 9999) As DataTable
             Dim returnData As New DataTable
-            Dim connString As String = cpCore.cluster.getConnectionString(config.name)
+            Dim connString As String = cpCore.cluster.getConnectionString(cpCore.appConfig.name)
             Try
                 If dbEnabled Then
                     'Dim dataSourceUrl As String
@@ -1017,130 +619,6 @@ ErrorTrap:
             Return returnData
         End Function
         '
-        '========================================================================
-        ' ----- Set a value in the Setup array
-        '       If its found, set it. If it changes, update the datasource
-        '       If not found, create it and insert a datasource record
-        '========================================================================
-        '
-        Public Sub siteProperty_set(ByVal propertyName As String, ByVal Value As String)
-            Try
-                Dim cacheName As String = "siteProperty-" & propertyName
-                Dim RecordID As Integer
-                Dim dt As DataTable
-                Dim SQL As String
-                Dim ContentID As Integer
-                Dim SitePropertyResult As Integer
-                Dim SQLNow As String = db_EncodeSQLDate(Now)
-
-                RecordID = 0
-                SQL = "SELECT ID FROM CCSETUP WHERE NAME=" & db_EncodeSQLText(propertyName) & " order by id"
-                dt = executeSql(SQL)
-                If dt.Rows.Count > 0 Then
-                    RecordID = EncodeInteger(dt.Rows(0).Item("ID"))
-                End If
-                If RecordID <> 0 Then
-                    SQL = "UPDATE ccSetup Set FieldValue=" & db_EncodeSQLText(Value) & ",ModifiedDate=" & SQLNow & " WHERE ID=" & RecordID
-                    Call executeSql(SQL)
-                Else
-                    ' get contentId manually, getContentId call checks cache, which gets site property, which may set
-                    ContentID = 0
-                    SQL = "SELECT ID FROM cccontent WHERE NAME='site properties' order by id"
-                    dt = executeSql(SQL)
-                    If dt.Rows.Count > 0 Then
-                        ContentID = EncodeInteger(dt.Rows(0).Item("ID"))
-                    End If
-                    'ContentID = csv_GetContentID("Site Properties")
-                    SQL = "INSERT INTO ccSetup (ACTIVE,CONTENTCONTROLID,NAME,FIELDVALUE,ModifiedDate,DateAdded)VALUES(" & SQLTrue & "," & db_EncodeSQLNumber(ContentID) & "," & db_EncodeSQLText(UCase(propertyName)) & "," & db_EncodeSQLText(Value) & "," & SQLNow & "," & SQLNow & ");"
-                    Call executeSql(SQL)
-                End If
-                Call cpCore.cache.SetKey(cacheName, Value, "site properties")
-
-            Catch ex As Exception
-                Call cpCore.handleExceptionAndRethrow(ex)
-            End Try
-        End Sub
-        '
-        Public Sub siteProperty_set(ByVal propertyName As String, ByVal Value As Boolean)
-            siteProperty_set(propertyName, Value.ToString)
-        End Sub
-        '
-        Public Sub siteProperty_set(ByVal propertyName As String, ByVal Value As Integer)
-            siteProperty_set(propertyName, Value.ToString)
-        End Sub
-        '========================================================================
-        ''' <summary>
-        ''' get site property without a cache check, return as text. If not found, set and return default value
-        ''' </summary>
-        ''' <param name="PropertyName"></param>
-        ''' <param name="DefaultValue"></param>
-        ''' <param name="memberId"></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Function siteProperty_getText_noCache(ByVal PropertyName As String, ByVal DefaultValue As String, ByRef return_propertyFound As Boolean) As String
-            Dim returnString As String
-            Try
-                Dim SQL As String
-                Dim dt As DataTable
-
-                SQL = "select FieldValue from ccSetup where name=" & db_EncodeSQLText(PropertyName) & " order by id"
-                dt = executeSql(SQL)
-                If dt.Rows.Count > 0 Then
-                    returnString = EncodeText(dt.Rows(0).Item("FieldValue"))
-                    return_propertyFound = True
-                ElseIf (DefaultValue <> "") Then
-                    ' do not set - set may have to save, and save needs contentId, which now loads ondemand, which checks cache, which does a getSiteProperty.
-                    Call siteProperty_set(PropertyName, DefaultValue)
-                    returnString = DefaultValue
-                    return_propertyFound = True
-                Else
-                    returnString = ""
-                    return_propertyFound = False
-                End If
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
-            Return returnString
-        End Function
-        '========================================================================
-        ''' <summary>
-        ''' get site property, return as text. If not found, set and return default value
-        ''' </summary>
-        ''' <param name="PropertyName"></param>
-        ''' <param name="DefaultValue"></param>
-        ''' <param name="memberId"></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Function siteProperty_getText(ByVal PropertyName As String, Optional ByVal DefaultValue As String = "") As String
-            Dim returnString As String = ""
-            Try
-                Dim cacheName As String = "siteProperty-" & PropertyName
-                Dim propertyFound As Boolean = False
-                returnString = EncodeText(cpCore.cache.GetObject(Of String)(cacheName))
-                If returnString = "" Then
-                    returnString = siteProperty_getText_noCache(PropertyName, DefaultValue, propertyFound)
-                    If (propertyFound) And (returnString <> "") Then
-                        Call cpCore.cache.SetKey(cacheName, returnString, "Site Properties")
-                    End If
-                End If
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
-            Return returnString
-        End Function
-        '
-        Public Function siteProperty_getText(ByVal PropertyName As String) As String
-            Return siteProperty_getText(PropertyName, "")
-        End Function
-        '
-        Public Function siteProperty_getinteger(ByVal PropertyName As String, Optional ByVal DefaultValue As Integer = 0) As Integer
-            Return EncodeInteger(siteProperty_getText(PropertyName, DefaultValue.ToString))
-        End Function
-        '
-        Public Function siteProperty_getBoolean(ByVal PropertyName As String, Optional ByVal DefaultValue As Boolean = False) As Boolean
-            Return EncodeBoolean(siteProperty_getText(PropertyName, DefaultValue.ToString))
-        End Function
-        '
         '
         '
         Public ReadOnly Property dataBuildVersion As String
@@ -1149,7 +627,7 @@ ErrorTrap:
                 Try
 
                     If Not dataBuildVersion_LocalLoaded Then
-                        dataBuildVersion_Local = siteProperty_getText("BuildVersion", "")
+                        dataBuildVersion_Local = cpCore.siteProperties.getText("BuildVersion", "")
                         If dataBuildVersion_Local = "" Then
                             dataBuildVersion_Local = "0.0.000"
                         End If
@@ -1253,24 +731,6 @@ ErrorTrap:
         End Function
         '
         '========================================================================
-        '   converts a virtual file into a filename
-        '       - in local mode, the cdnFiles can be mapped to a virtual folder in appRoot
-        '           -- see appConfig.cdnFilesVirtualFolder
-        '       convert all / to \
-        '       if it includes "://", it is a root file
-        '       if it starts with "/", it is already root relative
-        '       else (if it start with a file or a path), add the publicFileContentPathPrefix
-        '========================================================================
-        '
-        Public Function convertCdnUrlToCdnPathFilename(ByVal cdnUrl As String) As String
-            '
-            ' this routine was originally written to handle modes that were not adopted (content file absolute and relative URLs)
-            ' leave it here as a simple slash converter in case other conversions are needed later
-            '
-            Return Replace(cdnUrl, "/", "\")
-        End Function
-        '
-        '========================================================================
         '   Update a record in a table
         '========================================================================
         '
@@ -1329,7 +789,7 @@ ErrorTrap:
                 sqlList.add("EditArchive", db_EncodeSQLNumber(0))
                 sqlList.add("EditBlank", db_EncodeSQLNumber(0))
                 sqlList.add("ContentControlID", db_EncodeSQLNumber(0))
-                sqlList.add("Name", db_EncodeSQLText(""))
+                sqlList.add("Name", encodeSQLText(""))
                 sqlList.add("Active", db_EncodeSQLNumber(1))
                 '
                 Call db_InsertTableRecord(DataSourceName, TableName, sqlList)
@@ -1561,7 +1021,7 @@ ErrorTrap:
             Dim RSSchema As DataTable
             Dim TableFound As Boolean
             '
-            'If csv_AbortActivity Then Exit Sub
+            'If csv_false Then Exit Sub
             '
             Const MissingTableErrorMySQL = -2147467259
             Const MissingTableErrorAccess = -2147217900
@@ -1658,7 +1118,7 @@ ErrorTrap:
             '
             MethodName = "csv_CreateSQLTableField(" & DataSourceName & "," & TableName & "," & FieldName & "," & fieldType & ",)"
             '
-            'If csv_AbortActivity Then Exit Sub
+            'If csv_false Then Exit Sub
             '
             If TableName = "" Then
                 '
@@ -1874,7 +1334,7 @@ ErrorTrap:
             Try
                 Dim CS As Integer
                 '
-                CS = db_csOpen(ContentName, "name=" & db_EncodeSQLText(RecordName), "ID", , , , , "ID")
+                CS = db_csOpen(ContentName, "name=" & encodeSQLText(RecordName), "ID", , , , , "ID")
                 If db_csOk(CS) Then
                     returnValue = EncodeInteger(db_GetCS(CS, "ID"))
                     If returnValue = 0 Then
@@ -2096,7 +1556,7 @@ ErrorTrap:
         Friend Function db_isCdefField(ByVal ContentID As Integer, ByVal FieldName As String) As Boolean
             Dim RS As DataTable
             '
-            RS = executeSql("select top 1 id from ccFields where name=" & db_EncodeSQLText(FieldName) & " and contentid=" & ContentID)
+            RS = executeSql("select top 1 id from ccFields where name=" & encodeSQLText(FieldName) & " and contentid=" & ContentID)
             db_isCdefField = isDataTableOk(RS)
             If (isDataTableOk(RS)) Then
                 RS.Dispose()
@@ -2359,7 +1819,7 @@ ErrorTrap:
                         'hint = hint & ", 100"
                         iActiveOnly = ((ActiveOnly))
                         iSortFieldList = encodeEmptyText(SortFieldList, CDef.DefaultSortMethod)
-                        iWorkflowRenderingMode = siteProperty_AllowWorkflowAuthoring And CDef.AllowWorkflowAuthoring And (WorkflowRenderingMode)
+                        iWorkflowRenderingMode = cpCore.siteProperties.allowWorkflowAuthoring And CDef.AllowWorkflowAuthoring And (WorkflowRenderingMode)
                         AllowWorkflowSave = iWorkflowRenderingMode And (WorkflowEditingMode)
                         iMemberID = MemberID
                         iCriteria = encodeEmptyText(Criteria, "")
@@ -2634,9 +2094,9 @@ ErrorTrap:
                                 If Not db_IsCSEOF(db_csOpen) Then
                                     If db_ContentSet(db_csOpen).WorkflowEditingRequested Then
                                         RecordID = db_GetCSInteger(db_csOpen, "ID")
-                                        If Not workflow_IsRecordLocked(ContentName, RecordID, MemberID) Then
+                                        If Not cpCore.workflow.isRecordLocked(ContentName, RecordID, MemberID) Then
                                             db_ContentSet(db_csOpen).WorkflowEditingMode = True
-                                            Call workflow_SetEditLock(ContentName, RecordID, MemberID)
+                                            Call cpCore.workflow.setEditLock(ContentName, RecordID, MemberID)
                                         End If
                                     End If
                                 End If
@@ -2653,7 +2113,7 @@ ErrorTrap:
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
                 'If False Then
-                If Not siteProperty_trapErrors Then
+                If Not cpCore.siteProperties.trapErrors Then
                     Throw New ApplicationException("rethrow", ex)
                 End If
                 'End If
@@ -2725,7 +2185,7 @@ ErrorTrap:
                                             '
                                             Filename = db_GetCSText(CSPointer, fieldName)
                                             If Filename <> "" Then
-                                                Call cdnFiles.DeleteFile(cdnFiles.joinPath(config.cdnFilesNetprefix, Filename))
+                                                Call cpCore.cdnFiles.DeleteFile(cpCore.cdnFiles.joinPath(cpCore.appConfig.cdnFilesNetprefix, Filename))
                                             End If
                                         Case FieldTypeIdFileTextPrivate, FieldTypeIdFileHTMLPrivate
                                             '
@@ -2733,7 +2193,7 @@ ErrorTrap:
                                             '
                                             Filename = db_GetCSText(CSPointer, fieldName)
                                             If Filename <> "" Then
-                                                Call privateFiles.DeleteFile(Filename)
+                                                Call cpCore.privateFiles.DeleteFile(Filename)
                                             End If
                                     End Select
                                 End With
@@ -2743,7 +2203,7 @@ ErrorTrap:
                         ' non-workflow mode, delete the live record
                         '
                         Call db_DeleteTableRecord(ContentDataSourceName, ContentTableName, LiveRecordID)
-                        If csv_AllowAutocsv_ClearContentTimeStamp Then
+                        If cpCore.workflow.csv_AllowAutocsv_ClearContentTimeStamp Then
                             Call cpCore.cache.invalidateTag(ContentName)
                         End If
                         Call db_DeleteContentRules(ContentID, LiveRecordID)
@@ -2762,7 +2222,7 @@ ErrorTrap:
                         Call sqlList.add("MODIFIEDBY", db_EncodeSQLNumber(db_ContentSet(CSPointer).OwnerMemberID)) ' Pointer)
                         Call sqlList.add("MODIFIEDDATE", db_EncodeSQLDate(Now)) ' Pointer)
                         Call db_UpdateTableRecord(AuthoringDataSourceName, AuthoringTableName, "ID=" & EditRecordID, sqlList)
-                        Call workflow_SetAuthoringControl(ContentName, LiveRecordID, AuthoringControlsModified, db_ContentSet(CSPointer).OwnerMemberID)
+                        Call cpCore.workflow.setAuthoringControl(ContentName, LiveRecordID, AuthoringControlsModified, db_ContentSet(CSPointer).OwnerMemberID)
                     End If
                 End If
             End If
@@ -2793,7 +2253,7 @@ ErrorTrap:
                 '       (Save all buffered csv_ContentSet rows incase of overlap)
                 '       No - Csets may be from other PageProcesses in unknown states
                 '
-                returnCs = db_initCS(cpCore.userId)
+                returnCs = db_initCS(cpCore.user.userId)
                 With db_ContentSet(returnCs)
                     .Updateable = False
                     .ContentName = ""
@@ -2941,9 +2401,9 @@ ErrorTrap:
                     If (Not db_IsCSEOF(CSPointer)) And db_ContentSet(CSPointer).WorkflowEditingRequested Then
                         ContentName = db_ContentSet(CSPointer).ContentName
                         RecordID = db_GetCSInteger(CSPointer, "ID")
-                        If Not workflow_IsRecordLocked(ContentName, RecordID, db_ContentSet(CSPointer).OwnerMemberID) Then
+                        If Not cpCore.workflow.isRecordLocked(ContentName, RecordID, db_ContentSet(CSPointer).OwnerMemberID) Then
                             db_ContentSet(CSPointer).WorkflowEditingMode = True
-                            Call workflow_SetEditLock(ContentName, RecordID, db_ContentSet(CSPointer).OwnerMemberID)
+                            Call cpCore.workflow.setEditLock(ContentName, RecordID, db_ContentSet(CSPointer).OwnerMemberID)
                         End If
                     End If
                 End If
@@ -3508,15 +2968,15 @@ ErrorTrap:
                             '
                             ' Filename changed, mark record changed
                             '
-                            Call privateFiles.SaveFile(Filename, Copy)
+                            Call cpCore.privateFiles.SaveFile(Filename, Copy)
                             Call db_SetCSField(CSPointer, FieldName, Filename)
                         Else
-                            OldCopy = cdnFiles.ReadFile(Filename)
+                            OldCopy = cpCore.cdnFiles.ReadFile(Filename)
                             If OldCopy <> Copy Then
                                 '
                                 ' copy changed, mark record changed
                                 '
-                                Call privateFiles.SaveFile(Filename, Copy)
+                                Call cpCore.privateFiles.SaveFile(Filename, Copy)
                                 Call db_SetCSField(CSPointer, FieldName, Filename)
                             End If
                         End If
@@ -3547,7 +3007,7 @@ ErrorTrap:
             '
             Filename = db_GetCSText(CSPointer, FieldName)
             If Filename <> "" Then
-                db_csGetTextFile = cdnFiles.ReadFile(Filename)
+                db_csGetTextFile = cpCore.cdnFiles.ReadFile(Filename)
             End If
             '
             Exit Function
@@ -3734,7 +3194,7 @@ ErrorTrap:
                         '
                         ' Delete records from Content
                         '
-                        If siteProperty_AllowWorkflowAuthoring And (CDef.AllowWorkflowAuthoring) Then
+                        If cpCore.siteProperties.allowWorkflowAuthoring And (CDef.AllowWorkflowAuthoring) Then
                             '
                             ' Supports Workflow Authoring, handle it record at a time
                             '
@@ -3750,7 +3210,7 @@ ErrorTrap:
                             '
                             ContentCriteria = "(" & Criteria & ")And(" & CDef.ContentControlCriteria & ")"
                             Call db_DeleteTableRecords(CDef.ContentDataSourceName, CDef.ContentTableName, ContentCriteria)
-                            If csv_AllowAutocsv_ClearContentTimeStamp Then
+                            If cpCore.workflow.csv_AllowAutocsv_ClearContentTimeStamp Then
                                 Call cpCore.cache.invalidateTag(ContentName)
                             End If
                         End If
@@ -3791,7 +3251,7 @@ ErrorTrap:
                 Dim sqlList As New sqlFieldListClass
                 '
                 If MemberID = -1 Then
-                    MemberID = cpCore.userId
+                    MemberID = cpCore.user.userId
                 End If
                 returnCs = -1
                 CDef = cpCore.metaData.getCdef(ContentName)
@@ -3800,7 +3260,7 @@ ErrorTrap:
                     Throw (New ApplicationException("content [" & ContentName & "] could not be found."))
                 Else
                     With CDef
-                        WorkflowAuthoringMode = .AllowWorkflowAuthoring And siteProperty_AllowWorkflowAuthoring
+                        WorkflowAuthoringMode = .AllowWorkflowAuthoring And cpCore.siteProperties.allowWorkflowAuthoring
                         If WorkflowAuthoringMode Then
                             '
                             ' authoring, Create Blank in Live Table
@@ -3884,7 +3344,7 @@ ErrorTrap:
                                                         '
                                                         ' else text
                                                         '
-                                                        sqlList.add(FieldName, db_EncodeSQLText(.defaultValue))
+                                                        sqlList.add(FieldName, encodeSQLText(.defaultValue))
                                                 End Select
                                         End Select
                                     End If
@@ -3919,7 +3379,7 @@ ErrorTrap:
                         '
                         ' ----- Clear Time Stamp because a record changed
                         '
-                        If csv_AllowAutocsv_ClearContentTimeStamp Then
+                        If cpCore.workflow.csv_AllowAutocsv_ClearContentTimeStamp Then
                             Call cpCore.cache.invalidateTag(ContentName)
                         End If
                     End With
@@ -4050,7 +3510,7 @@ ErrorTrap:
                                         DestFilename = db_GetCSFilename(CSDestination, FieldName, "")
                                         'DestFilename = csv_GetVirtualFilename(DestContentName, FieldName, DestRecordID)
                                         Call db_SetCSField(CSDestination, FieldName, DestFilename)
-                                        Call cdnFiles.copyFile(SourceFilename, DestFilename)
+                                        Call cpCore.cdnFiles.copyFile(SourceFilename, DestFilename)
                                     End If
                                 Case FieldTypeIdFileTextPrivate, FieldTypeIdFileHTMLPrivate
                                     '
@@ -4062,7 +3522,7 @@ ErrorTrap:
                                         DestFilename = db_GetCSFilename(CSDestination, FieldName, "")
                                         'DestFilename = csv_GetVirtualFilename(DestContentName, FieldName, DestRecordID)
                                         Call db_SetCSField(CSDestination, FieldName, DestFilename)
-                                        Call privateFiles.copyFile(SourceFilename, DestFilename)
+                                        Call cpCore.privateFiles.copyFile(SourceFilename, DestFilename)
                                     End If
                                 Case Else
                                     '
@@ -4262,12 +3722,12 @@ ErrorTrap:
                                                 '
                                                 '
                                                 '
-                                                db_GetCS = privateFiles.ReadFile(EncodeText(FieldValueVariant))
+                                                db_GetCS = cpCore.privateFiles.ReadFile(EncodeText(FieldValueVariant))
                                             Case FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript
                                                 '
                                                 '
                                                 '
-                                                db_GetCS = cdnFiles.ReadFile(EncodeText(FieldValueVariant))
+                                                db_GetCS = cpCore.cdnFiles.ReadFile(EncodeText(FieldValueVariant))
                                             'NeedsHTMLEncode = False
                                             Case FieldTypeIdText, FieldTypeIdLongText, FieldTypeIdHTML
                                                 '
@@ -4368,7 +3828,7 @@ ErrorTrap:
                                                 FieldValueText = EncodeText(FieldValueVariantLocal)
                                                 If FieldValueText = "" Then
                                                     If fileNameNoExt <> "" Then
-                                                        Call privateFiles.DeleteFile(fileNameNoExt)
+                                                        Call cpCore.privateFiles.DeleteFile(fileNameNoExt)
                                                         'Call publicFiles.DeleteFile(fileNameNoExt)
                                                         fileNameNoExt = ""
                                                     End If
@@ -4376,7 +3836,7 @@ ErrorTrap:
                                                     If fileNameNoExt = "" Then
                                                         fileNameNoExt = db_GetCSFilename(CSPointer, FieldName, "", ContentName)
                                                     End If
-                                                    Call privateFiles.SaveFile(fileNameNoExt, FieldValueText)
+                                                    Call cpCore.privateFiles.SaveFile(fileNameNoExt, FieldValueText)
                                                     'Call publicFiles.SaveFile(fileNameNoExt, FieldValueText)
                                                 End If
                                                 FieldValueVariantLocal = fileNameNoExt
@@ -4400,7 +3860,7 @@ ErrorTrap:
                                                 BlankTest = Replace(BlankTest, vbTab, "")
                                                 If BlankTest = "" Then
                                                     If PathFilename <> "" Then
-                                                        Call cdnFiles.DeleteFile(PathFilename)
+                                                        Call cpCore.cdnFiles.DeleteFile(PathFilename)
                                                         PathFilename = ""
                                                     End If
                                                 Else
@@ -4445,9 +3905,9 @@ ErrorTrap:
                                                     End If
                                                     If (pathFilenameOriginal <> "") And (pathFilenameOriginal <> PathFilename) Then
                                                         pathFilenameOriginal = convertCdnUrlToCdnPathFilename(pathFilenameOriginal)
-                                                        Call cdnFiles.DeleteFile(pathFilenameOriginal)
+                                                        Call cpCore.cdnFiles.DeleteFile(pathFilenameOriginal)
                                                     End If
-                                                    Call cdnFiles.SaveFile(PathFilename, FieldValueText)
+                                                    Call cpCore.cdnFiles.SaveFile(PathFilename, FieldValueText)
                                                 End If
                                                 FieldValueVariantLocal = PathFilename
                                                 SetNeeded = True
@@ -4661,7 +4121,7 @@ ErrorTrap:
                             EditDataSourceName = .AuthoringDataSourceName
                             ContentName = .Name
                             ContentID = .Id
-                            WorkflowMode = .AllowWorkflowAuthoring And siteProperty_AllowWorkflowAuthoring
+                            WorkflowMode = .AllowWorkflowAuthoring And cpCore.siteProperties.allowWorkflowAuthoring
                         End With
                         '
                         LiveRecordID = db_GetCSInteger(CSPointer, "ID")
@@ -4772,12 +4232,12 @@ ErrorTrap:
                                                 If .Scramble Then
                                                     Copy = cpCore.metaData.TextScramble(Copy)
                                                 End If
-                                                SQLSetPair = FieldName & "=" & db_EncodeSQLText(Copy)
+                                                SQLSetPair = FieldName & "=" & encodeSQLText(Copy)
                                             Case FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdFileTextPrivate, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdFileHTMLPrivate
                                                 Copy = Left(EncodeText(writeCacheValueVariant), 255)
-                                                SQLSetPair = FieldName & "=" & db_EncodeSQLText(Copy)
+                                                SQLSetPair = FieldName & "=" & encodeSQLText(Copy)
                                             Case FieldTypeIdLongText, FieldTypeIdHTML
-                                                SQLSetPair = FieldName & "=" & db_EncodeSQLText(EncodeText(writeCacheValueVariant))
+                                                SQLSetPair = FieldName & "=" & encodeSQLText(EncodeText(writeCacheValueVariant))
                                             Case Else
                                                 '
                                                 ' Invalid fieldtype
@@ -4916,7 +4376,7 @@ ErrorTrap:
                             '
                             ' ----- set the csv_ContentSet Modified
                             '
-                            Call workflow_SetAuthoringControl(ContentName, LiveRecordID, AuthoringControlsModified, .OwnerMemberID)
+                            Call cpCore.workflow.setAuthoringControl(ContentName, LiveRecordID, AuthoringControlsModified, .OwnerMemberID)
                         End If
                         '
                         ' ----- Do the unique check on the content table, if necessary
@@ -4957,7 +4417,7 @@ ErrorTrap:
                                 '
                                 ' ----- reset the ContentTimeStamp to csv_ClearBake
                                 '
-                                If csv_AllowAutocsv_ClearContentTimeStamp And (Not Blockcsv_ClearBake) Then
+                                If cpCore.workflow.csv_AllowAutocsv_ClearContentTimeStamp And (Not Blockcsv_ClearBake) Then
                                     Call cpCore.cache.invalidateTag(LiveRecordContentName)
                                 End If
                                 '
@@ -5252,11 +4712,11 @@ ErrorTrap:
                 Case FieldTypeIdDate
                     db_EncodeSQL = db_EncodeSQLDate(EncodeDate(expression))
                 Case FieldTypeIdLongText, FieldTypeIdHTML
-                    db_EncodeSQL = db_EncodeSQLText(EncodeText(expression))
+                    db_EncodeSQL = encodeSQLText(EncodeText(expression))
                 Case FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdRedirect, FieldTypeIdManyToMany, FieldTypeIdText, FieldTypeIdFileTextPrivate, FieldTypeIdFileJavascript, FieldTypeIdFileXML, FieldTypeIdFileCSS, FieldTypeIdFileHTMLPrivate
-                    db_EncodeSQL = db_EncodeSQLText(EncodeText(expression))
+                    db_EncodeSQL = encodeSQLText(EncodeText(expression))
                 Case Else
-                    db_EncodeSQL = db_EncodeSQLText(EncodeText(expression))
+                    db_EncodeSQL = encodeSQLText(EncodeText(expression))
                     On Error GoTo 0
                     Call Err.Raise(KmaErrorBase, "dll", "Unknown Field Type [" & fieldType & "] used FieldTypeText.")
             End Select
@@ -5268,7 +4728,7 @@ ErrorTrap:
         '   encodeSQLText
         '========================================================================
         '
-        Public Function db_EncodeSQLText(ByVal expression As String) As String
+        Public Function encodeSQLText(ByVal expression As String) As String
             Dim returnString As String = ""
             If expression Is Nothing Then
                 returnString = "null"
@@ -5461,7 +4921,7 @@ ErrorTrap:
                 Dim subQuery As String = ""
                 For Each groupName As String In groupList
                     If Not String.IsNullOrEmpty(groupName.Trim) Then
-                        subQuery &= "or(ccGroups.Name=" & db_EncodeSQLText(groupName.Trim) & ")"
+                        subQuery &= "or(ccGroups.Name=" & encodeSQLText(groupName.Trim) & ")"
                     End If
                 Next
                 If Not String.IsNullOrEmpty(subQuery) Then
@@ -5502,10 +4962,10 @@ ErrorTrap:
             Dim rs As DataTable
             Dim SQL As String
             '
-            SQL = "select ContentTableID from ccContent where name=" & db_EncodeSQLText(ContentName) & ";"
+            SQL = "select ContentTableID from ccContent where name=" & encodeSQLText(ContentName) & ";"
             rs = executeSql(SQL)
             If Not isDataTableOk(rs) Then
-                cpCore.handleLegacyError2("cpCoreClass", "csv_GetContentTableID", config.name & ", Content [" & ContentName & "] was not found in ccContent table")
+                cpCore.handleLegacyError2("cpCoreClass", "csv_GetContentTableID", cpCore.appConfig.name & ", Content [" & ContentName & "] was not found in ccContent table")
             Else
                 db_GetContentTableID = EncodeInteger(rs.Rows(0).Item("ContentTableID"))
             End If
@@ -5516,370 +4976,6 @@ ErrorTrap:
             '
 ErrorTrap:
             cpCore.handleExceptionAndRethrow(New Exception("Unexpected exception"))
-        End Function
-        '
-        '=====================================================================================================
-        '   returns true if another user has the record locked
-        '=====================================================================================================
-        '
-        Public Function workflow_IsRecordLocked(ByVal ContentName As String, ByVal RecordID As Integer, ByVal MemberID As Integer) As Boolean
-            On Error GoTo ErrorTrap 'Const Tn = "csv_IsRecordLocked" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Dim TableID As Integer
-            Dim Criteria As String
-            Dim CS As Integer
-            '
-            Criteria = workflow_GetAuthoringControlCriteria(ContentName, RecordID) & "and(CreatedBy<>" & db_EncodeSQLNumber(MemberID) & ")"
-            CS = db_csOpen("Authoring Controls", Criteria, , , MemberID)
-            workflow_IsRecordLocked = db_csOk(CS)
-            Call db_csClose(CS)
-            '
-            Exit Function
-            '
-ErrorTrap:
-            cpCore.handleExceptionAndRethrow(New Exception("Unexpected exception"))
-        End Function
-        '
-        '=====================================================================================================
-        '   returns true if another user has the record locked
-        '=====================================================================================================
-        '
-        Private Function workflow_GetAuthoringControlCriteria(ByVal ContentName As String, ByVal RecordID As Integer) As String
-            On Error GoTo ErrorTrap 'Const Tn = "GetAuthoringControlCriteria" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Dim MethodName As String
-            Dim CSPointer As Integer
-            Dim ContentCnt As Integer
-            Dim CS As Integer
-            Dim ContentID As Integer
-            Dim Criteria As String
-            Dim TableID As Integer
-            '
-            MethodName = "csv_GetAuthoringControlCriteria"
-            '
-            TableID = db_GetContentTableID(ContentName)
-            '
-            ' Authoring Control records are referenced by ContentID
-            '
-            ContentCnt = 0
-            CS = db_csOpen("Content", "(contenttableid=" & TableID & ")")
-            Do While db_csOk(CS)
-                Criteria = Criteria & "," & db_GetCSInteger(CS, "ID")
-                ContentCnt = ContentCnt + 1
-                Call db_csGoNext(CS)
-            Loop
-            Call db_csClose(CS)
-            If ContentCnt < 1 Then
-                '
-                ' No references to this table
-                '
-                Call handleLegacyClassError4(KmaErrorInternal, "dll", "TableID [" & TableID & "] could not be found in any ccContent.ContentTableID", "csv_GetAuthoringControlCriteria", False, True)
-                workflow_GetAuthoringControlCriteria = "(1=0)"
-            ElseIf ContentCnt = 1 Then
-                '
-                ' One content record
-                '
-                workflow_GetAuthoringControlCriteria = "(ContentID=" & db_EncodeSQLNumber(Mid(Criteria, 2)) & ")and(RecordID=" & db_EncodeSQLNumber(RecordID) & ")and((DateExpires>" & db_EncodeSQLDate(Now) & ")or(DateExpires is null))"
-            Else
-                '
-                ' Multiple content records
-                '
-                workflow_GetAuthoringControlCriteria = "(ContentID in (" & Mid(Criteria, 2) & "))and(RecordID=" & db_EncodeSQLNumber(RecordID) & ")and((DateExpires>" & db_EncodeSQLDate(Now) & ")or(DateExpires is null))"
-            End If
-            '
-            Exit Function
-            '
-ErrorTrap:
-            Call handleLegacyClassError4(Err.Number, Err.Source, Err.Description, MethodName, True)
-        End Function
-        '
-        '=====================================================================================================
-        '   Clear the Approved Authoring Control
-        '=====================================================================================================
-        '
-        Public Sub workflow_ClearAuthoringControl(ByVal ContentName As String, ByVal RecordID As Integer, ByVal AuthoringControl As Integer, ByVal MemberID As Integer)
-            On Error GoTo ErrorTrap 'Const Tn = "MethodName-136" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Dim MethodName As String
-            'Dim ContentID as integer
-            Dim TableID As Integer
-            Dim Criteria As String
-            '
-            MethodName = "csv_ClearAuthoringControl"
-            '
-            'ContentID = csv_GetContentID(ContentName)
-            Criteria = workflow_GetAuthoringControlCriteria(ContentName, RecordID) & "and(ControlType=" & AuthoringControl & ")"
-
-            'If ContentID > -1 Then
-            Select Case AuthoringControl
-                Case AuthoringControlsEditing
-                    Call db_DeleteContentRecords("Authoring Controls", Criteria & "and(CreatedBy=" & db_EncodeSQLNumber(MemberID) & ")", MemberID)
-                    'Call csv_DeleteContentRecords("Authoring Controls", "(ControlType=" & AuthoringControl & ")and(ContentID=" & encodeSQLNumber(ContentID) & ")and(RecordID=" & encodeSQLNumber(RecordID) & ")and(CreatedBy=" & encodeSQLNumber(MemberID) & ")", MemberID)
-                Case AuthoringControlsSubmitted, AuthoringControlsApproved, AuthoringControlsModified
-                    Call db_DeleteContentRecords("Authoring Controls", Criteria, MemberID)
-                    'Call csv_DeleteContentRecords("Authoring Controls", "(ControlType=" & AuthoringControl & ")and(ContentID=" & encodeSQLNumber(ContentID) & ")and(RecordID=" & encodeSQLNumber(RecordID) & ")", MemberID)
-            End Select
-            'End If
-            '
-            Exit Sub
-            '
-ErrorTrap:
-            Call handleLegacyClassError4(Err.Number, Err.Source, Err.Description, MethodName, True)
-        End Sub
-        '
-        '=====================================================================================================
-        '   the Approved Authoring Control
-        '=====================================================================================================
-        '
-        Public Sub workflow_SetAuthoringControl(ByVal ContentName As String, ByVal RecordID As Integer, ByVal AuthoringControl As Integer, ByVal MemberID As Integer)
-            On Error GoTo ErrorTrap 'Const Tn = "MethodName-137" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Dim MethodName As String
-            Dim ContentID As Integer
-            'Dim TableID as integer
-            Dim AuthoringCriteria As String
-            Dim CSNewLock As Integer
-            Dim CSCurrentLock As Integer
-            Dim sqlCriteria As String
-            Dim EditLockTimeoutDays As Double
-            Dim EditLockTimeoutMinutes As Double
-            Dim CDef As coreMetaDataClass.CDefClass
-            '
-            MethodName = "csv_SetAuthoringControl"
-            '
-            CDef = cpCore.metaData.getCdef(ContentName)
-            ContentID = CDef.Id
-            If ContentID <> 0 Then
-                'TableID = csv_GetContentTableID(ContentName)
-                AuthoringCriteria = workflow_GetAuthoringControlCriteria(ContentName, RecordID)
-                Select Case AuthoringControl
-                    Case AuthoringControlsEditing
-                        EditLockTimeoutMinutes = EncodeNumber(siteProperty_getText("EditLockTimeout", "5"))
-                        If (EditLockTimeoutMinutes <> 0) Then
-                            sqlCriteria = AuthoringCriteria & "and(ControlType=" & AuthoringControlsEditing & ")"
-                            EditLockTimeoutDays = (EditLockTimeoutMinutes / 60 / 24)
-                            '
-                            ' Delete expired locks
-                            '
-                            Call db_DeleteContentRecords("Authoring Controls", sqlCriteria & "AND(DATEEXPIRES<" & db_EncodeSQLDate(Now) & ")")
-                            '
-                            ' Select any lock left, only the newest counts
-                            '
-                            CSCurrentLock = db_csOpen("Authoring Controls", sqlCriteria, "ID DESC", , MemberID, False, False)
-                            If Not db_csOk(CSCurrentLock) Then
-                                '
-                                ' No lock, create one
-                                '
-                                CSNewLock = db_csInsertRecord("Authoring Controls", MemberID)
-                                If db_csOk(CSNewLock) Then
-                                    Call db_SetCSField(CSNewLock, "RecordID", RecordID)
-                                    Call db_SetCSField(CSNewLock, "DateExpires", (Now.AddDays(EditLockTimeoutDays)))
-                                    Call db_SetCSField(CSNewLock, "ControlType", AuthoringControlsEditing)
-                                    Call db_SetCSField(CSNewLock, "ContentRecordKey", EncodeText(ContentID & "." & RecordID))
-                                    Call db_SetCSField(CSNewLock, "ContentID", ContentID)
-                                End If
-                                Call db_csClose(CSNewLock)
-                            Else
-                                If (db_GetCSInteger(CSCurrentLock, "CreatedBy") = MemberID) Then
-                                    '
-                                    ' Record Locked by Member, update DateExpire
-                                    '
-                                    Call db_SetCSField(CSCurrentLock, "DateExpires", (Now.AddDays(EditLockTimeoutDays)))
-                                End If
-                            End If
-                            Call db_csClose(CSCurrentLock)
-                        End If
-                    Case AuthoringControlsSubmitted, AuthoringControlsApproved, AuthoringControlsModified
-                        If CDef.AllowWorkflowAuthoring And siteProperty_AllowWorkflowAuthoring Then
-                            sqlCriteria = AuthoringCriteria & "and(ControlType=" & AuthoringControl & ")"
-                            CSCurrentLock = db_csOpen("Authoring Controls", sqlCriteria, "ID DESC", , MemberID, False, False)
-                            If Not db_csOk(CSCurrentLock) Then
-                                '
-                                ' Create new lock
-                                '
-                                CSNewLock = db_csInsertRecord("Authoring Controls", MemberID)
-                                If db_csOk(CSNewLock) Then
-                                    Call db_SetCSField(CSNewLock, "RecordID", RecordID)
-                                    Call db_SetCSField(CSNewLock, "ControlType", AuthoringControl)
-                                    Call db_SetCSField(CSNewLock, "ContentRecordKey", EncodeText(ContentID & "." & RecordID))
-                                    Call db_SetCSField(CSNewLock, "ContentID", ContentID)
-                                End If
-                                Call db_csClose(CSNewLock)
-                            Else
-                                '
-                                ' Update current lock
-                                '
-                                'Call csv_SetCSField(CSCurrentLock, "ContentID", ContentID)
-                                'Call csv_SetCSField(CSCurrentLock, "RecordID", RecordID)
-                                'Call csv_SetCSField(CSCurrentLock, "ControlType", AuthoringControl)
-                                'Call csv_SetCSField(CSCurrentLock, "ContentRecordKey", encodeText(ContentID & "." & RecordID))
-                            End If
-                            Call db_csClose(CSCurrentLock)
-                        End If
-                End Select
-            End If
-            '
-            Exit Sub
-            '
-ErrorTrap:
-            Call handleLegacyClassError4(Err.Number, Err.Source, Err.Description, MethodName, True)
-        End Sub
-        '
-        '=====================================================================================================
-        '   the Approved Authoring Control
-        '=====================================================================================================
-        '
-        Public Sub workflow_GetAuthoringStatus(ByVal ContentName As String, ByVal RecordID As Integer, ByRef IsSubmitted As Boolean, ByRef IsApproved As Boolean, ByRef SubmittedName As String, ByRef ApprovedName As String, ByRef IsInserted As Boolean, ByRef IsDeleted As Boolean, ByRef IsModified As Boolean, ByRef ModifiedName As String, ByRef ModifiedDate As Date, ByRef SubmittedDate As Date, ByRef ApprovedDate As Date)
-            On Error GoTo ErrorTrap 'Const Tn = "csv_GetAuthoringStatus" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Dim MethodName As String
-            '
-            MethodName = "csv_GetAuthoringStatus"
-            '
-            Dim SQL As String
-            Dim CSLocks As Integer
-            Dim ContentID As Integer
-            Dim Criteria As String
-            Dim ControlType As Integer
-            Dim EditMemberID As Integer
-            Dim rs As DataTable
-            Dim ContentTableName As String
-            Dim AuthoringTableName As String
-            Dim DataSourceName As String
-            Dim CDef As coreMetaDataClass.CDefClass
-            Dim CS As Integer
-            Dim EditingMemberID As Integer
-            'Dim TableID as integer
-            '
-            IsModified = False
-            ModifiedName = ""
-            ModifiedDate = Date.MinValue
-            IsSubmitted = False
-            SubmittedName = ""
-            SubmittedDate = Date.MinValue
-            IsApproved = False
-            ApprovedName = ""
-            ApprovedDate = Date.MinValue
-            IsInserted = False
-            IsDeleted = False
-            If RecordID > 0 Then
-                '
-                ' Get Workflow Locks
-                '
-                CDef = cpCore.metaData.getCdef(ContentName)
-                ContentID = CDef.Id
-                If ContentID > 0 Then
-                    If CDef.AllowWorkflowAuthoring And siteProperty_AllowWorkflowAuthoring Then
-                        '
-                        ' Check Authoring Controls record for Locks
-                        '
-                        'TableID = csv_GetContentTableID(ContentName)
-                        Criteria = workflow_GetAuthoringControlCriteria(ContentName, RecordID)
-                        CSLocks = db_csOpen("Authoring Controls", Criteria, "DateAdded Desc", , , , , "DateAdded,ControlType,CreatedBy,ID,DateExpires")
-                        Do While db_csOk(CSLocks)
-                            ControlType = db_GetCSInteger(CSLocks, "ControlType")
-                            Select Case ControlType
-                                Case AuthoringControlsModified
-                                    If Not IsModified Then
-                                        ModifiedDate = db_GetCSDate(CSLocks, "DateAdded")
-                                        ModifiedName = db_GetCS(CSLocks, "CreatedBy")
-                                        IsModified = True
-                                    End If
-                                Case AuthoringControlsSubmitted
-                                    If Not IsSubmitted Then
-                                        SubmittedDate = db_GetCSDate(CSLocks, "DateAdded")
-                                        SubmittedName = db_GetCS(CSLocks, "CreatedBy")
-                                        IsSubmitted = True
-                                    End If
-                                Case AuthoringControlsApproved
-                                    If Not IsApproved Then
-                                        ApprovedDate = db_GetCSDate(CSLocks, "DateAdded")
-                                        ApprovedName = db_GetCS(CSLocks, "CreatedBy")
-                                        IsApproved = True
-                                    End If
-                            End Select
-                            db_csGoNext(CSLocks)
-                        Loop
-                        Call db_csClose(CSLocks)
-                        '
-                        ContentTableName = CDef.ContentTableName
-                        AuthoringTableName = CDef.AuthoringTableName
-                        DataSourceName = CDef.ContentDataSourceName
-                        SQL = "SELECT ContentTableName.ID AS LiveRecordID, AuthoringTableName.ID AS EditRecordID, AuthoringTableName.EditBlank AS IsDeleted, ContentTableName.EditBlank AS IsInserted, AuthoringTableName.ModifiedDate AS EditRecordModifiedDate, ContentTableName.ModifiedDate AS LiveRecordModifiedDate" _
-                            & " FROM " & AuthoringTableName & " AS AuthoringTableName RIGHT JOIN " & ContentTableName & " AS ContentTableName ON AuthoringTableName.EditSourceID = ContentTableName.ID" _
-                            & " Where (((ContentTableName.ID) = " & RecordID & "))" _
-                            & " ORDER BY AuthoringTableName.ID DESC;"
-                        rs = executeSql(SQL, DataSourceName)
-                        If isDataTableOk(rs) Then
-                            IsInserted = EncodeBoolean(db_getDataRowColumnName(rs.Rows(0), "IsInserted"))
-                            IsDeleted = EncodeBoolean(db_getDataRowColumnName(rs.Rows(0), "IsDeleted"))
-                            'IsModified = (getDataRowColumnName(RS.rows(0), "LiveRecordModifiedDate") <> getDataRowColumnName(RS.rows(0), "EditRecordModifiedDate"))
-                        End If
-                        Call closeDataTable(rs)
-                    End If
-                End If
-            End If
-            '
-            Exit Sub
-            '
-ErrorTrap:
-            Call handleLegacyClassError4(Err.Number, Err.Source, Err.Description, MethodName, True)
-        End Sub
-        '
-        '=================================================================================
-        '   Depricate this
-        '   Instead, use csv_IsRecordLocked2, which uses the Db
-        '=================================================================================
-        '
-        Public Sub workflow_SetEditLock(ByVal ContentName As String, ByVal RecordID As Integer, ByVal MemberID As Integer)
-            On Error GoTo ErrorTrap 'Const Tn = "MethodName-160" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Call workflow_SetEditLock2(ContentName, RecordID, MemberID, False)
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassError4(Err.Number, Err.Source, Err.Description, "csv_SetEditLock", True)
-        End Sub
-        '
-        '=================================================================================
-        '   Depricate this
-        '   Instead, use csv_IsRecordLocked, which uses the Db
-        '=================================================================================
-        '
-        Public Sub workflow_ClearEditLock(ByVal ContentName As String, ByVal RecordID As Integer, ByVal MemberID As Integer)
-            On Error GoTo ErrorTrap 'Const Tn = "MethodName-161" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Call workflow_SetEditLock2(ContentName, RecordID, MemberID, True)
-            '
-            'Call csv_ClearAuthoringControl(ContentName, RecordID, AuthoringControlsEditing, MemberID)
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassError4(Err.Number, Err.Source, Err.Description, "csv_ClearEditLock", True)
-        End Sub
-        '
-        '=================================================================================
-        '   Depricate this
-        '   Instead, use csv_IsRecordLocked, which uses the Db
-        '=================================================================================
-        '
-        Public Function workflow_GetEditLock(ByVal ContentName As String, ByVal RecordID As Integer, ByRef ReturnMemberID As Integer, ByRef ReturnDateExpires As Date) As Boolean
-            On Error GoTo ErrorTrap 'Const Tn = "MethodName-162" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            workflow_GetEditLock = workflow_GetEditLock2(ContentName, RecordID, ReturnMemberID, ReturnDateExpires)
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassError4(Err.Number, Err.Source, Err.Description, "csv_ClearEditLock", True)
         End Function
         '
         '========================================================================
@@ -5931,7 +5027,7 @@ ErrorTrap:
                 Call Err.Raise(KmaErrorInternal, "dll", "ContentID [" & ContentID & "] or RecordID [" & RecordID & "] where blank")
             Else
                 ContentRecordKey = CStr(ContentID) & "." & CStr(RecordID)
-                Criteria = "(ContentRecordKey=" & db_EncodeSQLText(ContentRecordKey) & ")"
+                Criteria = "(ContentRecordKey=" & encodeSQLText(ContentRecordKey) & ")"
                 ContentName = db_GetContentNameByID(ContentID)
                 TableName = metaData_GetContentTablename(ContentName)
                 '
@@ -6322,22 +5418,6 @@ ErrorTrap:
             End Try
         End Function
         '
-        '   Buffered Site Property
-        '
-        Friend ReadOnly Property siteProperty_allowLinkAlias() As Boolean
-            Get
-                siteProperty_allowLinkAlias = False
-                If True Then
-                    If Not siteProperty_allowLinkAlias_LocalLoaded Then
-                        siteProperty_allowLinkAlias_Local = EncodeBoolean(siteProperty_getText("allowLinkAlias", "1"))
-                        siteProperty_allowLinkAlias_LocalLoaded = True
-                    End If
-                    siteProperty_allowLinkAlias = siteProperty_allowLinkAlias_Local
-                End If
-
-            End Get
-        End Property
-        '
         '========================================================================
         ' ----- Get FieldDescritor from FieldType
         '========================================================================
@@ -6503,550 +5583,6 @@ ErrorTrap:
 ErrorTrap:
             Call handleLegacyClassError4(Err.Number, Err.Source, Err.Description, MethodName, True)
         End Function
-        '
-        '=================================================================================
-        '
-        '=================================================================================
-        '
-        Public Sub workflow_PublishEdit(ByVal ContentName As String, ByVal RecordID As Integer, ByVal MemberID As Integer)
-            On Error GoTo ErrorTrap 'Const Tn = "MethodName-140" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Dim RSLive As DataTable
-            Dim LiveRecordID As Integer
-            Dim LiveDataSourceName As String
-            Dim LiveTableName As String
-            Dim LiveSQLValue As String
-            Dim LiveRecordBlank As Boolean
-            '
-            Dim BlankSQLValue As String
-            '
-            Dim RSEdit As DataTable
-            Dim EditDataSourceName As String
-            Dim EditTableName As String
-            Dim EditRecordID As Integer
-            Dim EditSQLValue As String
-            Dim EditFilename As String
-            Dim EditRecordCID As Integer
-            Dim EditRecordBlank As Boolean
-            '
-            Dim NewEditRecordID As Integer
-            Dim NewEditFilename As String
-            '
-            Dim ContentID As Integer
-            '
-            Dim FieldNameArray() As String
-            Dim ArchiveSqlFieldList As New sqlFieldListClass
-            Dim NewEditSqlFieldList As New sqlFieldListClass
-            Dim PublishFieldNameArray() As String
-            Dim PublishSqlFieldList As New sqlFieldListClass
-            Dim BlankSqlFieldList As New sqlFieldListClass
-            '
-            Dim FieldPointer As Integer
-            Dim FieldCount As Integer
-            Dim FieldName As String
-            Dim fieldTypeId As Integer
-            Dim SQL As String
-            Dim MethodName As String
-            Dim FieldArraySize As Integer
-            Dim PublishingDelete As Boolean
-            Dim PublishingInactive As Boolean
-            Dim CDef As coreMetaDataClass.CDefClass
-            Dim FieldList As String
-            '
-            Dim archiveSqlList As sqlFieldListClass
-            '
-            MethodName = "csv_PublishEdit"
-            '
-            CDef = cpCore.metaData.getCdef(ContentName)
-            If CDef.Id > 0 Then
-                If CDef.AllowWorkflowAuthoring And siteProperty_AllowWorkflowAuthoring Then
-                    With CDef
-                        FieldList = .SelectCommaList
-                        LiveDataSourceName = .ContentDataSourceName
-                        LiveTableName = .ContentTableName
-                        EditDataSourceName = .AuthoringDataSourceName
-                        EditTableName = .AuthoringTableName
-                        FieldCount = .fields.Count
-                        ContentID = .Id
-                        ContentName = .Name
-                    End With
-                    FieldArraySize = FieldCount + 6
-                    ReDim FieldNameArray(FieldArraySize)
-                    'ReDim ArchiveSqlFieldList(FieldArraySize)
-                    'ReDim NewEditSqlFieldList(FieldArraySize)
-                    'ReDim BlankSqlFieldList(FieldArraySize)
-                    'ReDim PublishSqlFieldList(FieldArraySize)
-                    ReDim PublishFieldNameArray(FieldArraySize)
-                    LiveRecordID = RecordID
-                    '
-                    ' ----- Open the live record
-                    '
-                    RSLive = executeSql("SELECT " & FieldList & " FROM " & LiveTableName & " WHERE ID=" & db_EncodeSQLNumber(LiveRecordID) & ";", LiveDataSourceName)
-                    'RSLive = appservices.executeSql(LiveDataSourceName, "SELECT " & FieldList & " FROM " & LiveTableName & " WHERE ID=" & encodeSQLNumber(LiveRecordID) & ";")
-                    If RSLive.Rows.Count <= 0 Then
-                        '
-                        Call handleLegacyClassError3(MethodName, ("During record publishing, there was an error opening the live record, [ID=" & LiveRecordID & "] in table [" & LiveTableName & "] on datasource [" & LiveDataSourceName & " ]"))
-                    Else
-                        If True Then
-                            LiveRecordID = EncodeInteger(db_getDataRowColumnName(RSLive.Rows(0), "ID"))
-                            LiveRecordBlank = EncodeBoolean(db_getDataRowColumnName(RSLive.Rows(0), "EditBlank"))
-                            '
-                            ' ----- Open the edit record
-                            '
-                            RSEdit = executeSql("SELECT " & FieldList & " FROM " & EditTableName & " WHERE (EditSourceID=" & db_EncodeSQLNumber(LiveRecordID) & ")and(EditArchive=0) Order By ID DESC;", EditDataSourceName)
-                            'RSEdit = appservices.executeSql(EditDataSourceName, "SELECT " & FieldList & " FROM " & EditTableName & " WHERE (EditSourceID=" & encodeSQLNumber(LiveRecordID) & ")and(EditArchive=0) Order By ID DESC;")
-                            If RSEdit.Rows.Count <= 0 Then
-                                '
-                                Call handleLegacyClassError3(MethodName, ("During record publishing, there was an error opening the edit record [EditSourceID=" & LiveRecordID & "] in table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
-                            Else
-                                If True Then
-                                    EditRecordID = EncodeInteger(db_getDataRowColumnName(RSEdit.Rows(0), "ID"))
-                                    EditRecordCID = EncodeInteger(db_getDataRowColumnName(RSEdit.Rows(0), "ContentControlID"))
-                                    EditRecordBlank = EncodeBoolean(db_getDataRowColumnName(RSEdit.Rows(0), "EditBlank"))
-                                    PublishingDelete = EditRecordBlank
-                                    PublishingInactive = Not EncodeBoolean(db_getDataRowColumnName(RSEdit.Rows(0), "active"))
-                                    '
-                                    ' ----- Create new Edit record
-                                    '
-                                    If Not PublishingDelete Then
-                                        NewEditRecordID = db_InsertTableRecordGetID(EditDataSourceName, EditTableName, SystemMemberID)
-                                        If NewEditRecordID < 1 Then
-                                            '
-                                            Call handleLegacyClassError3(MethodName, ("During record publishing, a new edit record could not be create, table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
-                                        End If
-                                    End If
-                                    If True Then
-                                        '
-                                        ' ----- create update arrays
-                                        '
-                                        FieldPointer = 0
-                                        For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In CDef.fields
-                                            Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
-                                            With field
-                                                FieldName = .nameLc
-                                                fieldTypeId = .fieldTypeId
-                                                Select Case fieldTypeId
-                                                    Case FieldTypeIdManyToMany, FieldTypeIdRedirect
-                                                        '
-                                                        ' These content fields have no Db Field
-                                                        '
-                                                    Case Else
-                                                        '
-                                                        ' Process These field types
-                                                        '
-                                                        Select Case UCase(FieldName)
-                                                            Case "EDITARCHIVE", "ID", "EDITSOURCEID", "EDITBLANK", "CONTENTCONTROLID"
-                                                                '
-                                                                ' ----- control fields that should not be in any dataset
-                                                                '
-                                                            Case "MODIFIEDDATE", "MODIFIEDBY"
-                                                                '
-                                                                ' ----- non-content fields that need to be in all datasets
-                                                                '       add manually later, in case they are not in ContentDefinition
-                                                                '
-                                                            Case Else
-                                                                '
-                                                                ' ----- Content related field
-                                                                '
-                                                                LiveSQLValue = db_EncodeSQL(db_getDataRowColumnName(RSLive.Rows(0), FieldName), fieldTypeId)
-                                                                EditSQLValue = db_EncodeSQL(db_getDataRowColumnName(RSEdit.Rows(0), FieldName), fieldTypeId)
-                                                                BlankSQLValue = db_EncodeSQL(Nothing, fieldTypeId)
-                                                                FieldNameArray(FieldPointer) = FieldName
-                                                                '
-                                                                ' ----- New Edit Record value
-                                                                '
-                                                                If Not PublishingDelete Then
-                                                                    Select Case fieldTypeId
-                                                                        Case FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript
-                                                                            '
-                                                                            ' ----- cdn files - create copy of File for neweditrecord
-                                                                            '
-                                                                            EditFilename = EncodeText(db_getDataRowColumnName(RSEdit.Rows(0), FieldName))
-                                                                            If EditFilename = "" Then
-                                                                                NewEditSqlFieldList.add(FieldName, db_EncodeSQLText(""))
-                                                                            Else
-                                                                                NewEditFilename = csv_GetVirtualFilenameByTable(EditTableName, FieldName, NewEditRecordID, "", fieldTypeId)
-                                                                                'NewEditFilename = csv_GetVirtualFilename(ContentName, FieldName, NewEditRecordID)
-                                                                                Call cdnFiles.copyFile(EditFilename, NewEditFilename)
-                                                                                NewEditSqlFieldList.add(FieldName, db_EncodeSQLText(NewEditFilename))
-                                                                            End If
-                                                                        Case FieldTypeIdFileTextPrivate, FieldTypeIdFileHTMLPrivate
-                                                                            '
-                                                                            ' ----- private files - create copy of File for neweditrecord
-                                                                            '
-                                                                            EditFilename = EncodeText(db_getDataRowColumnName(RSEdit.Rows(0), FieldName))
-                                                                            If EditFilename = "" Then
-                                                                                NewEditSqlFieldList.add(FieldName, db_EncodeSQLText(""))
-                                                                            Else
-                                                                                NewEditFilename = csv_GetVirtualFilenameByTable(EditTableName, FieldName, NewEditRecordID, "", fieldTypeId)
-                                                                                'NewEditFilename = csv_GetVirtualFilename(ContentName, FieldName, NewEditRecordID)
-                                                                                Call privateFiles.copyFile(EditFilename, NewEditFilename)
-                                                                                NewEditSqlFieldList.add(FieldName, db_EncodeSQLText(NewEditFilename))
-                                                                            End If
-                                                                        Case Else
-                                                                            '
-                                                                            ' ----- put edit value in new edit record
-                                                                            '
-                                                                            NewEditSqlFieldList.add(FieldName, EditSQLValue)
-                                                                    End Select
-                                                                End If
-                                                                '
-                                                                ' ----- set archive value
-                                                                '
-                                                                ArchiveSqlFieldList.add(FieldName, LiveSQLValue)
-                                                                '
-                                                                ' ----- set live record value (and name)
-                                                                '
-                                                                If PublishingDelete Then
-                                                                    '
-                                                                    ' ----- Record delete - fill the live record with null
-                                                                    '
-                                                                    PublishFieldNameArray(FieldPointer) = FieldName
-                                                                    PublishSqlFieldList.add(FieldName, BlankSQLValue)
-                                                                Else
-                                                                    PublishFieldNameArray(FieldPointer) = FieldName
-                                                                    PublishSqlFieldList.add(FieldName, EditSQLValue)
-                                                                End If
-                                                        End Select
-                                                End Select
-                                            End With
-                                            FieldPointer += 1
-                                        Next
-                                        '
-                                        ' ----- create non-content control field entries
-                                        '
-                                        FieldName = "MODIFIEDDATE"
-                                        fieldTypeId = FieldTypeIdDate
-                                        FieldNameArray(FieldPointer) = FieldName
-                                        LiveSQLValue = db_EncodeSQL(db_getDataRowColumnName(RSLive.Rows(0), FieldName), fieldTypeId)
-                                        EditSQLValue = db_EncodeSQL(db_getDataRowColumnName(RSEdit.Rows(0), FieldName), fieldTypeId)
-                                        ArchiveSqlFieldList.add(FieldName, LiveSQLValue)
-                                        NewEditSqlFieldList.add(FieldName, EditSQLValue)
-                                        PublishFieldNameArray(FieldPointer) = FieldName
-                                        PublishSqlFieldList.add(FieldName, EditSQLValue)
-                                        FieldPointer = FieldPointer + 1
-                                        '
-                                        FieldName = "MODIFIEDBY"
-                                        fieldTypeId = FieldTypeIdLookup
-                                        FieldNameArray(FieldPointer) = FieldName
-                                        LiveSQLValue = db_EncodeSQL(db_getDataRowColumnName(RSLive.Rows(0), FieldName), fieldTypeId)
-                                        EditSQLValue = db_EncodeSQL(db_getDataRowColumnName(RSEdit.Rows(0), FieldName), fieldTypeId)
-                                        ArchiveSqlFieldList.add(FieldName, LiveSQLValue)
-                                        NewEditSqlFieldList.add(FieldName, EditSQLValue)
-                                        PublishFieldNameArray(FieldPointer) = FieldName
-                                        PublishSqlFieldList.add(FieldName, EditSQLValue)
-                                        FieldPointer = FieldPointer + 1
-                                        '
-                                        FieldName = "CONTENTCONTROLID"
-                                        fieldTypeId = FieldTypeIdLookup
-                                        FieldNameArray(FieldPointer) = FieldName
-                                        LiveSQLValue = db_EncodeSQL(db_getDataRowColumnName(RSLive.Rows(0), FieldName), fieldTypeId)
-                                        EditSQLValue = db_EncodeSQL(db_getDataRowColumnName(RSEdit.Rows(0), FieldName), fieldTypeId)
-                                        ArchiveSqlFieldList.add(FieldName, LiveSQLValue)
-                                        NewEditSqlFieldList.add(FieldName, EditSQLValue)
-                                        PublishFieldNameArray(FieldPointer) = FieldName
-                                        If PublishingDelete Then
-                                            PublishSqlFieldList.add(FieldName, db_EncodeSQLNumber(0))
-                                        Else
-                                            PublishSqlFieldList.add(FieldName, EditSQLValue)
-                                        End If
-                                        FieldPointer = FieldPointer + 1
-                                        '
-                                        FieldName = "EDITBLANK"
-                                        fieldTypeId = FieldTypeIdBoolean
-                                        FieldNameArray(FieldPointer) = FieldName
-                                        LiveSQLValue = db_EncodeSQL(db_getDataRowColumnName(RSLive.Rows(0), FieldName), fieldTypeId)
-                                        EditSQLValue = db_EncodeSQL(db_getDataRowColumnName(RSEdit.Rows(0), FieldName), fieldTypeId)
-                                        ArchiveSqlFieldList.add(FieldName, LiveSQLValue)
-                                        NewEditSqlFieldList.add(FieldName, EditSQLValue)
-                                        PublishFieldNameArray(FieldPointer) = FieldName
-                                        If PublishingDelete Then
-                                            PublishSqlFieldList.add(FieldName, SQLFalse)
-                                        Else
-                                            PublishSqlFieldList.add(FieldName, EditSQLValue)
-                                        End If
-                                        FieldPointer = FieldPointer + 1
-                                        '
-                                        FieldNameArray(FieldPointer) = "EDITSOURCEID"
-                                        NewEditSqlFieldList.add(FieldName, db_EncodeSQLNumber(LiveRecordID))
-                                        ArchiveSqlFieldList.add(FieldName, db_EncodeSQLNumber(LiveRecordID))
-                                        FieldPointer = FieldPointer + 1
-                                        '
-                                        FieldNameArray(FieldPointer) = "EDITARCHIVE"
-                                        NewEditSqlFieldList.add(FieldName, db_EncodeSQLBoolean(False))
-                                        ArchiveSqlFieldList.add(FieldName, db_EncodeSQLBoolean(True))
-                                        '
-                                        ' ----- copy edit record to live record
-                                        '
-                                        Call db_UpdateTableRecord(LiveDataSourceName, LiveTableName, "ID=" & LiveRecordID, PublishSqlFieldList)
-                                        '
-                                        ' ----- copy live record to archive record and the edit to the new edit
-                                        '
-                                        Call db_UpdateTableRecord(EditDataSourceName, EditTableName, "ID=" & EditRecordID, ArchiveSqlFieldList)
-                                        If Not PublishingDelete Then
-                                            Call db_UpdateTableRecord(EditDataSourceName, EditTableName, "ID=" & NewEditRecordID, NewEditSqlFieldList)
-                                        End If
-                                        '
-                                        ' ----- Content Watch effects
-                                        '
-                                        If PublishingDelete Then
-                                            '
-                                            ' Record was deleted, delete contentwatch records also
-                                            '
-                                            Call db_DeleteContentRules(ContentID, RecordID)
-                                        End If
-                                        '
-                                        ' ----- mark the SpiderDocs record not up-to-date
-                                        '
-                                        If (LCase(EditTableName) = "ccpagecontent") And (LiveRecordID <> 0) Then
-                                            If db_IsSQLTableField("default", "ccSpiderDocs", "PageID") Then
-                                                SQL = "UPDATE ccspiderdocs SET UpToDate = 0 WHERE PageID=" & LiveRecordID
-                                                Call executeSql(SQL)
-                                            End If
-                                        End If
-                                        '
-                                        ' ----- Clear Time Stamp because a record changed
-                                        '
-                                        If csv_AllowAutocsv_ClearContentTimeStamp Then
-                                            Call cpCore.cache.invalidateTag(ContentName)
-                                        End If
-                                    End If
-                                End If
-                                'RSEdit.Close()
-                            End If
-                            'RSEdit = Nothing
-                        End If
-                        'RSLive.Close()
-                    End If
-                    RSLive.Dispose()
-                    '
-                    ' ----- Clear all Authoring Controls
-                    '
-                    Call workflow_ClearAuthoringControl(ContentName, LiveRecordID, AuthoringControlsEditing, MemberID)
-                    Call workflow_ClearAuthoringControl(ContentName, LiveRecordID, AuthoringControlsModified, MemberID)
-                    Call workflow_ClearAuthoringControl(ContentName, LiveRecordID, AuthoringControlsApproved, MemberID)
-                    Call workflow_ClearAuthoringControl(ContentName, LiveRecordID, AuthoringControlsSubmitted, MemberID)
-                    '
-                    '
-                    '
-                    If PublishingDelete Or PublishingInactive Then
-                        Call db_DeleteContentRules(ContentID, LiveRecordID)
-                    End If
-                End If
-            End If
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassError4(Err.Number, Err.Source, Err.Description, "csv_PublishEdit", True)
-        End Sub
-        '
-        '=================================================================================
-        '
-        '=================================================================================
-        '
-        Public Sub workflow_AbortEdit(ByVal ContentName As String, ByVal RecordID As Integer, ByVal MemberID As Integer)
-            On Error GoTo ErrorTrap 'Const Tn = "MethodName-141" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Dim CSPointer As Integer
-
-            Dim RSLive As DataTable
-            Dim LiveRecordID As Integer
-            Dim LiveDataSourceName As String
-            Dim LiveTableName As String
-            Dim LiveSQLValue As String
-            Dim LiveFilename As String
-            '
-            Dim RSEdit As DataTable
-            Dim EditDataSourceName As String
-            Dim EditTableName As String
-            Dim EditRecordID As Integer
-            Dim EditSQLValue As String
-            Dim EditFilename As String
-            '
-            Dim NewEditRecordID As Integer
-            Dim NewEditFilename As String
-            '
-            Dim ContentID As Integer
-            '
-            'Dim PublishFieldNameArray() As String
-            Dim FieldPointer As Integer
-            Dim FieldCount As Integer
-            Dim FieldName As String
-            Dim fieldTypeId As Integer
-            Dim SQL As String
-            Dim CDef As coreMetaDataClass.CDefClass
-            Dim sqlFieldList As New sqlFieldListClass
-            '
-            CDef = cpCore.metaData.getCdef(ContentName)
-            If CDef.Id > 0 Then
-                If CDef.AllowWorkflowAuthoring And siteProperty_AllowWorkflowAuthoring Then
-                    With CDef
-                        LiveDataSourceName = .ContentDataSourceName
-                        LiveTableName = .ContentTableName
-                        EditDataSourceName = .AuthoringDataSourceName
-                        EditTableName = .AuthoringTableName
-                        FieldCount = .fields.Count
-                        ContentID = .Id
-                        ContentName = .Name
-                    End With
-                    'ReDim sqlFieldList(FieldCount + 2)
-                    'ReDim PublishFieldNameArray(FieldCount + 2)
-                    LiveRecordID = RecordID
-                    ' LiveRecordID = appservices.csv_GetCSField(CSPointer, "ID")
-                    '
-                    ' Open the live record
-                    '
-                    RSLive = executeSql("SELECT * FROM " & LiveTableName & " WHERE ID=" & db_EncodeSQLNumber(LiveRecordID) & ";", LiveDataSourceName)
-                    If (RSLive Is Nothing) Then
-                        '
-                        Call handleLegacyClassError3("csv_AbortEdit", ("During record publishing, there was an error opening the live record, [ID=" & LiveRecordID & "] in table [" & LiveTableName & "] on datasource [" & LiveDataSourceName & " ]"))
-                    Else
-                        If RSLive.Rows.Count <= 0 Then
-                            '
-                            Call handleLegacyClassError3("csv_AbortEdit", ("During record publishing, the live record could not be found, [ID=" & LiveRecordID & "] in table [" & LiveTableName & "] on datasource [" & LiveDataSourceName & " ]"))
-                        Else
-                            LiveRecordID = EncodeInteger(db_getDataRowColumnName(RSLive.Rows(0), "ID"))
-                            '
-                            ' Open the edit record
-                            '
-                            RSEdit = executeSql("SELECT * FROM " & EditTableName & " WHERE (EditSourceID=" & db_EncodeSQLNumber(LiveRecordID) & ")and(EditArchive=0) Order By ID DESC;", EditDataSourceName)
-                            If (RSEdit Is Nothing) Then
-                                '
-                                Call handleLegacyClassError3("csv_AbortEdit", ("During record publishing, there was an error opening the edit record [EditSourceID=" & LiveRecordID & "] in table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
-                            Else
-                                If RSEdit.Rows.Count <= 0 Then
-                                    '
-                                    Call handleLegacyClassError3("csv_AbortEdit", ("During record publishing, the edit record could not be found, [EditSourceID=" & LiveRecordID & "] in table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
-                                Else
-                                    EditRecordID = EncodeInteger(db_getDataRowColumnName(RSEdit.Rows(0), "ID"))
-                                    '
-                                    ' create update arrays
-                                    '
-                                    FieldPointer = 0
-                                    For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In CDef.fields
-                                        Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
-                                        With field
-                                            FieldName = .nameLc
-                                            If db_IsSQLTableField(EditDataSourceName, EditTableName, FieldName) Then
-                                                fieldTypeId = .fieldTypeId
-                                                LiveSQLValue = db_EncodeSQL(db_getDataRowColumnName(RSLive.Rows(0), FieldName), fieldTypeId)
-                                                Select Case UCase(FieldName)
-                                                    Case "EDITARCHIVE", "ID", "EDITSOURCEID"
-                                                        '
-                                                        '   block from dataset
-                                                        '
-                                                    Case Else
-                                                        '
-                                                        ' allow only authorable fields
-                                                        '
-                                                        If (fieldTypeId = FieldTypeIdFileCSS) Or (fieldTypeId = FieldTypeIdFileJavascript) Or (fieldTypeId = FieldTypeIdFileXML) Then
-                                                            '
-                                                            '   cdnfiles - create copy of Live TextFile for Edit record
-                                                            '
-                                                            LiveFilename = EncodeText(db_getDataRowColumnName(RSLive.Rows(0), FieldName))
-                                                            If LiveFilename <> "" Then
-                                                                EditFilename = csv_GetVirtualFilenameByTable(EditTableName, FieldName, EditRecordID, "", fieldTypeId)
-                                                                Call cdnFiles.copyFile(LiveFilename, EditFilename)
-                                                                LiveSQLValue = db_EncodeSQLText(EditFilename)
-                                                            End If
-                                                        End If
-                                                        If (fieldTypeId = FieldTypeIdFileTextPrivate) Or (fieldTypeId = FieldTypeIdFileHTMLPrivate) Then
-                                                            '
-                                                            '   pivatefiles - create copy of Live TextFile for Edit record
-                                                            '
-                                                            LiveFilename = EncodeText(db_getDataRowColumnName(RSLive.Rows(0), FieldName))
-                                                            If LiveFilename <> "" Then
-                                                                EditFilename = csv_GetVirtualFilenameByTable(EditTableName, FieldName, EditRecordID, "", fieldTypeId)
-                                                                Call privateFiles.copyFile(LiveFilename, EditFilename)
-                                                                LiveSQLValue = db_EncodeSQLText(EditFilename)
-                                                            End If
-                                                        End If
-                                                        '
-                                                        sqlFieldList.add(FieldName, LiveSQLValue)
-                                                End Select
-                                            End If
-                                        End With
-                                        FieldPointer += 1
-                                    Next
-                                End If
-                                Call RSEdit.Dispose()
-                            End If
-                            RSEdit = Nothing
-                        End If
-                        RSLive.Dispose()
-                    End If
-                    RSLive = Nothing
-                    '
-                    ' ----- copy live record to editrecord
-                    '
-                    Call db_UpdateTableRecord(EditDataSourceName, EditTableName, "ID=" & EditRecordID, sqlFieldList)
-                    '
-                    ' ----- Clear all authoring controls
-                    '
-                    Call workflow_ClearAuthoringControl(ContentName, RecordID, AuthoringControlsModified, MemberID)
-                    Call workflow_ClearAuthoringControl(ContentName, RecordID, AuthoringControlsSubmitted, MemberID)
-                    Call workflow_ClearAuthoringControl(ContentName, RecordID, AuthoringControlsApproved, MemberID)
-                End If
-            End If
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassError4(Err.Number, Err.Source, Err.Description, "csv_AbortEdit", True)
-        End Sub
-        '
-        '=================================================================================
-        '
-        '=================================================================================
-        '
-        Public Sub workflow_ApproveEdit(ByVal ContentName As String, ByVal RecordID As Integer, ByVal MemberID As Integer)
-            On Error GoTo ErrorTrap 'Const Tn = "MethodName-142" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Dim CDef As coreMetaDataClass.CDefClass
-            '
-            CDef = cpCore.metaData.getCdef(ContentName)
-            If CDef.Id > 0 Then
-                If CDef.AllowWorkflowAuthoring And siteProperty_AllowWorkflowAuthoring Then
-                    Call workflow_SetAuthoringControl(ContentName, RecordID, AuthoringControlsApproved, MemberID)
-                End If
-            End If
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassError4(Err.Number, Err.Source, Err.Description, "csv_ApproveEdit", True)
-        End Sub
-        '
-        '=================================================================================
-        '
-        '=================================================================================
-        '
-        Public Sub workflow_SubmitEdit(ByVal ContentName As String, ByVal RecordID As Integer, ByVal MemberID As Integer)
-            On Error GoTo ErrorTrap 'Const Tn = "MethodName-143" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Dim CDef As coreMetaDataClass.CDefClass
-            '
-            CDef = cpCore.metaData.getCdef(ContentName)
-            If CDef.Id > 0 Then
-                If CDef.AllowWorkflowAuthoring And siteProperty_AllowWorkflowAuthoring Then
-                    Call workflow_SetAuthoringControl(ContentName, RecordID, AuthoringControlsSubmitted, MemberID)
-                End If
-            End If
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassError4(Err.Number, Err.Source, Err.Description, "csv_SubmitEdit", True)
-        End Sub
 
         Public Property db_SQLCommandTimeout() As Integer
             Get
@@ -7086,7 +5622,7 @@ ErrorTrap:
             '
             Dim CS As Integer
             '
-            CS = db_csOpen(ContentName, "ccguid=" & db_EncodeSQLText(RecordGuid), "ID", , , , , "ID")
+            CS = db_csOpen(ContentName, "ccguid=" & encodeSQLText(RecordGuid), "ID", , , , , "ID")
             If db_csOk(CS) Then
                 db_GetRecordIDByGuid = EncodeInteger(db_GetCS(CS, "ID"))
             End If
@@ -7264,33 +5800,6 @@ ErrorTrap:
             Call handleLegacyClassError4(Err.Number, Err.Source, Err.Description, "csv_GetSQLSelect", True, False)
         End Function
         '
-        '========================================================================
-        '
-        '========================================================================
-        '
-        Public Sub exportApplicationCDefXml(ByVal privateFilesPathFilename As String, ByVal IncludeBaseFields As Boolean)
-            On Error GoTo ErrorTrap 'Const Tn = "ExportXML2" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Dim MethodName As String
-            Dim XML As coreXmlToolsClass
-            Dim Content As String
-            '
-            MethodName = "csv_ExportXML2"
-            '
-            XML = New coreXmlToolsClass(cpCore)
-            'Call XML.Init(Me)
-            Content = XML.GetXMLContentDefinition3("", IncludeBaseFields)
-            Call privateFiles.SaveFile(privateFilesPathFilename, Content)
-            XML = Nothing
-            '
-            Exit Sub
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassError4(Err.Number, Err.Source, Err.Description, MethodName, True)
-        End Sub
-        '
         '
         '
         Public Function db_GetSQLIndexList(ByVal DataSourceName As String, ByVal TableName As String) As String
@@ -7317,7 +5826,7 @@ ErrorTrap:
         Public Function getTableSchemaData(tableName As String) As DataTable
             Dim returnDt As New DataTable
             Try
-                Dim connString As String = cpCore.cluster.getConnectionString(config.name)
+                Dim connString As String = cpCore.cluster.getConnectionString(cpCore.appConfig.name)
                 'Dim dataSourceUrl As String
                 'dataSourceUrl = cpCore.cluster.config.defaultDataSourceAddress
                 'If (dataSourceUrl.IndexOf(":") > 0) Then
@@ -7332,7 +5841,7 @@ ErrorTrap:
                 '    & ""
                 Using connSQL As New SqlConnection(connString)
                     connSQL.Open()
-                    returnDt = connSQL.GetSchema("Tables", {config.name, Nothing, tableName, Nothing})
+                    returnDt = connSQL.GetSchema("Tables", {cpCore.appConfig.name, Nothing, tableName, Nothing})
                 End Using
             Catch ex As Exception
                 Call handleLegacyClassError5(ex, System.Reflection.MethodBase.GetCurrentMethod.Name, "exception")
@@ -7345,7 +5854,7 @@ ErrorTrap:
         Public Function getColumnSchemaData(tableName As String) As DataTable
             Dim returnDt As New DataTable
             Try
-                Dim connString As String = cpCore.cluster.getConnectionString(config.name)
+                Dim connString As String = cpCore.cluster.getConnectionString(cpCore.appConfig.name)
                 'Dim dataSourceUrl As String
                 'dataSourceUrl = cpCore.cluster.config.defaultDataSourceAddress
                 'If (dataSourceUrl.IndexOf(":") > 0) Then
@@ -7360,7 +5869,7 @@ ErrorTrap:
                 '    & ""
                 Using connSQL As New SqlConnection(connString)
                     connSQL.Open()
-                    returnDt = connSQL.GetSchema("Columns", {config.name, Nothing, tableName, Nothing})
+                    returnDt = connSQL.GetSchema("Columns", {cpCore.appConfig.name, Nothing, tableName, Nothing})
                 End Using
             Catch ex As Exception
                 Call handleLegacyClassError5(ex, System.Reflection.MethodBase.GetCurrentMethod.Name, "exception")
@@ -7373,7 +5882,7 @@ ErrorTrap:
         Public Function getIndexSchemaData(tableName As String) As DataTable
             Dim returnDt As New DataTable
             Try
-                Dim connString As String = cpCore.cluster.getConnectionString(config.name)
+                Dim connString As String = cpCore.cluster.getConnectionString(cpCore.appConfig.name)
                 'Dim dataSourceUrl As String
                 'dataSourceUrl = cpCore.cluster.config.defaultDataSourceAddress
                 'If (dataSourceUrl.IndexOf(":") > 0) Then
@@ -7388,455 +5897,100 @@ ErrorTrap:
                 '    & ""
                 Using connSQL As New SqlConnection(connString)
                     connSQL.Open()
-                    returnDt = connSQL.GetSchema("Indexes", {config.name, Nothing, tableName, Nothing})
+                    returnDt = connSQL.GetSchema("Indexes", {cpCore.appConfig.name, Nothing, tableName, Nothing})
                 End Using
             Catch ex As Exception
                 Call handleLegacyClassError5(ex, System.Reflection.MethodBase.GetCurrentMethod.Name, "exception")
             End Try
             Return returnDt
         End Function
-        '
-        '
-        '
-        Public Function getAddonPath() As String
-            Return "addons\"
-        End Function
-        '
-        '   Buffered Site Property
-        '
-        Public ReadOnly Property siteProperty_DefaultFormInputWidth() As Integer
-            Get
-                If Not siteProperty_DefaultFormInputWidth_LocalLoaded Then
-                    siteProperty_DefaultFormInputWidth_Local = EncodeInteger(siteProperty_getText("DefaultFormInputWidth", "60"))
-                    siteProperty_DefaultFormInputWidth_LocalLoaded = True
-                End If
-                siteProperty_DefaultFormInputWidth = siteProperty_DefaultFormInputWidth_Local
-            End Get
-        End Property
-        '
-        '   Buffered Site Property
-        '
-        Public ReadOnly Property siteProperty_SelectFieldWidthLimit() As Integer
-            Get
-                If Not siteProperty_SelectFieldWidthLimit_LocalLoaded Then
-                    siteProperty_SelectFieldWidthLimit_Local = EncodeInteger(siteProperty_getText("SelectFieldWidthLimit", "200"))
-                    siteProperty_SelectFieldWidthLimit_LocalLoaded = True
-                End If
-                siteProperty_SelectFieldWidthLimit = siteProperty_SelectFieldWidthLimit_Local
-            End Get
-        End Property
-        '
-        '   Buffered Site Property
-        '
-        Public ReadOnly Property siteProperty_SelectFieldLimit() As Integer
-            Get
-                If Not siteProperty_SelectFieldLimit_LocalLoaded Then
-                    siteProperty_SelectFieldLimit_Local = EncodeInteger(siteProperty_getText("SelectFieldLimit", "1000"))
-                    If siteProperty_SelectFieldLimit_Local = 0 Then
-                        siteProperty_SelectFieldLimit_Local = 1000
-                        Call siteProperty_set("SelectFieldLimit", CStr(siteProperty_SelectFieldLimit_Local))
-                    End If
-                    siteProperty_SelectFieldLimit_LocalLoaded = True
-                End If
-                siteProperty_SelectFieldLimit = siteProperty_SelectFieldLimit_Local
-            End Get
-        End Property
-        '
-        '   Buffered Site Property
-        '
-        Public ReadOnly Property siteProperty_DefaultFormInputTextHeight() As Integer
-            Get
-                If Not siteProperty_DefaultFormInputTextHeight_LocalLoaded Then
-                    siteProperty_DefaultFormInputTextHeight_Local = EncodeInteger(siteProperty_getText("DefaultFormInputTextHeight", "1"))
-                    siteProperty_DefaultFormInputTextHeight_LocalLoaded = True
-                End If
-                siteProperty_DefaultFormInputTextHeight = siteProperty_DefaultFormInputTextHeight_Local
-            End Get
-        End Property
-        '
-        '
-        ' Buffered Site Property
-        '
-        Public ReadOnly Property siteProperty_AllowTransactionLog() As Boolean
-            Get
-                If Not siteProperty_AllowTransactionLog_localLoaded Then
-                    siteProperty_AllowTransactionLog_local = EncodeBoolean(siteProperty_getText("UseContentWatchLink", "false"))
-                    siteProperty_AllowTransactionLog_localLoaded = True
-                End If
-                siteProperty_AllowTransactionLog = siteProperty_AllowTransactionLog_local
-            End Get
-        End Property
-        Private siteProperty_AllowTransactionLog_localLoaded As Boolean = False
-        Private siteProperty_AllowTransactionLog_local As Boolean
-        '
-        ' Buffered Site Property
-        '
-        Public ReadOnly Property siteProperty_UseContentWatchLink() As Boolean
-            Get
-                If Not siteProperty_UseContentWatchLink_LocalLoaded Then
-                    siteProperty_UseContentWatchLink_local = EncodeBoolean(siteProperty_getText("UseContentWatchLink", "false"))
-                    siteProperty_UseContentWatchLink_LocalLoaded = True
-                End If
-                siteProperty_UseContentWatchLink = siteProperty_UseContentWatchLink_local
-
-            End Get
-        End Property
-        '
-        '   Buffered Site Property
-        '
-        Public ReadOnly Property siteProperty_AllowTestPointLogging() As Boolean
-            Get
-                If Not siteProperty_AllowTestPointLogging_LocalLoaded Then
-                    siteProperty_AllowTestPointLogging_Local = EncodeBoolean(siteProperty_getText("AllowTestPointLogging", "false"))
-                    siteProperty_AllowTestPointLogging_LocalLoaded = True
-                End If
-                siteProperty_AllowTestPointLogging = siteProperty_AllowTestPointLogging_Local
-
-            End Get
-        End Property
-        '====================================================================================================
-        ''' <summary>
-        ''' trap errors (hide errors) - when true, errors will be logged and code resumes next. When false, errors are re-thrown
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public ReadOnly Property siteProperty_trapErrors() As Boolean
-            Get
-                If Not _trapErrorsLoaded Then
-                    _trapErrors = EncodeBoolean(siteProperty_getText("TrapErrors", "true"))
-                    _trapErrorsLoaded = True
-                End If
-                siteProperty_trapErrors = _trapErrors
-            End Get
-        End Property
-        Private _trapErrors As Boolean
-        Private _trapErrorsLoaded As Boolean = False
-        '
-        '   Buffered Site Property
-        '
-        Public ReadOnly Property siteProperty_EmailAdmin() As String
-            Get
-                If Not siteProperty_EmailAdmin_LocalLoaded Then
-                    siteProperty_EmailAdmin_Local = siteProperty_getText("main_EmailAdmin", "webmaster@" & cpCore.main_ServerDomain)
-                    siteProperty_EmailAdmin_LocalLoaded = True
-                End If
-                siteProperty_EmailAdmin = siteProperty_EmailAdmin_Local
-
-            End Get
-        End Property
-        '
-        '   Buffered Site Property
-        '
-        Public ReadOnly Property siteProperty_ServerPageDefault() As String
-            Get
-                If Not siteProperty_ServerPageDefault_localLoaded Then
-                    siteProperty_ServerPageDefault_local = siteProperty_getText(siteproperty_serverPageDefault_name, siteproperty_serverPageDefault_defaultValue)
-                    siteProperty_ServerPageDefault_localLoaded = True
-                End If
-                siteProperty_ServerPageDefault = siteProperty_ServerPageDefault_local
-
-            End Get
-        End Property
-        Private siteProperty_ServerPageDefault_local As String
-        Private siteProperty_ServerPageDefault_localLoaded As Boolean = False
         ''
-        ''   Buffered Site Property
-        ''
-        'Public ReadOnly Property config.contentFilePathPrefix() As String
-        '    Get
-        '        If Not config.contentFilePathPrefix_LocalLoaded Then
-        '            config.contentFilePathPrefix_Local = siteProperty_getText("contentPathPrefix", "\contentFiles\")
-        '            config.contentFilePathPrefix_LocalLoaded = True
+        ''==========
+        '''' <summary>
+        '''' determine the application status code for the health of this application
+        '''' </summary>
+        '''' <returns></returns>
+        'Public Function checkHealth() As applicationStatusEnum
+        '    Dim returnStatus As applicationStatusEnum = applicationStatusEnum.ApplicationStatusLoading
+        '    Try
+        '        '
+        '        Try
+        '            '
+        '            '--------------------------------------------------------------------------
+        '            '   Verify the ccContent table exists 
+        '            '--------------------------------------------------------------------------
+        '            '
+        '            Dim testDt As DataTable
+        '            testDt = executeSql("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME='ccContent'")
+        '            If testDt.Rows.Count <> 1 Then
+        '                cpCore.appStatus = applicationStatusEnum.ApplicationStatusDbFoundButContentMetaMissing
+        '            End If
+        '            testDt.Dispose()
+        '        Catch ex As Exception
+        '            cpCore.appStatus = applicationStatusEnum.ApplicationStatusDbFoundButContentMetaMissing
+        '        End Try
+        '        '
+        '        '--------------------------------------------------------------------------
+        '        '   Perform DB Integregity checks
+        '        '--------------------------------------------------------------------------
+        '        '
+        '        Dim ts As coreMetaDataClass.tableSchemaClass = cpCore.metaData.getTableSchema("ccContent", "Default")
+        '        If (ts Is Nothing) Then
+        '            '
+        '            ' Bad Db and no upgrade - exit
+        '            '
+        '            cpCore.appStatus = applicationStatusEnum.ApplicationStatusDbBad
+        '        Else
         '        End If
-        '        config.contentFilePathPrefix = config.contentFilePathPrefix_Local
-
-        '    End Get
-        'End Property
-        'Private config.contentFilePathPrefix_Local As String
-        'Private config.contentFilePathPrefix_LocalLoaded As Boolean = False
+        '    Catch ex As Exception
+        '        cpCore.handleExceptionAndRethrow(ex)
+        '    End Try
+        'End Function
         '
-        '   Buffered Site Property
-        '
-        Public ReadOnly Property siteProperty_Language() As String
-            Get
-                If Not siteProperty_Language_LocalLoaded Then
-                    siteProperty_Language_Local = siteProperty_getText("Language", "English")
-                    siteProperty_Language_LocalLoaded = True
-                End If
-                siteProperty_Language = siteProperty_Language_Local
-
-            End Get
-        End Property
-        '
-        '   Buffered Site Property
-        '
-        Public ReadOnly Property siteProperty_AdminURL() As String
-            Get
-                Dim Position As Integer
-                If Not siteProperty_AdminURL_LocalLoaded Then
-                    siteProperty_AdminURL_Local = siteProperty_getText("AdminURL", config.adminRoute)
-                    'siteProperty_AdminURL_Local = cpCore.main_EncodeAppRootPath(siteProperty_AdminURL_Local)
-                    Position = InStr(1, siteProperty_AdminURL_Local, "?")
-                    If Position <> 0 Then
-                        siteProperty_AdminURL_Local = Mid(siteProperty_AdminURL_Local, 1, Position - 1)
-                    End If
-                    siteProperty_AdminURL_LocalLoaded = True
-                End If
-                siteProperty_AdminURL = siteProperty_AdminURL_Local
-
-            End Get
-        End Property
-
-        '
-        '   Buffered Site Property
-        '
-        Public ReadOnly Property siteProperty_CalendarYearLimit() As Integer
-            Get
-                If Not siteProperty_CalendarYearLimit_LocalLoaded Then
-                    siteProperty_CalendarYearLimit_Local = EncodeInteger(siteProperty_getText("CalendarYearLimit", "1"))
-                    siteProperty_CalendarYearLimit_LocalLoaded = True
-                End If
-                siteProperty_CalendarYearLimit = siteProperty_CalendarYearLimit_Local
-
-            End Get
-        End Property
-
-        '
-        '   Buffered Site Property
-        '
-        Public ReadOnly Property siteProperty_AllowChildMenuHeadline() As Boolean
-            Get
-                Return False
-            End Get
-        End Property
-
-        '
-        '   Buffered Site Property
-        '
-        Public ReadOnly Property siteProperty_DefaultFormInputHTMLHeight() As Integer
-            Get
-                If Not siteProperty_DefaultFormInputHTMLHeight_LocalLoaded Then
-                    siteProperty_DefaultFormInputHTMLHeight_Local = siteProperty_getinteger("DefaultFormInputHTMLHeight", 500)
-                    siteProperty_DefaultFormInputHTMLHeight_LocalLoaded = True
-                End If
-                siteProperty_DefaultFormInputHTMLHeight = siteProperty_DefaultFormInputHTMLHeight_Local
-
-            End Get
-        End Property
-        '
-        '   Buffered Site Property
-        '
-        Public ReadOnly Property siteProperty_AllowWorkflowAuthoring() As Boolean
-            Get
-                If Not siteProperty_AllowWorkflowAuthoring_LocalLoaded Then
-                    siteProperty_AllowWorkflowAuthoring_Local = EncodeBoolean(siteProperty_getText("AllowWorkflowAuthoring", "false"))
-                    siteProperty_AllowWorkflowAuthoring_LocalLoaded = True
-                End If
-                siteProperty_AllowWorkflowAuthoring = siteProperty_AllowWorkflowAuthoring_Local
-
-            End Get
-        End Property
-        '
-        '   Buffered Site Property
-        '
-        Public ReadOnly Property siteProperty_AllowPathBlocking() As Boolean
-            Get
-                If Not siteProperty_AllowPathBlocking_LocalLoaded Then
-                    siteProperty_AllowPathBlocking_Local = EncodeBoolean(siteProperty_getText("AllowPathBlocking", "false"))
-                    siteProperty_AllowPathBlocking_LocalLoaded = True
-                End If
-                siteProperty_AllowPathBlocking = siteProperty_AllowPathBlocking_Local
-
-            End Get
-        End Property
-        '
-        '
-        '===================================================================================================
-        '   Special Property Load
-        '       If the property did not exist, add it
-        '           true for existing sites
-        '               if there are any pathrule records or any template link is not blank
-        '           false for new sites
-        '===================================================================================================
-        '
-        Public ReadOnly Property siteProperty_AllowTemplateLinkVerification() As Boolean
-            Get
-                Dim TestString As String
-                Dim CS As Integer
-                Dim SetTrue As Boolean
-                Dim SQL As String
-                '
-                '    If true Then
-                '        siteProperty_AllowTemplateLinkVerification = True
-                '    Else
-                If Not siteProperty_AllowTemplateLinkVerification_LocalLoaded Then
-                    TestString = siteProperty_getText("AllowTemplateLinkVerification", "")
-                    If TestString <> "" Then
-                        '
-                        ' read value from property
-                        '
-                        siteProperty_AllowTemplateLinkVerification_Local = EncodeBoolean(TestString)
-                    Else
-                        '
-                        ' Update - template link verification is needed for Template.IsSecure, so turn it on for new sites
-                        '
-                        siteProperty_AllowTemplateLinkVerification_LocalLoaded = True
-                        Call siteProperty_set("AllowTemplateLinkVerification", "true")
-                    End If
-                    siteProperty_AllowTemplateLinkVerification_LocalLoaded = True
-                End If
-                siteProperty_AllowTemplateLinkVerification = siteProperty_AllowTemplateLinkVerification_Local
-
-            End Get
-        End Property
-        '
-        '
-        '
-        Friend ReadOnly Property siteProperty_DefaultWrapperID() As Integer
-            Get
-                If Not siteProperty_DefaultWrapperID_LocalLoaded Then
-                    siteProperty_DefaultWrapperID_LocalLoaded = True
-                    siteProperty_DefaultWrapperID_local = EncodeInteger(siteProperty_getText("DefaultWrapperID", "0"))
-                End If
-                siteProperty_DefaultWrapperID = siteProperty_DefaultWrapperID_local
-
-            End Get
-        End Property
-        '
-        '
-        '
-        Friend ReadOnly Property siteProperty_ChildListAddonID() As Integer
-            Get
-                Dim CS As Integer
-                Dim BuildSupportsGuid As Boolean
-                '
-                If Not siteProperty_ChildListAddonID_LocalLoaded Then
-                    siteProperty_ChildListAddonID_LocalLoaded = True
-                    siteProperty_ChildListAddonID_Local = EncodeInteger(siteProperty_getText("ChildListAddonID", ""))
-                    If siteProperty_ChildListAddonID_Local = 0 Then
-                        BuildSupportsGuid = True
-                        If BuildSupportsGuid Then
-                            CS = db_csOpen("Add-ons", "ccguid='" & ChildListGuid & "'", , , ,,  , "ID")
-                        Else
-                            CS = db_csOpen("Add-ons", "name='Child Page List'", , , , ,, "ID")
-                        End If
-                        If db_csOk(CS) Then
-                            siteProperty_ChildListAddonID_Local = db_GetCSInteger(CS, "ID")
-                        End If
-                        Call db_csClose(CS)
-                        If siteProperty_ChildListAddonID_Local = 0 Then
-                            CS = db_csInsertRecord("Add-ons")
-                            If db_csOk(CS) Then
-                                siteProperty_ChildListAddonID_Local = db_GetCSInteger(CS, "ID")
-                                Call db_setCS(CS, "name", "Child Page List")
-                                Call db_setCS(CS, "ArgumentList", "Name")
-                                Call db_setCS(CS, "CopyText", "<ac type=""childlist"" name=""$name$"">")
-                                Call db_setCS(CS, "Content", "1")
-                                Call db_setCS(CS, "StylesFilename", "")
-                                If BuildSupportsGuid Then
-                                    Call db_setCS(CS, "ccguid", ChildListGuid)
-                                End If
-                            End If
-                            Call db_csClose(CS)
-                        End If
-                        Call siteProperty_set("ChildListAddonID", CStr(siteProperty_ChildListAddonID_Local))
-                    End If
-                End If
-                siteProperty_ChildListAddonID = siteProperty_ChildListAddonID_Local
-
-            End Get
-
-        End Property
-        '
-        '
-        '
-        Public ReadOnly Property siteProperty_docTypeDeclaration() As String
-            Get
-                If Not siteProperty_DocType_LocalLoaded Then
-                    siteProperty_DocType_LocalLoaded = True
-                    siteProperty_DocType_Local = siteProperty_getText("DocTypeDeclaration", DTDDefault)
-                    If siteProperty_DocType_Local = "" Then
-                        siteProperty_DocType_Local = DTDDefault
-                        Call siteProperty_set("DocTypeDeclaration", DTDDefault)
-                    End If
-                End If
-                siteProperty_docTypeDeclaration = siteProperty_DocType_Local
-
-            End Get
-        End Property
-        '
-        '
-        '
-        Public ReadOnly Property siteProperty_docTypeDeclarationAdmin() As String
-            Get
-                If Not siteProperty_DocTypeAdmin_LocalLoaded Then
-                    siteProperty_DocTypeAdmin_LocalLoaded = True
-                    siteProperty_DocTypeAdmin_Local = siteProperty_getText("DocTypeDeclarationAdmin", DTDDefaultAdmin)
-                End If
-                siteProperty_docTypeDeclarationAdmin = siteProperty_DocTypeAdmin_Local
-
-            End Get
-        End Property
-        '
-        '==========
+        '=============================================================================
         ''' <summary>
-        ''' determine the application status code for the health of this application
+        ''' get Sql Criteria for string that could be id, guid or name
         ''' </summary>
+        ''' <param name="nameIdOrGuid"></param>
         ''' <returns></returns>
-        Public Function checkHealth() As applicationStatusEnum
-            Dim returnStatus As applicationStatusEnum = applicationStatusEnum.ApplicationStatusLoading
-            Try
-                '
-                Try
-                    '
-                    '--------------------------------------------------------------------------
-                    '   Verify the ccContent table exists 
-                    '--------------------------------------------------------------------------
-                    '
-                    Dim testDt As DataTable
-                    testDt = executeSql("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME='ccContent'")
-                    If testDt.Rows.Count <> 1 Then
-                        cpCore.db.status = applicationStatusEnum.ApplicationStatusDbFoundButContentMetaMissing
-                    End If
-                    testDt.Dispose()
-                Catch ex As Exception
-                    cpCore.db.status = applicationStatusEnum.ApplicationStatusDbFoundButContentMetaMissing
-                End Try
-                '
-                '--------------------------------------------------------------------------
-                '   Perform DB Integregity checks
-                '--------------------------------------------------------------------------
-                '
-                Dim ts As coreMetaDataClass.tableSchemaClass = cpCore.metaData.getTableSchema("ccContent", "Default")
-                If (ts Is Nothing) Then
-                    '
-                    ' Bad Db and no upgrade - exit
-                    '
-                    cpCore.db.status = applicationStatusEnum.ApplicationStatusDbBad
-                Else
-                End If
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
-        End Function
-        '
-        '==========
-        '
-        Friend Function db_getNameIdOrGuidSqlCriteria(nameIdOrGuid As String) As String
+        Friend Function getNameIdOrGuidSqlCriteria(nameIdOrGuid As String) As String
             Dim sqlCriteria As String = ""
             Try
                 If IsNumeric(nameIdOrGuid) Then
                     sqlCriteria = "id=" & db_EncodeSQLNumber(CDbl(nameIdOrGuid))
                 ElseIf cpCore.common_isGuid(nameIdOrGuid) Then
-                    sqlCriteria = "ccGuid=" & db_EncodeSQLText(nameIdOrGuid)
+                    sqlCriteria = "ccGuid=" & encodeSQLText(nameIdOrGuid)
                 Else
-                    sqlCriteria = "name=" & db_EncodeSQLText(nameIdOrGuid)
+                    sqlCriteria = "name=" & encodeSQLText(nameIdOrGuid)
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return sqlCriteria
+        End Function
+        '
+        '=============================================================================
+        ''' <summary>
+        ''' Get a ContentID from the ContentName using just the tables
+        ''' </summary>
+        ''' <param name="ContentName"></param>
+        ''' <returns></returns>
+        Private Function getDbContentID(ByVal ContentName As String) As Integer
+            Dim returnContentId As Integer = 0
+            Try
+                '
+                Dim dt As DataTable
+                '
+                getDbContentID = 0
+                dt = cpCore.db.executeSql("Select ID from ccContent where name=" & encodeSQLText(ContentName))
+                If dt.Rows.Count > 0 Then
+                    getDbContentID = EncodeInteger(dt.Rows(0).Item("id"))
+                End If
+                dt.Dispose()
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+            Return returnContentId
         End Function
 
 
