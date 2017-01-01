@@ -50,6 +50,23 @@ Namespace Contensive.Core
         '
         '===================================================================================================
         ''' <summary>
+        ''' JSON serialize/deserialize client
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public ReadOnly Property json() As System.Web.Script.Serialization.JavaScriptSerializer
+            Get
+                If (_json Is Nothing) Then
+                    _json = New System.Web.Script.Serialization.JavaScriptSerializer
+                End If
+                Return _json
+            End Get
+        End Property
+        Private _json As System.Web.Script.Serialization.JavaScriptSerializer
+        '
+        '===================================================================================================
+        ''' <summary>
         ''' siteProperties object
         ''' </summary>
         ''' <value></value>
@@ -1801,7 +1818,6 @@ Namespace Contensive.Core
                     '--------------------------------------------------------------------------
                     '
                     Dim updateDomainCache As Boolean = False
-                    Dim json As New System.Web.Script.Serialization.JavaScriptSerializer
                     '
                     domainDetails.name = web.requestDomain
                     domainDetails.rootPageId = 0
@@ -1820,7 +1836,7 @@ Namespace Contensive.Core
                         main_ServerDomainPrimary = ""
                     End If
                     '
-                    domainDetailsListText = EncodeText(cache.GetObject(Of String)("domainContentList"))
+                    domainDetailsListText = EncodeText(cache.getObject(Of String)("domainContentList"))
                     If Not String.IsNullOrEmpty(domainDetailsListText) Then
                         Try
                             domainDetailsList = json.Deserialize(Of Dictionary(Of String, domainDetailsClass))(domainDetailsListText)
@@ -1914,7 +1930,7 @@ Namespace Contensive.Core
                             '
                             SQL = "update ccdomains set visited=1 where name=" & db.encodeSQLText(web.requestDomain)
                             Call db.executeSql(SQL)
-                            Call cache.SetKey("domainContentList", "", "domains")
+                            Call cache.setKey("domainContentList", "", "domains")
                         End If
                         If domainDetails.typeId = 1 Then
                             '
@@ -2001,7 +2017,7 @@ Namespace Contensive.Core
                         ' if there was a change, update the cache
                         '
                         domainDetailsListText = json.Serialize(domainDetailsList)
-                        Call cache.SetKey("domainContentList", domainDetailsListText, "domains")
+                        Call cache.setKey("domainContentList", domainDetailsListText, "domains")
                     End If
 
                     '
@@ -3002,7 +3018,7 @@ ErrorTrap:
             '
             pageManager_cache_pageContent_rows = 0
             cache_pageContent = Nothing
-            Call cache.SetKey(pageManager_cache_pageContent_cacheName, cache_pageContent)
+            Call cache.setKey(pageManager_cache_pageContent_cacheName, cache_pageContent)
             '
             Exit Sub
             '
@@ -7181,39 +7197,39 @@ ErrorTrap:
 ErrorTrap:
             handleExceptionAndRethrow(New Exception("Unexpected exception"))
         End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Serialize an object into a JSON string
-        ''' </summary>
-        ''' <param name="source"></param>
-        ''' <returns></returns>
-        Public Function common_jsonSerialize(source As Object) As String
-            Try
-                Dim json As New System.Web.Script.Serialization.JavaScriptSerializer
-                Return json.Serialize(source)
-            Catch ex As Exception
-                handleExceptionAndRethrow(ex)
-                Return ""
-            End Try
-        End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Deserialize as JSON string into a generic object
-        ''' </summary>
-        ''' <param name="Source"></param>
-        ''' <returns></returns>
-        Public Function common_jsonDeserialize(Source As String) As Object
-            Dim returnObj As Object = Nothing
-            Try
-                Dim json As New System.Web.Script.Serialization.JavaScriptSerializer
-                returnObj = json.Deserialize(Of Object)(Source)
-            Catch ex As Exception
-                handleExceptionAndRethrow(ex)
-            End Try
-            Return returnObj
-        End Function
+        ''
+        ''====================================================================================================
+        '''' <summary>
+        '''' Serialize an object into a JSON string
+        '''' </summary>
+        '''' <param name="source"></param>
+        '''' <returns></returns>
+        'Public Function common_jsonSerialize(source As Object) As String
+        '    Try
+        '        Dim json As New System.Web.Script.Serialization.JavaScriptSerializer
+        '        Return json.Serialize(source)
+        '    Catch ex As Exception
+        '        handleExceptionAndRethrow(ex)
+        '        Return ""
+        '    End Try
+        'End Function
+        ''
+        ''====================================================================================================
+        '''' <summary>
+        '''' Deserialize as JSON string into a generic object
+        '''' </summary>
+        '''' <param name="Source"></param>
+        '''' <returns></returns>
+        'Public Function common_jsonDeserialize(Source As String) As Object
+        '    Dim returnObj As Object = Nothing
+        '    Try
+        '        Dim json As New System.Web.Script.Serialization.JavaScriptSerializer
+        '        returnObj = json.Deserialize(Of Object)(Source)
+        '    Catch ex As Exception
+        '        handleExceptionAndRethrow(ex)
+        '    End Try
+        '    Return returnObj
+        'End Function
         '
         '=======================================================================================================
         '   deprecated, use csv_getStyleSheet2
@@ -8637,7 +8653,7 @@ ErrorTrap:
                                 End If
                             End If
                         End If
-                        Call cache.invalidateTagList2("People")
+                        Call cache.invalidateTagCommaList("People")
                     End If
                     Call db.db_csClose(CSMember)
                 End If
@@ -17522,12 +17538,12 @@ ErrorTrap:
                 Call pageManager_cache_pageContent_clear()
                 Call pageManager_cache_pageTemplate_clear()
                 Call pageManager_cache_siteSection_clear()
-                Call cache.invalidateTagList2("")
+                Call cache.invalidateTagCommaList("")
                 If ContentName <> "" Then
-                    Call cache.invalidateTagList2(ContentName)
+                    Call cache.invalidateTagCommaList(ContentName)
                     TableName = db_GetContentTablename(ContentName)
                     If LCase(TableName) = "cctemplates" Then
-                        Call cache.SetKey(pageManager_cache_pageTemplate_cacheName, EmptyVariant)
+                        Call cache.setKey(pageManager_cache_pageTemplate_cacheName, EmptyVariant)
                         Call pageManager_cache_pageTemplate_load()
                     End If
                     If LCase(TableName) = "ccpagecontent" Then
@@ -19467,7 +19483,7 @@ ErrorTrap:
                 '        Next
             End If
             If RuleContentChanged Then
-                Call cache.invalidateTagList2(RulesContentName)
+                Call cache.invalidateTagCommaList(RulesContentName)
             End If
             Exit Sub
             '
@@ -20169,7 +20185,7 @@ ErrorTrap:
                     Next
                 End If
                 '
-                BotList = EncodeText(cache.GetObject(Of String)("DefaultBotNameList"))
+                BotList = EncodeText(cache.getObject(Of String)("DefaultBotNameList"))
                 If BotList <> "" Then
                     '
                     ' First line of Persistent variant is the expiration date (1 hour in the future)
@@ -20209,7 +20225,7 @@ ErrorTrap:
                         Call cluster.clusterFiles.SaveFile(Filename, BotList)
                     End If
                     DateExpires = main_PageStartTime.AddHours(1)
-                    Call cache.SetKey("DefaultBotNameList", CStr(DateExpires) & vbCrLf & BotList)
+                    Call cache.setKey("DefaultBotNameList", CStr(DateExpires) & vbCrLf & BotList)
                 End If
                 '
                 If BotList <> "" Then
@@ -20603,7 +20619,7 @@ ErrorTrap:
                         If Not SaveButNoChanges Then
                             Call main_ProcessSpecialCaseAfterSave(False, ContentName, RecordID, RecordName, RecordParentID, False)
                             Call pageManager_cache_pageContent_clear()
-                            Call cache.invalidateTagList2(ContentName)
+                            Call cache.invalidateTagCommaList(ContentName)
                         End If
                     End If
                 End If
@@ -20635,7 +20651,7 @@ ErrorTrap:
                     '
                     'Call AppendLog("pageManager_ProcessFormQuickEditor, 7-call pageManager_cache_pageContent_clear")
                     Call pageManager_cache_pageContent_clear()
-                    Call cache.invalidateTagList2(ContentName)
+                    Call cache.invalidateTagCommaList(ContentName)
                 End If
                 If (Button = ButtonAddSiblingPage) Then
                     '
@@ -20672,7 +20688,7 @@ ErrorTrap:
                     '
                     'Call AppendLog("pageManager_ProcessFormQuickEditor, 8-call pageManager_cache_pageContent_clear")
                     Call pageManager_cache_pageContent_clear()
-                    Call cache.invalidateTagList2(ContentName)
+                    Call cache.invalidateTagCommaList(ContentName)
                 End If
                 If (Button = ButtonDelete) Then
                     CSBlock = db_csOpen(ContentName, RecordID)
@@ -20687,7 +20703,7 @@ ErrorTrap:
                     If Not main_WorkflowSupport Then
                         'Call AppendLog("pageManager_ProcessFormQuickEditor, 9-call pageManager_cache_pageContent_clear")
                         Call pageManager_cache_pageContent_clear()
-                        Call cache.invalidateTagList2(ContentName)
+                        Call cache.invalidateTagCommaList(ContentName)
                     End If
                     '
                     If Not main_WorkflowSupport Then
@@ -20718,7 +20734,7 @@ ErrorTrap:
                     '
                     If (Button = ButtonPublish) Then
                         Call workflow.publishEdit(ContentName, RecordID)
-                        Call cache.invalidateTagList2(ContentName)
+                        Call cache.invalidateTagCommaList(ContentName)
                     End If
                     If (Button = ButtonPublishApprove) Then
                         Call workflow.approveEdit(ContentName, RecordID)
@@ -20779,7 +20795,7 @@ ErrorTrap:
                 BakeName = Replace(BakeName, ":", "_")
                 BakeName = Replace(BakeName, ".", "_")
                 BakeName = Replace(BakeName, " ", "_")
-                main_GetSectionMenu_NameMenu = EncodeText(cache.GetObject(Of String)(BakeName))
+                main_GetSectionMenu_NameMenu = EncodeText(cache.getObject(Of String)(BakeName))
                 If main_GetSectionMenu_NameMenu <> "" Then
                     main_GetSectionMenu_NameMenu = main_GetSectionMenu_NameMenu
                 Else
@@ -20936,7 +20952,7 @@ ErrorTrap:
                         End If
                         main_GetSectionMenu_NameMenu = main_GetSectionMenu_NameMenu & Replace(menu_Get(MenuNamePrefix & EncodeText(MenuID), MenuStyle, StyleSheetPrefix), vbCrLf, "")
                         main_GetSectionMenu_NameMenu = main_GetSectionMenu_NameMenu & menu_GetClose()
-                        Call cache.SetKey(BakeName, main_GetSectionMenu_NameMenu, ContentName & ",Site Sections,Dynamic Menus,Dynamic Menu Section Rules")
+                        Call cache.setKey(BakeName, main_GetSectionMenu_NameMenu, ContentName & ",Site Sections,Dynamic Menus,Dynamic Menu Section Rules")
                     End If
                 End If
             End If
@@ -21001,7 +21017,7 @@ ErrorTrap:
                 BakeName = Replace(BakeName, ":", "_")
                 BakeName = Replace(BakeName, ".", "_")
                 BakeName = Replace(BakeName, " ", "_")
-                main_GetSectionMenu_IdMenu = EncodeText(cache.GetObject(Of String)(BakeName))
+                main_GetSectionMenu_IdMenu = EncodeText(cache.getObject(Of String)(BakeName))
                 If main_GetSectionMenu_IdMenu <> "" Then
                     main_GetSectionMenu_IdMenu = main_GetSectionMenu_IdMenu
                 Else
@@ -21211,7 +21227,7 @@ ErrorTrap:
                         '
                         ' ----- Bake the completed menu
                         '
-                        Call cache.SetKey(BakeName, main_GetSectionMenu_IdMenu, ContentName & ",Site Sections,Dynamic Menus,Dynamic Menu Section Rules")
+                        Call cache.setKey(BakeName, main_GetSectionMenu_IdMenu, ContentName & ",Site Sections,Dynamic Menus,Dynamic Menu Section Rules")
                     End If
                 End If
             End If
@@ -22730,7 +22746,7 @@ ErrorTrap:
                             ' the defaultemplateid in the domain is not valid
                             '
                             Call db.executeSql("update ccdomains set defaulttemplateid=0 where defaulttemplateid=" & domainDetails.defaultTemplateId)
-                            Call cache.invalidateTagList2("domains")
+                            Call cache.invalidateTagCommaList("domains")
                         End If
                     End If
                     If Not db.db_csOk(CS) Then
@@ -22879,7 +22895,7 @@ ErrorTrap:
             Dim StyleSheetCopy As String
             '
             BakeName = "AutoSiteTemplate" & templateId
-            main_GetAutoSite_Template = EncodeText(cache.GetObject(Of String)(BakeName))
+            main_GetAutoSite_Template = EncodeText(cache.getObject(Of String)(BakeName))
             If main_GetAutoSite_Template = "" Then
                 If templateId = 0 Then
                     '
@@ -22919,7 +22935,7 @@ ErrorTrap:
                     ' Assemble Template
                     '
                 End If
-                Call cache.SetKey(BakeName, main_GetAutoSite_Template, "AutoSite Templates")
+                Call cache.setKey(BakeName, main_GetAutoSite_Template, "AutoSite Templates")
             End If
             '
             Exit Function
@@ -23494,7 +23510,7 @@ ErrorTrap:
                                                         '
                                                         ' Live Editing
                                                         '
-                                                        Call cache.invalidateTagList2(ClipChildContentName & "," & ClipParentContentName)
+                                                        Call cache.invalidateTagCommaList(ClipChildContentName & "," & ClipParentContentName)
                                                         Call pageManager_cache_pageContent_clear()
                                                     End If
                                                 End If
@@ -26514,7 +26530,7 @@ ErrorTrap:
                         & "</table>" _
                         & "</div>"
                     If Not IsAuthoringMode Then
-                        Call cache.SetKey(BakeName, main_GetFormInputCheckListCategories, "Content Categories," & PrimaryContentName & "," & SecondaryContentName & "," & RulesContentName)
+                        Call cache.setKey(BakeName, main_GetFormInputCheckListCategories, "Content Categories," & PrimaryContentName & "," & SecondaryContentName & "," & RulesContentName)
                     End If
                     '
                     ' initialize with all open
@@ -26988,7 +27004,7 @@ ErrorTrap:
             ' Load cache
             '
             On Error Resume Next
-            cacheTest = cache.GetObject(Of Object())(cache_linkAlias_cacheName)
+            cacheTest = cache.getObject(Of Object())(cache_linkAlias_cacheName)
             If Not pagemanager_IsWorkflowRendering() Then
                 If Not IsNothing(cacheTest) Then
                     cacheArray = DirectCast(cacheTest, Object())
@@ -27080,7 +27096,7 @@ ErrorTrap:
             cacheArray(0) = cache_linkAlias
             cacheArray(1) = cache_linkAlias_PageIdQSSIndex.exportPropertyBag
             cacheArray(2) = cache_linkAlias_NameIndex.exportPropertyBag
-            Call cache.SetKey(cache_linkAlias_cacheName, cacheArray, "link aliases")
+            Call cache.setKey(cache_linkAlias_cacheName, cacheArray, "link aliases")
             '
             Exit Sub
 ErrorTrap:
@@ -27094,7 +27110,7 @@ ErrorTrap:
             '
             cache_linkAliasCnt = 0
             cache_linkAlias = {}
-            Call cache.SetKey(cache_linkAlias_cacheName, cache_linkAlias)
+            Call cache.setKey(cache_linkAlias_cacheName, cache_linkAlias)
             '
             Exit Sub
             '
@@ -27651,7 +27667,7 @@ ErrorTrap:
             '
             On Error Resume Next
             If Not main_IsWorkflowRendering Then
-                arrayTest = cache.GetObject(Of Object())(pageManager_cache_pageContent_cacheName)
+                arrayTest = cache.getObject(Of Object())(pageManager_cache_pageContent_cacheName)
                 If Not IsNothing(arrayTest) Then
                     arrayData = DirectCast(arrayTest, Object())
                     If Not IsNothing(arrayData) Then
@@ -27752,7 +27768,7 @@ ErrorTrap:
                 cacheArray(1) = pageManager_cache_pageContent_idIndex.exportPropertyBag
                 cacheArray(2) = pageManager_cache_pageContent_nameIndex.exportPropertyBag
                 cacheArray(3) = pageManager_cache_pageContent_parentIdIndex.exportPropertyBag
-                Call cache.SetKey(pageManager_cache_pageContent_cacheName, cacheArray)
+                Call cache.setKey(pageManager_cache_pageContent_cacheName, cacheArray)
             End If
             '
             Exit Sub
@@ -28033,7 +28049,7 @@ ErrorTrap:
                     End If
                 End If
                 If Not main_IsWorkflowRendering Then
-                    Call cache.SetKey("PCC", cache_pageContent)
+                    Call cache.setKey("PCC", cache_pageContent)
                 End If
             End If
             '
@@ -28341,7 +28357,7 @@ ErrorTrap:
             '
             On Error Resume Next
             If Not pagemanager_IsWorkflowRendering() Then
-                cacheTest = cache.GetObject(Of Object())(pageManager_cache_siteSection_cacheName)
+                cacheTest = cache.getObject(Of Object())(pageManager_cache_siteSection_cacheName)
                 If Not IsNothing(cacheTest) Then
                     cacheObject = DirectCast(cacheTest, Object())
                     If Not IsNothing(cacheObject) Then
@@ -28423,7 +28439,7 @@ ErrorTrap:
             cacheArray(1) = pageManager_cache_siteSection_IDIndex.exportPropertyBag
             cacheArray(2) = pageManager_cache_siteSection_RootPageIDIndex.exportPropertyBag
             cacheArray(3) = pageManager_cache_siteSection_NameIndex.exportPropertyBag
-            Call cache.SetKey(pageManager_cache_siteSection_cacheName, cacheArray)
+            Call cache.setKey(pageManager_cache_siteSection_cacheName, cacheArray)
             '
             Exit Sub
 ErrorTrap:
@@ -28466,10 +28482,10 @@ ErrorTrap:
         Friend Sub pageManager_cache_siteSection_clear()
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("pageManager_cache_siteSection_clear")
             '
-            Call cache.invalidateTagList2("site sections")
+            Call cache.invalidateTagCommaList("site sections")
             cache_siteSection = {}
             pageManager_cache_siteSection_rows = 0
-            Call cache.SetKey(pageManager_cache_siteSection_cacheName, cache_siteSection)
+            Call cache.setKey(pageManager_cache_siteSection_cacheName, cache_siteSection)
             'Call cmc_siteSectionCache_clear
             '
             Exit Sub
@@ -28526,7 +28542,7 @@ ErrorTrap:
             '
             On Error Resume Next
             If Not pagemanager_IsWorkflowRendering() Then
-                arrayTest = cache.GetObject(Of Object())(pageManager_cache_pageTemplate_cacheName)
+                arrayTest = cache.getObject(Of Object())(pageManager_cache_pageTemplate_cacheName)
                 If Not IsNothing(arrayTest) Then
                     arrayData = DirectCast(arrayTest, Object())
                     If Not IsNothing(arrayData) Then
@@ -28664,7 +28680,7 @@ ErrorTrap:
             '
             cacheArray(0) = cache_pageTemplate
             cacheArray(1) = pageManager_cache_pageTemplate_contentIdindex.exportPropertyBag
-            Call cache.SetKey(pageManager_cache_pageTemplate_cacheName, cacheArray)
+            Call cache.setKey(pageManager_cache_pageTemplate_cacheName, cacheArray)
             '
             Exit Sub
 ErrorTrap:
@@ -28678,7 +28694,7 @@ ErrorTrap:
             '
             pageManager_cache_pageTemplate_rows = 0
             cache_pageTemplate = {}
-            Call cache.SetKey(pageManager_cache_pageTemplate_cacheName, cache_pageTemplate)
+            Call cache.setKey(pageManager_cache_pageTemplate_cacheName, cache_pageTemplate)
             '
             Exit Sub
             '
@@ -28868,7 +28884,7 @@ ErrorTrap:
             Dim DateExpires As Date
             Dim datetext As String
             '
-            main_GetMobileBrowserList = EncodeText(cache.GetObject(Of String)("MobileBrowserList"))
+            main_GetMobileBrowserList = EncodeText(cache.getObject(Of String)("MobileBrowserList"))
             If main_GetMobileBrowserList <> "" Then
                 datetext = getLine(main_GetMobileBrowserList)
                 If EncodeDate(datetext) < Now() Then
@@ -28884,7 +28900,7 @@ ErrorTrap:
                     'Call app.publicFiles.SaveFile(Filename, main_GetMobileBrowserList)
                 End If
                 datetext = Now.AddHours(1).ToString
-                Call cache.SetKey("MobileBrowserList", datetext & vbCrLf & main_GetMobileBrowserList)
+                Call cache.setKey("MobileBrowserList", datetext & vbCrLf & main_GetMobileBrowserList)
             End If
             '
             Exit Function
@@ -29083,11 +29099,11 @@ ErrorTrap:
                     'hint = hint & ",130"
                     Select Case LCase(RecordName)
                         Case "allowlinkalias"
-                            Call cache.invalidateTagList2("Page Content")
+                            Call cache.invalidateTagCommaList("Page Content")
                         Case "sectionlandinglink"
-                            Call cache.invalidateTagList2("Page Content")
+                            Call cache.invalidateTagCommaList("Page Content")
                         Case siteproperty_serverPageDefault_name
-                            Call cache.invalidateTagList2("Page Content")
+                            Call cache.invalidateTagCommaList("Page Content")
                     End Select
                 Case "ccpagecontent"
                     '
@@ -29411,7 +29427,7 @@ ErrorTrap:
             Else
                 BakeName = "SharedStyleMap-Public"
             End If
-            MapList = EncodeText(cache.GetObject(Of String)(BakeName))
+            MapList = EncodeText(cache.getObject(Of String)(BakeName))
             If MapList = "" Then
                 '
                 ' BuildMap
@@ -29452,7 +29468,7 @@ ErrorTrap:
                 If MapList = "" Then
                     MapList = ","
                 End If
-                Call cache.SetKey(BakeName, MapList, "Shared Styles")
+                Call cache.setKey(BakeName, MapList, "Shared Styles")
             End If
             If (MapList <> "") And (MapList <> ",") Then
                 Srcs = Split(SharedStyleIDList, ",")
@@ -31980,22 +31996,22 @@ ErrorTrap:
                 Return main_VisitProperty_AllowDebugging
             End Get
         End Property
-        '
-        '
-        '
-        Public Function main_parseJSON(ByVal Source As String) As Object
-            On Error GoTo ErrorTrap 'Const Tn = "parseJSON" : ''Dim th as integer : th = profileLogMethodEnter(Tn)    '
-            '
-            main_parseJSON = common_jsonDeserialize(Source)
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            handleExceptionAndRethrow(New Exception("Unexpected exception"))
-            '
-        End Function
+        '        '
+        '        '
+        '        '
+        '        Public Function main_parseJSON(ByVal Source As String) As Object
+        '            On Error GoTo ErrorTrap 'Const Tn = "parseJSON" : ''Dim th as integer : th = profileLogMethodEnter(Tn)    '
+        '            '
+        '            main_parseJSON = common_jsonDeserialize(Source)
+        '            '
+        '            Exit Function
+        '            '
+        '            ' ----- Error Trap
+        '            '
+        'ErrorTrap:
+        '            handleExceptionAndRethrow(New Exception("Unexpected exception"))
+        '            '
+        '        End Function
         '
         '
         '
@@ -32585,7 +32601,7 @@ ErrorTrap:
                 Const cacheName = "Domain Content List Cache"
                 '
                 If Not serverDomainList_localLoaded Then
-                    serverDomainList_local = DirectCast(cache.GetObject(Of List(Of String))(cacheName), List(Of String))
+                    serverDomainList_local = DirectCast(cache.getObject(Of List(Of String))(cacheName), List(Of String))
                     If (serverDomainList_local Is Nothing) Then
                         '
                         ' recreate (non-default) domain table list
@@ -32601,7 +32617,7 @@ ErrorTrap:
                         For Each dr As DataRow In dt.Rows
                             serverDomainList_local.Add(dr(0).ToString)
                         Next
-                        Call cache.SetKey(cacheName, serverDomainList_local, "domains")
+                        Call cache.setKey(cacheName, serverDomainList_local, "domains")
                     End If
                     serverDomainList_localLoaded = True
                 End If
@@ -32622,7 +32638,7 @@ ErrorTrap:
                 Const cacheName = "Domain Content Cross List Cache"
                 '
                 If Not main_Private_ServerDomainCrossList_Loaded Then
-                    main_Private_ServerDomainCrossList = EncodeText(cache.GetObject(Of String)(cacheName))
+                    main_Private_ServerDomainCrossList = EncodeText(cache.getObject(Of String)(cacheName))
                     If True And (main_Private_ServerDomainCrossList = "") Then
                         main_Private_ServerDomainCrossList = ","
                         SQL = "select name from ccDomains where (typeId=1)and(allowCrossLogin<>0)"
@@ -32630,7 +32646,7 @@ ErrorTrap:
                         For Each dr As DataRow In dt.Rows
                             main_Private_ServerDomainCrossList &= dr(0).ToString
                         Next
-                        Call cache.SetKey(cacheName, main_Private_ServerDomainCrossList, "domains")
+                        Call cache.setKey(cacheName, main_Private_ServerDomainCrossList, "domains")
                     End If
                     main_Private_ServerDomainCrossList_Loaded = True
                 End If
@@ -37619,7 +37635,10 @@ ErrorTrap:
                     ' Load cached addonCache
                     '
                     Try
-                        cacheTest = cache.GetObject(Of cache_addonsClass)(cache_addon_cacheName)
+                        cacheTest = cache.getObject(Of cache_addonsClass)(cache_addon_cacheName)
+                        Dim testCache1 = cache.getObject(Of cache_addonsClass)("testCache1")
+                        Dim testCache2 = cache.getObject(Of cache_addonsClass)("testCache2")
+                        Dim testCache3 = cache.getObject(Of String)("testCache3")
                         If Not IsNothing(cacheTest) Then
                             cache_addons = DirectCast(cacheTest, cache_addonsClass)
                             If Not IsNothing(cache_addons) Then
@@ -37777,7 +37796,10 @@ ErrorTrap:
             Call cache_addons.guidIndex.getPtr("test")
             cache_addons.propertyBag_guidIndex = cache_addons.guidIndex.exportPropertyBag()
             '
-            Call cache.SetKey(cache_addon_cacheName, cache_addons, "add-ons")
+            Call cache.setKey(cache_addon_cacheName, cache_addons, "add-ons")
+            Call cache.setKey("testCache1", cache_addons, "add-ons")
+            Call cache.setKey("testCache2", cache_addons)
+            Call cache.setKey("testCache3", "sampleName")
             'Call cache.cache_saveRaw(cache_addon_cacheName, cache_addons)
             '
             Exit Sub
@@ -37804,7 +37826,7 @@ ErrorTrap:
             cache_addons.propertyBag_guidIndex = ""
             cache_addons.propertyBag_idIndex = ""
             cache_addons.propertyBag_nameIndex = ""
-            Call cache.SetKey(cache_addon_cacheName, cache_addons, "add-ons")
+            Call cache.setKey(cache_addon_cacheName, cache_addons, "add-ons")
             '
             Exit Sub
             '
@@ -38059,7 +38081,7 @@ ErrorTrap:
             cache_addonIncludeRules = New addonIncludeRulesClass
             'cache_addonIncludeRules.itemCnt = 0
             'cache_addonIncludeRules.item = {}
-            Call cache.SetKey(cache_addonIncludeRules_cacheName, cache_addonIncludeRules.item)
+            Call cache.setKey(cache_addonIncludeRules_cacheName, cache_addonIncludeRules.item)
             '
             Exit Sub
             '
@@ -38077,7 +38099,7 @@ ErrorTrap:
             '
             Call cache_addonIncludeRules.addonIdIndex.getPtr("test")
             '
-            Call cache.SetKey(cache_addonIncludeRules_cacheName, cache_addonIncludeRules)
+            Call cache.setKey(cache_addonIncludeRules_cacheName, cache_addonIncludeRules)
             'cacheArray(0) = cache_addonIncludeRules.item
             'cacheArray(1) = cache_addonIncludeRules.addonIdIndex.exportPropertyBag
             'Call cache.cache_save(cache_addonIncludeRules_cacheName, cacheArray)
@@ -38123,7 +38145,7 @@ ErrorTrap:
             '
             On Error Resume Next
             If Not pagemanager_IsWorkflowRendering() Then
-                cacheTest = cache.GetObject(Of addonIncludeRulesClass)(cache_addonIncludeRules_cacheName)
+                cacheTest = cache.getObject(Of addonIncludeRulesClass)(cache_addonIncludeRules_cacheName)
                 If TypeOf cacheTest Is addonIncludeRulesClass Then
                     cache_addonIncludeRules = DirectCast(cacheTest, addonIncludeRulesClass)
                 End If
@@ -38240,7 +38262,7 @@ ErrorTrap:
             '
             ' Load cache
             '
-            cacheValue = DirectCast(cache.GetObject(Of String)(cache_linkForward_cacheName), String)
+            cacheValue = DirectCast(cache.getObject(Of String)(cache_linkForward_cacheName), String)
             If cacheValue = "" Then
                 RS = db.executeSql("select sourceLink from ccLinkForwards where (sourceLink<>'')and(DestinationLink<>'')and(active<>0) order by id desc")
                 For Each dr As DataRow In RS.Rows
@@ -38248,7 +38270,7 @@ ErrorTrap:
                 Next
                 If cacheValue <> "" Then
                     cacheValue = Replace(cacheValue, "\", "/")
-                    Call cache.SetKey(cache_linkForward_cacheName, cacheValue)
+                    Call cache.setKey(cache_linkForward_cacheName, cacheValue)
                     'Call cache.cache_savex("dummyValue", "dummyKey")
                 End If
             End If
@@ -38276,7 +38298,7 @@ ErrorTrap:
             '
             cache_libraryFilesCnt = 0
             cache_libraryFiles = {}
-            Call cache.SetKey(cache_LibraryFiles_cacheName, cache_libraryFiles)
+            Call cache.setKey(cache_LibraryFiles_cacheName, cache_libraryFiles)
             '
             Exit Sub
             '
@@ -38298,7 +38320,7 @@ ErrorTrap:
             '
             cacheArray(0) = cache_libraryFiles
             cacheArray(1) = cache_libraryFilesIdIndex.exportPropertyBag
-            Call cache.SetKey(cache_LibraryFiles_cacheName, cacheArray)
+            Call cache.setKey(cache_LibraryFiles_cacheName, cacheArray)
             '
             Exit Sub
 ErrorTrap:
@@ -38341,7 +38363,7 @@ ErrorTrap:
                 cache_libraryFilesIdIndex = New coreKeyPtrIndexClass
                 cache_libraryFilesCnt = 0
                 '
-                cacheTest = cache.GetObject(Of Object())(cache_LibraryFiles_cacheName)
+                cacheTest = cache.getObject(Of Object())(cache_LibraryFiles_cacheName)
                 If Not IsNothing(cacheTest) Then
                     cacheArray = DirectCast(cacheTest, Object())
                     cache_libraryFiles = DirectCast(cacheArray(0), String(,))
@@ -42426,12 +42448,12 @@ ErrorTrap:
                                         Call pageManager_cache_pageContent_clear()
                                         Call pageManager_cache_pageTemplate_clear()
                                         Call pageManager_cache_siteSection_clear()
-                                        Call cache.invalidateTagList2("")
+                                        Call cache.invalidateTagCommaList("")
                                         If contentName <> "" Then
-                                            Call cache.invalidateTagList2(contentName)
+                                            Call cache.invalidateTagCommaList(contentName)
                                             tableName = db_GetContentTablename(contentName)
                                             If LCase(tableName) = "cctemplates" Then
-                                                Call cache.SetKey(pageManager_cache_pageTemplate_cacheName, nothingObject)
+                                                Call cache.setKey(pageManager_cache_pageTemplate_cacheName, nothingObject)
                                                 Call pageManager_cache_pageTemplate_load()
                                             End If
                                         End If
@@ -43914,20 +43936,20 @@ ErrorTrap:
                     If (GroupID < 1) Then
                         handleExceptionAndRethrow(New ApplicationException("Could not find or create the group [" & groupNameOrGuid & "]"))
                     Else
-                        If user.userId = 0 Then
-                            user.userId = cp.User.Id
+                        If userid = 0 Then
+                            userid = cp.User.Id
                         End If
                         CS = cp.CSNew()
-                        CS.Open("Member Rules", "(MemberID=" & user.userId.ToString & ")and(GroupID=" & GroupID.ToString & ")", , False)
+                        CS.Open("Member Rules", "(MemberID=" & userid.ToString & ")and(GroupID=" & GroupID.ToString & ")", , False)
                         If Not CS.OK Then
                             Call CS.Close()
                             Call CS.Insert("Member Rules")
                         End If
                         If Not CS.OK Then
-                            handleExceptionAndRethrow(New ApplicationException("Could not find or create the Member Rule to add this member [" & user.userId & "] to the Group [" & GroupID & ", " & groupNameOrGuid & "]"))
+                            handleExceptionAndRethrow(New ApplicationException("Could not find or create the Member Rule to add this member [" & userid & "] to the Group [" & GroupID & ", " & groupNameOrGuid & "]"))
                         Else
                             Call CS.SetField("active", "1")
-                            Call CS.SetField("memberid", user.userId.ToString)
+                            Call CS.SetField("memberid", userid.ToString)
                             Call CS.SetField("groupid", GroupID.ToString)
                             If dateExpires <> #12:00:00 AM# Then
                                 Call CS.SetField("DateExpires", dateExpires.ToString)

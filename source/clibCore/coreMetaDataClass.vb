@@ -430,7 +430,7 @@ Namespace Contensive.Core
                 '
                 ' load xref from cache
                 '
-                cdefNameIdXref = DirectCast(cpCore.cache.GetObject(Of Dictionary(Of String, Integer))("cdefNameIdXref"), Dictionary(Of String, Integer))
+                cdefNameIdXref = DirectCast(cpCore.cache.getObject(Of Dictionary(Of String, Integer))("cdefNameIdXref"), Dictionary(Of String, Integer))
                 If (cdefNameIdXref Is Nothing) OrElse (cdefNameIdXref.Count = 0) Then
                     '
                     ' load xref from Db
@@ -446,7 +446,7 @@ Namespace Contensive.Core
                         Next
                     End If
                     dt.Dispose()
-                    Call cpCore.cache.SetKey("cdefNameIdXref", cdefNameIdXref, "content")
+                    Call cpCore.cache.setKey("cdefNameIdXref", cdefNameIdXref, "content")
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -500,7 +500,7 @@ Namespace Contensive.Core
                     '
                     '
                     If (Not forceDbLoad) Then
-                        returnCdef = DirectCast(cpCore.cache.GetObject(Of CDefClass)("cdefId" & contentId.ToString), CDefClass)
+                        returnCdef = DirectCast(cpCore.cache.getObject(Of CDefClass)("cdefId" & contentId.ToString), CDefClass)
                     End If
                     If returnCdef Is Nothing Then
                         '
@@ -863,7 +863,7 @@ Namespace Contensive.Core
                             End With
                             getCdef_SetAdminColumns(returnCdef)
                         End If
-                        Call cpCore.cache.SetKey("cdefId" & contentId.ToString, returnCdef, "content,content fields")
+                        Call cpCore.cache.setKey("cdefId" & contentId.ToString, returnCdef, "content,content fields")
                     End If
                     cdefList.Add(contentId, returnCdef)
                 End If
@@ -2121,7 +2121,7 @@ Namespace Contensive.Core
                                     '
                                     ' ----- Verify good DateAdded
                                     '
-                                    Dim testDate As Date = New Date(1990, 8, 7)
+                                    Dim testDate As Date = Date.MinValue
                                     SQL = "UPDATE " & ContentTableName & " set DateAdded=" & cpCore.db.db_EncodeSQLDate(testDate) & " where dateadded is null;"
                                     Call cpCore.db.executeSql(SQL, ContentDataSourceName)
                                     If ContentTableName <> AuthoringTableName Then

@@ -534,7 +534,7 @@ Namespace Contensive.Core
         '                        '
         '                    End Try
         '                    If returnTagInvalidationDate = Date.MinValue Then
-        '                        returnTagInvalidationDate = New Date(1990, 8, 7)
+        '                        returnTagInvalidationDate = date.minvalue
         '                    End If
         '                    cache_saveRaw(cacheNameTagInvalidateDate, returnTagInvalidationDate)
         '                End If
@@ -793,7 +793,7 @@ ErrorTrap:
                 sqlList.add("Active", db_EncodeSQLNumber(1))
                 '
                 Call db_InsertTableRecord(DataSourceName, TableName, sqlList)
-                returnDt = db_openTable(DataSourceName, TableName, "(DateAdded=" & DateAddedString & ")and(CreateKey=" & CreateKeyString & ")", "ID DESC",  , 1)
+                returnDt = db_openTable(DataSourceName, TableName, "(DateAdded=" & DateAddedString & ")and(CreateKey=" & CreateKeyString & ")", "ID DESC",, 1)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -3115,22 +3115,16 @@ ErrorTrap:
         '========================================================================
         '
         Public Function metaData_InsertContentRecordGetID(ByVal ContentName As String, ByVal MemberID As Integer) As Integer
-            On Error GoTo ErrorTrap 'Const Tn = "MethodName-071" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
+            On Error GoTo ErrorTrap
             '
             Dim CS As Integer
-            Dim hint As String
             '
-            'hint = "csv_InsertContentRecordGetID(" & ContentName & ")"
             metaData_InsertContentRecordGetID = -1
             CS = db_csInsertRecord(ContentName, MemberID)
-            If Not db_csOk(CS) Then
-                'hint = hint & ", notok"
-            Else
-                metaData_InsertContentRecordGetID = EncodeInteger(db_GetCSField(CS, "ID"))
-                'hint = hint & ", ok Return=" & db_InsertContentRecordGetID
+            If db_csOk(CS) Then
+                metaData_InsertContentRecordGetID = db_GetCSInteger(CS, "ID")
             End If
             Call db_csClose(CS)
-            ''Call main_testPoint(hint)
             '
             Exit Function
             '

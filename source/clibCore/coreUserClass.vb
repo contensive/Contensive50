@@ -1700,7 +1700,7 @@ ErrorTrap:
                     End If
                 End If
             End If
-            Call cpCore.cache.invalidateTagList2("People")
+            Call cpCore.cache.invalidateTagCommaList("People")
             '
             Exit Sub
 ErrorTrap:

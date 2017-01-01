@@ -3137,7 +3137,7 @@ Namespace Contensive.Core
                             ' ----- Load CDef
                             '
                             If clearMetaCache Then
-                                cpCore.cache.invalidateTagList2("content,content fields")
+                                cpCore.cache.invalidateTagCommaList("content,content fields")
                                 cpCore.metaData.clear()
                             End If
                         End If

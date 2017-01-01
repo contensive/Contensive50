@@ -399,7 +399,7 @@ Namespace Contensive.Core
                         '   { "import": "test.html" }
                         '
                         Try
-                            cmdDictionary = DirectCast(cpCore.main_parseJSON(cmdSrc), Dictionary(Of String, Object))
+                            cmdDictionary = cpCore.json.Deserialize(Of Dictionary(Of String, Object))(cmdSrc)
                         Catch ex As Exception
                             cpCore.handleExceptionAndRethrow(ex, "Error parsing JSON command list [" & GetErrString() & "]")
                         End Try
@@ -442,7 +442,7 @@ Namespace Contensive.Core
                         ' JSON is a command list in the form of an array, like:
                         '   [ "clear" , { "import": "test.html" },{ "open" : "myfile.txt" }]
                         '
-                        cmdCollection = DirectCast(cpCore.main_parseJSON(cmdSrc), Collection)
+                        cmdCollection = cpCore.json.Deserialize(Of Collection)(cmdSrc)
                         'If True Then
                         'End If
                         'If (LCase(TypeName(cmdDictionaryOrCollection)) <> "collection") Then
@@ -522,7 +522,7 @@ Namespace Contensive.Core
                             ' argument is in the form of an object, like:
                             '   { "text name": "my text" }
                             '
-                            cmdDictionaryOrCollection = cpCore.main_parseJSON(cmdArg)
+                            cmdDictionaryOrCollection = cpCore.json.Deserialize(Of Object)(cmdArg)
                             If (LCase(TypeName(cmdDictionaryOrCollection)) <> "dictionary") Then
                                 Throw New ApplicationException("Error parsing JSON command argument list, expected a single command, command list [" & cmdSrc & "]")
                                 Exit Function

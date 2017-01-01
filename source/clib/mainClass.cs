@@ -177,8 +177,8 @@ namespace Contensive.Core
                                         }
                                         else
                                         {
-                                            System.Web.Script.Serialization.JavaScriptSerializer json_serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
-                                            serverConfigClass serverConfig = json_serializer.Deserialize<serverConfigClass>(JSONTemp);
+                                            //System.Web.Script.Serialization.JavaScriptSerializer json_serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+                                            serverConfigClass serverConfig = cpCluster.core.json.Deserialize<serverConfigClass>(JSONTemp);
                                             if (i != (args.Length + 1))
                                             {
                                                 i++;
@@ -203,7 +203,7 @@ namespace Contensive.Core
                                                     //
                                                     serverConfig.allowTaskSchedulerService = cpCluster.Utils.EncodeBoolean(args[i]);
                                                     Console.WriteLine("allowtaskscheduler set " + serverConfig.allowTaskSchedulerService.ToString());
-                                                    programDataFiles.SaveFile("serverConfig.json", json_serializer.Serialize(serverConfig));
+                                                    programDataFiles.SaveFile("serverConfig.json", cpCluster.core.json.Serialize(serverConfig));
                                                 }
                                             }
                                         }
@@ -222,8 +222,8 @@ namespace Contensive.Core
                                         }
                                         else
                                         {
-                                            System.Web.Script.Serialization.JavaScriptSerializer json_serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
-                                            serverConfigClass serverConfig = json_serializer.Deserialize<serverConfigClass>(JSONTemp);
+                                            //System.Web.Script.Serialization.JavaScriptSerializer json_serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+                                            serverConfigClass serverConfig = cpCluster.core.json.Deserialize<serverConfigClass>(JSONTemp);
                                             if (i != (args.Length + 1))
                                             {
                                                 i++;
@@ -248,7 +248,7 @@ namespace Contensive.Core
                                                     //
                                                     serverConfig.allowTaskRunnerService = cpCluster.Utils.EncodeBoolean(args[i]);
                                                     Console.WriteLine("allowtaskrunner set " + serverConfig.allowTaskRunnerService.ToString());
-                                                    programDataFiles.SaveFile("serverConfig.json", json_serializer.Serialize(serverConfig));
+                                                    programDataFiles.SaveFile("serverConfig.json", cpCluster.core.json.Serialize(serverConfig));
                                                 }
                                             }
                                         }
@@ -272,8 +272,8 @@ namespace Contensive.Core
                                         }
                                         else
                                         {
-                                            System.Web.Script.Serialization.JavaScriptSerializer json_serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
-                                            serverConfigClass serverConfig = json_serializer.Deserialize<serverConfigClass>(JSONTemp);
+                                            //System.Web.Script.Serialization.JavaScriptSerializer json_serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+                                            serverConfigClass serverConfig = cpCluster.core.json.Deserialize<serverConfigClass>(JSONTemp);
                                             if (i != (args.Length + 1))
                                             {
                                                 i++;
@@ -309,7 +309,7 @@ namespace Contensive.Core
                                                     serverConfig.allowTaskRunnerService = cpCluster.Utils.EncodeBoolean(args[i]);
                                                     Console.WriteLine("allowTaskRunner set " + serverConfig.allowTaskRunnerService.ToString());
                                                     //
-                                                    programDataFiles.SaveFile("serverConfig.json", json_serializer.Serialize(serverConfig));
+                                                    programDataFiles.SaveFile("serverConfig.json", cpCluster.core.json.Serialize(serverConfig));
                                                 }
                                             }
                                         }

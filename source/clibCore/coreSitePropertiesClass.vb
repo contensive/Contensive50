@@ -443,7 +443,7 @@ Namespace Contensive.Core
                     SQL = "INSERT INTO ccSetup (ACTIVE,CONTENTCONTROLID,NAME,FIELDVALUE,ModifiedDate,DateAdded)VALUES(" & SQLTrue & "," & cpCore.db.db_EncodeSQLNumber(ContentID) & "," & cpCore.db.encodeSQLText(UCase(propertyName)) & "," & cpCore.db.encodeSQLText(Value) & "," & SQLNow & "," & SQLNow & ");"
                     Call cpCore.db.executeSql(SQL)
                 End If
-                Call cpCore.cache.SetKey(cacheName, Value, "site properties")
+                Call cpCore.cache.setKey(cacheName, Value, "site properties")
 
             Catch ex As Exception
                 Call cpCore.handleExceptionAndRethrow(ex)
@@ -523,11 +523,11 @@ Namespace Contensive.Core
             Try
                 Dim cacheName As String = "siteProperty-" & PropertyName
                 Dim propertyFound As Boolean = False
-                returnString = EncodeText(cpCore.cache.GetObject(Of String)(cacheName))
+                returnString = EncodeText(cpCore.cache.getObject(Of String)(cacheName))
                 If returnString = "" Then
                     returnString = getText_noCache(PropertyName, DefaultValue, propertyFound)
                     If (propertyFound) And (returnString <> "") Then
-                        Call cpCore.cache.SetKey(cacheName, returnString, "Site Properties")
+                        Call cpCore.cache.setKey(cacheName, returnString, "Site Properties")
                     End If
                 End If
             Catch ex As Exception
@@ -567,5 +567,27 @@ Namespace Contensive.Core
         Public Function getBoolean(ByVal PropertyName As String, Optional ByVal DefaultValue As Boolean = False) As Boolean
             Return EncodeBoolean(getText(PropertyName, DefaultValue.ToString))
         End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' allowCache site property, not cached (to make it available to the cache process)
+        ''' </summary>
+        ''' <returns></returns>
+        Public ReadOnly Property allowCache_notCached() As Boolean
+            Get
+                '
+                ' site property now runs query
+                '
+                'Return True
+                Dim propertyFound As Boolean = False
+                If Not siteProperty_AllowCache_LocalLoaded Then
+                    siteProperty_AllowCache_Local = EncodeBoolean(getText_noCache("AllowBake", "0", propertyFound))
+                    siteProperty_AllowCache_LocalLoaded = True
+                End If
+                allowCache_notCached = siteProperty_AllowCache_Local
+            End Get
+        End Property
+        Private siteProperty_AllowCache_LocalLoaded As Boolean = False
+        Private siteProperty_AllowCache_Local As Boolean
     End Class
 End Namespace

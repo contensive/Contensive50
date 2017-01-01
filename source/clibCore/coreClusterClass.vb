@@ -126,9 +126,9 @@ Namespace Contensive.Core
             MyBase.New()
             Me.cpCore = cpCore
             Try
-                Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer
+                'Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer
                 Dim JSONTemp As String
-                Dim serverPortSplit As String()
+                'Dim serverPortSplit As String()
                 Dim port As Integer = 11211
                 Dim serverConfig As serverConfigClass
                 Dim programDataFiles As coreFileSystemClass
@@ -157,9 +157,9 @@ Namespace Contensive.Core
                     End If
                     serverConfig.allowTaskRunnerService = False
                     serverConfig.allowTaskSchedulerService = False
-                    programDataFiles.SaveFile("serverConfig.json", json_serializer.Serialize(serverConfig))
+                    programDataFiles.SaveFile("serverConfig.json", cpCore.json.Serialize(serverConfig))
                 Else
-                    serverConfig = json_serializer.Deserialize(Of serverConfigClass)(JSONTemp)
+                    serverConfig = cpCore.json.Deserialize(Of serverConfigClass)(JSONTemp)
                 End If
                 clusterFiles = New coreFileSystemClass(cpCore, config, coreFileSystemClass.fileSyncModeEnum.activeSync, serverConfig.clusterPath)
                 JSONTemp = clusterFiles.ReadFile("clusterConfig.json")
@@ -168,7 +168,7 @@ Namespace Contensive.Core
                     ' for now it fails, maybe later let it autobuild a local cluster
                     '
                 Else
-                    config = json_serializer.Deserialize(Of clusterConfigClass)(JSONTemp)
+                    config = cpCore.json.Deserialize(Of clusterConfigClass)(JSONTemp)
                     _ok = True
                 End If
                 '
@@ -191,7 +191,10 @@ Namespace Contensive.Core
                 ' setup cache
                 '
                 If config.isLocalCache Then
-                    Throw New NotImplementedException("local cache not implemented yet")
+                    '
+                    ' implemented as file save/read to appCache private folder
+                    '
+                    'Throw New NotImplementedException("local cache not implemented yet")
                 Else
                     '
                     ' converted to lazy constructor, remove this after test
@@ -332,8 +335,7 @@ Namespace Contensive.Core
         ''' save config changes to the clusterConfig.json file
         ''' </summary>
         Public Sub saveConfig()
-            Dim json As New System.Web.Script.Serialization.JavaScriptSerializer
-            Dim jsonTemp As String = json.Serialize(config)
+            Dim jsonTemp As String = cpCore.json.Serialize(config)
             clusterFiles.SaveFile("clusterConfig.json", jsonTemp)
         End Sub
         '

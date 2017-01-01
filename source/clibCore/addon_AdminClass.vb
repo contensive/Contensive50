@@ -989,7 +989,7 @@ ErrorTrap:
                                     ContentName = cpCore.doc_getText("RowContentName" & RowPtr)
                                     Call cpCore.workflow.publishEdit(ContentName, RecordID)
                                     Call cpCore.main_ProcessSpecialCaseAfterSave(False, ContentName, RecordID, "", 0, UseContentWatchLink)
-                                    Call cpCore.cache.invalidateTagList2(ContentName)
+                                    Call cpCore.cache.invalidateTagCommaList(ContentName)
                                     Call cpCore.db.executeSql("delete from ccAuthoringControls where recordid=" & RecordID & " and Contentid=" & cpCore.main_GetContentID(ContentName))
                                 End If
                             Next
@@ -1005,7 +1005,7 @@ ErrorTrap:
                                 If ContentName <> "" Then
                                     Call cpCore.workflow.publishEdit(ContentName, RecordID)
                                     Call cpCore.main_ProcessSpecialCaseAfterSave(False, ContentName, RecordID, "", 0, UseContentWatchLink)
-                                    Call cpCore.cache.invalidateTagList2(ContentName)
+                                    Call cpCore.cache.invalidateTagCommaList(ContentName)
                                 End If
                                 cpCore.db.db_csGoNext(CS)
                             Loop
@@ -1064,7 +1064,7 @@ ErrorTrap:
                                 IsDeleted = Not cpCore.db.db_csOk(CS)
                                 Call cpCore.db.db_csClose(CS)
                                 Call cpCore.main_ProcessSpecialCaseAfterSave(IsDeleted, adminContent.Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
-                                Call cpCore.cache.invalidateTagList2(adminContent.Name)
+                                Call cpCore.cache.invalidateTagCommaList(adminContent.Name)
                             Else
                                 AdminForm = AdminSourceForm
                             End If
@@ -1104,7 +1104,7 @@ ErrorTrap:
                                     End If
                                     Call cpCore.db_DeleteCSRecord(CSEditRecord)
                                     Call cpCore.main_ProcessSpecialCaseAfterSave(True, editRecord.contentControlId_Name, editRecord.id, editRecord.nameLc, editRecord.parentID, UseContentWatchLink)
-                                    Call cpCore.cache.invalidateTagList2(editRecord.contentControlId_Name)
+                                    Call cpCore.cache.invalidateTagCommaList(editRecord.contentControlId_Name)
                                 End If
                                 Call cpCore.db.db_csClose(CSEditRecord)
                             End If
@@ -1350,7 +1350,7 @@ ErrorTrap:
                                                 ' non-Workflow Delete
                                                 '
                                                 ContentName = cpCore.main_GetContentNameByID(cpCore.db.db_GetCSInteger(CSEditRecord, "ContentControlID"))
-                                                Call cpCore.cache.invalidateTagList2(ContentName)
+                                                Call cpCore.cache.invalidateTagCommaList(ContentName)
                                                 Call cpCore.main_ProcessSpecialCaseAfterSave(True, ContentName, RecordID, "", 0, UseContentWatchLink)
                                             End If
                                             '
@@ -1491,7 +1491,7 @@ ErrorTrap:
                 Call cpCore.db.executeSql(SQL)
             End If
             If RecordChanged Then
-                Call cpCore.cache.invalidateTagList2("Group Rules")
+                Call cpCore.cache.invalidateTagCommaList("Group Rules")
             End If
             Exit Sub
             '
@@ -1630,7 +1630,7 @@ ErrorTrap:
             End If
             Call cpCore.db.db_csClose(CSPointer)
             If RecordChanged Then
-                Call cpCore.cache.invalidateTagList2("Group Rules")
+                Call cpCore.cache.invalidateTagCommaList("Group Rules")
             End If
             Exit Sub
             '
@@ -3038,8 +3038,8 @@ ErrorTrap:
                 '
                 ' Clear any bakes involving this content
                 '
-                Call cpCore.cache.invalidateTagList2("Meta Content")
-                Call cpCore.cache.invalidateTagList2("Meta Keyword Rules")
+                Call cpCore.cache.invalidateTagCommaList("Meta Content")
+                Call cpCore.cache.invalidateTagCommaList("Meta Keyword Rules")
             End If
             '
             Exit Sub
@@ -3495,9 +3495,9 @@ ErrorTrap:
                         ' if record is changed, and not workflow, clear the contenttimestamp
                         '
                         If editRecord.contentControlId = 0 Then
-                            Call cpCore.cache.invalidateTagList2(adminContent.Name)
+                            Call cpCore.cache.invalidateTagCommaList(adminContent.Name)
                         Else
-                            Call cpCore.cache.invalidateTagList2(editRecord.contentControlId_Name)
+                            Call cpCore.cache.invalidateTagCommaList(editRecord.contentControlId_Name)
                             'call cpCore.main_ClearBake (cpCore.main_GetContentNameByID(EditRecord.ContentID))
                         End If
                     End If
@@ -10350,7 +10350,7 @@ ErrorTrap:
                 ' ----- Get the baked version
                 '
                 BakeName = "AdminMenu" & Format(cpCore.user.userId, "00000000")
-                GetMenuTopMode = EncodeText(cpCore.cache.GetObject(Of String)(BakeName))
+                GetMenuTopMode = EncodeText(cpCore.cache.getObject(Of String)(BakeName))
                 MenuDelimiterPosition = InStr(1, GetMenuTopMode, MenuDelimiter, vbTextCompare)
                 If MenuDelimiterPosition > 1 Then
                     MenuClose = Mid(GetMenuTopMode, MenuDelimiterPosition + Len(MenuDelimiter))
@@ -10451,7 +10451,7 @@ ErrorTrap:
                     '
                     MenuClose = cpCore.menu_GetClose()
                     'GetMenuTopMode = GetMenuTopMode & cpCore.main_GetMenuClose
-                    Call cpCore.cache.SetKey(BakeName, GetMenuTopMode & MenuDelimiter & MenuClose, "Menu Entries,People,Content,Groups,Group Rules")
+                    Call cpCore.cache.setKey(BakeName, GetMenuTopMode & MenuDelimiter & MenuClose, "Menu Entries,People,Content,Groups,Group Rules")
                 End If
                 cpCore.main_ClosePageHTML = cpCore.main_ClosePageHTML & MenuClose
             End If

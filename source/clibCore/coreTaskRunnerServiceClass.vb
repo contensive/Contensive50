@@ -144,8 +144,7 @@ Namespace Contensive
                     Using cpCluster As New CPClass
                         Using programDataFiles As New coreFileSystemClass(cpCluster.core, cpCluster.core.cluster.config, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib")
                             Dim JSONTemp = programDataFiles.ReadFile("serverConfig.json")
-                            Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer()
-                            Dim serverConfig As serverConfigClass = json_serializer.Deserialize(Of serverConfigClass)(JSONTemp)
+                            Dim serverConfig As serverConfigClass = cpCluster.core.json.Deserialize(Of serverConfigClass)(JSONTemp)
                             If (Not serverConfig.allowTaskRunnerService) Then
                                 appendLog("taskRunnerService.processTimerTick, allowTaskRunnerService false, skip")
                             Else
@@ -208,14 +207,14 @@ Namespace Contensive
                                     cpSite.core.db.executeSql(sql)
                                     CS = cpSite.core.db.db_csOpen("tasks", "(cmdRunner=" & cpSite.core.db.encodeSQLText(runnerGuid) & ")and(datestarted is null)", "id")
                                     If cpSite.core.db.db_csOk(CS) Then
-                                        Dim json As New System.Web.Script.Serialization.JavaScriptSerializer
+                                        'Dim json As New System.Web.Script.Serialization.JavaScriptSerializer
                                         recordsRemaining = True
                                         Call cpSite.core.db.db_setCS(CS, "datestarted", Now())
                                         Call cpSite.core.db.db_SaveCS(CS)
                                         '
                                         command = cpSite.core.db.db_GetCSText(CS, "command")
                                         cmdDetailText = cpSite.core.db.db_GetCSText(CS, "cmdDetail")
-                                        cmdDetail = json.Deserialize(Of cmdDetailClass)(cmdDetailText)
+                                        cmdDetail = cpSite.core.json.Deserialize(Of cmdDetailClass)(cmdDetailText)
                                         '
                                         appendLog("taskRunnerService.runTasks, command=[" & command & "], cmdDetailText=[" & cmdDetailText & "]")
                                         '
