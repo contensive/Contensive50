@@ -96,7 +96,7 @@ Namespace Contensive.Core
         '
         'Public DataBuildVersion_DontUseThis As String               ' the build version of the database, valid only after start
         '
-        Public db_dataSources() As dataSourceClass         ' array from the appServices object
+        Public dataSources() As dataSourceClass         ' array from the appServices object
         '
         '
         ' ----- ContentField Type
@@ -229,8 +229,8 @@ Namespace Contensive.Core
                 '
                 Me.cpCore = cpCore
                 constructed = True
-                ReDim db_dataSources(0)
-                db_dataSources(0) = New dataSourceClass()
+                ReDim dataSources(0)
+                dataSources(0) = New dataSourceClass()
                 db_SQLTimeout = 30
                 csv_SlowSQLThreshholdMSec = 1000
             Catch ex As Exception
@@ -310,27 +310,27 @@ Namespace Contensive.Core
             Try
                 Dim dataSourceNameLower As String
                 '
-                If db_dataSources.Length > 0 Then
+                If dataSources.Length > 0 Then
                     '
                     ' Find it
                     '
                     dataSourceNameLower = DataSourceName.ToLower
-                    For returnPtr = 0 To db_dataSources.Length - 1
-                        If UCase(db_dataSources(returnPtr).NameLower) = dataSourceNameLower Then
+                    For returnPtr = 0 To dataSources.Length - 1
+                        If UCase(dataSources(returnPtr).NameLower) = dataSourceNameLower Then
                             Exit For
                         End If
                     Next
                 End If
                 '
-                If returnPtr >= db_dataSources.Length Then
+                If returnPtr >= dataSources.Length Then
                     '
                     ' Add it if not found
                     '
-                    returnPtr = db_dataSources.Length
-                    ReDim Preserve db_dataSources(returnPtr)
-                    db_dataSources(returnPtr) = New dataSourceClass
+                    returnPtr = dataSources.Length
+                    ReDim Preserve dataSources(returnPtr)
+                    dataSources(returnPtr) = New dataSourceClass
                 End If
-                With db_dataSources(returnPtr)
+                With dataSources(returnPtr)
                     .NameLower = DataSourceName.ToLower
                     .Id = Id
                     .odbcConnectionString = ConnectionString
@@ -354,7 +354,7 @@ Namespace Contensive.Core
         Public Function GetDataSourceByPointer(ByVal DataSourcePointer As Integer) As dataSourceClass
             Dim DataSource As dataSourceClass = Nothing
             If DataSourcePointer >= 0 Then
-                DataSource = db_dataSources(DataSourcePointer)
+                DataSource = dataSources(DataSourcePointer)
             End If
             Return DataSource
         End Function
@@ -368,10 +368,10 @@ Namespace Contensive.Core
             Dim DataSource As dataSourceClass = Nothing
             Dim DataSourcePointer As Integer
             '
-            If db_dataSources.Length > 0 Then
-                For DataSourcePointer = 0 To db_dataSources.Length - 1
-                    If db_dataSources(DataSourcePointer).Id = DataSourceID Then
-                        GetDataSourceByID = db_dataSources(db_dataSources.Length)
+            If dataSources.Length > 0 Then
+                For DataSourcePointer = 0 To dataSources.Length - 1
+                    If dataSources(DataSourcePointer).Id = DataSourceID Then
+                        GetDataSourceByID = dataSources(dataSources.Length)
                         Exit For
                     End If
                 Next
@@ -391,11 +391,11 @@ Namespace Contensive.Core
                 Dim DataSourcePointer As Integer
                 Dim lowerDataSourceName As String
                 '
-                If db_dataSources.Length > 0 Then
+                If dataSources.Length > 0 Then
                     lowerDataSourceName = DataSourceName.ToLower
-                    For DataSourcePointer = 0 To db_dataSources.Length - 1
-                        If UCase(db_dataSources(DataSourcePointer).NameLower) = lowerDataSourceName Then
-                            returnDataSource = db_dataSources(db_dataSources.Length)
+                    For DataSourcePointer = 0 To dataSources.Length - 1
+                        If UCase(dataSources(DataSourcePointer).NameLower) = lowerDataSourceName Then
+                            returnDataSource = dataSources(dataSources.Length)
                             Exit For
                         End If
                     Next
@@ -662,7 +662,7 @@ Namespace Contensive.Core
             '
             db_GetDataSourcePointer = 0
             lcaseDataSourceName = "default"
-            If db_dataSources.Length <= 0 Then
+            If dataSources.Length <= 0 Then
                 '
                 ' no datasources loaded
                 '
@@ -681,15 +681,15 @@ Namespace Contensive.Core
             '
             ' search for datasource
             '
-            For DataSourcePointer = 0 To db_dataSources.Length - 1
-                If db_dataSources(DataSourcePointer).NameLower = lcaseDataSourceName Then
+            For DataSourcePointer = 0 To dataSources.Length - 1
+                If dataSources(DataSourcePointer).NameLower = lcaseDataSourceName Then
                     Exit For
                 End If
             Next
             '
             '
             '
-            If (DataSourcePointer >= db_dataSources.Length) Then
+            If (DataSourcePointer >= dataSources.Length) Then
                 '
                 ' Not found
                 '
@@ -910,7 +910,7 @@ ErrorTrap:
             If LogEntry <> "" Then
                 Message = Replace(LogEntry, vbCr, "")
                 Message = Replace(Message, vbLf, "")
-                cpCore.appendLog(Message, "DbTransactions")
+                cpCore.log_appendLog(Message, "DbTransactions")
                 'Call csv_AppendFile(getDataPath() & "\logs\Trans" & CStr(CLng(Int(Now()))) & ".log", Message & vbCrLf)
             End If
             '
@@ -1285,26 +1285,6 @@ ErrorTrap:
             End Try
         End Sub
         '
-        '========================================================================
-        ' Get a Contents Tablename from the ContentPointer
-        '========================================================================
-        '
-        Public Function metaData_GetContentTablename(ByVal ContentName As String) As String
-            On Error GoTo ErrorTrap
-            '
-            Dim CDef As coreMetaDataClass.CDefClass
-            '
-            CDef = cpCore.metaData.getCdef(ContentName)
-            metaData_GetContentTablename = CDef.ContentTableName
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassError1("csv_GetContentTablename", "trap")
-        End Function
-        '
         '=============================================================
         '
         '=============================================================
@@ -1539,8 +1519,8 @@ ErrorTrap:
             MethodName = "csv_GetDataSourceID"
             '
             DataSourcePointer = db_GetDataSourcePointer(DataSourceName)
-            If db_dataSources.Length > 0 Then
-                db_GetDataSourceID = db_dataSources(DataSourcePointer).Id
+            If dataSources.Length > 0 Then
+                db_GetDataSourceID = dataSources(DataSourcePointer).Id
             End If
             '
             Exit Function
@@ -2867,7 +2847,7 @@ ErrorTrap:
                             '
                             ' CS is SQL-based, use the contentname
                             '
-                            TableName = metaData_GetContentTablename(ContentName)
+                            TableName = cpCore.metaData.getContentTablename(ContentName)
                         Else
                             '
                             ' no Contentname given
@@ -3319,7 +3299,7 @@ ErrorTrap:
                                                             DefaultValueText = "null"
                                                         Else
                                                             If .lookupContentID <> 0 Then
-                                                                LookupContentName = db_GetContentNameByID(.lookupContentID)
+                                                                LookupContentName = cpCore.metaData.getContentNameByID(.lookupContentID)
                                                                 If LookupContentName <> "" Then
                                                                     DefaultValueText = getRecordID(LookupContentName, DefaultValueText).ToString()
                                                                 End If
@@ -3625,8 +3605,8 @@ ErrorTrap:
                                     If .CDef.fields.ContainsKey("id") Then
                                         RecordID = EncodeInteger(db_GetCSField(CSPointer, "id"))
                                         With field
-                                            ContentName = db_GetContentNameByID(.manyToManyRuleContentID)
-                                            DbTable = metaData_GetContentTablename(ContentName)
+                                            ContentName = cpCore.metaData.getContentNameByID(.manyToManyRuleContentID)
+                                            DbTable = cpCore.metaData.getContentTablename(ContentName)
                                             SQL = "Select " & .ManyToManyRuleSecondaryField & " from " & DbTable & " where " & .ManyToManyRulePrimaryField & "=" & RecordID
                                             rs = executeSql(SQL)
                                             If (isDataTableOk(rs)) Then
@@ -3675,7 +3655,7 @@ ErrorTrap:
                                                 '
                                                 If IsNumeric(FieldValueVariant) Then
                                                     fieldLookupId = field.lookupContentID
-                                                    LookupContentName = db_GetContentNameByID(fieldLookupId)
+                                                    LookupContentName = cpCore.metaData.getContentNameByID(fieldLookupId)
                                                     LookupList = field.lookupList
                                                     If (LookupContentName <> "") Then
                                                         '
@@ -4120,7 +4100,7 @@ ErrorTrap:
                         '
                         LiveRecordID = db_GetCSInteger(CSPointer, "ID")
                         LiveRecordContentControlID = db_GetCSInteger(CSPointer, "CONTENTCONTROLID")
-                        LiveRecordContentName = db_GetContentNameByID(LiveRecordContentControlID)
+                        LiveRecordContentName = cpCore.metaData.getContentNameByID(LiveRecordContentControlID)
                         LiveRecordInactive = Not db_GetCSBoolean(CSPointer, "ACTIVE")
                         '
                         ' Get Edit Record ID
@@ -5022,8 +5002,8 @@ ErrorTrap:
             Else
                 ContentRecordKey = CStr(ContentID) & "." & CStr(RecordID)
                 Criteria = "(ContentRecordKey=" & encodeSQLText(ContentRecordKey) & ")"
-                ContentName = db_GetContentNameByID(ContentID)
-                TableName = metaData_GetContentTablename(ContentName)
+                ContentName = cpCore.metaData.getContentNameByID(ContentID)
+                TableName = cpCore.metaData.getContentTablename(ContentName)
                 '
                 ' ----- Delete CalendarEventRules and CalendarEvents
                 '
@@ -5378,27 +5358,6 @@ ErrorTrap:
         End Sub
         '
         '========================================================================
-        ' Get a Contents Name from the ContentID
-        '   Bad ContentID returns blank
-        '========================================================================
-        '
-        Public Function db_GetContentNameByID(ByVal ContentID As Integer) As String
-            Dim returnName As String = ""
-            Try
-                Dim cdef As coreMetaDataClass.CDefClass
-                '
-                cdef = cpCore.metaData.getCdef(ContentID)
-                If Not cdef Is Nothing Then
-                    returnName = cdef.Name
-                End If
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
-            Return returnName
-        End Function
-
-        '
-        '========================================================================
         '   return the content name of a csv_ContentSet
         '========================================================================
         '
@@ -5560,7 +5519,7 @@ ErrorTrap:
                                 '
                                 Call handleLegacyClassError3(MethodName, "The Lookup Content Definition [" & fieldLookupId & "] for this field [" & FieldName & "] is not valid.")
                             Else
-                                LookupContentName = db_GetContentNameByID(fieldLookupId)
+                                LookupContentName = cpCore.metaData.getContentNameByID(fieldLookupId)
                                 db_OpenCSJoin = db_csOpen(LookupContentName, "ID=" & db_EncodeSQLNumber(FieldValueVariant), "name", , , , , , 1)
                                 'CDefLookup = appEnvironment.GetCDefByID(FieldLookupID)
                                 'csv_OpenCSJoin = db_csOpen(CDefLookup.Name, "ID=" & encodeSQLNumber(FieldValueVariant), "name", , , , , , 1)
@@ -5711,7 +5670,7 @@ ErrorTrap:
                                         Call db_setCS(CS, FieldName, "null")
                                         If DefaultValueText <> "" Then
                                             If .lookupContentID <> 0 Then
-                                                LookupContentName = db_GetContentNameByID(.lookupContentID)
+                                                LookupContentName = cpCore.metaData.getContentNameByID(.lookupContentID)
                                                 If LookupContentName <> "" Then
                                                     Call db_setCS(CS, FieldName, getRecordID(LookupContentName, DefaultValueText))
                                                 End If
@@ -5976,7 +5935,7 @@ ErrorTrap:
                 Dim dt As DataTable
                 '
                 getDbContentID = 0
-                dt = cpCore.db.executeSql("Select ID from ccContent where name=" & encodeSQLText(ContentName))
+                dt = executeSql("Select ID from ccContent where name=" & encodeSQLText(ContentName))
                 If dt.Rows.Count > 0 Then
                     getDbContentID = EncodeInteger(dt.Rows(0).Item("id"))
                 End If
@@ -5985,6 +5944,46 @@ ErrorTrap:
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return returnContentId
+        End Function
+        '
+        '========================================================================
+        ' Get a DataSource Name from its ID
+        '   If failure, return an empty DataSourceType (.ID=0)
+        '========================================================================
+        '
+        Public Function getDataSourceNameByID(DataSourceID As Integer) As String
+            Dim returnDataSource As String = ""
+            Try
+                '
+                Dim ptr As Integer
+                '
+                If dataSources.Length <= 0 Then
+                    '
+                    ' if none available, use default
+                    '
+                    returnDataSource = "Default"
+                ElseIf DataSourceID <= 0 Then
+                    '
+                    ' compatibility, if datasourceid is not give, or default, make sourcedefault
+                    '
+                    returnDataSource = "Default"
+                Else
+                    For ptr = 0 To dataSources.Length - 1
+                        If dataSources(ptr).Id = DataSourceID Then
+                            Exit For
+                        End If
+                    Next
+                    If (ptr >= dataSources.Length) Then
+                        returnDataSource = "Default"
+                        Throw New ApplicationException("Datasource ID [" & DataSourceID & "] was not found, the default datasource will be used")
+                    Else
+                        returnDataSource = dataSources(ptr).NameLower
+                    End If
+                End If
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+            Return returnDataSource
         End Function
 
 

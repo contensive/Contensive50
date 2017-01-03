@@ -6,7 +6,7 @@ Imports System.Text
 Imports System.Security.Cryptography
 
 Namespace Contensive.Core
-    Class coreSecurityClass
+    Public Class coreSecurityClass
         '
         ' privateKey
         '
@@ -444,6 +444,43 @@ Namespace Contensive.Core
                                 hashEncode.VerifyHash(
                                 wrongPassword, "SHA512",
                                 passwordHashSha512).ToString())
+        End Sub
+        '
+        '========================================================================
+        '
+        Public Function encodeToken(ByVal keyInteger As Integer, ByVal keyDate As Date) As String
+            Dim returnToken As String = ""
+            Try
+                Dim sourceText As String = keyInteger.ToString & vbTab & keyDate.ToString
+                returnToken = twoWayEncrypt(sourceText)
+            Catch ex As Exception
+                cpCore.handleExceptionAndNoThrow(ex, "EncodeToken failure. Returning blank result for keyInteger [" & keyInteger & "], keyDate [" & keyDate & "]")
+                returnToken = ""
+            End Try
+            Return returnToken
+        End Function
+        '
+        '========================================================================
+        '   Decode a value from an encodestring value
+        '       result is 0 if there was a decode error
+        '========================================================================
+        '
+        Public Sub decodeToken(ByVal token As String, ByRef returnNumber As Integer, ByRef returnDate As Date)
+            Try
+                Dim decodedString As String = ""
+                Dim parts As String()
+                '
+                decodedString = twoWayDecrypt(token)
+                parts = decodedString.Split(CChar(vbTab))
+                If parts.Length = 2 Then '
+                    returnNumber = EncodeInteger(parts(0))
+                    returnDate = EncodeDate(parts(1))
+                End If
+            Catch ex As Exception
+                cpCore.handleExceptionAndNoThrow(ex, "DecodeToken failure. Returning blank result for token [" & token & "]")
+                returnNumber = 0
+                returnDate = Date.MinValue
+            End Try
         End Sub
     End Class
 End Namespace

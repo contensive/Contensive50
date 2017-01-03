@@ -128,9 +128,9 @@ Namespace Contensive.Core
                         Call cp.core.handleExceptionAndRethrow(New ApplicationException("cp.html.form called with method=get can not contain an upload file (input type=file)"))
                     End If
                     If ActionQueryString = "" Then
-                        FormStart = cpCore.main_GetFormStart(, HtmlName, HtmlId, Method)
+                        FormStart = cpCore.html_GetFormStart(, HtmlName, HtmlId, Method)
                     Else
-                        FormStart = cpCore.main_GetFormStart(ActionQueryString, HtmlName, HtmlId, Method)
+                        FormStart = cpCore.html_GetFormStart(ActionQueryString, HtmlName, HtmlId, Method)
                     End If
 
                 Else
@@ -285,7 +285,7 @@ Namespace Contensive.Core
         Public Overrides Function InputText(ByVal HtmlName As String, Optional ByVal HtmlValue As String = "", Optional ByVal Height As String = "", Optional ByVal Width As String = "", Optional ByVal IsPassword As Boolean = False, Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Inherits BaseClasses.CPHtmlBaseClass.InputText
             Dim returnValue As String = ""
             If True Then
-                returnValue = cpCore.main_GetFormInputText2(HtmlName, HtmlValue, EncodeInteger(Height), EncodeInteger(Width), HtmlId, IsPassword, False, HtmlClass)
+                returnValue = cpCore.html_GetFormInputText2(HtmlName, HtmlValue, EncodeInteger(Height), EncodeInteger(Width), HtmlId, IsPassword, False, HtmlClass)
                 returnValue = returnValue.Replace(" SIZE=""60""", "")
             End If
             Return returnValue
@@ -305,7 +305,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function InputTextExpandable(ByVal HtmlName As String, Optional ByVal HtmlValue As String = "", Optional ByVal Rows As Integer = 0, Optional ByVal StyleWidth As String = "", Optional ByVal IsPassword As Boolean = False, Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Inherits BaseClasses.CPHtmlBaseClass.InputTextExpandable
             If True Then
-                Return cpCore.main_GetFormInputTextExpandable(HtmlName, HtmlValue, Rows, StyleWidth, HtmlId, IsPassword)
+                Return cpCore.html_GetFormInputTextExpandable(HtmlName, HtmlValue, Rows, StyleWidth, HtmlId, IsPassword)
             Else
                 Return ""
             End If

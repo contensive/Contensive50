@@ -312,7 +312,7 @@ ErrorTrap:
             ErrNumber = Err.Number
             ErrSource = Err.Source
             ErrDescription = Err.Description
-            cpCore.appendLog(getAppExeName() & ".ConfigClass." & MethodName & "[" & ErrorMessage & "]-[" & ErrSource & " #" & ErrNumber & ", " & ErrDescription & "]", "Monitor")
+            cpCore.log_appendLog(getAppExeName() & ".ConfigClass." & MethodName & "[" & ErrorMessage & "]-[" & ErrSource & " #" & ErrNumber & ", " & ErrDescription & "]", "Monitor")
             Err.Clear()
         End Sub
     End Class

@@ -303,7 +303,7 @@ Namespace Contensive.Core
                                 DataSourceType = cp.core.db.db_GetDataSourceType("default")
                                 '
                                 DefaultMemberName = ""
-                                PeopleCID = cp.core.metaData_GetContentID("people")
+                                PeopleCID = cp.core.metaData.getContentId("people")
                                 SQL = "select defaultvalue from ccfields where name='name' and contentid=(" & PeopleCID & ")"
                                 CS = cp.core.db.db_openCsSql_rev("default", SQL)
                                 If cp.core.db.db_csOk(CS) Then
@@ -742,9 +742,9 @@ ErrorTrap:
             TimeoutSave = cp.core.db.db_SQLCommandTimeout
             cp.core.db.db_SQLCommandTimeout = 1800
             '
-            SQLTablePeople = cp.core.metaData_GetContentTablename2("People")
-            SQLTableMemberRules = cp.core.metaData_GetContentTablename2("Member Rules")
-            SQLTableGroups = cp.core.metaData_GetContentTablename2("Groups")
+            SQLTablePeople = cp.core.metaData.getContentTablename("People")
+            SQLTableMemberRules = cp.core.metaData.getContentTablename("Member Rules")
+            SQLTableGroups = cp.core.metaData.getContentTablename("Groups")
             SQLDateMidnightTwoDaysAgo = cp.core.db.db_EncodeSQLDate(MidnightTwoDaysAgo)
             '
             ' Any member records that were created outside contensive need to have CreatedByVisit=0 (past v4.1.152)
@@ -1534,7 +1534,7 @@ ErrorTrap:
             '
             ' Content TextFile types with no controlling record
             '
-            If EncodeBoolean(cp.core.siteproperties.getText("ArchiveAllowFileClean", "false")) Then
+            If EncodeBoolean(cp.core.siteProperties.getText("ArchiveAllowFileClean", "false")) Then
                 '
                 Dim DSType As Integer
                 DSType = cp.core.db.db_GetDataSourceType("")
@@ -1736,7 +1736,7 @@ ErrorTrap:
             TimeoutSave = cp.core.db.db_SQLCommandTimeout
             cp.core.db.db_SQLCommandTimeout = 1800
             '
-            SQLTablePeople = cp.core.metaData_GetContentTablename2("People")
+            SQLTablePeople = cp.core.metaData.getContentTablename("People")
             'SQLTableMemberRules = cp.Core.csv_GetContentTablename("Member Rules")
             'SQLTableGroups = cp.Core.csv_GetContentTablename("Groups")
             '
@@ -1856,7 +1856,7 @@ ErrorTrap:
             TimeoutSave = cp.core.db.db_SQLCommandTimeout
             cp.core.db.db_SQLCommandTimeout = 1800
             '
-            SQLTablePeople = cp.core.metaData_GetContentTablename2("People")
+            SQLTablePeople = cp.core.metaData.getContentTablename("People")
             'SQLTableMemberRules = cp.Core.csv_GetContentTablename("Member Rules")
             'SQLTableGroups = cp.Core.csv_GetContentTablename("Groups")
             '
@@ -2778,7 +2778,7 @@ ErrorTrap:
                 '
                 Dim loadOK As Boolean = True
                 Try
-                    collectionFileFilename = cp.core.getAddonPath & "Collections.xml"
+                    collectionFileFilename = cp.core.addon_getPrivateFilesAddonPath & "Collections.xml"
                     Call Doc.LoadXml(collectionFileFilename)
                 Catch ex As Exception
                     'hint = hint & ",parse error"
@@ -2849,7 +2849,7 @@ ErrorTrap:
                                             '
                                         Else
                                             CollectionRootPath = Left(CollectionRootPath, Pos - 1)
-                                            Path = cp.core.getAddonPath() & "\" & CollectionRootPath & "\"
+                                            Path = cp.core.addon_getPrivateFilesAddonPath() & "\" & CollectionRootPath & "\"
                                             'Path = GetProgramPath & "\addons\" & CollectionRootPath & "\"
                                             'On Error Resume Next
                                             If cp.core.privateFiles.checkPath(Path) Then

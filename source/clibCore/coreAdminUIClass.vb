@@ -732,7 +732,7 @@ ErrorTrap:
         Public Function GetReportSortColumnPtr(ByVal DefaultSortColumnPtr As Integer) As Integer
             Dim VarText As String
             '
-            VarText = cpCore.doc_getText("ColPtr")
+            VarText = cpCore.docProperties.getText("ColPtr")
             GetReportSortColumnPtr = EncodeInteger(VarText)
             If (GetReportSortColumnPtr = 0) And (VarText <> "0") Then
                 GetReportSortColumnPtr = DefaultSortColumnPtr
@@ -755,12 +755,12 @@ ErrorTrap:
         Public Function GetReportSortType() As Integer
             Dim VarText As String
             '
-            VarText = cpCore.doc_getText("ColPtr")
+            VarText = cpCore.docProperties.getText("ColPtr")
             If (EncodeInteger(VarText) <> 0) Or (VarText = "0") Then
                 '
                 ' A valid ColPtr was found
                 '
-                GetReportSortType = cpCore.web_GetStreamInteger2("ColSort")
+                GetReportSortType = cpCore.docProperties.getInteger("ColSort")
             Else
                 GetReportSortType = SortingStateEnum.SortableSetAZ
             End If

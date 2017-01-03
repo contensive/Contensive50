@@ -305,11 +305,11 @@ Namespace Contensive.Core
 
 
         Public Overrides Sub AppendLog(ByVal Text As String, ByVal logFolder As String)
-            CP.core.appendLog(Text, logFolder)
+            CP.core.log_appendLog(Text, logFolder)
         End Sub
 
         Public Overrides Sub AppendLog(ByVal Text As String)
-            CP.core.appendLog(Text)
+            CP.core.log_appendLog(Text)
         End Sub
 
         Public Overrides Function ConvertLinkToShortLink(ByVal URL As String, ByVal ServerHost As String, ByVal ServerVirtualPath As String) As String

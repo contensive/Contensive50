@@ -587,7 +587,7 @@ Namespace Contensive
                     ' Attempting to start service, and it is still starting
                     '
                     StatusMessage = "Attempting a service start retry, but it is still starting"
-                    cpCore.appendLog(MethodName & ", " & StatusMessage)
+                    cpCore.log_appendLog(MethodName & ", " & StatusMessage)
                 Else
                     StartServiceInProgress = True
                     '
@@ -612,7 +612,7 @@ Namespace Contensive
                         ' ----- Kernelservices failed to initialize
                         '
                         StatusMessage = "Contensive Kernel Services failed to initialize."
-                        cpCore.appendLog(MethodName & ", " & StatusMessage)
+                        cpCore.log_appendLog(MethodName & ", " & StatusMessage)
                     Else
                         If False Then
                             'If KernelServices.HostServiceProcessID <> 0 Then
@@ -620,7 +620,7 @@ Namespace Contensive
                             ' ----- Already started by another HostService
                             '
                             StatusMessage = "Contensive Kernel Services is already running."
-                            cpCore.appendLog(MethodName & ", " & StatusMessage)
+                            cpCore.log_appendLog(MethodName & ", " & StatusMessage)
                         Else
                             '
                             ' No license is trial license
@@ -787,7 +787,7 @@ Namespace Contensive
                 Dim IsLocalRemote As Boolean
                 'Dim cp As CPClass = New CPClass(appName)
                 '
-                cpCore.appendLog("serverClass.executeServerCmd, method=[" & Method & "], queryString=[" & queryString & "]")
+                cpCore.log_appendLog("serverClass.executeServerCmd, method=[" & Method & "], queryString=[" & queryString & "]")
                 '
                 If Mid(Method, 1, 1) = "/" Then
                     Method = Mid(Method, 2)
@@ -801,13 +801,13 @@ Namespace Contensive
                     '
                     ' Bad username and password
                     '
-                    cpCore.appendLog("serverClass.executeServerCmd", "bad username/password.")
+                    cpCore.log_appendLog("serverClass.executeServerCmd", "bad username/password.")
                     returnString = "ERROR " & ccError_InvalidAuthentication
                 Else
                     '
                     ' authenticated
                     '
-                    cpCore.appendLog("serverClass.executeServerCmd, switch on method=[" & Method & "]")
+                    cpCore.log_appendLog("serverClass.executeServerCmd, switch on method=[" & Method & "]")
                     Select Case UCase(Method)
                         Case "CONNECT"
                             '
@@ -1034,7 +1034,7 @@ Namespace Contensive
                             '
                             ' ccCmd parse the command line with a "&". Quotes in the values need to be doubled
                             '
-                            cpCore.appendLog("serverClass.executeServerCmd, ccCMD method case")
+                            cpCore.log_appendLog("serverClass.executeServerCmd, ccCMD method case")
                             '
                             Cmd = Method
                             QSPairs = Split(queryString, "&")
@@ -1074,7 +1074,7 @@ Namespace Contensive
                                 Method = Method
                             End If
                             '
-                            cpCore.appendLog("serverClass.executeServerCmd, adding command to Queue [" & Cmd & "]")
+                            cpCore.log_appendLog("serverClass.executeServerCmd, adding command to Queue [" & Cmd & "]")
                             '
                             If Not addAsyncCmd(cpCore, Cmd, False) Then
                                 returnString = "Command was blocked because there are too many commands waiting, or this is a duplicate command."
@@ -1087,7 +1087,7 @@ Namespace Contensive
                         Case Else
                             returnString = "ERROR " & ccError_InvalidCommand & vbCrLf & "unknown command [" & Method & "]"
                             '
-                            cpCore.appendLog("serverClass.executeServerCmd, unknown cmd=[" & Cmd & "]")
+                            cpCore.log_appendLog("serverClass.executeServerCmd, unknown cmd=[" & Cmd & "]")
                             '
                     End Select
                 End If
@@ -1340,7 +1340,7 @@ Namespace Contensive
                 Dim Ptr As Integer
                 Dim LcaseCommand As String
                 '
-                cpCore.appendLog("serverClass.addAsyncCmd, command=[" & Command & "], BlockDuplicates=[" & BlockDuplicates & "]")
+                cpCore.log_appendLog("serverClass.addAsyncCmd, command=[" & Command & "], BlockDuplicates=[" & BlockDuplicates & "]")
                 '
                 returnBoolean = True
                 LcaseCommand = LCase(Command)
@@ -1349,7 +1349,7 @@ Namespace Contensive
                     ' Server Queue is too large, block the add
                     '
                     returnBoolean = False
-                    cpCore.appendLog("addAsyncCmd, Server Cmd was blocked because Server Queue is too long [" & asyncCmdQueueCnt & "], command was [" & Command & "]")
+                    cpCore.log_appendLog("addAsyncCmd, Server Cmd was blocked because Server Queue is too long [" & asyncCmdQueueCnt & "], command was [" & Command & "]")
                 ElseIf BlockDuplicates Then
                     '
                     ' Search for a duplicate
@@ -1357,7 +1357,7 @@ Namespace Contensive
                     For Ptr = 0 To asyncCmdQueueCnt - 1
                         If LCase(asyncCmdQueue(Ptr)) = LcaseCommand Then
                             returnBoolean = False
-                            cpCore.appendLog("addAsyncCmd, Server Cmd was blocked because there is a duplicate in the queue already, [" & Command & "]")
+                            cpCore.log_appendLog("addAsyncCmd, Server Cmd was blocked because there is a duplicate in the queue already, [" & Command & "]")
                             Exit For
                         End If
                     Next
@@ -1373,12 +1373,12 @@ Namespace Contensive
                     asyncCmdQueue(asyncCmdQueueCnt) = Command
                     asyncCmdQueueCnt = asyncCmdQueueCnt + 1
                     '
-                    cpCore.appendLog("serverClass.addAsyncCmd, command added to ServerCmds, index=[" & asyncCmdQueueCnt & "], call runProcess...")
+                    cpCore.log_appendLog("serverClass.addAsyncCmd, command added to ServerCmds, index=[" & asyncCmdQueueCnt & "], call runProcess...")
                     '
                     Call runProcess(cpCore, getProgramFilesPath() & "\ccCmd.exe", "port=" & serverListenerPort & " max=" & maxCmdInstances)
                 End If
                 '
-                cpCore.appendLog("serverClass.addAsyncCmd, exit")
+                cpCore.log_appendLog("serverClass.addAsyncCmd, exit")
                 '
             Catch ex As Exception
                 Call handleExceptionResume(ex, "addAsyncCmd", "ErrorTrap")
@@ -1492,7 +1492,7 @@ Namespace Contensive
         End Sub
         '
         Private Sub appendTraceLog(ByVal method As String, ByVal logText As String)
-            cpCore.appendLog(logText, "", "trace")
+            cpCore.log_appendLog(logText, "", "trace")
         End Sub
 #Region " IDisposable Support "
         ' Do not change or add Overridable to these methods.

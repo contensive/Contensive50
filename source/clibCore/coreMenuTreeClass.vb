@@ -269,7 +269,7 @@ ErrorTrap:
         ' Temp log file solution
         '
         Private Sub AppendLog(ByVal Message As String)
-            cpCore.appendLog(Message, "menuing")
+            cpCore.log_appendLog(Message, "menuing")
         End Sub
         '
         '===============================================================================

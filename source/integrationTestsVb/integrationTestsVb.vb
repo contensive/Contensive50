@@ -182,10 +182,6 @@ Namespace integrationTests
                 cp.Content.DeleteRecords("layouts", "id=" & recordId)
             End Try
         End Sub
-        ''
-        '<Fact> Public Sub mynewtest()
-        '    Assert.Equal("asdf", "wert")
-        'End Sub
         '
         '====================================================================================================
         ' unit test - cp.blockNew
@@ -210,5 +206,9 @@ Namespace integrationTests
             '
             cpApp.Dispose()
         End Sub
+        '
     End Class
+    'Public Class cpBlockTests
+
+    'End Class
 End Namespace

@@ -2550,7 +2550,7 @@ Namespace Contensive.Core
         '===========================================================================
         '
         Private Sub handleClassException(ByVal ex As Exception, ByVal ApplicationName As String, ByVal MethodName As String)
-            cpCore.appendLog("exception in builderClass." & MethodName & ", application [" & ApplicationName & "], ex [" & ex.ToString & "]")
+            cpCore.log_appendLog("exception in builderClass." & MethodName & ", application [" & ApplicationName & "], ex [" & ex.ToString & "]")
         End Sub
         '
         '===========================================================================
@@ -2585,7 +2585,7 @@ Namespace Contensive.Core
         '
         Private Sub appendUpgradeLog(ByVal message As String)
             Console.WriteLine("upgrade: " & message)
-            cpCore.appendLog(message, "Upgrade")
+            cpCore.log_appendLog(message, "Upgrade")
         End Sub
         ''
         ''=============================================================================

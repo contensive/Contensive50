@@ -201,7 +201,7 @@ Namespace Contensive.Core
             Dim Stream As New coreFastStringClass
             Dim Adminui As New coreAdminUIClass(cpCore)
             '
-            Button = cpCore.doc_getText("Button")
+            Button = cpCore.docProperties.getText("Button")
             If (Button = ButtonCancelAll) Then
                 '
                 ' Cancel to the admin site
@@ -219,12 +219,12 @@ Namespace Contensive.Core
                 GetForm = Adminui.GetBody("Admin Tools", ButtonCancelAll, "", False, False, "<div>Administration Tools</div>", "", 0, GetForm)
             Else
                 ToolsAction = cpCore.doc_getInteger("dta")
-                Button = cpCore.doc_getText("Button")
+                Button = cpCore.docProperties.getText("Button")
                 AdminFormTool = cpCore.doc_getInteger(RequestNameAdminForm)
-                ToolsTable = cpCore.doc_getText("dtt")
-                ToolsContentName = cpCore.doc_getText("ContentName")
-                ToolsQuery = cpCore.doc_getText("dtq")
-                ToolsDataSource = cpCore.doc_getText("dtds")
+                ToolsTable = cpCore.docProperties.getText("dtt")
+                ToolsContentName = cpCore.docProperties.getText("ContentName")
+                ToolsQuery = cpCore.docProperties.getText("dtq")
+                ToolsDataSource = cpCore.docProperties.getText("dtds")
                 MenuEntryID = cpCore.doc_getInteger("dtei")
                 MenuHeaderID = cpCore.doc_getInteger("dthi")
                 MenuDirection = cpCore.doc_getInteger("dtmd")
@@ -416,7 +416,7 @@ ErrorTrap:
             '   process the button if present
             '
             If Button = ButtonCreateFields Then
-                ContentName = cpCore.doc_getText("ContentName")
+                ContentName = cpCore.docProperties.getText("ContentName")
                 If (ContentName = "") Then
                     Stream.Add("Select a content before submitting. Fields were not changed.")
                 Else
@@ -498,7 +498,7 @@ ErrorTrap:
             ButtonList = ButtonCancel & "," & ButtonSelect
             '
             ContentID = cpCore.doc_getInteger("" & RequestNameToolContentID & "")
-            ToolButton = cpCore.doc_getText("Button")
+            ToolButton = cpCore.docProperties.getText("Button")
             ReloadCDef = cpCore.doc_getBoolean("ReloadCDef")
             ContentName = Local_GetContentNameByID(ContentID)
             TableName = Local_GetContentTableName(ContentName)
@@ -520,7 +520,7 @@ ErrorTrap:
                     If RecordCount > 0 Then
                         For RecordPointer = 0 To RecordCount - 1
                             '
-                            formFieldName = cpCore.doc_getText("dtfaName." & RecordPointer)
+                            formFieldName = cpCore.docProperties.getText("dtfaName." & RecordPointer)
                             formFieldTypeId = cpCore.doc_getInteger("dtfaType." & RecordPointer)
                             formFieldId = EncodeInteger(cpCore.doc_getInteger("dtfaID." & RecordPointer))
                             formFieldInherited = cpCore.doc_getBoolean("dtfaInherited." & RecordPointer)
@@ -593,7 +593,7 @@ ErrorTrap:
                                                     '
                                                     ErrorMessage &= "<LI>Field [" & formFieldName & "] changed type from [" & cpCore.main_GetRecordName("content Field Types", .fieldTypeId) & "] to [" & cpCore.main_GetRecordName("content Field Types", formFieldTypeId) & "]. This may have caused a problem converting content.</LI>"
                                                     Dim DataSourceTypeID As Integer
-                                                    DataSourceTypeID = cpCore.main_GetDataSourceType(DataSourceName)
+                                                    DataSourceTypeID = cpCore.db.db_GetDataSourceType(DataSourceName)
                                                     Select Case DataSourceTypeID
                                                         Case DataSourceTypeODBCMySQL
                                                             SQL = "alter table " & CDef.ContentTableName & " change " & .nameLc & " " & .nameLc & " " & cpCore.db_GetSQLAlterColumnType(DataSourceName, formFieldTypeId) & ";"
@@ -605,8 +605,8 @@ ErrorTrap:
                                                 SQL = "Update ccFields" _
                                                 & " Set name=" & cpCore.db.encodeSQLText(formFieldName) _
                                                 & ",type=" & formFieldTypeId _
-                                                & ",caption=" & cpCore.db.encodeSQLText(cpCore.doc_getText("dtfaCaption." & RecordPointer)) _
-                                                & ",DefaultValue=" & cpCore.db.encodeSQLText(cpCore.doc_getText("dtfaDefaultValue." & RecordPointer)) _
+                                                & ",caption=" & cpCore.db.encodeSQLText(cpCore.docProperties.getText("dtfaCaption." & RecordPointer)) _
+                                                & ",DefaultValue=" & cpCore.db.encodeSQLText(cpCore.docProperties.getText("dtfaDefaultValue." & RecordPointer)) _
                                                 & ",EditSortPriority=" & cpCore.db.encodeSQLText(EncodeText(cpCore.doc_getInteger("dtfaEditSortPriority." & RecordPointer))) _
                                                 & ",Active=" & cpCore.db.db_EncodeSQLBoolean(cpCore.doc_getBoolean("dtfaActive." & RecordPointer)) _
                                                 & ",ReadOnly=" & cpCore.db.db_EncodeSQLBoolean(cpCore.doc_getBoolean("dtfaReadOnly." & RecordPointer)) _
@@ -616,7 +616,7 @@ ErrorTrap:
                                                 & ",TextBuffered=" & cpCore.db.db_EncodeSQLBoolean(cpCore.doc_getBoolean("dtfaTextBuffered." & RecordPointer)) _
                                                 & ",Password=" & cpCore.db.db_EncodeSQLBoolean(cpCore.doc_getBoolean("dtfaPassword." & RecordPointer)) _
                                                 & ",HTMLContent=" & cpCore.db.db_EncodeSQLBoolean(cpCore.doc_getBoolean("dtfaHTMLContent." & RecordPointer)) _
-                                                & ",EditTab=" & cpCore.db.encodeSQLText(cpCore.doc_getText("dtfaEditTab." & RecordPointer)) _
+                                                & ",EditTab=" & cpCore.db.encodeSQLText(cpCore.docProperties.getText("dtfaEditTab." & RecordPointer)) _
                                                 & ",Scramble=" & cpCore.db.db_EncodeSQLBoolean(cpCore.doc_getBoolean("dtfaScramble." & RecordPointer)) _
                                                 & ""
                                                 If cpCore.user.user_isAdmin Then
@@ -754,7 +754,7 @@ ErrorTrap:
                     AllowCDefInherit = False
                 Else
                     AllowCDefInherit = True
-                    ParentContentName = cpCore.main_GetContentNameByID(ParentContentID)
+                    ParentContentName = cpCore.metaData.getContentNameByID(ParentContentID)
                     ParentCDef = cpCore.metaData.getCdef(ParentContentID, True, True)
                 End If
                 If CDef.fields.Count > 0 Then
@@ -890,7 +890,7 @@ ErrorTrap:
                             ElseIf FieldLocked Then
                                 Call streamRow.Add(SpanClassAdminSmall & .nameLc & "&nbsp;</SPAN><input type=hidden name=dtfaName." & RecordCount & " value=""" & .nameLc & """>")
                             Else
-                                Call streamRow.Add(cpCore.main_GetFormInputText2("dtfaName." & RecordCount, .nameLc, 1, 10))
+                                Call streamRow.Add(cpCore.html_GetFormInputText2("dtfaName." & RecordCount, .nameLc, 1, 10))
                             End If
                             streamRow.Add("</nobr></td>")
                             '
@@ -900,7 +900,7 @@ ErrorTrap:
                             If .inherited Then
                                 Call streamRow.Add(SpanClassAdminSmall & .caption & "</SPAN>")
                             Else
-                                Call streamRow.Add(cpCore.main_GetFormInputText2("dtfaCaption." & RecordCount, .caption, 1, 10))
+                                Call streamRow.Add(cpCore.html_GetFormInputText2("dtfaCaption." & RecordCount, .caption, 1, 10))
                             End If
                             streamRow.Add("</nobr></td>")
                             '
@@ -910,7 +910,7 @@ ErrorTrap:
                             If .inherited Then
                                 Call streamRow.Add(SpanClassAdminSmall & .editTabName & "</SPAN>")
                             Else
-                                Call streamRow.Add(cpCore.main_GetFormInputText2("dtfaEditTab." & RecordCount, .editTabName, 1, 10))
+                                Call streamRow.Add(cpCore.html_GetFormInputText2("dtfaEditTab." & RecordCount, .editTabName, 1, 10))
                             End If
                             streamRow.Add("</nobr></td>")
                             '
@@ -920,7 +920,7 @@ ErrorTrap:
                             If .inherited Then
                                 Call streamRow.Add(SpanClassAdminSmall & EncodeText(.defaultValue) & "</SPAN>")
                             Else
-                                Call streamRow.Add(cpCore.main_GetFormInputText2("dtfaDefaultValue." & RecordCount, EncodeText(.defaultValue), 1, 10))
+                                Call streamRow.Add(cpCore.html_GetFormInputText2("dtfaDefaultValue." & RecordCount, EncodeText(.defaultValue), 1, 10))
                             End If
                             streamRow.Add("</nobr></td>")
                             '
@@ -952,7 +952,7 @@ ErrorTrap:
                             If .inherited Then
                                 Call streamRow.Add(SpanClassAdminSmall & .editSortPriority & "</SPAN>")
                             Else
-                                Call streamRow.Add(cpCore.main_GetFormInputText2("dtfaEditSortPriority." & RecordCount, .editSortPriority.ToString(), 1, 10))
+                                Call streamRow.Add(cpCore.html_GetFormInputText2("dtfaEditSortPriority." & RecordCount, .editSortPriority.ToString(), 1, 10))
                             End If
                             streamRow.Add("</nobr></td>")
                             '
@@ -1048,7 +1048,7 @@ ErrorTrap:
                 Call Stream.Add(cpCore.main_GetPanel(FormPanel))
             End If
             '
-            Call Stream.Add(cpCore.main_GetFormInputHidden("ReloadCDef", ReloadCDef))
+            Call Stream.Add(cpCore.html_GetFormInputHidden("ReloadCDef", ReloadCDef))
             GetForm_ConfigureEdit = OpenFormTable(ButtonList) & Stream.Text & CloseFormTable(ButtonList)
             '
             Exit Function
@@ -1217,18 +1217,18 @@ ErrorTrap:
                     PageNumber = 1
                 End If
                 '
-                If (cpCore.doc_getText("button")) = ButtonRun Then
+                If (cpCore.docProperties.getText("button")) = ButtonRun Then
                     DataSourceID = cpCore.doc_getInteger("DataSourceID")
                     DataSourceName = ""
                     If DataSourceID <> 0 Then
-                        DataSourceName = cpCore.main_GetDataSourceByID(DataSourceID)
+                        DataSourceName = cpCore.db.getDataSourceNameByID(DataSourceID)
                     End If
                     If DataSourceName = "" Then
                         DataSourceName = "default"
                     End If
-                    SQL = cpCore.doc_getText("SQL")
+                    SQL = cpCore.docProperties.getText("SQL")
                     If SQL = "" Then
-                        SQL = cpCore.doc_getText("SQLList")
+                        SQL = cpCore.docProperties.getText("SQLList")
                     End If
                     '
                     ' Add this SQL to the members SQL list
@@ -1358,17 +1358,17 @@ ErrorTrap:
                 If IsNull(PageSize) Then
                     PageSize = 100
                 End If
-                Call Stream.Add("<br>Page Size:<br>" & cpCore.main_GetFormInputText("PageSize", PageSize.ToString()))
+                Call Stream.Add("<br>Page Size:<br>" & cpCore.html_GetFormInputText("PageSize", PageSize.ToString()))
                 '
                 If IsNull(PageNumber) Then
                     PageNumber = 1
                 End If
-                Call Stream.Add("<br>Page Number:<br>" & cpCore.main_GetFormInputText("PageNumber", PageNumber.ToString()))
+                Call Stream.Add("<br>Page Number:<br>" & cpCore.html_GetFormInputText("PageNumber", PageNumber.ToString()))
                 '
                 If IsNull(Timeout) Then
                     Timeout = 30
                 End If
-                Call Stream.Add("<br>Timeout (sec):<br>" & cpCore.main_GetFormInputText("Timeout", Timeout.ToString()))
+                Call Stream.Add("<br>Timeout (sec):<br>" & cpCore.html_GetFormInputText("Timeout", Timeout.ToString()))
                 '
                 'Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolManualQuery))
                 'Stream.Add( cpCore.main_GetFormEnd & "</SPAN>")
@@ -1408,14 +1408,14 @@ ErrorTrap:
             '
             '   print out the submit form
             '
-            If (cpCore.doc_getText("Button") <> "") Then
+            If (cpCore.docProperties.getText("Button") <> "") Then
                 '
                 ' Process input
                 '
                 DataSourceID = cpCore.doc_getInteger("DataSourceID")
-                DataSourceName = cpCore.main_GetDataSourceByID(DataSourceID)
-                ContentName = cpCore.doc_getText("ContentName")
-                TableName = cpCore.doc_getText("TableName")
+                DataSourceName = cpCore.db.getDataSourceNameByID(DataSourceID)
+                ContentName = cpCore.docProperties.getText("ContentName")
+                TableName = cpCore.docProperties.getText("TableName")
                 '
                 Call Stream.Add(SpanClassAdminSmall)
                 Stream.Add("<P>Creating content [" & ContentName & "] on table [" & TableName & "] on Datasource [" & DataSourceName & "].</P>")
@@ -1460,10 +1460,10 @@ ErrorTrap:
             Call Stream.Add(cpCore.main_GetFormInputSelect("DataSourceID", DataSourceID, "Data Sources", "", "Default"))
             Call Stream.Add("<br><br>")
             Call Stream.Add("Content Name<br>")
-            Call Stream.Add(cpCore.main_GetFormInputText2("ContentName", ContentName, 1, 40))
+            Call Stream.Add(cpCore.html_GetFormInputText2("ContentName", ContentName, 1, 40))
             Call Stream.Add("<br><br>")
             Call Stream.Add("Table Name<br>")
-            Call Stream.Add(cpCore.main_GetFormInputText2("TableName", TableName, 1, 40))
+            Call Stream.Add(cpCore.html_GetFormInputText2("TableName", TableName, 1, 40))
             Call Stream.Add("<br><br>")
             'Call Stream.Add(cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolCreateContentDefinition))
             Call Stream.Add("</SPAN>")
@@ -1576,7 +1576,7 @@ ErrorTrap:
             TargetFieldID = cpCore.doc_getInteger("fi")
             ContentID = cpCore.doc_getInteger(RequestNameToolContentID)
             'ColumnPointer = cpCore.main_GetStreamInteger("dtcn")
-            FieldNameToAdd = UCase(cpCore.doc_getText(RequestNameAddField))
+            FieldNameToAdd = UCase(cpCore.docProperties.getText(RequestNameAddField))
             FieldIDToAdd = cpCore.doc_getInteger(RequestNameAddFieldID)
             ButtonList = ButtonCancel & "," & ButtonSelect
             ReloadCDef = cpCore.doc_getBoolean("ReloadCDef")
@@ -2109,7 +2109,7 @@ ErrorTrap:
             Call Stream.Add(cpCore.main_GetPanel(FormPanel))
             '
             Call cpCore.siteProperties.setProperty("AllowContentAutoLoad", AllowContentAutoLoad)
-            Stream.Add(cpCore.main_GetFormInputHidden("ReloadCDef", ReloadCDef))
+            Stream.Add(cpCore.html_GetFormInputHidden("ReloadCDef", ReloadCDef))
 
             GetForm_ConfigureListing = OpenFormTable(ButtonList) & Stream.Text & CloseFormTable(ButtonList)
             '
@@ -2189,7 +2189,7 @@ ErrorTrap:
             Call Stream.Add(SpanClassAdminNormal & "<br>")
             '
             iDiagActionCount = cpCore.doc_getInteger("DiagActionCount")
-            Button = cpCore.doc_getText("Button")
+            Button = cpCore.docProperties.getText("Button")
             If (iDiagActionCount <> 0) And ((Button = ButtonFix) Or (Button = ButtonFixAndRun)) Then
                 '
                 '-----------------------------------------------------------------------------------------------
@@ -2198,7 +2198,7 @@ ErrorTrap:
                 '
                 Stream.Add("<br>")
                 For DiagActionPointer = 0 To iDiagActionCount
-                    DiagAction = cpCore.doc_getText("DiagAction" & DiagActionPointer)
+                    DiagAction = cpCore.docProperties.getText("DiagAction" & DiagActionPointer)
                     Stream.Add("Perform Action " & DiagActionPointer & " - " & DiagAction & "<br>")
                     Select Case EncodeInteger(DiagArgument(DiagAction, 0))
                         Case DiagActionSetFieldType
@@ -2707,13 +2707,13 @@ ErrorTrap:
             '
             '   print out the submit form
             '
-            If (cpCore.doc_getText("Button") <> "") Then
+            If (cpCore.docProperties.getText("Button") <> "") Then
                 '
                 ' Process input
                 '
                 ParentContentID = cpCore.doc_getInteger("ParentContentID")
                 ParentContentName = Local_GetContentNameByID(ParentContentID)
-                ChildContentName = cpCore.doc_getText("ChildContentName")
+                ChildContentName = cpCore.docProperties.getText("ChildContentName")
                 AddAdminMenuEntry = cpCore.doc_getBoolean("AddAdminMenuEntry")
                 '
                 Call Stream.Add(SpanClassAdminSmall)
@@ -2758,7 +2758,7 @@ ErrorTrap:
             Call Stream.Add("<br><br>")
             '
             Call Stream.Add("Child Content Name<br>")
-            Stream.Add(cpCore.main_GetFormInputText2("ChildContentName", ChildContentName, 1, 40))
+            Stream.Add(cpCore.html_GetFormInputText2("ChildContentName", ChildContentName, 1, 40))
             Call Stream.Add("<br><br>")
             '
             Call Stream.Add("Add Admin Menu Entry under Parent's Menu Entry<br>")
@@ -2793,7 +2793,7 @@ ErrorTrap:
             Call Stream.Add(SpanClassAdminNormal)
             Stream.Add(GetTitle("Clear ContentWatch Links", "This tools nulls the Links field of all Content Watch records. After running this tool, run the diagnostic spider to repopulate the links."))
             '
-            If (cpCore.doc_getText("Button") <> "") Then
+            If (cpCore.docProperties.getText("Button") <> "") Then
                 '
                 ' Process input
                 '
@@ -2838,7 +2838,7 @@ ErrorTrap:
                 '
                 Stream.Add(GetTitle("Synchronize Tables to Content Definitions", "This tools goes through all Content Definitions and creates any necessary Tables and Table Fields to support the Definition."))
                 '
-                If (cpCore.doc_getText("Button") <> "") Then
+                If (cpCore.docProperties.getText("Button") <> "") Then
                     '
                     '   Run Tools
                     '
@@ -2983,7 +2983,7 @@ ErrorTrap:
             '
             Stream.Add(GetTitle("Benchmark", "Run a series of data operations and compare the results to previous known values."))
             '
-            If (cpCore.doc_getText("Button") <> "") Then
+            If (cpCore.docProperties.getText("Button") <> "") Then
                 '
                 '   Run Tools
                 '
@@ -3279,7 +3279,7 @@ ErrorTrap:
             Stream.Add(GetTitle("Query Database Schema", "This tool examines the database schema for all tables available."))
             '
             StatusOK = True
-            If (cpCore.doc_getText("button")) <> ButtonRun Then
+            If (cpCore.docProperties.getText("button")) <> ButtonRun Then
                 '
                 ' First pass, initialize
                 '
@@ -3290,9 +3290,9 @@ ErrorTrap:
                 '
                 ' Read in arguments
                 '
-                TableName = cpCore.doc_getText("TableName")
+                TableName = cpCore.docProperties.getText("TableName")
                 DataSourceID = cpCore.doc_getInteger("DataSourceID")
-                DataSourceName = cpCore.main_GetDataSourceByID(DataSourceID)
+                DataSourceName = cpCore.db.getDataSourceNameByID(DataSourceID)
                 '
                 ' Run the SQL
                 '
@@ -3516,7 +3516,7 @@ ErrorTrap:
             '
             Call Stream.Add("<br>")
             Call Stream.Add("Table Name<br>")
-            Stream.Add(cpCore.main_GetFormInputText("Tablename", TableName))
+            Stream.Add(cpCore.html_GetFormInputText("Tablename", TableName))
             '
             Call Stream.Add("<br><br>")
             Call Stream.Add("Data Source<br>")
@@ -3582,7 +3582,7 @@ ErrorTrap:
             '
             ' Process Input
             '
-            Button = cpCore.doc_getText("Button")
+            Button = cpCore.docProperties.getText("Button")
             TableID = cpCore.doc_getInteger("TableID")
             '
             ' Get Tablename and DataSource
@@ -3602,7 +3602,7 @@ ErrorTrap:
                 If Count > 0 Then
                     For Pointer = 0 To Count - 1
                         If cpCore.doc_getBoolean("DropIndex." & Pointer) Then
-                            IndexName = cpCore.doc_getText("DropIndexName." & Pointer)
+                            IndexName = cpCore.docProperties.getText("DropIndexName." & Pointer)
                             GetForm_DbIndex = GetForm_DbIndex & "<br>Dropping index [" & IndexName & "] from table [" & TableName & "]"
                             Call cpCore.db.db_deleteSqlIndex("Default", TableName, IndexName)
                         End If
@@ -3616,7 +3616,7 @@ ErrorTrap:
                     For Pointer = 0 To Count - 1
                         If cpCore.doc_getBoolean("AddIndex." & Pointer) Then
                             'IndexName = cpCore.main_GetStreamText2("AddIndexFieldName." & Pointer)
-                            FieldName = cpCore.doc_getText("AddIndexFieldName." & Pointer)
+                            FieldName = cpCore.docProperties.getText("AddIndexFieldName." & Pointer)
                             IndexName = TableName & FieldName
                             GetForm_DbIndex = GetForm_DbIndex & "<br>Adding index [" & IndexName & "] to table [" & TableName & "] for field [" & FieldName & "]"
                             Call cpCore.db.db_CreateSQLIndex(DataSource, TableName, IndexName, FieldName)
@@ -3625,7 +3625,7 @@ ErrorTrap:
                 End If
             End If
             '
-            GetForm_DbIndex = GetForm_DbIndex & cpCore.main_GetFormStart
+            GetForm_DbIndex = GetForm_DbIndex & cpCore.html_GetFormStart
             TableColSpan = 3
             GetForm_DbIndex = GetForm_DbIndex & StartTable(2, 0, 0)
             '
@@ -3879,7 +3879,7 @@ ErrorTrap:
             '
             ' CurrentPath is what is concatinated on to StartPath to get the current folder, it must start with a slash
             '
-            CurrentPath = cpCore.doc_getText("SetPath")
+            CurrentPath = cpCore.docProperties.getText("SetPath")
             If CurrentPath = "" Then
                 CurrentPath = "\"
             ElseIf Left(CurrentPath, 1) <> "\" Then
@@ -3896,13 +3896,13 @@ ErrorTrap:
             End If
             '
             '
-            If cpCore.doc_getText("SourceFile") <> "" Then
+            If cpCore.docProperties.getText("SourceFile") <> "" Then
                 '
                 ' Return the content of the file
                 '
 
                 Call cpCore.web_setResponseContentType("text/text")
-                Call cpCore.writeAltBuffer(cpCore.appRootFiles.ReadFile(cpCore.doc_getText("SourceFile")))
+                Call cpCore.writeAltBuffer(cpCore.appRootFiles.ReadFile(cpCore.docProperties.getText("SourceFile")))
                 Call cpCore.main_CloseStream()
                 'GetForm_LogFiles_Details = cpCore.app.publicFiles.ReadFile(cpCore.main_GetStreamText2("SourceFile"))
             Else
@@ -4012,7 +4012,7 @@ ErrorTrap:
             ButtonList = ButtonCancel & "," & ButtonSaveandInvalidateCache
             Stream.Add(GetTitle("Load Content Definitions", "This tool reloads the content definitions. This is necessary when changes are made to the ccContent or ccFields tables outside Contensive. The site will be blocked during the load."))
             '
-            If (cpCore.doc_getText("button")) <> ButtonSaveandInvalidateCache Then
+            If (cpCore.docProperties.getText("button")) <> ButtonSaveandInvalidateCache Then
                 '
                 ' First pass, initialize
                 '
@@ -4061,7 +4061,7 @@ ErrorTrap:
                 '
                 GetForm_Restart = "<P>You must be an administrator to use this tool.</P>"
                 '
-            ElseIf (cpCore.doc_getText("button")) <> ButtonRestartContensiveApplication Then
+            ElseIf (cpCore.docProperties.getText("button")) <> ButtonRestartContensiveApplication Then
                 '
                 ' First pass, initialize
                 '
@@ -4165,7 +4165,7 @@ ErrorTrap:
         '
         '
         Function OpenFormTable(ByVal ButtonList As String) As String
-            OpenFormTable = OpenFormTable & cpCore.main_GetFormStart()
+            OpenFormTable = OpenFormTable & cpCore.html_GetFormStart()
             If ButtonList <> "" Then
                 OpenFormTable = OpenFormTable & cpCore.main_GetPanelButtons(ButtonList, "Button")
             End If
@@ -4228,7 +4228,7 @@ ErrorTrap:
             '
             Stream.Add(GetTitle("Load Templates", "This tool creates template records from the HTML files in the root folder of the site."))
             '
-            If (cpCore.doc_getText("button")) <> ButtonImportTemplates Then
+            If (cpCore.docProperties.getText("button")) <> ButtonImportTemplates Then
                 '
                 ' First pass, initialize
                 '
@@ -4427,7 +4427,7 @@ ErrorTrap:
                 '
                 ParentID = cpCore.db.db_GetCSInteger(CSContent, "parentID")
                 If ParentID <> 0 Then
-                    ParentContentName = cpCore.main_GetContentNameByID(ParentID)
+                    ParentContentName = cpCore.metaData.getContentNameByID(ParentID)
                     If ParentContentName <> "" Then
                         LoadCDef = LoadCDef(ParentContentName)
                     End If
@@ -4657,7 +4657,7 @@ ErrorTrap:
             '
             ' Process the form
             '
-            Button = cpCore.doc_getText("button")
+            Button = cpCore.docProperties.getText("button")
             '
             IsDeveloper = cpCore.user.user_isDeveloper()
             If Button = ButtonFindAndReplace Then
@@ -4665,7 +4665,7 @@ ErrorTrap:
                 If RowCnt > 0 Then
                     For RowPtr = 0 To RowCnt - 1
                         If cpCore.doc_getBoolean("Cdef" & RowPtr) Then
-                            lcName = LCase(cpCore.doc_getText("CDefName" & RowPtr))
+                            lcName = LCase(cpCore.docProperties.getText("CDefName" & RowPtr))
                             If IsDeveloper Or (lcName = "page content") Or (lcName = "copy content") Or (lcName = "page templates") Then
                                 CDefList = CDefList & "," & lcName
                             End If
@@ -4675,8 +4675,8 @@ ErrorTrap:
                         CDefList = Mid(CDefList, 2)
                     End If
                     'CDefList = cpCore.main_GetStreamText2("CDefList")
-                    FindText = cpCore.doc_getText("FindText")
-                    ReplaceText = cpCore.doc_getText("ReplaceText")
+                    FindText = cpCore.docProperties.getText("FindText")
+                    ReplaceText = cpCore.docProperties.getText("ReplaceText")
                     'runAtServer.ipAddress = "127.0.0.1"
                     'runAtServer.port = "4531"
                     QS = "app=" & encodeNvaArgument(cpCore.appConfig.name) & "&FindText=" & encodeNvaArgument(FindText) & "&ReplaceText=" & encodeNvaArgument(ReplaceText) & "&CDefNameList=" & encodeNvaArgument(CDefList)
@@ -4768,7 +4768,7 @@ ErrorTrap:
             '
             ' Process the form
             '
-            Button = cpCore.doc_getText("button")
+            Button = cpCore.docProperties.getText("button")
             '
             If Button = ButtonIISReset Then
                 '
@@ -4820,11 +4820,11 @@ ErrorTrap:
             '
             ' Process the form
             '
-            Button = cpCore.doc_getText("button")
+            Button = cpCore.docProperties.getText("button")
             '
             'If Button = ButtonCreateGUID Then
             'GUIDGenerator = New guidClass
-            Call s.Add(cpCore.main_GetFormInputText2("GUID", Guid.NewGuid().ToString, 1, 80))
+            Call s.Add(cpCore.html_GetFormInputText2("GUID", Guid.NewGuid().ToString, 1, 80))
             'Call s.Add("<span style=""border:inset; padding:4px; background-color:white;"">" & Guid.NewGuid.ToString() & "</span>")
             'End If
             '

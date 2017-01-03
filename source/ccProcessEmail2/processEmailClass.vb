@@ -194,9 +194,9 @@ ErrorTrap:
             CSEmail = cpCore.db.db_csOpen("Email", Criteria, , , , , , FieldList)
             If cpCore.db.db_csOk(CSEmail) Then
                 '
-                SQLTablePeople = cpCore.metaData_GetContentTablename2("People")
-                SQLTableMemberRules = cpCore.metaData_GetContentTablename2("Member Rules")
-                SQLTableGroups = cpCore.metaData_GetContentTablename2("Groups")
+                SQLTablePeople = cpCore.metaData.getContentTablename("People")
+                SQLTableMemberRules = cpCore.metaData.getContentTablename("Member Rules")
+                SQLTableGroups = cpCore.metaData.getContentTablename("Groups")
                 BounceAddress = cpCore.siteProperties.getText("EmailBounceAddress", "")
                 siteStyles = cpCore.csv_getStyleSheetProcessed()
                 '
@@ -384,9 +384,9 @@ ErrorTrap:
             Dim sqlDateTest As String
             '
             dataSourceType = cpCore.db.db_GetDataSourceType("default")
-            SQLTablePeople = cpCore.metaData_GetContentTablename2("People")
-            SQLTableMemberRules = cpCore.metaData_GetContentTablename2("Member Rules")
-            SQLTableGroups = cpCore.metaData_GetContentTablename2("Groups")
+            SQLTablePeople = cpCore.metaData.getContentTablename("People")
+            SQLTableMemberRules = cpCore.metaData.getContentTablename("Member Rules")
+            SQLTableGroups = cpCore.metaData.getContentTablename("Groups")
             BounceAddress = cpCore.siteProperties.getText("EmailBounceAddress", "")
             siteStyles = cpCore.csv_getStyleSheetProcessed()
             '

@@ -204,11 +204,14 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="coreAddonCacheClass.vb" />
     <Compile Include="coreCacheClass.vb" />
+    <Compile Include="coreDocPropertiesClass.vb" />
+    <Compile Include="coreDomainsClass.vb" />
     <Compile Include="coreEncodeBase64Class.vb" />
     <Compile Include="coreSitePropertiesClass.vb" />
     <Compile Include="coreUserClass.vb" />
-    <Compile Include="coreWebClass.vb" />
+    <Compile Include="coreWebServerClass.vb" />
     <Compile Include="coreMetaDataClass.vb" />
     <Compile Include="coreCacheKeyPtrClass.vb" />
     <Compile Include="coreSecurityClass.vb" />

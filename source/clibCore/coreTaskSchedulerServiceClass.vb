@@ -348,7 +348,7 @@ Namespace Contensive
         '
         Private Sub appendLog(cpCore As cpCoreClass, ByVal logText As String, Optional isImportant As Boolean = False)
             If (isImportant Or allowVerboseLogging) Then
-                cpCore.appendLog(logText, "", "trace")
+                cpCore.log_appendLog(logText, "", "trace")
             End If
             If (allowConsoleWrite) Then
                 Console.WriteLine(logText)

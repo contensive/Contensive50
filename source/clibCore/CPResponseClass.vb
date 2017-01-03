@@ -141,7 +141,7 @@ Namespace Contensive.Core
 
         Public Overrides Sub SetCookie(ByVal CookieName As String, ByVal CookieValue As String, Optional ByVal DateExpires As Date = #12:00:00 AM#, Optional ByVal Domain As String = "", Optional ByVal Path As String = "", Optional ByVal Secure As Boolean = False) 'Inherits BaseClasses.CPResponseBaseClass.SetCookie
             If True Then
-                Call cpCore.inet_addResponseCookie(CookieName, CookieValue, DateExpires, Domain, Path, Secure)
+                Call cpCore.webServer.addResponseCookie(CookieName, CookieValue, DateExpires, Domain, Path, Secure)
             End If
         End Sub
 

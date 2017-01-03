@@ -19,18 +19,26 @@ Namespace Contensive.Core
         '
         Private cp As CPClass
         Private cpCore As Contensive.Core.cpCoreClass
-        Private LocalVars As New Collection
-        Private LocalVarNameList As String
+        'Private LocalVars As New Collection
+        'Private LocalVarNameList As String
         Protected disposed As Boolean = False
         '
+        '====================================================================================================
+        ''' <summary>
+        ''' constructor
+        ''' </summary>
+        ''' <param name="cpParent"></param>
         Friend Sub New(ByVal cpParent As CPClass)
             MyBase.New()
             cp = cpParent
             cpCore = cp.core
         End Sub
         '
-        ' dispose
-        '
+        '====================================================================================================
+        ''' <summary>
+        ''' destructor
+        ''' </summary>
+        ''' <param name="disposing"></param>
         Protected Overridable Overloads Sub Dispose(ByVal disposing As Boolean)
             If Not Me.disposed Then
                 Call appendDebugLog(".dispose, dereference main, csv")
@@ -48,9 +56,12 @@ Namespace Contensive.Core
             Me.disposed = True
         End Sub
         '
-        '
-        '
-        Public Overrides Property content() As String
+        '====================================================================================================
+        ''' <summary>
+        ''' Returns the pageManager content
+        ''' </summary>
+        ''' <returns></returns>
+        <Obsolete("Page Content comes from the pageManager addon.", True)> Public Overrides Property content() As String
             Get
                 If True Then
                     Return cpCore.main_PageContent
@@ -64,8 +75,13 @@ Namespace Contensive.Core
                 End If
             End Set
         End Property
-
-        Public Overrides ReadOnly Property navigationStructure() As String
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' deprecated.
+        ''' </summary>
+        ''' <returns></returns>
+        <Obsolete("Use addon navigation.", True)> Public Overrides ReadOnly Property navigationStructure() As String
             Get
                 If True Then
                     Return cpCore.main_RenderedNavigationStructure
@@ -74,7 +90,12 @@ Namespace Contensive.Core
                 End If
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Returns to the current value of NoFollow, set by addon execution
+        ''' </summary>
+        ''' <returns></returns>
         Public Overrides Property noFollow() As Boolean
             Get
                 If True Then
@@ -89,7 +110,12 @@ Namespace Contensive.Core
                 End If
             End Set
         End Property
-
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' returns the pageId set by the pageManager Addon
+        ''' </summary>
+        ''' <returns></returns>
         Public Overrides ReadOnly Property pageId() As Integer
             Get
                 If True Then
@@ -99,7 +125,12 @@ Namespace Contensive.Core
                 End If
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' returns the page name, set by the pagemenager addon
+        ''' </summary>
+        ''' <returns></returns>
         Public Overrides ReadOnly Property pageName() As String
             Get
                 Dim s As String
@@ -114,7 +145,12 @@ Namespace Contensive.Core
                 End If
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' returns the current value of refreshquerystring 
+        ''' </summary>
+        ''' <returns></returns>
         Public Overrides ReadOnly Property refreshQueryString() As String
             Get
                 Dim s As String
@@ -129,7 +165,12 @@ Namespace Contensive.Core
                 End If
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Returns the value of sectionId as set by pageManager
+        ''' </summary>
+        ''' <returns></returns>
         Public Overrides ReadOnly Property sectionId() As Integer
             Get
                 If True Then
@@ -139,7 +180,12 @@ Namespace Contensive.Core
                 End If
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' the time and date when this document was started 
+        ''' </summary>
+        ''' <returns></returns>
         Public Overrides ReadOnly Property startTime() As Date
             Get
                 If True Then
@@ -149,7 +195,12 @@ Namespace Contensive.Core
                 End If
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' returns the id of the template, as set by the page manager
+        ''' </summary>
+        ''' <returns></returns>
         Public Overrides ReadOnly Property templateId() As Integer
             Get
                 If True Then
@@ -159,7 +210,12 @@ Namespace Contensive.Core
                 End If
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' returns the docType, set by the page manager settings 
+        ''' </summary>
+        ''' <returns></returns>
         Public Overrides ReadOnly Property type() As String
             Get
                 If True Then
@@ -170,23 +226,29 @@ Namespace Contensive.Core
             End Get
         End Property
         '
-        '
-        '
+        '====================================================================================================
+        ''' <summary>
+        ''' adds javascript code to the head of the document
+        ''' </summary>
+        ''' <param name="NewCode"></param>
         Public Overrides Sub addHeadJavascript(ByVal NewCode As String)
             If True Then
                 Call cpCore.main_AddHeadJavascript(NewCode)
             End If
         End Sub
         '
-        '
-        '
+        '====================================================================================================
+        ''' <summary>
+        ''' adds a javascript tag to the head of the document
+        ''' </summary>
+        ''' <param name="HeadTag"></param>
         Public Overrides Sub addHeadTag(ByVal HeadTag As String)
             If True Then
                 Call cpCore.main_AddHeadTag(HeadTag)
             End If
         End Sub
         '
-        '
+        '====================================================================================================
         '
         Public Overrides Sub addMetaDescription(ByVal MetaDescription As String)
             If True Then
@@ -194,7 +256,7 @@ Namespace Contensive.Core
             End If
         End Sub
         '
-        '
+        '====================================================================================================
         '
         Public Overrides Sub addMetaKeywordList(ByVal MetaKeywordList As String)
             If True Then
@@ -202,7 +264,7 @@ Namespace Contensive.Core
             End If
         End Sub
         '
-        '
+        '====================================================================================================
         '
         Public Overrides Sub addOnLoadJavascript(ByVal NewCode As String)
             If True Then
@@ -210,7 +272,7 @@ Namespace Contensive.Core
             End If
         End Sub
         '
-        '
+        '====================================================================================================
         '
         Public Overrides Sub addTitle(ByVal PageTitle As String)
             If True Then
@@ -218,7 +280,7 @@ Namespace Contensive.Core
             End If
         End Sub
         '
-        '
+        '====================================================================================================
         '
         Public Overrides Sub addRefreshQueryString(ByVal Name As String, ByVal Value As String)
             If True Then
@@ -226,7 +288,7 @@ Namespace Contensive.Core
             End If
         End Sub
         '
-        '
+        '====================================================================================================
         '
         Public Overrides Sub addHeadStyle(ByVal StyleSheet As String)
             If True Then
@@ -234,20 +296,24 @@ Namespace Contensive.Core
             End If
         End Sub
         '
-        '
+        '====================================================================================================
         '
         Public Overrides Sub addHeadStyleLink(ByVal StyleSheetLink As String)
             If True Then
                 Call cpCore.main_AddStylesheetLink(StyleSheetLink)
             End If
         End Sub
-
+        '
+        '====================================================================================================
+        '
         Public Overrides Sub addBodyEnd(ByVal NewCode As String)
             If True Then
                 cpCore.main_ClosePageHTML = cpCore.main_ClosePageHTML & NewCode
             End If
         End Sub
-
+        '
+        '====================================================================================================
+        '
         Public Overrides Property body() As String
             Get
                 If True Then
@@ -263,40 +329,50 @@ Namespace Contensive.Core
             End Set
         End Property
         '
-        '
+        '====================================================================================================
         '
         Public Function getLegacyOptionStringFromVar() As String
-            Dim Value As String
-            Dim lcName As String
-            Dim lcNames() As String
-            Dim Ptr As Integer
+            Dim returnString As String = ""
             '
-            getLegacyOptionStringFromVar = ""
-            Call tp("getLegacyOptionStringFromVar enter, LocalVarNameList=" & LocalVarNameList)
-            If LocalVarNameList <> "" Then
-                lcNames = Split(LocalVarNameList, vbCrLf)
-                If lcNames.Length > 0 Then
-                    For Ptr = 0 To lcNames.Length - 1
-                        lcName = lcNames(Ptr)
-                        If lcName <> "" Then
-                            Value = var(lcName)
-                            getLegacyOptionStringFromVar = getLegacyOptionStringFromVar & "&" & encodeLegacyAddonOptionArgument(lcName) & "=" & encodeLegacyAddonOptionArgument(Value)
-                        End If
-                    Next
-                End If
-            End If
-            Call tp("getLegacyOptionStringFromVar exit, getLegacyOptionStringFromVar=" & getLegacyOptionStringFromVar)
+            Try
+                For Each kvp As KeyValuePair(Of String, docPropertiesClass) In cpCore.docProperties.docPropertiesDict
+                    returnString &= "" & "&" & encodeLegacyAddonOptionArgument(kvp.Key) & "=" & encodeLegacyAddonOptionArgument(kvp.Value.Value)
+                Next
+                'Dim Value As String
+                'Dim lcName As String
+                'Dim lcNames() As String
+                'Dim Ptr As Integer
+                ''
+                'getLegacyOptionStringFromVar = ""
+                'Call tp("getLegacyOptionStringFromVar enter, LocalVarNameList=" & LocalVarNameList)
+                'If LocalVarNameList <> "" Then
+                '    lcNames = Split(LocalVarNameList, vbCrLf)
+                '    If lcNames.Length > 0 Then
+                '        For Ptr = 0 To lcNames.Length - 1
+                '            lcName = lcNames(Ptr)
+                '            If lcName <> "" Then
+                '                Value = var(lcName)
+                '                getLegacyOptionStringFromVar = getLegacyOptionStringFromVar & "&" & encodeLegacyAddonOptionArgument(lcName) & "=" & encodeLegacyAddonOptionArgument(Value)
+                '            End If
+                '        Next
+                '    End If
+                'End If
+                'Call tp("getLegacyOptionStringFromVar exit, getLegacyOptionStringFromVar=" & getLegacyOptionStringFromVar)
+            Catch ex As Exception
+
+            End Try
+            Return returnString
         End Function
         '
-        '
+        '====================================================================================================
         '
         Public Overrides ReadOnly Property siteStylesheet() As String
             Get
-                Return cpCore.csv_getStyleSheet()
+                Return cpCore.pageManager_GetStyleSheet2()
             End Get
         End Property
         '
-        '------------------------------------------------------------------------------------------------------------
+        '====================================================================================================
         '   Encodes an argument in an Addon OptionString (QueryString) for all non-allowed characters
         '       call this before parsing them together
         '       call decodeAddonOptionArgument after parsing them apart
@@ -328,7 +404,7 @@ Namespace Contensive.Core
             End If
         End Function
         '
-        '------------------------------------------------------------------------------------------------------------
+        '====================================================================================================
         '   Decodes an argument parsed from an AddonOptionString for all non-allowed characters
         '       AddonOptionString is a & delimited string of name=value[selector]descriptor
         '
@@ -366,26 +442,27 @@ Namespace Contensive.Core
         '
         '=======================================================================================================
         '
-        '=======================================================================================================
-        '
         Public Overrides Function GetProperty(PropertyName As String, Optional DefaultValue As String = "") As String
-            Dim s As String = ""
+            'Dim s As String = ""
             Try
-                '
-                ' refactor to do the work directly
-                '
-                If isVar(PropertyName) Then
-                    s = var(PropertyName)
+                If cpCore.docProperties.containsKey(PropertyName) Then
+                    Return cpCore.docProperties.getText(PropertyName)
                 Else
-                    s = DefaultValue
+                    Return DefaultValue
                 End If
+                ''
+                '' refactor to do the work directly
+                ''
+                'If isVar(PropertyName) Then
+                '    s = var(PropertyName)
+                'Else
+                '    s = DefaultValue
+                'End If
             Catch ex As Exception
-
+                '
             End Try
-            Return s
+            'Return s
         End Function
-        '
-        '=======================================================================================================
         '
         '=======================================================================================================
         '
@@ -395,13 +472,9 @@ Namespace Contensive.Core
         '
         '=======================================================================================================
         '
-        '=======================================================================================================
-        '
         Public Overrides Function GetDate(PropertyName As String, Optional DefaultValue As String = "") As Date
             Return cp.Utils.EncodeDate(GetProperty(PropertyName, DefaultValue))
         End Function
-        '
-        '=======================================================================================================
         '
         '=======================================================================================================
         '
@@ -411,13 +484,9 @@ Namespace Contensive.Core
         '
         '=======================================================================================================
         '
-        '=======================================================================================================
-        '
         Public Overrides Function GetNumber(PropertyName As String, Optional DefaultValue As String = "") As Double
             Return cp.Utils.EncodeNumber(GetProperty(PropertyName, DefaultValue))
         End Function
-        '
-        '=======================================================================================================
         '
         '=======================================================================================================
         '
@@ -430,21 +499,20 @@ Namespace Contensive.Core
         '=======================================================================================================
         '
         Public Overrides Function IsProperty(FieldName As String) As Boolean
-            Dim s As Boolean
-            '
-            '
-            ' refactor to do the work directly
-            '
-            s = False
+            'Dim s As Boolean
+            ''
+            ''
+            '' refactor to do the work directly
+            ''
+            's = False
             Try
-                s = isVar(FieldName)
+                Return cpCore.docProperties.containsKey(FieldName)
+                's = isVar(FieldName)
             Catch ex As Exception
-
+                '
             End Try
-            Return s
+            'Return s
         End Function
-        '
-        '=======================================================================================================
         '
         '=======================================================================================================
         '
@@ -453,7 +521,8 @@ Namespace Contensive.Core
             ' refactor to do the work directly
             '
             Try
-                var(FieldName) = FieldValue
+                cpCore.docProperties.setProperty(FieldName, FieldValue)
+                'var(FieldName) = FieldValue
             Catch ex As Exception
 
             End Try
@@ -468,43 +537,45 @@ Namespace Contensive.Core
         '
         Public Overrides Property var(ByVal Name As String) As String
             Get
-                Dim lcName As String
-                If Name = "" Then
-                    var = ""
-                Else
-                    lcName = Name.ToLower
-                    If LocalVars.Contains(lcName) Then
-                        var = LocalVars(lcName)
-                    Else
-                        var = globalVar(lcName)
-                    End If
-                End If
-                Call tp("Property var get exit, " & Name & "=" & var)
+                Return cpCore.docProperties.getText(Name)
+                'Dim lcName As String
+                'If Name = "" Then
+                '    var = ""
+                'Else
+                '    lcName = Name.ToLower
+                '    If LocalVars.Contains(lcName) Then
+                '        var = LocalVars(lcName)
+                '    Else
+                '        var = globalVar(lcName)
+                '    End If
+                'End If
+                'Call tp("Property var get exit, " & Name & "=" & var)
             End Get
             Set(ByVal value As String)
-                Dim lcName As String
-                'Dim valueObj As String = ""
-                'If Not value Is Nothing Then
-                '    valueObj = value
+                cpCore.docProperties.setProperty(Name, value)
+                'Dim lcName As String
+                ''Dim valueObj As String = ""
+                ''If Not value Is Nothing Then
+                ''    valueObj = value
+                ''End If
+                'value = EncodeText(value)
+                'Call appendDebugLog("var set, " & Name & "=" & value.ToString)
+                'If Name <> "" Then
+                '    lcName = Name.ToLower
+                '    If LocalVars.Contains(lcName) Then
+                '        Call LocalVars.Remove(lcName)
+                '        If value = "" Then
+                '            LocalVarNameList = Replace(LocalVarNameList, vbCrLf & lcName, "", , , CompareMethod.Text)
+                '        Else
+                '            Call LocalVars.Add(value, lcName)
+                '            Call tp("Property var set, name found in localVars, removed and re-added, LocalVarNameList=" & LocalVarNameList)
+                '        End If
+                '    ElseIf value <> "" Then
+                '        Call LocalVars.Add(value, lcName)
+                '        LocalVarNameList = LocalVarNameList & vbCrLf & lcName
+                '        Call tp("Property var set, name not found in localVars so it was added, LocalVarNameList=" & LocalVarNameList)
+                '    End If
                 'End If
-                value = EncodeText(value)
-                Call appendDebugLog("var set, " & Name & "=" & value.ToString)
-                If Name <> "" Then
-                    lcName = Name.ToLower
-                    If LocalVars.Contains(lcName) Then
-                        Call LocalVars.Remove(lcName)
-                        If value = "" Then
-                            LocalVarNameList = Replace(LocalVarNameList, vbCrLf & lcName, "", , , CompareMethod.Text)
-                        Else
-                            Call LocalVars.Add(value, lcName)
-                            Call tp("Property var set, name found in localVars, removed and re-added, LocalVarNameList=" & LocalVarNameList)
-                        End If
-                    ElseIf value <> "" Then
-                        Call LocalVars.Add(value, lcName)
-                        LocalVarNameList = LocalVarNameList & vbCrLf & lcName
-                        Call tp("Property var set, name not found in localVars so it was added, LocalVarNameList=" & LocalVarNameList)
-                    End If
-                End If
             End Set
         End Property
         '
@@ -519,26 +590,28 @@ Namespace Contensive.Core
         '
         Public Overrides Property globalVar(ByVal Name As String) As String
             Get
-                Dim lcName As String
-                If True Then
-                    If Name = "" Then
-                        globalVar = ""
-                    Else
-                        lcName = Name.ToLower
-                        If cpCore.main_IsViewingProperty(lcName) Then
-                            globalVar = cpCore.main_GetViewingProperty(lcName)
-                        Else
-                            globalVar = cpCore.doc_getText(lcName)
-                        End If
-                    End If
-                Else
-                    globalVar = ""
-                End If
+                Return cpCore.docProperties.getText(Name)
+                'Dim lcName As String
+                'If True Then
+                '    If Name = "" Then
+                '        globalVar = ""
+                '    Else
+                '        lcName = Name.ToLower
+                '        If cpCore.main_IsViewingProperty(lcName) Then
+                '            globalVar = cpCore.docProperties.getText(lcName)
+                '        Else
+                '            globalVar = cpCore.docProperties.getText(lcName)
+                '        End If
+                '    End If
+                'Else
+                '    globalVar = ""
+                'End If
             End Get
             Set(ByVal value As String)
-                If True Then
-                    Call cpCore.main_SetViewingProperty(Name.ToLower, value)
-                End If
+                cpCore.docProperties.setProperty(Name, value)
+                'If True Then
+                '    Call cpCore.docProperties.setProperty(Name.ToLower, value)
+                'End If
             End Set
         End Property
         '
@@ -551,20 +624,21 @@ Namespace Contensive.Core
         '
         Public Overrides ReadOnly Property isGlobalVar(ByVal Name As String) As Boolean
             Get
-                Dim lcName As String
-                If True Then
-                    If Name = "" Then
-                        isGlobalVar = ""
-                    Else
-                        lcName = Name.ToLower
-                        isGlobalVar = cpCore.main_IsViewingProperty(lcName)
-                        If Not isGlobalVar Then
-                            isGlobalVar = cpCore.main_InStream(lcName)
-                        End If
-                    End If
-                Else
-                    isGlobalVar = False
-                End If
+                Return False
+                'Dim lcName As String
+                'If True Then
+                '    If Name = "" Then
+                '        isGlobalVar = ""
+                '    Else
+                '        lcName = Name.ToLower
+                '        isGlobalVar = cpCore.main_IsViewingProperty(lcName)
+                '        If Not isGlobalVar Then
+                '            isGlobalVar = cpCore.docProperties.containsKey(lcName)
+                '        End If
+                '    End If
+                'Else
+                '    isGlobalVar = False
+                'End If
             End Get
         End Property
         '
@@ -577,16 +651,17 @@ Namespace Contensive.Core
         '
         Public Overrides ReadOnly Property isVar(ByVal Name As String) As Boolean
             Get
-                Dim lcName As String
-                If Name = "" Then
-                    isVar = False
-                Else
-                    lcName = Name.ToLower
-                    isVar = LocalVars.Contains(lcName)
-                    If Not isVar Then
-                        isVar = isGlobalVar(lcName)
-                    End If
-                End If
+                Return cpCore.docProperties.containsKey(Name)
+                'Dim lcName As String
+                'If Name = "" Then
+                '    isVar = False
+                'Else
+                '    lcName = Name.ToLower
+                '    isVar = LocalVars.Contains(lcName)
+                '    If Not isVar Then
+                '        isVar = isGlobalVar(lcName)
+                '    End If
+                'End If
             End Get
         End Property
         '

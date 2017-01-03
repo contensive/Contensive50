@@ -172,7 +172,7 @@ Namespace Contensive.Core
                 If False Then
                     Return "/"
                 Else
-                    Return cpCore.appConfig.appRootFilesPath
+                    Return cpCore.www_requestRootPath
                 End If
             End Get
         End Property

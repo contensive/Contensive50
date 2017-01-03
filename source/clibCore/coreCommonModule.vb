@@ -19,6 +19,112 @@ Namespace Contensive.Core
     End Class
     '
     '====================================================================================================
+    '
+    Public Class docPropertiesClass
+        Public Name As String
+        Public Value As String
+        Public NameValue As String
+        Public IsForm As Boolean
+        Public IsFile As Boolean
+        Public FileContent() As Byte
+        Public tmpPrivatefile As String
+        Public FileSize As Integer
+        Public fileType As String
+    End Class
+    '
+    '====================================================================================================
+    ''' <summary>
+    ''' application configuration class
+    ''' </summary>
+    Public Class appConfigClass
+        Public name As String
+        Public enabled As Boolean
+        Public privateKey As String                     ' rename hashKey
+        Public defaultConnectionString As String
+        Public appRootFilesPath As String               ' path relative to clusterPhysicalPath
+        Public cdnFilesPath As String                   ' path relative to clusterPhysicalPath
+        Public privateFilesPath As String               ' path relative to clusterPhysicalPath
+        Public cdnFilesNetprefix As String              ' in some cases (like legacy), cdnFiles are iis virtual folder mapped to appRoot (/files/). Some cases this is a URL (http:\\cdn.domain.com pointing to s3)
+        Public allowSiteMonitor As Boolean
+        Public domainList As New List(Of String)        ' primary domain is the first item in the list
+        Public enableCache As Boolean
+        Public adminRoute As String                                          ' The url pathpath that executes the addon site
+    End Class    '
+    '
+    '====================================================================================================
+    ''' <summary>
+    ''' Holds location on the server of the clusterConfig file. Physically stored at programDataFolder/clib/serverConfig.json
+    ''' </summary>
+    Public Class serverConfigClass
+        Public clusterPath As String
+        Public allowTaskRunnerService As Boolean
+        Public allowTaskSchedulerService As Boolean
+    End Class
+
+    '
+    '====================================================================================================
+    ''' <summary>
+    ''' cluster configuration class - deserialized configration file
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Class clusterConfigClass
+        Public isLocal As Boolean = True
+        Public name As String = ""
+        '
+        ' local caching using dotnet framework, flushes on appPool
+        '
+        Public isLocalCache As Boolean = False
+        '
+        ' AWS dotnet elaticcache client wraps enyim, and provides node autodiscovery through the configuration object.
+        ' this is the srver:port to the config file it uses.
+        '
+        Public awsElastiCacheConfigurationEndpoint As String
+        '
+        ' datasource for the cluster
+        '
+        Public defaultDataSourceType As dataSourceTypeEnum
+        '
+        ' odbc
+        '
+        Public defaultDataSourceODBCConnectionString As String
+        '
+        ' native
+        '
+        Public defaultDataSourceAddress As String = ""
+        '
+        ' user for creating new databases, and creating the new user for the database during site create, and saved to appconfig
+        '
+        Public defaultDataSourceUsername As String = ""
+        Public defaultDataSourcePassword As String = ""
+        '
+        ' endpoint for cluster files (not sure how it works, maybe this will be an object taht includes permissions, for now an fpo)
+        '
+        Public clusterFilesEndpoint As String
+        '
+        ' configuration of async command listener on render machines (not sure if used still)
+        '
+        Public serverListenerPort As Integer = Port_ContentServerControlDefault
+        Public maxConcurrentTasksPerServer As Integer = 5
+        ' ayncCmd server authentication -- change this to a key later
+        Public username As String = ""
+        Public password As String = ""
+        '
+        ' This is the root path to the localCluster files, typically getLocalDataFolder (d:\inetpub)
+        '   if isLocal, the cluster runs from these files
+        '   if not, this is the local mirror of the cluster files
+        '
+        Public clusterPhysicalPath As String
+        '
+        'Public domainRoutes As Dictionary(Of String, String)
+        '
+        Public appPattern As String
+        '
+        '
+        '
+        Public apps As New Dictionary(Of String, appConfigClass)
+    End Class
+    '
+    '====================================================================================================
     ''' <summary>
     ''' miniCollection - This is an old collection object used in part to load the cdef part xml files. REFACTOR this into CollectionWantList and werialization into jscon
     ''' </summary>
@@ -2895,8 +3001,6 @@ Namespace Contensive.Core
         Public Const RequestNameLibraryName = "LibraryName"
         Public Const RequestNameLibraryDescription = "LibraryDescription"
 
-        Public Const RequestNameTestHook = "CC"       ' input request that sets debugging hooks
-
         Public Const RequestNameRootPage = "RootPageName"
         Public Const RequestNameRootPageID = "RootPageID"
         Public Const RequestNameContent = "ContentName"
@@ -5663,7 +5767,9 @@ ErrorTrap:
                 For SourcePointer = 1 To Len(LocalSource)
                     Character = Mid(LocalSource, SourcePointer, 1)
                     ' "%" added so if this is called twice, it will not destroy "%20" values
-                    If Character = " " Then
+                    If False Then
+                        'End If
+                        'If Character = " " Then
                         EncodeRequestVariable += "+"
                     ElseIf InStr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./:-_!*()", Character, vbTextCompare) <> 0 Then
                         'ElseIf InStr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./:?#-_!~*'()%", Character, vbTextCompare) <> 0 Then
@@ -5781,10 +5887,12 @@ ErrorTrap:
             Dim ESCValue As Integer
             Dim Digit0 As String
             Dim Digit1 As String
-            Dim iURL As String
+            'Dim iURL As String
             '
-            iURL = Source
-            DecodeResponseVariable = Replace(iURL, "+", " ")
+            'iURL = Source
+            ' plus to space only applies for query component of a URL, but %99 encoding works for both
+            'DecodeResponseVariable = Replace(iURL, "+", " ")
+            DecodeResponseVariable = Source
             Position = InStr(1, DecodeResponseVariable, "%")
             Do While Position <> 0
                 ESCString = Mid(DecodeResponseVariable, Position, 3)
@@ -5815,10 +5923,12 @@ ErrorTrap:
             Dim ESCValue As Integer
             Dim Digit0 As String
             Dim Digit1 As String
-            Dim iURL As String
+            'Dim iURL As String
             '
-            iURL = Source
-            DecodeURL = Replace(iURL, "+", " ")
+            'iURL = Source
+            ' plus to space only applies for query component of a URL, but %99 encoding works for both
+            'DecodeURL = Replace(iURL, "+", " ")
+            DecodeURL = Source
             Position = InStr(1, DecodeURL, "%")
             Do While Position <> 0
                 ESCString = Mid(DecodeURL, Position, 3)
@@ -6563,7 +6673,7 @@ ErrorTrap:
             Dim returnResult As String = ""
             Dim p As Process = New Process()
             '
-            cpCore.appendLog("ccCommonModule.runProcess, cmd=[" & Cmd & "], Arguments=[" & Arguments & "], WaitForReturn=[" & WaitForReturn & "]")
+            cpCore.log_appendLog("ccCommonModule.runProcess, cmd=[" & Cmd & "], Arguments=[" & Arguments & "], WaitForReturn=[" & WaitForReturn & "]")
             '
             p.StartInfo.FileName = Cmd
             p.StartInfo.Arguments = Arguments
@@ -7112,20 +7222,28 @@ ErrorTrap:
             End If
         End Function
         '
-        ' ==============================================================================
-        ' Encode a date to minvalue
-        '   if date is < minVAlue,m set it to minvalue
-        '   if date < 1/1/1990 (the beginning of time), it returns date.minvalue
-        ' ==============================================================================
-        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Encode a date to minvalue, if date is < minVAlue,m set it to minvalue, if date < 1/1/1990 (the beginning of time), it returns date.minvalue
+        ''' </summary>
+        ''' <param name="sourceDate"></param>
+        ''' <returns></returns>
         Public Function encodeDateMinValue(ByVal sourceDate As Date) As Date
-            Dim returnValue As Date = sourceDate
-            If returnValue < #1/1/1000# Then
-                returnValue = Date.MinValue
+            If sourceDate <= #1/1/1000# Then
+                Return Date.MinValue
             End If
-            Return returnValue
+            Return sourceDate
         End Function
         '
+        '====================================================================================================
+        ''' <summary>
+        ''' Return true if a date is the mindate, else return false 
+        ''' </summary>
+        ''' <param name="sourceDate"></param>
+        ''' <returns></returns>
+        Public Function isMinDate(sourceDate As Date) As Boolean
+            Return encodeDateMinValue(sourceDate) = Date.MinValue
+        End Function
 
         '
         '========================================================================

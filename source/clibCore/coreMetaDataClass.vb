@@ -410,7 +410,9 @@ Namespace Contensive.Core
             Try
                 Dim ContentId As Integer
                 ContentId = getContentId(contentName)
-                If (ContentId > 0) Then
+                If (ContentId < 0) Then
+                    Throw New ApplicationException("No metadata was found for content name [" & contentName & "]")
+                Else
                     returnCdef = getCdef(ContentId)
                 End If
             Catch ex As Exception
@@ -1884,15 +1886,15 @@ Namespace Contensive.Core
                 '
                 dt = cpCore.db.executeSql("select id,name,typeId,address,username,password,ConnString from ccDataSources")
                 If dt.Rows.Count > 0 Then
-                    ReDim cpCore.db.db_dataSources(cpCore.db.db_dataSources.Length - 1)
+                    ReDim cpCore.db.dataSources(cpCore.db.dataSources.Length - 1)
                     For Each row As DataRow In dt.Rows
-                        cpCore.db.db_dataSources(ptr).Id = EncodeInteger(row(0))
-                        cpCore.db.db_dataSources(ptr).NameLower = EncodeText(row(1)).ToLower
-                        cpCore.db.db_dataSources(ptr).dataSourceType = DirectCast(EncodeInteger(row(2)), dataSourceTypeEnum)
-                        cpCore.db.db_dataSources(ptr).endPoint = EncodeText(row(3))
-                        cpCore.db.db_dataSources(ptr).username = EncodeText(row(4))
-                        cpCore.db.db_dataSources(ptr).password = EncodeText(row(5))
-                        cpCore.db.db_dataSources(ptr).odbcConnectionString = EncodeText(row(6))
+                        cpCore.db.dataSources(ptr).Id = EncodeInteger(row(0))
+                        cpCore.db.dataSources(ptr).NameLower = EncodeText(row(1)).ToLower
+                        cpCore.db.dataSources(ptr).dataSourceType = DirectCast(EncodeInteger(row(2)), dataSourceTypeEnum)
+                        cpCore.db.dataSources(ptr).endPoint = EncodeText(row(3))
+                        cpCore.db.dataSources(ptr).username = EncodeText(row(4))
+                        cpCore.db.dataSources(ptr).password = EncodeText(row(5))
+                        cpCore.db.dataSources(ptr).odbcConnectionString = EncodeText(row(6))
                         ptr += 1
                     Next
                 End If
@@ -2279,7 +2281,7 @@ ErrorTrap:
                         returnList.AddRange(CDef.childIdList)
                     End If
                     ''main_GetContentManagementList = main_GetContentManagementList & "," & CStr(ContentID)
-                    'ContentName = main_GetContentNameByID(ContentID)
+                    'ContentName = metaData.getContentNameByID(ContentID)
                     'If ContentName <> "" Then
                     '    CDef = getCdef(ContentName)
                     '    If CDef.ChildIDList.Count > 0 Then
@@ -2302,15 +2304,19 @@ ErrorTrap:
         ''' Clear all data from the metaData current instance. Next request will load from cache.
         ''' </summary>
         Public Sub clear()
-            If (Not cdefList Is Nothing) Then
-                cdefList.Clear()
-            End If
-            If (Not tableSchemaList Is Nothing) Then
-                tableSchemaList.Clear()
-            End If
-            If (Not cdefNameIdXref Is Nothing) Then
-                cdefNameIdXref = Nothing
-            End If
+            Try
+                If (Not cdefList Is Nothing) Then
+                    cdefList.Clear()
+                End If
+                If (Not tableSchemaList Is Nothing) Then
+                    tableSchemaList.Clear()
+                End If
+                If (Not cdefNameIdXref Is Nothing) Then
+                    cdefNameIdXref = Nothing
+                End If
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
         End Sub
         '
         '=================================================================================
@@ -2404,7 +2410,7 @@ ErrorTrap:
             Try
                 cpCore.db.executeSql("delete from cccontent where (name=" & cpCore.db.encodeSQLText(contentNameOrGuid) & ")or(ccguid=" & cpCore.db.encodeSQLText(contentNameOrGuid) & ")")
                 cpCore.cache.invalidateTag("content")
-                cpCore.metaData.clear()
+                clear()
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -2419,7 +2425,7 @@ ErrorTrap:
             Try
                 cpCore.db.executeSql("delete from cccontent where (id=" & cpCore.db.db_EncodeSQLNumber(contentid) & ")")
                 cpCore.cache.invalidateTag("content")
-                cpCore.metaData.clear()
+                clear()
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -2557,7 +2563,7 @@ ErrorTrap:
                 ' ----- Load CDef
                 '
                 cpCore.cache.invalidateAll()
-                cpCore.metaData.clear()
+                clear()
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(New ApplicationException("Exception in CreateContentChild"))
             End Try
@@ -2679,6 +2685,66 @@ ErrorTrap:
             End Try
             Return returnCopy
         End Function
+        '
+        '========================================================================
+        ' Get a Contents Tablename from the ContentPointer
+        '========================================================================
+        '
+        Public Function getContentTablename(ByVal ContentName As String) As String
+            Dim returnTableName As String = ""
+            Try
+                Dim CDef As coreMetaDataClass.CDefClass
+                '
+                CDef = getCdef(ContentName)
+                If (CDef IsNot Nothing) Then
+                    returnTableName = CDef.ContentTableName
+                End If
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+            Return returnTableName
+        End Function
+        '
+        '========================================================================
+        ' ----- Get a DataSource Name from its ContentName
+        '
+        Public Function getContentDataSource(ContentName As String) As String
+            Dim returnDataSource As String = ""
+            Try
+                Dim CDef As coreMetaDataClass.CDefClass
+                '
+                CDef = getCdef(ContentName)
+                If (CDef Is Nothing) Then
+                    '
+                Else
+                    returnDataSource = CDef.ContentDataSourceName
+                End If
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+            Return returnDataSource
+        End Function
+        '
+        '========================================================================
+        ' Get a Contents Name from the ContentID
+        '   Bad ContentID returns blank
+        '========================================================================
+        '
+        Public Function getContentNameByID(ByVal ContentID As Integer) As String
+            Dim returnName As String = ""
+            Try
+                Dim cdef As coreMetaDataClass.CDefClass
+                '
+                cdef = getCdef(ContentID)
+                If cdef IsNot Nothing Then
+                    returnName = cdef.Name
+                End If
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+            Return returnName
+        End Function
+
 
 #Region " IDisposable Support "
         Protected disposed As Boolean = False

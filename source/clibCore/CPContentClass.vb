@@ -90,7 +90,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetID(ByVal ContentName As String) As Integer
-            Return cpCore.metaData_GetContentID(ContentName)
+            Return cpCore.metaData.getContentId(ContentName)
         End Function
         '
         '====================================================================================================
@@ -102,7 +102,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetDataSource(ByVal ContentName As String) As String
-            Return cpCore.metaData_GetContentDataSource(ContentName)
+            Return cpCore.metaData.getContentDataSource(ContentName)
         End Function
         '
         '====================================================================================================
@@ -150,7 +150,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetTable(ByVal ContentName As String) As String
-            Return cpCore.metaData_GetContentTablename2(ContentName)
+            Return cpCore.metaData.getContentTablename(ContentName)
         End Function
         '
         '====================================================================================================

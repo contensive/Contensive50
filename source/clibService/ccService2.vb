@@ -16,13 +16,13 @@ Namespace Contensive.Core
             Dim cp As New CPClass()
             Try
                 '
-                cp.core.appendLog("ccService2.OnStart enter")
+                cp.core.log_appendLog("ccService2.OnStart enter")
                 '
                 If (True) Then
                     '
                     ' this server is the scheduler
                     '
-                    cp.core.appendLog("ccService2.OnStart, start taskScheduler")
+                    cp.core.log_appendLog("ccService2.OnStart, start taskScheduler")
                     taskScheduler = New coreTaskSchedulerServiceClass()
                     Call taskScheduler.StartService(True, False)
                 End If
@@ -30,11 +30,11 @@ Namespace Contensive.Core
                     '
                     ' this server is a runner
                     '
-                    cp.core.appendLog("ccService2.OnStart, start taskRunner")
+                    cp.core.log_appendLog("ccService2.OnStart, start taskRunner")
                     taskRunner = New coreTaskRunnerServiceClass()
                     Call taskRunner.StartService()
                 End If
-                cp.core.appendLog("ccService2.OnStart exit")
+                cp.core.log_appendLog("ccService2.OnStart exit")
             Catch ex As Exception
                 Call handleExceptionResume(cp.core, ex, "OnStart", "Unexpected Error")
             End Try
@@ -48,13 +48,13 @@ Namespace Contensive.Core
             Dim cp As New CPClass()
             Try
                 '
-                cp.core.appendLog("ccService2.OnStop enter")
+                cp.core.log_appendLog("ccService2.OnStop enter")
                 '
                 If (Not taskScheduler Is Nothing) Then
                     '
                     ' stop taskscheduler
                     '
-                    cp.core.appendLog("ccService2.OnStop, stop taskScheduler")
+                    cp.core.log_appendLog("ccService2.OnStop, stop taskScheduler")
                     Call taskScheduler.stopService()
                     Call taskScheduler.Dispose()
                 End If
@@ -62,11 +62,11 @@ Namespace Contensive.Core
                     '
                     ' stop taskrunner
                     '
-                    cp.core.appendLog("ccService2.OnStop, stop taskRunner")
+                    cp.core.log_appendLog("ccService2.OnStop, stop taskRunner")
                     Call taskRunner.stopService()
                     Call taskRunner.Dispose()
                 End If
-                cp.core.appendLog("ccService2.OnStop exit")
+                cp.core.log_appendLog("ccService2.OnStop exit")
             Catch ex As Exception
                 Call handleExceptionResume(cp.core, ex, "OnStop", "Unexpected Error")
             End Try

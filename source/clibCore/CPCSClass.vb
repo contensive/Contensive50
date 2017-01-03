@@ -319,7 +319,7 @@ Namespace Contensive.Core
         Public Overrides Function GetEditLink(Optional ByVal AllowCut As Boolean = False) As String
             Dim result As Object
             Try
-                result = cpCore.main_GetCSRecordEditLink(CSPointer, AllowCut)
+                result = cpCore.cs_GetCSRecordEditLink(CSPointer, AllowCut)
                 If result Is Nothing Then
                     result = New String("")
                 End If
@@ -524,7 +524,7 @@ Namespace Contensive.Core
         Public Overrides Sub SetFormInput(ByVal FieldName As String, Optional ByVal RequestName As String = "")
             Dim success As Boolean = False
             Try
-                Call cpCore.main_SetCSFormInput(CSPointer, FieldName, RequestName)
+                Call cpCore.cs_SetCSFormInput(CSPointer, FieldName, RequestName)
             Catch ex As Exception
                 Call cp.core.handleExceptionAndRethrow(ex, "Unexpected error in cs.SetFormInput")
             End Try

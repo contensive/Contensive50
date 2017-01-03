@@ -126,7 +126,7 @@ Namespace Contensive.Core
 
                 DbUpToDate = (dataBuildVersion = coreVersion)
                 '
-                Button = cpCore.doc_getText(RequestNameButton)
+                Button = cpCore.docProperties.getText(RequestNameButton)
                 AllowInstallFromFolder = False
                 If True Then
                     GuidFieldName = "ccguid"
@@ -156,10 +156,10 @@ Namespace Contensive.Core
                             ' Download and install Collections from the Collection Library
                             '---------------------------------------------------------------------------------------------
                             '
-                            If cpCore.doc_getText("LibraryRow") <> "" Then
-                                Ptr = cpCore.web_GetStreamInteger2("LibraryRow")
+                            If cpCore.docProperties.getText("LibraryRow") <> "" Then
+                                Ptr = cpCore.docProperties.getInteger("LibraryRow")
                                 'If cpcore.main_GetStreamBoolean2("LibraryRow" & Ptr) Then
-                                CollectionGuid = cpCore.doc_getText("LibraryRowguid" & Ptr)
+                                CollectionGuid = cpCore.docProperties.getText("LibraryRowguid" & Ptr)
                                 InstallLibCollectionList = InstallLibCollectionList & "," & CollectionGuid
                             End If
 
@@ -179,7 +179,7 @@ Namespace Contensive.Core
                             '   Before deleting each addon, make sure it is not in another collection
                             '---------------------------------------------------------------------------------------------
                             '
-                            Cnt = cpCore.web_GetStreamInteger2("accnt")
+                            Cnt = cpCore.docProperties.getInteger("accnt")
                             If Cnt > 0 Then
                                 For Ptr = 0 To Cnt - 1
                                     If cpCore.main_GetStreamBoolean2("ac" & Ptr) Then
@@ -446,11 +446,11 @@ Namespace Contensive.Core
                             ' Delete Add-ons
                             '---------------------------------------------------------------------------------------------
                             '
-                            Cnt = cpCore.web_GetStreamInteger2("aocnt")
+                            Cnt = cpCore.docProperties.getInteger("aocnt")
                             If Cnt > 0 Then
                                 For Ptr = 0 To Cnt - 1
                                     If cpCore.main_GetStreamBoolean2("ao" & Ptr) Then
-                                        Call cpCore.db_DeleteContentRecord("Add-ons", cpCore.web_GetStreamInteger2("aoID" & Ptr))
+                                        Call cpCore.db_DeleteContentRecord("Add-ons", cpCore.docProperties.getInteger("aoID" & Ptr))
                                     End If
                                 Next
                             End If
@@ -475,9 +475,9 @@ Namespace Contensive.Core
                                 status = status & "<br>Uploaded collection file [" & CollectionFilePathPage & "]"
                                 CollectionFilename = Mid(Replace(CollectionFilePathPage, InstallFolder, ""), 2)
                                 '
-                                cpCore.appendLog("app [" & cpCore.appConfig.name & "], Uploading new collection file, member=[#" & cpCore.user.userId & ", " & cpCore.user.userName & "], CollectionFilename [" & CollectionFilename & "]")
+                                cpCore.log_appendLog("app [" & cpCore.appConfig.name & "], Uploading new collection file, member=[#" & cpCore.user.userId & ", " & cpCore.user.userName & "], CollectionFilename [" & CollectionFilename & "]")
                                 '
-                                UploadsCnt = cpCore.web_GetStreamInteger2("UploadCount")
+                                UploadsCnt = cpCore.docProperties.getInteger("UploadCount")
                                 ReDim Uploads(UploadsCnt)
                                 For Ptr = 0 To UploadsCnt - 1
                                     UploadPathPage = cpCore.web_ProcessFormInputFile2("Upload" & Ptr, cpCore.privateFiles, InstallFolder)

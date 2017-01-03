@@ -759,7 +759,7 @@ ErrorTrap:
         '
         '
         Private Sub appendMonitorLog(ByVal message As String)
-            cpCore.appendLog(message, "Monitor")
+            cpCore.log_appendLog(message, "Monitor")
         End Sub
 
         Public Sub New(cpCore As cpCoreClass)

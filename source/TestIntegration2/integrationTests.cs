@@ -587,11 +587,11 @@ namespace integrationTests
             Assert.NotEqual(0, testuserId);
             // open with id criteria must return exactly one record
             testuserId = 0;
-            if (cs.Open("people","id=" + cp.Db.EncodeSQLNumber(newuserId)))            {
+            if (cs.Open("people", "id=" + cp.Db.EncodeSQLNumber(newuserId))) {
                 Assert.Equal(newuserId, cs.GetInteger("id"));
                 Assert.Equal(true, cs.OK());
                 cs.GoNext();
-                Assert.Equal( false, cs.OK() );
+                Assert.Equal(false, cs.OK());
             }
             cs.Close();
             //
@@ -646,7 +646,7 @@ namespace integrationTests
             }
             cs.Close();
             Assert.NotEqual(0, newuserId);
-            if ( cs.OpenRecord( "people", newuserId ))
+            if (cs.OpenRecord("people", newuserId))
             {
                 Assert.Equal(newuserId, cs.GetInteger("id"));
             }
@@ -699,7 +699,7 @@ namespace integrationTests
             //
             // dispose
             //
-            cp.Content.DeleteRecords("groups", "name=" + cp.Db.EncodeSQLText( groupName));
+            cp.Content.DeleteRecords("groups", "name=" + cp.Db.EncodeSQLText(groupName));
             cp.Content.DeleteRecords("people", "id=" + user1Id);
             cp.Content.DeleteRecords("people", "id=" + user2Id);
             cp.Dispose();
@@ -729,7 +729,7 @@ namespace integrationTests
             Assert.True(cs.FieldOK("firstname"));
             cs.Close();
             //
-            Assert.True(cs.OpenRecord("people", user1Id,"id,name"));
+            Assert.True(cs.OpenRecord("people", user1Id, "id,name"));
             Assert.True(cs.FieldOK("id"));
             Assert.True(cs.FieldOK("ID"));
             Assert.True(cs.FieldOK("name"));
@@ -795,7 +795,7 @@ namespace integrationTests
             //
             Assert.True(cs.OpenRecord("people", user1Id));
             cs.SetField("name", user1Name);
-            cs.SetField("excludefromanalytics", true );
+            cs.SetField("excludefromanalytics", true);
             cs.SetField("lastVisit", testDate);
             cs.SetField("birthdayyear", testinteger);
             // eventually fill out all the rest
@@ -804,7 +804,7 @@ namespace integrationTests
             Assert.True(cs.OpenRecord("people", user1Id));
             Assert.Equal(user1Name, cs.GetText("name"));
             Assert.Equal(true, cs.GetBoolean("excludefromanalytics"));
-            Assert.Equal(testDate, cs.GetDate("lastVisit") );
+            Assert.Equal(testDate, cs.GetDate("lastVisit"));
             Assert.Equal(testinteger, cs.GetInteger("birthdayyear"));
             cs.Close();
             // eventually fill out all the rest
@@ -846,7 +846,7 @@ namespace integrationTests
             Assert.NotEqual(0, user4Id);
             //
             Assert.True(cs.Open("people", "(id in (" + user1Id + "," + user2Id + "," + user3Id + "," + user4Id + "))"));
-            Assert.Equal(4,cs.GetRowCount());
+            Assert.Equal(4, cs.GetRowCount());
             cs.Delete();
             Assert.True(cs.NextOK());
             cs.Delete();
@@ -856,6 +856,58 @@ namespace integrationTests
             cs.Delete();
             Assert.False(cs.NextOK());
             cs.Close();
+            //
+            // dispose
+            //
+            cp.Dispose();
+        }
+        //====================================================================================================
+        /// <summary>
+        /// cp.cs.getSql
+        /// </summary>
+        [Fact]
+        private void cpCsGetSql_Test()
+        {
+            // arrange
+            CPClass cp = new CPClass("testapp");
+            CPCSBaseClass cs = cp.CSNew();
+            //
+            // act
+            //
+            // assert
+            //
+            // dispose
+            //
+            cp.Dispose();
+        }
+    }
+    public class cpSecurityTests
+    {
+
+        //====================================================================================================
+        /// <summary>
+        /// coreSecurity
+        /// </summary>
+        [Fact]
+        private void coreSecurityEncryptDecrypt()
+        {
+            // arrange
+            CPClass cp = new CPClass("testapp");
+            CPCSBaseClass cs = cp.CSNew();
+            int testNumber = 12345;
+            DateTime testDate = new DateTime(1990, 8, 7);
+            //
+            // act
+            //
+            string token = cp.core.security.encodeToken(testNumber, testDate);
+            //
+            // assert
+            //
+            int resultNumber = 0;
+            DateTime resultDate = DateTime.MinValue;
+            cp.core.security.decodeToken(token, ref resultNumber, ref resultDate);
+            Assert.Equal(testNumber, resultNumber);
+            Assert.Equal(testDate, resultDate);
             //
             // dispose
             //

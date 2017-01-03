@@ -334,7 +334,7 @@ ErrorTrap:
                     '
                     ' Download all files for this collection and build the collection folder(s)
                     '
-                    WorkingFolder = cpCore.getAddonPath() & "temp_" & GetRandomInteger() & "\"
+                    WorkingFolder = cpCore.addon_getPrivateFilesAddonPath() & "temp_" & GetRandomInteger() & "\"
                     Call cpCore.privateFiles.createPath(WorkingFolder)
                     '
                     UpgradeOK = DownloadCollectionFiles(WorkingFolder, CollectionGuid, return_IISResetRequired, return_RegisterList, CollectionLastChangeDate, return_ErrorMessage)
@@ -400,14 +400,14 @@ ErrorTrap:
                 '
                 allowLogging = False
                 '
-                If allowLogging Then cpCore.appendLog("UpgradeAllLocalCollectionsFromLib3(), Enter")
+                If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), Enter")
                 LocalFile = getCollectionListFile()
                 If LocalFile <> "" Then
                     LocalCollections = New XmlDocument
                     Try
                         LocalCollections.LoadXml(LocalFile)
                     Catch ex As Exception
-                        If allowLogging Then cpCore.appendLog("UpgradeAllLocalCollectionsFromLib3(), parse error reading collections.xml")
+                        If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), parse error reading collections.xml")
                         Copy = "Error loading privateFiles\addons\Collections.xml"
                         Call appendInstallLog("Server", "UpgradeAllLocalCollecionFilesFileLib2", Copy)
                         return_ErrorMessage = return_ErrorMessage & "<P>" & Copy & "</P>"
@@ -415,7 +415,7 @@ ErrorTrap:
                     End Try
                     If returnOk Then
                         If LCase(LocalCollections.DocumentElement.Name) <> LCase(CollectionListRootNode) Then
-                            If allowLogging Then cpCore.appendLog("UpgradeAllLocalCollectionsFromLib3(), The addons\Collections.xml file has an invalid root node")
+                            If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), The addons\Collections.xml file has an invalid root node")
                             Copy = "The addons\Collections.xml has an invalid root node, [" & LocalCollections.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected."
                             'Copy = "The LocalCollections file [" & App.Path & "\Addons\Collections.xml] has an invalid root node, [" & LocalCollections.DocumentElement.name & "] was received and [" & CollectionListRootNode & "] was expected."
                             Call appendInstallLog("Server", "UpgradeAllLocalCollecionFilesFileLib2", Copy)
@@ -444,7 +444,7 @@ ErrorTrap:
                                     Next
                                 End If
                             End With
-                            If allowLogging Then cpCore.appendLog("UpgradeAllLocalCollectionsFromLib3(), collection.xml file has " & GuidCnt & " collection nodes.")
+                            If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), collection.xml file has " & GuidCnt & " collection nodes.")
                             If GuidCnt > 0 Then
                                 '
                                 ' Request collection updates 10 at a time
@@ -472,7 +472,7 @@ ErrorTrap:
                                         '-----------------------------------------------------------------------------------------------
                                         '
                                         If allowLogging Then
-                                            cpCore.appendLog("UpgradeAllLocalCollectionsFromLib3(), requesting Library updates for [" & GuidList & "]")
+                                            cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), requesting Library updates for [" & GuidList & "]")
                                         End If
                                         'hint = "Getting CollectionList"
                                         LibraryCollections = New XmlDocument
@@ -482,7 +482,7 @@ ErrorTrap:
                                             LibraryCollections.Load(SupportURL)
                                         Catch ex As Exception
                                             If allowLogging Then
-                                                cpCore.appendLog("UpgradeAllLocalCollectionsFromLib3(), Error downloading or loading GetCollectionList from Support.")
+                                                cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), Error downloading or loading GetCollectionList from Support.")
                                             End If
                                             Copy = "Error downloading or loading GetCollectionList from Support."
                                             Call appendInstallLog("Server", "UpgradeAllLocalCollecionFilesFileLib2", Copy & ", the request was [" & SupportURL & "]")
@@ -494,14 +494,14 @@ ErrorTrap:
                                             If True Then
                                                 If LCase(LibraryCollections.DocumentElement.Name) <> LCase(CollectionListRootNode) Then
                                                     Copy = "The GetCollectionList support site remote method returned an xml file with an invalid root node, [" & LibraryCollections.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected."
-                                                    If allowLogging Then cpCore.appendLog("UpgradeAllLocalCollectionsFromLib3(), " & Copy)
+                                                    If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), " & Copy)
                                                     Call appendInstallLog("Server", "UpgradeAllLocalCollecionFilesFileLib2", Copy & ", the request was [" & SupportURL & "]")
                                                     return_ErrorMessage = return_ErrorMessage & "<P>" & Copy & "</P>"
                                                     returnOk = False
                                                 Else
                                                     With LocalCollections.DocumentElement
                                                         If LCase(.Name) <> "collectionlist" Then
-                                                            cpCore.appendLog("UpgradeAllLocalCollectionsFromLib3(), The Library response did not have a collectioinlist top node, the request was [" & SupportURL & "]")
+                                                            cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), The Library response did not have a collectioinlist top node, the request was [" & SupportURL & "]")
                                                         Else
                                                             '
                                                             '-----------------------------------------------------------------------------------------------
@@ -510,7 +510,7 @@ ErrorTrap:
                                                             '
                                                             For Each LocalListNode In .ChildNodes
                                                                 localCollectionUpToDate = False
-                                                                If allowLogging Then cpCore.appendLog("UpgradeAllLocalCollectionsFromLib3(), Process local collection.xml node [" & LocalListNode.Name & "]")
+                                                                If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), Process local collection.xml node [" & LocalListNode.Name & "]")
                                                                 Select Case LCase(LocalListNode.Name)
                                                                     Case "collection"
                                                                         LocalGuid = ""
@@ -538,7 +538,7 @@ ErrorTrap:
                                                                                 LocalLastChangeDate = EncodeDate(LocalLastChangeDateStr)
                                                                             End If
                                                                         End If
-                                                                        If allowLogging Then cpCore.appendLog("UpgradeAllLocalCollectionsFromLib3(), node is collection, LocalGuid [" & LocalGuid & "], LocalLastChangeDateStr [" & LocalLastChangeDateStr & "]")
+                                                                        If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), node is collection, LocalGuid [" & LocalGuid & "], LocalLastChangeDateStr [" & LocalLastChangeDateStr & "]")
                                                                         '
                                                                         ' go through each collection on the Library and find the local collection guid
                                                                         '
@@ -582,7 +582,7 @@ ErrorTrap:
                                                                                             '
                                                                                             ' LibCollection matches the LocalCollection - process the upgrade
                                                                                             '
-                                                                                            If allowLogging Then cpCore.appendLog("UpgradeAllLocalCollectionsFromLib3(), Library collection node found that matches")
+                                                                                            If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), Library collection node found that matches")
                                                                                             If InStr(1, LibGUID, "58c9", vbTextCompare) <> 0 Then
                                                                                                 LibGUID = LibGUID
                                                                                             End If
@@ -596,8 +596,8 @@ ErrorTrap:
                                                                                                 '
                                                                                                 ' LibLastChangeDate <>0, and it is > local lastchangedate
                                                                                                 '
-                                                                                                WorkingFolder = cpCore.getAddonPath() & "\temp_" & GetRandomInteger() & "\"
-                                                                                                If allowLogging Then cpCore.appendLog("UpgradeAllLocalCollectionsFromLib3(), matching library collection is newer, start upgrade [" & WorkingFolder & "].")
+                                                                                                WorkingFolder = cpCore.addon_getPrivateFilesAddonPath() & "\temp_" & GetRandomInteger() & "\"
+                                                                                                If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), matching library collection is newer, start upgrade [" & WorkingFolder & "].")
                                                                                                 Call appendInstallLog("server", "UpgradeAllLocalCollectionsFromLib3", "Upgrading Collection [" & LibGUID & "], Library name [" & LibName & "], because LocalChangeDate [" & LocalLastChangeDate & "] < LibraryChangeDate [" & LibLastChangeDate & "]")
                                                                                                 '
                                                                                                 ' Upgrade Needed
@@ -605,14 +605,14 @@ ErrorTrap:
                                                                                                 Call cpCore.privateFiles.createPath(WorkingFolder)
                                                                                                 '
                                                                                                 returnOk = DownloadCollectionFiles(WorkingFolder, LibGUID, return_IISResetRequired, return_RegisterList, CollectionLastChangeDate, return_ErrorMessage)
-                                                                                                If allowLogging Then cpCore.appendLog("UpgradeAllLocalCollectionsFromLib3(), DownloadCollectionFiles returned " & returnOk)
+                                                                                                If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), DownloadCollectionFiles returned " & returnOk)
                                                                                                 If returnOk Then
                                                                                                     returnOk = BuildLocalCollectionFolder(WorkingFolder, return_IISResetRequired, return_RegisterList, CollectionLastChangeDate, LibGUID, return_ErrorMessage, allowLogging)
-                                                                                                    If allowLogging Then cpCore.appendLog("UpgradeAllLocalCollectionsFromLib3(), BuildLocalCollectionFolder returned " & returnOk)
+                                                                                                    If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), BuildLocalCollectionFolder returned " & returnOk)
                                                                                                 End If
                                                                                                 '
                                                                                                 If allowLogging Then
-                                                                                                    cpCore.appendLog("UpgradeAllLocalCollectionsFromLib3(), working folder not deleted because debugging. Delete tmp folders when finished.")
+                                                                                                    cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), working folder not deleted because debugging. Delete tmp folders when finished.")
                                                                                                 Else
                                                                                                     Call cpCore.privateFiles.DeleteFileFolder(WorkingFolder)
                                                                                                 End If
@@ -621,13 +621,13 @@ ErrorTrap:
                                                                                                 '
                                                                                                 If returnOk Then
                                                                                                     returnOk = installCollectionFromLocalRepo(builder, return_IISResetRequired, LibGUID, cpCore.db.dataBuildVersion, return_ErrorMessage, return_RegisterList, "", IsNewBuild)
-                                                                                                    If allowLogging Then cpCore.appendLog("UpgradeAllLocalCollectionsFromLib3(), UpgradeAllAppsFromLocalCollection returned " & returnOk)
+                                                                                                    If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), UpgradeAllAppsFromLocalCollection returned " & returnOk)
                                                                                                 End If
                                                                                                 '
                                                                                                 ' make sure this issue is logged and clear the flag to let other local collections install
                                                                                                 '
                                                                                                 If Not returnOk Then
-                                                                                                    If allowLogging Then cpCore.appendLog("UpgradeAllLocalCollectionsFromLib3(), for this local collection, process returned " & returnOk)
+                                                                                                    If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), for this local collection, process returned " & returnOk)
                                                                                                     Call appendInstallLog("server", "UpgradeAllLocalCollectionsFromLib3", "There was a problem upgrading Collection [" & LibGUID & "], Library name [" & LibName & "], error message [" & return_ErrorMessage & "], will clear error and continue with the next collection, the request was [" & SupportURL & "]")
                                                                                                     returnOk = True
                                                                                                 End If
@@ -724,14 +724,14 @@ ErrorTrap:
             '
             ' process all xml files in this workingfolder
             '
-            If allowLogging Then cpCore.appendLog("BuildLocalCollectionFolder(), Enter")
+            If allowLogging Then cpCore.log_appendLog("BuildLocalCollectionFolder(), Enter")
             '
             If Not cpCore.privateFiles.checkPath(privateFolderPath) Then
                 '
                 ' The working folder is not there
                 '
                 return_ErrorMessage = "<p>There was a problem with the installation. The installation folder is not valid.</p>"
-                If allowLogging Then cpCore.appendLog("BuildLocalCollectionFolder(), " & return_ErrorMessage)
+                If allowLogging Then cpCore.log_appendLog("BuildLocalCollectionFolder(), " & return_ErrorMessage)
                 Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, CheckFileFolder was false for the private folder [" & privateFolderPath & "]")
             Else
                 Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, processing files in private folder [" & privateFolderPath & "]")
@@ -837,7 +837,7 @@ ErrorTrap:
                                                 CollectionFolderName = Replace(CollectionFolderName, " ", "")
                                                 CollectionFolderName = Collectionname & "_" & CollectionFolderName
                                             End If
-                                            CollectionFolder = cpCore.getAddonPath() & CollectionFolderName & "\"
+                                            CollectionFolder = cpCore.addon_getPrivateFilesAddonPath() & CollectionFolderName & "\"
                                             If Not cpCore.privateFiles.checkPath(CollectionFolder) Then
                                                 '
                                                 ' Create collection folder
@@ -868,7 +868,7 @@ ErrorTrap:
                                             If (NowPart < 10) Then TimeStamp &= "0"
                                             TimeStamp &= NowPart.ToString()
                                             CollectionVersionFolderName = CollectionFolderName & "\" & TimeStamp
-                                            CollectionVersionFolder = cpCore.getAddonPath() & "\" & CollectionVersionFolderName & "\"
+                                            CollectionVersionFolder = cpCore.addon_getPrivateFilesAddonPath() & "\" & CollectionVersionFolderName & "\"
                                             Call cpCore.privateFiles.createPath(CollectionVersionFolder)
                                             '
                                             ' copy all files from source to CollectionVersionFolder
@@ -1315,7 +1315,7 @@ ErrorTrap:
                         '
                         ' Search Local Collection Folder for collection config file (xml file)
                         '
-                        CollectionVersionFolder = cpCore.getAddonPath() & CollectionVersionFolderName & "\"
+                        CollectionVersionFolder = cpCore.addon_getPrivateFilesAddonPath() & CollectionVersionFolderName & "\"
                         'CollectionVersionFolder = GetProgramPath & "\Addons\" & CollectionVersionFolderName & "\"
                         CollectionHelp = ""
                         CollectionHelpLink = ""
@@ -1975,7 +1975,7 @@ ErrorTrap:
                                                                                                                         ' read in text value, if a guid, use it, otherwise assume name
                                                                                                                         '
                                                                                                                         If FieldLookupContentID <> 0 Then
-                                                                                                                            FieldLookupContentName = cpCore.db.db_GetContentNameByID(FieldLookupContentID)
+                                                                                                                            FieldLookupContentName = cpCore.metaData.getContentNameByID(FieldLookupContentID)
                                                                                                                             If FieldLookupContentName <> "" Then
                                                                                                                                 If (Left(FieldValue, 1) = "{") And (Right(FieldValue, 1) = "}") And cpCore.db.metaData_IsContentFieldSupported(FieldLookupContentName, "ccguid") Then
                                                                                                                                     '
@@ -2321,10 +2321,10 @@ ErrorTrap:
                 Dim Pos As Integer
                 Dim FolderList As IO.DirectoryInfo()
                 '
-                collectionFilePathFilename = cpCore.getAddonPath & "Collections.xml"
+                collectionFilePathFilename = cpCore.addon_getPrivateFilesAddonPath & "Collections.xml"
                 returnXml = cpCore.privateFiles.ReadFile(collectionFilePathFilename)
                 If returnXml = "" Then
-                    FolderList = cpCore.privateFiles.getFolders(cpCore.getAddonPath)
+                    FolderList = cpCore.privateFiles.getFolders(cpCore.addon_getPrivateFilesAddonPath)
                     If FolderList.Count > 0 Then
                         For Each folder As IO.DirectoryInfo In FolderList
                             FolderName = folder.Name
@@ -2338,7 +2338,7 @@ ErrorTrap:
                                         Collectionname = Left(FolderName, Len(FolderName) - Len(CollectionGuid) - 1)
                                         CollectionGuid = Mid(CollectionGuid, 1, 8) & "-" & Mid(CollectionGuid, 9, 4) & "-" & Mid(CollectionGuid, 13, 4) & "-" & Mid(CollectionGuid, 17, 4) & "-" & Mid(CollectionGuid, 21)
                                         CollectionGuid = "{" & CollectionGuid & "}"
-                                        SubFolderList = cpCore.privateFiles.getFolders(cpCore.getAddonPath() & "\" & FolderName)
+                                        SubFolderList = cpCore.privateFiles.getFolders(cpCore.addon_getPrivateFilesAddonPath() & "\" & FolderName)
                                         If SubFolderList.Count > 0 Then
                                             SubFolder = SubFolderList(SubFolderList.Count - 1)
                                             FolderName = FolderName & "\" & SubFolder.Name
@@ -2449,7 +2449,7 @@ ErrorTrap:
                             '
                             ' Save the result
                             '
-                            LocalFilename = cpCore.getAddonPath() & "Collections.xml"
+                            LocalFilename = cpCore.addon_getPrivateFilesAddonPath() & "Collections.xml"
                             'LocalFilename = GetProgramPath & "\Addons\Collections.xml"
                             Call Doc.Save(cpCore.privateFiles.rootLocalFolderPath & LocalFilename)
                         End If
@@ -4227,7 +4227,7 @@ ErrorTrap:
                     Try
                         srcXmlDom.LoadXml(srcCollecionXml)
                     Catch ex As Exception
-                        cpCore.appendLog("UpgradeCDef_LoadDataToCollection Error reading xml archive, ex=[" & ex.ToString & "]")
+                        cpCore.log_appendLog("UpgradeCDef_LoadDataToCollection Error reading xml archive, ex=[" & ex.ToString & "]")
                         Throw New Exception("Error in UpgradeCDef_LoadDataToCollection, during doc.loadXml()", ex)
                     End Try
                     With srcXmlDom.DocumentElement

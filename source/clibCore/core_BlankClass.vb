@@ -17,4 +17,6 @@ Namespace Contensive.Core
             Me.cpCore = cpCore
         End Sub
     End Class
+
+
 End Namespace

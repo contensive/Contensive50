@@ -185,7 +185,7 @@ Namespace Contensive.Core
                                     If (cpCore.main_VisitProperty_AllowEditing Or cpCore.main_VisitProperty_AllowAdvancedEditor) Then
                                         If localContentNameOrId <> "" Then
                                             If IsNumeric(localContentNameOrId) Then
-                                                localContentNameOrId = cpCore.main_GetContentNameByID(EncodeInteger(localContentNameOrId))
+                                                localContentNameOrId = cpCore.metaData.getContentNameByID(EncodeInteger(localContentNameOrId))
                                             End If
                                         End If
                                         returnResult = main_IsContentManager(localContentNameOrId)
@@ -418,7 +418,7 @@ ErrorTrap:
                 '
                 ' ----- When page loads, set focus on login username
                 '
-                returnHtml = cpCore.main_GetLoginForm_Default()
+                returnHtml = cpCore.user_GetLoginForm_Default()
             End If
             '
             user_GetLoginForm = returnHtml
@@ -473,25 +473,23 @@ ErrorTrap:
                     & s _
                     & cpCore.html_GetFormInputHidden("Type", FormTypeSendPassword) _
                     & ""
-                If cpCore.web_InStreamArrayCount > 0 Then
-                    For Pointer = 0 To cpCore.web_InStreamArrayCount - 1
-                        With cpCore.web_InStreamArray(Pointer)
-                            If .IsForm Then
-                                Select Case UCase(.Name)
-                                    Case "S", "MA", "MB", "USERNAME", "PASSWORD", "EMAIL"
-                                    Case Else
-                                        s = s & cpCore.html_GetFormInputHidden(.Name, .Value)
-                                End Select
-                            End If
-                        End With
-                    Next
-                End If
+                For Each kvp As KeyValuePair(Of String, docPropertiesClass) In cpCore.docProperties.docPropertiesDict
+                    With kvp.Value
+                        If .IsForm Then
+                            Select Case UCase(.Name)
+                                Case "S", "MA", "MB", "USERNAME", "PASSWORD", "EMAIL"
+                                Case Else
+                                    s = s & cpCore.html_GetFormInputHidden(.Name, .Value)
+                            End Select
+                        End If
+                    End With
+                Next
                 '
                 QueryString = cpCore.web_RefreshQueryString
                 QueryString = ModifyQueryString(QueryString, "S", "")
                 QueryString = ModifyQueryString(QueryString, "ccIPage", "")
                 s = "" _
-                    & cpCore.main_GetFormStart(QueryString) _
+                    & cpCore.html_GetFormStart(QueryString) _
                     & kmaIndent(s) _
                     & cr & "</form>" _
                     & ""
@@ -684,7 +682,7 @@ ErrorTrap:
                     If True Then
                         userStyleFilename = cpCore.db.db_GetCSText(CS, "StyleFilename")
                         If userStyleFilename <> "" Then
-                            Call cpCore.main_AddStylesheetLink(cpCore.web_requestProtocol & cpCore.web.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, userStyleFilename))
+                            Call cpCore.main_AddStylesheetLink(cpCore.web_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, userStyleFilename))
                         End If
                     End If
                     If True Then
@@ -724,7 +722,7 @@ ErrorTrap:
             If iMemberID = 0 Then
                 iMemberID = userId
             End If
-            user_IsGroupMember = user_IsGroupListMember2("," & cpCore.main_GetGroupID(EncodeText(GroupName)), iMemberID, True)
+            user_IsGroupMember = user_IsGroupListMember2("," & cpCore.group_GetGroupID(EncodeText(GroupName)), iMemberID, True)
         End Function
         '
         '========================================================================
@@ -737,7 +735,7 @@ ErrorTrap:
             If iMemberID = 0 Then
                 iMemberID = userId
             End If
-            user_IsGroupMember2 = user_IsGroupListMember2("," & cpCore.main_GetGroupID(EncodeText(GroupName)), iMemberID, adminReturnsTrue)
+            user_IsGroupMember2 = user_IsGroupListMember2("," & cpCore.group_GetGroupID(EncodeText(GroupName)), iMemberID, adminReturnsTrue)
         End Function
 
         '
@@ -825,8 +823,8 @@ ErrorTrap:
                 ' This flag prevents the default form from processing twice
                 '
                 main_loginFormDefaultProcessed = True
-                loginForm_Username = cpCore.doc_getText("username")
-                loginForm_Password = cpCore.doc_getText("password")
+                loginForm_Username = cpCore.docProperties.getText("username")
+                loginForm_Password = cpCore.docProperties.getText("password")
                 loginForm_AutoLogin = cpCore.main_GetStreamBoolean2("autologin")
                 '
                 If (cpCore.main_VisitLoginAttempts < main_maxVisitLoginAttempts) And (cpCore.main_VisitCookieSupport) Then
@@ -868,7 +866,7 @@ ErrorTrap:
             '
             ' ----- lookup a Member account and send the username/password
             '
-            loginForm_Email = cpCore.doc_getText("email")
+            loginForm_Email = cpCore.docProperties.getText("email")
             Call security_SendMemberPassword(loginForm_Email)
             '
             Exit Sub
@@ -1354,7 +1352,7 @@ ErrorTrap:
                 If True Then
                     userStyleFilename = cpCore.db.db_GetCSText(CS, "StyleFilename")
                     If userStyleFilename <> "" Then
-                        Call cpCore.main_AddStylesheetLink(cpCore.web_requestProtocol & cpCore.web.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, userStyleFilename))
+                        Call cpCore.main_AddStylesheetLink(cpCore.web_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, userStyleFilename))
                     End If
                 End If
                 If True Then
@@ -1665,8 +1663,8 @@ ErrorTrap:
             '
             ' ----- add a username and password for this guest
             '
-            loginForm_Username = cpCore.doc_getText("username")
-            loginForm_Password = cpCore.doc_getText("password")
+            loginForm_Username = cpCore.docProperties.getText("username")
+            loginForm_Password = cpCore.docProperties.getText("password")
             '
             If Not EncodeBoolean(cpCore.siteProperties.getBoolean("AllowMemberJoin", False)) Then
                 cpCore.error_AddUserError("This site does not accept public main_MemberShip.")
@@ -1685,10 +1683,10 @@ ErrorTrap:
                                 '
                                 Call security_LogoutMember()
                             End If
-                            FirstName = cpCore.doc_getText("firstname")
-                            LastName = cpCore.doc_getText("firstname")
+                            FirstName = cpCore.docProperties.getText("firstname")
+                            LastName = cpCore.docProperties.getText("firstname")
                             FullName = FirstName & " " & LastName
-                            Email = cpCore.doc_getText("email")
+                            Email = cpCore.docProperties.getText("email")
                             Call cpCore.db.db_setCS(CS, "FirstName", FirstName)
                             Call cpCore.db.db_setCS(CS, "LastName", LastName)
                             Call cpCore.db.db_setCS(CS, "Name", FullName)
