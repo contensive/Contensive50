@@ -276,10 +276,10 @@ Namespace Contensive.Core
         '
         Public Property form() As String
             Get
-                Return cp.core.webServer.requestForm
+                Return cp.core.webServer.requestFormString
             End Get
             Set(ByVal value As String)
-                cp.core.webServer.requestForm = value
+                cp.core.webServer.requestFormString = value
             End Set
         End Property
         '==========================================================================================
@@ -291,10 +291,10 @@ Namespace Contensive.Core
         ''' <remarks></remarks>
         Public Property formFiles() As String
             Get
-                Return cp.core.webServer.requestFormFiles
+                Return cp.core.webServer.requesFilesString
             End Get
             Set(ByVal value As String)
-                cp.core.webServer.requestFormFiles = value
+                cp.core.webServer.requesFilesString = value
             End Set
         End Property
         '

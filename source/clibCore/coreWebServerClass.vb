@@ -24,20 +24,20 @@ Namespace Contensive.Core
         Public requestxWapProfile As String = ""
         Public requestHTTPVia As String = ""                   ' informs the server of proxies used during the request
         Public requestHTTPFrom As String = ""                  ' contains the email address of the requestor
-        Public requestPathPage As String = ""             ' The Path and Page part of the current URI
+        Public requestPathPage As String = ""               ' The Path and Page part of the current URI
         Public requestReferrer As String = ""
         Public requestDomain As String = ""                 ' The Host part of the current URI
-        Public requestSecure As Boolean = False          ' Set in InitASPEnvironment, true if https
-        Public requestRemoteIP As String = ""              '
-        Public requestBrowser As String = ""               ' The browser for this visit
-        Public requestQueryString As String = ""          ' The QueryString of the current URI
-        Public requestFormUseBinaryHeader As Boolean = False              ' When set true with RequestNameBinaryRead=true, InitEnvironment reads the form in with a binary read
-        Public requestFormBinaryHeader As Byte() ' Object        ' For asp pages, this is the full multipart header
-        Public requestForm As String = ""                 ' String from an HTML form post - buffered to remove passwords
-        Public requestFormFiles As String = ""            ' String from an HTML form post
-        'Public requestCookieString As String = ""              ' Set in InitASPEnvironment, the full cookie string
-        Public requestSpaceAsUnderscore As Boolean = False ' when true, is it assumed that dots in request variable names will convert
-        Public requestDotAsUnderscore As Boolean = False '   (php converts spaces and dots to underscores)
+        Public requestSecure As Boolean = False             ' Set in InitASPEnvironment, true if https
+        Public requestRemoteIP As String = ""               '
+        Public requestBrowser As String = ""                ' The browser for this visit
+        Public requestQueryString As String = ""            ' The QueryString of the current URI
+        Public requestFormUseBinaryHeader As Boolean = False ' When set true with RequestNameBinaryRead=true, InitEnvironment reads the form in with a binary read
+        Public requestFormBinaryHeader As Byte()            ' For asp pages, this is the full multipart header
+        Public requestFormString As String = ""             ' String from an HTML form post - buffered to remove passwords
+        Public requesFilesString As String = ""             ' String from an HTML form post
+        'Public requestCookieString As String = ""          ' Set in InitASPEnvironment, the full cookie string
+        Public requestSpaceAsUnderscore As Boolean = False  ' when true, is it assumed that dots in request variable names will convert
+        Public requestDotAsUnderscore As Boolean = False    ' (php converts spaces and dots to underscores)
         Public requestLinkSource As String = ""
         '
         Public Class cookieClass
@@ -156,53 +156,6 @@ Namespace Contensive.Core
             End Try
         End Sub
         '
-        '==========================================================================================
-        ''' <summary>
-        ''' add querystring to the doc properties
-        ''' </summary>
-        ''' <param name="QS"></param>
-        Public Sub addQueryStringToDocProperties(QS As String)
-            Try
-                '
-                Dim ampSplit() As String
-                Dim ampSplitCount As Integer
-                Dim ValuePair() As String
-                Dim key As String
-                Dim Ptr As Integer
-                '
-                ampSplit = Split(QS, "&")
-                ampSplitCount = UBound(ampSplit) + 1
-                For Ptr = 0 To ampSplitCount - 1
-                    Dim nameValuePair As String = ampSplit(Ptr)
-                    Dim docProperty As New docPropertiesClass
-                    With docProperty
-                        If Not String.IsNullOrEmpty(nameValuePair) Then
-                            If InStr(1, nameValuePair, "=") <> 0 Then
-                                ValuePair = Split(nameValuePair, "=")
-                                key = DecodeResponseVariable(CStr(ValuePair(0)))
-                                If key <> "" Then
-                                    .Name = key
-                                    If UBound(ValuePair) > 0 Then
-                                        .Value = DecodeResponseVariable(CStr(ValuePair(1)))
-                                    End If
-                                    .IsForm = False
-                                    .IsFile = False
-                                    cpCore.web_ReadStreamJSForm = cpCore.web_ReadStreamJSForm Or (UCase(.Name) = UCase(RequestNameJSForm))
-                                    cpCore.main_ReadStreamJSProcess = cpCore.main_ReadStreamJSProcess Or (UCase(.Name) = UCase(RequestNameJSProcess))
-                                    If .Name = RequestNameStateString Then
-                                        cpCore.main_Private_StateString_In = .Value
-                                    End If
-                                    cpCore.docProperties.setProperty(key, docProperty)
-                                End If
-                            End If
-                        End If
-                    End With
-                Next
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
-        End Sub
-        '
         '==================================================================================
         '   Initialize the application
         '       returns responseOpen
@@ -311,7 +264,7 @@ Namespace Contensive.Core
                         '
                         ' Add query string to stream
                         '
-                        Call addQueryStringToDocProperties(requestQueryString)
+                        Call cpCore.docProperties.addQueryString(requestQueryString)
                     End If
                     '
                     '--------------------------------------------------------------------------
@@ -348,7 +301,7 @@ Namespace Contensive.Core
                                 If UBound(propNameValuePair) > 0 Then
                                     propValue = DecodeResponseVariable(propNameValuePair(1))
                                 End If
-                                cpCore.docProperties.setProperty(propName, propValue)
+                                cpCore.docProperties.setProperty(propName, propValue, False)
                             Next
                         End If
                     End If
@@ -356,126 +309,130 @@ Namespace Contensive.Core
                     '--------------------------------------------------------------------------
                     ' ReCreate cpcore.main_ServerQueryString public
                     '--------------------------------------------------------------------------
-                    '
-                    For Each kvp As KeyValuePair(Of String, docPropertiesClass) In cpCore.docProperties.docPropertiesDict
-                        requestQueryString &= "&" & kvp.Key & "=" & kvp.Value.Value
-                    Next
+                    ' strings created when context added
+                    If False Then
+                        For Each kvp As KeyValuePair(Of String, docPropertiesClass) In cpCore.docProperties.docPropertiesDict
+                            requestQueryString &= "&" & kvp.Key & "=" & kvp.Value.Value
+                        Next
+                    End If
                     '
                     '--------------------------------------------------------------------------
                     ' ----- Process Form input to cpcore.doc.main_InStreamArray
                     '--------------------------------------------------------------------------
-                    '
-                    If requestFormFiles <> "" Then
-                        '
-                        ' Form File input (main_ServerFormFile string)
-                        '   0formname=formname&0filename=filename&0type=fileType&0file=tempfile&0error=errors&0size=fileSize&2..."
-                        '
-                        Ptr = 0
-                        Do
-                            Key = getSimpleNameValue(Ptr & "formname", requestFormFiles, "", "&")
-                            If Key <> "" Then
-                                Filename = DecodeURL(getSimpleNameValue(Ptr & "filename", requestFormFiles, "", "&"))
-                                If InStr(1, Filename, "%") <> 0 Then
-                                    '
-                                    ' fix step 1 -- see if they accidently double encoded
-                                    '
-                                    Filename = DecodeURL(Filename)
-                                End If
-                                If InStr(1, Filename, "%") <> 0 Then
-                                    '
-                                    ' fix step 1 -- see if they accidently double encoded
-                                    '
-                                    Filename = Replace(Filename, "%", "-")
-                                End If
-                                fileError = DecodeURL(getSimpleNameValue(Ptr & "error", requestFormFiles, "", "&"))
-                                If (fileError <> "") And (fileError <> "0") Then
-                                    '
-                                    ' log the error but still create the form field - it may be used as a flag for a form action
-                                    '
-                                    Throw New ApplicationException("Error uploading file, form file [" & Key & "], filename [" & Filename & "]. The error reported was [" & fileError & "]")
-                                End If
-                                Dim newProp As New docPropertiesClass
-                                With newProp
-                                    .Name = Key
-                                    .Value = Filename
-                                    .NameValue = .Name & "=" & .Value
-                                    .IsForm = True
-                                    .IsFile = True
-                                    .tmpPrivatefile = DecodeURL(getSimpleNameValue(Ptr & "tmpfile", requestFormFiles, "", "&"))
-                                    .FileSize = EncodeInteger(DecodeURL(getSimpleNameValue(Ptr & "size", requestFormFiles, "", "&")))
-                                    .fileType = DecodeURL(getSimpleNameValue(Ptr & "type", requestFormFiles, "", "&"))
-                                End With
-                                cpCore.docProperties.setProperty(Key, newProp)
-                            End If
-                            Ptr = Ptr + 1
-                        Loop While (Key <> "")
-                    End If
-                    If requestFormUseBinaryHeader Then
-                        '
-                        ' Form input through the Binary upload object
-                        '
-                        If Not IsNothing(requestFormBinaryHeader) Then
-                            BinaryHeader = requestFormBinaryHeader
-                            Upload = New coreUploadClass
-                            Upload.binaryHeader = BinaryHeader
-                            If Upload.Count > 0 Then
-                                For KeyPointer = 0 To Upload.Count - 1
-                                    Key = Upload.Key(KeyPointer)
+                    ' strings created when context added
+                    If False Then
+                        If requesFilesString <> "" Then
+                            '
+                            ' Form File input (main_ServerFormFile string)
+                            '   0formname=formname&0filename=filename&0type=fileType&0file=tempfile&0error=errors&0size=fileSize&2..."
+                            '
+                            Ptr = 0
+                            Do
+                                Key = getSimpleNameValue(Ptr & "formname", requesFilesString, "", "&")
+                                If Key <> "" Then
+                                    Filename = DecodeURL(getSimpleNameValue(Ptr & "filename", requesFilesString, "", "&"))
+                                    If InStr(1, Filename, "%") <> 0 Then
+                                        '
+                                        ' fix step 1 -- see if they accidently double encoded
+                                        '
+                                        Filename = DecodeURL(Filename)
+                                    End If
+                                    If InStr(1, Filename, "%") <> 0 Then
+                                        '
+                                        ' fix step 1 -- see if they accidently double encoded
+                                        '
+                                        Filename = Replace(Filename, "%", "-")
+                                    End If
+                                    fileError = DecodeURL(getSimpleNameValue(Ptr & "error", requesFilesString, "", "&"))
+                                    If (fileError <> "") And (fileError <> "0") Then
+                                        '
+                                        ' log the error but still create the form field - it may be used as a flag for a form action
+                                        '
+                                        Throw New ApplicationException("Error uploading file, form file [" & Key & "], filename [" & Filename & "]. The error reported was [" & fileError & "]")
+                                    End If
                                     Dim newProp As New docPropertiesClass
                                     With newProp
-                                        If Upload.Form(Key).IsFile Then
-                                            '
-                                            ' Store a file
-                                            '
-                                            .Name = CStr(Key)
-                                            .Value = Upload.Form(Key).Filename
-                                            .Value = Replace(.Value, "#", "_")
-                                            .Value = Replace(.Value, "?", "_")
-                                            .Value = Replace(.Value, ":", "_")
-                                            .NameValue = .Name & "=" & .Value
-                                            .IsForm = True
-                                            .IsFile = True
-                                            .FileContent = Upload.Form(Key).Value
-                                        Else
-                                            '
-                                            ' Store a form element
-                                            '
-                                            .Name = CStr(Key)
-                                            .Value = System.Text.Encoding.Default.GetString(Upload.Form(Key).Value)
-                                            .NameValue = .Name & "=" & .Value
-                                            .IsForm = True
-                                            .IsFile = False
-                                        End If
+                                        .Name = Key
+                                        .Value = Filename
+                                        .NameValue = .Name & "=" & .Value
+                                        .IsForm = True
+                                        .IsFile = True
+                                        .tmpPrivatefile = DecodeURL(getSimpleNameValue(Ptr & "tmpfile", requesFilesString, "", "&"))
+                                        .FileSize = EncodeInteger(DecodeURL(getSimpleNameValue(Ptr & "size", requesFilesString, "", "&")))
+                                        .fileType = DecodeURL(getSimpleNameValue(Ptr & "type", requesFilesString, "", "&"))
                                     End With
                                     cpCore.docProperties.setProperty(Key, newProp)
+                                End If
+                                Ptr = Ptr + 1
+                            Loop While (Key <> "")
+                        End If
+                        If requestFormUseBinaryHeader Then
+                            '
+                            ' Form input through the Binary upload object
+                            '
+                            If Not IsNothing(requestFormBinaryHeader) Then
+                                BinaryHeader = requestFormBinaryHeader
+                                Upload = New coreUploadClass
+                                Upload.binaryHeader = BinaryHeader
+                                If Upload.Count > 0 Then
+                                    For KeyPointer = 0 To Upload.Count - 1
+                                        Key = Upload.Key(KeyPointer)
+                                        Dim newProp As New docPropertiesClass
+                                        With newProp
+                                            If Upload.Form(Key).IsFile Then
+                                                '
+                                                ' Store a file
+                                                '
+                                                .Name = CStr(Key)
+                                                .Value = Upload.Form(Key).Filename
+                                                .Value = Replace(.Value, "#", "_")
+                                                .Value = Replace(.Value, "?", "_")
+                                                .Value = Replace(.Value, ":", "_")
+                                                .NameValue = .Name & "=" & .Value
+                                                .IsForm = True
+                                                .IsFile = True
+                                                .FileContent = Upload.Form(Key).Value
+                                            Else
+                                                '
+                                                ' Store a form element
+                                                '
+                                                .Name = CStr(Key)
+                                                .Value = System.Text.Encoding.Default.GetString(Upload.Form(Key).Value)
+                                                .NameValue = .Name & "=" & .Value
+                                                .IsForm = True
+                                                .IsFile = False
+                                            End If
+                                        End With
+                                        cpCore.docProperties.setProperty(Key, newProp)
+                                    Next
+                                End If
+                                Upload = Nothing
+                            End If
+                        Else
+                            '
+                            ' Non-Binary Form - Read the form in with the standard Request Object
+                            '
+                            If requestFormString <> "" Then
+                                ampSplit = Split(requestFormString, "&")
+                                ampSplitCount = UBound(ampSplit) + 1
+                                For ampSplitPointer = 0 To ampSplitCount - 1
+                                    Dim newProp As New docPropertiesClass
+                                    Dim propName As String
+                                    Dim propValue As String = ""
+                                    Dim propNameValue As String = ampSplit(ampSplitPointer)
+                                    Dim propNameValuePair() As String = Split(propNameValue, "=")
+                                    propName = DecodeResponseVariable(propNameValuePair(0))
+                                    If UBound(propNameValuePair) > 0 Then
+                                        propValue = DecodeResponseVariable(propNameValuePair(1))
+                                    End If
+                                    newProp.IsForm = True
+                                    newProp.IsFile = False
+                                    newProp.Name = propName
+                                    newProp.Value = propValue
+                                    newProp.NameValue = EncodeRequestVariable(propName) & "&" & EncodeRequestVariable(propValue)
+                                    cpCore.docProperties.setProperty(propName, newProp)
                                 Next
                             End If
-                            Upload = Nothing
-                        End If
-                    Else
-                        '
-                        ' Non-Binary Form - Read the form in with the standard Request Object
-                        '
-                        If requestForm <> "" Then
-                            ampSplit = Split(requestForm, "&")
-                            ampSplitCount = UBound(ampSplit) + 1
-                            For ampSplitPointer = 0 To ampSplitCount - 1
-                                Dim newProp As New docPropertiesClass
-                                Dim propName As String
-                                Dim propValue As String = ""
-                                Dim propNameValue As String = ampSplit(ampSplitPointer)
-                                Dim propNameValuePair() As String = Split(propNameValue, "=")
-                                propName = DecodeResponseVariable(propNameValuePair(0))
-                                If UBound(propNameValuePair) > 0 Then
-                                    propValue = DecodeResponseVariable(propNameValuePair(1))
-                                End If
-                                newProp.IsForm = True
-                                newProp.IsFile = False
-                                newProp.Name = propName
-                                newProp.Value = propValue
-                                newProp.NameValue = EncodeRequestVariable(propName) & "&" & EncodeRequestVariable(propValue)
-                                cpCore.docProperties.setProperty(propName, newProp)
-                            Next
                         End If
                     End If
                     '
@@ -538,132 +495,235 @@ Namespace Contensive.Core
                     '--------------------------------------------------------------------------
                     '
                     cpCore.web_MemberAction = cpCore.docProperties.getInteger("ma")
-                    If (cpCore.web_MemberAction = 3) Or (cpCore.web_MemberAction = 2) Then
-                        cpCore.web_MemberAction = 0
-                        HardCodedPage = HardCodedPageLogoutLogin
-                    End If
-                    '
-                    ' calculate now - but recalculate later - this does not include the /RemoteMethodFromQueryString case
-                    '
-                    '
-                    cpCore.web_PageExcludeFromAnalytics = (AjaxFunction <> "") Or (AjaxFastFunction <> "") Or (RemoteMethodFromQueryString <> "")
-                    '
-                    '
-                    ' Other Server variables
-                    '
-                    cpCore.web_requestReferer = requestReferrer
-                    cpCore.web_requestPageReferer = requestReferrer
-                    '
-                    If requestSecure Then
-                        cpCore.web_requestProtocol = "https://"
-                    Else
-                        cpCore.web_requestProtocol = "http://"
-                    End If
-                    '
-                    cpCore.blockExceptionReporting = False
-                    '
-                    '--------------------------------------------------------------------------
-                    ' ----- initialize server connection
-                    '--------------------------------------------------------------------------
-                    '
-                    If cpCore.domains.getDomainDbList.Contains("*") Then
-                        cpCore.domains.ServerMultiDomainMode = True
-                    End If
-                    '
-                    '--------------------------------------------------------------------------
-                    '   javascript cookie detect on page1 of all visits
-                    '--------------------------------------------------------------------------
-                    '
-                    CookieDetectKey = cpCore.docProperties.getText(RequestNameCookieDetectVisitID)
-                    If CookieDetectKey <> "" Then
-                        '
-                        'Call AppendLog("cpCore.main_init(), 1630 - exit for cookie key detected/processed")
-                        '
-                        Dim cookieDetectDate As Date = New Date
-                        Call cpCore.security.decodeToken(CookieDetectKey, CookieDetectVisitId, cookieDetectDate)
-                        'CookieDetectVisitId = cpCore.main_DecodeKeyNumber(CookieDetectKey)
-                        If CookieDetectVisitId <> 0 Then
-                            Call cpCore.db.executeSql("update ccvisits set CookieSupport=1 where id=" & CookieDetectVisitId)
-                            cpCore.docOpen = False '--- should be disposed by caller --- Call dispose
-                            Return cpCore.docOpen
+                        If (cpCore.web_MemberAction = 3) Or (cpCore.web_MemberAction = 2) Then
+                            cpCore.web_MemberAction = 0
+                            HardCodedPage = HardCodedPageLogoutLogin
                         End If
-                    End If
-                    '
-                    '--------------------------------------------------------------------------
-                    '   verify Domain table entry
-                    '--------------------------------------------------------------------------
-                    '
-                    Dim updateDomainCache As Boolean = False
-                    '
-                    cpCore.domains.domainDetails.name = requestDomain
-                    cpCore.domains.domainDetails.rootPageId = 0
-                    cpCore.domains.domainDetails.noFollow = False
-                    cpCore.domains.domainDetails.typeId = 1
-                    cpCore.domains.domainDetails.visited = False
-                    cpCore.domains.domainDetails.id = 0
-                    cpCore.domains.domainDetails.forwardUrl = ""
-                    cpCore.main_ServerDomain = requestDomain
-                    '
-                    ' set cpcore.main_ServerDomainPrmary to the first valid defaultDomain entry
-                    '
-                    If cpCore.appConfig.domainList.Count > 0 Then
-                        cpCore.main_ServerDomainPrimary = cpCore.appConfig.domainList(0)
-                    Else
-                        cpCore.main_ServerDomainPrimary = ""
-                    End If
-                    '
-                    ' REFACTOR -- move to cpcore.domains class 
-                    domainDetailsListText = EncodeText(cpCore.cache.getObject(Of String)("domainContentList"))
-                    If Not String.IsNullOrEmpty(domainDetailsListText) Then
-                        Try
-                            cpCore.domains.domainDetailsList = cpCore.json.Deserialize(Of Dictionary(Of String, coreDomainsClass.domainDetailsClass))(domainDetailsListText)
-                        Catch ex As Exception
-                            cpCore.domains.domainDetailsList = Nothing
-                        End Try
-                    End If
-                    If (cpCore.domains.domainDetailsList Is Nothing) Then
                         '
-                        '  no cache found, build domainContentList from database
+                        ' calculate now - but recalculate later - this does not include the /RemoteMethodFromQueryString case
                         '
-                        cpCore.domains.domainDetailsList = New Dictionary(Of String, coreDomainsClass.domainDetailsClass)
-                        domainDetailsListText = vbCrLf
-                        SQL = "select name,rootpageid,nofollow,typeid,visited,id,ForwardURL,DefaultTemplateId,PageNotFoundPageID,allowCrossLogin,ForwardDomainId from ccdomains where (active<>0)and(name is not null) order by id"
-                        Dim dt As DataTable
-                        dt = cpCore.db.executeSql(SQL)
-                        If dt.Rows.Count > 0 Then
-                            If Not (dt.Columns Is Nothing) Then
-                                Dim colCnt As Integer = dt.Columns.Count
-                                For Each row As DataRow In dt.Rows
-                                    Dim domainNameNew As String = row.Item(0).ToString.Trim
-                                    If Not String.IsNullOrEmpty(domainNameNew) Then
-                                        If Not cpCore.domains.domainDetailsList.ContainsKey(domainNameNew.ToLower) Then
-                                            Dim domainDetailsNew As New coreDomainsClass.domainDetailsClass
-                                            domainDetailsNew.name = domainNameNew
-                                            domainDetailsNew.rootPageId = EncodeInteger(row.Item(1).ToString)
-                                            domainDetailsNew.noFollow = EncodeBoolean(row.Item(2).ToString)
-                                            domainDetailsNew.typeId = EncodeInteger(row.Item(3).ToString)
-                                            domainDetailsNew.visited = EncodeBoolean(row.Item(4).ToString)
-                                            domainDetailsNew.id = EncodeInteger(row.Item(5).ToString)
-                                            domainDetailsNew.forwardUrl = row.Item(6).ToString
-                                            domainDetailsNew.defaultTemplateId = EncodeInteger(row.Item(7).ToString)
-                                            domainDetailsNew.pageNotFoundPageId = EncodeInteger(row.Item(8).ToString)
-                                            domainDetailsNew.allowCrossLogin = EncodeBoolean(row.Item(9).ToString)
-                                            domainDetailsNew.forwardDomainId = EncodeInteger(row.Item(10).ToString)
-                                            cpCore.domains.domainDetailsList.Add(domainNameNew.ToLower(), domainDetailsNew)
-                                        End If
-                                    End If
-                                Next
+                        '
+                        cpCore.web_PageExcludeFromAnalytics = (AjaxFunction <> "") Or (AjaxFastFunction <> "") Or (RemoteMethodFromQueryString <> "")
+                        '
+                        '
+                        ' Other Server variables
+                        '
+                        cpCore.web_requestReferer = requestReferrer
+                        cpCore.web_requestPageReferer = requestReferrer
+                        '
+                        If requestSecure Then
+                            cpCore.web_requestProtocol = "https://"
+                        Else
+                            cpCore.web_requestProtocol = "http://"
+                        End If
+                        '
+                        cpCore.blockExceptionReporting = False
+                        '
+                        '--------------------------------------------------------------------------
+                        ' ----- initialize server connection
+                        '--------------------------------------------------------------------------
+                        '
+                        If cpCore.domains.getDomainDbList.Contains("*") Then
+                            cpCore.domains.ServerMultiDomainMode = True
+                        End If
+                        '
+                        '--------------------------------------------------------------------------
+                        '   javascript cookie detect on page1 of all visits
+                        '--------------------------------------------------------------------------
+                        '
+                        CookieDetectKey = cpCore.docProperties.getText(RequestNameCookieDetectVisitID)
+                        If CookieDetectKey <> "" Then
+                            '
+                            'Call AppendLog("cpCore.main_init(), 1630 - exit for cookie key detected/processed")
+                            '
+                            Dim cookieDetectDate As Date = New Date
+                            Call cpCore.security.decodeToken(CookieDetectKey, CookieDetectVisitId, cookieDetectDate)
+                            'CookieDetectVisitId = cpCore.main_DecodeKeyNumber(CookieDetectKey)
+                            If CookieDetectVisitId <> 0 Then
+                                Call cpCore.db.executeSql("update ccvisits set CookieSupport=1 where id=" & CookieDetectVisitId)
+                                cpCore.docOpen = False '--- should be disposed by caller --- Call dispose
+                                Return cpCore.docOpen
                             End If
                         End If
-                        updateDomainCache = True
-                    End If
-                    '
-                    ' verify app config domainlist is in the domainlist cache
-                    '
-                    For Each domain As String In cpCore.appConfig.domainList
-                        If Not cpCore.domains.domainDetailsList.ContainsKey(domain.ToLower()) Then
+                        '
+                        '--------------------------------------------------------------------------
+                        '   verify Domain table entry
+                        '--------------------------------------------------------------------------
+                        '
+                        Dim updateDomainCache As Boolean = False
+                        '
+                        cpCore.domains.domainDetails.name = requestDomain
+                        cpCore.domains.domainDetails.rootPageId = 0
+                        cpCore.domains.domainDetails.noFollow = False
+                        cpCore.domains.domainDetails.typeId = 1
+                        cpCore.domains.domainDetails.visited = False
+                        cpCore.domains.domainDetails.id = 0
+                        cpCore.domains.domainDetails.forwardUrl = ""
+                        cpCore.main_ServerDomain = requestDomain
+                        '
+                        ' set cpcore.main_ServerDomainPrmary to the first valid defaultDomain entry
+                        '
+                        If cpCore.appConfig.domainList.Count > 0 Then
+                            cpCore.main_ServerDomainPrimary = cpCore.appConfig.domainList(0)
+                        Else
+                            cpCore.main_ServerDomainPrimary = ""
+                        End If
+                        '
+                        ' REFACTOR -- move to cpcore.domains class 
+                        domainDetailsListText = EncodeText(cpCore.cache.getObject(Of String)("domainContentList"))
+                        If Not String.IsNullOrEmpty(domainDetailsListText) Then
+                            Try
+                                cpCore.domains.domainDetailsList = cpCore.json.Deserialize(Of Dictionary(Of String, coreDomainsClass.domainDetailsClass))(domainDetailsListText)
+                            Catch ex As Exception
+                                cpCore.domains.domainDetailsList = Nothing
+                            End Try
+                        End If
+                        If (cpCore.domains.domainDetailsList Is Nothing) Then
+                            '
+                            '  no cache found, build domainContentList from database
+                            '
+                            cpCore.domains.domainDetailsList = New Dictionary(Of String, coreDomainsClass.domainDetailsClass)
+                            domainDetailsListText = vbCrLf
+                            SQL = "select name,rootpageid,nofollow,typeid,visited,id,ForwardURL,DefaultTemplateId,PageNotFoundPageID,allowCrossLogin,ForwardDomainId from ccdomains where (active<>0)and(name is not null) order by id"
+                            Dim dt As DataTable
+                            dt = cpCore.db.executeSql(SQL)
+                            If dt.Rows.Count > 0 Then
+                                If Not (dt.Columns Is Nothing) Then
+                                    Dim colCnt As Integer = dt.Columns.Count
+                                    For Each row As DataRow In dt.Rows
+                                        Dim domainNameNew As String = row.Item(0).ToString.Trim
+                                        If Not String.IsNullOrEmpty(domainNameNew) Then
+                                            If Not cpCore.domains.domainDetailsList.ContainsKey(domainNameNew.ToLower) Then
+                                                Dim domainDetailsNew As New coreDomainsClass.domainDetailsClass
+                                                domainDetailsNew.name = domainNameNew
+                                                domainDetailsNew.rootPageId = EncodeInteger(row.Item(1).ToString)
+                                                domainDetailsNew.noFollow = EncodeBoolean(row.Item(2).ToString)
+                                                domainDetailsNew.typeId = EncodeInteger(row.Item(3).ToString)
+                                                domainDetailsNew.visited = EncodeBoolean(row.Item(4).ToString)
+                                                domainDetailsNew.id = EncodeInteger(row.Item(5).ToString)
+                                                domainDetailsNew.forwardUrl = row.Item(6).ToString
+                                                domainDetailsNew.defaultTemplateId = EncodeInteger(row.Item(7).ToString)
+                                                domainDetailsNew.pageNotFoundPageId = EncodeInteger(row.Item(8).ToString)
+                                                domainDetailsNew.allowCrossLogin = EncodeBoolean(row.Item(9).ToString)
+                                                domainDetailsNew.forwardDomainId = EncodeInteger(row.Item(10).ToString)
+                                                cpCore.domains.domainDetailsList.Add(domainNameNew.ToLower(), domainDetailsNew)
+                                            End If
+                                        End If
+                                    Next
+                                End If
+                            End If
+                            updateDomainCache = True
+                        End If
+                        '
+                        ' verify app config domainlist is in the domainlist cache
+                        '
+                        For Each domain As String In cpCore.appConfig.domainList
+                            If Not cpCore.domains.domainDetailsList.ContainsKey(domain.ToLower()) Then
+                                Dim domainDetailsNew As New coreDomainsClass.domainDetailsClass
+                                domainDetailsNew.name = domain
+                                domainDetailsNew.rootPageId = 0
+                                domainDetailsNew.noFollow = False
+                                domainDetailsNew.typeId = 1
+                                domainDetailsNew.visited = False
+                                domainDetailsNew.id = 0
+                                domainDetailsNew.forwardUrl = ""
+                                domainDetailsNew.defaultTemplateId = 0
+                                domainDetailsNew.pageNotFoundPageId = 0
+                                domainDetailsNew.allowCrossLogin = False
+                                domainDetailsNew.forwardDomainId = 0
+                                cpCore.domains.domainDetailsList.Add(domain.ToLower(), domainDetailsNew)
+                            End If
+                        Next
+                        If cpCore.domains.domainDetailsList.ContainsKey(requestDomain.ToLower()) Then
+                            '
+                            ' domain found
+                            '
+                            cpCore.domains.domainDetails = cpCore.domains.domainDetailsList(requestDomain.ToLower())
+                            If (cpCore.domains.domainDetails.id = 0) Then
+                                '
+                                ' this is a default domain or a new domain -- add to the domain table
+                                '
+                                CS = cpCore.db.db_csInsertRecord("domains")
+                                If cpCore.db.db_csOk(CS) Then
+                                    cpCore.domains.domainDetails.id = cpCore.db.db_GetCSInteger(CS, "id")
+                                    Call cpCore.db.db_setCS(CS, "name", requestDomain)
+                                    Call cpCore.db.db_setCS(CS, "typeId", "1")
+                                    Call cpCore.db.db_setCS(CS, "RootPageId", cpCore.domains.domainDetails.rootPageId.ToString)
+                                    Call cpCore.db.db_setCS(CS, "ForwardUrl", cpCore.domains.domainDetails.forwardUrl)
+                                    Call cpCore.db.db_setCS(CS, "NoFollow", cpCore.domains.domainDetails.noFollow.ToString)
+                                    Call cpCore.db.db_setCS(CS, "Visited", cpCore.domains.domainDetails.visited.ToString)
+                                    Call cpCore.db.db_setCS(CS, "DefaultTemplateId", cpCore.domains.domainDetails.defaultTemplateId.ToString)
+                                    Call cpCore.db.db_setCS(CS, "PageNotFoundPageId", cpCore.domains.domainDetails.pageNotFoundPageId.ToString)
+                                    Call cpCore.db.db_setCS(CS, "allowCrossLogin", cpCore.domains.domainDetails.allowCrossLogin.ToString)
+                                End If
+                                Call cpCore.db.db_csClose(CS)
+                            End If
+                            If Not cpCore.domains.domainDetails.visited Then
+                                '
+                                ' set visited true
+                                '
+                                SQL = "update ccdomains set visited=1 where name=" & cpCore.db.encodeSQLText(requestDomain)
+                                Call cpCore.db.executeSql(SQL)
+                                Call cpCore.cache.setKey("domainContentList", "", "domains")
+                            End If
+                            If cpCore.domains.domainDetails.typeId = 1 Then
+                                '
+                                ' normal domain, leave it
+                                '
+                            ElseIf InStr(1, requestPathPage, cpCore.siteProperties.adminURL, vbTextCompare) <> 0 Then
+                                '
+                                ' forwarding does not work in the admin site
+                                '
+                            ElseIf (cpCore.domains.domainDetails.typeId = 2) And (cpCore.domains.domainDetails.forwardUrl <> "") Then
+                                '
+                                ' forward to a URL
+                                '
+                                '
+                                'Call AppendLog("main_init(), 1710 - exit for domain forward")
+                                '
+                                If InStr(1, cpCore.domains.domainDetails.forwardUrl, "://") = 0 Then
+                                    cpCore.domains.domainDetails.forwardUrl = "http://" & cpCore.domains.domainDetails.forwardUrl
+                                End If
+                                Call cpCore.web_Redirect2(cpCore.domains.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domains.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this URL", False)
+                                Return cpCore.docOpen
+                            ElseIf (cpCore.domains.domainDetails.typeId = 3) And (cpCore.domains.domainDetails.forwardDomainId <> 0) And (cpCore.domains.domainDetails.forwardDomainId <> cpCore.domains.domainDetails.id) Then
+                                '
+                                ' forward to a replacement domain
+                                '
+                                forwardDomain = cpCore.main_GetRecordName("domains", cpCore.domains.domainDetails.forwardDomainId)
+                                If forwardDomain <> "" Then
+                                    Pos = InStr(1, requestLinkSource, requestDomain, vbTextCompare)
+                                    If (Pos > 0) Then
+                                        '
+                                        'Call AppendLog("main_init(), 1720 - exit for forward domain")
+                                        '
+                                        cpCore.domains.domainDetails.forwardUrl = Mid(requestLinkSource, 1, Pos - 1) & forwardDomain & Mid(requestLinkSource, Pos + Len(requestDomain))
+                                        'main_domainForwardUrl = Replace(main_ServerLinkSource, cpcore.main_ServerHost, forwardDomain)
+                                        Call cpCore.web_Redirect2(cpCore.domains.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domains.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this replacement domain", False)
+                                        Return cpCore.docOpen
+                                    End If
+                                    '                                cpcore.main_domainForwardUrl = "http://"
+                                    '                                If cpcore.main_ServerPageSecure Then
+                                    '                                    cpcore.main_domainForwardUrl = "https://"
+                                    '                                End If
+                                    '                                cpcore.main_domainForwardUrl = cpcore.main_domainForwardUrl & forwardDomain & cpcore.main_ServerPathPage
+                                    '                                If cpcore.main_ServerQueryString <> "" Then
+                                    '                                    cpcore.main_domainForwardUrl = cpcore.main_domainForwardUrl & "?" & cpcore.main_ServerQueryString
+                                    '                                End If
+                                    '                                Call cpcore.main_Redirect2(main_domainForwardUrl, "Forwarding to [" & cpcore.main_domainForwardUrl & "] because the current domain [" & cpcore.main_ServerHost & "] is in the domain content set to forward to this replacement domain", False)
+                                End If
+                            End If
+                            If cpCore.domains.domainDetails.noFollow Then
+                                cpCore.main_MetaContent_NoFollow = True
+                            End If
+
+                        Else
+                            '
+                            ' domain not found
+                            ' current host not in domainContent, add it and re-save the cache
+                            '
                             Dim domainDetailsNew As New coreDomainsClass.domainDetailsClass
-                            domainDetailsNew.name = domain
+                            domainDetailsNew.name = requestDomain
                             domainDetailsNew.rootPageId = 0
                             domainDetailsNew.noFollow = False
                             domainDetailsNew.typeId = 1
@@ -674,302 +734,199 @@ Namespace Contensive.Core
                             domainDetailsNew.pageNotFoundPageId = 0
                             domainDetailsNew.allowCrossLogin = False
                             domainDetailsNew.forwardDomainId = 0
-                            cpCore.domains.domainDetailsList.Add(domain.ToLower(), domainDetailsNew)
-                        End If
-                    Next
-                    If cpCore.domains.domainDetailsList.ContainsKey(requestDomain.ToLower()) Then
-                        '
-                        ' domain found
-                        '
-                        cpCore.domains.domainDetails = cpCore.domains.domainDetailsList(requestDomain.ToLower())
-                        If (cpCore.domains.domainDetails.id = 0) Then
-                            '
-                            ' this is a default domain or a new domain -- add to the domain table
+                            cpCore.domains.domainDetailsList.Add(requestDomain.ToLower(), domainDetailsNew)
                             '
                             CS = cpCore.db.db_csInsertRecord("domains")
                             If cpCore.db.db_csOk(CS) Then
                                 cpCore.domains.domainDetails.id = cpCore.db.db_GetCSInteger(CS, "id")
                                 Call cpCore.db.db_setCS(CS, "name", requestDomain)
-                                Call cpCore.db.db_setCS(CS, "typeId", "1")
-                                Call cpCore.db.db_setCS(CS, "RootPageId", cpCore.domains.domainDetails.rootPageId.ToString)
-                                Call cpCore.db.db_setCS(CS, "ForwardUrl", cpCore.domains.domainDetails.forwardUrl)
-                                Call cpCore.db.db_setCS(CS, "NoFollow", cpCore.domains.domainDetails.noFollow.ToString)
-                                Call cpCore.db.db_setCS(CS, "Visited", cpCore.domains.domainDetails.visited.ToString)
-                                Call cpCore.db.db_setCS(CS, "DefaultTemplateId", cpCore.domains.domainDetails.defaultTemplateId.ToString)
-                                Call cpCore.db.db_setCS(CS, "PageNotFoundPageId", cpCore.domains.domainDetails.pageNotFoundPageId.ToString)
-                                Call cpCore.db.db_setCS(CS, "allowCrossLogin", cpCore.domains.domainDetails.allowCrossLogin.ToString)
+                                Call cpCore.db.db_setCS(CS, "typeid", "1")
                             End If
                             Call cpCore.db.db_csClose(CS)
+                            '
+                            updateDomainCache = True
                         End If
-                        If Not cpCore.domains.domainDetails.visited Then
+                        If (updateDomainCache) Then
                             '
-                            ' set visited true
+                            ' if there was a change, update the cache
                             '
-                            SQL = "update ccdomains set visited=1 where name=" & cpCore.db.encodeSQLText(requestDomain)
-                            Call cpCore.db.executeSql(SQL)
-                            Call cpCore.cache.setKey("domainContentList", "", "domains")
+                            domainDetailsListText = cpCore.json.Serialize(cpCore.domains.domainDetailsList)
+                            Call cpCore.cache.setKey("domainContentList", domainDetailsListText, "domains")
                         End If
-                        If cpCore.domains.domainDetails.typeId = 1 Then
+
+                        '
+                        cpCore.properties_site__AllowVisitTracking = cpCore.siteProperties.getBoolean("allowVisitTracking", True)
+                        '
+                        cpCore.web_requestVirtualFilePath = "/" & cpCore.appConfig.name
+                        '
+                        cpCore.web_requestContentWatchPrefix = cpCore.web_requestProtocol & requestDomain & cpCore.www_requestRootPath
+                        cpCore.web_requestContentWatchPrefix = Mid(cpCore.web_requestContentWatchPrefix, 1, Len(cpCore.web_requestContentWatchPrefix) - 1)
+                        '
+                        'ServerSocketLoaded = False
+                        '
+                        ' ----- Server Identification
+                        '       keep case from AppRootPath, but do not redirect
+                        '       all cpcore.main_ContentWatch URLs should be checked (and changed to) AppRootPath
+                        '
+                        '
+                        cpCore.web_requestPath = "/"
+                        cpCore.web_requestPage = cpCore.siteProperties.serverPageDefault
+                        TextStartPointer = InStrRev(requestPathPage, "/")
+                        If TextStartPointer <> 0 Then
+                            cpCore.web_requestPath = Mid(requestPathPage, 1, TextStartPointer)
+                            cpCore.web_requestPage = Mid(requestPathPage, TextStartPointer + 1)
+                        End If
+                        ' cpcore.web_requestAppPath = Mid(cpcore.web_requestPath, Len(appRootPath) + 1)
+                        cpCore.web_requestSecureURLRoot = "https://" & cpCore.main_ServerDomain & cpCore.www_requestRootPath
+                        ''
+                        '' ----- If virtual site, check RootPath case against current URL
+                        ''
+                        'If appRootPath <> "/" Then
+                        '    PathTest = Left(cpcore.web_requestPath, Len(appRootPath))
+                        '    If PathTest <> appRootPath Then
+                        '        '
+                        '        ' Case mismatch, redirect to correct case so cookies will be valid
+                        '        '
+                        '        'Call AppendLog("main_init(), 1810 - exit for rootpath mismatch (?)")
+                        '        '
+                        '        If web.requestQueryString = "" Then
+                        '            Link = cpcore.web_requestProtocol & cpcore.main_ServerDomain & appRootPath & cpcore.web_requestAppPath & cpcore.web_requestPage
+                        '        Else
+                        '            Link = cpcore.web_requestProtocol & cpcore.main_ServerDomain & appRootPath & cpcore.web_requestAppPath & cpcore.web_requestPage & "?" & web.requestQueryString
+                        '        End If
+                        '        Call cpcore.web_Redirect2(Link, "Redirecting because this site is configured to only run in the path [" & appRootPath & "]. See the IIS Virtual Folder property of the Contensive Application Manager.", False)
+                        '        cpcore. docopen = False '--- should be disposed by caller --- Call dispose
+                        '        Return cpcore. docopen
+                        '    End If
+                        'End If
+                        '
+                        ' ----- cpcore.main_RefreshQueryString
+                        '
+                        Id = cpCore.docProperties.getInteger("bid")
+                        If Id <> 0 Then
+                            Call cpCore.web_addRefreshQueryString("bid", Id.ToString)
+                        End If
+                        Id = cpCore.docProperties.getInteger("sid")
+                        If Id <> 0 Then
+                            Call cpCore.web_addRefreshQueryString("sid", Id.ToString)
+                        End If
+                        '
+                        ' ----- Create Server Link property
+                        '
+                        cpCore.main_ServerLink = cpCore.web_requestProtocol & requestDomain & cpCore.www_requestRootPath & cpCore.web_requestPath & cpCore.web_requestPage
+                        If requestQueryString <> "" Then
+                            cpCore.main_ServerLink = cpCore.main_ServerLink & "?" & requestQueryString
+                        End If
+                        If requestLinkSource = "" Then
+                            requestLinkSource = cpCore.main_ServerLink
+                        End If
+                        '
+                        ' ----- File storage
+                        '
+                        'app.siteProperty_publicFileContentPathPrefix = cpcore.main_ServerVirtualPath & "/files/"
+                        '
+                        ' ----- Style tag
+                        '
+                        cpCore.main_AdminMessage = "For more information, please contact the <a href=""mailto:" & cpCore.siteProperties.emailAdmin & "?subject=Re: " & cpCore.main_ServerDomain & """>Site Administrator</A>."
+
+                        '
+                        '
+                        '
+                        ' START - this goes in getRoute (link alias and link forwarding hooks)
+                        '
+                        '
+                        '
+                        '
+                        '
+                        '
+                        '--------------------------------------------------------------------------
+                        ' ----- Create Server Link property
+                        '--------------------------------------------------------------------------
+                        '
+                        cpCore.main_ServerLink = cpCore.web_requestProtocol & requestDomain & cpCore.www_requestRootPath & cpCore.web_requestPath & cpCore.web_requestPage
+                        If requestQueryString <> "" Then
+                            cpCore.main_ServerLink = cpCore.main_ServerLink & "?" & requestQueryString
+                        End If
+                        '
+                        '--------------------------------------------------------------------------
+                        ' ----- Domain and path checks
+                        '       must be before cookie check, because the cookie is only availabel on teh right path
+                        '--------------------------------------------------------------------------
+                        '
+                        'Call AppendLog("main_init(), 2300")
+                        '
+                        If (RedirectLink = "") And (Not cpCore.domains.ServerMultiDomainMode) And (LCase(requestDomain) <> LCase(cpCore.main_ServerDomain)) Then
                             '
-                            ' normal domain, leave it
+                            'Call AppendLog("main_init(), 2310 - exit in domain and path check")
                             '
-                        ElseIf InStr(1, requestPathPage, cpCore.siteProperties.adminURL, vbTextCompare) <> 0 Then
-                            '
-                            ' forwarding does not work in the admin site
-                            '
-                        ElseIf (cpCore.domains.domainDetails.typeId = 2) And (cpCore.domains.domainDetails.forwardUrl <> "") Then
-                            '
-                            ' forward to a URL
-                            '
-                            '
-                            'Call AppendLog("main_init(), 1710 - exit for domain forward")
-                            '
-                            If InStr(1, cpCore.domains.domainDetails.forwardUrl, "://") = 0 Then
-                                cpCore.domains.domainDetails.forwardUrl = "http://" & cpCore.domains.domainDetails.forwardUrl
+                            Copy = "Redirecting to domain [" & cpCore.main_ServerDomain & "] because this site is configured to run on the current domain [" & requestDomain & "]"
+                            If requestQueryString <> "" Then
+                                Call cpCore.web_Redirect2(cpCore.web_requestProtocol & cpCore.main_ServerDomain & cpCore.web_requestPath & cpCore.web_requestPage & "?" & requestQueryString, Copy, False)
+                            Else
+                                Call cpCore.web_Redirect2(cpCore.web_requestProtocol & cpCore.main_ServerDomain & cpCore.web_requestPath & cpCore.web_requestPage, Copy, False)
                             End If
-                            Call cpCore.web_Redirect2(cpCore.domains.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domains.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this URL", False)
+                            cpCore.docOpen = False '--- should be disposed by caller --- Call dispose
                             Return cpCore.docOpen
-                        ElseIf (cpCore.domains.domainDetails.typeId = 3) And (cpCore.domains.domainDetails.forwardDomainId <> 0) And (cpCore.domains.domainDetails.forwardDomainId <> cpCore.domains.domainDetails.id) Then
-                            '
-                            ' forward to a replacement domain
-                            '
-                            forwardDomain = cpCore.main_GetRecordName("domains", cpCore.domains.domainDetails.forwardDomainId)
-                            If forwardDomain <> "" Then
-                                Pos = InStr(1, requestLinkSource, requestDomain, vbTextCompare)
-                                If (Pos > 0) Then
-                                    '
-                                    'Call AppendLog("main_init(), 1720 - exit for forward domain")
-                                    '
-                                    cpCore.domains.domainDetails.forwardUrl = Mid(requestLinkSource, 1, Pos - 1) & forwardDomain & Mid(requestLinkSource, Pos + Len(requestDomain))
-                                    'main_domainForwardUrl = Replace(main_ServerLinkSource, cpcore.main_ServerHost, forwardDomain)
-                                    Call cpCore.web_Redirect2(cpCore.domains.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domains.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this replacement domain", False)
-                                    Return cpCore.docOpen
-                                End If
-                                '                                cpcore.main_domainForwardUrl = "http://"
-                                '                                If cpcore.main_ServerPageSecure Then
-                                '                                    cpcore.main_domainForwardUrl = "https://"
-                                '                                End If
-                                '                                cpcore.main_domainForwardUrl = cpcore.main_domainForwardUrl & forwardDomain & cpcore.main_ServerPathPage
-                                '                                If cpcore.main_ServerQueryString <> "" Then
-                                '                                    cpcore.main_domainForwardUrl = cpcore.main_domainForwardUrl & "?" & cpcore.main_ServerQueryString
-                                '                                End If
-                                '                                Call cpcore.main_Redirect2(main_domainForwardUrl, "Forwarding to [" & cpcore.main_domainForwardUrl & "] because the current domain [" & cpcore.main_ServerHost & "] is in the domain content set to forward to this replacement domain", False)
+                        End If
+                        '
+                        ' ----- Verify virtual path is not used on non-virtual sites
+                        '
+                        If (RedirectLink = "") And (cpCore.www_requestRootPath = "/") And (InStr(1, cpCore.web_requestPath, cpCore.web_requestVirtualFilePath & "/", vbTextCompare) = 1) Then
+                            Copy = "Redirecting because this site can not be run in the path [" & cpCore.web_requestVirtualFilePath & "]"
+                            cpCore.web_requestPath = Replace(cpCore.web_requestPath, cpCore.appConfig.name & "/", "", , , vbTextCompare)
+                            If requestQueryString <> "" Then
+                                Call cpCore.web_Redirect2(cpCore.web_requestProtocol & cpCore.main_ServerDomain & cpCore.www_requestRootPath & cpCore.web_requestPath & cpCore.web_requestPage & "?" & requestQueryString, Copy, False)
+                            Else
+                                Call cpCore.web_Redirect2(cpCore.web_requestProtocol & cpCore.main_ServerDomain & cpCore.www_requestRootPath & cpCore.web_requestPath & cpCore.web_requestPage, Copy, False)
                             End If
                         End If
-                        If cpCore.domains.domainDetails.noFollow Then
-                            cpCore.main_MetaContent_NoFollow = True
+                        '
+                        ' ----- Create cpcore.main_ServerFormActionURL if it has not been overridden manually
+                        '
+                        If cpCore.web_ServerFormActionURL = "" Then
+                            cpCore.web_ServerFormActionURL = cpCore.web_requestProtocol & requestDomain & cpCore.web_requestPath & cpCore.web_requestPage
                         End If
-
-                    Else
                         '
-                        ' domain not found
-                        ' current host not in domainContent, add it and re-save the cache
+                        '--------------------------------------------------------------------------
+                        ' ----- Initialize Visit
+                        '   AjaxFast does NOT support visit tracking
+                        '   Ajax and RemoteMethods DO support visit tracking so they can handle authentication based permissions
+                        '--------------------------------------------------------------------------
                         '
-                        Dim domainDetailsNew As New coreDomainsClass.domainDetailsClass
-                        domainDetailsNew.name = requestDomain
-                        domainDetailsNew.rootPageId = 0
-                        domainDetailsNew.noFollow = False
-                        domainDetailsNew.typeId = 1
-                        domainDetailsNew.visited = False
-                        domainDetailsNew.id = 0
-                        domainDetailsNew.forwardUrl = ""
-                        domainDetailsNew.defaultTemplateId = 0
-                        domainDetailsNew.pageNotFoundPageId = 0
-                        domainDetailsNew.allowCrossLogin = False
-                        domainDetailsNew.forwardDomainId = 0
-                        cpCore.domains.domainDetailsList.Add(requestDomain.ToLower(), domainDetailsNew)
+                        'Call AppendLog("main_init(), 2400")
                         '
-                        CS = cpCore.db.db_csInsertRecord("domains")
-                        If cpCore.db.db_csOk(CS) Then
-                            cpCore.domains.domainDetails.id = cpCore.db.db_GetCSInteger(CS, "id")
-                            Call cpCore.db.db_setCS(CS, "name", requestDomain)
-                            Call cpCore.db.db_setCS(CS, "typeid", "1")
+                        ''hint = "Initializing Visit"
+                        Call cpCore.web_init_initVisit(cpCore.properties_site__AllowVisitTracking)
+                        '
+                        '--------------------------------------------------------------------------
+                        ' ----- Process Early redirects, like PageNotFound
+                        '       Must wait for here so admin message can be displayed explaining problem
+                        '       Visit is necessary to identify admin
+                        '--------------------------------------------------------------------------
+                        '
+                        If (RedirectLink <> "") Then
+                            '
+                            'Call AppendLog("main_init(), 2510 - exit for redirect")
+                            '
+                            Call cpCore.web_Redirect2(RedirectLink, RedirectReason, IsPageNotFound)
+                            cpCore.docOpen = False '--- should be disposed by caller --- Call dispose
+                            Return cpCore.docOpen
                         End If
-                        Call cpCore.db.db_csClose(CS)
                         '
-                        updateDomainCache = True
-                    End If
-                    If (updateDomainCache) Then
+                        '--------------------------------------------------------------------------
+                        '   Setup Debugging
+                        '       must be on good domainname (for cookie), after authentication, after visit detect and after cpcore.main_ProcessFormToolsPanel
+                        '--------------------------------------------------------------------------
                         '
-                        ' if there was a change, update the cache
+                        ''hint = "Checking Debugging Hook (was Verbose Reporting)"
                         '
-                        domainDetailsListText = cpCore.json.Serialize(cpCore.domains.domainDetailsList)
-                        Call cpCore.cache.setKey("domainContentList", domainDetailsListText, "domains")
-                    End If
-
-                    '
-                    cpCore.properties_site__AllowVisitTracking = cpCore.siteProperties.getBoolean("allowVisitTracking", True)
-                    '
-                    cpCore.web_requestVirtualFilePath = "/" & cpCore.appConfig.name
-                    '
-                    cpCore.web_requestContentWatchPrefix = cpCore.web_requestProtocol & requestDomain & cpCore.www_requestRootPath
-                    cpCore.web_requestContentWatchPrefix = Mid(cpCore.web_requestContentWatchPrefix, 1, Len(cpCore.web_requestContentWatchPrefix) - 1)
-                    '
-                    'ServerSocketLoaded = False
-                    '
-                    ' ----- Server Identification
-                    '       keep case from AppRootPath, but do not redirect
-                    '       all cpcore.main_ContentWatch URLs should be checked (and changed to) AppRootPath
-                    '
-                    '
-                    cpCore.web_requestPath = "/"
-                    cpCore.web_requestPage = cpCore.siteProperties.serverPageDefault
-                    TextStartPointer = InStrRev(requestPathPage, "/")
-                    If TextStartPointer <> 0 Then
-                        cpCore.web_requestPath = Mid(requestPathPage, 1, TextStartPointer)
-                        cpCore.web_requestPage = Mid(requestPathPage, TextStartPointer + 1)
-                    End If
-                    ' cpcore.web_requestAppPath = Mid(cpcore.web_requestPath, Len(appRootPath) + 1)
-                    cpCore.web_requestSecureURLRoot = "https://" & cpCore.main_ServerDomain & cpCore.www_requestRootPath
-                    ''
-                    '' ----- If virtual site, check RootPath case against current URL
-                    ''
-                    'If appRootPath <> "/" Then
-                    '    PathTest = Left(cpcore.web_requestPath, Len(appRootPath))
-                    '    If PathTest <> appRootPath Then
-                    '        '
-                    '        ' Case mismatch, redirect to correct case so cookies will be valid
-                    '        '
-                    '        'Call AppendLog("main_init(), 1810 - exit for rootpath mismatch (?)")
-                    '        '
-                    '        If web.requestQueryString = "" Then
-                    '            Link = cpcore.web_requestProtocol & cpcore.main_ServerDomain & appRootPath & cpcore.web_requestAppPath & cpcore.web_requestPage
-                    '        Else
-                    '            Link = cpcore.web_requestProtocol & cpcore.main_ServerDomain & appRootPath & cpcore.web_requestAppPath & cpcore.web_requestPage & "?" & web.requestQueryString
-                    '        End If
-                    '        Call cpcore.web_Redirect2(Link, "Redirecting because this site is configured to only run in the path [" & appRootPath & "]. See the IIS Virtual Folder property of the Contensive Application Manager.", False)
-                    '        cpcore. docopen = False '--- should be disposed by caller --- Call dispose
-                    '        Return cpcore. docopen
-                    '    End If
-                    'End If
-                    '
-                    ' ----- cpcore.main_RefreshQueryString
-                    '
-                    Id = cpCore.docProperties.getInteger("bid")
-                    If Id <> 0 Then
-                        Call cpCore.web_addRefreshQueryString("bid", Id.ToString)
-                    End If
-                    Id = cpCore.docProperties.getInteger("sid")
-                    If Id <> 0 Then
-                        Call cpCore.web_addRefreshQueryString("sid", Id.ToString)
-                    End If
-                    '
-                    ' ----- Create Server Link property
-                    '
-                    cpCore.main_ServerLink = cpCore.web_requestProtocol & requestDomain & cpCore.www_requestRootPath & cpCore.web_requestPath & cpCore.web_requestPage
-                    If requestQueryString <> "" Then
-                        cpCore.main_ServerLink = cpCore.main_ServerLink & "?" & requestQueryString
-                    End If
-                    If requestLinkSource = "" Then
-                        requestLinkSource = cpCore.main_ServerLink
-                    End If
-                    '
-                    ' ----- File storage
-                    '
-                    'app.siteProperty_publicFileContentPathPrefix = cpcore.main_ServerVirtualPath & "/files/"
-                    '
-                    ' ----- Style tag
-                    '
-                    cpCore.main_AdminMessage = "For more information, please contact the <a href=""mailto:" & cpCore.siteProperties.emailAdmin & "?subject=Re: " & cpCore.main_ServerDomain & """>Site Administrator</A>."
-
-                    '
-                    '
-                    '
-                    ' START - this goes in getRoute (link alias and link forwarding hooks)
-                    '
-                    '
-                    '
-                    '
-                    '
-                    '
-                    '--------------------------------------------------------------------------
-                    ' ----- Create Server Link property
-                    '--------------------------------------------------------------------------
-                    '
-                    cpCore.main_ServerLink = cpCore.web_requestProtocol & requestDomain & cpCore.www_requestRootPath & cpCore.web_requestPath & cpCore.web_requestPage
-                    If requestQueryString <> "" Then
-                        cpCore.main_ServerLink = cpCore.main_ServerLink & "?" & requestQueryString
-                    End If
-                    '
-                    '--------------------------------------------------------------------------
-                    ' ----- Domain and path checks
-                    '       must be before cookie check, because the cookie is only availabel on teh right path
-                    '--------------------------------------------------------------------------
-                    '
-                    'Call AppendLog("main_init(), 2300")
-                    '
-                    If (RedirectLink = "") And (Not cpCore.domains.ServerMultiDomainMode) And (LCase(requestDomain) <> LCase(cpCore.main_ServerDomain)) Then
+                        ' debug printed defaults on, so if not on, set it off and clear what was collected
                         '
-                        'Call AppendLog("main_init(), 2310 - exit in domain and path check")
-                        '
-                        Copy = "Redirecting to domain [" & cpCore.main_ServerDomain & "] because this site is configured to run on the current domain [" & requestDomain & "]"
-                        If requestQueryString <> "" Then
-                            Call cpCore.web_Redirect2(cpCore.web_requestProtocol & cpCore.main_ServerDomain & cpCore.web_requestPath & cpCore.web_requestPage & "?" & requestQueryString, Copy, False)
-                        Else
-                            Call cpCore.web_Redirect2(cpCore.web_requestProtocol & cpCore.main_ServerDomain & cpCore.web_requestPath & cpCore.web_requestPage, Copy, False)
-                        End If
-                        cpCore.docOpen = False '--- should be disposed by caller --- Call dispose
-                        Return cpCore.docOpen
-                    End If
-                    '
-                    ' ----- Verify virtual path is not used on non-virtual sites
-                    '
-                    If (RedirectLink = "") And (cpCore.www_requestRootPath = "/") And (InStr(1, cpCore.web_requestPath, cpCore.web_requestVirtualFilePath & "/", vbTextCompare) = 1) Then
-                        Copy = "Redirecting because this site can not be run in the path [" & cpCore.web_requestVirtualFilePath & "]"
-                        cpCore.web_requestPath = Replace(cpCore.web_requestPath, cpCore.appConfig.name & "/", "", , , vbTextCompare)
-                        If requestQueryString <> "" Then
-                            Call cpCore.web_Redirect2(cpCore.web_requestProtocol & cpCore.main_ServerDomain & cpCore.www_requestRootPath & cpCore.web_requestPath & cpCore.web_requestPage & "?" & requestQueryString, Copy, False)
-                        Else
-                            Call cpCore.web_Redirect2(cpCore.web_requestProtocol & cpCore.main_ServerDomain & cpCore.www_requestRootPath & cpCore.web_requestPath & cpCore.web_requestPage, Copy, False)
+                        If Not cpCore.main_VisitProperty_AllowDebugging Then
+                            cpCore.main_PageTestPointPrinting = False
+                            cpCore.main_testPointMessage = ""
                         End If
                     End If
-                    '
-                    ' ----- Create cpcore.main_ServerFormActionURL if it has not been overridden manually
-                    '
-                    If cpCore.web_ServerFormActionURL = "" Then
-                        cpCore.web_ServerFormActionURL = cpCore.web_requestProtocol & requestDomain & cpCore.web_requestPath & cpCore.web_requestPage
-                    End If
-                    '
-                    '--------------------------------------------------------------------------
-                    ' ----- Initialize Visit
-                    '   AjaxFast does NOT support visit tracking
-                    '   Ajax and RemoteMethods DO support visit tracking so they can handle authentication based permissions
-                    '--------------------------------------------------------------------------
-                    '
-                    'Call AppendLog("main_init(), 2400")
-                    '
-                    ''hint = "Initializing Visit"
-                    Call cpCore.web_init_initVisit(cpCore.properties_site__AllowVisitTracking)
-                    '
-                    '--------------------------------------------------------------------------
-                    ' ----- Process Early redirects, like PageNotFound
-                    '       Must wait for here so admin message can be displayed explaining problem
-                    '       Visit is necessary to identify admin
-                    '--------------------------------------------------------------------------
-                    '
-                    If (RedirectLink <> "") Then
-                        '
-                        'Call AppendLog("main_init(), 2510 - exit for redirect")
-                        '
-                        Call cpCore.web_Redirect2(RedirectLink, RedirectReason, IsPageNotFound)
-                        cpCore.docOpen = False '--- should be disposed by caller --- Call dispose
-                        Return cpCore.docOpen
-                    End If
-                    '
-                    '--------------------------------------------------------------------------
-                    '   Setup Debugging
-                    '       must be on good domainname (for cookie), after authentication, after visit detect and after cpcore.main_ProcessFormToolsPanel
-                    '--------------------------------------------------------------------------
-                    '
-                    ''hint = "Checking Debugging Hook (was Verbose Reporting)"
-                    '
-                    ' debug printed defaults on, so if not on, set it off and clear what was collected
-                    '
-                    If Not cpCore.main_VisitProperty_AllowDebugging Then
-                        cpCore.main_PageTestPointPrinting = False
-                        cpCore.main_testPointMessage = ""
-                    End If
-                End If
                 '
                 '--------------------------------------------------------------------------------
                 ' done at last

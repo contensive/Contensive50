@@ -47,13 +47,14 @@ Namespace Contensive.Addons
                     & vbCrLf & "visit.id:" & cpCore.main_VisitId _
                     & vbCrLf & "url:" & cpCore.main_ServerLink _
                     & vbCrLf & "url source:" & cpCore.webServer.requestLinkSource
-                If cpCore.webServer.requestForm <> "" Then
-                    SaveContent &= "" _
+                SaveContent &= "" _
                         & vbCrLf & "----------" _
-                        & vbCrLf & "form post:" _
-                        & vbCrLf & cpCore.webServer.requestForm _
-                        & vbCrLf
-                End If
+                        & vbCrLf & "form post:"
+                For Each kvp As KeyValuePair(Of String, docPropertiesClass) In cpCore.docProperties.docPropertiesDict
+                    If kvp.Value.IsForm Then
+                        SaveContent &= vbCrLf & kvp.Value.NameValue
+                    End If
+                Next
                 If Not IsNothing(cpCore.webServer.requestFormBinaryHeader) Then
                     BinaryHeader = cpCore.webServer.requestFormBinaryHeader
                     BinaryHeaderString = kmaByteArrayToString(BinaryHeader)

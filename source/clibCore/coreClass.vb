@@ -7747,7 +7747,7 @@ ErrorTrap:
                     ' the same as the destination of the link forward, this throws an error and does not forward. the only case where main_ServerLinksource is different
                     ' then main_ServerLink is the linkfforward/linkalias case.
                     '
-                ElseIf (webServer.requestForm = "") And (webServer.requestLinkSource = FullLink) Then
+                ElseIf (webServer.requestFormString = "") And (webServer.requestLinkSource = FullLink) Then
                     '
                     ' Loop redirect error, throw trap and block redirect to prevent loop
                     '
@@ -10149,22 +10149,12 @@ ErrorTrap:
                     End If
                     DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerQueryString", Copy)
                     Copy = ""
-                    If webServer.requestForm <> "" Then
-                        CopySplit = Split(webServer.requestForm, "&")
-                        For Ptr = 0 To UBound(CopySplit)
-                            copyNameValue = CopySplit(Ptr)
-                            If copyNameValue <> "" Then
-                                copyNameValueSplit = Split(copyNameValue, "=")
-                                CopyName = DecodeResponseVariable(copyNameValueSplit(0))
-                                copyValue = ""
-                                If UBound(copyNameValueSplit) > 0 Then
-                                    copyValue = DecodeResponseVariable(copyNameValueSplit(1))
-                                End If
-                                Copy = Copy & cr & "<br>" & html_EncodeHTML(CopyName & "=" & copyValue)
-                            End If
-                        Next
-                        Copy = Mid(Copy, 8)
-                    End If
+                    For Each kvp As KeyValuePair(Of String, docPropertiesClass) In docProperties.docPropertiesDict
+                        If kvp.Value.IsForm Then
+                            Copy = Copy & cr & "<br>" & html_EncodeHTML(kvp.Value.NameValue)
+                        End If
+                    Next
+
                     'DebugPanel = DebugPanel & main_DebugPanelRow("ServerForm", Copy)
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Request Path", html_EncodeHTML(web_requestPath))
                     'DebugPanel = DebugPanel & main_DebugPanelRow("CDN Files Path", html_EncodeHTML(appConfig.cdnFilesNetprefix))
@@ -22325,14 +22315,14 @@ ErrorTrap:
                                             ' New Way - use pageid and QueryStringSuffix
                                             '
                                             Dim LinkQueryString As String = "bid=" & cache_linkAlias(linkAliasCache_pageId, Ptr) & "&" & cache_linkAlias(linkAliasCache_queryStringSuffix, Ptr)
-                                            docProperties.setProperty("bid", cache_linkAlias(linkAliasCache_pageId, Ptr))
+                                            docProperties.setProperty("bid", cache_linkAlias(linkAliasCache_pageId, Ptr), False)
                                             Dim nameValuePairs As String() = Split(cache_linkAlias(linkAliasCache_queryStringSuffix, Ptr), "&")
                                             For Each nameValuePair As String In nameValuePairs
                                                 Dim nameValueThing As String() = Split(nameValuePair, "=")
                                                 If (nameValueThing.GetUpperBound(0) = 0) Then
-                                                    docProperties.setProperty(nameValueThing(0), "")
+                                                    docProperties.setProperty(nameValueThing(0), "", False)
                                                 Else
-                                                    docProperties.setProperty(nameValueThing(0), nameValueThing(1))
+                                                    docProperties.setProperty(nameValueThing(0), nameValueThing(1), False)
                                                 End If
                                             Next
                                         End If
@@ -30720,7 +30710,7 @@ ErrorTrap:
                 End If
                 '
                 main_GetEditorAddonListJSON = s
-                Call docProperties.setProperty(cacheKey, main_GetEditorAddonListJSON)
+                Call docProperties.setProperty(cacheKey, main_GetEditorAddonListJSON, False)
             End If
             '
             Exit Function
@@ -32467,7 +32457,7 @@ ErrorTrap:
                                         & "&HostRecordID=" & HostRecordID _
                                         & "&HostRQS=" & EncodeRequestVariable(web_RefreshQueryString) _
                                         & "&HostQS=" & EncodeRequestVariable(webServer.requestQueryString) _
-                                        & "&HostForm=" & EncodeRequestVariable(webServer.requestForm) _
+                                        & "&HostForm=" & EncodeRequestVariable(webServer.requestFormString) _
                                         & "&optionstring=" & EncodeRequestVariable(WorkingOptionString) _
                                         & ""
                                     If IsInline Then
@@ -32544,7 +32534,7 @@ ErrorTrap:
                                     If isMainOk Then
                                         QS = docProperties.getText("Hostform")
                                         If QS <> "" Then
-                                            Call webServer.addQueryStringToDocProperties(QS)
+                                            Call docProperties.addQueryString(QS)
                                         End If
                                         '
                                         ' restore refresh querystring values
@@ -32564,7 +32554,7 @@ ErrorTrap:
                                         ' restore query string
                                         '
                                         QS = docProperties.getText("HostQS")
-                                        Call webServer.addQueryStringToDocProperties(QS)
+                                        Call docProperties.addQueryString(QS)
                                         '
                                         ' Clear the style,js and meta features that were delivered to the host page
                                         ' After processing, if these strings are not empty, they must have been added by the DLL
@@ -40637,7 +40627,7 @@ ErrorTrap:
             ' web client initialize
             '
             iisContext = httpContext
-            Dim NewKey As String
+            Dim newKey As String
             Dim isMultipartPost As Boolean
             Dim c As String
             Dim newValue As String
@@ -40756,6 +40746,7 @@ ErrorTrap:
             '
             ' init post (form)
             '
+            webServer.requestFormString = ""
             Dim postError As Boolean = False
             Try
                 Dim inputStream As IO.Stream = iisContext.Request.InputStream
@@ -40772,21 +40763,20 @@ ErrorTrap:
                 If isMultipartPost Then
                     Try
                         '
-                        ' convert to standard form object and process here
+                        ' multipart pot - add to doc properties and requestformstring
                         '
                         parser = New MultipartFormDataParser(iisContext.Request.InputStream)
-                        c = ""
                         For Each parameter As ParameterPart In parser.Parameters
-                            NewKey = parameter.Name
+                            newKey = parameter.Name
                             newValue = parameter.Data
-                            c &= "&" & iisContext.Server.UrlEncode(NewKey) & "=" & iisContext.Server.UrlEncode(newValue)
+                            docProperties.setProperty(newKey, newValue, True)
+                            webServer.requestFormString &= "&" & iisContext.Server.UrlEncode(newKey) & "=" & iisContext.Server.UrlEncode(newValue)
                         Next
-                        If Len(c) > 0 Then
-                            c = Mid(c, 2)
+                        If Len(webServer.requestFormString) > 0 Then
+                            webServer.requestFormString = webServer.requestFormString.Substring(1)
                         End If
-                        webServer.requestForm = c
                         '
-                        ' file uploads
+                        ' file uploads, add to doc properties
                         '
                         If parser.Files.Count > 0 Then
                             Dim ptr As Integer = 0
@@ -40802,7 +40792,8 @@ ErrorTrap:
                                     Using fileStream As System.IO.FileStream = System.IO.File.OpenWrite(privateFiles.rootLocalFolderPath & tmpFilename)
                                         file.Data.CopyTo(fileStream)
                                     End Using
-                                    webServer.requestFormFiles = "" _
+                                    docProperties.setProperty(file.Name, file.FileName, True, True)
+                                    webServer.requesFilesString = "" _
                                     & "&" & ptrText & "formname=" & file.Name _
                                     & "&" & ptrText & "filename=" & file.FileName _
                                     & "&" & ptrText & "type=" _
@@ -40846,46 +40837,25 @@ ErrorTrap:
                     End Try
                 Else
                     '
-                    ' non-binary form, create Form String
+                    ' non-binary form, add to properties and create Form String
                     '
-                    c = ""
-                    For Each NewKey In iisContext.Request.Form.Keys
-                        ' NewKey = nameValue.GetKey()
-                        'If cp.Utils.EncodeInteger(Request.Form(NewKey).Count) > 1 Then
-                        '    keyValue = ""
-                        '    For keyPointer = 1 To Request.Form(NewKey).Count
-                        '        If keyValue <> "" Then
-                        '            keyValue = keyValue & ","
-                        '        End If
-                        '        keyValue = keyValue & Request.Form(NewKey)(keyPointer)
-                        '    Next
-                        '    c = c & "&" & Server.server.UrlEncode(CStr(NewKey)) & "=" & Server.server.UrlEncode(CStr(keyValue))
-                        'Else
-                        c = c & "&" & iisContext.Server.UrlEncode(CStr(NewKey)) & "=" & iisContext.Server.UrlEncode(iisContext.Request.Form(NewKey))
-                        'End If
+                    For Each newKey In iisContext.Request.Form.Keys
+                        newValue = iisContext.Request.Form(newKey)
+                        docProperties.setProperty(newKey, newValue, True)
+                        webServer.requestFormString &= "&" & iisContext.Server.UrlEncode(newKey) & "=" & iisContext.Server.UrlEncode(newValue)
                     Next
-                    If Len(c) > 0 Then
-                        c = Mid(c, 2)
+                    If Len(webServer.requestFormString) > 0 Then
+                        webServer.requestFormString = webServer.requestFormString.Substring(1)
                     End If
-                    webServer.requestForm = c
                 End If
             End If
             '
             ' load request cookies
             '
-            For Each NewKey In iisContext.Request.Cookies
-                Dim cookieValue = iisContext.Request.Cookies(NewKey).Value
+            For Each newKey In iisContext.Request.Cookies
+                Dim cookieValue = iisContext.Request.Cookies(newKey).Value
                 cookieValue = DecodeResponseVariable(cookieValue)
-                webServer.addRequestCookie(NewKey, cookieValue)
-                'Dim newCookie As New coreWebServerClass.cookieClass
-                'newCookie.name = NewKey
-                'If web.requestCookies.ContainsKey(NewKey) Then
-                '    '
-                '    Dim test As System.Web.HttpCookie = iisContext.Request.Cookies(NewKey)
-                'Else
-                '    newCookie.value = iisContext.Server.UrlEncode(iisContext.Request.Cookies(NewKey).Value)
-                '    web.requestCookies.Add(NewKey, newCookie)
-                'End If
+                webServer.addRequestCookie(newKey, cookieValue)
             Next
             '
             Call webServer.web_Init()

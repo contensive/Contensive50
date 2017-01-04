@@ -40,14 +40,26 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Sub setProperty(key As String, value As String)
+            setProperty(key, value, False, False)
+        End Sub
+        '
+        '====================================================================================================
+        '
+        Public Sub setProperty(key As String, value As String, isForm As Boolean)
+            setProperty(key, value, isForm, False)
+        End Sub
+        '
+        '====================================================================================================
+        '
+        Public Sub setProperty(key As String, value As String, isForm As Boolean, isFile As Boolean)
             Try
                 Dim prop As New docPropertiesClass
                 prop.NameValue = key
                 prop.FileContent = Nothing
                 prop.FileSize = 0
                 prop.fileType = ""
-                prop.IsFile = False
-                prop.IsForm = False
+                prop.IsFile = isFile
+                prop.IsForm = isForm
                 prop.Name = key
                 prop.NameValue = key & "=" & value
                 prop.Value = value
@@ -122,6 +134,56 @@ Namespace Contensive.Core
             End Try
             Return returnResult
         End Function
+        '
+        '
+        '
+        '==========================================================================================
+        ''' <summary>
+        ''' add querystring to the doc properties
+        ''' </summary>
+        ''' <param name="QS"></param>
+        Public Sub addQueryString(QS As String)
+            Try
+                '
+                Dim ampSplit() As String
+                Dim ampSplitCount As Integer
+                Dim ValuePair() As String
+                Dim key As String
+                Dim Ptr As Integer
+                '
+                ampSplit = Split(QS, "&")
+                ampSplitCount = UBound(ampSplit) + 1
+                For Ptr = 0 To ampSplitCount - 1
+                    Dim nameValuePair As String = ampSplit(Ptr)
+                    Dim docProperty As New docPropertiesClass
+                    With docProperty
+                        If Not String.IsNullOrEmpty(nameValuePair) Then
+                            If InStr(1, nameValuePair, "=") <> 0 Then
+                                ValuePair = Split(nameValuePair, "=")
+                                key = DecodeResponseVariable(CStr(ValuePair(0)))
+                                If key <> "" Then
+                                    .Name = key
+                                    If UBound(ValuePair) > 0 Then
+                                        .Value = DecodeResponseVariable(CStr(ValuePair(1)))
+                                    End If
+                                    .IsForm = False
+                                    .IsFile = False
+                                    cpCore.web_ReadStreamJSForm = cpCore.web_ReadStreamJSForm Or (UCase(.Name) = UCase(RequestNameJSForm))
+                                    cpCore.main_ReadStreamJSProcess = cpCore.main_ReadStreamJSProcess Or (UCase(.Name) = UCase(RequestNameJSProcess))
+                                    If .Name = RequestNameStateString Then
+                                        cpCore.main_Private_StateString_In = .Value
+                                    End If
+                                    cpCore.docProperties.setProperty(key, docProperty)
+                                End If
+                            End If
+                        End If
+                    End With
+                Next
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+        End Sub
+
     End Class
 
 
