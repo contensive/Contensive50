@@ -439,8 +439,8 @@ Namespace Contensive.Core
                         '
                         ' set build version so a scratch build will not go through data conversion
                         '
-                        DataBuildVersion = cpCore.version()
-                        Call cpCore.siteProperties.setProperty("BuildVersion", cpCore.version)
+                        DataBuildVersion = cpCore.common_version()
+                        Call cpCore.siteProperties.setProperty("BuildVersion", cpCore.common_version)
                         cpCore.db.dataBuildVersion_LocalLoaded = False
                     End If
                     '
@@ -448,9 +448,9 @@ Namespace Contensive.Core
                     ' ----- Upgrade Database fields if not new
                     '---------------------------------------------------------------------
                     '
-                    If DataBuildVersion < cpCore.version() Then
+                    If DataBuildVersion < cpCore.common_version() Then
                         '
-                        Call appendUpgradeLog("Calling database conversion, DataBuildVersion [" & DataBuildVersion & "], software version [" & cpCore.version() & "]")
+                        Call appendUpgradeLog("Calling database conversion, DataBuildVersion [" & DataBuildVersion & "], software version [" & cpCore.common_version() & "]")
                         '
                         Call Upgrade_Conversion(DataBuildVersion)
                     End If
@@ -572,8 +572,8 @@ Namespace Contensive.Core
                     '---------------------------------------------------------------------
                     '
                     If True Then
-                        Call appendUpgradeLog("Internal upgrade complete, set Buildversion to " & cpCore.version)
-                        Call cpCore.siteProperties.setProperty("BuildVersion", cpCore.version)
+                        Call appendUpgradeLog("Internal upgrade complete, set Buildversion to " & cpCore.common_version)
+                        Call cpCore.siteProperties.setProperty("BuildVersion", cpCore.common_version)
                         cpCore.db.dataBuildVersion_LocalLoaded = False
                         '
                         '---------------------------------------------------------------------
@@ -734,7 +734,7 @@ Namespace Contensive.Core
                                                                 If upgradeCollection Then
                                                                     Call appendUpgradeLog("...upgrading collection")
                                                                     saveLogFolder = classLogFolder
-                                                                    Call addonInstall.installCollectionFromLocalRepo(Me, IISResetRequired, CollectionGuid, cpCore.version, ErrorMessage, "", "", isNewBuild)
+                                                                    Call addonInstall.installCollectionFromLocalRepo(Me, IISResetRequired, CollectionGuid, cpCore.common_version, ErrorMessage, "", "", isNewBuild)
                                                                     classLogFolder = saveLogFolder
                                                                 End If
                                                             End If
@@ -2084,12 +2084,12 @@ Namespace Contensive.Core
                 Dim CS As Integer
                 Const ContentName = "States"
                 '
-                CS = cpCore.db.db_csOpen(ContentName, "name=" & cpCore.db.encodeSQLText(Name), , False)
-                If Not cpCore.db.db_csOk(CS) Then
+                CS = cpCore.db.csOpen(ContentName, "name=" & cpCore.db.encodeSQLText(Name), , False)
+                If Not cpCore.db.cs_Ok(CS) Then
                     '
                     ' create new record
                     '
-                    Call cpCore.db.db_csClose(CS)
+                    Call cpCore.db.cs_Close(CS)
                     CS = cpCore.db.db_csInsertRecord(ContentName, SystemMemberID)
                     Call cpCore.db.db_SetCSField(CS, "NAME", Name)
                     Call cpCore.db.db_SetCSField(CS, "ACTIVE", True)
@@ -2103,7 +2103,7 @@ Namespace Contensive.Core
                     Call cpCore.db.db_SetCSField(CS, "CountryID", CountryID)
                     Call cpCore.db.db_SetCSField(CS, "Abbreviation", Abbreviation)
                 End If
-                Call cpCore.db.db_csClose(CS)
+                Call cpCore.db.cs_Close(CS)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -2191,22 +2191,22 @@ Namespace Contensive.Core
                 Dim CS As Integer
                 Dim Active As Boolean
                 '
-                CS = cpCore.db.db_csOpen("Countries", "name=" & cpCore.db.encodeSQLText(Name))
-                If Not cpCore.db.db_csOk(CS) Then
-                    Call cpCore.db.db_csClose(CS)
+                CS = cpCore.db.csOpen("Countries", "name=" & cpCore.db.encodeSQLText(Name))
+                If Not cpCore.db.cs_Ok(CS) Then
+                    Call cpCore.db.cs_Close(CS)
                     CS = cpCore.db.db_csInsertRecord("Countries", SystemMemberID)
-                    If cpCore.db.db_csOk(CS) Then
+                    If cpCore.db.cs_Ok(CS) Then
                         Call cpCore.db.db_SetCSField(CS, "ACTIVE", True)
                     End If
                 End If
-                If cpCore.db.db_csOk(CS) Then
+                If cpCore.db.cs_Ok(CS) Then
                     Call cpCore.db.db_SetCSField(CS, "NAME", Name)
                     Call cpCore.db.db_SetCSField(CS, "Abbreviation", Abbreviation)
                     If LCase(Name) = "united states" Then
                         Call cpCore.db.db_setCS(CS, "DomesticShipping", "1")
                     End If
                 End If
-                Call cpCore.db.db_csClose(CS)
+                Call cpCore.db.cs_Close(CS)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -2643,11 +2643,11 @@ Namespace Contensive.Core
                 Else
                     SelectList = SelectList & ",AddonID"
                     If AddonName <> "" Then
-                        CS = cpCore.db.db_csOpen(AddonContentName, "name=" & cpCore.db.encodeSQLText(AddonName), "ID", False, , , , "ID", 1)
-                        If cpCore.db.db_csOk(CS) Then
-                            addonId = (cpCore.db.db_GetCSInteger(CS, "ID"))
+                        CS = cpCore.db.csOpen(AddonContentName, "name=" & cpCore.db.encodeSQLText(AddonName), "ID", False, , , , "ID", 1)
+                        If cpCore.db.cs_Ok(CS) Then
+                            addonId = (cpCore.db.cs_getInteger(CS, "ID"))
                         End If
-                        Call cpCore.db.db_csClose(CS)
+                        Call cpCore.db.cs_Close(CS)
                     End If
                 End If
                 ''
@@ -2659,11 +2659,11 @@ Namespace Contensive.Core
                 '
                 ParentID = 0
                 If ParentName <> "" Then
-                    CS = cpCore.db.db_csOpen(MenuContentName, "name=" & cpCore.db.encodeSQLText(ParentName), "ID", False, , , , "ID", 1)
-                    If cpCore.db.db_csOk(CS) Then
-                        ParentID = (cpCore.db.db_GetCSInteger(CS, "ID"))
+                    CS = cpCore.db.csOpen(MenuContentName, "name=" & cpCore.db.encodeSQLText(ParentName), "ID", False, , , , "ID", 1)
+                    If cpCore.db.cs_Ok(CS) Then
+                        ParentID = (cpCore.db.cs_getInteger(CS, "ID"))
                     End If
-                    Call cpCore.db.db_csClose(CS)
+                    Call cpCore.db.cs_Close(CS)
                 End If
                 '
                 ' Set ContentID from ContentName
@@ -2675,18 +2675,18 @@ Namespace Contensive.Core
                 '
                 ' Locate current entry
                 '
-                CSEntry = cpCore.db.db_csOpen(MenuContentName, "(name=" & cpCore.db.encodeSQLText(EntryName) & ")", "ID", False, , , , SelectList)
+                CSEntry = cpCore.db.csOpen(MenuContentName, "(name=" & cpCore.db.encodeSQLText(EntryName) & ")", "ID", False, , , , SelectList)
                 '
                 ' If no current entry, create one
                 '
-                If Not cpCore.db.db_csOk(CSEntry) Then
-                    cpCore.db.db_csClose(CSEntry)
+                If Not cpCore.db.cs_Ok(CSEntry) Then
+                    cpCore.db.cs_Close(CSEntry)
                     CSEntry = cpCore.db.db_csInsertRecord(MenuContentName, SystemMemberID)
-                    If cpCore.db.db_csOk(CSEntry) Then
+                    If cpCore.db.cs_Ok(CSEntry) Then
                         Call cpCore.db.db_SetCSField(CSEntry, "name", EntryName)
                     End If
                 End If
-                If cpCore.db.db_csOk(CSEntry) Then
+                If cpCore.db.cs_Ok(CSEntry) Then
                     If ParentID = 0 Then
                         Call cpCore.db.db_SetCSField(CSEntry, "ParentID", Nothing)
                     Else
@@ -2707,7 +2707,7 @@ Namespace Contensive.Core
                         Call cpCore.db.db_SetCSField(CSEntry, "AddonID", addonId)
                     End If
                 End If
-                Call cpCore.db.db_csClose(CSEntry)
+                Call cpCore.db.cs_Close(CSEntry)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try

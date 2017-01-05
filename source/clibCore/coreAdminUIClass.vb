@@ -480,7 +480,7 @@ ErrorTrap:
             End If
             GetEditRow = "<tr><td class=""ccEditCaptionCon""><nobr>" & Copy & "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=1 height=15 >"
             'GetEditRow = "<tr><td class=""ccAdminEditCaption""><nobr>" & Copy & "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=1 height=15 >"
-            'If cpCore.main_VisitProperty_AllowHelpIcon Then
+            'If cpCore.visitProperty.getboolean("AllowHelpIcon") Then
             '    'If HelpMessage <> "" Then
             '        GetEditRow = GetEditRow & "&nbsp;" & cpCore.main_GetHelpLinkEditable(0, Caption, HelpMessage, FormInputName)
             '    'Else
@@ -523,7 +523,7 @@ ErrorTrap:
                 Copy = "&nbsp;"
             End If
             GetEditRowWithHelpEdit = "<tr><td class=""ccAdminEditCaption""><nobr>" & Copy
-            If cpCore.main_VisitProperty_AllowHelpIcon Then
+            If cpCore.visitProperty.getBoolean("AllowHelpIcon") Then
                 'If HelpMessage <> "" Then
                 'GetEditRowWithHelpEdit = GetEditRowWithHelpEdit & "&nbsp;" & cpCore.main_GetHelpLinkEditable(0, Caption, HelpMessage, FormInputName)
                 'Else

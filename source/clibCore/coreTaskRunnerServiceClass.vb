@@ -205,15 +205,15 @@ Namespace Contensive
                                     & vbCrLf & " update cctasks set cmdRunner=" & cpSite.core.db.encodeSQLText(runnerGuid) & " where id in (select top 1 id from cctasks where (cmdRunner is null)and(datestarted is null))" _
                                     & vbCrLf & " COMMIT TRANSACTION"
                                     cpSite.core.db.executeSql(sql)
-                                    CS = cpSite.core.db.db_csOpen("tasks", "(cmdRunner=" & cpSite.core.db.encodeSQLText(runnerGuid) & ")and(datestarted is null)", "id")
-                                    If cpSite.core.db.db_csOk(CS) Then
+                                    CS = cpSite.core.db.csOpen("tasks", "(cmdRunner=" & cpSite.core.db.encodeSQLText(runnerGuid) & ")and(datestarted is null)", "id")
+                                    If cpSite.core.db.cs_Ok(CS) Then
                                         'Dim json As New System.Web.Script.Serialization.JavaScriptSerializer
                                         recordsRemaining = True
                                         Call cpSite.core.db.db_setCS(CS, "datestarted", Now())
                                         Call cpSite.core.db.db_SaveCS(CS)
                                         '
-                                        command = cpSite.core.db.db_GetCSText(CS, "command")
-                                        cmdDetailText = cpSite.core.db.db_GetCSText(CS, "cmdDetail")
+                                        command = cpSite.core.db.cs_getText(CS, "command")
+                                        cmdDetailText = cpSite.core.db.cs_getText(CS, "cmdDetail")
                                         cmdDetail = cpSite.core.json.Deserialize(Of cmdDetailClass)(cmdDetailText)
                                         '
                                         appendLog("taskRunnerService.runTasks, command=[" & command & "], cmdDetailText=[" & cmdDetailText & "]")
@@ -223,7 +223,7 @@ Namespace Contensive
                                                 Call cpSite.core.executeAddon(cmdDetail.addonId, cmdDetail.docProperties, cpCoreClass.addonContextEnum.ContextSimple)
                                         End Select
                                     End If
-                                    cpSite.core.db.db_csClose(CS)
+                                    cpSite.core.db.cs_Close(CS)
                                 Loop While recordsRemaining
                             Catch ex As Exception
                                 cpClusterCore.handleExceptionAndRethrow(ex)

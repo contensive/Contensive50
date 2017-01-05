@@ -54,7 +54,7 @@ namespace Contensive.Core
                                 // display core version
                                 //
                                 cp = new CPClass();
-                                Console.WriteLine("version " + cp.core.version());
+                                Console.WriteLine("version " + cp.core.common_version());
                                 exitCmd = true;
                                 cp.Dispose();
                                 break;

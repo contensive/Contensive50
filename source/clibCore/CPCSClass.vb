@@ -30,7 +30,7 @@ Namespace Contensive.Core
             cp = cpParent
             cpCore = cp.core
             CSPointer = -1
-            OpeningMemberID = cpCore.user.userId
+            OpeningMemberID = cpCore.user.id
         End Sub
         '
         ' dispose
@@ -44,7 +44,7 @@ Namespace Contensive.Core
                     '
                     Try
                         If CSPointer <> -1 And True Then
-                            Call cpCore.db.db_csClose(CSPointer)
+                            Call cpCore.db.cs_Close(CSPointer)
                         End If
                         'If Not (False) Then
                         '    Call cmc.asv.csv_CloseCS(CSPointer)
@@ -69,10 +69,10 @@ Namespace Contensive.Core
             '
             Try
                 If CSPointer <> -1 Then
-                    Call cpCore.db.db_csClose(CSPointer)
+                    Call cpCore.db.cs_Close(CSPointer)
                 End If
                 CSPointer = cpCore.db.db_csInsertRecord(ContentName, OpeningMemberID)
-                success = cpCore.db.db_csOk(CSPointer)
+                success = cpCore.db.cs_Ok(CSPointer)
             Catch ex As Exception
                 Call cp.core.handleExceptionAndRethrow(ex, "Unexpected error in cs.insert")
             End Try
@@ -86,10 +86,10 @@ Namespace Contensive.Core
             '
             Try
                 If CSPointer <> -1 Then
-                    Call cpCore.db.db_csClose(CSPointer)
+                    Call cpCore.db.cs_Close(CSPointer)
                 End If
-                CSPointer = cpCore.db.db_csOpen(ContentName, "id=" & recordId, , ActiveOnly, , , , SelectFieldList, 1, 1)
-                success = cpCore.db.db_csOk(CSPointer)
+                CSPointer = cpCore.db.csOpen(ContentName, "id=" & recordId, , ActiveOnly, , , , SelectFieldList, 1, 1)
+                success = cpCore.db.cs_Ok(CSPointer)
             Catch ex As Exception
                 Call cp.core.handleExceptionAndRethrow(ex, "Unexpected error in cs.OpenRecord")
             End Try
@@ -104,10 +104,10 @@ Namespace Contensive.Core
             '
             Try
                 If CSPointer <> -1 Then
-                    Call cpCore.db.db_csClose(CSPointer)
+                    Call cpCore.db.cs_Close(CSPointer)
                 End If
-                CSPointer = cpCore.db.db_csOpen(ContentName, SQLCriteria, SortFieldList, ActiveOnly, , , , SelectFieldList, pageSize, PageNumber)
-                success = cpCore.db.db_csOk(CSPointer)
+                CSPointer = cpCore.db.csOpen(ContentName, SQLCriteria, SortFieldList, ActiveOnly, , , , SelectFieldList, pageSize, PageNumber)
+                success = cpCore.db.cs_Ok(CSPointer)
             Catch ex As Exception
                 Call cp.core.handleExceptionAndRethrow(ex, "Unexpected error in cs.Open")
             End Try
@@ -121,7 +121,7 @@ Namespace Contensive.Core
             '
             Try
                 If CSPointer <> -1 Then
-                    Call cpCore.db.db_csClose(CSPointer)
+                    Call cpCore.db.cs_Close(CSPointer)
                 End If
                 CSPointer = cpCore.db.db_OpenCSGroupUsers(GroupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber)
                 success = OK()
@@ -140,7 +140,7 @@ Namespace Contensive.Core
                 Dim groupList As New List(Of String)
                 groupList.Add(GroupName)
                 If CSPointer <> -1 Then
-                    Call cpCore.db.db_csClose(CSPointer)
+                    Call cpCore.db.cs_Close(CSPointer)
                 End If
                 CSPointer = cpCore.db.db_OpenCSGroupUsers(groupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber)
                 success = OK()
@@ -166,10 +166,10 @@ Namespace Contensive.Core
             '
             Try
                 If CSPointer <> -1 Then
-                    Call cpCore.db.db_csClose(CSPointer)
+                    Call cpCore.db.cs_Close(CSPointer)
                 End If
                 CSPointer = cpCore.db.db_openCsSql_rev("default", sql)
-                success = cpCore.db.db_csOk(CSPointer)
+                success = cpCore.db.cs_Ok(CSPointer)
             Catch ex As Exception
                 Call cp.core.handleExceptionAndRethrow(ex, "Unexpected error in cs.OpenSQL")
             End Try
@@ -184,17 +184,17 @@ Namespace Contensive.Core
             '
             Try
                 If CSPointer <> -1 Then
-                    Call cpCore.db.db_csClose(CSPointer)
+                    Call cpCore.db.cs_Close(CSPointer)
                 End If
                 If ((sql = "") Or (sql.ToLower = "default")) And (DataSourcename <> "") And (DataSourcename.ToLower <> "default") Then
                     '
                     ' support legacy calls were the arguments were was backwards (datasourcename is sql and vise-versa)
                     '
-                    CSPointer = cpCore.db.db_csOpenSql(sql, DataSourcename, PageSize, PageNumber)
+                    CSPointer = cpCore.db.cs_openSql(sql, DataSourcename, PageSize, PageNumber)
                 Else
-                    CSPointer = cpCore.db.db_csOpenSql(sql, DataSourcename, PageSize, PageNumber)
+                    CSPointer = cpCore.db.cs_openSql(sql, DataSourcename, PageSize, PageNumber)
                 End If
-                success = cpCore.db.db_csOk(CSPointer)
+                success = cpCore.db.cs_Ok(CSPointer)
             Catch ex As Exception
                 Call cp.core.handleExceptionAndRethrow(ex, "Unexpected error in cs.OpenSQL")
             End Try
@@ -209,17 +209,17 @@ Namespace Contensive.Core
             '
             Try
                 If CSPointer <> -1 Then
-                    Call cpCore.db.db_csClose(CSPointer)
+                    Call cpCore.db.cs_Close(CSPointer)
                 End If
                 If ((sql = "") Or (sql.ToLower = "default")) And (DataSourcename <> "") And (DataSourcename.ToLower <> "default") Then
                     '
                     ' support legacy calls were the arguments were was backwards (datasourcename is sql and vise-versa)
                     '
-                    CSPointer = cpCore.db.db_csOpenSql(sql, DataSourcename, PageSize, PageNumber)
+                    CSPointer = cpCore.db.cs_openSql(sql, DataSourcename, PageSize, PageNumber)
                 Else
-                    CSPointer = cpCore.db.db_csOpenSql(sql, DataSourcename, PageSize, PageNumber)
+                    CSPointer = cpCore.db.cs_openSql(sql, DataSourcename, PageSize, PageNumber)
                 End If
-                success = cpCore.db.db_csOk(CSPointer)
+                success = cpCore.db.cs_Ok(CSPointer)
             Catch ex As Exception
                 Call cp.core.handleExceptionAndRethrow(ex, "Unexpected error in cs.OpenSQL")
             End Try
@@ -230,7 +230,7 @@ Namespace Contensive.Core
         Public Overrides Sub Close()
             Try
                 If CSPointer <> -1 Then
-                    Call cpCore.db.db_csClose(CSPointer)
+                    Call cpCore.db.cs_Close(CSPointer)
                     CSPointer = -1
                 End If
             Catch ex As Exception
@@ -296,7 +296,7 @@ Namespace Contensive.Core
             Dim result As Boolean = False
             '
             Try
-                result = cpCore.db.db_GetCSBoolean(CSPointer, FieldName)
+                result = cpCore.db.cs_getBoolean(CSPointer, FieldName)
             Catch ex As Exception
                 Call cp.core.handleExceptionAndRethrow(ex, "Unexpected error in cs.GetBoolean")
             End Try
@@ -354,7 +354,7 @@ Namespace Contensive.Core
             Dim result As Integer = 0
             '
             Try
-                result = cpCore.db.db_GetCSInteger(CSPointer, FieldName)
+                result = cpCore.db.cs_getInteger(CSPointer, FieldName)
             Catch ex As Exception
                 Call cp.core.handleExceptionAndRethrow(ex, "Unexpected error in cs.GetInteger")
             End Try
@@ -464,7 +464,7 @@ Namespace Contensive.Core
         Public Overrides Function NextOK() As Boolean
             Try
                 Call cpCore.db.db_csGoNext(CSPointer)
-                Return cpCore.db.db_csOk(CSPointer)
+                Return cpCore.db.cs_Ok(CSPointer)
             Catch ex As Exception
                 Call cp.core.handleExceptionAndRethrow(ex, "Unexpected error in cs.NextOK")
             End Try
@@ -476,7 +476,7 @@ Namespace Contensive.Core
             Dim result As Boolean = False
             '
             Try
-                result = cpCore.db.db_csOk(CSPointer)
+                result = cpCore.db.cs_Ok(CSPointer)
             Catch ex As Exception
                 Call cp.core.handleExceptionAndRethrow(ex, "Unexpected error in cs.OK")
             End Try

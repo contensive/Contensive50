@@ -398,7 +398,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub AddEvent(ByVal HtmlId As String, ByVal DOMEvent As String, ByVal JavaScript As String)
             If True Then
-                Call cpCore.main_AddEvent(HtmlId, DOMEvent, JavaScript)
+                Call cpCore.html_AddEvent(HtmlId, DOMEvent, JavaScript)
             End If
         End Sub
         '

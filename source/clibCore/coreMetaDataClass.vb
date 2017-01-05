@@ -2267,7 +2267,7 @@ ErrorTrap:
                 & " Left Join ccGroupRules on ccMemberRules.GroupID=ccGroupRules.GroupID)" _
                 & " Left Join ccContent on ccGroupRules.ContentID=ccContent.ID)" _
                 & " WHERE" _
-                    & " (ccMemberRules.MemberID=" & cpCore.user.userId & ")" _
+                    & " (ccMemberRules.MemberID=" & cpCore.user.id & ")" _
                     & " AND(ccGroupRules.Active<>0)" _
                     & " AND(ccContent.Active<>0)" _
                     & " AND(ccMemberRules.Active<>0)"
@@ -2511,7 +2511,7 @@ ErrorTrap:
                         '
                         DataSourceName = "Default"
                         CSContent = cpCore.db.db_OpenCSContentRecord("Content", ParentContentID)
-                        If Not cpCore.db.db_csOk(CSContent) Then
+                        If Not cpCore.db.cs_Ok(CSContent) Then
                             cpCore.handleExceptionAndRethrow(New ApplicationException("Can not create Child Content [" & ChildContentName & "] because the Parent Content [" & ParentContentName & "] was not found."))
                         Else
                             SelectFieldList = cpCore.db.db_GetCSSelectFieldList(CSContent)
@@ -2519,7 +2519,7 @@ ErrorTrap:
                                 cpCore.handleExceptionAndRethrow(New ApplicationException("Can not create Child Content [" & ChildContentName & "] because the Parent Content [" & ParentContentName & "] record has not fields."))
                             Else
                                 CSNew = cpCore.db.db_csInsertRecord("Content", 0)
-                                If Not cpCore.db.db_csOk(CSNew) Then
+                                If Not cpCore.db.cs_Ok(CSNew) Then
                                     Call cpCore.handleExceptionAndRethrow(New ApplicationException("Can not create Child Content [" & ChildContentName & "] because there was an error creating a new record in ccContent."))
                                 Else
                                     Fields = Split(SelectFieldList, ",")
@@ -2532,7 +2532,7 @@ ErrorTrap:
                                             Case "NAME"
                                                 Call cpCore.db.db_SetCSField(CSNew, FieldName, ChildContentName)
                                             Case "PARENTID"
-                                                Call cpCore.db.db_SetCSField(CSNew, FieldName, cpCore.db.db_GetCSText(CSContent, "ID"))
+                                                Call cpCore.db.db_SetCSField(CSNew, FieldName, cpCore.db.cs_getText(CSContent, "ID"))
                                             Case "CREATEDBY", "MODIFIEDBY"
                                                 Call cpCore.db.db_SetCSField(CSNew, FieldName, MemberID)
                                             Case "DATEADDED", "MODIFIEDDATE"
@@ -2544,14 +2544,14 @@ ErrorTrap:
                                                 '
                                                 Call cpCore.db.db_SetCSField(CSNew, FieldName, Guid.NewGuid.ToString())
                                             Case Else
-                                                Call cpCore.db.db_SetCSField(CSNew, FieldName, cpCore.db.db_GetCSText(CSContent, FieldName))
+                                                Call cpCore.db.db_SetCSField(CSNew, FieldName, cpCore.db.cs_getText(CSContent, FieldName))
                                         End Select
                                     Next
                                 End If
-                                Call cpCore.db.db_csClose(CSNew)
+                                Call cpCore.db.cs_Close(CSNew)
                             End If
                         End If
-                        Call cpCore.db.db_csClose(CSContent)
+                        Call cpCore.db.cs_Close(CSContent)
                         'SQL = "INSERT INTO ccContent ( Name, Active, DateAdded, CreatedBy, ModifiedBy, ModifiedDate, AllowAdd, DeveloperOnly, AdminOnly, CreateKey, SortOrder, ContentControlID, AllowDelete, ParentID, EditSourceID, EditArchive, EditBlank, ContentTableID, AuthoringTableID, AllowWorkflowAuthoring, DefaultSortMethodID, DropDownFieldList, EditorGroupID )" _
                         '    & " SELECT " & encodeSQLText(ChildContentName) & " AS Name, ccContent.Active, ccContent.DateAdded, ccContent.CreatedBy, ccContent.ModifiedBy, ccContent.ModifiedDate, ccContent.AllowAdd, ccContent.DeveloperOnly, ccContent.AdminOnly, ccContent.CreateKey, ccContent.SortOrder, ccContent.ContentControlID, ccContent.AllowDelete, ccContent.ID, ccContent.EditSourceID, ccContent.EditArchive, ccContent.EditBlank, ccContent.ContentTableID, ccContent.AuthoringTableID, ccContent.AllowWorkflowAuthoring, ccContent.DefaultSortMethodID, ccContent.DropDownFieldList, ccContent.EditorGroupID" _
                         '    & " From ccContent" _

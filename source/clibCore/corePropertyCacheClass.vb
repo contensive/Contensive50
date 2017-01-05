@@ -27,8 +27,70 @@ Namespace Contensive.Core
             Me.propertyTypeId = propertyTypeId
         End Sub
         '
-        ' key is like vistiId, vistorId, userId
+        '====================================================================================================
+        ''' <summary>
+        ''' set property
+        ''' </summary>
+        ''' <param name="propertyName"></param>
+        ''' <param name="PropertyValue"></param>
+        Public Sub setProperty(ByVal propertyName As String, ByVal PropertyValue As Double)
+            setProperty(propertyName, PropertyValue.ToString())
+        End Sub
         '
+        '====================================================================================================
+        ''' <summary>
+        ''' set property
+        ''' </summary>
+        ''' <param name="propertyName"></param>
+        ''' <param name="PropertyValue"></param>
+        Public Sub setProperty(ByVal propertyName As String, ByVal PropertyValue As Boolean)
+            setProperty(propertyName, PropertyValue.ToString())
+        End Sub
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' set property
+        ''' </summary>
+        ''' <param name="propertyName"></param>
+        ''' <param name="PropertyValue"></param>
+        Public Sub setProperty(ByVal propertyName As String, ByVal PropertyValue As Date)
+            setProperty(propertyName, PropertyValue.ToString())
+        End Sub
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' set property
+        ''' </summary>
+        ''' <param name="propertyName"></param>
+        ''' <param name="PropertyValue"></param>
+        Public Sub setProperty(ByVal propertyName As String, ByVal PropertyValue As Integer)
+            setProperty(propertyName, PropertyValue.ToString())
+        End Sub
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' set property
+        ''' </summary>
+        ''' <param name="propertyName"></param>
+        ''' <param name="PropertyValue"></param>
+        Public Sub setProperty(ByVal propertyName As String, ByVal PropertyValue As String)
+            Select Case propertyTypeId
+                Case PropertyTypeVisit
+                    setProperty(propertyName, PropertyValue, cpCore.main_VisitId)
+                Case PropertyTypeVisitor
+                    setProperty(propertyName, PropertyValue, cpCore.main_VisitorID)
+                Case PropertyTypeMember
+                    setProperty(propertyName, PropertyValue, cpCore.user.id)
+            End Select
+        End Sub
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' set property
+        ''' </summary>
+        ''' <param name="propertyName"></param>
+        ''' <param name="PropertyValue"></param>
+        ''' <param name="keyId">keyId is like vistiId, vistorId, userId</param>
         Public Sub setProperty(ByVal propertyName As String, ByVal PropertyValue As String, ByVal keyId As Integer)
             On Error GoTo ErrorTrap 'Const Tn = "SetCSv_VisitProperty" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
@@ -57,14 +119,14 @@ Namespace Contensive.Core
                 ' insert a new property record, get the ID back and save it in cache
                 '
                 CS = db.db_csInsertRecord("Properties", SystemMemberID)
-                If db.db_csOk(CS) Then
-                    propertyCache(2, Ptr) = db.db_GetCSText(CS, "ID")
+                If db.cs_Ok(CS) Then
+                    propertyCache(2, Ptr) = db.cs_getText(CS, "ID")
                     Call db.db_setCS(CS, "name", propertyName)
                     Call db.db_setCS(CS, "FieldValue", PropertyValue)
                     Call db.db_setCS(CS, "TypeID", propertyTypeId)
                     Call db.db_setCS(CS, "KeyID", CStr(keyId))
                 End If
-                Call db.db_csClose(CS)
+                Call db.cs_Close(CS)
             ElseIf propertyCache(1, Ptr) <> PropertyValue Then
                 propertyCache(1, Ptr) = PropertyValue
                 RecordID = EncodeInteger(propertyCache(2, Ptr))
@@ -85,9 +147,223 @@ ErrorTrap:
             cpCore.handleExceptionAndRethrow(New Exception("Unexpected exception"))
         End Sub
         '
+        '====================================================================================================
+        ''' <summary>
+        ''' get a property
+        ''' </summary>
+        ''' <param name="propertyName"></param>
+        ''' <param name="defaultValue"></param>
+        ''' <param name="keyId"></param>
+        ''' <returns></returns>
+        Public Function getDate(ByVal propertyName As String) As Date
+            Return getDate(propertyName, Date.MinValue)
+        End Function
         '
+        '====================================================================================================
+        ''' <summary>
+        ''' get a property
+        ''' </summary>
+        ''' <param name="propertyName"></param>
+        ''' <param name="defaultValue"></param>
+        ''' <param name="keyId"></param>
+        ''' <returns></returns>
+        Public Function getDate(ByVal propertyName As String, ByVal defaultValue As Date) As Date
+            Select Case propertyTypeId
+                Case PropertyTypeVisit
+                    Return getDate(propertyName, defaultValue, cpCore.main_VisitId)
+                Case PropertyTypeVisitor
+                    Return getDate(propertyName, defaultValue, cpCore.main_VisitorID)
+                Case PropertyTypeMember
+                    Return getDate(propertyName, defaultValue, cpCore.user.id)
+            End Select
+            Return Date.MinValue
+        End Function
         '
-        Public Function getProperty(ByVal propertyName As String, ByVal defaultValue As String, ByVal keyId As Integer) As String
+        '====================================================================================================
+        ''' <summary>
+        ''' get a property
+        ''' </summary>
+        ''' <param name="propertyName"></param>
+        ''' <param name="defaultValue"></param>
+        ''' <param name="keyId"></param>
+        ''' <returns></returns>
+        Public Function getDate(ByVal propertyName As String, ByVal defaultValue As Date, ByVal keyId As Integer) As Date
+            Return EncodeDate(getText(propertyName, EncodeText(defaultValue), keyId))
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' get a property
+        ''' </summary>
+        ''' <param name="propertyName"></param>
+        ''' <param name="defaultValue"></param>
+        ''' <param name="keyId"></param>
+        ''' <returns></returns>
+        Public Function getNumber(ByVal propertyName As String) As Double
+            Return getNumber(propertyName, 0)
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' get a property
+        ''' </summary>
+        ''' <param name="propertyName"></param>
+        ''' <param name="defaultValue"></param>
+        ''' <param name="keyId"></param>
+        ''' <returns></returns>
+        Public Function getNumber(ByVal propertyName As String, ByVal defaultValue As Double) As Double
+            Select Case propertyTypeId
+                Case PropertyTypeVisit
+                    Return getNumber(propertyName, defaultValue, cpCore.main_VisitId)
+                Case PropertyTypeVisitor
+                    Return getNumber(propertyName, defaultValue, cpCore.main_VisitorID)
+                Case PropertyTypeMember
+                    Return getNumber(propertyName, defaultValue, cpCore.user.id)
+            End Select
+            Return 0
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' get a boolean property
+        ''' </summary>
+        ''' <param name="propertyName"></param>
+        ''' <param name="defaultValue"></param>
+        ''' <param name="keyId"></param>
+        ''' <returns></returns>
+        Public Function getNumber(ByVal propertyName As String, ByVal defaultValue As Double, ByVal keyId As Integer) As Double
+            Return EncodeNumber(getText(propertyName, EncodeText(defaultValue), keyId))
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' get a property
+        ''' </summary>
+        ''' <param name="propertyName"></param>
+        ''' <param name="defaultValue"></param>
+        ''' <param name="keyId"></param>
+        ''' <returns></returns>
+        Public Function getBoolean(ByVal propertyName As String) As Boolean
+            Return getBoolean(propertyName, False)
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' get a property
+        ''' </summary>
+        ''' <param name="propertyName"></param>
+        ''' <param name="defaultValue"></param>
+        ''' <param name="keyId"></param>
+        ''' <returns></returns>
+        Public Function getBoolean(ByVal propertyName As String, ByVal defaultValue As Boolean) As Boolean
+            Select Case propertyTypeId
+                Case PropertyTypeVisit
+                    Return getBoolean(propertyName, defaultValue, cpCore.main_VisitId)
+                Case PropertyTypeVisitor
+                    Return getBoolean(propertyName, defaultValue, cpCore.main_VisitorID)
+                Case PropertyTypeMember
+                    Return getBoolean(propertyName, defaultValue, cpCore.user.id)
+            End Select
+            Return False
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' get a boolean property
+        ''' </summary>
+        ''' <param name="propertyName"></param>
+        ''' <param name="defaultValue"></param>
+        ''' <param name="keyId"></param>
+        ''' <returns></returns>
+        Public Function getBoolean(ByVal propertyName As String, ByVal defaultValue As Boolean, ByVal keyId As Integer) As Boolean
+            Return EncodeBoolean(getText(propertyName, EncodeText(defaultValue), keyId))
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' get an integer property
+        ''' </summary>
+        ''' <param name="propertyName"></param>
+        ''' <param name="defaultValue"></param>
+        ''' <param name="keyId"></param>
+        ''' <returns></returns>
+        Public Function getInteger(ByVal propertyName As String) As Integer
+            Return getInteger(propertyName, 0)
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' get an integer property
+        ''' </summary>
+        ''' <param name="propertyName"></param>
+        ''' <param name="defaultValue"></param>
+        ''' <param name="keyId"></param>
+        ''' <returns></returns>
+        Public Function getInteger(ByVal propertyName As String, ByVal defaultValue As Integer) As Integer
+            Select Case propertyTypeId
+                Case PropertyTypeVisit
+                    Return getInteger(propertyName, defaultValue, cpCore.main_VisitId)
+                Case PropertyTypeVisitor
+                    Return getInteger(propertyName, defaultValue, cpCore.main_VisitorID)
+                Case PropertyTypeMember
+                    Return getInteger(propertyName, defaultValue, cpCore.user.id)
+            End Select
+            Return 0
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' get an integer property
+        ''' </summary>
+        ''' <param name="propertyName"></param>
+        ''' <param name="defaultValue"></param>
+        ''' <param name="keyId"></param>
+        ''' <returns></returns>
+        Public Function getInteger(ByVal propertyName As String, ByVal defaultValue As Integer, ByVal keyId As Integer) As Integer
+            Return EncodeInteger(getText(propertyName, EncodeText(defaultValue), keyId))
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' get a string property
+        ''' </summary>
+        ''' <param name="propertyName"></param>
+        ''' <param name="defaultValue"></param>
+        ''' <param name="keyId"></param>
+        ''' <returns></returns>
+        Public Function getText(ByVal propertyName As String) As String
+            Return getText(propertyName, "")
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' get a string property
+        ''' </summary>
+        ''' <param name="propertyName"></param>
+        ''' <param name="defaultValue"></param>
+        ''' <param name="keyId"></param>
+        ''' <returns></returns>
+        Public Function getText(ByVal propertyName As String, ByVal defaultValue As String) As String
+            Select Case propertyTypeId
+                Case PropertyTypeVisit
+                    Return getText(propertyName, defaultValue, cpCore.main_VisitId)
+                Case PropertyTypeVisitor
+                    Return getText(propertyName, defaultValue, cpCore.main_VisitorID)
+                Case PropertyTypeMember
+                    Return getText(propertyName, defaultValue, cpCore.user.id)
+            End Select
+            Return ""
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' get a string property
+        ''' </summary>
+        ''' <param name="propertyName"></param>
+        ''' <param name="defaultValue"></param>
+        ''' <param name="keyId"></param>
+        ''' <returns></returns>
+        Public Function getText(ByVal propertyName As String, ByVal defaultValue As String, ByVal keyId As Integer) As String
             Dim returnString As String = ""
             Try
                 Dim Ptr As Integer

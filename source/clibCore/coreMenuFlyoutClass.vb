@@ -73,11 +73,50 @@ Namespace Contensive.Core
             MenuFlyoutIcon_Local = "&nbsp;&#187;"
         End Sub
         '
+        '========================================================================
+        ' ----- main_Get the menu link for the menu name specified
+        '========================================================================
+        '
+        Public Function getMenu(ByVal menuName As String, ByVal MenuStyle As Integer, Optional ByVal StyleSheetPrefix As String = "") As String
+            Dim returnHtml As String = ""
+            Try
+                Dim MenuFlyoutIcon As String
+                Const DefaultIcon = "&#187;"
+                '
+                MenuFlyoutIcon = cpCore.siteProperties.getText("MenuFlyoutIcon", DefaultIcon)
+                If MenuFlyoutIcon <> DefaultIcon Then
+                    MenuFlyoutIcon = MenuFlyoutIcon
+                End If
+                Select Case MenuStyle
+                    Case 11
+                        returnHtml = getMenuType(menuName, False, 3, encodeEmptyText(StyleSheetPrefix, ""))
+                    Case 10
+                        returnHtml = getMenuType(menuName, False, 2, encodeEmptyText(StyleSheetPrefix, ""))
+                    Case 9
+                        returnHtml = getMenuType(menuName, False, 1, encodeEmptyText(StyleSheetPrefix, ""))
+                    Case 8
+                        returnHtml = getMenuType(menuName, False, 0, encodeEmptyText(StyleSheetPrefix, ""))
+                    Case 7
+                        returnHtml = getMenuType(menuName, True, 3, encodeEmptyText(StyleSheetPrefix, ""))
+                    Case 6
+                        returnHtml = getMenuType(menuName, True, 2, encodeEmptyText(StyleSheetPrefix, ""))
+                    Case 5
+                        returnHtml = getMenuType(menuName, True, 1, encodeEmptyText(StyleSheetPrefix, ""))
+                    Case Else
+                        returnHtml = getMenuType(menuName, True, 0, encodeEmptyText(StyleSheetPrefix, ""))
+                End Select
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+            Return returnHtml
+        End Function
+
+        '
         '===============================================================================
         '   Returns the menu specified, if it is in local storage
         '===============================================================================
         '
-        Public Function GetMenu(ByVal MenuName As String, ByVal ClickToOpen As Boolean, ByVal Direction As Integer, Optional ByVal StyleSheetPrefix As String = "") As String
+        Public Function getMenuType(ByVal MenuName As String, ByVal ClickToOpen As Boolean, ByVal Direction As Integer, Optional ByVal StyleSheetPrefix As String = "") As String
             On Error GoTo ErrorTrap
             '
             Dim MenuSource As String
@@ -109,7 +148,7 @@ Namespace Contensive.Core
                         MenuStyle = MenuStyleFlyoutDown
                 End Select
             End If
-            GetMenu = GetMenuFlyout(MenuName, MenuStyle, StyleSheetPrefix)
+            getMenuType = GetMenuFlyout(MenuName, MenuStyle, StyleSheetPrefix)
             '
             Exit Function
             '

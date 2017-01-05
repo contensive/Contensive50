@@ -214,7 +214,7 @@ Namespace Contensive.Core
                         Dim LegacyOptionString As String = MyDoc.getLegacyOptionStringFromVar()
                         result = core.executeAddon_legacy4(addonId.ToString(), LegacyOptionString, addonContext, Nothing)
                     End If
-                    result = core.executeAddon(addonId, "", "", addonContext, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", core.user.userId, core.visit_isAuthenticated)
+                    result = core.executeAddon(addonId, "", "", addonContext, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", core.user.id, core.visit_isAuthenticated)
                 End If
                 '
             Catch ex As Exception
@@ -252,7 +252,7 @@ Namespace Contensive.Core
         '
         Public Overrides ReadOnly Property Version() As String
             Get
-                Return core.version()
+                Return core.common_version()
             End Get
         End Property
         '

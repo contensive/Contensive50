@@ -691,7 +691,7 @@ Namespace Contensive
                         '
                         'Errorhint = "StartService Success, Logging Status"
                         startTimer.Enabled = False
-                        StatusMessage = "Contensive v" & cpCore.version() & " started"
+                        StatusMessage = "Contensive v" & cpCore.common_version() & " started"
                         'cpCore.AppendLog("StartService", StatusMessage)
                     Else
                         '
@@ -828,7 +828,7 @@ Namespace Contensive
                                 & vbCrLf & "" _
                                 & vbCrLf & AdminUsername _
                                 & vbCrLf & AdminPassword _
-                                & vbCrLf & cpCore.version() _
+                                & vbCrLf & cpCore.common_version() _
                                 & vbCrLf & maxCmdInstances _
                                 & ""
                         Case "SETSERVERCONFIG"
@@ -1271,12 +1271,12 @@ Namespace Contensive
                                     & " or((ProcessInterval is not null)and(ProcessInterval<>0)and(ProcessNextRun is null))" _
                                     & " or(ProcessNextRun<" & SQLNow & ")" _
                                     & ")"
-                            CS = cpSite.core.db.db_csOpen("add-ons", SQL)
-                            Do While cpSite.core.db.db_csOk(CS)
-                                ProcessInterval = cpSite.core.db.db_GetCSInteger(CS, "ProcessInterval")
-                                ProcessID = cpSite.core.db.db_GetCSInteger(CS, "ID")
-                                processName = cpSite.core.db.db_GetCSText(CS, "name")
-                                ProcessRunOnce = cpSite.core.db.db_GetCSBoolean(CS, "ProcessRunOnce")
+                            CS = cpSite.core.db.csOpen("add-ons", SQL)
+                            Do While cpSite.core.db.cs_Ok(CS)
+                                ProcessInterval = cpSite.core.db.cs_getInteger(CS, "ProcessInterval")
+                                ProcessID = cpSite.core.db.cs_getInteger(CS, "ID")
+                                processName = cpSite.core.db.cs_getText(CS, "name")
+                                ProcessRunOnce = cpSite.core.db.cs_getBoolean(CS, "ProcessRunOnce")
                                 ProcessNextRun = cpSite.core.db.db_GetCSDate(CS, "ProcessNextRun")
                                 NextRun = Date.MinValue
                                 hint &= ",run addon " & processName
@@ -1313,7 +1313,7 @@ Namespace Contensive
                                 Call cpSite.core.db.db_csGoNext(CS)
                                 cpSite.Dispose()
                             Loop
-                            Call cpSite.core.db.db_csClose(CS)
+                            Call cpSite.core.db.cs_Close(CS)
                         Catch ex As Exception
                             '
                             ' error on this site, skip to next

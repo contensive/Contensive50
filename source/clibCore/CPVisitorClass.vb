@@ -59,7 +59,7 @@ Namespace Contensive.Core
 
         Public Overrides Function GetProperty(ByVal PropertyName As String, Optional ByVal DefaultValue As String = "", Optional ByVal TargetVisitorId As Integer = 0) As String 'Inherits BaseClasses.CPVisitorBaseClass.GetProperty
             If True Then
-                Return cpCore.visitorPropertyCache.getProperty(PropertyName, DefaultValue, TargetVisitorId)
+                Return cpCore.visitorProperty.getText(PropertyName, DefaultValue, TargetVisitorId)
             Else
                 Return ""
             End If
@@ -127,7 +127,7 @@ Namespace Contensive.Core
 
         Public Overrides Sub SetProperty(ByVal PropertyName As String, ByVal Value As String, Optional ByVal TargetVisitorid As Integer = 0) 'Inherits BaseClasses.CPVisitorBaseClass.SetProperty
             If True Then
-                Call cpCore.visitorPropertyCache.setProperty(PropertyName, Value, TargetVisitorid)
+                Call cpCore.visitorProperty.setProperty(PropertyName, Value, TargetVisitorid)
             End If
         End Sub
 

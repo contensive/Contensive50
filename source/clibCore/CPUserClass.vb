@@ -22,13 +22,15 @@ Namespace Contensive.Core
         Private CP As CPClass
         Protected disposed As Boolean = False
         '
+        '====================================================================================================
+        '
         Public Sub New(ByVal cpCoreObj As Contensive.Core.cpCoreClass, ByVal CPParent As CPClass)
             MyBase.New()
             cpCore = cpCoreObj
             CP = CPParent
         End Sub
         '
-        ' dispose
+        '====================================================================================================
         '
         Protected Overridable Overloads Sub Dispose(ByVal disposing As Boolean)
             If Not Me.disposed Then
@@ -47,54 +49,59 @@ Namespace Contensive.Core
             Me.disposed = True
         End Sub
         '
-        '
+        '====================================================================================================
         '
         Public Overrides ReadOnly Property Email() As String 'Inherits BaseClasses.CPUserBaseClass.Email
             Get
                 If True Then
-                    Return cpCore.user.userEmail
+                    Return cpCore.user.email
                 Else
                     Return ""
                 End If
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides Function GetIdByLogin(ByVal Username As String, ByVal Password As String) As Integer 'Inherits BaseClasses.CPUserBaseClass.GetIdByLogin
             If True Then
-                Return cpCore.main_GetLoginMemberID(Username, Password)
+                Return cpCore.user.user_getLoginUserID(Username, Password)
             Else
                 Return 0
             End If
         End Function
         '
-        ' verifies the user record is initialize and returns the Id
+        '====================================================================================================
         '
-
         Public Overrides ReadOnly Property Id() As Integer 'Inherits BaseClasses.CPUserBaseClass.Id
             Get
                 Dim localId As Integer = 0
                 '
                 If True Then
-                    localId = cpCore.user.userId
+                    localId = cpCore.user.id
                     If (localId = 0) Then
                         localId = cpCore.db.metaData_InsertContentRecordGetID("people", 0)
-                        Call cpCore.user.user_RecognizeMemberByID(localId)
+                        Call cpCore.user.recognizeByID(localId)
                     End If
                 End If
                 Return localId
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property IsAdmin() As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsAdmin
             Get
                 If True Then
-                    Return cpCore.user.user_isAdmin
+                    Return cpCore.user.isAuthenticatedAdmin
                 Else
                     Return False
                 End If
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides Function IsAdvancedEditing(ByVal ContentName As String) As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsAdvancedEditing
             If True Then
                 Return cpCore.user.user_IsAdvancedEditing(ContentName)
@@ -102,44 +109,53 @@ Namespace Contensive.Core
                 Return False
             End If
         End Function
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property IsAuthenticated() As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsAuthenticated
             Get
                 If True Then
-                    Return (cpCore.user.user_isAuthenticated())
+                    Return (cpCore.user.isAuthenticated())
                 Else
                     Return False
                 End If
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides Function IsAuthoring(ByVal ContentName As String) As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsAuthoring
             If True Then
-                Return cpCore.user_IsAuthoring(ContentName)
+                Return cpCore.user.user_isEditing(ContentName)
             Else
                 Return False
             End If
         End Function
-
+        '
+        '====================================================================================================
+        '
         Public Overrides Function IsContentManager(Optional ByVal ContentName As String = "Page Content") As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsContentManager
             If True Then
-                Return cpCore.user.main_IsContentManager(ContentName)
+                Return cpCore.user.isAuthenticatedContentManager(ContentName)
             Else
                 Return False
             End If
         End Function
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property IsDeveloper() As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsDeveloper
             Get
                 If True Then
-                    Return cpCore.user.user_isDeveloper()
+                    Return cpCore.user.isAuthenticatedDeveloper()
                 Else
                     Return False
                 End If
             End Get
         End Property
-
-
+        '
+        '====================================================================================================
+        '
         Public Overrides Function IsEditing(ByVal ContentName As String) As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsEditing
             If True Then
                 Return cpCore.user.user_isEditing(ContentName)
@@ -147,7 +163,9 @@ Namespace Contensive.Core
                 Return False
             End If
         End Function
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property IsEditingAnything() As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsEditingAnything
             Get
                 If True Then
@@ -157,7 +175,9 @@ Namespace Contensive.Core
                 End If
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property IsGuest() As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsGuest
             Get
                 If True Then
@@ -168,7 +188,7 @@ Namespace Contensive.Core
             End Get
         End Property
         '
-        '
+        '====================================================================================================
         '
         Public Overrides Function IsInGroup(ByVal groupName As String, Optional ByVal userId As Integer = 0) As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsInGroup
             Dim groupId As Integer
@@ -191,7 +211,7 @@ Namespace Contensive.Core
             Return result
         End Function
         '
-        '
+        '====================================================================================================
         '
         Public Overrides Function IsInGroupList(ByVal GroupIDList As String, Optional ByVal userId As Integer = 0) As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsInGroup
             Dim result As Boolean
@@ -208,17 +228,21 @@ Namespace Contensive.Core
             Return result
             '
         End Function
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property IsMember() As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsMember
             Get
                 If True Then
-                    Return cpCore.user.user_IsMember
+                    Return cpCore.user.user_isAuthenticatedMember
                 Else
                     Return False
                 End If
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides Function IsQuickEditing(ByVal ContentName As String) As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsQuickEditing
             If True Then
                 Return cpCore.user.user_isQuickEditing(ContentName)
@@ -226,7 +250,9 @@ Namespace Contensive.Core
                 Return False
             End If
         End Function
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property IsRecognized() As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsRecognized
             Get
                 If True Then
@@ -236,7 +262,9 @@ Namespace Contensive.Core
                 End If
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property IsWorkflowRendering() As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsWorkflowRendering
             Get
                 If True Then
@@ -246,43 +274,53 @@ Namespace Contensive.Core
                 End If
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property Language() As String 'Inherits BaseClasses.CPUserBaseClass.Language
             Get
                 If True Then
-                    Return cpCore.user.userLanguage
+                    Return cpCore.user.language
                 Else
                     Return ""
                 End If
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property LanguageID() As Integer 'Inherits BaseClasses.CPUserBaseClass.LanguageId
             Get
                 If True Then
-                    Return cpCore.user.userLanguageId
+                    Return cpCore.user.languageId
                 Else
                     Return 0
                 End If
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides Function Login(ByVal UsernameOrEmail As String, ByVal Password As String, Optional ByVal SetAutoLogin As Boolean = False) As Boolean 'Inherits BaseClasses.CPUserBaseClass.Login
             If True Then
-                Return cpCore.user.user_LoginMember(UsernameOrEmail, Password, SetAutoLogin)
+                Return cpCore.user.authenticate(UsernameOrEmail, Password, SetAutoLogin)
             Else
                 Return False
             End If
         End Function
-
+        '
+        '====================================================================================================
+        '
         Public Overrides Function LoginByID(ByVal RecordID As String, Optional ByVal SetAutoLogin As Boolean = False) As Boolean 'Inherits BaseClasses.CPUserBaseClass.LoginById
             If True Then
-                Return cpCore.user.user_LoginMemberByID(RecordID, SetAutoLogin)
+                Return cpCore.user.authenticateByID(RecordID, SetAutoLogin)
             Else
                 Return False
             End If
         End Function
-
+        '
+        '====================================================================================================
+        '
         Public Overrides Function LoginIsOK(ByVal UsernameOrEmail As String, ByVal Password As String) As Boolean 'Inherits BaseClasses.CPUserBaseClass.LoginIsOK
             If True Then
                 Return cpCore.main_IsLoginOK(UsernameOrEmail, Password)
@@ -290,136 +328,133 @@ Namespace Contensive.Core
                 Return False
             End If
         End Function
-
+        '
+        '====================================================================================================
+        '
         Public Overrides Sub Logout() 'Inherits BaseClasses.CPUserBaseClass.Logout
             Call cpCore.user.security_LogoutMember()
         End Sub
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property Name() As String 'Inherits BaseClasses.CPUserBaseClass.Name
             Get
                 If True Then
-                    Return cpCore.user.userName
+                    Return cpCore.user.name
                 Else
                     Return ""
                 End If
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property IsNew() As Boolean 'Inherits BaseClasses.CPUserBaseClass.IsNew
             Get
-                If True Then
-                    Return cpCore.user.userIsNew
-                Else
-                    Return False
-                End If
+                Return cpCore.user.isNew
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides Function IsNewLoginOK(ByVal Username As String, ByVal Password As String) As Boolean 'Inherits BaseClasses.CPUserBaseClass.NewLoginIsOK
-            If True Then
-                Return cpCore.main_IsNewLoginOK(Username, Password)
-            Else
-                Return False
-            End If
+            Return cpCore.user.main_IsNewLoginOK(Username, Password)
         End Function
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property OrganizationID() As Integer 'Inherits BaseClasses.CPUserBaseClass.OrganizationId
             Get
                 If True Then
-                    Return cpCore.user.userOrganizationId
+                    Return cpCore.user.organizationId
                 Else
                     Return 0
                 End If
             End Get
         End Property
-
+        '
+        '====================================================================================================
+        '
         Public Overrides ReadOnly Property Password() As String 'Inherits BaseClasses.CPUserBaseClass.Password
             Get
-                If True Then
-                    Return cpCore.user.userPassword
-                Else
-                    Return ""
-                End If
-            End Get
-        End Property
-
-        Public Overrides Function Recognize(ByVal UserID As Integer) As Boolean 'Inherits BaseClasses.CPUserBaseClass.Recognize
-            Return cpCore.user.user_RecognizeMemberByID(UserID)
-        End Function
-
-        Public Overrides ReadOnly Property Username() As String 'Inherits BaseClasses.CPUserBaseClass.Username
-            Get
-                If True Then
-                    Return cpCore.user.userUsername
-                Else
-                    Return ""
-                End If
+                Return cpCore.user.password
             End Get
         End Property
         '
-        '=======================================================================================================
+        '====================================================================================================
+        '
+        Public Overrides Function Recognize(ByVal UserID As Integer) As Boolean 'Inherits BaseClasses.CPUserBaseClass.Recognize
+            Return cpCore.user.recognizeByID(UserID)
+        End Function
+        '
+        '====================================================================================================
+        '
+        Public Overrides ReadOnly Property Username() As String 'Inherits BaseClasses.CPUserBaseClass.Username
+            Get
+                Return cpCore.user.username
+            End Get
+        End Property
         '
         '=======================================================================================================
         '
         Public Overrides Function GetProperty(ByVal PropertyName As String, Optional ByVal DefaultValue As String = "", Optional ByVal TargetMemberId As Integer = 0) As String
-            If True Then
-                Return cpCore.properties_user_getText(PropertyName, DefaultValue, TargetMemberId)
+            If (TargetMemberId = 0) Then
+                Return cpCore.userProperty.getText(PropertyName, DefaultValue)
             Else
-                Return ""
+                Return cpCore.userProperty.getText(PropertyName, DefaultValue, TargetMemberId)
             End If
         End Function
-        '
-        '=======================================================================================================
         '
         '=======================================================================================================
         '
         Public Overrides Sub SetProperty(ByVal PropertyName As String, ByVal Value As String, Optional ByVal TargetMemberId As Integer = 0)
-            If True Then
-                Call cpCore.properties_SetMemberProperty2(PropertyName, Value, TargetMemberId)
+            If (TargetMemberId = 0) Then
+                Call cpCore.userProperty.setProperty(PropertyName, Value)
+            Else
+                Call cpCore.userProperty.setProperty(PropertyName, Value, TargetMemberId)
             End If
         End Sub
         '
         '=======================================================================================================
-        '
+        ' REFACTOR -- obsolete this and setup the defaultValue type correctly, and add the targetUserId
         '=======================================================================================================
         '
         Public Overrides Function GetBoolean(PropertyName As String, Optional DefaultValue As String = "") As Boolean
-            Return CP.Utils.EncodeBoolean(GetProperty(PropertyName, DefaultValue))
+            Return cpCore.userProperty.getBoolean(PropertyName, DefaultValue)
         End Function
         '
         '=======================================================================================================
-        '
+        ' REFACTOR -- obsolete this and setup the defaultValue type correctly, and add the targetUserId
         '=======================================================================================================
         '
         Public Overrides Function GetDate(PropertyName As String, Optional DefaultValue As String = "") As Date
-            Return CP.Utils.EncodeDate(GetProperty(PropertyName, DefaultValue))
+            Return cpCore.userProperty.getDate(PropertyName, DefaultValue)
         End Function
         '
         '=======================================================================================================
-        '
+        ' REFACTOR -- obsolete this and setup the defaultValue type correctly, and add the targetUserId
         '=======================================================================================================
         '
         Public Overrides Function GetInteger(PropertyName As String, Optional DefaultValue As String = "") As Integer
-            Return CP.Utils.EncodeInteger(GetProperty(PropertyName, DefaultValue))
+            Return cpCore.userProperty.getInteger(PropertyName, DefaultValue)
         End Function
         '
         '=======================================================================================================
-        '
+        ' REFACTOR -- obsolete this and setup the defaultValue type correctly, and add the targetUserId
         '=======================================================================================================
         '
         Public Overrides Function GetNumber(PropertyName As String, Optional DefaultValue As String = "") As Double
-            Return CP.Utils.EncodeNumber(GetProperty(PropertyName, DefaultValue))
+            Return cpCore.userProperty.getNumber(PropertyName, DefaultValue)
         End Function
         '
         '=======================================================================================================
         '
-        '=======================================================================================================
-        '
-        Public Overrides Function GetText(FieldName As String, Optional DefaultValue As String = "") As String
-            Return GetProperty(FieldName, DefaultValue)
+        Public Overrides Function GetText(PropertyName As String, Optional DefaultValue As String = "") As String
+            Return cpCore.userProperty.getText(PropertyName, DefaultValue)
         End Function
         '
-        '
+        '====================================================================================================
+        ' REFACTOR -- figure out what this does and rewrite
         '
         Public Overrides Sub track()
             Dim localId As Integer
@@ -434,16 +469,14 @@ Namespace Contensive.Core
                 'End If
             End If
         End Sub
-
         '
-        '
+        '====================================================================================================
         '
         Private Sub appendDebugLog(ByVal copy As String)
-            'My.Computer.FileSystem.WriteAllText("c:\clibCpDebug.log", Now & " - cp.user, " & copy & vbCrLf, True)
-            ' 'My.Computer.FileSystem.WriteAllText(System.AppDocmc.main_CurrentDocmc.main_BaseDirectory() & "cpLog.txt", Now & " - " & copy & vbCrLf, True)
+            '
         End Sub
         '
-        ' testpoint
+        '====================================================================================================
         '
         Private Sub tp(ByVal msg As String)
             'Call appendDebugLog(msg)

@@ -174,7 +174,7 @@ Namespace Contensive.Core
             '
             appName = cpCore.appConfig.name
             CS = cpCore.db.db_openCsSql_rev(DataSource, SQL)
-            If cpCore.db.db_csOk(CS) Then
+            If cpCore.db.cs_Ok(CS) Then
                 '
                 ' ----- print out the field names
                 '
@@ -200,7 +200,7 @@ Namespace Contensive.Core
                     '
                     ' ----- print out the values
                     '
-                    Do While cpCore.db.db_csOk(CS)
+                    Do While cpCore.db.cs_Ok(CS)
                         Delimiter = ""
                         RowBuffer = ""
                         For FieldNamePtr = 0 To FieldNameCnt - 1
@@ -220,7 +220,7 @@ Namespace Contensive.Core
                 End If
             End If
             '
-            Call cpCore.db.db_csClose(CS)
+            Call cpCore.db.cs_Close(CS)
             '
             Exit Function
 ErrorTrap:
@@ -251,7 +251,7 @@ ErrorTrap:
             '
             appName = cpCore.appConfig.name
             CS = cpCore.db.db_openCsSql_rev(DataSource, SQL)
-            If cpCore.db.db_csOk(CS) Then
+            If cpCore.db.cs_Ok(CS) Then
                 '
                 ' ----- setup the field names
                 '
@@ -276,7 +276,7 @@ ErrorTrap:
                     '
                     ' ----- print out the values
                     '
-                    Do While cpCore.db.db_csOk(CS)
+                    Do While cpCore.db.cs_Ok(CS)
                         Delimiter = ""
                         RowBuffer = "<Record>"
                         For FieldNamePtr = 0 To FieldNameCnt - 1
@@ -301,7 +301,7 @@ ErrorTrap:
                 End If
             End If
             '
-            Call cpCore.db.db_csClose(CS)
+            Call cpCore.db.cs_Close(CS)
             'FS = Nothing
             '
             Exit Function

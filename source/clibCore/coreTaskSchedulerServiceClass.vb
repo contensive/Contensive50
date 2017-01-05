@@ -199,13 +199,13 @@ Namespace Contensive
                                     & "  or((ProcessInterval is not null)and(ProcessInterval<>0)and(ProcessNextRun is null))" _
                                     & "  or(ProcessNextRun<" & SQLNow & ")" _
                                     & " )"
-                                CS = cpSite.core.db.db_csOpen("add-ons", sqlAddonsCriteria)
-                                Do While cpSite.core.db.db_csOk(CS)
-                                    addonProcessInterval = cpSite.core.db.db_GetCSInteger(CS, "ProcessInterval")
-                                    addonId = cpSite.core.db.db_GetCSInteger(CS, "ID")
-                                    addonName = cpSite.core.db.db_GetCSText(CS, "name")
-                                    addonArguments = cpSite.core.db.db_GetCSText(CS, "argumentlist")
-                                    addonProcessRunOnce = cpSite.core.db.db_GetCSBoolean(CS, "ProcessRunOnce")
+                                CS = cpSite.core.db.csOpen("add-ons", sqlAddonsCriteria)
+                                Do While cpSite.core.db.cs_Ok(CS)
+                                    addonProcessInterval = cpSite.core.db.cs_getInteger(CS, "ProcessInterval")
+                                    addonId = cpSite.core.db.cs_getInteger(CS, "ID")
+                                    addonName = cpSite.core.db.cs_getText(CS, "name")
+                                    addonArguments = cpSite.core.db.cs_getText(CS, "argumentlist")
+                                    addonProcessRunOnce = cpSite.core.db.cs_getBoolean(CS, "ProcessRunOnce")
                                     addonProcessNextRun = cpSite.core.db.db_GetCSDate(CS, "ProcessNextRun")
                                     NextRun = Date.MinValue
                                     hint &= ",run addon " & addonName
@@ -246,7 +246,7 @@ Namespace Contensive
                                     End If
                                     Call cpSite.core.db.db_csGoNext(CS)
                                 Loop
-                                Call cpSite.core.db.db_csClose(CS)
+                                Call cpSite.core.db.cs_Close(CS)
                             Catch ex As Exception
                                 cpClusterCore.handleExceptionAndRethrow(ex)
                             End Try
@@ -285,24 +285,24 @@ Namespace Contensive
                     ' Search for a duplicate
                     '
                     sql = "select top 1 id from cctasks where ((command=" & cpSiteCore.db.encodeSQLText(Command) & ")and(cmdDetail=" & cmdDetailJson & "))"
-                    cs = cpSiteCore.db.db_csOpenSql(sql)
-                    If cpSiteCore.db.db_csOk(cs) Then
+                    cs = cpSiteCore.db.cs_openSql(sql)
+                    If cpSiteCore.db.cs_Ok(cs) Then
                         returnTaskAdded = False
                     End If
-                    Call cpSiteCore.db.db_csClose(cs)
+                    Call cpSiteCore.db.cs_Close(cs)
                 End If
                 '
                 ' Add it to the queue and shell out to the command
                 '
                 If returnTaskAdded Then
                     cs = cpSiteCore.db.db_csInsertRecord("tasks")
-                    If cpSiteCore.db.db_csOk(cs) Then
+                    If cpSiteCore.db.cs_Ok(cs) Then
                         cpSiteCore.db.db_SetCSField(cs, "name", "")
                         cpSiteCore.db.db_SetCSField(cs, "command", Command)
                         cpSiteCore.db.db_SetCSField(cs, "cmdDetail", cmdDetailJson)
                         returnTaskAdded = True
                     End If
-                    Call cpSiteCore.db.db_csClose(cs)
+                    Call cpSiteCore.db.cs_Close(cs)
                 End If
             Catch ex As Exception
                 cpSiteCore.handleExceptionAndRethrow(ex)

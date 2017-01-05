@@ -92,7 +92,7 @@ Namespace Contensive.Core
                 main_EditLockStatus_Local = False
                 '
                 main_EditLockStatus_Local = getEditLock(EncodeText(ContentName), EncodeInteger(RecordID), ReturnMemberID, ReturnDateExpires)
-                If main_EditLockStatus_Local And (ReturnMemberID <> cpCore.user.userId) Then
+                If main_EditLockStatus_Local And (ReturnMemberID <> cpCore.user.id) Then
                     main_EditLockStatus_Local = True
                     main_EditLockDateExpires_Local = ReturnDateExpires
                     main_EditLockMemberID_Local = ReturnMemberID
@@ -119,10 +119,10 @@ Namespace Contensive.Core
                     If main_EditLockMemberName_Local = "" Then
                         If main_EditLockMemberID_Local <> 0 Then
                             CS = cpCore.db_csOpenRecord("people", main_EditLockMemberID_Local)
-                            If cpCore.db.db_csOk(CS) Then
-                                main_EditLockMemberName_Local = cpCore.db.db_GetCSText(CS, "name")
+                            If cpCore.db.cs_Ok(CS) Then
+                                main_EditLockMemberName_Local = cpCore.db.cs_getText(CS, "name")
                             End If
-                            Call cpCore.db.db_csClose(CS)
+                            Call cpCore.db.cs_Close(CS)
                         End If
                         If main_EditLockMemberName_Local = "" Then
                             main_EditLockMemberName_Local = "unknown"
@@ -160,7 +160,7 @@ Namespace Contensive.Core
         '========================================================================
         '
         Public Sub SetEditLock(ByVal ContentName As String, ByVal RecordID As Integer)
-            Call setEditLock(EncodeText(ContentName), EncodeInteger(RecordID), cpCore.user.userId)
+            Call setEditLock(EncodeText(ContentName), EncodeInteger(RecordID), cpCore.user.id)
         End Sub
         '
         '========================================================================
@@ -168,7 +168,7 @@ Namespace Contensive.Core
         '========================================================================
         '
         Public Sub ClearEditLock(ByVal ContentName As String, ByVal RecordID As Integer)
-            Call clearEditLock(EncodeText(ContentName), EncodeInteger(RecordID), cpCore.user.userId)
+            Call clearEditLock(EncodeText(ContentName), EncodeInteger(RecordID), cpCore.user.id)
         End Sub
         '
         '========================================================================
@@ -176,7 +176,7 @@ Namespace Contensive.Core
         '========================================================================
         '
         Public Sub publishEdit(ByVal ContentName As String, ByVal RecordID As Integer)
-            Call publishEdit(EncodeText(ContentName), EncodeInteger(RecordID), cpCore.user.userId)
+            Call publishEdit(EncodeText(ContentName), EncodeInteger(RecordID), cpCore.user.id)
         End Sub
         '
         '========================================================================
@@ -184,7 +184,7 @@ Namespace Contensive.Core
         '========================================================================
         '
         Public Sub approveEdit(ByVal ContentName As String, ByVal RecordID As Integer)
-            Call approveEdit(EncodeText(ContentName), EncodeInteger(RecordID), cpCore.user.userId)
+            Call approveEdit(EncodeText(ContentName), EncodeInteger(RecordID), cpCore.user.id)
         End Sub
         '
         '========================================================================
@@ -192,7 +192,7 @@ Namespace Contensive.Core
         '========================================================================
         '
         Public Sub main_SubmitEdit(ByVal ContentName As String, ByVal RecordID As Integer)
-            Call submitEdit2(EncodeText(ContentName), EncodeInteger(RecordID), cpCore.user.userId)
+            Call submitEdit2(EncodeText(ContentName), EncodeInteger(RecordID), cpCore.user.id)
         End Sub
         '
         '=========================================================================================
@@ -748,9 +748,9 @@ Namespace Contensive.Core
                 Dim CS As Integer
                 '
                 Criteria = getAuthoringControlCriteria(ContentName, RecordID) & "and(CreatedBy<>" & cpCore.db.db_EncodeSQLNumber(MemberID) & ")"
-                CS = cpCore.db.db_csOpen("Authoring Controls", Criteria, , , MemberID)
-                isRecordLocked = cpCore.db.db_csOk(CS)
-                Call cpCore.db.db_csClose(CS)
+                CS = cpCore.db.csOpen("Authoring Controls", Criteria, , , MemberID)
+                isRecordLocked = cpCore.db.cs_Ok(CS)
+                Call cpCore.db.cs_Close(CS)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -777,13 +777,13 @@ Namespace Contensive.Core
                 ' Authoring Control records are referenced by ContentID
                 '
                 ContentCnt = 0
-                CS = cpCore.db.db_csOpen("Content", "(contenttableid=" & TableID & ")")
-                Do While cpCore.db.db_csOk(CS)
-                    Criteria = Criteria & "," & cpCore.db.db_GetCSInteger(CS, "ID")
+                CS = cpCore.db.csOpen("Content", "(contenttableid=" & TableID & ")")
+                Do While cpCore.db.cs_Ok(CS)
+                    Criteria = Criteria & "," & cpCore.db.cs_getInteger(CS, "ID")
                     ContentCnt = ContentCnt + 1
                     Call cpCore.db.db_csGoNext(CS)
                 Loop
-                Call cpCore.db.db_csClose(CS)
+                Call cpCore.db.cs_Close(CS)
                 If ContentCnt < 1 Then
                     '
                     ' No references to this table
@@ -874,46 +874,46 @@ Namespace Contensive.Core
                                 '
                                 ' Select any lock left, only the newest counts
                                 '
-                                CSCurrentLock = cpCore.db.db_csOpen("Authoring Controls", sqlCriteria, "ID DESC", , MemberID, False, False)
-                                If Not cpCore.db.db_csOk(CSCurrentLock) Then
+                                CSCurrentLock = cpCore.db.csOpen("Authoring Controls", sqlCriteria, "ID DESC", , MemberID, False, False)
+                                If Not cpCore.db.cs_Ok(CSCurrentLock) Then
                                     '
                                     ' No lock, create one
                                     '
                                     CSNewLock = cpCore.db.db_csInsertRecord("Authoring Controls", MemberID)
-                                    If cpCore.db.db_csOk(CSNewLock) Then
+                                    If cpCore.db.cs_Ok(CSNewLock) Then
                                         Call cpCore.db.db_SetCSField(CSNewLock, "RecordID", RecordID)
                                         Call cpCore.db.db_SetCSField(CSNewLock, "DateExpires", (Now.AddDays(EditLockTimeoutDays)))
                                         Call cpCore.db.db_SetCSField(CSNewLock, "ControlType", AuthoringControlsEditing)
                                         Call cpCore.db.db_SetCSField(CSNewLock, "ContentRecordKey", EncodeText(ContentID & "." & RecordID))
                                         Call cpCore.db.db_SetCSField(CSNewLock, "ContentID", ContentID)
                                     End If
-                                    Call cpCore.db.db_csClose(CSNewLock)
+                                    Call cpCore.db.cs_Close(CSNewLock)
                                 Else
-                                    If (cpCore.db.db_GetCSInteger(CSCurrentLock, "CreatedBy") = MemberID) Then
+                                    If (cpCore.db.cs_getInteger(CSCurrentLock, "CreatedBy") = MemberID) Then
                                         '
                                         ' Record Locked by Member, update DateExpire
                                         '
                                         Call cpCore.db.db_SetCSField(CSCurrentLock, "DateExpires", (Now.AddDays(EditLockTimeoutDays)))
                                     End If
                                 End If
-                                Call cpCore.db.db_csClose(CSCurrentLock)
+                                Call cpCore.db.cs_Close(CSCurrentLock)
                             End If
                         Case AuthoringControlsSubmitted, AuthoringControlsApproved, AuthoringControlsModified
                             If CDef.AllowWorkflowAuthoring And cpCore.siteProperties.allowWorkflowAuthoring Then
                                 sqlCriteria = AuthoringCriteria & "And(ControlType=" & AuthoringControl & ")"
-                                CSCurrentLock = cpCore.db.db_csOpen("Authoring Controls", sqlCriteria, "ID DESC", , MemberID, False, False)
-                                If Not cpCore.db.db_csOk(CSCurrentLock) Then
+                                CSCurrentLock = cpCore.db.csOpen("Authoring Controls", sqlCriteria, "ID DESC", , MemberID, False, False)
+                                If Not cpCore.db.cs_Ok(CSCurrentLock) Then
                                     '
                                     ' Create new lock
                                     '
                                     CSNewLock = cpCore.db.db_csInsertRecord("Authoring Controls", MemberID)
-                                    If cpCore.db.db_csOk(CSNewLock) Then
+                                    If cpCore.db.cs_Ok(CSNewLock) Then
                                         Call cpCore.db.db_SetCSField(CSNewLock, "RecordID", RecordID)
                                         Call cpCore.db.db_SetCSField(CSNewLock, "ControlType", AuthoringControl)
                                         Call cpCore.db.db_SetCSField(CSNewLock, "ContentRecordKey", EncodeText(ContentID & "." & RecordID))
                                         Call cpCore.db.db_SetCSField(CSNewLock, "ContentID", ContentID)
                                     End If
-                                    Call cpCore.db.db_csClose(CSNewLock)
+                                    Call cpCore.db.cs_Close(CSNewLock)
                                 Else
                                     '
                                     ' Update current lock
@@ -923,7 +923,7 @@ Namespace Contensive.Core
                                     'Call csv_SetCSField(CSCurrentLock, "ControlType", AuthoringControl)
                                     'Call csv_SetCSField(CSCurrentLock, "ContentRecordKey", encodeText(ContentID & "." & RecordID))
                                 End If
-                                Call cpCore.db.db_csClose(CSCurrentLock)
+                                Call cpCore.db.cs_Close(CSCurrentLock)
                             End If
                     End Select
                 End If
@@ -977,9 +977,9 @@ Namespace Contensive.Core
                             '
                             'TableID = csv_GetContentTableID(ContentName)
                             Criteria = getAuthoringControlCriteria(ContentName, RecordID)
-                            CSLocks = cpCore.db.db_csOpen("Authoring Controls", Criteria, "DateAdded Desc", , , , , "DateAdded,ControlType,CreatedBy,ID,DateExpires")
-                            Do While cpCore.db.db_csOk(CSLocks)
-                                ControlType = cpCore.db.db_GetCSInteger(CSLocks, "ControlType")
+                            CSLocks = cpCore.db.csOpen("Authoring Controls", Criteria, "DateAdded Desc", , , , , "DateAdded,ControlType,CreatedBy,ID,DateExpires")
+                            Do While cpCore.db.cs_Ok(CSLocks)
+                                ControlType = cpCore.db.cs_getInteger(CSLocks, "ControlType")
                                 Select Case ControlType
                                     Case AuthoringControlsModified
                                         If Not IsModified Then
@@ -1002,7 +1002,7 @@ Namespace Contensive.Core
                                 End Select
                                 cpCore.db.db_csGoNext(CSLocks)
                             Loop
-                            Call cpCore.db.db_csClose(CSLocks)
+                            Call cpCore.db.cs_Close(CSLocks)
                             '
                             ContentTableName = CDef.ContentTableName
                             AuthoringTableName = CDef.AuthoringTableName

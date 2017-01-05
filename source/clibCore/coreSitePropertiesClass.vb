@@ -122,18 +122,18 @@ Namespace Contensive.Core
                         If _childListAddonID_Local = 0 Then
                             BuildSupportsGuid = True
                             If BuildSupportsGuid Then
-                                CS = cpCore.db.db_csOpen("Add-ons", "ccguid='" & ChildListGuid & "'", , , ,,  , "ID")
+                                CS = cpCore.db.csOpen("Add-ons", "ccguid='" & ChildListGuid & "'", , , ,,  , "ID")
                             Else
-                                CS = cpCore.db.db_csOpen("Add-ons", "name='Child Page List'", , , , ,, "ID")
+                                CS = cpCore.db.csOpen("Add-ons", "name='Child Page List'", , , , ,, "ID")
                             End If
-                            If cpCore.db.db_csOk(CS) Then
-                                _childListAddonID_Local = cpCore.db.db_GetCSInteger(CS, "ID")
+                            If cpCore.db.cs_Ok(CS) Then
+                                _childListAddonID_Local = cpCore.db.cs_getInteger(CS, "ID")
                             End If
-                            Call cpCore.db.db_csClose(CS)
+                            Call cpCore.db.cs_Close(CS)
                             If _childListAddonID_Local = 0 Then
                                 CS = cpCore.db.db_csInsertRecord("Add-ons")
-                                If cpCore.db.db_csOk(CS) Then
-                                    _childListAddonID_Local = cpCore.db.db_GetCSInteger(CS, "ID")
+                                If cpCore.db.cs_Ok(CS) Then
+                                    _childListAddonID_Local = cpCore.db.cs_getInteger(CS, "ID")
                                     Call cpCore.db.db_setCS(CS, "name", "Child Page List")
                                     Call cpCore.db.db_setCS(CS, "ArgumentList", "Name")
                                     Call cpCore.db.db_setCS(CS, "CopyText", "<ac type=""childlist"" name=""$name$"">")
@@ -143,7 +143,7 @@ Namespace Contensive.Core
                                         Call cpCore.db.db_setCS(CS, "ccguid", ChildListGuid)
                                     End If
                                 End If
-                                Call cpCore.db.db_csClose(CS)
+                                Call cpCore.db.cs_Close(CS)
                             End If
                             Call setProperty("ChildListAddonID", CStr(_childListAddonID_Local))
                         End If
@@ -521,6 +521,10 @@ Namespace Contensive.Core
         Public Function getText(ByVal PropertyName As String, Optional ByVal DefaultValue As String = "") As String
             Dim returnString As String = ""
             Try
+                '
+                ' REFACTOR -- add a dictionary to not relookup values twice -- then refactor out all the hardcoded _cache siteproperties
+                '   a setproperty udpates the local dictionary, the cache and the db
+                '
                 Dim cacheName As String = "siteProperty-" & PropertyName
                 Dim propertyFound As Boolean = False
                 returnString = EncodeText(cpCore.cache.getObject(Of String)(cacheName))

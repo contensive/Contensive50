@@ -122,12 +122,14 @@ Namespace Contensive.Core
         Private Function encodeDocPropertyKey(sourceKey As String) As String
             Dim returnResult As String = ""
             Try
-                returnResult = sourceKey.ToLower()
-                If cpCore.webServer.requestSpaceAsUnderscore Then
-                    returnResult = Replace(returnResult, " ", "_")
-                End If
-                If cpCore.webServer.requestDotAsUnderscore Then
-                    returnResult = Replace(returnResult, ".", "_")
+                If Not String.IsNullOrEmpty(sourceKey) Then
+                    returnResult = sourceKey.ToLower()
+                    If cpCore.webServer.requestSpaceAsUnderscore Then
+                        returnResult = Replace(returnResult, " ", "_")
+                    End If
+                    If cpCore.webServer.requestDotAsUnderscore Then
+                        returnResult = Replace(returnResult, ".", "_")
+                    End If
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)

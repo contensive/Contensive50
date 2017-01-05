@@ -401,7 +401,7 @@ Namespace Contensive.Core
         Public Overrides Function installCollectionFile(privateFolder As String, ByRef returnUserError As String) As Boolean
             Dim returnOk As Boolean = False
             Try
-                returnOk = cp.core.installCollectionFile(privateFolder, returnUserError)
+                returnOk = cp.core.addonInstall_installCollectionFile(privateFolder, returnUserError)
             Catch ex As Exception
                 cp.core.handleExceptionAndRethrow(ex)
                 If Not cp.core.siteProperties.trapErrors Then

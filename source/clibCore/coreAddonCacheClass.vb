@@ -124,10 +124,7 @@ Namespace Contensive.Core
                 Dim addonCacheRow As String(,)
                 Dim addonPtr As Integer
                 Dim addonCacheRowOK As Boolean
-                Dim hint As String
                 Dim SQL As String
-                '
-                'hint = hint & "enter, 1 recordid=[" & RecordID & "]"
                 '
                 If RecordID <= 0 Then
                     Throw New ArgumentException("argument invalid, recordid=[" & RecordID & "]")
@@ -256,16 +253,12 @@ Namespace Contensive.Core
         ''' <param name="addonNameGuidOrId"></param>
         ''' <returns></returns>
         Friend Function getPtr(addonNameGuidOrId As String) As Integer
+            Dim ReturnPtr As Integer = -1
             Try
-                Dim returnPtr As Integer
                 Dim CS As Integer
                 Dim sqlCriteria As String
-                Dim Ptr As Integer
                 Dim addonId As Integer
-                Dim nameOrGuid As String
-                Dim hint As String
                 '
-                returnPtr = -1
                 Call load()
                 If localCache.addonList.Count <= 0 Then
                     '
@@ -288,11 +281,11 @@ Namespace Contensive.Core
                         ' This addonId is missing from cache - try to load it from Db
                         '
                         sqlCriteria = "(id=" & cpCore.db.db_EncodeSQLNumber(addonNameGuidOrId) & ")or(name=" & cpCore.db.encodeSQLText(addonNameGuidOrId) & ")or(ccguid=" & cpCore.db.encodeSQLText(addonNameGuidOrId) & ")"
-                        CS = cpCore.db.db_csOpen("add-ons", sqlCriteria)
-                        If cpCore.db.db_csOk(CS) Then
-                            addonId = cpCore.db.db_GetCSInteger(CS, "id")
+                        CS = cpCore.db.csOpen("add-ons", sqlCriteria)
+                        If cpCore.db.cs_Ok(CS) Then
+                            addonId = cpCore.db.cs_getInteger(CS, "id")
                         End If
-                        Call cpCore.db.db_csClose(CS)
+                        Call cpCore.db.cs_Close(CS)
                         If addonId > 0 Then
                             Call updateRow(addonId)
                             Call load()
@@ -307,10 +300,10 @@ Namespace Contensive.Core
                     End If
                 End If
                 '
-                getPtr = returnPtr
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
+            Return ReturnPtr
         End Function
         '
         '================================================================================================
@@ -319,13 +312,11 @@ Namespace Contensive.Core
         ''' </summary>
         Public Sub load()
             Try
-                Dim hint As String
                 Dim addonPtr As Integer
                 Dim SQL As String
                 Dim RecordID As Integer
                 Dim RecordName As String
                 Dim RecordGuid As String
-                Dim SaveHintToLog As Boolean
                 Dim cacheTest As Object
                 Dim onBodyStartCnt As Integer
                 Dim onBodyEndCnt As Integer

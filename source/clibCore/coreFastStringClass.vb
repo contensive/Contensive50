@@ -35,11 +35,7 @@ Namespace Contensive.Core
         ''' <returns></returns>
         Public ReadOnly Property Text As String
             Get
-                Try
-                    Return Join(Holder, "")
-                Catch ex As Exception
-                    Throw New ApplicationException("Exception in coreFastString.Text()", ex)
-                End Try
+                Return Join(Holder, "") & ""
             End Get
         End Property
     End Class

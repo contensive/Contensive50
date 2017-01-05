@@ -59,12 +59,12 @@ Namespace Contensive.Core
                 Dim XMLTools As New coreXmlToolsClass(cpCore)
                 Dim GuidFieldName As String
                 Dim InstalledCollectionID As Integer
-                Dim InstalledCollectionGuid As String
+                Dim InstalledCollectionGuid As String = ""
                 Dim DateValue As Date
-                Dim ErrorMessage As String
-                Dim OnServerGuidList As String
+                Dim ErrorMessage As String = ""
+                Dim OnServerGuidList As String = ""
                 Dim UpgradeOK As Boolean
-                Dim RegisterList As String
+                Dim RegisterList As String = ""
                 Dim LocalCollections As XmlDocument
                 Dim LibCollections As XmlDocument
                 Dim InstallFolder As String
@@ -72,12 +72,12 @@ Namespace Contensive.Core
                 Dim IISResetRequired As Boolean
                 Dim AddonNavigatorID As Integer
                 Dim TargetCollectionName As String
-                Dim Collectionname As String
-                Dim CollectionGuid As String
+                Dim Collectionname As String = ""
+                Dim CollectionGuid As String = ""
                 Dim CollectionVersion As String
-                Dim CollectionDescription As String
-                Dim CollectionContensiveVersion As String
-                Dim CollectionLastChangeDate As String
+                Dim CollectionDescription As String = ""
+                Dim CollectionContensiveVersion As String = ""
+                Dim CollectionLastChangeDate As String = ""
                 Dim Cells3 As String(,)
                 Dim FormInput As String
                 Dim Cnt As Integer
@@ -94,7 +94,7 @@ Namespace Contensive.Core
                 Dim ColWidth() As String
                 Dim ColSortable() As Boolean
                 Dim PreTableCopy As String
-                Dim PostTableCopy As String
+                Dim PostTableCopy As String = ""
                 Dim BodyHTML As String
                 Dim CS As Integer
                 Dim UserError As String
@@ -102,7 +102,7 @@ Namespace Contensive.Core
                 Dim Button As String
                 Dim Caption As String
                 Dim Description As String
-                Dim ButtonList As String
+                Dim ButtonList As String = ""
                 Dim CollectionFilename As String
                 Dim CollectionFilePathPage As String
                 Dim Uploads() As String
@@ -111,7 +111,7 @@ Namespace Contensive.Core
                 Dim CDef_Node As XmlNode
                 Dim Doc As New XmlDocument
                 Dim CollectionNode As XmlNode
-                Dim status As String
+                Dim status As String = ""
                 Dim AllowInstallFromFolder As Boolean
                 Dim InstallLibCollectionList As String = ""
                 Dim TargetCollectionID As Integer
@@ -122,7 +122,7 @@ Namespace Contensive.Core
                 '
                 ' BuildVersion = cpcore.app.dataBuildVersion
                 Dim dataBuildVersion As String = cpCore.db.dataBuildVersion
-                Dim coreVersion As String = cpCore.version()
+                Dim coreVersion As String = cpCore.common_version()
 
                 DbUpToDate = (dataBuildVersion = coreVersion)
                 '
@@ -139,7 +139,7 @@ Namespace Contensive.Core
                     '
                     Call cpCore.web_Redirect2(cpCore.siteProperties.adminURL, "Addon Manager, Cancel Button Pressed", False)
                 Else
-                    If Not cpCore.user.user_isAdmin Then
+                    If Not cpCore.user.isAuthenticatedAdmin Then
                         '
                         ' ----- Put up error message
                         '
@@ -421,11 +421,11 @@ Namespace Contensive.Core
                                         '
                                         If TargetCollectionID > 0 Then
                                             AddonNavigatorID = 0
-                                            CS = cpCore.db.db_csOpen("Navigator Entries", "name='Manage Add-ons' and ((parentid=0)or(parentid is null))")
-                                            If cpCore.db.db_csOk(CS) Then
-                                                AddonNavigatorID = cpCore.db.db_GetCSInteger(CS, "ID")
+                                            CS = cpCore.db.csOpen("Navigator Entries", "name='Manage Add-ons' and ((parentid=0)or(parentid is null))")
+                                            If cpCore.db.cs_Ok(CS) Then
+                                                AddonNavigatorID = cpCore.db.cs_getInteger(CS, "ID")
                                             End If
-                                            Call cpCore.db.db_csClose(CS)
+                                            Call cpCore.db.cs_Close(CS)
                                             If AddonNavigatorID > 0 Then
                                                 Call GetForm_SafeModeAddonManager_DeleteNavigatorBranch(TargetCollectionName, AddonNavigatorID)
                                             End If
@@ -459,7 +459,7 @@ Namespace Contensive.Core
                             ' Reinstall core collection
                             '---------------------------------------------------------------------------------------------
                             '
-                            If cpCore.user.user_isDeveloper() And cpCore.doc_getBoolean("InstallCore") Then
+                            If cpCore.user.isAuthenticatedDeveloper() And cpCore.doc_getBoolean("InstallCore") Then
                                 UpgradeOK = addonInstall.installCollectionFromRemoteRepo("{8DAABAE6-8E45-4CEE-A42C-B02D180E799B}", cpCore.appConfig.name, IISResetRequired, RegisterList, ErrorMessage, "", False)
                             End If
                             '
@@ -472,10 +472,10 @@ Namespace Contensive.Core
                             ' Process the MetaFile
                             '
                             If CollectionFilePathPage <> "" Then
-                                status = status & "<br>Uploaded collection file [" & CollectionFilePathPage & "]"
+                                status &= "<br>Uploaded collection file [" & CollectionFilePathPage & "]"
                                 CollectionFilename = Mid(Replace(CollectionFilePathPage, InstallFolder, ""), 2)
                                 '
-                                cpCore.log_appendLog("app [" & cpCore.appConfig.name & "], Uploading new collection file, member=[#" & cpCore.user.userId & ", " & cpCore.user.userName & "], CollectionFilename [" & CollectionFilename & "]")
+                                cpCore.log_appendLog("app [" & cpCore.appConfig.name & "], Uploading new collection file, member=[#" & cpCore.user.id & ", " & cpCore.user.name & "], CollectionFilename [" & CollectionFilename & "]")
                                 '
                                 UploadsCnt = cpCore.docProperties.getInteger("UploadCount")
                                 ReDim Uploads(UploadsCnt)
@@ -483,12 +483,12 @@ Namespace Contensive.Core
                                     UploadPathPage = cpCore.web_ProcessFormInputFile2("Upload" & Ptr, cpCore.privateFiles, InstallFolder)
                                     If UploadPathPage <> "" Then
                                         Uploads(Ptr) = Mid(Replace(UploadPathPage, InstallFolder, ""), 2)
-                                        Call HandleClassAppendLog("AddonManager", " app=" & cpCore.appConfig.name & ", Member=" & cpCore.user.userName & " (" & cpCore.user.userId & "), Uploads=" & Uploads(Ptr))
-                                        status = status & "<br>Uploaded collection file [" & Uploads(Ptr) & "]"
+                                        Call HandleClassAppendLog("AddonManager", " app=" & cpCore.appConfig.name & ", Member=" & cpCore.user.name & " (" & cpCore.user.id & "), Uploads=" & Uploads(Ptr))
+                                        status &= "<br>Uploaded collection file [" & Uploads(Ptr) & "]"
                                     End If
                                 Next
                                 AllowInstallFromFolder = True
-                                status = status & "<br>Submitted Collection for import."
+                                status &= "<br>Submitted Collection for import."
                             End If
                         End If
                         '
@@ -549,11 +549,11 @@ Namespace Contensive.Core
                         ' --------------------------------------------------------------------------------
                         '
                         If InstalledCollectionGuid <> "" Then
-                            CS = cpCore.db.db_csOpen("Add-on Collections", GuidFieldName & "=" & cpCore.db.encodeSQLText(InstalledCollectionGuid))
-                            If cpCore.db.db_csOk(CS) Then
-                                InstalledCollectionID = cpCore.db.db_GetCSInteger(CS, "ID")
+                            CS = cpCore.db.csOpen("Add-on Collections", GuidFieldName & "=" & cpCore.db.encodeSQLText(InstalledCollectionGuid))
+                            If cpCore.db.cs_Ok(CS) Then
+                                InstalledCollectionID = cpCore.db.cs_getInteger(CS, "ID")
                             End If
-                            Call cpCore.db.db_csClose(CS)
+                            Call cpCore.db.cs_Close(CS)
                         End If
                         '
                         ' --------------------------------------------------------------------------------
@@ -633,7 +633,7 @@ Namespace Contensive.Core
                                     If LCase(CDef_Node.Name) = "collection" Then
                                         For Each CollectionNode In CDef_Node.ChildNodes
                                             If LCase(CollectionNode.Name) = "guid" Then
-                                                OnServerGuidList = OnServerGuidList & "," & CollectionNode.InnerText
+                                                OnServerGuidList &= "," & CollectionNode.InnerText
                                                 Exit For
                                             End If
                                         Next
@@ -643,11 +643,11 @@ Namespace Contensive.Core
                                 LibCollections = New XmlDocument
                                 Dim parseError As Boolean = False
                                 Try
-                                    LibCollections.Load("http://support.contensive.com/GetCollectionList?iv=" & cpCore.version())
+                                    LibCollections.Load("http://support.contensive.com/GetCollectionList?iv=" & cpCore.common_version())
                                 Catch ex As Exception
                                     UserError = "There was an error reading the Collection Library. The site may be unavailable."
                                     Call HandleClassAppendLog("AddonManager", UserError)
-                                    status = status & "<br>" & UserError
+                                    status &= "<br>" & UserError
                                     cpCore.error_AddUserError(UserError)
                                     parseError = True
                                 End Try
@@ -656,7 +656,7 @@ Namespace Contensive.Core
                                     If LCase(LibCollections.DocumentElement.Name) <> LCase(CollectionListRootNode) Then
                                         UserError = "There was an error reading the Collection Library file. The '" & CollectionListRootNode & "' element was not found."
                                         Call HandleClassAppendLog("AddonManager", UserError)
-                                        status = status & "<br>" & UserError
+                                        status &= "<br>" & UserError
                                         cpCore.error_AddUserError(UserError)
                                     Else
                                         '
@@ -728,9 +728,9 @@ Namespace Contensive.Core
                                                             Cells3(RowPtr, 3) = CollectionDescription & "&nbsp;"
                                                         Else
                                                             IsOnServer = EncodeBoolean(InStr(1, OnServerGuidList, CollectionGuid, vbTextCompare))
-                                                            CS = cpCore.db.db_csOpen("Add-on Collections", GuidFieldName & "=" & cpCore.db.encodeSQLText(CollectionGuid), , , , , , "ID")
-                                                            IsOnSite = cpCore.db.db_csOk(CS)
-                                                            Call cpCore.db.db_csClose(CS)
+                                                            CS = cpCore.db.csOpen("Add-on Collections", GuidFieldName & "=" & cpCore.db.encodeSQLText(CollectionGuid), , , , , , "ID")
+                                                            IsOnSite = cpCore.db.cs_Ok(CS)
+                                                            Call cpCore.db.cs_Close(CS)
                                                             If IsOnSite Then
                                                                 '
                                                                 ' Already installed
@@ -739,7 +739,7 @@ Namespace Contensive.Core
                                                                 Cells3(RowPtr, 1) = Collectionname & "&nbsp;(installed already)"
                                                                 Cells3(RowPtr, 2) = CollectionLastChangeDate & "&nbsp;"
                                                                 Cells3(RowPtr, 3) = CollectionDescription & "&nbsp;"
-                                                            ElseIf ((CollectionContensiveVersion <> "") And (CollectionContensiveVersion > cpCore.version())) Then
+                                                            ElseIf ((CollectionContensiveVersion <> "") And (CollectionContensiveVersion > cpCore.common_version())) Then
                                                                 '
                                                                 ' wrong version
                                                                 '
@@ -826,34 +826,34 @@ Namespace Contensive.Core
                                     '
                                     ' before system attribute
                                     '
-                                    CS = cpCore.db.db_csOpen("Add-on Collections", , "Name")
-                                ElseIf Not cpCore.user.user_isDeveloper Then
+                                    CS = cpCore.db.csOpen("Add-on Collections", , "Name")
+                                ElseIf Not cpCore.user.isAuthenticatedDeveloper Then
                                     '
                                     ' non-developers
                                     '
-                                    CS = cpCore.db.db_csOpen("Add-on Collections", "((system is null)or(system=0))", "Name")
+                                    CS = cpCore.db.csOpen("Add-on Collections", "((system is null)or(system=0))", "Name")
                                 Else
                                     '
                                     ' developers
                                     '
                                     DisplaySystem = True
-                                    CS = cpCore.db.db_csOpen("Add-on Collections", , "Name")
+                                    CS = cpCore.db.csOpen("Add-on Collections", , "Name")
                                 End If
                                 ReDim Preserve Cells(cpCore.db.db_GetCSRowCount(CS), ColumnCnt)
                                 RowPtr = 0
-                                Do While cpCore.db.db_csOk(CS)
-                                    Cells(RowPtr, 0) = cpCore.html_GetFormInputCheckBox2("AC" & RowPtr) & cpCore.html_GetFormInputHidden("ACID" & RowPtr, cpCore.db.db_GetCSInteger(CS, "ID"))
+                                Do While cpCore.db.cs_Ok(CS)
+                                    Cells(RowPtr, 0) = cpCore.html_GetFormInputCheckBox2("AC" & RowPtr) & cpCore.html_GetFormInputHidden("ACID" & RowPtr, cpCore.db.cs_getInteger(CS, "ID"))
                                     'Cells(RowPtr, 1) = "<a href=""" & cpcore.app.SiteProperty_AdminURL & "?id=" & cpcore.app.db_GetCSInteger(CS, "ID") & "&cid=" & cpcore.app.db_GetCSInteger(CS, "ContentControlID") & "&af=4""><img src=""/ccLib/images/IconContentEdit.gif"" border=0></a>"
-                                    Cells(RowPtr, 1) = cpCore.db.db_GetCSText(CS, "name")
+                                    Cells(RowPtr, 1) = cpCore.db.cs_getText(CS, "name")
                                     If DisplaySystem Then
-                                        If cpCore.db.db_GetCSBoolean(CS, "system") Then
+                                        If cpCore.db.cs_getBoolean(CS, "system") Then
                                             Cells(RowPtr, 1) = Cells(RowPtr, 1) & " (system)"
                                         End If
                                     End If
                                     Call cpCore.db.db_csGoNext(CS)
                                     RowPtr = RowPtr + 1
                                 Loop
-                                Call cpCore.db.db_csClose(CS)
+                                Call cpCore.db.cs_Close(CS)
                                 BodyHTML = "<div style=""width:100%"">" & Adminui.GetReport2(RowPtr, ColCaption, ColAlign, ColWidth, Cells, RowPtr, 1, "", PostTableCopy, RowPtr, "ccAdmin", ColSortable, 0) & "</div>"
                                 BodyHTML = Adminui.GetEditPanel(True, "Add-on Collections", "Use this form to review and delete current add-on collections.", BodyHTML)
                                 BodyHTML = BodyHTML & cpCore.html_GetFormInputHidden("accnt", RowPtr)
@@ -868,7 +868,7 @@ Namespace Contensive.Core
                                     Call Body.Add("<p>Add-on upload is disabled because your site database needs to be updated.</p>")
                                 Else
                                     Call Body.Add(Adminui.EditTableOpen)
-                                    If cpCore.user.user_isDeveloper Then
+                                    If cpCore.user.isAuthenticatedDeveloper Then
                                         Call Body.Add(Adminui.GetEditRow(cpCore.html_GetFormInputCheckBox2("InstallCore"), "Reinstall Core Collection", "", False, False, ""))
                                     End If
                                     Call Body.Add(Adminui.GetEditRow(cpCore.html_GetFormInputFile("MetaFile"), "Add-on Collection File(s)", "", True, False, ""))
@@ -907,12 +907,13 @@ Namespace Contensive.Core
                     If status <> "" Then
                         Description = Description & "<div style=""Margin-left:50px"">" & status & "</div>"
                     End If
-                    GetForm_SafeModeAddonManager = Adminui.GetBody(Caption, ButtonList, "", False, False, Description, "", 0, Content.Text)
+                    addonManager = Adminui.GetBody(Caption, ButtonList, "", False, False, Description, "", 0, Content.Text)
                     Call cpCore.main_AddPagetitle("Add-on Manager")
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
+            Return addonManager
         End Function
         '
         '
@@ -924,22 +925,22 @@ Namespace Contensive.Core
             Dim EntryID As Integer
             '
             If EntryParentID = 0 Then
-                CS = cpCore.db.db_csOpen("Navigator Entries", "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and((parentID is null)or(parentid=0))")
+                CS = cpCore.db.csOpen("Navigator Entries", "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and((parentID is null)or(parentid=0))")
             Else
-                CS = cpCore.db.db_csOpen("Navigator Entries", "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(parentID=" & cpCore.db.db_EncodeSQLNumber(EntryParentID) & ")")
+                CS = cpCore.db.csOpen("Navigator Entries", "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(parentID=" & cpCore.db.db_EncodeSQLNumber(EntryParentID) & ")")
             End If
-            If cpCore.db.db_csOk(CS) Then
-                EntryID = cpCore.db.db_GetCSInteger(CS, "ID")
+            If cpCore.db.cs_Ok(CS) Then
+                EntryID = cpCore.db.cs_getInteger(CS, "ID")
             End If
-            Call cpCore.db.db_csClose(CS)
+            Call cpCore.db.cs_Close(CS)
             '
             If EntryID <> 0 Then
-                CS = cpCore.db.db_csOpen("Navigator Entries", "(parentID=" & cpCore.db.db_EncodeSQLNumber(EntryID) & ")")
-                Do While cpCore.db.db_csOk(CS)
-                    Call GetForm_SafeModeAddonManager_DeleteNavigatorBranch(cpCore.db.db_GetCSText(CS, "name"), EntryID)
+                CS = cpCore.db.csOpen("Navigator Entries", "(parentID=" & cpCore.db.db_EncodeSQLNumber(EntryID) & ")")
+                Do While cpCore.db.cs_Ok(CS)
+                    Call GetForm_SafeModeAddonManager_DeleteNavigatorBranch(cpCore.db.cs_getText(CS, "name"), EntryID)
                     Call cpCore.db.db_csGoNext(CS)
                 Loop
-                Call cpCore.db.db_csClose(CS)
+                Call cpCore.db.cs_Close(CS)
                 Call cpCore.db_DeleteContentRecord("Navigator Entries", EntryID)
             End If
             '
@@ -1026,18 +1027,18 @@ ErrorTrap:
                     ParentNameSpace = Mid(menuNameSpace, 1, Pos - 1)
                 End If
                 If ParentNameSpace = "" Then
-                    CS = cpCore.db.db_csOpen(ContentName, "(name=" & cpCore.db.encodeSQLText(ParentName) & ")and((parentid is null)or(parentid=0))", "ID", , , , , "ID")
-                    If cpCore.db.db_csOk(CS) Then
-                        GetParentIDFromNameSpace = cpCore.db.db_GetCSInteger(CS, "ID")
+                    CS = cpCore.db.csOpen(ContentName, "(name=" & cpCore.db.encodeSQLText(ParentName) & ")and((parentid is null)or(parentid=0))", "ID", , , , , "ID")
+                    If cpCore.db.cs_Ok(CS) Then
+                        GetParentIDFromNameSpace = cpCore.db.cs_getInteger(CS, "ID")
                     End If
-                    Call cpCore.db.db_csClose(CS)
+                    Call cpCore.db.cs_Close(CS)
                 Else
                     ParentID = GetParentIDFromNameSpace(ContentName, ParentNameSpace)
-                    CS = cpCore.db.db_csOpen(ContentName, "(name=" & cpCore.db.encodeSQLText(ParentName) & ")and(parentid=" & ParentID & ")", "ID", , , , , "ID")
-                    If cpCore.db.db_csOk(CS) Then
-                        GetParentIDFromNameSpace = cpCore.db.db_GetCSInteger(CS, "ID")
+                    CS = cpCore.db.csOpen(ContentName, "(name=" & cpCore.db.encodeSQLText(ParentName) & ")and(parentid=" & ParentID & ")", "ID", , , , , "ID")
+                    If cpCore.db.cs_Ok(CS) Then
+                        GetParentIDFromNameSpace = cpCore.db.cs_getInteger(CS, "ID")
                     End If
-                    Call cpCore.db.db_csClose(CS)
+                    Call cpCore.db.cs_Close(CS)
                 End If
             End If
             '

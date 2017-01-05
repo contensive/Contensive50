@@ -260,7 +260,7 @@ Namespace Contensive.Core
                         Dim CSPointer As Integer
                         For CSPointer = 1 To csv_ContentSetCount
                             If db_ContentSet(CSPointer).IsOpen Then
-                                Call db_csClose(CSPointer)
+                                Call cs_Close(CSPointer)
                             End If
                         Next
                     End If
@@ -1295,10 +1295,10 @@ ErrorTrap:
             Dim CS As Integer
             '
             CS = db_OpenCSContentRecord(ContentName, RecordID, , , , "Name")
-            If db_csOk(CS) Then
+            If cs_Ok(CS) Then
                 db_GetRecordName = db_GetCS(CS, "Name")
             End If
-            Call db_csClose(CS)
+            Call cs_Close(CS)
 
             Exit Function
 ErrorTrap:
@@ -1314,14 +1314,14 @@ ErrorTrap:
             Try
                 Dim CS As Integer
                 '
-                CS = db_csOpen(ContentName, "name=" & encodeSQLText(RecordName), "ID", , , , , "ID")
-                If db_csOk(CS) Then
+                CS = csOpen(ContentName, "name=" & encodeSQLText(RecordName), "ID", , , , , "ID")
+                If cs_Ok(CS) Then
                     returnValue = EncodeInteger(db_GetCS(CS, "ID"))
                     If returnValue = 0 Then
                         cpCore.handleExceptionAndRethrow(New ApplicationException("getRecordId([" & ContentName & "],[" & RecordName & "]), a record was found but id returned 0"))
                     End If
                 End If
-                Call db_csClose(CS)
+                Call cs_Close(CS)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -1758,7 +1758,7 @@ ErrorTrap:
         ''' <returns></returns>
         '========================================================================
         '
-        Public Function db_csOpen(ByVal ContentName As String, Optional ByVal Criteria As String = "", Optional ByVal SortFieldList As String = "", Optional ByVal ActiveOnly As Boolean = True, Optional ByVal MemberID As Integer = 0, Optional ByVal WorkflowRenderingMode As Boolean = False, Optional ByVal WorkflowEditingMode As Boolean = False, Optional ByVal SelectFieldList As String = "", Optional ByVal PageSize As Integer = 9999, Optional ByVal PageNumber As Integer = 1) As Integer
+        Public Function csOpen(ByVal ContentName As String, Optional ByVal Criteria As String = "", Optional ByVal SortFieldList As String = "", Optional ByVal ActiveOnly As Boolean = True, Optional ByVal MemberID As Integer = 0, Optional ByVal WorkflowRenderingMode As Boolean = False, Optional ByVal WorkflowEditingMode As Boolean = False, Optional ByVal SelectFieldList As String = "", Optional ByVal PageSize As Integer = 9999, Optional ByVal PageNumber As Integer = 1) As Integer
             Try
                 '
                 Dim Copy2 As String
@@ -1781,7 +1781,7 @@ ErrorTrap:
                 Dim TestUcaseFieldList As String
                 Dim SQL As String
                 '
-                db_csOpen = -1
+                csOpen = -1
                 '
                 If (ContentName.ToLower() = "system email") Then
                     ContentName = ContentName
@@ -2012,8 +2012,8 @@ ErrorTrap:
                         '
                         ' ----- Open the csv_ContentSet
                         '
-                        db_csOpen = db_initCS(iMemberID)
-                        With db_ContentSet(db_csOpen)
+                        csOpen = db_initCS(iMemberID)
+                        With db_ContentSet(csOpen)
                             .Updateable = True
                             .ContentName = ContentName
                             .WorkflowAuthoringMode = iWorkflowRenderingMode
@@ -2049,33 +2049,33 @@ ErrorTrap:
                                 '
                                 ' Save the source, but do not open the recordset
                                 '
-                                db_ContentSet(db_csOpen).Source = SQL
+                                db_ContentSet(csOpen).Source = SQL
                             Else
                                 '
                                 ' Run the query
                                 '
-                                db_ContentSet(db_csOpen).dt = executeSql(SQL, DataSourceName, .PageSize * (.PageNumber - 1), .PageSize)
+                                db_ContentSet(csOpen).dt = executeSql(SQL, DataSourceName, .PageSize * (.PageNumber - 1), .PageSize)
                             End If
                         End With
                         'hint = hint & ",600"
-                        Call db_initCSData(db_csOpen)
-                        Call db_LoadContentSetCurrentRow(db_csOpen)
+                        Call db_initCSData(csOpen)
+                        Call db_LoadContentSetCurrentRow(csOpen)
                         '
                         'hint = hint & ",700"
                         If iWorkflowRenderingMode Then
                             '
                             ' Authoring mode
                             '
-                            Call db_VerifyWorkflowAuthoringRecord(db_csOpen)
+                            Call db_VerifyWorkflowAuthoringRecord(csOpen)
                             If AllowWorkflowSave Then
                                 '
                                 ' Workflow Editing Mode - lock the first record
                                 '
-                                If Not db_IsCSEOF(db_csOpen) Then
-                                    If db_ContentSet(db_csOpen).WorkflowEditingRequested Then
-                                        RecordID = db_GetCSInteger(db_csOpen, "ID")
+                                If Not db_IsCSEOF(csOpen) Then
+                                    If db_ContentSet(csOpen).WorkflowEditingRequested Then
+                                        RecordID = cs_getInteger(csOpen, "ID")
                                         If Not cpCore.workflow.isRecordLocked(ContentName, RecordID, MemberID) Then
-                                            db_ContentSet(db_csOpen).WorkflowEditingMode = True
+                                            db_ContentSet(csOpen).WorkflowEditingMode = True
                                             Call cpCore.workflow.setEditLock(ContentName, RecordID, MemberID)
                                         End If
                                     End If
@@ -2127,7 +2127,7 @@ ErrorTrap:
             '
             MethodName = "csv_DeleteCSRecord"
             '
-            If Not db_csOk(CSPointer) Then
+            If Not cs_Ok(CSPointer) Then
                 '
                 Call handleLegacyClassError3(MethodName, ("csv_ContentSet Is empty Or at End-Of-file"))
             ElseIf Not db_ContentSet(CSPointer).Updateable Then
@@ -2146,7 +2146,7 @@ ErrorTrap:
                     '
                     Call handleLegacyClassError3(MethodName, ("csv_ContentSet Is Not based On a Content Definition"))
                 Else
-                    LiveRecordID = db_GetCSInteger(CSPointer, "ID")
+                    LiveRecordID = cs_getInteger(CSPointer, "ID")
                     If Not db_ContentSet(CSPointer).WorkflowAuthoringMode Then
                         '
                         ' delete any files
@@ -2163,7 +2163,7 @@ ErrorTrap:
                                             '
                                             ' public content files
                                             '
-                                            Filename = db_GetCSText(CSPointer, fieldName)
+                                            Filename = cs_getText(CSPointer, fieldName)
                                             If Filename <> "" Then
                                                 Call cpCore.cdnFiles.DeleteFile(cpCore.cdnFiles.joinPath(cpCore.appConfig.cdnFilesNetprefix, Filename))
                                             End If
@@ -2171,7 +2171,7 @@ ErrorTrap:
                                             '
                                             ' private files
                                             '
-                                            Filename = db_GetCSText(CSPointer, fieldName)
+                                            Filename = cs_getText(CSPointer, fieldName)
                                             If Filename <> "" Then
                                                 Call cpCore.privateFiles.DeleteFile(Filename)
                                             End If
@@ -2196,7 +2196,7 @@ ErrorTrap:
                         '
                         ' workflow mode, mark the editrecord "Blanked"
                         '
-                        EditRecordID = db_GetCSInteger(CSPointer, "EditID")
+                        EditRecordID = cs_getInteger(CSPointer, "EditID")
                         sqlList = New sqlFieldListClass
                         Call sqlList.add("EDITBLANK", SQLTrue) ' Pointer)
                         Call sqlList.add("MODIFIEDBY", db_EncodeSQLNumber(db_ContentSet(CSPointer).OwnerMemberID)) ' Pointer)
@@ -2220,10 +2220,10 @@ ErrorTrap:
         '========================================================================
         '
         Public Function db_openCsSql_rev(ByVal DataSourceName As String, ByVal SQL As String, Optional ByVal PageSize As Integer = 9999, Optional ByVal PageNumber As Integer = 1) As Integer
-            Return db_csOpenSql(SQL, DataSourceName, PageSize, PageNumber)
+            Return cs_openSql(SQL, DataSourceName, PageSize, PageNumber)
         End Function
         '
-        Public Function db_csOpenSql(ByVal SQL As String, Optional ByVal DataSourceName As String = "", Optional ByVal PageSize As Integer = 9999, Optional ByVal PageNumber As Integer = 1) As Integer
+        Public Function cs_openSql(ByVal SQL As String, Optional ByVal DataSourceName As String = "", Optional ByVal PageSize As Integer = 9999, Optional ByVal PageNumber As Integer = 1) As Integer
             Dim returnCs As Integer = -1
             Try
                 'Dim CSPointer As Integer
@@ -2233,7 +2233,7 @@ ErrorTrap:
                 '       (Save all buffered csv_ContentSet rows incase of overlap)
                 '       No - Csets may be from other PageProcesses in unknown states
                 '
-                returnCs = db_initCS(cpCore.user.userId)
+                returnCs = db_initCS(cpCore.user.id)
                 With db_ContentSet(returnCs)
                     .Updateable = False
                     .ContentName = ""
@@ -2317,7 +2317,7 @@ ErrorTrap:
         '   sets CSPointer to -1
         '========================================================================
         '
-        Public Sub db_csClose(ByRef CSPointer As Integer, Optional ByVal AsyncSave As Boolean = False)
+        Public Sub cs_Close(ByRef CSPointer As Integer, Optional ByVal AsyncSave As Boolean = False)
             Try
                 If (CSPointer > 0) And (CSPointer <= csv_ContentSetCount) Then
                     With db_ContentSet(CSPointer)
@@ -2358,7 +2358,7 @@ ErrorTrap:
             '
             MethodName = "csv_NextCSRecord"
             '
-            If Not db_csOk(CSPointer) Then
+            If Not cs_Ok(CSPointer) Then
                 '
                 Call handleLegacyClassError3(MethodName, ("CSPointer Not csv_IsCSOK."))
             Else
@@ -2380,7 +2380,7 @@ ErrorTrap:
                     '
                     If (Not db_IsCSEOF(CSPointer)) And db_ContentSet(CSPointer).WorkflowEditingRequested Then
                         ContentName = db_ContentSet(CSPointer).ContentName
-                        RecordID = db_GetCSInteger(CSPointer, "ID")
+                        RecordID = cs_getInteger(CSPointer, "ID")
                         If Not cpCore.workflow.isRecordLocked(ContentName, RecordID, db_ContentSet(CSPointer).OwnerMemberID) Then
                             db_ContentSet(CSPointer).WorkflowEditingMode = True
                             Call cpCore.workflow.setEditLock(ContentName, RecordID, db_ContentSet(CSPointer).OwnerMemberID)
@@ -2468,7 +2468,7 @@ ErrorTrap:
             '
             FieldNameLocal = Trim(FieldName)
             FieldNameLocalUcase = UCase(FieldNameLocal)
-            If Not db_csOk(CSPointer) Then
+            If Not cs_Ok(CSPointer) Then
                 '
                 cpCore.handleExceptionAndRethrow(New Exception("csv_ContentSet Is empty Or EOF"))
             Else
@@ -2577,7 +2577,7 @@ ErrorTrapField:
             MethodName = "csv_GetCSFirstFieldName"
             db_GetCSFirstFieldName = ""
             '
-            If Not db_csOk(CSPointer) Then
+            If Not cs_Ok(CSPointer) Then
                 Call handleLegacyClassError3(MethodName, ("csv_ContentSet invalid Or End-Of-file"))
             Else
                 db_ContentSet(CSPointer).fieldPointer = 0
@@ -2604,7 +2604,7 @@ ErrorTrap:
             '
             db_GetCSNextFieldName = ""
             '
-            If Not db_csOk(CSPointer) Then
+            If Not cs_Ok(CSPointer) Then
                 Call handleLegacyClassError3("csv_GetCSNextFieldName", "csv_ContentSet invalid Or End-Of-file")
             Else
                 With db_ContentSet(CSPointer)
@@ -2646,7 +2646,7 @@ ErrorTrap:
             MethodName = "csv_GetCSFieldType"
             '
             db_GetCSFieldTypeId = 0
-            If db_csOk(CSPointer) Then
+            If cs_Ok(CSPointer) Then
                 If db_ContentSet(CSPointer).Updateable Then
                     With db_ContentSet(CSPointer).CDef
                         If .Name <> "" Then
@@ -2679,7 +2679,7 @@ ErrorTrap:
             MethodName = "csv_GetCSFieldCaption"
             '
             db_getCSFieldCaption = ""
-            If db_csOk(CSPointer) Then
+            If cs_Ok(CSPointer) Then
                 If db_ContentSet(CSPointer).Updateable Then
                     With db_ContentSet(CSPointer).CDef
                         If .Name <> "" Then
@@ -2711,7 +2711,7 @@ ErrorTrap:
             MethodName = "csv_GetCSSelectFieldList"
             '
             db_GetCSSelectFieldList = ""
-            If db_csOk(CSPointer) Then
+            If cs_Ok(CSPointer) Then
                 If useCSReadCacheMultiRow Then
                     db_GetCSSelectFieldList = Join(db_ContentSet(CSPointer).fieldNames, ",")
                 Else
@@ -2786,7 +2786,7 @@ ErrorTrap:
             '
             MethodName = "csv_GetCSFilename"
             '
-            If Not db_csOk(CSPointer) Then
+            If Not cs_Ok(CSPointer) Then
                 Call Err.Raise(KmaErrorInternal, "dll", "CSPointer Not OK")
             ElseIf FieldName = "" Then
                 Call Err.Raise(KmaErrorInternal, "dll", "Fieldname Is blank")
@@ -2825,7 +2825,7 @@ ErrorTrap:
                         If .ResultColumnCount > 0 Then
                             For FieldPointer = 0 To .ResultColumnCount - 1
                                 If UCase(.fieldNames(FieldPointer)) = "ID" Then
-                                    RecordID = db_GetCSInteger(CSPointer, "ID")
+                                    RecordID = cs_getInteger(CSPointer, "ID")
                                     Exit For
                                 End If
                             Next
@@ -2882,14 +2882,14 @@ ErrorTrap:
         '
         '   csv_GetCSText
         '
-        Public Function db_GetCSText(ByVal CSPointer As Integer, ByVal FieldName As String) As String
-            db_GetCSText = EncodeText(db_GetCSField(CSPointer, FieldName))
+        Public Function cs_getText(ByVal CSPointer As Integer, ByVal FieldName As String) As String
+            cs_getText = EncodeText(db_GetCSField(CSPointer, FieldName))
         End Function
         '
         '   encodeInteger( csv_GetCSField )
         '
-        Public Function db_GetCSInteger(ByVal CSPointer As Integer, ByVal FieldName As String) As Integer
-            db_GetCSInteger = EncodeInteger(db_GetCSField(CSPointer, FieldName))
+        Public Function cs_getInteger(ByVal CSPointer As Integer, ByVal FieldName As String) As Integer
+            cs_getInteger = EncodeInteger(db_GetCSField(CSPointer, FieldName))
         End Function
         '
         '   encodeNumber( csv_GetCSField )
@@ -2906,8 +2906,8 @@ ErrorTrap:
         '
         '   encodeBoolean( csv_GetCSField )
         '
-        Public Function db_GetCSBoolean(ByVal CSPointer As Integer, ByVal FieldName As String) As Boolean
-            db_GetCSBoolean = EncodeBoolean(db_GetCSField(CSPointer, FieldName))
+        Public Function cs_getBoolean(ByVal CSPointer As Integer, ByVal FieldName As String) As Boolean
+            cs_getBoolean = EncodeBoolean(db_GetCSField(CSPointer, FieldName))
         End Function
         '
         '   encodeBoolean( csv_GetCSField )
@@ -2933,7 +2933,7 @@ ErrorTrap:
             Dim OldFilename As String
             Dim OldCopy As String
             '
-            If Not db_csOk(CSPointer) Then
+            If Not cs_Ok(CSPointer) Then
                 '
                 Call handleLegacyClassError3("csv_SetCSTextFile", ("csv_ContentSet invalid Or End-Of-file"))
             Else
@@ -2942,7 +2942,7 @@ ErrorTrap:
                         '
                         Call handleLegacyClassError3("csv_SetCSTextFile", ("Attempting To update an unupdateable Content Set"))
                     Else
-                        OldFilename = db_GetCSText(CSPointer, FieldName)
+                        OldFilename = cs_getText(CSPointer, FieldName)
                         Filename = db_GetCSFilename(CSPointer, FieldName, "", ContentName)
                         If OldFilename <> Filename Then
                             '
@@ -2985,7 +2985,7 @@ ErrorTrap:
             '
             Dim Filename As String
             '
-            Filename = db_GetCSText(CSPointer, FieldName)
+            Filename = cs_getText(CSPointer, FieldName)
             If Filename <> "" Then
                 db_csGetTextFile = cpCore.cdnFiles.ReadFile(Filename)
             End If
@@ -3010,7 +3010,7 @@ ErrorTrap:
                 Dim SetNeeded As Boolean
                 Dim field As coreMetaDataClass.CDefFieldClass
                 '
-                If Not db_csOk(CSPointer) Then
+                If Not cs_Ok(CSPointer) Then
                     cpCore.handleExceptionAndRethrow(New ApplicationException("csv_ContentSet invalid Or End-Of-file"))
                 Else
                     With db_ContentSet(CSPointer)
@@ -3042,14 +3042,14 @@ ErrorTrap:
                                         Case FieldTypeIdBoolean
                                             '
                                             ' Boolean - sepcial case, block on typed GetAlways set
-                                            If EncodeBoolean(FieldValue) <> db_GetCSBoolean(CSPointer, FieldName) Then
+                                            If EncodeBoolean(FieldValue) <> cs_getBoolean(CSPointer, FieldName) Then
                                                 SetNeeded = True
                                             End If
                                         Case Else
                                             '
                                             ' Set if text of value changes
                                             '
-                                            If EncodeText(FieldValue) <> db_GetCSText(CSPointer, FieldName) Then
+                                            If EncodeText(FieldValue) <> cs_getText(CSPointer, FieldName) Then
                                                 SetNeeded = True
                                             End If
                                     End Select
@@ -3101,10 +3101,10 @@ ErrorTrap:
             '
             metaData_InsertContentRecordGetID = -1
             CS = db_csInsertRecord(ContentName, MemberID)
-            If db_csOk(CS) Then
-                metaData_InsertContentRecordGetID = db_GetCSInteger(CS, "ID")
+            If cs_Ok(CS) Then
+                metaData_InsertContentRecordGetID = cs_getInteger(CS, "ID")
             End If
-            Call db_csClose(CS)
+            Call cs_Close(CS)
             '
             Exit Function
             '
@@ -3131,10 +3131,10 @@ ErrorTrap:
             MethodName = "csv_DeleteContentRecord"
             '
             CSPointer = db_OpenCSContentRecord(ContentName, RecordID, MemberID, True, True)
-            If db_csOk(CSPointer) Then
+            If cs_Ok(CSPointer) Then
                 Call db_DeleteCSRecord(CSPointer)
             End If
-            Call db_csClose(CSPointer)
+            Call cs_Close(CSPointer)
             '
             Exit Sub
             '
@@ -3172,12 +3172,12 @@ ErrorTrap:
                             '
                             ' Supports Workflow Authoring, handle it record at a time
                             '
-                            CSPointer = db_csOpen(ContentName, Criteria, , False, MemberID, True, True, "ID")
-                            Do While db_csOk(CSPointer)
+                            CSPointer = csOpen(ContentName, Criteria, , False, MemberID, True, True, "ID")
+                            Do While cs_Ok(CSPointer)
                                 Call db_DeleteCSRecord(CSPointer)
                                 Call db_csGoNext(CSPointer)
                             Loop
-                            Call db_csClose(CSPointer)
+                            Call cs_Close(CSPointer)
                         Else
                             '
                             ' No Workflow Authoring, just delete records
@@ -3225,7 +3225,7 @@ ErrorTrap:
                 Dim sqlList As New sqlFieldListClass
                 '
                 If MemberID = -1 Then
-                    MemberID = cpCore.user.userId
+                    MemberID = cpCore.user.id
                 End If
                 returnCs = -1
                 CDef = cpCore.metaData.getCdef(ContentName)
@@ -3349,7 +3349,7 @@ ErrorTrap:
                         ' ----- Get the record back so we can use the ID
                         '
                         Criteria = "((createkey=" & CreateKeyString & ")And(DateAdded=" & DateAddedString & "))"
-                        returnCs = db_csOpen(ContentName, Criteria, "ID DESC", False, MemberID, WorkflowAuthoringMode, True)
+                        returnCs = csOpen(ContentName, Criteria, "ID DESC", False, MemberID, WorkflowAuthoringMode, True)
                         '
                         ' ----- Clear Time Stamp because a record changed
                         '
@@ -3378,7 +3378,7 @@ ErrorTrap:
             '
             MethodName = "db_csOpen"
             '
-            db_OpenCSContentRecord = db_csOpen(ContentName, "(ID=" & db_EncodeSQLNumber(RecordID) & ")", , False, MemberID, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
+            db_OpenCSContentRecord = csOpen(ContentName, "(ID=" & db_EncodeSQLNumber(RecordID) & ")", , False, MemberID, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
             '
             Exit Function
             '
@@ -3414,16 +3414,16 @@ ErrorTrap:
         '   returns true if the csv_ContentSet is not empty and not EOF
         '========================================================================
         '
-        Function db_csOk(ByVal CSPointer As Integer) As Boolean
+        Function cs_Ok(ByVal CSPointer As Integer) As Boolean
             On Error GoTo ErrorTrap 'Const Tn = "IsCSOK" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
             If CSPointer > 0 Then
                 If useCSReadCacheMultiRow Then
                     With db_ContentSet(CSPointer)
-                        db_csOk = .IsOpen And (.readCacheRowPtr >= 0) And (.readCacheRowPtr < .readCacheRowCnt)
+                        cs_Ok = .IsOpen And (.readCacheRowPtr >= 0) And (.readCacheRowPtr < .readCacheRowCnt)
                     End With
                 Else
-                    db_csOk = db_ContentSet(CSPointer).IsOpen And (Not db_ContentSet(CSPointer).ResultEOF)
+                    cs_Ok = db_ContentSet(CSPointer).IsOpen And (Not db_ContentSet(CSPointer).ResultEOF)
                 End If
                 'With csv_ContentSet(CSPointer)
                 '    '
@@ -3459,11 +3459,11 @@ ErrorTrap:
             '
             MethodName = "csv_CopyCSRecord"
             '
-            If db_csOk(CSSource) And db_csOk(CSDestination) Then
+            If cs_Ok(CSSource) And cs_Ok(CSDestination) Then
                 '
                 DestCDef = db_ContentSet(CSDestination).CDef
                 DestContentName = DestCDef.Name
-                DestRecordID = db_GetCSInteger(CSDestination, "ID")
+                DestRecordID = cs_getInteger(CSDestination, "ID")
                 FieldName = db_GetCSFirstFieldName(CSSource)
                 Do While (FieldName <> "")
                     Select Case UCase(FieldName)
@@ -3525,7 +3525,7 @@ ErrorTrap:
         Public Function db_GetCSSource(ByVal CSPointer As Integer) As String
             On Error GoTo ErrorTrap 'Const Tn = "MethodName-187" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
-            If db_csOk(CSPointer) Then
+            If cs_Ok(CSPointer) Then
                 db_GetCSSource = db_ContentSet(CSPointer).Source
             End If
             '
@@ -3561,7 +3561,7 @@ ErrorTrap:
                 '       then print accordingly
                 '
                 db_GetCS = ""
-                If Not db_csOk(CSPointer) Then
+                If Not cs_Ok(CSPointer) Then
                     '
                     cpCore.handleExceptionAndRethrow(New Exception("csv_ContentSet Is empty Or End Of file"))
                 Else
@@ -3661,11 +3661,11 @@ ErrorTrap:
                                                         '
                                                         ' First try Lookup Content
                                                         '
-                                                        CSLookup = db_csOpen(LookupContentName, "ID=" & db_EncodeSQLNumber(FieldValueVariant), , , , , , "name", 1)
-                                                        If db_csOk(CSLookup) Then
-                                                            db_GetCS = db_GetCSText(CSLookup, "name")
+                                                        CSLookup = csOpen(LookupContentName, "ID=" & db_EncodeSQLNumber(FieldValueVariant), , , , , , "name", 1)
+                                                        If cs_Ok(CSLookup) Then
+                                                            db_GetCS = cs_getText(CSLookup, "name")
                                                         End If
-                                                        Call db_csClose(CSLookup)
+                                                        Call cs_Close(CSLookup)
                                                     ElseIf LookupList <> "" Then
                                                         '
                                                         ' Next try lookup list
@@ -3755,7 +3755,7 @@ ErrorTrap:
                 Dim fileName As String
                 Dim pathFilenameOriginal As String
                 '
-                If Not db_csOk(CSPointer) Then
+                If Not cs_Ok(CSPointer) Then
                     Throw New ApplicationException("contentset is invalid Or End-Of-file.")
                 Else
                     With db_ContentSet(CSPointer)
@@ -3798,7 +3798,7 @@ ErrorTrap:
                                                 ' Use the csv_SetCSTextFile to manage the modified name and date correctly.
                                                 ' csv_SetCSTextFile uses this method to set the row changed, so leave this here.
                                                 '
-                                                fileNameNoExt = db_GetCSText(CSPointer, FieldNameLc)
+                                                fileNameNoExt = cs_getText(CSPointer, FieldNameLc)
                                                 FieldValueText = EncodeText(FieldValueVariantLocal)
                                                 If FieldValueText = "" Then
                                                     If fileNameNoExt <> "" Then
@@ -3824,7 +3824,7 @@ ErrorTrap:
                                                 Dim FilenameRev As Integer
                                                 Dim path As String
                                                 Dim Pos As Integer
-                                                pathFilenameOriginal = db_GetCSText(CSPointer, FieldNameLc)
+                                                pathFilenameOriginal = cs_getText(CSPointer, FieldNameLc)
                                                 PathFilename = pathFilenameOriginal
                                                 FieldValueText = EncodeText(FieldValueVariantLocal)
                                                 BlankTest = FieldValueText
@@ -3889,7 +3889,7 @@ ErrorTrap:
                                                 '
                                                 ' Boolean - sepcial case, block on typed GetAlways set
                                                 FieldValueVariantLocal = EncodeBoolean(FieldValueVariantLocal)
-                                                If EncodeBoolean(FieldValueVariantLocal) <> db_GetCSBoolean(CSPointer, FieldNameLc) Then
+                                                If EncodeBoolean(FieldValueVariantLocal) <> cs_getBoolean(CSPointer, FieldNameLc) Then
                                                     SetNeeded = True
                                                 End If
                                             Case FieldTypeIdText
@@ -3897,7 +3897,7 @@ ErrorTrap:
                                                 ' Set if text of value changes
                                                 '
                                                 FieldValueVariantLocal = Left(EncodeText(FieldValueVariantLocal), 255)
-                                                If EncodeText(FieldValueVariantLocal) <> db_GetCSText(CSPointer, FieldNameLc) Then
+                                                If EncodeText(FieldValueVariantLocal) <> cs_getText(CSPointer, FieldNameLc) Then
                                                     SetNeeded = True
                                                 End If
                                             Case FieldTypeIdLongText, FieldTypeIdHTML
@@ -3905,14 +3905,14 @@ ErrorTrap:
                                                 ' Set if text of value changes
                                                 '
                                                 FieldValueVariantLocal = Left(EncodeText(FieldValueVariantLocal), 65535)
-                                                If EncodeText(FieldValueVariantLocal) <> db_GetCSText(CSPointer, FieldNameLc) Then
+                                                If EncodeText(FieldValueVariantLocal) <> cs_getText(CSPointer, FieldNameLc) Then
                                                     SetNeeded = True
                                                 End If
                                             Case Else
                                                 '
                                                 ' Set if text of value changes
                                                 '
-                                                If EncodeText(FieldValueVariantLocal) <> db_GetCSText(CSPointer, FieldNameLc) Then
+                                                If EncodeText(FieldValueVariantLocal) <> cs_getText(CSPointer, FieldNameLc) Then
                                                     SetNeeded = True
                                                 End If
                                         End Select
@@ -3994,7 +3994,7 @@ ErrorTrap:
         Public Sub db_RollBackCS(ByVal CSPointer As Integer)
             On Error GoTo ErrorTrap 'Const Tn = "MethodName-190" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
-            If db_csOk(CSPointer) Then
+            If cs_Ok(CSPointer) Then
                 db_ContentSet(CSPointer).writeCache.Clear()
                 'csv_ContentSet(CSPointer).writeCacheCount = 0
                 'csv_ContentSet(CSPointer).writeCacheChanged = False
@@ -4079,7 +4079,7 @@ ErrorTrap:
             '
             MethodName = "csv_SaveCS"
             '
-            If db_csOk(CSPointer) Then
+            If cs_Ok(CSPointer) Then
                 With db_ContentSet(CSPointer)
                     If (.Updateable) And (.writeCache.Count > 0) Then
                         '
@@ -4098,10 +4098,10 @@ ErrorTrap:
                             WorkflowMode = .AllowWorkflowAuthoring And cpCore.siteProperties.allowWorkflowAuthoring
                         End With
                         '
-                        LiveRecordID = db_GetCSInteger(CSPointer, "ID")
-                        LiveRecordContentControlID = db_GetCSInteger(CSPointer, "CONTENTCONTROLID")
+                        LiveRecordID = cs_getInteger(CSPointer, "ID")
+                        LiveRecordContentControlID = cs_getInteger(CSPointer, "CONTENTCONTROLID")
                         LiveRecordContentName = cpCore.metaData.getContentNameByID(LiveRecordContentControlID)
-                        LiveRecordInactive = Not db_GetCSBoolean(CSPointer, "ACTIVE")
+                        LiveRecordInactive = Not cs_getBoolean(CSPointer, "ACTIVE")
                         '
                         ' Get Edit Record ID
                         '
@@ -4109,7 +4109,7 @@ ErrorTrap:
                             '
                             ' Live Mode
                             '
-                            EditRecordID = db_GetCSInteger(CSPointer, "ID")
+                            EditRecordID = cs_getInteger(CSPointer, "ID")
                         ElseIf Not (WorkflowRenderingMode) Then
                             '
                             ' Workflow Live Mode, (Workflow system, but opened the live record)
@@ -4134,7 +4134,7 @@ ErrorTrap:
                             '
                             ' Workflow Render or Workflow Edit mode, get the Edit Record ID from the original recordset
                             '
-                            EditRecordID = db_GetCSInteger(CSPointer, "EDITID")
+                            EditRecordID = cs_getInteger(CSPointer, "EDITID")
                         End If
                         '
                         SQLLiveDelimiter = ""
@@ -5013,12 +5013,12 @@ ErrorTrap:
                 '
                 ' ----- Delete ContentWatch
                 '
-                CS = db_csOpen("Content Watch", Criteria)
-                Do While db_csOk(CS)
+                CS = csOpen("Content Watch", Criteria)
+                Do While cs_Ok(CS)
                     Call db_DeleteCSRecord(CS)
                     db_csGoNext(CS)
                 Loop
-                Call db_csClose(CS)
+                Call cs_Close(CS)
                 '
                 ' ----- Table Specific rules
                 '
@@ -5197,7 +5197,7 @@ ErrorTrap:
                 '
                 'hint = "csv_GetCSRows2"
                 returnOK = False
-                If db_csOk(CSPointer) Then
+                If cs_Ok(CSPointer) Then
                     'hint = hint & ",10"
                     If isDataTableOk(db_ContentSet(CSPointer).dt) Then
                         'hint = hint & ",20"
@@ -5253,7 +5253,7 @@ ErrorTrap:
             Dim Row() As String
             Dim ColumnPointer As Integer
             '
-            If db_csOk(CSPointer) Then
+            If cs_Ok(CSPointer) Then
                 With db_ContentSet(CSPointer)
                     ReDim Row(.ResultColumnCount)
                     If useCSReadCacheMultiRow Then
@@ -5314,7 +5314,7 @@ ErrorTrap:
             '
             MethodName = "csv_GetCSRowFields"
             '
-            If Not db_csOk(CSPointer) Then
+            If Not cs_Ok(CSPointer) Then
                 Call handleLegacyClassError4(KmaErrorUser, "dll", "csv_ContentSet is not valid or End-of-File", MethodName, False, False)
             Else
                 db_GetCSRowFields = db_ContentSet(CSPointer).fieldNames
@@ -5471,7 +5471,7 @@ ErrorTrap:
             '       then print accordingly
             '
             db_OpenCSJoin = -1
-            If Not db_csOk(CSPointer) Then
+            If Not cs_Ok(CSPointer) Then
                 '
                 Call handleLegacyClassError3(MethodName, ("csv_ContentSet is empty or end of file"))
             Else
@@ -5501,7 +5501,7 @@ ErrorTrap:
                         '
                         Dim field As coreMetaDataClass.CDefFieldClass = CDef.fields(FieldName.ToLower())
 
-                        RecordId = db_GetCSInteger(CSPointer, "ID")
+                        RecordId = cs_getInteger(CSPointer, "ID")
                         fieldTypeId = field.fieldTypeId
                         fieldLookupId = field.lookupContentID
                         If fieldTypeId <> FieldTypeIdLookup Then
@@ -5520,7 +5520,7 @@ ErrorTrap:
                                 Call handleLegacyClassError3(MethodName, "The Lookup Content Definition [" & fieldLookupId & "] for this field [" & FieldName & "] is not valid.")
                             Else
                                 LookupContentName = cpCore.metaData.getContentNameByID(fieldLookupId)
-                                db_OpenCSJoin = db_csOpen(LookupContentName, "ID=" & db_EncodeSQLNumber(FieldValueVariant), "name", , , , , , 1)
+                                db_OpenCSJoin = csOpen(LookupContentName, "ID=" & db_EncodeSQLNumber(FieldValueVariant), "name", , , , , , 1)
                                 'CDefLookup = appEnvironment.GetCDefByID(FieldLookupID)
                                 'csv_OpenCSJoin = db_csOpen(CDefLookup.Name, "ID=" & encodeSQLNumber(FieldValueVariant), "name", , , , , , 1)
                             End If
@@ -5575,11 +5575,11 @@ ErrorTrap:
             '
             Dim CS As Integer
             '
-            CS = db_csOpen(ContentName, "ccguid=" & encodeSQLText(RecordGuid), "ID", , , , , "ID")
-            If db_csOk(CS) Then
+            CS = csOpen(ContentName, "ccguid=" & encodeSQLText(RecordGuid), "ID", , , , , "ID")
+            If cs_Ok(CS) Then
                 db_GetRecordIDByGuid = EncodeInteger(db_GetCS(CS, "ID"))
             End If
-            Call db_csClose(CS)
+            Call cs_Close(CS)
 
             Exit Function
 ErrorTrap:
@@ -5600,18 +5600,18 @@ ErrorTrap:
                 Dim Rows() As Object
                 '
                 If useCSReadCacheMultiRow Then
-                    CS = db_csOpen(ContentName, Criteria, SortFieldList, ActiveOnly, MemberID, WorkflowRenderingMode, WorkflowEditingMode, SelectFieldList, PageSize, PageNumber)
-                    If db_csOk(CS) Then
+                    CS = csOpen(ContentName, Criteria, SortFieldList, ActiveOnly, MemberID, WorkflowRenderingMode, WorkflowEditingMode, SelectFieldList, PageSize, PageNumber)
+                    If cs_Ok(CS) Then
                         returnRows = db_ContentSet(CS).readCache
                     End If
-                    Call db_csClose(CS)
+                    Call cs_Close(CS)
                 Else
                     '
                     ' Open the CS, but do not run the query yet
                     '
                     OldState = csv_OpenCSWithoutRecords
                     csv_OpenCSWithoutRecords = True
-                    CS = db_csOpen(ContentName, Criteria, SortFieldList, ActiveOnly, MemberID, WorkflowRenderingMode, WorkflowEditingMode, SelectFieldList, PageSize, PageNumber)
+                    CS = csOpen(ContentName, Criteria, SortFieldList, ActiveOnly, MemberID, WorkflowRenderingMode, WorkflowEditingMode, SelectFieldList, PageSize, PageNumber)
                     csv_OpenCSWithoutRecords = OldState
                     '
                     If db_ContentSet(CS).Source <> "" Then
@@ -5622,7 +5622,7 @@ ErrorTrap:
                         End If
                         Call closeDataTable(rs)
                     End If
-                    Call db_csClose(CS)
+                    Call cs_Close(CS)
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)

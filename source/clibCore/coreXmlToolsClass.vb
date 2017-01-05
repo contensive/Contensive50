@@ -722,9 +722,9 @@ ErrorTrap:
                 & " from cctables T left join ccDataSources d on D.ID=T.DataSourceID" _
                 & " where t.active<>0"
             CS = cpCore.db.db_openCsSql_rev("default", SQL)
-            Do While cpCore.db.db_csOk(CS)
-                DataSourceName = cpCore.db.db_GetCSText(CS, "DataSourceName")
-                TableName = cpCore.db.db_GetCSText(CS, "TableName")
+            Do While cpCore.db.cs_Ok(CS)
+                DataSourceName = cpCore.db.cs_getText(CS, "DataSourceName")
+                TableName = cpCore.db.cs_getText(CS, "TableName")
                 IndexList = cpCore.db.db_GetSQLIndexList(DataSourceName, TableName)
                 '
                 ' name1,index1
@@ -784,7 +784,7 @@ ErrorTrap:
                 End If
                 cpCore.db.db_csGoNext(CS)
             Loop
-            Call cpCore.db.db_csClose(CS)
+            Call cpCore.db.cs_Close(CS)
             GetXMLContentDefinition_SQLIndexes = sb.ToString
             '
             Exit Function

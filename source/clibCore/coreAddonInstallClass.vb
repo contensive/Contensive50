@@ -44,11 +44,11 @@ Namespace Contensive.Core
             Else
                 Criteria = Criteria & "And(parentid=" & ParentID & ")"
             End If
-            CS = cpCore.db.db_csOpen("Navigator Entries", Criteria, "ID")
-            If Not cpCore.db.db_csOk(CS) Then
-                Call cpCore.db.db_csClose(CS)
+            CS = cpCore.db.csOpen("Navigator Entries", Criteria, "ID")
+            If Not cpCore.db.cs_Ok(CS) Then
+                Call cpCore.db.cs_Close(CS)
                 CS = cpCore.db.db_csInsertRecord("Navigator Entries", SystemMemberID)
-                If cpCore.db.db_csOk(CS) Then
+                If cpCore.db.cs_Ok(CS) Then
                     'Call cmc.cpCore.app.csv_SetCSRecordDefaults(CS)
                     Call cpCore.db.db_setCS(CS, "name", EntryName)
                     Call cpCore.db.db_setCS(CS, "parentid", ParentID)
@@ -74,17 +74,17 @@ Namespace Contensive.Core
                     ' if there are more, these are a errors - move their child nodes to the first and delete them
                     '
                     Call cpCore.db.db_csGoNext(CS)
-                    Do While cpCore.db.db_csOk(CS)
-                        Call cpCore.db.executeSql("update ccmenuentries set parentid=" & GetNavigatorID & " where parentid=" & cpCore.db.db_GetCSInteger(CS, "ID"))
-                        Call cpCore.db.executeSql("delete from ccmenuentries where id=" & cpCore.db.db_GetCSInteger(CS, "ID"))
+                    Do While cpCore.db.cs_Ok(CS)
+                        Call cpCore.db.executeSql("update ccmenuentries set parentid=" & GetNavigatorID & " where parentid=" & cpCore.db.cs_getInteger(CS, "ID"))
+                        Call cpCore.db.executeSql("delete from ccmenuentries where id=" & cpCore.db.cs_getInteger(CS, "ID"))
                         Call cpCore.db.db_csGoNext(CS)
                     Loop
                 End If
             End If
-            If cpCore.db.db_csOk(CS) Then
-                GetNavigatorID = cpCore.db.db_GetCSInteger(CS, "ID")
+            If cpCore.db.cs_Ok(CS) Then
+                GetNavigatorID = cpCore.db.cs_getInteger(CS, "ID")
             End If
-            Call cpCore.db.db_csClose(CS)
+            Call cpCore.db.cs_Close(CS)
             '
             Exit Function
 ErrorTrap:
@@ -133,7 +133,7 @@ ErrorTrap:
                 '
                 Doc = New XmlDocument
                 DownloadCollectionFiles = True
-                URL = "http://support.contensive.com/GetCollection?iv=" & cpCore.version() & "&guid=" & CollectionGuid
+                URL = "http://support.contensive.com/GetCollection?iv=" & cpCore.common_version() & "&guid=" & CollectionGuid
                 errorPrefix = "DownloadCollectionFiles, Error reading the collection library status file from the server for Collection [" & CollectionGuid & "], download URL [" & URL & "]. "
                 return_ErrorMessage = ""
                 downloadRetry = 0
@@ -476,7 +476,7 @@ ErrorTrap:
                                         End If
                                         'hint = "Getting CollectionList"
                                         LibraryCollections = New XmlDocument
-                                        SupportURL = "http://support.contensive.com/GetCollectionList?iv=" & cpCore.version() & "&guidlist=" & EncodeRequestVariable(GuidList)
+                                        SupportURL = "http://support.contensive.com/GetCollectionList?iv=" & cpCore.common_version() & "&guidlist=" & EncodeRequestVariable(GuidList)
                                         Dim loadOK As Boolean = True
                                         Try
                                             LibraryCollections.Load(SupportURL)
@@ -578,7 +578,7 @@ ErrorTrap:
                                                                                         If InStr(1, LibGUID, "58c9", vbTextCompare) <> 0 Then
                                                                                             LibGUID = LibGUID
                                                                                         End If
-                                                                                        If (LibGUID <> "") And (LibGUID = LocalGuid) And ((LibContensiveVersion = "") Or (LibContensiveVersion <= cpCore.version())) Then
+                                                                                        If (LibGUID <> "") And (LibGUID = LocalGuid) And ((LibContensiveVersion = "") Or (LibContensiveVersion <= cpCore.common_version())) Then
                                                                                             '
                                                                                             ' LibCollection matches the LocalCollection - process the upgrade
                                                                                             '
@@ -1541,8 +1541,8 @@ ErrorTrap:
                                                             '
                                                             OKToInstall = False
                                                             Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 1 done, create collection record.")
-                                                            CSCollection = cpCore.db.db_csOpen("Add-on Collections", "(" & AddonGuidFieldName & "=" & cpCore.db.encodeSQLText(CollectionGuid) & ")")
-                                                            If cpCore.db.db_csOk(CSCollection) Then
+                                                            CSCollection = cpCore.db.csOpen("Add-on Collections", "(" & AddonGuidFieldName & "=" & cpCore.db.encodeSQLText(CollectionGuid) & ")")
+                                                            If cpCore.db.cs_Ok(CSCollection) Then
                                                                 '
                                                                 ' Upgrade addon
                                                                 '
@@ -1560,7 +1560,7 @@ ErrorTrap:
                                                                 '
                                                                 ' Install new on this application
                                                                 '
-                                                                Call cpCore.db.db_csClose(CSCollection)
+                                                                Call cpCore.db.cs_Close(CSCollection)
                                                                 'Call AppendClassLogFile(cmc.appEnvironment.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Creating a new collection record for Collection [" & Collectionname & "], GUID [" & CollectionGuid & "]")
                                                                 CSCollection = cpCore.db.db_csInsertRecord("Add-on Collections", 0)
                                                                 Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], App does not have this collection so it will be installed.")
@@ -1590,12 +1590,12 @@ ErrorTrap:
                                                                 '
                                                                 ' ----- Install or upgrade this collection
                                                                 '
-                                                                If cpCore.db.db_csOk(CSCollection) Then
+                                                                If cpCore.db.cs_Ok(CSCollection) Then
                                                                     '
                                                                     ' ----- set or clear all fields
                                                                     '
                                                                     OtherXML = ""
-                                                                    CollectionID = cpCore.db.db_GetCSInteger(CSCollection, "ID")
+                                                                    CollectionID = cpCore.db.cs_getInteger(CSCollection, "ID")
                                                                     Call cpCore.db.db_setCS(CSCollection, "name", Collectionname)
                                                                     Call cpCore.db.db_setCS(CSCollection, "help", CollectionHelp)
                                                                     Call cpCore.db.db_setCS(CSCollection, AddonGuidFieldName, CollectionGuid)
@@ -1770,11 +1770,11 @@ ErrorTrap:
                                                                                             ContentID = cpCore.db.db_GetContentID(ContentName)
                                                                                             If ContentID > 0 Then
                                                                                                 CS = cpCore.db.db_csInsertRecord("Add-on Collection CDef Rules", 0)
-                                                                                                If cpCore.db.db_csOk(CS) Then
+                                                                                                If cpCore.db.cs_Ok(CS) Then
                                                                                                     Call cpCore.db.db_setCS(CS, "Contentid", ContentID)
                                                                                                     Call cpCore.db.db_setCS(CS, "CollectionID", CollectionID)
                                                                                                 End If
-                                                                                                Call cpCore.db.db_csClose(CS)
+                                                                                                Call cpCore.db.cs_Close(CS)
                                                                                             End If
                                                                                             '
                                                                                             ' create navigator entry
@@ -1841,22 +1841,22 @@ ErrorTrap:
                                                                                                 '
                                                                                                 CDef = cpCore.metaData.getCdef(ContentName)
                                                                                                 If ContentRecordGuid <> "" Then
-                                                                                                    CS = cpCore.db.db_csOpen(ContentName, "ccguid=" & cpCore.db.encodeSQLText(ContentRecordGuid))
+                                                                                                    CS = cpCore.db.csOpen(ContentName, "ccguid=" & cpCore.db.encodeSQLText(ContentRecordGuid))
                                                                                                 Else
-                                                                                                    CS = cpCore.db.db_csOpen(ContentName, "name=" & cpCore.db.encodeSQLText(ContentRecordName))
+                                                                                                    CS = cpCore.db.csOpen(ContentName, "name=" & cpCore.db.encodeSQLText(ContentRecordName))
                                                                                                 End If
                                                                                                 Dim recordfound As Boolean
 
                                                                                                 recordfound = True
-                                                                                                If Not cpCore.db.db_csOk(CS) Then
+                                                                                                If Not cpCore.db.cs_Ok(CS) Then
                                                                                                     '
                                                                                                     ' Insert the new record
                                                                                                     '
                                                                                                     recordfound = False
-                                                                                                    Call cpCore.db.db_csClose(CS)
+                                                                                                    Call cpCore.db.cs_Close(CS)
                                                                                                     CS = cpCore.db.db_csInsertRecord(ContentName, 0)
                                                                                                 End If
-                                                                                                If cpCore.db.db_csOk(CS) Then
+                                                                                                If cpCore.db.cs_Ok(CS) Then
                                                                                                     '
                                                                                                     ' Update the record
                                                                                                     '
@@ -1881,7 +1881,7 @@ ErrorTrap:
                                                                                                     End If
                                                                                                 End If
                                                                                                 'On Error Resume Next
-                                                                                                Call cpCore.db.db_csClose(CS)
+                                                                                                Call cpCore.db.cs_Close(CS)
                                                                                                 If Err.Number <> 0 Then
                                                                                                     '
                                                                                                     ' add this error to the front, and abort -- let them try to fix it
@@ -1931,11 +1931,11 @@ ErrorTrap:
                                                                                             If (ContentRecordGuid <> "") Or (ContentRecordName <> "") Then
                                                                                                 CDef = cpCore.metaData.getCdef(ContentName)
                                                                                                 If ContentRecordGuid <> "" Then
-                                                                                                    CS = cpCore.db.db_csOpen(ContentName, "ccguid=" & cpCore.db.encodeSQLText(ContentRecordGuid))
+                                                                                                    CS = cpCore.db.csOpen(ContentName, "ccguid=" & cpCore.db.encodeSQLText(ContentRecordGuid))
                                                                                                 Else
-                                                                                                    CS = cpCore.db.db_csOpen(ContentName, "name=" & cpCore.db.encodeSQLText(ContentRecordName))
+                                                                                                    CS = cpCore.db.csOpen(ContentName, "name=" & cpCore.db.encodeSQLText(ContentRecordName))
                                                                                                 End If
-                                                                                                If Not cpCore.db.db_csOk(CS) Then
+                                                                                                If Not cpCore.db.cs_Ok(CS) Then
                                                                                                     CS = CS
                                                                                                 Else
                                                                                                     '
@@ -2015,7 +2015,7 @@ ErrorTrap:
                                                                                                     Next
                                                                                                 End If
                                                                                                 'On Error Resume Next
-                                                                                                Call cpCore.db.db_csClose(CS)
+                                                                                                Call cpCore.db.cs_Close(CS)
                                                                                                 If Err.Number <> 0 Then
                                                                                                     '
                                                                                                     ' add this error to the front, and abort -- let them try to fix it
@@ -2061,18 +2061,18 @@ ErrorTrap:
                                                                                 End If
                                                                                 If ChildCollectionGUID <> "" Then
                                                                                     ChildCollectionID = 0
-                                                                                    CS = cpCore.db.db_csOpen("Add-on Collections", "ccguid=" & cpCore.db.encodeSQLText(ChildCollectionGUID), , , , , , "id")
-                                                                                    If cpCore.db.db_csOk(CS) Then
-                                                                                        ChildCollectionID = cpCore.db.db_GetCSInteger(CS, "id")
+                                                                                    CS = cpCore.db.csOpen("Add-on Collections", "ccguid=" & cpCore.db.encodeSQLText(ChildCollectionGUID), , , , , , "id")
+                                                                                    If cpCore.db.cs_Ok(CS) Then
+                                                                                        ChildCollectionID = cpCore.db.cs_getInteger(CS, "id")
                                                                                     End If
-                                                                                    Call cpCore.db.db_csClose(CS)
+                                                                                    Call cpCore.db.cs_Close(CS)
                                                                                     If ChildCollectionID <> 0 Then
                                                                                         CS = cpCore.db.db_csInsertRecord("Add-on Collection Parent Rules", 0)
-                                                                                        If cpCore.db.db_csOk(CS) Then
+                                                                                        If cpCore.db.cs_Ok(CS) Then
                                                                                             Call cpCore.db.db_setCS(CS, "ParentID", CollectionID)
                                                                                             Call cpCore.db.db_setCS(CS, "ChildID", ChildCollectionID)
                                                                                         End If
-                                                                                        Call cpCore.db.db_csClose(CS)
+                                                                                        Call cpCore.db.cs_Close(CS)
                                                                                     End If
                                                                                 End If
                                                                             Case "scriptingmodule", "scriptingmodules"
@@ -2090,8 +2090,8 @@ ErrorTrap:
                                                                                 End If
                                                                                 Criteria = "(ccguid=" & cpCore.db.encodeSQLText(ScriptingGuid) & ")"
                                                                                 ScriptingModuleID = 0
-                                                                                CS = cpCore.db.db_csOpen("Scripting Modules", Criteria)
-                                                                                If cpCore.db.db_csOk(CS) Then
+                                                                                CS = cpCore.db.csOpen("Scripting Modules", Criteria)
+                                                                                If cpCore.db.cs_Ok(CS) Then
                                                                                     '
                                                                                     ' Update the Addon
                                                                                     '
@@ -2100,45 +2100,45 @@ ErrorTrap:
                                                                                     '
                                                                                     ' not found by GUID - search name against name to update legacy Add-ons
                                                                                     '
-                                                                                    Call cpCore.db.db_csClose(CS)
+                                                                                    Call cpCore.db.cs_Close(CS)
                                                                                     Criteria = "(name=" & cpCore.db.encodeSQLText(ScriptingName) & ")and(ccguid is null)"
-                                                                                    CS = cpCore.db.db_csOpen("Scripting Modules", Criteria)
-                                                                                    If cpCore.db.db_csOk(CS) Then
+                                                                                    CS = cpCore.db.csOpen("Scripting Modules", Criteria)
+                                                                                    If cpCore.db.cs_Ok(CS) Then
                                                                                         Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Scripting Module matched an existing Module that has no GUID, Updating to [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
                                                                                     End If
                                                                                 End If
-                                                                                If Not cpCore.db.db_csOk(CS) Then
+                                                                                If Not cpCore.db.cs_Ok(CS) Then
                                                                                     '
                                                                                     ' not found by GUID or by name, Insert a new
                                                                                     '
-                                                                                    Call cpCore.db.db_csClose(CS)
+                                                                                    Call cpCore.db.cs_Close(CS)
                                                                                     CS = cpCore.db.db_csInsertRecord("Scripting Modules", 0)
-                                                                                    If cpCore.db.db_csOk(CS) Then
+                                                                                    If cpCore.db.cs_Ok(CS) Then
                                                                                         Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Creating new Scripting Module [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
                                                                                     End If
                                                                                 End If
-                                                                                If Not cpCore.db.db_csOk(CS) Then
+                                                                                If Not cpCore.db.cs_Ok(CS) Then
                                                                                     '
                                                                                     ' Could not create new
                                                                                     '
                                                                                     Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Scripting Module could not be created, skipping Scripting Module [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
                                                                                 Else
-                                                                                    ScriptingModuleID = cpCore.db.db_GetCSInteger(CS, "ID")
+                                                                                    ScriptingModuleID = cpCore.db.cs_getInteger(CS, "ID")
                                                                                     Call cpCore.db.db_setCS(CS, "code", CDefSection.InnerText)
                                                                                     Call cpCore.db.db_setCS(CS, "name", ScriptingName)
                                                                                     Call cpCore.db.db_setCS(CS, "ccguid", ScriptingGuid)
                                                                                 End If
-                                                                                Call cpCore.db.db_csClose(CS)
+                                                                                Call cpCore.db.cs_Close(CS)
                                                                                 If ScriptingModuleID <> 0 Then
                                                                                     '
                                                                                     ' Add Add-on Collection Module Rule
                                                                                     '
                                                                                     CS = cpCore.db.db_csInsertRecord("Add-on Collection Module Rules", 0)
-                                                                                    If cpCore.db.db_csOk(CS) Then
+                                                                                    If cpCore.db.cs_Ok(CS) Then
                                                                                         Call cpCore.db.db_setCS(CS, "Collectionid", CollectionID)
                                                                                         Call cpCore.db.db_setCS(CS, "ScriptingModuleID", ScriptingModuleID)
                                                                                     End If
-                                                                                    Call cpCore.db.db_csClose(CS)
+                                                                                    Call cpCore.db.cs_Close(CS)
                                                                                 End If
                                                                             Case "sharedstyle"
                                                                                 '
@@ -2156,8 +2156,8 @@ ErrorTrap:
                                                                                 End If
                                                                                 Criteria = "(ccguid=" & cpCore.db.encodeSQLText(nodeGuid) & ")"
                                                                                 ScriptingModuleID = 0
-                                                                                CS = cpCore.db.db_csOpen("Shared Styles", Criteria)
-                                                                                If cpCore.db.db_csOk(CS) Then
+                                                                                CS = cpCore.db.csOpen("Shared Styles", Criteria)
+                                                                                If cpCore.db.cs_Ok(CS) Then
                                                                                     '
                                                                                     ' Update the Addon
                                                                                     '
@@ -2166,30 +2166,30 @@ ErrorTrap:
                                                                                     '
                                                                                     ' not found by GUID - search name against name to update legacy Add-ons
                                                                                     '
-                                                                                    Call cpCore.db.db_csClose(CS)
+                                                                                    Call cpCore.db.cs_Close(CS)
                                                                                     Criteria = "(name=" & cpCore.db.encodeSQLText(NodeName) & ")and(ccguid is null)"
-                                                                                    CS = cpCore.db.db_csOpen("shared styles", Criteria)
-                                                                                    If cpCore.db.db_csOk(CS) Then
+                                                                                    CS = cpCore.db.csOpen("shared styles", Criteria)
+                                                                                    If cpCore.db.cs_Ok(CS) Then
                                                                                         Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, shared style matched an existing Module that has no GUID, Updating to [" & NodeName & "], Guid [" & nodeGuid & "]")
                                                                                     End If
                                                                                 End If
-                                                                                If Not cpCore.db.db_csOk(CS) Then
+                                                                                If Not cpCore.db.cs_Ok(CS) Then
                                                                                     '
                                                                                     ' not found by GUID or by name, Insert a new
                                                                                     '
-                                                                                    Call cpCore.db.db_csClose(CS)
+                                                                                    Call cpCore.db.cs_Close(CS)
                                                                                     CS = cpCore.db.db_csInsertRecord("shared styles", 0)
-                                                                                    If cpCore.db.db_csOk(CS) Then
+                                                                                    If cpCore.db.cs_Ok(CS) Then
                                                                                         Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Creating new shared style [" & NodeName & "], Guid [" & nodeGuid & "]")
                                                                                     End If
                                                                                 End If
-                                                                                If Not cpCore.db.db_csOk(CS) Then
+                                                                                If Not cpCore.db.cs_Ok(CS) Then
                                                                                     '
                                                                                     ' Could not create new
                                                                                     '
                                                                                     Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, shared style could not be created, skipping shared style [" & NodeName & "], Guid [" & nodeGuid & "]")
                                                                                 Else
-                                                                                    sharedStyleId = cpCore.db.db_GetCSInteger(CS, "ID")
+                                                                                    sharedStyleId = cpCore.db.cs_getInteger(CS, "ID")
                                                                                     Call cpCore.db.db_setCS(CS, "StyleFilename", CDefSection.InnerText)
                                                                                     Call cpCore.db.db_setCS(CS, "name", NodeName)
                                                                                     Call cpCore.db.db_setCS(CS, "ccguid", nodeGuid)
@@ -2199,7 +2199,7 @@ ErrorTrap:
                                                                                     Call cpCore.db.db_setCS(CS, "suffix", GetXMLAttribute(IsFound, CDefSection, "suffix", ""))
                                                                                     Call cpCore.db.db_setCS(CS, "sortOrder", GetXMLAttribute(IsFound, CDefSection, "sortOrder", ""))
                                                                                 End If
-                                                                                Call cpCore.db.db_csClose(CS)
+                                                                                Call cpCore.db.cs_Close(CS)
                                                                             Case "addon", "add-on"
                                                                                 '
                                                                                 ' Add-on Node, do part 1 of 2
@@ -2262,7 +2262,7 @@ ErrorTrap:
                                                             End If
                                                             Call cpCore.db.db_setCS(CSCollection, "DataRecordList", DataRecordList)
                                                             Call cpCore.db.db_setCS(CSCollection, "OtherXML", OtherXML)
-                                                            Call cpCore.db.db_csClose(CSCollection)
+                                                            Call cpCore.db.cs_Close(CSCollection)
                                                         End If
                                                         '
                                                         Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], upgrade complete, flush cache")
@@ -2597,14 +2597,14 @@ ErrorTrap:
             Dim CS As Integer
             '
             If True Then
-                CS = cpCore.db.db_csOpen("Navigator Entries", "ccguid=" & cpCore.db.encodeSQLText(ccGuid), "ID", , , , , "ID")
+                CS = cpCore.db.csOpen("Navigator Entries", "ccguid=" & cpCore.db.encodeSQLText(ccGuid), "ID", , , , , "ID")
             ElseIf cpCore.db.db_IsSQLTableField("default", "ccMenuEntries", "navguid") Then
-                CS = cpCore.db.db_csOpen("Navigator Entries", "navguid=" & cpCore.db.encodeSQLText(ccGuid), "ID", , , , , "ID")
+                CS = cpCore.db.csOpen("Navigator Entries", "navguid=" & cpCore.db.encodeSQLText(ccGuid), "ID", , , , , "ID")
             End If
-            If cpCore.db.db_csOk(CS) Then
-                GetNavIDByGuid = cpCore.db.db_GetCSInteger(CS, "id")
+            If cpCore.db.cs_Ok(CS) Then
+                GetNavIDByGuid = cpCore.db.cs_getInteger(CS, "id")
             End If
-            Call cpCore.db.db_csClose(CS)
+            Call cpCore.db.cs_Close(CS)
         End Function
         '        '
         '===============================================================================================
@@ -2868,8 +2868,8 @@ ErrorTrap:
                         navTypeId = NavTypeIDAddon
                     End If
                     Criteria = "(" & AddonGuidFieldName & "=" & cpCore.db.encodeSQLText(addonGuid) & ")"
-                    CS = cpCore.db.db_csOpen("Add-ons", Criteria, , False)
-                    If cpCore.db.db_csOk(CS) Then
+                    CS = cpCore.db.csOpen("Add-ons", Criteria, , False)
+                    If cpCore.db.cs_Ok(CS) Then
                         '
                         ' Update the Addon
                         '
@@ -2878,30 +2878,30 @@ ErrorTrap:
                         '
                         ' not found by GUID - search name against name to update legacy Add-ons
                         '
-                        Call cpCore.db.db_csClose(CS)
+                        Call cpCore.db.cs_Close(CS)
                         Criteria = "(name=" & cpCore.db.encodeSQLText(addonName) & ")and(" & AddonGuidFieldName & " is null)"
-                        CS = cpCore.db.db_csOpen("Add-ons", Criteria, , False)
-                        If cpCore.db.db_csOk(CS) Then
+                        CS = cpCore.db.csOpen("Add-ons", Criteria, , False)
+                        If cpCore.db.cs_Ok(CS) Then
                             Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Add-on name matched an existing Add-on that has no GUID, Updating legacy Aggregate Function to Add-on [" & addonName & "], Guid [" & addonGuid & "]")
                         End If
                     End If
-                    If Not cpCore.db.db_csOk(CS) Then
+                    If Not cpCore.db.cs_Ok(CS) Then
                         '
                         ' not found by GUID or by name, Insert a new addon
                         '
-                        Call cpCore.db.db_csClose(CS)
+                        Call cpCore.db.cs_Close(CS)
                         CS = cpCore.db.db_csInsertRecord("Add-ons", 0)
-                        If cpCore.db.db_csOk(CS) Then
+                        If cpCore.db.cs_Ok(CS) Then
                             Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Creating new Add-on [" & addonName & "], Guid [" & addonGuid & "]")
                         End If
                     End If
-                    If Not cpCore.db.db_csOk(CS) Then
+                    If Not cpCore.db.cs_Ok(CS) Then
                         '
                         ' Could not create new Add-on
                         '
                         Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Add-on could not be created, skipping Add-on [" & addonName & "], Guid [" & addonGuid & "]")
                     Else
-                        addonId = cpCore.db.db_GetCSInteger(CS, "ID")
+                        addonId = cpCore.db.cs_getInteger(CS, "ID")
                         '
                         ' Initialize the add-on
                         ' Delete any existing related records - so if this is an update with removed relationships, those are removed
@@ -2936,16 +2936,16 @@ ErrorTrap:
                                                     fieldTypeID = cpCore.db.getRecordID("Content Field Types", fieldType)
                                                     If fieldTypeID > 0 Then
                                                         Criteria = "(addonid=" & addonId & ")and(contentfieldTypeID=" & fieldTypeID & ")"
-                                                        CS2 = cpCore.db.db_csOpen("Add-on Content Field Type Rules", Criteria)
-                                                        If Not cpCore.db.db_csOk(CS2) Then
-                                                            Call cpCore.db.db_csClose(CS2)
+                                                        CS2 = cpCore.db.csOpen("Add-on Content Field Type Rules", Criteria)
+                                                        If Not cpCore.db.cs_Ok(CS2) Then
+                                                            Call cpCore.db.cs_Close(CS2)
                                                             CS2 = cpCore.db.db_csInsertRecord("Add-on Content Field Type Rules", 0)
                                                         End If
-                                                        If cpCore.db.db_csOk(CS2) Then
+                                                        If cpCore.db.cs_Ok(CS2) Then
                                                             Call cpCore.db.db_setCS(CS2, "addonid", addonId)
                                                             Call cpCore.db.db_setCS(CS2, "contentfieldTypeID", fieldTypeID)
                                                         End If
-                                                        Call cpCore.db.db_csClose(CS2)
+                                                        Call cpCore.db.cs_Close(CS2)
                                                     End If
                                             End Select
                                         Next
@@ -2965,24 +2965,24 @@ ErrorTrap:
                                                         End If
                                                     End If
                                                     Criteria = "(ccguid=" & cpCore.db.encodeSQLText(ContentNameorGuid) & ")"
-                                                    CS2 = cpCore.db.db_csOpen("Content", Criteria)
-                                                    If Not cpCore.db.db_csOk(CS2) Then
-                                                        Call cpCore.db.db_csClose(CS2)
+                                                    CS2 = cpCore.db.csOpen("Content", Criteria)
+                                                    If Not cpCore.db.cs_Ok(CS2) Then
+                                                        Call cpCore.db.cs_Close(CS2)
                                                         Criteria = "(ccguid is null)and(name=" & cpCore.db.encodeSQLText(ContentNameorGuid) & ")"
-                                                        CS2 = cpCore.db.db_csOpen("content", Criteria)
+                                                        CS2 = cpCore.db.csOpen("content", Criteria)
                                                     End If
-                                                    If cpCore.db.db_csOk(CS2) Then
-                                                        TriggerContentID = cpCore.db.db_GetCSInteger(CS2, "ID")
+                                                    If cpCore.db.cs_Ok(CS2) Then
+                                                        TriggerContentID = cpCore.db.cs_getInteger(CS2, "ID")
                                                     End If
-                                                    Call cpCore.db.db_csClose(CS2)
+                                                    Call cpCore.db.cs_Close(CS2)
                                                     If TriggerContentID = 0 Then
                                                         CS2 = cpCore.db.db_csInsertRecord("Scripting Modules", 0)
-                                                        If cpCore.db.db_csOk(CS2) Then
+                                                        If cpCore.db.cs_Ok(CS2) Then
                                                             Call cpCore.db.db_setCS(CS2, "name", ScriptingNameorGuid)
                                                             Call cpCore.db.db_setCS(CS2, "ccguid", ScriptingNameorGuid)
-                                                            TriggerContentID = cpCore.db.db_GetCSInteger(CS2, "ID")
+                                                            TriggerContentID = cpCore.db.cs_getInteger(CS2, "ID")
                                                         End If
-                                                        Call cpCore.db.db_csClose(CS2)
+                                                        Call cpCore.db.cs_Close(CS2)
                                                     End If
                                                     If TriggerContentID = 0 Then
                                                         '
@@ -2990,16 +2990,16 @@ ErrorTrap:
                                                         '
                                                     Else
                                                         Criteria = "(addonid=" & addonId & ")and(contentid=" & TriggerContentID & ")"
-                                                        CS2 = cpCore.db.db_csOpen("Add-on Content Trigger Rules", Criteria)
-                                                        If Not cpCore.db.db_csOk(CS2) Then
-                                                            Call cpCore.db.db_csClose(CS2)
+                                                        CS2 = cpCore.db.csOpen("Add-on Content Trigger Rules", Criteria)
+                                                        If Not cpCore.db.cs_Ok(CS2) Then
+                                                            Call cpCore.db.cs_Close(CS2)
                                                             CS2 = cpCore.db.db_csInsertRecord("Add-on Content Trigger Rules", 0)
-                                                            If cpCore.db.db_csOk(CS2) Then
+                                                            If cpCore.db.cs_Ok(CS2) Then
                                                                 Call cpCore.db.db_setCS(CS2, "addonid", addonId)
                                                                 Call cpCore.db.db_setCS(CS2, "contentid", TriggerContentID)
                                                             End If
                                                         End If
-                                                        Call cpCore.db.db_csClose(CS2)
+                                                        Call cpCore.db.cs_Close(CS2)
                                                     End If
                                             End Select
                                         Next
@@ -3032,36 +3032,36 @@ ErrorTrap:
                                                         End If
                                                     End If
                                                     Criteria = "(ccguid=" & cpCore.db.encodeSQLText(ScriptingNameorGuid) & ")"
-                                                    CS2 = cpCore.db.db_csOpen("Scripting Modules", Criteria)
-                                                    If Not cpCore.db.db_csOk(CS2) Then
-                                                        Call cpCore.db.db_csClose(CS2)
+                                                    CS2 = cpCore.db.csOpen("Scripting Modules", Criteria)
+                                                    If Not cpCore.db.cs_Ok(CS2) Then
+                                                        Call cpCore.db.cs_Close(CS2)
                                                         Criteria = "(ccguid is null)and(name=" & cpCore.db.encodeSQLText(ScriptingNameorGuid) & ")"
-                                                        CS2 = cpCore.db.db_csOpen("Scripting Modules", Criteria)
+                                                        CS2 = cpCore.db.csOpen("Scripting Modules", Criteria)
                                                     End If
-                                                    If cpCore.db.db_csOk(CS2) Then
-                                                        ScriptingModuleID = cpCore.db.db_GetCSInteger(CS2, "ID")
+                                                    If cpCore.db.cs_Ok(CS2) Then
+                                                        ScriptingModuleID = cpCore.db.cs_getInteger(CS2, "ID")
                                                     End If
-                                                    Call cpCore.db.db_csClose(CS2)
+                                                    Call cpCore.db.cs_Close(CS2)
                                                     If ScriptingModuleID = 0 Then
                                                         CS2 = cpCore.db.db_csInsertRecord("Scripting Modules", 0)
-                                                        If cpCore.db.db_csOk(CS2) Then
+                                                        If cpCore.db.cs_Ok(CS2) Then
                                                             Call cpCore.db.db_setCS(CS2, "name", ScriptingNameorGuid)
                                                             Call cpCore.db.db_setCS(CS2, "ccguid", ScriptingNameorGuid)
-                                                            ScriptingModuleID = cpCore.db.db_GetCSInteger(CS2, "ID")
+                                                            ScriptingModuleID = cpCore.db.cs_getInteger(CS2, "ID")
                                                         End If
-                                                        Call cpCore.db.db_csClose(CS2)
+                                                        Call cpCore.db.cs_Close(CS2)
                                                     End If
                                                     Criteria = "(addonid=" & addonId & ")and(scriptingmoduleid=" & ScriptingModuleID & ")"
-                                                    CS2 = cpCore.db.db_csOpen("Add-on Scripting Module Rules", Criteria)
-                                                    If Not cpCore.db.db_csOk(CS2) Then
-                                                        Call cpCore.db.db_csClose(CS2)
+                                                    CS2 = cpCore.db.csOpen("Add-on Scripting Module Rules", Criteria)
+                                                    If Not cpCore.db.cs_Ok(CS2) Then
+                                                        Call cpCore.db.cs_Close(CS2)
                                                         CS2 = cpCore.db.db_csInsertRecord("Add-on Scripting Module Rules", 0)
-                                                        If cpCore.db.db_csOk(CS2) Then
+                                                        If cpCore.db.cs_Ok(CS2) Then
                                                             Call cpCore.db.db_setCS(CS2, "addonid", addonId)
                                                             Call cpCore.db.db_setCS(CS2, "scriptingmoduleid", ScriptingModuleID)
                                                         End If
                                                     End If
-                                                    Call cpCore.db.db_csClose(CS2)
+                                                    Call cpCore.db.cs_Close(CS2)
                                             End Select
                                         Next
                                         Call cpCore.db.db_setCS(CS, "ScriptingCode", ScriptingCode)
@@ -3120,36 +3120,36 @@ ErrorTrap:
                                             nodeNameOrGuid = GetXMLAttribute(IsFound, PageInterface, "name", "")
                                         End If
                                         Criteria = "(ccguid=" & cpCore.db.encodeSQLText(nodeNameOrGuid) & ")"
-                                        CS2 = cpCore.db.db_csOpen("shared styles", Criteria)
-                                        If Not cpCore.db.db_csOk(CS2) Then
-                                            Call cpCore.db.db_csClose(CS2)
+                                        CS2 = cpCore.db.csOpen("shared styles", Criteria)
+                                        If Not cpCore.db.cs_Ok(CS2) Then
+                                            Call cpCore.db.cs_Close(CS2)
                                             Criteria = "(ccguid is null)and(name=" & cpCore.db.encodeSQLText(nodeNameOrGuid) & ")"
-                                            CS2 = cpCore.db.db_csOpen("shared styles", Criteria)
+                                            CS2 = cpCore.db.csOpen("shared styles", Criteria)
                                         End If
-                                        If cpCore.db.db_csOk(CS2) Then
-                                            sharedStyleId = cpCore.db.db_GetCSInteger(CS2, "ID")
+                                        If cpCore.db.cs_Ok(CS2) Then
+                                            sharedStyleId = cpCore.db.cs_getInteger(CS2, "ID")
                                         End If
-                                        Call cpCore.db.db_csClose(CS2)
+                                        Call cpCore.db.cs_Close(CS2)
                                         If sharedStyleId = 0 Then
                                             CS2 = cpCore.db.db_csInsertRecord("shared styles", 0)
-                                            If cpCore.db.db_csOk(CS2) Then
+                                            If cpCore.db.cs_Ok(CS2) Then
                                                 Call cpCore.db.db_setCS(CS2, "name", nodeNameOrGuid)
                                                 Call cpCore.db.db_setCS(CS2, "ccguid", nodeNameOrGuid)
-                                                sharedStyleId = cpCore.db.db_GetCSInteger(CS2, "ID")
+                                                sharedStyleId = cpCore.db.cs_getInteger(CS2, "ID")
                                             End If
-                                            Call cpCore.db.db_csClose(CS2)
+                                            Call cpCore.db.cs_Close(CS2)
                                         End If
                                         Criteria = "(addonid=" & addonId & ")and(StyleId=" & sharedStyleId & ")"
-                                        CS2 = cpCore.db.db_csOpen("Shared Styles Add-on Rules", Criteria)
-                                        If Not cpCore.db.db_csOk(CS2) Then
-                                            Call cpCore.db.db_csClose(CS2)
+                                        CS2 = cpCore.db.csOpen("Shared Styles Add-on Rules", Criteria)
+                                        If Not cpCore.db.cs_Ok(CS2) Then
+                                            Call cpCore.db.cs_Close(CS2)
                                             CS2 = cpCore.db.db_csInsertRecord("Shared Styles Add-on Rules", 0)
-                                            If cpCore.db.db_csOk(CS2) Then
+                                            If cpCore.db.cs_Ok(CS2) Then
                                                 Call cpCore.db.db_setCS(CS2, "addonid", addonId)
                                                 Call cpCore.db.db_setCS(CS2, "StyleId", sharedStyleId)
                                             End If
                                         End If
-                                        Call cpCore.db.db_csClose(CS2)
+                                        Call cpCore.db.cs_Close(CS2)
                                     Case "stylesheet", "styles"
                                         '
                                         ' import exclusive stylesheet if more then whitespace
@@ -3276,7 +3276,7 @@ ErrorTrap:
                         '                AddonNavID = GetNonRootNavigatorID(asv, AOName, GetNavIDByGuid(asv, "{5FDDC758-4A15-4F98-8333-9CE8B8BFABC4}"), addonid, 0, NavIconTypeSetting, AOName & " Add-on", NavDeveloperOnly, 0, "", 0, 0, CollectionID, navAdminOnly)
                         '            End If
                     End If
-                    Call cpCore.db.db_csClose(CS)
+                    Call cpCore.db.cs_Close(CS)
                     '
                     ' Addon is now fully installed
                     ' Go through all collection files on this site and see if there are
@@ -3285,8 +3285,8 @@ ErrorTrap:
                     '   - if this addon is the target of another add-on's  "includeaddon" node
                     '
                     Doc = New XmlDocument
-                    CS = cpCore.db.db_csOpen("Add-on Collections")
-                    Do While cpCore.db.db_csOk(CS)
+                    CS = cpCore.db.csOpen("Add-on Collections")
+                    Do While cpCore.db.cs_Ok(CS)
                         CollectionFile = cpCore.db.db_GetCS(CS, "InstallFile")
                         If CollectionFile <> "" Then
                             Try
@@ -3328,27 +3328,27 @@ ErrorTrap:
                                                                     End If
                                                                     If Criteria <> "" Then
                                                                         '$$$$$ cache this
-                                                                        CS2 = cpCore.db.db_csOpen("Add-ons", Criteria, "ID")
-                                                                        If cpCore.db.db_csOk(CS2) Then
-                                                                            SrcAddonID = cpCore.db.db_GetCSInteger(CS2, "ID")
+                                                                        CS2 = cpCore.db.csOpen("Add-ons", Criteria, "ID")
+                                                                        If cpCore.db.cs_Ok(CS2) Then
+                                                                            SrcAddonID = cpCore.db.cs_getInteger(CS2, "ID")
                                                                         End If
-                                                                        Call cpCore.db.db_csClose(CS2)
+                                                                        Call cpCore.db.cs_Close(CS2)
                                                                         AddRule = False
                                                                         If SrcAddonID = 0 Then
                                                                             UserError = "The add-on being installed is referenced by another add-on in collection [], but this add-on could not be found by the respoective criteria [" & Criteria & "]"
                                                                             Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAddFromLocalCollection_InstallAddonNode, UserError [" & UserError & "]")
                                                                         Else
                                                                             CS2 = cpCore.db.db_openCsSql_rev("default", "select ID from ccAddonIncludeRules where Addonid=" & SrcAddonID & " and IncludedAddonID=" & addonId)
-                                                                            AddRule = Not cpCore.db.db_csOk(CS2)
-                                                                            Call cpCore.db.db_csClose(CS2)
+                                                                            AddRule = Not cpCore.db.cs_Ok(CS2)
+                                                                            Call cpCore.db.cs_Close(CS2)
                                                                         End If
                                                                         If AddRule Then
                                                                             CS2 = cpCore.db.db_csInsertRecord("Add-on Include Rules", 0)
-                                                                            If cpCore.db.db_csOk(CS2) Then
+                                                                            If cpCore.db.cs_Ok(CS2) Then
                                                                                 Call cpCore.db.db_setCS(CS2, "Addonid", SrcAddonID)
                                                                                 Call cpCore.db.db_setCS(CS2, "IncludedAddonID", addonId)
                                                                             End If
-                                                                            Call cpCore.db.db_csClose(CS2)
+                                                                            Call cpCore.db.cs_Close(CS2)
                                                                         End If
                                                                     End If
                                                                 End If
@@ -3368,7 +3368,7 @@ ErrorTrap:
                         End If
                         Call cpCore.db.db_csGoNext(CS)
                     Loop
-                    Call cpCore.db.db_csClose(CS)
+                    Call cpCore.db.cs_Close(CS)
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -3451,8 +3451,8 @@ ErrorTrap:
                 End If
                 AddOnType = GetXMLAttribute(IsFound, AddonNode, "type", "")
                 Criteria = "(" & AddonGuidFieldName & "=" & cpCore.db.encodeSQLText(AOGuid) & ")"
-                CS = cpCore.db.db_csOpen("Add-ons", Criteria, , False)
-                If cpCore.db.db_csOk(CS) Then
+                CS = cpCore.db.csOpen("Add-ons", Criteria, , False)
+                If cpCore.db.cs_Ok(CS) Then
                     '
                     ' Update the Addon
                     '
@@ -3461,17 +3461,17 @@ ErrorTrap:
                     '
                     ' not found by GUID - search name against name to update legacy Add-ons
                     '
-                    Call cpCore.db.db_csClose(CS)
+                    Call cpCore.db.cs_Close(CS)
                     Criteria = "(name=" & cpCore.db.encodeSQLText(AOName) & ")and(" & AddonGuidFieldName & " is null)"
-                    CS = cpCore.db.db_csOpen("Add-ons", Criteria, , False)
+                    CS = cpCore.db.csOpen("Add-ons", Criteria, , False)
                 End If
-                If Not cpCore.db.db_csOk(CS) Then
+                If Not cpCore.db.cs_Ok(CS) Then
                     '
                     ' Could not find add-on
                     '
                     Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Add-on could not be created, skipping Add-on [" & AOName & "], Guid [" & AOGuid & "]")
                 Else
-                    addonId = cpCore.db.db_GetCSInteger(CS, "ID")
+                    addonId = cpCore.db.cs_getInteger(CS, "ID")
                     ArgumentList = ""
                     StyleSheet = ""
                     NavDeveloperOnly = True
@@ -3497,11 +3497,11 @@ ErrorTrap:
                                             Criteria = "(name=" & cpCore.db.encodeSQLText(IncludeAddonName) & ")"
                                         End If
                                         If Criteria <> "" Then
-                                            CS2 = cpCore.db.db_csOpen("Add-ons", Criteria)
-                                            If cpCore.db.db_csOk(CS2) Then
-                                                IncludeAddonID = cpCore.db.db_GetCSInteger(CS2, "ID")
+                                            CS2 = cpCore.db.csOpen("Add-ons", Criteria)
+                                            If cpCore.db.cs_Ok(CS2) Then
+                                                IncludeAddonID = cpCore.db.cs_getInteger(CS2, "ID")
                                             End If
-                                            Call cpCore.db.db_csClose(CS2)
+                                            Call cpCore.db.cs_Close(CS2)
                                             AddRule = False
                                             If IncludeAddonID = 0 Then
                                                 UserError = "The include add-on [" & IncludeAddonName & "] could not be added because it was not found. If it is in the collection being installed, it must appear before any add-ons that include it."
@@ -3510,16 +3510,16 @@ ErrorTrap:
                                                 ReturnErrorMessage = ReturnErrorMessage & "<P>The collection was not installed because the add-on [" & AOName & "] requires an included add-on [" & IncludeAddonName & "] which could not be found. If it is in the collection being installed, it must appear before any add-ons that include it.</P>"
                                             Else
                                                 CS2 = cpCore.db.db_openCsSql_rev("default", "select ID from ccAddonIncludeRules where Addonid=" & addonId & " and IncludedAddonID=" & IncludeAddonID)
-                                                AddRule = Not cpCore.db.db_csOk(CS2)
-                                                Call cpCore.db.db_csClose(CS2)
+                                                AddRule = Not cpCore.db.cs_Ok(CS2)
+                                                Call cpCore.db.cs_Close(CS2)
                                             End If
                                             If AddRule Then
                                                 CS2 = cpCore.db.db_csInsertRecord("Add-on Include Rules", 0)
-                                                If cpCore.db.db_csOk(CS2) Then
+                                                If cpCore.db.cs_Ok(CS2) Then
                                                     Call cpCore.db.db_setCS(CS2, "Addonid", addonId)
                                                     Call cpCore.db.db_setCS(CS2, "IncludedAddonID", IncludeAddonID)
                                                 End If
-                                                Call cpCore.db.db_csClose(CS2)
+                                                Call cpCore.db.cs_Close(CS2)
                                             End If
                                         End If
                                     End If
@@ -3527,7 +3527,7 @@ ErrorTrap:
                         Next
                     End If
                 End If
-                Call cpCore.db.db_csClose(CS)
+                Call cpCore.db.cs_Close(CS)
             End If
             Exit Function
             '
@@ -5061,7 +5061,7 @@ ErrorTrap:
                                     '
                                     ' This collection is installed locally, install from local collections
                                     '
-                                    Call installCollectionFromLocalRepo(builder, ignoreRefactor, Guid, cpCore.version, errorMessage, "", "", isNewBuild)
+                                    Call installCollectionFromLocalRepo(builder, ignoreRefactor, Guid, cpCore.common_version, errorMessage, "", "", isNewBuild)
                                 Else
                                     '
                                     ' This is a new collection, install to the server and force it on this site
@@ -6594,11 +6594,11 @@ ErrorTrap:
                     SupportNavIcon = cpCore.db.metaData_IsContentFieldSupported(MenuContentName, "NavIconType")
                     addonId = 0
                     If SupportAddonID And (AddonName <> "") Then
-                        CS = cpCore.db.db_csOpen(AddonContentName, "name=" & cpCore.db.encodeSQLText(AddonName), "ID", False, , , , "ID", 1)
-                        If cpCore.db.db_csOk(CS) Then
-                            addonId = cpCore.db.db_GetCSInteger(CS, "ID")
+                        CS = cpCore.db.csOpen(AddonContentName, "name=" & cpCore.db.encodeSQLText(AddonName), "ID", False, , , , "ID", 1)
+                        If cpCore.db.cs_Ok(CS) Then
+                            addonId = cpCore.db.cs_getInteger(CS, "ID")
                         End If
-                        Call cpCore.db.db_csClose(CS)
+                        Call cpCore.db.cs_Close(CS)
                     End If
                     ParentID = getParentIDFromNameSpace(MenuContentName, menuNameSpace)
                     ContentID = -1
@@ -6616,22 +6616,22 @@ ErrorTrap:
                             '
                             ' ----- Find match by menuNameSpace
                             '
-                            CSEntry = cpCore.db.db_csOpen(MenuContentName, "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(Parentid=" & ParentID & ")and((" & GuidFieldName & " is null)or(" & GuidFieldName & "=''))", "ID", True, , , , SelectList)
+                            CSEntry = cpCore.db.csOpen(MenuContentName, "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(Parentid=" & ParentID & ")and((" & GuidFieldName & " is null)or(" & GuidFieldName & "=''))", "ID", True, , , , SelectList)
                         Else
                             '
                             ' ----- Find match by guid
                             '
-                            CSEntry = cpCore.db.db_csOpen(MenuContentName, "(" & GuidFieldName & "=" & cpCore.db.encodeSQLText(ccGuid) & ")", "ID", True, , , , SelectList)
+                            CSEntry = cpCore.db.csOpen(MenuContentName, "(" & GuidFieldName & "=" & cpCore.db.encodeSQLText(ccGuid) & ")", "ID", True, , , , SelectList)
                         End If
-                        If Not cpCore.db.db_csOk(CSEntry) Then
+                        If Not cpCore.db.cs_Ok(CSEntry) Then
                             '
                             ' ----- if not found by guid, look for a name/parent match with a blank guid
                             '
-                            Call cpCore.db.db_csClose(CSEntry)
+                            Call cpCore.db.cs_Close(CSEntry)
                             Criteria = "AND((" & GuidFieldName & " is null)or(" & GuidFieldName & "=''))"
                         End If
                     End If
-                    If Not cpCore.db.db_csOk(CSEntry) Then
+                    If Not cpCore.db.cs_Ok(CSEntry) Then
                         If ParentID = 0 Then
                             ' 12/19/2008 change to ActiveOnly - because if there is a non-guid entry, it is marked inactive. We only want to update the active entries
                             Criteria = Criteria & "And(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(ParentID is null)"
@@ -6639,13 +6639,13 @@ ErrorTrap:
                             ' 12/19/2008 change to ActiveOnly - because if there is a non-guid entry, it is marked inactive. We only want to update the active entries
                             Criteria = Criteria & "And(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(ParentID=" & ParentID & ")"
                         End If
-                        CSEntry = cpCore.db.db_csOpen(MenuContentName, Mid(Criteria, 4), "ID", True, , , , SelectList)
+                        CSEntry = cpCore.db.csOpen(MenuContentName, Mid(Criteria, 4), "ID", True, , , , SelectList)
                     End If
                     '
                     ' If no current entry, create one
                     '
-                    If Not cpCore.db.db_csOk(CSEntry) Then
-                        cpCore.db.db_csClose(CSEntry)
+                    If Not cpCore.db.cs_Ok(CSEntry) Then
+                        cpCore.db.cs_Close(CSEntry)
                         '
                         ' This entry was not found - insert a new record if there is no other name/menuNameSpace match
                         '
@@ -6655,13 +6655,13 @@ ErrorTrap:
                             '
                             DupFound = False
                         ElseIf ParentID = 0 Then
-                            CSEntry = cpCore.db.db_csOpen(MenuContentName, "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(ParentID is null)", "ID", False, , , , SelectList)
-                            DupFound = cpCore.db.db_csOk(CSEntry)
-                            cpCore.db.db_csClose(CSEntry)
+                            CSEntry = cpCore.db.csOpen(MenuContentName, "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(ParentID is null)", "ID", False, , , , SelectList)
+                            DupFound = cpCore.db.cs_Ok(CSEntry)
+                            cpCore.db.cs_Close(CSEntry)
                         Else
-                            CSEntry = cpCore.db.db_csOpen(MenuContentName, "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(ParentID=" & ParentID & ")", "ID", False, , , , SelectList)
-                            DupFound = cpCore.db.db_csOk(CSEntry)
-                            cpCore.db.db_csClose(CSEntry)
+                            CSEntry = cpCore.db.csOpen(MenuContentName, "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(ParentID=" & ParentID & ")", "ID", False, , , , SelectList)
+                            DupFound = cpCore.db.cs_Ok(CSEntry)
+                            cpCore.db.cs_Close(CSEntry)
                         End If
                         If DupFound Then
                             '
@@ -6675,8 +6675,8 @@ ErrorTrap:
                             CSEntry = cpCore.db.db_csInsertRecord(MenuContentName, SystemMemberID)
                         End If
                     End If
-                    If cpCore.db.db_csOk(CSEntry) Then
-                        EntryID = cpCore.db.db_GetCSInteger(CSEntry, "ID")
+                    If cpCore.db.cs_Ok(CSEntry) Then
+                        EntryID = cpCore.db.cs_getInteger(CSEntry, "ID")
                         If EntryID = 265 Then
                             EntryID = EntryID
                         End If
@@ -6716,14 +6716,14 @@ ErrorTrap:
                         ' merge any duplicate guid matches
                         '
                         Call cpCore.db.db_csGoNext(CSEntry)
-                        Do While cpCore.db.db_csOk(CSEntry)
-                            DuplicateID = cpCore.db.db_GetCSInteger(CSEntry, "ID")
+                        Do While cpCore.db.cs_Ok(CSEntry)
+                            DuplicateID = cpCore.db.cs_getInteger(CSEntry, "ID")
                             Call cpCore.db.executeSql("update ccMenuEntries set ParentID=" & EntryID & " where ParentID=" & DuplicateID)
                             Call cpCore.db.db_DeleteContentRecord(MenuContentName, DuplicateID)
                             Call cpCore.db.db_csGoNext(CSEntry)
                         Loop
                     End If
-                    Call cpCore.db.db_csClose(CSEntry)
+                    Call cpCore.db.cs_Close(CSEntry)
                     '
                     ' Merge duplicates with menuNameSpace.Name match
                     '
@@ -6733,13 +6733,13 @@ ErrorTrap:
                         Else
                             CSEntry = cpCore.db.db_openCsSql_rev("default", "select * from ccMenuEntries where (parentid=" & ParentID & ")and(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(id<>" & EntryID & ")")
                         End If
-                        Do While cpCore.db.db_csOk(CSEntry)
-                            DuplicateID = cpCore.db.db_GetCSInteger(CSEntry, "ID")
+                        Do While cpCore.db.cs_Ok(CSEntry)
+                            DuplicateID = cpCore.db.cs_getInteger(CSEntry, "ID")
                             Call cpCore.db.executeSql("update ccMenuEntries set ParentID=" & EntryID & " where ParentID=" & DuplicateID)
                             Call cpCore.db.db_DeleteContentRecord(MenuContentName, DuplicateID)
                             Call cpCore.db.db_csGoNext(CSEntry)
                         Loop
-                        Call cpCore.db.db_csClose(CSEntry)
+                        Call cpCore.db.cs_Close(CSEntry)
                     End If
                 End If
                 '
@@ -6764,23 +6764,23 @@ ErrorTrap:
                 MethodName = "csv_VerifyAggregateScript"
                 '
                 ContentName = "Aggregate Function Scripts"
-                CSEntry = cpCore.db.db_csOpen(ContentName, "(name=" & cpCore.db.encodeSQLText(Name) & ")", , False, , , , "Name,Link,ObjectProgramID,ArgumentList,SortOrder")
+                CSEntry = cpCore.db.csOpen(ContentName, "(name=" & cpCore.db.encodeSQLText(Name) & ")", , False, , , , "Name,Link,ObjectProgramID,ArgumentList,SortOrder")
                 '
                 ' If no current entry, create one
                 '
-                If Not cpCore.db.db_csOk(CSEntry) Then
-                    cpCore.db.db_csClose(CSEntry)
+                If Not cpCore.db.cs_Ok(CSEntry) Then
+                    cpCore.db.cs_Close(CSEntry)
                     CSEntry = cpCore.db.db_csInsertRecord(ContentName, SystemMemberID)
-                    If cpCore.db.db_csOk(CSEntry) Then
+                    If cpCore.db.cs_Ok(CSEntry) Then
                         Call cpCore.db.db_SetCSField(CSEntry, "name", Name)
                     End If
                 End If
-                If cpCore.db.db_csOk(CSEntry) Then
+                If cpCore.db.cs_Ok(CSEntry) Then
                     Call cpCore.db.db_SetCSField(CSEntry, "Link", Link)
                     Call cpCore.db.db_SetCSField(CSEntry, "ArgumentList", ArgumentList)
                     Call cpCore.db.db_SetCSField(CSEntry, "SortOrder", SortOrder)
                 End If
-                Call cpCore.db.db_csClose(CSEntry)
+                Call cpCore.db.cs_Close(CSEntry)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -6808,23 +6808,23 @@ ErrorTrap:
                 MethodName = "csv_VerifyAggregateReplacement2"
                 '
                 ContentName = "Aggregate Function Replacements"
-                CSEntry = cpCore.db.db_csOpen(ContentName, "(name=" & cpCore.db.encodeSQLText(Name) & ")", , False, , , , "Name,Copy,SortOrder,ArgumentList")
+                CSEntry = cpCore.db.csOpen(ContentName, "(name=" & cpCore.db.encodeSQLText(Name) & ")", , False, , , , "Name,Copy,SortOrder,ArgumentList")
                 '
                 ' If no current entry, create one
                 '
-                If Not cpCore.db.db_csOk(CSEntry) Then
-                    cpCore.db.db_csClose(CSEntry)
+                If Not cpCore.db.cs_Ok(CSEntry) Then
+                    cpCore.db.cs_Close(CSEntry)
                     CSEntry = cpCore.db.db_csInsertRecord(ContentName, SystemMemberID)
-                    If cpCore.db.db_csOk(CSEntry) Then
+                    If cpCore.db.cs_Ok(CSEntry) Then
                         Call cpCore.db.db_SetCSField(CSEntry, "name", Name)
                     End If
                 End If
-                If cpCore.db.db_csOk(CSEntry) Then
+                If cpCore.db.cs_Ok(CSEntry) Then
                     Call cpCore.db.db_setCS(CSEntry, "Copy", Copy)
                     Call cpCore.db.db_setCS(CSEntry, "SortOrder", SortOrder)
                     Call cpCore.db.db_setCS(CSEntry, "ArgumentList", ArgumentList)
                 End If
-                Call cpCore.db.db_csClose(CSEntry)
+                Call cpCore.db.cs_Close(CSEntry)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -6846,23 +6846,23 @@ ErrorTrap:
                 ' Locate current entry
                 '
                 ContentName = "Aggregate Function Objects"
-                CSEntry = cpCore.db.db_csOpen(ContentName, "(name=" & cpCore.db.encodeSQLText(Name) & ")", , False, , , , "Name,Link,ObjectProgramID,ArgumentList,SortOrder")
+                CSEntry = cpCore.db.csOpen(ContentName, "(name=" & cpCore.db.encodeSQLText(Name) & ")", , False, , , , "Name,Link,ObjectProgramID,ArgumentList,SortOrder")
                 '
                 ' If no current entry, create one
                 '
-                If Not cpCore.db.db_csOk(CSEntry) Then
-                    cpCore.db.db_csClose(CSEntry)
+                If Not cpCore.db.cs_Ok(CSEntry) Then
+                    cpCore.db.cs_Close(CSEntry)
                     CSEntry = cpCore.db.db_csInsertRecord(ContentName, SystemMemberID)
-                    If cpCore.db.db_csOk(CSEntry) Then
+                    If cpCore.db.cs_Ok(CSEntry) Then
                         Call cpCore.db.db_SetCSField(CSEntry, "name", Name)
                     End If
                 End If
-                If cpCore.db.db_csOk(CSEntry) Then
+                If cpCore.db.cs_Ok(CSEntry) Then
                     Call cpCore.db.db_SetCSField(CSEntry, "ObjectProgramID", ObjectProgramID)
                     Call cpCore.db.db_SetCSField(CSEntry, "ArgumentList", ArgumentList)
                     Call cpCore.db.db_SetCSField(CSEntry, "SortOrder", SortOrder)
                 End If
-                Call cpCore.db.db_csClose(CSEntry)
+                Call cpCore.db.cs_Close(CSEntry)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -6893,21 +6893,21 @@ ErrorTrap:
                         End If
                         RecordID = 0
                         ' 12/19/2008 change to ActiveOnly - because if there is a non-guid entry, it is marked inactive. We only want to attach to the active entries
-                        CS = cpCore.db.db_csOpen(ContentName, Criteria, "ID", True, , , , "ID", 1)
-                        If cpCore.db.db_csOk(CS) Then
-                            RecordID = (cpCore.db.db_GetCSInteger(CS, "ID"))
+                        CS = cpCore.db.csOpen(ContentName, Criteria, "ID", True, , , , "ID", 1)
+                        If cpCore.db.cs_Ok(CS) Then
+                            RecordID = (cpCore.db.cs_getInteger(CS, "ID"))
                         End If
-                        Call cpCore.db.db_csClose(CS)
+                        Call cpCore.db.cs_Close(CS)
                         If RecordID = 0 Then
                             CS = cpCore.db.db_csInsertRecord(ContentName, SystemMemberID)
-                            If cpCore.db.db_csOk(CS) Then
-                                RecordID = cpCore.db.db_GetCSInteger(CS, "ID")
+                            If cpCore.db.cs_Ok(CS) Then
+                                RecordID = cpCore.db.cs_getInteger(CS, "ID")
                                 Call cpCore.db.db_setCS(CS, "name", RecordName)
                                 If ParentID <> 0 Then
                                     Call cpCore.db.db_setCS(CS, "parentID", ParentID)
                                 End If
                             End If
-                            Call cpCore.db.db_csClose(CS)
+                            Call cpCore.db.cs_Close(CS)
                         End If
                         ParentID = RecordID
                     Next

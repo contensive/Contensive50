@@ -47,7 +47,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property fromAddressDefault() As String
             Get
                 If True Then
-                    Return cpCore.user.user_IsMember
+                    Return cpCore.user.user_isAuthenticatedMember
                 Else
                     Return False
                 End If
