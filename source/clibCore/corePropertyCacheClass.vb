@@ -76,9 +76,9 @@ Namespace Contensive.Core
         Public Sub setProperty(ByVal propertyName As String, ByVal PropertyValue As String)
             Select Case propertyTypeId
                 Case PropertyTypeVisit
-                    setProperty(propertyName, PropertyValue, cpCore.main_VisitId)
+                    setProperty(propertyName, PropertyValue, cpCore.visit_Id)
                 Case PropertyTypeVisitor
-                    setProperty(propertyName, PropertyValue, cpCore.main_VisitorID)
+                    setProperty(propertyName, PropertyValue, cpCore.visitor_id)
                 Case PropertyTypeMember
                     setProperty(propertyName, PropertyValue, cpCore.user.id)
             End Select
@@ -118,19 +118,19 @@ Namespace Contensive.Core
                 '
                 ' insert a new property record, get the ID back and save it in cache
                 '
-                CS = db.db_csInsertRecord("Properties", SystemMemberID)
+                CS = db.cs_insertRecord("Properties", SystemMemberID)
                 If db.cs_Ok(CS) Then
                     propertyCache(2, Ptr) = db.cs_getText(CS, "ID")
-                    Call db.db_setCS(CS, "name", propertyName)
-                    Call db.db_setCS(CS, "FieldValue", PropertyValue)
-                    Call db.db_setCS(CS, "TypeID", propertyTypeId)
-                    Call db.db_setCS(CS, "KeyID", CStr(keyId))
+                    Call db.cs_set(CS, "name", propertyName)
+                    Call db.cs_set(CS, "FieldValue", PropertyValue)
+                    Call db.cs_set(CS, "TypeID", propertyTypeId)
+                    Call db.cs_set(CS, "KeyID", CStr(keyId))
                 End If
                 Call db.cs_Close(CS)
             ElseIf propertyCache(1, Ptr) <> PropertyValue Then
                 propertyCache(1, Ptr) = PropertyValue
                 RecordID = EncodeInteger(propertyCache(2, Ptr))
-                SQLNow = db.db_EncodeSQLDate(Now)
+                SQLNow = db.encodeSQLDate(Now)
                 '
                 ' save the value in the property that was found
                 '
@@ -170,9 +170,9 @@ ErrorTrap:
         Public Function getDate(ByVal propertyName As String, ByVal defaultValue As Date) As Date
             Select Case propertyTypeId
                 Case PropertyTypeVisit
-                    Return getDate(propertyName, defaultValue, cpCore.main_VisitId)
+                    Return getDate(propertyName, defaultValue, cpCore.visit_Id)
                 Case PropertyTypeVisitor
-                    Return getDate(propertyName, defaultValue, cpCore.main_VisitorID)
+                    Return getDate(propertyName, defaultValue, cpCore.visitor_id)
                 Case PropertyTypeMember
                     Return getDate(propertyName, defaultValue, cpCore.user.id)
             End Select
@@ -214,9 +214,9 @@ ErrorTrap:
         Public Function getNumber(ByVal propertyName As String, ByVal defaultValue As Double) As Double
             Select Case propertyTypeId
                 Case PropertyTypeVisit
-                    Return getNumber(propertyName, defaultValue, cpCore.main_VisitId)
+                    Return getNumber(propertyName, defaultValue, cpCore.visit_Id)
                 Case PropertyTypeVisitor
-                    Return getNumber(propertyName, defaultValue, cpCore.main_VisitorID)
+                    Return getNumber(propertyName, defaultValue, cpCore.visitor_id)
                 Case PropertyTypeMember
                     Return getNumber(propertyName, defaultValue, cpCore.user.id)
             End Select
@@ -258,9 +258,9 @@ ErrorTrap:
         Public Function getBoolean(ByVal propertyName As String, ByVal defaultValue As Boolean) As Boolean
             Select Case propertyTypeId
                 Case PropertyTypeVisit
-                    Return getBoolean(propertyName, defaultValue, cpCore.main_VisitId)
+                    Return getBoolean(propertyName, defaultValue, cpCore.visit_Id)
                 Case PropertyTypeVisitor
-                    Return getBoolean(propertyName, defaultValue, cpCore.main_VisitorID)
+                    Return getBoolean(propertyName, defaultValue, cpCore.visitor_id)
                 Case PropertyTypeMember
                     Return getBoolean(propertyName, defaultValue, cpCore.user.id)
             End Select
@@ -302,9 +302,9 @@ ErrorTrap:
         Public Function getInteger(ByVal propertyName As String, ByVal defaultValue As Integer) As Integer
             Select Case propertyTypeId
                 Case PropertyTypeVisit
-                    Return getInteger(propertyName, defaultValue, cpCore.main_VisitId)
+                    Return getInteger(propertyName, defaultValue, cpCore.visit_Id)
                 Case PropertyTypeVisitor
-                    Return getInteger(propertyName, defaultValue, cpCore.main_VisitorID)
+                    Return getInteger(propertyName, defaultValue, cpCore.visitor_id)
                 Case PropertyTypeMember
                     Return getInteger(propertyName, defaultValue, cpCore.user.id)
             End Select
@@ -346,9 +346,9 @@ ErrorTrap:
         Public Function getText(ByVal propertyName As String, ByVal defaultValue As String) As String
             Select Case propertyTypeId
                 Case PropertyTypeVisit
-                    Return getText(propertyName, defaultValue, cpCore.main_VisitId)
+                    Return getText(propertyName, defaultValue, cpCore.visit_Id)
                 Case PropertyTypeVisitor
-                    Return getText(propertyName, defaultValue, cpCore.main_VisitorID)
+                    Return getText(propertyName, defaultValue, cpCore.visitor_id)
                 Case PropertyTypeMember
                     Return getText(propertyName, defaultValue, cpCore.user.id)
             End Select

@@ -188,7 +188,7 @@ Namespace Contensive.Core
                                         '
                                         ' Delete any addons from this collection
                                         '
-                                        Call cpCore.db.db_DeleteContentRecords("add-ons", "collectionid=" & TargetCollectionID)
+                                        Call cpCore.db.deleteContentRecords("add-ons", "collectionid=" & TargetCollectionID)
 
                                         '                            '
                                         '                            ' Load all collections into local collection storage
@@ -436,7 +436,7 @@ Namespace Contensive.Core
                                             '
                                             ' Delete Navigator Entries set as installed by the collection (this may be all that is needed)
                                             '
-                                            Call cpCore.db.db_DeleteContentRecords("Navigator Entries", "installedbycollectionid=" & TargetCollectionID)
+                                            Call cpCore.db.deleteContentRecords("Navigator Entries", "installedbycollectionid=" & TargetCollectionID)
                                         End If
                                     End If
                                 Next
@@ -927,7 +927,7 @@ Namespace Contensive.Core
             If EntryParentID = 0 Then
                 CS = cpCore.db.csOpen("Navigator Entries", "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and((parentID is null)or(parentid=0))")
             Else
-                CS = cpCore.db.csOpen("Navigator Entries", "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(parentID=" & cpCore.db.db_EncodeSQLNumber(EntryParentID) & ")")
+                CS = cpCore.db.csOpen("Navigator Entries", "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(parentID=" & cpCore.db.encodeSQLNumber(EntryParentID) & ")")
             End If
             If cpCore.db.cs_Ok(CS) Then
                 EntryID = cpCore.db.cs_getInteger(CS, "ID")
@@ -935,7 +935,7 @@ Namespace Contensive.Core
             Call cpCore.db.cs_Close(CS)
             '
             If EntryID <> 0 Then
-                CS = cpCore.db.csOpen("Navigator Entries", "(parentID=" & cpCore.db.db_EncodeSQLNumber(EntryID) & ")")
+                CS = cpCore.db.csOpen("Navigator Entries", "(parentID=" & cpCore.db.encodeSQLNumber(EntryID) & ")")
                 Do While cpCore.db.cs_Ok(CS)
                     Call GetForm_SafeModeAddonManager_DeleteNavigatorBranch(cpCore.db.cs_getText(CS, "name"), EntryID)
                     Call cpCore.db.db_csGoNext(CS)

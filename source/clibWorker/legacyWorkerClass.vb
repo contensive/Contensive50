@@ -1249,7 +1249,7 @@ Namespace Contensive
                 hint &= ",entering"
                 '
                 RightNow = Now
-                SQLNow = cpCore.db.db_EncodeSQLDate(RightNow)
+                SQLNow = cpCore.db.encodeSQLDate(RightNow)
                 For Each kvp As KeyValuePair(Of String, appConfigClass) In cpCore.cluster.config.apps
                     AppName = kvp.Value.name
                     '
@@ -1289,26 +1289,26 @@ Namespace Contensive
                                     ' Server has been restarted, reset next run
                                     '
                                     'Call cpSite.core.app.cpSite.core.app.csv_SetCS(CS, "ProcessServerKey", HostProcessID)
-                                    Call cpSite.core.db.db_setCS(CS, "ProcessNextRun", NextRun)
+                                    Call cpSite.core.db.cs_set(CS, "ProcessNextRun", NextRun)
                                 ElseIf ProcessRunOnce Then
                                     '
                                     ' Run Once
                                     '
-                                    Call cpSite.core.db.db_setCS(CS, "ProcessRunOnce", False)
-                                    Call cpSite.core.db.db_setCS(CS, "ProcessNextRun", NextRun)
+                                    Call cpSite.core.db.cs_set(CS, "ProcessRunOnce", False)
+                                    Call cpSite.core.db.cs_set(CS, "ProcessNextRun", NextRun)
                                     Call addAsyncCmd(cpCore, "runprocess appname=""" & cpSite.core.appConfig.name & """ addonid=""" & ProcessID & """", True)
                                     'Call addAsyncCmd(cp,"runprocess appname=""" & cpSite.core.appEnvironment.name & """ addonname=""" & ProcessName & """", True)
                                 ElseIf cpSite.core.db.db_GetCSDate(CS, "ProcessNextRun") = Date.MinValue Then
                                     '
                                     ' Interval is OK but NextRun is 0, just set next run
                                     '
-                                    Call cpSite.core.db.db_setCS(CS, "ProcessNextRun", NextRun)
+                                    Call cpSite.core.db.cs_set(CS, "ProcessNextRun", NextRun)
                                 ElseIf ProcessNextRun < RightNow Then
                                     '
                                     ' All is OK, triggered on NextRun, Cycle RightNow
                                     '
                                     Call addAsyncCmd(cpCore, "runprocess appname=""" & cpSite.core.appConfig.name & """ addonid=""" & ProcessID & """", True)
-                                    Call cpSite.core.db.db_setCS(CS, "ProcessNextRun", NextRun)
+                                    Call cpSite.core.db.cs_set(CS, "ProcessNextRun", NextRun)
                                 End If
                                 Call cpSite.core.db.db_csGoNext(CS)
                                 cpSite.Dispose()

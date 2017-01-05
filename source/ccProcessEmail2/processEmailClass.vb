@@ -171,7 +171,7 @@ ErrorTrap:
             Dim emailStyles As String
             Dim EmailFrom As String
             '
-            SQLDateNow = cpCore.db.db_EncodeSQLDate(Now)
+            SQLDateNow = cpCore.db.encodeSQLDate(Now)
             PrimaryLink = "http://" & GetPrimaryDomainName()
             '
             ' Open the email records
@@ -218,7 +218,7 @@ ErrorTrap:
                     '
                     ' Create Drop Record
                     '
-                    CSDrop = cpCore.db.db_csInsertRecord("Email Drops", EmailMemberID)
+                    CSDrop = cpCore.db.cs_insertRecord("Email Drops", EmailMemberID)
                     If cpCore.db.cs_Ok(CSDrop) Then
                         EmailDropID = cpCore.db.cs_getInteger(CSDrop, "ID")
                         ScheduleDate = cpCore.db.db_GetCSDate(CSEmail, "ScheduleDate")
@@ -395,7 +395,7 @@ ErrorTrap:
 
 
 
-            SQLDateNow = cpCore.db.db_EncodeSQLDate(Now)
+            SQLDateNow = cpCore.db.encodeSQLDate(Now)
             '
             ' Send Conditional Email - Offset days after Joining
             '   sends email between the condition period date and date +1. if a conditional email is setup and there are already
@@ -556,7 +556,7 @@ ErrorTrap:
                         & " AND (" & SQLTablePeople & ".AllowBulkEmail <> 0)" _
                         & " AND (" & SQLTablePeople & ".BirthdayMonth=" & Month(Now) & ")" _
                         & " AND (" & SQLTablePeople & ".BirthdayDay=" & Day(Now) & ")" _
-                        & " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.MemberID=" & SQLTablePeople & ".ID and ccEmailLog.DateAdded>=" & cpCore.db.db_EncodeSQLDate(Int(Now())) & "))"
+                        & " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.MemberID=" & SQLTablePeople & ".ID and ccEmailLog.DateAdded>=" & cpCore.db.encodeSQLDate(Int(Now())) & "))"
                     CSEmailBig = cpCore.db.db_openCsSql_rev("Default", SQL)
                     Do While cpCore.db.cs_Ok(CSEmailBig)
                         emailID = cpCore.db.cs_getInteger(CSEmailBig, "EmailID")
@@ -637,7 +637,7 @@ ErrorTrap:
                 EmailBodyEncoded = EmailBody
                 EmailSubjectEncoded = EmailSubject
                 'buildversion = cpCore.app.dataBuildVersion
-                CSLog = cpCore.db.db_csInsertRecord("Email Log", 0)
+                CSLog = cpCore.db.cs_insertRecord("Email Log", 0)
                 If cpCore.db.cs_Ok(CSLog) Then
                     Call cpCore.db.db_SetCSField(CSLog, "Name", "Sent " & CStr(Now()))
                     Call cpCore.db.db_SetCSField(CSLog, "EmailDropID", EmailDropID)
@@ -647,8 +647,8 @@ ErrorTrap:
                     Call cpCore.db.db_SetCSField(CSLog, "DateBlockExpires", DateBlockExpires)
                     Call cpCore.db.db_SetCSField(CSLog, "SendStatus", "Send attempted but not completed")
                     If True Then
-                        Call cpCore.db.db_setCS(CSLog, "fromaddress", FromAddress)
-                        Call cpCore.db.db_setCS(CSLog, "Subject", EmailSubject)
+                        Call cpCore.db.cs_set(CSLog, "fromaddress", FromAddress)
+                        Call cpCore.db.cs_set(CSLog, "Subject", EmailSubject)
                     End If
                     Call cpCore.db.db_SaveCS(CSLog)
                     '
@@ -762,9 +762,9 @@ ErrorTrap:
                         '
                         ' ----- Log the send
                         '
-                        Call cpCore.db.db_setCS(CSLog, "SendStatus", EmailStatus)
+                        Call cpCore.db.cs_set(CSLog, "SendStatus", EmailStatus)
                         If True Then
-                            Call cpCore.db.db_setCS(CSLog, "toaddress", ToAddress)
+                            Call cpCore.db.cs_set(CSLog, "toaddress", ToAddress)
                         End If
                         Call cpCore.db.db_SaveCS(CSLog)
                     End If

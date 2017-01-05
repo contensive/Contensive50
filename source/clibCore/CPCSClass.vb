@@ -71,7 +71,7 @@ Namespace Contensive.Core
                 If CSPointer <> -1 Then
                     Call cpCore.db.cs_Close(CSPointer)
                 End If
-                CSPointer = cpCore.db.db_csInsertRecord(ContentName, OpeningMemberID)
+                CSPointer = cpCore.db.cs_insertRecord(ContentName, OpeningMemberID)
                 success = cpCore.db.cs_Ok(CSPointer)
             Catch ex As Exception
                 Call cp.core.handleExceptionAndRethrow(ex, "Unexpected error in cs.insert")
@@ -497,7 +497,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub SetField(ByVal FieldName As String, ByVal FieldValue As Object)
             Try
-                Call cpCore.db.db_setCS(CSPointer, FieldName, FieldValue)
+                Call cpCore.db.cs_set(CSPointer, FieldName, FieldValue)
             Catch ex As Exception
                 Call cp.core.handleExceptionAndRethrow(ex, "Unexpected error in cs.SetField")
             End Try
@@ -507,7 +507,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub SetField(ByVal FieldName As String, ByVal FieldValue As String)
             Try
-                Call cpCore.db.db_setCS(CSPointer, FieldName, FieldValue)
+                Call cpCore.db.cs_set(CSPointer, FieldName, FieldValue)
             Catch ex As Exception
                 Call cp.core.handleExceptionAndRethrow(ex, "Unexpected error in cs.SetField")
             End Try
@@ -524,7 +524,7 @@ Namespace Contensive.Core
         Public Overrides Sub SetFormInput(ByVal FieldName As String, Optional ByVal RequestName As String = "")
             Dim success As Boolean = False
             Try
-                Call cpCore.cs_SetCSFormInput(CSPointer, FieldName, RequestName)
+                Call cpCore.db_cs_setFormInput(CSPointer, FieldName, RequestName)
             Catch ex As Exception
                 Call cp.core.handleExceptionAndRethrow(ex, "Unexpected error in cs.SetFormInput")
             End Try

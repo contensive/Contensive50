@@ -280,7 +280,7 @@ Namespace Contensive.Core
                         '
                         ' This addonId is missing from cache - try to load it from Db
                         '
-                        sqlCriteria = "(id=" & cpCore.db.db_EncodeSQLNumber(addonNameGuidOrId) & ")or(name=" & cpCore.db.encodeSQLText(addonNameGuidOrId) & ")or(ccguid=" & cpCore.db.encodeSQLText(addonNameGuidOrId) & ")"
+                        sqlCriteria = "(id=" & cpCore.db.encodeSQLNumber(addonNameGuidOrId) & ")or(name=" & cpCore.db.encodeSQLText(addonNameGuidOrId) & ")or(ccguid=" & cpCore.db.encodeSQLText(addonNameGuidOrId) & ")"
                         CS = cpCore.db.csOpen("add-ons", sqlCriteria)
                         If cpCore.db.cs_Ok(CS) Then
                             addonId = cpCore.db.cs_getInteger(CS, "id")

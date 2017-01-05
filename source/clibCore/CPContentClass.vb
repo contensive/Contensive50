@@ -265,13 +265,13 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Sub Delete(ByVal ContentName As String, ByVal SQLCriteria As String)
-            Call cpCore.db.db_DeleteContentRecords(ContentName, SQLCriteria)
+            Call cpCore.db.deleteContentRecords(ContentName, SQLCriteria)
         End Sub
         '
         '====================================================================================================
         '
         Public Overrides Sub DeleteRecords(ByVal ContentName As String, ByVal SQLCriteria As String)
-            Call cpCore.db.db_DeleteContentRecords(ContentName, SQLCriteria)
+            Call cpCore.db.deleteContentRecords(ContentName, SQLCriteria)
         End Sub
         '
         '====================================================================================================

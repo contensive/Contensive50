@@ -50,7 +50,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property CookieSupport() As Boolean 'Inherits BaseClasses.CPVisitBaseClass.CookieSupport
             Get
                 If True Then
-                    Return cpCore.main_VisitCookieSupport
+                    Return cpCore.visit_cookieSupport
                 Else
                     Return False
                 End If
@@ -73,7 +73,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Id() As Integer 'Inherits BaseClasses.CPVisitBaseClass.Id
             Get
                 If True Then
-                    Return cpCore.main_VisitId
+                    Return cpCore.visit_Id
                 Else
                     Return 0
                 End If
@@ -83,7 +83,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property LastTime() As Date 'Inherits BaseClasses.CPVisitBaseClass.LastTime
             Get
                 If True Then
-                    Return cpCore.main_VisitLastTime
+                    Return cpCore.visit_lastTime
                 Else
                     Return New Date()
                 End If
@@ -93,7 +93,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property LoginAttempts() As Integer 'Inherits BaseClasses.CPVisitBaseClass.LoginAttempts
             Get
                 If True Then
-                    Return cpCore.main_VisitLoginAttempts
+                    Return cpCore.visit_loginAttempts
                 Else
                     Return 0
                 End If
@@ -103,7 +103,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Name() As String 'Inherits BaseClasses.CPVisitBaseClass.Name
             Get
                 If True Then
-                    Return cpCore.main_VisitName
+                    Return cpCore.visit_name
                 Else
                     Return ""
                 End If
@@ -113,7 +113,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Pages() As Integer 'Inherits BaseClasses.CPVisitBaseClass.Pages
             Get
                 If True Then
-                    Return cpCore.main_VisitPages
+                    Return cpCore.visit_pages
                 Else
                     Return 0
                 End If
@@ -123,7 +123,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Referer() As String 'Inherits BaseClasses.CPVisitBaseClass.Referer
             Get
                 If True Then
-                    Return cpCore.main_VisitReferer
+                    Return cpCore.visit_referer
                 Else
                     Return ""
                 End If
@@ -181,7 +181,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property StartDateValue() As Integer 'Inherits BaseClasses.CPVisitBaseClass.StartDateValue
             Get
                 If True Then
-                    Return cpCore.main_VisitStartDateValue
+                    Return cpCore.visit_startDateValue
                 Else
                     Return 0
                 End If
@@ -191,7 +191,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property StartTime() As Date 'Inherits BaseClasses.CPVisitBaseClass.StartTime
             Get
                 If True Then
-                    Return cpCore.main_VisitStartTime
+                    Return cpCore.visit_startTime
                 Else
                     Return New Date()
                 End If

@@ -58,7 +58,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property BrowserIsIE() As Boolean 'Inherits BaseClasses.CPRequestBaseClass.BrowserIsIE
             Get
                 If True Then
-                    Return cpCore.main_VisitBrowserIsIE
+                    Return cpCore.visit_browserIsIE
                 Else
                     Return False
                 End If
@@ -68,7 +68,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property BrowserIsMac() As Boolean 'Inherits BaseClasses.CPRequestBaseClass.BrowserIsMac
             Get
                 If True Then
-                    Return cpCore.main_VisitBrowserIsMac
+                    Return cpCore.visit_browserIsMac
                 Else
                     Return False
                 End If
@@ -78,7 +78,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property BrowserIsMobile() As Boolean 'Inherits BaseClasses.CPRequestBaseClass.BrowserIsMobile
             Get
                 If True Then
-                    Return cpCore.main_VisitBrowserIsMobile
+                    Return cpCore.visit_browserIsMobile
                 Else
                     Return False
                 End If
@@ -88,7 +88,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property BrowserIsWindows() As Boolean 'Inherits BaseClasses.CPRequestBaseClass.BrowserIsWindows
             Get
                 If True Then
-                    Return cpCore.main_VisitBrowserIsWindows
+                    Return cpCore.visit_browserIsWindows
                 Else
                     Return False
                 End If
@@ -98,7 +98,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property BrowserVersion() As String 'Inherits BaseClasses.CPRequestBaseClass.BrowserVersion
             Get
                 If True Then
-                    Return cpCore.main_VisitBrowserVersion
+                    Return cpCore.visit_browserVersion
                 Else
                     Return ""
                 End If

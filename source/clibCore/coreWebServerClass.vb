@@ -457,18 +457,18 @@ Namespace Contensive.Core
                             '
                             ' this is a default domain or a new domain -- add to the domain table
                             '
-                            CS = cpCore.db.db_csInsertRecord("domains")
+                            CS = cpCore.db.cs_insertRecord("domains")
                             If cpCore.db.cs_Ok(CS) Then
                                 cpCore.domains.domainDetails.id = cpCore.db.cs_getInteger(CS, "id")
-                                Call cpCore.db.db_setCS(CS, "name", requestDomain)
-                                Call cpCore.db.db_setCS(CS, "typeId", "1")
-                                Call cpCore.db.db_setCS(CS, "RootPageId", cpCore.domains.domainDetails.rootPageId.ToString)
-                                Call cpCore.db.db_setCS(CS, "ForwardUrl", cpCore.domains.domainDetails.forwardUrl)
-                                Call cpCore.db.db_setCS(CS, "NoFollow", cpCore.domains.domainDetails.noFollow.ToString)
-                                Call cpCore.db.db_setCS(CS, "Visited", cpCore.domains.domainDetails.visited.ToString)
-                                Call cpCore.db.db_setCS(CS, "DefaultTemplateId", cpCore.domains.domainDetails.defaultTemplateId.ToString)
-                                Call cpCore.db.db_setCS(CS, "PageNotFoundPageId", cpCore.domains.domainDetails.pageNotFoundPageId.ToString)
-                                Call cpCore.db.db_setCS(CS, "allowCrossLogin", cpCore.domains.domainDetails.allowCrossLogin.ToString)
+                                Call cpCore.db.cs_set(CS, "name", requestDomain)
+                                Call cpCore.db.cs_set(CS, "typeId", "1")
+                                Call cpCore.db.cs_set(CS, "RootPageId", cpCore.domains.domainDetails.rootPageId.ToString)
+                                Call cpCore.db.cs_set(CS, "ForwardUrl", cpCore.domains.domainDetails.forwardUrl)
+                                Call cpCore.db.cs_set(CS, "NoFollow", cpCore.domains.domainDetails.noFollow.ToString)
+                                Call cpCore.db.cs_set(CS, "Visited", cpCore.domains.domainDetails.visited.ToString)
+                                Call cpCore.db.cs_set(CS, "DefaultTemplateId", cpCore.domains.domainDetails.defaultTemplateId.ToString)
+                                Call cpCore.db.cs_set(CS, "PageNotFoundPageId", cpCore.domains.domainDetails.pageNotFoundPageId.ToString)
+                                Call cpCore.db.cs_set(CS, "allowCrossLogin", cpCore.domains.domainDetails.allowCrossLogin.ToString)
                             End If
                             Call cpCore.db.cs_Close(CS)
                         End If
@@ -550,11 +550,11 @@ Namespace Contensive.Core
                         domainDetailsNew.forwardDomainId = 0
                         cpCore.domains.domainDetailsList.Add(requestDomain.ToLower(), domainDetailsNew)
                         '
-                        CS = cpCore.db.db_csInsertRecord("domains")
+                        CS = cpCore.db.cs_insertRecord("domains")
                         If cpCore.db.cs_Ok(CS) Then
                             cpCore.domains.domainDetails.id = cpCore.db.cs_getInteger(CS, "id")
-                            Call cpCore.db.db_setCS(CS, "name", requestDomain)
-                            Call cpCore.db.db_setCS(CS, "typeid", "1")
+                            Call cpCore.db.cs_set(CS, "name", requestDomain)
+                            Call cpCore.db.cs_set(CS, "typeid", "1")
                         End If
                         Call cpCore.db.cs_Close(CS)
                         '
@@ -567,9 +567,6 @@ Namespace Contensive.Core
                         domainDetailsListText = cpCore.json.Serialize(cpCore.domains.domainDetailsList)
                         Call cpCore.cache.setKey("domainContentList", domainDetailsListText, "domains")
                     End If
-
-                    '
-                    cpCore.properties_site__AllowVisitTracking = cpCore.siteProperties.getBoolean("allowVisitTracking", True)
                     '
                     cpCore.web_requestVirtualFilePath = "/" & cpCore.appConfig.name
                     '
@@ -710,7 +707,7 @@ Namespace Contensive.Core
                     'Call AppendLog("main_init(), 2400")
                     '
                     ''hint = "Initializing Visit"
-                    Call cpCore.web_init_initVisit(cpCore.properties_site__AllowVisitTracking)
+                    Call cpCore.visit_init(cpCore.siteProperties.getBoolean("allowVisitTracking", True))
                     '
                     '--------------------------------------------------------------------------
                     ' ----- Process Early redirects, like PageNotFound

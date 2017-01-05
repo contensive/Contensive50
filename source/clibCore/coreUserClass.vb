@@ -314,15 +314,15 @@ Namespace Contensive.Core
                         & ",username=" & cpCore.db.encodeSQLText(username) _
                         & ",email=" & cpCore.db.encodeSQLText(email) _
                         & ",password=" & cpCore.db.encodeSQLText(password) _
-                        & ",OrganizationID=" & cpCore.db.db_EncodeSQLNumber(organizationId) _
-                        & ",LanguageID=" & cpCore.db.db_EncodeSQLNumber(languageId) _
-                        & ",Active=" & cpCore.db.db_EncodeSQLBoolean(active) _
+                        & ",OrganizationID=" & cpCore.db.encodeSQLNumber(organizationId) _
+                        & ",LanguageID=" & cpCore.db.encodeSQLNumber(languageId) _
+                        & ",Active=" & cpCore.db.encodeSQLBoolean(active) _
                         & ",Company=" & cpCore.db.encodeSQLText(company) _
-                        & ",Visits=" & cpCore.db.db_EncodeSQLNumber(visits) _
-                        & ",LastVisit=" & cpCore.db.db_EncodeSQLDate(lastVisit) _
-                        & ",AllowBulkEmail=" & cpCore.db.db_EncodeSQLBoolean(allowBulkEmail) _
-                        & ",AdminMenuModeID=" & cpCore.db.db_EncodeSQLNumber(adminMenuModeID) _
-                        & ",AutoLogin=" & cpCore.db.db_EncodeSQLBoolean(autoLogin)
+                        & ",Visits=" & cpCore.db.encodeSQLNumber(visits) _
+                        & ",LastVisit=" & cpCore.db.encodeSQLDate(lastVisit) _
+                        & ",AllowBulkEmail=" & cpCore.db.encodeSQLBoolean(allowBulkEmail) _
+                        & ",AdminMenuModeID=" & cpCore.db.encodeSQLNumber(adminMenuModeID) _
+                        & ",AutoLogin=" & cpCore.db.encodeSQLBoolean(autoLogin)
                         ' 6/18/2009 - removed notes from base
                         '           & ",SendNotes=" & encodeSQLBoolean(MemberSendNotes)
                         SQL &= "" _
@@ -345,7 +345,7 @@ Namespace Contensive.Core
                         & ",ShipCountry=" & cpCore.db.encodeSQLText(main_MemberShipCountry) _
                         & ",ShipPhone=" & cpCore.db.encodeSQLText(main_MemberShipPhone)
                         If True Then
-                            SQL &= ",ExcludeFromAnalytics=" & cpCore.db.db_EncodeSQLBoolean(excludeFromAnalytics)
+                            SQL &= ",ExcludeFromAnalytics=" & cpCore.db.encodeSQLBoolean(excludeFromAnalytics)
                         End If
                         SQL &= " WHERE ID=" & id & ";"
                         Call cpCore.db.executeSql(SQL)
@@ -540,7 +540,7 @@ Namespace Contensive.Core
                         Criteria = "" _
                         & "(" & Criteria & ")" _
                         & " and(r.id is not null)" _
-                        & " and((r.DateExpires is null)or(r.DateExpires>" & cpCore.db.db_EncodeSQLDate(Now) & "))" _
+                        & " and((r.DateExpires is null)or(r.DateExpires>" & cpCore.db.encodeSQLDate(Now) & "))" _
                         & " "
                         If adminReturnsTrue Then
                             Criteria = "(" & Criteria & ")or(m.admin<>0)or(m.developer<>0)"
@@ -628,6 +628,7 @@ Namespace Contensive.Core
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
+            Return returnRecordId
         End Function
         '
         '========================================================================
@@ -729,11 +730,11 @@ Namespace Contensive.Core
                     loginForm_Password = cpCore.docProperties.getText("password")
                     loginForm_AutoLogin = cpCore.main_GetStreamBoolean2("autologin")
                     '
-                    If (cpCore.main_VisitLoginAttempts < main_maxVisitLoginAttempts) And (cpCore.main_VisitCookieSupport) Then
+                    If (cpCore.visit_loginAttempts < main_maxVisitLoginAttempts) And (cpCore.visit_cookieSupport) Then
                         LocalMemberID = user_getLoginUserID(loginForm_Username, loginForm_Password)
                         If LocalMemberID = 0 Then
-                            cpCore.main_VisitLoginAttempts = cpCore.main_VisitLoginAttempts + 1
-                            Call cpCore.main_SaveVisit()
+                            cpCore.visit_loginAttempts = cpCore.visit_loginAttempts + 1
+                            Call cpCore.visit_save()
                         Else
                             returnREsult = authenticateByID(LocalMemberID, loginForm_AutoLogin)
                             If returnREsult Then
@@ -819,7 +820,7 @@ Namespace Contensive.Core
                         recordCnt = 0
                         sqlCriteria = "(email=" & cpCore.db.encodeSQLText(workingEmail) & ")"
                         If True Then
-                            sqlCriteria = sqlCriteria & "and((dateExpires is null)or(dateExpires>" & cpCore.db.db_EncodeSQLDate(Now) & "))"
+                            sqlCriteria = sqlCriteria & "and((dateExpires is null)or(dateExpires>" & cpCore.db.encodeSQLDate(Now) & "))"
                         End If
                         CS = cpCore.db.csOpen("People", sqlCriteria, "ID", , , ,, "username,password", 1)
                         If Not cpCore.db.cs_Ok(CS) Then
@@ -846,7 +847,7 @@ Namespace Contensive.Core
                                     '
                                     'hint = "150"
                                     Call cpCore.db.cs_Close(CS)
-                                    CS = cpCore.db.db_csInsertRecord("people")
+                                    CS = cpCore.db.cs_insertRecord("people")
                                     Call cpCore.db.db_SetCSField(CS, "name", "Contensive Support")
                                     Call cpCore.db.db_SetCSField(CS, "email", workingEmail)
                                     Call cpCore.db.db_SetCSField(CS, "developer", "1")
@@ -937,8 +938,8 @@ Namespace Contensive.Core
                                     returnREsult = True
                                     If updateUser Then
                                         'hint = "350"
-                                        Call cpCore.db.db_setCS(CS, "username", Username)
-                                        Call cpCore.db.db_setCS(CS, "password", Password)
+                                        Call cpCore.db.cs_set(CS, "username", Username)
+                                        Call cpCore.db.cs_set(CS, "password", Password)
                                     End If
                                     recordCnt = recordCnt + 1
                                 End If
@@ -981,7 +982,7 @@ Namespace Contensive.Core
                 ' REFACTOR -- add a private dictionary with contentname=>result, plus a authenticationChange flag that makes properties like this invalid
                 '
                 returnIsContentManager = False
-                If Not String.IsNullOrEmpty(ContentName) Then
+                If String.IsNullOrEmpty(ContentName) Then
                     If isAuthenticated() Then
                         If isAuthenticatedAdmin() Then
                             returnIsContentManager = True
@@ -989,23 +990,24 @@ Namespace Contensive.Core
                             '
                             ' Is a CM for any content def
                             '
-                            If Not cpCore.property_user_isContentManagerOfAnything_isLoaded Then
+                            If (Not _isAuthenticatedContentManagerAnything_loaded) Or (_isAuthenticatedContentManagerAnything_userId <> id) Then
                                 SQL = "SELECT ccGroupRules.ContentID" _
                                     & " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupID = ccMemberRules.GroupID" _
                                     & " WHERE (" _
-                                        & "(ccMemberRules.MemberID=" & cpCore.db.db_EncodeSQLNumber(id) & ")" _
+                                        & "(ccMemberRules.MemberID=" & cpCore.db.encodeSQLNumber(id) & ")" _
                                         & " AND(ccMemberRules.active<>0)" _
                                         & " AND(ccGroupRules.active<>0)" _
                                         & " AND(ccGroupRules.ContentID Is not Null)" _
-                                        & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & cpCore.db.db_EncodeSQLDate(cpCore.main_PageStartTime) & "))" _
+                                        & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & cpCore.db.encodeSQLDate(cpCore.main_PageStartTime) & "))" _
                                         & ")"
                                 CS = cpCore.db.cs_openSql(SQL)
-                                cpCore.property_user_isContentManagerOfAnything = cpCore.db.cs_Ok(CS)
+                                _isAuthenticatedContentManagerAnything = cpCore.db.cs_Ok(CS)
                                 cpCore.db.cs_Close(CS)
                                 '
-                                cpCore.property_user_isContentManagerOfAnything_isLoaded = True
+                                _isAuthenticatedContentManagerAnything_userId = id
+                                _isAuthenticatedContentManagerAnything_loaded = True
                             End If
-                            returnIsContentManager = cpCore.property_user_isContentManagerOfAnything
+                            returnIsContentManager = _isAuthenticatedContentManagerAnything
                         End If
                     End If
                 Else
@@ -1019,6 +1021,9 @@ Namespace Contensive.Core
             End Try
             Return returnIsContentManager
         End Function
+        Private _isAuthenticatedContentManagerAnything_loaded As Boolean = False
+        Private _isAuthenticatedContentManagerAnything_userId As Integer
+        Private _isAuthenticatedContentManagerAnything As Boolean
         '
         '========================================================================
         ' Member Login (by username and password)
@@ -1026,28 +1031,22 @@ Namespace Contensive.Core
         '   See main_GetLoginMemberID and main_LoginMemberByID
         '========================================================================
         '
-        Public Function authenticate(ByVal loginFieldValue As String, ByVal Password As String, Optional ByVal AllowAutoLogin As Boolean = False) As Boolean
+        Public Function authenticate(ByVal loginFieldValue As String, ByVal password As String, Optional ByVal AllowAutoLogin As Boolean = False) As Boolean
             Dim returnREsult As Boolean = False
             Try
-                Dim iLoginFieldValue As String
-                Dim iPassword As String
                 Dim LocalMemberID As Integer
                 '
-                iLoginFieldValue = EncodeText(loginFieldValue)
-                iPassword = EncodeText(Password)
-                '
                 returnREsult = False
-                LocalMemberID = user_getLoginUserID(iLoginFieldValue, iPassword)
+                LocalMemberID = user_getLoginUserID(loginFieldValue, password)
                 If LocalMemberID <> 0 Then
                     returnREsult = authenticateByID(LocalMemberID, AllowAutoLogin)
                     If returnREsult Then
                         Call cpCore.main_LogActivity2("successful password login", id, organizationId)
-                        cpCore.property_user_isContentManagerOfAnything_isLoaded = False
                         isAuthenticatedAdmin_cache_isLoaded = False
                         property_user_isMember_isLoaded = False
                         property_user_isAuthenticated_isLoaded = False
                     Else
-                        Call cpCore.main_LogActivity2("unsuccessful login (loginField:" & iLoginFieldValue & "/password:" & iPassword & ")", id, organizationId)
+                        Call cpCore.main_LogActivity2("unsuccessful login (loginField:" & loginFieldValue & "/password:" & password & ")", id, organizationId)
                     End If
                 End If
             Catch ex As Exception
@@ -1072,7 +1071,7 @@ Namespace Contensive.Core
                     ' Log them in
                     '
                     cpCore.visit_isAuthenticated = True
-                    Call cpCore.main_SaveVisit()
+                    Call cpCore.visit_save()
                     isAuthenticatedAdmin_cache_isLoaded = False
                     property_user_isMember_isLoaded = False
                     property_user_isAuthenticated_isLoaded = False
@@ -1080,24 +1079,22 @@ Namespace Contensive.Core
                     '
                     ' Write Cookies in case Visit Tracking is off
                     '
-                    If cpCore.main_VisitStartTime = Date.MinValue Then
-                        cpCore.main_VisitStartTime = cpCore.main_PageStartTime
+                    If cpCore.visit_startTime = Date.MinValue Then
+                        cpCore.visit_startTime = cpCore.main_PageStartTime
                     End If
-                    If Not EncodeBoolean(cpCore.siteProperties.getBoolean("allowVisitTracking", True)) Then
-                        Call cpCore.web_init_initVisit(True)
+                    If Not cpCore.siteProperties.getBoolean("allowVisitTracking", True) Then
+                        Call cpCore.visit_init(True)
                     End If
                     '
                     ' Change autologin if included, selected, and allowed
                     '
-                    If Not isMissing(AllowAutoLogin) Then
-                        If AllowAutoLogin Xor autoLogin Then
-                            If EncodeBoolean(cpCore.siteProperties.getBoolean("AllowAutoLogin", False)) Then
-                                CS = cpCore.db_csOpenRecord("people", irecordID)
-                                If cpCore.db.cs_Ok(CS) Then
-                                    Call cpCore.db.db_setCS(CS, "AutoLogin", AllowAutoLogin)
-                                End If
-                                Call cpCore.db.cs_Close(CS)
+                    If AllowAutoLogin Xor autoLogin Then
+                        If EncodeBoolean(cpCore.siteProperties.getBoolean("AllowAutoLogin", False)) Then
+                            CS = cpCore.db_csOpenRecord("people", irecordID)
+                            If cpCore.db.cs_Ok(CS) Then
+                                Call cpCore.db.cs_set(CS, "AutoLogin", AllowAutoLogin)
                             End If
+                            Call cpCore.db.cs_Close(CS)
                         End If
                     End If
                 End If
@@ -1151,15 +1148,15 @@ Namespace Contensive.Core
                     & " (ccMembers.active<>" & SQLFalse & ")" _
                     & " and(ccMembers.ID=" & RecordID & ")"
                 SQL &= "" _
-                    & " and((ccMembers.dateExpires is null)or(ccMembers.dateExpires>" & cpCore.db.db_EncodeSQLDate(Now) & "))" _
+                    & " and((ccMembers.dateExpires is null)or(ccMembers.dateExpires>" & cpCore.db.encodeSQLDate(Now) & "))" _
                     & ""
                 CS = cpCore.db.cs_openSql(SQL)
                 If cpCore.db.cs_Ok(CS) Then
-                    If cpCore.main_VisitId = 0 Then
+                    If cpCore.visit_Id = 0 Then
                         '
                         ' Visit was blocked during init, init the visit now
                         '
-                        Call cpCore.web_init_initVisit(True)
+                        Call cpCore.visit_init(True)
                     End If
                     '
                     ' ----- Member was recognized
@@ -1198,11 +1195,11 @@ Namespace Contensive.Core
                         isNew = False
                     End If
                     lastVisit = cpCore.main_PageStartTime
-                    cpCore.main_VisitMemberID = id
-                    cpCore.main_VisitLoginAttempts = 0
-                    cpCore.main_VisitorMemberID = id
-                    cpCore.main_VisitExcludeFromAnalytics = cpCore.main_VisitExcludeFromAnalytics Or cpCore.main_VisitIsBot Or excludeFromAnalytics Or isAdmin Or isDeveloper
-                    Call cpCore.main_SaveVisit()
+                    'cpCore.main_VisitMemberID = id
+                    cpCore.visit_loginAttempts = 0
+                    cpCore.visitor_memberID = id
+                    cpCore.visit_excludeFromAnalytics = cpCore.visit_excludeFromAnalytics Or cpCore.visit_isBot Or excludeFromAnalytics Or isAdmin Or isDeveloper
+                    Call cpCore.visit_save()
                     Call cpCore.main_SaveVisitor()
                     Call user_SaveMemberBase()
                     returnREsult = True
@@ -1225,31 +1222,31 @@ Namespace Contensive.Core
                 Dim CSMember As Integer
                 Dim CSlanguage As Integer
                 '
-                Call user_CreateUserDefaults(cpCore.main_VisitName)
+                Call user_CreateUserDefaults(cpCore.visit_name)
                 '
                 id = 0
-                CSMember = cpCore.db.db_csInsertRecord("people")
+                CSMember = cpCore.db.cs_insertRecord("people")
                 If Not cpCore.db.cs_Ok(CSMember) Then
                     Call cpCore.handleExceptionAndRethrow(New ApplicationException("main_CreateUser, Error inserting new people record, could not main_CreateUser"))
                 Else
                     id = cpCore.db.cs_getInteger(CSMember, "id")
-                    Call cpCore.db.db_setCS(CSMember, "CreatedByVisit", True)
+                    Call cpCore.db.cs_set(CSMember, "CreatedByVisit", True)
                     '
                     active = True
-                    Call cpCore.db.db_setCS(CSMember, "active", active)
+                    Call cpCore.db.cs_set(CSMember, "active", active)
                     '
                     visits = 1
-                    Call cpCore.db.db_setCS(CSMember, "Visits", visits)
+                    Call cpCore.db.cs_set(CSMember, "Visits", visits)
                     '
                     lastVisit = cpCore.main_PageStartTime
-                    Call cpCore.db.db_setCS(CSMember, "LastVisit", lastVisit)
+                    Call cpCore.db.cs_set(CSMember, "LastVisit", lastVisit)
                     '
                     '
                     CSlanguage = cpCore.db_csOpenRecord("Languages", cpCore.web_GetBrowserLanguageID, , , "Name")
                     If cpCore.db.cs_Ok(CSlanguage) Then
                         languageId = cpCore.db.cs_getInteger(CSlanguage, "ID")
                         language = cpCore.db.cs_getText(CSlanguage, "Name")
-                        Call cpCore.db.db_setCS(CSMember, "LanguageID", languageId)
+                        Call cpCore.db.cs_set(CSMember, "LanguageID", languageId)
                     End If
                     Call cpCore.db.cs_Close(CSlanguage)
                     '
@@ -1260,10 +1257,10 @@ Namespace Contensive.Core
                     '
                     Call cpCore.db.cs_Close(CSMember)
                     '
-                    cpCore.main_VisitMemberID = id
-                    cpCore.main_VisitorMemberID = id
+                    'cpCore.main_VisitMemberID = id
+                    cpCore.visitor_memberID = id
                     cpCore.visit_isAuthenticated = False
-                    Call cpCore.main_SaveVisit()
+                    Call cpCore.visit_save()
                     Call cpCore.main_SaveVisitor()
                     '
                     isAuthenticatedAdmin_cache_isLoaded = False
@@ -1308,7 +1305,7 @@ Namespace Contensive.Core
                 contentControlID = 0
                 active = False
                 visits = 0
-                lastVisit = cpCore.main_VisitStartTime
+                lastVisit = cpCore.visit_startTime
                 company = ""
                 user_Title = ""
                 main_MemberAddress = ""
@@ -1363,17 +1360,17 @@ Namespace Contensive.Core
                         & ",username=" & cpCore.db.encodeSQLText(username) _
                         & ",email=" & cpCore.db.encodeSQLText(email) _
                         & ",password=" & cpCore.db.encodeSQLText(password) _
-                        & ",OrganizationID=" & cpCore.db.db_EncodeSQLNumber(organizationId) _
-                        & ",LanguageID=" & cpCore.db.db_EncodeSQLNumber(languageId) _
-                        & ",Active=" & cpCore.db.db_EncodeSQLBoolean(active) _
+                        & ",OrganizationID=" & cpCore.db.encodeSQLNumber(organizationId) _
+                        & ",LanguageID=" & cpCore.db.encodeSQLNumber(languageId) _
+                        & ",Active=" & cpCore.db.encodeSQLBoolean(active) _
                         & ",Company=" & cpCore.db.encodeSQLText(company) _
-                        & ",Visits=" & cpCore.db.db_EncodeSQLNumber(visits) _
-                        & ",LastVisit=" & cpCore.db.db_EncodeSQLDate(lastVisit) _
-                        & ",AllowBulkEmail=" & cpCore.db.db_EncodeSQLBoolean(allowBulkEmail) _
-                        & ",AllowToolsPanel=" & cpCore.db.db_EncodeSQLBoolean(allowToolsPanel) _
-                        & ",AdminMenuModeID=" & cpCore.db.db_EncodeSQLNumber(adminMenuModeID) _
-                        & ",AutoLogin=" & cpCore.db.db_EncodeSQLBoolean(autoLogin)
-                        SQL &= ",ExcludeFromAnalytics=" & cpCore.db.db_EncodeSQLBoolean(excludeFromAnalytics)
+                        & ",Visits=" & cpCore.db.encodeSQLNumber(visits) _
+                        & ",LastVisit=" & cpCore.db.encodeSQLDate(lastVisit) _
+                        & ",AllowBulkEmail=" & cpCore.db.encodeSQLBoolean(allowBulkEmail) _
+                        & ",AllowToolsPanel=" & cpCore.db.encodeSQLBoolean(allowToolsPanel) _
+                        & ",AdminMenuModeID=" & cpCore.db.encodeSQLNumber(adminMenuModeID) _
+                        & ",AutoLogin=" & cpCore.db.encodeSQLBoolean(autoLogin)
+                        SQL &= ",ExcludeFromAnalytics=" & cpCore.db.encodeSQLBoolean(excludeFromAnalytics)
                         SQL &= " WHERE ID=" & id & ";"
                         Call cpCore.db.executeSql(SQL)
                     End If
@@ -1432,7 +1429,7 @@ Namespace Contensive.Core
                         Call cpCore.error_AddUserError(ErrorMessage)
                     Else
                         If Not cpCore.error_IsUserError() Then
-                            CS = cpCore.db.csOpen("people", "ID=" & cpCore.db.db_EncodeSQLNumber(cpCore.user.id))
+                            CS = cpCore.db.csOpen("people", "ID=" & cpCore.db.encodeSQLNumber(cpCore.user.id))
                             If Not cpCore.db.cs_Ok(CS) Then
                                 cpCore.handleExceptionAndRethrow(New Exception("Could not open the current members account to set the username and password."))
                             Else
@@ -1446,11 +1443,11 @@ Namespace Contensive.Core
                                 LastName = cpCore.docProperties.getText("firstname")
                                 FullName = FirstName & " " & LastName
                                 Email = cpCore.docProperties.getText("email")
-                                Call cpCore.db.db_setCS(CS, "FirstName", FirstName)
-                                Call cpCore.db.db_setCS(CS, "LastName", LastName)
-                                Call cpCore.db.db_setCS(CS, "Name", FullName)
-                                Call cpCore.db.db_setCS(CS, "username", loginForm_Username)
-                                Call cpCore.db.db_setCS(CS, "password", loginForm_Password)
+                                Call cpCore.db.cs_set(CS, "FirstName", FirstName)
+                                Call cpCore.db.cs_set(CS, "LastName", LastName)
+                                Call cpCore.db.cs_set(CS, "Name", FullName)
+                                Call cpCore.db.cs_set(CS, "username", loginForm_Username)
+                                Call cpCore.db.cs_set(CS, "password", loginForm_Password)
                                 Call cpCore.user.authenticateByID(cpCore.user.id)
                             End If
                             Call cpCore.db.cs_Close(CS)
@@ -1722,12 +1719,12 @@ Namespace Contensive.Core
                         '
                         Call user_CreateUser()
                         '
-                        CSPointer = cpCore.db.csOpen("people", "ID=" & cpCore.db.db_EncodeSQLNumber(id))
+                        CSPointer = cpCore.db.csOpen("people", "ID=" & cpCore.db.encodeSQLNumber(id))
                         If cpCore.db.cs_Ok(CSPointer) Then
-                            Call cpCore.db.db_setCS(CSPointer, "Username", username)
-                            Call cpCore.db.db_setCS(CSPointer, "password", password)
-                            Call cpCore.db.db_setCS(CSPointer, "email", email)
-                            Call cpCore.db.db_setCS(CSPointer, "ContentControlID", cpCore.main_GetContentID("Members"))
+                            Call cpCore.db.cs_set(CSPointer, "Username", username)
+                            Call cpCore.db.cs_set(CSPointer, "password", password)
+                            Call cpCore.db.cs_set(CSPointer, "email", email)
+                            Call cpCore.db.cs_set(CSPointer, "ContentControlID", cpCore.main_GetContentID("Members"))
                         End If
                         Call cpCore.db.cs_Close(CSPointer)
                         returnREsult = id
@@ -1789,7 +1786,7 @@ Namespace Contensive.Core
                     ' ----- password blank, stop here
                     '
                     Call cpCore.error_AddUserError("A valid login requires a non-blank password.")
-                ElseIf (cpCore.main_VisitLoginAttempts >= main_maxVisitLoginAttempts) Then
+                ElseIf (cpCore.visit_loginAttempts >= main_maxVisitLoginAttempts) Then
                     '
                     ' ----- already tried 5 times
                     '
@@ -1807,7 +1804,7 @@ Namespace Contensive.Core
                         Criteria = "(username=" & cpCore.db.encodeSQLText(iLoginFieldValue) & ")"
                     End If
                     If True Then
-                        Criteria = Criteria & "and((dateExpires is null)or(dateExpires>" & cpCore.db.db_EncodeSQLDate(Now()) & "))"
+                        Criteria = Criteria & "and((dateExpires is null)or(dateExpires>" & cpCore.db.encodeSQLDate(Now()) & "))"
                     End If
                     CS = cpCore.db.csOpen("People", Criteria, "id", , , , , "ID ,password,admin,developer", 2)
                     If Not cpCore.db.cs_Ok(CS) Then
@@ -1843,11 +1840,11 @@ Namespace Contensive.Core
                                     SQL = "SELECT ccGroupRules.ContentID" _
                                     & " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupID = ccMemberRules.GroupID" _
                                     & " WHERE (" _
-                                        & "(ccMemberRules.MemberID=" & cpCore.db.db_EncodeSQLNumber(returnUserId) & ")" _
+                                        & "(ccMemberRules.MemberID=" & cpCore.db.encodeSQLNumber(returnUserId) & ")" _
                                         & " AND(ccMemberRules.active<>0)" _
                                         & " AND(ccGroupRules.active<>0)" _
                                         & " AND(ccGroupRules.ContentID Is not Null)" _
-                                        & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & cpCore.db.db_EncodeSQLDate(cpCore.main_PageStartTime) & "))" _
+                                        & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & cpCore.db.encodeSQLDate(cpCore.main_PageStartTime) & "))" _
                                         & ");"
                                     CS = cpCore.db.cs_openSql(SQL)
                                     If cpCore.db.cs_Ok(CS) Then
@@ -2026,11 +2023,11 @@ Namespace Contensive.Core
                     SQL = "SELECT ccGroupRules.ContentID,allowAdd,allowDelete" _
                     & " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupID = ccMemberRules.GroupID" _
                     & " WHERE (" _
-                        & " (ccMemberRules.MemberID=" & cpCore.db.db_EncodeSQLNumber(id) & ")" _
+                        & " (ccMemberRules.MemberID=" & cpCore.db.encodeSQLNumber(id) & ")" _
                         & " AND(ccMemberRules.active<>0)" _
                         & " AND(ccGroupRules.active<>0)" _
                         & " AND(ccGroupRules.ContentID=" & ContentID & ")" _
-                        & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & cpCore.db.db_EncodeSQLDate(cpCore.main_PageStartTime) & "))" _
+                        & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & cpCore.db.encodeSQLDate(cpCore.main_PageStartTime) & "))" _
                         & ");"
                     CSPointer = cpCore.db.cs_openSql(SQL)
                     If cpCore.db.cs_Ok(CSPointer) Then

@@ -362,8 +362,6 @@ Namespace Contensive.Core
         '
         Public main_Private_LegacySiteSites_Loaded As Boolean = False
         '
-        Public properties_site__AllowVisitTracking As Boolean = False
-        '
         Public main_optionString As String = ""
         Public main_FilterInput As String = ""
         '
@@ -390,71 +388,45 @@ Namespace Contensive.Core
         '
         Friend visit_initialized As Boolean = False                ' true when visit has been initialized
         '
-        Public main_VisitId As Integer = 0                      ' Index into the visits table
-        Public main_VisitName As String = ""                  '
-        Public main_VisitStartDateValue As Integer = 0          ' Long Integer representing date
-        Public main_VisitStartTime As Date = Date.MinValue            ' Date/Time when visit started
-        Public main_VisitLastTime As Date = Date.MinValue                ' The date/time when the last page was created
-        Public main_VisitCookieSupport As Boolean = False        ' true if this visit has cookie support
-        Public main_VisitPages As Integer = 0                   ' how many pages have been viewed this visit
-        Public main_VisitReferer As String = ""               ' the referer to this site
-        Public main_VisitRefererHost As String = ""           '   derived during init
-        Public main_VisitRefererPathPage As String = ""       '   derived during init
-        Public main_VisitLoginAttempts As Integer = 0           ' number of times this visit/visitor has attempted member-login this visit
+        Public visit_Id As Integer = 0                      ' Index into the visits table
+        Public visit_name As String = ""                  '
+        Public visit_startDateValue As Integer = 0          ' Long Integer representing date
+        Public visit_startTime As Date = Date.MinValue            ' Date/Time when visit started
+        Public visit_lastTime As Date = Date.MinValue                ' The date/time when the last page was created
+        Public visit_cookieSupport As Boolean = False        ' true if this visit has cookie support
+        Public visit_pages As Integer = 0                   ' how many pages have been viewed this visit
+        Public visit_referer As String = ""               ' the referer to this site
+        Public visit_refererHost As String = ""           '   derived during init
+        Public visit_refererPathPage As String = ""       '   derived during init
+        Public visit_loginAttempts As Integer = 0           ' number of times this visit/visitor has attempted member-login this visit
         Public visit_isAuthenticated As Boolean = False
-        Public main_VisitBrowserIsIE As Boolean = False          ' if detail includes msie
-        Public main_VisitBrowserIsNS As Boolean = False          ' if detail or detailtail is netscape
-        Public main_VisitBrowserVersion As String = ""        ' attempt to main_Get main_version
-        Public main_VisitBrowserIsWindows As Boolean = False    ' if any browser detail includes "windows"
-        Public main_VisitBrowserIsMac As Boolean = False        ' if any browser deail includes "mac"
-        Public main_VisitBrowserIsLinux As Boolean = False      ' not sure
-        Public main_VisitBrowserIsMobile As Boolean = False     ' if a WAP Mobile device
-        Public main_VisitExcludeFromAnalytics As Boolean = False ' if true, this visit is excluded from all reporting, like page hit notification, graphic, etc.
-        Public main_VisitIsBot As Boolean = False               '
-        Public main_VisitIsBadBot As Boolean = False            '
+        Public visit_browserIsIE As Boolean = False          ' if detail includes msie
+        Public visit_browserIsNS As Boolean = False          ' if detail or detailtail is netscape
+        Public visit_browserVersion As String = ""        ' attempt to main_Get main_version
+        Public visit_browserIsWindows As Boolean = False    ' if any browser detail includes "windows"
+        Public visit_browserIsMac As Boolean = False        ' if any browser deail includes "mac"
+        Public visit_browserIsLinux As Boolean = False      ' not sure
+        Public visit_browserIsMobile As Boolean = False     ' if a WAP Mobile device
+        Public visit_excludeFromAnalytics As Boolean = False ' if true, this visit is excluded from all reporting, like page hit notification, graphic, etc.
+        Public visit_isBot As Boolean = False               '
+        Public visit_isBadBot As Boolean = False            '
         '
         ' see main_VisitorForceBrowserMobile
         '
-        Public main_VisitStateOK As Boolean = False             ' if false, page is out of state (sequence)
-        Public main_VisitMemberID As Integer = 0               ' MemberID for the current visit (memberid=0 means untracked guest)
+        Public visit_stateOK As Boolean = False             ' if false, page is out of state (sequence)
+        'Public main_VisitMemberID As Integer = 0               ' MemberID for the current visit (memberid=0 means untracked guest)
         Public main_VisitTimeToLastHit As Integer = 0          ' seconds from first hit to last hit
         '
         '-----------------------------------------------------------------------
         ' ----- visitor (computer) values
         '-----------------------------------------------------------------------
         '
-        Public main_VisitorID As Integer = 0                    ' Index into the visitor table
-        Public main_VisitorName As String = ""                ' The name used by the last member identity users name
-        Public main_VisitorMemberID As Integer = 0              ' the last member account this visitor used (memberid=0 means untracked guest)
-        Public main_VisitorOrderID As Integer = 0               ' the current shopping cart (non-complete order)
-        Public main_VisitorNew As Boolean = False               ' stored in visit record - Is this the first visit for this visitor
-        Public main_VisitorForceBrowserMobile As Integer = 0           ' 0 = not set -- use Browser detect each time, 1 = Force Mobile, 2 = Force not Mobile
-        '
-        '-----------------------------------------------------------------------
-        '   On demand loads
-        '       used only when main_visitInitializedd is true
-        '-----------------------------------------------------------------------
-        '
-        Private property_visit_allowEditing As Boolean
-        Private property_visit_allowEditing_isLoaded As Boolean = False
-        '
-        Private property_visit_allowQuickEditor As Boolean
-        Private property_visit_allowQuickEditor_isLoaded As Boolean = False
-        '
-        Private property_visit_allowAdvancedEditor As Boolean
-        Private property_visit_allowAdvancedEditor_isLoaded As Boolean = False
-        '
-        Private property_visit_allowWorkflowRendering As Boolean
-        Private property_visit_allowWorkflowRendering_isLoaded As Boolean = False
-        '
-        Private property_visit_allowDebugging_Local As Boolean
-        Private property_visit_allowDebugging_isLoaded As Boolean = False
-        '
-        Private property_visit_allowHelpIcon_Local As Boolean
-        Private property_visit_allowHelpIcon_isLoaded As Boolean = False
-        '
-        Public property_user_isContentManagerOfAnything As Boolean
-        Public property_user_isContentManagerOfAnything_isLoaded As Boolean = False
+        Public visitor_id As Integer = 0                    ' Index into the visitor table
+        Public visitor_Name As String = ""                ' The name used by the last member identity users name
+        Public visitor_memberID As Integer = 0              ' the last member account this visitor used (memberid=0 means untracked guest)
+        Public visitor_orderID As Integer = 0               ' the current shopping cart (non-complete order)
+        Public visitor_new As Boolean = False               ' stored in visit record - Is this the first visit for this visitor
+        Public visitor_forceBrowserMobile As Integer = 0           ' 0 = not set -- use Browser detect each time, 1 = Force Mobile, 2 = Force not Mobile
         '
         '-----------------------------------------------------------------------
         ' ----- Help Subsystem
@@ -475,20 +447,12 @@ Namespace Contensive.Core
         '-----------------------------------------------------------------------
         '
         Private constructorTickCount As Integer = 0
-        Const main_TPStackPointerMax = 20
-        Private main_TPStackPointer As Integer = 0 '
-        Private main_TPStack(20) As String     '
-        Const main_TestPointTab = 5
         Private main_TestPointIndent As Integer = 0
         '
         ' Tracing - Debugging
         '
         Public allowDebugLog As Boolean = False                             ' turn on in script -- use to write /debug.log in content files for whatever is needed
         Private profileLogIsOpen As Boolean = False
-        'Private profileLogEntryCnt As Integer = 0
-        'Private profileLogStoreSize As Integer = 0
-        'Private Const profileLogStoreChunk = 100
-        'Private profileLogStore As String()
         '
         Public main_BlockNotAvailableMessage As Boolean = False             ' if false and contensive has an error, a Site Not Available message is presented
         Public main_PageStartTime As Date                                   ' set in constructor
@@ -1619,11 +1583,11 @@ ErrorTrap:
                     CreateKey = getRandomLong()
                     SQL = "INSERT INTO " & TableName & " (CreateKey,DateAdded" _
                         & ")VALUES(" _
-                        & " " & db.db_EncodeSQLNumber(CreateKey) _
-                        & "," & db.db_EncodeSQLDate(DateAdded) _
+                        & " " & db.encodeSQLNumber(CreateKey) _
+                        & "," & db.encodeSQLDate(DateAdded) _
                         & ");"
                     Call db.executeSql(SQL, DataSourceName)
-                    SQL = db.db_GetSQLSelect("default", TableName, "ID", "DateAdded=" & db.db_EncodeSQLDate(DateAdded) & " AND CreateKey=" & db.db_EncodeSQLNumber(CreateKey))
+                    SQL = db.db_GetSQLSelect("default", TableName, "ID", "DateAdded=" & db.encodeSQLDate(DateAdded) & " AND CreateKey=" & db.encodeSQLNumber(CreateKey))
                     dtTargetTable = db.executeSql(SQL, DataSourceName)
                     If dtTargetTable.Rows.Count = 0 Then
                         Call handleLegacyError25(MethodName, ("Could not locate a new re   cord added to table [" & TableName & "]"))
@@ -1910,16 +1874,16 @@ ErrorTrap:
                     ' ----- Log the send
                     '
                     If True Then
-                        CSLog = db.db_csInsertRecord("Email Log", 0)
+                        CSLog = db.cs_insertRecord("Email Log", 0)
                         If db.cs_Ok(CSLog) Then
-                            Call db.db_setCS(CSLog, "Name", "System Email Send " & CStr(Now()))
-                            Call db.db_setCS(CSLog, "LogType", EmailLogTypeImmediateSend)
-                            Call db.db_setCS(CSLog, "SendStatus", returnStatus)
-                            Call db.db_setCS(CSLog, "toaddress", ToAddress)
-                            Call db.db_setCS(CSLog, "fromaddress", FromAddress)
-                            Call db.db_setCS(CSLog, "Subject", SubjectMessage)
+                            Call db.cs_set(CSLog, "Name", "System Email Send " & CStr(Now()))
+                            Call db.cs_set(CSLog, "LogType", EmailLogTypeImmediateSend)
+                            Call db.cs_set(CSLog, "SendStatus", returnStatus)
+                            Call db.cs_set(CSLog, "toaddress", ToAddress)
+                            Call db.cs_set(CSLog, "fromaddress", FromAddress)
+                            Call db.cs_set(CSLog, "Subject", SubjectMessage)
                             If emailIdOrZeroForLog <> 0 Then
-                                Call db.db_setCS(CSLog, "emailid", emailIdOrZeroForLog)
+                                Call db.cs_set(CSLog, "emailid", emailIdOrZeroForLog)
                             End If
                         End If
                         Call db.cs_Close(CSLog)
@@ -3844,7 +3808,7 @@ ErrorTrap:
                                                     End If
                                                 End If
                                             ElseIf InStr(1, ImageSrc, "cclibraryfiles", vbTextCompare) <> 0 Then
-                                                ImageAllowSFResize = EncodeBoolean(siteProperties.getBoolean("ImageAllowSFResize", True))
+                                                ImageAllowSFResize = siteProperties.getBoolean("ImageAllowSFResize", True)
                                                 If ImageAllowSFResize And True Then
                                                     '
                                                     ' if it is a real image, check for resize
@@ -4172,14 +4136,14 @@ ErrorTrap:
         ' ----- Decode Content
         '========================================================================
         '
-        Public Function csv_DecodeContent(ByVal Source As String) As String
+        Public Function html_DecodeContent2(ByVal Source As String) As String
             On Error GoTo ErrorTrap 'Const Tn = "MethodName-186" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
             ' ----- Do Active Content Conversion
             '
-            csv_DecodeContent = Source
-            If (csv_DecodeContent <> "") Then
-                csv_DecodeContent = html_DecodeActiveContent(Source)
+            html_DecodeContent2 = Source
+            If (html_DecodeContent2 <> "") Then
+                html_DecodeContent2 = html_DecodeActiveContent(Source)
             End If
             '
             Exit Function
@@ -4228,12 +4192,12 @@ ErrorTrap:
             Else
                 TaskName = CStr(Now()) & " snapshot of " & LCase(ExportName)
             End If
-            CS = db.db_csInsertRecord("Tasks", RequestedByMemberID)
+            CS = db.cs_insertRecord("Tasks", RequestedByMemberID)
             If db.cs_Ok(CS) Then
                 Call db.db_GetCSFilename(CS, "Filename", Filename)
-                Call db.db_setCS(CS, "Name", TaskName)
-                Call db.db_setCS(CS, "Command", Command)
-                Call db.db_setCS(CS, "SQLQuery", SQL)
+                Call db.cs_set(CS, "Name", TaskName)
+                Call db.cs_set(CS, "Command", Command)
+                Call db.cs_set(CS, "SQLQuery", SQL)
             End If
             Call db.cs_Close(CS)
             '
@@ -4286,7 +4250,7 @@ ErrorTrap:
                     & "AND ((ccContentWatch.Active)<>0)" _
                     & "AND (ccContentWatch.Link is not null)" _
                     & "AND (ccContentWatch.LinkLabel is not null)" _
-                    & "AND ((ccContentWatch.WhatsNewDateExpires is null)or(ccContentWatch.WhatsNewDateExpires>" & db.db_EncodeSQLDate(Now) & "))" _
+                    & "AND ((ccContentWatch.WhatsNewDateExpires is null)or(ccContentWatch.WhatsNewDateExpires>" & db.encodeSQLDate(Now) & "))" _
                     & ")" _
                 & " ORDER BY " & SortFieldList & ";"
             db_csOpenWatchList = db.db_openCsSql_rev("Default", SQL)
@@ -4297,9 +4261,9 @@ ErrorTrap:
                 CS = db.csOpen("Content Watch Lists", "name=" & db.encodeSQLText(ListName), "ID", , , , , "ID")
                 If Not db.cs_Ok(CS) Then
                     Call db.cs_Close(CS)
-                    CS = db.db_csInsertRecord("Content Watch Lists", 0)
+                    CS = db.cs_insertRecord("Content Watch Lists", 0)
                     If db.cs_Ok(CS) Then
-                        Call db.db_setCS(CS, "name", ListName)
+                        Call db.cs_set(CS, "name", ListName)
                     End If
                 End If
                 Call db.cs_Close(CS)
@@ -4461,12 +4425,12 @@ ErrorTrap:
                     '
                     ' Add the Menu
                     '
-                    CS = db.db_csInsertRecord("Dynamic Menus", SystemMemberID)
+                    CS = db.cs_insertRecord("Dynamic Menus", SystemMemberID)
                     If db.cs_Ok(CS) Then
                         csv_VerifyDynamicMenu = db.cs_getInteger(CS, "ID")
-                        Call db.db_setCS(CS, "name", iMenuName)
+                        Call db.cs_set(CS, "name", iMenuName)
                         If True Then
-                            Call db.db_setCS(CS, "ccGuid", DefaultDynamicMenuGuid)
+                            Call db.cs_set(CS, "ccGuid", DefaultDynamicMenuGuid)
                         End If
                     End If
                     Call db.cs_Close(CS)
@@ -4477,10 +4441,10 @@ ErrorTrap:
                         '
                         CS = db.csOpen("Site Sections")
                         Do While db.cs_Ok(CS)
-                            CSRule = db.db_csInsertRecord("Dynamic Menu Section Rules", SystemMemberID)
+                            CSRule = db.cs_insertRecord("Dynamic Menu Section Rules", SystemMemberID)
                             If db.cs_Ok(CSRule) Then
-                                Call db.db_setCS(CSRule, "DynamicMenuID", csv_VerifyDynamicMenu)
-                                Call db.db_setCS(CSRule, "SectionID", db.cs_getInteger(CS, "ID"))
+                                Call db.cs_set(CSRule, "DynamicMenuID", csv_VerifyDynamicMenu)
+                                Call db.cs_set(CSRule, "SectionID", db.cs_getInteger(CS, "ID"))
                             End If
                             Call db.cs_Close(CSRule)
                             db.db_csGoNext(CS)
@@ -4803,7 +4767,7 @@ ErrorTrap:
         Public Function pageManager_GetStyleSheetDefault2() As String
             On Error GoTo ErrorTrap 'Const Tn = "csv_getStyleSheetDefault" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
-            If (True) And EncodeBoolean(siteProperties.getBoolean("Allow CSS Reset", False)) Then
+            If siteProperties.getBoolean("Allow CSS Reset") Then
                 pageManager_GetStyleSheetDefault2 = pageManager_GetStyleSheetDefault2 _
                     & vbCrLf & "/*" _
                     & vbCrLf & "Reset Styles" _
@@ -5160,14 +5124,14 @@ ErrorTrap:
             '
             Dim CS As Integer
             '
-            CS = db.db_csInsertRecord("Activity Log", ByMemberID)
+            CS = db.cs_insertRecord("Activity Log", ByMemberID)
             If db.cs_Ok(CS) Then
-                Call db.db_setCS(CS, "MemberID", SubjectMemberID)
-                Call db.db_setCS(CS, "OrganizationID", SubjectOrganizationID)
-                Call db.db_setCS(CS, "Message", Message)
-                Call db.db_setCS(CS, "Link", Link)
-                Call db.db_setCS(CS, "VisitorID", VisitorID)
-                Call db.db_setCS(CS, "VisitID", VisitID)
+                Call db.cs_set(CS, "MemberID", SubjectMemberID)
+                Call db.cs_set(CS, "OrganizationID", SubjectOrganizationID)
+                Call db.cs_set(CS, "Message", Message)
+                Call db.cs_set(CS, "Link", Link)
+                Call db.cs_set(CS, "VisitorID", VisitorID)
+                Call db.cs_set(CS, "VisitID", VisitID)
             End If
             Call db.cs_Close(CS)
             '
@@ -5721,7 +5685,7 @@ ErrorTrap:
             '
             ContentFilesLinkPrefix = "/" & appConfig.name & "/files/"
             ResourceLibraryLinkPrefix = ContentFilesLinkPrefix & "ccLibraryFiles/"
-            ImageAllowUpdate = EncodeBoolean(siteProperties.getBoolean("ImageAllowUpdate", True))
+            ImageAllowUpdate = siteProperties.getBoolean("ImageAllowUpdate", True)
             ImageAllowUpdate = ImageAllowUpdate And (InStr(1, Source, ResourceLibraryLinkPrefix, vbTextCompare) <> 0)
             If ImageAllowUpdate Then
                 '
@@ -6345,24 +6309,24 @@ ErrorTrap:
                 '
                 ' increment count for matching warning
                 '
-                SQL = "update ccsitewarnings set count=count+1,DateLastReported=" & db.db_EncodeSQLDate(Now()) & " where id=" & warningId
+                SQL = "update ccsitewarnings set count=count+1,DateLastReported=" & db.encodeSQLDate(Now()) & " where id=" & warningId
                 Call db.executeSql(SQL)
             Else
                 '
                 ' insert new record
                 '
-                CS = db.db_csInsertRecord("Site Warnings", 0)
+                CS = db.cs_insertRecord("Site Warnings", 0)
                 If db.cs_Ok(CS) Then
-                    Call db.db_setCS(CS, "name", Name)
-                    Call db.db_setCS(CS, "description", Description)
-                    Call db.db_setCS(CS, "generalKey", generalKey)
-                    Call db.db_setCS(CS, "specificKey", specificKey)
-                    Call db.db_setCS(CS, "count", 1)
-                    Call db.db_setCS(CS, "DateLastReported", Now())
+                    Call db.cs_set(CS, "name", Name)
+                    Call db.cs_set(CS, "description", Description)
+                    Call db.cs_set(CS, "generalKey", generalKey)
+                    Call db.cs_set(CS, "specificKey", specificKey)
+                    Call db.cs_set(CS, "count", 1)
+                    Call db.cs_set(CS, "DateLastReported", Now())
                     If True Then
-                        Call db.db_setCS(CS, "shortDescription", shortDescription)
-                        Call db.db_setCS(CS, "location", location)
-                        Call db.db_setCS(CS, "pageId", PageID)
+                        Call db.cs_set(CS, "shortDescription", shortDescription)
+                        Call db.cs_set(CS, "location", location)
+                        Call db.cs_set(CS, "pageId", PageID)
                     End If
                 End If
                 Call db.cs_Close(CS)
@@ -6446,7 +6410,7 @@ ErrorTrap:
             'dim buildversion As String
             '
             If (True) Then
-                AllowLinkAlias = EncodeBoolean(siteProperties.getBoolean("allowLinkAlias", False))
+                AllowLinkAlias = siteProperties.getBoolean("allowLinkAlias", False)
                 WorkingLinkAlias = linkAlias
                 If (WorkingLinkAlias <> "") Then
                     '
@@ -6529,13 +6493,13 @@ ErrorTrap:
                                 ' Alias not found, create a Link Aliases
                                 '
                                 Call db.cs_Close(CS)
-                                CS = db.db_csInsertRecord("Link Aliases", 0)
+                                CS = db.cs_insertRecord("Link Aliases", 0)
                                 If db.cs_Ok(CS) Then
-                                    Call db.db_setCS(CS, "Name", WorkingLinkAlias)
+                                    Call db.cs_set(CS, "Name", WorkingLinkAlias)
                                     'Call app.csv_SetCS(CS, "Link", Link)
-                                    Call db.db_setCS(CS, "Pageid", PageID)
+                                    Call db.cs_set(CS, "Pageid", PageID)
                                     If True Then
-                                        Call db.db_setCS(CS, "QueryStringSuffix", QueryStringSuffix)
+                                        Call db.cs_set(CS, "QueryStringSuffix", QueryStringSuffix)
                                     End If
                                 End If
                             Else
@@ -6560,12 +6524,12 @@ ErrorTrap:
                                     If resaveLinkAlias Then
                                         Call db.executeSql("delete from ccLinkAliases where id=" & CurrentLinkAliasID)
                                         Call db.cs_Close(CS)
-                                        CS = db.db_csInsertRecord("Link Aliases", 0)
+                                        CS = db.cs_insertRecord("Link Aliases", 0)
                                         If db.cs_Ok(CS) Then
-                                            Call db.db_setCS(CS, "Name", WorkingLinkAlias)
-                                            Call db.db_setCS(CS, "Pageid", PageID)
+                                            Call db.cs_set(CS, "Name", WorkingLinkAlias)
+                                            Call db.cs_set(CS, "Pageid", PageID)
                                             If True Then
-                                                Call db.db_setCS(CS, "QueryStringSuffix", QueryStringSuffix)
+                                                Call db.cs_set(CS, "QueryStringSuffix", QueryStringSuffix)
                                             End If
                                         End If
                                     End If
@@ -6578,9 +6542,9 @@ ErrorTrap:
                                         ' change the Link Alias to the new link
                                         '
                                         'Call app.csv_SetCS(CS, "Link", Link)
-                                        Call db.db_setCS(CS, "Pageid", PageID)
+                                        Call db.cs_set(CS, "Pageid", PageID)
                                         If True Then
-                                            Call db.db_setCS(CS, "QueryStringSuffix", QueryStringSuffix)
+                                            Call db.cs_set(CS, "QueryStringSuffix", QueryStringSuffix)
                                         End If
                                     ElseIf AllowLinkAlias Then
                                         '
@@ -6698,7 +6662,7 @@ ErrorTrap:
                 ' ----- Do EncodeCRLF Conversion
                 '
                 'hint = hint & ",010"
-                If EncodeBoolean(siteProperties.getBoolean("ConvertContentCRLF2BR", False)) And (Not PlainText) Then
+                If siteProperties.getBoolean("ConvertContentCRLF2BR", False) And (Not PlainText) Then
                     returnValue = Replace(returnValue, vbCr, "")
                     returnValue = Replace(returnValue, vbLf, "<br>")
                 End If
@@ -7032,7 +6996,7 @@ ErrorTrap:
         ''' <param name="template"></param>
         ''' <param name="EmailAllowLinkEID"></param>
         ''' <returns> returns ok if send is successful, otherwise returns the principle issue as a user error</returns>
-        Public Function sendMemberEmail3(ByVal ToMemberID As Integer, ByVal FromAddress As String, ByVal subject As String, ByVal Body As String, ByVal Immediate As Boolean, ByVal HTML As Boolean, ByVal emailIdOrZeroForLog As Integer, ByVal template As String, ByVal EmailAllowLinkEID As Boolean) As String
+        Public Function email_sendMemberEmail3(ByVal ToMemberID As Integer, ByVal FromAddress As String, ByVal subject As String, ByVal Body As String, ByVal Immediate As Boolean, ByVal HTML As Boolean, ByVal emailIdOrZeroForLog As Integer, ByVal template As String, ByVal EmailAllowLinkEID As Boolean) As String
             Dim returnStatus As String = ""
             Try
                 Dim CS As Integer
@@ -7210,10 +7174,10 @@ ErrorTrap:
                 ' ----- Email was not found
                 '
                 Call db.cs_Close(CSEmail)
-                CSEmail = db.db_csInsertRecord("System Email")
-                Call db.db_setCS(CSEmail, "name", EMailName)
-                Call db.db_setCS(CSEmail, "Subject", EMailName)
-                Call db.db_setCS(CSEmail, "FromAddress", siteProperties.getText("EmailAdmin", "webmaster@" & appConfig.domainList(0)))
+                CSEmail = db.cs_insertRecord("System Email")
+                Call db.cs_set(CSEmail, "name", EMailName)
+                Call db.cs_set(CSEmail, "Subject", EMailName)
+                Call db.cs_set(CSEmail, "FromAddress", siteProperties.getText("EmailAdmin", "webmaster@" & appConfig.domainList(0)))
                 'Call app.csv_SetCS(CSEmail, "caption", EmailName)
                 Call db.cs_Close(CSEmail)
                 Call Err.Raise(KmaErrorInternal, "dll", "No system email was found with the name [" & EMailName & "]. A new email blank was created but not sent.")
@@ -7273,7 +7237,7 @@ ErrorTrap:
                         If EmailToAddress = "" Then
                             EmailStatusMessage = EmailStatusMessage & "&nbsp;&nbsp;Error: Not Sent to " & EmailToName & " (people #" & EMailToMemberID & ") because their email address was blank." & BR
                         Else
-                            EmailStatus = sendMemberEmail3(iAdditionalMemberID, EmailFrom, EmailSubjectSource, EmailBodySource, False, True, EmailRecordID, EmailTemplateSource, EmailAllowLinkEID)
+                            EmailStatus = email_sendMemberEmail3(iAdditionalMemberID, EmailFrom, EmailSubjectSource, EmailBodySource, False, True, EmailRecordID, EmailTemplateSource, EmailAllowLinkEID)
                             If EmailStatus = "" Then
                                 EmailStatus = "ok"
                             End If
@@ -7295,7 +7259,7 @@ ErrorTrap:
                     If EmailToAddress = "" Then
                         EmailStatusMessage = EmailStatusMessage & "&nbsp;&nbsp;Not Sent to " & EmailToName & ", people #" & EMailToMemberID & " because their email address was blank." & BR
                     Else
-                        EmailStatus = sendMemberEmail3(EMailToMemberID, EmailFrom, EmailSubjectSource, EmailBodySource, False, True, EmailRecordID, EmailTemplateSource, EmailAllowLinkEID)
+                        EmailStatus = email_sendMemberEmail3(EMailToMemberID, EmailFrom, EmailSubjectSource, EmailBodySource, False, True, EmailRecordID, EmailTemplateSource, EmailAllowLinkEID)
                         If EmailStatus = "" Then
                             EmailStatus = "ok"
                         End If
@@ -7355,7 +7319,7 @@ ErrorTrap:
                         ConfirmBody = ConfirmBody & "--- end of list ---" & BR
                         ConfirmBody = ConfirmBody & "</div>"
                         '
-                        EmailStatus = sendMemberEmail3(EmailToConfirmationMemberID, EmailFrom, "System Email confirmation from " & appConfig.domainList(0), ConfirmBody, False, True, EmailRecordID, "", False)
+                        EmailStatus = email_sendMemberEmail3(EmailToConfirmationMemberID, EmailFrom, "System Email confirmation from " & appConfig.domainList(0), ConfirmBody, False, True, EmailRecordID, "", False)
                         If isAdmin And (EmailStatus <> "") Then
                             returnString = "Administrator: There was a problem sending the confirmation email, " & EmailStatus
                         End If
@@ -7530,7 +7494,7 @@ ErrorTrap:
                     End If
                 End If
                 If AllowChange Then
-                    CSMember = db.csOpen("people", "id=" & db.db_EncodeSQLNumber(user.id))
+                    CSMember = db.csOpen("people", "id=" & db.encodeSQLNumber(user.id))
                     If Not db.cs_Ok(CSMember) Then
                         Call error_AddUserError("There was a problem locating your account record. No changes were saved.")
                         ' if user error, it goes back to the hardcodedpage
@@ -7615,7 +7579,7 @@ ErrorTrap:
                             Call main_ProcessFormMyProfile_UpdateFieldBoolean(CSMember, "AllowBulkEmail")
                             Call main_ProcessFormMyProfile_UpdateField(CSMember, "LanguageID")
 
-                            If EncodeBoolean(siteProperties.getBoolean("AllowAutoLogin", False)) Then
+                            If siteProperties.getBoolean("AllowAutoLogin", False) Then
                                 Call main_ProcessFormMyProfile_UpdateFieldBoolean(CSMember, "AutoLogin")
                             End If
                             If user.isAuthenticatedContentManager() Then
@@ -7668,7 +7632,7 @@ ErrorTrap:
             FieldValue = docProperties.getText(FieldName)
             If db.cs_getText(CSMember, FieldName) <> FieldValue Then
                 Call main_LogActivity2("profile changed " & FieldName, user.id, user.organizationId)
-                Call db.db_setCS(CSMember, FieldName, FieldValue)
+                Call db.cs_set(CSMember, FieldName, FieldValue)
             End If
             Exit Sub
             '
@@ -7690,7 +7654,7 @@ ErrorTrap:
             FieldValue = main_GetStreamBoolean2(FieldName)
             If db.cs_getBoolean(CSMember, FieldName) <> FieldValue Then
                 Call main_LogActivity2("profile changed " & FieldName, user.id, user.organizationId)
-                Call db.db_setCS(CSMember, FieldName, FieldValue)
+                Call db.cs_set(CSMember, FieldName, FieldValue)
             End If
             Exit Sub
             '
@@ -8149,7 +8113,7 @@ ErrorTrap:
                 iMessage = Replace(iMessage, vbCrLf, " ")
                 iMessage = Replace(iMessage, vbCr, " ")
                 iMessage = Replace(iMessage, vbLf, " ")
-                iMessage = FormatDateTime(Now, vbShortTime) & vbTab & Format((ElapsedTime), "00.000") & vbTab & main_VisitId & vbTab & iMessage
+                iMessage = FormatDateTime(Now, vbShortTime) & vbTab & Format((ElapsedTime), "00.000") & vbTab & visit_Id & vbTab & iMessage
                 '
                 Call log_appendLog(iMessage, "", "testPoints_" & appConfig.name)
             End If
@@ -8238,7 +8202,7 @@ ErrorTrap:
                                 ' ----- Content Watch with a bad ContentID, mark inactive
                                 '
                                 BlockRedirect = True
-                                Call db.db_setCS(CSPointer, "active", 0)
+                                Call db.cs_set(CSPointer, "active", 0)
                             Else
                                 HostRecordID = (db.cs_getInteger(CSPointer, "RecordID"))
                                 If HostRecordID = 0 Then
@@ -8246,7 +8210,7 @@ ErrorTrap:
                                     ' ----- Content Watch with a bad iRecordID, mark inactive
                                     '
                                     BlockRedirect = True
-                                    Call db.db_setCS(CSPointer, "active", 0)
+                                    Call db.cs_set(CSPointer, "active", 0)
                                 Else
                                     CSHost = db.csOpen(HostContentName, "ID=" & HostRecordID)
                                     If Not db.cs_Ok(CSHost) Then
@@ -8254,7 +8218,7 @@ ErrorTrap:
                                         ' ----- Content Watch host record not found, mark inactive
                                         '
                                         BlockRedirect = True
-                                        Call db.db_setCS(CSPointer, "active", 0)
+                                        Call db.cs_set(CSPointer, "active", 0)
                                     End If
                                 End If
                                 Call db.cs_Close(CSHost)
@@ -8273,7 +8237,7 @@ ErrorTrap:
                     '
                     NonEncodedLink = ConvertShortLinkToLink(NonEncodedLink, LinkPrefix)
                     If db.db_IsCSFieldSupported(CSPointer, "Clicks") Then
-                        Call db.db_setCS(CSPointer, "Clicks", (db.db_GetCSNumber(CSPointer, "Clicks")) + 1)
+                        Call db.cs_set(CSPointer, "Clicks", (db.db_GetCSNumber(CSPointer, "Clicks")) + 1)
                     End If
                     Call web_Redirect2(LinkPrefix & NonEncodedLink, "Call to " & MethodName & ", no reason given.", False)
                     main_RedirectByRecord_ReturnStatus = True
@@ -8868,7 +8832,7 @@ ErrorTrap:
                             & " from ccMemberRules R" _
                             & " inner join ccMembers P on R.MemberID=P.ID" _
                             & " where (R.GroupID=" & GroupID & ")" _
-                            & " and((R.DateExpires is null)or(R.DateExpires>" & db.db_EncodeSQLDate(Now) & "))" _
+                            & " and((R.DateExpires is null)or(R.DateExpires>" & db.encodeSQLDate(Now) & "))" _
                             & " and(P.active<>0)" _
                             & " order by P." & SortFieldList
                         '                SQL = "select " & SelectFields _
@@ -9056,7 +9020,7 @@ ErrorTrap:
             Dim Link As String
             Dim IconFilename As String
             '
-            If EncodeBoolean(siteProperties.getBoolean("AllowLoginIcon", True)) Then
+            If siteProperties.getBoolean("AllowLoginIcon", True) Then
                 main_GetLoginLink = main_GetLoginLink & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"">"
                 main_GetLoginLink = main_GetLoginLink & "<tr><td align=""right"">"
                 If user.isAuthenticatedContentManager() Then
@@ -9206,7 +9170,7 @@ ErrorTrap:
                     ' ----- Popup USER errors
                     '
                     If (Not BlockNonContentExtras) And error_IsUserError() Then
-                        AllowPopupErrors = EncodeBoolean(siteProperties.getBoolean("AllowPopupErrors", True))
+                        AllowPopupErrors = siteProperties.getBoolean("AllowPopupErrors", True)
                         If AllowPopupErrors Then
                             's = s & main_GetPopupMessage("<div style=""margin:20px;"">" & main_GetUserError() & "</div>", 300, 200, False)
                         End If
@@ -9223,7 +9187,7 @@ ErrorTrap:
                     ' ----- popup error if this is a developer
                     '
                     If (Not BlockNonContentExtras) And user.isAuthenticatedDeveloper() Then
-                        AllowPopupTraps = EncodeBoolean(siteProperties.getBoolean("AllowPopupTraps", True))
+                        AllowPopupTraps = siteProperties.getBoolean("AllowPopupTraps", True)
                         If AllowPopupTraps Then
                             If main_PageErrorWithoutCsv Then
                                 main_TrapLogMessage = "" _
@@ -9878,7 +9842,7 @@ ErrorTrap:
             MethodName = "main_GetToolsPanel"
             '
             If user.allowToolsPanel Then
-                ShowLegacyToolsPanel = (False) Or (EncodeBoolean(siteProperties.getBoolean("AllowLegacyToolsPanel", True)))
+                ShowLegacyToolsPanel = siteProperties.getBoolean("AllowLegacyToolsPanel", True)
                 '
                 ' --- Link Panel - used for both Legacy Tools Panel, and without it
                 '
@@ -9890,8 +9854,8 @@ ErrorTrap:
                 LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html_EncodeHTML(siteProperties.adminURL) & """>Admin Home</A> | ")
                 LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html_EncodeHTML("http://" & main_ServerDomain) & """>Public Home</A> | ")
                 LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & html_EncodeHTML(siteProperties.adminURL & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
-                If EncodeBoolean(siteProperties.getBoolean("AllowMobileTemplates", False)) Then
-                    If main_VisitBrowserIsMobile Then
+                If siteProperties.getBoolean("AllowMobileTemplates", False) Then
+                    If visit_browserIsMobile Then
                         QS = web_RefreshQueryString
                         QS = ModifyQueryString(QS, "method", "forcenonmobile")
                         LinkPanel.Add("<a class=""ccAdminLink"" href=""?" & QS & """>Non-Mobile Version</A> | ")
@@ -10053,7 +10017,7 @@ ErrorTrap:
                     ' Username
                     '
                     Dim Caption As String
-                    If EncodeBoolean(siteProperties.getBoolean("allowEmailLogin", False)) Then
+                    If siteProperties.getBoolean("allowEmailLogin", False) Then
                         Caption = "Username&nbsp;or&nbsp;Email"
                     Else
                         Caption = "Username"
@@ -10066,7 +10030,7 @@ ErrorTrap:
                     '
                     ' Username
                     '
-                    If EncodeBoolean(siteProperties.getBoolean("allownopasswordLogin", False)) Then
+                    If siteProperties.getBoolean("allownopasswordLogin", False) Then
                         Caption = "Password&nbsp;(optional)"
                     Else
                         Caption = "Password"
@@ -10079,8 +10043,8 @@ ErrorTrap:
                     '
                     ' Autologin checkbox
                     '
-                    If EncodeBoolean(siteProperties.getBoolean("AllowAutoLogin", False)) Then
-                        If main_VisitCookieSupport Then
+                    If siteProperties.getBoolean("AllowAutoLogin", False) Then
+                        If visit_cookieSupport Then
                             TagID = "autologin"
                             LoginPanel = LoginPanel & "" _
                                 & cr & "<div class=""ccAdminSmall"">" _
@@ -10518,7 +10482,7 @@ ErrorTrap:
                     NoteCopy = NoteCopy & Copy & BR
                     Call db.cs_Close(CS)
                     '
-                    Call sendMemberEmail3(iToMemberID, NoteFromEmail, "Feedback Form Submitted", NoteCopy, False, True, 0, "", False)
+                    Call email_sendMemberEmail3(iToMemberID, NoteFromEmail, "Feedback Form Submitted", NoteCopy, False, True, 0, "", False)
                     '
                     ' ----- Note sent, say thanks
                     '
@@ -10654,7 +10618,7 @@ ErrorTrap:
                     & "AND ((ccContentWatch.Active)<>0)" _
                     & "AND (ccContentWatch.Link is not null)" _
                     & "AND (ccContentWatch.LinkLabel is not null)" _
-                    & "AND ((ccContentWatch.WhatsNewDateExpires is null)or(ccContentWatch.WhatsNewDateExpires>" & db.db_EncodeSQLDate(main_PageStartTime) & "))" _
+                    & "AND ((ccContentWatch.WhatsNewDateExpires is null)or(ccContentWatch.WhatsNewDateExpires>" & db.encodeSQLDate(main_PageStartTime) & "))" _
                     & ")" _
                 & " ORDER BY " & iSortFieldList & ";"
             main_OpenCSContentWatchList = db.cs_openSql(SQL, , PageSize, PageNumber)
@@ -10665,9 +10629,9 @@ ErrorTrap:
                 CS = db.csOpen("Content Watch Lists", "name=" & db.encodeSQLText(ListName), "ID", , , , , "ID")
                 If Not db.cs_Ok(CS) Then
                     Call db.cs_Close(CS)
-                    CS = db.db_csInsertRecord("Content Watch Lists")
+                    CS = db.cs_insertRecord("Content Watch Lists")
                     If db.cs_Ok(CS) Then
-                        Call db.db_setCS(CS, "name", ListName)
+                        Call db.cs_set(CS, "name", ListName)
                     End If
                 End If
                 Call db.cs_Close(CS)
@@ -11113,7 +11077,7 @@ ErrorTrap:
         '                    ' 6/18/2009 - removed notes from base
         '                    '            Stream.Add( main_GetMyProfileForm_RowCS(CSMember, "People", "sendnotes", "If checked, notes sent to you as a site member will be emailed. Otherwise, they are available only when you have logged on.", RowCount) & vbcrlf )
         '                    Stream.Add(main_GetMyProfileForm_RowCS(CSMember, "People", "LanguageID", "", RowCount) & vbCrLf)
-        '                    If EncodeBoolean(siteProperties.getBoolean("AllowAutoLogin", False)) Then
+        '                    If siteProperties.getBoolean("AllowAutoLogin", False) Then
         '                        Stream.Add(main_GetMyProfileForm_RowCS(CSMember, "People", "autologin", "This site allows automatic login. If this box is check, you will enable this function for your member account.", RowCount) & vbCrLf)
         '                    End If
         '                    If user.main_IsContentManager() Then
@@ -11447,12 +11411,12 @@ ErrorTrap:
             If dt.Rows.Count > 0 Then
                 group_Add = EncodeInteger(dt.Rows(0).Item(0))
             Else
-                CS = db.db_csInsertRecord("Groups", SystemMemberID)
+                CS = db.cs_insertRecord("Groups", SystemMemberID)
                 If db.cs_Ok(CS) Then
                     group_Add = EncodeInteger(db.db_GetCSField(CS, "ID"))
-                    Call db.db_setCS(CS, "name", iGroupName)
-                    Call db.db_setCS(CS, "caption", iGroupCaption)
-                    Call db.db_setCS(CS, "active", True)
+                    Call db.cs_set(CS, "name", iGroupName)
+                    Call db.cs_set(CS, "caption", iGroupCaption)
+                    Call db.cs_set(CS, "active", True)
                 End If
                 Call db.cs_Close(CS)
             End If
@@ -11474,7 +11438,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Sub
             '
-            Call db.db_DeleteContentRecords("Groups", "name=" & db.encodeSQLText(GroupName))
+            Call db.deleteContentRecords("Groups", "name=" & db.encodeSQLText(GroupName))
             '
             Exit Sub
             '
@@ -11512,21 +11476,21 @@ ErrorTrap:
                 If (GroupID < 1) Then
                     Call handleLegacyError14(MethodName, "main_AddGroupMember could not find or add Group [" & GroupName & "]")
                 Else
-                    CS = db.csOpen("Member Rules", "(MemberID=" & db.db_EncodeSQLNumber(NewMemberID) & ")and(GroupID=" & db.db_EncodeSQLNumber(GroupID) & ")", , False)
+                    CS = db.csOpen("Member Rules", "(MemberID=" & db.encodeSQLNumber(NewMemberID) & ")and(GroupID=" & db.encodeSQLNumber(GroupID) & ")", , False)
                     If Not db.cs_Ok(CS) Then
                         Call db.cs_Close(CS)
-                        CS = db.db_csInsertRecord("Member Rules")
+                        CS = db.cs_insertRecord("Member Rules")
                     End If
                     If Not db.cs_Ok(CS) Then
                         Call handleLegacyError14(MethodName, "main_AddGroupMember could not add this member to the Group [" & GroupName & "]")
                     Else
-                        Call db.db_setCS(CS, "active", True)
-                        Call db.db_setCS(CS, "memberid", NewMemberID)
-                        Call db.db_setCS(CS, "groupid", GroupID)
+                        Call db.cs_set(CS, "active", True)
+                        Call db.cs_set(CS, "memberid", NewMemberID)
+                        Call db.cs_set(CS, "groupid", GroupID)
                         If iDateExpires <> Date.MinValue Then
-                            Call db.db_setCS(CS, "DateExpires", iDateExpires)
+                            Call db.cs_set(CS, "DateExpires", iDateExpires)
                         Else
-                            Call db.db_setCS(CS, "DateExpires", Nothing)
+                            Call db.cs_set(CS, "DateExpires", Nothing)
                         End If
                     End If
                     Call db.cs_Close(CS)
@@ -11565,7 +11529,7 @@ ErrorTrap:
                 ElseIf (NewMemberID < 1) Then
                     Call handleLegacyError14(MethodName, "Member ID is invalid")
                 Else
-                    Call db.db_DeleteContentRecords("Member Rules", "(MemberID=" & db.db_EncodeSQLNumber(NewMemberID) & ")AND(groupid=" & db.db_EncodeSQLNumber(GroupID) & ")")
+                    Call db.deleteContentRecords("Member Rules", "(MemberID=" & db.encodeSQLNumber(NewMemberID) & ")AND(groupid=" & db.encodeSQLNumber(GroupID) & ")")
                 End If
             End If
             '
@@ -11653,11 +11617,11 @@ ErrorTrap:
                 CS = db.csOpen(ContentName, "name=" & db_EncodeSQLText(iCopyName))
                 If Not db.cs_Ok(CS) Then
                     Call db.cs_Close(CS)
-                    CS = db.db_csInsertRecord(ContentName)
+                    CS = db.cs_insertRecord(ContentName)
                 End If
                 If db.cs_Ok(CS) Then
-                    Call db.db_setCS(CS, "name", iCopyName)
-                    Call db.db_setCS(CS, "Copy", iContent)
+                    Call db.cs_set(CS, "name", iCopyName)
+                    Call db.cs_set(CS, "Copy", iContent)
                 End If
                 Call db.cs_Close(CS)
             End If
@@ -13167,7 +13131,7 @@ ErrorTrap:
         '   If main_VisitId = 0, create new visit entry and set main_VisitId
         '=============================================================================
         '
-        Public Sub main_SaveVisit()
+        Public Sub visit_save()
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SaveVisit")
             '
             'If Not (true) Then Exit Sub
@@ -13186,63 +13150,45 @@ ErrorTrap:
                 '
                 ' ----- set the default Visit Name if nothing else
                 '
-                If main_VisitName = "" Then
-                    main_VisitName = "Visit" & main_VisitId
+                If visit_name = "" Then
+                    visit_name = "Visit" & visit_Id
                 End If
                 '
                 ' ----- save existing visit
                 '
-                If main_VisitPages <= 1 Then
+                SQL = "UPDATE ccVisits SET " _
+                    & " LastVisitTime=" & db.encodeSQLDate(main_PageStartTime) _
+                    & ",PageVisits=" & (visit_pages) _
+                    & ",CookieSupport=" & db.encodeSQLBoolean(visit_cookieSupport) _
+                    & ",LoginAttempts=" & visit_loginAttempts _
+                    & ",VisitAuthenticated=" & db.encodeSQLBoolean(visit_isAuthenticated) _
+                    & ",MemberID=" & user.id _
+                    & ",MemberNew=" & db.encodeSQLBoolean(user.isNew) _
+                    & ",TimeToLastHit=" & db.encodeSQLNumber(main_VisitTimeToLastHit) _
+                    & ",ExcludeFromAnalytics=" & db.encodeSQLBoolean(visit_excludeFromAnalytics) _
+                    & ",Mobile=" & db.encodeSQLBoolean(visit_browserIsMobile) _
+                    & ",Bot=" & db.encodeSQLBoolean(visit_isBot Or visit_isBadBot) _
+                    & ""
+                If visit_pages <= 1 Then
                     '
                     ' First page of the visit, save everything
                     '
-                    SQL = "UPDATE ccVisits SET " _
-                        & " LastVisitTime=" & db.db_EncodeSQLDate(main_PageStartTime) _
-                        & ",PageVisits=" & main_VisitPages _
-                        & ",VisitorID=" & main_VisitorID _
-                        & ",Name=" & db.encodeSQLText(main_VisitName) _
-                        & ",VisitorNew=" & db.db_EncodeSQLBoolean(main_VisitorNew) _
-                        & ",MemberID=" & main_VisitMemberID _
-                        & ",CookieSupport=" & db.db_EncodeSQLBoolean(main_VisitCookieSupport) _
-                        & ",LoginAttempts=" & main_VisitLoginAttempts _
-                        & ",VisitAuthenticated=" & db.db_EncodeSQLBoolean(visit_isAuthenticated) _
-                        & ",MemberNew=" & db.db_EncodeSQLBoolean(user.isNew) _
-                        & ",StartTime=" & db.db_EncodeSQLDate(main_VisitStartTime) _
-                        & ",StartDateValue=" & main_VisitStartDateValue _
-                        & ",DateAdded=" & db.db_EncodeSQLDate(main_VisitStartTime) _
+                    SQL = "" _
+                        & ",VisitorID=" & visitor_id _
+                        & ",Name=" & db.encodeSQLText(visit_name) _
+                        & ",VisitorNew=" & db.encodeSQLBoolean(visitor_new) _
+                        & ",StartTime=" & db.encodeSQLDate(visit_startTime) _
+                        & ",StartDateValue=" & visit_startDateValue _
+                        & ",DateAdded=" & db.encodeSQLDate(visit_startTime) _
                         & ",Remote_Addr=" & db.encodeSQLText(webServer.requestRemoteIP) _
                         & ",Browser=" & db.encodeSQLText(Left(webServer.requestBrowser, 255)) _
                         & ",HTTP_Via=" & db.encodeSQLText(Left(webServer.requestHTTPVia, 255)) _
                         & ",HTTP_From=" & db.encodeSQLText(Left(webServer.requestHTTPFrom, 255)) _
-                        & ",HTTP_REFERER=" & db.encodeSQLText(Left(main_VisitRefererHost, 255)) _
-                        & ",RefererPathPage=" & db.encodeSQLText(Left(main_VisitRefererPathPage, 255))
-                Else
-                    '
-                    ' non-First page of the visit, save only what can change
-                    '
-                    SQL = "UPDATE ccVisits SET " _
-                        & " LastVisitTime=" & db.db_EncodeSQLDate(main_PageStartTime) _
-                        & ",PageVisits=" & (main_VisitPages) _
-                        & ",MemberID=" & main_VisitMemberID _
-                        & ",CookieSupport=" & db.db_EncodeSQLBoolean(main_VisitCookieSupport) _
-                        & ",LoginAttempts=" & main_VisitLoginAttempts _
-                        & ",VisitAuthenticated=" & db.db_EncodeSQLBoolean(visit_isAuthenticated) _
-                        & ",MemberNew=" & db.db_EncodeSQLBoolean(user.isNew)
+                        & ",HTTP_REFERER=" & db.encodeSQLText(Left(visit_refererHost, 255)) _
+                        & ",RefererPathPage=" & db.encodeSQLText(Left(visit_refererPathPage, 255)) _
+                        & ""
                 End If
-                If True Then
-                    SQL &= ",TimeToLastHit=" & db.db_EncodeSQLNumber(main_VisitTimeToLastHit)
-                    If True Then
-                        SQL &= ",ExcludeFromAnalytics=" & db.db_EncodeSQLBoolean(main_VisitExcludeFromAnalytics)
-                        If True Then
-                            '
-                            ' can be changed with forcemobile flag
-                            '
-                            SQL &= ",Mobile=" & db.db_EncodeSQLBoolean(main_VisitBrowserIsMobile)
-                            SQL &= ",Bot=" & db.db_EncodeSQLBoolean(main_VisitIsBot Or main_VisitIsBadBot)
-                        End If
-                    End If
-                End If
-                SQL &= " WHERE (ID=" & main_VisitId & ");"
+                SQL &= " WHERE (ID=" & visit_Id & ");"
                 Call db.executeSql(SQL)
             End If
             Exit Sub
@@ -13274,17 +13220,17 @@ ErrorTrap:
             If visit_initialized Then
                 If True Then
                     SQL = "UPDATE ccVisitors SET " _
-                        & " Name = " & db.encodeSQLText(main_VisitorName) _
-                        & ",MemberID = " & db.db_EncodeSQLNumber(main_VisitorMemberID) _
-                        & ",OrderID = " & db.db_EncodeSQLNumber(main_VisitorOrderID) _
-                        & ",ForceBrowserMobile = " & db.db_EncodeSQLNumber(main_VisitorForceBrowserMobile) _
-                        & " WHERE ID=" & main_VisitorID & ";"
+                        & " Name = " & db.encodeSQLText(visitor_Name) _
+                        & ",MemberID = " & db.encodeSQLNumber(visitor_memberID) _
+                        & ",OrderID = " & db.encodeSQLNumber(visitor_orderID) _
+                        & ",ForceBrowserMobile = " & db.encodeSQLNumber(visitor_forceBrowserMobile) _
+                        & " WHERE ID=" & visitor_id & ";"
                 Else
                     SQL = "UPDATE ccVisitors SET " _
-                        & " Name = " & db.encodeSQLText(main_VisitorName) _
-                        & ",MemberID = " & db.db_EncodeSQLNumber(main_VisitorMemberID) _
-                        & ",OrderID = " & db.db_EncodeSQLNumber(main_VisitorOrderID) _
-                        & " WHERE ID=" & main_VisitorID & ";"
+                        & " Name = " & db.encodeSQLText(visitor_Name) _
+                        & ",MemberID = " & db.encodeSQLNumber(visitor_memberID) _
+                        & ",OrderID = " & db.encodeSQLNumber(visitor_orderID) _
+                        & " WHERE ID=" & visitor_id & ";"
                 End If
                 Call db.executeSql(SQL)
             End If
@@ -13302,7 +13248,7 @@ ErrorTrap:
         '   main_AllowVisitTracking - if true a cookie will be written and the visit tracked
         '========================================================================
         '
-        Public Sub web_init_initVisit(ByVal main_AllowVisitTracking As Boolean)
+        Public Sub visit_init(ByVal allowVisitTracking As Boolean)
             Try
                 Dim NeedToWriteVisitCookie As Boolean
                 Dim TrackGuests As Boolean
@@ -13310,11 +13256,11 @@ ErrorTrap:
                 Dim DefaultMemberName As String
                 Dim AllowOnNewVisitEvent As Boolean
                 Dim CS As Integer
-                Dim CSNewVisit As Integer
-                Dim CSNewVisitor As Integer
-                Dim VisitorChanges As Boolean
-                Dim MemberChanges As Boolean
-                Dim main_VisitLastTimeFromCookie As Date
+                'Dim CSNewVisit As Integer
+                'Dim CSNewVisitor As Integer
+                Dim visitor_changes As Boolean
+                Dim user_changes As Boolean
+                Dim visit_lastTimeFromCookie As Date
                 Dim SQL As String
                 Dim SlashPosition As Integer
                 Dim MemberLinkinEID As String
@@ -13335,23 +13281,22 @@ ErrorTrap:
 
                 ' ----- Visit Defaults
                 '
-                CSNewVisit = -1
-                main_VisitId = 0
-                main_VisitPages = 0
-                main_VisitLoginAttempts = 0
-                main_VisitLastTimeFromCookie = Date.MinValue
-                main_VisitStateOK = True
+                visit_Id = 0
+                visit_pages = 0
+                visit_loginAttempts = 0
+                visit_lastTimeFromCookie = Date.MinValue
+                visit_stateOK = True
                 visit_isAuthenticated = False
-                main_VisitExcludeFromAnalytics = False
+                visit_excludeFromAnalytics = False
+                visit_cookieSupport = False
                 '
                 ' ----- Visitor Defaults
                 '
                 'hint = "010"
-                CSNewVisitor = -1
-                main_VisitorID = 0
-                main_VisitorNew = False
-                main_VisitCookieSupport = False
-                VisitorChanges = False
+                'CSNewVisitor = -1
+                visitor_id = 0
+                visitor_new = False
+                visitor_changes = False
                 '
                 ' ----- Member Defaults
                 '
@@ -13360,7 +13305,7 @@ ErrorTrap:
                 user.name = "Guest"
                 user.userAdded = False
                 user.isNew = False
-                MemberChanges = False
+                user_changes = False
                 user.styleFilename = ""
                 user.excludeFromAnalytics = False
                 '
@@ -13380,13 +13325,13 @@ ErrorTrap:
                 MemberLinkLoginID = 0
                 MemberLinkRecognizeID = 0
                 If (MemberLinkinEID <> "") Then
-                    If EncodeBoolean(siteProperties.getBoolean("AllowLinkLogin", True)) Then
+                    If siteProperties.getBoolean("AllowLinkLogin", True) Then
                         '
                         ' Link Login
                         '
                         Call security.decodeToken(MemberLinkinEID, MemberLinkLoginID, tokenDate)
                         'MemberLinkLoginID = main_DecodeKeyNumber(MemberLinkinEID)
-                    ElseIf EncodeBoolean(siteProperties.getBoolean("AllowLinkRecognize", True)) Then
+                    ElseIf siteProperties.getBoolean("AllowLinkRecognize", True) Then
                         '
                         ' Link Recognize
                         '
@@ -13400,15 +13345,15 @@ ErrorTrap:
                     End If
                 End If
                 'hint = "200"
-                If (main_AllowVisitTracking) Or (CookieVisit <> "") Or (MemberLinkLoginID <> 0) Or (MemberLinkRecognizeID <> 0) Then
+                If (allowVisitTracking) Or (CookieVisit <> "") Or (MemberLinkLoginID <> 0) Or (MemberLinkRecognizeID <> 0) Then
                     '
                     ' ----- try cookie main_VisitId
                     '
                     'hint = "210"
                     If (CookieVisit <> "") Then
-                        Call security.decodeToken(CookieVisit, main_VisitId, main_VisitLastTimeFromCookie)
+                        Call security.decodeToken(CookieVisit, visit_Id, visit_lastTimeFromCookie)
                         'main_VisitId = main_DecodeKeyNumber(CookieVisit)
-                        If main_VisitId = 0 Then
+                        If visit_Id = 0 Then
                             '
                             ' ----- Bad Cookie, clear it so a new one will be written
                             '
@@ -13424,7 +13369,7 @@ ErrorTrap:
                     ' ----- Visit is good, read Visit/Visitor
                     '
                     'hint = "220"
-                    If (main_VisitId <> 0) Then
+                    If (visit_Id <> 0) Then
                         SQL = "SELECT" _
                             & " ccVisits.ID AS VisitId" _
                             & ",ccVisits.Name AS VisitName" _
@@ -13447,18 +13392,9 @@ ErrorTrap:
                             & ",ccVisitors.Name AS VisitorName" _
                             & ",ccVisitors.MemberID AS VisitorMemberID" _
                             & ",ccVisitors.OrderID AS VisitorOrderID"
-                        If True Then
-                            SQL &= ",ccVisitors.ForceBrowserMobile AS VisitorForceBrowserMobile"
-                        Else
-                            SQL &= ",0 AS VisitorForceBrowserMobile"
-                        End If
-                        If True Then
-                            SQL &= ",ccVisits.bot AS VisitBot"
-                            SQL &= ",ccVisits.mobile AS VisitMobile"
-                        Else
-                            SQL &= ",0 AS VisitBot"
-                            SQL &= ",0 AS VisitMobile"
-                        End If
+                        SQL &= ",ccVisitors.ForceBrowserMobile AS VisitorForceBrowserMobile"
+                        SQL &= ",ccVisits.bot AS VisitBot"
+                        SQL &= ",ccVisits.mobile AS VisitMobile"
                         SQL &= "" _
                             & ",m.ID AS MemberID" _
                             & ",m.Name AS MemberName" _
@@ -13473,10 +13409,6 @@ ErrorTrap:
                             & ",m.password AS MemberPassword" _
                             & ",m.LanguageID AS MemberLanguageID" _
                             & ",ccLanguages.name AS MemberLanguage"
-                        ' ----- consider removing these
-                        ' 6/18/2009 notes was removed from base
-                        '                & ",m.SendNotes AS MemberSendNotes"
-
                         SQL &= "" _
                             & ",m.OrganizationID AS MemberOrganizationID" _
                             & ",m.Active AS MemberActive" _
@@ -13484,60 +13416,43 @@ ErrorTrap:
                             & ",m.LastVisit AS MemberLastVisit" _
                             & ",m.Company AS MemberCompany" _
                             & ",m.Email AS MemberEmail"
-                        If True Then
-                            SQL &= ",m.StyleFilename as MemberStyleFilename"
-                        Else
-                            SQL &= ",'' as MemberStyleFilename"
-                        End If
-                        If True Then
-                            SQL &= ",m.ExcludeFromAnalytics as MemberExcludeFromAnalytics"
-                            SQL &= ",ccvisits.ExcludeFromAnalytics as VisitExcludeFromAnalytics"
-                        Else
-                            SQL &= ",0 as MemberExcludeFromAnalytics"
-                            SQL &= ",0 as VisitExcludeFromAnalytics"
-                        End If
-
+                        SQL &= ",m.StyleFilename as MemberStyleFilename"
+                        SQL &= ",m.ExcludeFromAnalytics as MemberExcludeFromAnalytics"
+                        SQL &= ",ccvisits.ExcludeFromAnalytics as VisitExcludeFromAnalytics"
                         SQL &= "" _
                             & " FROM ((ccVisits" _
                                 & " LEFT JOIN ccVisitors ON ccVisits.VisitorID = ccVisitors.ID)" _
                                 & " LEFT JOIN ccMembers as m ON ccVisits.MemberID = m.ID)" _
                                 & " LEFT JOIN ccLanguages ON m.LanguageID = ccLanguages.ID" _
-                            & " WHERE (((ccVisits.ID)=" & main_VisitId & "))"
-                        'hint = "230"
-                        '
-                        'Call AppendLog("main_InitVisit(), 2430")
+                            & " WHERE (((ccVisits.ID)=" & visit_Id & "))"
                         '
                         CS = db.cs_openSql(SQL)
                         If Not db.cs_Ok(CS) Then
                             '
-                            'Call AppendLog("main_InitVisit(), 2435")
-                            '
                             ' Bad visit cookie, kill main_VisitId
                             '
-                            main_VisitId = 0
-                            main_VisitorID = 0
+                            visit_Id = 0
+                            visitor_id = 0
                         Else
-                            '
-                            'Call AppendLog("main_InitVisit(), 2440")
                             '
                             '--------------------------------------------------------------------------
                             ' ----- Visit found, read visitor info first
                             '--------------------------------------------------------------------------
                             '
                             'hint = "240"
-                            main_VisitorID = db.cs_getInteger(CS, "VisitorID")
-                            main_VisitorName = db.cs_getText(CS, "VisitorName")
-                            main_VisitorMemberID = (db.cs_getInteger(CS, "VisitorMemberID"))
-                            main_VisitorForceBrowserMobile = (db.cs_getInteger(CS, "VisitorForceBrowserMobile"))
-                            main_VisitorOrderID = (db.cs_getInteger(CS, "VisitorOrderID"))
+                            visitor_id = db.cs_getInteger(CS, "VisitorID")
+                            visitor_Name = db.cs_getText(CS, "VisitorName")
+                            visitor_memberID = (db.cs_getInteger(CS, "VisitorMemberID"))
+                            visitor_forceBrowserMobile = (db.cs_getInteger(CS, "VisitorForceBrowserMobile"))
+                            visitor_orderID = (db.cs_getInteger(CS, "VisitorOrderID"))
                             '
                             '--------------------------------------------------------------------------
                             ' ----- test visit age
                             '--------------------------------------------------------------------------
                             '
                             'hint = "250"
-                            main_VisitLastTime = db.db_GetCSDate(CS, "VisitLastVisitTime")
-                            If main_VisitLastTime.ToOADate + 0.041666 < main_PageStartTime.ToOADate Then
+                            visit_lastTime = db.db_GetCSDate(CS, "VisitLastVisitTime")
+                            If visit_lastTime.ToOADate + 0.041666 < main_PageStartTime.ToOADate Then
                                 '--------------------------------------------------------------------------
                                 ' ----- kill visit (no activity for over 1 hour)
                                 ' changed time to 60 minutes from 30 minutes - multiple client request (Toll Brothers, etc)
@@ -13546,7 +13461,7 @@ ErrorTrap:
                                 'hint = "251"
                                 Call testPoint("main_InitVisit Last visit was more than an hour old, kill the visit")
                                 NeedToWriteVisitCookie = True
-                                main_VisitId = 0
+                                visit_Id = 0
                                 CookieVisit = ""
                             Else
                                 '--------------------------------------------------------------------------
@@ -13554,30 +13469,32 @@ ErrorTrap:
                                 '--------------------------------------------------------------------------
                                 '
                                 'hint = "252"
-                                main_VisitId = (db.cs_getInteger(CS, "VisitId"))
-                                main_VisitName = (db.cs_getText(CS, "VisitName"))
-                                main_VisitCookieSupport = (db.cs_getBoolean(CS, "VisitCookieSupport"))
-                                main_VisitPages = (db.cs_getInteger(CS, "VisitPageVisits"))
-                                main_VisitMemberID = (db.cs_getInteger(CS, "VisitMemberID"))
+                                visit_Id = (db.cs_getInteger(CS, "VisitId"))
+                                visit_name = (db.cs_getText(CS, "VisitName"))
+                                visit_cookieSupport = (db.cs_getBoolean(CS, "VisitCookieSupport"))
+                                visit_pages = (db.cs_getInteger(CS, "VisitPageVisits"))
                                 visit_isAuthenticated = (db.cs_getBoolean(CS, "VisitAuthenticated"))
-                                main_VisitStartTime = (db.db_GetCSDate(CS, "VisitStartTime"))
-                                main_VisitStartDateValue = (db.cs_getInteger(CS, "VisitStartDateValue"))
-                                main_VisitReferer = (db.cs_getText(CS, "VisitHTTP_REFERER"))
-                                main_VisitLoginAttempts = (db.cs_getInteger(CS, "VisitLoginAttempts"))
-                                main_VisitorNew = (db.cs_getBoolean(CS, "VisitVisitorNew"))
+                                visit_startTime = (db.db_GetCSDate(CS, "VisitStartTime"))
+                                visit_startDateValue = (db.cs_getInteger(CS, "VisitStartDateValue"))
+                                visit_referer = (db.cs_getText(CS, "VisitHTTP_REFERER"))
+                                visit_loginAttempts = (db.cs_getInteger(CS, "VisitLoginAttempts"))
+                                visitor_new = (db.cs_getBoolean(CS, "VisitVisitorNew"))
+                                '
+                                user.id = (db.cs_getInteger(CS, "VisitMemberID"))
                                 user.isNew = (db.cs_getBoolean(CS, "VisitMemberNew"))
+                                '
                                 webServer.requestRemoteIP = (db.cs_getText(CS, "VisitREMOTE_ADDR"))
                                 webServer.requestBrowser = (db.cs_getText(CS, "VisitBrowser"))
                                 main_VisitTimeToLastHit = 0
-                                If main_VisitStartTime > Date.MinValue Then
-                                    main_VisitTimeToLastHit = CInt((main_PageStartTime - main_VisitStartTime).TotalSeconds)
+                                If visit_startTime > Date.MinValue Then
+                                    main_VisitTimeToLastHit = CInt((main_PageStartTime - visit_startTime).TotalSeconds)
                                 End If
-                                main_VisitExcludeFromAnalytics = db.cs_getBoolean(CS, "VisitExcludeFromAnalytics")
-                                If ((Not main_VisitCookieSupport) And (CookieVisit <> "")) Then
-                                    main_VisitCookieSupport = True
+                                visit_excludeFromAnalytics = db.cs_getBoolean(CS, "VisitExcludeFromAnalytics")
+                                If ((Not visit_cookieSupport) And (CookieVisit <> "")) Then
+                                    visit_cookieSupport = True
                                 End If
-                                main_VisitBrowserIsMobile = db.cs_getBoolean(CS, "VisitMobile")
-                                main_VisitIsBot = db.cs_getBoolean(CS, "VisitBot")
+                                visit_browserIsMobile = db.cs_getBoolean(CS, "VisitMobile")
+                                visit_isBot = db.cs_getBoolean(CS, "VisitBot")
                                 '
                                 '--------------------------------------------------------------------------
                                 ' -----  Member info
@@ -13585,11 +13502,15 @@ ErrorTrap:
                                 ' REFACTOR -- this is loading the user twice, when refactored remove these fields from the visit state and just set the user.id
                                 '--------------------------------------------------------------------------
                                 '
-                                user.id = db.cs_getInteger(CS, "MemberID")
-                                user.active = db.cs_getBoolean(CS, "MemberActive")
-                                If (user.id = 0) Or (Not user.active) Then
+                                Dim testActive As Boolean
+                                Dim testId As Integer
+                                testActive = db.cs_getBoolean(CS, "MemberActive")
+                                testId = db.cs_getInteger(CS, "MemberID")
+                                If ((Not testActive) Or (testId = 0)) Then
                                     user.id = 0
                                 Else
+                                    user.id = testId
+                                    user.active = testActive
                                     user.name = (db.cs_getText(CS, "MemberName"))
                                     user.isDeveloper = (db.cs_getBoolean(CS, "MemberDeveloper"))
                                     user.isAdmin = (db.cs_getBoolean(CS, "MemberAdmin"))
@@ -13619,8 +13540,8 @@ ErrorTrap:
                                 '--------------------------------------------------------------------------
                                 '
                                 'hint = "270"
-                                If ((main_VisitLastTimeFromCookie - main_VisitLastTime).TotalSeconds) > 2 Then
-                                    main_VisitStateOK = False
+                                If ((visit_lastTimeFromCookie - visit_lastTime).TotalSeconds) > 2 Then
+                                    visit_stateOK = False
                                     testPoint("VisitState is false, main_VisitLastTime <> Database main_VisitLastTime, this page is out of order (back button), set main_VisitStateOK false")
                                 End If
                             End If
@@ -13636,7 +13557,7 @@ ErrorTrap:
                     '
                     'hint = "300"
                     ' 1/15/2010
-                    If (main_VisitId = 0) Then
+                    If (visit_Id = 0) Then
                         '
                         ' ----- Decode Browser User-Agent string to main_VisitName, main_VisitIsBot, main_VisitIsBadBot, etc
                         '
@@ -13645,18 +13566,18 @@ ErrorTrap:
                         ' ----- create new visit record
                         '
                         'hint = "310"
-                        main_VisitId = db.metaData_InsertContentRecordGetID("Visits", user.id)
-                        If (main_VisitId < 1) Then
-                            main_VisitId = 0
+                        visit_Id = db.metaData_InsertContentRecordGetID("Visits", user.id)
+                        If (visit_Id < 1) Then
+                            visit_Id = 0
                             handleExceptionAndRethrow(New Exception("Internal error, new visit record could not be selected."))
                         End If
-                        If main_VisitName = "" Then
-                            main_VisitName = "User"
+                        If visit_name = "" Then
+                            visit_name = "User"
                         End If
-                        main_VisitPages = 0
-                        main_VisitStartTime = main_PageStartTime
-                        main_VisitStartDateValue = CInt(main_PageStartTime.ToOADate)
-                        main_VisitLastTime = main_PageStartTime
+                        visit_pages = 0
+                        visit_startTime = main_PageStartTime
+                        visit_startDateValue = CInt(main_PageStartTime.ToOADate)
+                        visit_lastTime = main_PageStartTime
                         '
                         ' ----- main_Get visit referer
                         '
@@ -13669,11 +13590,11 @@ ErrorTrap:
                             End If
                             SlashPosition = InStr(1, WorkingReferer, "/")
                             If SlashPosition = 0 Then
-                                main_VisitRefererPathPage = ""
-                                main_VisitRefererHost = WorkingReferer
+                                visit_refererPathPage = ""
+                                visit_refererHost = WorkingReferer
                             Else
-                                main_VisitRefererPathPage = Mid(WorkingReferer, SlashPosition)
-                                main_VisitRefererHost = Mid(WorkingReferer, 1, SlashPosition - 1)
+                                visit_refererPathPage = Mid(WorkingReferer, SlashPosition)
+                                visit_refererHost = Mid(WorkingReferer, 1, SlashPosition - 1)
                             End If
                         End If
                         '
@@ -13686,40 +13607,40 @@ ErrorTrap:
                         '
                         'Call AppendLog("main_InitVisit(), 2480")
                         '
-                        If EncodeBoolean(siteProperties.getBoolean("AllowAutoRecognize", True)) Then
+                        If siteProperties.getBoolean("AllowAutoRecognize", True) Then
                             '
                             'Call AppendLog("main_InitVisit(), 2485")
                             '
                             'hint = "340"
-                            Call security.decodeToken(CookieVisitor, main_VisitorID, tokenDate)
+                            Call security.decodeToken(CookieVisitor, visitor_id, tokenDate)
                             'main_VisitorID = main_DecodeKeyNumber(CookieVisitor)
-                            If main_VisitorID <> 0 Then
+                            If visitor_id <> 0 Then
                                 '
                                 ' ----- cookie found, open visitor
                                 '
                                 'hint = "350"
-                                main_VisitCookieSupport = True
+                                visit_cookieSupport = True
                                 If True Then
-                                    SQL = "SELECT ID,Name,MemberID,OrderID,ForceBrowserMobile from ccVisitors WHERE ID=" & main_VisitorID & ";"
+                                    SQL = "SELECT ID,Name,MemberID,OrderID,ForceBrowserMobile from ccVisitors WHERE ID=" & visitor_id & ";"
                                 Else
-                                    SQL = "SELECT ID,Name,MemberID,OrderID,0 as ForceBrowserMobile from ccVisitors WHERE ID=" & main_VisitorID & ";"
+                                    SQL = "SELECT ID,Name,MemberID,OrderID,0 as ForceBrowserMobile from ccVisitors WHERE ID=" & visitor_id & ";"
                                 End If
                                 CS = db.cs_openSql(SQL)
                                 If Not db.cs_Ok(CS) Then
                                     '
                                     ' ----- bad cookie, kill main_VisitorID
                                     '
-                                    main_VisitorID = 0
+                                    visitor_id = 0
                                 Else
                                     '
                                     ' ----- set visitor values
                                     '
-                                    VisitorChanges = False
-                                    main_VisitorID = (db.cs_getInteger(CS, "ID"))
-                                    main_VisitorName = (db.cs_getText(CS, "Name"))
-                                    main_VisitorMemberID = (db.cs_getInteger(CS, "MemberID"))
-                                    main_VisitorForceBrowserMobile = (db.cs_getInteger(CS, "ForceBrowserMobile"))
-                                    main_VisitorOrderID = (db.cs_getInteger(CS, "OrderID"))
+                                    visitor_changes = False
+                                    visitor_id = (db.cs_getInteger(CS, "ID"))
+                                    visitor_Name = (db.cs_getText(CS, "Name"))
+                                    visitor_memberID = (db.cs_getInteger(CS, "MemberID"))
+                                    visitor_forceBrowserMobile = (db.cs_getInteger(CS, "ForceBrowserMobile"))
+                                    visitor_orderID = (db.cs_getInteger(CS, "OrderID"))
                                 End If
                                 Call db.cs_Close(CS)
                             End If
@@ -13732,24 +13653,24 @@ ErrorTrap:
                         'Call AppendLog("main_InitVisit(), 2490")
                         '
                         'hint = "400"
-                        If main_VisitorID = 0 Then
+                        If visitor_id = 0 Then
                             '
                             ' Visitor Fields
                             '
-                            main_VisitorID = db.metaData_InsertContentRecordGetID("Visitors", user.id)
-                            If (main_VisitorID < 1) Then
+                            visitor_id = db.metaData_InsertContentRecordGetID("Visitors", user.id)
+                            If (visitor_id < 1) Then
                                 Call handleLegacyError14(MethodName, "main_InitVisit, could not create new visitor")
-                                main_VisitorID = 0
+                                visitor_id = 0
                             End If
-                            main_VisitorName = "Visitor " & main_VisitorID
-                            main_VisitorMemberID = 0
-                            main_VisitorOrderID = 0
-                            VisitorChanges = True
-                            main_VisitorForceBrowserMobile = 0
+                            visitor_Name = "Visitor " & visitor_id
+                            visitor_memberID = 0
+                            visitor_orderID = 0
+                            visitor_changes = True
+                            visitor_forceBrowserMobile = 0
                             '
                             ' Visit Fields
                             '
-                            main_VisitorNew = True
+                            visitor_new = True
                         End If
                         '
                         '-----------------------------------------------------------------------------------
@@ -13759,24 +13680,24 @@ ErrorTrap:
                         'Call AppendLog("main_InitVisit(), 2492")
                         '
                         'hint = "500"
-                        main_VisitMemberID = main_VisitorMemberID
-                        If (main_VisitorMemberID > 0) Then
+                        user.id = visitor_memberID
+                        If (visitor_memberID > 0) Then
                             '
                             ' ----- recognize by the main_VisitorMemberID
                             '
                             'hint = "510"
-                            If user.recognizeByID(main_VisitorMemberID) Then
+                            If user.recognizeByID(visitor_memberID) Then
                                 '
                                 ' ----- if successful, now test for autologin (authentication)
                                 '
                                 'hint = "520"
 
-                                If (EncodeBoolean(siteProperties.getBoolean("AllowAutoLogin", False))) And (user.autoLogin) And main_VisitCookieSupport Then
+                                If (siteProperties.getBoolean("AllowAutoLogin", False)) And (user.autoLogin) And visit_cookieSupport Then
                                     '
                                     ' ----- they allow it, now Check if they were logged in on their last visit
                                     '
                                     'hint = "530"
-                                    SQL = "select top 1 V.VisitAuthenticated from ccVisits V where (V.ID<>" & main_VisitId & ")and(V.VisitorID=" & main_VisitorID & ") order by id desc"
+                                    SQL = "select top 1 V.VisitAuthenticated from ccVisits V where (V.ID<>" & visit_Id & ")and(V.VisitorID=" & visitor_id & ") order by id desc"
                                     CS = db.cs_openSql(SQL)
                                     If db.cs_Ok(CS) Then
                                         If db.cs_getBoolean(CS, "VisitAuthenticated") Then
@@ -13785,8 +13706,8 @@ ErrorTrap:
                                             '
                                             If user.authenticateByID(user.id) Then
                                                 Call main_LogActivity2("autologin", user.id, user.organizationId)
-                                                VisitorChanges = True
-                                                MemberChanges = True
+                                                visitor_changes = True
+                                                user_changes = True
                                             End If
                                         End If
                                     End If
@@ -13806,8 +13727,8 @@ ErrorTrap:
                         '--------------------------------------------------------------------------
                         '
                         'hint = "600"
-                        If main_AllowVisitTracking Then
-                            Call webServer.addResponseCookie(main_appNameCookiePrefix & main_cookieNameVisitor, security.encodeToken(main_VisitorID, main_VisitStartTime), main_VisitStartTime.AddYears(1), , www_requestRootPath, False)
+                        If allowVisitTracking Then
+                            Call webServer.addResponseCookie(main_appNameCookiePrefix & main_cookieNameVisitor, security.encodeToken(visitor_id, visit_startTime), visit_startTime.AddYears(1), , www_requestRootPath, False)
                         End If
                         '
                         '--------------------------------------------------------------------------
@@ -13851,8 +13772,8 @@ ErrorTrap:
                         '
                         ' No user created
                         '
-                        If (LCase(Left(main_VisitName, 5)) <> "visit") Then
-                            DefaultMemberName = main_VisitName
+                        If (LCase(Left(visit_name, 5)) <> "visit") Then
+                            DefaultMemberName = visit_name
                         Else
                             DefaultMemberName = EncodeText(db_GetContentFieldProperty("people", "name", "default"))
                         End If
@@ -13865,14 +13786,14 @@ ErrorTrap:
                             '
                             ' upgraded, determine the kind of tracking - experimental build set to true
                             '
-                            TrackGuests = EncodeBoolean(siteProperties.getBoolean("track guests", False))
+                            TrackGuests = siteProperties.getBoolean("track guests", False)
                             If Not TrackGuests Then
                                 '
                                 ' do not track guests at all
                                 '
                                 Call user.user_CreateUserDefaults(DefaultMemberName)
                             Else
-                                If main_VisitCookieSupport Then
+                                If visit_cookieSupport Then
                                     '
                                     ' cookies supported, not first hit and not spider
                                     '
@@ -13881,7 +13802,7 @@ ErrorTrap:
                                     '
                                     ' upgraded, set it to the site property - experimental build set to true
                                     '
-                                    TrackGuestsWithoutCookies = EncodeBoolean(siteProperties.getBoolean("track guests without cookies", False))
+                                    TrackGuestsWithoutCookies = siteProperties.getBoolean("track guests without cookies")
                                     If TrackGuestsWithoutCookies Then
                                         '
                                         ' compatibiltiy mode - create people for non-cookies too
@@ -13905,7 +13826,7 @@ ErrorTrap:
                     'Call AppendLog("main_InitVisit(), 2498")
                     '
                     'hint = "900"
-                    If main_VisitPages = 0 Then
+                    If visit_pages = 0 Then
                         '
                         ' First page of this visit, verify the member language
                         '
@@ -13918,7 +13839,7 @@ ErrorTrap:
                                 '
                                 ' Browser Language worked
                                 '
-                                MemberChanges = True
+                                user_changes = True
                             Else
                                 '
                                 ' Still no match, main_Get the default language
@@ -13931,7 +13852,7 @@ ErrorTrap:
                                     CS = db.csOpen("Languages", "name=" & db.encodeSQLText(user.language))
                                     If db.cs_Ok(CS) Then
                                         user.languageId = db.cs_getInteger(CS, "ID")
-                                        MemberChanges = True
+                                        user_changes = True
                                     End If
                                     Call db.cs_Close(CS)
                                     If user.languageId = 0 Then
@@ -13946,20 +13867,20 @@ ErrorTrap:
                                     CS = db.csOpen("Languages", "name=" & db.encodeSQLText(user.language))
                                     If db.cs_Ok(CS) Then
                                         user.languageId = db.cs_getInteger(CS, "ID")
-                                        MemberChanges = True
+                                        user_changes = True
                                     End If
                                     Call db.cs_Close(CS)
                                     If user.languageId < 1 Then
                                         '
                                         ' English is not in Language table, add it, and set it in Member
                                         '
-                                        CS = db.db_csInsertRecord("Languages")
+                                        CS = db.cs_insertRecord("Languages")
                                         If db.cs_Ok(CS) Then
                                             user.languageId = db.cs_getInteger(CS, "ID")
                                             user.language = "English"
-                                            Call db.db_setCS(CS, "Name", user.language)
-                                            Call db.db_setCS(CS, "HTTP_Accept_LANGUAGE", "en")
-                                            MemberChanges = True
+                                            Call db.cs_set(CS, "Name", user.language)
+                                            Call db.cs_set(CS, "HTTP_Accept_LANGUAGE", "en")
+                                            user_changes = True
                                         End If
                                         Call db.cs_Close(CS)
                                     End If
@@ -13976,31 +13897,31 @@ ErrorTrap:
                     '
                     ' can not count main_VisitCookieSupport yet, since a new visit will not show cookie support until the ajax hit
                     'hint = "910"
-                    main_VisitExcludeFromAnalytics = main_VisitExcludeFromAnalytics Or main_VisitIsBot Or user.excludeFromAnalytics Or user.isAdmin Or user.isDeveloper
+                    visit_excludeFromAnalytics = visit_excludeFromAnalytics Or visit_isBot Or user.excludeFromAnalytics Or user.isAdmin Or user.isDeveloper
                     '
                     ' Update Page count
                     '
                     If Not web_PageExcludeFromAnalytics Then
-                        main_VisitPages = main_VisitPages + 1
+                        visit_pages = visit_pages + 1
                     End If
                     '
                     ' Update the Visit
                     ' set main_visitInitialized true allows main_SaveVisit, main_SaveVisitor, etc to work
                     '
                     visit_initialized = True
-                    Call main_SaveVisit()
+                    Call visit_save()
                     '
                     ' ----- Save visitor record
                     '
                     'hint = "940"
-                    If VisitorChanges Then
+                    If visitor_changes Then
                         Call main_SaveVisitor()
                     End If
                     '
                     ' ----- Save Member record
                     '
                     'hint = "950"
-                    If MemberChanges Then
+                    If user_changes Then
                         Call user.user_SaveMemberBase()
                     End If
                     '
@@ -14008,9 +13929,9 @@ ErrorTrap:
                     '       no, always send the cookie. There are too many exceptions to try being tricky here.
                     '
                     'hint = "960"
-                    CookieVisitNew = security.encodeToken(main_VisitId, main_VisitLastTime)
+                    CookieVisitNew = security.encodeToken(visit_Id, visit_lastTime)
                     'CookieVisitNew = encodeToken(main_VisitId, main_VisitStartTime)
-                    If main_AllowVisitTracking And (CookieVisit <> CookieVisitNew) Then
+                    If allowVisitTracking And (CookieVisit <> CookieVisitNew) Then
                         CookieVisit = CookieVisitNew
                         NeedToWriteVisitCookie = True
                     End If
@@ -14039,11 +13960,7 @@ ErrorTrap:
                 ' ----- Write Visit Cookie
                 '---------------------------------------------------------------------------------
                 '
-                CookieVisit = security.encodeToken(main_VisitId, main_PageStartTime)
-                Dim returnNumber As Integer = 0
-                Dim returnDate As Date = Date.MinValue
-                security.decodeToken(CookieVisit, returnNumber, returnDate)
-                '
+                CookieVisit = security.encodeToken(visit_Id, main_PageStartTime)
                 Call webServer.addResponseCookie(main_appNameCookiePrefix & main_cookieNameVisit, CookieVisit, , , www_requestRootPath, False)
             Catch ex As Exception
                 handleExceptionAndRethrow(ex)
@@ -14535,7 +14452,7 @@ ErrorTrap:
         ' ----- alternate name
         '
         Public Function db_InsertCSContent(ByVal ContentName As String) As Integer
-            db_InsertCSContent = db.db_csInsertRecord(EncodeText(ContentName))
+            db_InsertCSContent = db.cs_insertRecord(EncodeText(ContentName))
         End Function
         '
         '========================================================================
@@ -15147,7 +15064,7 @@ ErrorTrap:
                             & " AND(ccContent.active<>0)" _
                             & " AND(ccGroupRules.active<>0)" _
                             & " AND(ccMemberRules.active<>0)" _
-                            & " AND((ccMemberRules.DateExpires is Null)or(ccMemberRules.DateExpires>" & db.db_EncodeSQLDate(main_PageStartTime) & "))" _
+                            & " AND((ccMemberRules.DateExpires is Null)or(ccMemberRules.DateExpires>" & db.encodeSQLDate(main_PageStartTime) & "))" _
                             & " AND(ccgroups.active<>0)" _
                             & " AND(ccMembers.active<>0)" _
                             & " AND(ccMembers.ID=" & user.id & ")" _
@@ -15493,27 +15410,22 @@ ErrorTrap:
                             ' ----- AllowAdminLinks
                             '
                             Call visitProperty.setProperty("AllowEditing", EncodeText(main_GetStreamBoolean2("AllowEditing")))
-                            property_visit_allowEditing_isLoaded = False
                             '
                             ' ----- Quick Editor
                             '
                             Call visitProperty.setProperty("AllowQuickEditor", EncodeText(main_GetStreamBoolean2("AllowQuickEditor")))
-                            property_visit_allowQuickEditor_isLoaded = False
                             '
                             ' ----- Advanced Editor
                             '
                             Call visitProperty.setProperty("AllowAdvancedEditor", EncodeText(main_GetStreamBoolean2("AllowAdvancedEditor")))
-                            property_visit_allowAdvancedEditor_isLoaded = False
                             '
                             ' ----- Allow Workflow authoring Render Mode - Visit Property
                             '
                             Call visitProperty.setProperty("AllowWorkflowRendering", EncodeText(main_GetStreamBoolean2("AllowWorkflowRendering")))
-                            property_visit_allowWorkflowRendering_isLoaded = False
                             '
                             ' ----- developer Only parts
                             '
                             Call visitProperty.setProperty("AllowDebugging", EncodeText(main_GetStreamBoolean2("AllowDebugging")))
-                            property_visit_allowDebugging_isLoaded = False
                             If user.isAuthenticatedDeveloper() Then
                                 '
                                 ' ----- Create Path Block record, if requested
@@ -15529,10 +15441,10 @@ ErrorTrap:
                                     '
                                     ' path is not blocked, but we want it blocked
                                     '
-                                    CS = db.db_csInsertRecord("Paths")
+                                    CS = db.cs_insertRecord("Paths")
                                     If db.cs_Ok(CS) Then
-                                        Call db.db_setCS(CS, "name", web_requestPath)
-                                        Call db.db_setCS(CS, "active", 1)
+                                        Call db.cs_set(CS, "name", web_requestPath)
+                                        Call db.cs_set(CS, "active", 1)
                                     End If
                                     Call db.cs_Close(CS)
                                 ElseIf (PathID <> 0) And (Not CreatePathBlock) Then
@@ -15898,7 +15810,7 @@ ErrorTrap:
                                     If PosIDEnd <> 0 Then
                                         ParseOK = True
                                         Copy = Mid(Copy, 1, PosIDStart - 1) & html_EncodeHTML(addonOption_String) & Mid(Copy, PosIDEnd)
-                                        Call db.db_setCS(CS, FieldName, Copy)
+                                        Call db.cs_set(CS, FieldName, Copy)
                                         needToClearCache = True
                                     End If
                                 End If
@@ -16620,7 +16532,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            db_csOpenRecord = db.csOpen(ContentName, "(ID=" & db.db_EncodeSQLNumber(RecordID) & ")", , False, user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
+            db_csOpenRecord = db.csOpen(ContentName, "(ID=" & db.encodeSQLNumber(RecordID) & ")", , False, user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
             '
             Exit Function
             '
@@ -16645,7 +16557,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            db_csOpen = db.csOpen(EncodeText(ContentName), "(ID=" & db.db_EncodeSQLNumber(RecordID) & ")", , False, user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
+            db_csOpen = db.csOpen(EncodeText(ContentName), "(ID=" & db.encodeSQLNumber(RecordID) & ")", , False, user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
             '
             Exit Function
             '
@@ -17426,13 +17338,13 @@ ErrorTrap:
                         '
                         ' No record exists, and one is needed
                         '
-                        CSRule = db.db_csInsertRecord(RulesContentName)
+                        CSRule = db.cs_insertRecord(RulesContentName)
                         If db.cs_Ok(CSRule) Then
-                            Call db.db_setCS(CSRule, "Active", RuleNeeded)
-                            Call db.db_setCS(CSRule, RulesPrimaryFieldname, PrimaryRecordID)
-                            Call db.db_setCS(CSRule, RulesSecondaryFieldName, SecondaryRecordID)
+                            Call db.cs_set(CSRule, "Active", RuleNeeded)
+                            Call db.cs_set(CSRule, RulesPrimaryFieldname, PrimaryRecordID)
+                            Call db.cs_set(CSRule, RulesSecondaryFieldName, SecondaryRecordID)
                             If SupportRuleCopy Then
-                                Call db.db_setCS(CSRule, "RuleCopy", RuleCopy)
+                                Call db.cs_set(CSRule, "RuleCopy", RuleCopy)
                             End If
                         End If
                         Call db.cs_Close(CSRule)
@@ -18049,22 +17961,22 @@ ErrorTrap:
             Dim Subs() As String
             '
             If True Then
-                Select Case main_VisitorForceBrowserMobile
+                Select Case visitor_forceBrowserMobile
                     Case 1
-                        main_VisitBrowserIsMobile = True
+                        visit_browserIsMobile = True
                     Case 2
-                        main_VisitBrowserIsMobile = False
+                        visit_browserIsMobile = False
                     Case Else
                         If webServer.requestxWapProfile <> "" Then
                             '
                             ' If x_wap, set mobile true
                             '
-                            main_VisitBrowserIsMobile = True
+                            visit_browserIsMobile = True
                         ElseIf InStr(1, webServer.requestHttpAccept, "wap", vbTextCompare) <> 0 Then
                             '
                             ' If main_HTTP_Accept, set mobile true
                             '
-                            main_VisitBrowserIsMobile = True
+                            visit_browserIsMobile = True
                         Else
                             '
                             ' If useragent is in the list, set mobile true
@@ -18077,7 +17989,7 @@ ErrorTrap:
                                 If Cnt > 0 Then
                                     For Ptr = 0 To Cnt - 1
                                         If InStr(1, BrowserUserAgent, Subs(Ptr), vbTextCompare) <> 0 Then
-                                            main_VisitBrowserIsMobile = True
+                                            visit_browserIsMobile = True
                                             Exit For
                                         End If
                                     Next
@@ -18086,7 +17998,7 @@ ErrorTrap:
                         End If
                 End Select
             Else
-                main_VisitBrowserIsMobile = False
+                visit_browserIsMobile = False
             End If
             '
             '
@@ -18095,9 +18007,9 @@ ErrorTrap:
                 '
                 ' blank browser, Blank-Browser-Bot
                 '
-                main_VisitName = "Blank-Browser-Bot"
-                main_VisitIsBot = True
-                main_VisitIsBadBot = False
+                visit_name = "Blank-Browser-Bot"
+                visit_isBot = True
+                visit_isBadBot = False
             Else
                 DetailsStart = InStr(1, BrowserUserAgent, "(")
                 '
@@ -18123,7 +18035,7 @@ ErrorTrap:
                     '
                     PositionStart = InStr(1, DetailTail, "netscape", vbTextCompare)
                     If PositionStart <> 0 Then
-                        main_VisitBrowserIsNS = True
+                        visit_browserIsNS = True
                         PositionEnd = InStr(PositionStart, DetailTail, " ")
                         If PositionEnd = 0 Then
                             Agent = Mid(DetailTail, PositionStart)
@@ -18132,7 +18044,7 @@ ErrorTrap:
                         End If
                         AgentParts = Split(Agent, "/")
                         If UBound(AgentParts) > 0 Then
-                            main_VisitBrowserVersion = Trim(AgentParts(1))
+                            visit_browserVersion = Trim(AgentParts(1))
                         End If
                     End If
                     '
@@ -18142,26 +18054,26 @@ ErrorTrap:
                         Detail = Trim(DetailSections(DetailPointer))
                         '
                         If (InStr(1, Detail, "msie", vbTextCompare) >= 0) Then
-                            main_VisitBrowserIsIE = True
+                            visit_browserIsIE = True
                             DetailsVersionSection = Split(Trim(Detail), " ")
                             If UBound(DetailsVersionSection) > 0 Then
-                                main_VisitBrowserVersion = Trim(DetailsVersionSection(1))
+                                visit_browserVersion = Trim(DetailsVersionSection(1))
                             End If
                         ElseIf InStr(1, Details, "netscape", vbTextCompare) <> 0 Then
                             '
-                            main_VisitBrowserIsNS = True
+                            visit_browserIsNS = True
                         End If
                         '
                         If InStr(1, Detail, "win", vbTextCompare) <> 0 Then
-                            main_VisitBrowserIsWindows = True
+                            visit_browserIsWindows = True
                         End If
                         '
                         If InStr(1, Detail, "mac", vbTextCompare) <> 0 Then
-                            main_VisitBrowserIsMac = True
+                            visit_browserIsMac = True
                         End If
                         '
                         If InStr(1, Detail, "linux", vbTextCompare) <> 0 Then
-                            main_VisitBrowserIsLinux = True
+                            visit_browserIsLinux = True
                         End If
                     Next
                 End If
@@ -18223,7 +18135,7 @@ ErrorTrap:
                                 If UBound(Args) > 0 Then
                                     If Trim(Args(1)) <> "" Then
                                         If InStr(1, BrowserUserAgent, Args(1), vbTextCompare) <> 0 Then
-                                            main_VisitName = Args(0)
+                                            visit_name = Args(0)
                                             visitNameFound = True
                                             Exit For
                                         End If
@@ -18231,7 +18143,7 @@ ErrorTrap:
                                     If UBound(Args) > 1 Then
                                         If Trim(Args(2)) <> "" Then
                                             If InStr(1, webServer.requestRemoteIP, Args(2), vbTextCompare) <> 0 Then
-                                                main_VisitName = Args(0)
+                                                visit_name = Args(0)
                                                 visitNameFound = True
                                                 Exit For
                                             End If
@@ -18242,11 +18154,11 @@ ErrorTrap:
                         Next
                         If visitNameFound Then
                             If UBound(Args) < 3 Then
-                                main_VisitIsBot = True
-                                main_VisitIsBadBot = False
+                                visit_isBot = True
+                                visit_isBadBot = False
                             Else
-                                main_VisitIsBadBot = (LCase(Args(3)) = "b")
-                                main_VisitIsBot = main_VisitIsBadBot Or (LCase(Args(3)) = "r")
+                                visit_isBadBot = (LCase(Args(3)) = "b")
+                                visit_isBot = visit_isBadBot Or (LCase(Args(3)) = "r")
                             End If
                         End If
                     End If
@@ -18351,7 +18263,7 @@ ErrorTrap:
             If db.cs_Ok(CSPointer) Then
                 main_GetContentWatchLinkByKey = db.cs_getText(CSPointer, "Link")
                 If EncodeBoolean(IncrementClicks) Then
-                    Call db.db_setCS(CSPointer, "Clicks", db.cs_getInteger(CSPointer, "clicks") + 1)
+                    Call db.cs_set(CSPointer, "Clicks", db.cs_getInteger(CSPointer, "clicks") + 1)
                 End If
             Else
                 main_GetContentWatchLinkByKey = EncodeText(DefaultLink)
@@ -18424,7 +18336,7 @@ ErrorTrap:
             '
             ' BuildVersion = app.dataBuildVersion
             pageManager_GetContentBoxWrapper = Content
-            If (EncodeBoolean(siteProperties.getBoolean("Compatibility ContentBox Pad With Table", False))) Then
+            If siteProperties.getBoolean("Compatibility ContentBox Pad With Table") Then
                 '
                 If ContentPadding > 0 Then
                     '
@@ -18576,19 +18488,19 @@ ErrorTrap:
                         If db.cs_Ok(CSBlock) Then
                             FieldName = "copyFilename"
                             Copy = docProperties.getText(FieldName)
-                            Copy = main_DecodeContent(Copy)
+                            Copy = html_DecodeContent(Copy)
                             If Copy <> db.db_GetCS(CSBlock, "copyFilename") Then
-                                Call db.db_setCS(CSBlock, "copyFilename", Copy)
+                                Call db.cs_set(CSBlock, "copyFilename", Copy)
                                 SaveButNoChanges = False
                             End If
                             RecordName = docProperties.getText("name")
                             If RecordName <> db.db_GetCS(CSBlock, "name") Then
-                                Call db.db_setCS(CSBlock, "name", RecordName)
+                                Call db.cs_set(CSBlock, "name", RecordName)
                                 SaveButNoChanges = False
                             End If
                             Call main_AddLinkAlias(RecordName, RecordID, "")
                             If (docProperties.getText("headline") <> db.db_GetCS(CSBlock, "headline")) Then
-                                Call db.db_setCS(CSBlock, "headline", docProperties.getText("headline"))
+                                Call db.cs_set(CSBlock, "headline", docProperties.getText("headline"))
                                 SaveButNoChanges = False
                             End If
                             RecordParentID = db.cs_getInteger(CSBlock, "parentid")
@@ -18608,13 +18520,13 @@ ErrorTrap:
                     '
                     '
                     '
-                    CSBlock = db.db_csInsertRecord(ContentName)
+                    CSBlock = db.cs_insertRecord(ContentName)
                     If db.cs_Ok(CSBlock) Then
-                        Call db.db_setCS(CSBlock, "active", True)
-                        Call db.db_setCS(CSBlock, "ParentID", RecordID)
-                        Call db.db_setCS(CSBlock, "contactmemberid", user.id)
-                        Call db.db_setCS(CSBlock, "name", "New Page added " & main_PageStartTime & " by " & user.name)
-                        Call db.db_setCS(CSBlock, "copyFilename", "")
+                        Call db.cs_set(CSBlock, "active", True)
+                        Call db.cs_set(CSBlock, "ParentID", RecordID)
+                        Call db.cs_set(CSBlock, "contactmemberid", user.id)
+                        Call db.cs_set(CSBlock, "name", "New Page added " & main_PageStartTime & " by " & user.name)
+                        Call db.cs_set(CSBlock, "copyFilename", "")
                         RecordID = db.cs_getInteger(CSBlock, "ID")
                         Call db.db_SaveCSRecord(CSBlock)
                         '
@@ -18644,13 +18556,13 @@ ErrorTrap:
                     End If
                     Call db.cs_Close(CSBlock)
                     If ParentID <> 0 Then
-                        CSBlock = db.db_csInsertRecord(ContentName)
+                        CSBlock = db.cs_insertRecord(ContentName)
                         If db.cs_Ok(CSBlock) Then
-                            Call db.db_setCS(CSBlock, "active", True)
-                            Call db.db_setCS(CSBlock, "ParentID", ParentID)
-                            Call db.db_setCS(CSBlock, "contactmemberid", user.id)
-                            Call db.db_setCS(CSBlock, "name", "New Page added " & main_PageStartTime & " by " & user.name)
-                            Call db.db_setCS(CSBlock, "copyFilename", "")
+                            Call db.cs_set(CSBlock, "active", True)
+                            Call db.cs_set(CSBlock, "ParentID", ParentID)
+                            Call db.cs_set(CSBlock, "contactmemberid", user.id)
+                            Call db.cs_set(CSBlock, "name", "New Page added " & main_PageStartTime & " by " & user.name)
+                            Call db.cs_set(CSBlock, "copyFilename", "")
                             RecordID = db.cs_getInteger(CSBlock, "ID")
                             Call db.db_SaveCSRecord(CSBlock)
                             '
@@ -19859,7 +19771,7 @@ ErrorTrap:
                     ContentID = db.cs_getInteger(CSSections, "ContentID")
                     If (ContentID <> PageContentCID) And (Not db_IsWithinContent(ContentID, PageContentCID)) Then
                         ContentID = PageContentCID
-                        Call db.db_setCS(CSSections, "ContentID", ContentID)
+                        Call db.cs_set(CSSections, "ContentID", ContentID)
                     End If
                     If ContentID = PageContentCID Then
                         ContentName = "Page Content"
@@ -19998,7 +19910,7 @@ ErrorTrap:
                     & " AND ((ccPageContentBlockRules.Active)<>0)" _
                     & " AND ((ccgroups.Active)<>0)" _
                     & " AND ((ccMemberRules.Active)<>0)" _
-                    & " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" & db.db_EncodeSQLDate(main_PageStartTime) & ")" _
+                    & " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" & db.encodeSQLDate(main_PageStartTime) & ")" _
                     & " AND ((ccMemberRules.MemberID)=" & user.id & "));"
                 CS = db.cs_openSql(SQL)
                 pageManager_BypassContentBlock = db.cs_Ok(CS)
@@ -20754,17 +20666,17 @@ ErrorTrap:
                     If main_RenderedTemplateID = 0 Then
                         pageManager_TemplateName = TemplateDefaultName
                         pageManager_TemplateBody = TemplateDefaultBody
-                        CS = db.db_csInsertRecord("Page Templates")
+                        CS = db.cs_insertRecord("Page Templates")
                         If db.cs_Ok(CS) Then
                             main_RenderedTemplateID = db.cs_getInteger(CS, "ID")
                             main_RenderedTemplateName = TemplateDefaultName
-                            Call db.db_setCS(CS, "name", TemplateDefaultName)
-                            Call db.db_setCS(CS, "Link", "")
+                            Call db.cs_set(CS, "name", TemplateDefaultName)
+                            Call db.cs_set(CS, "Link", "")
                             If True Then
-                                Call db.db_setCS(CS, "BodyHTML", pageManager_TemplateBody)
+                                Call db.cs_set(CS, "BodyHTML", pageManager_TemplateBody)
                             End If
                             If True Then
-                                Call db.db_setCS(CS, "ccGuid", DefaultTemplateGuid)
+                                Call db.cs_set(CS, "ccGuid", DefaultTemplateGuid)
                             End If
                             Call db.cs_Close(CS)
                         End If
@@ -21234,9 +21146,9 @@ ErrorTrap:
                     '--------------------------------------------------------------------------
                     '
                     Dim AllowCookieTest As Boolean
-                    AllowCookieTest = properties_site__AllowVisitTracking And (main_VisitPages = 1)
+                    AllowCookieTest = siteProperties.getBoolean("allowVisitTracking", True) And (visit_pages = 1)
                     If AllowCookieTest Then
-                        Call main_AddOnLoadJavascript2("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" & security.encodeToken(main_VisitId, main_PageStartTime) & "')};", "Cookie Test")
+                        Call main_AddOnLoadJavascript2("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" & security.encodeToken(visit_Id, main_PageStartTime) & "')};", "Cookie Test")
                     End If
                     '
                     '--------------------------------------------------------------------------
@@ -21247,17 +21159,17 @@ ErrorTrap:
                     If docProperties.getInteger("ContensiveUserForm") = 1 Then
                         Dim FromAddress As String = siteProperties.getText("EmailFromAddress", "info@" & main_ServerDomain)
                         Call main_SendFormEmail(siteProperties.emailAdmin, FromAddress, "Form Submitted on " & web_requestReferer)
-                        Dim cs As Integer = db.db_csInsertRecord("User Form Response")
+                        Dim cs As Integer = db.cs_insertRecord("User Form Response")
                         If db.cs_Ok(cs) Then
-                            Call db.db_setCS(cs, "name", "Form " & webServer.requestReferrer)
+                            Call db.cs_set(cs, "name", "Form " & webServer.requestReferrer)
                             Dim Copy As String = ""
                             For Each kvp As KeyValuePair(Of String, docPropertiesClass) In docProperties.docPropertiesDict
                                 If (kvp.Key.ToLower() <> "contensiveuserform") Then
                                     Copy &= kvp.Value.Name & "=" & kvp.Value.Value & vbCrLf
                                 End If
                             Next
-                            Call db.db_setCS(cs, "copy", Copy)
-                            Call db.db_setCS(cs, "VisitId", main_VisitId)
+                            Call db.cs_set(cs, "copy", Copy)
+                            Call db.cs_set(cs, "VisitId", visit_Id)
                         End If
                         Call db.cs_Close(cs)
                     End If
@@ -21267,7 +21179,7 @@ ErrorTrap:
                     '--------------------------------------------------------------------------
                     '
                     If docProperties.getInteger("ContensiveFormPageID") <> 0 Then
-                        Call main_ProcessFormPage(docProperties.getInteger("ContensiveFormPageID"))
+                        Call pageManager_ProcessFormPage(docProperties.getInteger("ContensiveFormPageID"))
                     End If
                     '
                     '--------------------------------------------------------------------------
@@ -21340,11 +21252,11 @@ ErrorTrap:
                                 '
                                 ' ----- create log entry
                                 '
-                                Dim CSPointer As Integer = db.db_csInsertRecord("Library File Log")
+                                Dim CSPointer As Integer = db.cs_insertRecord("Library File Log")
                                 If db.cs_Ok(CSPointer) Then
-                                    Call db.db_setCS(CSPointer, "FileID", downloadId)
-                                    Call db.db_setCS(CSPointer, "VisitId", main_VisitId)
-                                    Call db.db_setCS(CSPointer, "MemberID", user.id)
+                                    Call db.cs_set(CSPointer, "FileID", downloadId)
+                                    Call db.cs_set(CSPointer, "VisitId", visit_Id)
+                                    Call db.cs_set(CSPointer, "MemberID", user.id)
                                 End If
                                 Call db.cs_Close(CSPointer)
                                 '
@@ -21434,7 +21346,7 @@ ErrorTrap:
                                                             If Not db.db_IsCSFieldSupported(CSClip, "ParentID") Then
                                                                 Call error_AddUserError("The paste operation failed because the record you are pasting does not   support the necessary parenting feature.")
                                                             Else
-                                                                Call db.db_setCS(CSClip, "ParentID", ClipParentRecordID)
+                                                                Call db.cs_set(CSClip, "ParentID", ClipParentRecordID)
                                                             End If
                                                         Else
                                                             '
@@ -21455,7 +21367,7 @@ ErrorTrap:
                                                                     If Not db.db_IsCSFieldSupported(CSClip, CStr(NameValues(0))) Then
                                                                         Call error_AddUserError("The paste operation failed because the clipboard data Field [" & CStr(NameValues(0)) & "] is not supported by the location data.")
                                                                     Else
-                                                                        Call db.db_setCS(CSClip, CStr(NameValues(0)), CStr(NameValues(1)))
+                                                                        Call db.cs_set(CSClip, CStr(NameValues(0)), CStr(NameValues(1)))
                                                                     End If
                                                                 End If
                                                             Next
@@ -21474,7 +21386,7 @@ ErrorTrap:
                                                     '
                                                     CSClip = db_csOpen(ClipParentContentName, ClipParentRecordID, , , "ChildPagesFound")
                                                     If db.cs_Ok(CSClip) Then
-                                                        Call db.db_setCS(CSClip, "ChildPagesFound", True.ToString)
+                                                        Call db.cs_set(CSClip, "ChildPagesFound", True.ToString)
                                                     End If
                                                     Call db.cs_Close(CSClip)
                                                     Call pageManager_cache_pageContent_clear()
@@ -21722,15 +21634,15 @@ ErrorTrap:
                                         '
                                         ' No Link Forward, no Link Alias, no RemoteMethodFromPage, not Robots.txt
                                         '
-                                        If (main_PageErrorCount = 0) And EncodeBoolean(siteProperties.getBoolean("LinkForwardAutoInsert", False)) And (Not IsInLinkForwardTable) Then
+                                        If (main_PageErrorCount = 0) And siteProperties.getBoolean("LinkForwardAutoInsert") And (Not IsInLinkForwardTable) Then
                                             '
                                             ' Add a new Link Forward entry
                                             '
                                             CSPointer = db_InsertCSContent("Link Forwards")
                                             If db.cs_Ok(CSPointer) Then
-                                                Call db.db_setCS(CSPointer, "Name", webServer.requestPathPage)
-                                                Call db.db_setCS(CSPointer, "sourcelink", webServer.requestPathPage)
-                                                Call db.db_setCS(CSPointer, "Viewings", 1)
+                                                Call db.cs_set(CSPointer, "Name", webServer.requestPathPage)
+                                                Call db.cs_set(CSPointer, "sourcelink", webServer.requestPathPage)
+                                                Call db.cs_set(CSPointer, "Viewings", 1)
                                             End If
                                             Call db.cs_Close(CSPointer)
                                         End If
@@ -22007,7 +21919,7 @@ ErrorTrap:
             ' stylesheets first -- for performance
             ' put stylesheets inline without processing
             '
-            If (True) And EncodeBoolean(siteProperties.getBoolean("Allow CSS Reset", False)) Then
+            If siteProperties.getBoolean("Allow CSS Reset") Then
                 '
                 ' reset styles
                 '
@@ -22266,13 +22178,13 @@ ErrorTrap:
             Dim CS As Integer
             Dim Id As Integer
             '
-            CS = db.db_csInsertRecord(ContentName, CreatedBy)
+            CS = db.cs_insertRecord(ContentName, CreatedBy)
             If db.cs_Ok(CS) Then
                 Id = db.cs_getInteger(CS, "ID")
-                Call db.db_setCS(CS, "name", PageName)
-                Call db.db_setCS(CS, "active", "1")
+                Call db.cs_set(CS, "name", PageName)
+                Call db.cs_set(CS, "active", "1")
                 If True Then
-                    Call db.db_setCS(CS, "ccGuid", pageGuid)
+                    Call db.cs_set(CS, "ccGuid", pageGuid)
                 End If
                 Call db.db_SaveCSRecord(CS)
                 Call workflow.publishEdit("Page Content", Id)
@@ -22304,7 +22216,7 @@ ErrorTrap:
             Dim NameOK As Boolean
             Dim SectionNameTry As String
             '
-            If (main_PageErrorCount = 0) And EncodeBoolean(siteProperties.getBoolean("AllowAutoHomeSectionOnce", False)) Then
+            If (main_PageErrorCount = 0) And siteProperties.getBoolean("AllowAutoHomeSectionOnce") Then
                 '
                 SectionTemplateID = pageManager_LoadTemplateGetID(0)
                 '
@@ -22323,20 +22235,20 @@ ErrorTrap:
                     LoopPtr = LoopPtr + 1
                 Loop
                 '
-                CS = db.db_csInsertRecord("Site Sections")
+                CS = db.cs_insertRecord("Site Sections")
                 If db.cs_Ok(CS) Then
                     SectionID = db.cs_getInteger(CS, "ID")
-                    Call db.db_setCS(CS, "Name", SectionNameTry)
-                    Call db.db_setCS(CS, "Caption", DefaultLandingSectionName)
-                    Call db.db_setCS(CS, "SortOrder", -1)
-                    Call db.db_setCS(CS, "HideMenu", False)
-                    Call db.db_setCS(CS, "contentid", SectionContentID)
-                    Call db.db_setCS(CS, "TemplateID", SectionTemplateID)
+                    Call db.cs_set(CS, "Name", SectionNameTry)
+                    Call db.cs_set(CS, "Caption", DefaultLandingSectionName)
+                    Call db.cs_set(CS, "SortOrder", -1)
+                    Call db.cs_set(CS, "HideMenu", False)
+                    Call db.cs_set(CS, "contentid", SectionContentID)
+                    Call db.cs_set(CS, "TemplateID", SectionTemplateID)
                     If True Then
-                        Call db.db_setCS(CS, "RootPageID", rootPageId)
+                        Call db.cs_set(CS, "RootPageID", rootPageId)
                     End If
                     If True Then
-                        Call db.db_setCS(CS, "ccGuid", DefaultLandingSectionGuid)
+                        Call db.cs_set(CS, "ccGuid", DefaultLandingSectionGuid)
                     End If
                 End If
                 Call db.cs_Close(CS)
@@ -22352,10 +22264,10 @@ ErrorTrap:
                 '
                 ' Add the new landing section to the default menu
                 '
-                CS = db.db_csInsertRecord("Dynamic Menu Section Rules")
+                CS = db.cs_insertRecord("Dynamic Menu Section Rules")
                 If db.cs_Ok(CS) Then
-                    Call db.db_setCS(CS, "DynamicMenuID", DefaultMenuID)
-                    Call db.db_setCS(CS, "SectionID", SectionID)
+                    Call db.cs_set(CS, "DynamicMenuID", DefaultMenuID)
+                    Call db.cs_set(CS, "SectionID", SectionID)
                 End If
                 Call db.cs_Close(CS)
                 '
@@ -22424,7 +22336,7 @@ ErrorTrap:
                         & " and M.GroupID=R.GroupID" _
                         & " and R.Active<>0" _
                         & " and M.Active<>0" _
-                        & " and ((M.DateExpires is null)or(M.DateExpires>" & db.db_EncodeSQLDate(main_PageStartTime) & "))"
+                        & " and ((M.DateExpires is null)or(M.DateExpires>" & db.encodeSQLDate(main_PageStartTime) & "))"
                     SQL = db_GetSQLSelect("", "ccmemberRules M,ccSectionBlockRules R", "M.ID", SQLWhere, , , 1)
                     CS = db.cs_openSql(SQL)
                     'SQL = "select ID" _
@@ -22526,7 +22438,7 @@ ErrorTrap:
                                         '
                                         'Call app.db_DeleteContentRecords("Topic Rules", "ContentRecordKey=" & encodeSQLText(ContentRecordKey))
                                         'Call app.db_DeleteContentRecords("Topic Habits", "ContentRecordKey=" & encodeSQLText(ContentRecordKey))
-                                        Call db.db_DeleteContentRecords("Content Watch", "ContentRecordKey=" & db.encodeSQLText(ContentRecordKey))
+                                        Call db.deleteContentRecords("Content Watch", "ContentRecordKey=" & db.encodeSQLText(ContentRecordKey))
                                         Call metaData_DeleteContentTracking(ContentName, RecordID, True)
                                     Else
 
@@ -22700,7 +22612,7 @@ ErrorTrap:
         '
         '
         '
-        Friend Sub html_AddComboTabEntry(Caption As String, Link As String, AjaxLink As String, LiveBody As String, IsHit As Boolean, ContainerClass As String)
+        Friend Sub menu_AddComboTabEntry(Caption As String, Link As String, AjaxLink As String, LiveBody As String, IsHit As Boolean, ContainerClass As String)
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("AddComboTabEntry")
             '
             ' should use the ccNav object, no the ccCommon module for this code
@@ -22717,7 +22629,7 @@ ErrorTrap:
         '
         '
         '
-        Friend Function main_GetComboTabs() As String
+        Friend Function menu_GetComboTabs() As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetComboTabs")
             '
             ' should use the ccNav object, no the ccCommon module for this code
@@ -22725,7 +22637,7 @@ ErrorTrap:
             If (html_ComboTabObject Is Nothing) Then
                 html_ComboTabObject = New coreMenuComboTabClass
             End If
-            main_GetComboTabs = html_ComboTabObject.GetTabs()
+            menu_GetComboTabs = html_ComboTabObject.GetTabs()
             '
             Exit Function
 ErrorTrap:
@@ -22739,7 +22651,7 @@ ErrorTrap:
         '   read it first to main_Get the correct contentid
         '============================================================================================================
         '
-        Friend Function main_SetContentControl(ByVal ContentID As Integer, ByVal RecordID As Integer, ByVal NewContentControlID As Integer, Optional ByVal UsedIDString As String = "") As Integer
+        Friend Function content_SetContentControl(ByVal ContentID As Integer, ByVal RecordID As Integer, ByVal NewContentControlID As Integer, Optional ByVal UsedIDString As String = "") As Integer
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SetContentControl")
             '
             Dim SQL As String
@@ -22776,7 +22688,7 @@ ErrorTrap:
                         SQL = "select contentcontrolid,ID from " & RecordTableName & " where ParentID=" & RecordID
                         CS = db.db_openCsSql_rev(DataSourceName, SQL)
                         Do While db.cs_Ok(CS)
-                            Call main_SetContentControl(db.cs_getInteger(CS, "contentcontrolid"), db.cs_getInteger(CS, "ID"), NewContentControlID, UsedIDString & "," & RecordID)
+                            Call content_SetContentControl(db.cs_getInteger(CS, "contentcontrolid"), db.cs_getInteger(CS, "ID"), NewContentControlID, UsedIDString & "," & RecordID)
                             db.db_csGoNext(CS)
                         Loop
                         Call db.cs_Close(CS)
@@ -22804,12 +22716,12 @@ ErrorTrap:
         '
         '========================================================================
         '
-        Public Function main_VerifyDynamicMenu(ByVal MenuName As String) As Integer
+        Public Function menu_VerifyDynamicMenu(ByVal MenuName As String) As Integer
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("VerifyDynamicMenu")
             '
             'If Not (true) Then Exit Function
             '
-            main_VerifyDynamicMenu = csv_VerifyDynamicMenu(EncodeText(MenuName))
+            menu_VerifyDynamicMenu = csv_VerifyDynamicMenu(EncodeText(MenuName))
             '
             Exit Function
 ErrorTrap:
@@ -22820,12 +22732,12 @@ ErrorTrap:
         '
         '========================================================================
         '
-        Friend Function main_GetDynamicMenuACSelect() As String
+        Friend Function menu_GetDynamicMenuACSelect() As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetDynamicMenuACSelect")
             '
             'If Not (true) Then Exit Function
             '
-            main_GetDynamicMenuACSelect = csv_GetDynamicMenuACSelect()
+            menu_GetDynamicMenuACSelect = csv_GetDynamicMenuACSelect()
             '
             Exit Function
 ErrorTrap:
@@ -22871,118 +22783,16 @@ ErrorTrap:
         '
         '========================================================================
         '
-        Public Function main_GetAdminFormBody(Caption As String, ButtonListLeft As String, ButtonListRight As String, AllowAdd As Boolean, AllowDelete As Boolean, Description As String, ContentSummary As String, ContentPadding As Integer, Content As String) As String
+        Public Function admin_GetAdminFormBody(Caption As String, ButtonListLeft As String, ButtonListRight As String, AllowAdd As Boolean, AllowDelete As Boolean, Description As String, ContentSummary As String, ContentPadding As Integer, Content As String) As String
             Dim Adminui As New coreAdminUIClass(Me)
             '
-            main_GetAdminFormBody = Adminui.GetBody(Caption, ButtonListLeft, ButtonListRight, AllowAdd, AllowDelete, Description, ContentSummary, ContentPadding, Content)
-        End Function
-        '
-        '========================================================================
-        '
-        '========================================================================
-        '
-        Public Function main_GetWizardContent(HeaderCaption As String, ButtonListLeft As String, ButtonListRight As String, AllowAdd As Boolean, AllowDelete As Boolean, Description As String, Content As String) As String
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("main_GetWizardContent")
-            '
-            Dim Stream As New coreFastStringClass
-            Dim ButtonBarLeft As String
-            Dim ButtonBarRight As String
-            Dim Buttons() As String
-            Dim Button As String
-            Dim Ptr As Integer
-            Dim ButtonBar As String
-            Dim ButtonList As String
-            Dim Copy As String
-            Dim Adminui As New coreAdminUIClass(Me)
-            Dim RightButtons As String
-            Dim LeftButtons As String
-            '
-            ButtonList = ""
-            If Trim(ButtonListLeft) <> "" Then
-                LeftButtons = Adminui.GetButtonsFromList(ButtonListLeft, True, True, "Button")
-            End If
-            If Trim(ButtonListRight) <> "" Then
-                RightButtons = Adminui.GetButtonsFromList(ButtonListRight, True, True, "Button")
-            End If
-            ButtonBar = Adminui.GetButtonBar(LeftButtons, RightButtons)
-            '
-            ' When run from admin, they should not main_Get forms
-            '
-            '    Stream.Add( main_GetUploadFormStart()
-            ''
-            '' Lay down background for description, content summary and content
-            ''
-            'Stream.Add( "<table border=0 cellpadding=10 cellspacing=0 width=""100%""><tr><td valign=top class=""ccWizardPanel"">"
-            '    '
-            '    ' Description and content toGether must be at least 200
-            '    '
-            '    Stream.Add( "<table border=0 cellpadding=10 cellspacing=0 width=""100%"" height=200><tr><td valign=top>"
-            '    '
-            '    ' Description
-            '    '
-            Dim cellDescription As String
-            Dim CellContent As String
-            Dim CellInner As String
-            If Description <> "" Then
-                cellDescription = "" _
-                    & cr & "<div>" _
-                    & kmaIndent(Description) _
-                    & cr & "</div>"
-            End If
-            '
-            If Content <> "" Then
-                CellContent = "" _
-                    & cr & "<div>" _
-                    & kmaIndent(Content) _
-                    & cr & "</div>"
-            End If
-            '
-            CellInner = "" _
-                & cr & "<table border=0 cellpadding=10 cellspacing=0 height=100 width=""100%""><tr><td valign=top>" _
-                & kmaIndent(CellContent) _
-                & cr & "</td></tr></table>"
-            '
-            If ButtonBar <> "" Then
-                CellInner = CellInner _
-                    & cr & "<div>" _
-                    & kmaIndent(ButtonBar) _
-                    & cr & "</div>"
-            End If
-            '
-            ' add Header
-            '
-            If HeaderCaption <> "" Then
-                Stream.Add("" _
-                    & cr & "<div class=""ccWizardHeader"">" _
-                    & kmaIndent(HeaderCaption) _
-                    & "</div>")
-                'Stream.Add( "<table border=0 cellpadding=0 cellspacing=0 width=""100%""><tr><td valign=top class=""ccWizardHeader"">" & HeaderCaption & "</td></tr></table>"
-            End If
-            '
-            ' Make WizardPanel
-            '
-            Stream.Add("" _
-                & cr & "<table border=0 cellpadding=10 cellspacing=0 width=""100%""><tr><td valign=top class=""ccWizardPanel"">" _
-                & kmaIndent(cellDescription) _
-                & kmaIndent(CellInner) _
-                & cr & "</td></tr></table>")
-            main_GetWizardContent = "" _
-                & cr & "<table border=0 cellpadding=0 cellspacing=0 width=500 align=center><tr><td valign=top>" _
-                & kmaIndent(Stream.Text & "<br><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=400 height=1>") _
-                & cr & "</td></tr></table>"
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18("main_GetWizardContent")
+            admin_GetAdminFormBody = Adminui.GetBody(Caption, ButtonListLeft, ButtonListRight, AllowAdd, AllowDelete, Description, ContentSummary, ContentPadding, Content)
         End Function
         '
         '
         '
-        Private Function main_GetDefaultBlockMessage(UseContentWatchLink As Boolean) As String
-            main_GetDefaultBlockMessage = ""
+        Private Function pageManager_GetDefaultBlockMessage(UseContentWatchLink As Boolean) As String
+            pageManager_GetDefaultBlockMessage = ""
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("main_GetDefaultBlockMessage")
             '
             Dim CS As Integer
@@ -22990,22 +22800,22 @@ ErrorTrap:
             '
             CS = db.csOpen("Copy Content", "name=" & db.encodeSQLText(ContentBlockCopyName), "ID", , , , , "Copy,ID")
             If db.cs_Ok(CS) Then
-                main_GetDefaultBlockMessage = db.db_GetCS(CS, "Copy")
+                pageManager_GetDefaultBlockMessage = db.db_GetCS(CS, "Copy")
             End If
             Call db.cs_Close(CS)
             '
             ' ----- Do not allow blank message - if still nothing, create default
             '
-            If main_GetDefaultBlockMessage = "" Then
-                main_GetDefaultBlockMessage = "<p>The content on this page has restricted access. If you have a username and password for this system, <a href=""?method=login"" rel=""nofollow"">Click Here</a>. For more information, please contact the administrator.</p>"
+            If pageManager_GetDefaultBlockMessage = "" Then
+                pageManager_GetDefaultBlockMessage = "<p>The content on this page has restricted access. If you have a username and password for this system, <a href=""?method=login"" rel=""nofollow"">Click Here</a>. For more information, please contact the administrator.</p>"
             End If
             '
             ' ----- Create Copy Content Record for future
             '
-            CS = db.db_csInsertRecord("Copy Content")
+            CS = db.cs_insertRecord("Copy Content")
             If db.cs_Ok(CS) Then
-                Call db.db_setCS(CS, "Name", ContentBlockCopyName)
-                Call db.db_setCS(CS, "Copy", main_GetDefaultBlockMessage)
+                Call db.cs_set(CS, "Name", ContentBlockCopyName)
+                Call db.cs_set(CS, "Copy", pageManager_GetDefaultBlockMessage)
                 Call db.db_SaveCSRecord(CS)
                 Call workflow.publishEdit("Copy Content", EncodeInteger(db.db_GetCS(CS, "ID")))
             End If
@@ -23039,7 +22849,7 @@ ErrorTrap:
         '   {{CAPTION}} tags -- main_Gets the caption for each instruction line
         '   {{FIELD}} tags -- main_Gets the form field for each instruction line
         '
-        Private Function main_LoadFormPageInstructions(FormInstructions As String, Formhtml As String) As main_FormPagetype
+        Private Function pageManager_LoadFormPageInstructions(FormInstructions As String, Formhtml As String) As main_FormPagetype
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("main_LoadFormPageInstructions")
             '
             Dim RepeatBody As String
@@ -23125,7 +22935,7 @@ ErrorTrap:
                 End If
             End If
             '
-            main_LoadFormPageInstructions = f
+            pageManager_LoadFormPageInstructions = f
             '
             Exit Function
             '
@@ -23137,7 +22947,7 @@ ErrorTrap:
         '
         '
         '
-        Private Function main_GetFormPage(FormPageName As String, GroupIDToJoinOnSuccess As Integer) As String
+        Private Function pageManager_GetFormPage(FormPageName As String, GroupIDToJoinOnSuccess As Integer) As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("main_GetFormPage")
             '
             Dim RepeatBody As String
@@ -23178,7 +22988,7 @@ ErrorTrap:
                 FormInstructions = db.cs_getText(CS, "Instructions")
             End If
             Call db.cs_Close(CS)
-            f = main_LoadFormPageInstructions(FormInstructions, Formhtml)
+            f = pageManager_LoadFormPageInstructions(FormInstructions, Formhtml)
             '
             '
             '
@@ -23232,7 +23042,7 @@ ErrorTrap:
                 RepeatBody = RepeatBody & Body
             End If
             '
-            main_GetFormPage = "" _
+            pageManager_GetFormPage = "" _
             & error_GetUserError() _
             & html_GetUploadFormStart() _
             & html_GetFormInputHidden("ContensiveFormPageID", FormPageID) _
@@ -23252,7 +23062,7 @@ ErrorTrap:
         '
         '
         '
-        Private Sub main_ProcessFormPage(FormPageID As Integer)
+        Private Sub pageManager_ProcessFormPage(FormPageID As Integer)
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("main_ProcessFormPage")
             '
             Dim CS As Integer
@@ -23288,7 +23098,7 @@ ErrorTrap:
                 '
                 ' Load the instructions
                 '
-                f = main_LoadFormPageInstructions(FormInstructions, Formhtml)
+                f = pageManager_LoadFormPageInstructions(FormInstructions, Formhtml)
                 If f.AuthenticateOnFormProcess And Not user.isAuthenticated() And user.user_isRecognized() Then
                     '
                     ' If this form will authenticate when done, and their is a current, non-authenticated account -- logout first
@@ -23327,24 +23137,24 @@ ErrorTrap:
                                         Select Case UCase(.PeopleField)
                                             Case "NAME"
                                                 PeopleName = FormValue
-                                                Call db.db_setCS(CSPeople, .PeopleField, FormValue)
+                                                Call db.cs_set(CSPeople, .PeopleField, FormValue)
                                             Case "FIRSTNAME"
                                                 PeopleFirstName = FormValue
-                                                Call db.db_setCS(CSPeople, .PeopleField, FormValue)
+                                                Call db.cs_set(CSPeople, .PeopleField, FormValue)
                                             Case "LASTNAME"
                                                 PeopleLastName = FormValue
-                                                Call db.db_setCS(CSPeople, .PeopleField, FormValue)
+                                                Call db.cs_set(CSPeople, .PeopleField, FormValue)
                                             Case "EMAIL"
                                                 PeopleEmail = FormValue
-                                                Call db.db_setCS(CSPeople, .PeopleField, FormValue)
+                                                Call db.cs_set(CSPeople, .PeopleField, FormValue)
                                             Case "USERNAME"
                                                 PeopleUsername = FormValue
-                                                Call db.db_setCS(CSPeople, .PeopleField, FormValue)
+                                                Call db.cs_set(CSPeople, .PeopleField, FormValue)
                                             Case "PASSWORD"
                                                 PeoplePassword = FormValue
-                                                Call db.db_setCS(CSPeople, .PeopleField, FormValue)
+                                                Call db.cs_set(CSPeople, .PeopleField, FormValue)
                                             Case Else
-                                                Call db.db_setCS(CSPeople, .PeopleField, FormValue)
+                                                Call db.cs_set(CSPeople, .PeopleField, FormValue)
                                         End Select
                                     End If
                                 End If
@@ -23367,7 +23177,7 @@ ErrorTrap:
                 '
                 If PeopleName = "" And PeopleFirstName <> "" And PeopleLastName <> "" Then
                     If db.cs_Ok(CSPeople) Then
-                        Call db.db_setCS(CSPeople, "name", PeopleFirstName & " " & PeopleLastName)
+                        Call db.cs_set(CSPeople, "name", PeopleFirstName & " " & PeopleLastName)
                     End If
                 End If
                 Call db.cs_Close(CSPeople)
@@ -23422,7 +23232,7 @@ ErrorTrap:
             Dim GroupNameList As String
             Dim Copy As String
             '
-            Call db.db_DeleteContentRecords("Form Pages", "name=" & db.encodeSQLText("Registration Form"))
+            Call db.deleteContentRecords("Form Pages", "name=" & db.encodeSQLText("Registration Form"))
             CS = db.csOpen("Form Pages", "name=" & db.encodeSQLText("Registration Form"))
             If Not db.cs_Ok(CS) Then
                 '
@@ -23430,16 +23240,16 @@ ErrorTrap:
                 '
                 Call db.cs_Close(CS)
                 GroupNameList = "Registered"
-                CS = db.db_csInsertRecord("Form Pages")
+                CS = db.cs_insertRecord("Form Pages")
                 If db.cs_Ok(CS) Then
-                    Call db.db_setCS(CS, "name", "Registration Form")
+                    Call db.cs_set(CS, "name", "Registration Form")
                     Copy = "" _
                         & vbCrLf & "<table border=""0"" cellpadding=""2"" cellspacing=""0"" width=""100%"">" _
                         & vbCrLf & "{{REPEATSTART}}<tr><td align=right style=""height:22px;"">{{CAPTION}}&nbsp;</td><td align=left>{{FIELD}}</td></tr>{{REPEATEND}}" _
                         & vbCrLf & "<tr><td align=right><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=135 height=1></td><td width=""100%"">&nbsp;</td></tr>" _
                         & vbCrLf & "<tr><td colspan=2>&nbsp;<br>" & main_GetPanelButtons(ButtonRegister, "Button") & "</td></tr>" _
                         & vbCrLf & "</table>"
-                    Call db.db_setCS(CS, "Body", Copy)
+                    Call db.cs_set(CS, "Body", Copy)
                     Copy = "" _
                         & "1" _
                         & vbCrLf & GroupNameList _
@@ -23450,7 +23260,7 @@ ErrorTrap:
                         & vbCrLf & "1,Phone,true,Phone" _
                         & vbCrLf & "2,Please keep me informed of news and events,false,Subscribers" _
                         & ""
-                    Call db.db_setCS(CS, "Instructions", Copy)
+                    Call db.cs_set(CS, "Instructions", Copy)
                 End If
             End If
             Call db.cs_Close(CS)
@@ -23538,7 +23348,7 @@ ErrorTrap:
                         Menu = "Default"
                     End If
                 End If
-                MenuID = main_VerifyDynamicMenu(Menu)
+                MenuID = menu_VerifyDynamicMenu(Menu)
                 '
                 ' Open the Menu
                 '
@@ -23548,7 +23358,7 @@ ErrorTrap:
                     ' ID was given, but no found in Db
                     '
                     Call db.cs_Close(CS)
-                    CS = db_csOpen("Dynamic Menus", main_VerifyDynamicMenu("Default"))
+                    CS = db_csOpen("Dynamic Menus", menu_VerifyDynamicMenu("Default"))
                 End If
                 If db.cs_Ok(CS) Then
                     '
@@ -23719,7 +23529,7 @@ ErrorTrap:
         '
         '
         '
-        Public Sub cs_SetCSFormInput(ByVal CSPointer As Integer, ByVal FieldName As String, Optional ByVal RequestName As String = "")
+        Public Sub db_cs_setFormInput(ByVal CSPointer As Integer, ByVal FieldName As String, Optional ByVal RequestName As String = "")
             On Error GoTo ErrorTrap
             '
             Dim LocalRequestName As String
@@ -23742,17 +23552,17 @@ ErrorTrap:
                         '
                         ' Boolean
                         '
-                        Call db.db_setCS(CSPointer, FieldName, main_GetStreamBoolean2(LocalRequestName))
+                        Call db.cs_set(CSPointer, FieldName, main_GetStreamBoolean2(LocalRequestName))
                     Case FieldTypeIdCurrency, FieldTypeIdFloat, FieldTypeIdInteger, FieldTypeIdLookup, FieldTypeIdManyToMany
                         '
                         ' Numbers
                         '
-                        Call db.db_setCS(CSPointer, FieldName, main_GetStreamNumber2(LocalRequestName))
+                        Call db.cs_set(CSPointer, FieldName, main_GetStreamNumber2(LocalRequestName))
                     Case FieldTypeIdDate
                         '
                         ' Date
                         '
-                        Call db.db_setCS(CSPointer, FieldName, doc_getDate(LocalRequestName))
+                        Call db.cs_set(CSPointer, FieldName, doc_getDate(LocalRequestName))
                     Case FieldTypeIdFile, FieldTypeIdFileImage
                         '
                         '
@@ -23769,7 +23579,7 @@ ErrorTrap:
                         '
                         ' text files
                         '
-                        Call db.db_setCS(CSPointer, FieldName, docProperties.getText(LocalRequestName))
+                        Call db.cs_set(CSPointer, FieldName, docProperties.getText(LocalRequestName))
                 End Select
             End If
 
@@ -23810,7 +23620,7 @@ ErrorTrap:
         Private Function pageManager_GetStyleTagPublic() As String
             Dim StyleSN As Integer
             '
-            If (True) And EncodeBoolean(siteProperties.getBoolean("Allow CSS Reset", False)) Then
+            If siteProperties.getBoolean("Allow CSS Reset") Then
                 pageManager_GetStyleTagPublic = pageManager_GetStyleTagPublic & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & web_requestProtocol & main_ServerDomain & "/cclib/styles/ccreset.css"" >"
             End If
             StyleSN = EncodeInteger(siteProperties.getText("StylesheetSerialNumber", "0"))
@@ -23981,12 +23791,12 @@ ErrorTrap:
         ' ----- Encode Active Content AI
         '========================================================================
         '
-        Public Function main_DecodeContent(ByVal Source As String) As String
+        Public Function html_DecodeContent(ByVal Source As String) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("DecodeContent")
             '
             'If Not (true) Then Exit Function
             '
-            main_DecodeContent = csv_DecodeContent(EncodeText(Source))
+            html_DecodeContent = html_DecodeContent2(EncodeText(Source))
             '
             Exit Function
             '
@@ -24006,10 +23816,10 @@ ErrorTrap:
         '           so an object can call encodecontentforweb.
         '==========================================================================================================================================
         '
-        Public Function encodeContentForWeb(Source As String, ContextContentName As String, ContextRecordID As Integer, Ignore_BasePath As String, WrapperID As Integer) As String
+        Public Function html_encodeContentForWeb(Source As String, ContextContentName As String, ContextRecordID As Integer, Ignore_BasePath As String, WrapperID As Integer) As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("EncodeContentForWeb")
             '
-            encodeContentForWeb = html_encodeContent9(Source, user.id, ContextContentName, ContextRecordID, 0, False, False, True, True, False, True, "", "", False, WrapperID, "", addonContextEnum.ContextPage)
+            html_encodeContentForWeb = html_encodeContent9(Source, user.id, ContextContentName, ContextRecordID, 0, False, False, True, True, False, True, "", "", False, WrapperID, "", addonContextEnum.ContextPage)
             '
             Exit Function
 ErrorTrap:
@@ -27141,7 +26951,7 @@ ErrorTrap:
                         PageContentID = db.cs_getInteger(CS, "ContentID")
                         If PageContentID = 0 Then
                             PageContentID = main_GetContentID("Page Content")
-                            Call db.db_setCS(CS, "ContentID", PageContentID)
+                            Call db.cs_set(CS, "ContentID", PageContentID)
                         End If
                         rootPageId = db.cs_getInteger(CS, "RootPageID")
                         If rootPageId = 0 Then
@@ -27153,7 +26963,7 @@ ErrorTrap:
                             If pageContentName = "" Then
                                 pageContentName = "Page Content"
                             End If
-                            Call db.db_setCS(CS, "RootPageID", main_CreatePageGetID(PageName, "Page Content", user.id, ""))
+                            Call db.cs_set(CS, "RootPageID", main_CreatePageGetID(PageName, "Page Content", user.id, ""))
                             Call pageManager_cache_pageContent_clear()
                         End If
                     End If
@@ -27185,7 +26995,7 @@ ErrorTrap:
                     ' if a AltSizeList is blank, make large,medium,small and thumbnails
                     '
                     'hint = hint & ",180"
-                    If (True) And (EncodeBoolean(siteProperties.getBoolean("ImageAllowSFResize", True))) Then
+                    If (siteProperties.getBoolean("ImageAllowSFResize", True)) Then
                         If Not IsDelete Then
                             CS = db_csOpen("library files", RecordID)
                             If db.cs_Ok(CS) Then
@@ -27195,7 +27005,7 @@ ErrorTrap:
                                     FilePath = Mid(Filename, 1, Pos)
                                     Filename = Mid(Filename, Pos + 1)
                                 End If
-                                Call db.db_setCS(CS, "filesize", main_GetFileSize(appRootFiles.rootLocalFolderPath & FilePath & Filename))
+                                Call db.cs_set(CS, "filesize", main_GetFileSize(appRootFiles.rootLocalFolderPath & FilePath & Filename))
                                 Pos = InStrRev(Filename, ".")
                                 If Pos > 0 Then
                                     FilenameExt = Mid(Filename, Pos + 1)
@@ -27206,8 +27016,8 @@ ErrorTrap:
                                             '
                                             '
                                             '
-                                            Call db.db_setCS(CS, "height", sf.height)
-                                            Call db.db_setCS(CS, "width", sf.width)
+                                            Call db.cs_set(CS, "height", sf.height)
+                                            Call db.cs_set(CS, "width", sf.width)
                                             AltSizeList = db.cs_getText(CS, "AltSizeList")
                                             RebuildSizes = (AltSizeList = "")
                                             If RebuildSizes Then
@@ -27249,7 +27059,7 @@ ErrorTrap:
                                                     Call sf.save(appRootFiles.rootLocalFolderPath & FilePath & FilenameNoExt & "-180x" & sf.height & "." & FilenameExt)
                                                     AltSizeList = AltSizeList & vbCrLf & "80x" & sf.height
                                                 End If
-                                                Call db.db_setCS(CS, "AltSizeList", AltSizeList)
+                                                Call db.cs_set(CS, "AltSizeList", AltSizeList)
                                             End If
                                             Call sf.Dispose()
                                             sf = Nothing
@@ -27741,7 +27551,7 @@ ErrorTrap:
                 DataSourceName = main_GetContentDataSource(ContentName)
                 TableName = db_GetContentTablename(ContentName)
                 '
-                SQL = "update " & TableName & " set DateReviewed=" & db.db_EncodeSQLDate(main_PageStartTime)
+                SQL = "update " & TableName & " set DateReviewed=" & db.encodeSQLDate(main_PageStartTime)
                 If main_IsContentFieldSupported(ContentName, "ReviewedBy") Then
                     SQL &= ",ReviewedBy=" & user.id
                 End If
@@ -27804,7 +27614,7 @@ ErrorTrap:
         '
         '
         Public Sub main_LogActivity2(Message As String, SubjectMemberID As Integer, SubjectOrganizationID As Integer)
-            Call logActivity(Message, user.id, SubjectMemberID, SubjectOrganizationID, main_ServerLink, main_VisitorID, main_VisitId)
+            Call logActivity(Message, user.id, SubjectMemberID, SubjectOrganizationID, main_ServerLink, visitor_id, visit_Id)
         End Sub
         '
         '=================================================================================================
@@ -27935,7 +27745,7 @@ ErrorTrap:
                 ' main_Get values out of the remote query record
                 '
                 If gv.status = GoogleVisualizationStatusEnum.OK Then
-                    CS = db.csOpen("Remote Queries", "((VisitId=" & main_VisitId & ")and(remotekey=" & db.encodeSQLText(RemoteKey) & "))")
+                    CS = db.csOpen("Remote Queries", "((VisitId=" & visit_Id & ")and(remotekey=" & db.encodeSQLText(RemoteKey) & "))")
                     If db.cs_Ok(CS) Then
                         '
                         ' Use user definied query
@@ -28149,7 +27959,7 @@ ErrorTrap:
                                                     Dim errorMessage As String = "result, QueryTypeUpdateContent, key [" & RemoteKey & "], bad field [" & FieldName & "] skipped"
                                                     Call handleExceptionAndRethrow(New ApplicationException(errorMessage))
                                                 Else
-                                                    Call db.db_setCS(CS, FieldName, FieldValue)
+                                                    Call db.cs_set(CS, FieldName, FieldValue)
                                                 End If
                                             End If
                                         End If
@@ -28197,13 +28007,13 @@ ErrorTrap:
             If db.cs_Ok(CS) Then
                 RemoteKey = Guid.NewGuid.ToString()
                 DataSourceID = main_GetRecordID("Data Sources", DataSourceName)
-                Call db.db_setCS(CS, "remotekey", RemoteKey)
-                Call db.db_setCS(CS, "datasourceid", DataSourceID)
-                Call db.db_setCS(CS, "sqlquery", SQL)
-                Call db.db_setCS(CS, "maxRows", maxRows)
-                Call db.db_setCS(CS, "dateexpires", db.db_EncodeSQLDate(main_PageStartTime.AddDays(1)))
-                Call db.db_setCS(CS, "QueryTypeID", QueryTypeSQL)
-                Call db.db_setCS(CS, "VisitId", main_VisitId)
+                Call db.cs_set(CS, "remotekey", RemoteKey)
+                Call db.cs_set(CS, "datasourceid", DataSourceID)
+                Call db.cs_set(CS, "sqlquery", SQL)
+                Call db.cs_set(CS, "maxRows", maxRows)
+                Call db.cs_set(CS, "dateexpires", db.encodeSQLDate(main_PageStartTime.AddDays(1)))
+                Call db.cs_set(CS, "QueryTypeID", QueryTypeSQL)
+                Call db.cs_set(CS, "VisitId", visit_Id)
             End If
             Call db.cs_Close(CS)
             '
@@ -28305,7 +28115,7 @@ ErrorTrap:
         '
         Private Sub log_appendLogPageNotFound(PageNotFoundLink As String)
             Try
-                Call log_appendLog("""" & FormatDateTime(main_PageStartTime, vbGeneralDate) & """,""App=" & appConfig.name & """,""main_VisitId=" & main_VisitId & """,""" & PageNotFoundLink & """,""Referrer=" & webServer.requestReferrer & """", "performance", "pagenotfound")
+                Call log_appendLog("""" & FormatDateTime(main_PageStartTime, vbGeneralDate) & """,""App=" & appConfig.name & """,""main_VisitId=" & visit_Id & """,""" & PageNotFoundLink & """,""Referrer=" & webServer.requestReferrer & """", "performance", "pagenotfound")
             Catch ex As Exception
                 handleExceptionAndRethrow(ex)
             End Try
@@ -28453,7 +28263,7 @@ ErrorTrap:
             If True Then
                 doc_getActiveContent = docProperties.getText(RequestName)
                 If doc_getActiveContent <> "" Then
-                    doc_getActiveContent = csv_DecodeContent(EncodeText(doc_getActiveContent))
+                    doc_getActiveContent = html_DecodeContent2(EncodeText(doc_getActiveContent))
                 End If
             End If
             '
@@ -28687,7 +28497,7 @@ ErrorTrap:
                         '
                         ' 5/12/2008 - converted to RootPageID call because we do not use RootPageName anymore
                         '
-                        allowPageWithoutSectionDisplay = EncodeBoolean(siteProperties.getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default))
+                        allowPageWithoutSectionDisplay = siteProperties.getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default)
                         If Not allowPageWithoutSectionDisplay Then
                             allowPageWithoutSectionDisplay = user.isAuthenticatedContentManager(ContentName)
                         End If
@@ -28876,7 +28686,7 @@ ErrorTrap:
                     On Error Resume Next
                     Err.Clear()
                     InsertTestOK = False
-                    CS = db.db_csInsertRecord("Trap Log")
+                    CS = db.cs_insertRecord("Trap Log")
                     If Not db.cs_Ok(CS) Then
                         Call handleLegacyError10(KmaErrorInternal, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was not OK.", "Init", False, True)
                     Else
@@ -28933,7 +28743,7 @@ ErrorTrap:
                         ' main_Get the page
                         '
                         rootPageId = main_GetRecordID("Page Content", Name)
-                        allowPageWithoutSectionDisplay = EncodeBoolean(siteProperties.getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default))
+                        allowPageWithoutSectionDisplay = siteProperties.getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default)
                         If Not allowPageWithoutSectionDisplay Then
                             allowPageWithoutSectionDisplay = user.isAuthenticatedContentManager(ContentName)
                         End If
@@ -29044,19 +28854,19 @@ ErrorTrap:
                         '
                         CS = db.csOpen("Orders", "(ID=" & ConfirmOrderID & ") and ((OrderCompleted=0)or(OrderCompleted is Null))")
                         If db.cs_Ok(CS) Then
-                            Call db.db_setCS(CS, "OrderCompleted", True)
-                            Call db.db_setCS(CS, "DateCompleted", main_PageStartTime)
-                            Call db.db_setCS(CS, "ccAuthCode", docProperties.getText("txn_id"))
-                            Call db.db_setCS(CS, "ccActionCode", docProperties.getText("payment_status"))
-                            Call db.db_setCS(CS, "ccRefCode", docProperties.getText("pending_reason"))
-                            Call db.db_setCS(CS, "PayMethod", "PayPal " & docProperties.getText("payment_type"))
-                            Call db.db_setCS(CS, "ShipName", docProperties.getText("first_name") & " " & docProperties.getText("last_name"))
-                            Call db.db_setCS(CS, "ShipAddress", docProperties.getText("address_street"))
-                            Call db.db_setCS(CS, "ShipCity", docProperties.getText("address_city"))
-                            Call db.db_setCS(CS, "ShipState", docProperties.getText("address_state"))
-                            Call db.db_setCS(CS, "ShipZip", docProperties.getText("address_zip"))
-                            Call db.db_setCS(CS, "BilleMail", docProperties.getText("payer_email"))
-                            Call db.db_setCS(CS, "ContentControlID", main_GetContentID("Orders Completed"))
+                            Call db.cs_set(CS, "OrderCompleted", True)
+                            Call db.cs_set(CS, "DateCompleted", main_PageStartTime)
+                            Call db.cs_set(CS, "ccAuthCode", docProperties.getText("txn_id"))
+                            Call db.cs_set(CS, "ccActionCode", docProperties.getText("payment_status"))
+                            Call db.cs_set(CS, "ccRefCode", docProperties.getText("pending_reason"))
+                            Call db.cs_set(CS, "PayMethod", "PayPal " & docProperties.getText("payment_type"))
+                            Call db.cs_set(CS, "ShipName", docProperties.getText("first_name") & " " & docProperties.getText("last_name"))
+                            Call db.cs_set(CS, "ShipAddress", docProperties.getText("address_street"))
+                            Call db.cs_set(CS, "ShipCity", docProperties.getText("address_city"))
+                            Call db.cs_set(CS, "ShipState", docProperties.getText("address_state"))
+                            Call db.cs_set(CS, "ShipZip", docProperties.getText("address_zip"))
+                            Call db.cs_set(CS, "BilleMail", docProperties.getText("payer_email"))
+                            Call db.cs_set(CS, "ContentControlID", main_GetContentID("Orders Completed"))
                             Call db.db_SaveCSRecord(CS)
                         End If
                         Call db.cs_Close(CS)
@@ -29065,7 +28875,7 @@ ErrorTrap:
                         '
                         CS = db.csOpen("Visitors", "OrderID=" & ConfirmOrderID)
                         If db.cs_Ok(CS) Then
-                            Call db.db_setCS(CS, "OrderID", 0)
+                            Call db.cs_set(CS, "OrderID", 0)
                             Call db.db_SaveCSRecord(CS)
                         End If
                         Call db.cs_Close(CS)
@@ -29202,15 +29012,15 @@ ErrorTrap:
                     '
                     ' ----- convert editor active edit icons
                     '
-                    ContentCopy = main_DecodeContent(ContentCopy)
+                    ContentCopy = html_DecodeContent(ContentCopy)
                     '
                     ' ----- save the content
                     '
                     ContentName = metaData.getContentNameByID(ContentID)
                     If ContentName <> "" Then
-                        CS = db.csOpen(ContentName, "ID=" & db.db_EncodeSQLNumber(RecordID), , False)
+                        CS = db.csOpen(ContentName, "ID=" & db.encodeSQLNumber(RecordID), , False)
                         If db.cs_Ok(CS) Then
-                            Call db.db_setCS(CS, FieldName, ContentCopy)
+                            Call db.cs_set(CS, FieldName, ContentCopy)
                         End If
                         Call db.cs_Close(CS)
                     End If
@@ -30218,16 +30028,16 @@ ErrorTrap:
             ' ----- if default template not found, create a simple default template
             '
             If main_GetDefaultTemplateId = 0 Then
-                CS = db.db_csInsertRecord("Page Templates")
+                CS = db.cs_insertRecord("Page Templates")
                 If db.cs_Ok(CS) Then
                     main_GetDefaultTemplateId = db.cs_getInteger(CS, "ID")
-                    Call db.db_setCS(CS, "name", TemplateDefaultName)
-                    Call db.db_setCS(CS, "Link", "")
+                    Call db.cs_set(CS, "name", TemplateDefaultName)
+                    Call db.cs_set(CS, "Link", "")
                     If True Then
-                        Call db.db_setCS(CS, "BodyHTML", pageManager_TemplateBody)
+                        Call db.cs_set(CS, "BodyHTML", pageManager_TemplateBody)
                     End If
                     If True Then
-                        Call db.db_setCS(CS, "ccGuid", DefaultTemplateGuid)
+                        Call db.cs_set(CS, "ccGuid", DefaultTemplateGuid)
                     End If
                     Call db.cs_Close(CS)
                 End If
@@ -30402,7 +30212,7 @@ ErrorTrap:
         ''' </summary>
         ''' <param name="EmailID"></param>
         ''' <param name="ConfirmationMemberID"></param>
-        Public Sub sendEmailConfirmationTest(ByVal EmailID As Integer, ByVal ConfirmationMemberID As Integer)
+        Public Sub email_sendEmailConfirmationTest(ByVal EmailID As Integer, ByVal ConfirmationMemberID As Integer)
             Try
                 Dim ConfirmFooter As String
                 Dim TotalCnt As Integer
@@ -30559,7 +30369,7 @@ ErrorTrap:
                         error_AddUserError("No confirmation email was send because a Confirmation member is not selected")
                     Else
                         EmailBody = EmailBody & "<div style=""clear:both;padding:10px;margin:10px;border:1px dashed #888;"">Administrator<br><br>" & ConfirmFooter & "</div>"
-                        EmailStatus = sendMemberEmail3(ConfirmationMemberID, db.cs_getText(CS, "FromAddress"), EmailSubject, EmailBody, True, True, EmailID, EmailTemplate, False)
+                        EmailStatus = email_sendMemberEmail3(ConfirmationMemberID, db.cs_getText(CS, "FromAddress"), EmailSubject, EmailBody, True, True, EmailID, EmailTemplate, False)
                         If EmailStatus <> "ok" Then
                             error_AddUserError(EmailStatus)
                         End If
@@ -30695,7 +30505,7 @@ ErrorTrap:
                 '
                 SQL = "SELECT DISTINCT ccMembers.ID" _
                     & " FROM (ccMembers LEFT JOIN ccMemberRules ON ccMembers.ID = ccMemberRules.MemberID) LEFT JOIN ccgroups ON ccMemberRules.GroupID = ccgroups.ID" _
-                    & " WHERE (((ccMembers.Active)<>0) AND ((ccMembers.AllowBulkEmail)<>0) AND ((ccMemberRules.Active)<>0) AND ((ccgroups.Active)<>0) AND ((ccgroups.AllowBulkEmail)<>0)AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & db.db_EncodeSQLDate(main_PageStartTime) & ")) AND ("
+                    & " WHERE (((ccMembers.Active)<>0) AND ((ccMembers.AllowBulkEmail)<>0) AND ((ccMemberRules.Active)<>0) AND ((ccgroups.Active)<>0) AND ((ccgroups.AllowBulkEmail)<>0)AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & db.encodeSQLDate(main_PageStartTime) & ")) AND ("
                 For GroupPointer = 0 To GroupCount - 1
                     If GroupPointer = 0 Then
                         SQL &= "(ccgroups.Name=" & db.encodeSQLText(Groups(GroupPointer)) & ")"
@@ -30714,7 +30524,7 @@ ErrorTrap:
 
                     ' send
                     '
-                    Call sendMemberEmail3(ToMemberID, iFromAddress, iSubject, iBody, iImmediate, iHTML, 0, "", False)
+                    Call email_sendMemberEmail3(ToMemberID, iFromAddress, iSubject, iBody, iImmediate, iHTML, 0, "", False)
                     Call db.db_csGoNext(CSPointer)
                 Loop
             End If
@@ -31350,7 +31160,7 @@ ErrorTrap:
                                 AddonName = "Addon #" & addonId
                             End If
                             If Context = addonContextEnum.ContextAdmin Then
-                                s = "The Add-on '" & AddonName & "' could not be found. It may have been deleted or marked inactive. If you are receiving this message after clicking an Add-on from the Navigator, their may be a problem with this Add-on. If you are receiving this message from the main admin page, your Dashboard Add-on may be set incorrectly. Use the Admin tab under Preferences to select the Dashboard, or <a href=""?" & RequestNameDashboardReset & "=" & main_VisitId & """>click here</a> to automatically reset the dashboard."
+                                s = "The Add-on '" & AddonName & "' could not be found. It may have been deleted or marked inactive. If you are receiving this message after clicking an Add-on from the Navigator, their may be a problem with this Add-on. If you are receiving this message from the main admin page, your Dashboard Add-on may be set incorrectly. Use the Admin tab under Preferences to select the Dashboard, or <a href=""?" & RequestNameDashboardReset & "=" & visit_Id & """>click here</a> to automatically reset the dashboard."
                             Else
                                 s = "The Add-on '" & AddonName & "' could not be found. It may have been deleted or marked inactive. Please use the Add-on Manager to replace it, or edit this page and remove it."
                             End If
@@ -32455,14 +32265,14 @@ exitNoError:
                                                                 CS = db.csOpen("Copy Content", "name=" & db.encodeSQLText(FieldName), "ID")
                                                                 If Not db.cs_Ok(CS) Then
                                                                     Call db.cs_Close(CS)
-                                                                    CS = db.db_csInsertRecord("Copy Content", user.id)
+                                                                    CS = db.cs_insertRecord("Copy Content", user.id)
                                                                 End If
                                                                 If db.cs_Ok(CS) Then
-                                                                    Call db.db_setCS(CS, "name", FieldName)
+                                                                    Call db.cs_set(CS, "name", FieldName)
                                                                     '
                                                                     ' Set copy
                                                                     '
-                                                                    Call db.db_setCS(CS, "copy", FieldValue)
+                                                                    Call db.cs_set(CS, "copy", FieldValue)
                                                                     '
                                                                     ' delete duplicates
                                                                     '
@@ -32688,11 +32498,11 @@ exitNoError:
                                                             CS = db.csOpen("Copy Content", "Name=" & db.encodeSQLText(FieldName), "ID", , , , , "id,name,Copy")
                                                             If Not db.cs_Ok(CS) Then
                                                                 Call db.cs_Close(CS)
-                                                                CS = db.db_csInsertRecord("Copy Content", user.id)
+                                                                CS = db.cs_insertRecord("Copy Content", user.id)
                                                                 If db.cs_Ok(CS) Then
                                                                     RecordID = db.cs_getInteger(CS, "ID")
-                                                                    Call db.db_setCS(CS, "name", FieldName)
-                                                                    Call db.db_setCS(CS, "copy", EncodeText(TabNode.InnerText))
+                                                                    Call db.cs_set(CS, "name", FieldName)
+                                                                    Call db.cs_set(CS, "copy", EncodeText(TabNode.InnerText))
                                                                     Call db.db_SaveCSRecord(CS)
                                                                     Call workflow.publishEdit("Copy Content", RecordID)
                                                                 End If
@@ -34534,14 +34344,14 @@ ErrorTrap:
                                                                 CS = db.csOpen("Copy Content", "name=" & db.encodeSQLText(FieldName), "ID")
                                                                 If Not db.cs_Ok(CS) Then
                                                                     Call db.cs_Close(CS)
-                                                                    CS = db.db_csInsertRecord("Copy Content")
+                                                                    CS = db.cs_insertRecord("Copy Content")
                                                                 End If
                                                                 If db.cs_Ok(CS) Then
-                                                                    Call db.db_setCS(CS, "name", FieldName)
+                                                                    Call db.cs_set(CS, "name", FieldName)
                                                                     '
                                                                     ' Set copy
                                                                     '
-                                                                    Call db.db_setCS(CS, "copy", FieldValue)
+                                                                    Call db.cs_set(CS, "copy", FieldValue)
                                                                     '
                                                                     ' delete duplicates
                                                                     '
@@ -34769,11 +34579,11 @@ ErrorTrap:
                                                             CS = db.csOpen("Copy Content", "Name=" & db_EncodeSQLText(FieldName), "ID", , , , , "Copy")
                                                             If Not db.cs_Ok(CS) Then
                                                                 Call db.cs_Close(CS)
-                                                                CS = db.db_csInsertRecord("Copy Content")
+                                                                CS = db.cs_insertRecord("Copy Content")
                                                                 If db.cs_Ok(CS) Then
                                                                     RecordID = db.cs_getInteger(CS, "ID")
-                                                                    Call db.db_setCS(CS, "name", FieldName)
-                                                                    Call db.db_setCS(CS, "copy", EncodeText(TabNode.InnerText))
+                                                                    Call db.cs_set(CS, "name", FieldName)
+                                                                    Call db.cs_set(CS, "copy", EncodeText(TabNode.InnerText))
                                                                     Call db.db_SaveCSRecord(CS)
                                                                     Call workflow.publishEdit("Copy Content", RecordID)
                                                                 End If
@@ -36310,7 +36120,7 @@ ErrorTrap:
                     '
                     ' Make it pretty for those who care
                     '
-                    If EncodeBoolean(siteProperties.getBoolean("AutoHTMLFormatting", False)) Then
+                    If siteProperties.getBoolean("AutoHTMLFormatting") Then
                         IndentCnt = 0
                         Parse = New coreHtmlParseClass(Me)
                         Call Parse.Load(returnHtmlBody)
@@ -36669,7 +36479,7 @@ ErrorTrap:
                 '
                 ' Orphan Page -- Section could not be determined
                 '
-                allowPageWithoutSectionDislay = EncodeBoolean(siteProperties.getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default))
+                allowPageWithoutSectionDislay = siteProperties.getBoolean(spAllowPageWithoutSectionDisplay, spAllowPageWithoutSectionDisplay_default)
                 allowPageWithoutSectionDislay = True
                 Call log_appendLog("hardcoded allowPageWithoutSectionDislay in getHtmlBody_getSection")
                 If Not allowPageWithoutSectionDislay Then
@@ -36901,8 +36711,8 @@ ErrorTrap:
                         ' Set the Template buffers
                         '
                         If TCPtr >= 0 Then
-                            If main_VisitBrowserIsMobile Then
-                                If EncodeBoolean(siteProperties.getBoolean("AllowMobileTemplates", False)) Then
+                            If visit_browserIsMobile Then
+                                If siteProperties.getBoolean("AllowMobileTemplates") Then
                                     '
                                     ' set Mobile Template
                                     '
@@ -37421,12 +37231,12 @@ ErrorTrap:
                             & " FROM (ccPageContentBlockRules" _
                             & " LEFT JOIN ccgroups ON ccPageContentBlockRules.GroupID = ccgroups.ID)" _
                             & " LEFT JOIN ccMemberRules ON ccgroups.ID = ccMemberRules.GroupID" _
-                            & " WHERE (((ccMemberRules.MemberID)=" & db.db_EncodeSQLNumber(user.id) & ")" _
+                            & " WHERE (((ccMemberRules.MemberID)=" & db.encodeSQLNumber(user.id) & ")" _
                             & " AND ((ccPageContentBlockRules.RecordID) In (" & BlockedRecordIDList & "))" _
                             & " AND ((ccPageContentBlockRules.Active)<>0)" _
                             & " AND ((ccgroups.Active)<>0)" _
                             & " AND ((ccMemberRules.Active)<>0)" _
-                            & " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" & db.db_EncodeSQLDate(main_PageStartTime) & "));"
+                            & " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" & db.encodeSQLDate(main_PageStartTime) & "));"
                         CS = db.cs_openSql(SQL)
                         BlockedRecordIDList = "," & BlockedRecordIDList
                         Do While db.cs_Ok(CS)
@@ -37449,7 +37259,7 @@ ErrorTrap:
                                 & " AND ((ccGroupRules.Active)<>0)" _
                                 & " AND ((ManagementGroups.Active)<>0)" _
                                 & " AND ((ManagementMemberRules.Active)<>0)" _
-                                & " AND ((ManagementMemberRules.DateExpires) Is Null Or (ManagementMemberRules.DateExpires)>" & db.db_EncodeSQLDate(main_PageStartTime) & ")" _
+                                & " AND ((ManagementMemberRules.DateExpires) Is Null Or (ManagementMemberRules.DateExpires)>" & db.encodeSQLDate(main_PageStartTime) & ")" _
                                 & " AND ((ManagementMemberRules.MemberID)=" & user.id & " ));"
                             CS = db.cs_openSql(SQL)
                             Do While db.cs_Ok(CS)
@@ -37581,7 +37391,7 @@ ErrorTrap:
                                     ' Use Registration FormPage
                                     '
                                     Call main_VerifyRegistrationFormPage()
-                                    BlockForm = main_GetFormPage("Registration Form", RegistrationGroupID)
+                                    BlockForm = pageManager_GetFormPage("Registration Form", RegistrationGroupID)
                                 End If
                             End If
                             returnHtml = "" _
@@ -37595,13 +37405,13 @@ ErrorTrap:
                             '
                             ' ----- Content as blocked - convert from site property to content page
                             '
-                            returnHtml = main_GetDefaultBlockMessage(UseContentWatchLink)
+                            returnHtml = pageManager_GetDefaultBlockMessage(UseContentWatchLink)
                     End Select
                     '
                     ' If the output is blank, put default message in
                     '
                     If returnHtml = "" Then
-                        returnHtml = main_GetDefaultBlockMessage(UseContentWatchLink)
+                        returnHtml = pageManager_GetDefaultBlockMessage(UseContentWatchLink)
                     End If
                     '
                     ' Encode the copy
@@ -37682,7 +37492,7 @@ ErrorTrap:
                         '
                         ' Page Hit Notification
                         '
-                        If (Not main_VisitExcludeFromAnalytics) And (contactMemberID <> 0) And (InStr(1, webServer.requestBrowser, "kmahttp", vbTextCompare) = 0) Then
+                        If (Not visit_excludeFromAnalytics) And (contactMemberID <> 0) And (InStr(1, webServer.requestBrowser, "kmahttp", vbTextCompare) = 0) Then
                             AllowHitNotification = EncodeBoolean(cache_pageContent(PCC_AllowHitNotification, main_RenderCache_CurrentPage_PCCPtr))
                             'AllowHitNotification = app.csv_GetCSBoolean(CS, "AllowHitNotification")
                             If AllowHitNotification Then
@@ -37705,15 +37515,15 @@ ErrorTrap:
                                 Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Page Name", PageName, True)
                                 Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Member Name", user.name, False)
                                 Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Member #", CStr(user.id), True)
-                                Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Start Time", CStr(main_VisitStartTime), False)
-                                Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit #", CStr(main_VisitId), True)
+                                Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Start Time", CStr(visit_startTime), False)
+                                Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit #", CStr(visit_Id), True)
                                 Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit IP", webServer.requestRemoteIP, False)
                                 Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Browser ", webServer.requestBrowser, True)
-                                Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Visitor #", CStr(main_VisitorID), False)
+                                Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Visitor #", CStr(visitor_id), False)
                                 Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Authenticated", CStr(visit_isAuthenticated), True)
-                                Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Referrer", main_VisitReferer, False)
+                                Body = Body & main_GetHtmlBody_GetSection_GetContent_GetTableRow("Visit Referrer", visit_referer, False)
                                 Body = Body & kmaEndTable
-                                Call sendMemberEmail3(contactMemberID, siteProperties.getText("EmailFromAddress", "info@" & main_ServerDomain), "Page Hit Notification", Body, False, True, 0, "", False)
+                                Call email_sendMemberEmail3(contactMemberID, siteProperties.getText("EmailFromAddress", "info@" & main_ServerDomain), "Page Hit Notification", Body, False, True, 0, "", False)
                             End If
                         End If
                         '
@@ -38429,7 +38239,7 @@ ErrorTrap:
                 'hint = hint & ",030"
                 If (Not main_ServerPagePrintVersion) Then
                     IconRow = ""
-                    If (Not main_VisitIsBot) And (AllowPrinterVersion Or AllowEmailPage) Then
+                    If (Not visit_isBot) And (AllowPrinterVersion Or AllowEmailPage) Then
                         '
                         ' not a bot, and either print or email allowed
                         '
@@ -38491,7 +38301,7 @@ ErrorTrap:
                         'hint = hint & ",043"
                         ' an html field can be added to an html stream. a non-html field should be html encoded before being added.
                         headline = main_encodeHTML(headline)
-                        If EncodeBoolean(siteProperties.getBoolean("PageHeadlineUseccHeadline", False)) Then
+                        If siteProperties.getBoolean("PageHeadlineUseccHeadline") Then
                             Cell = Cell & cr & "<p>" & AddSpan(headline, "ccHeadline") & "</p>"
                         Else
                             Cell = Cell & cr & "<h1>" & headline & "</h1>"
@@ -39076,18 +38886,18 @@ ErrorTrap:
                                         '
                                         ' Not from this site
                                         '
-                                        If EncodeBoolean(siteProperties.getBoolean("AllowAggregateAccessBlocking", False)) Then
+                                        If siteProperties.getBoolean("AllowAggregateAccessBlocking") Then
                                             cs = db.csOpen("Aggregate Access", "Link=" & db_EncodeSQLText(refHost), , False, , , , "active")
                                             If Not db.cs_Ok(cs) Then
                                                 '
                                                 ' no record, add an inactive record and throw error
                                                 '
                                                 Call db.cs_Close(cs)
-                                                cs = db.db_csInsertRecord("Aggregate Access")
+                                                cs = db.cs_insertRecord("Aggregate Access")
                                                 If db.cs_Ok(cs) Then
-                                                    Call db.db_setCS(cs, "Name", refHost)
-                                                    Call db.db_setCS(cs, "Link", refHost)
-                                                    Call db.db_setCS(cs, "active", False)
+                                                    Call db.cs_set(cs, "Name", refHost)
+                                                    Call db.cs_set(cs, "Link", refHost)
+                                                    Call db.cs_set(cs, "active", False)
                                                 End If
                                                 Call db.cs_Close(cs)
                                                 Call handleLegacyError12("Init", "Add-on call from [" & refHost & "] was blocked because this domain is not in the Aggregate Access Content. An inactive record was added. To allow this domain access, mark the record active.")
@@ -39395,12 +39205,12 @@ ErrorTrap:
                             ' ----- Email open detected. Log it and redirect to a 1x1 spacer
                             '
                             EmailMemberID = docProperties.getInteger(RequestNameEmailMemberID)
-                            CSLog = db.db_csInsertRecord("Email Log")
+                            CSLog = db.cs_insertRecord("Email Log")
                             If db.cs_Ok(CSLog) Then
-                                Call db.db_setCS(CSLog, "Name", "Opened " & CStr(main_PageStartTime))
-                                Call db.db_setCS(CSLog, "EmailDropID", recordid)
-                                Call db.db_setCS(CSLog, "MemberID", EmailMemberID)
-                                Call db.db_setCS(CSLog, "LogType", EmailLogTypeOpen)
+                                Call db.cs_set(CSLog, "Name", "Opened " & CStr(main_PageStartTime))
+                                Call db.cs_set(CSLog, "EmailDropID", recordid)
+                                Call db.cs_set(CSLog, "MemberID", EmailMemberID)
+                                Call db.cs_set(CSLog, "LogType", EmailLogTypeOpen)
                             End If
                             Call db.cs_Close(CSLog)
                             RedirectLink = web_requestProtocol & webServer.requestDomain & "/ccLib/images/spacer.gif"
@@ -39414,13 +39224,13 @@ ErrorTrap:
                             ' ----- Email click detected. Log it.
                             '
                             EmailMemberID = docProperties.getInteger(RequestNameEmailMemberID)
-                            CSLog = db.db_csInsertRecord("Email Log")
+                            CSLog = db.cs_insertRecord("Email Log")
                             If db.cs_Ok(CSLog) Then
-                                Call db.db_setCS(CSLog, "Name", "Clicked " & CStr(main_PageStartTime))
-                                Call db.db_setCS(CSLog, "EmailDropID", emailDropId)
-                                Call db.db_setCS(CSLog, "MemberID", EmailMemberID)
-                                Call db.db_setCS(CSLog, "VisitId", main_VisitId)
-                                Call db.db_setCS(CSLog, "LogType", EmailLogTypeClick)
+                                Call db.cs_set(CSLog, "Name", "Clicked " & CStr(main_PageStartTime))
+                                Call db.cs_set(CSLog, "EmailDropID", emailDropId)
+                                Call db.cs_set(CSLog, "MemberID", EmailMemberID)
+                                Call db.cs_set(CSLog, "VisitId", visit_Id)
+                                Call db.cs_set(CSLog, "LogType", EmailLogTypeClick)
                             End If
                             Call db.cs_Close(CSLog)
                         End If
@@ -39432,7 +39242,7 @@ ErrorTrap:
                             '
                             CSLog = db.csOpen("people", "email=" & db.encodeSQLText(EmailSpamBlock), , , , , , "AllowBulkEmail")
                             Do While db.cs_Ok(CSLog)
-                                Call db.db_setCS(CSLog, "AllowBulkEmail", False)
+                                Call db.cs_set(CSLog, "AllowBulkEmail", False)
                                 Call db.db_csGoNext(CSLog)
                             Loop
                             Call db.cs_Close(CSLog)
@@ -39445,13 +39255,13 @@ ErrorTrap:
                                 ' ----- Email click detected. Log it.
                                 '
                                 EmailMemberID = docProperties.getInteger(RequestNameEmailMemberID)
-                                CSLog = db.db_csInsertRecord("Email Log")
+                                CSLog = db.cs_insertRecord("Email Log")
                                 If db.cs_Ok(CSLog) Then
-                                    Call db.db_setCS(CSLog, "Name", "Email Block Request " & CStr(main_PageStartTime))
-                                    Call db.db_setCS(CSLog, "EmailDropID", emailDropId)
-                                    Call db.db_setCS(CSLog, "MemberID", EmailMemberID)
-                                    Call db.db_setCS(CSLog, "VisitId", main_VisitId)
-                                    Call db.db_setCS(CSLog, "LogType", EmailLogTypeBlockRequest)
+                                    Call db.cs_set(CSLog, "Name", "Email Block Request " & CStr(main_PageStartTime))
+                                    Call db.cs_set(CSLog, "EmailDropID", emailDropId)
+                                    Call db.cs_set(CSLog, "MemberID", EmailMemberID)
+                                    Call db.cs_set(CSLog, "VisitId", visit_Id)
+                                    Call db.cs_set(CSLog, "LogType", EmailLogTypeBlockRequest)
                                 End If
                                 Call db.cs_Close(CSLog)
                             End If
@@ -39515,7 +39325,7 @@ ErrorTrap:
                                         addonId = docProperties.getInteger("AddonID")
                                         cs = db_csOpen("Add-ons", addonId)
                                         If db.cs_Ok(cs) Then
-                                            Call db.db_setCS(cs, "CustomStylesFilename", docProperties.getText("CustomStyles"))
+                                            Call db.cs_set(cs, "CustomStylesFilename", docProperties.getText("CustomStyles"))
                                         End If
                                         Call db.cs_Close(cs)
                                         '
@@ -40925,11 +40735,11 @@ ErrorTrap:
                 CS = db.csOpen("copy content", "Name=" & db.encodeSQLText(CopyName), "ID", , 0, , , "Name,ID,Copy,modifiedBy")
                 If Not db.cs_Ok(CS) Then
                     Call db.cs_Close(CS)
-                    CS = db.db_csInsertRecord("copy content", 0)
+                    CS = db.cs_insertRecord("copy content", 0)
                     If db.cs_Ok(CS) Then
                         RecordID = db.cs_getInteger(CS, "ID")
-                        Call db.db_setCS(CS, "name", CopyName)
-                        Call db.db_setCS(CS, "copy", EncodeText(DefaultContent))
+                        Call db.cs_set(CS, "name", CopyName)
+                        Call db.cs_set(CS, "copy", EncodeText(DefaultContent))
                         Call db.db_SaveCSRecord(CS)
                         Call workflow.publishEdit("copy content", RecordID)
                     End If
@@ -41036,11 +40846,11 @@ ErrorTrap:
                     '
                     ' content server object is valie
                     '
-                    If properties_site__AllowVisitTracking Then
+                    If siteProperties.getBoolean("allowVisitTracking", True) Then
                         '
                         ' If visit tracking, save the viewing record
                         '
-                        ViewingName = Left(main_VisitId & "." & main_VisitPages, 10)
+                        ViewingName = Left(visit_Id & "." & visit_pages, 10)
                         PageID = main_RenderedPageID
                         FieldNames = "Name,VisitId,MemberID,Host,Path,Page,QueryString,Form,Referer,DateAdded,StateOK,ContentControlID,pagetime,Active,CreateKey,RecordID"
                         If True Then
@@ -41051,7 +40861,7 @@ ErrorTrap:
                         End If
                         Form = main_ServerFormOriginal
                         If Form <> "" Then
-                            If EncodeBoolean(siteProperties.getBoolean("Block Viewing Form Field", False)) Then
+                            If siteProperties.getBoolean("Block Viewing Form Field") Then
                                 Form = "[blocked]"
                             End If
                         End If
@@ -41059,23 +40869,23 @@ ErrorTrap:
                             & FieldNames _
                             & ")VALUES(" _
                             & " " & db.encodeSQLText(ViewingName) _
-                            & "," & db.db_EncodeSQLNumber(main_VisitId) _
-                            & "," & db.db_EncodeSQLNumber(user.id) _
+                            & "," & db.encodeSQLNumber(visit_Id) _
+                            & "," & db.encodeSQLNumber(user.id) _
                             & "," & db.encodeSQLText(webServer.requestDomain) _
                             & "," & db.encodeSQLText(web_requestPath) _
                             & "," & db.encodeSQLText(web_requestPage) _
                             & "," & db.encodeSQLText(Left(webServer.requestQueryString, 255)) _
                             & "," & db.encodeSQLText(Left(Form, 255)) _
                             & "," & db.encodeSQLText(Left(webServer.requestReferrer, 255)) _
-                            & "," & db.db_EncodeSQLDate(main_PageStartTime) _
-                            & "," & db.db_EncodeSQLBoolean(main_VisitStateOK) _
-                            & "," & db.db_EncodeSQLNumber(main_GetContentID("Viewings")) _
-                            & "," & db.db_EncodeSQLNumber(GetTickCount - constructorTickCount) _
+                            & "," & db.encodeSQLDate(main_PageStartTime) _
+                            & "," & db.encodeSQLBoolean(visit_stateOK) _
+                            & "," & db.encodeSQLNumber(main_GetContentID("Viewings")) _
+                            & "," & db.encodeSQLNumber(GetTickCount - constructorTickCount) _
                             & ",1" _
-                            & "," & db.db_EncodeSQLNumber(CSMax) _
-                            & "," & db.db_EncodeSQLNumber(PageID)
+                            & "," & db.encodeSQLNumber(CSMax) _
+                            & "," & db.encodeSQLNumber(PageID)
                         If True Then
-                            SQL &= "," & db.db_EncodeSQLBoolean(web_PageExcludeFromAnalytics)
+                            SQL &= "," & db.encodeSQLBoolean(web_PageExcludeFromAnalytics)
                         End If
                         If True Then
                             SQL &= "," & db.encodeSQLText(main_MetaContent_Title)

@@ -50,7 +50,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property ForceBrowserMobile() As Boolean 'Inherits BaseClasses.CPVisitorBaseClass.ForceBrowserMobile
             Get
                 If True Then
-                    Return cpCore.main_VisitorForceBrowserMobile
+                    Return cpCore.visitor_forceBrowserMobile
                 Else
                     Return False
                 End If
@@ -108,7 +108,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property Id() As Integer 'Inherits BaseClasses.CPVisitorBaseClass.Id
             Get
                 If True Then
-                    Return cpCore.main_VisitorID
+                    Return cpCore.visitor_id
                 Else
                     Return 0
                 End If
@@ -118,7 +118,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property IsNew() As Boolean 'Inherits BaseClasses.CPVisitorBaseClass.IsNew
             Get
                 If True Then
-                    Return cpCore.main_VisitorNew
+                    Return cpCore.visitor_new
                 Else
                     Return False
                 End If
@@ -134,7 +134,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property UserId() As Integer 'Inherits BaseClasses.CPVisitorBaseClass.UserId
             Get
                 If True Then
-                    Return cpCore.main_VisitorMemberID
+                    Return cpCore.visitor_memberID
                 Else
                     Return 0
                 End If

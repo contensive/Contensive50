@@ -128,19 +128,19 @@ Namespace Contensive.Core
         '
         '
         Public Overrides Function EncodeSQLBoolean(ByVal SourceBoolean As Boolean) As String
-            Return cp.core.db.db_EncodeSQLBoolean(SourceBoolean)
+            Return cp.core.db.encodeSQLBoolean(SourceBoolean)
         End Function
         '
         '
         '
         Public Overrides Function EncodeSQLDate(ByVal SourceDate As Date) As String
-            Return cp.core.db.db_EncodeSQLDate(SourceDate)
+            Return cp.core.db.encodeSQLDate(SourceDate)
         End Function
         '
         '
         '
         Public Overrides Function EncodeSQLNumber(ByVal SourceNumber As Double) As String
-            Return cp.core.db.db_EncodeSQLNumber(SourceNumber)
+            Return cp.core.db.encodeSQLNumber(SourceNumber)
         End Function
         '
         '

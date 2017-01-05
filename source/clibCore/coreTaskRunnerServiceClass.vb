@@ -209,7 +209,7 @@ Namespace Contensive
                                     If cpSite.core.db.cs_Ok(CS) Then
                                         'Dim json As New System.Web.Script.Serialization.JavaScriptSerializer
                                         recordsRemaining = True
-                                        Call cpSite.core.db.db_setCS(CS, "datestarted", Now())
+                                        Call cpSite.core.db.cs_set(CS, "datestarted", Now())
                                         Call cpSite.core.db.db_SaveCS(CS)
                                         '
                                         command = cpSite.core.db.cs_getText(CS, "command")

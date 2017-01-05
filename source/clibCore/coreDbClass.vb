@@ -777,20 +777,20 @@ ErrorTrap:
                 Dim CreateKeyString As String
                 Dim DateAddedString As String
                 '
-                CreateKeyString = db_EncodeSQLNumber(getRandomLong)
-                DateAddedString = db_EncodeSQLDate(Now)
+                CreateKeyString = encodeSQLNumber(getRandomLong)
+                DateAddedString = encodeSQLDate(Now)
                 '
                 sqlList.add("createkey", CreateKeyString)
                 sqlList.add("dateadded", DateAddedString)
-                sqlList.add("createdby", db_EncodeSQLNumber(MemberID))
+                sqlList.add("createdby", encodeSQLNumber(MemberID))
                 sqlList.add("ModifiedDate", DateAddedString)
-                sqlList.add("ModifiedBy", db_EncodeSQLNumber(MemberID))
-                sqlList.add("EditSourceID", db_EncodeSQLNumber(0))
-                sqlList.add("EditArchive", db_EncodeSQLNumber(0))
-                sqlList.add("EditBlank", db_EncodeSQLNumber(0))
-                sqlList.add("ContentControlID", db_EncodeSQLNumber(0))
+                sqlList.add("ModifiedBy", encodeSQLNumber(MemberID))
+                sqlList.add("EditSourceID", encodeSQLNumber(0))
+                sqlList.add("EditArchive", encodeSQLNumber(0))
+                sqlList.add("EditBlank", encodeSQLNumber(0))
+                sqlList.add("ContentControlID", encodeSQLNumber(0))
                 sqlList.add("Name", encodeSQLText(""))
-                sqlList.add("Active", db_EncodeSQLNumber(1))
+                sqlList.add("Active", encodeSQLNumber(1))
                 '
                 Call db_InsertTableRecord(DataSourceName, TableName, sqlList)
                 returnDt = db_openTable(DataSourceName, TableName, "(DateAdded=" & DateAddedString & ")and(CreateKey=" & CreateKeyString & ")", "ID DESC",, 1)
@@ -2199,8 +2199,8 @@ ErrorTrap:
                         EditRecordID = cs_getInteger(CSPointer, "EditID")
                         sqlList = New sqlFieldListClass
                         Call sqlList.add("EDITBLANK", SQLTrue) ' Pointer)
-                        Call sqlList.add("MODIFIEDBY", db_EncodeSQLNumber(db_ContentSet(CSPointer).OwnerMemberID)) ' Pointer)
-                        Call sqlList.add("MODIFIEDDATE", db_EncodeSQLDate(Now)) ' Pointer)
+                        Call sqlList.add("MODIFIEDBY", encodeSQLNumber(db_ContentSet(CSPointer).OwnerMemberID)) ' Pointer)
+                        Call sqlList.add("MODIFIEDDATE", encodeSQLDate(Now)) ' Pointer)
                         Call db_UpdateTableRecord(AuthoringDataSourceName, AuthoringTableName, "ID=" & EditRecordID, sqlList)
                         Call cpCore.workflow.setAuthoringControl(ContentName, LiveRecordID, AuthoringControlsModified, db_ContentSet(CSPointer).OwnerMemberID)
                     End If
@@ -3100,7 +3100,7 @@ ErrorTrap:
             Dim CS As Integer
             '
             metaData_InsertContentRecordGetID = -1
-            CS = db_csInsertRecord(ContentName, MemberID)
+            CS = cs_insertRecord(ContentName, MemberID)
             If cs_Ok(CS) Then
                 metaData_InsertContentRecordGetID = cs_getInteger(CS, "ID")
             End If
@@ -3148,7 +3148,7 @@ ErrorTrap:
         ' csv_DeleteContentRecords
         '========================================================================
         '
-        Public Sub db_DeleteContentRecords(ByVal ContentName As String, ByVal Criteria As String, Optional ByVal MemberID As Integer = 0)
+        Public Sub deleteContentRecords(ByVal ContentName As String, ByVal Criteria As String, Optional ByVal MemberID As Integer = 0)
             Try
                 '
                 Dim MethodName As String
@@ -3205,7 +3205,7 @@ ErrorTrap:
         '       an editable record is created in the edit table
         '========================================================================
         '
-        Public Function db_csInsertRecord(ByVal ContentName As String, Optional ByVal MemberID As Integer = -1) As Integer
+        Public Function cs_insertRecord(ByVal ContentName As String, Optional ByVal MemberID As Integer = -1) As Integer
             Dim returnCs As Integer = -1
             Try
                 Dim DateAddedString As String
@@ -3242,7 +3242,7 @@ ErrorTrap:
                             LiveRecordID = db_InsertTableRecordGetID(.ContentDataSourceName, .ContentTableName, MemberID)
                             sqlList = New sqlFieldListClass
                             Call sqlList.add("EDITBLANK", SQLTrue) ' Pointer)
-                            Call sqlList.add("EDITSOURCEID", db_EncodeSQLNumber(Nothing)) ' Pointer)
+                            Call sqlList.add("EDITSOURCEID", encodeSQLNumber(Nothing)) ' Pointer)
                             Call sqlList.add("EDITARCHIVE", SQLFalse) ' Pointer)
                             Call db_UpdateTableRecord(.ContentDataSourceName, .ContentTableName, "ID=" & LiveRecordID, sqlList)
                             '
@@ -3282,11 +3282,11 @@ ErrorTrap:
                                                     ' ignore these fields, they have no associated DB field
                                                     '
                                                     Case FieldTypeIdBoolean
-                                                        sqlList.add(FieldName, db_EncodeSQLBoolean(EncodeBoolean(.defaultValue)))
+                                                        sqlList.add(FieldName, encodeSQLBoolean(EncodeBoolean(.defaultValue)))
                                                     Case FieldTypeIdCurrency, FieldTypeIdFloat, FieldTypeIdInteger, FieldTypeIdMemberSelect
-                                                        sqlList.add(FieldName, db_EncodeSQLNumber(.defaultValue))
+                                                        sqlList.add(FieldName, encodeSQLNumber(.defaultValue))
                                                     Case FieldTypeIdDate
-                                                        sqlList.add(FieldName, db_EncodeSQLDate(EncodeDate(.defaultValue)))
+                                                        sqlList.add(FieldName, encodeSQLDate(EncodeDate(.defaultValue)))
                                                     Case FieldTypeIdLookup
                                                         '
                                                         ' *******************************
@@ -3327,22 +3327,22 @@ ErrorTrap:
                         End If
                         '
                         If WorkflowAuthoringMode Then
-                            Call sqlList.add("EDITSOURCEID", db_EncodeSQLNumber(LiveRecordID)) ' ArrayPointer)
+                            Call sqlList.add("EDITSOURCEID", encodeSQLNumber(LiveRecordID)) ' ArrayPointer)
                             Call sqlList.add("EDITARCHIVE", SQLFalse) ' ArrayPointer)
                             Call sqlList.add("EDITBLANK", SQLFalse) ' ArrayPointer)
                         Else
-                            Call sqlList.add("EDITSOURCEID", db_EncodeSQLNumber(Nothing)) ' ArrayPointer)
+                            Call sqlList.add("EDITSOURCEID", encodeSQLNumber(Nothing)) ' ArrayPointer)
                             Call sqlList.add("EDITARCHIVE", SQLFalse) ' ArrayPointer)
                             Call sqlList.add("EDITBLANK", SQLFalse) ' ArrayPointer)
                         End If
                         '
-                        CreateKeyString = db_EncodeSQLNumber(getRandomLong)
-                        DateAddedString = db_EncodeSQLDate(Now)
+                        CreateKeyString = encodeSQLNumber(getRandomLong)
+                        DateAddedString = encodeSQLDate(Now)
                         '
                         Call sqlList.add("CREATEKEY", CreateKeyString) ' ArrayPointer)
                         Call sqlList.add("DATEADDED", DateAddedString) ' ArrayPointer)
-                        Call sqlList.add("CONTENTCONTROLID", db_EncodeSQLNumber(CDef.Id)) ' ArrayPointer)
-                        Call sqlList.add("CREATEDBY", db_EncodeSQLNumber(MemberID)) ' ArrayPointer)
+                        Call sqlList.add("CONTENTCONTROLID", encodeSQLNumber(CDef.Id)) ' ArrayPointer)
+                        Call sqlList.add("CREATEDBY", encodeSQLNumber(MemberID)) ' ArrayPointer)
                         '
                         Call db_InsertTableRecord(DataSourceName, TableName, sqlList)
                         '
@@ -3378,7 +3378,7 @@ ErrorTrap:
             '
             MethodName = "db_csOpen"
             '
-            db_OpenCSContentRecord = csOpen(ContentName, "(ID=" & db_EncodeSQLNumber(RecordID) & ")", , False, MemberID, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
+            db_OpenCSContentRecord = csOpen(ContentName, "(ID=" & encodeSQLNumber(RecordID) & ")", , False, MemberID, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
             '
             Exit Function
             '
@@ -3661,7 +3661,7 @@ ErrorTrap:
                                                         '
                                                         ' First try Lookup Content
                                                         '
-                                                        CSLookup = csOpen(LookupContentName, "ID=" & db_EncodeSQLNumber(FieldValueVariant), , , , , , "name", 1)
+                                                        CSLookup = csOpen(LookupContentName, "ID=" & encodeSQLNumber(FieldValueVariant), , , , , , "name", 1)
                                                         If cs_Ok(CSLookup) Then
                                                             db_GetCS = cs_getText(CSLookup, "name")
                                                         End If
@@ -3743,7 +3743,7 @@ ErrorTrap:
         '           csv_SetCS( CS, "copyfilename", "This Is the text" ) - saves this in the file
         '========================================================================
         '
-        Public Sub db_setCS(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal FieldValue As Object)
+        Public Sub cs_set(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal FieldValue As Object)
             Try
                 Dim BlankTest As String
                 Dim FieldValueText As String
@@ -4196,11 +4196,11 @@ ErrorTrap:
                                         Select Case .fieldTypeId
                                             Case FieldTypeIdRedirect, FieldTypeIdManyToMany
                                             Case FieldTypeIdInteger, FieldTypeIdLookup, FieldTypeIdCurrency, FieldTypeIdFloat, FieldTypeIdAutoIdIncrement, FieldTypeIdMemberSelect
-                                                SQLSetPair = FieldName & "=" & db_EncodeSQLNumber(writeCacheValueVariant)
+                                                SQLSetPair = FieldName & "=" & encodeSQLNumber(writeCacheValueVariant)
                                             Case FieldTypeIdBoolean
-                                                SQLSetPair = FieldName & "=" & db_EncodeSQLBoolean(EncodeBoolean(writeCacheValueVariant))
+                                                SQLSetPair = FieldName & "=" & encodeSQLBoolean(EncodeBoolean(writeCacheValueVariant))
                                             Case FieldTypeIdDate
-                                                SQLSetPair = FieldName & "=" & db_EncodeSQLDate(EncodeDate(writeCacheValueVariant))
+                                                SQLSetPair = FieldName & "=" & encodeSQLDate(EncodeDate(writeCacheValueVariant))
                                             Case FieldTypeIdText
                                                 Copy = Left(EncodeText(writeCacheValueVariant), 255)
                                                 If .Scramble Then
@@ -4331,14 +4331,14 @@ ErrorTrap:
                                     '
                                     ' ----- Authorable Fields Updated in Authoring Mode, set Edit Record Modified
                                     '
-                                    SQLEditUpdate = SQLEditUpdate & ",MODIFIEDDATE=" & db_EncodeSQLDate(sqlModifiedDate) & ",MODIFIEDBY=" & db_EncodeSQLNumber(sqlModifiedBy)
+                                    SQLEditUpdate = SQLEditUpdate & ",MODIFIEDDATE=" & encodeSQLDate(sqlModifiedDate) & ",MODIFIEDBY=" & encodeSQLNumber(sqlModifiedBy)
                                 End If
                             Else
                                 If (SQLLiveUpdate <> "") Then
                                     '
                                     ' ----- Authorable Fields Updated in non-Authoring Mode, set Live Record Modified
                                     '
-                                    SQLLiveUpdate = SQLLiveUpdate & ",MODIFIEDDATE=" & db_EncodeSQLDate(sqlModifiedDate) & ",MODIFIEDBY=" & db_EncodeSQLNumber(sqlModifiedBy)
+                                    SQLLiveUpdate = SQLLiveUpdate & ",MODIFIEDDATE=" & encodeSQLDate(sqlModifiedDate) & ",MODIFIEDBY=" & encodeSQLNumber(sqlModifiedBy)
                                 End If
                             End If
                         End If
@@ -4680,11 +4680,11 @@ ErrorTrap:
             iFieldType = fieldType
             Select Case iFieldType
                 Case FieldTypeIdBoolean
-                    db_EncodeSQL = db_EncodeSQLBoolean(EncodeBoolean(expression))
+                    db_EncodeSQL = encodeSQLBoolean(EncodeBoolean(expression))
                 Case FieldTypeIdCurrency, FieldTypeIdAutoIdIncrement, FieldTypeIdFloat, FieldTypeIdInteger, FieldTypeIdLookup, FieldTypeIdMemberSelect
-                    db_EncodeSQL = db_EncodeSQLNumber(expression)
+                    db_EncodeSQL = encodeSQLNumber(expression)
                 Case FieldTypeIdDate
-                    db_EncodeSQL = db_EncodeSQLDate(EncodeDate(expression))
+                    db_EncodeSQL = encodeSQLDate(EncodeDate(expression))
                 Case FieldTypeIdLongText, FieldTypeIdHTML
                     db_EncodeSQL = encodeSQLText(EncodeText(expression))
                 Case FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdRedirect, FieldTypeIdManyToMany, FieldTypeIdText, FieldTypeIdFileTextPrivate, FieldTypeIdFileJavascript, FieldTypeIdFileXML, FieldTypeIdFileCSS, FieldTypeIdFileHTMLPrivate
@@ -4722,7 +4722,7 @@ ErrorTrap:
         '       encode a date variable to go in an sql expression
         '========================================================================
         '
-        Public Function db_EncodeSQLDate(ByVal expression As Date) As String
+        Public Function encodeSQLDate(ByVal expression As Date) As String
             Dim returnString As String = ""
             Dim expressionDate As Date = Date.MinValue
             'If expression Is Nothing Then
@@ -4749,7 +4749,7 @@ ErrorTrap:
         '       encode a number variable to go in an sql expression
         '========================================================================
         '
-        Public Function db_EncodeSQLNumber(ByVal expression As Object) As String
+        Public Function encodeSQLNumber(ByVal expression As Object) As String
             Dim returnString As String = ""
             Dim expressionNumber As Double = 0
             If expression Is Nothing Then
@@ -4778,13 +4778,13 @@ ErrorTrap:
         '       encode a boolean variable to go in an sql expression
         '========================================================================
         '
-        Public Function db_EncodeSQLBoolean(ByVal ExpressionVariant As Boolean) As String
+        Public Function encodeSQLBoolean(ByVal ExpressionVariant As Boolean) As String
             '
             'Dim src As String
             '
-            db_EncodeSQLBoolean = SQLFalse
+            encodeSQLBoolean = SQLFalse
             If EncodeBoolean(ExpressionVariant) Then
-                db_EncodeSQLBoolean = SQLTrue
+                encodeSQLBoolean = SQLTrue
             End If
         End Function
         '
@@ -4865,7 +4865,7 @@ ErrorTrap:
             '
             iActiveOnly = ActiveOnly
             rightNow = Now
-            sqlRightNow = db_EncodeSQLDate(rightNow)
+            sqlRightNow = encodeSQLDate(rightNow)
             If PageNumber = 0 Then
                 PageNumber = 1
             End If
@@ -5008,7 +5008,7 @@ ErrorTrap:
                 ' ----- Delete CalendarEventRules and CalendarEvents
                 '
                 If metaData_IsContentFieldSupported("calendar events", "ID") Then
-                    Call db_DeleteContentRecords("Calendar Events", Criteria)
+                    Call deleteContentRecords("Calendar Events", Criteria)
                 End If
                 '
                 ' ----- Delete ContentWatch
@@ -5025,52 +5025,52 @@ ErrorTrap:
                 Select Case UCase(TableName)
                     Case "CCCALENDARS"
                         '
-                        Call db_DeleteContentRecords("Calendar Event Rules", "CalendarID=" & RecordID)
+                        Call deleteContentRecords("Calendar Event Rules", "CalendarID=" & RecordID)
                     Case "CCCALENDAREVENTS"
                         '
-                        Call db_DeleteContentRecords("Calendar Event Rules", "CalendarEventID=" & RecordID)
+                        Call deleteContentRecords("Calendar Event Rules", "CalendarEventID=" & RecordID)
                     Case "CCCONTENT"
                         '
-                        Call db_DeleteContentRecords("Group Rules", "ContentID=" & RecordID)
+                        Call deleteContentRecords("Group Rules", "ContentID=" & RecordID)
                     Case "CCCONTENTWATCH"
                         '
-                        Call db_DeleteContentRecords("Content Watch List Rules", "Contentwatchid=" & RecordID)
+                        Call deleteContentRecords("Content Watch List Rules", "Contentwatchid=" & RecordID)
                     Case "CCCONTENTWATCHLISTS"
                         '
-                        Call db_DeleteContentRecords("Content Watch List Rules", "Contentwatchlistid=" & RecordID)
+                        Call deleteContentRecords("Content Watch List Rules", "Contentwatchlistid=" & RecordID)
                     Case "CCGROUPS"
                         '
-                        Call db_DeleteContentRecords("Group Rules", "GroupID=" & RecordID)
-                        Call db_DeleteContentRecords("Library Folder Rules", "GroupID=" & RecordID)
-                        Call db_DeleteContentRecords("Member Rules", "GroupID=" & RecordID)
-                        Call db_DeleteContentRecords("Page Content Block Rules", "GroupID=" & RecordID)
-                        Call db_DeleteContentRecords("Path Rules", "GroupID=" & RecordID)
+                        Call deleteContentRecords("Group Rules", "GroupID=" & RecordID)
+                        Call deleteContentRecords("Library Folder Rules", "GroupID=" & RecordID)
+                        Call deleteContentRecords("Member Rules", "GroupID=" & RecordID)
+                        Call deleteContentRecords("Page Content Block Rules", "GroupID=" & RecordID)
+                        Call deleteContentRecords("Path Rules", "GroupID=" & RecordID)
                     Case "CCLIBRARYFOLDERS"
                         '
-                        Call db_DeleteContentRecords("Library Folder Rules", "FolderID=" & RecordID)
+                        Call deleteContentRecords("Library Folder Rules", "FolderID=" & RecordID)
                     Case "CCMEMBERS"
                         '
-                        Call db_DeleteContentRecords("Member Rules", "MemberID=" & RecordID)
-                        Call db_DeleteContentRecords("Topic Habits", "MemberID=" & RecordID)
-                        Call db_DeleteContentRecords("Member Topic Rules", "MemberID=" & RecordID)
+                        Call deleteContentRecords("Member Rules", "MemberID=" & RecordID)
+                        Call deleteContentRecords("Topic Habits", "MemberID=" & RecordID)
+                        Call deleteContentRecords("Member Topic Rules", "MemberID=" & RecordID)
                     Case "CCPAGECONTENT"
                         '
-                        Call db_DeleteContentRecords("Page Content Block Rules", "RecordID=" & RecordID)
-                        Call db_DeleteContentRecords("Page Content Topic Rules", "PageID=" & RecordID)
+                        Call deleteContentRecords("Page Content Block Rules", "RecordID=" & RecordID)
+                        Call deleteContentRecords("Page Content Topic Rules", "PageID=" & RecordID)
                     Case "CCPATHS"
                         '
-                        Call db_DeleteContentRecords("Path Rules", "PathID=" & RecordID)
+                        Call deleteContentRecords("Path Rules", "PathID=" & RecordID)
                     Case "CCSURVEYQUESTIONS"
                         '
-                        Call db_DeleteContentRecords("Survey Results", "QuestionID=" & RecordID)
+                        Call deleteContentRecords("Survey Results", "QuestionID=" & RecordID)
                     Case "CCSURVEYS"
                         '
-                        Call db_DeleteContentRecords("Survey Questions", "SurveyID=" & RecordID)
+                        Call deleteContentRecords("Survey Questions", "SurveyID=" & RecordID)
                     Case "CCTOPICS"
                         '
-                        Call db_DeleteContentRecords("Topic Habits", "TopicID=" & RecordID)
-                        Call db_DeleteContentRecords("Page Content Topic Rules", "TopicID=" & RecordID)
-                        Call db_DeleteContentRecords("Member Topic Rules", "TopicID=" & RecordID)
+                        Call deleteContentRecords("Topic Habits", "TopicID=" & RecordID)
+                        Call deleteContentRecords("Page Content Topic Rules", "TopicID=" & RecordID)
+                        Call deleteContentRecords("Member Topic Rules", "TopicID=" & RecordID)
                 End Select
             End If
             Exit Sub
@@ -5520,7 +5520,7 @@ ErrorTrap:
                                 Call handleLegacyClassError3(MethodName, "The Lookup Content Definition [" & fieldLookupId & "] for this field [" & FieldName & "] is not valid.")
                             Else
                                 LookupContentName = cpCore.metaData.getContentNameByID(fieldLookupId)
-                                db_OpenCSJoin = csOpen(LookupContentName, "ID=" & db_EncodeSQLNumber(FieldValueVariant), "name", , , , , , 1)
+                                db_OpenCSJoin = csOpen(LookupContentName, "ID=" & encodeSQLNumber(FieldValueVariant), "name", , , , , , 1)
                                 'CDefLookup = appEnvironment.GetCDefByID(FieldLookupID)
                                 'csv_OpenCSJoin = db_csOpen(CDefLookup.Name, "ID=" & encodeSQLNumber(FieldValueVariant), "name", , , , , , 1)
                             End If
@@ -5667,19 +5667,19 @@ ErrorTrap:
                                         ' *******************************
                                         '
                                         DefaultValueText = EncodeText(.defaultValue)
-                                        Call db_setCS(CS, FieldName, "null")
+                                        Call cs_set(CS, FieldName, "null")
                                         If DefaultValueText <> "" Then
                                             If .lookupContentID <> 0 Then
                                                 LookupContentName = cpCore.metaData.getContentNameByID(.lookupContentID)
                                                 If LookupContentName <> "" Then
-                                                    Call db_setCS(CS, FieldName, getRecordID(LookupContentName, DefaultValueText))
+                                                    Call cs_set(CS, FieldName, getRecordID(LookupContentName, DefaultValueText))
                                                 End If
                                             ElseIf .lookupList <> "" Then
                                                 UCaseDefaultValueText = UCase(DefaultValueText)
                                                 lookups = Split(.lookupList, ",")
                                                 For Ptr = 0 To UBound(lookups)
                                                     If UCaseDefaultValueText = UCase(lookups(Ptr)) Then
-                                                        Call db_setCS(CS, FieldName, Ptr + 1)
+                                                        Call cs_set(CS, FieldName, Ptr + 1)
                                                         Exit For
                                                     End If
                                                 Next
@@ -5689,7 +5689,7 @@ ErrorTrap:
                                         '
                                         ' else text
                                         '
-                                        Call db_setCS(CS, FieldName, .defaultValue)
+                                        Call cs_set(CS, FieldName, .defaultValue)
                                 End Select
                         End Select
                     End If
@@ -5910,7 +5910,7 @@ ErrorTrap:
             Dim sqlCriteria As String = ""
             Try
                 If IsNumeric(nameIdOrGuid) Then
-                    sqlCriteria = "id=" & db_EncodeSQLNumber(CDbl(nameIdOrGuid))
+                    sqlCriteria = "id=" & encodeSQLNumber(CDbl(nameIdOrGuid))
                 ElseIf cpCore.common_isGuid(nameIdOrGuid) Then
                     sqlCriteria = "ccGuid=" & encodeSQLText(nameIdOrGuid)
                 Else

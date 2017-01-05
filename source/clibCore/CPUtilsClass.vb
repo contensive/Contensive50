@@ -107,7 +107,7 @@ Namespace Contensive.Core
 
         Public Overrides Function EncodeContentForWeb(ByVal Source As String, Optional ByVal ContextContentName As String = "", Optional ByVal ContextRecordID As Integer = 0, Optional ByVal WrapperID As Integer = 0) As String
             If True Then
-                EncodeContentForWeb = CP.core.encodeContentForWeb(Source, ContextContentName, ContextRecordID, "", WrapperID)
+                EncodeContentForWeb = CP.core.html_encodeContentForWeb(Source, ContextContentName, ContextRecordID, "", WrapperID)
             Else
                 EncodeContentForWeb = ""
             End If
@@ -443,7 +443,7 @@ Namespace Contensive.Core
         ''' <param name="Source"></param>
         ''' <returns></returns>
         Public Overrides Function DecodeHtmlFromWysiwygEditor(Source As String) As String
-            Return CP.core.main_DecodeContent(Source)
+            Return CP.core.html_DecodeContent(Source)
             'Throw New NotImplementedException()
         End Function
         '

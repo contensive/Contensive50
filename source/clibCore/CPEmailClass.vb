@@ -116,7 +116,7 @@ Namespace Contensive.Core
             Dim userId As Integer = 0
             If IsNumeric(toUserId) Then
                 userId = CInt(toUserId)
-                Call cpCore.sendMemberEmail3(userId, FromAddress, Subject, Body, SendImmediately, BodyIsHTML, 0, "", False)
+                Call cpCore.email_sendMemberEmail3(userId, FromAddress, Subject, Body, SendImmediately, BodyIsHTML, 0, "", False)
             End If
         End Sub
         Private Sub appendDebugLog(ByVal copy As String)

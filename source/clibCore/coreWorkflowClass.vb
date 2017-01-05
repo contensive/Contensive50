@@ -286,7 +286,7 @@ Namespace Contensive.Core
                         '
                         ' ----- Open the live record
                         '
-                        RSLive = cpCore.db.executeSql("SELECT " & FieldList & " FROM " & LiveTableName & " WHERE ID=" & cpCore.db.db_EncodeSQLNumber(LiveRecordID) & ";", LiveDataSourceName)
+                        RSLive = cpCore.db.executeSql("SELECT " & FieldList & " FROM " & LiveTableName & " WHERE ID=" & cpCore.db.encodeSQLNumber(LiveRecordID) & ";", LiveDataSourceName)
                         'RSLive = appservices.cpcore.db.executeSql(LiveDataSourceName, "SELECT " & FieldList & " FROM " & LiveTableName & " WHERE ID=" & encodeSQLNumber(LiveRecordID) & ";")
                         If RSLive.Rows.Count <= 0 Then
                             '
@@ -298,7 +298,7 @@ Namespace Contensive.Core
                                 '
                                 ' ----- Open the edit record
                                 '
-                                RSEdit = cpCore.db.executeSql("SELECT " & FieldList & " FROM " & EditTableName & " WHERE (EditSourceID=" & cpCore.db.db_EncodeSQLNumber(LiveRecordID) & ")and(EditArchive=0) Order By ID DESC;", EditDataSourceName)
+                                RSEdit = cpCore.db.executeSql("SELECT " & FieldList & " FROM " & EditTableName & " WHERE (EditSourceID=" & cpCore.db.encodeSQLNumber(LiveRecordID) & ")and(EditArchive=0) Order By ID DESC;", EditDataSourceName)
                                 'RSEdit = appservices.cpcore.db.executeSql(EditDataSourceName, "SELECT " & FieldList & " FROM " & EditTableName & " WHERE (EditSourceID=" & encodeSQLNumber(LiveRecordID) & ")and(EditArchive=0) Order By ID DESC;")
                                 If RSEdit.Rows.Count <= 0 Then
                                     '
@@ -451,7 +451,7 @@ Namespace Contensive.Core
                                             NewEditSqlFieldList.add(FieldName, EditSQLValue)
                                             PublishFieldNameArray(FieldPointer) = FieldName
                                             If PublishingDelete Then
-                                                PublishSqlFieldList.add(FieldName, cpCore.db.db_EncodeSQLNumber(0))
+                                                PublishSqlFieldList.add(FieldName, cpCore.db.encodeSQLNumber(0))
                                             Else
                                                 PublishSqlFieldList.add(FieldName, EditSQLValue)
                                             End If
@@ -473,13 +473,13 @@ Namespace Contensive.Core
                                             FieldPointer = FieldPointer + 1
                                             '
                                             FieldNameArray(FieldPointer) = "EDITSOURCEID"
-                                            NewEditSqlFieldList.add(FieldName, cpCore.db.db_EncodeSQLNumber(LiveRecordID))
-                                            ArchiveSqlFieldList.add(FieldName, cpCore.db.db_EncodeSQLNumber(LiveRecordID))
+                                            NewEditSqlFieldList.add(FieldName, cpCore.db.encodeSQLNumber(LiveRecordID))
+                                            ArchiveSqlFieldList.add(FieldName, cpCore.db.encodeSQLNumber(LiveRecordID))
                                             FieldPointer = FieldPointer + 1
                                             '
                                             FieldNameArray(FieldPointer) = "EDITARCHIVE"
-                                            NewEditSqlFieldList.add(FieldName, cpCore.db.db_EncodeSQLBoolean(False))
-                                            ArchiveSqlFieldList.add(FieldName, cpCore.db.db_EncodeSQLBoolean(True))
+                                            NewEditSqlFieldList.add(FieldName, cpCore.db.encodeSQLBoolean(False))
+                                            ArchiveSqlFieldList.add(FieldName, cpCore.db.encodeSQLBoolean(True))
                                             '
                                             ' ----- copy edit record to live record
                                             '
@@ -600,7 +600,7 @@ Namespace Contensive.Core
                         '
                         ' Open the live record
                         '
-                        RSLive = cpCore.db.executeSql("SELECT * FROM " & LiveTableName & " WHERE ID=" & cpCore.db.db_EncodeSQLNumber(LiveRecordID) & ";", LiveDataSourceName)
+                        RSLive = cpCore.db.executeSql("SELECT * FROM " & LiveTableName & " WHERE ID=" & cpCore.db.encodeSQLNumber(LiveRecordID) & ";", LiveDataSourceName)
                         If (RSLive Is Nothing) Then
                             '
                             Call cpCore.handleExceptionAndRethrow(New ApplicationException("During record publishing, there was an error opening the live record, [ID=" & LiveRecordID & "] in table [" & LiveTableName & "] on datasource [" & LiveDataSourceName & " ]"))
@@ -613,7 +613,7 @@ Namespace Contensive.Core
                                 '
                                 ' Open the edit record
                                 '
-                                RSEdit = cpCore.db.executeSql("SELECT * FROM " & EditTableName & " WHERE (EditSourceID=" & cpCore.db.db_EncodeSQLNumber(LiveRecordID) & ")and(EditArchive=0) Order By ID DESC;", EditDataSourceName)
+                                RSEdit = cpCore.db.executeSql("SELECT * FROM " & EditTableName & " WHERE (EditSourceID=" & cpCore.db.encodeSQLNumber(LiveRecordID) & ")and(EditArchive=0) Order By ID DESC;", EditDataSourceName)
                                 If (RSEdit Is Nothing) Then
                                     '
                                     Call cpCore.handleExceptionAndRethrow(New ApplicationException("During record publishing, there was an error opening the edit record [EditSourceID=" & LiveRecordID & "] in table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
@@ -747,7 +747,7 @@ Namespace Contensive.Core
                 Dim Criteria As String
                 Dim CS As Integer
                 '
-                Criteria = getAuthoringControlCriteria(ContentName, RecordID) & "and(CreatedBy<>" & cpCore.db.db_EncodeSQLNumber(MemberID) & ")"
+                Criteria = getAuthoringControlCriteria(ContentName, RecordID) & "and(CreatedBy<>" & cpCore.db.encodeSQLNumber(MemberID) & ")"
                 CS = cpCore.db.csOpen("Authoring Controls", Criteria, , , MemberID)
                 isRecordLocked = cpCore.db.cs_Ok(CS)
                 Call cpCore.db.cs_Close(CS)
@@ -794,12 +794,12 @@ Namespace Contensive.Core
                     '
                     ' One content record
                     '
-                    getAuthoringControlCriteria = "(ContentID=" & cpCore.db.db_EncodeSQLNumber(Mid(Criteria, 2)) & ")And(RecordID=" & cpCore.db.db_EncodeSQLNumber(RecordID) & ")And((DateExpires>" & cpCore.db.db_EncodeSQLDate(Now) & ")Or(DateExpires Is null))"
+                    getAuthoringControlCriteria = "(ContentID=" & cpCore.db.encodeSQLNumber(Mid(Criteria, 2)) & ")And(RecordID=" & cpCore.db.encodeSQLNumber(RecordID) & ")And((DateExpires>" & cpCore.db.encodeSQLDate(Now) & ")Or(DateExpires Is null))"
                 Else
                     '
                     ' Multiple content records
                     '
-                    getAuthoringControlCriteria = "(ContentID In (" & Mid(Criteria, 2) & "))And(RecordID=" & cpCore.db.db_EncodeSQLNumber(RecordID) & ")And((DateExpires>" & cpCore.db.db_EncodeSQLDate(Now) & ")Or(DateExpires Is null))"
+                    getAuthoringControlCriteria = "(ContentID In (" & Mid(Criteria, 2) & "))And(RecordID=" & cpCore.db.encodeSQLNumber(RecordID) & ")And((DateExpires>" & cpCore.db.encodeSQLDate(Now) & ")Or(DateExpires Is null))"
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -825,10 +825,10 @@ Namespace Contensive.Core
                 'If ContentID > -1 Then
                 Select Case AuthoringControl
                     Case AuthoringControlsEditing
-                        Call cpCore.db.db_DeleteContentRecords("Authoring Controls", Criteria & "And(CreatedBy=" & cpCore.db.db_EncodeSQLNumber(MemberID) & ")", MemberID)
+                        Call cpCore.db.deleteContentRecords("Authoring Controls", Criteria & "And(CreatedBy=" & cpCore.db.encodeSQLNumber(MemberID) & ")", MemberID)
                     'Call csv_DeleteContentRecords("Authoring Controls", "(ControlType=" & AuthoringControl & ")And(ContentID=" & encodeSQLNumber(ContentID) & ")And(RecordID=" & encodeSQLNumber(RecordID) & ")And(CreatedBy=" & encodeSQLNumber(MemberID) & ")", MemberID)
                     Case AuthoringControlsSubmitted, AuthoringControlsApproved, AuthoringControlsModified
-                        Call cpCore.db.db_DeleteContentRecords("Authoring Controls", Criteria, MemberID)
+                        Call cpCore.db.deleteContentRecords("Authoring Controls", Criteria, MemberID)
                         'Call csv_DeleteContentRecords("Authoring Controls", "(ControlType=" & AuthoringControl & ")And(ContentID=" & encodeSQLNumber(ContentID) & ")And(RecordID=" & encodeSQLNumber(RecordID) & ")", MemberID)
                 End Select
             Catch ex As Exception
@@ -870,7 +870,7 @@ Namespace Contensive.Core
                                 '
                                 ' Delete expired locks
                                 '
-                                Call cpCore.db.db_DeleteContentRecords("Authoring Controls", sqlCriteria & "And(DATEEXPIRES<" & cpCore.db.db_EncodeSQLDate(Now) & ")")
+                                Call cpCore.db.deleteContentRecords("Authoring Controls", sqlCriteria & "And(DATEEXPIRES<" & cpCore.db.encodeSQLDate(Now) & ")")
                                 '
                                 ' Select any lock left, only the newest counts
                                 '
@@ -879,7 +879,7 @@ Namespace Contensive.Core
                                     '
                                     ' No lock, create one
                                     '
-                                    CSNewLock = cpCore.db.db_csInsertRecord("Authoring Controls", MemberID)
+                                    CSNewLock = cpCore.db.cs_insertRecord("Authoring Controls", MemberID)
                                     If cpCore.db.cs_Ok(CSNewLock) Then
                                         Call cpCore.db.db_SetCSField(CSNewLock, "RecordID", RecordID)
                                         Call cpCore.db.db_SetCSField(CSNewLock, "DateExpires", (Now.AddDays(EditLockTimeoutDays)))
@@ -906,7 +906,7 @@ Namespace Contensive.Core
                                     '
                                     ' Create new lock
                                     '
-                                    CSNewLock = cpCore.db.db_csInsertRecord("Authoring Controls", MemberID)
+                                    CSNewLock = cpCore.db.cs_insertRecord("Authoring Controls", MemberID)
                                     If cpCore.db.cs_Ok(CSNewLock) Then
                                         Call cpCore.db.db_SetCSField(CSNewLock, "RecordID", RecordID)
                                         Call cpCore.db.db_SetCSField(CSNewLock, "ControlType", AuthoringControl)

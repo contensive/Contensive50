@@ -131,16 +131,16 @@ Namespace Contensive.Core
                             End If
                             Call cpCore.db.cs_Close(CS)
                             If _childListAddonID_Local = 0 Then
-                                CS = cpCore.db.db_csInsertRecord("Add-ons")
+                                CS = cpCore.db.cs_insertRecord("Add-ons")
                                 If cpCore.db.cs_Ok(CS) Then
                                     _childListAddonID_Local = cpCore.db.cs_getInteger(CS, "ID")
-                                    Call cpCore.db.db_setCS(CS, "name", "Child Page List")
-                                    Call cpCore.db.db_setCS(CS, "ArgumentList", "Name")
-                                    Call cpCore.db.db_setCS(CS, "CopyText", "<ac type=""childlist"" name=""$name$"">")
-                                    Call cpCore.db.db_setCS(CS, "Content", "1")
-                                    Call cpCore.db.db_setCS(CS, "StylesFilename", "")
+                                    Call cpCore.db.cs_set(CS, "name", "Child Page List")
+                                    Call cpCore.db.cs_set(CS, "ArgumentList", "Name")
+                                    Call cpCore.db.cs_set(CS, "CopyText", "<ac type=""childlist"" name=""$name$"">")
+                                    Call cpCore.db.cs_set(CS, "Content", "1")
+                                    Call cpCore.db.cs_set(CS, "StylesFilename", "")
                                     If BuildSupportsGuid Then
-                                        Call cpCore.db.db_setCS(CS, "ccguid", ChildListGuid)
+                                        Call cpCore.db.cs_set(CS, "ccguid", ChildListGuid)
                                     End If
                                 End If
                                 Call cpCore.db.cs_Close(CS)
@@ -420,7 +420,7 @@ Namespace Contensive.Core
                 Dim dt As DataTable
                 Dim SQL As String
                 Dim ContentID As Integer
-                Dim SQLNow As String = cpCore.db.db_EncodeSQLDate(Now)
+                Dim SQLNow As String = cpCore.db.encodeSQLDate(Now)
 
                 RecordID = 0
                 SQL = "SELECT ID FROM CCSETUP WHERE NAME=" & cpCore.db.encodeSQLText(propertyName) & " order by id"
@@ -440,7 +440,7 @@ Namespace Contensive.Core
                         ContentID = EncodeInteger(dt.Rows(0).Item("ID"))
                     End If
                     'ContentID = csv_GetContentID("Site Properties")
-                    SQL = "INSERT INTO ccSetup (ACTIVE,CONTENTCONTROLID,NAME,FIELDVALUE,ModifiedDate,DateAdded)VALUES(" & SQLTrue & "," & cpCore.db.db_EncodeSQLNumber(ContentID) & "," & cpCore.db.encodeSQLText(UCase(propertyName)) & "," & cpCore.db.encodeSQLText(Value) & "," & SQLNow & "," & SQLNow & ");"
+                    SQL = "INSERT INTO ccSetup (ACTIVE,CONTENTCONTROLID,NAME,FIELDVALUE,ModifiedDate,DateAdded)VALUES(" & SQLTrue & "," & cpCore.db.encodeSQLNumber(ContentID) & "," & cpCore.db.encodeSQLText(UCase(propertyName)) & "," & cpCore.db.encodeSQLText(Value) & "," & SQLNow & "," & SQLNow & ");"
                     Call cpCore.db.executeSql(SQL)
                 End If
                 Call cpCore.cache.setKey(cacheName, Value, "site properties")

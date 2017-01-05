@@ -44,7 +44,7 @@ Namespace Contensive.Addons
                     & Now() _
                     & vbCrLf & "member.name:" & cpCore.user.name _
                     & vbCrLf & "member.id:" & cpCore.user.id _
-                    & vbCrLf & "visit.id:" & cpCore.main_VisitId _
+                    & vbCrLf & "visit.id:" & cpCore.visit_Id _
                     & vbCrLf & "url:" & cpCore.main_ServerLink _
                     & vbCrLf & "url source:" & cpCore.webServer.requestLinkSource
                 SaveContent &= "" _
@@ -108,7 +108,7 @@ Namespace Contensive.Addons
                     & Now() _
                     & vbCrLf & "member.name:" & cpCore.user.name _
                     & vbCrLf & "member.id:" & cpCore.user.id _
-                    & vbCrLf & "visit.id:" & cpCore.main_VisitId _
+                    & vbCrLf & "visit.id:" & cpCore.visit_Id _
                     & vbCrLf & "url:" & cpCore.main_ServerLink _
                     & vbCrLf & "url source:" & cpCore.webServer.requestLinkSource _
                     & vbCrLf & "----------" _
@@ -1237,10 +1237,10 @@ ErrorTrap:
                                         ElseIf cpCore.db.db_GetCS(CS, "Subject") = "" Then
                                             Call cpCore.error_AddUserError("A 'Subject' is required before sending an email.")
                                         Else
-                                            Call cpCore.db.db_setCS(CS, "submitted", True)
-                                            Call cpCore.db.db_setCS(CS, "ConditionID", 0)
+                                            Call cpCore.db.cs_set(CS, "submitted", True)
+                                            Call cpCore.db.cs_set(CS, "ConditionID", 0)
                                             If cpCore.db.db_GetCSDate(CS, "ScheduleDate") = Date.MinValue Then
-                                                Call cpCore.db.db_setCS(CS, "ScheduleDate", cpCore.main_PageStartTime)
+                                                Call cpCore.db.cs_set(CS, "ScheduleDate", cpCore.main_PageStartTime)
                                             End If
                                         End If
                                         Call cpCore.db.cs_Close(CS)
@@ -1266,7 +1266,7 @@ ErrorTrap:
                                         If Not cpCore.db.cs_Ok(CS) Then
                                             Call cpCore.handleLegacyError23("Email ID [" & editRecord.id & "] could not be opened.")
                                         Else
-                                            Call cpCore.db.db_setCS(CS, "submitted", False)
+                                            Call cpCore.db.cs_set(CS, "submitted", False)
                                         End If
                                         Call cpCore.db.cs_Close(CS)
                                     End If
@@ -1296,9 +1296,9 @@ ErrorTrap:
                                         ElseIf cpCore.db.cs_getInteger(CS, "ConditionID") = 0 Then
                                             cpCore.error_AddUserError("A condition must be set.")
                                         Else
-                                            Call cpCore.db.db_setCS(CS, "submitted", True)
+                                            Call cpCore.db.cs_set(CS, "submitted", True)
                                             If cpCore.db.db_GetCSDate(CS, "ScheduleDate") = Date.MinValue Then
-                                                Call cpCore.db.db_setCS(CS, "ScheduleDate", cpCore.main_PageStartTime)
+                                                Call cpCore.db.cs_set(CS, "ScheduleDate", cpCore.main_PageStartTime)
                                             End If
                                         End If
                                         Call cpCore.db.cs_Close(CS)
@@ -1323,11 +1323,11 @@ ErrorTrap:
                                     EmailToConfirmationMemberID = 0
                                     If editRecord.fieldsLc.ContainsKey("testmemberid") Then
                                         EmailToConfirmationMemberID = EncodeInteger(editRecord.fieldsLc.Item("testmemberid").value)
-                                        Call cpCore.sendEmailConfirmationTest(editRecord.id, EmailToConfirmationMemberID)
+                                        Call cpCore.email_sendEmailConfirmationTest(editRecord.id, EmailToConfirmationMemberID)
                                         '
                                         If editRecord.fieldsLc.ContainsKey("lastsendtestdate") Then
                                             editRecord.fieldsLc.Item("lastsendtestdate").value = cpCore.main_PageStartTime
-                                            Call cpCore.db.executeSql("update ccemail Set lastsendtestdate=" & cpCore.db.db_EncodeSQLDate(cpCore.main_PageStartTime) & " where id=" & editRecord.id)
+                                            Call cpCore.db.executeSql("update ccemail Set lastsendtestdate=" & cpCore.db.encodeSQLDate(cpCore.main_PageStartTime) & " where id=" & editRecord.id)
                                         End If
                                     End If
                                 End If
@@ -1461,12 +1461,12 @@ ErrorTrap:
                         Loop
                     End If
                     If RuleNeeded And Not RuleFound Then
-                        CSNew = cpCore.db.db_csInsertRecord("Group Rules")
+                        CSNew = cpCore.db.cs_insertRecord("Group Rules")
                         If cpCore.db.cs_Ok(CSNew) Then
-                            Call cpCore.db.db_setCS(CSNew, "GroupID", GroupID)
-                            Call cpCore.db.db_setCS(CSNew, "ContentID", ContentID)
-                            Call cpCore.db.db_setCS(CSNew, "AllowAdd", AllowAdd)
-                            Call cpCore.db.db_setCS(CSNew, "AllowDelete", AllowDelete)
+                            Call cpCore.db.cs_set(CSNew, "GroupID", GroupID)
+                            Call cpCore.db.cs_set(CSNew, "ContentID", ContentID)
+                            Call cpCore.db.cs_set(CSNew, "AllowAdd", AllowAdd)
+                            Call cpCore.db.cs_set(CSNew, "AllowDelete", AllowDelete)
                         End If
                         cpCore.db.cs_Close(CSNew)
                         RecordChanged = True
@@ -1476,11 +1476,11 @@ ErrorTrap:
                         RecordChanged = True
                     ElseIf RuleFound And RuleNeeded Then
                         If (AllowAdd <> cpCore.db.cs_getBoolean(CSPointer, "AllowAdd")) Then
-                            Call cpCore.db.db_setCS(CSPointer, "AllowAdd", AllowAdd)
+                            Call cpCore.db.cs_set(CSPointer, "AllowAdd", AllowAdd)
                             RecordChanged = True
                         End If
                         If (AllowDelete <> cpCore.db.cs_getBoolean(CSPointer, "AllowDelete")) Then
-                            Call cpCore.db.db_setCS(CSPointer, "AllowDelete", AllowDelete)
+                            Call cpCore.db.cs_set(CSPointer, "AllowDelete", AllowDelete)
                             RecordChanged = True
                         End If
                     End If
@@ -1605,12 +1605,12 @@ ErrorTrap:
                         Loop
                     End If
                     If RuleNeeded And Not RuleFound Then
-                        CSNew = cpCore.db.db_csInsertRecord("Group Rules")
+                        CSNew = cpCore.db.cs_insertRecord("Group Rules")
                         If cpCore.db.cs_Ok(CSNew) Then
-                            Call cpCore.db.db_setCS(CSNew, "ContentID", ContentID)
-                            Call cpCore.db.db_setCS(CSNew, "GroupID", GroupID)
-                            Call cpCore.db.db_setCS(CSNew, "AllowAdd", AllowAdd)
-                            Call cpCore.db.db_setCS(CSNew, "AllowDelete", AllowDelete)
+                            Call cpCore.db.cs_set(CSNew, "ContentID", ContentID)
+                            Call cpCore.db.cs_set(CSNew, "GroupID", GroupID)
+                            Call cpCore.db.cs_set(CSNew, "AllowAdd", AllowAdd)
+                            Call cpCore.db.cs_set(CSNew, "AllowDelete", AllowDelete)
                         End If
                         cpCore.db.cs_Close(CSNew)
                         RecordChanged = True
@@ -1619,11 +1619,11 @@ ErrorTrap:
                         RecordChanged = True
                     ElseIf RuleFound And RuleNeeded Then
                         If (AllowAdd <> cpCore.db.cs_getBoolean(CSPointer, "AllowAdd")) Then
-                            Call cpCore.db.db_setCS(CSPointer, "AllowAdd", AllowAdd)
+                            Call cpCore.db.cs_set(CSPointer, "AllowAdd", AllowAdd)
                             RecordChanged = True
                         End If
                         If (AllowDelete <> cpCore.db.cs_getBoolean(CSPointer, "AllowDelete")) Then
-                            Call cpCore.db.db_setCS(CSPointer, "AllowDelete", AllowDelete)
+                            Call cpCore.db.cs_set(CSPointer, "AllowDelete", AllowDelete)
                             RecordChanged = True
                         End If
                     End If
@@ -2662,7 +2662,7 @@ ErrorTrap:
                                                 ' this is a fix for when content editors leave white space in the editor, and do not realize it
                                                 '   then cannot fixgure out how to remove it
                                                 '
-                                                ResponseFieldValueText = cpCore.main_DecodeContent(ResponseFieldValueText)
+                                                ResponseFieldValueText = cpCore.html_DecodeContent(ResponseFieldValueText)
                                                 ResponseFieldValueText = LCase(EncodeText(ResponseFieldValueText))
                                                 If Len(ResponseFieldValueText) < 20 Then
                                                     HasInput = (InStr(1, ResponseFieldValueText, "<input ") <> 0)
@@ -2886,22 +2886,22 @@ ErrorTrap:
                 ' ----- update/create the content watch record for this content record
                 '
                 ContentID = editRecord.contentControlId
-                CSContentWatch = cpCore.db.csOpen("Content Watch", "(ContentID=" & cpCore.db.db_EncodeSQLNumber(ContentID) & ")And(RecordID=" & cpCore.db.db_EncodeSQLNumber(editRecord.id) & ")")
+                CSContentWatch = cpCore.db.csOpen("Content Watch", "(ContentID=" & cpCore.db.encodeSQLNumber(ContentID) & ")And(RecordID=" & cpCore.db.encodeSQLNumber(editRecord.id) & ")")
                 If Not cpCore.db.cs_Ok(CSContentWatch) Then
                     Call cpCore.db.cs_Close(CSContentWatch)
-                    CSContentWatch = cpCore.db.db_csInsertRecord("Content Watch")
-                    Call cpCore.db.db_setCS(CSContentWatch, "contentid", ContentID)
-                    Call cpCore.db.db_setCS(CSContentWatch, "recordid", editRecord.id)
-                    Call cpCore.db.db_setCS(CSContentWatch, "ContentRecordKey", ContentID & "." & editRecord.id)
-                    Call cpCore.db.db_setCS(CSContentWatch, "clicks", 0)
+                    CSContentWatch = cpCore.db.cs_insertRecord("Content Watch")
+                    Call cpCore.db.cs_set(CSContentWatch, "contentid", ContentID)
+                    Call cpCore.db.cs_set(CSContentWatch, "recordid", editRecord.id)
+                    Call cpCore.db.cs_set(CSContentWatch, "ContentRecordKey", ContentID & "." & editRecord.id)
+                    Call cpCore.db.cs_set(CSContentWatch, "clicks", 0)
                 End If
                 If Not cpCore.db.cs_Ok(CSContentWatch) Then
                     Call handleLegacyClassError(MethodName, "SaveContentTracking, can Not create New record")
                 Else
                     ContentWatchID = cpCore.db.cs_getInteger(CSContentWatch, "ID")
-                    Call cpCore.db.db_setCS(CSContentWatch, "LinkLabel", ContentWatchLinkLabel)
-                    Call cpCore.db.db_setCS(CSContentWatch, "WhatsNewDateExpires", ContentWatchExpires)
-                    Call cpCore.db.db_setCS(CSContentWatch, "Link", ContentWatchLink)
+                    Call cpCore.db.cs_set(CSContentWatch, "LinkLabel", ContentWatchLinkLabel)
+                    Call cpCore.db.cs_set(CSContentWatch, "WhatsNewDateExpires", ContentWatchExpires)
+                    Call cpCore.db.cs_set(CSContentWatch, "Link", ContentWatchLink)
                     '
                     ' ----- delete all rules for this ContentWatch record
                     '
@@ -2918,10 +2918,10 @@ ErrorTrap:
                     Dim ListPointer As Integer
                     If ContentWatchListIDCount > 0 Then
                         For ListPointer = 0 To ContentWatchListIDCount - 1
-                            CSRules = cpCore.db.db_csInsertRecord("Content Watch List Rules")
+                            CSRules = cpCore.db.cs_insertRecord("Content Watch List Rules")
                             If cpCore.db.cs_Ok(CSRules) Then
-                                Call cpCore.db.db_setCS(CSRules, "ContentWatchID", ContentWatchID)
-                                Call cpCore.db.db_setCS(CSRules, "ContentWatchListID", ContentWatchListID(ListPointer))
+                                Call cpCore.db.cs_set(CSRules, "ContentWatchID", ContentWatchID)
+                                Call cpCore.db.cs_set(CSRules, "ContentWatchListID", ContentWatchListID(ListPointer))
                             End If
                             Call cpCore.db.cs_Close(CSRules)
                         Next
@@ -3010,10 +3010,10 @@ ErrorTrap:
                 '
                 CS = cpCore.db_csOpen("Meta Content", MetaContentID)
                 If cpCore.db.cs_Ok(CS) Then
-                    Call cpCore.db.db_setCS(CS, "Name", cpCore.docProperties.getText("MetaContent.PageTitle"))
-                    Call cpCore.db.db_setCS(CS, "MetaDescription", cpCore.docProperties.getText("MetaContent.MetaDescription"))
+                    Call cpCore.db.cs_set(CS, "Name", cpCore.docProperties.getText("MetaContent.PageTitle"))
+                    Call cpCore.db.cs_set(CS, "MetaDescription", cpCore.docProperties.getText("MetaContent.MetaDescription"))
                     If True Then ' 3.3.930" Then
-                        Call cpCore.db.db_setCS(CS, "OtherHeadTags", cpCore.docProperties.getText("MetaContent.OtherHeadTags"))
+                        Call cpCore.db.cs_set(CS, "OtherHeadTags", cpCore.docProperties.getText("MetaContent.OtherHeadTags"))
                         MetaKeywordList = cpCore.docProperties.getText("MetaContent.MetaKeywordList")
                         MetaKeywordList = Replace(MetaKeywordList, ",", vbCrLf)
                         Do While InStr(1, MetaKeywordList, vbCrLf & " ") <> 0
@@ -3028,9 +3028,9 @@ ErrorTrap:
                         Do While (MetaKeywordList <> "") And (Right(MetaKeywordList, 2) = vbCrLf)
                             MetaKeywordList = Left(MetaKeywordList, Len(MetaKeywordList) - 2)
                         Loop
-                        Call cpCore.db.db_setCS(CS, "MetaKeywordList", MetaKeywordList)
+                        Call cpCore.db.cs_set(CS, "MetaKeywordList", MetaKeywordList)
                     ElseIf cpCore.db.db_IsCSFieldSupported(CS, "OtherHeadTags") Then
-                        Call cpCore.db.db_setCS(CS, "OtherHeadTags", cpCore.docProperties.getText("MetaContent.OtherHeadTags"))
+                        Call cpCore.db.cs_set(CS, "OtherHeadTags", cpCore.docProperties.getText("MetaContent.OtherHeadTags"))
                     End If
                     Call cpCore.main_ProcessCheckList("MetaContent.KeywordList", "Meta Content", EncodeText(MetaContentID), "Meta Keywords", "Meta Keyword Rules", "MetaContentID", "MetaKeywordID")
                 End If
@@ -3098,7 +3098,7 @@ ErrorTrap:
                             DupCausesWarning = True
                             CS = cpCore.db_csOpenRecord(adminContent.Name, editRecord.id, True, True)
                             If cpCore.db.cs_Ok(CS) Then
-                                Call cpCore.db.db_setCS(CS, "linkalias", linkAlias)
+                                Call cpCore.db.cs_set(CS, "linkalias", linkAlias)
                             End If
                             Call cpCore.db.cs_Close(CS)
                             '
@@ -3139,7 +3139,7 @@ ErrorTrap:
                 ' ----- Open the content watch record for this content record
                 '
                 ContentID = editRecord.contentControlId
-                CSPointer = cpCore.db.csOpen("Content Watch", "(ContentID=" & cpCore.db.db_EncodeSQLNumber(ContentID) & ")AND(RecordID=" & cpCore.db.db_EncodeSQLNumber(editRecord.id) & ")")
+                CSPointer = cpCore.db.csOpen("Content Watch", "(ContentID=" & cpCore.db.encodeSQLNumber(ContentID) & ")AND(RecordID=" & cpCore.db.encodeSQLNumber(editRecord.id) & ")")
                 If cpCore.db.cs_Ok(CSPointer) Then
                     ContentWatchLoaded = True
                     ContentWatchRecordID = (cpCore.db.cs_getInteger(CSPointer, "ID"))
@@ -3229,7 +3229,7 @@ ErrorTrap:
                 If editRecord.id = 0 Then
                     NewRecord = True
                     RecordChanged = True
-                    CSEditRecord = cpCore.db.db_csInsertRecord(adminContent.Name)
+                    CSEditRecord = cpCore.db.cs_insertRecord(adminContent.Name)
                 Else
                     NewRecord = False
                     CSEditRecord = cpCore.db_csOpenRecord(adminContent.Name, editRecord.id, True, True)
@@ -3277,7 +3277,7 @@ ErrorTrap:
                                     If cpCore.db.cs_getText(CSEditRecord, FieldName) <> EncodeText(FieldValueVariant) Then
                                         FieldChanged = True
                                         RecordChanged = True
-                                        Call cpCore.db.db_setCS(CSEditRecord, FieldName, FieldValueVariant)
+                                        Call cpCore.db.cs_set(CSEditRecord, FieldName, FieldValueVariant)
                                     End If
                                         'RecordChanged = True
                                         'Call cpCore.app.db_SetCS(CSEditRecord, FieldName, FieldValueVariant)
@@ -3285,7 +3285,7 @@ ErrorTrap:
                                     If cpCore.db.cs_getInteger(CSEditRecord, FieldName) <> EncodeInteger(FieldValueVariant) Then
                                         FieldChanged = True
                                         RecordChanged = True
-                                        Call cpCore.db.db_setCS(CSEditRecord, FieldName, FieldValueVariant)
+                                        Call cpCore.db.cs_set(CSEditRecord, FieldName, FieldValueVariant)
                                     End If
                                         'RecordChanged = True
                                         'Call cpCore.app.db_SetCS(CSEditRecord, FieldName, FieldValueVariant)
@@ -3382,7 +3382,7 @@ ErrorTrap:
                                         If cpCore.db.cs_getBoolean(CSEditRecord, FieldName) <> EncodeBoolean(FieldValueVariant) Then
                                             RecordChanged = True
                                             FieldChanged = True
-                                            Call cpCore.db.db_setCS(CSEditRecord, FieldName, FieldValueVariant)
+                                            Call cpCore.db.cs_set(CSEditRecord, FieldName, FieldValueVariant)
                                         End If
                                     Case FieldTypeIdCurrency, FieldTypeIdFloat
                                         '
@@ -3393,7 +3393,7 @@ ErrorTrap:
                                             'If cpCore.main_GetCSNumber(CSEditRecord, FieldName) <> encodeNumber(FieldValueVariant) Then
                                             RecordChanged = True
                                             FieldChanged = True
-                                            Call cpCore.db.db_setCS(CSEditRecord, FieldName, FieldValueVariant)
+                                            Call cpCore.db.cs_set(CSEditRecord, FieldName, FieldValueVariant)
                                         End If
                                     Case FieldTypeIdDate
                                         '
@@ -3402,7 +3402,7 @@ ErrorTrap:
                                         If cpCore.db.db_GetCSDate(CSEditRecord, FieldName) <> EncodeDate(FieldValueVariant) Then
                                             FieldChanged = True
                                             RecordChanged = True
-                                            Call cpCore.db.db_setCS(CSEditRecord, FieldName, FieldValueVariant)
+                                            Call cpCore.db.cs_set(CSEditRecord, FieldName, FieldValueVariant)
                                         End If
                                     Case FieldTypeIdInteger, FieldTypeIdLookup
                                         '
@@ -3413,7 +3413,7 @@ ErrorTrap:
                                             'If cpCore.app.db_GetCSInteger(CSEditRecord, FieldName) <> encodeInteger(FieldValueVariant) Then
                                             FieldChanged = True
                                             RecordChanged = True
-                                            Call cpCore.db.db_setCS(CSEditRecord, FieldName, FieldValueVariant)
+                                            Call cpCore.db.cs_set(CSEditRecord, FieldName, FieldValueVariant)
                                         End If
                                     Case FieldTypeIdLongText, FieldTypeIdText, FieldTypeIdFileTextPrivate, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate
                                         '
@@ -3422,7 +3422,7 @@ ErrorTrap:
                                         If cpCore.db.db_GetCS(CSEditRecord, FieldName) <> EncodeText(FieldValueVariant) Then
                                             FieldChanged = True
                                             RecordChanged = True
-                                            Call cpCore.db.db_setCS(CSEditRecord, FieldName, EncodeText(FieldValueVariant))
+                                            Call cpCore.db.cs_set(CSEditRecord, FieldName, EncodeText(FieldValueVariant))
                                         End If
                                     Case FieldTypeIdManyToMany
                                         '
@@ -3441,7 +3441,7 @@ ErrorTrap:
 
                                         FieldChanged = True
                                         RecordChanged = True
-                                        Call cpCore.db.db_setCS(CSEditRecord, UcaseFieldName, FieldValueVariant)
+                                        Call cpCore.db.cs_set(CSEditRecord, UcaseFieldName, FieldValueVariant)
                                         'sql &=  "," & .Name & "=" & cpCore.app.EncodeSQL(FieldValueVariant, .FieldType)
                                 End Select
                             End If
@@ -3479,7 +3479,7 @@ ErrorTrap:
                                     '
                                     If True Then ' 3.4.200" Then
                                         If cpCore.docProperties.getText("filename") <> "" Then
-                                            Call cpCore.db.db_setCS(CSEditRecord, "altsizelist", "")
+                                            Call cpCore.db.cs_set(CSEditRecord, "altsizelist", "")
                                         End If
                                     End If
                             End Select
@@ -3521,7 +3521,7 @@ ErrorTrap:
                     ' ----- if admin content is changed, reload the admincontent data in case this is a save, and not an OK
                     '
                     If RecordChanged And SaveCCIDValue <> 0 Then
-                        Call cpCore.main_SetContentControl(editRecord.contentControlId, editRecord.id, SaveCCIDValue)
+                        Call cpCore.content_SetContentControl(editRecord.contentControlId, editRecord.id, SaveCCIDValue)
                         editRecord.contentControlId_Name = cpCore.metaData.getContentNameByID(SaveCCIDValue)
                         adminContent = cpCore.metaData.getCdef(editRecord.contentControlId_Name)
                         adminContent.Id = adminContent.Id
@@ -4246,7 +4246,7 @@ ErrorTrap:
                             Call Stream.Add(GetForm_Edit_AddTab("Reports", GetForm_Edit_MemberReports(adminContent, editRecord), allowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                             If allowAdminTabs Then
-                                Call Stream.Add(cpCore.main_GetComboTabs())
+                                Call Stream.Add(cpCore.menu_GetComboTabs())
                             End If
                             Call Stream.Add(EditSectionButtonBar)
                         End If
@@ -4270,7 +4270,7 @@ ErrorTrap:
                             'Call Stream.Add(GetForm_Edit_AddTab("Calendar", GetForm_Edit_CalendarEvents, AllowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                             If allowAdminTabs Then
-                                Call Stream.Add(cpCore.main_GetComboTabs())
+                                Call Stream.Add(cpCore.menu_GetComboTabs())
                                 'Call Stream.Add("<div class=""ccPanelBackground"">" & cpCore.main_GetComboTabs() & "</div>")
                             End If
                             Call Stream.Add(EditSectionButtonBar)
@@ -4332,7 +4332,7 @@ ErrorTrap:
                             Call Stream.Add(GetForm_Edit_AddTab("Bounce&nbsp;Control", GetForm_Edit_EmailBounceStatus(), allowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                             If allowAdminTabs Then
-                                Call Stream.Add(cpCore.main_GetComboTabs())
+                                Call Stream.Add(cpCore.menu_GetComboTabs())
                                 'Call Stream.Add("<div Class=""ccPanelBackground"">" & cpCore.main_GetComboTabs() & "</div>")
                             End If
                             Call Stream.Add(EditSectionButtonBar)
@@ -4385,7 +4385,7 @@ ErrorTrap:
                             Call Stream.Add(GetForm_Edit_AddTab("Bounce&nbsp;Control", GetForm_Edit_EmailBounceStatus(), allowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                             If allowAdminTabs Then
-                                Call Stream.Add(cpCore.main_GetComboTabs())
+                                Call Stream.Add(cpCore.menu_GetComboTabs())
                                 'Call Stream.Add("<div Class=""ccPanelBackground"">" & cpCore.main_GetComboTabs() & "</div>")
                             End If
                             Call Stream.Add(EditSectionButtonBar)
@@ -4436,7 +4436,7 @@ ErrorTrap:
                             Call Stream.Add(GetForm_Edit_AddTab("Bounce&nbsp;Control", GetForm_Edit_EmailBounceStatus(), allowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                             If allowAdminTabs Then
-                                Call Stream.Add(cpCore.main_GetComboTabs())
+                                Call Stream.Add(cpCore.menu_GetComboTabs())
                                 'Call Stream.Add("<div Class=""ccPanelBackground"">" & cpCore.main_GetComboTabs() & "</div>")
                             End If
                             Call Stream.Add(EditSectionButtonBar)
@@ -4459,7 +4459,7 @@ ErrorTrap:
                             Call Stream.Add(GetForm_Edit_AddTab("Authoring Permissions", GetForm_Edit_GroupRules(adminContent, editRecord), allowAdminTabs))
                             Call Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                             If allowAdminTabs Then
-                                Call Stream.Add(cpCore.main_GetComboTabs())
+                                Call Stream.Add(cpCore.menu_GetComboTabs())
                                 'Call Stream.Add("<div class=""ccPanelBackground"">" & cpCore.main_GetComboTabs() & "</div>")
                             End If
                             Call Stream.Add(EditSectionButtonBar)
@@ -4483,7 +4483,7 @@ ErrorTrap:
                         'Call Stream.Add(GetForm_Edit_AddTab("Calendar", GetForm_Edit_CalendarEvents, AllowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                         If allowAdminTabs Then
-                            Call Stream.Add(cpCore.main_GetComboTabs())
+                            Call Stream.Add(cpCore.menu_GetComboTabs())
                         End If
                         Call Stream.Add(EditSectionButtonBar)
                     Case "CCSECTIONS"
@@ -4499,7 +4499,7 @@ ErrorTrap:
                         Call Stream.Add(GetForm_Edit_AddTab("Section Blocking", GetForm_Edit_SectionBlockRules(adminContent, editRecord), allowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                         If allowAdminTabs Then
-                            Call Stream.Add(cpCore.main_GetComboTabs())
+                            Call Stream.Add(cpCore.menu_GetComboTabs())
                             'Call Stream.Add("<div class=""ccPanelBackground"">" & cpCore.main_GetComboTabs() & "</div>")
                         End If
                         Call Stream.Add(EditSectionButtonBar)
@@ -4515,7 +4515,7 @@ ErrorTrap:
                         Call Stream.Add(GetForm_Edit_AddTab("Select Sections", GetForm_Edit_DynamicMenuSectionRules(adminContent, editRecord), allowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                         If allowAdminTabs Then
-                            Call Stream.Add(cpCore.main_GetComboTabs())
+                            Call Stream.Add(cpCore.menu_GetComboTabs())
                             'Call Stream.Add("<div class=""ccPanelBackground"">" & cpCore.main_GetComboTabs() & "</div>")
                         End If
                         Call Stream.Add(EditSectionButtonBar)
@@ -4531,7 +4531,7 @@ ErrorTrap:
                         Call Stream.Add(GetForm_Edit_AddTab("Authoring Access", GetForm_Edit_LibraryFolderRules(adminContent, editRecord), allowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                         If allowAdminTabs Then
-                            Call Stream.Add(cpCore.main_GetComboTabs())
+                            Call Stream.Add(cpCore.menu_GetComboTabs())
                         End If
                         Call Stream.Add(EditSectionButtonBar)
                     Case UCase("ccGroups")
@@ -4551,7 +4551,7 @@ ErrorTrap:
                         'Call Stream.Add(GetForm_Edit_AddTab("Calendar", GetForm_Edit_CalendarEvents, AllowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                         If allowAdminTabs Then
-                            Call Stream.Add(cpCore.main_GetComboTabs())
+                            Call Stream.Add(cpCore.menu_GetComboTabs())
                         End If
                         Call Stream.Add(EditSectionButtonBar)
                     '
@@ -4588,7 +4588,7 @@ ErrorTrap:
                         Call Stream.Add(GetForm_Edit_AddTab("Reports", GetForm_Edit_LayoutReports(adminContent, editRecord), allowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                         If allowAdminTabs Then
-                            Call Stream.Add(cpCore.main_GetComboTabs())
+                            Call Stream.Add(cpCore.menu_GetComboTabs())
                         End If
                         Call Stream.Add(EditSectionButtonBar)
                     Case Else
@@ -4604,7 +4604,7 @@ ErrorTrap:
                         Call Stream.Add(GetForm_Edit_AddTab("Content Watch", GetForm_Edit_ContentTracking(adminContent, editRecord), allowAdminTabs))
                         Call Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContent, editRecord), allowAdminTabs))
                         If allowAdminTabs Then
-                            Call Stream.Add(cpCore.main_GetComboTabs())
+                            Call Stream.Add(cpCore.menu_GetComboTabs())
                         End If
                         Call Stream.Add(EditSectionButtonBar)
                 End Select
@@ -7136,7 +7136,7 @@ ErrorTrap:
                 ' This is really messy -- there must be a better way
                 '
                 addonId = 0
-                If (cpCore.main_VisitId = cpCore.docProperties.getInteger(RequestNameDashboardReset)) Then
+                If (cpCore.visit_Id = cpCore.docProperties.getInteger(RequestNameDashboardReset)) Then
                     '$$$$$ cache this
                     CS = cpCore.db.csOpen("Add-ons", "ccguid=" & cpCore.db.encodeSQLText(DashboardAddonGuid))
                     If cpCore.db.cs_Ok(CS) Then
@@ -7213,7 +7213,7 @@ ErrorTrap:
                     & vbCrLf & "<div style=""clear:both;height:18px;margin-top:10px""><div style=""float:left;width:200px;"">Domain Name</div><div style=""float:left;"">" & cpCore.main_ServerDomain & "</div></div>" _
                     & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;"">Login Member Name</div><div style=""float:left;"">" & cpCore.user.name & "</div></div>" _
                     & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;"">Quick Reports</div><div style=""float:left;""><a Href=""?" & RequestNameAdminForm & "=" & AdminFormQuickStats & """>Real-Time Activity</A></div></div>" _
-                    & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;""><a Href=""?" & RequestNameDashboardReset & "=" & cpCore.main_VisitId & """>Run Dashboard</A></div></div>"
+                    & vbCrLf & "<div style=""clear:both;height:18px;""><div style=""float:left;width:200px;""><a Href=""?" & RequestNameDashboardReset & "=" & cpCore.visit_Id & """>Run Dashboard</A></div></div>"
                     '
                     If cpCore.error_IsUserError Then
                         returnHtml = returnHtml _
@@ -7271,7 +7271,7 @@ ErrorTrap:
             '
             ' ----- All Visits Today
             '
-            SQL = "SELECT Count(ccVisits.ID) AS VisitCount, Avg(ccVisits.PageVisits) AS PageCount FROM ccVisits WHERE ((ccVisits.StartTime)>" & cpCore.db.db_EncodeSQLDate(cpCore.main_PageStartTime.Date) & ");"
+            SQL = "SELECT Count(ccVisits.ID) AS VisitCount, Avg(ccVisits.PageVisits) AS PageCount FROM ccVisits WHERE ((ccVisits.StartTime)>" & cpCore.db.encodeSQLDate(cpCore.main_PageStartTime.Date) & ");"
             CS = cpCore.db.cs_openSql(SQL)
             If cpCore.db.cs_Ok(CS) Then
                 VisitCount = cpCore.db.cs_getInteger(CS, "VisitCount")
@@ -7286,7 +7286,7 @@ ErrorTrap:
             '
             ' ----- Non-Bot Visits Today
             '
-            SQL = "SELECT Count(ccVisits.ID) AS VisitCount, Avg(ccVisits.PageVisits) AS PageCount FROM ccVisits WHERE (ccVisits.CookieSupport=1)and((ccVisits.StartTime)>" & cpCore.db.db_EncodeSQLDate(cpCore.main_PageStartTime.Date) & ");"
+            SQL = "SELECT Count(ccVisits.ID) AS VisitCount, Avg(ccVisits.PageVisits) AS PageCount FROM ccVisits WHERE (ccVisits.CookieSupport=1)and((ccVisits.StartTime)>" & cpCore.db.encodeSQLDate(cpCore.main_PageStartTime.Date) & ");"
             CS = cpCore.db.cs_openSql(SQL)
             If cpCore.db.cs_Ok(CS) Then
                 VisitCount = cpCore.db.cs_getInteger(CS, "VisitCount")
@@ -7301,7 +7301,7 @@ ErrorTrap:
             '
             ' ----- Visits Today by new visitors
             '
-            SQL = "SELECT Count(ccVisits.ID) AS VisitCount, Avg(ccVisits.PageVisits) AS PageCount FROM ccVisits WHERE (ccVisits.CookieSupport=1)and(ccVisits.StartTime>" & cpCore.db.db_EncodeSQLDate(cpCore.main_PageStartTime.Date) & ")AND(ccVisits.VisitorNew<>0);"
+            SQL = "SELECT Count(ccVisits.ID) AS VisitCount, Avg(ccVisits.PageVisits) AS PageCount FROM ccVisits WHERE (ccVisits.CookieSupport=1)and(ccVisits.StartTime>" & cpCore.db.encodeSQLDate(cpCore.main_PageStartTime.Date) & ")AND(ccVisits.VisitorNew<>0);"
             CS = cpCore.db.cs_openSql(SQL)
             If cpCore.db.cs_Ok(CS) Then
                 VisitCount = cpCore.db.cs_getInteger(CS, "VisitCount")
@@ -7323,7 +7323,7 @@ ErrorTrap:
                 Stream.Add("<h2>Current Visits</h2>")
                 SQL = "SELECT ccVisits.HTTP_REFERER as referer,ccVisits.remote_addr as Remote_Addr, ccVisits.LastVisitTime as LastVisitTime, ccVisits.PageVisits as PageVisits, ccMembers.Name as MemberName, ccVisits.ID as VisitID, ccMembers.ID as MemberID" _
                     & " FROM ccVisits LEFT JOIN ccMembers ON ccVisits.MemberID = ccMembers.ID" _
-                    & " WHERE (((ccVisits.LastVisitTime)>" & cpCore.db.db_EncodeSQLDate(cpCore.main_PageStartTime.AddHours(-1)) & "))" _
+                    & " WHERE (((ccVisits.LastVisitTime)>" & cpCore.db.encodeSQLDate(cpCore.main_PageStartTime.AddHours(-1)) & "))" _
                     & " ORDER BY ccVisits.LastVisitTime DESC;"
                 CS = cpCore.db.cs_openSql(SQL)
                 If cpCore.db.cs_Ok(CS) Then
@@ -7609,8 +7609,8 @@ ErrorTrap:
                 CS = cpCore.db.csOpen("Meta Content", "(ContentID=" & editRecord.contentControlId & ")and(RecordID=" & editRecord.id & ")")
                 If Not cpCore.db.cs_Ok(CS) Then
                     CS = cpCore.db_InsertCSContent("Meta Content")
-                    Call cpCore.db.db_setCS(CS, "ContentID", editRecord.contentControlId)
-                    Call cpCore.db.db_setCS(CS, "RecordID", editRecord.id)
+                    Call cpCore.db.cs_set(CS, "ContentID", editRecord.contentControlId)
+                    Call cpCore.db.cs_set(CS, "RecordID", editRecord.id)
                     Call cpCore.db.db_SaveCSRecord(CS)
                 End If
                 If cpCore.db.cs_Ok(CS) Then
@@ -10456,12 +10456,12 @@ ErrorTrap:
                             ' No record, Rule needed, add it
                             '
                             Call cpCore.db.cs_Close(CSRule)
-                            CSRule = cpCore.db.db_csInsertRecord("Member Rules")
+                            CSRule = cpCore.db.cs_insertRecord("Member Rules")
                             If cpCore.db.cs_Ok(CSRule) Then
-                                Call cpCore.db.db_setCS(CSRule, "Active", True)
-                                Call cpCore.db.db_setCS(CSRule, "MemberID", PeopleID)
-                                Call cpCore.db.db_setCS(CSRule, "GroupID", GroupID)
-                                Call cpCore.db.db_setCS(CSRule, "DateExpires", DateExpires)
+                                Call cpCore.db.cs_set(CSRule, "Active", True)
+                                Call cpCore.db.cs_set(CSRule, "MemberID", PeopleID)
+                                Call cpCore.db.cs_set(CSRule, "GroupID", GroupID)
+                                Call cpCore.db.cs_set(CSRule, "DateExpires", DateExpires)
                             End If
                             Call cpCore.db.cs_Close(CSRule)
                         Else
@@ -10481,8 +10481,8 @@ ErrorTrap:
                             RuleActive = cpCore.db.cs_getBoolean(CSRule, "active")
                             RuleDateExpires = cpCore.db.db_GetCSDate(CSRule, "DateExpires")
                             If (Not RuleActive) Or (RuleDateExpires <> DateExpires) Then
-                                Call cpCore.db.db_setCS(CSRule, "Active", True)
-                                Call cpCore.db.db_setCS(CSRule, "DateExpires", DateExpires)
+                                Call cpCore.db.cs_set(CSRule, "Active", True)
+                                Call cpCore.db.cs_set(CSRule, "DateExpires", DateExpires)
                             End If
                             Call cpCore.db.cs_Close(CSRule)
                         Else
@@ -10623,22 +10623,22 @@ ErrorTrap:
                                 Description = Description _
                                     & "<div>Creating new group [" & NewGroupName & "]</div>"
                                 Call cpCore.db.cs_Close(CS)
-                                CS = cpCore.db.db_csInsertRecord("Groups")
+                                CS = cpCore.db.cs_insertRecord("Groups")
                                 If cpCore.db.cs_Ok(CS) Then
                                     GroupID = cpCore.db.cs_getInteger(CS, "ID")
-                                    Call cpCore.db.db_setCS(CS, "Name", NewGroupName)
-                                    Call cpCore.db.db_setCS(CS, "Caption", NewGroupName)
+                                    Call cpCore.db.cs_set(CS, "Name", NewGroupName)
+                                    Call cpCore.db.cs_set(CS, "Caption", NewGroupName)
                                 End If
                             End If
                             Call cpCore.db.cs_Close(CS)
                         End If
                         If GroupID <> 0 Then
-                            CS = cpCore.db.db_csInsertRecord("Group Rules")
+                            CS = cpCore.db.cs_insertRecord("Group Rules")
                             If cpCore.db.cs_Ok(CS) Then
                                 Description = Description _
                                     & "<div>Assigning group [" & cpCore.main_GetRecordName("Groups", GroupID) & "] to edit content [" & ChildContentName & "].</div>"
-                                Call cpCore.db.db_setCS(CS, "GroupID", GroupID)
-                                Call cpCore.db.db_setCS(CS, "ContentID", ChildContentID)
+                                Call cpCore.db.cs_set(CS, "GroupID", GroupID)
+                                Call cpCore.db.cs_set(CS, "ContentID", ChildContentID)
                             End If
                             Call cpCore.db.cs_Close(CS)
                         End If
@@ -11498,14 +11498,14 @@ ErrorTrap:
                                         If cpCore.db.cs_Ok(CSSrc) Then
                                             CSDst = cpCore.db_InsertCSContent("Tasks")
                                             If cpCore.db.cs_Ok(CSDst) Then
-                                                Call cpCore.db.db_setCS(CSDst, "Name", cpCore.db.cs_getText(CSSrc, "name"))
-                                                Call cpCore.db.db_setCS(CSDst, SQLFieldName, cpCore.db.cs_getText(CSSrc, SQLFieldName))
+                                                Call cpCore.db.cs_set(CSDst, "Name", cpCore.db.cs_getText(CSSrc, "name"))
+                                                Call cpCore.db.cs_set(CSDst, SQLFieldName, cpCore.db.cs_getText(CSSrc, SQLFieldName))
                                                 If LCase(cpCore.db.cs_getText(CSSrc, "command")) = "xml" Then
-                                                    Call cpCore.db.db_setCS(CSDst, "Filename", "DupDownload_" & CStr(dateToSeconds(cpCore.main_PageStartTime)) & CStr(GetRandomInteger()) & ".xml")
-                                                    Call cpCore.db.db_setCS(CSDst, "Command", "BUILDXML")
+                                                    Call cpCore.db.cs_set(CSDst, "Filename", "DupDownload_" & CStr(dateToSeconds(cpCore.main_PageStartTime)) & CStr(GetRandomInteger()) & ".xml")
+                                                    Call cpCore.db.cs_set(CSDst, "Command", "BUILDXML")
                                                 Else
-                                                    Call cpCore.db.db_setCS(CSDst, "Filename", "DupDownload_" & CStr(dateToSeconds(cpCore.main_PageStartTime)) & CStr(GetRandomInteger()) & ".csv")
-                                                    Call cpCore.db.db_setCS(CSDst, "Command", "BUILDCSV")
+                                                    Call cpCore.db.cs_set(CSDst, "Filename", "DupDownload_" & CStr(dateToSeconds(cpCore.main_PageStartTime)) & CStr(GetRandomInteger()) & ".csv")
+                                                    Call cpCore.db.cs_set(CSDst, "Command", "BUILDCSV")
                                                 End If
                                             End If
                                             Call cpCore.db.cs_Close(CSDst)
@@ -11529,10 +11529,10 @@ ErrorTrap:
                                     Criteria = cpCore.db_GetContentControlCriteria(ContentName)
                                     Name = "CSV Download, " & ContentName
                                     Filename = Replace(ContentName, " ", "") & "_" & CStr(dateToSeconds(cpCore.main_PageStartTime)) & CStr(GetRandomInteger()) & ".csv"
-                                    Call cpCore.db.db_setCS(CS, "Name", Name)
-                                    Call cpCore.db.db_setCS(CS, "Filename", Filename)
-                                    Call cpCore.db.db_setCS(CS, "Command", "BUILDCSV")
-                                    Call cpCore.db.db_setCS(CS, SQLFieldName, "SELECT * from " & TableName & " where " & Criteria)
+                                    Call cpCore.db.cs_set(CS, "Name", Name)
+                                    Call cpCore.db.cs_set(CS, "Filename", Filename)
+                                    Call cpCore.db.cs_set(CS, "Command", "BUILDCSV")
+                                    Call cpCore.db.cs_set(CS, SQLFieldName, "SELECT * from " & TableName & " where " & Criteria)
                                     Description = Description & "<p>Your CSV Download has been requested.</p>"
                                 End If
                                 Call cpCore.db.cs_Close(CS)
@@ -11546,10 +11546,10 @@ ErrorTrap:
                                     Criteria = cpCore.db_GetContentControlCriteria(ContentName)
                                     Name = "XML Download, " & ContentName
                                     Filename = Replace(ContentName, " ", "") & "_" & CStr(dateToSeconds(cpCore.main_PageStartTime)) & CStr(GetRandomInteger()) & ".xml"
-                                    Call cpCore.db.db_setCS(CS, "Name", Name)
-                                    Call cpCore.db.db_setCS(CS, "Filename", Filename)
-                                    Call cpCore.db.db_setCS(CS, "Command", "BUILDXML")
-                                    Call cpCore.db.db_setCS(CS, SQLFieldName, "SELECT * from " & TableName & " where " & Criteria)
+                                    Call cpCore.db.cs_set(CS, "Name", Name)
+                                    Call cpCore.db.cs_set(CS, "Filename", Filename)
+                                    Call cpCore.db.cs_set(CS, "Command", "BUILDXML")
+                                    Call cpCore.db.cs_set(CS, SQLFieldName, "SELECT * from " & TableName & " where " & Criteria)
                                     Description = Description & "<p>Your XML Download has been requested.</p>"
                                 End If
                                 Call cpCore.db.cs_Close(CS)
@@ -11736,7 +11736,7 @@ ErrorTrap:
                 If Not AllowAdminTabs Then
                     GetForm_Edit_AddTab = Content
                 Else
-                    Call cpCore.html_AddComboTabEntry(Replace(Caption, " ", "&nbsp;"), "", "", Content, False, "ccAdminTab")
+                    Call cpCore.menu_AddComboTabEntry(Replace(Caption, " ", "&nbsp;"), "", "", Content, False, "ccAdminTab")
                     'Call cpCore.main_AddLiveTabEntry(Replace(Caption, " ", "&nbsp;"), Content, "ccAdminTab")
                 End If
             End If
@@ -11763,12 +11763,12 @@ ErrorTrap:
                 '
                 ' Ajax Tab
                 '
-                Call cpCore.html_AddComboTabEntry(Replace(Caption, " ", "&nbsp;"), "", AjaxLink, "", False, "ccAdminTab")
+                Call cpCore.menu_AddComboTabEntry(Replace(Caption, " ", "&nbsp;"), "", AjaxLink, "", False, "ccAdminTab")
             Else
                 '
                 ' Live Tab
                 '
-                Call cpCore.html_AddComboTabEntry(Replace(Caption, " ", "&nbsp;"), "", "", Content, False, "ccAdminTab")
+                Call cpCore.menu_AddComboTabEntry(Replace(Caption, " ", "&nbsp;"), "", "", Content, False, "ccAdminTab")
             End If
             '
             Exit Function
@@ -12161,10 +12161,10 @@ ErrorTrap:
                                 If (Name = "") Or (SQL = "") Then
                                     cpCore.error_AddUserError("A name and SQL Query are required to save a new custom report.")
                                 Else
-                                    CS = cpCore.db.db_csInsertRecord("Custom Reports")
+                                    CS = cpCore.db.cs_insertRecord("Custom Reports")
                                     If cpCore.db.cs_Ok(CS) Then
-                                        Call cpCore.db.db_setCS(CS, "Name", Name)
-                                        Call cpCore.db.db_setCS(CS, SQLFieldName, SQL)
+                                        Call cpCore.db.cs_set(CS, "Name", Name)
+                                        Call cpCore.db.cs_set(CS, SQLFieldName, SQL)
                                     End If
                                     Call cpCore.db.cs_Close(CS)
                                 End If
@@ -12186,14 +12186,14 @@ ErrorTrap:
                                         If cpCore.db.cs_Ok(CS) Then
                                             RecordName = "CSV Download, Custom Report [" & Name & "]"
                                             Filename = "CustomReport_" & CStr(dateToSeconds(cpCore.main_PageStartTime)) & CStr(GetRandomInteger()) & ".csv"
-                                            Call cpCore.db.db_setCS(CS, "Name", RecordName)
-                                            Call cpCore.db.db_setCS(CS, "Filename", Filename)
+                                            Call cpCore.db.cs_set(CS, "Name", RecordName)
+                                            Call cpCore.db.cs_set(CS, "Filename", Filename)
                                             If Format = "XML" Then
-                                                Call cpCore.db.db_setCS(CS, "Command", "BUILDXML")
+                                                Call cpCore.db.cs_set(CS, "Command", "BUILDXML")
                                             Else
-                                                Call cpCore.db.db_setCS(CS, "Command", "BUILDCSV")
+                                                Call cpCore.db.cs_set(CS, "Command", "BUILDCSV")
                                             End If
-                                            Call cpCore.db.db_setCS(CS, SQLFieldName, SQL)
+                                            Call cpCore.db.cs_set(CS, SQLFieldName, SQL)
                                             Description = Description & "<p>Your Download [" & Name & "] has been requested, and will be available in the <a href=""?" & RequestNameAdminForm & "=30"">Download Manager</a> when it is complete. This may take a few minutes depending on the size of the report.</p>"
                                         End If
                                         Call cpCore.db.cs_Close(CS)
@@ -12309,7 +12309,7 @@ ErrorTrap:
                 '
             End If
             '
-            GetForm_CustomReports = cpCore.main_GetAdminFormBody(Caption, ButtonListLeft, ButtonListRight, True, True, Description, ContentSummary, ContentPadding, Content)
+            GetForm_CustomReports = cpCore.admin_GetAdminFormBody(Caption, ButtonListLeft, ButtonListRight, True, True, Description, ContentSummary, ContentPadding, Content)
             '
             Call cpCore.main_AddPagetitle("Custom Reports")
             Exit Function
@@ -15354,10 +15354,10 @@ ErrorTrap:
                                     SourceName = field.nameLc
                                     CSSource = cpCore.db.csOpen("Content Fields", "(ContentID=" & SourceContentID & ")and(Name=" & cpCore.db.encodeSQLText(SourceName) & ")")
                                     If cpCore.db.cs_Ok(CSSource) Then
-                                        CSTarget = cpCore.db.db_csInsertRecord("Content Fields")
+                                        CSTarget = cpCore.db.cs_insertRecord("Content Fields")
                                         If cpCore.db.cs_Ok(CSTarget) Then
                                             Call cpCore.db_cs_CopyRecord(CSSource, CSTarget)
-                                            Call cpCore.db.db_setCS(CSTarget, "ContentID", ContentID)
+                                            Call cpCore.db.cs_set(CSTarget, "ContentID", ContentID)
                                             NeedToReloadCDef = True
                                         End If
                                         Call cpCore.db.cs_Close(CSTarget)
@@ -15379,10 +15379,10 @@ ErrorTrap:
                             SourceName = field.nameLc
                             CSSource = cpCore.db.csOpen("Content Fields", "(ContentID=" & SourceContentID & ")and(Name=" & cpCore.db.encodeSQLText(SourceName) & ")")
                             If cpCore.db.cs_Ok(CSSource) Then
-                                CSTarget = cpCore.db.db_csInsertRecord("Content Fields")
+                                CSTarget = cpCore.db.cs_insertRecord("Content Fields")
                                 If cpCore.db.cs_Ok(CSTarget) Then
                                     Call cpCore.db_cs_CopyRecord(CSSource, CSTarget)
-                                    Call cpCore.db.db_setCS(CSTarget, "ContentID", ContentID)
+                                    Call cpCore.db.cs_set(CSTarget, "ContentID", ContentID)
                                     NeedToReloadCDef = True
                                 End If
                                 Call cpCore.db.cs_Close(CSTarget)
@@ -16667,9 +16667,9 @@ ErrorTrap:
 
                                     dt = cpCore.db.executeSql("select top 1 ID from ccMetaKeywords where name=" & cpCore.db.encodeSQLText(Keyword))
                                     If dt.Rows.Count = 0 Then
-                                        CS = cpCore.db.db_csInsertRecord("Meta Keywords")
+                                        CS = cpCore.db.cs_insertRecord("Meta Keywords")
                                         If cpCore.db.cs_Ok(CS) Then
-                                            Call cpCore.db.db_setCS(CS, "name", Keyword)
+                                            Call cpCore.db.cs_set(CS, "name", Keyword)
                                         End If
                                         Call cpCore.db.cs_Close(CS)
                                     End If
@@ -17086,7 +17086,7 @@ ErrorTrap:
                 Dim sqlRightNow As String
                 Dim rightNow As Date
                 rightNow = Now()
-                sqlRightNow = cpCore.db.db_EncodeSQLDate(rightNow)
+                sqlRightNow = cpCore.db.encodeSQLDate(rightNow)
                 If LCase(adminContent.ContentTableName) = LCase("ccMembers") Then
                     'If LCase(AdminContent.ContentTableName) = "ccmembers" Then
                     With IndexConfig
@@ -17186,19 +17186,19 @@ ErrorTrap:
                 ' Where Clause: edited today
                 '
                 If IndexConfig.LastEditedToday Then
-                    return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".ModifiedDate>=" & cpCore.db.db_EncodeSQLDate(cpCore.main_PageStartTime.Date) & ")"
+                    return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".ModifiedDate>=" & cpCore.db.encodeSQLDate(cpCore.main_PageStartTime.Date) & ")"
                 End If
                 '
                 ' Where Clause: edited past week
                 '
                 If IndexConfig.LastEditedPast7Days Then
-                    return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".ModifiedDate>=" & cpCore.db.db_EncodeSQLDate(cpCore.main_PageStartTime.Date.AddDays(-7)) & ")"
+                    return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".ModifiedDate>=" & cpCore.db.encodeSQLDate(cpCore.main_PageStartTime.Date.AddDays(-7)) & ")"
                 End If
                 '
                 ' Where Clause: edited past month
                 '
                 If IndexConfig.LastEditedPast30Days Then
-                    return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".ModifiedDate>=" & cpCore.db.db_EncodeSQLDate(cpCore.main_PageStartTime.Date.AddDays(-30)) & ")"
+                    return_SQLWhere &= "AND(" & adminContent.ContentTableName & ".ModifiedDate>=" & cpCore.db.encodeSQLDate(cpCore.main_PageStartTime.Date.AddDays(-30)) & ")"
                 End If
                 '
                 ' Where Clause: Workflow
@@ -17278,11 +17278,11 @@ ErrorTrap:
                                                         Case FindWordMatchEnum.MatchNotEmpty
                                                             return_SQLWhere &= "AND(" & adminContent.ContentTableName & "." & FindWordName & " is not null)"
                                                         Case FindWordMatchEnum.MatchEquals, FindWordMatchEnum.matchincludes
-                                                            return_SQLWhere &= "AND(" & adminContent.ContentTableName & "." & FindWordName & "=" & cpCore.db.db_EncodeSQLNumber(FindWordValue) & ")"
+                                                            return_SQLWhere &= "AND(" & adminContent.ContentTableName & "." & FindWordName & "=" & cpCore.db.encodeSQLNumber(FindWordValue) & ")"
                                                         Case FindWordMatchEnum.MatchGreaterThan
-                                                            return_SQLWhere &= "AND(" & adminContent.ContentTableName & "." & FindWordName & ">" & cpCore.db.db_EncodeSQLNumber(FindWordValue) & ")"
+                                                            return_SQLWhere &= "AND(" & adminContent.ContentTableName & "." & FindWordName & ">" & cpCore.db.encodeSQLNumber(FindWordValue) & ")"
                                                         Case FindWordMatchEnum.MatchLessThan
-                                                            return_SQLWhere &= "AND(" & adminContent.ContentTableName & "." & FindWordName & "<" & cpCore.db.db_EncodeSQLNumber(FindWordValue) & ")"
+                                                            return_SQLWhere &= "AND(" & adminContent.ContentTableName & "." & FindWordName & "<" & cpCore.db.encodeSQLNumber(FindWordValue) & ")"
                                                     End Select
                                                     Exit For
                                                 Case FieldTypeIdFile, FieldTypeIdFileImage
@@ -17310,11 +17310,11 @@ ErrorTrap:
                                                         Case FindWordMatchEnum.MatchNotEmpty
                                                             return_SQLWhere &= "AND(" & adminContent.ContentTableName & "." & FindWordName & " is not null)"
                                                         Case FindWordMatchEnum.MatchEquals, FindWordMatchEnum.matchincludes
-                                                            return_SQLWhere &= "AND(" & adminContent.ContentTableName & "." & FindWordName & "=" & cpCore.db.db_EncodeSQLDate(findDate) & ")"
+                                                            return_SQLWhere &= "AND(" & adminContent.ContentTableName & "." & FindWordName & "=" & cpCore.db.encodeSQLDate(findDate) & ")"
                                                         Case FindWordMatchEnum.MatchGreaterThan
-                                                            return_SQLWhere &= "AND(" & adminContent.ContentTableName & "." & FindWordName & ">" & cpCore.db.db_EncodeSQLDate(findDate) & ")"
+                                                            return_SQLWhere &= "AND(" & adminContent.ContentTableName & "." & FindWordName & ">" & cpCore.db.encodeSQLDate(findDate) & ")"
                                                         Case FindWordMatchEnum.MatchLessThan
-                                                            return_SQLWhere &= "AND(" & adminContent.ContentTableName & "." & FindWordName & "<" & cpCore.db.db_EncodeSQLDate(findDate) & ")"
+                                                            return_SQLWhere &= "AND(" & adminContent.ContentTableName & "." & FindWordName & "<" & cpCore.db.encodeSQLDate(findDate) & ")"
                                                     End Select
                                                     Exit For
                                                 Case FieldTypeIdLookup, FieldTypeIdMemberSelect
@@ -17349,7 +17349,7 @@ ErrorTrap:
                                                                 LookupQuery = ""
                                                                 For LookupPtr = 0 To UBound(lookups)
                                                                     If InStr(1, lookups(LookupPtr), FindWordValue, vbTextCompare) <> 0 Then
-                                                                        LookupQuery = LookupQuery & "OR(" & adminContent.ContentTableName & "." & FindWordName & "=" & cpCore.db.db_EncodeSQLNumber(LookupPtr + 1) & ")"
+                                                                        LookupQuery = LookupQuery & "OR(" & adminContent.ContentTableName & "." & FindWordName & "=" & cpCore.db.encodeSQLNumber(LookupPtr + 1) & ")"
                                                                     End If
                                                                 Next
                                                                 If LookupQuery <> "" Then

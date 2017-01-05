@@ -190,7 +190,7 @@ Namespace Contensive
                             ' Execute Processes
                             '
                             Try
-                                SQLNow = cpSite.core.db.db_EncodeSQLDate(RightNow)
+                                SQLNow = cpSite.core.db.encodeSQLDate(RightNow)
                                 sqlAddonsCriteria = "" _
                                     & "(Active<>0)" _
                                     & " and(name<>'')" _
@@ -216,8 +216,8 @@ Namespace Contensive
                                         '
                                         ' Run Once
                                         '
-                                        Call cpSite.core.db.db_setCS(CS, "ProcessRunOnce", False)
-                                        Call cpSite.core.db.db_setCS(CS, "ProcessNextRun", "")
+                                        Call cpSite.core.db.cs_set(CS, "ProcessRunOnce", False)
+                                        Call cpSite.core.db.cs_set(CS, "ProcessNextRun", "")
                                         Call cpSite.core.db.db_SaveCS(CS)
                                         '
                                         cmdDetail = New cmdDetailClass
@@ -229,13 +229,13 @@ Namespace Contensive
                                         '
                                         ' Interval is OK but NextRun is 0, just set next run
                                         '
-                                        Call cpSite.core.db.db_setCS(CS, "ProcessNextRun", NextRun)
+                                        Call cpSite.core.db.cs_set(CS, "ProcessNextRun", NextRun)
                                         Call cpSite.core.db.db_SaveCS(CS)
                                     ElseIf addonProcessNextRun < RightNow Then
                                         '
                                         ' All is OK, triggered on NextRun, Cycle RightNow
                                         '
-                                        Call cpSite.core.db.db_setCS(CS, "ProcessNextRun", NextRun)
+                                        Call cpSite.core.db.cs_set(CS, "ProcessNextRun", NextRun)
                                         Call cpSite.core.db.db_SaveCS(CS)
                                         '
                                         cmdDetail = New cmdDetailClass
@@ -295,7 +295,7 @@ Namespace Contensive
                 ' Add it to the queue and shell out to the command
                 '
                 If returnTaskAdded Then
-                    cs = cpSiteCore.db.db_csInsertRecord("tasks")
+                    cs = cpSiteCore.db.cs_insertRecord("tasks")
                     If cpSiteCore.db.cs_Ok(cs) Then
                         cpSiteCore.db.db_SetCSField(cs, "name", "")
                         cpSiteCore.db.db_SetCSField(cs, "command", Command)

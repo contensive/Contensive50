@@ -2027,7 +2027,7 @@ Namespace Contensive.Core
                                 '
                                 SQL = "SELECT ContentTable.*" _
                                     & " FROM " & ContentTableName & " AS ContentTable LEFT JOIN " & AuthoringTableName & " AS AuthoringTable ON ContentTable.ID = AuthoringTable.EditSourceID" _
-                                    & " WHERE ((ContentTable.ContentControlID=" & cpCore.db.db_EncodeSQLNumber(ContentID) & ")AND(ContentTable.EditSourceID Is Null)AND(AuthoringTable.ID Is Null));"
+                                    & " WHERE ((ContentTable.ContentControlID=" & cpCore.db.encodeSQLNumber(ContentID) & ")AND(ContentTable.EditSourceID Is Null)AND(AuthoringTable.ID Is Null));"
                                 dtContent = cpCore.db.executeSql(SQL)
                                 If dtContent.Rows.Count > 0 Then
                                     Do While rowPtr < dtContent.Rows.Count
@@ -2109,7 +2109,7 @@ Namespace Contensive.Core
                                         ' EditSourceID
                                         '
                                         'SQLNames(FieldPointer) = "EDITSOURCEID"
-                                        sqlFieldList.add("editsourceid", cpCore.db.db_EncodeSQLNumber(LiveRecordID))
+                                        sqlFieldList.add("editsourceid", cpCore.db.encodeSQLNumber(LiveRecordID))
                                         FieldPointer = FieldPointer + 1
                                         '
                                         ' EditArchive
@@ -2124,19 +2124,19 @@ Namespace Contensive.Core
                                     ' ----- Verify good DateAdded
                                     '
                                     Dim testDate As Date = Date.MinValue
-                                    SQL = "UPDATE " & ContentTableName & " set DateAdded=" & cpCore.db.db_EncodeSQLDate(testDate) & " where dateadded is null;"
+                                    SQL = "UPDATE " & ContentTableName & " set DateAdded=" & cpCore.db.encodeSQLDate(testDate) & " where dateadded is null;"
                                     Call cpCore.db.executeSql(SQL, ContentDataSourceName)
                                     If ContentTableName <> AuthoringTableName Then
-                                        SQL = "UPDATE " & AuthoringTableName & " set DateAdded=" & cpCore.db.db_EncodeSQLDate(testDate) & " where dateadded is null;"
+                                        SQL = "UPDATE " & AuthoringTableName & " set DateAdded=" & cpCore.db.encodeSQLDate(testDate) & " where dateadded is null;"
                                         Call cpCore.db.executeSql(SQL, AuthoringDataSourceName)
                                     End If
                                     '
                                     ' ----- Verify good CreatedBy
                                     '
-                                    SQL = "UPDATE " & ContentTableName & " set CreatedBy=" & cpCore.db.db_EncodeSQLNumber(SystemMemberID) & " where CreatedBy is null;"
+                                    SQL = "UPDATE " & ContentTableName & " set CreatedBy=" & cpCore.db.encodeSQLNumber(SystemMemberID) & " where CreatedBy is null;"
                                     Call cpCore.db.executeSql(SQL, ContentDataSourceName)
                                     If ContentTableName <> AuthoringTableName Then
-                                        SQL = "UPDATE " & AuthoringTableName & " set CreatedBy=" & cpCore.db.db_EncodeSQLNumber(SystemMemberID) & " where CreatedBy is null;"
+                                        SQL = "UPDATE " & AuthoringTableName & " set CreatedBy=" & cpCore.db.encodeSQLNumber(SystemMemberID) & " where CreatedBy is null;"
                                         Call cpCore.db.executeSql(SQL, AuthoringDataSourceName)
                                     End If
                                     '
@@ -2151,10 +2151,10 @@ Namespace Contensive.Core
                                     '
                                     ' ----- Verify good ModifiedBy
                                     '
-                                    SQL = "UPDATE " & ContentTableName & " set ModifiedBy=" & cpCore.db.db_EncodeSQLNumber(SystemMemberID) & " where ModifiedBy is null;"
+                                    SQL = "UPDATE " & ContentTableName & " set ModifiedBy=" & cpCore.db.encodeSQLNumber(SystemMemberID) & " where ModifiedBy is null;"
                                     Call cpCore.db.executeSql(SQL, ContentDataSourceName)
                                     If ContentTableName <> AuthoringTableName Then
-                                        SQL = "UPDATE " & AuthoringTableName & " set ModifiedBy=" & cpCore.db.db_EncodeSQLNumber(SystemMemberID) & " where ModifiedBy is null;"
+                                        SQL = "UPDATE " & AuthoringTableName & " set ModifiedBy=" & cpCore.db.encodeSQLNumber(SystemMemberID) & " where ModifiedBy is null;"
                                         Call cpCore.db.executeSql(SQL, AuthoringDataSourceName)
                                     End If
                                     '
@@ -2423,7 +2423,7 @@ ErrorTrap:
         ''' <param name="contentNameOrGuid"></param>
         Public Sub deleteContent(contentid As Integer)
             Try
-                cpCore.db.executeSql("delete from cccontent where (id=" & cpCore.db.db_EncodeSQLNumber(contentid) & ")")
+                cpCore.db.executeSql("delete from cccontent where (id=" & cpCore.db.encodeSQLNumber(contentid) & ")")
                 cpCore.cache.invalidateTag("content")
                 clear()
             Catch ex As Exception
@@ -2518,7 +2518,7 @@ ErrorTrap:
                             If SelectFieldList = "" Then
                                 cpCore.handleExceptionAndRethrow(New ApplicationException("Can not create Child Content [" & ChildContentName & "] because the Parent Content [" & ParentContentName & "] record has not fields."))
                             Else
-                                CSNew = cpCore.db.db_csInsertRecord("Content", 0)
+                                CSNew = cpCore.db.cs_insertRecord("Content", 0)
                                 If Not cpCore.db.cs_Ok(CSNew) Then
                                     Call cpCore.handleExceptionAndRethrow(New ApplicationException("Can not create Child Content [" & ChildContentName & "] because there was an error creating a new record in ccContent."))
                                 Else

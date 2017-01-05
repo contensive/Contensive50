@@ -1457,7 +1457,7 @@ Namespace Contensive.Core
                     ' cid = GetContentID(ContentName)
                     'tableName = cpcore.app.csv_GetContentTablename(ContentName)
                     sql1 = "insert into " & tableName & " (contentcontrolid,createkey,active,name"
-                    sql2 = ") values (" & cid & ",0," & cpCore.db.db_EncodeSQLBoolean(Active) & "," & cpCore.db.encodeSQLText(Name)
+                    sql2 = ") values (" & cid & ",0," & cpCore.db.encodeSQLBoolean(Active) & "," & cpCore.db.encodeSQLText(Name)
                     sql3 = ")"
                     If CodeFieldName <> "" Then
                         sql1 &= "," & CodeFieldName
@@ -2090,7 +2090,7 @@ Namespace Contensive.Core
                     ' create new record
                     '
                     Call cpCore.db.cs_Close(CS)
-                    CS = cpCore.db.db_csInsertRecord(ContentName, SystemMemberID)
+                    CS = cpCore.db.cs_insertRecord(ContentName, SystemMemberID)
                     Call cpCore.db.db_SetCSField(CS, "NAME", Name)
                     Call cpCore.db.db_SetCSField(CS, "ACTIVE", True)
                     Call cpCore.db.db_SetCSField(CS, "Abbreviation", Abbreviation)
@@ -2194,7 +2194,7 @@ Namespace Contensive.Core
                 CS = cpCore.db.csOpen("Countries", "name=" & cpCore.db.encodeSQLText(Name))
                 If Not cpCore.db.cs_Ok(CS) Then
                     Call cpCore.db.cs_Close(CS)
-                    CS = cpCore.db.db_csInsertRecord("Countries", SystemMemberID)
+                    CS = cpCore.db.cs_insertRecord("Countries", SystemMemberID)
                     If cpCore.db.cs_Ok(CS) Then
                         Call cpCore.db.db_SetCSField(CS, "ACTIVE", True)
                     End If
@@ -2203,7 +2203,7 @@ Namespace Contensive.Core
                     Call cpCore.db.db_SetCSField(CS, "NAME", Name)
                     Call cpCore.db.db_SetCSField(CS, "Abbreviation", Abbreviation)
                     If LCase(Name) = "united states" Then
-                        Call cpCore.db.db_setCS(CS, "DomesticShipping", "1")
+                        Call cpCore.db.cs_set(CS, "DomesticShipping", "1")
                     End If
                 End If
                 Call cpCore.db.cs_Close(CS)
@@ -2260,7 +2260,7 @@ Namespace Contensive.Core
                 Call appendUpgradeLogAddStep(cpCore.appConfig.name, "VerifyDefaultGroups", "Verify Default Groups")
                 '
                 GroupID = cpCore.group_add("Content Editors")
-                SQL = "Update ccContent Set EditorGroupID=" & cpCore.db.db_EncodeSQLNumber(GroupID) & " where EditorGroupID is null;"
+                SQL = "Update ccContent Set EditorGroupID=" & cpCore.db.encodeSQLNumber(GroupID) & " where EditorGroupID is null;"
                 Call cpCore.db.executeSql(SQL)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -2681,7 +2681,7 @@ Namespace Contensive.Core
                 '
                 If Not cpCore.db.cs_Ok(CSEntry) Then
                     cpCore.db.cs_Close(CSEntry)
-                    CSEntry = cpCore.db.db_csInsertRecord(MenuContentName, SystemMemberID)
+                    CSEntry = cpCore.db.cs_insertRecord(MenuContentName, SystemMemberID)
                     If cpCore.db.cs_Ok(CSEntry) Then
                         Call cpCore.db.db_SetCSField(CSEntry, "name", EntryName)
                     End If
@@ -2844,8 +2844,8 @@ Namespace Contensive.Core
                                 sqlList = New sqlFieldListClass
                                 sqlList.add("name", cpCore.db.encodeSQLText(TableName))
                                 sqlList.add("active", SQLTrue)
-                                sqlList.add("DATASOURCEID", cpCore.db.db_EncodeSQLNumber(DataSourceID))
-                                sqlList.add("CONTENTCONTROLID", cpCore.db.db_EncodeSQLNumber(cpCore.db.db_GetContentID("Tables")))
+                                sqlList.add("DATASOURCEID", cpCore.db.encodeSQLNumber(DataSourceID))
+                                sqlList.add("CONTENTCONTROLID", cpCore.db.encodeSQLNumber(cpCore.db.db_GetContentID("Tables")))
                                 '
                                 Call cpCore.db.db_UpdateTableRecord("Default", "ccTables", "ID=" & TableID, sqlList)
                             Else
@@ -2885,31 +2885,31 @@ Namespace Contensive.Core
                             sqlList = New sqlFieldListClass
                             Call sqlList.add("name", cpCore.db.encodeSQLText(ContentName))
                             Call sqlList.add("CREATEKEY", "0")
-                            Call sqlList.add("active", cpCore.db.db_EncodeSQLBoolean(Active))
-                            Call sqlList.add("ContentControlID", cpCore.db.db_EncodeSQLNumber(ContentIDofContent))
-                            Call sqlList.add("AllowAdd", cpCore.db.db_EncodeSQLBoolean(AllowAdd))
-                            Call sqlList.add("AllowDelete", cpCore.db.db_EncodeSQLBoolean(AllowDelete))
-                            Call sqlList.add("AllowWorkflowAuthoring", cpCore.db.db_EncodeSQLBoolean(AllowWorkflowAuthoring))
-                            Call sqlList.add("DeveloperOnly", cpCore.db.db_EncodeSQLBoolean(DeveloperOnly))
-                            Call sqlList.add("AdminOnly", cpCore.db.db_EncodeSQLBoolean(AdminOnly))
-                            Call sqlList.add("ParentID", cpCore.db.db_EncodeSQLNumber(parentId))
-                            Call sqlList.add("DefaultSortMethodID", cpCore.db.db_EncodeSQLNumber(DefaultSortMethodID))
+                            Call sqlList.add("active", cpCore.db.encodeSQLBoolean(Active))
+                            Call sqlList.add("ContentControlID", cpCore.db.encodeSQLNumber(ContentIDofContent))
+                            Call sqlList.add("AllowAdd", cpCore.db.encodeSQLBoolean(AllowAdd))
+                            Call sqlList.add("AllowDelete", cpCore.db.encodeSQLBoolean(AllowDelete))
+                            Call sqlList.add("AllowWorkflowAuthoring", cpCore.db.encodeSQLBoolean(AllowWorkflowAuthoring))
+                            Call sqlList.add("DeveloperOnly", cpCore.db.encodeSQLBoolean(DeveloperOnly))
+                            Call sqlList.add("AdminOnly", cpCore.db.encodeSQLBoolean(AdminOnly))
+                            Call sqlList.add("ParentID", cpCore.db.encodeSQLNumber(parentId))
+                            Call sqlList.add("DefaultSortMethodID", cpCore.db.encodeSQLNumber(DefaultSortMethodID))
                             Call sqlList.add("DropDownFieldList", cpCore.db.encodeSQLText(encodeEmptyText(DropDownFieldList, "Name")))
-                            Call sqlList.add("ContentTableID", cpCore.db.db_EncodeSQLNumber(TableID))
-                            Call sqlList.add("AuthoringTableID", cpCore.db.db_EncodeSQLNumber(TableID))
-                            Call sqlList.add("ModifiedDate", cpCore.db.db_EncodeSQLDate(Now))
-                            Call sqlList.add("CreatedBy", cpCore.db.db_EncodeSQLNumber(SystemMemberID))
-                            Call sqlList.add("ModifiedBy", cpCore.db.db_EncodeSQLNumber(SystemMemberID))
-                            Call sqlList.add("AllowCalendarEvents", cpCore.db.db_EncodeSQLBoolean(AllowCalendarEvents))
-                            Call sqlList.add("AllowContentTracking", cpCore.db.db_EncodeSQLBoolean(AllowContentTracking))
-                            Call sqlList.add("AllowTopicRules", cpCore.db.db_EncodeSQLBoolean(AllowTopicRules))
-                            Call sqlList.add("AllowContentChildTool", cpCore.db.db_EncodeSQLBoolean(AllowContentChildTool))
-                            Call sqlList.add("AllowMetaContent", cpCore.db.db_EncodeSQLBoolean(AllowMetaContent))
+                            Call sqlList.add("ContentTableID", cpCore.db.encodeSQLNumber(TableID))
+                            Call sqlList.add("AuthoringTableID", cpCore.db.encodeSQLNumber(TableID))
+                            Call sqlList.add("ModifiedDate", cpCore.db.encodeSQLDate(Now))
+                            Call sqlList.add("CreatedBy", cpCore.db.encodeSQLNumber(SystemMemberID))
+                            Call sqlList.add("ModifiedBy", cpCore.db.encodeSQLNumber(SystemMemberID))
+                            Call sqlList.add("AllowCalendarEvents", cpCore.db.encodeSQLBoolean(AllowCalendarEvents))
+                            Call sqlList.add("AllowContentTracking", cpCore.db.encodeSQLBoolean(AllowContentTracking))
+                            Call sqlList.add("AllowTopicRules", cpCore.db.encodeSQLBoolean(AllowTopicRules))
+                            Call sqlList.add("AllowContentChildTool", cpCore.db.encodeSQLBoolean(AllowContentChildTool))
+                            Call sqlList.add("AllowMetaContent", cpCore.db.encodeSQLBoolean(AllowMetaContent))
                             Call sqlList.add("IconLink", cpCore.db.encodeSQLText(encodeEmptyText(IconLink, "")))
-                            Call sqlList.add("IconHeight", cpCore.db.db_EncodeSQLNumber(IconHeight))
-                            Call sqlList.add("IconWidth", cpCore.db.db_EncodeSQLNumber(IconWidth))
-                            Call sqlList.add("IconSprites", cpCore.db.db_EncodeSQLNumber(IconSprites))
-                            Call sqlList.add("installedByCollectionid", cpCore.db.db_EncodeSQLNumber(InstalledByCollectionID))
+                            Call sqlList.add("IconHeight", cpCore.db.encodeSQLNumber(IconHeight))
+                            Call sqlList.add("IconWidth", cpCore.db.encodeSQLNumber(IconWidth))
+                            Call sqlList.add("IconSprites", cpCore.db.encodeSQLNumber(IconSprites))
+                            Call sqlList.add("installedByCollectionid", cpCore.db.encodeSQLNumber(InstalledByCollectionID))
                             If SupportsGuid Then
                                 If (LcContentGuid = "") And (NewGuid <> "") Then
                                     '
@@ -3448,7 +3448,7 @@ Namespace Contensive.Core
                 '
                 RecordID = 0
                 RecordIsBaseField = False
-                SQL = "select ID,IsBaseField from ccFields where (ContentID=" & cpCore.db.db_EncodeSQLNumber(ContentID) & ")and(name=" & cpCore.db.encodeSQLText(field.nameLc) & ");"
+                SQL = "select ID,IsBaseField from ccFields where (ContentID=" & cpCore.db.encodeSQLNumber(ContentID) & ")and(name=" & cpCore.db.encodeSQLText(field.nameLc) & ");"
                 rs = cpCore.db.executeSql(SQL)
                 If isDataTableOk(rs) Then
                     isNewFieldRecord = False
@@ -3549,7 +3549,7 @@ Namespace Contensive.Core
                         ' Get the TableName and DataSourceID
                         '
                         TableName = ""
-                        rs = cpCore.db.executeSql("Select Name, DataSourceID from ccTables where ID=" & cpCore.db.db_EncodeSQLNumber(TableID) & ";")
+                        rs = cpCore.db.executeSql("Select Name, DataSourceID from ccTables where ID=" & cpCore.db.encodeSQLNumber(TableID) & ";")
                         If Not isDataTableOk(rs) Then
                             Call cpCore.handleExceptionAndRethrow(New ApplicationException("Could Not create Field [" & field.nameLc & "] because table For tableID [" & TableID & "] was Not found."))
                         Else
@@ -3564,7 +3564,7 @@ Namespace Contensive.Core
                             If (DataSourceID < 1) Then
                                 DataSourceName = "Default"
                             Else
-                                rs = cpCore.db.executeSql("Select Name from ccDataSources where ID=" & cpCore.db.db_EncodeSQLNumber(DataSourceID) & ";")
+                                rs = cpCore.db.executeSql("Select Name from ccDataSources where ID=" & cpCore.db.encodeSQLNumber(DataSourceID) & ";")
                                 If Not isDataTableOk(rs) Then
 
                                     DataSourceName = "Default"
@@ -3610,52 +3610,52 @@ Namespace Contensive.Core
                             '
                             Dim sqlList As New sqlFieldListClass
                             Pointer = 0
-                            Call sqlList.add("ACTIVE", cpCore.db.db_EncodeSQLBoolean(field.active)) ' Pointer)
-                            Call sqlList.add("MODIFIEDBY", cpCore.db.db_EncodeSQLNumber(SystemMemberID)) ' Pointer)
-                            Call sqlList.add("MODIFIEDDATE", cpCore.db.db_EncodeSQLDate(Now)) ' Pointer)
-                            Call sqlList.add("TYPE", cpCore.db.db_EncodeSQLNumber(fieldTypeId)) ' Pointer)
+                            Call sqlList.add("ACTIVE", cpCore.db.encodeSQLBoolean(field.active)) ' Pointer)
+                            Call sqlList.add("MODIFIEDBY", cpCore.db.encodeSQLNumber(SystemMemberID)) ' Pointer)
+                            Call sqlList.add("MODIFIEDDATE", cpCore.db.encodeSQLDate(Now)) ' Pointer)
+                            Call sqlList.add("TYPE", cpCore.db.encodeSQLNumber(fieldTypeId)) ' Pointer)
                             Call sqlList.add("CAPTION", cpCore.db.encodeSQLText(FieldCaption)) ' Pointer)
-                            Call sqlList.add("ReadOnly", cpCore.db.db_EncodeSQLBoolean(FieldReadOnly)) ' Pointer)
-                            Call sqlList.add("LOOKUPCONTENTID", cpCore.db.db_EncodeSQLNumber(LookupContentID)) ' Pointer)
-                            Call sqlList.add("REQUIRED", cpCore.db.db_EncodeSQLBoolean(FieldRequired)) ' Pointer)
+                            Call sqlList.add("ReadOnly", cpCore.db.encodeSQLBoolean(FieldReadOnly)) ' Pointer)
+                            Call sqlList.add("LOOKUPCONTENTID", cpCore.db.encodeSQLNumber(LookupContentID)) ' Pointer)
+                            Call sqlList.add("REQUIRED", cpCore.db.encodeSQLBoolean(FieldRequired)) ' Pointer)
                             Call sqlList.add("TEXTBUFFERED", SQLFalse) ' Pointer)
-                            Call sqlList.add("PASSWORD", cpCore.db.db_EncodeSQLBoolean(Password)) ' Pointer)
-                            Call sqlList.add("EDITSORTPRIORITY", cpCore.db.db_EncodeSQLNumber(field.editSortPriority)) ' Pointer)
-                            Call sqlList.add("ADMINONLY", cpCore.db.db_EncodeSQLBoolean(field.adminOnly)) ' Pointer)
-                            Call sqlList.add("DEVELOPERONLY", cpCore.db.db_EncodeSQLBoolean(FieldDeveloperOnly)) ' Pointer)
-                            Call sqlList.add("CONTENTCONTROLID", cpCore.db.db_EncodeSQLNumber(cpCore.db.db_GetContentID("Content Fields"))) ' Pointer)
+                            Call sqlList.add("PASSWORD", cpCore.db.encodeSQLBoolean(Password)) ' Pointer)
+                            Call sqlList.add("EDITSORTPRIORITY", cpCore.db.encodeSQLNumber(field.editSortPriority)) ' Pointer)
+                            Call sqlList.add("ADMINONLY", cpCore.db.encodeSQLBoolean(field.adminOnly)) ' Pointer)
+                            Call sqlList.add("DEVELOPERONLY", cpCore.db.encodeSQLBoolean(FieldDeveloperOnly)) ' Pointer)
+                            Call sqlList.add("CONTENTCONTROLID", cpCore.db.encodeSQLNumber(cpCore.db.db_GetContentID("Content Fields"))) ' Pointer)
                             Call sqlList.add("DefaultValue", cpCore.db.encodeSQLText(DefaultValue)) ' Pointer)
-                            Call sqlList.add("HTMLCONTENT", cpCore.db.db_EncodeSQLBoolean(HTMLContent)) ' Pointer)
-                            Call sqlList.add("NOTEDITABLE", cpCore.db.db_EncodeSQLBoolean(NotEditable)) ' Pointer)
-                            Call sqlList.add("AUTHORABLE", cpCore.db.db_EncodeSQLBoolean(FieldAuthorable)) ' Pointer)
+                            Call sqlList.add("HTMLCONTENT", cpCore.db.encodeSQLBoolean(HTMLContent)) ' Pointer)
+                            Call sqlList.add("NOTEDITABLE", cpCore.db.encodeSQLBoolean(NotEditable)) ' Pointer)
+                            Call sqlList.add("AUTHORABLE", cpCore.db.encodeSQLBoolean(FieldAuthorable)) ' Pointer)
                             Call sqlList.add("EDITARCHIVE", SQLFalse) ' Pointer)
                             Call sqlList.add("EDITBLANK", SQLFalse) ' Pointer)
-                            Call sqlList.add("INDEXCOLUMN", cpCore.db.db_EncodeSQLNumber(field.indexColumn)) ' Pointer)
+                            Call sqlList.add("INDEXCOLUMN", cpCore.db.encodeSQLNumber(field.indexColumn)) ' Pointer)
                             Call sqlList.add("INDEXWIDTH", cpCore.db.encodeSQLText(AdminIndexWidth)) ' Pointer)
-                            Call sqlList.add("INDEXSORTPRIORITY", cpCore.db.db_EncodeSQLNumber(AdminIndexSort)) ' Pointer)
-                            Call sqlList.add("REDIRECTCONTENTID", cpCore.db.db_EncodeSQLNumber(RedirectContentID)) ' Pointer)
+                            Call sqlList.add("INDEXSORTPRIORITY", cpCore.db.encodeSQLNumber(AdminIndexSort)) ' Pointer)
+                            Call sqlList.add("REDIRECTCONTENTID", cpCore.db.encodeSQLNumber(RedirectContentID)) ' Pointer)
                             Call sqlList.add("REDIRECTID", cpCore.db.encodeSQLText(RedirectIDField)) ' Pointer)
                             Call sqlList.add("REDIRECTPATH", cpCore.db.encodeSQLText(RedirectPath)) ' Pointer)
-                            Call sqlList.add("UNIQUENAME", cpCore.db.db_EncodeSQLBoolean(UniqueName)) ' Pointer)
-                            Call sqlList.add("RSSTITLEFIELD", cpCore.db.db_EncodeSQLBoolean(RSSTitle)) ' Pointer)
-                            Call sqlList.add("RSSDESCRIPTIONFIELD", cpCore.db.db_EncodeSQLBoolean(RSSDescription)) ' Pointer)
-                            Call sqlList.add("MEMBERSELECTGROUPID", cpCore.db.db_EncodeSQLNumber(MemberSelectGroupID)) ' Pointer)
-                            Call sqlList.add("installedByCollectionId", cpCore.db.db_EncodeSQLNumber(InstalledByCollectionID)) ' Pointer)
+                            Call sqlList.add("UNIQUENAME", cpCore.db.encodeSQLBoolean(UniqueName)) ' Pointer)
+                            Call sqlList.add("RSSTITLEFIELD", cpCore.db.encodeSQLBoolean(RSSTitle)) ' Pointer)
+                            Call sqlList.add("RSSDESCRIPTIONFIELD", cpCore.db.encodeSQLBoolean(RSSDescription)) ' Pointer)
+                            Call sqlList.add("MEMBERSELECTGROUPID", cpCore.db.encodeSQLNumber(MemberSelectGroupID)) ' Pointer)
+                            Call sqlList.add("installedByCollectionId", cpCore.db.encodeSQLNumber(InstalledByCollectionID)) ' Pointer)
                             Call sqlList.add("EDITTAB", cpCore.db.encodeSQLText(EditTab)) ' Pointer)
-                            Call sqlList.add("SCRAMBLE", cpCore.db.db_EncodeSQLBoolean(Scramble)) ' Pointer)
+                            Call sqlList.add("SCRAMBLE", cpCore.db.encodeSQLBoolean(Scramble)) ' Pointer)
                             Call sqlList.add("LOOKUPLIST", cpCore.db.encodeSQLText(LookupList)) ' Pointer)
-                            Call sqlList.add("MANYTOMANYCONTENTID", cpCore.db.db_EncodeSQLNumber(ManyToManyContentID)) ' Pointer)
-                            Call sqlList.add("MANYTOMANYRULECONTENTID", cpCore.db.db_EncodeSQLNumber(ManyToManyRuleContentID)) ' Pointer)
+                            Call sqlList.add("MANYTOMANYCONTENTID", cpCore.db.encodeSQLNumber(ManyToManyContentID)) ' Pointer)
+                            Call sqlList.add("MANYTOMANYRULECONTENTID", cpCore.db.encodeSQLNumber(ManyToManyRuleContentID)) ' Pointer)
                             Call sqlList.add("MANYTOMANYRULEPRIMARYFIELD", cpCore.db.encodeSQLText(ManyToManyRulePrimaryField)) ' Pointer)
                             Call sqlList.add("MANYTOMANYRULESECONDARYFIELD", cpCore.db.encodeSQLText(ManyToManyRuleSecondaryField)) ' Pointer)
-                            Call sqlList.add("ISBASEFIELD", cpCore.db.db_EncodeSQLBoolean(IsBaseField)) ' Pointer)
+                            Call sqlList.add("ISBASEFIELD", cpCore.db.encodeSQLBoolean(IsBaseField)) ' Pointer)
                             '
                             If RecordID = 0 Then
                                 Call sqlList.add("NAME", cpCore.db.encodeSQLText(field.nameLc)) ' Pointer)
-                                Call sqlList.add("CONTENTID", cpCore.db.db_EncodeSQLNumber(ContentID)) ' Pointer)
+                                Call sqlList.add("CONTENTID", cpCore.db.encodeSQLNumber(ContentID)) ' Pointer)
                                 Call sqlList.add("CREATEKEY", "0") ' Pointer)
-                                Call sqlList.add("DATEADDED", cpCore.db.db_EncodeSQLDate(Now)) ' Pointer)
-                                Call sqlList.add("CREATEDBY", cpCore.db.db_EncodeSQLNumber(SystemMemberID)) ' Pointer)
+                                Call sqlList.add("DATEADDED", cpCore.db.encodeSQLDate(Now)) ' Pointer)
+                                Call sqlList.add("CREATEDBY", cpCore.db.encodeSQLNumber(SystemMemberID)) ' Pointer)
                                 '
                                 RecordID = cpCore.db.db_InsertTableRecordGetID("Default", "ccFields")
                             End If
@@ -3728,8 +3728,8 @@ Namespace Contensive.Core
                 '----------------------------------------------------------------
                 '
                 DataSourceID = cpCore.db.db_GetDataSourceID(DataSourceName)
-                DateAddedString = cpCore.db.db_EncodeSQLDate(Now())
-                CreateKeyString = cpCore.db.db_EncodeSQLNumber(getRandomLong)
+                DateAddedString = cpCore.db.encodeSQLDate(Now())
+                CreateKeyString = cpCore.db.encodeSQLNumber(getRandomLong)
                 '
                 '----------------------------------------------------------------
                 ' ----- Read in a record from the table to get fields
