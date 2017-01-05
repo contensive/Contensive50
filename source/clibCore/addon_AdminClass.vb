@@ -241,7 +241,7 @@ leak200:
                 '
                 ' --- must be authenticated to continue
                 '
-                Stream.Add(cpCore.user.user_GetLoginPage2(False))
+                Stream.Add(cpCore.user.getLoginPage(False))
             ElseIf Not cpCore.user.isAuthenticatedContentManager Then
                 '
                 ' --- member must have proper access to continue
@@ -567,7 +567,7 @@ leak200:
                 '    'ContentCell = "<div class=""ccAdminMsg"">The form you requested did not return a valid response.</div>"
                 'End If
                 '
-                If cpCore.main_ServerPagePrintVersion Then
+                If cpCore.pageManager_printVersion Then
                     '
                     ' For print version, just add content
                     '
@@ -758,7 +758,7 @@ ErrorTrap:
             End If
             If cpCore.user.adminMenuModeID <> AdminMenuModeID Then
                 cpCore.user.adminMenuModeID = AdminMenuModeID
-                Call cpCore.user.user_SaveMember()
+                Call cpCore.user.saveMember()
             End If
             '    '
             '    ' ----- FieldName
@@ -3467,12 +3467,12 @@ ErrorTrap:
                                         End If
                                         Call cpCore.db.cs_Close(CS)
                                     End If
-                                    Call cpCore.main_LogActivity2("modifying field " & FieldName, editRecord.id, ActivityLogOrganizationID)
+                                    Call cpCore.log_LogActivity2("modifying field " & FieldName, editRecord.id, ActivityLogOrganizationID)
                                 Case "organizations"
                                     '
                                     ' Log organization
                                     '
-                                    Call cpCore.main_LogActivity2("modifying field " & FieldName, 0, editRecord.id)
+                                    Call cpCore.log_LogActivity2("modifying field " & FieldName, 0, editRecord.id)
                                 Case "cclibraryfiles"
                                     '
                                     ' if new upload to files, clear AltSizeList
@@ -3661,7 +3661,7 @@ ErrorTrap:
                             Filename = cpCore.db.db_GetCS(CS, .nameLc)
                             If Filename <> "" Then
                                 Copy = cpCore.cdnFiles.ReadFile(Filename)
-                                Copy = cpCore.html_encodeContent10(Copy, cpCore.user.id, "", 0, 0, True, False, False, False, True, False, "", "", IsEmailContent, 0, "", cpCoreClass.addonContextEnum.ContextAdmin, cpCore.user.isAuthenticated, Nothing, cpCore.user.user_isEditingAnything)
+                                Copy = cpCore.html_encodeContent10(Copy, cpCore.user.id, "", 0, 0, True, False, False, False, True, False, "", "", IsEmailContent, 0, "", cpCoreClass.addonContextEnum.ContextAdmin, cpCore.user.isAuthenticated, Nothing, cpCore.user.isEditingAnything)
                                 Stream.Add(Copy)
                             End If
                         Case FieldTypeIdRedirect, FieldTypeIdManyToMany

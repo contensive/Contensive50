@@ -264,7 +264,7 @@ Namespace Contensive.Core
         End Function
 
         Public Overrides Sub LogActivity(ByVal Message As String, ByVal UserID As Integer, ByVal OrganizationID As Integer) 'Inherits BaseClasses.CPSiteBaseClass.LogActivity
-            Call cpCore.logActivity(Message, 0, UserID, OrganizationID)
+            Call cpCore.log_logActivity(Message, 0, UserID, OrganizationID)
         End Sub
         '
         ' Report an alarm

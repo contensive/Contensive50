@@ -47,7 +47,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property fromAddressDefault() As String
             Get
                 If True Then
-                    Return cpCore.user.user_isAuthenticatedMember
+                    Return cpCore.user.isAuthenticatedMember
                 Else
                     Return False
                 End If
@@ -104,7 +104,7 @@ Namespace Contensive.Core
 
         Public Overrides Sub SendPassword(ByVal UserEmailAddress As String) 'Inherits BaseClasses.CPEmailBaseClass.SendPassword
             If True Then
-                Call cpCore.user.security_SendMemberPassword(UserEmailAddress)
+                Call cpCore.user.sendPassword(UserEmailAddress)
             End If
         End Sub
 

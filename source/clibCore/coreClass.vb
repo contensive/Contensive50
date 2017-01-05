@@ -530,7 +530,7 @@ Namespace Contensive.Core
         '
         'Public app.siteProperty_ServerPageDefault As String = ""          ' Set from site property during init, the page assumed for URLs with no page given
         '
-        Public main_ServerPagePrintVersion As Boolean = False
+        Public pageManager_printVersion As Boolean = False
         '
         Public web_requestContentWatchPrefix As String = ""   ' The different between the URL and the main_ContentWatch Pathpage
         '
@@ -2842,7 +2842,7 @@ ErrorTrap:
                                                             '
                                                             Copy = ""
                                                             GroupIDList = csv_GetAddonOptionStringValue("AllowGroups", addonOptionString)
-                                                            If (Not user.user_isMemberOfGroupIdList2(personalizationPeopleId, True, GroupIDList, True)) Then
+                                                            If (Not user.isMemberOfGroupIdList(personalizationPeopleId, True, GroupIDList, True)) Then
                                                                 '
                                                                 ' Block content if not allowed
                                                                 '
@@ -5119,7 +5119,7 @@ ErrorTrap:
         '   Insert into the ActivityLog
         '=====================================================================================================
         '
-        Public Sub logActivity(ByVal Message As String, ByVal ByMemberID As Integer, ByVal SubjectMemberID As Integer, ByVal SubjectOrganizationID As Integer, Optional ByVal Link As String = "", Optional ByVal VisitorID As Integer = 0, Optional ByVal VisitID As Integer = 0)
+        Public Sub log_logActivity(ByVal Message As String, ByVal ByMemberID As Integer, ByVal SubjectMemberID As Integer, ByVal SubjectOrganizationID As Integer, Optional ByVal Link As String = "", Optional ByVal VisitorID As Integer = 0, Optional ByVal VisitID As Integer = 0)
             On Error GoTo ErrorTrap 'Const Tn = "LogActivity2" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
             Dim CS As Integer
@@ -7488,7 +7488,7 @@ ErrorTrap:
                     '
                     ' ----- username changed, check if change is allowed
                     '
-                    If Not user.main_IsNewLoginOK(Newusername, NewPassword, ErrorMessage, ErrorCode) Then
+                    If Not user.isNewLoginOK(Newusername, NewPassword, ErrorMessage, ErrorCode) Then
                         error_AddUserError(ErrorMessage)
                         AllowChange = False
                     End If
@@ -7631,7 +7631,7 @@ ErrorTrap:
             '
             FieldValue = docProperties.getText(FieldName)
             If db.cs_getText(CSMember, FieldName) <> FieldValue Then
-                Call main_LogActivity2("profile changed " & FieldName, user.id, user.organizationId)
+                Call log_LogActivity2("profile changed " & FieldName, user.id, user.organizationId)
                 Call db.cs_set(CSMember, FieldName, FieldValue)
             End If
             Exit Sub
@@ -7653,7 +7653,7 @@ ErrorTrap:
             '
             FieldValue = main_GetStreamBoolean2(FieldName)
             If db.cs_getBoolean(CSMember, FieldName) <> FieldValue Then
-                Call main_LogActivity2("profile changed " & FieldName, user.id, user.organizationId)
+                Call log_LogActivity2("profile changed " & FieldName, user.id, user.organizationId)
                 Call db.cs_set(CSMember, FieldName, FieldValue)
             End If
             Exit Sub
@@ -9137,7 +9137,7 @@ ErrorTrap:
                     '
                     ' ----- add window.print if this is the Printerversion
                     '
-                    If main_ServerPagePrintVersion Then
+                    If pageManager_printVersion Then
                         autoPrintText = docProperties.getText("AutoPrint")
                         If autoPrintText = "" Then
                             autoPrintText = siteProperties.getText("AllowAutoPrintDialog", "1")
@@ -9149,7 +9149,7 @@ ErrorTrap:
                     '
                     ' -- print what is needed
                     '
-                    If (Not BlockNonContentExtras) And (Not main_ServerPagePrintVersion) Then
+                    If (Not BlockNonContentExtras) And (Not pageManager_printVersion) Then
                         If user.isAuthenticatedContentManager() And user.allowToolsPanel Then
                             If AllowTools Then
                                 s = s & main_GetToolsPanel()
@@ -10324,7 +10324,7 @@ ErrorTrap:
                     '
                     ' ----- Set authoring only for valid ContentName
                     '
-                    IsEditingLocal = user.user_isEditing(iContentName)
+                    IsEditingLocal = user.isEditing(iContentName)
                 Else
                     '
                     ' ----- if iContentName was bad, maybe they put table in, no authoring
@@ -10342,7 +10342,7 @@ ErrorTrap:
                                 SeeAlsoLink = web_requestProtocol & SeeAlsoLink
                             End If
                             If IsEditingLocal Then
-                                main_GetSeeAlso = main_GetSeeAlso & main_GetRecordEditLink2("See Also", (db.cs_getInteger(CS, "ID")), False, "", user.user_isEditing("See Also"))
+                                main_GetSeeAlso = main_GetSeeAlso & main_GetRecordEditLink2("See Also", (db.cs_getInteger(CS, "ID")), False, "", user.isEditing("See Also"))
                             End If
                             main_GetSeeAlso = main_GetSeeAlso & "<a href=""" & html_EncodeHTML(SeeAlsoLink) & """ target=""_blank"">" & (db.cs_getText(CS, "Name")) & "</A>"
                             Copy = (db.cs_getText(CS, "Brief"))
@@ -11833,7 +11833,7 @@ ErrorTrap:
                     ContentControlID = (db.cs_getInteger(iCSPointer, "contentcontrolid"))
                     ContentName = metaData.getContentNameByID(ContentControlID)
                     If ContentName <> "" Then
-                        cs_GetCSRecordEditLink = main_GetRecordEditLink2(ContentName, RecordID, EncodeBoolean(AllowCut), RecordName, user.user_isEditing(ContentName))
+                        cs_GetCSRecordEditLink = main_GetRecordEditLink2(ContentName, RecordID, EncodeBoolean(AllowCut), RecordName, user.isEditing(ContentName))
                     End If
                 End If
             End If
@@ -13173,7 +13173,7 @@ ErrorTrap:
                     '
                     ' First page of the visit, save everything
                     '
-                    SQL = "" _
+                    SQL &= "" _
                         & ",VisitorID=" & visitor_id _
                         & ",Name=" & db.encodeSQLText(visit_name) _
                         & ",VisitorNew=" & db.encodeSQLBoolean(visitor_new) _
@@ -13207,7 +13207,7 @@ ErrorTrap:
         '   before exit of anypage if anything here changes
         '=============================================================================
         '
-        Public Sub main_SaveVisitor()
+        Public Sub visitor_save()
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SaveVisitor")
             '
             'If Not (true) Then Exit Sub
@@ -13373,7 +13373,6 @@ ErrorTrap:
                         SQL = "SELECT" _
                             & " ccVisits.ID AS VisitId" _
                             & ",ccVisits.Name AS VisitName" _
-                            & ",ccVisits.MemberID AS VisitMemberID" _
                             & ",ccVisits.VisitAuthenticated AS VisitAuthenticated" _
                             & ",ccVisits.StartTime AS VisitStartTime" _
                             & ",ccVisits.StartDateValue AS VisitStartDateValue" _
@@ -13480,9 +13479,6 @@ ErrorTrap:
                                 visit_loginAttempts = (db.cs_getInteger(CS, "VisitLoginAttempts"))
                                 visitor_new = (db.cs_getBoolean(CS, "VisitVisitorNew"))
                                 '
-                                user.id = (db.cs_getInteger(CS, "VisitMemberID"))
-                                user.isNew = (db.cs_getBoolean(CS, "VisitMemberNew"))
-                                '
                                 webServer.requestRemoteIP = (db.cs_getText(CS, "VisitREMOTE_ADDR"))
                                 webServer.requestBrowser = (db.cs_getText(CS, "VisitBrowser"))
                                 main_VisitTimeToLastHit = 0
@@ -13511,6 +13507,7 @@ ErrorTrap:
                                 Else
                                     user.id = testId
                                     user.active = testActive
+                                    user.isNew = db.cs_getBoolean(CS, "VisitMemberNew")
                                     user.name = (db.cs_getText(CS, "MemberName"))
                                     user.isDeveloper = (db.cs_getBoolean(CS, "MemberDeveloper"))
                                     user.isAdmin = (db.cs_getBoolean(CS, "MemberAdmin"))
@@ -13686,7 +13683,7 @@ ErrorTrap:
                             ' ----- recognize by the main_VisitorMemberID
                             '
                             'hint = "510"
-                            If user.recognizeByID(visitor_memberID) Then
+                            If user.recognizeById(visitor_memberID) Then
                                 '
                                 ' ----- if successful, now test for autologin (authentication)
                                 '
@@ -13704,8 +13701,8 @@ ErrorTrap:
                                             '
                                             ' ----- yes, go ahead with autologin
                                             '
-                                            If user.authenticateByID(user.id) Then
-                                                Call main_LogActivity2("autologin", user.id, user.organizationId)
+                                            If user.authenticateById(user.id) Then
+                                                Call log_LogActivity2("autologin", user.id, user.organizationId)
                                                 visitor_changes = True
                                                 user_changes = True
                                             End If
@@ -13717,7 +13714,7 @@ ErrorTrap:
                                     ' Recognized, not auto login
                                     '
                                     'hint = "540"
-                                    Call main_LogActivity2("recognized", user.id, user.organizationId)
+                                    Call log_LogActivity2("recognized", user.id, user.organizationId)
                                 End If
                             End If
                         End If
@@ -13750,15 +13747,15 @@ ErrorTrap:
                         '
                         ' Link Login
                         '
-                        If user.authenticateByID(MemberLinkLoginID) Then
-                            Call main_LogActivity2("link login with eid " & MemberLinkinEID, user.id, user.organizationId)
+                        If user.authenticateById(MemberLinkLoginID) Then
+                            Call log_LogActivity2("link login with eid " & MemberLinkinEID, user.id, user.organizationId)
                         End If
                     ElseIf (MemberLinkRecognizeID <> 0) Then
                         '
                         ' Link Recognize
                         '
-                        Call user.recognizeByID(MemberLinkRecognizeID)
-                        Call main_LogActivity2("link recognize with eid " & MemberLinkinEID, user.id, user.organizationId)
+                        Call user.recognizeById(MemberLinkRecognizeID)
+                        Call log_LogActivity2("link recognize with eid " & MemberLinkinEID, user.id, user.organizationId)
                     End If
                     '
                     '-----------------------------------------------------------------------------------
@@ -13781,7 +13778,7 @@ ErrorTrap:
                             '
                             ' not upgraded, just create user like it did before
                             '
-                            Call user.user_CreateUser()
+                            Call user.createUser()
                         Else
                             '
                             ' upgraded, determine the kind of tracking - experimental build set to true
@@ -13791,13 +13788,13 @@ ErrorTrap:
                                 '
                                 ' do not track guests at all
                                 '
-                                Call user.user_CreateUserDefaults(DefaultMemberName)
+                                Call user.createUserDefaults(DefaultMemberName)
                             Else
                                 If visit_cookieSupport Then
                                     '
                                     ' cookies supported, not first hit and not spider
                                     '
-                                    Call user.user_CreateUser()
+                                    Call user.createUser()
                                 Else
                                     '
                                     ' upgraded, set it to the site property - experimental build set to true
@@ -13807,12 +13804,12 @@ ErrorTrap:
                                         '
                                         ' compatibiltiy mode - create people for non-cookies too
                                         '
-                                        Call user.user_CreateUser()
+                                        Call user.createUser()
                                     Else
                                         '
                                         ' set defaults for people record
                                         '
-                                        Call user.user_CreateUserDefaults(DefaultMemberName)
+                                        Call user.createUserDefaults(DefaultMemberName)
                                     End If
                                 End If
                             End If
@@ -13915,14 +13912,14 @@ ErrorTrap:
                     '
                     'hint = "940"
                     If visitor_changes Then
-                        Call main_SaveVisitor()
+                        Call visitor_save()
                     End If
                     '
                     ' ----- Save Member record
                     '
                     'hint = "950"
                     If user_changes Then
-                        Call user.user_SaveMemberBase()
+                        Call user.saveMemberBase()
                     End If
                     '
                     ' ----- send visit cookie if supported or first page
@@ -14546,7 +14543,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function main_GetRecordEditLink(ByVal ContentName As String, ByVal RecordID As Integer, Optional ByVal AllowCut As Boolean = False) As String
-            main_GetRecordEditLink = main_GetRecordEditLink2(ContentName, RecordID, EncodeBoolean(AllowCut), "", user.user_isEditing(EncodeText(ContentName)))
+            main_GetRecordEditLink = main_GetRecordEditLink2(ContentName, RecordID, EncodeBoolean(AllowCut), "", user.isEditing(EncodeText(ContentName)))
         End Function
         '
         '========================================================================
@@ -14732,7 +14729,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Function main_GetRecordAddLink(ByVal ContentName As String, ByVal PresetNameValueList As String, Optional ByVal AllowPaste As Boolean = False) As String
-            main_GetRecordAddLink = main_GetRecordAddLink2(EncodeText(ContentName), EncodeText(PresetNameValueList), AllowPaste, user.user_isEditing(EncodeText(ContentName)))
+            main_GetRecordAddLink = main_GetRecordAddLink2(EncodeText(ContentName), EncodeText(PresetNameValueList), AllowPaste, user.isEditing(EncodeText(ContentName)))
         End Function
         '
         '========================================================================
@@ -15173,7 +15170,7 @@ ErrorTrap:
             ContentName = metaData.getContentNameByID(ContentID)
             If ContentName <> "" Then
                 If Not IsNull(RecordIDVariant) Then
-                    main_GetRecordEditLinkByContent = main_GetRecordEditLink2(ContentName, EncodeInteger(RecordIDVariant), False, "", user.user_isEditing(ContentName))
+                    main_GetRecordEditLinkByContent = main_GetRecordEditLink2(ContentName, EncodeInteger(RecordIDVariant), False, "", user.isEditing(ContentName))
                 Else
                     main_GetRecordEditLinkByContent = main_GetRecordAddLink(ContentName, Criteria)
                 End If
@@ -15392,19 +15389,19 @@ ErrorTrap:
                             '
                             ' Logout - This can only come from the Horizonal Tool Bar
                             '
-                            Call user.security_LogoutMember()
+                            Call user.logout()
                         Case ButtonLogin
                             '
                             ' Login - This can only come from the Horizonal Tool Bar
                             '
-                            Call user.user_ProcessLoginFormDefault()
+                            Call user.processFormLoginDefault()
                         Case ButtonApply
                             '
                             ' Apply
                             '
                             user.loginForm_Username = docProperties.getText("username")
                             If user.loginForm_Username <> "" Then
-                                Call user.user_ProcessLoginFormDefault()
+                                Call user.processFormLoginDefault()
                             End If
                             '
                             ' ----- AllowAdminLinks
@@ -17168,7 +17165,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            main_IsLoginOK = (user.user_getLoginUserID(Username, Password) <> 0)
+            main_IsLoginOK = (user.authenticateGetId(Username, Password) <> 0)
             If Not main_IsLoginOK Then
                 ErrorMessage = error_GetUserError()
             End If
@@ -17188,7 +17185,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            main_GetFormSendPassword = user.user_GetSendPasswordForm()
+            main_GetFormSendPassword = user.getSendPasswordForm()
             '
             Exit Function
 ErrorTrap:
@@ -17435,7 +17432,7 @@ ErrorTrap:
                 RecordID = db.cs_getInteger(CSPointer, "id")
                 ContentName = metaData.getContentNameByID(db.cs_getInteger(CSPointer, "contentcontrolId"))
             End If
-            main_GetCSEncodedField = html_encodeContent10(db.db_GetCS(EncodeInteger(CSPointer), EncodeText(FieldName)), user.id, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, 0, "", addonContextEnum.ContextPage, user.isAuthenticated, Nothing, user.user_isEditingAnything)
+            main_GetCSEncodedField = html_encodeContent10(db.db_GetCS(EncodeInteger(CSPointer), EncodeText(FieldName)), user.id, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, 0, "", addonContextEnum.ContextPage, user.isAuthenticated, Nothing, user.isEditingAnything)
             Exit Function
             '
             ' ----- Error Trap
@@ -19445,7 +19442,7 @@ ErrorTrap:
                 End If
                 pageParentListName = EncodeText(cache_pageContent(PCC_ParentListName, PCCPtr))
                 pageEditLink = ""
-                If user.user_isEditing(ContentName) Then
+                If user.isEditing(ContentName) Then
                     pageEditLink = main_GetRecordEditLink2(ContentName, PageID, True, PageName, True)
                 End If
                 pageAllowInChildLists = EncodeBoolean(cache_pageContent(PCC_AllowInChildLists, PCCPtr))
@@ -19652,7 +19649,7 @@ ErrorTrap:
             PageContentCID = main_GetContentID("Page Content")
             If (True) Then
                 SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,BlockSection,RootPageID"
-                ShowHiddenMenu = user.user_isEditingAnything()
+                ShowHiddenMenu = user.isEditingAnything()
                 'ShowHiddenMenu = main_IsEditing("Site Sections")
                 If IsAllSectionsMenuMode Then
                     '
@@ -19688,7 +19685,7 @@ ErrorTrap:
                 ' Multiple Menus with ccDynamicMenuSectionRules
                 '
                 SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,BlockSection,0 as RootPageID"
-                ShowHiddenMenu = user.user_isEditingAnything()
+                ShowHiddenMenu = user.isEditingAnything()
                 'ShowHiddenMenu = main_IsEditing("Site Sections")
                 If IsAllSectionsMenuMode Then
                     '
@@ -19722,7 +19719,7 @@ ErrorTrap:
                 '
                 SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,BlockSection,0 as RootPageID"
                 Criteria = ""
-                ShowHiddenMenu = user.user_isEditingAnything()
+                ShowHiddenMenu = user.isEditingAnything()
                 'ShowHiddenMenu = main_IsEditing("Site Sections")
                 CSSections = db.csOpen("Site Sections", Criteria, , , , ,, SelectFieldList)
             ElseIf db_IsSQLTableField("Default", "ccSections", "MenuImageOverFilename") Then
@@ -19731,7 +19728,7 @@ ErrorTrap:
                 '
                 SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,0 as BlockSection,0 as RootPageID"
                 Criteria = ""
-                ShowHiddenMenu = user.user_isEditingAnything()
+                ShowHiddenMenu = user.isEditingAnything()
                 'ShowHiddenMenu = main_IsEditing("Site Sections")
                 CSSections = db.csOpen("Site Sections", Criteria, , , , ,, SelectFieldList)
             ElseIf db_IsSQLTableField("Default", "ccSections", "HideMenu") Then
@@ -19740,7 +19737,7 @@ ErrorTrap:
                 '
                 SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,'' as MenuImageOverFilename,HideMenu,0 as BlockSection,0 as RootPageID"
                 Criteria = ""
-                ShowHiddenMenu = user.user_isEditingAnything()
+                ShowHiddenMenu = user.isEditingAnything()
                 'ShowHiddenMenu = main_IsEditing("Site Sections")
                 CSSections = db.csOpen("Site Sections", Criteria, , , , ,, SelectFieldList)
             Else
@@ -19854,7 +19851,7 @@ ErrorTrap:
                         If Link = "" Then
                             Link = DefaultTemplateLink
                         End If
-                        AuthoringTag = main_GetRecordEditLink2("Site Sections", SectionID, False, SectionName, user.user_isEditing("Site Sections"))
+                        AuthoringTag = main_GetRecordEditLink2("Site Sections", SectionID, False, SectionName, user.isEditing("Site Sections"))
                         Link = modifyLinkQuery(Link, "sid", CStr(SectionID), True)
                         '
                         ' main_Get Menu, remove crlf, and parse the line with crlf
@@ -19880,7 +19877,7 @@ ErrorTrap:
             Call db.cs_Close(CSSections)
             '
             pageManager_GetSectionMenu = html_executeContentCommands(Nothing, pageManager_GetSectionMenu, addonContextEnum.ContextPage, user.id, user.isAuthenticated, layoutError)
-            pageManager_GetSectionMenu = html_encodeContent10(pageManager_GetSectionMenu, user.id, "", 0, 0, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, 0, "", addonContextEnum.ContextPage, user.isAuthenticated, Nothing, user.user_isEditingAnything)
+            pageManager_GetSectionMenu = html_encodeContent10(pageManager_GetSectionMenu, user.id, "", 0, 0, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, 0, "", addonContextEnum.ContextPage, user.isAuthenticated, Nothing, user.isEditingAnything)
             'pageManager_GetSectionMenu = main_EncodeContent5(pageManager_GetSectionMenu, memberID, "", 0, 0, False, False, True, True, False, True, "", "", False, 0)
             '
             Exit Function
@@ -20062,7 +20059,7 @@ ErrorTrap:
             '
             Dim PCCPtr As Integer
             '
-            PCCPtr = pageManager_cache_pageContent_getPtr(PageID, pagemanager_IsWorkflowRendering, user.user_isQuickEditing(""))
+            PCCPtr = pageManager_cache_pageContent_getPtr(PageID, pagemanager_IsWorkflowRendering, user.isQuickEditing(""))
             If PCCPtr >= 0 Then
                 PageName2 = EncodeText(cache_pageContent(PCC_Name, PCCPtr))
                 ParentID = EncodeInteger(cache_pageContent(PCC_ParentID, PCCPtr))
@@ -20228,7 +20225,7 @@ ErrorTrap:
             Dim templateId As Integer
             Dim templateDomain As String
             '
-            Call main_GetPageArgs(PageID, pagemanager_IsWorkflowRendering, user.user_isQuickEditing(""), ContentControlID, templateId, ParentID, MenuLinkOverRide, IsRootPage, SectionID, PageIsSecure, "")
+            Call main_GetPageArgs(PageID, pagemanager_IsWorkflowRendering, user.isQuickEditing(""), ContentControlID, templateId, ParentID, MenuLinkOverRide, IsRootPage, SectionID, PageIsSecure, "")
             '
             ' main_Get defaultpathpage
             '
@@ -20435,7 +20432,7 @@ ErrorTrap:
             Dim PCCPtr As Integer
             Dim PageIsSecure As Boolean
             '
-            Call main_GetPageArgs(PageID, pagemanager_IsWorkflowRendering, user.user_isQuickEditing(""), CCID, templateId, ParentID, MenuLinkOverRide, IsRootPage, SectionID, PageIsSecure, "")
+            Call main_GetPageArgs(PageID, pagemanager_IsWorkflowRendering, user.isQuickEditing(""), CCID, templateId, ParentID, MenuLinkOverRide, IsRootPage, SectionID, PageIsSecure, "")
             '    PCCPtr = pageManager_cache_pageContent_getPtr(PageID, main_IsWorkflowRendering, main_IsQuickEditing(""))
             '    If PCCPtr >= 0 Then
             '        PageFound = True
@@ -21676,7 +21673,7 @@ ErrorTrap:
                                     'Call AppendLog("main_init(), 3410 - exit for login block")
                                     '
                                     Call main_SetMetaContent(0, 0)
-                                    Call writeAltBuffer(user.user_GetLoginPage2(False) & main_GetEndOfBody(False, False, False, False))
+                                    Call writeAltBuffer(user.getLoginPage(False) & main_GetEndOfBody(False, False, False, False))
                                     docOpen = False '--- should be disposed by caller --- Call dispose
                                     Return _docBuffer
                                 Case 2
@@ -22138,7 +22135,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            If user.user_isEditing("") Or user.isAuthenticatedAdmin() Then
+            If user.isEditing("") Or user.isAuthenticatedAdmin() Then
                 main_GetAdminHintWrapper = main_GetAdminHintWrapper & web_GetLegacySiteStyles()
                 main_GetAdminHintWrapper = main_GetAdminHintWrapper _
                     & "<table border=0 width=""100%"" cellspacing=0 cellpadding=0><tr><td class=""ccHintWrapper"">" _
@@ -23024,7 +23021,7 @@ ErrorTrap:
                             '
                             ' Group main_MemberShip
                             '
-                            GroupValue = user.user_IsGroupMember(.GroupName)
+                            GroupValue = user.IsMemberOfGroup2(.GroupName)
                             Body = f.RepeatCell
                             Body = Replace(Body, "{{CAPTION}}", html_GetFormInputCheckBox2("Group" & .GroupName, GroupValue), , , vbTextCompare)
                             Body = Replace(Body, "{{FIELD}}", .Caption)
@@ -23099,11 +23096,11 @@ ErrorTrap:
                 ' Load the instructions
                 '
                 f = pageManager_LoadFormPageInstructions(FormInstructions, Formhtml)
-                If f.AuthenticateOnFormProcess And Not user.isAuthenticated() And user.user_isRecognized() Then
+                If f.AuthenticateOnFormProcess And Not user.isAuthenticated() And user.isRecognized() Then
                     '
                     ' If this form will authenticate when done, and their is a current, non-authenticated account -- logout first
                     '
-                    Call user.security_LogoutMember()
+                    Call user.logout()
                 End If
                 CSPeople = -1
                 Success = True
@@ -23163,7 +23160,7 @@ ErrorTrap:
                                 ' Group main_MemberShip
                                 '
                                 IsInGroup = main_GetStreamBoolean2("Group" & .GroupName)
-                                WasInGroup = user.user_IsGroupMember(.GroupName)
+                                WasInGroup = user.IsMemberOfGroup2(.GroupName)
                                 If WasInGroup And Not IsInGroup Then
                                     group_DeleteGroupMember(.GroupName)
                                 ElseIf IsInGroup And Not WasInGroup Then
@@ -23189,7 +23186,7 @@ ErrorTrap:
                     ' Authenticate
                     '
                     If f.AuthenticateOnFormProcess Then
-                        Call user.authenticateByID(user.id)
+                        Call user.authenticateById(user.id)
                     End If
                     '
                     ' Join Group requested by page that created form
@@ -23316,7 +23313,7 @@ ErrorTrap:
             Dim IsOldMenu As Boolean
             Dim CompatibilitySpanAroundButton As Boolean
             '
-            IsAuthoring = user.user_isEditing("Dynamic Menus")
+            IsAuthoring = user.isEditing("Dynamic Menus")
             DefaultTemplateLink = www_requestRootPath & web_requestPage
             If False Then '.292" Then
                 CompatibilitySpanAroundButton = True
@@ -23464,7 +23461,7 @@ ErrorTrap:
                 End If
             End If
             pageManager_GetDynamicMenu = PreButton & Replace(pageManager_GetDynamicMenu, vbCrLf, PostButton & MenuDelimiter & PreButton) & PostButton
-            If user.user_IsAdvancedEditing("") Then
+            If user.isAdvancedEditing("") Then
                 pageManager_GetDynamicMenu = "<div style=""border-bottom:1px dashed #404040; padding:5px;margin-bottom:5px;"">Dynamic Menu [" & MenuName & "]" & EditLink & "</div><div>" & pageManager_GetDynamicMenu & "</div>"
             End If
             '
@@ -23708,7 +23705,7 @@ ErrorTrap:
             '
             Dim returnValue As String
             '
-            returnValue = html_encodeContent10(Source, personalizationPeopleId, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, IsEmailContent, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, user.isAuthenticated, Nothing, user.user_isEditingAnything)
+            returnValue = html_encodeContent10(Source, personalizationPeopleId, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, IsEmailContent, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, user.isAuthenticated, Nothing, user.isEditingAnything)
             '
             html_encodeContent9 = returnValue
             '
@@ -24717,7 +24714,7 @@ ErrorTrap:
             '
             Dim IsAuthoring As Boolean
             '
-            IsAuthoring = user.user_isEditingAnything()
+            IsAuthoring = user.isEditingAnything()
             If Not IsAuthoring Then
                 main_GetEditWrapper = Content
             Else
@@ -26787,7 +26784,7 @@ ErrorTrap:
                     IDs = Split(pageManager_DeleteChildRecords, ",")
                     IDCnt = UBound(IDs) + 1
                     SingleEntry = (IDCnt = 1)
-                    QuickEditing = user.user_isQuickEditing("page content")
+                    QuickEditing = user.isQuickEditing("page content")
                     For Ptr = 0 To IDCnt - 1
                         Call db_DeleteContentRecord("page content", EncodeInteger(IDs(Ptr)))
                         Call pageManager_cache_pageContent_removeRow(EncodeInteger(IDs(Ptr)), pagemanager_IsWorkflowRendering, QuickEditing)
@@ -26860,9 +26857,9 @@ ErrorTrap:
                     End If
                     Call db.cs_Close(CS)
                     If IsDelete Then
-                        Call main_LogActivity2("deleting user #" & RecordID & " (" & RecordName & ")", RecordID, ActivityLogOrganizationID)
+                        Call log_LogActivity2("deleting user #" & RecordID & " (" & RecordName & ")", RecordID, ActivityLogOrganizationID)
                     Else
-                        Call main_LogActivity2("saving changes to user #" & RecordID & " (" & RecordName & ")", RecordID, ActivityLogOrganizationID)
+                        Call log_LogActivity2("saving changes to user #" & RecordID & " (" & RecordName & ")", RecordID, ActivityLogOrganizationID)
                     End If
                 Case "organizations"
                     '
@@ -26870,9 +26867,9 @@ ErrorTrap:
                     '
                     'hint = hint & ",120"
                     If IsDelete Then
-                        Call main_LogActivity2("deleting organization #" & RecordID & " (" & RecordName & ")", 0, RecordID)
+                        Call log_LogActivity2("deleting organization #" & RecordID & " (" & RecordName & ")", 0, RecordID)
                     Else
-                        Call main_LogActivity2("saving changes to organization #" & RecordID & " (" & RecordName & ")", 0, RecordID)
+                        Call log_LogActivity2("saving changes to organization #" & RecordID & " (" & RecordName & ")", 0, RecordID)
                     End If
                 Case "ccsetup"
                     '
@@ -27604,17 +27601,17 @@ ErrorTrap:
                 Call main_FlushStream()
             End If
         End Sub
+        ''
+        ''   Pass-through to AppService main_LogActivity
+        ''
+        'Public Sub main_LogActivity(Message As String)
+        '    Call log_LogActivity2(Message, 0, 0)
+        'End Sub
         '
-        '   Pass-through to AppService main_LogActivity
-        '
-        Public Sub main_LogActivity(Message As String)
-            Call main_LogActivity2(Message, 0, 0)
-        End Sub
         '
         '
-        '
-        Public Sub main_LogActivity2(Message As String, SubjectMemberID As Integer, SubjectOrganizationID As Integer)
-            Call logActivity(Message, user.id, SubjectMemberID, SubjectOrganizationID, main_ServerLink, visitor_id, visit_Id)
+        Public Sub log_LogActivity2(Message As String, SubjectMemberID As Integer, SubjectOrganizationID As Integer)
+            Call log_logActivity(Message, user.id, SubjectMemberID, SubjectOrganizationID, main_ServerLink, visitor_id, visit_Id)
         End Sub
         '
         '=================================================================================================
@@ -28462,7 +28459,7 @@ ErrorTrap:
                     '
                     Email = docProperties.getText("email")
                     If Email <> "" Then
-                        Call user.security_SendMemberPassword(Email)
+                        Call user.sendPassword(Email)
                         Copy = "" _
                             & "<div style=""width:300px;margin:100px auto 0 auto;"">" _
                             & "<p>An attempt to send login information for email address '" & Email & "' has been made.</p>" _
@@ -28478,7 +28475,7 @@ ErrorTrap:
                     ' ----- Page Content Printer main_version
                     '
                     Call web_addRefreshQueryString(RequestNameHardCodedPage, HardCodedPagePrinterVersion)
-                    main_ServerPagePrintVersion = True
+                    pageManager_printVersion = True
                     autoPrintText = docProperties.getText("AutoPrint")
                     '
                     If ContentName = "" Then
@@ -28618,7 +28615,7 @@ ErrorTrap:
                     ' 9/4/2012 added to prevent lockout if login addon fails
                     web_RefreshQueryString = webServer.requestQueryString
                     'Call main_AddRefreshQueryString("method", "")
-                    Call writeAltBuffer(user.user_GetLoginPage2(True))
+                    Call writeAltBuffer(user.getLoginPage(True))
                     executeRoute_hardCodedPage = True
                 Case HardCodedPageLogin, HardCodedPageLogoutLogin
                     '
@@ -28629,18 +28626,18 @@ ErrorTrap:
                     ' Because you want the form created to save the refresh values
                     '
                     If UCase(HardCodedPage) = "LOGOUTLOGIN" Then
-                        Call user.security_LogoutMember()
+                        Call user.logout()
                     End If
                     web_RefreshQueryString = webServer.requestQueryString
                     'Call main_AddRefreshQueryString("method", "")
-                    Call writeAltBuffer(user.user_GetLoginPage2(False))
+                    Call writeAltBuffer(user.getLoginPage(False))
                     'Call writeAltBuffer(main_GetLoginPage2(false) & main_GetEndOfBody(False, False, False))
                     executeRoute_hardCodedPage = True
                 Case HardCodedPageLogout
                     '
                     ' ----- logout the current member
                     '
-                    Call user.security_LogoutMember()
+                    Call user.logout()
                     executeRoute_hardCodedPage = False
                 Case HardCodedPageSiteExplorer
                     '
@@ -31098,7 +31095,7 @@ ErrorTrap:
                             GroupIDList = csv_GetAddonOption("AllowGroups", WorkingOptionString)
                             GroupIDList = Trim(GroupIDList)
                             ' not webonly anymore
-                            If Not user.user_isMemberOfGroupIdList(personalizationPeopleId, personalizationIsAuthenticated, GroupIDList) Then
+                            If Not user.isMemberOfGroupIdList(personalizationPeopleId, personalizationIsAuthenticated, GroupIDList) Then
                                 HTMLContent = BlockTextStartMarker
                             End If
                             'If isMainOk Then
@@ -31204,7 +31201,7 @@ ErrorTrap:
                             If IncludeEditWrapper Then
                                 IncludeEditWrapper = IncludeEditWrapper _
                                     And (visitProperty.getBoolean("AllowAdvancedEditor") _
-                                    And ((Context = addonContextEnum.ContextAdmin) Or user.user_isEditing(HostContentName)))
+                                    And ((Context = addonContextEnum.ContextAdmin) Or user.isEditing(HostContentName)))
                                 'IncludeEditWrapper = IncludeEditWrapper _
                                 '    And ( _
                                 '        ( _
@@ -33560,7 +33557,7 @@ ErrorTrap:
             Dim Pos As Integer
             '
             If user.isAuthenticated() And ((ACInstanceID = "-2") Or (ACInstanceID = "-1") Or (ACInstanceID = "0") Or (RecordID <> 0)) Then
-                If user.user_isEditingAnything() Then
+                If user.isEditingAnything() Then
                     CopyHeader = CopyHeader _
                         & "<div class=""ccHeaderCon"">" _
                         & "<table border=0 cellpadding=0 cellspacing=0 width=""100%"">" _
@@ -33827,7 +33824,7 @@ ErrorTrap:
             Dim AddonName As String
             '
             If user.isAuthenticated() And True Then
-                If user.user_isEditingAnything() Then
+                If user.isEditingAnything() Then
                     CS = db_csOpen("Add-ons", addonId)
                     If db.cs_Ok(CS) Then
                         AddonName = db.cs_getText(CS, "name")
@@ -33942,7 +33939,7 @@ ErrorTrap:
             Dim CollectionCopy As String
             '
             If user.isAuthenticated() Then
-                If user.user_isEditingAnything() Then
+                If user.isEditingAnything() Then
                     StyleSN = EncodeInteger(siteProperties.getText("StylesheetSerialNumber", "0"))
                     pageManager_HelpViewerButtonID = "HelpBubble" & pageManager_HelpCodeCount
                     InnerCopy = helpCopy
@@ -34051,7 +34048,7 @@ ErrorTrap:
             Dim HTMLViewerBubbleID As String
             '
             If user.isAuthenticated() Then
-                If user.user_isEditingAnything() Then
+                If user.isEditingAnything() Then
                     StyleSN = EncodeInteger(siteProperties.getText("StylesheetSerialNumber", "0"))
                     HTMLViewerBubbleID = "HelpBubble" & pageManager_HelpCodeCount
                     '
@@ -35439,7 +35436,7 @@ ErrorTrap:
                         '
                         ContentName = metaData.getContentNameByID(ContentControlID)
                         If ContentName <> "" Then
-                            If (Not main_RenderCache_CurrentPage_IsQuickEditing) And user.user_isQuickEditing(ContentName) Then
+                            If (Not main_RenderCache_CurrentPage_IsQuickEditing) And user.isQuickEditing(ContentName) Then
                                 main_RenderCache_CurrentPage_IsQuickEditing = True
                                 reloadPage = True
                             End If
@@ -35523,8 +35520,8 @@ ErrorTrap:
                 main_RenderCache_CurrentPage_IsRootPage = (main_RenderedPageID = rootPageId) And (main_RenderedParentID = 0)
                 main_RenderCache_CurrentPage_ContentId = EncodeInteger(cache_pageContent(PCC_ContentControlID, main_RenderCache_CurrentPage_PCCPtr))
                 main_RenderCache_CurrentPage_ContentName = metaData.getContentNameByID(main_RenderCache_CurrentPage_ContentId)
-                main_RenderCache_CurrentPage_IsEditing = user.user_isEditing(main_RenderCache_CurrentPage_ContentName)
-                main_RenderCache_CurrentPage_IsQuickEditing = user.user_isQuickEditing(main_RenderCache_CurrentPage_ContentName)
+                main_RenderCache_CurrentPage_IsEditing = user.isEditing(main_RenderCache_CurrentPage_ContentName)
+                main_RenderCache_CurrentPage_IsQuickEditing = user.isQuickEditing(main_RenderCache_CurrentPage_ContentName)
                 main_RenderCache_CurrentPage_IsAuthoring = main_RenderCache_CurrentPage_IsEditing Or main_RenderCache_CurrentPage_IsQuickEditing
                 main_MetaContent_NoFollow = EncodeBoolean(cache_pageContent(PCC_AllowMetaContentNoFollow, main_RenderCache_CurrentPage_PCCPtr)) Or main_MetaContent_NoFollow
                 '
@@ -35767,7 +35764,7 @@ ErrorTrap:
                         ParentContentID = EncodeInteger(cache_pageContent(PCC_ContentControlID, parentPCCPtr))
                         ParentContentName = metaData.getContentNameByID(ParentContentID)
                         If ParentContentName <> "" Then
-                            IsParentEditing = user.user_isEditing(ParentContentName)
+                            IsParentEditing = user.isEditing(ParentContentName)
                         End If
                     End If
                 End If
@@ -36063,7 +36060,7 @@ ErrorTrap:
                     '
                     ' ----- Encode Template
                     '
-                    If Not main_ServerPagePrintVersion Then
+                    If Not pageManager_printVersion Then
                         LocalTemplateBody = html_executeContentCommands(Nothing, LocalTemplateBody, addonContextEnum.ContextTemplate, user.id, user.isAuthenticated, layoutError)
                         returnHtmlBody = returnHtmlBody & html_encodeContent9(LocalTemplateBody, user.id, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", web_requestProtocol & webServer.requestDomain, False, siteProperties.defaultWrapperID, PageContent, addonContextEnum.ContextTemplate)
                         'returnHtmlBody = returnHtmlBody & EncodeContent8(LocalTemplateBody, memberID, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", main_ServerProtocol, False, app.SiteProperty_DefaultWrapperID, PageContent, ContextTemplate)
@@ -36087,8 +36084,8 @@ ErrorTrap:
                         '
                         ' Add template editing
                         '
-                        If visitProperty.getBoolean("AllowAdvancedEditor") And user.user_isEditing("Page Templates") Then
-                            returnHtmlBody = main_GetEditWrapper("Page Template [" & LocalTemplateName & "]", main_GetRecordEditLink2("Page Templates", LocalTemplateID, False, LocalTemplateName, user.user_isEditing("Page Templates")) & returnHtmlBody)
+                        If visitProperty.getBoolean("AllowAdvancedEditor") And user.isEditing("Page Templates") Then
+                            returnHtmlBody = main_GetEditWrapper("Page Template [" & LocalTemplateName & "]", main_GetRecordEditLink2("Page Templates", LocalTemplateID, False, LocalTemplateName, user.isEditing("Page Templates")) & returnHtmlBody)
                         End If
                     End If
                     '
@@ -36773,7 +36770,7 @@ ErrorTrap:
                         '
                         If pageManager_RedirectLink = "" Then
                             If (TCPtr >= 0) And (siteProperties.allowTemplateLinkVerification) Then
-                                PCCPtr = pageManager_cache_pageContent_getPtr(main_RenderedPageID, pagemanager_IsWorkflowRendering, user.user_isQuickEditing(""))
+                                PCCPtr = pageManager_cache_pageContent_getPtr(main_RenderedPageID, pagemanager_IsWorkflowRendering, user.isQuickEditing(""))
                                 '$$$$$ must check for PPtr<0
                                 SecureLink_CurrentURL = (Left(LCase(main_ServerLink), 8) = "https://")
                                 SecureLink_Template_Required = EncodeBoolean(cache_pageTemplate(TC_IsSecure, TCPtr))
@@ -37002,7 +36999,7 @@ ErrorTrap:
                 rootPageId = PageID
             Else
                 If pageManager_cache_pageContent_rows = 0 Then
-                    Call pageManager_cache_pageContent_load(pagemanager_IsWorkflowRendering, user.user_isQuickEditing(""))
+                    Call pageManager_cache_pageContent_load(pagemanager_IsWorkflowRendering, user.isQuickEditing(""))
                 End If
                 Ptr = pageManager_cache_pageContent_idIndex.getPtr(CStr(PageID))
                 If Ptr >= 0 Then
@@ -37309,14 +37306,14 @@ ErrorTrap:
                             ' ----- Login page
                             '
                             If Not user.isAuthenticated() Then
-                                If Not user.user_isRecognized() Then
+                                If Not user.isRecognized() Then
                                     '
                                     ' not recognized
                                     '
                                     BlockCopy = "" _
                                         & "<p>This content has limited access. If you have an account, please login using this form.</p>" _
                                         & ""
-                                    BlockForm = user.user_GetLoginForm()
+                                    BlockForm = user.getLoginForm()
                                 Else
                                     '
                                     ' recognized, not authenticated
@@ -37324,7 +37321,7 @@ ErrorTrap:
                                     BlockCopy = "" _
                                         & "<p>This content has limited access. You were recognized as ""<b>" & user.name & "</b>"", but you need to login to continue. To login to this account or another, please use this form.</p>" _
                                         & ""
-                                    BlockForm = user.user_GetLoginForm()
+                                    BlockForm = user.getLoginForm()
                                 End If
                             Else
                                 '
@@ -37334,7 +37331,7 @@ ErrorTrap:
                                     & "<p>You are currently logged in as ""<b>" & user.name & "</b>"". If this is not you, please <a href=""?" & web_RefreshQueryString & "&method=logout"" rel=""nofollow"">Click Here</a>.</p>" _
                                     & "<p>This account does not have access to this content. If you want to login with a different account, please use this form.</p>" _
                                     & ""
-                                BlockForm = user.user_GetLoginForm()
+                                BlockForm = user.getLoginForm()
                             End If
                             returnHtml = "" _
                                 & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%""><tr><td align=center>" _
@@ -37351,7 +37348,7 @@ ErrorTrap:
                                 '
                                 ' login subform form
                                 '
-                                BlockForm = user.user_GetLoginForm()
+                                BlockForm = user.getLoginForm()
                                 BlockCopy = "" _
                                     & "<p>This content has limited access. If you have an account, please login using this form.</p>" _
                                     & "<p>If you do not have an account, <a href=?" & web_RefreshQueryString & "&subform=0>click here to register</a>.</p>" _
@@ -37360,11 +37357,11 @@ ErrorTrap:
                                 '
                                 ' Register Form
                                 '
-                                If Not user.isAuthenticated() And user.user_isRecognized() Then
+                                If Not user.isAuthenticated() And user.isRecognized() Then
                                     '
                                     ' Can not take the chance, if you go to a registration page, and you are recognized but not auth -- logout first
                                     '
-                                    Call user.security_LogoutMember()
+                                    Call user.logout()
                                 End If
                                 If Not user.isAuthenticated() Then
                                     '
@@ -37458,13 +37455,13 @@ ErrorTrap:
                         contactMemberID = EncodeInteger(cache_pageContent(PCC_ContactMemberID, main_RenderCache_CurrentPage_PCCPtr))
                         pageViewings = EncodeInteger(cache_pageContent(PCC_Viewings, main_RenderCache_CurrentPage_PCCPtr))
                         'contactMemberID = app.csv_GetCSInteger(CS, "ContactMemberID")
-                        If user.user_isEditing(main_RenderCache_CurrentPage_ContentName) Or visitProperty.getBoolean("AllowWorkflowRendering") Then
+                        If user.isEditing(main_RenderCache_CurrentPage_ContentName) Or visitProperty.getBoolean("AllowWorkflowRendering") Then
                             '
                             ' Link authoring, workflow rendering -> do encoding, but no tracking
                             '
                             returnHtml = html_executeContentCommands(Nothing, returnHtml, addonContextEnum.ContextPage, user.id, user.isAuthenticated, layoutError)
                             returnHtml = html_encodeContent9(returnHtml, user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, siteProperties.defaultWrapperID, "", addonContextEnum.ContextPage)
-                        ElseIf main_ServerPagePrintVersion Then
+                        ElseIf pageManager_printVersion Then
                             '
                             ' Printer Version -> personalize and count viewings, no tracking
                             '
@@ -37563,7 +37560,7 @@ ErrorTrap:
                                 ' If in Condition Group
                                 '
                                 If ConditionGroupID <> 0 Then
-                                    If user.user_IsGroupMember(group_GetGroupName(ConditionGroupID)) Then
+                                    If user.IsMemberOfGroup2(group_GetGroupName(ConditionGroupID)) Then
                                         If SystemEMailID <> 0 Then
                                             Call main_SendSystemEmail(main_GetRecordName("System Email", SystemEMailID), "", user.id)
                                         End If
@@ -37580,7 +37577,7 @@ ErrorTrap:
                                 ' If not in Condition Group
                                 '
                                 If ConditionGroupID <> 0 Then
-                                    If Not user.user_IsGroupMember(group_GetGroupName(ConditionGroupID)) Then
+                                    If Not user.IsMemberOfGroup2(group_GetGroupName(ConditionGroupID)) Then
                                         If main_AddGroupID <> 0 Then
                                             Call group_AddGroupMember(group_GetGroupName(main_AddGroupID))
                                         End If
@@ -37900,16 +37897,16 @@ ErrorTrap:
                     ' $$$$$ remove main_oldCacheRS_cs, use pccPtr
                     'hint = hint & ",200"
                     '????? test - this was a routine placed in-line
-                    iIsEditing = user.user_isEditing(main_RenderCache_CurrentPage_ContentName)
+                    iIsEditing = user.isEditing(main_RenderCache_CurrentPage_ContentName)
                     '
                     ' ----- Render the Body
                     '
                     LiveBody = main_GetHtmlBody_GetSection_GetContentBox_Live_Body(main_RenderCache_CurrentPage_ContentName, main_RenderCache_CurrentPage_ContentId, OrderByClause, AllowChildPageList, False, rootPageId, AllowReturnLink, RootPageContentName, ArchivePages)
-                    If user.user_IsAdvancedEditing("") Then
+                    If user.isAdvancedEditing("") Then
                         returnHtml = returnHtml & main_GetRecordEditLink(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage)) & LiveBody
                     ElseIf iIsEditing Then
                         PageName = EncodeText(cache_pageContent(PCC_Name, main_RenderCache_CurrentPage_PCCPtr))
-                        EditLink = main_GetRecordEditLink2(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage), PageName, user.user_isEditing(ContentName))
+                        EditLink = main_GetRecordEditLink2(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage), PageName, user.isEditing(ContentName))
                         returnHtml = returnHtml & main_GetEditWrapper("", main_GetRecordEditLink(main_RenderCache_CurrentPage_ContentName, PageID, (Not main_RenderCache_CurrentPage_IsRootPage)) & LiveBody)
                     Else
                         returnHtml = returnHtml & LiveBody
@@ -38221,7 +38218,7 @@ ErrorTrap:
                 Dim BreadCrumbDelimiter As String
                 Dim BreadCrumbPrefix As String
                 '
-                If allowReturnLinkComposite And (Not main_RenderCache_CurrentPage_IsRootPage) And (Not main_ServerPagePrintVersion) Then
+                If allowReturnLinkComposite And (Not main_RenderCache_CurrentPage_IsRootPage) And (Not pageManager_printVersion) Then
                     '
                     ' ----- Print Heading if not at root Page
                     '
@@ -38237,7 +38234,7 @@ ErrorTrap:
                 ' move print and email icons here - ASBO 5/24/2007
                 '
                 'hint = hint & ",030"
-                If (Not main_ServerPagePrintVersion) Then
+                If (Not pageManager_printVersion) Then
                     IconRow = ""
                     If (Not visit_isBot) And (AllowPrinterVersion Or AllowEmailPage) Then
                         '
@@ -38320,7 +38317,7 @@ ErrorTrap:
                         '
                         ' Page copy is empty if  Links Enabled put in a blank line to separate edit from add tag
                         '
-                        If user.user_isEditing(main_RenderCache_CurrentPage_ContentName) Then
+                        If user.isEditing(main_RenderCache_CurrentPage_ContentName) Then
                             Body = cr & "<p><!-- Empty Content Placeholder --></p>"
                         End If
                     Else
@@ -38337,7 +38334,7 @@ ErrorTrap:
                     ' ----- Child pages
                     '
                     'hint = hint & ",046"
-                    If allowChildListComposite Or user.user_isEditingAnything() Then
+                    If allowChildListComposite Or user.isEditingAnything() Then
                         'hint = hint & ",047"
                         If Not allowChildListComposite Then
                             Cell = Cell & main_GetAdminHintWrapper("Automatic Child List display is disabled for this page. It is displayed here because you are in editing mode. To enable automatic child list display, see the features tab for this page.")
@@ -38375,7 +38372,7 @@ ErrorTrap:
                 '
                 ' ----- Feedback
                 '
-                If (Not main_ServerPagePrintVersion) And (contactMemberID <> 0) And allowFeedback Then
+                If (Not pageManager_printVersion) And (contactMemberID <> 0) And allowFeedback Then
                     's = s &  "<BR ><img alt=""image"" src=""/ccLib/images/808080.gif"" width=""100%"" height=""1"" >"
                     s = s & cr & "<ac TYPE=""" & ACTypeFeedback & """>"
                     's = s &  main_GetFeedbackForm(ContentName, PageID, ContactMemberID)
@@ -39358,17 +39355,17 @@ ErrorTrap:
                                     '
                                     '
                                     '
-                                    Call user.user_ProcessFormJoin()
+                                    Call user.processFormJoin()
                                 Case FormTypeSendPassword
                                     '
                                     '
                                     '
-                                    Call user.user_ProcessFormSendPassword()
+                                    Call user.processFormSendPassword()
                                 Case FormTypeLogin, "l09H58a195"
                                     '
                                     '
                                     '
-                                    Call user.user_ProcessLoginFormDefault()
+                                    Call user.processFormLoginDefault()
                             'Case FormTypeMyProfile
                             '    '
                             '    '
@@ -40752,7 +40749,7 @@ ErrorTrap:
                     returnCopy = html_encodeContent10(returnCopy, personalizationPeopleId, "copy content", RecordID, contactPeopleId, False, False, True, True, False, True, "", "", False, 0, "", addonContextEnum.ContextPage, False, Nothing, False)
                     '
                     If True Then
-                        If user.user_isEditingAnything() Then
+                        If user.isEditingAnything() Then
                             returnCopy = cs_GetCSRecordEditLink(CS, False) & returnCopy
                             If AllowEditWrapper Then
                                 returnCopy = main_GetEditWrapper("copy content", returnCopy)

@@ -22,7 +22,9 @@ Namespace Contensive.Core
                 Return _id
             End Get
             Set(value As Integer)
-                _id = initializeUser(value)
+                If (_id <> value) Then
+                    _id = initializeUser(value)
+                End If
             End Set
         End Property
         Private _id As Integer = 0
@@ -51,9 +53,6 @@ Namespace Contensive.Core
         Friend styleFilename As String = ""          ' if not empty, add to head
         Friend excludeFromAnalytics As Boolean = False   ' if true, future visits will be marked exclude from analytics
         '
-        Private property_user_isAuthenticated As Boolean = False
-        Private property_user_isAuthenticated_isLoaded As Boolean = False
-        '
         Public main_IsEditingContentList As String = ""
         Public main_IsNotEditingContentList As String = ""
         '
@@ -80,24 +79,24 @@ Namespace Contensive.Core
         ' ----- Member Commerce properties
         '-----------------------------------------------------------------------
         '
-        Public user_billEmail As String = ""          ' Billing Address for purchases
-        Public user_billPhone As String = ""          '
-        Public user_billFax As String = ""            '
-        Public main_MemberBillCompany As String = ""        '
-        Public main_MemberBillAddress As String = ""        '
-        Public main_MemberBillCity As String = ""           '
-        Public main_MemberBillState As String = ""         '
-        Public main_MemberBillZip As String = ""            '
-        Public main_MemberBillCountry As String = ""       '
+        Public billEmail As String = ""          ' Billing Address for purchases
+        Public billPhone As String = ""          '
+        Public billFax As String = ""            '
+        Public billCompany As String = ""        '
+        Public billAddress As String = ""        '
+        Public billCity As String = ""           '
+        Public billState As String = ""         '
+        Public billZip As String = ""            '
+        Public billCountry As String = ""       '
         '
-        Public main_MemberShipName As String = ""          ' Mailing Address
-        Public main_MemberShipCompany As String = ""           '
-        Public main_MemberShipAddress As String = ""          '
-        Public main_MemberShipCity As String = ""          '
-        Public main_MemberShipState As String = ""        '
-        Public main_MemberShipZip As String = ""           '
-        Public main_MemberShipCountry As String = ""         '
-        Public main_MemberShipPhone As String = ""        '
+        Public shipName As String = ""          ' Mailing Address
+        Public shipCompany As String = ""           '
+        Public shipAddress As String = ""          '
+        Public shipCity As String = ""          '
+        Public shipState As String = ""        '
+        Public shipZip As String = ""           '
+        Public shipCountry As String = ""         '
+        Public shipPhone As String = ""        '
         '
         '----------------------------------------------------------------------------------------------------
         '
@@ -114,18 +113,18 @@ Namespace Contensive.Core
         ' ----- local cache to speed up user.main_IsContentManager
         '------------------------------------------------------------------------
         '
-        Private main_GetContentAccessRights_NotList As String = ""                  ' If ContentId in this list, they are not a content manager
-        Private main_GetContentAccessRights_List As String = ""                     ' If ContentId in this list, they are a content manager
-        Private main_GetContentAccessRights_AllowAddList As String = ""             ' If in _List, test this for allowAdd
-        Private main_GetContentAccessRights_AllowDeleteList As String = ""          ' If in _List, test this for allowDelete
+        Private contentAccessRights_NotList As String = ""                  ' If ContentId in this list, they are not a content manager
+        Private contentAccessRights_List As String = ""                     ' If ContentId in this list, they are a content manager
+        Private contentAccessRights_AllowAddList As String = ""             ' If in _List, test this for allowAdd
+        Private contentAccessRights_AllowDeleteList As String = ""          ' If in _List, test this for allowDelete
         '
         '========================================================================
         ''' <summary>
         ''' is Guest
         ''' </summary>
         ''' <returns></returns>
-        Public Function user_IsGuest() As Boolean
-            Return Not user_isAuthenticatedMember()
+        Public Function isGuest() As Boolean
+            Return Not isAuthenticatedMember()
         End Function
         '
         '========================================================================
@@ -133,7 +132,7 @@ Namespace Contensive.Core
         ''' Is Recognized (not new and not authenticted)
         ''' </summary>
         ''' <returns></returns>
-        Public Function user_isRecognized() As Boolean
+        Public Function isRecognized() As Boolean
             Return Not isNew
         End Function
         '
@@ -151,8 +150,8 @@ Namespace Contensive.Core
         ''' true if editing any content
         ''' </summary>
         ''' <returns></returns>
-        Public Function user_isEditingAnything() As Boolean
-            Return user_isEditing("")
+        Public Function isEditingAnything() As Boolean
+            Return isEditing("")
         End Function
         '
         '========================================================================
@@ -161,7 +160,7 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="ContentNameOrId"></param>
         ''' <returns></returns>
-        Public Function user_isEditing(ByVal ContentNameOrId As String) As Boolean
+        Public Function isEditing(ByVal ContentNameOrId As String) As Boolean
             Dim returnResult As Boolean = False
             Try
                 If True Then
@@ -187,7 +186,7 @@ Namespace Contensive.Core
                             Call cpCore.testPoint("...is in main_IsNotEditingContentList")
                         Else
                             If isAuthenticated() Then
-                                If Not cpCore.main_ServerPagePrintVersion Then
+                                If Not cpCore.pageManager_printVersion Then
                                     If (cpCore.visitProperty.getBoolean("AllowEditing") Or cpCore.visitProperty.getBoolean("AllowAdvancedEditor")) Then
                                         If localContentNameOrId <> "" Then
                                             If IsNumeric(localContentNameOrId) Then
@@ -218,10 +217,10 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="ContentName"></param>
         ''' <returns></returns>
-        Public Function user_isQuickEditing(ByVal ContentName As String) As Boolean
+        Public Function isQuickEditing(ByVal ContentName As String) As Boolean
             Dim returnResult As Boolean = False
             Try
-                If (Not cpCore.main_ServerPagePrintVersion) Then
+                If (Not cpCore.pageManager_printVersion) Then
                     If isAuthenticatedContentManager(EncodeText(ContentName)) Then
                         returnResult = cpCore.visitProperty.getBoolean("AllowQuickEditor")
                     End If
@@ -239,10 +238,10 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="ContentName"></param>
         ''' <returns></returns>
-        Public Function user_IsAdvancedEditing(ByVal ContentName As String) As Boolean
+        Public Function isAdvancedEditing(ByVal ContentName As String) As Boolean
             Dim returnResult As Boolean = False
             Try
-                If (Not cpCore.main_ServerPagePrintVersion) Then
+                If (Not cpCore.pageManager_printVersion) Then
                     If isAuthenticatedContentManager(EncodeText(ContentName)) Then
                         returnResult = cpCore.visitProperty.getBoolean("AllowAdvancedEditor")
                     End If
@@ -303,7 +302,7 @@ Namespace Contensive.Core
         '       Saves the member properties that are loaded during main_OpenMember
         '=============================================================================
         '
-        Public Sub user_SaveMember()
+        Public Sub saveMember()
             Try
                 Dim SQL As String
                 '
@@ -326,24 +325,24 @@ Namespace Contensive.Core
                         ' 6/18/2009 - removed notes from base
                         '           & ",SendNotes=" & encodeSQLBoolean(MemberSendNotes)
                         SQL &= "" _
-                        & ",BillEmail=" & cpCore.db.encodeSQLText(user_billEmail) _
-                        & ",BillPhone=" & cpCore.db.encodeSQLText(user_billPhone) _
-                        & ",BillFax=" & cpCore.db.encodeSQLText(user_billFax) _
-                        & ",BillCompany=" & cpCore.db.encodeSQLText(main_MemberBillCompany) _
-                        & ",BillAddress=" & cpCore.db.encodeSQLText(main_MemberBillAddress) _
-                        & ",BillCity=" & cpCore.db.encodeSQLText(main_MemberBillCity) _
-                        & ",BillState=" & cpCore.db.encodeSQLText(main_MemberBillState) _
-                        & ",BillZip=" & cpCore.db.encodeSQLText(main_MemberBillZip) _
-                        & ",BillCountry=" & cpCore.db.encodeSQLText(main_MemberBillCountry)
+                        & ",BillEmail=" & cpCore.db.encodeSQLText(billEmail) _
+                        & ",BillPhone=" & cpCore.db.encodeSQLText(billPhone) _
+                        & ",BillFax=" & cpCore.db.encodeSQLText(billFax) _
+                        & ",BillCompany=" & cpCore.db.encodeSQLText(billCompany) _
+                        & ",BillAddress=" & cpCore.db.encodeSQLText(billAddress) _
+                        & ",BillCity=" & cpCore.db.encodeSQLText(billCity) _
+                        & ",BillState=" & cpCore.db.encodeSQLText(billState) _
+                        & ",BillZip=" & cpCore.db.encodeSQLText(billZip) _
+                        & ",BillCountry=" & cpCore.db.encodeSQLText(billCountry)
                         SQL &= "" _
-                        & ",ShipName=" & cpCore.db.encodeSQLText(main_MemberShipName) _
-                        & ",ShipCompany=" & cpCore.db.encodeSQLText(main_MemberShipCompany) _
-                        & ",ShipAddress=" & cpCore.db.encodeSQLText(main_MemberShipAddress) _
-                        & ",ShipCity=" & cpCore.db.encodeSQLText(main_MemberShipCity) _
-                        & ",ShipState=" & cpCore.db.encodeSQLText(main_MemberShipState) _
-                        & ",ShipZip=" & cpCore.db.encodeSQLText(main_MemberShipZip) _
-                        & ",ShipCountry=" & cpCore.db.encodeSQLText(main_MemberShipCountry) _
-                        & ",ShipPhone=" & cpCore.db.encodeSQLText(main_MemberShipPhone)
+                        & ",ShipName=" & cpCore.db.encodeSQLText(shipName) _
+                        & ",ShipCompany=" & cpCore.db.encodeSQLText(shipCompany) _
+                        & ",ShipAddress=" & cpCore.db.encodeSQLText(shipAddress) _
+                        & ",ShipCity=" & cpCore.db.encodeSQLText(shipCity) _
+                        & ",ShipState=" & cpCore.db.encodeSQLText(shipState) _
+                        & ",ShipZip=" & cpCore.db.encodeSQLText(shipZip) _
+                        & ",ShipCountry=" & cpCore.db.encodeSQLText(shipCountry) _
+                        & ",ShipPhone=" & cpCore.db.encodeSQLText(shipPhone)
                         If True Then
                             SQL &= ",ExcludeFromAnalytics=" & cpCore.db.encodeSQLBoolean(excludeFromAnalytics)
                         End If
@@ -361,7 +360,7 @@ Namespace Contensive.Core
         ''' 
         ''' </summary>
         ''' <returns></returns>
-        Public Function user_GetLoginForm() As String
+        Public Function getLoginForm() As String
             Dim returnHtml As String = ""
             Try
                 '
@@ -392,7 +391,7 @@ Namespace Contensive.Core
                     '
                     ' ----- When page loads, set focus on login username
                     '
-                    returnHtml = user_GetLoginForm_Default()
+                    returnHtml = getLoginForm_Default()
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -405,7 +404,7 @@ Namespace Contensive.Core
         ''' a simple email password form
         ''' </summary>
         ''' <returns></returns>
-        Public Function user_GetSendPasswordForm() As String
+        Public Function getSendPasswordForm() As String
             Dim returnResult As String = ""
             Try
                 Dim QueryString As String
@@ -467,15 +466,15 @@ Namespace Contensive.Core
         '   admins are always returned true
         '===============================================================================================================================
         '
-        Public Function user_isMemberOfGroupIdList(ByVal MemberID As Integer, ByVal isAuthenticated As Boolean, ByVal GroupIDList As String) As Boolean
-            user_isMemberOfGroupIdList = user_isMemberOfGroupIdList2(MemberID, isAuthenticated, GroupIDList, True)
+        Public Function isMemberOfGroupIdList(ByVal MemberID As Integer, ByVal isAuthenticated As Boolean, ByVal GroupIDList As String) As Boolean
+            Return isMemberOfGroupIdList(MemberID, isAuthenticated, GroupIDList, True)
         End Function
         '
         '===============================================================================================================================
         '   Is Group Member of a GroupIDList
         '===============================================================================================================================
         '
-        Public Function user_isMemberOfGroupIdList2(ByVal MemberID As Integer, ByVal isAuthenticated As Boolean, ByVal GroupIDList As String, ByVal adminReturnsTrue As Boolean) As Boolean
+        Public Function isMemberOfGroupIdList(ByVal MemberID As Integer, ByVal isAuthenticated As Boolean, ByVal GroupIDList As String, ByVal adminReturnsTrue As Boolean) As Boolean
             Dim returnREsult As Boolean = False
             Try
                 '
@@ -584,37 +583,37 @@ Namespace Contensive.Core
                     '
                     CS = cpCore.db_csOpenRecord("People", recordId)
                     If cpCore.db.cs_Ok(CS) Then
-                        name = (cpCore.db.cs_getText(CS, "Name"))
-                        isDeveloper = (cpCore.db.cs_getBoolean(CS, "Developer"))
-                        isAdmin = (cpCore.db.cs_getBoolean(CS, "Admin"))
-                        contentControlID = (cpCore.db.cs_getInteger(CS, "ContentControlID"))
-                        organizationId = (cpCore.db.cs_getInteger(CS, "OrganizationID"))
-                        languageId = (cpCore.db.cs_getInteger(CS, "LanguageID"))
-                        language = (cpCore.main_GetCSEncodedField(CS, "LanguageID"))
+                        name = cpCore.db.cs_getText(CS, "Name")
+                        isDeveloper = cpCore.db.cs_getBoolean(CS, "Developer")
+                        isAdmin = cpCore.db.cs_getBoolean(CS, "Admin")
+                        contentControlID = cpCore.db.cs_getInteger(CS, "ContentControlID")
+                        organizationId = cpCore.db.cs_getInteger(CS, "OrganizationID")
+                        languageId = cpCore.db.cs_getInteger(CS, "LanguageID")
+                        language = cpCore.main_GetCSEncodedField(CS, "LanguageID")
                         '
-                        main_MemberShipName = (cpCore.db.cs_getText(CS, "ShipName"))
-                        main_MemberShipCompany = (cpCore.db.cs_getText(CS, "ShipCompany"))
-                        main_MemberShipAddress = (cpCore.db.cs_getText(CS, "ShipAddress"))
-                        main_MemberShipCity = (cpCore.db.cs_getText(CS, "ShipCity"))
-                        main_MemberShipState = (cpCore.db.cs_getText(CS, "ShipState"))
-                        main_MemberShipZip = (cpCore.db.cs_getText(CS, "ShipZip"))
-                        main_MemberShipCountry = (cpCore.db.cs_getText(CS, "ShipCountry"))
-                        main_MemberShipPhone = (cpCore.db.cs_getText(CS, "ShipPhone"))
+                        shipName = cpCore.db.cs_getText(CS, "ShipName")
+                        shipCompany = cpCore.db.cs_getText(CS, "ShipCompany")
+                        shipAddress = cpCore.db.cs_getText(CS, "ShipAddress")
+                        shipCity = cpCore.db.cs_getText(CS, "ShipCity")
+                        shipState = cpCore.db.cs_getText(CS, "ShipState")
+                        shipZip = cpCore.db.cs_getText(CS, "ShipZip")
+                        shipCountry = cpCore.db.cs_getText(CS, "ShipCountry")
+                        shipPhone = cpCore.db.cs_getText(CS, "ShipPhone")
                         '
-                        main_MemberBillCompany = (cpCore.db.cs_getText(CS, "BillCompany"))
-                        main_MemberBillAddress = (cpCore.db.cs_getText(CS, "BillAddress"))
-                        main_MemberBillCity = (cpCore.db.cs_getText(CS, "BillCity"))
-                        main_MemberBillState = (cpCore.db.cs_getText(CS, "BillState"))
-                        main_MemberBillZip = (cpCore.db.cs_getText(CS, "BillZip"))
-                        main_MemberBillCountry = (cpCore.db.cs_getText(CS, "BillCountry"))
-                        user_billEmail = (cpCore.db.cs_getText(CS, "BillEmail"))
-                        user_billPhone = (cpCore.db.cs_getText(CS, "BillPhone"))
-                        user_billFax = (cpCore.db.cs_getText(CS, "BillFax"))
+                        billCompany = cpCore.db.cs_getText(CS, "BillCompany")
+                        billAddress = cpCore.db.cs_getText(CS, "BillAddress")
+                        billCity = cpCore.db.cs_getText(CS, "BillCity")
+                        billState = cpCore.db.cs_getText(CS, "BillState")
+                        billZip = cpCore.db.cs_getText(CS, "BillZip")
+                        billCountry = cpCore.db.cs_getText(CS, "BillCountry")
+                        billEmail = cpCore.db.cs_getText(CS, "BillEmail")
+                        billPhone = cpCore.db.cs_getText(CS, "BillPhone")
+                        billFax = cpCore.db.cs_getText(CS, "BillFax")
                         '
-                        allowBulkEmail = (cpCore.db.cs_getBoolean(CS, "AllowBulkEmail"))
-                        allowToolsPanel = (cpCore.db.cs_getBoolean(CS, "AllowToolsPanel"))
-                        adminMenuModeID = (cpCore.db.cs_getInteger(CS, "AdminMenuModeID"))
-                        autoLogin = (cpCore.db.cs_getBoolean(CS, "AutoLogin"))
+                        allowBulkEmail = cpCore.db.cs_getBoolean(CS, "AllowBulkEmail")
+                        allowToolsPanel = cpCore.db.cs_getBoolean(CS, "AllowToolsPanel")
+                        adminMenuModeID = cpCore.db.cs_getInteger(CS, "AdminMenuModeID")
+                        autoLogin = cpCore.db.cs_getBoolean(CS, "AutoLogin")
                         '
                         styleFilename = cpCore.db.cs_getText(CS, "StyleFilename")
                         If styleFilename <> "" Then
@@ -635,7 +634,7 @@ Namespace Contensive.Core
         ' ----- Returns true if the visitor is an admin, or authenticated and in the group named
         '========================================================================
         '
-        Public Function user_IsGroupMember(ByVal GroupName As String, Optional ByVal checkMemberID As Integer = 0) As Boolean
+        Public Function IsMemberOfGroup2(ByVal GroupName As String, Optional ByVal checkMemberID As Integer = 0) As Boolean
             Dim returnREsult As Boolean = False
             Try
                 Dim iMemberID As Integer
@@ -643,7 +642,7 @@ Namespace Contensive.Core
                 If iMemberID = 0 Then
                     iMemberID = id
                 End If
-                returnREsult = user_IsGroupListMember2("," & cpCore.group_GetGroupID(EncodeText(GroupName)), iMemberID, True)
+                returnREsult = isMemberOfGroupList("," & cpCore.group_GetGroupID(EncodeText(GroupName)), iMemberID, True)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -654,7 +653,7 @@ Namespace Contensive.Core
         ' ----- Returns true if the visitor is a member, and in the group named
         '========================================================================
         '
-        Public Function user_IsGroupMember2(ByVal GroupName As String, Optional ByVal checkMemberID As Integer = 0, Optional ByVal adminReturnsTrue As Boolean = False) As Boolean
+        Public Function isMemberOfGroup(ByVal GroupName As String, Optional ByVal checkMemberID As Integer = 0, Optional ByVal adminReturnsTrue As Boolean = False) As Boolean
             Dim returnREsult As Boolean = False
             Try
                 Dim iMemberID As Integer
@@ -662,7 +661,7 @@ Namespace Contensive.Core
                 If iMemberID = 0 Then
                     iMemberID = id
                 End If
-                returnREsult = user_IsGroupListMember2("," & cpCore.group_GetGroupID(EncodeText(GroupName)), iMemberID, adminReturnsTrue)
+                returnREsult = isMemberOfGroupList("," & cpCore.group_GetGroupID(EncodeText(GroupName)), iMemberID, adminReturnsTrue)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -674,13 +673,13 @@ Namespace Contensive.Core
         ' ----- Returns true if the visitor is an admin, or authenticated and in the group list
         '========================================================================
         '
-        Public Function user_IsGroupListMember2(ByVal GroupIDList As String, Optional ByVal checkMemberID As Integer = 0, Optional ByVal adminReturnsTrue As Boolean = False) As Boolean
+        Public Function isMemberOfGroupList(ByVal GroupIDList As String, Optional ByVal checkMemberID As Integer = 0, Optional ByVal adminReturnsTrue As Boolean = False) As Boolean
             Dim returnREsult As Boolean = False
             Try
                 If checkMemberID = 0 Then
                     checkMemberID = id
                 End If
-                returnREsult = user_isMemberOfGroupIdList2(checkMemberID, isAuthenticated(), GroupIDList, adminReturnsTrue)
+                returnREsult = isMemberOfGroupIdList(checkMemberID, isAuthenticated(), GroupIDList, adminReturnsTrue)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -692,7 +691,7 @@ Namespace Contensive.Core
         '   true if the user is authenticated and is a trusted people (member content)
         '========================================================================
         '
-        Public Function user_isAuthenticatedMember() As Boolean
+        Public Function isAuthenticatedMember() As Boolean
             Dim returnREsult As Boolean = False
             Try
                 If (Not property_user_isMember_isLoaded) And (cpCore.visit_initialized) Then
@@ -712,7 +711,7 @@ Namespace Contensive.Core
         ' ----- Process the login form
         '========================================================================
         '
-        Friend Function user_ProcessLoginFormDefault() As Boolean
+        Friend Function processFormLoginDefault() As Boolean
             Dim returnREsult As Boolean = False
             Try
                 Dim LocalMemberID As Integer
@@ -731,16 +730,16 @@ Namespace Contensive.Core
                     loginForm_AutoLogin = cpCore.main_GetStreamBoolean2("autologin")
                     '
                     If (cpCore.visit_loginAttempts < main_maxVisitLoginAttempts) And (cpCore.visit_cookieSupport) Then
-                        LocalMemberID = user_getLoginUserID(loginForm_Username, loginForm_Password)
+                        LocalMemberID = authenticateGetId(loginForm_Username, loginForm_Password)
                         If LocalMemberID = 0 Then
                             cpCore.visit_loginAttempts = cpCore.visit_loginAttempts + 1
                             Call cpCore.visit_save()
                         Else
-                            returnREsult = authenticateByID(LocalMemberID, loginForm_AutoLogin)
+                            returnREsult = authenticateById(LocalMemberID, loginForm_AutoLogin)
                             If returnREsult Then
-                                Call cpCore.main_LogActivity2("successful username/password login", id, organizationId)
+                                Call cpCore.log_LogActivity2("successful username/password login", id, organizationId)
                             Else
-                                Call cpCore.main_LogActivity2("bad username/password login", id, organizationId)
+                                Call cpCore.log_LogActivity2("bad username/password login", id, organizationId)
                             End If
                         End If
                     End If
@@ -755,10 +754,10 @@ Namespace Contensive.Core
         ' ----- Process the send password form
         '========================================================================
         '
-        Public Sub user_ProcessFormSendPassword()
+        Public Sub processFormSendPassword()
             Try
                 loginForm_Email = cpCore.docProperties.getText("email")
-                Call security_SendMemberPassword(loginForm_Email)
+                Call sendPassword(loginForm_Email)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -768,7 +767,7 @@ Namespace Contensive.Core
         ' Send the Member his username and password
         '=============================================================================
         '
-        Public Function security_SendMemberPassword(ByVal Email As Object) As Boolean
+        Public Function sendPassword(ByVal Email As Object) As Boolean
             Dim returnREsult As Boolean = False
             Try
                 Dim sqlCriteria As String
@@ -814,7 +813,7 @@ Namespace Contensive.Core
                         'hint = "140"
                         EMailName = Mid(workingEmail, 1, atPtr - 1)
                         '
-                        Call cpCore.main_LogActivity2("password request for email " & workingEmail, id, organizationId)
+                        Call cpCore.log_LogActivity2("password request for email " & workingEmail, id, organizationId)
                         '
                         allowEmailLogin = cpCore.siteProperties.getBoolean("allowEmailLogin", False)
                         recordCnt = 0
@@ -1037,16 +1036,15 @@ Namespace Contensive.Core
                 Dim LocalMemberID As Integer
                 '
                 returnREsult = False
-                LocalMemberID = user_getLoginUserID(loginFieldValue, password)
+                LocalMemberID = authenticateGetId(loginFieldValue, password)
                 If LocalMemberID <> 0 Then
-                    returnREsult = authenticateByID(LocalMemberID, AllowAutoLogin)
+                    returnREsult = authenticateById(LocalMemberID, AllowAutoLogin)
                     If returnREsult Then
-                        Call cpCore.main_LogActivity2("successful password login", id, organizationId)
+                        Call cpCore.log_LogActivity2("successful password login", id, organizationId)
                         isAuthenticatedAdmin_cache_isLoaded = False
                         property_user_isMember_isLoaded = False
-                        property_user_isAuthenticated_isLoaded = False
                     Else
-                        Call cpCore.main_LogActivity2("unsuccessful login (loginField:" & loginFieldValue & "/password:" & password & ")", id, organizationId)
+                        Call cpCore.log_LogActivity2("unsuccessful login (loginField:" & loginFieldValue & "/password:" & password & ")", id, organizationId)
                     End If
                 End If
             Catch ex As Exception
@@ -1060,12 +1058,12 @@ Namespace Contensive.Core
         '
         '========================================================================
         '
-        Public Function authenticateByID(ByVal irecordID As Integer, Optional ByVal AllowAutoLogin As Boolean = False) As Boolean
+        Public Function authenticateById(ByVal irecordID As Integer, Optional ByVal AllowAutoLogin As Boolean = False) As Boolean
             Dim returnREsult As Boolean = False
             Try
                 Dim CS As Integer
                 '
-                returnREsult = recognizeByID(irecordID)
+                returnREsult = recognizeById(irecordID)
                 If returnREsult Then
                     '
                     ' Log them in
@@ -1074,7 +1072,6 @@ Namespace Contensive.Core
                     Call cpCore.visit_save()
                     isAuthenticatedAdmin_cache_isLoaded = False
                     property_user_isMember_isLoaded = False
-                    property_user_isAuthenticated_isLoaded = False
                     isAuthenticatedDeveloper_cache_isLoaded = False
                     '
                     ' Write Cookies in case Visit Tracking is off
@@ -1089,7 +1086,7 @@ Namespace Contensive.Core
                     ' Change autologin if included, selected, and allowed
                     '
                     If AllowAutoLogin Xor autoLogin Then
-                        If EncodeBoolean(cpCore.siteProperties.getBoolean("AllowAutoLogin", False)) Then
+                        If cpCore.siteProperties.getBoolean("AllowAutoLogin") Then
                             CS = cpCore.db_csOpenRecord("people", irecordID)
                             If cpCore.db.cs_Ok(CS) Then
                                 Call cpCore.db.cs_set(CS, "AutoLogin", AllowAutoLogin)
@@ -1132,7 +1129,7 @@ Namespace Contensive.Core
         '   the current member to be non-authenticated, but recognized
         '========================================================================
         '
-        Public Function recognizeByID(ByVal RecordID As Integer) As Boolean
+        Public Function recognizeById(ByVal RecordID As Integer) As Boolean
             Dim returnREsult As Boolean = False
             Try
                 Dim CS As Integer
@@ -1200,8 +1197,8 @@ Namespace Contensive.Core
                     cpCore.visitor_memberID = id
                     cpCore.visit_excludeFromAnalytics = cpCore.visit_excludeFromAnalytics Or cpCore.visit_isBot Or excludeFromAnalytics Or isAdmin Or isDeveloper
                     Call cpCore.visit_save()
-                    Call cpCore.main_SaveVisitor()
-                    Call user_SaveMemberBase()
+                    Call cpCore.visitor_save()
+                    Call saveMemberBase()
                     returnREsult = True
                 End If
                 Call cpCore.db.cs_Close(CS)
@@ -1217,12 +1214,12 @@ Namespace Contensive.Core
         '       If successful, main_VisitMemberID and main_VisitorMemberID must be set to MemberID
         '========================================================================
         '
-        Public Sub user_CreateUser()
+        Public Sub createUser()
             Try
                 Dim CSMember As Integer
                 Dim CSlanguage As Integer
                 '
-                Call user_CreateUserDefaults(cpCore.visit_name)
+                Call createUserDefaults(cpCore.visit_name)
                 '
                 id = 0
                 CSMember = cpCore.db.cs_insertRecord("people")
@@ -1261,11 +1258,10 @@ Namespace Contensive.Core
                     cpCore.visitor_memberID = id
                     cpCore.visit_isAuthenticated = False
                     Call cpCore.visit_save()
-                    Call cpCore.main_SaveVisitor()
+                    Call cpCore.visitor_save()
                     '
                     isAuthenticatedAdmin_cache_isLoaded = False
                     property_user_isMember_isLoaded = False
-                    property_user_isAuthenticated_isLoaded = False
                     isAuthenticatedDeveloper_cache_isLoaded = False
                 End If
             Catch ex As Exception
@@ -1278,7 +1274,7 @@ Namespace Contensive.Core
         '   a people record to save them
         '========================================================================
         '
-        Friend Sub user_CreateUserDefaults(ByVal DefaultName As String)
+        Friend Sub createUserDefaults(ByVal DefaultName As String)
             Try
                 Dim CSlanguage As Integer
                 '
@@ -1337,7 +1333,6 @@ Namespace Contensive.Core
                 '
                 isAuthenticatedAdmin_cache_isLoaded = False
                 property_user_isMember_isLoaded = False
-                property_user_isAuthenticated_isLoaded = False
                 isAuthenticatedDeveloper_cache_isLoaded = False
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -1349,7 +1344,7 @@ Namespace Contensive.Core
         '       Saves the current Member record to the database
         '=============================================================================
         '
-        Public Sub user_SaveMemberBase()
+        Public Sub saveMemberBase()
             Try
                 Dim SQL As String
                 '
@@ -1385,21 +1380,18 @@ Namespace Contensive.Core
         '   Create and assign a guest Member identity
         '========================================================================
         '
-        Public Sub security_LogoutMember()
+        Public Sub logout()
             Try
-                Dim CS As Integer
-                '
-                Call cpCore.main_LogActivity2("logout", id, organizationId)
+                Call cpCore.log_LogActivity2("logout", id, organizationId)
                 '
                 ' Clear MemberID for this page
                 '
-                Call user_CreateUser()
+                Call createUser()
                 '
                 ' Clear cached permissions
                 '
                 isAuthenticatedAdmin_cache_isLoaded = False              ' true if main_IsAdminCache is initialized
                 property_user_isMember_isLoaded = False
-                property_user_isAuthenticated_isLoaded = False
                 isAuthenticatedDeveloper_cache_isLoaded = False
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -1410,7 +1402,7 @@ Namespace Contensive.Core
         ' ----- Process the send password form
         '========================================================================
         '
-        Public Sub user_ProcessFormJoin()
+        Public Sub processFormJoin()
             Try
                 Dim ErrorMessage As String = ""
                 Dim CS As Integer
@@ -1425,7 +1417,7 @@ Namespace Contensive.Core
                 If Not EncodeBoolean(cpCore.siteProperties.getBoolean("AllowMemberJoin", False)) Then
                     cpCore.error_AddUserError("This site does not accept public main_MemberShip.")
                 Else
-                    If Not main_IsNewLoginOK(loginForm_Username, loginForm_Password, ErrorMessage) Then
+                    If Not isNewLoginOK(loginForm_Username, loginForm_Password, ErrorMessage) Then
                         Call cpCore.error_AddUserError(ErrorMessage)
                     Else
                         If Not cpCore.error_IsUserError() Then
@@ -1437,7 +1429,7 @@ Namespace Contensive.Core
                                     '
                                     ' if the current account can be logged into, you can not join 'into' it
                                     '
-                                    Call security_LogoutMember()
+                                    Call logout()
                                 End If
                                 FirstName = cpCore.docProperties.getText("firstname")
                                 LastName = cpCore.docProperties.getText("firstname")
@@ -1448,7 +1440,7 @@ Namespace Contensive.Core
                                 Call cpCore.db.cs_set(CS, "Name", FullName)
                                 Call cpCore.db.cs_set(CS, "username", loginForm_Username)
                                 Call cpCore.db.cs_set(CS, "password", loginForm_Password)
-                                Call cpCore.user.authenticateByID(cpCore.user.id)
+                                Call cpCore.user.authenticateById(cpCore.user.id)
                             End If
                             Call cpCore.db.cs_Close(CS)
                         End If
@@ -1464,7 +1456,7 @@ Namespace Contensive.Core
         '   Print the login form in an intercept page
         '========================================================================
         '
-        Public Function user_GetLoginPage2(forceDefaultLogin As Boolean) As String
+        Public Function getLoginPage(forceDefaultLogin As Boolean) As String
             Dim returnREsult As String = ""
             Try
                 Dim Body As String
@@ -1474,9 +1466,9 @@ Namespace Contensive.Core
                 ' ----- Default Login
                 '
                 If forceDefaultLogin Then
-                    Body = user_GetLoginForm_Default()
+                    Body = getLoginForm_Default()
                 Else
-                    Body = user_GetLoginForm()
+                    Body = getLoginForm()
                 End If
                 Body = "" _
                     & cr & "<p class=""ccAdminNormal"">You are attempting to enter an access controlled area. Continue only if you have authority to enter this area. Information about your visit will be recorded for security purposes.</p>" _
@@ -1519,7 +1511,7 @@ Namespace Contensive.Core
         '   default login form
         '========================================================================
         '
-        Friend Function user_GetLoginForm_Default() As String
+        Friend Function getLoginForm_Default() As String
             Dim returnHtml As String = ""
             Try
                 Dim Panel As String
@@ -1535,7 +1527,7 @@ Namespace Contensive.Core
                 needLoginForm = True
                 formType = cpCore.docProperties.getText("type")
                 If formType = FormTypeLogin Then
-                    If user_ProcessLoginFormDefault() Then
+                    If processFormLoginDefault() Then
                         returnHtml = ""
                         needLoginForm = False
                     End If
@@ -1640,7 +1632,7 @@ Namespace Contensive.Core
                             & Panel _
                             & cr & "<p class=""ccAdminNormal""><b>Forget your password?</b></p>" _
                             & cr & "<p class=""ccAdminNormal"">If you are a member of the system and can not remember your password, enter your email address below and we will email your matching username and password.</p>" _
-                            & user_GetSendPasswordForm() _
+                            & getSendPasswordForm() _
                             & ""
                     End If
                     '
@@ -1661,80 +1653,80 @@ Namespace Contensive.Core
         '========================================================================
         '
         Public Function getLoginPanel() As String
-            Return user_GetLoginForm()
+            Return getLoginForm()
         End Function
-        '
-        '========================================================================
-        '   Member Check
-        '       Check for visit authentication.
-        '       If the visit is not authenticated (logged in with username/password),
-        '       block the page with the login form (not a loginpage so there is no <html><body>
-        '========================================================================
-        '
-        Public Sub user_CheckMember()
-            Try
-                If Not isAuthenticated() Then
-                    Call cpCore.writeAltBuffer(user_GetLoginPage2(False))
-                    Call cpCore.main_CloseStream()
-                End If
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
-        End Sub
-        '
-        '========================================================================
-        '   Create Member
-        '       creates a new member account
-        '       iUsername is required and must be unique
-        '       Returns the new member ID if OK.
-        '       If failure, returns 0 and adds a user error
-        '       iUsername must be included and must be unique
-        '       does NOT log the visitor into the new account
-        '========================================================================
-        '
-        Public Function user_CreateMember(ByVal username As String, Optional ByVal password As String = "", Optional ByVal email As String = "") As Integer
-            Dim returnREsult As Integer = 0
-            Try
-                Dim CS As Integer
-                Dim CSPointer As Integer
-                '
-                returnREsult = 0
-                If username = "" Then
-                    cpCore.error_AddUserError("A Username is required to create a new site member.")
-                Else
-                    '
-                    ' ----- check if the iUsername is in use (con not use main_OpenContent because active tested)
-                    '
-                    CS = cpCore.db.csOpen("People", "(Username=" & cpCore.db.encodeSQLText(username) & ")", , False)
-                    If cpCore.db.cs_Ok(CS) Then
-                        '
-                        ' ----- iUsername is taken
-                        '
-                        Call cpCore.db.cs_Close(CS)
-                        cpCore.error_AddUserError("This Username is currently in use.")
-                    Else
-                        Call cpCore.db.cs_Close(CS)
-                        '
-                        ' ----- Create the new people with whatever you got
-                        '
-                        Call user_CreateUser()
-                        '
-                        CSPointer = cpCore.db.csOpen("people", "ID=" & cpCore.db.encodeSQLNumber(id))
-                        If cpCore.db.cs_Ok(CSPointer) Then
-                            Call cpCore.db.cs_set(CSPointer, "Username", username)
-                            Call cpCore.db.cs_set(CSPointer, "password", password)
-                            Call cpCore.db.cs_set(CSPointer, "email", email)
-                            Call cpCore.db.cs_set(CSPointer, "ContentControlID", cpCore.main_GetContentID("Members"))
-                        End If
-                        Call cpCore.db.cs_Close(CSPointer)
-                        returnREsult = id
-                    End If
-                End If
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
-            Return returnREsult
-        End Function
+        ''
+        ''========================================================================
+        ''   Member Check
+        ''       Check for visit authentication.
+        ''       If the visit is not authenticated (logged in with username/password),
+        ''       block the page with the login form (not a loginpage so there is no <html><body>
+        ''========================================================================
+        ''
+        'Public Sub user_CheckMember()
+        '    Try
+        '        If Not isAuthenticated() Then
+        '            Call cpCore.writeAltBuffer(user_GetLoginPage2(False))
+        '            Call cpCore.main_CloseStream()
+        '        End If
+        '    Catch ex As Exception
+        '        cpCore.handleExceptionAndRethrow(ex)
+        '    End Try
+        'End Sub
+        ''
+        ''========================================================================
+        ''   Create Member
+        ''       creates a new member account
+        ''       iUsername is required and must be unique
+        ''       Returns the new member ID if OK.
+        ''       If failure, returns 0 and adds a user error
+        ''       iUsername must be included and must be unique
+        ''       does NOT log the visitor into the new account
+        ''========================================================================
+        ''
+        'Public Function user_CreateMember(ByVal username As String, Optional ByVal password As String = "", Optional ByVal email As String = "") As Integer
+        '    Dim returnREsult As Integer = 0
+        '    Try
+        '        Dim CS As Integer
+        '        Dim CSPointer As Integer
+        '        '
+        '        returnREsult = 0
+        '        If username = "" Then
+        '            cpCore.error_AddUserError("A Username is required to create a new site member.")
+        '        Else
+        '            '
+        '            ' ----- check if the iUsername is in use (con not use main_OpenContent because active tested)
+        '            '
+        '            CS = cpCore.db.csOpen("People", "(Username=" & cpCore.db.encodeSQLText(username) & ")", , False)
+        '            If cpCore.db.cs_Ok(CS) Then
+        '                '
+        '                ' ----- iUsername is taken
+        '                '
+        '                Call cpCore.db.cs_Close(CS)
+        '                cpCore.error_AddUserError("This Username is currently in use.")
+        '            Else
+        '                Call cpCore.db.cs_Close(CS)
+        '                '
+        '                ' ----- Create the new people with whatever you got
+        '                '
+        '                Call user_CreateUser()
+        '                '
+        '                CSPointer = cpCore.db.csOpen("people", "ID=" & cpCore.db.encodeSQLNumber(id))
+        '                If cpCore.db.cs_Ok(CSPointer) Then
+        '                    Call cpCore.db.cs_set(CSPointer, "Username", username)
+        '                    Call cpCore.db.cs_set(CSPointer, "password", password)
+        '                    Call cpCore.db.cs_set(CSPointer, "email", email)
+        '                    Call cpCore.db.cs_set(CSPointer, "ContentControlID", cpCore.main_GetContentID("Members"))
+        '                End If
+        '                Call cpCore.db.cs_Close(CSPointer)
+        '                returnREsult = id
+        '            End If
+        '        End If
+        '    Catch ex As Exception
+        '        cpCore.handleExceptionAndRethrow(ex)
+        '    End Try
+        '    Return returnREsult
+        'End Function
         '
         '===================================================================================================
         '   Returns the ID of a member given their Username and Password
@@ -1742,7 +1734,7 @@ Namespace Contensive.Core
         '   If the Id can not be found, user errors are added with main_AddUserError and 0 is returned (false)
         '===================================================================================================
         '
-        Public Function user_getLoginUserID(ByVal loginFieldValue As String, ByVal Password As String) As Integer
+        Public Function authenticateGetId(ByVal username As String, ByVal password As String) As Integer
             Dim returnUserId As Integer = 0
             Try
                 Const badLoginUserError = "Your login was not successful. Please try again."
@@ -1766,8 +1758,8 @@ Namespace Contensive.Core
                 Dim CDef As coreMetaDataClass.CDefClass
                 Dim iLoginFieldValue As String
                 '
-                iLoginFieldValue = EncodeText(loginFieldValue)
-                iPassword = EncodeText(Password)
+                iLoginFieldValue = EncodeText(username)
+                iPassword = EncodeText(password)
                 '
                 returnUserId = 0
                 allowEmailLogin = cpCore.siteProperties.getBoolean("allowEmailLogin")
@@ -1882,7 +1874,7 @@ Namespace Contensive.Core
         '       returns true if this can be used
         '       returns false, and a User Error response if it can not be used
         '
-        Public Function main_IsNewLoginOK(ByVal Username As String, ByVal Password As String, Optional ByRef ErrorMessage As String = "", Optional ByVal ErrorCode As Integer = 0) As Boolean
+        Public Function isNewLoginOK(ByVal Username As String, ByVal Password As String, Optional ByRef ErrorMessage As String = "", Optional ByVal ErrorCode As Integer = 0) As Boolean
             Dim returnOk As Boolean = False
             Try
                 Dim CSPointer As Integer
@@ -2005,17 +1997,17 @@ Namespace Contensive.Core
                     '
                     ' ----- not a valid contentname
                     '
-                ElseIf IsInDelimitedString(main_GetContentAccessRights_NotList, CStr(ContentID), ",") Then
+                ElseIf IsInDelimitedString(contentAccessRights_NotList, CStr(ContentID), ",") Then
                     '
                     ' ----- was previously found to not be a Content Manager
                     '
-                ElseIf IsInDelimitedString(main_GetContentAccessRights_List, CStr(ContentID), ",") Then
+                ElseIf IsInDelimitedString(contentAccessRights_List, CStr(ContentID), ",") Then
                     '
                     ' ----- was previously found to be a Content Manager
                     '
                     returnAllowEdit = True
-                    returnAllowAdd = IsInDelimitedString(main_GetContentAccessRights_AllowAddList, CStr(ContentID), ",")
-                    returnAllowDelete = IsInDelimitedString(main_GetContentAccessRights_AllowDeleteList, CStr(ContentID), ",")
+                    returnAllowAdd = IsInDelimitedString(contentAccessRights_AllowAddList, CStr(ContentID), ",")
+                    returnAllowDelete = IsInDelimitedString(contentAccessRights_AllowDeleteList, CStr(ContentID), ",")
                 Else
                     '
                     ' ----- Must test it
@@ -2054,18 +2046,18 @@ Namespace Contensive.Core
                         '
                         ' ----- Was found to be true
                         '
-                        main_GetContentAccessRights_List = main_GetContentAccessRights_List & "," & CStr(ContentID)
+                        contentAccessRights_List &= "," & CStr(ContentID)
                         If returnAllowAdd Then
-                            main_GetContentAccessRights_AllowAddList = main_GetContentAccessRights_AllowAddList & "," & CStr(ContentID)
+                            contentAccessRights_AllowAddList &= "," & CStr(ContentID)
                         End If
                         If returnAllowDelete Then
-                            main_GetContentAccessRights_AllowDeleteList = main_GetContentAccessRights_AllowDeleteList & "," & CStr(ContentID)
+                            contentAccessRights_AllowDeleteList &= "," & CStr(ContentID)
                         End If
                     Else
                         '
                         ' ----- Was found to be false
                         '
-                        main_GetContentAccessRights_NotList = main_GetContentAccessRights_NotList & "," & CStr(ContentID)
+                        contentAccessRights_NotList &= "," & CStr(ContentID)
                     End If
                 End If
             Catch ex As Exception
