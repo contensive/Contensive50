@@ -9,7 +9,7 @@ Namespace Contensive
         '
         Public Const Port_SiteMonitorDefault As Integer = 4532
         '
-        Private cpCore As cpCoreClass
+        Private cpCore As coreClass
         '
         Public TimerIntervalSec As Integer
         Public allowErrorRecovery As Boolean
@@ -28,7 +28,7 @@ Namespace Contensive
         '
         '
         '
-        Public Sub New(cpCore As cpCoreClass)
+        Public Sub New(cpCore As coreClass)
             '
             Dim Filename As String
             Dim config As String
@@ -75,15 +75,15 @@ Namespace Contensive
                 LineCnt = UBound(Lines) + 1
                 For LinePtr = 0 To LineCnt - 1
                     LineBuffer = Lines(LinePtr)
-                    Pos = InStr(1, LineBuffer, "//")
+                    Pos = vbInstr(1, LineBuffer, "//")
                     If Pos <> 0 Then
                         LineBuffer = Mid(LineBuffer, 1, Pos - 1)
                     End If
-                    Pos = InStr(1, LineBuffer, "=")
+                    Pos = vbInstr(1, LineBuffer, "=")
                     If Pos <> 0 Then
                         NameValue = Split(LineBuffer, "=")
                         If UBound(NameValue) > 0 Then
-                            Select Case UCase(Trim(NameValue(0)))
+                            Select Case vbUCase(Trim(NameValue(0)))
                                 Case "STATUSMETHOD"
                                     StatusMethod = Trim(NameValue(1))
                                 Case "LISTENPORT"
@@ -239,7 +239,7 @@ ErrorTrap:
                 Dim schedulePeriodStartTime As String
                 '
                 isInSchedule = True
-                RightNow = Now()
+                RightNow = DateTime.Now()
                 'TimeNow = New Date(0, 1, 1, RightNow.Hour, RightNow.Minute, 1)
                 If scheduleList <> "" Then
                     isInSchedule = False
@@ -247,7 +247,7 @@ ErrorTrap:
                     For Ptr = 0 To UBound(schedulePeriods)
                         schedulePeriod = Trim(schedulePeriods(Ptr))
                         If schedulePeriod <> "" Then
-                            If InStr(1, schedulePeriod, "-") <> 0 Then
+                            If vbInstr(1, schedulePeriod, "-") <> 0 Then
                                 schedulePeriodTimes = Split(schedulePeriod, "-")
                                 Ptr = schedulePeriodTimes(0).IndexOf(":")
                                 schedulePeriodStartTime = schedulePeriodTimes(0)

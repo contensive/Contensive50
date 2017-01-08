@@ -54,7 +54,7 @@ Namespace Contensive.Core
         ' Development Tools values
         '=============================================================================
         '
-        Private cpCore As cpCoreClass
+        Private cpCore As coreClass
         Private ToolsTable As String
         Private ToolsContentName As String
         Private DefaultReadOnly As Boolean
@@ -183,7 +183,7 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <remarks></remarks>
-        Public Sub New(cpCore As cpCoreClass)
+        Public Sub New(cpCore As coreClass)
             MyBase.New()
             Me.cpCore = cpCore
         End Sub
@@ -566,8 +566,8 @@ ErrorTrap:
                                                     '
                                                     ' remoave spaces from new name
                                                     '
-                                                    StatusMessage = StatusMessage & "<LI>Field [" & formFieldName & "] was renamed [" & Replace(formFieldName, " ", "") & "] because the field name can not include spaces.</LI>"
-                                                    formFieldName = Replace(formFieldName, " ", "")
+                                                    StatusMessage = StatusMessage & "<LI>Field [" & formFieldName & "] was renamed [" & vbReplace(formFieldName, " ", "") & "] because the field name can not include spaces.</LI>"
+                                                    formFieldName = vbReplace(formFieldName, " ", "")
                                                 End If
                                                 '
                                                 If (formFieldName <> "") And (formFieldTypeId <> 0) And ((.nameLc = "") Or (.fieldTypeId = 0)) Then
@@ -940,8 +940,8 @@ ErrorTrap:
                                 Call streamRow.Add(cpCore.main_GetRecordName("content field types", .fieldTypeId) & cpCore.html_GetFormInputHidden("dtfaType." & RecordCount, .fieldTypeId))
                             Else
                                 TypeSelect = TypeSelectTemplate
-                                TypeSelect = Replace(TypeSelect, "menuname", "dtfaType." & RecordCount, , , vbTextCompare)
-                                TypeSelect = Replace(TypeSelect, "=""" & .fieldTypeId & """", "=""" & .fieldTypeId & """ selected", , , vbTextCompare)
+                                TypeSelect = vbReplace(TypeSelect, "menuname", "dtfaType." & RecordCount, 1, 99, vbTextCompare)
+                                TypeSelect = vbReplace(TypeSelect, "=""" & .fieldTypeId & """", "=""" & .fieldTypeId & """ selected", 1, 99, vbTextCompare)
                                 Call streamRow.Add(TypeSelect)
                             End If
                             streamRow.Add("</nobr></td>")
@@ -1234,9 +1234,9 @@ ErrorTrap:
                     ' Add this SQL to the members SQL list
                     '
                     If SQL <> "" Then
-                        SQLArchive = Replace(SQLArchive, SQL & vbCrLf, "")
+                        SQLArchive = vbReplace(SQLArchive, SQL & vbCrLf, "")
                         SQLArchiveOld = SQLArchive
-                        SQLArchive = Replace(SQL, vbCrLf, " ") & vbCrLf
+                        SQLArchive = vbReplace(SQL, vbCrLf, " ") & vbCrLf
                         LineCounter = 0
                         Do While (LineCounter < 10) And (SQLArchiveOld <> "")
                             SQLArchive = SQLArchive & getLine(SQLArchiveOld) & vbCrLf
@@ -1421,7 +1421,7 @@ ErrorTrap:
                 Stream.Add("<P>Creating content [" & ContentName & "] on table [" & TableName & "] on Datasource [" & DataSourceName & "].</P>")
                 If (ContentName <> "") And (TableName <> "") And (DataSourceName <> "") Then
                     Call cpCore.db.db_CreateSQLTable(DataSourceName, TableName)
-                    Call cpCore.db_CreateContentFromSQLTable(DataSourceName, TableName, ContentName)
+                    Call cpCore.db.db_CreateContentFromSQLTable(DataSourceName, TableName, ContentName)
                     cpCore.cache.invalidateAll()
                     cpCore.metaData.clear()
                     ContentID = cpCore.main_GetContentID(ContentName)
@@ -1576,7 +1576,7 @@ ErrorTrap:
             TargetFieldID = cpCore.doc_getInteger("fi")
             ContentID = cpCore.doc_getInteger(RequestNameToolContentID)
             'ColumnPointer = cpCore.main_GetStreamInteger("dtcn")
-            FieldNameToAdd = UCase(cpCore.docProperties.getText(RequestNameAddField))
+            FieldNameToAdd = vbUCase(cpCore.docProperties.getText(RequestNameAddField))
             FieldIDToAdd = cpCore.doc_getInteger(RequestNameAddFieldID)
             ButtonList = ButtonCancel & "," & ButtonSelect
             ReloadCDef = cpCore.doc_getBoolean("ReloadCDef")
@@ -2610,7 +2610,7 @@ ErrorTrap:
                     '
                     Call cpCore.db.db_firstCSRecord(CSPointer)
                     Do While cpCore.db.cs_Ok(CSPointer)
-                        Select Case UCase(cpCore.db.cs_getText(CSPointer, "name"))
+                        Select Case vbUCase(cpCore.db.cs_getText(CSPointer, "name"))
                             Case "ACTIVE"
                                 Call cpCore.db.cs_set(CSPointer, "IndexColumn", 0)
                                 Call cpCore.db.cs_set(CSPointer, "IndexWidth", 20)
@@ -2938,7 +2938,7 @@ ErrorTrap:
             EndOfList = False
             CommandStartPosition = 1
             Do While (CommandCount < CommandPosition) And (Not EndOfList)
-                CommandStartPosition = InStr(CommandStartPosition, CommandList, ",")
+                CommandStartPosition = vbInstr(CommandStartPosition, CommandList, ",")
                 If CommandStartPosition = 0 Then
                     EndOfList = True
                 End If
@@ -2946,7 +2946,7 @@ ErrorTrap:
                 CommandCount = CommandCount + 1
             Loop
             If (Not EndOfList) Then
-                CommandEndPosition = InStr(CommandStartPosition, CommandList, ",")
+                CommandEndPosition = vbInstr(CommandStartPosition, CommandList, ",")
                 If CommandEndPosition = 0 Then
                     DiagArgument = Mid(CommandList, CommandStartPosition)
                 Else
@@ -3815,7 +3815,7 @@ ErrorTrap:
             '
             QueryOld = ".asp?"
             QueryNew = ModifyQueryString(QueryOld, RequestNameAdminForm, AdminFormToolLogFileView, True)
-            GetForm_LogFiles = GetForm_LogFiles & Replace(GetForm_LogFiles_Details(), QueryOld, QueryNew & "&", , , vbTextCompare)
+            GetForm_LogFiles = GetForm_LogFiles & vbReplace(GetForm_LogFiles_Details(), QueryOld, QueryNew & "&", 1, 99, vbTextCompare)
             '
             'GetForm_LogFiles = GetForm_LogFiles & cpCore.main_GetFormInputHidden("af", AdminFormToolLogFileView)
             GetForm_LogFiles = (OpenFormTable(ButtonList)) & GetForm_LogFiles & (CloseFormTable(ButtonList))
@@ -3903,7 +3903,7 @@ ErrorTrap:
 
                 Call cpCore.web_setResponseContentType("text/text")
                 Call cpCore.writeAltBuffer(cpCore.appRootFiles.ReadFile(cpCore.docProperties.getText("SourceFile")))
-                Call cpCore.main_CloseStream()
+                Call cpCore.doc_close()
                 'GetForm_LogFiles_Details = cpCore.app.publicFiles.ReadFile(cpCore.main_GetStreamText2("SourceFile"))
             Else
                 GetForm_LogFiles_Details = GetForm_LogFiles_Details & GetTableStart
@@ -4237,7 +4237,7 @@ ErrorTrap:
                 ' Restart
                 '
                 Call Stream.Add("<br>Loading Templates...")
-                Call Stream.Add(ImportTemplates(Replace(cpCore.cluster.config.clusterPhysicalPath & cpCore.appConfig.appRootFilesPath & cpCore.appConfig.appRootFilesPath, "/", "\"), "", AllowBodyHTML, AllowScriptLink, AllowImageImport, AllowStyleImport))
+                Call Stream.Add(ImportTemplates(Replace(cpCore.serverConfig.clusterPath & cpCore.appConfig.appRootFilesPath & cpCore.appConfig.appRootFilesPath, "/", "\"), "", AllowBodyHTML, AllowScriptLink, AllowImageImport, AllowStyleImport))
                 Call Stream.Add("<br>Templates loaded")
             End If
             '
@@ -4301,7 +4301,7 @@ ErrorTrap:
                 FileDetailString = Files(Ptr)
                 FileDetails = Split(FileDetailString, ",")
                 Filename = FileDetails(0)
-                Link = Replace(AppPath & Filename, "\", "/")
+                Link = vbReplace(AppPath & Filename, "\", "/")
                 '
                 'ImportTemplates = ImportTemplates & "<br>Checking path [/" & AppPath & "], file [" & Filename & "]"
                 '
@@ -4309,10 +4309,10 @@ ErrorTrap:
                     '
                     ImportTemplates = ImportTemplates & "<br>Create Hard Template for script page [" & Link & "]"
                     '
-                    Link = Replace(AppPath & Filename, "\", "/")
-                    TemplateName = Replace(Link, "/", "-")
-                    If InStr(1, TemplateName, ".") <> 0 Then
-                        TemplateName = Mid(TemplateName, 1, InStr(1, TemplateName, ".") - 1)
+                    Link = vbReplace(AppPath & Filename, "\", "/")
+                    TemplateName = vbReplace(Link, "/", "-")
+                    If vbInstr(1, TemplateName, ".") <> 0 Then
+                        TemplateName = Mid(TemplateName, 1, vbInstr(1, TemplateName, ".") - 1)
 
                     End If
                     '
@@ -4332,10 +4332,10 @@ ErrorTrap:
                     '
                     PageSource = cpCore.appRootFiles.ReadFile(Filename)
                     PageSource = cpCore.main_GetBody(PageSource)
-                    Link = Replace(AppPath & Filename, "\", "/")
-                    TemplateName = Replace(Link, "/", "-")
-                    If InStr(1, TemplateName, ".") <> 0 Then
-                        TemplateName = Mid(TemplateName, 1, InStr(1, TemplateName, ".") - 1)
+                    Link = vbReplace(AppPath & Filename, "\", "/")
+                    TemplateName = vbReplace(Link, "/", "-")
+                    If vbInstr(1, TemplateName, ".") <> 0 Then
+                        TemplateName = Mid(TemplateName, 1, vbInstr(1, TemplateName, ".") - 1)
 
                     End If
                     '
@@ -4438,7 +4438,7 @@ ErrorTrap:
                 With LoadCDef
                     CS = cpCore.db.csOpen("Content Fields", "contentid=" & ContentID)
                     Do While cpCore.db.cs_Ok(CS)
-                        Select Case UCase(cpCore.db.cs_getText(CS, "name"))
+                        Select Case vbUCase(cpCore.db.cs_getText(CS, "name"))
                             Case "NAME"
                                 .Name = ""
                         End Select
@@ -4574,7 +4574,7 @@ ErrorTrap:
             '
             InstanceOptionString = "AdminLayout=1&filesystem=content files"
             'InstanceOptionString = cpCore.main_GetMemberProperty("Addon [File Manager] Options", "")
-            Content = cpCore.executeAddon_legacy1(0, "{B966103C-DBF4-4655-856A-3D204DEF6B21}", InstanceOptionString, cpCoreClass.addonContextEnum.ContextAdmin, "", 0, "", "-2", -1)
+            Content = cpCore.executeAddon_legacy1(0, "{B966103C-DBF4-4655-856A-3D204DEF6B21}", InstanceOptionString, coreClass.addonContextEnum.ContextAdmin, "", 0, "", "-2", -1)
             'If Content = "" Then
             '    IsContentManager = cpCore.user.main_IsContentManager()
             '    Content = FileView.GetContentFileView2( "", IsContentManager, IsContentManager, True, False, True, False)
@@ -4611,7 +4611,7 @@ ErrorTrap:
             '
             InstanceOptionString = "AdminLayout=1&filesystem=website files"
             'InstanceOptionString = cpCore.main_GetMemberProperty("Addon [File Manager] Options", "")
-            Content = cpCore.executeAddon_legacy1(0, "{B966103C-DBF4-4655-856A-3D204DEF6B21}", InstanceOptionString, cpCoreClass.addonContextEnum.ContextAdmin, "", 0, "", "-2", -1)
+            Content = cpCore.executeAddon_legacy1(0, "{B966103C-DBF4-4655-856A-3D204DEF6B21}", InstanceOptionString, coreClass.addonContextEnum.ContextAdmin, "", 0, "", "-2", -1)
             'If Content = "" Then
             '    IsContentManager = cpCore.user.main_IsContentManager()
             '    Content = FileView.GetContentFileView2( "", IsContentManager, IsContentManager, True, False, True, False)
@@ -4665,7 +4665,7 @@ ErrorTrap:
                 If RowCnt > 0 Then
                     For RowPtr = 0 To RowCnt - 1
                         If cpCore.doc_getBoolean("Cdef" & RowPtr) Then
-                            lcName = LCase(cpCore.docProperties.getText("CDefName" & RowPtr))
+                            lcName = vbLCase(cpCore.docProperties.getText("CDefName" & RowPtr))
                             If IsDeveloper Or (lcName = "page content") Or (lcName = "copy content") Or (lcName = "page templates") Then
                                 CDefList = CDefList & "," & lcName
                             End If
@@ -4727,10 +4727,10 @@ ErrorTrap:
             CS = cpCore.db.csOpen("Content")
             Do While cpCore.db.cs_Ok(CS)
                 RecordName = cpCore.db.cs_getText(CS, "Name")
-                lcName = LCase(RecordName)
+                lcName = vbLCase(RecordName)
                 If IsDeveloper Or (lcName = "page content") Or (lcName = "copy content") Or (lcName = "page templates") Then
                     RecordID = cpCore.db.cs_getInteger(CS, "ID")
-                    If InStr(1, "," & CDefList & ",", "," & RecordName & ",") <> 0 Then
+                    If vbInstr(1, "," & CDefList & ",", "," & RecordName & ",") <> 0 Then
                         TopHalf = TopHalf & "<div>" & cpCore.html_GetFormInputCheckBox2("Cdef" & RowPtr, True) & cpCore.html_GetFormInputHidden("CDefName" & RowPtr, RecordName) & "&nbsp;" & cpCore.db.cs_getText(CS, "Name") & "</div>"
                     Else
                         BottomHalf = BottomHalf & "<div>" & cpCore.html_GetFormInputCheckBox2("Cdef" & RowPtr, False) & cpCore.html_GetFormInputHidden("CDefName" & RowPtr, RecordName) & "&nbsp;" & cpCore.db.cs_getText(CS, "Name") & "</div>"
@@ -4858,7 +4858,7 @@ ErrorTrap:
         ''' <param name="ErrDescription"></param>
         ''' <remarks></remarks>
         Private Sub handleLegacyClassErrors2(ByVal MethodName As String, ByVal ErrDescription As String)
-            Call Err.Raise(KmaErrorInternal, "App.EXEName", ErrDescription)
+            Call Err.Raise(ignoreInteger, "App.EXEName", ErrDescription)
         End Sub
     End Class
 End Namespace

@@ -17,10 +17,10 @@ Namespace Contensive.Core
         Public Const EventsId As String = "B784BFEF-127B-48D5-8C99-B075984227DB"
 #End Region
         '
-        Private cpCore As Contensive.Core.cpCoreClass
+        Private cpCore As Contensive.Core.coreClass
         Protected disposed As Boolean = False
         '
-        Public Sub New(ByVal cpCoreObj As Contensive.Core.cpCoreClass)
+        Public Sub New(ByVal cpCoreObj As Contensive.Core.coreClass)
             MyBase.New()
             cpCore = cpCoreObj
         End Sub

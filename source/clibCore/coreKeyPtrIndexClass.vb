@@ -98,7 +98,7 @@ Namespace Contensive.Core
                 '
                 ArrayPointer = -1
                 If store.ArrayCount > 0 Then
-                    UcaseTargetKey = Replace(UCase(Key), vbCrLf, "")
+                    UcaseTargetKey = vbReplace(UCase(Key), vbCrLf, "")
                     LowGuess = -1
                     HighGuess = store.ArrayCount - 1
                     Do While (HighGuess - LowGuess) > 1
@@ -138,8 +138,8 @@ Namespace Contensive.Core
                 Dim UcaseKey As String
                 test = ""
                 '
-                UcaseKey = Replace(UCase(Key), vbCrLf, "")
-                'UcaseKey = UCase(Key)
+                UcaseKey = vbReplace(UCase(Key), vbCrLf, "")
+                'UcaseKey = vbUCase(Key)
                 store.ArrayPointer = GetArrayPointer(Key)
                 If store.ArrayPointer > -1 Then
                     ' Make sure this is the first match
@@ -171,7 +171,7 @@ Namespace Contensive.Core
             Try
                 Dim keyToSave As String
                 '
-                keyToSave = Replace(UCase(Key), vbCrLf, "")
+                keyToSave = vbReplace(UCase(Key), vbCrLf, "")
                 '
                 If store.ArrayCount >= store.ArraySize Then
                     store.ArraySize = store.ArraySize + KeyPointerArrayChunk
@@ -200,7 +200,7 @@ Namespace Contensive.Core
                 '
                 If store.ArrayPointer < (store.ArrayCount - 1) Then
                     store.ArrayPointer = store.ArrayPointer + 1
-                    UcaseKey = UCase(Key)
+                    UcaseKey = vbUCase(Key)
                     If (store.UcaseKeyArray(store.ArrayPointer) = UcaseKey) Then
                         nextPointerMatch = EncodeInteger(store.PointerArray(store.ArrayPointer))
                     Else

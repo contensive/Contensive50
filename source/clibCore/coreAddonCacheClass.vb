@@ -6,13 +6,15 @@ Namespace Contensive.Core
     '
     '====================================================================================================
     ''' <summary>
-    ''' classSummary
+    ''' Addon cache. This class is model addon objects
     ''' </summary>
     Public Class coreAddonCacheClass
         '
-        Private cpCore As cpCoreClass
+        ' not IDisposable - not contained classes that need to be disposed
         '
-        Public Sub New(cpCore As cpCoreClass)
+        Private cpCore As coreClass
+        '
+        Public Sub New(cpCore As coreClass)
             MyBase.New()
             Me.cpCore = cpCore
         End Sub
@@ -88,7 +90,7 @@ Namespace Contensive.Core
         ''' <summary>
         ''' clear the addonCAche
         ''' </summary>
-        Friend Sub clear()
+        Public Sub clear()
             Try
                 If localCache Is Nothing Then
                     localCache = New addonsCacheClass()
@@ -115,7 +117,7 @@ Namespace Contensive.Core
         ''' update a row in the addonCache
         ''' </summary>
         ''' <param name="RecordID"></param>
-        Friend Sub updateRow(RecordID As Integer)
+        Public Sub updateRow(RecordID As Integer)
             Try
                 Dim dt As DataTable
                 Dim addon As addonClass
@@ -252,7 +254,7 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="addonNameGuidOrId"></param>
         ''' <returns></returns>
-        Friend Function getPtr(addonNameGuidOrId As String) As Integer
+        Public Function getPtr(addonNameGuidOrId As String) As Integer
             Dim ReturnPtr As Integer = -1
             Try
                 Dim CS As Integer
@@ -265,16 +267,16 @@ Namespace Contensive.Core
                 ElseIf (localCache.idIndex Is Nothing) Then
                     '
                 Else
-                    If IsNumeric(addonNameGuidOrId) Then
-                        returnPtr = localCache.idIndex.getPtr(addonNameGuidOrId.ToUpper())
+                    If vbIsNumeric(addonNameGuidOrId) Then
+                        ReturnPtr = localCache.idIndex.getPtr(addonNameGuidOrId.ToUpper())
                     End If
-                    If returnPtr < 0 Then
-                        returnPtr = localCache.nameIndex.getPtr(addonNameGuidOrId)
-                        If returnPtr < 0 Then
-                            returnPtr = localCache.guidIndex.getPtr(CStr(addonNameGuidOrId))
+                    If ReturnPtr < 0 Then
+                        ReturnPtr = localCache.nameIndex.getPtr(addonNameGuidOrId)
+                        If ReturnPtr < 0 Then
+                            ReturnPtr = localCache.guidIndex.getPtr(CStr(addonNameGuidOrId))
                         End If
                     End If
-                    If returnPtr >= 0 Then
+                    If ReturnPtr >= 0 Then
                         '
                     Else
                         '
@@ -294,7 +296,7 @@ Namespace Contensive.Core
                             ElseIf (localCache.idIndex Is Nothing) Then
                                 '
                             Else
-                                returnPtr = localCache.idIndex.getPtr(CStr(addonId))
+                                ReturnPtr = localCache.idIndex.getPtr(CStr(addonId))
                             End If
                         End If
                     End If
@@ -486,7 +488,7 @@ Namespace Contensive.Core
         ''' <summary>
         ''' save addonCache
         ''' </summary>
-        Friend Sub save()
+        Public Sub save()
             Try
                 ' access keyPtr indexes to clear dirty flag and export property bad (remove when the class will serialize)
                 '

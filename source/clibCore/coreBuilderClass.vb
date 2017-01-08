@@ -6,22 +6,39 @@ Imports System.Xml
 Imports Microsoft.Web.Administration
 '
 Namespace Contensive.Core
+    '
+    '====================================================================================================
+    ''' <summary>
+    ''' code to built and upgrade apps
+    ''' not IDisposable - not contained classes that need to be disposed
+    ''' </summary>
     Public Class coreBuilderClass
+        '
+        '====================================================================================================
         '
         Private Structure fieldTypePrivate
             Dim Name As String
             Dim fieldTypePrivate As Integer
         End Structure
         '
-        ' ----- Class scope variables
+        ' ----- objects passed in constructor
         '
-        Private cpCore As cpCoreClass
+        Private cpCore As coreClass
+        '
+        ' ----- constants
+        '
+        Private Const UpgradeErrorTheshold As Integer = 100
+        '
+        ' ----- shared globals
+        '
         Friend classLogFolder As String                    ' the folder for logging errors. default="Upgrade", AddonInstall can change it
-        Private ApplicationCollectionLoaded As Boolean = False
-        Private UpgradeErrorCount As Integer = 0
-        Private Const UpgradeErrorTheshold = 100
-        Private StepCount As Integer = 0
-        Private AddonInstallNeeded As Boolean = False
+        '
+        ' ----- private globals
+        '
+        Private ApplicationCollectionLoaded As Boolean
+        Private UpgradeErrorCount As Integer
+        Private StepCount As Integer
+        Private AddonInstallNeeded As Boolean
         '
         '====================================================================================================
         ''' <summary>
@@ -29,11 +46,16 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <remarks></remarks>
-        Public Sub New(cpCore As cpCoreClass)
+        Public Sub New(cpCore As coreClass)
             MyBase.New()
             Me.cpCore = cpCore
             classLogFolder = "Upgrade"
-        End Sub        '
+            ApplicationCollectionLoaded = False
+            UpgradeErrorCount = 0
+            StepCount = 0
+            AddonInstallNeeded = False
+        End Sub
+        '
         Private Function web_existsSite(appName As String) As Boolean
             Dim returnExists As Boolean = False
             Dim serverManager As New ServerManager
@@ -62,7 +84,7 @@ Namespace Contensive.Core
                         cpCore.appRootFiles.SaveFile("deleteMe.txt", "Temp document to create path")
                         cpCore.appRootFiles.DeleteFile("deleteMe.txt")
                         bindinginformation = "*:80:" & DomainName
-                        mySite = iisManager.Sites.Add(appName, "http", bindinginformation, cpCore.cluster.config.clusterPhysicalPath & cpCore.appConfig.appRootFilesPath)
+                        mySite = iisManager.Sites.Add(appName, "http", bindinginformation, cpCore.serverConfig.clusterPath & cpCore.appConfig.appRootFilesPath)
                         'iisManager.Sites.Item(0).)
                         bindinginformation = "*:80:" & appName
                         mySite.Bindings.Add(bindinginformation, "http")
@@ -379,7 +401,7 @@ Namespace Contensive.Core
                 '---------------------------------------------------------------------
                 '
                 If cpCore.db.UpgradeInProgress Then
-                    Call Err.Raise(KmaccErrorUpgrading, "ccCSv", KmaError_UpgradeInProgress_Msg)
+                    Call Err.Raise(ignoreInteger, "ccCSv", ignoreString)
                 Else
                     cpCore.db.UpgradeInProgress = True
                     Call appendUpgradeLog("Upgrade, isNewBuild=[" & isNewBuild & "]")
@@ -654,11 +676,11 @@ Namespace Contensive.Core
                                 Doc = New XmlDocument
                                 Call Doc.LoadXml(addonInstall.getCollectionListFile)
                                 If True Then
-                                    If LCase(Doc.DocumentElement.Name) <> LCase(CollectionListRootNode) Then
+                                    If vbLCase(Doc.DocumentElement.Name) <> vbLCase(CollectionListRootNode) Then
                                         cpCore.handleLegacyError3(cpCore.appConfig.name, "Error loading Collection config file. The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.", "dll", "builderClass", "Upgrade", 0, "", "", False, True, "")
                                     Else
                                         With Doc.DocumentElement
-                                            If LCase(.Name) = "collectionlist" Then
+                                            If vbLCase(.Name) = "collectionlist" Then
                                                 '
                                                 ' now go through each collection in this app and check the last updated agains the one here
                                                 '
@@ -670,7 +692,7 @@ Namespace Contensive.Core
                                                     For rowptr = 0 To dt.Rows.Count - 1
 
                                                         ErrorMessage = ""
-                                                        CollectionGuid = LCase(dt.Rows(rowptr).Item("ccguid").ToString)
+                                                        CollectionGuid = vbLCase(dt.Rows(rowptr).Item("ccguid").ToString)
                                                         Collectionname = dt.Rows(rowptr).Item("name").ToString
                                                         Call appendUpgradeLog("...checking collection [" & Collectionname & "], guid [" & CollectionGuid & "]")
                                                         If CollectionGuid <> "{7c6601a7-9d52-40a3-9570-774d0d43d758}" Then
@@ -693,20 +715,20 @@ Namespace Contensive.Core
                                                                 LocalGuid = ""
                                                                 LocalLastChangeDate = Date.MinValue
                                                                 For Each LocalListNode In .ChildNodes
-                                                                    Select Case LCase(LocalListNode.Name)
+                                                                    Select Case vbLCase(LocalListNode.Name)
                                                                         Case "collection"
                                                                             For Each CollectionNode In LocalListNode.ChildNodes
-                                                                                Select Case LCase(CollectionNode.Name)
+                                                                                Select Case vbLCase(CollectionNode.Name)
                                                                                     Case "guid"
                                                                                         '
-                                                                                        LocalGuid = LCase(CollectionNode.InnerText)
+                                                                                        LocalGuid = vbLCase(CollectionNode.InnerText)
                                                                                     Case "lastchangedate"
                                                                                         '
                                                                                         LocalLastChangeDate = EncodeDate(CollectionNode.InnerText)
                                                                                 End Select
                                                                             Next
                                                                     End Select
-                                                                    If CollectionGuid = LCase(LocalGuid) Then
+                                                                    If CollectionGuid = vbLCase(LocalGuid) Then
                                                                         localCollectionFound = True
                                                                         Call appendUpgradeLog("...local collection found")
                                                                         If LocalLastChangeDate <> Date.MinValue Then
@@ -803,7 +825,7 @@ Namespace Contensive.Core
         '            Call cpcore.app.csv_CreateSQLTableField(DataSourceName, TableName, "TempField", FieldTypeText)
         '            CSPointer = cpcore.app.csv_OpenCSSQL(DataSourceName, "SELECT ID, Sortorder from " & TableName & " Order By Sortorder;")
         '            If Not cpcore.app.csv_IsCSOK(CSPointer) Then
-        '                Dim ex2 As New Exception("todo") : Call HandleClassError(ex2, cpcore.app.config.name, methodName) ' KmaErrorInternal, "dll", "Could not upgrade SortOrder", "UpgradeSortOrder", False, True)
+        '                Dim ex2 As New Exception("todo") : Call HandleClassError(ex2, cpcore.app.config.name, methodName) ' ignoreInteger, "dll", "Could not upgrade SortOrder", "UpgradeSortOrder", False, True)
         '            Else
         '                Do While cpcore.app.csv_IsCSOK(CSPointer)
         '                    Call cpcore.app.ExecuteSQL(DataSourceName, "UPDATE " & TableName & " SET TempField=" & encodeSQLText(Format(cpcore.app.csv_GetCSInteger(CSPointer, "sortorder"), "00000000")) & " WHERE ID=" & encodeSQLNumber(cpcore.app.csv_GetCSInteger(CSPointer, "ID")) & ";")
@@ -853,7 +875,7 @@ Namespace Contensive.Core
         '            If dt.Rows.Count > 0 Then
 
         '                For FieldPointer = 1 To dt.Rows.Count - 1
-        '                    If UcaseFieldName = UCase(dt.Rows(FieldPointer).Item("name")) Then
+        '                    If UcaseFieldName = vbUCase(dt.Rows(FieldPointer).Item("name")) Then
         '                        ExistsSQLTableField = True
         '                        Exit For
         '                    End If
@@ -1612,7 +1634,7 @@ Namespace Contensive.Core
         '        '   Load content from an XML file
         '        '========================================================================
         '        '
-        '        Friend Sub VerifyXMLContentNode( ByVal ContentNode As XmlNode)
+        '        public Sub VerifyXMLContentNode( ByVal ContentNode As XmlNode)
         '            On Error GoTo ErrorTrap
         '            '
         '            Dim FieldCount As Integer
@@ -1655,9 +1677,9 @@ Namespace Contensive.Core
         '                '
         '                ' ----- process rows
         '                '
-        '                If UCase(RowNode.Name) = "ROW" Then
+        '                If vbUCase(RowNode.Name) = "ROW" Then
         '                    For Each FieldNode In RowNode.ChildNodes
-        '                        If UCase(RowNode.Name) = "FIELD" Then
+        '                        If vbUCase(RowNode.Name) = "FIELD" Then
         '                            Call VerifyRecord( ContentName, GetXMLAttribute( Found, RowNode, "name", ""), "CreateKey", "0")
         '                        End If
         '                    Next
@@ -1727,7 +1749,7 @@ Namespace Contensive.Core
         '
         '=========================================================================================
         '
-        Friend Sub VerifyTableCoreFields()
+        Public Sub VerifyTableCoreFields()
             Try
                 '
                 Dim IDVariant As Integer
@@ -1772,7 +1794,7 @@ Namespace Contensive.Core
         '
         '=========================================================================================
         '
-        Friend Sub VerifyScriptingRecords()
+        Public Sub VerifyScriptingRecords()
             Try
                 '
                 Call appendUpgradeLogAddStep(cpCore.appConfig.name, "VerifyScriptingRecords", "Verify Scripting Records.")
@@ -1788,7 +1810,7 @@ Namespace Contensive.Core
         '
         '=========================================================================================
         '
-        Friend Sub VerifyLanguageRecords()
+        Public Sub VerifyLanguageRecords()
             Try
                 '
                 Call appendUpgradeLogAddStep(cpCore.appConfig.name, "VerifyLanguageRecords", "Verify Language Records.")
@@ -1911,7 +1933,7 @@ Namespace Contensive.Core
         '                '
         '                ' Problem
         '                '
-        '                Call Err.Raise(KmaErrorInternal, "dll", "Survey Question Types content definition was not found")
+        '                Call Err.Raise(ignoreInteger, "dll", "Survey Question Types content definition was not found")
         '            Else
         '                Do While RowsNeeded > 0
         '                    Call cpCore.app.executeSql("Insert into ccSurveyQuestionTypes (active,contentcontrolid)values(1," & CID & ")")
@@ -2113,7 +2135,7 @@ Namespace Contensive.Core
         '
         '=========================================================================================
         '
-        Friend Sub VerifyStates()
+        Public Sub VerifyStates()
             Try
                 '
                 Call appendUpgradeLogAddStep(cpCore.appConfig.name, "VerifyStates", "Verify States")
@@ -2202,7 +2224,7 @@ Namespace Contensive.Core
                 If cpCore.db.cs_Ok(CS) Then
                     Call cpCore.db.db_SetCSField(CS, "NAME", Name)
                     Call cpCore.db.db_SetCSField(CS, "Abbreviation", Abbreviation)
-                    If LCase(Name) = "united states" Then
+                    If vbLCase(Name) = "united states" Then
                         Call cpCore.db.cs_set(CS, "DomesticShipping", "1")
                     End If
                 End If
@@ -2216,7 +2238,7 @@ Namespace Contensive.Core
         '
         '=========================================================================================
         '
-        Friend Sub VerifyCountries()
+        Public Sub VerifyCountries()
             Try
                 '
                 Dim list As String
@@ -2251,7 +2273,7 @@ Namespace Contensive.Core
         '
         '=========================================================================================
         '
-        Friend Sub VerifyDefaultGroups()
+        Public Sub VerifyDefaultGroups()
             Try
                 '
                 Dim GroupID As Integer
@@ -2304,7 +2326,7 @@ Namespace Contensive.Core
         ''
         ''
         ''
-        'Friend Sub SetNavigatorEntry(EntryName As String, ParentName As String, AddonID As Integer)
+        'public Sub SetNavigatorEntry(EntryName As String, ParentName As String, AddonID As Integer)
         '    On Error GoTo ErrorTrap
         '    '
         '    Dim CS As Integer
@@ -2339,7 +2361,7 @@ Namespace Contensive.Core
         ''
         ''
         ''
-        'Friend Sub SetNavigatorEntry2(EntryName As String, ParentGuid As String, AddonID As Integer, NavIconTypeID As Integer, NavIconTitle As String, DataBuildVersion As String)
+        'public Sub SetNavigatorEntry2(EntryName As String, ParentGuid As String, AddonID As Integer, NavIconTypeID As Integer, NavIconTitle As String, DataBuildVersion As String)
         '    On Error GoTo ErrorTrap
         '    '
         '    Dim CS As Integer
@@ -2409,7 +2431,7 @@ Namespace Contensive.Core
         ''
         ''
         Public Sub ReplaceAddonWithCollection(ByVal AddonProgramID As String, ByVal CollectionGuid As String, ByRef return_IISResetRequired As Boolean, ByRef return_RegisterList As String)
-            Dim ex As New Exception("todo") : Call handleClassException(ex, cpCore.appConfig.name, "methodNameFPO") ' KmaErrorInternal, "dll", "builderClass.ReplaceAddonWithCollection is deprecated", "ReplaceAddonWithCollection", True, True)
+            Dim ex As New Exception("todo") : Call handleClassException(ex, cpCore.appConfig.name, "methodNameFPO") ' ignoreInteger, "dll", "builderClass.ReplaceAddonWithCollection is deprecated", "ReplaceAddonWithCollection", True, True)
         End Sub
         '    On Error GoTo ErrorTrap
         '    '
@@ -2651,7 +2673,7 @@ Namespace Contensive.Core
                     End If
                 End If
                 ''
-                'If LCase(EntryName) = "property search log" Then
+                'If vbLCase(EntryName) = "property search log" Then
                 '    EntryName = EntryName
                 'End If
                 '
@@ -2712,1154 +2734,5 @@ Namespace Contensive.Core
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
-
-        '========================================================================
-        '   Create a content definition
-        '       called from upgrade and DeveloperTools
-        '========================================================================
-        '
-        Public Function metaData_CreateContent4(ByVal Active As Boolean, ByVal DataSourceName As String, ByVal TableName As String, ByVal ContentName As String, Optional ByVal AdminOnly As Boolean = False, Optional ByVal DeveloperOnly As Boolean = False, Optional ByVal AllowAdd As Boolean = True, Optional ByVal AllowDelete As Boolean = True, Optional ByVal ParentName As String = "", Optional ByVal DefaultSortMethod As String = "", Optional ByVal DropDownFieldList As String = "", Optional ByVal AllowWorkflowAuthoring As Boolean = False, Optional ByVal AllowCalendarEvents As Boolean = False, Optional ByVal AllowContentTracking As Boolean = False, Optional ByVal AllowTopicRules As Boolean = False, Optional ByVal AllowContentChildTool As Boolean = False, Optional ByVal AllowMetaContent As Boolean = False, Optional ByVal IconLink As String = "", Optional ByVal IconWidth As Integer = 0, Optional ByVal IconHeight As Integer = 0, Optional ByVal IconSprites As Integer = 0, Optional ByVal ccGuid As String = "", Optional ByVal IsBaseContent As Boolean = False, Optional ByVal installedByCollectionGuid As String = "", Optional clearMetaCache As Boolean = False) As Integer
-            Dim returnContentId As Integer = 0
-            Try
-                '
-                Dim ContentIsBaseContent As Boolean
-                Dim NewGuid As String
-                Dim SupportsGuid As Boolean
-                Dim LcContentGuid As String
-                Dim SQL As String
-                Dim parentId As Integer
-                Dim dt As DataTable
-                Dim TableID As Integer
-                Dim DataSourceID As Integer
-                Dim iDefaultSortMethod As String
-                Dim DefaultSortMethodID As Integer
-                Dim CDefFound As Boolean
-                Dim InstalledByCollectionID As Integer
-                Dim sqlList As sqlFieldListClass
-                Dim field As coreMetaDataClass.CDefFieldClass
-                Dim ContentIDofContent As Integer
-                '
-                If ContentName = "" Then
-                    cpCore.handleExceptionAndRethrow(New ApplicationException("ContentName can not be blank"))
-                Else
-                    '
-                    If TableName = "" Then
-                        cpCore.handleExceptionAndRethrow(New ApplicationException("Tablename can not be blanl"))
-                    Else
-                        '
-                        ' Create the SQL table
-                        '
-                        Call cpCore.db.db_CreateSQLTable(DataSourceName, TableName)
-                        '
-                        ' Check for a Content Definition
-                        '
-                        returnContentId = 0
-                        LcContentGuid = ""
-                        ContentIsBaseContent = False
-                        NewGuid = encodeEmptyText(ccGuid, "")
-                        '
-                        ' get contentId, guid, IsBaseContent
-                        '
-                        SQL = "select ID,ccguid,IsBaseContent  from ccContent where (name=" & cpCore.db.encodeSQLText(ContentName) & ") order by id;"
-                        dt = cpCore.db.executeSql(SQL)
-                        If dt.Rows.Count > 0 Then
-                            returnContentId = EncodeInteger(dt.Rows(0).Item("ID"))
-                            LcContentGuid = LCase(EncodeText(dt.Rows(0).Item("ccguid")))
-                            ContentIsBaseContent = EncodeBoolean(dt.Rows(0).Item("IsBaseContent"))
-                        End If
-                        dt.Dispose()
-                        '
-                        ' get contentid of content
-                        '
-                        ContentIDofContent = 0
-                        If ContentName.ToLower() = "content" Then
-                            ContentIDofContent = returnContentId
-                        Else
-                            SQL = "select ID from ccContent where (name='content') order by id;"
-                            dt = cpCore.db.executeSql(SQL)
-                            If dt.Rows.Count > 0 Then
-                                ContentIDofContent = EncodeInteger(dt.Rows(0).Item("ID"))
-                            End If
-                            dt.Dispose()
-                        End If
-                        '
-                        ' get parentId
-                        '
-                        If Not String.IsNullOrEmpty(ParentName) Then
-                            SQL = "select id from ccContent where (name=" & cpCore.db.encodeSQLText(ParentName) & ") order by id;"
-                            dt = cpCore.db.executeSql(SQL)
-                            If dt.Rows.Count > 0 Then
-                                parentId = EncodeInteger(dt.Rows(0).Item(0))
-                            End If
-                            dt.Dispose()
-                        End If
-                        '
-                        ' get InstalledByCollectionID
-                        '
-                        InstalledByCollectionID = 0
-                        If (installedByCollectionGuid <> "") Then
-                            SQL = "select id from ccAddonCollections where ccGuid=" & cpCore.db.encodeSQLText(installedByCollectionGuid)
-                            dt = cpCore.db.executeSql(SQL)
-                            If dt.Rows.Count > 0 Then
-                                InstalledByCollectionID = EncodeInteger(dt.Rows(0).Item("ID"))
-                            End If
-                        End If
-                        '
-                        ' Block non-base update of a base field
-                        '
-                        If ContentIsBaseContent And Not IsBaseContent Then
-                            '
-                            '
-                            '
-                            Call cpCore.handleExceptionAndRethrow(New ApplicationException("Attempt to update a Base Content Definition [" & ContentName & "] as non-base. This is not allowed."))
-                        Else
-                            CDefFound = (returnContentId <> 0)
-                            If Not CDefFound Then
-                                '
-                                ' ----- Create a new empty Content Record (to get ContentID)
-                                '
-                                returnContentId = cpCore.db.db_InsertTableRecordGetID("Default", "ccContent", SystemMemberID)
-                            End If
-                            '
-                            ' ----- Get the Table Definition ID, create one if missing
-                            '
-                            SQL = "SELECT ID from ccTables where (active<>0) and (name=" & cpCore.db.encodeSQLText(TableName) & ");"
-                            dt = cpCore.db.executeSql(SQL)
-                            If dt.Rows.Count <= 0 Then
-                                '
-                                ' ----- no table definition found, create one
-                                '
-                                If UCase(DataSourceName) = "DEFAULT" Then
-                                    DataSourceID = -1
-                                ElseIf DataSourceName = "" Then
-                                    DataSourceID = -1
-                                Else
-                                    DataSourceID = cpCore.db.db_GetDataSourceID(DataSourceName)
-                                    If DataSourceID = -1 Then
-                                        Call cpCore.handleExceptionAndRethrow(New ApplicationException("Could not find DataSource [" & DataSourceName & "] for table [" & TableName & "]"))
-                                    End If
-                                End If
-                                TableID = cpCore.db.db_InsertTableRecordGetID("Default", "ccTables", SystemMemberID)
-                                '
-                                sqlList = New sqlFieldListClass
-                                sqlList.add("name", cpCore.db.encodeSQLText(TableName))
-                                sqlList.add("active", SQLTrue)
-                                sqlList.add("DATASOURCEID", cpCore.db.encodeSQLNumber(DataSourceID))
-                                sqlList.add("CONTENTCONTROLID", cpCore.db.encodeSQLNumber(cpCore.db.db_GetContentID("Tables")))
-                                '
-                                Call cpCore.db.db_UpdateTableRecord("Default", "ccTables", "ID=" & TableID, sqlList)
-                            Else
-                                TableID = EncodeInteger(dt.Rows(0).Item("ID"))
-                            End If
-                            '
-                            ' ----- Get Sort Method ID from SortMethod
-                            iDefaultSortMethod = encodeEmptyText(DefaultSortMethod, "")
-                            DefaultSortMethodID = 0
-                            '
-                            ' First - try lookup by name
-                            '
-                            If iDefaultSortMethod = "" Then
-                                DefaultSortMethodID = 0
-                            Else
-                                dt = cpCore.db.db_openTable("Default", "ccSortMethods", "(name=" & cpCore.db.encodeSQLText(iDefaultSortMethod) & ")and(active<>0)", "ID", "ID", 1, 1)
-                                If dt.Rows.Count > 0 Then
-                                    DefaultSortMethodID = EncodeInteger(dt.Rows(0).Item("ID"))
-                                End If
-                            End If
-                            If DefaultSortMethodID = 0 Then
-                                '
-                                ' fallback - maybe they put the orderbyclause in (common mistake)
-                                '
-                                dt = cpCore.db.db_openTable("Default", "ccSortMethods", "(OrderByClause=" & cpCore.db.encodeSQLText(iDefaultSortMethod) & ")and(active<>0)", "ID", "ID", 1, 1)
-                                If dt.Rows.Count > 0 Then
-                                    DefaultSortMethodID = EncodeInteger(dt.Rows(0).Item("ID"))
-                                End If
-                            End If
-                            '
-                            ' determine parentId from parentName
-                            '
-
-                            '
-                            ' ----- update record
-                            '
-                            sqlList = New sqlFieldListClass
-                            Call sqlList.add("name", cpCore.db.encodeSQLText(ContentName))
-                            Call sqlList.add("CREATEKEY", "0")
-                            Call sqlList.add("active", cpCore.db.encodeSQLBoolean(Active))
-                            Call sqlList.add("ContentControlID", cpCore.db.encodeSQLNumber(ContentIDofContent))
-                            Call sqlList.add("AllowAdd", cpCore.db.encodeSQLBoolean(AllowAdd))
-                            Call sqlList.add("AllowDelete", cpCore.db.encodeSQLBoolean(AllowDelete))
-                            Call sqlList.add("AllowWorkflowAuthoring", cpCore.db.encodeSQLBoolean(AllowWorkflowAuthoring))
-                            Call sqlList.add("DeveloperOnly", cpCore.db.encodeSQLBoolean(DeveloperOnly))
-                            Call sqlList.add("AdminOnly", cpCore.db.encodeSQLBoolean(AdminOnly))
-                            Call sqlList.add("ParentID", cpCore.db.encodeSQLNumber(parentId))
-                            Call sqlList.add("DefaultSortMethodID", cpCore.db.encodeSQLNumber(DefaultSortMethodID))
-                            Call sqlList.add("DropDownFieldList", cpCore.db.encodeSQLText(encodeEmptyText(DropDownFieldList, "Name")))
-                            Call sqlList.add("ContentTableID", cpCore.db.encodeSQLNumber(TableID))
-                            Call sqlList.add("AuthoringTableID", cpCore.db.encodeSQLNumber(TableID))
-                            Call sqlList.add("ModifiedDate", cpCore.db.encodeSQLDate(Now))
-                            Call sqlList.add("CreatedBy", cpCore.db.encodeSQLNumber(SystemMemberID))
-                            Call sqlList.add("ModifiedBy", cpCore.db.encodeSQLNumber(SystemMemberID))
-                            Call sqlList.add("AllowCalendarEvents", cpCore.db.encodeSQLBoolean(AllowCalendarEvents))
-                            Call sqlList.add("AllowContentTracking", cpCore.db.encodeSQLBoolean(AllowContentTracking))
-                            Call sqlList.add("AllowTopicRules", cpCore.db.encodeSQLBoolean(AllowTopicRules))
-                            Call sqlList.add("AllowContentChildTool", cpCore.db.encodeSQLBoolean(AllowContentChildTool))
-                            Call sqlList.add("AllowMetaContent", cpCore.db.encodeSQLBoolean(AllowMetaContent))
-                            Call sqlList.add("IconLink", cpCore.db.encodeSQLText(encodeEmptyText(IconLink, "")))
-                            Call sqlList.add("IconHeight", cpCore.db.encodeSQLNumber(IconHeight))
-                            Call sqlList.add("IconWidth", cpCore.db.encodeSQLNumber(IconWidth))
-                            Call sqlList.add("IconSprites", cpCore.db.encodeSQLNumber(IconSprites))
-                            Call sqlList.add("installedByCollectionid", cpCore.db.encodeSQLNumber(InstalledByCollectionID))
-                            If SupportsGuid Then
-                                If (LcContentGuid = "") And (NewGuid <> "") Then
-                                    '
-                                    ' hard one - only update guid if the tables supports it, and it the new guid is not blank
-                                    ' if the new guid does no match te old guid
-                                    '
-                                    Call sqlList.add("ccGuid", cpCore.db.encodeSQLText(NewGuid))
-                                ElseIf (NewGuid <> "") And (LcContentGuid <> LCase(NewGuid)) Then
-                                    '
-                                    ' new guid does not match current guid
-                                    '
-                                    'cpCore.AppendLog("upgrading cdef [" & ContentName & "], the guid was not updated because the current guid [" & LcContentGuid & "] is not empty, and it did not match the new guid [" & LCase(NewGuid) & "]")
-                                    'Call AppendLog2(cpCore,appEnvironment.name, "upgrading cdef [" & ContentName & "], the guid was not updated because the current guid [" & LcContentGuid & "] is not empty, and it did not match the new guid [" & LCase(NewGuid) & "]", "dll", "cpCoreClass", "csv_CreateContent3", 0, "", "", False, True, "", "", "")
-                                End If
-                            End If
-                            If returnContentId = 54 Then
-                                returnContentId = returnContentId
-                            End If
-                            Call cpCore.db.db_UpdateTableRecord("Default", "ccContent", "ID=" & returnContentId, sqlList)
-                            '
-                            '-----------------------------------------------------------------------------------------------
-                            ' Verify Core Content Definition Fields
-                            '-----------------------------------------------------------------------------------------------
-                            '
-                            If parentId < 1 Then
-                                '
-                                ' CDef does not inherit its fields, create what is needed for a non-inherited CDef
-                                '
-                                If Not cpCore.db.db_isCdefField(returnContentId, "ID") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
-                                    field.nameLc = "id"
-                                    field.active = True
-                                    field.fieldTypeId = FieldTypeIdAutoIdIncrement
-                                    field.editSortPriority = 100
-                                    field.authorable = False
-                                    field.caption = "ID"
-                                    field.defaultValue = ""
-                                    field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(ContentName, field)
-                                End If
-                                '
-                                If Not cpCore.db.db_isCdefField(returnContentId, "name") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
-                                    field.nameLc = "name"
-                                    field.active = True
-                                    field.fieldTypeId = FieldTypeIdText
-                                    field.editSortPriority = 110
-                                    field.authorable = True
-                                    field.caption = "Name"
-                                    field.defaultValue = ""
-                                    field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(ContentName, field)
-                                End If
-                                '
-                                If Not cpCore.db.db_isCdefField(returnContentId, "active") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
-                                    field.nameLc = "active"
-                                    field.active = True
-                                    field.fieldTypeId = FieldTypeIdBoolean
-                                    field.editSortPriority = 200
-                                    field.authorable = True
-                                    field.caption = "Active"
-                                    field.defaultValue = "1"
-                                    field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(ContentName, field)
-                                End If
-                                '
-                                If Not cpCore.db.db_isCdefField(returnContentId, "sortorder") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
-                                    field.nameLc = "sortorder"
-                                    field.active = True
-                                    field.fieldTypeId = FieldTypeIdText
-                                    field.editSortPriority = 2000
-                                    field.authorable = False
-                                    field.caption = "Alpha Sort Order"
-                                    field.defaultValue = ""
-                                    field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(ContentName, field)
-                                End If
-                                '
-                                If Not cpCore.db.db_isCdefField(returnContentId, "dateadded") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
-                                    field.nameLc = "dateadded"
-                                    field.active = True
-                                    field.fieldTypeId = FieldTypeIdDate
-                                    field.editSortPriority = 9999
-                                    field.authorable = False
-                                    field.caption = "Date Added"
-                                    field.defaultValue = ""
-                                    field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(ContentName, field)
-                                End If
-                                If Not cpCore.db.db_isCdefField(returnContentId, "createdby") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
-                                    field.nameLc = "createdby"
-                                    field.active = True
-                                    field.fieldTypeId = FieldTypeIdLookup
-                                    field.editSortPriority = 9999
-                                    field.authorable = False
-                                    field.caption = "Created By"
-                                    field.lookupContentName = "People"
-                                    field.defaultValue = ""
-                                    field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(ContentName, field)
-                                End If
-                                If Not cpCore.db.db_isCdefField(returnContentId, "modifieddate") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
-                                    field.nameLc = "modifieddate"
-                                    field.active = True
-                                    field.fieldTypeId = FieldTypeIdDate
-                                    field.editSortPriority = 9999
-                                    field.authorable = False
-                                    field.caption = "Date Modified"
-                                    field.defaultValue = ""
-                                    field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(ContentName, field)
-                                End If
-                                If Not cpCore.db.db_isCdefField(returnContentId, "modifiedby") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
-                                    field.nameLc = "modifiedby"
-                                    field.active = True
-                                    field.fieldTypeId = FieldTypeIdLookup
-                                    field.editSortPriority = 9999
-                                    field.authorable = False
-                                    field.caption = "Modified By"
-                                    field.lookupContentName = "People"
-                                    field.defaultValue = ""
-                                    field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(ContentName, field)
-                                End If
-                                If Not cpCore.db.db_isCdefField(returnContentId, "ContentControlID") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
-                                    field.nameLc = "ContentControlID"
-                                    field.active = True
-                                    field.fieldTypeId = FieldTypeIdLookup
-                                    field.editSortPriority = 9999
-                                    field.authorable = False
-                                    field.caption = "Controlling Content"
-                                    field.lookupContentName = "Content"
-                                    field.defaultValue = ""
-                                    field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(ContentName, field)
-                                End If
-                                If Not cpCore.db.db_isCdefField(returnContentId, "CreateKey") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
-                                    field.nameLc = "CreateKey"
-                                    field.active = True
-                                    field.fieldTypeId = FieldTypeIdInteger
-                                    field.editSortPriority = 9999
-                                    field.authorable = False
-                                    field.caption = "Create Key"
-                                    field.defaultValue = ""
-                                    field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(ContentName, field)
-                                End If
-                                '
-                                ' REFACTOR - these fieldsonly apply to page content
-                                '
-                                If Not cpCore.db.db_isCdefField(returnContentId, "EditSourceID") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
-                                    field.nameLc = "EditSourceID"
-                                    field.active = True
-                                    field.fieldTypeId = FieldTypeIdInteger
-                                    field.editSortPriority = 9999
-                                    field.authorable = False
-                                    field.caption = "Edit Source ID"
-                                    field.lookupContentName = ""
-                                    field.defaultValue = "null"
-                                    field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(ContentName, field)
-                                End If
-                                If Not cpCore.db.db_isCdefField(returnContentId, "EditArchive") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
-                                    field.nameLc = "EditArchive"
-                                    field.active = True
-                                    field.fieldTypeId = FieldTypeIdBoolean
-                                    field.editSortPriority = 9999
-                                    field.authorable = False
-                                    field.caption = "Edit Archive"
-                                    field.lookupContentName = ""
-                                    field.defaultValue = "0"
-                                    field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(ContentName, field)
-                                End If
-                                If Not cpCore.db.db_isCdefField(returnContentId, "EditBlank") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
-                                    field.nameLc = "EditBlank"
-                                    field.active = True
-                                    field.fieldTypeId = FieldTypeIdBoolean
-                                    field.editSortPriority = 9999
-                                    field.authorable = False
-                                    field.caption = "Edit Blank"
-                                    field.lookupContentName = ""
-                                    field.defaultValue = "0"
-                                    field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(ContentName, field)
-                                End If
-                                If Not cpCore.db.db_isCdefField(returnContentId, "ContentCategoryID") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
-                                    field.nameLc = "ContentCategoryID"
-                                    field.active = True
-                                    field.fieldTypeId = FieldTypeIdLookup
-                                    field.editSortPriority = 9999
-                                    field.authorable = False
-                                    field.caption = "Content Category"
-                                    field.lookupContentName = "Content Categories"
-                                    field.defaultValue = ""
-                                    field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(ContentName, field)
-                                End If
-                                If Not cpCore.db.db_isCdefField(returnContentId, "ccGuid") Then
-                                    field = New coreMetaDataClass.CDefFieldClass
-                                    field.nameLc = "ccGuid"
-                                    field.active = True
-                                    field.fieldTypeId = FieldTypeIdText
-                                    field.editSortPriority = 9999
-                                    field.authorable = False
-                                    field.caption = "Guid"
-                                    field.defaultValue = ""
-                                    field.isBaseField = IsBaseContent
-                                    Call metaData_VerifyCDefField_ReturnID(ContentName, field)
-                                End If
-                            End If
-                            '
-                            ' ----- Load CDef
-                            '
-                            If clearMetaCache Then
-                                cpCore.cache.invalidateTagCommaList("content,content fields")
-                                cpCore.metaData.clear()
-                            End If
-                        End If
-                    End If
-                End If
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
-            Return returnContentId
-        End Function
-        '
-        '========================================================================
-        ' Define a Content Definition Field based only on what is known from a SQL table
-        '========================================================================
-        '
-        Public Sub db_CreateContentFieldFromTableField(ByVal ContentName As String, ByVal FieldName As String, ByVal ADOFieldType As Integer)
-            Try
-                '
-                Dim field As New coreMetaDataClass.CDefFieldClass
-                '
-                field.fieldTypeId = cpCore.db.db_GetFieldTypeIdByADOType(ADOFieldType)
-                field.caption = FieldName
-                field.editSortPriority = 1000
-                field.ReadOnly = False
-                field.authorable = True
-                field.adminOnly = False
-                field.developerOnly = False
-                field.TextBuffered = False
-                field.htmlContent = False
-                '
-                Select Case UCase(FieldName)
-                '
-                ' --- Core fields
-                '
-                    Case "NAME"
-                        field.caption = "Name"
-                        field.editSortPriority = 100
-                    Case "ACTIVE"
-                        field.caption = "Active"
-                        field.editSortPriority = 200
-                        field.fieldTypeId = FieldTypeIdBoolean
-                        field.defaultValue = "1"
-                    Case "DATEADDED"
-                        field.caption = "Created"
-                        field.ReadOnly = True
-                        field.editSortPriority = 5020
-                    Case "CREATEDBY"
-                        field.caption = "Created By"
-                        field.fieldTypeId = FieldTypeIdLookup
-                        field.lookupContentName = "Members"
-                        field.ReadOnly = True
-                        field.editSortPriority = 5030
-                    Case "MODIFIEDDATE"
-                        field.caption = "Modified"
-                        field.ReadOnly = True
-                        field.editSortPriority = 5040
-                    Case "MODIFIEDBY"
-                        field.caption = "Modified By"
-                        field.fieldTypeId = FieldTypeIdLookup
-                        field.lookupContentName = "Members"
-                        field.ReadOnly = True
-                        field.editSortPriority = 5050
-                    Case "ID"
-                        field.caption = "Number"
-                        field.ReadOnly = True
-                        field.editSortPriority = 5060
-                        field.authorable = True
-                        field.adminOnly = False
-                        field.developerOnly = True
-                    Case "CONTENTCONTROLID"
-                        field.caption = "Content Definition"
-                        field.fieldTypeId = FieldTypeIdLookup
-                        field.lookupContentName = "Content"
-                        field.editSortPriority = 5070
-                        field.authorable = True
-                        field.ReadOnly = False
-                        field.adminOnly = True
-                        field.developerOnly = True
-                    Case "CREATEKEY"
-                        field.caption = "CreateKey"
-                        field.ReadOnly = True
-                        field.editSortPriority = 5080
-                        field.authorable = False
-                    Case "EDITSOURCEID"
-                        field.caption = "Edit Source"
-                        field.ReadOnly = True
-                        field.editSortPriority = 5090
-                        field.authorable = False
-                        field.defaultValue = "null"
-                    Case "EDITARCHIVE"
-                        field.caption = "Edit Archive"
-                        field.fieldTypeId = FieldTypeIdBoolean
-                        field.ReadOnly = True
-                        field.editSortPriority = 5100
-                        field.authorable = False
-                        field.defaultValue = "0"
-                    Case "EDITBLANK"
-                        field.caption = "Edit Blank"
-                        field.fieldTypeId = FieldTypeIdBoolean
-                        field.ReadOnly = True
-                        field.editSortPriority = 5110
-                        field.authorable = False
-                        field.defaultValue = "0"
-                    '
-                    ' --- fields related to body content
-                    '
-                    Case "HEADLINE"
-                        field.caption = "Headline"
-                        field.editSortPriority = 1000
-                        field.htmlContent = False
-                    Case "DATESTART"
-                        field.caption = "Date Start"
-                        field.editSortPriority = 1100
-                    Case "DATEEND"
-                        field.caption = "Date End"
-                        field.editSortPriority = 1200
-                    Case "PUBDATE"
-                        field.caption = "Publish Date"
-                        field.editSortPriority = 1300
-                    Case "ORGANIZATIONID"
-                        field.caption = "Organization"
-                        field.fieldTypeId = FieldTypeIdLookup
-                        field.lookupContentName = "Organizations"
-                        field.editSortPriority = 2005
-                        field.authorable = True
-                        field.ReadOnly = False
-                    Case "COPYFILENAME"
-                        field.caption = "Copy"
-                        field.fieldTypeId = FieldTypeIdFileHTMLPrivate
-                        field.TextBuffered = True
-                        field.editSortPriority = 2010
-                    Case "BRIEFFILENAME"
-                        field.caption = "Overview"
-                        field.fieldTypeId = FieldTypeIdFileHTMLPrivate
-                        field.TextBuffered = True
-                        field.editSortPriority = 2020
-                        field.htmlContent = False
-                    Case "DOCFILENAME"
-                        field.caption = "Download Document"
-                        field.fieldTypeId = FieldTypeIdFile
-                        field.editSortPriority = 2030
-                    Case "DOCLABEL"
-                        field.caption = "Download Label"
-                        field.editSortPriority = 2035
-                        field.htmlContent = False
-                    Case "IMAGEFILENAME"
-                        field.caption = "Image"
-                        field.fieldTypeId = FieldTypeIdFile
-                        field.editSortPriority = 2040
-                    Case "THUMBNAILFILENAME"
-                        field.caption = "Thumbnail"
-                        field.fieldTypeId = FieldTypeIdFile
-                        field.editSortPriority = 2050
-                    Case "CONTENTID"
-                        field.caption = "Content"
-                        field.fieldTypeId = FieldTypeIdLookup
-                        field.lookupContentName = "Content"
-                        field.ReadOnly = False
-                        field.editSortPriority = 2060
-                    '
-                    ' --- Record Features
-                    '
-                    Case "PARENTID"
-                        field.caption = "Parent"
-                        field.fieldTypeId = FieldTypeIdLookup
-                        field.lookupContentName = ContentName
-                        field.ReadOnly = False
-                        field.editSortPriority = 3000
-                    Case "MEMBERID"
-                        field.caption = "Member"
-                        field.fieldTypeId = FieldTypeIdLookup
-                        field.lookupContentName = "Members"
-                        field.ReadOnly = False
-                        field.editSortPriority = 3005
-                    Case "CONTACTMEMBERID"
-                        field.caption = "Contact"
-                        field.fieldTypeId = FieldTypeIdLookup
-                        field.lookupContentName = "Members"
-                        field.ReadOnly = False
-                        field.editSortPriority = 3010
-                    Case "ALLOWBULKEMAIL"
-                        field.caption = "Allow Bulk Email"
-                        field.editSortPriority = 3020
-                    Case "ALLOWSEEALSO"
-                        field.caption = "Allow See Also"
-                        field.editSortPriority = 3030
-                    Case "ALLOWFEEDBACK"
-                        field.caption = "Allow Feedback"
-                        field.editSortPriority = 3040
-                        field.authorable = False
-                    Case "SORTORDER"
-                        field.caption = "Alpha Sort Order"
-                        field.editSortPriority = 3050
-                    '
-                    ' --- Display only information
-                    '
-                    Case "VIEWINGS"
-                        field.caption = "Viewings"
-                        field.ReadOnly = True
-                        field.editSortPriority = 5000
-                        field.defaultValue = "0"
-                    Case "CLICKS"
-                        field.caption = "Clicks"
-                        field.ReadOnly = True
-                        field.editSortPriority = 5010
-                        field.defaultValue = "0"
-                End Select
-                Call metaData_VerifyCDefField_ReturnID(ContentName, field)
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
-        End Sub
-
-        '
-        ' ====================================================================================================================
-        '   Verify a CDef field and return the recordid
-        '       same a old csv_CreateContentField
-        '      args is a delimited name=value pair sring: a=1,b=2,c=3 where delimiter = ","
-        '
-        ' ***** add optional argument, doNotOverWrite -- called true from csv_CreateContent3 so if the cdef is there, it's fields will not be crushed.
-        '
-        ' ====================================================================================================================
-        '
-        Public Function metaData_VerifyCDefField_ReturnID(ByVal ContentName As String, field As coreMetaDataClass.CDefFieldClass) As Integer ' , ByVal FieldName As String, ByVal Args As String, ByVal Delimiter As String) As Integer
-            Dim returnId As Integer = 0
-            Try
-                '
-                Dim RecordIsBaseField As Boolean
-                Dim IsBaseField As Boolean
-                Dim SQL As String
-                Dim dt As DataTable
-                Dim ContentID As Integer
-                Dim Pointer As Integer
-                Dim SQLName(100) As String
-                Dim SQLValue(100) As String
-                Dim MethodName As String
-                Dim LookupContentID As Integer
-                Dim RecordID As Integer
-                Dim TableID As Integer
-                Dim TableName As String
-                Dim DataSourceID As Integer
-                Dim DataSourceName As String
-
-                Dim FieldReadOnly As Boolean
-                Dim FieldActive As Boolean
-                Dim fieldTypeId As Integer
-                Dim FieldCaption As String
-                'Dim FieldSortOrder As Integer
-                Dim FieldAuthorable As Boolean
-                Dim LookupContentName As String
-                Dim DefaultValue As String
-                Dim NotEditable As Boolean
-                'Dim field.indexColumn As Integer
-                Dim AdminIndexWidth As String
-                Dim AdminIndexSort As Integer
-                Dim RedirectContentName As String
-                Dim RedirectIDField As String
-                Dim RedirectPath As String
-                Dim HTMLContent As Boolean
-                Dim UniqueName As Boolean
-                Dim Password As Boolean
-                Dim RedirectContentID As Integer
-                Dim FieldRequired As Boolean
-                Dim StateOfAllowContentAutoLoad As Boolean
-                Dim RSSTitle As Boolean
-                Dim RSSDescription As Boolean
-                'Dim FieldAdminOnly As Boolean
-                Dim FieldDeveloperOnly As Boolean
-                Dim MemberSelectGroupID As Integer
-                Dim installedByCollectionGuid As String
-                Dim InstalledByCollectionID As Integer
-                Dim EditTab As String
-                Dim Scramble As Boolean
-                Dim LookupList As String
-                Dim ManyToManyContent As String
-                Dim ManyToManyContentID As Integer
-                Dim ManyToManyRuleContent As String
-                Dim ManyToManyRuleContentID As Integer
-                Dim ManyToManyRulePrimaryField As String
-                Dim ManyToManyRuleSecondaryField As String
-                Dim rs As DataTable
-                Dim isNewFieldRecord As Boolean = True
-                '
-                MethodName = "csv_VerifyCDefField_ReturnID(" & ContentName & "," & field.nameLc & ")"
-                '
-                '
-                If (UCase(ContentName) = "PAGE CONTENT") And (UCase(field.nameLc) = "ACTIVE") Then
-                    field.nameLc = field.nameLc
-                End If
-                '
-                ' Prevent load during the changes
-                '
-                'StateOfAllowContentAutoLoad = AllowContentAutoLoad
-                'AllowContentAutoLoad = False
-                '
-                ' determine contentid and tableid
-                '
-                ContentID = -1
-                TableID = 0
-                SQL = "select ID,ContentTableID from ccContent where name=" & cpCore.db.encodeSQLText(ContentName) & ";"
-                rs = cpCore.db.executeSql(SQL)
-                If isDataTableOk(rs) Then
-                    ContentID = EncodeInteger(cpCore.db.db_getDataRowColumnName(rs.Rows(0), "ID"))
-                    TableID = EncodeInteger(cpCore.db.db_getDataRowColumnName(rs.Rows(0), "ContentTableID"))
-                End If
-                '
-                ' test if field definition found or not
-                '
-                RecordID = 0
-                RecordIsBaseField = False
-                SQL = "select ID,IsBaseField from ccFields where (ContentID=" & cpCore.db.encodeSQLNumber(ContentID) & ")and(name=" & cpCore.db.encodeSQLText(field.nameLc) & ");"
-                rs = cpCore.db.executeSql(SQL)
-                If isDataTableOk(rs) Then
-                    isNewFieldRecord = False
-                    RecordID = EncodeInteger(cpCore.db.db_getDataRowColumnName(rs.Rows(0), "ID"))
-                    RecordIsBaseField = EncodeBoolean(cpCore.db.db_getDataRowColumnName(rs.Rows(0), "IsBaseField"))
-                End If
-                '
-                ' check if this is a non-base field updating a base field
-                '
-                IsBaseField = field.isBaseField
-                If (Not IsBaseField) And (RecordIsBaseField) Then
-                    '
-                    ' This update is not allowed
-                    '
-                    cpCore.handleLegacyError2("cpCoreClass", "csv_VerifyCDefField_ReturnID", cpCore.appConfig.name & ", Warning, a Base field Is being updated To non-base. This should only happen When a base field Is removed from the base collection. Content [" & ContentName & "], field [" & field.nameLc & "].")
-                End If
-                If True Then
-                    'FieldAdminOnly = field.adminOnly
-                    FieldDeveloperOnly = field.developerOnly
-                    FieldActive = field.active
-                    FieldCaption = field.caption
-                    FieldReadOnly = field.ReadOnly
-                    fieldTypeId = field.fieldTypeId
-                    'FieldSortOrder = field.indexSortOrder
-                    FieldAuthorable = field.authorable
-                    DefaultValue = EncodeText(field.defaultValue)
-                    NotEditable = field.NotEditable
-                    LookupContentName = field.lookupContentName
-                    'field.indexColumn = field.indexColumn
-                    AdminIndexWidth = field.indexWidth
-                    AdminIndexSort = field.indexSortOrder
-                    RedirectContentName = field.RedirectContentName
-                    RedirectIDField = field.RedirectID
-                    RedirectPath = field.RedirectPath
-                    HTMLContent = field.htmlContent
-                    UniqueName = field.UniqueName
-                    Password = field.Password
-                    FieldRequired = field.Required
-                    RSSTitle = field.RSSTitleField
-                    RSSDescription = field.RSSDescriptionField
-                    MemberSelectGroupID = field.MemberSelectGroupID
-                    installedByCollectionGuid = field.installedByCollectionGuid
-                    EditTab = field.editTabName
-                    Scramble = field.Scramble
-                    LookupList = field.lookupList
-                    ManyToManyContent = field.ManyToManyContentName
-                    ManyToManyRuleContent = field.ManyToManyRuleContentName
-                    ManyToManyRulePrimaryField = field.ManyToManyRulePrimaryField
-                    ManyToManyRuleSecondaryField = field.ManyToManyRuleSecondaryField
-                    '
-                    If RedirectContentName <> "" Then
-                        RedirectContentID = cpCore.db.db_GetContentID(RedirectContentName)
-                        If RedirectContentID <= 0 Then
-                            Call cpCore.handleExceptionAndRethrow(New Exception("Could Not create redirect For field [" & field.nameLc & "] For Content Definition [" & ContentName & "] because no Content Definition was found For RedirectContentName [" & RedirectContentName & "]."))
-                        End If
-                    End If
-                    '
-                    If LookupContentName <> "" Then
-                        LookupContentID = cpCore.db.db_GetContentID(LookupContentName)
-                        If LookupContentID <= 0 Then
-                            Call cpCore.handleExceptionAndRethrow(New Exception("Could Not create lookup For field [" & field.nameLc & "] For Content Definition [" & ContentName & "] because no Content Definition was found For [" & LookupContentName & "]."))
-                        End If
-                    End If
-                    '
-                    If ManyToManyContent <> "" Then
-                        ManyToManyContentID = cpCore.db.db_GetContentID(ManyToManyContent)
-                        If ManyToManyContentID <= 0 Then
-                            Call cpCore.handleExceptionAndRethrow(New ApplicationException("Could Not create many To many For field [" & field.nameLc & "] For Content Definition [" & ContentName & "] because no Content Definition was found For ManyToManyContent [" & ManyToManyContent & "]."))
-                        End If
-                    End If
-                    '
-                    If ManyToManyRuleContent <> "" Then
-                        ManyToManyRuleContentID = cpCore.db.db_GetContentID(ManyToManyRuleContent)
-                        If ManyToManyRuleContentID <= 0 Then
-                            Call cpCore.handleExceptionAndRethrow(New ApplicationException("Could Not create many To many For field [" & field.nameLc & "] For Content Definition [" & ContentName & "] because no Content Definition was found For ManyToManyRuleContent [" & ManyToManyRuleContent & "]."))
-                        End If
-                    End If
-                    '
-                    ' ----- Check error conditions before starting
-                    '
-                    If ContentID = -1 Then
-                        '
-                        ' Content Definition not found
-                        '
-                        Call cpCore.handleExceptionAndRethrow(New ApplicationException("Could Not create Field [" & field.nameLc & "] because Content Definition [" & ContentName & "] was Not found In ccContent Table."))
-                    ElseIf TableID <= 0 Then
-                        '
-                        ' Content Definition not found
-                        '
-                        Call cpCore.handleExceptionAndRethrow(New ApplicationException("Could Not create Field [" & field.nameLc & "] because Content Definition [" & ContentName & "] has no associated Content Table."))
-                    ElseIf fieldTypeId <= 0 Then
-                        '
-                        ' invalid field type
-                        '
-                        Call cpCore.handleExceptionAndRethrow(New ApplicationException("Could Not create Field [" & field.nameLc & "] because the field type [" & fieldTypeId & "] Is Not valid."))
-                    Else
-                        '
-                        ' Get the TableName and DataSourceID
-                        '
-                        TableName = ""
-                        rs = cpCore.db.executeSql("Select Name, DataSourceID from ccTables where ID=" & cpCore.db.encodeSQLNumber(TableID) & ";")
-                        If Not isDataTableOk(rs) Then
-                            Call cpCore.handleExceptionAndRethrow(New ApplicationException("Could Not create Field [" & field.nameLc & "] because table For tableID [" & TableID & "] was Not found."))
-                        Else
-                            DataSourceID = EncodeInteger(cpCore.db.db_getDataRowColumnName(rs.Rows(0), "DataSourceID"))
-                            TableName = EncodeText(cpCore.db.db_getDataRowColumnName(rs.Rows(0), "Name"))
-                        End If
-                        rs.Dispose()
-                        If (TableName <> "") Then
-                            '
-                            ' Get the DataSourceName
-                            '
-                            If (DataSourceID < 1) Then
-                                DataSourceName = "Default"
-                            Else
-                                rs = cpCore.db.executeSql("Select Name from ccDataSources where ID=" & cpCore.db.encodeSQLNumber(DataSourceID) & ";")
-                                If Not isDataTableOk(rs) Then
-
-                                    DataSourceName = "Default"
-                                    ' change condition to successful -- the goal is 1) deliver pages 2) report problems
-                                    ' this problem, if translated to default, is really no longer a problem, unless the
-                                    ' resulting datasource does not have this data, then other errors will be generated anyway.
-                                    'Call csv_HandleClassInternalError(MethodName, "Could Not create Field [" & field.name & "] because datasource For ID [" & DataSourceID & "] was Not found.")
-                                Else
-                                    DataSourceName = EncodeText(cpCore.db.db_getDataRowColumnName(rs.Rows(0), "Name"))
-                                End If
-                                rs.Dispose()
-                            End If
-                            '
-                            ' Get the installedByCollectionId
-                            '
-                            InstalledByCollectionID = 0
-                            If (installedByCollectionGuid <> "") Then
-                                rs = cpCore.db.executeSql("Select id from ccAddonCollections where ccguid=" & cpCore.db.encodeSQLText(installedByCollectionGuid) & ";")
-                                If isDataTableOk(rs) Then
-                                    InstalledByCollectionID = EncodeInteger(cpCore.db.db_getDataRowColumnName(rs.Rows(0), "Id"))
-                                End If
-                                rs.Dispose()
-                            End If
-                            '
-                            ' Create or update the Table Field
-                            '
-                            If (fieldTypeId = FieldTypeIdRedirect) Then
-                                '
-                                ' Redirect Field
-                                '
-                            ElseIf (fieldTypeId = FieldTypeIdManyToMany) Then
-                                '
-                                ' ManyToMany Field
-                                '
-                            Else
-                                '
-                                ' All other fields
-                                '
-                                Call cpCore.db.db_CreateSQLTableField(DataSourceName, TableName, field.nameLc, fieldTypeId)
-                            End If
-                            '
-                            ' create or update the field
-                            '
-                            Dim sqlList As New sqlFieldListClass
-                            Pointer = 0
-                            Call sqlList.add("ACTIVE", cpCore.db.encodeSQLBoolean(field.active)) ' Pointer)
-                            Call sqlList.add("MODIFIEDBY", cpCore.db.encodeSQLNumber(SystemMemberID)) ' Pointer)
-                            Call sqlList.add("MODIFIEDDATE", cpCore.db.encodeSQLDate(Now)) ' Pointer)
-                            Call sqlList.add("TYPE", cpCore.db.encodeSQLNumber(fieldTypeId)) ' Pointer)
-                            Call sqlList.add("CAPTION", cpCore.db.encodeSQLText(FieldCaption)) ' Pointer)
-                            Call sqlList.add("ReadOnly", cpCore.db.encodeSQLBoolean(FieldReadOnly)) ' Pointer)
-                            Call sqlList.add("LOOKUPCONTENTID", cpCore.db.encodeSQLNumber(LookupContentID)) ' Pointer)
-                            Call sqlList.add("REQUIRED", cpCore.db.encodeSQLBoolean(FieldRequired)) ' Pointer)
-                            Call sqlList.add("TEXTBUFFERED", SQLFalse) ' Pointer)
-                            Call sqlList.add("PASSWORD", cpCore.db.encodeSQLBoolean(Password)) ' Pointer)
-                            Call sqlList.add("EDITSORTPRIORITY", cpCore.db.encodeSQLNumber(field.editSortPriority)) ' Pointer)
-                            Call sqlList.add("ADMINONLY", cpCore.db.encodeSQLBoolean(field.adminOnly)) ' Pointer)
-                            Call sqlList.add("DEVELOPERONLY", cpCore.db.encodeSQLBoolean(FieldDeveloperOnly)) ' Pointer)
-                            Call sqlList.add("CONTENTCONTROLID", cpCore.db.encodeSQLNumber(cpCore.db.db_GetContentID("Content Fields"))) ' Pointer)
-                            Call sqlList.add("DefaultValue", cpCore.db.encodeSQLText(DefaultValue)) ' Pointer)
-                            Call sqlList.add("HTMLCONTENT", cpCore.db.encodeSQLBoolean(HTMLContent)) ' Pointer)
-                            Call sqlList.add("NOTEDITABLE", cpCore.db.encodeSQLBoolean(NotEditable)) ' Pointer)
-                            Call sqlList.add("AUTHORABLE", cpCore.db.encodeSQLBoolean(FieldAuthorable)) ' Pointer)
-                            Call sqlList.add("EDITARCHIVE", SQLFalse) ' Pointer)
-                            Call sqlList.add("EDITBLANK", SQLFalse) ' Pointer)
-                            Call sqlList.add("INDEXCOLUMN", cpCore.db.encodeSQLNumber(field.indexColumn)) ' Pointer)
-                            Call sqlList.add("INDEXWIDTH", cpCore.db.encodeSQLText(AdminIndexWidth)) ' Pointer)
-                            Call sqlList.add("INDEXSORTPRIORITY", cpCore.db.encodeSQLNumber(AdminIndexSort)) ' Pointer)
-                            Call sqlList.add("REDIRECTCONTENTID", cpCore.db.encodeSQLNumber(RedirectContentID)) ' Pointer)
-                            Call sqlList.add("REDIRECTID", cpCore.db.encodeSQLText(RedirectIDField)) ' Pointer)
-                            Call sqlList.add("REDIRECTPATH", cpCore.db.encodeSQLText(RedirectPath)) ' Pointer)
-                            Call sqlList.add("UNIQUENAME", cpCore.db.encodeSQLBoolean(UniqueName)) ' Pointer)
-                            Call sqlList.add("RSSTITLEFIELD", cpCore.db.encodeSQLBoolean(RSSTitle)) ' Pointer)
-                            Call sqlList.add("RSSDESCRIPTIONFIELD", cpCore.db.encodeSQLBoolean(RSSDescription)) ' Pointer)
-                            Call sqlList.add("MEMBERSELECTGROUPID", cpCore.db.encodeSQLNumber(MemberSelectGroupID)) ' Pointer)
-                            Call sqlList.add("installedByCollectionId", cpCore.db.encodeSQLNumber(InstalledByCollectionID)) ' Pointer)
-                            Call sqlList.add("EDITTAB", cpCore.db.encodeSQLText(EditTab)) ' Pointer)
-                            Call sqlList.add("SCRAMBLE", cpCore.db.encodeSQLBoolean(Scramble)) ' Pointer)
-                            Call sqlList.add("LOOKUPLIST", cpCore.db.encodeSQLText(LookupList)) ' Pointer)
-                            Call sqlList.add("MANYTOMANYCONTENTID", cpCore.db.encodeSQLNumber(ManyToManyContentID)) ' Pointer)
-                            Call sqlList.add("MANYTOMANYRULECONTENTID", cpCore.db.encodeSQLNumber(ManyToManyRuleContentID)) ' Pointer)
-                            Call sqlList.add("MANYTOMANYRULEPRIMARYFIELD", cpCore.db.encodeSQLText(ManyToManyRulePrimaryField)) ' Pointer)
-                            Call sqlList.add("MANYTOMANYRULESECONDARYFIELD", cpCore.db.encodeSQLText(ManyToManyRuleSecondaryField)) ' Pointer)
-                            Call sqlList.add("ISBASEFIELD", cpCore.db.encodeSQLBoolean(IsBaseField)) ' Pointer)
-                            '
-                            If RecordID = 0 Then
-                                Call sqlList.add("NAME", cpCore.db.encodeSQLText(field.nameLc)) ' Pointer)
-                                Call sqlList.add("CONTENTID", cpCore.db.encodeSQLNumber(ContentID)) ' Pointer)
-                                Call sqlList.add("CREATEKEY", "0") ' Pointer)
-                                Call sqlList.add("DATEADDED", cpCore.db.encodeSQLDate(Now)) ' Pointer)
-                                Call sqlList.add("CREATEDBY", cpCore.db.encodeSQLNumber(SystemMemberID)) ' Pointer)
-                                '
-                                RecordID = cpCore.db.db_InsertTableRecordGetID("Default", "ccFields")
-                            End If
-                            If RecordID = 0 Then
-                                Call cpCore.handleExceptionAndRethrow(New ApplicationException("Could Not create Field [" & field.nameLc & "] because insert into ccfields failed."))
-                            Else
-                                Call cpCore.db.db_UpdateTableRecord("Default", "ccFields", "ID=" & RecordID, sqlList)
-                            End If
-                            '
-                        End If
-                    End If
-                End If
-                '
-                If Not isNewFieldRecord Then
-                    cpCore.cache.invalidateAll()
-                    cpCore.metaData.clear()
-                End If
-                '
-                returnId = RecordID
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
-            Return returnId
-        End Function
-        '
-        '=============================================================================
-        ' Imports the named table into the content system
-        '   Note: ContentNames are unique, so you can not have the same name on different
-        '   datasources, so the datasource here is ...
-        '
-        '   What if...
-        '       - content is found on different datasource
-        '       - content does not exist
-        '=============================================================================
-        '
-        Public Sub db_CreateContentFromSQLTable(ByVal DataSourceName As String, ByVal TableName As String, ByVal ContentName As String, ByVal MemberID As Integer)
-            Try
-                '
-                Dim SQL As String
-                'Dim RSTable as datatable
-                Dim dtFields As DataTable
-                'Dim RSContent as datatable
-                Dim DateAddedString As String
-                Dim CreateKeyString As String
-                Dim ContentFieldType As Integer
-                ' converted array to dictionary - Dim FieldPointer As Integer
-                Dim ContentID As Integer
-                Dim BlankRecordID As Integer
-                Dim MakeOK As Boolean
-                Dim DataSourceID As Integer
-                Dim ContentFieldCount As Integer
-                Dim ContentFieldPointer As Integer
-                Dim ContentFieldFound As Boolean
-                Dim ContentPointer As Integer
-                Dim UcaseContentName As String
-                Dim ContentIsNew As Boolean             ' true if the content definition is being created
-                Dim Copy As String
-                Dim MethodName As String
-                Dim CSContent As Integer
-                Dim RecordID As Integer
-                Dim StateOfAllowContentAutoLoad As Boolean
-                '
-                MethodName = "csv_CreateContentFromSQLTable"
-                '
-                'StateOfAllowContentAutoLoad = AllowContentAutoLoad
-                'AllowContentAutoLoad = False
-                '
-                '----------------------------------------------------------------
-                ' ----- lookup datasource ID, if default, ID is -1
-                '----------------------------------------------------------------
-                '
-                DataSourceID = cpCore.db.db_GetDataSourceID(DataSourceName)
-                DateAddedString = cpCore.db.encodeSQLDate(Now())
-                CreateKeyString = cpCore.db.encodeSQLNumber(getRandomLong)
-                '
-                '----------------------------------------------------------------
-                ' ----- Read in a record from the table to get fields
-                '----------------------------------------------------------------
-                '
-                Dim rsTable As DataTable
-                rsTable = cpCore.db.db_openTable(DataSourceName, TableName, "", "", , 1)
-                If True Then
-                    If rsTable.Rows.Count = 0 Then
-                        '
-                        ' --- no records were found, add a blank if we can
-                        '
-                        rsTable = cpCore.db.db_InsertTableRecordGetDataTable(DataSourceName, TableName, MemberID)
-                        If rsTable.Rows.Count > 0 Then
-                            RecordID = EncodeInteger(rsTable.Rows(0).Item("ID"))
-                            Call cpCore.db.executeSql("Update " & TableName & " Set active=0 where id=" & RecordID & ";", DataSourceName)
-                        End If
-                    End If
-                    If rsTable.Rows.Count = 0 Then
-                        '
-                        Call cpCore.handleExceptionAndRethrow(New ApplicationException("Could Not add a record To table [" & TableName & "]."))
-                    Else
-                        '
-                        '----------------------------------------------------------------
-                        ' --- Find/Create the Content Definition
-                        '----------------------------------------------------------------
-                        '
-                        ContentID = cpCore.db.db_GetContentID(ContentName)
-                        If (ContentID < 0) Then
-                            '
-                            ' ----- Content definition not found, create it
-                            '
-                            ContentIsNew = True
-                            Call metaData_CreateContent4(True, DataSourceName, TableName, ContentName)
-                            'ContentID = csv_GetContentID(ContentName)
-                            SQL = "Select ID from ccContent where name=" & cpCore.db.encodeSQLText(ContentName)
-                            Dim rsContent As DataTable
-                            rsContent = cpCore.db.executeSql(SQL)
-                            If rsContent.Rows.Count = 0 Then
-                                Call cpCore.handleExceptionAndRethrow(New ApplicationException("Content Definition [" & ContentName & "] could Not be selected by name after it was inserted"))
-                            Else
-                                ContentID = EncodeInteger(rsContent(0).Item("ID"))
-                                Call cpCore.db.executeSql("update ccContent Set CreateKey=0 where id=" & ContentID)
-                            End If
-                            rsContent = Nothing
-                            cpCore.cache.invalidateAll()
-                            cpCore.metaData.clear()
-                        End If
-                        '
-                        '-----------------------------------------------------------
-                        ' --- Create the ccFields records for the new table
-                        '-----------------------------------------------------------
-                        '
-                        ' ----- locate the field in the content field table
-                        '
-                        SQL = "Select name from ccFields where ContentID=" & ContentID & ";"
-                        dtFields = cpCore.db.executeSql(SQL)
-                        '
-                        ' ----- verify all the table fields
-                        '
-                        For Each dcTableColumns As DataColumn In rsTable.Columns
-                            '
-                            ' ----- see if the field is already in the content fields
-                            '
-                            Dim UcaseTableColumnName As String
-                            UcaseTableColumnName = UCase(dcTableColumns.ColumnName)
-                            ContentFieldFound = False
-                            For Each drContentRecords As DataRow In dtFields.Rows
-                                If UCase(EncodeText(drContentRecords("name"))) = UcaseTableColumnName Then
-                                    ContentFieldFound = True
-                                    Exit For
-                                End If
-                            Next
-                            If Not ContentFieldFound Then
-                                '
-                                ' create the content field
-                                '
-                                Call db_CreateContentFieldFromTableField(ContentName, dcTableColumns.ColumnName, EncodeInteger(dcTableColumns.DataType))
-                            Else
-                                '
-                                ' touch field so upgrade does not delete it
-                                '
-                                Call cpCore.db.executeSql("update ccFields Set CreateKey=0 where (Contentid=" & ContentID & ") And (name = " & cpCore.db.encodeSQLText(UcaseTableColumnName) & ")")
-                            End If
-                        Next
-                    End If
-                End If
-                '
-                ' Fill ContentControlID fields with new ContentID
-                '
-                SQL = "Update " & TableName & " Set ContentControlID=" & ContentID & " where (ContentControlID Is null);"
-                Call cpCore.db.executeSql(SQL, DataSourceName)
-                '
-                ' ----- Load CDef
-                '       Load only if the previous state of autoload was true
-                '       Leave Autoload false during load so more do not trigger
-                '
-                cpCore.cache.invalidateAll()
-                cpCore.metaData.clear()
-                rsTable = Nothing
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
-        End Sub
-        '
-        '
-        Private Sub csv_HandleClassTrapError(ByVal ignore As Integer, ByVal ignore2 As String, ByVal ErrDescription As String, ByVal MethodName As String, ByVal ErrorTrap As Boolean, ByVal ResumeNext As Boolean)
-            cpCore.handleLegacyError3("appname unknown", "unknown", "dll", "builderClass", MethodName, ignore, ignore2, ErrDescription, ErrorTrap, ResumeNext, "")
-        End Sub
-        '
-        '===========================================================================
-        '   Error handler
-        '===========================================================================
-        '
-        Private Sub HandleClassTrapError(ByVal ApplicationName As String, ByVal ErrNumber As Integer, ByVal ErrSource As String, ByVal ErrDescription As String, ByVal MethodName As String, ByVal ErrorTrap As Boolean, Optional ByVal ResumeNext As Boolean = False)
-            '
-            'Call App.LogEvent("addonInstallClass.HandleClassTrapError called from " & MethodName)
-            '
-            cpCore.handleLegacyError3(ApplicationName, "unknown", "dll", "builderClass", MethodName, ErrNumber, ErrSource, ErrDescription, ErrorTrap, ResumeNext, "")
-            '
-        End Sub
-        '
-        ' delete when done
-        '
-        Private Sub profileLogMethodExit(ByVal ignore As String)
-            '
-        End Sub
-        '
-        Private Function profileLogMethodEnter(ByVal ignore As String) As String
-            '
-        End Function
     End Class
 End Namespace

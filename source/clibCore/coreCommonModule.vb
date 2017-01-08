@@ -5,6 +5,7 @@ Option Strict On
 Imports System.Runtime.InteropServices
 Imports System.Net
 Imports Xunit
+Imports System.Text.RegularExpressions
 '
 Namespace Contensive.Core
     '
@@ -113,7 +114,7 @@ Namespace Contensive.Core
         '   if isLocal, the cluster runs from these files
         '   if not, this is the local mirror of the cluster files
         '
-        Public clusterPhysicalPath As String
+        'Public clusterPhysicalPath As String
         '
         'Public domainRoutes As Dictionary(Of String, String)
         '
@@ -235,9 +236,9 @@ Namespace Contensive.Core
 
     Public Module coreCommonModule
         '
-        Public Const sqlAddonStyles = "select addonid,styleid from ccSharedStylesAddonRules where (active<>0) order by id"
+        Public Const sqlAddonStyles As String = "select addonid,styleid from ccSharedStylesAddonRules where (active<>0) order by id"
         '
-        Public Const cacheNameAddonStyleRules = "addon styles"
+        Public Const cacheNameAddonStyleRules As String = "addon styles"
         '
         Public Const ALLOWLEGACYAPI As Boolean = False
         Public Const ALLOWPROFILING As Boolean = False
@@ -351,29 +352,29 @@ Namespace Contensive.Core
         ' old - If an error is raised that is not a KmaCode, it is logged and translated
         ' old - If an error is raised and the soure is not he current "dll", it is logged and translated
         '
-        Public Const KmaErrorBase = vbObjectError                 ' Base on which Internal errors should start
+        'Public Const ignoreInteger = vbObjectError                 ' Base on which Internal errors should start
+        ''
+        ''Public Const KmaError_UnderlyingObject = vbObjectError + 1     ' An error occurec in an underlying object
+        ''Public Const KmaccErrorServiceStopped = vbObjectError + 2       ' The service is not running
+        ''Public Const KmaError_BadObject = vbObjectError + 3            ' The Server Pointer is not valid
+        ''Public Const KmaError_UpgradeInProgress = vbObjectError + 4    ' page is blocked because an upgrade is in progress
+        ''Public Const KmaError_InvalidArgument = vbObjectError + 5      ' and input argument is not valid. Put details at end of description
+        ''
+        'Public Const ignoreInteger = ignoreInteger + 16                   ' Generic Error code that passes the description back to the user
+        'Public Const ignoreInteger = ignoreInteger + 17               ' Internal error which the user should not see
+        'Public Const KmaErrorPage = ignoreInteger + 18                   ' Error from the page which called Contensive
+        ''
+        'Public Const KmaObjectError = ignoreInteger + 256                ' Internal error which the user should not see
         '
-        'Public Const KmaError_UnderlyingObject = vbObjectError + 1     ' An error occurec in an underlying object
-        'Public Const KmaccErrorServiceStopped = vbObjectError + 2       ' The service is not running
-        'Public Const KmaError_BadObject = vbObjectError + 3            ' The Server Pointer is not valid
-        'Public Const KmaError_UpgradeInProgress = vbObjectError + 4    ' page is blocked because an upgrade is in progress
-        'Public Const KmaError_InvalidArgument = vbObjectError + 5      ' and input argument is not valid. Put details at end of description
-        '
-        Public Const KmaErrorUser = KmaErrorBase + 16                   ' Generic Error code that passes the description back to the user
-        Public Const KmaErrorInternal = KmaErrorBase + 17               ' Internal error which the user should not see
-        Public Const KmaErrorPage = KmaErrorBase + 18                   ' Error from the page which called Contensive
-        '
-        Public Const KmaObjectError = KmaErrorBase + 256                ' Internal error which the user should not see
-        '
-        Public Const SQLTrue = "1"
-        Public Const SQLFalse = "0"
+        Public Const SQLTrue As String = "1"
+        Public Const SQLFalse As String = "0"
         '
         Public Const dateMinValue As Date = #12/30/1899#
         '
         '
-        Public Const kmaEndTable = "</table >"
-        Public Const kmaEndTableCell = "</td>"
-        Public Const kmaEndTableRow = "</tr>"
+        Public Const kmaEndTable As String = "</table >"
+        Public Const kmaEndTableCell As String = "</td>"
+        Public Const kmaEndTableRow As String = "</tr>"
         '
         Public Enum csv_contentTypeEnum
             contentTypeWeb = 1
@@ -610,7 +611,7 @@ Namespace Contensive.Core
         '            If Not IsMissing(ExpressionVariant) Then
         '                If Not IsNull(ExpressionVariant) Then
         '                    If ExpressionVariant <> "" Then
-        '                        If IsNumeric(ExpressionVariant) Then
+        '                        If vbIsNumeric(ExpressionVariant) Then
         '                            encodeInteger = CLng(ExpressionVariant)
         '                        End If
         '                    End If
@@ -639,7 +640,7 @@ Namespace Contensive.Core
         '        If Not IsMissing(ExpressionVariant) Then
         '            If Not IsNull(ExpressionVariant) Then
         '                If ExpressionVariant <> "" Then
-        '                    If IsNumeric(ExpressionVariant) Then
+        '                    If vbIsNumeric(ExpressionVariant) Then
         '                        encodeNumber = ExpressionVariant
         '                    End If
         '                End If
@@ -697,17 +698,17 @@ Namespace Contensive.Core
         '        If Not IsMissing(ExpressionVariant) Then
         '            If Not IsNull(ExpressionVariant) Then
         '                If ExpressionVariant <> "" Then
-        '                    If IsNumeric(ExpressionVariant) Then
+        '                    If vbIsNumeric(ExpressionVariant) Then
         '                        If ExpressionVariant <> "0" Then
         '                            If ExpressionVariant <> 0 Then
         '                                encodeBoolean = True
         '                            End If
         '                        End If
-        '                    ElseIf UCase(ExpressionVariant) = "ON" Then
+        '                    ElseIf vbUCase(ExpressionVariant) = "ON" Then
         '                        encodeBoolean = True
-        '                    ElseIf UCase(ExpressionVariant) = "YES" Then
+        '                    ElseIf vbUCase(ExpressionVariant) = "YES" Then
         '                        encodeBoolean = True
-        '                    ElseIf UCase(ExpressionVariant) = "TRUE" Then
+        '                    ElseIf vbUCase(ExpressionVariant) = "TRUE" Then
         '                        encodeBoolean = True
         '                    Else
         '                        encodeBoolean = False
@@ -840,8 +841,8 @@ Namespace Contensive.Core
         '        ' Get Protocol (before the first :)
         '        '
         '        WorkingURL = SourceURL
-        '        Position = InStr(1, WorkingURL, ":")
-        '        'Position = InStr(1, WorkingURL, "://")
+        '        Position = vbInstr(1, WorkingURL, ":")
+        '        'Position = vbInstr(1, WorkingURL, "://")
         '        If Position <> 0 Then
         '            Protocol = Mid(WorkingURL, 1, Position + 2)
         '            WorkingURL = Mid(WorkingURL, Position + 3)
@@ -849,7 +850,7 @@ Namespace Contensive.Core
         '        '
         '        ' compatibility fix
         '        '
-        '        If InStr(1, WorkingURL, "//") = 1 Then
+        '        If vbInstr(1, WorkingURL, "//") = 1 Then
         '            If Protocol = "" Then
         '                Protocol = "http:"
         '            End If
@@ -859,7 +860,7 @@ Namespace Contensive.Core
         '        '
         '        ' Get QueryString
         '        '
-        '        Position = InStr(1, WorkingURL, "?")
+        '        Position = vbInstr(1, WorkingURL, "?")
         '        If Position > 0 Then
         '            QueryString = Mid(WorkingURL, Position)
         '            WorkingURL = Mid(WorkingURL, 1, Position - 1)
@@ -868,7 +869,7 @@ Namespace Contensive.Core
         '        ' separate host from pathpage
         '        '
         '        'iURLHost = WorkingURL
-        '        Position = InStr(WorkingURL, "/")
+        '        Position = vbInstr(WorkingURL, "/")
         '        If (Position = 0) And (Protocol = "") Then
         '            '
         '            ' Page without path or host
@@ -931,7 +932,7 @@ Namespace Contensive.Core
         '        Dim Position As Integer
         '        '
         '        iURLWorking = SourceURL
-        '        Position = InStr(1, iURLWorking, "://")
+        '        Position = vbInstr(1, iURLWorking, "://")
         '        If Position <> 0 Then
         '            iURLProtocol = Mid(iURLWorking, 1, Position + 2)
         '            iURLWorking = Mid(iURLWorking, Position + 3)
@@ -940,7 +941,7 @@ Namespace Contensive.Core
         '        ' separate Host:Port from pathpage
         '        '
         '        iURLHost = iURLWorking
-        '        Position = InStr(iURLHost, "/")
+        '        Position = vbInstr(iURLHost, "/")
         '        If Position = 0 Then
         '            '
         '            ' just host, no path or page
@@ -968,12 +969,12 @@ Namespace Contensive.Core
         '        '
         '        ' Divide Host from Port
         '        '
-        '        Position = InStr(iURLHost, ":")
+        '        Position = vbInstr(iURLHost, ":")
         '        If Position = 0 Then
         '            '
         '            ' host not given, take a guess
         '            '
-        '            Select Case UCase(iURLProtocol)
+        '            Select Case vbUCase(iURLProtocol)
         '                Case "FTP://"
         '                    iURLPort = "21"
         '                Case "HTTP://", "HTTPS://"
@@ -985,7 +986,7 @@ Namespace Contensive.Core
         '            iURLPort = Mid(iURLHost, Position + 1)
         '            iURLHost = Mid(iURLHost, 1, Position - 1)
         '        End If
-        '        Position = InStr(1, iURLPage, "?")
+        '        Position = vbInstr(1, iURLPage, "?")
         '        If Position > 0 Then
         '            iURLQueryString = Mid(iURLPage, Position)
         '            iURLPage = Mid(iURLPage, 1, Position - 1)
@@ -1069,7 +1070,7 @@ Namespace Contensive.Core
         '            '
         '            ' If not explicit
         '            '
-        '            If InStr(1, ArgumentString, vbCrLf) <> 0 Then
+        '            If vbInstr(1, ArgumentString, vbCrLf) <> 0 Then
         '                '
         '                ' crlf can only be here if it is the delimiter
         '                '
@@ -1086,7 +1087,7 @@ Namespace Contensive.Core
         '        getSimpleNameValue = iDefaultValue
         '        If WorkingString <> "" Then
         '            WorkingString = Delimiter & WorkingString & Delimiter
-        '            ValueStart = InStr(1, WorkingString, Delimiter & Name & "=", vbTextCompare)
+        '            ValueStart = vbInstr(1, WorkingString, Delimiter & Name & "=", vbTextCompare)
         '            If ValueStart <> 0 Then
         '                NameLength = Len(Name)
         '                ValueStart = ValueStart + Len(Delimiter) + NameLength + 1
@@ -1095,9 +1096,9 @@ Namespace Contensive.Core
         '                    ValueStart = ValueStart + 1
         '                End If
         '                If IsQuoted Then
-        '                    ValueEnd = InStr(ValueStart, WorkingString, """" & Delimiter)
+        '                    ValueEnd = vbInstr(ValueStart, WorkingString, """" & Delimiter)
         '                Else
-        '                    ValueEnd = InStr(ValueStart, WorkingString, Delimiter)
+        '                    ValueEnd = vbInstr(ValueStart, WorkingString, Delimiter)
         '                End If
         '                If ValueEnd = 0 Then
         '                    getSimpleNameValue = Mid(WorkingString, ValueStart)
@@ -1137,14 +1138,14 @@ Namespace Contensive.Core
         '        '
         '        ' remove the manual select list syntax "answer[choice1|choice2]"
         '        '
-        '        Pos = InStr(1, GetAggrOption_old, "[")
+        '        Pos = vbInstr(1, GetAggrOption_old, "[")
         '        If Pos <> 0 Then
         '            GetAggrOption_old = Left(GetAggrOption_old, Pos - 1)
         '        End If
         '        '
         '        ' remove any function syntax "answer{selectcontentname RSS Feeds}"
         '        '
-        '        Pos = InStr(1, GetAggrOption_old, "{")
+        '        Pos = vbInstr(1, GetAggrOption_old, "{")
         '        If Pos <> 0 Then
         '            GetAggrOption_old = Left(GetAggrOption_old, Pos - 1)
         '        End If
@@ -1186,8 +1187,8 @@ Namespace Contensive.Core
         '            ' ??? this should not be here -- to correct a field used in a CDef, truncate in SaveCS by fieldtype
         '            'encodeSQLText = Left(ExpressionVariant, 255)
         '            'remove-can not find a case where | is not allowed to be saved.
-        '            'encodeSQLText = Replace(encodeSQLText, "|", "_")
-        '            encodeSQLText = "'" & Replace(encodeSQLText, "'", "''") & "'"
+        '            'encodeSQLText = vbReplace(encodeSQLText, "|", "_")
+        '            encodeSQLText = "'" & vbReplace(encodeSQLText, "'", "''") & "'"
         '        End If
         '        Exit Function
         '        '
@@ -1215,8 +1216,8 @@ Namespace Contensive.Core
         '            encodeSQLLongText = "null"
         '        Else
         '            encodeSQLLongText = ExpressionVariant
-        '            'encodeSQLLongText = Replace(ExpressionVariant, "|", "_")
-        '            encodeSQLLongText = "'" & Replace(encodeSQLLongText, "'", "''") & "'"
+        '            'encodeSQLLongText = vbReplace(ExpressionVariant, "|", "_")
+        '            encodeSQLLongText = "'" & vbReplace(encodeSQLLongText, "'", "''") & "'"
         '        End If
         '        Exit Function
         '        '
@@ -1296,7 +1297,7 @@ Namespace Contensive.Core
         '            encodeSQLNumber = "null"
         '        ElseIf ExpressionVariant = "" Then
         '            encodeSQLNumber = "null"
-        '        ElseIf IsNumeric(ExpressionVariant) Then
+        '        ElseIf vbIsNumeric(ExpressionVariant) Then
         '            Select Case VarType(ExpressionVariant)
         '                Case vbBoolean
         '                    If ExpressionVariant Then
@@ -1351,8 +1352,8 @@ Namespace Contensive.Core
         '        Dim NextLF As Integer
         '        Dim BOL As Integer
         '        '
-        '        NextCR = InStr(1, Body, vbCr)
-        '        NextLF = InStr(1, Body, vbLf)
+        '        NextCR = vbInstr(1, Body, vbCr)
+        '        NextLF = vbInstr(1, Body, vbLf)
 
         '        If NextCR <> 0 Or NextLF <> 0 Then
         '            If NextCR <> 0 Then
@@ -1384,7 +1385,7 @@ Namespace Contensive.Core
         '            Body = ""
         '        End If
 
-        '        'EOL = InStr(1, Body, vbCrLf)
+        '        'EOL = vbInstr(1, Body, vbCrLf)
 
         '        'If EOL <> 0 Then
         '        '    getLine = Mid(Body, 1, EOL - 1)
@@ -1446,7 +1447,7 @@ Namespace Contensive.Core
         '
         Public Function ModifyQueryString(ByVal WorkingQuery As String, ByVal QueryName As String, ByVal QueryValue As String, Optional ByVal AddIfMissing As Boolean = True) As String
             '
-            If WorkingQuery.IndexOf("?") >= 0 Then
+            If WorkingQuery.IndexOf("?") > 0 Then
                 ModifyQueryString = modifyLinkQuery(WorkingQuery, QueryName, QueryValue, AddIfMissing)
             Else
                 ModifyQueryString = Mid(modifyLinkQuery("?" & WorkingQuery, QueryName, QueryValue, AddIfMissing), 2)
@@ -1482,21 +1483,21 @@ Namespace Contensive.Core
                 Dim QueryString As String
                 '
                 iAddIfMissing = AddIfMissing
-                If InStr(1, Link, "?") <> 0 Then
-                    modifyLinkQuery = Mid(Link, 1, InStr(1, Link, "?") - 1)
+                If vbInstr(1, Link, "?") <> 0 Then
+                    modifyLinkQuery = Mid(Link, 1, vbInstr(1, Link, "?") - 1)
                     QueryString = Mid(Link, Len(modifyLinkQuery) + 2)
                 Else
                     modifyLinkQuery = Link
                     QueryString = ""
                 End If
-                UcaseQueryName = UCase(EncodeRequestVariable(QueryName))
+                UcaseQueryName = vbUCase(EncodeRequestVariable(QueryName))
                 If QueryString <> "" Then
                     Element = Split(QueryString, "&")
                     ElementCount = UBound(Element) + 1
                     For ElementPointer = 0 To ElementCount - 1
                         NameValue = Split(Element(ElementPointer), "=")
                         If UBound(NameValue) = 1 Then
-                            If UCase(NameValue(0)) = UcaseQueryName Then
+                            If vbUCase(NameValue(0)) = UcaseQueryName Then
                                 If QueryValue = "" Then
                                     Element(ElementPointer) = ""
                                 Else
@@ -1528,7 +1529,7 @@ Namespace Contensive.Core
                         '
                         ' element found and needs to be removed
                         '
-                        QueryString = Replace(QueryString, "&&", "&")
+                        QueryString = vbReplace(QueryString, "&&", "&")
                         If Left(QueryString, 1) = "&" Then
                             QueryString = Mid(QueryString, 2)
                         End If
@@ -1577,36 +1578,36 @@ Namespace Contensive.Core
         '        Call SetPriorityClass(hProcess, HIGH_PRIORITY_CLASS)
         '        '
         '    End Sub
-        '    '
-        '    '==========================================================================================
-        '    '   Format the current error object into a standard string
-        '    '==========================================================================================
-        '    '
+        ''
+        ''==========================================================================================
+        ''   Format the current error object into a standard string
+        ''==========================================================================================
+        ''
         'Public Function GetErrString(Optional ErrorObject As Object) As String
-        '        Dim Copy As String
-        '        If ErrorObject Is Nothing Then
-        '            If Err.Number = 0 Then
-        '                GetErrString = "[no error]"
-        '            Else
-        '                Copy = Err.Description
-        '                Copy = Replace(Copy, vbCrLf, "-")
-        '                Copy = Replace(Copy, vbLf, "-")
-        '                Copy = Replace(Copy, vbCrLf, "")
-        '                GetErrString = "[" & Err.Source & " #" & Err.Number & ", " & Copy & "]"
-        '            End If
+        '    Dim Copy As String
+        '    If ErrorObject Is Nothing Then
+        '        If Err.Number = 0 Then
+        '            GetErrString = "[no error]"
         '        Else
-        '            If ErrorObject.Number = 0 Then
-        '                GetErrString = "[no error]"
-        '            Else
-        '                Copy = ErrorObject.Description
-        '                Copy = Replace(Copy, vbCrLf, "-")
-        '                Copy = Replace(Copy, vbLf, "-")
-        '                Copy = Replace(Copy, vbCrLf, "")
-        '                GetErrString = "[" & ErrorObject.Source & " #" & ErrorObject.Number & ", " & Copy & "]"
-        '            End If
+        '            Copy = Err.Description
+        '            Copy = vbReplace(Copy, vbCrLf, "-")
+        '            Copy = vbReplace(Copy, vbLf, "-")
+        '            Copy = vbReplace(Copy, vbCrLf, "")
+        '            GetErrString = "[" & Err.Source & " #" & Err.Number & ", " & Copy & "]"
         '        End If
-        '        '
-        '    End Function
+        '    Else
+        '        If ErrorObject.Number = 0 Then
+        '            GetErrString = "[no error]"
+        '        Else
+        '            Copy = ErrorObject.Description
+        '            Copy = vbReplace(Copy, vbCrLf, "-")
+        '            Copy = vbReplace(Copy, vbLf, "-")
+        '            Copy = vbReplace(Copy, vbCrLf, "")
+        '            GetErrString = "[" & ErrorObject.Source & " #" & ErrorObject.Number & ", " & Copy & "]"
+        '        End If
+        '    End If
+        '    '
+        'End Function
         '    '
         '    '==========================================================================================
         '    '   Format the current error object into a standard string
@@ -1621,7 +1622,7 @@ Namespace Contensive.Core
         '    '==========================================================================================
         '    '
         '    Public Function IsInDelimitedString(DelimitedString As String, TestString As String, Delimiter As String) As Boolean
-        '        IsInDelimitedString = (0 <> InStr(1, Delimiter & DelimitedString & Delimiter, Delimiter & TestString & Delimiter, vbTextCompare))
+        '        IsInDelimitedString = (0 <> vbInstr(1, Delimiter & DelimitedString & Delimiter, Delimiter & TestString & Delimiter, vbTextCompare))
         '    End Function
         '    '
         '    '========================================================================
@@ -1642,18 +1643,18 @@ Namespace Contensive.Core
         '        If Source <> "" Then
         '            URLSplit = Split(Source, "?")
         '            encodeURL = URLSplit(0)
-        '            encodeURL = Replace(encodeURL, "%", "%25")
+        '            encodeURL = vbReplace(encodeURL, "%", "%25")
         '            '
-        '            encodeURL = Replace(encodeURL, """", "%22")
-        '            encodeURL = Replace(encodeURL, " ", "%20")
-        '            encodeURL = Replace(encodeURL, "$", "%24")
-        '            encodeURL = Replace(encodeURL, "+", "%2B")
-        '            encodeURL = Replace(encodeURL, ",", "%2C")
-        '            encodeURL = Replace(encodeURL, ";", "%3B")
-        '            encodeURL = Replace(encodeURL, "<", "%3C")
-        '            encodeURL = Replace(encodeURL, "=", "%3D")
-        '            encodeURL = Replace(encodeURL, ">", "%3E")
-        '            encodeURL = Replace(encodeURL, "@", "%40")
+        '            encodeURL = vbReplace(encodeURL, """", "%22")
+        '            encodeURL = vbReplace(encodeURL, " ", "%20")
+        '            encodeURL = vbReplace(encodeURL, "$", "%24")
+        '            encodeURL = vbReplace(encodeURL, "+", "%2B")
+        '            encodeURL = vbReplace(encodeURL, ",", "%2C")
+        '            encodeURL = vbReplace(encodeURL, ";", "%3B")
+        '            encodeURL = vbReplace(encodeURL, "<", "%3C")
+        '            encodeURL = vbReplace(encodeURL, "=", "%3D")
+        '            encodeURL = vbReplace(encodeURL, ">", "%3E")
+        '            encodeURL = vbReplace(encodeURL, "@", "%40")
         '            If UBound(URLSplit) > 0 Then
         '                encodeURL = encodeURL & "?" & encodeQueryString(URLSplit(1))
         '            End If
@@ -1716,15 +1717,15 @@ Namespace Contensive.Core
         '        If Source <> "" Then
         '            LocalSource = Source
         '            ' "+" is an allowed character for filenames. If you add it, the wrong file will be looked up
-        '            'LocalSource = Replace(LocalSource, " ", "+")
+        '            'LocalSource = vbReplace(LocalSource, " ", "+")
         '            For SourcePointer = 1 To Len(LocalSource)
         '                Character = Mid(LocalSource, SourcePointer, 1)
         '                ' "%" added so if this is called twice, it will not destroy "%20" values
         '                'If Character = " " Then
         '                '    encodeRequestVariable = encodeRequestVariable & "+"
-        '                If InStr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-_!*()", Character, vbTextCompare) <> 0 Then
-        '                    'ElseIf InStr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./:-_!*()", Character, vbTextCompare) <> 0 Then
-        '                    'ElseIf InStr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./:?#-_!~*'()%", Character, vbTextCompare) <> 0 Then
+        '                If vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-_!*()", Character, vbTextCompare) <> 0 Then
+        '                    'ElseIf vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./:-_!*()", Character, vbTextCompare) <> 0 Then
+        '                    'ElseIf vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./:?#-_!~*'()%", Character, vbTextCompare) <> 0 Then
         '                    encodeRequestVariable = encodeRequestVariable & Character
         '                Else
         '                    encodeRequestVariable = encodeRequestVariable & "%" & Hex(Asc(Character))
@@ -1745,12 +1746,12 @@ Namespace Contensive.Core
         '        ' ##### removed to catch err<>0 problem on error resume next
         '        '
         '        encodeHTML = Source
-        '        encodeHTML = Replace(encodeHTML, "&", "&amp;")
-        '        encodeHTML = Replace(encodeHTML, "<", "&lt;")
-        '        encodeHTML = Replace(encodeHTML, ">", "&gt;")
-        '        encodeHTML = Replace(encodeHTML, """", "&quot;")
-        '        encodeHTML = Replace(encodeHTML, "'", "&#39;")
-        '        'encodeHTML = Replace(encodeHTML, "'", "&apos;")
+        '        encodeHTML = vbReplace(encodeHTML, "&", "&amp;")
+        '        encodeHTML = vbReplace(encodeHTML, "<", "&lt;")
+        '        encodeHTML = vbReplace(encodeHTML, ">", "&gt;")
+        '        encodeHTML = vbReplace(encodeHTML, """", "&quot;")
+        '        encodeHTML = vbReplace(encodeHTML, "'", "&#39;")
+        '        'encodeHTML = vbReplace(encodeHTML, "'", "&apos;")
         '        '
         '    End Function
         '
@@ -1790,7 +1791,7 @@ Namespace Contensive.Core
                         posEnd = Pos + 6
                     End If
                     If CharCodeString <> "" Then
-                        If IsNumeric(CharCodeString) Then
+                        If vbIsNumeric(CharCodeString) Then
                             CharCode = EncodeInteger(CharCodeString)
                             s = Mid(s, 1, Pos - 1) & Chr(CharCode) & Mid(s, posEnd)
                         End If
@@ -1801,24 +1802,24 @@ Namespace Contensive.Core
                 '
                 ' replace out all common names (at least the most common for now)
                 '
-                s = Replace(s, "&lt;", "<")
-                s = Replace(s, "&gt;", ">")
-                s = Replace(s, "&quot;", """")
-                s = Replace(s, "&apos;", "'")
+                s = vbReplace(s, "&lt;", "<")
+                s = vbReplace(s, "&gt;", ">")
+                s = vbReplace(s, "&quot;", """")
+                s = vbReplace(s, "&apos;", "'")
                 '
                 ' Always replace the amp last
                 '
-                s = Replace(s, "&amp;", "&")
+                s = vbReplace(s, "&amp;", "&")
                 '
                 decodeHtml = s
             End If
             ' pre-11/26/2009
             'decodeHtml = Source
-            'decodeHtml = Replace(decodeHtml, "&amp;", "&")
-            'decodeHtml = Replace(decodeHtml, "&lt;", "<")
-            'decodeHtml = Replace(decodeHtml, "&gt;", ">")
-            'decodeHtml = Replace(decodeHtml, "&quot;", """")
-            'decodeHtml = Replace(decodeHtml, "&nbsp;", " ")
+            'decodeHtml = vbReplace(decodeHtml, "&amp;", "&")
+            'decodeHtml = vbReplace(decodeHtml, "&lt;", "<")
+            'decodeHtml = vbReplace(decodeHtml, "&gt;", ">")
+            'decodeHtml = vbReplace(decodeHtml, "&quot;", """")
+            'decodeHtml = vbReplace(decodeHtml, "&nbsp;", " ")
             '
         End Function
         '    '
@@ -1831,22 +1832,22 @@ Namespace Contensive.Core
             Dim post As String
             Dim target As String
             '
-            posStart = InStr(1, Source, "<![CDATA[", CompareMethod.Text)
+            posStart = vbInstr(1, Source, "<![CDATA[", CompareMethod.Text)
             If posStart = 0 Then
                 '
                 ' no cdata
                 '
-                posStart = InStr(1, Source, "<textarea", CompareMethod.Text)
+                posStart = vbInstr(1, Source, "<textarea", CompareMethod.Text)
                 If posStart = 0 Then
                     '
                     ' no textarea
                     '
-                    kmaIndent = Replace(Source, vbCrLf & vbTab, vbCrLf & vbTab & vbTab)
+                    kmaIndent = vbReplace(Source, vbCrLf & vbTab, vbCrLf & vbTab & vbTab)
                 Else
                     '
                     ' text area found, isolate it and indent before and after
                     '
-                    posEnd = InStr(posStart, Source, "</textarea>", CompareMethod.Text)
+                    posEnd = vbInstr(posStart, Source, "</textarea>", CompareMethod.Text)
                     pre = Mid(Source, 1, posStart - 1)
                     If posEnd = 0 Then
                         target = Mid(Source, posStart)
@@ -1861,7 +1862,7 @@ Namespace Contensive.Core
                 '
                 ' cdata found, isolate it and indent before and after
                 '
-                posEnd = InStr(posStart, Source, "]]>", CompareMethod.Text)
+                posEnd = vbInstr(posStart, Source, "]]>", CompareMethod.Text)
                 pre = Mid(Source, 1, posStart - 1)
                 If posEnd = 0 Then
                     target = Mid(Source, posStart)
@@ -1873,8 +1874,8 @@ Namespace Contensive.Core
                 kmaIndent = kmaIndent(pre) & target & kmaIndent(post)
             End If
             '    kmaIndent = Source
-            '    If InStr(1, kmaIndent, "<textarea", vbTextCompare) = 0 Then
-            '        kmaIndent = Replace(Source, vbCrLf & vbTab, vbCrLf & vbTab & vbTab)
+            '    If vbInstr(1, kmaIndent, "<textarea", vbTextCompare) = 0 Then
+            '        kmaIndent = vbReplace(Source, vbCrLf & vbTab, vbCrLf & vbTab & vbTab)
             '    End If
         End Function
         '
@@ -2087,10 +2088,10 @@ Namespace Contensive.Core
         Public Const BlockTextEndMarker = "<!-- BLOCKTEXTEND -->"
         '
         'Private Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Integer)
-        Private Declare Function GetExitCodeProcess Lib "kernel32" (ByVal hProcess As Integer, ByVal lpExitCode As Integer) As Integer
-        Private Declare Function timeGetTime Lib "winmm.dll" () As Integer
-        Private Declare Function OpenProcess Lib "kernel32" (ByVal dwDesiredAccess As Integer, ByVal bInheritHandle As Integer, ByVal dwProcessId As Integer) As Integer
-        Private Declare Function CloseHandle Lib "kernel32" (ByVal hObject As Integer) As Integer
+        'Private Declare Function GetExitCodeProcess Lib "kernel32" (ByVal hProcess As Integer, ByVal lpExitCode As Integer) As Integer
+        'Private Declare Function timeGetTime Lib "winmm.dll" () As Integer
+        'Private Declare Function OpenProcess Lib "kernel32" (ByVal dwDesiredAccess As Integer, ByVal bInheritHandle As Integer, ByVal dwProcessId As Integer) As Integer
+        'Private Declare Function CloseHandle Lib "kernel32" (ByVal hObject As Integer) As Integer
         '
         Public Const InstallFolderName = "Install"
         Public Const DownloadFileRootNode = "collectiondownload"
@@ -2102,42 +2103,47 @@ Namespace Contensive.Core
         Public Const DefaultNewLandingPageName = "Home"
         Public Const DefaultLandingSectionName = "Home"
         '
+        '
+        '
+        Public Const ignoreInteger As Integer = 0
+        Public Const ignoreString As String = ""
+        '
         ' ----- Errors Specific to the Contensive Objects
         '
-        Public Const KmaccErrorUpgrading = KmaObjectError + 1
-        Public Const KmaccErrorServiceStopped = KmaObjectError + 2
+        'Public Const ignoreInteger = KmaObjectError + 1
+        'Public Const KmaccErrorServiceStopped = KmaObjectError + 2
         '
         Public Const UserErrorHeadline = "<p class=""ccError"">There was a problem with this page.</p>"
+        ''
+        '' ----- Errors connecting to server
+        ''
+        'Public Const ccError_InvalidAppName = 100
+        'Public Const ccError_ErrorAddingApp = 101
+        'Public Const ccError_ErrorDeletingApp = 102
+        'Public Const ccError_InvalidFieldName = 103     ' Invalid parameter name
+        'Public Const ignoreString = 104
+        'Public Const ignoreString = 105
+        'Public Const ccError_NotConnected = 106             ' Attempt to execute a command without a connection
+        ''
         '
-        ' ----- Errors connecting to server
         '
-        Public Const ccError_InvalidAppName = 100
-        Public Const ccError_ErrorAddingApp = 101
-        Public Const ccError_ErrorDeletingApp = 102
-        Public Const ccError_InvalidFieldName = 103     ' Invalid parameter name
-        Public Const ccError_InvalidCommand = 104
-        Public Const ccError_InvalidAuthentication = 105
-        Public Const ccError_NotConnected = 106             ' Attempt to execute a command without a connection
-        '
-        '
-        '
-        Public Const ccStatusCode_Base = KmaErrorBase
-        Public Const ccStatusCode_ControllerCreateFailed = ccStatusCode_Base + 1
-        Public Const ccStatusCode_ControllerInProcess = ccStatusCode_Base + 2
-        Public Const ccStatusCode_ControllerStartedWithoutService = ccStatusCode_Base + 3
+        'Public Const ccStatusCode_Base = ignoreInteger
+        'Public Const ccStatusCode_ControllerCreateFailed = ccStatusCode_Base + 1
+        'Public Const ccStatusCode_ControllerInProcess = ccStatusCode_Base + 2
+        'Public Const ccStatusCode_ControllerStartedWithoutService = ccStatusCode_Base + 3
         '
         ' ----- Previous errors, can be replaced
         '
         'Public Const KmaError_UnderlyingObject_Msg = "An error occurred in an underlying routine."
-        Public Const KmaccErrorServiceStopped_Msg = "The Contensive CSv Service is not running."
-        Public Const KmaError_BadObject_Msg = "Server Object is not valid."
-        Public Const KmaError_UpgradeInProgress_Msg = "Server is busy with internal builder."
+        'Public Const KmaccErrorServiceStopped_Msg = "The Contensive CSv Service is not running."
+        'Public Const KmaError_BadObject_Msg = "Server Object is not valid."
+        'Public Const ignoreString = "Server is busy with internal builder."
         '
         'Public Const KmaError_InvalidArgument_Msg = "Invalid Argument"
         'Public Const KmaError_UnderlyingObject_Msg = "An error occurred in an underlying routine."
         'Public Const KmaccErrorServiceStopped_Msg = "The Contensive CSv Service is not running."
         'Public Const KmaError_BadObject_Msg = "Server Object is not valid."
-        'Public Const KmaError_UpgradeInProgress_Msg = "Server is busy with internal builder."
+        'Public Const ignoreString = "Server is busy with internal builder."
         'Public Const KmaError_InvalidArgument_Msg = "Invalid Argument"
         '
         '-----------------------------------------------------------------------
@@ -3758,7 +3764,7 @@ Namespace Contensive.Core
         '                    EncodeXML = "null"
         '                ElseIf ValueVariant = "" Then
         '                    EncodeXML = "null"
-        '                ElseIf IsNumeric(ValueVariant) Then
+        '                ElseIf vbIsNumeric(ValueVariant) Then
         '                    EncodeXML = Int(ValueVariant)
         '                Else
         '                    EncodeXML = "null"
@@ -3776,7 +3782,7 @@ Namespace Contensive.Core
         '                    EncodeXML = "null"
         '                ElseIf ValueVariant = "" Then
         '                    EncodeXML = "null"
-        '                ElseIf IsNumeric(ValueVariant) Then
+        '                ElseIf vbIsNumeric(ValueVariant) Then
         '                    EncodeXML = ValueVariant
         '                Else
         '                    EncodeXML = "null"
@@ -3786,7 +3792,7 @@ Namespace Contensive.Core
         '                    EncodeXML = "null"
         '                ElseIf ValueVariant = "" Then
         '                    EncodeXML = "null"
-        '                ElseIf IsNumeric(ValueVariant) Then
+        '                ElseIf vbIsNumeric(ValueVariant) Then
         '                    EncodeXML = ValueVariant
         '                Else
         '                    EncodeXML = "null"
@@ -3826,9 +3832,9 @@ Namespace Contensive.Core
         '                    EncodeXML = ""
         '                Else
         '                    'EncodeXML = ASPServer.HTMLEncode(ValueVariant)
-        '                    'EncodeXML = Replace(ValueVariant, "&", "&lt;")
-        '                    'EncodeXML = Replace(ValueVariant, "<", "&lt;")
-        '                    'EncodeXML = Replace(EncodeXML, ">", "&gt;")
+        '                    'EncodeXML = vbReplace(ValueVariant, "&", "&lt;")
+        '                    'EncodeXML = vbReplace(ValueVariant, "<", "&lt;")
+        '                    'EncodeXML = vbReplace(EncodeXML, ">", "&gt;")
         '                End If
         '        End Select
         '        '
@@ -3874,8 +3880,8 @@ Namespace Contensive.Core
         '    '    If Len(encodeFilename) > 254 Then
         '    '        encodeFilename = Left(encodeFilename, 254)
         '    '    End If
-        '    '    encodeFilename = Replace(encodeFilename, vbCr, "_")
-        '    '    encodeFilename = Replace(encodeFilename, vbLf, "_")
+        '    '    encodeFilename = vbReplace(encodeFilename, vbCr, "_")
+        '    '    encodeFilename = vbReplace(encodeFilename, vbLf, "_")
         '    '    '
         '    '    End Function
         '    '
@@ -3916,7 +3922,7 @@ Namespace Contensive.Core
         '        Count = UBound(ArrayOfSource) + 1
         '        ReplaceMany = Source
         '        For Pointer = 0 To Count - 1
-        '            ReplaceMany = Replace(ReplaceMany, ArrayOfSource(Pointer), ArrayOfReplacement(Pointer))
+        '            ReplaceMany = vbReplace(ReplaceMany, ArrayOfSource(Pointer), ArrayOfReplacement(Pointer))
         '        Next
         '        '
         '    End Function
@@ -3935,21 +3941,21 @@ Namespace Contensive.Core
         '        Dim URIPath As String
         '        Dim URIPage As String
         '        URIWorking = URI
-        '        If Mid(UCase(URIWorking), 1, 4) = "HTTP" Then
-        '            URIWorking = Mid(URIWorking, InStr(1, URIWorking, "//") + 2)
+        '        If Mid(vbUCase(URIWorking), 1, 4) = "HTTP" Then
+        '            URIWorking = Mid(URIWorking, vbInstr(1, URIWorking, "//") + 2)
         '        End If
         '        URIHost = URIWorking
-        '        Slash = InStr(1, URIHost, "/")
+        '        Slash = vbInstr(1, URIHost, "/")
         '        If Slash = 0 Then
         '            URIPath = "/"
         '            URIPage = ""
         '        Else
         '            URIPath = Mid(URIHost, Slash)
         '            URIHost = Mid(URIHost, 1, Slash - 1)
-        '            Slash = InStr(1, URIPath, "/")
+        '            Slash = vbInstr(1, URIPath, "/")
         '            Do While Slash <> 0
         '                LastSlash = Slash
-        '                Slash = InStr(LastSlash + 1, URIPath, "/")
+        '                Slash = vbInstr(LastSlash + 1, URIPath, "/")
         '                '''DoEvents()
         '            Loop
         '            URIPage = Mid(URIPath, LastSlash + 1)
@@ -3973,21 +3979,21 @@ Namespace Contensive.Core
         '        Dim URIPage As String
         '        Dim URIWorking As String
         '        URIWorking = URI
-        '        If Mid(UCase(URIWorking), 1, 4) = "HTTP" Then
-        '            URIWorking = Mid(URIWorking, InStr(1, URIWorking, "//") + 2)
+        '        If Mid(vbUCase(URIWorking), 1, 4) = "HTTP" Then
+        '            URIWorking = Mid(URIWorking, vbInstr(1, URIWorking, "//") + 2)
         '        End If
         '        URIHost = URIWorking
-        '        Slash = InStr(1, URIHost, "/")
+        '        Slash = vbInstr(1, URIHost, "/")
         '        If Slash = 0 Then
         '            URIPath = "/"
         '            URIPage = ""
         '        Else
         '            URIPath = Mid(URIHost, Slash)
         '            URIHost = Mid(URIHost, 1, Slash - 1)
-        '            Slash = InStr(1, URIPath, "/")
+        '            Slash = vbInstr(1, URIPath, "/")
         '            Do While Slash <> 0
         '                LastSlash = Slash
-        '                Slash = InStr(LastSlash + 1, URIPath, "/")
+        '                Slash = vbInstr(LastSlash + 1, URIPath, "/")
         '                '''DoEvents()
         '            Loop
         '            URIPage = Mid(URIPath, LastSlash + 1)
@@ -4133,7 +4139,7 @@ Namespace Contensive.Core
         '        Case Else
         '            EncodeSQL = app.db_EncodeSQLText(expression)
         '            On Error GoTo 0
-        '            Call Err.Raise(KmaErrorBase, "dll", "Unknown Field Type [" & fieldType & "] used FieldTypeText.")
+        '            Call Err.Raise(ignoreInteger, "dll", "Unknown Field Type [" & fieldType & "] used FieldTypeText.")
         '    End Select
         '    '
         'End Function
@@ -4236,17 +4242,17 @@ Namespace Contensive.Core
             ' ----- read pairs in from NameValueLines
             '
             iNameValueLines = EncodeText(NameValueLines)
-            If InStr(1, iNameValueLines, "=") <> 0 Then
+            If vbInstr(1, iNameValueLines, "=") <> 0 Then
                 PairCnt = 0
                 Lines = SplitCRLF(iNameValueLines)
                 For LinePtr = 0 To UBound(Lines)
-                    If InStr(1, Lines(LinePtr), "=") <> 0 Then
+                    If vbInstr(1, Lines(LinePtr), "=") <> 0 Then
                         Splits = Split(Lines(LinePtr), "=")
                         ReDim Preserve Names(PairCnt)
                         ReDim Preserve Names(PairCnt)
                         ReDim Preserve Values(PairCnt)
                         Names(PairCnt) = Trim(Splits(0))
-                        Names(PairCnt) = Replace(Names(PairCnt), vbTab, "")
+                        Names(PairCnt) = vbReplace(Names(PairCnt), vbTab, "")
                         Splits(0) = ""
                         Values(PairCnt) = Trim(Splits(1))
                         PairCnt = PairCnt + 1
@@ -4259,7 +4265,7 @@ Namespace Contensive.Core
             processReplacement = EncodeText(Source)
             If PairCnt > 0 Then
                 For PairPtr = 0 To PairCnt - 1
-                    processReplacement = Replace(processReplacement, Names(PairPtr), Values(PairPtr), 1, 999, CompareMethod.Text)
+                    processReplacement = vbReplace(processReplacement, Names(PairPtr), Values(PairPtr), 1, 99, vbTextCompare)
                 Next
             End If
             '
@@ -4621,32 +4627,32 @@ Namespace Contensive.Core
             '
             s = Source
             '
-            s = Replace(s, " href=""", " href=""/", , , vbTextCompare)
-            s = Replace(s, " href=""/http", " href=""http", , , vbTextCompare)
-            s = Replace(s, " href=""/mailto", " href=""mailto", , , vbTextCompare)
-            s = Replace(s, " href=""//", " href=""" & RootLink, , , vbTextCompare)
-            s = Replace(s, " href=""/?", " href=""" & RootLink & "?", , , vbTextCompare)
-            s = Replace(s, " href=""/", " href=""" & RootLink, , , vbTextCompare)
+            s = vbReplace(s, " href=""", " href=""/", 1, 99, vbTextCompare)
+            s = vbReplace(s, " href=""/http", " href=""http", 1, 99, vbTextCompare)
+            s = vbReplace(s, " href=""/mailto", " href=""mailto", 1, 99, vbTextCompare)
+            s = vbReplace(s, " href=""//", " href=""" & RootLink, 1, 99, vbTextCompare)
+            s = vbReplace(s, " href=""/?", " href=""" & RootLink & "?", 1, 99, vbTextCompare)
+            s = vbReplace(s, " href=""/", " href=""" & RootLink, 1, 99, vbTextCompare)
             '
-            s = Replace(s, " href=", " href=/", , , vbTextCompare)
-            s = Replace(s, " href=/""", " href=""", , , vbTextCompare)
-            s = Replace(s, " href=/http", " href=http", , , vbTextCompare)
-            s = Replace(s, " href=//", " href=" & RootLink, , , vbTextCompare)
-            s = Replace(s, " href=/?", " href=" & RootLink & "?", , , vbTextCompare)
-            s = Replace(s, " href=/", " href=" & RootLink, , , vbTextCompare)
+            s = vbReplace(s, " href=", " href=/", 1, 99, vbTextCompare)
+            s = vbReplace(s, " href=/""", " href=""", 1, 99, vbTextCompare)
+            s = vbReplace(s, " href=/http", " href=http", 1, 99, vbTextCompare)
+            s = vbReplace(s, " href=//", " href=" & RootLink, 1, 99, vbTextCompare)
+            s = vbReplace(s, " href=/?", " href=" & RootLink & "?", 1, 99, vbTextCompare)
+            s = vbReplace(s, " href=/", " href=" & RootLink, 1, 99, vbTextCompare)
             '
-            s = Replace(s, " src=""", " src=""/", , , vbTextCompare)
-            s = Replace(s, " src=""/http", " src=""http", , , vbTextCompare)
-            s = Replace(s, " src=""//", " src=""" & RootLink, , , vbTextCompare)
-            s = Replace(s, " src=""/?", " src=""" & RootLink & "?", , , vbTextCompare)
-            s = Replace(s, " src=""/", " src=""" & RootLink, , , vbTextCompare)
+            s = vbReplace(s, " src=""", " src=""/", 1, 99, vbTextCompare)
+            s = vbReplace(s, " src=""/http", " src=""http", 1, 99, vbTextCompare)
+            s = vbReplace(s, " src=""//", " src=""" & RootLink, 1, 99, vbTextCompare)
+            s = vbReplace(s, " src=""/?", " src=""" & RootLink & "?", 1, 99, vbTextCompare)
+            s = vbReplace(s, " src=""/", " src=""" & RootLink, 1, 99, vbTextCompare)
             '
-            s = Replace(s, " src=", " src=/", , , vbTextCompare)
-            s = Replace(s, " src=/""", " src=""", , , vbTextCompare)
-            s = Replace(s, " src=/http", " src=http", , , vbTextCompare)
-            s = Replace(s, " src=//", " src=" & RootLink, , , vbTextCompare)
-            s = Replace(s, " src=/?", " src=" & RootLink & "?", , , vbTextCompare)
-            s = Replace(s, " src=/", " src=" & RootLink, , , vbTextCompare)
+            s = vbReplace(s, " src=", " src=/", 1, 99, vbTextCompare)
+            s = vbReplace(s, " src=/""", " src=""", 1, 99, vbTextCompare)
+            s = vbReplace(s, " src=/http", " src=http", 1, 99, vbTextCompare)
+            s = vbReplace(s, " src=//", " src=" & RootLink, 1, 99, vbTextCompare)
+            s = vbReplace(s, " src=/?", " src=" & RootLink & "?", 1, 99, vbTextCompare)
+            s = vbReplace(s, " src=/", " src=" & RootLink, 1, 99, vbTextCompare)
             '
             ConvertLinksToAbsolute = s
             '
@@ -4661,10 +4667,10 @@ ErrorTrap:
         'Public Function getAppPath() As String
         '    Dim Ptr As Integer
         '    getAppPath = App.Path
-        '    Ptr = InStr(1, getAppPath, "\github\", vbTextCompare)
+        '    Ptr = vbInstr(1, getAppPath, "\github\", vbTextCompare)
         '    If Ptr <> 0 Then
         '        ' for ...\github\contensive4?\bin"
-        '        Ptr = InStr(Ptr + 8, getAppPath, "\")
+        '        Ptr = vbInstr(Ptr + 8, getAppPath, "\")
         '        getAppPath = Left(getAppPath, Ptr) & "bin"
         '    End If
         'End Function
@@ -4675,7 +4681,7 @@ ErrorTrap:
         '    Dim testPath As String
         '    '
         '    GetAddonRootPath = getAppPath & "\addons"
-        '    If InStr(1, GetAddonRootPath, "\github\", vbTextCompare) <> 0 Then
+        '    If vbInstr(1, GetAddonRootPath, "\github\", vbTextCompare) <> 0 Then
         '        '
         '        ' debugging - change program path to dummy path so addon builds all copy to
         '        '
@@ -4699,11 +4705,11 @@ ErrorTrap:
             Dim Args() As String
             Dim Ptr As Integer
             '
-            If InStr(1, Expression, vbCrLf) <> 0 Then
+            If vbInstr(1, Expression, vbCrLf) <> 0 Then
                 SplitCRLF = Split(Expression, vbCrLf, , vbTextCompare)
-            ElseIf InStr(1, Expression, vbCr) <> 0 Then
+            ElseIf vbInstr(1, Expression, vbCr) <> 0 Then
                 SplitCRLF = Split(Expression, vbCr, , vbTextCompare)
-            ElseIf InStr(1, Expression, vbLf) <> 0 Then
+            ElseIf vbInstr(1, Expression, vbLf) <> 0 Then
                 SplitCRLF = Split(Expression, vbLf, , vbTextCompare)
             Else
                 ReDim SplitCRLF(0)
@@ -4746,18 +4752,18 @@ ErrorTrap:
                 a = Arg
                 If True Then
                     'If AddonNewParse Then
-                    a = Replace(a, "\", "\\")
-                    a = Replace(a, vbCrLf, "\n")
-                    a = Replace(a, vbTab, "\t")
-                    a = Replace(a, "&", "\&")
-                    a = Replace(a, "=", "\=")
-                    a = Replace(a, ",", "\,")
-                    a = Replace(a, """", "\""")
-                    a = Replace(a, "'", "\'")
-                    a = Replace(a, "|", "\|")
-                    a = Replace(a, "[", "\[")
-                    a = Replace(a, "]", "\]")
-                    a = Replace(a, ":", "\:")
+                    a = vbReplace(a, "\", "\\")
+                    a = vbReplace(a, vbCrLf, "\n")
+                    a = vbReplace(a, vbTab, "\t")
+                    a = vbReplace(a, "&", "\&")
+                    a = vbReplace(a, "=", "\=")
+                    a = vbReplace(a, ",", "\,")
+                    a = vbReplace(a, """", "\""")
+                    a = vbReplace(a, "'", "\'")
+                    a = vbReplace(a, "|", "\|")
+                    a = vbReplace(a, "[", "\[")
+                    a = vbReplace(a, "]", "\]")
+                    a = vbReplace(a, ":", "\:")
                 End If
                 EncodeAddonConstructorArgument = a
             End If
@@ -4786,18 +4792,18 @@ ErrorTrap:
             a = EncodedArg
             If True Then
                 'If AddonNewParse Then
-                a = Replace(a, "\:", ":")
-                a = Replace(a, "\]", "]")
-                a = Replace(a, "\[", "[")
-                a = Replace(a, "\|", "|")
-                a = Replace(a, "\'", "'")
-                a = Replace(a, "\""", """")
-                a = Replace(a, "\,", ",")
-                a = Replace(a, "\=", "=")
-                a = Replace(a, "\&", "&")
-                a = Replace(a, "\t", vbTab)
-                a = Replace(a, "\n", vbCrLf)
-                a = Replace(a, "\\", "\")
+                a = vbReplace(a, "\:", ":")
+                a = vbReplace(a, "\]", "]")
+                a = vbReplace(a, "\[", "[")
+                a = vbReplace(a, "\|", "|")
+                a = vbReplace(a, "\'", "'")
+                a = vbReplace(a, "\""", """")
+                a = vbReplace(a, "\,", ",")
+                a = vbReplace(a, "\=", "=")
+                a = vbReplace(a, "\&", "&")
+                a = vbReplace(a, "\t", vbTab)
+                a = vbReplace(a, "\n", vbCrLf)
+                a = vbReplace(a, "\\", "\")
             End If
             DecodeAddonConstructorArgument = a
         End Function
@@ -4822,18 +4828,18 @@ ErrorTrap:
         '        Dim a As String
         '        a = Arg
         '        If a <> "" Then
-        '            a = Replace(a, vbCrLf, "#0013#")
-        '            a = Replace(a, vbLf, "#0013#")
-        '            a = Replace(a, vbCr, "#0013#")
-        '            a = Replace(a, "&", "#0038#")
-        '            a = Replace(a, "=", "#0061#")
-        '            a = Replace(a, ",", "#0044#")
-        '            a = Replace(a, """", "#0034#")
-        '            a = Replace(a, "'", "#0039#")
-        '            a = Replace(a, "|", "#0124#")
-        '            a = Replace(a, "[", "#0091#")
-        '            a = Replace(a, "]", "#0093#")
-        '            a = Replace(a, ":", "#0058#")
+        '            a = vbReplace(a, vbCrLf, "#0013#")
+        '            a = vbReplace(a, vbLf, "#0013#")
+        '            a = vbReplace(a, vbCr, "#0013#")
+        '            a = vbReplace(a, "&", "#0038#")
+        '            a = vbReplace(a, "=", "#0061#")
+        '            a = vbReplace(a, ",", "#0044#")
+        '            a = vbReplace(a, """", "#0034#")
+        '            a = vbReplace(a, "'", "#0039#")
+        '            a = vbReplace(a, "|", "#0124#")
+        '            a = vbReplace(a, "[", "#0091#")
+        '            a = vbReplace(a, "]", "#0093#")
+        '            a = vbReplace(a, ":", "#0058#")
         '        End If
         '        encodeNvaArgument = a
         '    End Function
@@ -4848,16 +4854,16 @@ ErrorTrap:
         '        Dim a As String
         '        '
         '        a = EncodedArg
-        '        a = Replace(a, "#0058#", ":")
-        '        a = Replace(a, "#0093#", "]")
-        '        a = Replace(a, "#0091#", "[")
-        '        a = Replace(a, "#0124#", "|")
-        '        a = Replace(a, "#0039#", "'")
-        '        a = Replace(a, "#0034#", """")
-        '        a = Replace(a, "#0044#", ",")
-        '        a = Replace(a, "#0061#", "=")
-        '        a = Replace(a, "#0038#", "&")
-        '        a = Replace(a, "#0013#", vbCrLf)
+        '        a = vbReplace(a, "#0058#", ":")
+        '        a = vbReplace(a, "#0093#", "]")
+        '        a = vbReplace(a, "#0091#", "[")
+        '        a = vbReplace(a, "#0124#", "|")
+        '        a = vbReplace(a, "#0039#", "'")
+        '        a = vbReplace(a, "#0034#", """")
+        '        a = vbReplace(a, "#0044#", ",")
+        '        a = vbReplace(a, "#0061#", "=")
+        '        a = vbReplace(a, "#0038#", "&")
+        '        a = vbReplace(a, "#0013#", vbCrLf)
         '        decodeNvaArgument = a
         '    End Function
         '    '
@@ -4873,39 +4879,39 @@ ErrorTrap:
                 ' Blank is not a link
                 '
                 IsLinkToThisHost = False
-            ElseIf InStr(1, Link, "://") <> 0 Then
+            ElseIf vbInstr(1, Link, "://") <> 0 Then
                 '
                 ' includes protocol, may be link to another site
                 '
-                LinkHost = LCase(Link)
+                LinkHost = vbLCase(Link)
                 Pos = 1
-                Pos = InStr(Pos, LinkHost, "://")
+                Pos = vbInstr(Pos, LinkHost, "://")
                 If Pos > 0 Then
-                    Pos = InStr(Pos + 3, LinkHost, "/")
+                    Pos = vbInstr(Pos + 3, LinkHost, "/")
                     If Pos > 0 Then
                         LinkHost = Mid(LinkHost, 1, Pos - 1)
                     End If
-                    IsLinkToThisHost = (LCase(Host) = LinkHost)
+                    IsLinkToThisHost = (vbLCase(Host) = LinkHost)
                     If Not IsLinkToThisHost Then
                         '
                         ' try combinations including/excluding www.
                         '
-                        If InStr(1, LinkHost, "www.", vbTextCompare) <> 0 Then
+                        If vbInstr(1, LinkHost, "www.", vbTextCompare) <> 0 Then
                             '
                             ' remove it
                             '
-                            LinkHost = Replace(LinkHost, "www.", "", 1, -1, vbTextCompare)
-                            IsLinkToThisHost = (LCase(Host) = LinkHost)
+                            LinkHost = vbReplace(LinkHost, "www.", "", 1, 99, vbTextCompare)
+                            IsLinkToThisHost = (vbLCase(Host) = LinkHost)
                         Else
                             '
                             ' add it
                             '
-                            LinkHost = Replace(LinkHost, "://", "://www.", 1, -1, vbTextCompare)
-                            IsLinkToThisHost = (LCase(Host) = LinkHost)
+                            LinkHost = vbReplace(LinkHost, "://", "://www.", 1, 99, vbTextCompare)
+                            IsLinkToThisHost = (vbLCase(Host) = LinkHost)
                         End If
                     End If
                 End If
-            ElseIf InStr(1, Link, "#") = 1 Then
+            ElseIf vbInstr(1, Link, "#") = 1 Then
                 '
                 ' Is a bookmark, not a link
                 '
@@ -4936,17 +4942,17 @@ ErrorTrap:
             Dim Pos As Integer
             '
             ConvertLinkToRootRelative = Link
-            If InStr(1, Link, "/") = 1 Then
+            If vbInstr(1, Link, "/") = 1 Then
                 '
                 '   case /images/logo-cmc.main_jpg with any Basepath to /images/logo-cmc.main_jpg
                 '
-            ElseIf InStr(1, Link, "://") <> 0 Then
+            ElseIf vbInstr(1, Link, "://") <> 0 Then
                 '
                 '   case http://gcm.brandeveolve.com/images/logo-cmc.main_jpg with any BasePath  to /images/logo-cmc.main_jpg
                 '
-                Pos = InStr(1, Link, "://")
+                Pos = vbInstr(1, Link, "://")
                 If Pos > 0 Then
-                    Pos = InStr(Pos + 3, Link, "/")
+                    Pos = vbInstr(Pos + 3, Link, "/")
                     If Pos > 0 Then
                         ConvertLinkToRootRelative = Mid(Link, Pos)
                     Else
@@ -4994,7 +5000,7 @@ ErrorTrap:
                     IconHeight = 59
                     IconSprites = 4
                 End If
-            ElseIf InStr(1, IconFilename, "://") <> 0 Then
+            ElseIf vbInstr(1, IconFilename, "://") <> 0 Then
                 '
                 ' icon is an Absolute URL - leave it
                 '
@@ -5141,8 +5147,8 @@ ErrorTrap:
             ' Get Protocol (before the first :)
             '
             WorkingURL = SourceURL
-            Position = InStr(1, WorkingURL, ":")
-            'Position = InStr(1, WorkingURL, "://")
+            Position = vbInstr(1, WorkingURL, ":")
+            'Position = vbInstr(1, WorkingURL, "://")
             If Position <> 0 Then
                 Protocol = Mid(WorkingURL, 1, Position + 2)
                 WorkingURL = Mid(WorkingURL, Position + 3)
@@ -5150,7 +5156,7 @@ ErrorTrap:
             '
             ' compatibility fix
             '
-            If InStr(1, WorkingURL, "//") = 1 Then
+            If vbInstr(1, WorkingURL, "//") = 1 Then
                 If Protocol = "" Then
                     Protocol = "http:"
                 End If
@@ -5160,7 +5166,7 @@ ErrorTrap:
             '
             ' Get QueryString
             '
-            Position = InStr(1, WorkingURL, "?")
+            Position = vbInstr(1, WorkingURL, "?")
             If Position > 0 Then
                 QueryString = Mid(WorkingURL, Position)
                 WorkingURL = Mid(WorkingURL, 1, Position - 1)
@@ -5169,7 +5175,7 @@ ErrorTrap:
             ' separate host from pathpage
             '
             'iURLHost = WorkingURL
-            Position = InStr(WorkingURL, "/")
+            Position = vbInstr(WorkingURL, "/")
             If (Position = 0) And (Protocol = "") Then
                 '
                 ' Page without path or host
@@ -5225,7 +5231,7 @@ ErrorTrap:
             Dim Position As Integer = 0
             '
             iURLWorking = SourceURL
-            Position = InStr(1, iURLWorking, "://")
+            Position = vbInstr(1, iURLWorking, "://")
             If Position <> 0 Then
                 iURLProtocol = Mid(iURLWorking, 1, Position + 2)
                 iURLWorking = Mid(iURLWorking, Position + 3)
@@ -5234,7 +5240,7 @@ ErrorTrap:
             ' separate Host:Port from pathpage
             '
             iURLHost = iURLWorking
-            Position = InStr(iURLHost, "/")
+            Position = vbInstr(iURLHost, "/")
             If Position = 0 Then
                 '
                 ' just host, no path or page
@@ -5262,12 +5268,12 @@ ErrorTrap:
             '
             ' Divide Host from Port
             '
-            Position = InStr(iURLHost, ":")
+            Position = vbInstr(iURLHost, ":")
             If Position = 0 Then
                 '
                 ' host not given, take a guess
                 '
-                Select Case UCase(iURLProtocol)
+                Select Case vbUCase(iURLProtocol)
                     Case "FTP://"
                         iURLPort = "21"
                     Case "HTTP://", "HTTPS://"
@@ -5279,7 +5285,7 @@ ErrorTrap:
                 iURLPort = Mid(iURLHost, Position + 1)
                 iURLHost = Mid(iURLHost, 1, Position - 1)
             End If
-            Position = InStr(1, iURLPage, "?")
+            Position = vbInstr(1, iURLPage, "?")
             If Position > 0 Then
                 iURLQueryString = Mid(iURLPage, Position)
                 iURLPage = Mid(iURLPage, 1, Position - 1)
@@ -5339,7 +5345,7 @@ ErrorTrap:
                 '
                 ' If not explicit
                 '
-                If InStr(1, ArgumentString, vbCrLf) <> 0 Then
+                If vbInstr(1, ArgumentString, vbCrLf) <> 0 Then
                     '
                     ' crlf can only be here if it is the delimiter
                     '
@@ -5356,7 +5362,7 @@ ErrorTrap:
             GetArgument = iDefaultValue
             If WorkingString <> "" Then
                 WorkingString = Delimiter & WorkingString & Delimiter
-                ValueStart = InStr(1, WorkingString, Delimiter & Name & "=", vbTextCompare)
+                ValueStart = vbInstr(1, WorkingString, Delimiter & Name & "=", vbTextCompare)
                 If ValueStart <> 0 Then
                     NameLength = Len(Name)
                     ValueStart = ValueStart + Len(Delimiter) + NameLength + 1
@@ -5365,9 +5371,9 @@ ErrorTrap:
                         ValueStart = ValueStart + 1
                     End If
                     If IsQuoted Then
-                        ValueEnd = InStr(ValueStart, WorkingString, """" & Delimiter)
+                        ValueEnd = vbInstr(ValueStart, WorkingString, """" & Delimiter)
                     Else
-                        ValueEnd = InStr(ValueStart, WorkingString, Delimiter)
+                        ValueEnd = vbInstr(ValueStart, WorkingString, Delimiter)
                     End If
                     If ValueEnd = 0 Then
                         GetArgument = Mid(WorkingString, ValueStart)
@@ -5400,14 +5406,14 @@ ErrorTrap:
         '    '
         '    ' remove the manual select list syntax "answer[choice1|choice2]"
         '    '
-        '    Pos = InStr(1, GetAggrOption, "[")
+        '    Pos = vbInstr(1, GetAggrOption, "[")
         '    If Pos <> 0 Then
         '        GetAggrOption = Left(GetAggrOption, Pos - 1)
         '    End If
         '    '
         '    ' remove any function syntax "answer{selectcontentname RSS Feeds}"
         '    '
-        '    Pos = InStr(1, GetAggrOption, "{")
+        '    Pos = vbInstr(1, GetAggrOption, "{")
         '    If Pos <> 0 Then
         '        GetAggrOption = Left(GetAggrOption, Pos - 1)
         '    End If
@@ -5432,8 +5438,8 @@ ErrorTrap:
         '    Dim NextLF As Integer
         '    Dim BOL As Integer
         '    '
-        '    NextCR = InStr(1, Body, vbCr)
-        '    NextLF = InStr(1, Body, vbLf)
+        '    NextCR = vbInstr(1, Body, vbCr)
+        '    NextLF = vbInstr(1, Body, vbLf)
 
         '    If NextCR <> 0 Or NextLF <> 0 Then
         '        If NextCR <> 0 Then
@@ -5509,7 +5515,7 @@ ErrorTrap:
         ''
         'Public Function ModifyQueryString(ByVal WorkingQuery As String, ByVal QueryName As String, ByVal QueryValue As String, Optional ByVal AddIfMissing As Boolean = True) As String
         '    '
-        '    If InStr(1, WorkingQuery, "?") Then
+        '    If vbInstr(1, WorkingQuery, "?") Then
         '        ModifyQueryString = ModifyLinkQueryString(WorkingQuery, QueryName, QueryValue, AddIfMissing)
         '    Else
         '        ModifyQueryString = Mid(ModifyLinkQueryString("?" & WorkingQuery, QueryName, QueryValue, AddIfMissing), 2)
@@ -5530,21 +5536,21 @@ ErrorTrap:
             Dim ElementFound As Boolean
             Dim QueryString As String
             '
-            If InStr(1, Link, "?") <> 0 Then
-                ModifyLinkQueryString = Mid(Link, 1, InStr(1, Link, "?") - 1)
+            If vbInstr(1, Link, "?") <> 0 Then
+                ModifyLinkQueryString = Mid(Link, 1, vbInstr(1, Link, "?") - 1)
                 QueryString = Mid(Link, Len(ModifyLinkQueryString) + 2)
             Else
                 ModifyLinkQueryString = Link
                 QueryString = ""
             End If
-            UcaseQueryName = UCase(EncodeRequestVariable(QueryName))
+            UcaseQueryName = vbUCase(EncodeRequestVariable(QueryName))
             If QueryString <> "" Then
                 Element = Split(QueryString, "&")
                 ElementCount = UBound(Element) + 1
                 For ElementPointer = 0 To ElementCount - 1
                     NameValue = Split(Element(ElementPointer), "=")
                     If UBound(NameValue) = 1 Then
-                        If UCase(NameValue(0)) = UcaseQueryName Then
+                        If vbUCase(NameValue(0)) = UcaseQueryName Then
                             If QueryValue = "" Then
                                 Element(ElementPointer) = ""
                             Else
@@ -5576,7 +5582,7 @@ ErrorTrap:
                     '
                     ' element found and needs to be removed
                     '
-                    QueryString = Replace(QueryString, "&&", "&")
+                    QueryString = vbReplace(QueryString, "&&", "&")
                     If Left(QueryString, 1) = "&" Then
                         QueryString = Mid(QueryString, 2)
                     End If
@@ -5633,9 +5639,9 @@ ErrorTrap:
                     GetErrString = "[no error]"
                 Else
                     Copy = Err.Description
-                    Copy = Replace(Copy, vbCrLf, "-")
-                    Copy = Replace(Copy, vbLf, "-")
-                    Copy = Replace(Copy, vbCrLf, "")
+                    Copy = vbReplace(Copy, vbCrLf, "-")
+                    Copy = vbReplace(Copy, vbLf, "-")
+                    Copy = vbReplace(Copy, vbCrLf, "")
                     GetErrString = "[" & Err.Source & " #" & Err.Number & ", " & Copy & "]"
                 End If
             Else
@@ -5643,9 +5649,9 @@ ErrorTrap:
                     GetErrString = "[no error]"
                 Else
                     Copy = ErrorObject.Description
-                    Copy = Replace(Copy, vbCrLf, "-")
-                    Copy = Replace(Copy, vbLf, "-")
-                    Copy = Replace(Copy, vbCrLf, "")
+                    Copy = vbReplace(Copy, vbCrLf, "-")
+                    Copy = vbReplace(Copy, vbLf, "-")
+                    Copy = vbReplace(Copy, vbCrLf, "")
                     GetErrString = "[" & ErrorObject.Source & " #" & ErrorObject.Number & ", " & Copy & "]"
                 End If
             End If
@@ -5667,7 +5673,7 @@ ErrorTrap:
         '==========================================================================================
         '
         Public Function IsInDelimitedString(ByVal DelimitedString As String, ByVal TestString As String, ByVal Delimiter As String) As Boolean
-            IsInDelimitedString = (0 <> InStr(1, Delimiter & DelimitedString & Delimiter, Delimiter & TestString & Delimiter, vbTextCompare))
+            IsInDelimitedString = (0 <> vbInstr(1, Delimiter & DelimitedString & Delimiter, Delimiter & TestString & Delimiter, vbTextCompare))
         End Function
         '
         '========================================================================
@@ -5688,18 +5694,18 @@ ErrorTrap:
             If Source <> "" Then
                 URLSplit = Split(Source, "?")
                 EncodeURL = URLSplit(0)
-                EncodeURL = Replace(EncodeURL, "%", "%25")
+                EncodeURL = vbReplace(EncodeURL, "%", "%25")
                 '
-                EncodeURL = Replace(EncodeURL, """", "%22")
-                EncodeURL = Replace(EncodeURL, " ", "%20")
-                EncodeURL = Replace(EncodeURL, "$", "%24")
-                EncodeURL = Replace(EncodeURL, "+", "%2B")
-                EncodeURL = Replace(EncodeURL, ",", "%2C")
-                EncodeURL = Replace(EncodeURL, ";", "%3B")
-                EncodeURL = Replace(EncodeURL, "<", "%3C")
-                EncodeURL = Replace(EncodeURL, "=", "%3D")
-                EncodeURL = Replace(EncodeURL, ">", "%3E")
-                EncodeURL = Replace(EncodeURL, "@", "%40")
+                EncodeURL = vbReplace(EncodeURL, """", "%22")
+                EncodeURL = vbReplace(EncodeURL, " ", "%20")
+                EncodeURL = vbReplace(EncodeURL, "$", "%24")
+                EncodeURL = vbReplace(EncodeURL, "+", "%2B")
+                EncodeURL = vbReplace(EncodeURL, ",", "%2C")
+                EncodeURL = vbReplace(EncodeURL, ";", "%3B")
+                EncodeURL = vbReplace(EncodeURL, "<", "%3C")
+                EncodeURL = vbReplace(EncodeURL, "=", "%3D")
+                EncodeURL = vbReplace(EncodeURL, ">", "%3E")
+                EncodeURL = vbReplace(EncodeURL, "@", "%40")
                 If UBound(URLSplit) > 0 Then
                     EncodeURL = EncodeURL & "?" & EncodeQueryString(URLSplit(1))
                 End If
@@ -5763,7 +5769,7 @@ ErrorTrap:
             If Source <> "" Then
                 LocalSource = Source
                 ' "+" is an allowed character for filenames. If you add it, the wrong file will be looked up
-                'LocalSource = Replace(LocalSource, " ", "+")
+                'LocalSource = vbReplace(LocalSource, " ", "+")
                 For SourcePointer = 1 To Len(LocalSource)
                     Character = Mid(LocalSource, SourcePointer, 1)
                     ' "%" added so if this is called twice, it will not destroy "%20" values
@@ -5771,8 +5777,8 @@ ErrorTrap:
                         'End If
                         'If Character = " " Then
                         EncodeRequestVariable += "+"
-                    ElseIf InStr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./:-_!*()", Character, vbTextCompare) <> 0 Then
-                        'ElseIf InStr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./:?#-_!~*'()%", Character, vbTextCompare) <> 0 Then
+                    ElseIf vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./:-_!*()", Character, vbTextCompare) <> 0 Then
+                        'ElseIf vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./:?#-_!~*'()%", Character, vbTextCompare) <> 0 Then
                         EncodeRequestVariable += Character
                     Else
                         EncodeRequestVariable += "%" & Hex(Asc(Character))
@@ -5793,11 +5799,11 @@ ErrorTrap:
             ' ##### removed to catch err<>0 problem on error resume next
             '
             html_EncodeHTML = Source
-            html_EncodeHTML = Replace(html_EncodeHTML, "&", "&amp;")
-            html_EncodeHTML = Replace(html_EncodeHTML, "<", "&lt;")
-            html_EncodeHTML = Replace(html_EncodeHTML, ">", "&gt;")
-            html_EncodeHTML = Replace(html_EncodeHTML, """", "&quot;")
-            html_EncodeHTML = Replace(html_EncodeHTML, "'", "&apos;")
+            html_EncodeHTML = vbReplace(html_EncodeHTML, "&", "&amp;")
+            html_EncodeHTML = vbReplace(html_EncodeHTML, "<", "&lt;")
+            html_EncodeHTML = vbReplace(html_EncodeHTML, ">", "&gt;")
+            html_EncodeHTML = vbReplace(html_EncodeHTML, """", "&quot;")
+            html_EncodeHTML = vbReplace(html_EncodeHTML, "'", "&apos;")
             '
         End Function
         ''
@@ -5837,7 +5843,7 @@ ErrorTrap:
         '            PosEnd = Pos + 6
         '        End If
         '        If CharCodeString <> "" Then
-        '            If IsNumeric(CharCodeString) Then
+        '            If vbIsNumeric(CharCodeString) Then
         '                CharCode = CLng(CharCodeString)
         '                s = Mid(s, 1, Pos - 1) & Chr(CharCode) & Mid(s, PosEnd)
         '            End If
@@ -5848,14 +5854,14 @@ ErrorTrap:
         '    '
         '    ' character entities (at least the most common )
         '    '
-        '    s = Replace(s, "&lt;", "<")
-        '    s = Replace(s, "&gt;", ">")
-        '    s = Replace(s, "&quot;", """")
-        '    s = Replace(s, "&apos;", "'")
+        '    s = vbReplace(s, "&lt;", "<")
+        '    s = vbReplace(s, "&gt;", ">")
+        '    s = vbReplace(s, "&quot;", """")
+        '    s = vbReplace(s, "&apos;", "'")
         '    '
         '    ' always last
         '    '
-        '    s = Replace(s, "&amp;", "&")
+        '    s = vbReplace(s, "&amp;", "&")
         '    '
         '    DecodeHTML = s
         '    '
@@ -5891,21 +5897,21 @@ ErrorTrap:
             '
             'iURL = Source
             ' plus to space only applies for query component of a URL, but %99 encoding works for both
-            'DecodeResponseVariable = Replace(iURL, "+", " ")
+            'DecodeResponseVariable = vbReplace(iURL, "+", " ")
             DecodeResponseVariable = Source
-            Position = InStr(1, DecodeResponseVariable, "%")
+            Position = vbInstr(1, DecodeResponseVariable, "%")
             Do While Position <> 0
                 ESCString = Mid(DecodeResponseVariable, Position, 3)
-                Digit0 = UCase(Mid(ESCString, 2, 1))
-                Digit1 = UCase(Mid(ESCString, 3, 1))
+                Digit0 = vbUCase(Mid(ESCString, 2, 1))
+                Digit1 = vbUCase(Mid(ESCString, 3, 1))
                 If ((Digit0 >= "0") And (Digit0 <= "9")) Or ((Digit0 >= "A") And (Digit0 <= "F")) Then
                     If ((Digit1 >= "0") And (Digit1 <= "9")) Or ((Digit1 >= "A") And (Digit1 <= "F")) Then
                         ESCValue = CInt("&H" & Mid(ESCString, 2))
                         DecodeResponseVariable = Mid(DecodeResponseVariable, 1, Position - 1) & Chr(ESCValue) & Mid(DecodeResponseVariable, Position + 3)
-                        '  & Replace(DecodeResponseVariable, ESCString, Chr(ESCValue), Position, 1)
+                        '  & vbReplace(DecodeResponseVariable, ESCString, Chr(ESCValue), Position, 1)
                     End If
                 End If
-                Position = InStr(Position + 1, DecodeResponseVariable, "%")
+                Position = vbInstr(Position + 1, DecodeResponseVariable, "%")
             Loop
             '
         End Function
@@ -5927,20 +5933,20 @@ ErrorTrap:
             '
             'iURL = Source
             ' plus to space only applies for query component of a URL, but %99 encoding works for both
-            'DecodeURL = Replace(iURL, "+", " ")
+            'DecodeURL = vbReplace(iURL, "+", " ")
             DecodeURL = Source
-            Position = InStr(1, DecodeURL, "%")
+            Position = vbInstr(1, DecodeURL, "%")
             Do While Position <> 0
                 ESCString = Mid(DecodeURL, Position, 3)
-                Digit0 = UCase(Mid(ESCString, 2, 1))
-                Digit1 = UCase(Mid(ESCString, 3, 1))
+                Digit0 = vbUCase(Mid(ESCString, 2, 1))
+                Digit1 = vbUCase(Mid(ESCString, 3, 1))
                 If ((Digit0 >= "0") And (Digit0 <= "9")) Or ((Digit0 >= "A") And (Digit0 <= "F")) Then
                     If ((Digit1 >= "0") And (Digit1 <= "9")) Or ((Digit1 >= "A") And (Digit1 <= "F")) Then
                         ESCValue = CInt("&H" & Mid(ESCString, 2))
-                        DecodeURL = Replace(DecodeURL, ESCString, Chr(ESCValue))
+                        DecodeURL = vbReplace(DecodeURL, ESCString, Chr(ESCValue))
                     End If
                 End If
-                Position = InStr(Position + 1, DecodeURL, "%")
+                Position = vbInstr(Position + 1, DecodeURL, "%")
             Loop
             '
         End Function
@@ -6183,7 +6189,7 @@ ErrorTrap:
         Public Function ConvertShortLinkToLink(ByVal URL As String, ByVal PathPagePrefix As String) As String
             ConvertShortLinkToLink = URL
             If URL <> "" And PathPagePrefix <> "" Then
-                If InStr(1, ConvertShortLinkToLink, PathPagePrefix, vbTextCompare) = 1 Then
+                If vbInstr(1, ConvertShortLinkToLink, PathPagePrefix, vbTextCompare) = 1 Then
                     ConvertShortLinkToLink = Mid(ConvertShortLinkToLink, Len(PathPagePrefix) + 1)
                 End If
             End If
@@ -6208,12 +6214,12 @@ ErrorTrap:
             '
             ' ----- Determine Protocol
             '
-            If InStr(1, WorkingLink, "HTTP://", vbTextCompare) = 1 Then
+            If vbInstr(1, WorkingLink, "HTTP://", vbTextCompare) = 1 Then
                 '
                 ' HTTP
                 '
                 Protocol = Mid(WorkingLink, 1, 7)
-            ElseIf InStr(1, WorkingLink, "HTTPS://", vbTextCompare) = 1 Then
+            ElseIf vbInstr(1, WorkingLink, "HTTPS://", vbTextCompare) = 1 Then
                 '
                 ' HTTPS
                 '
@@ -6238,18 +6244,18 @@ ErrorTrap:
                         '
                         BadString = GoodString
                         GoodString = ServerVirtualPath & "/files/"
-                        WorkingLink = Replace(WorkingLink, BadString, GoodString, , , vbTextCompare)
+                        WorkingLink = vbReplace(WorkingLink, BadString, GoodString, 1, 99, vbTextCompare)
                     Else
                         '
                         ' URL is not in files virtual directory
                         '
                         BadString = Protocol & ServerHost & ServerVirtualPath & "/"
                         GoodString = "/"
-                        WorkingLink = Replace(WorkingLink, BadString, GoodString, , , vbTextCompare)
+                        WorkingLink = vbReplace(WorkingLink, BadString, GoodString, 1, 99, vbTextCompare)
                         '
                         BadString = Protocol & ServerHost & "/"
                         GoodString = "/"
-                        WorkingLink = Replace(WorkingLink, BadString, GoodString, , , vbTextCompare)
+                        WorkingLink = vbReplace(WorkingLink, BadString, GoodString, 1, 99, vbTextCompare)
                     End If
                 End If
             End If
@@ -6288,7 +6294,7 @@ ErrorTrap:
                         '
                         ' Virtual hosted site, add VirualPath if it is not there
                         '
-                        If InStr(1, Path, AppRootPath, vbTextCompare) = 0 Then
+                        If vbInstr(1, Path, AppRootPath, vbTextCompare) = 0 Then
                             If Path = "/" Then
                                 Path = AppRootPath
                             Else
@@ -6299,8 +6305,8 @@ ErrorTrap:
                         '
                         ' Root hosted site, remove virtual path if it is there
                         '
-                        If InStr(1, Path, AppRootPath, vbTextCompare) <> 0 Then
-                            Path = Replace(Path, AppRootPath, "/")
+                        If vbInstr(1, Path, AppRootPath, vbTextCompare) <> 0 Then
+                            Path = vbReplace(Path, AppRootPath, "/")
                         End If
                     End If
                     EncodeAppRootPath = Protocol & Host & Path & Page & QueryString
@@ -6335,7 +6341,7 @@ ErrorTrap:
             GetLinkedText = ""
             iAnchorTag = AnchorTag
             iAnchorText = AnchorText
-            UcaseAnchorText = UCase(iAnchorText)
+            UcaseAnchorText = vbUCase(iAnchorText)
             If (iAnchorTag <> "") And (iAnchorText <> "") Then
                 LinkPosition = InStrRev(UcaseAnchorText, "<LINK>", -1)
                 If LinkPosition = 0 Then
@@ -6367,7 +6373,7 @@ ErrorTrap:
                 SegMax = UBound(SegSplit)
                 If SegMax >= 0 Then
                     For SegPtr = 0 To SegMax
-                        SegSplit(SegPtr) = UCase(Left(SegSplit(SegPtr), 1)) & LCase(Mid(SegSplit(SegPtr), 2))
+                        SegSplit(SegPtr) = vbUCase(Left(SegSplit(SegPtr), 1)) & vbLCase(Mid(SegSplit(SegPtr), 2))
                     Next
                 End If
                 EncodeInitialCaps = Join(SegSplit, " ")
@@ -6380,9 +6386,9 @@ ErrorTrap:
             Dim Pos As Integer
             Dim PosEnd As Integer
             RemoveTag = Source
-            Pos = InStr(1, Source, "<" & TagName, vbTextCompare)
+            Pos = vbInstr(1, Source, "<" & TagName, vbTextCompare)
             If Pos <> 0 Then
-                PosEnd = InStr(Pos, Source, ">")
+                PosEnd = vbInstr(Pos, Source, ">")
                 If PosEnd > 0 Then
                     RemoveTag = Left(Source, Pos - 1) & Mid(Source, PosEnd + 1)
                 End If
@@ -6393,10 +6399,10 @@ ErrorTrap:
         '
         Public Function RemoveStyleTags(ByVal Source As String) As String
             RemoveStyleTags = Source
-            Do While InStr(1, RemoveStyleTags, "<style", vbTextCompare) <> 0
+            Do While vbInstr(1, RemoveStyleTags, "<style", vbTextCompare) <> 0
                 RemoveStyleTags = RemoveTag(RemoveStyleTags, "style")
             Loop
-            Do While InStr(1, RemoveStyleTags, "</style", vbTextCompare) <> 0
+            Do While vbInstr(1, RemoveStyleTags, "</style", vbTextCompare) <> 0
                 RemoveStyleTags = RemoveTag(RemoveStyleTags, "/style")
             Loop
         End Function
@@ -6411,18 +6417,18 @@ ErrorTrap:
             GetSingular = PluralSource
             If Len(GetSingular) > 1 Then
                 LastCharacter = Right(GetSingular, 1)
-                If LastCharacter <> UCase(LastCharacter) Then
+                If LastCharacter <> vbUCase(LastCharacter) Then
                     UpperCase = True
                 End If
-                If UCase(Right(GetSingular, 3)) = "IES" Then
+                If vbUCase(Right(GetSingular, 3)) = "IES" Then
                     If UpperCase Then
                         GetSingular = Mid(GetSingular, 1, Len(GetSingular) - 3) & "Y"
                     Else
                         GetSingular = Mid(GetSingular, 1, Len(GetSingular) - 3) & "y"
                     End If
-                ElseIf UCase(Right(GetSingular, 2)) = "SS" Then
+                ElseIf vbUCase(Right(GetSingular, 2)) = "SS" Then
                     ' nothing
-                ElseIf UCase(Right(GetSingular, 1)) = "S" Then
+                ElseIf vbUCase(Right(GetSingular, 1)) = "S" Then
                     GetSingular = Mid(GetSingular, 1, Len(GetSingular) - 1)
                 Else
                     ' nothing
@@ -6435,12 +6441,12 @@ ErrorTrap:
         Public Function EncodeJavascript(ByVal Source As String) As String
             '
             EncodeJavascript = Source
-            EncodeJavascript = Replace(EncodeJavascript, "\", "\\")
-            EncodeJavascript = Replace(EncodeJavascript, "'", "\'")
-            'EncodeJavascript = Replace(EncodeJavascript, "'", "'+""'""+'")
-            EncodeJavascript = Replace(EncodeJavascript, vbCrLf, "\n")
-            EncodeJavascript = Replace(EncodeJavascript, vbCr, "\n")
-            EncodeJavascript = Replace(EncodeJavascript, vbLf, "\n")
+            EncodeJavascript = vbReplace(EncodeJavascript, "\", "\\")
+            EncodeJavascript = vbReplace(EncodeJavascript, "'", "\'")
+            'EncodeJavascript = vbReplace(EncodeJavascript, "'", "'+""'""+'")
+            EncodeJavascript = vbReplace(EncodeJavascript, vbCrLf, "\n")
+            EncodeJavascript = vbReplace(EncodeJavascript, vbCr, "\n")
+            EncodeJavascript = vbReplace(EncodeJavascript, vbLf, "\n")
             '
         End Function
         ''' <summary>
@@ -6459,8 +6465,8 @@ ErrorTrap:
             '
             GetListIndex = 0
             If ListOfItems <> "" Then
-                LcaseItem = LCase(Item)
-                LcaseList = LCase(ListOfItems)
+                LcaseItem = vbLCase(Item)
+                LcaseList = vbLCase(ListOfItems)
                 Items = SplitDelimited(LcaseList, ",")
                 For Ptr = 0 To UBound(Items)
                     If Items(Ptr) = LcaseItem Then
@@ -6496,35 +6502,35 @@ ErrorTrap:
             GetTagInnerHTML = ""
             Pos = 1
             Do While (Pos > 0) And (LoopCnt < 100)
-                TagStart = InStr(Pos, PageSource, "<" & Tag, vbTextCompare)
+                TagStart = vbInstr(Pos, PageSource, "<" & Tag, vbTextCompare)
                 If TagStart = 0 Then
                     Pos = 0
                 Else
                     '
                     ' tag found, skip any comments that start between current position and the tag
                     '
-                    CommentPos = InStr(Pos, PageSource, "<!--")
+                    CommentPos = vbInstr(Pos, PageSource, "<!--")
                     If (CommentPos <> 0) And (CommentPos < TagStart) Then
                         '
                         ' skip comment and start again
                         '
-                        Pos = InStr(CommentPos, PageSource, "-->")
+                        Pos = vbInstr(CommentPos, PageSource, "-->")
                     Else
-                        ScriptPos = InStr(Pos, PageSource, "<script")
+                        ScriptPos = vbInstr(Pos, PageSource, "<script")
                         If (ScriptPos <> 0) And (ScriptPos < TagStart) Then
                             '
                             ' skip comment and start again
                             '
-                            Pos = InStr(ScriptPos, PageSource, "</script")
+                            Pos = vbInstr(ScriptPos, PageSource, "</script")
                         Else
                             '
                             ' Get the tags innerHTML
                             '
-                            TagStart = InStr(TagStart, PageSource, ">", vbTextCompare)
+                            TagStart = vbInstr(TagStart, PageSource, ">", vbTextCompare)
                             Pos = TagStart
                             If TagStart <> 0 Then
                                 TagStart = TagStart + 1
-                                TagEnd = InStr(TagStart, PageSource, "</" & Tag, vbTextCompare)
+                                TagEnd = vbInstr(TagStart, PageSource, "</" & Tag, vbTextCompare)
                                 If TagEnd <> 0 Then
                                     GetTagInnerHTML &= Mid(PageSource, TagStart, TagEnd - TagStart)
                                 End If
@@ -6533,7 +6539,7 @@ ErrorTrap:
                     End If
                     LoopCnt = LoopCnt + 1
                     If ReturnAll Then
-                        TagStart = InStr(TagEnd, PageSource, "<" & Tag, vbTextCompare)
+                        TagStart = vbInstr(TagEnd, PageSource, "<" & Tag, vbTextCompare)
                     Else
                         TagStart = 0
                     End If
@@ -6550,7 +6556,7 @@ ErrorTrap:
         Public Function EncodeInteger(ByVal Expression As Object) As Integer
             '
             EncodeInteger = 0
-            If IsNumeric(Expression) Then
+            If vbIsNumeric(Expression) Then
                 EncodeInteger = CInt(Expression)
             ElseIf TypeOf Expression Is Boolean Then
                 If DirectCast(Expression, Boolean) Then
@@ -6563,7 +6569,7 @@ ErrorTrap:
         '
         Public Function EncodeNumber(ByVal Expression As Object) As Double
             EncodeNumber = 0
-            If IsNumeric(Expression) Then
+            If vbIsNumeric(Expression) Then
                 EncodeNumber = CDbl(Expression)
             ElseIf TypeOf Expression Is Boolean Then
                 If DirectCast(Expression, Boolean) Then
@@ -6593,7 +6599,7 @@ ErrorTrap:
             EncodeBoolean = False
             If TypeOf Expression Is Boolean Then
                 EncodeBoolean = DirectCast(Expression, Boolean)
-            ElseIf IsNumeric(Expression) Then
+            ElseIf vbIsNumeric(Expression) Then
                 EncodeBoolean = (CStr(Expression) <> "0")
             ElseIf TypeOf Expression Is String Then
                 Select Case Expression.ToString.ToLower.Trim
@@ -6627,8 +6633,8 @@ ErrorTrap:
                 Dim NextLF As Integer
                 Dim BOL As Integer
                 '
-                NextCR = InStr(1, Body, vbCr)
-                NextLF = InStr(1, Body, vbLf)
+                NextCR = vbInstr(1, Body, vbCr)
+                NextLF = vbInstr(1, Body, vbLf)
 
                 If NextCR <> 0 Or NextLF <> 0 Then
                     If NextCR <> 0 Then
@@ -6669,7 +6675,7 @@ ErrorTrap:
         '
         '
         '
-        Public Function runProcess(cpCore As cpCoreClass, ByVal Cmd As String, Optional ByVal Arguments As String = "", Optional ByVal WaitForReturn As Boolean = False) As String
+        Public Function runProcess(cpCore As coreClass, ByVal Cmd As String, Optional ByVal Arguments As String = "", Optional ByVal WaitForReturn As Boolean = False) As String
             Dim returnResult As String = ""
             Dim p As Process = New Process()
             '
@@ -6725,18 +6731,18 @@ ErrorTrap:
             Dim a As String
             a = Arg
             If a <> "" Then
-                a = Replace(a, vbCrLf, "#0013#")
-                a = Replace(a, vbLf, "#0013#")
-                a = Replace(a, vbCr, "#0013#")
-                a = Replace(a, "&", "#0038#")
-                a = Replace(a, "=", "#0061#")
-                a = Replace(a, ",", "#0044#")
-                a = Replace(a, """", "#0034#")
-                a = Replace(a, "'", "#0039#")
-                a = Replace(a, "|", "#0124#")
-                a = Replace(a, "[", "#0091#")
-                a = Replace(a, "]", "#0093#")
-                a = Replace(a, ":", "#0058#")
+                a = vbReplace(a, vbCrLf, "#0013#")
+                a = vbReplace(a, vbLf, "#0013#")
+                a = vbReplace(a, vbCr, "#0013#")
+                a = vbReplace(a, "&", "#0038#")
+                a = vbReplace(a, "=", "#0061#")
+                a = vbReplace(a, ",", "#0044#")
+                a = vbReplace(a, """", "#0034#")
+                a = vbReplace(a, "'", "#0039#")
+                a = vbReplace(a, "|", "#0124#")
+                a = vbReplace(a, "[", "#0091#")
+                a = vbReplace(a, "]", "#0093#")
+                a = vbReplace(a, ":", "#0058#")
             End If
             encodeNvaArgument = a
         End Function
@@ -6751,26 +6757,26 @@ ErrorTrap:
             Dim a As String
             '
             a = EncodedArg
-            a = Replace(a, "#0058#", ":")
-            a = Replace(a, "#0093#", "]")
-            a = Replace(a, "#0091#", "[")
-            a = Replace(a, "#0124#", "|")
-            a = Replace(a, "#0039#", "'")
-            a = Replace(a, "#0034#", """")
-            a = Replace(a, "#0044#", ",")
-            a = Replace(a, "#0061#", "=")
-            a = Replace(a, "#0038#", "&")
-            a = Replace(a, "#0013#", vbCrLf)
+            a = vbReplace(a, "#0058#", ":")
+            a = vbReplace(a, "#0093#", "]")
+            a = vbReplace(a, "#0091#", "[")
+            a = vbReplace(a, "#0124#", "|")
+            a = vbReplace(a, "#0039#", "'")
+            a = vbReplace(a, "#0034#", """")
+            a = vbReplace(a, "#0044#", ",")
+            a = vbReplace(a, "#0061#", "=")
+            a = vbReplace(a, "#0038#", "&")
+            a = vbReplace(a, "#0013#", vbCrLf)
             decodeNvaArgument = a
         End Function
         '
         '
-        Friend Function LogFileCopyPrep(ByVal Source As String) As String
+        Public Function LogFileCopyPrep(ByVal Source As String) As String
             Dim Copy As String
             Copy = Source
-            Copy = Replace(Copy, vbCrLf, " ")
-            Copy = Replace(Copy, vbLf, " ")
-            Copy = Replace(Copy, vbCr, " ")
+            Copy = vbReplace(Copy, vbCrLf, " ")
+            Copy = vbReplace(Copy, vbLf, " ")
+            Copy = vbReplace(Copy, vbCr, " ")
             LogFileCopyPrep = Copy
         End Function
         '        '
@@ -6787,7 +6793,7 @@ ErrorTrap:
         '                If returnString = "" Then
         '                    returnString = "null"
         '                Else
-        '                    returnString = "'" & Replace(returnString, "'", "''") & "'"
+        '                    returnString = "'" & vbReplace(returnString, "'", "''") & "'"
         '                End If
         '            End If
         '            Return returnString
@@ -6806,7 +6812,7 @@ ErrorTrap:
         '                If returnString = "" Then
         '                    returnString = "null"
         '                Else
-        '                    returnString = "'" & Replace(returnString, "'", "''") & "'"
+        '                    returnString = "'" & vbReplace(returnString, "'", "''") & "'"
         '                End If
         '            End If
         '            Return returnString
@@ -6855,7 +6861,7 @@ ErrorTrap:
         '                Else
         '                    returnString = SQLFalse
         '                End If
-        '            ElseIf Not IsNumeric(expression) Then
+        '            ElseIf Not vbIsNumeric(expression) Then
         '                returnString = "null"
         '            Else
         '                returnString = expression.ToString
@@ -6910,7 +6916,7 @@ ErrorTrap:
                 '
                 ' If not explicit
                 '
-                If InStr(1, ArgumentString, vbCrLf) <> 0 Then
+                If vbInstr(1, ArgumentString, vbCrLf) <> 0 Then
                     '
                     ' crlf can only be here if it is the delimiter
                     '
@@ -6927,7 +6933,7 @@ ErrorTrap:
             getSimpleNameValue = iDefaultValue
             If WorkingString <> "" Then
                 WorkingString = Delimiter & WorkingString & Delimiter
-                ValueStart = InStr(1, WorkingString, Delimiter & Name & "=", vbTextCompare)
+                ValueStart = vbInstr(1, WorkingString, Delimiter & Name & "=", vbTextCompare)
                 If ValueStart <> 0 Then
                     NameLength = Len(Name)
                     ValueStart = ValueStart + Len(Delimiter) + NameLength + 1
@@ -6936,9 +6942,9 @@ ErrorTrap:
                         ValueStart = ValueStart + 1
                     End If
                     If IsQuoted Then
-                        ValueEnd = InStr(ValueStart, WorkingString, """" & Delimiter)
+                        ValueEnd = vbInstr(ValueStart, WorkingString, """" & Delimiter)
                     Else
-                        ValueEnd = InStr(ValueStart, WorkingString, Delimiter)
+                        ValueEnd = vbInstr(ValueStart, WorkingString, Delimiter)
                     End If
                     If ValueEnd = 0 Then
                         getSimpleNameValue = Mid(WorkingString, ValueStart)
@@ -6989,7 +6995,7 @@ ErrorTrap:
         '    Dim testPath As String
         '    '
         '    GetAddonRootPath = "addons"
-        '    If InStr(1, GetAddonRootPath, "\github\", vbTextCompare) <> 0 Then
+        '    If vbInstr(1, GetAddonRootPath, "\github\", vbTextCompare) <> 0 Then
         '        '
         '        ' debugging - change program path to dummy path so addon builds all copy to
         '        '
@@ -7265,16 +7271,16 @@ ErrorTrap:
             MethodName = "csv_GetVirtualFilenameByTable"
             '
             iTableName = TableName
-            iTableName = Replace(iTableName, " ", "_")
-            iTableName = Replace(iTableName, ".", "_")
+            iTableName = vbReplace(iTableName, " ", "_")
+            iTableName = vbReplace(iTableName, ".", "_")
             '
             iFieldName = FieldName
-            iFieldName = Replace(FieldName, " ", "_")
-            iFieldName = Replace(iFieldName, ".", "_")
+            iFieldName = vbReplace(FieldName, " ", "_")
+            iFieldName = vbReplace(iFieldName, ".", "_")
             '
             iOriginalFilename = OriginalFilename
-            iOriginalFilename = Replace(iOriginalFilename, " ", "_")
-            iOriginalFilename = Replace(iOriginalFilename, ".", "_")
+            iOriginalFilename = vbReplace(iOriginalFilename, " ", "_")
+            iOriginalFilename = vbReplace(iOriginalFilename, ".", "_")
             '
             RecordIDString = CStr(RecordID)
             If RecordID = 0 Then
@@ -7341,10 +7347,10 @@ ErrorTrap:
             Dim returnPath As String = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath)
             Dim ptr As Integer
             '
-            ptr = InStr(1, returnPath, "\github\", vbTextCompare)
+            ptr = vbInstr(1, returnPath, "\github\", vbTextCompare)
             If ptr <> 0 Then
                 ' for ...\github\contensive4?\bin"
-                ptr = InStr(ptr + 8, returnPath, "\")
+                ptr = vbInstr(ptr + 8, returnPath, "\")
                 returnPath = Left(returnPath, ptr) & "bin\"
             End If
 
@@ -7423,7 +7429,7 @@ ErrorTrap:
         ''' <param name="needle"></param>
         ''' <param name="ignore"></param>
         ''' <returns></returns>
-        Friend Function isInStr(start As Integer, haystack As String, needle As String, Optional ignore As CompareMethod = CompareMethod.Text) As Boolean
+        Public Function isInStr(start As Integer, haystack As String, needle As String, Optional ignore As CompareMethod = CompareMethod.Text) As Boolean
             Return (InStr(start, haystack, needle, vbTextCompare) >= 0)
         End Function
         '
@@ -7433,7 +7439,7 @@ ErrorTrap:
         ''' </summary>
         ''' <param name="route"></param>
         ''' <returns></returns>
-        Friend Function normalizeRoute(route As String) As String
+        Public Function normalizeRoute(route As String) As String
             Dim normalizedRoute As String = route.ToLower()
             Try
                 If String.IsNullOrEmpty(normalizedRoute) Then
@@ -7467,7 +7473,7 @@ ErrorTrap:
             ' this routine was originally written to handle modes that were not adopted (content file absolute and relative URLs)
             ' leave it here as a simple slash converter in case other conversions are needed later
             '
-            Return Replace(cdnUrl, "/", "\")
+            Return vbReplace(cdnUrl, "/", "\")
         End Function
         '
         '==============================================================================
@@ -7502,6 +7508,176 @@ ErrorTrap:
                 Throw New ApplicationException("Exception in isGuid", ex)
             End Try
             Return returnValue
+        End Function
+        '
+        '====================================================================================================
+        '
+        Public Function vbInstr(string1 As String, string2 As String, compare As CompareMethod) As Integer
+            Return vbInstr(1, string1, string2, compare)
+        End Function
+        '
+        Public Function vbInstr(string1 As String, string2 As String) As Integer
+            Return vbInstr(1, string1, string2, CompareMethod.Binary)
+        End Function
+        '
+        Public Function vbInstr(start As Integer, string1 As String, string2 As String) As Integer
+            Return vbInstr(start, string1, string2, CompareMethod.Binary)
+        End Function
+        '
+        Public Function vbInstr(start As Integer, string1 As String, string2 As String, compare As CompareMethod) As Integer
+            If (String.IsNullOrEmpty(string1)) Then
+                Return 0
+            Else
+                If (start < 1) Then
+                    Throw New ArgumentException("Instr() start must be > 0.")
+                Else
+                    If (compare = CompareMethod.Binary) Then
+                        Return string1.IndexOf(string2, start - 1, StringComparison.CurrentCulture) + 1
+                    Else
+                        Return string1.IndexOf(string2, start - 1, StringComparison.CurrentCultureIgnoreCase) + 1
+                    End If
+                End If
+            End If
+        End Function
+        '
+        '====================================================================================================
+        '
+        Public Function vbReplace(expression As String, find As String, replacement As String) As String
+            Return vbReplace(expression, find, replacement, 1, 9999, CompareMethod.Binary)
+        End Function
+        '
+        Public Function vbReplace(expression As String, find As String, replacement As String, startIgnore As Integer, countIgnore As Integer, compare As CompareMethod) As String
+            If String.IsNullOrEmpty(expression) Then
+                Return expression
+            ElseIf String.IsNullOrEmpty(find) Then
+                Return expression
+            Else
+                If compare = CompareMethod.Binary Then
+                    Return expression.Replace(find, replacement)
+                ElseIf String.IsNullOrEmpty(replacement) Then
+                    Return Regex.Replace(expression, find, "", RegexOptions.IgnoreCase)
+                Else
+                    Return Regex.Replace(expression, find, replacement, RegexOptions.IgnoreCase)
+                End If
+            End If
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Visual Basic UCase
+        ''' </summary>
+        ''' <param name="source"></param>
+        ''' <returns></returns>
+        Public Function vbUCase(source As String) As String
+            If (String.IsNullOrEmpty(source)) Then
+                Return ""
+            Else
+                Return source.ToUpper
+            End If
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Visual Basic LCase
+        ''' </summary>
+        ''' <param name="source"></param>
+        ''' <returns></returns>
+        Public Function vbLCase(source As String) As String
+            If (String.IsNullOrEmpty(source)) Then
+                Return ""
+            Else
+                Return source.ToLower
+            End If
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' visual basic Left()
+        ''' </summary>
+        ''' <param name="source"></param>
+        ''' <param name="length"></param>
+        ''' <returns></returns>
+        Public Function vbLeft(source As String, length As Integer) As String
+            If (String.IsNullOrEmpty(source)) Then
+                Return ""
+            Else
+                Return source.Substring(length)
+            End If
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Visual Basic Right()
+        ''' </summary>
+        ''' <param name="source"></param>
+        ''' <param name="length"></param>
+        ''' <returns></returns>
+        Public Function vbRight(source As String, length As Integer) As String
+            If (String.IsNullOrEmpty(source)) Then
+                Return ""
+            Else
+                Return source.Substring(source.Length - length)
+            End If
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Visual Basic Len()
+        ''' </summary>
+        ''' <param name="source"></param>
+        ''' <returns></returns>
+        Public Function vbLen(source As String) As Integer
+            If (String.IsNullOrEmpty(source)) Then
+                Return 0
+            Else
+                Return source.Length
+            End If
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Visual Basic Mid()
+        ''' </summary>
+        ''' <param name="source"></param>
+        ''' <param name="startIndex"></param>
+        ''' <returns></returns>
+        Public Function vbMid(source As String, startIndex As Integer) As String
+            If (String.IsNullOrEmpty(source)) Then
+                Return ""
+            Else
+                Return source.Substring(startIndex)
+            End If
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Visual Basic Mid()
+        ''' </summary>
+        ''' <param name="source"></param>
+        ''' <param name="startIndex"></param>
+        ''' <param name="length"></param>
+        ''' <returns></returns>
+        Public Function vbMid(source As String, startIndex As Integer, length As Integer) As String
+            If (String.IsNullOrEmpty(source)) Then
+                Return ""
+            Else
+                Return source.Substring(startIndex, length)
+            End If
+        End Function
+        '
+        Public Function vbIsNumeric(Expression As Object) As Boolean
+            If (TypeOf Expression Is DateTime) Then
+                Return False
+            ElseIf (Expression Is Nothing) Then
+                Return False
+            ElseIf (TypeOf Expression Is Integer) Or (TypeOf Expression Is Int16) Or (TypeOf Expression Is Int32) Or (TypeOf Expression Is Int64) Or (TypeOf Expression Is Decimal) Or (TypeOf Expression Is Single) Or (TypeOf Expression Is Double) Or (TypeOf Expression Is Boolean) Then
+                Return True
+            ElseIf (TypeOf Expression Is String) Then
+                Dim output As Double
+                Return Double.TryParse(DirectCast(Expression, String), output)
+            Else
+                Return False
+            End If
         End Function
     End Module
     '
@@ -7572,6 +7748,81 @@ ErrorTrap:
             Assert.Equal("index.html?a=1", modifyLinkQuery("index.html?a=0", "a", "1", False))
             Assert.Equal("index.html?a=1", modifyLinkQuery("index.html?a=0", "a", "1", True))
             Assert.Equal("index.html?a=1&b=2", modifyLinkQuery("index.html?a=1", "b", "2", True))
+        End Sub
+        '
+        <Fact> Public Sub vbInstr_test()
+            'vbInstr(1, Link, "?")
+            Assert.Equal(InStr("abcdefgabcdefgabcdefgabcdefg", "d"), vbInstr("abcdefgabcdefgabcdefgabcdefg", "d"))
+            Assert.Equal(InStr("abcdefgabcdefgabcdefgabcdefg", "E"), vbInstr("abcdefgabcdefgabcdefgabcdefg", "E"))
+            Assert.Equal(InStr(10, "abcdefgabcdefgabcdefgabcdefg", "E"), vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E"))
+            Assert.Equal(InStr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Binary), vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Binary))
+            Assert.Equal(InStr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Text), vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Text))
+            Assert.Equal(InStr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Binary), vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Binary))
+            Assert.Equal(InStr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Text), vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Text))
+            Dim haystack As String = "abcdefgabcdefgabcdefgabcdefg"
+            Dim needle As String = "c"
+            Assert.Equal(InStr(1, "?", "?"), vbInstr(1, "?", "?"))
+            For ptr As Integer = 1 To haystack.Length
+                Assert.Equal(InStr(ptr, haystack, needle, CompareMethod.Binary), vbInstr(ptr, haystack, needle, CompareMethod.Binary))
+            Next
+        End Sub
+        '
+        <Fact> Public Sub vbIsNumeric_test()
+            Assert.Equal(IsNumeric(0), vbIsNumeric(0))
+            Assert.Equal(IsNumeric(New Date(2000, 1, 1)), vbIsNumeric(New Date(2000, 1, 1)))
+            Assert.Equal(IsNumeric(1234), vbIsNumeric(1234))
+            Assert.Equal(IsNumeric(12.34), vbIsNumeric(12.34))
+            Assert.Equal(IsNumeric("abcd"), vbIsNumeric("abcd"))
+            Assert.Equal(IsNumeric("1234"), vbIsNumeric("1234"))
+            Assert.Equal(IsNumeric("12.34"), vbIsNumeric("12.34"))
+            Assert.Equal(IsNumeric(Nothing), vbIsNumeric(Nothing))
+        End Sub
+        '
+        <Fact> Public Sub vbReplace_test()
+            Dim actual As String
+            Dim expected As String
+            Dim start As Integer = 1
+            Dim count As Integer = 9999
+            '
+            expected = Replace("abcdefg", "cd", "12345")
+            actual = vbReplace("abcdefg", "cd", "12345")
+            Assert.Equal(expected, actual)
+            '
+            expected = Replace("abcdefg", "cD", "12345")
+            actual = vbReplace("abcdefg", "cD", "12345")
+            Assert.Equal(expected, actual)
+            '
+            expected = Replace("abcdefg", "cd", "12345", start, count, CompareMethod.Binary)
+            actual = vbReplace("abcdefg", "cd", "12345", start, count, CompareMethod.Binary)
+            Assert.Equal(expected, actual)
+            '
+            expected = Replace("abcdefg", "cD", "12345", start, count, CompareMethod.Binary)
+            actual = vbReplace("abcdefg", "cD", "12345", start, count, CompareMethod.Binary)
+            Assert.Equal(expected, actual)
+            '
+            expected = Replace("abcdefg", "cd", "12345", start, count, CompareMethod.Text)
+            actual = vbReplace("abcdefg", "cd", "12345", start, count, CompareMethod.Text)
+            Assert.Equal(expected, actual)
+            '
+            expected = Replace("abcdefg", "cD", "12345", start, count, CompareMethod.Text)
+            actual = vbReplace("abcdefg", "cD", "12345", start, count, CompareMethod.Text)
+            Assert.Equal(expected, actual)
+        End Sub
+        '
+        <Fact> Public Sub vbUCase_test()
+            Assert.Equal(UCase("AbCdEfG"), vbUCase("AbCdEfG"))
+            Assert.Equal(UCase("ABCDEFG"), vbUCase("ABCDEFG"))
+            Assert.Equal(UCase("abcdefg"), vbUCase("abcdefg"))
+        End Sub
+        '
+        <Fact> Public Sub vbLCase_test()
+            Assert.Equal(LCase("AbCdEfG"), vbLCase("AbCdEfG"))
+            Assert.Equal(LCase("ABCDEFG"), vbLCase("ABCDEFG"))
+            Assert.Equal(LCase("abcdefg"), vbLCase("abcdefg"))
+        End Sub
+        '
+        <Fact> Public Sub vbLeft_test()
+            Assert.Equal(LCase("AbCdEfG"), vbLCase("AbCdEfG"))
         End Sub
 
     End Class

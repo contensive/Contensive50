@@ -10,7 +10,7 @@ Namespace Contensive.Core
     ''' </summary>
     Public Class coreDomainsClass
         '
-        Private cpCore As cpCoreClass
+        Private cpCore As coreClass
         '
         Private domainList_local As New List(Of String)
         Private serverDomainList_localLoaded As Boolean = False
@@ -37,7 +37,7 @@ Namespace Contensive.Core
         Public domainDetailsList As Dictionary(Of String, domainDetailsClass)
         Public domainDetails As New domainDetailsClass
         '
-        Public Sub New(cpCore As cpCoreClass)
+        Public Sub New(cpCore As coreClass)
             MyBase.New()
             Me.cpCore = cpCore
         End Sub

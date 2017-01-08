@@ -41,8 +41,8 @@ Namespace Contensive.Core
             activeSync = 3
         End Enum
         '
-        Private cpCore As cpCoreClass
-        Private Property clusterConfig As clusterConfigClass
+        Private cpCore As coreClass
+        Private Property isLocal As Boolean
         Public Property rootLocalFolderPath As String                ' path ends in \, folder ends in foldername 
         Private Property clusterFileEndpoint As String
         Private Property fileSyncMode As fileSyncModeEnum
@@ -52,14 +52,13 @@ Namespace Contensive.Core
         ''' Create a filesystem
         ''' </summary>
         ''' <param name="cpCore"></param>
-        ''' <param name="clusterConfig"></param>
+        ''' <param name="isLocal">If true, thie object reads/saves to the local filesystem</param>
         ''' <param name="rootLocalFolder"></param>
-        ''' <param name="clusterFileEndpoint"></param>
-        Public Sub New(cpCore As cpCoreClass, clusterConfig As clusterConfigClass, fileSyncMode As fileSyncModeEnum, rootLocalFolder As String, Optional clusterFileEndpoint As String = "")
-            ' need cp for compatibility, but cp.core etc may not be available during construction, so bootstrap with a clusterConfig
+        ''' <param name="remoteFileEndpoint">If not isLocal, this endpoint is used for file sync</param>
+        Public Sub New(cpCore As coreClass, isLocal As Boolean, fileSyncMode As fileSyncModeEnum, rootLocalFolder As String, Optional remoteFileEndpoint As String = "")
             Me.cpCore = cpCore
-            Me.clusterConfig = clusterConfig
-            Me.clusterFileEndpoint = clusterFileEndpoint
+            Me.isLocal = isLocal
+            Me.clusterFileEndpoint = remoteFileEndpoint
             Me.fileSyncMode = fileSyncMode
             Me.rootLocalFolderPath = rootLocalFolder
             If (Not String.IsNullOrEmpty(rootLocalFolder)) Then
@@ -105,7 +104,7 @@ Namespace Contensive.Core
                     ' Not an error because an empty pathname returns an empty result
                     '
                 Else
-                    If Not clusterConfig.isLocal Then
+                    If Not isLocal Then
                         ' check local cache, download if needed
                     End If
                     If checkFile(PathFilename) Then
@@ -131,7 +130,7 @@ Namespace Contensive.Core
                     ' Not an error because an empty pathname returns an empty result
                     '
                 Else
-                    If Not clusterConfig.isLocal Then
+                    If Not isLocal Then
                         ' check local cache, download if needed
                     End If
                     If checkFile(PathFilename) Then
@@ -188,7 +187,7 @@ Namespace Contensive.Core
                     Catch ex As Exception
                         Call cpCore.handleExceptionAndRethrow(ex)
                     End Try
-                    If Not clusterConfig.isLocal Then
+                    If Not isLocal Then
                         ' s3 transfer
                     End If
                 End If
@@ -247,7 +246,7 @@ Namespace Contensive.Core
         '========================================================================
         '
         Public Sub syncLocalFile(ByVal PathFilename As String, ByVal FileContent As String)
-            If Not clusterConfig.isLocal Then
+            If Not isLocal Then
                 ' s3 transfer
             End If
         End Sub
@@ -274,13 +273,13 @@ Namespace Contensive.Core
                         WorkingPath = WorkingPath & "\"
                     End If
                     If Not Directory.Exists(WorkingPath) Then
-                        Position = InStr(1, WorkingPath, "\")
+                        Position = vbInstr(1, WorkingPath, "\")
                         Do While Position <> 0
                             PartialPath = Mid(WorkingPath, 1, Position - 1)
                             If Not Directory.Exists(PartialPath) Then
                                 Call Directory.CreateDirectory(PartialPath)
                             End If
-                            Position = InStr(Position + 1, WorkingPath, "\")
+                            Position = vbInstr(Position + 1, WorkingPath, "\")
                         Loop
                     End If
                 End If
@@ -299,7 +298,7 @@ Namespace Contensive.Core
             Try
                 '
                 Call CreatefullPath(joinPath(rootLocalFolderPath, FolderPath))
-                If Not clusterConfig.isLocal Then
+                If Not isLocal Then
                     ' s3 transfer
                 End If
             Catch ex As Exception
@@ -325,7 +324,7 @@ Namespace Contensive.Core
                     If checkFile(PathFilename) Then
                         Call File.Delete(rootLocalFolderPath & PathFilename)
                     End If
-                    If Not clusterConfig.isLocal Then
+                    If Not isLocal Then
                         ' s3 transfer
                     End If
                 End If
@@ -364,7 +363,7 @@ Namespace Contensive.Core
                     If checkPath(PathName) Then
                         Call Directory.Delete(localPath, True)
                     End If
-                    If Not clusterConfig.isLocal Then
+                    If Not isLocal Then
                         ' s3 transfer
                     End If
                 End If
@@ -393,7 +392,7 @@ Namespace Contensive.Core
                 ElseIf (dstPathFilename = "") Then
                     Throw New ArgumentException("Invalid destination file.")
                 Else
-                    If Not clusterConfig.isLocal Then
+                    If Not isLocal Then
                         ' s3 transfer
                     Else
                         If Not checkFile(srcPathFilename) Then
@@ -426,7 +425,7 @@ Namespace Contensive.Core
         Public Function GetFolderFiles(ByVal FolderPath As String) As FileInfo()
             Dim returnFileInfoList As FileInfo() = {}
             Try
-                If Not clusterConfig.isLocal Then
+                If Not isLocal Then
                     ' s3 transfer
                 Else
                     If checkPath(FolderPath) Then
@@ -472,7 +471,7 @@ Namespace Contensive.Core
         Public Function getFolders(ByVal FolderPath As String) As IO.DirectoryInfo()
             Dim returnFolders As IO.DirectoryInfo() = {}
             Try
-                If Not clusterConfig.isLocal Then
+                If Not isLocal Then
                     returnFolders = {}
                 Else
                     If Not checkPath(FolderPath) Then
@@ -514,7 +513,7 @@ Namespace Contensive.Core
         Public Function checkFile(ByVal pathFilename As String) As Boolean
             Dim returnOK As Boolean = False
             Try
-                If Not clusterConfig.isLocal Then
+                If Not isLocal Then
                 Else
                     Dim localPathFilename As String = rootLocalFolderPath & pathFilename
                     returnOK = File.Exists(localPathFilename)
@@ -532,7 +531,7 @@ Namespace Contensive.Core
         Public Function checkPath(ByVal path As String) As Boolean
             Dim returnOK As Boolean = False
             Try
-                If Not clusterConfig.isLocal Then
+                If Not isLocal Then
                 Else
                     Dim localFileFolder As String = rootLocalFolderPath & path
                     returnOK = Directory.Exists(localFileFolder)
@@ -561,7 +560,7 @@ Namespace Contensive.Core
                 If (SourcePathFilename = "") Then
                     Throw New ApplicationException("Invalid source file")
                 Else
-                    If Not clusterConfig.isLocal Then
+                    If Not isLocal Then
                     Else
                         SourcePathFilename = SourcePathFilename.Replace("/", "\")
                         srcFullPathFilename = rootLocalFolderPath & SourcePathFilename
@@ -656,7 +655,7 @@ Namespace Contensive.Core
         '
         Public Sub copyFolder(ByVal srcPath As String, ByVal dstPath As String, Optional dstFileSystem As coreFileSystemClass = Nothing)
             Try
-                If Not clusterConfig.isLocal Then
+                If Not isLocal Then
                     '
                     ' s3
                     '
@@ -718,15 +717,15 @@ Namespace Contensive.Core
         '
         '=========================================================================================================
         '
-        Friend Sub SaveRemoteFile(ByVal Link As String, ByVal pathFilename As String)
+        public Sub SaveRemoteFile(ByVal Link As String, ByVal pathFilename As String)
             Try
                 '
                 Dim HTTP As New coreHttpRequestClass()
                 Dim URLLink As String
                 '
                 If (pathFilename <> "") And (Link <> "") Then
-                    pathFilename = Replace(pathFilename, "/", "\")
-                    URLLink = Replace(Link, " ", "%20")
+                    pathFilename = vbReplace(pathFilename, "/", "\")
+                    URLLink = vbReplace(Link, " ", "%20")
                     HTTP.timeout = 600
                     Call HTTP.getUrlToFile(CStr(URLLink), rootLocalFolderPath & pathFilename)
                 End If

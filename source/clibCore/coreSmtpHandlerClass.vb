@@ -19,7 +19,7 @@ Namespace Contensive.Core
         '   This module handles the common email interface for the Content Server
         '========================================================================
         '
-        Private cpCore As cpCoreClass
+        Private cpCore As coreClass
         '
         '====================================================================================================
         ''' <summary>
@@ -27,7 +27,7 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <remarks></remarks>
-        Public Sub New(cpCore As cpCoreClass)
+        Public Sub New(cpCore As coreClass)
             MyBase.New()
             Me.cpCore = cpCore
         End Sub
@@ -92,10 +92,10 @@ Namespace Contensive.Core
                             '
                             converthtmlToText = New coreHtmlToTextClass(cpCore)
                             EmailBodyHTML = EmailBody
-                            If InStr(1, EmailBodyHTML, "<BODY", vbTextCompare) = 0 Then
+                            If vbInstr(1, EmailBodyHTML, "<BODY", vbTextCompare) = 0 Then
                                 EmailBodyHTML = "<BODY>" & EmailBodyHTML & "</BODY>"
                             End If
-                            If InStr(1, EmailBodyHTML, "<HTML>", vbTextCompare) = 0 Then
+                            If vbInstr(1, EmailBodyHTML, "<HTML>", vbTextCompare) = 0 Then
                                 EmailBodyHTML = "<HTML>" & EmailBodyHTML & "</HTML>"
                             End If
                             EmailBodyText = converthtmlToText.convert(EmailBody)
@@ -111,7 +111,7 @@ Namespace Contensive.Core
                         '
                         ' ----- clean up the result code for logging (change empty to "ok")
                         '
-                        sendEmail5 = Replace(sendEmail5, vbCrLf, "")
+                        sendEmail5 = vbReplace(sendEmail5, vbCrLf, "")
                         If sendEmail5 = "" Then
                             SendResult = "ok"
                         Else
@@ -260,7 +260,7 @@ ErrorTrap:
                 '
                 Dim Line0 As String
                 Line0 = ReadLine(Copy)
-                If UCase(Mid(Line0, 1, 11)) = "CONTENSIVE " Then
+                If vbUCase(Mid(Line0, 1, 11)) = "CONTENSIVE " Then
                     '
                     ' Email record (LINE0 IS CONENSIVE AND VERSION)
                     '
@@ -300,7 +300,7 @@ ErrorTrap:
                     '
                     ' Error, log the problem
                     '
-                    Call HandleClassInternalError(KmaErrorUser, "App.EXEName", "Invalid email in send queue [" & Filename & "] was removed", MethodName, True)
+                    Call HandleClassInternalError(ignoreInteger, "App.EXEName", "Invalid email in send queue [" & Filename & "] was removed", MethodName, True)
                 End If
             Next
             '
@@ -321,7 +321,7 @@ ErrorTrap:
         Private Function ReadLine(ByRef Body As String) As String
             Dim line As String = ""
             Try
-                Dim EOL As Integer = InStr(1, Body, vbCrLf)
+                Dim EOL As Integer = vbInstr(1, Body, vbCrLf)
                 If EOL <> 0 Then
                     line = Mid(Body, 1, EOL - 1)
                     Body = Mid(Body, EOL + 2)
@@ -358,7 +358,7 @@ ErrorTrap:
             Dim SplitArray() As String
             CheckAddress = False
             If EmailAddress <> "" Then
-                If InStr(1, EmailAddress, "@") <> 0 Then
+                If vbInstr(1, EmailAddress, "@") <> 0 Then
                     SplitArray = Split(EmailAddress, "@")
                     If UBound(SplitArray) = 1 Then
                         If Len(SplitArray(0)) > 0 Then
@@ -383,7 +383,7 @@ ErrorTrap:
             '
             If EmailServer = "" Then
                 CheckServer = False
-            ElseIf InStr(1, EmailServer, "SMTP.YourServer.Com", vbTextCompare) <> 0 Then
+            ElseIf vbInstr(1, EmailServer, "SMTP.YourServer.Com", vbTextCompare) <> 0 Then
                 CheckServer = False
             Else
                 SplitArray = Split(EmailServer, ".")

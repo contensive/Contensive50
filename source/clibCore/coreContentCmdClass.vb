@@ -19,7 +19,7 @@ Imports Contensive.Core.coreCommonModule
 Namespace Contensive.Core
     Public Class coreContentCmdClass
         '
-        Private cpCore As cpCoreClass
+        Private cpCore As coreClass
         '
         '====================================================================================================
         ''' <summary>
@@ -27,7 +27,7 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="cpCore"></param>
         ''' <remarks></remarks>
-        Public Sub New(cpCore As cpCoreClass)
+        Public Sub New(cpCore As coreClass)
             Me.cpCore = cpCore
         End Sub
         ''
@@ -150,7 +150,7 @@ Namespace Contensive.Core
         '           user firstname
         '           site propertyname
         '
-        Friend Function ExecuteCmd(src As String, Context As cpCoreClass.addonContextEnum, personalizationPeopleId As Integer, personalizationIsAuthenticated As Boolean) As String
+        public Function ExecuteCmd(src As String, Context As coreClass.addonContextEnum, personalizationPeopleId As Integer, personalizationIsAuthenticated As Boolean) As String
             Dim returnValue As String = ""
             Try
                 Dim badCmd As Boolean
@@ -191,7 +191,7 @@ Namespace Contensive.Core
                 ptrLast = 1
                 Do
                     Cmd = ""
-                    posOpen = InStr(ptrLast, src, contentReplaceEscapeStart)
+                    posOpen = vbInstr(ptrLast, src, contentReplaceEscapeStart)
                     Ptr = posOpen
                     If Ptr = 0 Then
                         '
@@ -203,7 +203,7 @@ Namespace Contensive.Core
                         '
                         notFound = True
                         Do
-                            posClose = InStr(Ptr, src, contentReplaceEscapeEnd)
+                            posClose = vbInstr(Ptr, src, contentReplaceEscapeEnd)
                             If posClose = 0 Then
                                 '
                                 ' brace opened but no close, forget the open and exit
@@ -213,7 +213,7 @@ Namespace Contensive.Core
                             Else
                                 posDq = Ptr
                                 Do
-                                    posDq = InStr(posDq + 1, src, """")
+                                    posDq = vbInstr(posDq + 1, src, """")
                                     escape = ""
                                     If posDq > 0 Then
                                         escape = Mid(src, posDq - 1, 1)
@@ -221,7 +221,7 @@ Namespace Contensive.Core
                                 Loop While (escape = "\")
                                 posSq = Ptr
                                 Do
-                                    posSq = InStr(posSq + 1, src, "'")
+                                    posSq = vbInstr(posSq + 1, src, "'")
                                     escape = ""
                                     If posSq > 0 Then
                                         escape = Mid(src, posSq - 1, 1)
@@ -244,7 +244,7 @@ Namespace Contensive.Core
                                             ' skip forward to the next non-escaped sq
                                             '
                                             Do
-                                                posSq = InStr(posSq + 1, src, "'")
+                                                posSq = vbInstr(posSq + 1, src, "'")
                                                 escape = ""
                                                 If posSq > 0 Then
                                                     escape = Mid(src, posSq - 1, 1)
@@ -265,7 +265,7 @@ Namespace Contensive.Core
                                             '
                                             Do
                                                 'Ptr = posDq + 1
-                                                posDq = InStr(posDq + 1, src, """")
+                                                posDq = vbInstr(posDq + 1, src, """")
                                                 escape = ""
                                                 If posDq > 0 Then
                                                     escape = Mid(src, posDq - 1, 1)
@@ -313,7 +313,7 @@ Namespace Contensive.Core
         '   EncodeActiveContent - Execute Content Command Source
         '=================================================================================================================
         '
-        Private Function ExecuteAllCmdLists_Execute(cmdSrc As String, return_BadCmd As Boolean, Context As cpCoreClass.addonContextEnum, personalizationPeopleId As Integer, personalizationIsAuthenticated As Boolean) As String
+        Private Function ExecuteAllCmdLists_Execute(cmdSrc As String, return_BadCmd As Boolean, Context As coreClass.addonContextEnum, personalizationPeopleId As Integer, personalizationIsAuthenticated As Boolean) As String
             Dim returnValue As String = ""
             Try
                 '
@@ -360,11 +360,11 @@ Namespace Contensive.Core
                     If trimLen > 0 Then
                         leftChr = Left(cmdSrc, 1)
                         rightChr = Right(cmdSrc, 1)
-                        If InStr(1, whiteChrs, leftChr) <> 0 Then
+                        If vbInstr(1, whiteChrs, leftChr) <> 0 Then
                             cmdSrc = Mid(cmdSrc, 2)
                             trimming = True
                         End If
-                        If InStr(1, whiteChrs, rightChr) <> 0 Then
+                        If vbInstr(1, whiteChrs, rightChr) <> 0 Then
                             cmdSrc = Mid(cmdSrc, 1, Len(cmdSrc) - 1)
                             trimming = True
                         End If
@@ -472,7 +472,7 @@ Namespace Contensive.Core
                             '   "Open" file
                             '   "Open" "file"
                             '
-                            Pos = InStr(2, Cmd, """")
+                            Pos = vbInstr(2, Cmd, """")
                             If Pos <= 1 Then
                                 Throw New ApplicationException("Error parsing content command [" & cmdSrc & "], expected a close quote around position " & Pos)
                             Else
@@ -500,7 +500,7 @@ Namespace Contensive.Core
                             '   open
                             '   open file
                             '
-                            Pos = InStr(1, Cmd, " ")
+                            Pos = vbInstr(1, Cmd, " ")
                             If Pos > 0 Then
                                 cmdArg = Mid(cmdSrc, Pos + 1)
                                 Cmd = Trim(Mid(cmdSrc, 1, Pos - 1))
@@ -510,7 +510,7 @@ Namespace Contensive.Core
                             '
                             'cmdarg is quoted
                             '
-                            Pos = InStr(2, cmdArg, """")
+                            Pos = vbInstr(2, cmdArg, """")
                             If Pos <= 1 Then
                                 Throw New ApplicationException("Error parsing JSON command list, expected a quoted command argument, command list [" & cmdSrc & "]")
                             Else
@@ -562,13 +562,13 @@ Namespace Contensive.Core
                         '   D - { "command" : { "name" : "The Name"} }
                         '   E - { "command" : { "name" : "The Name" , "secondArgument" : "secondValue" } }
                         '
-                        If LCase(TypeName(cmdStringOrDictionary)) = "string" Then
+                        If vbLCase(TypeName(cmdStringOrDictionary)) = "string" Then
                             '
                             ' case A & B, the cmdDef is a string
                             '
                             Cmd = DirectCast(cmdStringOrDictionary, String)
                             cmdArgDef = New Dictionary(Of String, Object)
-                        ElseIf LCase(TypeName(cmdStringOrDictionary)) = "dictionary" Then
+                        ElseIf vbLCase(TypeName(cmdStringOrDictionary)) = "dictionary" Then
                             '
                             ' cases C-E, (0).key=cmd, (0).value = argument (might be string or object)
                             '
@@ -579,13 +579,13 @@ Namespace Contensive.Core
                                 '
                             Else
                                 Cmd = cmdDef.Keys(0)
-                                If LCase(TypeName(cmdDef.Item(Cmd))) = "string" Then
+                                If vbLCase(TypeName(cmdDef.Item(Cmd))) = "string" Then
                                     '
                                     ' command definition with default argument
                                     '
                                     cmdArgDef = New Dictionary(Of String, Object)
                                     Call cmdArgDef.Add("default", cmdDef.Item(Cmd))
-                                ElseIf LCase(TypeName(cmdDef.Item(Cmd))) = "dictionary" Then
+                                ElseIf vbLCase(TypeName(cmdDef.Item(Cmd))) = "dictionary" Then
                                     cmdArgDef = DirectCast(cmdDef.Item(Cmd), Dictionary(Of String, Object))
                                 Else
                                     '
@@ -607,7 +607,7 @@ Namespace Contensive.Core
                         '
                         ' execute the cmd with cmdArgDef dictionary
                         '
-                        Select Case LCase(Cmd)
+                        Select Case vbLCase(Cmd)
                             Case "textbox"
                                 '
                                 ' Opens a textbox addon (patch for text box name being "text name" so it requies json)copy content record
@@ -762,7 +762,7 @@ Namespace Contensive.Core
                                 'CmdAccumulator = ""
                                 'ArgName = ""
                                 'For Ptr = 0 To cmdArgDef.Count - 1
-                                '    Select Case LCase(cmdArgDef.Keys(Ptr))
+                                '    Select Case vbLCase(cmdArgDef.Keys(Ptr))
                                 '        Case "name", "default"
                                 '            ArgName = cmdArgDef.Item(Ptr)
                                 '    End Select
@@ -784,7 +784,7 @@ Namespace Contensive.Core
                                 ''CmdAccumulator = ""
                                 'ArgName = ""
                                 'For Ptr = 0 To cmdArgDef.Count - 1
-                                '    Select Case LCase(cmdArgDef.Keys(Ptr))
+                                '    Select Case vbLCase(cmdArgDef.Keys(Ptr))
                                 '        Case "find"
                                 '            argFind = cmdArgDef.Item(Ptr)
                                 '        Case "replace"
@@ -792,7 +792,7 @@ Namespace Contensive.Core
                                 '    End Select
                                 'Next
                                 'If argFind <> "" Then
-                                '    CmdAccumulator = Replace(CmdAccumulator, argFind, argReplace, , , vbTextCompare)
+                                '    CmdAccumulator = vbReplace(CmdAccumulator, argFind, argReplace, vbTextCompare)
                                 'End If
                             Case "setinner"
                                 Throw New NotImplementedException("setInner contentCmd")
@@ -807,7 +807,7 @@ Namespace Contensive.Core
                                 ''
                                 'ArgName = ""
                                 'For Ptr = 0 To cmdArgDef.Count - 1
-                                '    Select Case LCase(cmdArgDef.Keys(Ptr))
+                                '    Select Case vbLCase(cmdArgDef.Keys(Ptr))
                                 '        Case "find"
                                 '            argFind = cmdArgDef.Item(Ptr)
                                 '        Case "replace"
@@ -829,7 +829,7 @@ Namespace Contensive.Core
                                 ''
                                 'ArgName = ""
                                 'For Ptr = 0 To cmdArgDef.Count - 1
-                                '    Select Case LCase(cmdArgDef.Keys(Ptr))
+                                '    Select Case vbLCase(cmdArgDef.Keys(Ptr))
                                 '        Case "find"
                                 '            argFind = cmdArgDef.Item(Ptr)
                                 '        Case "replace"
@@ -852,7 +852,7 @@ Namespace Contensive.Core
                                 ''
                                 'ArgName = ""
                                 'For Ptr = 0 To cmdArgDef.Count - 1
-                                '    Select Case LCase(cmdArgDef.Keys(Ptr))
+                                '    Select Case vbLCase(cmdArgDef.Keys(Ptr))
                                 '        Case "find"
                                 '            argFind = cmdArgDef.Item(Ptr)
                                 '        Case "replace"
@@ -874,7 +874,7 @@ Namespace Contensive.Core
                                 ''
                                 'ArgName = ""
                                 'For Ptr = 0 To cmdArgDef.Count - 1
-                                '    Select Case LCase(cmdArgDef.Keys(Ptr))
+                                '    Select Case vbLCase(cmdArgDef.Keys(Ptr))
                                 '        Case "find"
                                 '            argFind = cmdArgDef.Item(Ptr)
                                 '        Case "replace"

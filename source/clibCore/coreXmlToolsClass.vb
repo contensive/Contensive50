@@ -17,7 +17,7 @@ Namespace Contensive.Core
         Private iBusy As Integer
         Private iTaskCount As Integer
         Const ApplicationNameLocal = "unknown"
-        Private cpCore As cpCoreClass
+        Private cpCore As coreClass
         '
         '====================================================================================================
         ''' <summary>
@@ -25,7 +25,7 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <remarks></remarks>
-        Public Sub New(cpCore As cpCoreClass)
+        Public Sub New(cpCore As coreClass)
             Me.cpCore = cpCore
         End Sub
         '
@@ -271,7 +271,7 @@ Namespace Contensive.Core
                     '
                     IsBaseContent = EncodeBoolean(dr("isBaseContent"))
                     iContentName = GetRSXMLAttribute(appName, dr, "Name")
-                    If InStr(1, iContentName, "data sources", vbTextCompare) = 1 Then
+                    If vbInstr(1, iContentName, "data sources", vbTextCompare) = 1 Then
                         iContentName = iContentName
                     End If
                     ContentID = EncodeInteger(dr("ID"))
@@ -306,7 +306,7 @@ Namespace Contensive.Core
                         If DataSourceName = "" Then
                             DataSourceName = "Default"
                         End If
-                        If UCase(TableName) = "CCMENUENTRIES" Then
+                        If vbUCase(TableName) = "CCMENUENTRIES" Then
                             FoundMenuTable = True
                         End If
                         sb.Append(" AuthoringDataSourceName=""" & EncodeXMLattribute(DataSourceName) & """")
@@ -590,9 +590,9 @@ ErrorTrap:
             'If Not (Node.Attributes Is Nothing) Then
             '    REsultNode = Node.Attributes.getNamedItem(Name)
             '    If (REsultNode Is Nothing) Then
-            UcaseName = UCase(Name)
+            UcaseName = vbUCase(Name)
             For Each NodeAttribute In Node.Attributes
-                If UCase(NodeAttribute.Name) = UcaseName Then
+                If vbUCase(NodeAttribute.Name) = UcaseName Then
                     GetXMLAttribute = NodeAttribute.Value
                     Found = True
                     Exit For
@@ -652,7 +652,7 @@ ErrorTrap:
         '    MethodName = "XMLClass.GetXMLAttribute"
         '    '
         '    For Each NodeAttribute In NodeName.Attributes
-        '        If UCase(NodeAttribute.Name) = UCase(Name) Then
+        '        If vbUCase(NodeAttribute.Name) = vbUCase(Name) Then
         '            GetXMLAttribute = NodeAttribute.nodeValue
         '            End If
         '        Next
@@ -992,9 +992,9 @@ ErrorTrap:
         '
         Private Function EncodeXMLattribute(ByVal Source As String) As String
             EncodeXMLattribute = html_EncodeHTML(Source)
-            EncodeXMLattribute = Replace(EncodeXMLattribute, vbCrLf, " ")
-            EncodeXMLattribute = Replace(EncodeXMLattribute, vbCr, "")
-            EncodeXMLattribute = Replace(EncodeXMLattribute, vbLf, "")
+            EncodeXMLattribute = vbReplace(EncodeXMLattribute, vbCrLf, " ")
+            EncodeXMLattribute = vbReplace(EncodeXMLattribute, vbCr, "")
+            EncodeXMLattribute = vbReplace(EncodeXMLattribute, vbLf, "")
         End Function
         '
         '
@@ -1065,7 +1065,7 @@ ErrorTrap:
             '
             appName = cpCore.appConfig.name
             If RecordID <> 0 Then
-                If InStr(1, "," & UsedIDString & ",", "," & RecordID & ",", vbTextCompare) <> 0 Then
+                If vbInstr(1, "," & UsedIDString & ",", "," & RecordID & ",", vbTextCompare) <> 0 Then
                     Call HandleClassErrorAndResume(appName, "getMenuNameSpace", "Circular reference found in UsedIDString [" & UsedIDString & "] getting ccMenuEntries namespace for recordid [" & RecordID & "]")
                     getMenuNameSpace = ""
                 Else

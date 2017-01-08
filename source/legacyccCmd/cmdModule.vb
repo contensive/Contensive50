@@ -84,7 +84,7 @@ End Namespace
 '                        cp.core.appendLog("cmdModule.main, call getNextAsyncCmd and loop until command is 'error', or empty ")
 '                        '
 '                        'cmd = GetNextAsyncCmd(cp.core, "127.0.0.1", MonitorPort, "", "")
-'                        Do While cmd <> "" And InStr(1, cmd, "error", vbTextCompare) <> 1
+'                        Do While cmd <> "" And vbInstr(1, cmd, "error", vbTextCompare) <> 1
 '                            '
 '                            cp.core.appendLog("cmdModule.main, looping, cmd=[" & cmd & "]")
 '                            '
@@ -194,7 +194,7 @@ End Namespace
 '                        'Else
 
 '                        'End If
-'                        Select Case UCase(Method)
+'                        Select Case vbUCase(Method)
 '                            'Case "INSTALLADDON", "INSTALLADDONS"
 '                            '    '
 '                            '    ' Install Add-ons in the AddonInstall folder of the applications virtual folder
@@ -507,7 +507,7 @@ End Namespace
 '                                '
 '                                ' Unknown
 '                                '
-'                                cpCore.handleLegacyError2("CmdModule", "ExecuteServerCmd", "Unknown command [" & UCase(Method) & "]")
+'                                cpCore.handleLegacyError2("CmdModule", "ExecuteServerCmd", "Unknown command [" & vbUCase(Method) & "]")
 '                        End Select
 '                    End If
 '                End If

@@ -3,21 +3,25 @@ Option Explicit On
 Option Strict On
 '
 Namespace Contensive.Core
+    '
+    '====================================================================================================
+    ''' <summary>
+    ''' UI rendering for Admin
+    ''' REFACTOR - add  try-catch
+    ''' not IDisposable - not contained classes that need to be disposed
+    ''' </summary>
     Public Class coreAdminUIClass
-        '========================================================================
-        ' This is the header file controls the online forums architecture
         '
-        ' This file and its contents are copyright by Kidwell McGowan Associates.
         '========================================================================
         '
-        Public Enum SortingStateEnum
+        Private Enum SortingStateEnum
             NotSortable = 0
             SortableSetAZ = 1
             SortableSetza = 2
             SortableNotSet = 3
         End Enum
         '
-        Private cpCore As cpCoreClass
+        Private cpCore As coreClass
         '
         '====================================================================================================
         ''' <summary>
@@ -25,12 +29,10 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <remarks></remarks>
-        Public Sub New(cpCore As cpCoreClass)
+        Public Sub New(cpCore As coreClass)
             MyBase.New()
             Me.cpCore = cpCore
         End Sub
-        '
-        '===========================================================================
         '
         '===========================================================================
         '
@@ -42,7 +44,7 @@ Namespace Contensive.Core
             GetTitleBar = "<div class=""ccAdminTitleBar"">" & Title
             'GetTitleBar = "<div class=""ccAdminTitleBar"">" & Title & "</div>"
             Copy = Description
-            If InStr(1, Copy, "<p>", vbTextCompare) = 1 Then
+            If vbInstr(1, Copy, "<p>", vbTextCompare) = 1 Then
                 Copy = Mid(Copy, 4)
                 If InStrRev(Copy, "</p>", , vbTextCompare) = (Len(Copy) - 4) Then
                     Copy = Mid(Copy, 1, Len(Copy) - 4)
@@ -74,7 +76,7 @@ ErrorTrap:
         '   used on Normal Edit and others
         '========================================================================
         '
-        Friend Function GetEditButtonBar2(ByVal MenuDepth As Integer, ByVal AllowDelete As Boolean, ByVal AllowCancel As Boolean, ByVal allowSave As Boolean, ByVal AllowSpellCheck As Boolean, ByVal AllowPublish As Boolean, ByVal AllowAbort As Boolean, ByVal AllowSubmit As Boolean, ByVal AllowApprove As Boolean, ByVal AllowAdd As Boolean, ByVal ignore_AllowReloadCDef As Boolean, ByVal HasChildRecords As Boolean, ByVal IsPageContent As Boolean, ByVal AllowMarkReviewed As Boolean, ByVal AllowRefresh As Boolean, ByVal AllowCreateDuplicate As Boolean) As String
+        Public Function GetEditButtonBar2(ByVal MenuDepth As Integer, ByVal AllowDelete As Boolean, ByVal AllowCancel As Boolean, ByVal allowSave As Boolean, ByVal AllowSpellCheck As Boolean, ByVal AllowPublish As Boolean, ByVal AllowAbort As Boolean, ByVal AllowSubmit As Boolean, ByVal AllowApprove As Boolean, ByVal AllowAdd As Boolean, ByVal ignore_AllowReloadCDef As Boolean, ByVal HasChildRecords As Boolean, ByVal IsPageContent As Boolean, ByVal AllowMarkReviewed As Boolean, ByVal AllowRefresh As Boolean, ByVal AllowCreateDuplicate As Boolean) As String
             On Error GoTo ErrorTrap
             '
             Dim JSOnClick As String
@@ -319,7 +321,7 @@ ErrorTrap:
         '
         '
         '
-        Friend Function GetButtonBarForIndex(ByVal LeftButtons As String, ByVal RightButtons As String, ByVal PageNumber As Integer, ByVal RecordsPerPage As Integer, ByVal PageCount As Integer) As String
+        Public Function GetButtonBarForIndex(ByVal LeftButtons As String, ByVal RightButtons As String, ByVal PageNumber As Integer, ByVal RecordsPerPage As Integer, ByVal PageCount As Integer) As String
             On Error GoTo ErrorTrap
             '
             Dim Ptr As Integer
@@ -349,7 +351,7 @@ ErrorTrap:
             If NavEnd < PageCount Then
                 Nav = Nav & "<li class=""delim"">&#187;</li><li onclick=""bbj(this);"">" & PageCount & "</li>"
             End If
-            Nav = Replace(Nav, ">" & PageNumber & "<", " class=""hit"">" & PageNumber & "<")
+            Nav = vbReplace(Nav, ">" & PageNumber & "<", " class=""hit"">" & PageNumber & "<")
             GetButtonBarForIndex = GetButtonBarForIndex _
                 & cr & "<script language=""javascript"">function bbj(p){document.getElementsByName('indexGoToPage')[0].value=p.innerHTML;document.adminForm.submit();}</script>" _
                 & cr & "<div class=""ccJumpCon"">" _
@@ -678,7 +680,7 @@ ErrorTrap:
             If Title = "" Then
                 Copy = "&nbsp;"
             Else
-                Copy = Replace(Title, " ", "&nbsp;")
+                Copy = vbReplace(Title, " ", "&nbsp;")
                 'Copy = "<nobr>" & Title & "</nobr>"
             End If
             Style = "VERTICAL-ALIGN:bottom;"
@@ -703,7 +705,7 @@ ErrorTrap:
             End Select
             '
             If Width <> "" Then
-                WidthTest = EncodeInteger(Replace(Width, "px", "", , , vbTextCompare))
+                WidthTest = EncodeInteger(Replace(Width, "px", "", vbTextCompare))
                 If WidthTest <> 0 Then
                     Style = Style & "width:" & WidthTest & "px;"
                     Copy = Copy & "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""" & WidthTest & """ height=1 border=0>"

@@ -2,21 +2,34 @@
 Option Explicit On
 Option Strict On
 
+Imports Xunit
+
 Namespace Contensive.Core
+    '
+    '====================================================================================================
+    ''' <summary>
+    ''' Creates a simple keyValue cache system
+    ''' not IDisposable - not contained classes that need to be disposed
+    ''' constructor includes query to load with two fields, key (string) and value (string)
+    ''' values are stored in a List, referenced by a pointer
+    ''' keys are stored in an keyPtrINdex with the pointer to the value
+    ''' loads with cache. if cache is empty, it loads on demand
+    ''' when cleared, loads on demand
+    '''  combines a key ptr index and a value store, referenced by ptr
+    ''' </summary>
     Public Class coreCacheKeyPtrClass
         '
-        ' combines a key ptr index and a value store, referenced by ptr
+        ' ----- objects passed in constructor, do not dispose
         '
-        ' constructor includes query to load with two fields, key (string) and value (string)
-        ' values are stored in a List, referenced by a pointer
-        ' keys are stored in an keyPtrINdex with the pointer to the value
-        ' loads with cache. if cache is empty, it loads on demand
-        ' when cleared, loads on demand
+        Private cpCore As coreClass
         '
-        Private cpCore As cpCoreClass
+        ' ----- private globals
+        '
+        Private sqlLoadKeyValue As String
         Private cacheName As String
+        Private cacheInvalidationTagCommaList As String
         '
-        Public sqlLoad As String
+        '====================================================================================================
         '
         Public Class dataStoreClass
             Public dataList As List(Of String)
@@ -25,16 +38,21 @@ Namespace Contensive.Core
         End Class
         Private dataStore As New dataStoreClass
         '
-        Public Sub New(cpCore As cpCoreClass, cacheName As String, sqlLoadKeyValue As String)
+        '====================================================================================================
+        '
+        Public Sub New(cpCore As coreClass, cacheName As String, sqlLoadKeyValue As String, cacheInvalidationTagCommaList As String)
             MyBase.New()
             Me.cpCore = cpCore
             Me.cacheName = cacheName
-            Me.sqlLoad = sqlLoadKeyValue
+            Me.sqlLoadKeyValue = sqlLoadKeyValue
+            Me.cacheInvalidationTagCommaList = cacheInvalidationTagCommaList
             dataStore = New dataStoreClass
             dataStore.dataList = New List(Of String)
             dataStore.keyPtrIndex = New coreKeyPtrIndexClass
             dataStore.loaded = False
         End Sub
+        '
+        '====================================================================================================
         '
         '   clear sharedStylesAddonRules cache
         '
@@ -45,71 +63,119 @@ Namespace Contensive.Core
                 dataStore.keyPtrIndex = New coreKeyPtrIndexClass
                 Call cpCore.cache.setKey(cacheName & "-dataList", dataStore.dataList)
             Catch ex As Exception
-                Throw New ApplicationException("Exception in cacheKeyPtrClass.clear", ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '
-        '   getPtr sharedStylesAddonRules cache
-        '
-        Friend Function getFirstPtr(key As String) As Integer
+        '====================================================================================================
+        ''' <summary>
+        ''' get an integer pointer to the array that contains the keys value. Returns -1 if not found
+        ''' </summary>
+        ''' <param name="key"></param>
+        ''' <returns></returns>
+        Public Function getFirstPtr(key As String) As Integer
             Dim returnPtr As Integer = -1
             Try
-                If Not dataStore.loaded Then
-                    Call load()
-                End If
-                If dataStore.loaded Then
-                    returnPtr = dataStore.keyPtrIndex.getPtr(key)
+                If String.IsNullOrEmpty(key) Then
+                    Throw New ArgumentException("blank key is not valid.")
+                Else
+                    If Not dataStore.loaded Then
+                        Call load()
+                    End If
+                    If Not dataStore.loaded Then
+                        Throw New ApplicationException("datastore could not be loaded")
+                    Else
+                        returnPtr = dataStore.keyPtrIndex.getPtr(key)
+                    End If
                 End If
             Catch ex As Exception
-                Throw New ApplicationException("Exception in cacheKeyPtrClass.getFirstPtr", ex)
+                cpCore.handleExceptionAndRethrow(ex, "key[" & key & "]")
             End Try
             Return returnPtr
         End Function
         '
-        Friend Function getNextPtr() As Integer
+        '====================================================================================================
+        ''' <summary>
+        ''' Returns the next pointer in the array, sorted by value. Returns -1 if there are no more values
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function getNextPtr() As Integer
             Dim returnPtr As Integer = -1
             Try
                 If Not dataStore.loaded Then
                     Call load()
                 End If
-                If dataStore.loaded Then
+                If Not dataStore.loaded Then
+                    Throw New ApplicationException("datastore could not be loaded")
+                Else
                     returnPtr = dataStore.keyPtrIndex.getNextPtr()
                 End If
             Catch ex As Exception
-                Throw New ApplicationException("Exception in cacheKeyPtrClass.getNextPtr", ex)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return returnPtr
         End Function
         '
+        '====================================================================================================
+        ''' <summary>
+        ''' return an integer pointer to the value for this key. -1 if not found
+        ''' </summary>
+        ''' <param name="key"></param>
+        ''' <returns></returns>
         Public Function getPtr(key As String) As Integer
+            Dim returnPtr As Integer = -1
             Try
-                If Not dataStore.loaded Then
-                    Call load()
-                End If
-                If dataStore.loaded Then
-                    Return dataStore.keyPtrIndex.getPtr(key)
+                If String.IsNullOrEmpty(key) Then
+                    Throw New ArgumentException("blank key is not valid.")
+                Else
+                    If Not dataStore.loaded Then
+                        Call load()
+                    End If
+                    If Not dataStore.loaded Then
+                        Throw New ApplicationException("datastore could not be loaded")
+                    Else
+                        returnPtr = dataStore.keyPtrIndex.getPtr(key)
+                    End If
                 End If
             Catch ex As Exception
-                Throw New ApplicationException("Exception in cacheKeyPtrClass.getPtr", ex)
+                cpCore.handleExceptionAndRethrow(ex, "key[" & key & "]")
             End Try
+            Return returnPtr
         End Function
         '
+        '====================================================================================================
+        ''' <summary>
+        ''' Returns the value stored with this pointer.
+        ''' </summary>
+        ''' <param name="ptr"></param>
+        ''' <returns></returns>
         Public Function getValue(ptr As Integer) As String
+            Dim returnValue As String = ""
             Try
-                If Not dataStore.loaded Then
-                    Call load()
-                End If
-                If dataStore.loaded Then
-                    Return dataStore.dataList(ptr)
+                If (ptr < 0) Then
+                    Throw New ArgumentException("ptr must be >= 0")
+                Else
+                    If Not dataStore.loaded Then
+                        Call load()
+                    End If
+                    If Not dataStore.loaded Then
+                        Throw New ApplicationException("datastore could not be loaded")
+                    Else
+                        returnValue = dataStore.dataList(ptr)
+                    End If
                 End If
             Catch ex As Exception
-
+                cpCore.handleExceptionAndRethrow(ex, "ptr[" & ptr.ToString() & "]")
             End Try
-
+            Return returnValue
         End Function
         '
-        '   load sharedStylesAddonRules cache
-        '
+        '====================================================================================================
+        ''' <summary>
+        ''' load the values based on the sql statement loaded during constructor sqlLoadKeyVAlue.
+        ''' If already loaded, does nothing
+        ''' Attempts to read the cache from the cache, invalidated by the contentname
+        ''' </summary>
         Private Sub load()
             Try
                 '
@@ -136,7 +202,7 @@ Namespace Contensive.Core
                         dataStore = New dataStoreClass
                         dataStore.dataList = New List(Of String)
                         dataStore.keyPtrIndex = New coreKeyPtrIndexClass
-                        Using dt As DataTable = cpCore.db.executeSql(sqlLoad)
+                        Using dt As DataTable = cpCore.db.executeSql(sqlLoadKeyValue)
                             Ptr = 0
                             For Each dr As DataRow In dt.Rows
                                 dataStore.keyPtrIndex.setPtr(dr.Item(0).ToString, Ptr)
@@ -151,7 +217,7 @@ Namespace Contensive.Core
                                 RecordIdTextValue = dataStore.dataList(Ptr)
                                 Call dataStore.keyPtrIndex.setPtr(RecordIdTextValue, Ptr)
                             Next
-                            Call save()
+                            Call updateCache()
                         End If
                         needsToReload = False
                     End If
@@ -162,17 +228,33 @@ Namespace Contensive.Core
             End Try
         End Sub
         '
-        '
-        '
-        Friend Sub save()
+        '====================================================================================================
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        Public Sub updateCache()
             Try
-                If dataStore.loaded Then '
+                If dataStore.loaded Then
                     Call dataStore.keyPtrIndex.getPtr("test")
-                    Call cpCore.cache.setKey(cacheName, dataStore)
+                    Call cpCore.cache.setKey(cacheName, dataStore, cacheInvalidationTagCommaList)
                 End If
             Catch ex As Exception
                 Throw New ApplicationException("Exception in cacheKeyPtrClass.save", ex)
             End Try
+        End Sub
+    End Class
+    '
+    '====================================================================================================
+    ''' <summary>
+    ''' unit tests
+    ''' </summary>
+    Friend Class coreCacheKeyPtrClass_UnitTests
+        '
+        <Fact> Public Sub sampleMethod_unit()
+            ' arrange
+            ' act
+            ' assert
+            Assert.Equal(True, True)
         End Sub
     End Class
 End Namespace

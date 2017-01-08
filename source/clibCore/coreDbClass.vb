@@ -19,7 +19,7 @@ Namespace Contensive.Core
         ' objects passed in that are not disposed
         '------------------------------------------------------------------------------------------------------------------------
         '
-        Private cpCore As cpCoreClass
+        Private cpCore As coreClass
         '
         '------------------------------------------------------------------------------------------------------------------------
         ' objects created within class to dispose in dispose
@@ -218,7 +218,7 @@ Namespace Contensive.Core
         ''' <param name="cluster"></param>
         ''' <param name="appName"></param>
         ''' <remarks></remarks>
-        Friend Sub New(cpCore As cpCoreClass, ByVal appName As String)
+        Public Sub New(cpCore As coreClass, ByVal appName As String)
             MyBase.New()
             Try
                 '
@@ -316,7 +316,7 @@ Namespace Contensive.Core
                     '
                     dataSourceNameLower = DataSourceName.ToLower
                     For returnPtr = 0 To dataSources.Length - 1
-                        If UCase(dataSources(returnPtr).NameLower) = dataSourceNameLower Then
+                        If vbUCase(dataSources(returnPtr).NameLower) = dataSourceNameLower Then
                             Exit For
                         End If
                     Next
@@ -394,7 +394,7 @@ Namespace Contensive.Core
                 If dataSources.Length > 0 Then
                     lowerDataSourceName = DataSourceName.ToLower
                     For DataSourcePointer = 0 To dataSources.Length - 1
-                        If UCase(dataSources(DataSourcePointer).NameLower) = lowerDataSourceName Then
+                        If vbUCase(dataSources(DataSourcePointer).NameLower) = lowerDataSourceName Then
                             returnDataSource = dataSources(dataSources.Length)
                             Exit For
                         End If
@@ -422,7 +422,7 @@ Namespace Contensive.Core
         '            ' Open TimerTrace if needed
         '            '-------------------------------------------------------------------------------
         '            '
-        '            If InStr(1, "," & DomainName & ",", ",TRACE,", vbTextCompare) <> 0 Then
+        '            If vbInstr(1, "," & DomainName & ",", ",TRACE,", vbTextCompare) <> 0 Then
         '                Call TimerTraceOpen("TimerTrace_AppServicesClass_" & Name & "_" & ConnectionHandleCount & ".txt")
         '                th = TimerTraceStart(Tn)
         '            End If
@@ -574,12 +574,6 @@ Namespace Contensive.Core
             End Set
         End Property
         '
-        ' execute sql offline
-        '
-        Public Sub executeSqlAsync(ByVal sql As String, Optional ByVal dataSourceName As String = "", Optional ByVal startRecord As Integer = 0, Optional ByVal maxRecords As Integer = 9999)
-            Throw New NotImplementedException("executeSqlAsync not implemented yet")
-        End Sub
-        '
         ' execute sql on default connection and return datatable
         '
         Public Function executeSql(ByVal sql As String, Optional ByVal dataSourceName As String = "", Optional ByVal startRecord As Integer = 0, Optional ByVal maxRecords As Integer = 9999) As DataTable
@@ -587,17 +581,6 @@ Namespace Contensive.Core
             Dim connString As String = cpCore.cluster.getConnectionString(cpCore.appConfig.name)
             Try
                 If dbEnabled Then
-                    'Dim dataSourceUrl As String
-                    'dataSourceUrl = cpCore.cluster.config.defaultDataSourceAddress
-                    'If (dataSourceUrl.IndexOf(":") > 0) Then
-                    '    dataSourceUrl = dataSourceUrl.Substring(0, dataSourceUrl.IndexOf(":"))
-                    'End If
-                    'connString = "" _
-                    '    & "data source=" & dataSourceUrl & ";" _
-                    '    & "initial catalog=" & config.name & ";" _
-                    '    & "UID=" & cpCore.cluster.config.defaultDataSourceUsername & ";" _
-                    '    & "PWD=" & cpCore.cluster.config.defaultDataSourcePassword & ";" _
-                    '    & ""
                     Using connSQL As New SqlConnection(connString)
                         connSQL.Open()
                         Using cmdSQL As New SqlCommand()
@@ -618,6 +601,30 @@ Namespace Contensive.Core
             End Try
             Return returnData
         End Function
+        '
+        ' execute sql on default connection and return datatable
+        '
+        Public Sub executeSqlAsync(ByVal sql As String, Optional ByVal dataSourceName As String = "")
+            Dim connString As String = cpCore.cluster.getConnectionString(cpCore.appConfig.name)
+            Try
+                If dbEnabled Then
+                    Using connSQL As New SqlConnection(connString)
+                        connSQL.Open()
+                        Using cmdSQL As New SqlCommand()
+                            cmdSQL.CommandType = Data.CommandType.Text
+                            cmdSQL.CommandText = sql
+                            cmdSQL.Connection = connSQL
+                            cmdSQL.BeginExecuteNonQuery()
+                        End Using
+                    End Using
+                    dbVerified = True
+                End If
+            Catch ex As Exception
+                Dim newEx As New ApplicationException("Exception [" & ex.Message & "] executing sql async [" & sql & "], datasource [" & dataSourceName & "]", ex)
+                cpCore.handleExceptionAndRethrow(newEx)
+                Throw newEx
+            End Try
+        End Sub
         '
         '
         '
@@ -908,8 +915,8 @@ ErrorTrap:
             Dim Message As String
             '
             If LogEntry <> "" Then
-                Message = Replace(LogEntry, vbCr, "")
-                Message = Replace(Message, vbLf, "")
+                Message = vbReplace(LogEntry, vbCr, "")
+                Message = vbReplace(Message, vbLf, "")
                 cpCore.log_appendLog(Message, "DbTransactions")
                 'Call csv_AppendFile(getDataPath() & "\logs\Trans" & CStr(CLng(Int(Now()))) & ".log", Message & vbCrLf)
             End If
@@ -964,7 +971,7 @@ ErrorTrap:
         ''   Returns true if the field exists in the table
         ''========================================================================
         ''
-        'Friend Function csv_IsSQLTableField(ByVal DataSourceName As String, ByVal TableName As String, ByVal FieldName As String)
+        'public Function csv_IsSQLTableField(ByVal DataSourceName As String, ByVal TableName As String, ByVal FieldName As String)
         '    csv_IsSQLTableField = csv_IsSQLTableField(DataSourceName, TableName, FieldName)
         'End Function
         '
@@ -1031,8 +1038,8 @@ ErrorTrap:
                 '
                 ' tablename required
                 '
-                Call Err.Raise(KmaErrorInternal, "dll", "Tablename can not be blank.")
-            ElseIf InStr(1, TableName, ".") <> 0 Then
+                Call Err.Raise(ignoreInteger, "dll", "Tablename can not be blank.")
+            ElseIf vbInstr(1, TableName, ".") <> 0 Then
                 '
                 ' Remote table -- remote system controls remote tables
                 '
@@ -1135,7 +1142,7 @@ ErrorTrap:
                 ' contensive fields with no table field
                 '
                 fieldType = fieldType
-            ElseIf InStr(1, TableName, ".") <> 0 Then
+            ElseIf vbInstr(1, TableName, ".") <> 0 Then
                 '
                 ' External table
                 '
@@ -1146,10 +1153,10 @@ ErrorTrap:
                 '
                 Call handleLegacyClassError1(MethodName, "csv_CreateSQLTableField called with blank fieldname")
             Else
-                UcaseFieldName = UCase(FieldName)
+                UcaseFieldName = vbUCase(FieldName)
                 If Not db_IsSQLTableField(DataSourceName, TableName, FieldName) Then
                     SQL = "ALTER TABLE " & TableName & " ADD " & FieldName & " "
-                    If Not IsNumeric(fieldType) Then
+                    If Not vbIsNumeric(fieldType) Then
                         '
                         ' ----- support old calls
                         '
@@ -1365,13 +1372,13 @@ ErrorTrap:
             '
             Pointer = db_GetDataSourcePointer(DataSourceName)
             If Pointer < 0 Then
-                Call handleLegacyClassError4(KmaErrorInternal, "dll", "Data Source [" & DataSourceName & "] was not found", MethodName, True)
+                Call handleLegacyClassError4(ignoreInteger, "dll", "Data Source [" & DataSourceName & "] was not found", MethodName, True)
             Else
                 'If Not DataSourceConnectionObjs(Pointer).IsOpen Then
                 '    Call csv_OpenDataSource(DataSourceName, 30)
                 'End If
                 If True Then
-                    '    Call csv_HandleClassTrapError(KmaErrorInternal, "dll", "Data Source [" & DataSourceName & "] could not be opened", MethodName, True)
+                    '    Call csv_HandleClassTrapError(ignoreInteger, "dll", "Data Source [" & DataSourceName & "] could not be opened", MethodName, True)
                     'Else
                     Select Case fieldType
                         Case FieldTypeIdBoolean
@@ -1424,9 +1431,9 @@ ErrorTrap:
                             '
                             '
                             ' Invalid field type
-                            Call Err.Raise(KmaErrorInternal, "dll", "Can not proceed because the field being created has an invalid FieldType [" & fieldType & "]")
+                            Call Err.Raise(ignoreInteger, "dll", "Can not proceed because the field being created has an invalid FieldType [" & fieldType & "]")
                             'csv_GetSQLAlterColumnType = "VarChar(255) NULL"
-                            'Call HandleClassTrapError(KmaErrorUser, "dll", "Unknown FieldType [" & FieldType & "], used FieldTypeText", MethodName, False, True)
+                            'Call HandleClassTrapError(ignoreString, "dll", "Unknown FieldType [" & FieldType & "], used FieldTypeText", MethodName, False, True)
                     End Select
                 End If
             End If
@@ -1478,7 +1485,7 @@ ErrorTrap:
             '            Dim SchemaPointer As Integer
             '            Dim UcaseIndexName As String
             '            '
-            '            UcaseIndexName = UCase(IndexName)
+            '            UcaseIndexName = vbUCase(IndexName)
             '            SchemaPointer = getTableSchema(TableName, DataSourceName)
             '            If SchemaPointer <> -1 Then
             '                With metaCache.tableSchema(SchemaPointer)
@@ -1533,7 +1540,7 @@ ErrorTrap:
         '
         '   Patch -- returns true if the cdef field exists
         '
-        Friend Function db_isCdefField(ByVal ContentID As Integer, ByVal FieldName As String) As Boolean
+        Public Function db_isCdefField(ByVal ContentID As Integer, ByVal FieldName As String) As Boolean
             Dim RS As DataTable
             '
             RS = executeSql("select top 1 id from ccFields where name=" & encodeSQLText(FieldName) & " and contentid=" & ContentID)
@@ -1620,7 +1627,7 @@ ErrorTrap:
         ' ----- Get FieldType from ADO Field Type
         '========================================================================
         '
-        Friend Function db_GetFieldTypeIdByADOType(ByVal ADOFieldType As Integer) As Integer
+        Public Function db_GetFieldTypeIdByADOType(ByVal ADOFieldType As Integer) As Integer
             On Error GoTo ErrorTrap
             '
             Dim MethodName As String
@@ -1651,7 +1658,7 @@ ErrorTrap:
                     db_GetFieldTypeIdByADOType = FieldTypeIdText
                 Case Else
                     db_GetFieldTypeIdByADOType = FieldTypeIdText
-                    'Call csv_HandleClassTrapError(KmaErrorUser, "dll", "Unknown ADO field type [" & ADOFieldType & "], [Text] used", MethodName, False, True)
+                    'Call csv_HandleClassTrapError(ignoreString, "dll", "Unknown ADO field type [" & ADOFieldType & "], [Text] used", MethodName, False, True)
             End Select
             '
             Exit Function
@@ -1675,7 +1682,7 @@ ErrorTrap:
             '
             MethodName = "csv_GetFieldTypeByDescriptor"
             '
-            Select Case LCase(FieldTypeName)
+            Select Case vbLCase(FieldTypeName)
                 Case FieldTypeNameLcaseBoolean
                     getFieldTypeIdFromFieldTypeName = FieldTypeIdBoolean
                 Case FieldTypeNameLcaseCurrency
@@ -1730,7 +1737,7 @@ ErrorTrap:
                     'For Ptr = 1 To FieldTypeMax
                     '    Copy = Copy & ", " & csv_GetFieldTypeNameByType(Ptr)
                     'Next
-                    'Call Err.Raise(KmaErrorInternal, "dll", "Unknown FieldTypeName [" & FieldTypeName & "], valid values are [" & Mid(Copy, 2) & "]")
+                    'Call Err.Raise(ignoreInteger, "dll", "Unknown FieldTypeName [" & FieldTypeName & "], valid values are [" & Mid(Copy, 2) & "]")
             End Select
             '
             Exit Function
@@ -1815,8 +1822,8 @@ ErrorTrap:
                             Cnt = UBound(SortFields) + 1
                             For Ptr = 0 To Cnt - 1
                                 SortField = SortFields(Ptr).ToLower
-                                SortField = Replace(SortField, "asc", "", , , vbTextCompare)
-                                SortField = Replace(SortField, "desc", "", , , vbTextCompare)
+                                SortField = vbReplace(SortField, "asc", "", 1, 99, vbTextCompare)
+                                SortField = vbReplace(SortField, "desc", "", 1, 99, vbTextCompare)
                                 SortField = Trim(SortField)
                                 If Not CDef.selectList.Contains(SortField) Then
                                     'throw (New ApplicationException(""))
@@ -1835,7 +1842,7 @@ ErrorTrap:
                             ' remove tablename from contentcontrolcriteria - if in workflow mode, and authoringtable is different, this would be wrong
                             ' also makes sql smaller, and is not necessary
                             '
-                            ContentCriteria = Replace(ContentCriteria, CDef.ContentTableName & ".", "")
+                            ContentCriteria = vbReplace(ContentCriteria, CDef.ContentTableName & ".", "")
                         End If
                         If iCriteria <> "" Then
                             ContentCriteria = ContentCriteria & "And(" & iCriteria & ")"
@@ -1850,25 +1857,25 @@ ErrorTrap:
                         '
                         ' ----- Process Select Fields, make sure ContentControlID,ID,Name,Active are included
                         '
-                        iSelectFieldList = Replace(iSelectFieldList, vbTab, " ")
-                        Do While InStr(1, iSelectFieldList, " ,") <> 0
-                            iSelectFieldList = Replace(iSelectFieldList, " ,", ",")
+                        iSelectFieldList = vbReplace(iSelectFieldList, vbTab, " ")
+                        Do While vbInstr(1, iSelectFieldList, " ,") <> 0
+                            iSelectFieldList = vbReplace(iSelectFieldList, " ,", ",")
                         Loop
-                        Do While InStr(1, iSelectFieldList, ", ") <> 0
-                            iSelectFieldList = Replace(iSelectFieldList, ", ", ",")
+                        Do While vbInstr(1, iSelectFieldList, ", ") <> 0
+                            iSelectFieldList = vbReplace(iSelectFieldList, ", ", ",")
                         Loop
                         If (iSelectFieldList <> "") And (InStr(1, iSelectFieldList, "*", vbTextCompare) = 0) Then
-                            TestUcaseFieldList = UCase("," & iSelectFieldList & ",")
-                            If InStr(1, TestUcaseFieldList, ",CONTENTCONTROLID,", vbTextCompare) = 0 Then
+                            TestUcaseFieldList = vbUCase("," & iSelectFieldList & ",")
+                            If vbInstr(1, TestUcaseFieldList, ",CONTENTCONTROLID,", vbTextCompare) = 0 Then
                                 iSelectFieldList = iSelectFieldList & ",ContentControlID"
                             End If
-                            If InStr(1, TestUcaseFieldList, ",NAME,", vbTextCompare) = 0 Then
+                            If vbInstr(1, TestUcaseFieldList, ",NAME,", vbTextCompare) = 0 Then
                                 iSelectFieldList = iSelectFieldList & ",Name"
                             End If
-                            If InStr(1, TestUcaseFieldList, ",ID,", vbTextCompare) = 0 Then
+                            If vbInstr(1, TestUcaseFieldList, ",ID,", vbTextCompare) = 0 Then
                                 iSelectFieldList = iSelectFieldList & ",ID"
                             End If
-                            If InStr(1, TestUcaseFieldList, ",ACTIVE,", vbTextCompare) = 0 Then
+                            If vbInstr(1, TestUcaseFieldList, ",ACTIVE,", vbTextCompare) = 0 Then
                                 iSelectFieldList = iSelectFieldList & ",ACTIVE"
                             End If
                         End If
@@ -1908,19 +1915,19 @@ ErrorTrap:
                             '
                             'hint = hint & ",300"
                             TableName = CDef.AuthoringTableName
-                            'UcaseTablename = UCase(TableName)
+                            'UcaseTablename = vbUCase(TableName)
                             DataSourceName = CDef.AuthoringDataSourceName
                             '
                             ' Substitute ID for EditSourceID in criteria
                             '
-                            ContentCriteria = Replace(ContentCriteria, " ID=", " " & TableName & ".EditSourceID=")
-                            ContentCriteria = Replace(ContentCriteria, " ID>", " " & TableName & ".EditSourceID>")
-                            ContentCriteria = Replace(ContentCriteria, " ID<", " " & TableName & ".EditSourceID<")
-                            ContentCriteria = Replace(ContentCriteria, " ID ", " " & TableName & ".EditSourceID ")
-                            ContentCriteria = Replace(ContentCriteria, "(ID=", "(" & TableName & ".EditSourceID=")
-                            ContentCriteria = Replace(ContentCriteria, "(ID>", "(" & TableName & ".EditSourceID>")
-                            ContentCriteria = Replace(ContentCriteria, "(ID<", "(" & TableName & ".EditSourceID<")
-                            ContentCriteria = Replace(ContentCriteria, "(ID ", "(" & TableName & ".EditSourceID ")
+                            ContentCriteria = vbReplace(ContentCriteria, " ID=", " " & TableName & ".EditSourceID=")
+                            ContentCriteria = vbReplace(ContentCriteria, " ID>", " " & TableName & ".EditSourceID>")
+                            ContentCriteria = vbReplace(ContentCriteria, " ID<", " " & TableName & ".EditSourceID<")
+                            ContentCriteria = vbReplace(ContentCriteria, " ID ", " " & TableName & ".EditSourceID ")
+                            ContentCriteria = vbReplace(ContentCriteria, "(ID=", "(" & TableName & ".EditSourceID=")
+                            ContentCriteria = vbReplace(ContentCriteria, "(ID>", "(" & TableName & ".EditSourceID>")
+                            ContentCriteria = vbReplace(ContentCriteria, "(ID<", "(" & TableName & ".EditSourceID<")
+                            ContentCriteria = vbReplace(ContentCriteria, "(ID ", "(" & TableName & ".EditSourceID ")
                             '
                             ' Require non-null editsourceid and editarchive false
                             ' include tablename so fields are used, not aliases created for phantomID
@@ -1938,8 +1945,8 @@ ErrorTrap:
                             '
                             If iSortFieldList <> "" Then
                                 iSortFieldList = "," & iSortFieldList & ","
-                                iSortFieldList = Replace(iSortFieldList, ",ID,", "," & TableName & ".EditSourceID,")
-                                iSortFieldList = Replace(iSortFieldList, ",ID ", "," & TableName & ".EditSourceID ")
+                                iSortFieldList = vbReplace(iSortFieldList, ",ID,", "," & TableName & ".EditSourceID,")
+                                iSortFieldList = vbReplace(iSortFieldList, ",ID ", "," & TableName & ".EditSourceID ")
                                 iSortFieldList = Mid(iSortFieldList, 2, Len(iSortFieldList) - 2)
                             End If
                             '
@@ -1953,7 +1960,7 @@ ErrorTrap:
                                 ' this was done in the csv_GetCSField, but then a csv_GetCSrows call would return incorrect
                                 ' values because there is no translation
                                 '
-                                If InStr(1, iSelectFieldList, ",ID,", vbTextCompare) = 0 Then
+                                If vbInstr(1, iSelectFieldList, ",ID,", vbTextCompare) = 0 Then
                                     '
                                     ' Add ID select if not there
                                     '
@@ -1962,26 +1969,26 @@ ErrorTrap:
                                     '
                                     ' remove ID, and add ID alias to return EditSourceID (the live records id)
                                     '
-                                    iSelectFieldList = Replace(iSelectFieldList, ",ID,", "," & TableName & ".EditSourceID As ID,")
+                                    iSelectFieldList = vbReplace(iSelectFieldList, ",ID,", "," & TableName & ".EditSourceID As ID,")
                                 End If
                                 '
                                 ' Add the edit fields to the select
                                 '
                                 Copy2 = TableName & ".EDITSOURCEID,"
                                 If (InStr(1, iSelectFieldList, ",EDITSOURCEID,", vbTextCompare) <> 0) Then
-                                    iSelectFieldList = Replace(iSelectFieldList, ",EDITSOURCEID,", "," & Copy2, 1, 99, vbTextCompare)
+                                    iSelectFieldList = vbReplace(iSelectFieldList, ",EDITSOURCEID,", "," & Copy2, 1, 99, vbTextCompare)
                                 Else
                                     iSelectFieldList = iSelectFieldList & Copy2
                                 End If
                                 Copy2 = TableName & ".EDITARCHIVE,"
                                 If (InStr(1, iSelectFieldList, ",EDITARCHIVE,", vbTextCompare) <> 0) Then
-                                    iSelectFieldList = Replace(iSelectFieldList, ",EDITARCHIVE,", "," & Copy2, 1, 99, vbTextCompare)
+                                    iSelectFieldList = vbReplace(iSelectFieldList, ",EDITARCHIVE,", "," & Copy2, 1, 99, vbTextCompare)
                                 Else
                                     iSelectFieldList = iSelectFieldList & Copy2
                                 End If
                                 Copy2 = TableName & ".EDITBLANK,"
                                 If (InStr(1, iSelectFieldList, ",EDITBLANK,", vbTextCompare) <> 0) Then
-                                    iSelectFieldList = Replace(iSelectFieldList, ",EDITBLANK,", "," & Copy2, 1, 99, vbTextCompare)
+                                    iSelectFieldList = vbReplace(iSelectFieldList, ",EDITBLANK,", "," & Copy2, 1, 99, vbTextCompare)
                                 Else
                                     iSelectFieldList = iSelectFieldList & Copy2
                                 End If
@@ -2187,7 +2194,7 @@ ErrorTrap:
                             Call cpCore.cache.invalidateTag(ContentName)
                         End If
                         Call db_DeleteContentRules(ContentID, LiveRecordID)
-                        '                Select Case UCase(ContentTableName)
+                        '                Select Case vbUCase(ContentTableName)
                         '                    Case "CCCONTENTWATCH", "CCCONTENTWATCHLISTS", "CCCONTENTWATCHLISTRULES"
                         '                    Case Else
                         '                        Call csv_DeleteContentTracking(ContentName, LiveRecordID, True)
@@ -2303,7 +2310,7 @@ ErrorTrap:
                     .Updateable = False
                     .IsModified = False
                     .OwnerMemberID = MemberID
-                    .LastUsed = Now
+                    .LastUsed = DateTime.Now
                 End With
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -2467,7 +2474,7 @@ ErrorTrap:
             'Dim arrayOfFields As appServices_metaDataClass.CDefFieldClass()
             '
             FieldNameLocal = Trim(FieldName)
-            FieldNameLocalUcase = UCase(FieldNameLocal)
+            FieldNameLocalUcase = vbUCase(FieldNameLocal)
             If Not cs_Ok(CSPointer) Then
                 '
                 cpCore.handleExceptionAndRethrow(New Exception("csv_ContentSet Is empty Or EOF"))
@@ -2498,7 +2505,7 @@ ErrorTrap:
                         End If
                         'For writeCachePointer = 0 To .writeCacheCount - 1
                         '    With .writeCache(writeCachePointer)
-                        '        If FieldNameLocalUcase = UCase(.Name) Then
+                        '        If FieldNameLocalUcase = vbUCase(.Name) Then
                         '            '
                         '            ' ----- field found, use the buffer value
                         '            '
@@ -2515,7 +2522,7 @@ ErrorTrap:
                         '
                         If useCSReadCacheMultiRow Then
                             If Not .dt.Columns.Contains(FieldName.ToLower) Then
-                                Call handleLegacyClassError4(KmaErrorUser, "dll", "Field [" & FieldNameLocal & "] was Not found In csv_ContentSet from source [" & .Source & "]", "unknownMethodNameLegacyCall", False, False)
+                                Call handleLegacyClassError4(ignoreInteger, "dll", "Field [" & FieldNameLocal & "] was Not found In csv_ContentSet from source [" & .Source & "]", "unknownMethodNameLegacyCall", False, False)
                             Else
                                 db_GetCSField = EncodeText(.dt.Rows(.readCacheRowPtr).Item(FieldName.ToLower))
                             End If
@@ -2537,13 +2544,13 @@ ErrorTrap:
                                     End If
                                 Next
                                 If ColumnPointer = .ResultColumnCount Then
-                                    Call handleLegacyClassError4(KmaErrorUser, "dll", "Field [" & FieldNameLocal & "] was Not found In csv_ContentSet from source [" & .Source & "]", "unknownMethodNameLegacyCall", False, False)
+                                    Call handleLegacyClassError4(ignoreInteger, "dll", "Field [" & FieldNameLocal & "] was Not found In csv_ContentSet from source [" & .Source & "]", "unknownMethodNameLegacyCall", False, False)
                                 End If
                             End If
                             On Error GoTo ErrorTrap
                         End If
                     End If
-                    .LastUsed = Now
+                    .LastUsed = DateTime.Now
                 End With
             End If
             '
@@ -2557,9 +2564,9 @@ ErrorTrapField:
             Dim ErrDescription As String
             ErrDescription = GetErrString(Err)
             If db_ContentSet(CSPointer).Updateable Then
-                Call handleLegacyClassError4(KmaErrorUser, "dll", "Error " & ErrDescription & " reading Field [" & FieldNameLocal & "] from Content Definition [" & db_ContentSet(CSPointer).ContentName & "],  recordset sql [" & db_ContentSet(CSPointer).Source & "]", "csv_GetCSField", False)
+                Call handleLegacyClassError4(ignoreInteger, "dll", "Error " & ErrDescription & " reading Field [" & FieldNameLocal & "] from Content Definition [" & db_ContentSet(CSPointer).ContentName & "],  recordset sql [" & db_ContentSet(CSPointer).Source & "]", "csv_GetCSField", False)
             Else
-                Call handleLegacyClassError4(KmaErrorUser, "dll", "Error " & ErrDescription & " reading Field [" & FieldNameLocal & "] from Source [" & db_ContentSet(CSPointer).Source & "]", "csv_GetCSField", False)
+                Call handleLegacyClassError4(ignoreInteger, "dll", "Error " & ErrDescription & " reading Field [" & FieldNameLocal & "] from Source [" & db_ContentSet(CSPointer).Source & "]", "csv_GetCSField", False)
             End If
         End Function
         '
@@ -2753,7 +2760,7 @@ ErrorTrap:
             '
             CSSelectFieldList = db_GetCSSelectFieldList(CSPointer)
             db_IsCSFieldSupported = IsInDelimitedString(CSSelectFieldList, FieldName, ",")
-            'csv_IsCSFieldSupported = InStr(1, CSSelectFieldList & ",", "." & FieldName & ",", vbTextCompare)
+            'csv_IsCSFieldSupported = vbInstr(1, CSSelectFieldList & ",", "." & FieldName & ",", vbTextCompare)
             '
             Exit Function
             '
@@ -2787,11 +2794,11 @@ ErrorTrap:
             MethodName = "csv_GetCSFilename"
             '
             If Not cs_Ok(CSPointer) Then
-                Call Err.Raise(KmaErrorInternal, "dll", "CSPointer Not OK")
+                Call Err.Raise(ignoreInteger, "dll", "CSPointer Not OK")
             ElseIf FieldName = "" Then
-                Call Err.Raise(KmaErrorInternal, "dll", "Fieldname Is blank")
+                Call Err.Raise(ignoreInteger, "dll", "Fieldname Is blank")
             Else
-                UcaseFieldName = UCase(Trim(FieldName))
+                UcaseFieldName = vbUCase(Trim(FieldName))
                 db_GetCSFilename = EncodeText(db_GetCSField(CSPointer, UcaseFieldName))
                 If db_GetCSFilename <> "" Then
                     '
@@ -2824,7 +2831,7 @@ ErrorTrap:
                         '
                         If .ResultColumnCount > 0 Then
                             For FieldPointer = 0 To .ResultColumnCount - 1
-                                If UCase(.fieldNames(FieldPointer)) = "ID" Then
+                                If vbUCase(.fieldNames(FieldPointer)) = "ID" Then
                                     RecordID = cs_getInteger(CSPointer, "ID")
                                     Exit For
                                 End If
@@ -2852,7 +2859,7 @@ ErrorTrap:
                             '
                             ' no Contentname given
                             '
-                            Call Err.Raise(KmaErrorInternal, "dll", "Can Not create a filename because no ContentName was given, And the csv_ContentSet Is SQL-based.")
+                            Call Err.Raise(ignoreInteger, "dll", "Can Not create a filename because no ContentName was given, And the csv_ContentSet Is SQL-based.")
                         End If
                         '
                         ' ----- Create filename
@@ -3018,7 +3025,7 @@ ErrorTrap:
                             cpCore.handleExceptionAndRethrow(New ApplicationException("Attempting To update an unupdateable Content Set"))
                         Else
                             FieldNameLocal = Trim(FieldName)
-                            FieldNameLocalUcase = UCase(FieldNameLocal)
+                            FieldNameLocalUcase = vbUCase(FieldNameLocal)
                             With .CDef
                                 If .Name <> "" Then
                                     Try
@@ -3064,7 +3071,7 @@ ErrorTrap:
                                     '
                                     If FieldNameLocalUcase = "ID" Then
                                         FieldNameLocal = "EditSourceID"
-                                        FieldNameLocalUcase = UCase(FieldNameLocal)
+                                        FieldNameLocalUcase = vbUCase(FieldNameLocal)
                                     End If
                                 End If
                                 If .writeCache.ContainsKey(FieldName.ToLower) Then
@@ -3072,7 +3079,7 @@ ErrorTrap:
                                 Else
                                     .writeCache.Add(FieldName.ToLower, EncodeText(FieldValue))
                                 End If
-                                .LastUsed = Now
+                                .LastUsed = DateTime.Now
                             End If
                         End If
                     End With
@@ -3263,7 +3270,7 @@ ErrorTrap:
                                 With field
                                     FieldName = .nameLc
                                     If (FieldName <> "") And (Not String.IsNullOrEmpty(.defaultValue)) Then
-                                        Select Case UCase(FieldName)
+                                        Select Case vbUCase(FieldName)
                                             Case "CREATEKEY", "DATEADDED", "CREATEDBY", "CONTENTCONTROLID", "EDITSOURCEID", "EDITARCHIVE", "EDITBLANK", "ID"
                                                 '
                                                 ' Block control fields
@@ -3304,10 +3311,10 @@ ErrorTrap:
                                                                     DefaultValueText = getRecordID(LookupContentName, DefaultValueText).ToString()
                                                                 End If
                                                             ElseIf .lookupList <> "" Then
-                                                                UCaseDefaultValueText = UCase(DefaultValueText)
+                                                                UCaseDefaultValueText = vbUCase(DefaultValueText)
                                                                 lookups = Split(.lookupList, ",")
                                                                 For Ptr = 0 To UBound(lookups)
-                                                                    If UCaseDefaultValueText = UCase(lookups(Ptr)) Then
+                                                                    If UCaseDefaultValueText = vbUCase(lookups(Ptr)) Then
                                                                         DefaultValueText = (Ptr + 1).ToString()
                                                                     End If
                                                                 Next
@@ -3466,7 +3473,7 @@ ErrorTrap:
                 DestRecordID = cs_getInteger(CSDestination, "ID")
                 FieldName = db_GetCSFirstFieldName(CSSource)
                 Do While (FieldName <> "")
-                    Select Case UCase(FieldName)
+                    Select Case vbUCase(FieldName)
                         Case "ID", "EDITSOURCEID", "EDITARCHIVE"
                         Case Else
                             '
@@ -3653,7 +3660,7 @@ ErrorTrap:
                                                 '
                                                 '
                                                 '
-                                                If IsNumeric(FieldValueVariant) Then
+                                                If vbIsNumeric(FieldValueVariant) Then
                                                     fieldLookupId = field.lookupContentID
                                                     LookupContentName = cpCore.metaData.getContentNameByID(fieldLookupId)
                                                     LookupList = field.lookupList
@@ -3681,14 +3688,14 @@ ErrorTrap:
                                                 '
                                                 '
                                                 '
-                                                If IsNumeric(FieldValueVariant) Then
+                                                If vbIsNumeric(FieldValueVariant) Then
                                                     db_GetCS = db_GetRecordName("people", EncodeInteger(FieldValueVariant))
                                                 End If
                                             Case FieldTypeIdCurrency
                                                 '
                                                 '
                                                 '
-                                                If IsNumeric(FieldValueVariant) Then
+                                                If vbIsNumeric(FieldValueVariant) Then
                                                     db_GetCS = FormatCurrency(FieldValueVariant, 2, vbFalse, vbFalse, vbFalse)
                                                 End If
                                             'NeedsHTMLEncode = False
@@ -3828,10 +3835,10 @@ ErrorTrap:
                                                 PathFilename = pathFilenameOriginal
                                                 FieldValueText = EncodeText(FieldValueVariantLocal)
                                                 BlankTest = FieldValueText
-                                                BlankTest = Replace(BlankTest, " ", "")
-                                                BlankTest = Replace(BlankTest, vbCr, "")
-                                                BlankTest = Replace(BlankTest, vbLf, "")
-                                                BlankTest = Replace(BlankTest, vbTab, "")
+                                                BlankTest = vbReplace(BlankTest, " ", "")
+                                                BlankTest = vbReplace(BlankTest, vbCr, "")
+                                                BlankTest = vbReplace(BlankTest, vbLf, "")
+                                                BlankTest = vbReplace(BlankTest, vbTab, "")
                                                 If BlankTest = "" Then
                                                     If PathFilename <> "" Then
                                                         Call cpCore.cdnFiles.DeleteFile(PathFilename)
@@ -3859,8 +3866,8 @@ ErrorTrap:
                                                                 fileNameNoExt = Mid(fileNameNoExt, Pos + 1)
                                                                 path = Mid(PathFilename, 1, Pos)
                                                                 FilenameRev = 1
-                                                                If Not IsNumeric(fileNameNoExt) Then
-                                                                    Pos = InStr(1, fileNameNoExt, ".r", vbTextCompare)
+                                                                If Not vbIsNumeric(fileNameNoExt) Then
+                                                                    Pos = vbInstr(1, fileNameNoExt, ".r", vbTextCompare)
                                                                     If Pos > 0 Then
                                                                         FilenameRev = EncodeInteger(Mid(fileNameNoExt, Pos + 2))
                                                                         FilenameRev = FilenameRev + 1
@@ -3870,8 +3877,8 @@ ErrorTrap:
                                                                 fileName = fileNameNoExt & ".r" & FilenameRev & "." & FileExt
                                                                 'PathFilename = PathFilename & dstFilename
                                                                 path = convertCdnUrlToCdnPathFilename(path)
-                                                                'srcSysFile = config.physicalFilePath & Replace(srcPathFilename, "/", "\")
-                                                                'dstSysFile = config.physicalFilePath & Replace(PathFilename, "/", "\")
+                                                                'srcSysFile = config.physicalFilePath & vbReplace(srcPathFilename, "/", "\")
+                                                                'dstSysFile = config.physicalFilePath & vbReplace(PathFilename, "/", "\")
                                                                 PathFilename = path & fileName
                                                                 'Call publicFiles.renameFile(pathFilenameOriginal, fileName)
                                                             End If
@@ -3928,7 +3935,7 @@ ErrorTrap:
                                     '
                                     If FieldNameLc = "id" Then
                                         FieldNameLc = "editsourceid"
-                                        'FieldNameLocalUcase = UCase(FieldNameLocal)
+                                        'FieldNameLocalUcase = vbUCase(FieldNameLocal)
                                     End If
                                 End If
                                 'If .writeCacheSize = 0 Then
@@ -3952,7 +3959,7 @@ ErrorTrap:
                                 '    '
                                 '    For writeCachePointer = 0 To .writeCacheCount - 1
                                 '        With .writeCache(writeCachePointer)
-                                '            If FieldNameLocalUcase = UCase(.Name) Then
+                                '            If FieldNameLocalUcase = vbUCase(.Name) Then
                                 '                '
                                 '                ' ----- field found, update it
                                 '                '
@@ -3978,7 +3985,7 @@ ErrorTrap:
                                 '    .writeCacheCount = .writeCacheCount + 1
                                 'End If
                                 '.writeCacheChanged = True
-                                .LastUsed = Now
+                                .LastUsed = DateTime.Now
                             End If
                         End If
                     End With
@@ -4142,14 +4149,14 @@ ErrorTrap:
                         SQLLiveDelimiter = ""
                         SQLEditUpdate = ""
                         SQLEditDelimiter = ""
-                        sqlModifiedDate = Now
+                        sqlModifiedDate = DateTime.Now
                         sqlModifiedBy = .OwnerMemberID
                         '
                         AuthorableFieldUpdate = False
                         FieldFoundCount = 0
                         For Each keyValuePair In .writeCache
                             FieldName = keyValuePair.Key
-                            UcaseFieldName = UCase(FieldName)
+                            UcaseFieldName = vbUCase(FieldName)
                             writeCacheValueVariant = keyValuePair.Value
                             '
                             ' field has changed
@@ -4180,7 +4187,7 @@ ErrorTrap:
                                 '                                '
                                 '                                ' ----- Control field, log and continue
                                 '                                '
-                                '                                Call csv_HandleClassErrorAndResume(MethodName, "Record was saved, but field [" & LCase(.CDef.Name) & "].[" & LCase(FieldName) & "] should Not be used In a csv_ContentSet because it Is one Of the Protected record control fields [" & protectedcsv_ContentSetControlFieldList & "]")
+                                '                                Call csv_HandleClassErrorAndResume(MethodName, "Record was saved, but field [" & vbLCase(.CDef.Name) & "].[" & vbLCase(FieldName) & "] should Not be used In a csv_ContentSet because it Is one Of the Protected record control fields [" & protectedcsv_ContentSetControlFieldList & "]")
                                 '                            End If
                                 '
                                 Dim field As coreMetaDataClass.CDefFieldClass = .CDef.fields(FieldName.ToLower())
@@ -4216,7 +4223,7 @@ ErrorTrap:
                                                 '
                                                 ' Invalid fieldtype
                                                 '
-                                                Call Err.Raise(KmaErrorInternal, "dll", "Can Not save this record because the field [" & .nameLc & "] has an invalid field type Id [" & .fieldTypeId & "]")
+                                                Call Err.Raise(ignoreInteger, "dll", "Can Not save this record because the field [" & .nameLc & "] has an invalid field type Id [" & .fieldTypeId & "]")
                                         End Select
                                         If SQLSetPair <> "" Then
                                             '
@@ -4405,7 +4412,7 @@ ErrorTrap:
                                 End If
                             End If
                         End If
-                        .LastUsed = Now
+                        .LastUsed = DateTime.Now
                     End If
                 End With
             End If
@@ -4491,7 +4498,7 @@ ErrorTrap:
                             'hint = hint & ",310"
                             For Each dc As DataColumn In .dt.Columns
                                 'hint = hint & "," & dc.ColumnName
-                                .fieldNames(ColumnPtr) = UCase(dc.ColumnName)
+                                .fieldNames(ColumnPtr) = vbUCase(dc.ColumnName)
                                 ColumnPtr = ColumnPtr + 1
                             Next
                             '
@@ -4623,7 +4630,7 @@ ErrorTrap:
             On Error GoTo ErrorTrap 'Const Tn = "csv_IsCSEOF" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
             If CSPointer <= 0 Then
-                Call handleLegacyClassError4(KmaErrorUser, "dll", "csv_IsCSEOF called with an invalid CSPointer", "csv_IsCSEOF", False)
+                Call handleLegacyClassError4(ignoreInteger, "dll", "csv_IsCSEOF called with an invalid CSPointer", "csv_IsCSEOF", False)
             Else
                 If useCSReadCacheMultiRow Then
                     With db_ContentSet(CSPointer)
@@ -4648,7 +4655,7 @@ ErrorTrap:
             On Error GoTo ErrorTrap 'Const Tn = "csv_IsCSBOF" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
             If CSPointer <= 0 Then
-                Call handleLegacyClassError4(KmaErrorUser, "dll", "csv_IsCSBOF called with an invalid CSPointer", "csv_IsCSBOF", False)
+                Call handleLegacyClassError4(ignoreInteger, "dll", "csv_IsCSBOF called with an invalid CSPointer", "csv_IsCSBOF", False)
             Else
                 db_IsCSBOF = (db_ContentSet(CSPointer).readCacheRowPtr < 0)
                 ' ##### readCacheRowPtr no longer supported csv_IsCSBOF = (csv_ContentSet(CSPointer).readCacheRowPtr = 0) And (csv_ContentSet(CSPointer).PageNumber = 1)
@@ -4692,7 +4699,7 @@ ErrorTrap:
                 Case Else
                     db_EncodeSQL = encodeSQLText(EncodeText(expression))
                     On Error GoTo 0
-                    Call Err.Raise(KmaErrorBase, "dll", "Unknown Field Type [" & fieldType & "] used FieldTypeText.")
+                    Call Err.Raise(ignoreInteger, "dll", "Unknown Field Type [" & fieldType & "] used FieldTypeText.")
             End Select
             '
         End Function
@@ -4711,7 +4718,7 @@ ErrorTrap:
                 If returnString = "" Then
                     returnString = "null"
                 Else
-                    returnString = "'" & Replace(returnString, "'", "''") & "'"
+                    returnString = "'" & vbReplace(returnString, "'", "''") & "'"
                 End If
             End If
             Return returnString
@@ -4760,7 +4767,7 @@ ErrorTrap:
                 Else
                     returnString = SQLFalse
                 End If
-            ElseIf Not IsNumeric(expression) Then
+            ElseIf Not vbIsNumeric(expression) Then
                 returnString = "null"
             Else
                 returnString = expression.ToString
@@ -4864,7 +4871,7 @@ ErrorTrap:
             Dim iActiveOnly As Boolean
             '
             iActiveOnly = ActiveOnly
-            rightNow = Now
+            rightNow = DateTime.Now
             sqlRightNow = encodeSQLDate(rightNow)
             If PageNumber = 0 Then
                 PageNumber = 1
@@ -4998,7 +5005,7 @@ ErrorTrap:
             '
             If (ContentID <= 0) Or (RecordID <= 0) Then
                 '
-                Call Err.Raise(KmaErrorInternal, "dll", "ContentID [" & ContentID & "] or RecordID [" & RecordID & "] where blank")
+                Call Err.Raise(ignoreInteger, "dll", "ContentID [" & ContentID & "] or RecordID [" & RecordID & "] where blank")
             Else
                 ContentRecordKey = CStr(ContentID) & "." & CStr(RecordID)
                 Criteria = "(ContentRecordKey=" & encodeSQLText(ContentRecordKey) & ")"
@@ -5022,7 +5029,7 @@ ErrorTrap:
                 '
                 ' ----- Table Specific rules
                 '
-                Select Case UCase(TableName)
+                Select Case vbUCase(TableName)
                     Case "CCCALENDARS"
                         '
                         Call deleteContentRecords("Calendar Event Rules", "CalendarID=" & RecordID)
@@ -5105,7 +5112,7 @@ ErrorTrap:
             '            '
             '            Pointer = csv_GetDataSourcePointer(DataSourceName)
             '            If Pointer < 0 Then
-            '                Call csv_HandleClassTrapError(KmaErrorInternal, "dll", "DataSource [" & DataSourceName & "] was not found", MethodName, True)
+            '                Call csv_HandleClassTrapError(ignoreInteger, "dll", "DataSource [" & DataSourceName & "] was not found", MethodName, True)
             '            Else
             '                Select Case DataSourceConnectionObjs(Pointer).Type
             '                    Case DataSourceTypeODBCAccess
@@ -5185,7 +5192,7 @@ ErrorTrap:
         ' try declaring the return as object() - an array holder for variants
         ' try setting up each call to return a variant, not an array of variants
         '
-        Friend Function db_GetCSRows2(ByVal CSPointer As Integer) As String(,)
+        Public Function db_GetCSRows2(ByVal CSPointer As Integer) As String(,)
             On Error GoTo ErrorTrap 'Const Tn = "csv_GetCSRows2" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             Dim rs As DataTable
             Dim hint As String
@@ -5315,7 +5322,7 @@ ErrorTrap:
             MethodName = "csv_GetCSRowFields"
             '
             If Not cs_Ok(CSPointer) Then
-                Call handleLegacyClassError4(KmaErrorUser, "dll", "csv_ContentSet is not valid or End-of-File", MethodName, False, False)
+                Call handleLegacyClassError4(ignoreInteger, "dll", "csv_ContentSet is not valid or End-of-File", MethodName, False, False)
             Else
                 db_GetCSRowFields = db_ContentSet(CSPointer).fieldNames
             End If
@@ -5431,7 +5438,7 @@ ErrorTrap:
                             ' If field type is ignored, call it a text field
                             '
                             returnFieldTypeName = FieldTypeNameText
-                            'Call Err.Raise(KmaErrorUser, "dll", "Unknown FieldType [" & fieldType & "]")
+                            'Call Err.Raise(ignoreString, "dll", "Unknown FieldType [" & fieldType & "]")
                         End If
                 End Select
             Catch ex As Exception
@@ -5509,7 +5516,7 @@ ErrorTrap:
                             ' ----- Wrong Field Type
                             '
                             Call handleLegacyClassError3(MethodName, ("csv_OpenCSJoin only supports Content Definition Fields set as 'Lookup' type. Field [ " & FieldName & " ] is not a 'Lookup'."))
-                        ElseIf IsNumeric(FieldValueVariant) Then
+                        ElseIf vbIsNumeric(FieldValueVariant) Then
                             '
                             '
                             '
@@ -5649,7 +5656,7 @@ ErrorTrap:
                 With field
                     FieldName = .nameLc
                     If (FieldName <> "") And (Not String.IsNullOrEmpty(.defaultValue)) Then
-                        Select Case UCase(FieldName)
+                        Select Case vbUCase(FieldName)
                             Case "ID", "CCGUID", "CREATEKEY", "DATEADDED", "CREATEDBY", "CONTENTCONTROLID", "EDITSOURCEID", "EDITARCHIVE", "EDITBLANK"
                                 '
                                 ' Block control fields
@@ -5675,10 +5682,10 @@ ErrorTrap:
                                                     Call cs_set(CS, FieldName, getRecordID(LookupContentName, DefaultValueText))
                                                 End If
                                             ElseIf .lookupList <> "" Then
-                                                UCaseDefaultValueText = UCase(DefaultValueText)
+                                                UCaseDefaultValueText = vbUCase(DefaultValueText)
                                                 lookups = Split(.lookupList, ",")
                                                 For Ptr = 0 To UBound(lookups)
-                                                    If UCaseDefaultValueText = UCase(lookups(Ptr)) Then
+                                                    If UCaseDefaultValueText = vbUCase(lookups(Ptr)) Then
                                                         Call cs_set(CS, FieldName, Ptr + 1)
                                                         Exit For
                                                     End If
@@ -5906,10 +5913,10 @@ ErrorTrap:
         ''' </summary>
         ''' <param name="nameIdOrGuid"></param>
         ''' <returns></returns>
-        Friend Function getNameIdOrGuidSqlCriteria(nameIdOrGuid As String) As String
+        Public Function getNameIdOrGuidSqlCriteria(nameIdOrGuid As String) As String
             Dim sqlCriteria As String = ""
             Try
-                If IsNumeric(nameIdOrGuid) Then
+                If vbIsNumeric(nameIdOrGuid) Then
                     sqlCriteria = "id=" & encodeSQLNumber(CDbl(nameIdOrGuid))
                 ElseIf cpCore.common_isGuid(nameIdOrGuid) Then
                     sqlCriteria = "ccGuid=" & encodeSQLText(nameIdOrGuid)
@@ -5985,6 +5992,343 @@ ErrorTrap:
             End Try
             Return returnDataSource
         End Function
+        '
+        '=============================================================================
+        ' Imports the named table into the content system
+        '   Note: ContentNames are unique, so you can not have the same name on different
+        '   datasources, so the datasource here is ...
+        '
+        '   What if...
+        '       - content is found on different datasource
+        '       - content does not exist
+        '=============================================================================
+        '
+        Public Sub db_CreateContentFromSQLTable(ByVal DataSourceName As String, ByVal TableName As String, ByVal ContentName As String)
+            Try
+                '
+                Dim SQL As String
+                Dim dtFields As DataTable
+                Dim DateAddedString As String
+                Dim CreateKeyString As String
+                Dim ContentID As Integer
+                Dim DataSourceID As Integer
+                Dim ContentFieldFound As Boolean
+                Dim ContentIsNew As Boolean             ' true if the content definition is being created
+                Dim RecordID As Integer
+                '
+                '----------------------------------------------------------------
+                ' ----- lookup datasource ID, if default, ID is -1
+                '----------------------------------------------------------------
+                '
+                DataSourceID = cpCore.db.db_GetDataSourceID(DataSourceName)
+                DateAddedString = cpCore.db.encodeSQLDate(Now())
+                CreateKeyString = cpCore.db.encodeSQLNumber(getRandomLong)
+                '
+                '----------------------------------------------------------------
+                ' ----- Read in a record from the table to get fields
+                '----------------------------------------------------------------
+                '
+                Dim rsTable As DataTable
+                rsTable = cpCore.db.db_openTable(DataSourceName, TableName, "", "", , 1)
+                If True Then
+                    If rsTable.Rows.Count = 0 Then
+                        '
+                        ' --- no records were found, add a blank if we can
+                        '
+                        rsTable = cpCore.db.db_InsertTableRecordGetDataTable(DataSourceName, TableName, cpCore.user.id)
+                        If rsTable.Rows.Count > 0 Then
+                            RecordID = EncodeInteger(rsTable.Rows(0).Item("ID"))
+                            Call cpCore.db.executeSql("Update " & TableName & " Set active=0 where id=" & RecordID & ";", DataSourceName)
+                        End If
+                    End If
+                    If rsTable.Rows.Count = 0 Then
+                        '
+                        Call cpCore.handleExceptionAndRethrow(New ApplicationException("Could Not add a record To table [" & TableName & "]."))
+                    Else
+                        '
+                        '----------------------------------------------------------------
+                        ' --- Find/Create the Content Definition
+                        '----------------------------------------------------------------
+                        '
+                        ContentID = cpCore.db.db_GetContentID(ContentName)
+                        If (ContentID < 0) Then
+                            '
+                            ' ----- Content definition not found, create it
+                            '
+                            ContentIsNew = True
+                            Call cpCore.metaData.metaData_CreateContent4(True, DataSourceName, TableName, ContentName)
+                            'ContentID = csv_GetContentID(ContentName)
+                            SQL = "Select ID from ccContent where name=" & cpCore.db.encodeSQLText(ContentName)
+                            Dim rsContent As DataTable
+                            rsContent = cpCore.db.executeSql(SQL)
+                            If rsContent.Rows.Count = 0 Then
+                                Call cpCore.handleExceptionAndRethrow(New ApplicationException("Content Definition [" & ContentName & "] could Not be selected by name after it was inserted"))
+                            Else
+                                ContentID = EncodeInteger(rsContent(0).Item("ID"))
+                                Call cpCore.db.executeSql("update ccContent Set CreateKey=0 where id=" & ContentID)
+                            End If
+                            rsContent = Nothing
+                            cpCore.cache.invalidateAll()
+                            cpCore.metaData.clear()
+                        End If
+                        '
+                        '-----------------------------------------------------------
+                        ' --- Create the ccFields records for the new table
+                        '-----------------------------------------------------------
+                        '
+                        ' ----- locate the field in the content field table
+                        '
+                        SQL = "Select name from ccFields where ContentID=" & ContentID & ";"
+                        dtFields = cpCore.db.executeSql(SQL)
+                        '
+                        ' ----- verify all the table fields
+                        '
+                        For Each dcTableColumns As DataColumn In rsTable.Columns
+                            '
+                            ' ----- see if the field is already in the content fields
+                            '
+                            Dim UcaseTableColumnName As String
+                            UcaseTableColumnName = vbUCase(dcTableColumns.ColumnName)
+                            ContentFieldFound = False
+                            For Each drContentRecords As DataRow In dtFields.Rows
+                                If vbUCase(EncodeText(drContentRecords("name"))) = UcaseTableColumnName Then
+                                    ContentFieldFound = True
+                                    Exit For
+                                End If
+                            Next
+                            If Not ContentFieldFound Then
+                                '
+                                ' create the content field
+                                '
+                                Call db_CreateContentFieldFromTableField(ContentName, dcTableColumns.ColumnName, EncodeInteger(dcTableColumns.DataType))
+                            Else
+                                '
+                                ' touch field so upgrade does not delete it
+                                '
+                                Call cpCore.db.executeSql("update ccFields Set CreateKey=0 where (Contentid=" & ContentID & ") And (name = " & cpCore.db.encodeSQLText(UcaseTableColumnName) & ")")
+                            End If
+                        Next
+                    End If
+                End If
+                '
+                ' Fill ContentControlID fields with new ContentID
+                '
+                SQL = "Update " & TableName & " Set ContentControlID=" & ContentID & " where (ContentControlID Is null);"
+                Call cpCore.db.executeSql(SQL, DataSourceName)
+                '
+                ' ----- Load CDef
+                '       Load only if the previous state of autoload was true
+                '       Leave Autoload false during load so more do not trigger
+                '
+                cpCore.cache.invalidateAll()
+                cpCore.metaData.clear()
+                rsTable = Nothing
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+        End Sub
+        '
+        '========================================================================
+        ' Define a Content Definition Field based only on what is known from a SQL table
+        '========================================================================
+        '
+        Public Sub db_CreateContentFieldFromTableField(ByVal ContentName As String, ByVal FieldName As String, ByVal ADOFieldType As Integer)
+            Try
+                '
+                Dim field As New coreMetaDataClass.CDefFieldClass
+                '
+                field.fieldTypeId = cpCore.db.db_GetFieldTypeIdByADOType(ADOFieldType)
+                field.caption = FieldName
+                field.editSortPriority = 1000
+                field.ReadOnly = False
+                field.authorable = True
+                field.adminOnly = False
+                field.developerOnly = False
+                field.TextBuffered = False
+                field.htmlContent = False
+                '
+                Select Case vbUCase(FieldName)
+                '
+                ' --- Core fields
+                '
+                    Case "NAME"
+                        field.caption = "Name"
+                        field.editSortPriority = 100
+                    Case "ACTIVE"
+                        field.caption = "Active"
+                        field.editSortPriority = 200
+                        field.fieldTypeId = FieldTypeIdBoolean
+                        field.defaultValue = "1"
+                    Case "DATEADDED"
+                        field.caption = "Created"
+                        field.ReadOnly = True
+                        field.editSortPriority = 5020
+                    Case "CREATEDBY"
+                        field.caption = "Created By"
+                        field.fieldTypeId = FieldTypeIdLookup
+                        field.lookupContentName = "Members"
+                        field.ReadOnly = True
+                        field.editSortPriority = 5030
+                    Case "MODIFIEDDATE"
+                        field.caption = "Modified"
+                        field.ReadOnly = True
+                        field.editSortPriority = 5040
+                    Case "MODIFIEDBY"
+                        field.caption = "Modified By"
+                        field.fieldTypeId = FieldTypeIdLookup
+                        field.lookupContentName = "Members"
+                        field.ReadOnly = True
+                        field.editSortPriority = 5050
+                    Case "ID"
+                        field.caption = "Number"
+                        field.ReadOnly = True
+                        field.editSortPriority = 5060
+                        field.authorable = True
+                        field.adminOnly = False
+                        field.developerOnly = True
+                    Case "CONTENTCONTROLID"
+                        field.caption = "Content Definition"
+                        field.fieldTypeId = FieldTypeIdLookup
+                        field.lookupContentName = "Content"
+                        field.editSortPriority = 5070
+                        field.authorable = True
+                        field.ReadOnly = False
+                        field.adminOnly = True
+                        field.developerOnly = True
+                    Case "CREATEKEY"
+                        field.caption = "CreateKey"
+                        field.ReadOnly = True
+                        field.editSortPriority = 5080
+                        field.authorable = False
+                    Case "EDITSOURCEID"
+                        field.caption = "Edit Source"
+                        field.ReadOnly = True
+                        field.editSortPriority = 5090
+                        field.authorable = False
+                        field.defaultValue = "null"
+                    Case "EDITARCHIVE"
+                        field.caption = "Edit Archive"
+                        field.fieldTypeId = FieldTypeIdBoolean
+                        field.ReadOnly = True
+                        field.editSortPriority = 5100
+                        field.authorable = False
+                        field.defaultValue = "0"
+                    Case "EDITBLANK"
+                        field.caption = "Edit Blank"
+                        field.fieldTypeId = FieldTypeIdBoolean
+                        field.ReadOnly = True
+                        field.editSortPriority = 5110
+                        field.authorable = False
+                        field.defaultValue = "0"
+                    '
+                    ' --- fields related to body content
+                    '
+                    Case "HEADLINE"
+                        field.caption = "Headline"
+                        field.editSortPriority = 1000
+                        field.htmlContent = False
+                    Case "DATESTART"
+                        field.caption = "Date Start"
+                        field.editSortPriority = 1100
+                    Case "DATEEND"
+                        field.caption = "Date End"
+                        field.editSortPriority = 1200
+                    Case "PUBDATE"
+                        field.caption = "Publish Date"
+                        field.editSortPriority = 1300
+                    Case "ORGANIZATIONID"
+                        field.caption = "Organization"
+                        field.fieldTypeId = FieldTypeIdLookup
+                        field.lookupContentName = "Organizations"
+                        field.editSortPriority = 2005
+                        field.authorable = True
+                        field.ReadOnly = False
+                    Case "COPYFILENAME"
+                        field.caption = "Copy"
+                        field.fieldTypeId = FieldTypeIdFileHTMLPrivate
+                        field.TextBuffered = True
+                        field.editSortPriority = 2010
+                    Case "BRIEFFILENAME"
+                        field.caption = "Overview"
+                        field.fieldTypeId = FieldTypeIdFileHTMLPrivate
+                        field.TextBuffered = True
+                        field.editSortPriority = 2020
+                        field.htmlContent = False
+                    Case "DOCFILENAME"
+                        field.caption = "Download Document"
+                        field.fieldTypeId = FieldTypeIdFile
+                        field.editSortPriority = 2030
+                    Case "DOCLABEL"
+                        field.caption = "Download Label"
+                        field.editSortPriority = 2035
+                        field.htmlContent = False
+                    Case "IMAGEFILENAME"
+                        field.caption = "Image"
+                        field.fieldTypeId = FieldTypeIdFile
+                        field.editSortPriority = 2040
+                    Case "THUMBNAILFILENAME"
+                        field.caption = "Thumbnail"
+                        field.fieldTypeId = FieldTypeIdFile
+                        field.editSortPriority = 2050
+                    Case "CONTENTID"
+                        field.caption = "Content"
+                        field.fieldTypeId = FieldTypeIdLookup
+                        field.lookupContentName = "Content"
+                        field.ReadOnly = False
+                        field.editSortPriority = 2060
+                    '
+                    ' --- Record Features
+                    '
+                    Case "PARENTID"
+                        field.caption = "Parent"
+                        field.fieldTypeId = FieldTypeIdLookup
+                        field.lookupContentName = ContentName
+                        field.ReadOnly = False
+                        field.editSortPriority = 3000
+                    Case "MEMBERID"
+                        field.caption = "Member"
+                        field.fieldTypeId = FieldTypeIdLookup
+                        field.lookupContentName = "Members"
+                        field.ReadOnly = False
+                        field.editSortPriority = 3005
+                    Case "CONTACTMEMBERID"
+                        field.caption = "Contact"
+                        field.fieldTypeId = FieldTypeIdLookup
+                        field.lookupContentName = "Members"
+                        field.ReadOnly = False
+                        field.editSortPriority = 3010
+                    Case "ALLOWBULKEMAIL"
+                        field.caption = "Allow Bulk Email"
+                        field.editSortPriority = 3020
+                    Case "ALLOWSEEALSO"
+                        field.caption = "Allow See Also"
+                        field.editSortPriority = 3030
+                    Case "ALLOWFEEDBACK"
+                        field.caption = "Allow Feedback"
+                        field.editSortPriority = 3040
+                        field.authorable = False
+                    Case "SORTORDER"
+                        field.caption = "Alpha Sort Order"
+                        field.editSortPriority = 3050
+                    '
+                    ' --- Display only information
+                    '
+                    Case "VIEWINGS"
+                        field.caption = "Viewings"
+                        field.ReadOnly = True
+                        field.editSortPriority = 5000
+                        field.defaultValue = "0"
+                    Case "CLICKS"
+                        field.caption = "Clicks"
+                        field.ReadOnly = True
+                        field.editSortPriority = 5010
+                        field.defaultValue = "0"
+                End Select
+                Call cpCore.metaData.metaData_VerifyCDefField_ReturnID(ContentName, field)
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+        End Sub
 
 
 

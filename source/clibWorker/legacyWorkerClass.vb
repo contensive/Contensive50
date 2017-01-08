@@ -22,7 +22,7 @@ Namespace Contensive
         '   in dev, it runs under the debug service app, a stand=alone that can be debugged
         '==================================================================================================
         '
-        Private cpCore As cpCoreClass
+        Private cpCore As coreClass
         '
         ' ----- Log File
         '
@@ -107,7 +107,7 @@ Namespace Contensive
         ''' </summary>
         ''' <param name="cpCore"></param>
         ''' <remarks></remarks>
-        Public Sub New(cpCore As cpCoreClass)
+        Public Sub New(cpCore As coreClass)
             '
             ' Initialize
             '
@@ -115,7 +115,7 @@ Namespace Contensive
             '
             verboseLogging = False
             '
-            StartTime = Now()
+            StartTime = DateTime.Now()
             LocalIPList = vbCrLf & getIpAddressList.Replace(",", vbCrLf) & vbCrLf & "127.0.0.1" & vbCrLf
             '
             processTimer = New System.Timers.Timer(5000)
@@ -630,15 +630,15 @@ Namespace Contensive
                                 ' ----- Set shared Mail out folder
                                 '
                                 EmailFolder = "\EmailOut"
-                                If Not cpCore.cluster.clusterFiles.checkPath(EmailFolder) Then
-                                    Call cpCore.cluster.clusterFiles.createPath(EmailFolder)
+                                If Not cpCore.cluster.localClusterFiles.checkPath(EmailFolder) Then
+                                    Call cpCore.cluster.localClusterFiles.createPath(EmailFolder)
                                 End If
                                 '
                                 ' ----- Set shared log folder
                                 '
                                 LogFolder = "\Logs"
-                                If Not cpCore.cluster.clusterFiles.checkPath(LogFolder) Then
-                                    Call cpCore.cluster.clusterFiles.createPath(LogFolder)
+                                If Not cpCore.cluster.localClusterFiles.checkPath(LogFolder) Then
+                                    Call cpCore.cluster.localClusterFiles.createPath(LogFolder)
                                 End If
                                 '
                                 ' ----- Create ServerConfig object
@@ -649,10 +649,10 @@ Namespace Contensive
                                     ' ----- Load the configuration file
                                     '
                                     'Errorhint = "Calling Control Object to load applications into server"
-                                    AdminUsername = cpCore.cluster.config.username
-                                    AdminPassword = cpCore.cluster.config.password
-                                    serverListenerPort = cpCore.cluster.config.serverListenerPort
-                                    maxCmdInstances = cpCore.cluster.config.maxConcurrentTasksPerServer
+                                    AdminUsername = cpCore.clusterConfig.username
+                                    AdminPassword = cpCore.clusterConfig.password
+                                    serverListenerPort = cpCore.clusterConfig.serverListenerPort
+                                    maxCmdInstances = cpCore.clusterConfig.maxConcurrentTasksPerServer
                                     'KernelServices.ServerLicense = ServerConfig.ServerLicense
                                     '
                                     ' ----- Turn on the tcpListener
@@ -741,7 +741,7 @@ Namespace Contensive
         '        Dim CopySplit() As String
         '        '
         '        returnString = DomainNameList
-        '        If InStr(1, returnString, ",", 1) <> 0 Then
+        '        If vbInstr(1, returnString, ",", 1) <> 0 Then
         '            CopySplit = Split(returnString, ",")
         '            returnString = CopySplit(0)
         '        End If
@@ -755,7 +755,7 @@ Namespace Contensive
         '       this is how clients run asyncCmds (addons) - by calling this with a runProcess command
         '       this is how the ccCmd processes request the next command in the queue (maybe that should be a seperate control listener)
         '
-        Private Function tcpListenerConnectionThread_executeCmd(cpCore As cpCoreClass, ByVal Method As String, ByVal queryString As String, ByVal RemoteIP As String) As String
+        Private Function tcpListenerConnectionThread_executeCmd(cpCore As coreClass, ByVal Method As String, ByVal queryString As String, ByVal RemoteIP As String) As String
             Dim returnString As String = ""
             Try
                 '
@@ -802,13 +802,13 @@ Namespace Contensive
                     ' Bad username and password
                     '
                     cpCore.log_appendLog("serverClass.executeServerCmd", "bad username/password.")
-                    returnString = "ERROR " & ccError_InvalidAuthentication
+                    returnString = "ERROR " & ignoreString
                 Else
                     '
                     ' authenticated
                     '
                     cpCore.log_appendLog("serverClass.executeServerCmd, switch on method=[" & Method & "]")
-                    Select Case UCase(Method)
+                    Select Case vbUCase(Method)
                         Case "CONNECT"
                             '
                             ' Connect
@@ -835,19 +835,19 @@ Namespace Contensive
                             '
                             ' SetConnectInfo
                             '
-                            If InStr(1, queryString, "serverListenerPort=", vbTextCompare) <> 0 Then
+                            If vbInstr(1, queryString, "serverListenerPort=", vbTextCompare) <> 0 Then
                                 serverListenerPort = getCommandArgument("serverListenerPort", queryString)
                             End If
                             '
-                            If InStr(1, queryString, "AdminUsername=", vbTextCompare) <> 0 Then
+                            If vbInstr(1, queryString, "AdminUsername=", vbTextCompare) <> 0 Then
                                 AdminUsername = getCommandArgument("AdminUsername", queryString)
                             End If
                             '
-                            If InStr(1, queryString, "AdminPassword=", vbTextCompare) <> 0 Then
+                            If vbInstr(1, queryString, "AdminPassword=", vbTextCompare) <> 0 Then
                                 AdminPassword = getCommandArgument("AdminPassword", queryString)
                             End If
                             '
-                            If InStr(1, queryString, "maxCmdInstances=", vbTextCompare) <> 0 Then
+                            If vbInstr(1, queryString, "maxCmdInstances=", vbTextCompare) <> 0 Then
                                 maxCmdInstances = EncodeInteger(getCommandArgument("maxCmdInstances", queryString))
                                 If maxCmdInstances <= 0 Then
                                     maxCmdInstances = 1
@@ -913,7 +913,7 @@ Namespace Contensive
                             '            If (AppServices Is Nothing) Then
                             '                returnString = "ERROR " & ccError_InvalidAppName
                             '            Else
-                            '                Select Case UCase(Name)
+                            '                Select Case vbUCase(Name)
                             '                    Case "NAME"
                             '                        appServices.config.name = Value
                             '                        returnString = "ok"
@@ -1040,7 +1040,7 @@ Namespace Contensive
                             QSPairs = Split(queryString, "&")
                             If UBound(QSPairs) >= 0 Then
                                 For Ptr = 0 To UBound(QSPairs)
-                                    Pos = InStr(1, QSPairs(Ptr), "=")
+                                    Pos = vbInstr(1, QSPairs(Ptr), "=")
                                     QSValue = ""
                                     If Pos > 0 Then
                                         '
@@ -1055,7 +1055,7 @@ Namespace Contensive
                                         QSValue = decodeNvaArgument(QSValue)
                                         '
                                         'QSValue = decodeNvaArgument(Mid(QSPairs(Ptr), Pos + 1))
-                                        QSValue = Replace(QSValue, """", """""")
+                                        QSValue = vbReplace(QSValue, """", """""")
                                         '
                                         ' !!!! should have commandLine- encode/decode pair
                                         '   handle quote
@@ -1070,7 +1070,7 @@ Namespace Contensive
                                     End If
                                 Next
                             End If
-                            If UCase(Method) = "RUNPROCESS" Then
+                            If vbUCase(Method) = "RUNPROCESS" Then
                                 Method = Method
                             End If
                             '
@@ -1085,7 +1085,7 @@ Namespace Contensive
                             ' Unknown call
                             '
                         Case Else
-                            returnString = "ERROR " & ccError_InvalidCommand & vbCrLf & "unknown command [" & Method & "]"
+                            returnString = "ERROR " & ignoreString & vbCrLf & "unknown command [" & Method & "]"
                             '
                             cpCore.log_appendLog("serverClass.executeServerCmd, unknown cmd=[" & Cmd & "]")
                             '
@@ -1109,7 +1109,7 @@ Namespace Contensive
                 'Call memCheck.logMemCheck()
                 'memCheck = Nothing
                 '
-                rightNow = Now
+                rightNow = DateTime.Now
                 'Call appendTraceLog("", Now.ToLongTimeString & " processTimerTick")
                 If Not ProcessTimerInProcess Then
                     '
@@ -1248,9 +1248,9 @@ Namespace Contensive
                 '
                 hint &= ",entering"
                 '
-                RightNow = Now
+                RightNow = DateTime.Now
                 SQLNow = cpCore.db.encodeSQLDate(RightNow)
-                For Each kvp As KeyValuePair(Of String, appConfigClass) In cpCore.cluster.config.apps
+                For Each kvp As KeyValuePair(Of String, appConfigClass) In cpCore.clusterConfig.apps
                     AppName = kvp.Value.name
                     '
                     ' permissions issue -- this is a root process - maybe the token will be saved in a configuration file
@@ -1333,7 +1333,7 @@ Namespace Contensive
         '
         ' Returns false if it could not be added (full or duplicate)
         '
-        Private Function addAsyncCmd(cpCore As cpCoreClass, ByVal Command As String, ByVal BlockDuplicates As Boolean) As Boolean
+        Private Function addAsyncCmd(cpCore As coreClass, ByVal Command As String, ByVal BlockDuplicates As Boolean) As Boolean
             Dim returnBoolean As Boolean = False
             Try
                 '
@@ -1343,7 +1343,7 @@ Namespace Contensive
                 cpCore.log_appendLog("serverClass.addAsyncCmd, command=[" & Command & "], BlockDuplicates=[" & BlockDuplicates & "]")
                 '
                 returnBoolean = True
-                LcaseCommand = LCase(Command)
+                LcaseCommand = vbLCase(Command)
                 If asyncCmdQueueCnt >= asyncCmdQueueLimit Then
                     '
                     ' Server Queue is too large, block the add
@@ -1355,7 +1355,7 @@ Namespace Contensive
                     ' Search for a duplicate
                     '
                     For Ptr = 0 To asyncCmdQueueCnt - 1
-                        If LCase(asyncCmdQueue(Ptr)) = LcaseCommand Then
+                        If vbLCase(asyncCmdQueue(Ptr)) = LcaseCommand Then
                             returnBoolean = False
                             cpCore.log_appendLog("addAsyncCmd, Server Cmd was blocked because there is a duplicate in the queue already, [" & Command & "]")
                             Exit For

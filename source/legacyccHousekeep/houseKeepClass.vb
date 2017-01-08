@@ -88,7 +88,7 @@ Namespace Contensive.Core
             Dim LocalCollections As New XmlDocument
             Dim Doc As New XmlDocument
             ''Dim AppService As appServicesClass
-            Dim cpCore As cpCoreClass
+            Dim cpCore As coreClass
             '   Dim CSConnection As appEnvironmentStruc
             Dim AlarmTimeString As String
             Dim AlarmTimeMinutesSinceMidnight As Double
@@ -147,7 +147,7 @@ Namespace Contensive.Core
             '
             cp = New CPClass(appName)
             '
-            rightNow = Now()
+            rightNow = DateTime.Now()
             Yesterday = rightNow.AddDays(-1).Date
             ALittleWhileAgo = rightNow.AddDays(-90).Date
             SQLNow = cp.core.db.encodeSQLDate(rightNow)
@@ -245,7 +245,7 @@ Namespace Contensive.Core
             '
             ' Housekeep each application
             '
-            For Each kvp As KeyValuePair(Of String, appConfigClass) In cp.core.cluster.config.apps
+            For Each kvp As KeyValuePair(Of String, appConfigClass) In cp.core.clusterConfig.apps
                 appName = kvp.Value.name
                 If True Then
                     'End If
@@ -295,7 +295,7 @@ Namespace Contensive.Core
                                 '
                                 DomainNameList = cp.core.app_domainList
                                 DomainNamePrimary = DomainNameList
-                                Pos = InStr(1, DomainNamePrimary, ",")
+                                Pos = vbInstr(1, DomainNamePrimary, ",")
                                 If Pos > 1 Then
                                     DomainNamePrimary = Mid(DomainNamePrimary, 1, Pos - 1)
                                 End If
@@ -731,7 +731,7 @@ ErrorTrap:
             Dim SQLDateMidnightTwoDaysAgo As String
             Dim TimeoutSave As Integer
             Dim Yesterday As Date
-            Dim rightNow As Date = Now
+            Dim rightNow As Date = DateTime.Now
             '
             Yesterday = rightNow.AddDays(-1).Date
             MidnightTwoDaysAgo = rightNow.AddDays(-2).Date
@@ -1560,7 +1560,7 @@ ErrorTrap:
                         For Each file As IO.FileInfo In FileList
                             Filename = file.Name
                             VirtualFileName = PathName & "\" & Filename
-                            VirtualLink = Replace(VirtualFileName, "\", "/")
+                            VirtualLink = vbReplace(VirtualFileName, "\", "/")
                             FileSize = file.Length
                             If FileSize = 0 Then
                                 SQL = "update " & TableName & " set " & FieldName & "=null where (" & FieldName & "=" & cp.core.db.encodeSQLText(VirtualFileName) & ")or(" & FieldName & "=" & cp.core.db.encodeSQLText(VirtualLink) & ")"
@@ -1651,7 +1651,7 @@ ErrorTrap:
                 '                                                If FilenameAltSize <> "" Then
                 '                                                FilenameDim = Split(FilenameAltSize, "x")
                 '                                                If UBound(FilenameDim) = 1 Then
-                '                                                    If IsNumeric(FilenameDim(0)) And IsNumeric(FilenameDim(1)) Then
+                '                                                    If vbIsNumeric(FilenameDim(0)) And vbIsNumeric(FilenameDim(1)) Then
                 '                                                        FilenameNoExt = Mid(FilenameNoExt, 1, Pos - 1)
                 '                                                    End If
                 '                                                End If
@@ -2066,7 +2066,7 @@ ErrorTrap:
             'Dim AddonInstall As New addonInstallClass
             '
             If BuildVersion < cp.Version Then
-                Call HandleClassInternalError(cp.core.appConfig.name, "HouseKeep_VisitSummary", KmaErrorInternal, "Can not summarize analytics until this site's data needs been upgraded.")
+                Call HandleClassInternalError(cp.core.appConfig.name, "HouseKeep_VisitSummary", ignoreInteger, "Can not summarize analytics until this site's data needs been upgraded.")
             Else
                 PeriodStart = StartTimeDate
                 If PeriodStart < OldestVisitSummaryWeCareAbout Then
@@ -2305,9 +2305,9 @@ ErrorTrap:
             'Dim fs As New fileSystemClass
             Dim FileList As IO.FileInfo()
             '
-            LogDate = Now.AddDays(-30)
+            LogDate = DateTime.Now.AddDays(-30)
             Call AppendClassLog("", "HouseKeep", "Deleting Logs [" & FolderName & "] older than 30 days")
-            FileList = cp.core.cluster.clusterFiles.GetFolderFiles(FolderName)
+            FileList = cp.core.cluster.localClusterFiles.GetFolderFiles(FolderName)
             For Each file As IO.FileInfo In FileList
                 If file.CreationTime < LogDate Then
                     cp.core.privateFiles.DeleteFile(FolderName & "\" & file.Name)
@@ -2375,7 +2375,7 @@ ErrorTrap:
                 loadOK = True
                 Call Doc.Load(URL)
                 With Doc.DocumentElement
-                    If (LCase(Doc.DocumentElement.Name) <> LCase("ContensiveUpdate")) Then
+                    If (LCase(Doc.DocumentElement.Name) <> vbLCase("ContensiveUpdate")) Then
                         DownloadUpdates = False
                     Else
                         If Doc.DocumentElement.ChildNodes.Count = 0 Then
@@ -2384,7 +2384,7 @@ ErrorTrap:
                             With Doc.DocumentElement
                                 For Each CDefSection In .ChildNodes
                                     Copy = CDefSection.InnerText
-                                    Select Case LCase(CDefSection.Name)
+                                    Select Case vbLCase(CDefSection.Name)
                                         Case "mastervisitnamelist"
                                             '
                                             ' Read in the interfaces and save to Add-ons
@@ -2535,7 +2535,7 @@ ErrorTrap:
 
             '
             If BuildVersion < cp.Version Then
-                Call HandleClassInternalError(cp.core.appConfig.name, "HouseKeep_PageViewSummary", KmaErrorInternal, "Can not summarize analytics until this site's data needs been upgraded.")
+                Call HandleClassInternalError(cp.core.appConfig.name, "HouseKeep_PageViewSummary", ignoreInteger, "Can not summarize analytics until this site's data needs been upgraded.")
             Else
                 PeriodStart = StartTimeDate
                 If PeriodStart < OldestVisitSummaryWeCareAbout Then
@@ -2789,7 +2789,7 @@ ErrorTrap:
                     '
                     Call AppendClassLog("Server", "RegisterAddonFolder", "Collection.xml loaded ok")
                     '
-                    If LCase(Doc.DocumentElement.Name) <> LCase(CollectionListRootNode) Then
+                    If vbLCase(Doc.DocumentElement.Name) <> vbLCase(CollectionListRootNode) Then
                         Call AppendClassLog("Server", "", "RegisterAddonFolder, Hint=[" & hint & "], The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.")
                     Else
                         '
@@ -2797,7 +2797,7 @@ ErrorTrap:
                         '
                         With Doc.DocumentElement
                             If True Then
-                                'If LCase(.name) <> "collectionlist" Then
+                                'If vbLCase(.name) <> "collectionlist" Then
                                 '    Call AppendClassLog("Server", "", "RegisterAddonFolder, basename was not collectionlist, [" & .name & "].")
                                 'Else
                                 NodeCnt = 0
@@ -2810,20 +2810,20 @@ ErrorTrap:
                                     LocalGuid = ""
                                     LocalName = "no name found"
                                     LocalPath = ""
-                                    Select Case LCase(LocalListNode.Name)
+                                    Select Case vbLCase(LocalListNode.Name)
                                         Case "collection"
                                             LocalGuid = ""
                                             For Each CollectionNode In LocalListNode.ChildNodes
-                                                Select Case LCase(CollectionNode.Name)
+                                                Select Case vbLCase(CollectionNode.Name)
                                                     Case "name"
                                                         '
-                                                        LocalName = LCase(CollectionNode.InnerText)
+                                                        LocalName = vbLCase(CollectionNode.InnerText)
                                                     Case "guid"
                                                         '
-                                                        LocalGuid = LCase(CollectionNode.InnerText)
+                                                        LocalGuid = vbLCase(CollectionNode.InnerText)
                                                     Case "path"
                                                         '
-                                                        CollectionPath = LCase(CollectionNode.InnerText)
+                                                        CollectionPath = vbLCase(CollectionNode.InnerText)
                                                     Case "lastchangedate"
                                                         LastChangeDate = EncodeDate(CollectionNode.InnerText)
                                                 End Select
@@ -2840,7 +2840,7 @@ ErrorTrap:
                                         Call AppendClassLog("Server", "RegisterAddonFolder", "no collection path, skipping")
                                         '
                                     Else
-                                        CollectionPath = LCase(CollectionPath)
+                                        CollectionPath = vbLCase(CollectionPath)
                                         CollectionRootPath = CollectionPath
                                         Pos = InStrRev(CollectionRootPath, "\")
                                         If Pos <= 0 Then

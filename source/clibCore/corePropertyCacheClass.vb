@@ -5,7 +5,7 @@ Option Strict On
 Namespace Contensive.Core
     Public Class corePropertyCacheClass
         '
-        Private cpCore As cpCoreClass
+        Private cpCore As coreClass
         '
         ' visit property cache
         '
@@ -22,7 +22,7 @@ Namespace Contensive.Core
         ''' <param name="cp"></param>
         ''' <param name="propertyTypeId"></param>
         ''' <remarks></remarks>
-        Public Sub New(cpCore As cpCoreClass, propertyTypeId As Integer)
+        Public Sub New(cpCore As coreClass, propertyTypeId As Integer)
             Me.cpCore = cpCore
             Me.propertyTypeId = propertyTypeId
         End Sub

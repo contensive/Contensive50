@@ -25,7 +25,7 @@ Namespace Contensive.Core
         '
         ' ----- global scope variables
         '
-        Private cpCore As cpCoreClass
+        Private cpCore As coreClass
         Private Const serviceDisplayName As String = "Contensive Monitor"
         Private ClassInitialized As Boolean        ' if true, the module has been
         Private DebugMode As Boolean
@@ -196,7 +196,7 @@ Namespace Contensive.Core
                 If UBound(ResponseLines) > 0 Then
                     ResponseStatus = ResponseLines(0)
                 End If
-                If InStr(1, ResponseStatus, "200 OK", vbTextCompare) = 0 Then
+                If vbInstr(1, ResponseStatus, "200 OK", vbTextCompare) = 0 Then
                     '
                     ' Not a 200, this is an error
                     '
@@ -280,7 +280,7 @@ ErrorTrap:
         '
         '
         '
-        Friend Sub StartMonitoring()
+        public Sub StartMonitoring()
             On Error GoTo ErrorTrap
             '
             ' convert to cluster-level object, then do applicaiton work by enumerating applications and using cp for each app
@@ -334,7 +334,7 @@ ErrorTrap:
         '       2 - if busy and it shuts down correctly, complete is at end of GetDoc
         '       3 - if busy and TopTimeoutTimer goes off, abort GetDoc
         '
-        Friend Sub StopMonitoring()
+        public Sub StopMonitoring()
             On Error GoTo ErrorTrap
             '
             Dim Timeout As Integer
@@ -542,7 +542,7 @@ ErrorTrap:
                                     AppLog(AppLogPtr).ErrorCount = AppLog(AppLogPtr).ErrorCount + 1
                                     Call appendMonitorLog(AppName & " has no valid domain name")
                                 Else
-                                    If InStr(1, DomainName, "http://", CompareMethod.Text) = 0 Then
+                                    If vbInstr(1, DomainName, "http://", CompareMethod.Text) = 0 Then
                                         DomainName = "http://" & DomainName
                                     End If
                                     DomainName = DomainName & AppRootPath & DefaultPageName
@@ -557,7 +557,7 @@ ErrorTrap:
                                     Response = GetDoc(DomainName, AppName, SiteTimeout, needsErrorRecovery)
                                     ResponseStatusLine = getLine(Response)
                                     AppLog(AppLogPtr).LastStatusResponse = ResponseStatusLine
-                                    If InStr(1, ResponseStatusLine, "Contensive OK", vbTextCompare) = 1 Then
+                                    If vbInstr(1, ResponseStatusLine, "Contensive OK", vbTextCompare) = 1 Then
                                         '
                                         ' no error
                                         '
@@ -615,7 +615,7 @@ ErrorTrap:
                                             Response = GetDoc(DomainName, AppName, SiteTimeout, needsErrorRecovery)
                                             ResponseStatusLine = getLine(Response)
                                             AppLog(AppLogPtr).LastStatusResponse = "[" & AppLog(AppLogPtr).LastStatusResponse & "], after recovery [" & ResponseStatusLine & "]"
-                                            If InStr(1, ResponseStatusLine, "Contensive OK", vbTextCompare) = 1 Then
+                                            If vbInstr(1, ResponseStatusLine, "Contensive OK", vbTextCompare) = 1 Then
                                                 '
                                                 ' recovered, continue without error
                                                 '
@@ -683,12 +683,12 @@ ErrorTrap:
         '    ListSplit = Split(DomainNameList, ",")
         '    DomainName = ListSplit(0)
         '    If DomainName <> "" Then
-        '        If InStr(1, DomainName, "http://", 1) = 0 Then
+        '        If vbInstr(1, DomainName, "http://", 1) = 0 Then
         '            DomainName = "http://" & DomainName
         '        End If
         '        DomainName = DomainName & "/" & DefaultPageName & "?method=status"
         '        Response = GetDoc(DomainName, AppName, SiteTimeout, ErrorMessageResponse)
-        '        If InStr(1, Response, "Contensive OK", vbTextCompare) <> 0 Then
+        '        If vbInstr(1, Response, "Contensive OK", vbTextCompare) <> 0 Then
         '            IsSiteOK = True
         '        Else
         '            IsSiteOK = False
@@ -762,7 +762,7 @@ ErrorTrap:
             cpCore.log_appendLog(message, "Monitor")
         End Sub
 
-        Public Sub New(cpCore As cpCoreClass)
+        Public Sub New(cpCore As coreClass)
             MyBase.New()
             Me.cpcore = cpCore
             version = Assembly.GetEntryAssembly().GetName().Version.ToString()

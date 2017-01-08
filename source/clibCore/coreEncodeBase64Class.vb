@@ -12,9 +12,9 @@ Namespace Contensive.Core
     ''' </summary>
     Public Class coreEncodingBase64Class
         '
-        Private cpCore As cpCoreClass
+        Private cpCore As coreClass
         '
-        Public Sub New(cpCore As cpCoreClass)
+        Public Sub New(cpCore As coreClass)
             MyBase.New()
             Me.cpCore = cpCore
         End Sub

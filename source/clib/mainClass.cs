@@ -80,20 +80,20 @@ namespace Contensive.Core
                                 else
                                 {
                                     Console.WriteLine("Cluster Configuration file [c:\\ProgramData\\Clib\\clusterConfig.json] found.");
-                                    Console.WriteLine("cluster name: " + cp.cluster.config.name);
-                                    Console.WriteLine("appPattern: " + cp.cluster.config.appPattern);
-                                    Console.WriteLine("ElastiCacheConfigurationEndpoint: " + cp.cluster.config.awsElastiCacheConfigurationEndpoint);
-                                    Console.WriteLine("FilesEndpoint: " + cp.cluster.config.clusterFilesEndpoint);
-                                    Console.WriteLine("defaultDataSourceAddress: " + cp.cluster.config.defaultDataSourceAddress);
-                                    Console.WriteLine("isLocal: " + cp.cluster.config.isLocal.ToString());
-                                    Console.WriteLine("clusterPhysicalPath: " + cp.cluster.config.clusterPhysicalPath.ToString());
-                                    Console.WriteLine("defaultDataSourceAddress: " + cp.cluster.config.defaultDataSourceAddress.ToString());
-                                    Console.WriteLine("defaultDataSourceType: " + cp.cluster.config.defaultDataSourceType.ToString());
-                                    Console.WriteLine("defaultDataSourceUsername: " + cp.cluster.config.defaultDataSourceUsername.ToString());
-                                    Console.WriteLine("isLocalCache: " + cp.cluster.config.isLocalCache.ToString());
-                                    Console.WriteLine("maxConcurrentTasksPerServer: " + cp.cluster.config.maxConcurrentTasksPerServer.ToString());
-                                    Console.WriteLine("apps.Count: " + cp.cluster.config.apps.Count);
-                                    foreach (KeyValuePair<string, appConfigClass> kvp in cp.cluster.config.apps)
+                                    Console.WriteLine("cluster name: " + cp.core.clusterConfig.name);
+                                    Console.WriteLine("appPattern: " + cp.core.clusterConfig.appPattern);
+                                    Console.WriteLine("ElastiCacheConfigurationEndpoint: " + cp.core.clusterConfig.awsElastiCacheConfigurationEndpoint);
+                                    Console.WriteLine("FilesEndpoint: " + cp.core.clusterConfig.clusterFilesEndpoint);
+                                    Console.WriteLine("defaultDataSourceAddress: " + cp.core.clusterConfig.defaultDataSourceAddress);
+                                    Console.WriteLine("isLocal: " + cp.core.clusterConfig.isLocal.ToString());
+                                    Console.WriteLine("clusterPhysicalPath: " + cp.core.serverConfig.clusterPath.ToString());
+                                    Console.WriteLine("defaultDataSourceAddress: " + cp.core.clusterConfig.defaultDataSourceAddress.ToString());
+                                    Console.WriteLine("defaultDataSourceType: " + cp.core.clusterConfig.defaultDataSourceType.ToString());
+                                    Console.WriteLine("defaultDataSourceUsername: " + cp.core.clusterConfig.defaultDataSourceUsername.ToString());
+                                    Console.WriteLine("isLocalCache: " + cp.core.clusterConfig.isLocalCache.ToString());
+                                    Console.WriteLine("maxConcurrentTasksPerServer: " + cp.core.clusterConfig.maxConcurrentTasksPerServer.ToString());
+                                    Console.WriteLine("apps.Count: " + cp.core.clusterConfig.apps.Count);
+                                    foreach (KeyValuePair<string, appConfigClass> kvp in cp.core.clusterConfig.apps)
                                     {
                                         appConfigClass app = kvp.Value;
                                         Console.WriteLine("----------app name: " + app.name);
@@ -134,7 +134,7 @@ namespace Contensive.Core
                                 }
                                 else {
                                     cp = new CPClass(appName);
-                                    installFiles = new coreFileSystemClass(cp.core, cp.core.cluster.config, coreFileSystemClass.fileSyncModeEnum.noSync, System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
+                                    installFiles = new coreFileSystemClass(cp.core, cp.core.clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
                                     Console.WriteLine("Upgrading cluster folder clibResources from installation");
                                     createApp.upgradeResources(cp, installFiles);
                                     coreBuilderClass builder = new coreBuilderClass(cp.core);
@@ -150,12 +150,12 @@ namespace Contensive.Core
                                 //
                                 using (cpCluster = new CPClass())
                                 {
-                                    using (installFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.cluster.config, coreFileSystemClass.fileSyncModeEnum.noSync, System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)))
+                                    using (installFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)))
                                     {
                                         Console.WriteLine("Upgrading cluster folder clibResources from installation");
                                         createApp.upgradeResources(cpCluster, installFiles);
                                         //
-                                        foreach (var item in cpCluster.core.cluster.config.apps)
+                                        foreach (var item in cpCluster.core.clusterConfig.apps)
                                         {
                                             cp = new CPClass(item.Key);
                                             coreBuilderClass builder = new coreBuilderClass(cp.core);
@@ -168,7 +168,7 @@ namespace Contensive.Core
                             case "-taskscheduler":
                                 using (cpCluster = new CPClass())
                                 {
-                                    using (programDataFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.cluster.config, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib"))
+                                    using (programDataFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib"))
                                     {
                                         JSONTemp = programDataFiles.ReadFile("serverConfig.json");
                                         if (string.IsNullOrEmpty(JSONTemp))
@@ -213,7 +213,7 @@ namespace Contensive.Core
                             case "-taskrunner":
                                 using (cpCluster = new CPClass())
                                 {
-                                    using (programDataFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.cluster.config, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib"))
+                                    using (programDataFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib"))
                                     {
                                         JSONTemp = programDataFiles.ReadFile("serverConfig.json");
                                         if (string.IsNullOrEmpty(JSONTemp))
@@ -261,10 +261,10 @@ namespace Contensive.Core
                                 //
                                 using (cpCluster = new CPClass())
                                 {
-                                    using (programDataFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.cluster.config, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib"))
+                                    using (programDataFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib"))
                                     {
                                         cpCluster = new CPClass();
-                                        programDataFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.cluster.config, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib");
+                                        programDataFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib");
                                         JSONTemp = programDataFiles.ReadFile("serverConfig.json");
                                         if (string.IsNullOrEmpty(JSONTemp))
                                         {
@@ -333,11 +333,32 @@ namespace Contensive.Core
         const string helpText = ""
             + "\r\nclib command line"
             + "\r\n"
-            + "\r\n-n"
+            + "\r\n-newapp (-n)"
             + "\r\n\tnew application wizard"
             + "\r\n"
-            + "\r\n-u appName"
+            + "\r\n-upgrade appName (-u appname)"
             + "\r\n\trun application upgrade"
+            + "\r\n"
+            + "\r\n-upgradeall"
+            + "\r\n\trun application upgrade on all applications"
+            + "\r\n"
+            + "\r\n-version (-v)"
+            + "\r\n\tdisplay code version"
+            + "\r\n"
+            + "\r\n-status (-s)"
+            + "\r\n\tdisplay configuration status"
+            + "\r\n"
+            + "\r\n-taskscheduler run"
+            + "\r\n\tRun the taskscheduler in the console (temporary)"
+            + "\r\n"
+            + "\r\n-taskscheduler on|off"
+            + "\r\n\tStart or stop the taskscheduler service"
+            + "\r\n"
+            + "\r\n-taskrunner run"
+            + "\r\n\tRun the taskrunner in the console (temporary)"
+            + "\r\n"
+            + "\r\n-taskrunner on|off"
+            + "\r\n\tStart or stop the taskrunner service"
             + "";
     }
 

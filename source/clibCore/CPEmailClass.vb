@@ -18,10 +18,10 @@ Namespace Contensive.Core
         Public Const EventsId As String = "32E893C5-165B-4088-8D9E-CE82524A5000"
 #End Region
         '
-        Private cpCore As Contensive.Core.cpCoreClass
+        Private cpCore As Contensive.Core.coreClass
         Protected disposed As Boolean = False
         '
-        Public Sub New(ByVal cpCoreObj As Contensive.Core.cpCoreClass)
+        Public Sub New(ByVal cpCoreObj As Contensive.Core.coreClass)
             MyBase.New()
             cpCore = cpCoreObj
         End Sub
@@ -114,7 +114,7 @@ Namespace Contensive.Core
 
         Public Overrides Sub SendUser(ByVal toUserId As String, ByVal FromAddress As String, ByVal Subject As String, ByVal Body As String, Optional ByVal SendImmediately As Boolean = True, Optional ByVal BodyIsHTML As Boolean = True) 'Inherits BaseClasses.CPEmailBaseClass.SendUser
             Dim userId As Integer = 0
-            If IsNumeric(toUserId) Then
+            If vbIsNumeric(toUserId) Then
                 userId = CInt(toUserId)
                 Call cpCore.email_sendMemberEmail3(userId, FromAddress, Subject, Body, SendImmediately, BodyIsHTML, 0, "", False)
             End If

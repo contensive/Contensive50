@@ -31,7 +31,7 @@ Namespace Contensive.Core
         '
         ' Constructor - Initialize the Main and Csv objects
         '
-        Friend Sub New(ByRef cpParent As CPClass)
+        Public Sub New(ByRef cpParent As CPClass)
             MyBase.New()
             cp = cpParent
         End Sub

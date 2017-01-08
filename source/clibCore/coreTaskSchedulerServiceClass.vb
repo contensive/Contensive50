@@ -155,7 +155,7 @@ Namespace Contensive
         ''' <summary>
         ''' Iterate through all apps, find addosn that need to run and add them to the task queue
         ''' </summary>
-        Private Sub scheduleTasks(cpClusterCore As cpCoreClass)
+        Private Sub scheduleTasks(cpClusterCore As coreClass)
             Dim hint As String = ""
             Try
                 '
@@ -176,8 +176,8 @@ Namespace Contensive
                 '
                 appendLog(cpClusterCore, "taskScheduler.scheduleTasks")
                 '
-                RightNow = Now
-                For Each kvp As KeyValuePair(Of String, appConfigClass) In cpClusterCore.cluster.config.apps
+                RightNow = DateTime.Now
+                For Each kvp As KeyValuePair(Of String, appConfigClass) In cpClusterCore.clusterConfig.apps
                     AppName = kvp.Value.name
                     '
                     ' schedule tasks for this app
@@ -268,7 +268,7 @@ Namespace Contensive
         ''' <param name="cmdDetail"></param>
         ''' <param name="BlockDuplicates"></param>
         ''' <returns></returns>
-        Public Function addTaskToQueue(cpSiteCore As cpCoreClass, ByVal Command As String, ByVal cmdDetail As cmdDetailClass, ByVal BlockDuplicates As Boolean) As Boolean
+        Public Function addTaskToQueue(cpSiteCore As coreClass, ByVal Command As String, ByVal cmdDetail As cmdDetailClass, ByVal BlockDuplicates As Boolean) As Boolean
             Dim returnTaskAdded As Boolean = True
             Try
                 Dim LcaseCommand As String
@@ -279,7 +279,7 @@ Namespace Contensive
                 appendLog(cpSiteCore, "taskScheduler.addTaskToQueue, application=[" & cpSiteCore.appConfig.name & "], command=[" & Command & "], cmdDetail=[" & cmdDetailJson & "]")
                 '
                 returnTaskAdded = True
-                LcaseCommand = LCase(Command)
+                LcaseCommand = vbLCase(Command)
                 If BlockDuplicates Then
                     '
                     ' Search for a duplicate
@@ -317,7 +317,7 @@ Namespace Contensive
         ''' <param name="cpCore"></param>
         ''' <param name="SrcOptionList"></param>
         ''' <returns></returns>
-        Public Function convertAddonArgumentstoDocPropertiesList(cpCore As cpCoreClass, SrcOptionList As String) As Dictionary(Of String, String)
+        Public Function convertAddonArgumentstoDocPropertiesList(cpCore As coreClass, SrcOptionList As String) As Dictionary(Of String, String)
             Dim returnList As New Dictionary(Of String, String)
             Try
                 Dim SrcOptions As String()
@@ -331,7 +331,7 @@ Namespace Contensive
                         key = SrcOptions(Ptr).Replace(vbTab, "")
                         If Not String.IsNullOrEmpty(key) Then
                             value = ""
-                            Pos = InStr(1, key, "=")
+                            Pos = vbInstr(1, key, "=")
                             If Pos > 0 Then
                                 value = Mid(key, Pos + 1)
                                 key = Mid(key, 1, Pos - 1)
@@ -346,7 +346,7 @@ Namespace Contensive
             Return returnList
         End Function
         '
-        Private Sub appendLog(cpCore As cpCoreClass, ByVal logText As String, Optional isImportant As Boolean = False)
+        Private Sub appendLog(cpCore As coreClass, ByVal logText As String, Optional isImportant As Boolean = False)
             If (isImportant Or allowVerboseLogging) Then
                 cpCore.log_appendLog(logText, "", "trace")
             End If

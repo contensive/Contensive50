@@ -7,7 +7,7 @@ Namespace Contensive.BaseClasses
     ''' </summary>
     ''' <remarks></remarks>
     Public MustInherit Class CPCSBaseClass
-        'Friend Sub New(ByVal cmcObj As Contensive.Core.cpCoreClass, ByRef CPParent As CPBaseClass)
+        'public Sub New(ByVal cmcObj As Contensive.Core.cpCoreClass, ByRef CPParent As CPBaseClass)
         ''' <summary>
         ''' Inserts a new content row
         ''' </summary>

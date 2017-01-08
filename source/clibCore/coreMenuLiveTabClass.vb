@@ -107,17 +107,17 @@ Namespace Contensive.Core
             '            ' This tab is hit
             '            '
             '            GetTabs = GetTabs & "<td valign=bottom>" & TabBlank & "</td>"
-            '            GetTabs = Replace(GetTabs, "Replace-TabID", TabID)
-            '            GetTabs = Replace(GetTabs, "Replace-StyleEdge", TabEdgeStyle)
+            '            GetTabs = vbReplace(GetTabs, "Replace-TabID", TabID)
+            '            GetTabs = vbReplace(GetTabs, "Replace-StyleEdge", TabEdgeStyle)
             '            If Not FirstLiveBodyShown Then
             '                FirstLiveBodyShown = True
-            '                GetTabs = Replace(GetTabs, "Replace-HotSpot", "<a href=# Class=""" & TabHitLinkStyle & """ name=tabLink onClick=""switchLiveTab2('" & LiveBodyID & "', this,'" & TabID & "','" & TabStyle & "','" & TabWrapperID & "');return false;"">" & Tabs(TabPtr).Caption & "</a>")
-            '                GetTabs = Replace(GetTabs, "Replace-StyleHit", TabHitStyle)
+            '                GetTabs = vbReplace(GetTabs, "Replace-HotSpot", "<a href=# Class=""" & TabHitLinkStyle & """ name=tabLink onClick=""switchLiveTab2('" & LiveBodyID & "', this,'" & TabID & "','" & TabStyle & "','" & TabWrapperID & "');return false;"">" & Tabs(TabPtr).Caption & "</a>")
+            '                GetTabs = vbReplace(GetTabs, "Replace-StyleHit", TabHitStyle)
             '                JSClose = JSClose & "ActiveTabTableID=""" & TabID & """;ActiveContentDivID=""" & LiveBodyID & """;"
             '                TabBody = TabBody & "<div id=""" & LiveBodyID & """ class=""" & TabBodyStyle & """>" & Tabs(TabPtr).LiveBody & "</div>"
             '            Else
-            '                GetTabs = Replace(GetTabs, "Replace-HotSpot", "<a href=# Class=""" & TabLinkStyle & """ name=tabLink onClick=""switchLiveTab2('" & LiveBodyID & "', this,'" & TabID & "','" & TabStyle & "','" & TabWrapperID & "');return false;"">" & Tabs(TabPtr).Caption & "</a>")
-            '                GetTabs = Replace(GetTabs, "Replace-StyleHit", TabStyle)
+            '                GetTabs = vbReplace(GetTabs, "Replace-HotSpot", "<a href=# Class=""" & TabLinkStyle & """ name=tabLink onClick=""switchLiveTab2('" & LiveBodyID & "', this,'" & TabID & "','" & TabStyle & "','" & TabWrapperID & "');return false;"">" & Tabs(TabPtr).Caption & "</a>")
+            '                GetTabs = vbReplace(GetTabs, "Replace-StyleHit", TabStyle)
             '                'TabBody = TabBody & "<div id=""" & LiveBodyID & """ class=""" & TabBodyStyle & """ style=""position:absolute;top:-5000px;"">" & Tabs(TabPtr).LiveBody & "</div>"
             '                TabBody = TabBody & "<div id=""" & LiveBodyID & """ class=""" & TabBodyStyle & """ style=""display:none;"">" & Tabs(TabPtr).LiveBody & "</div>"
             '            End If
@@ -137,7 +137,7 @@ Namespace Contensive.Core
         '
         '
         '
-        Friend Function GetTabBlank() As String
+        public Function GetTabBlank() As String
             GetTabBlank = comboTab.GetTabBlank
             Exit Function
             '-----------------------------

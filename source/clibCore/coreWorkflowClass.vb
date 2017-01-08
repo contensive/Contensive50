@@ -13,7 +13,7 @@ Namespace Contensive.Core
         ' objects passed in that are not disposed
         '------------------------------------------------------------------------------------------------------------------------
         '
-        Private cpCore As cpCoreClass
+        Private cpCore As coreClass
         '
         '------------------------------------------------------------------------------------------------------------------------
         ' objects created within class to dispose in dispose
@@ -58,7 +58,7 @@ Namespace Contensive.Core
         ''' <param name="cluster"></param>
         ''' <param name="appName"></param>
         ''' <remarks></remarks>
-        Friend Sub New(cpCore As cpCoreClass)
+        public Sub New(cpCore As coreClass)
             MyBase.New()
             Try
                 '
@@ -339,7 +339,7 @@ Namespace Contensive.Core
                                                             '
                                                             ' Process These field types
                                                             '
-                                                            Select Case UCase(FieldName)
+                                                            Select Case vbUCase(FieldName)
                                                                 Case "EDITARCHIVE", "ID", "EDITSOURCEID", "EDITBLANK", "CONTENTCONTROLID"
                                                                 '
                                                                 ' ----- control fields that should not be in any dataset
@@ -634,7 +634,7 @@ Namespace Contensive.Core
                                                 If cpCore.db.db_IsSQLTableField(EditDataSourceName, EditTableName, FieldName) Then
                                                     fieldTypeId = .fieldTypeId
                                                     LiveSQLValue = cpCore.db.db_EncodeSQL(cpCore.db.db_getDataRowColumnName(RSLive.Rows(0), FieldName), fieldTypeId)
-                                                    Select Case UCase(FieldName)
+                                                    Select Case vbUCase(FieldName)
                                                         Case "EDITARCHIVE", "ID", "EDITSOURCEID"
                                                             '
                                                             '   block from dataset
@@ -1078,10 +1078,10 @@ Namespace Contensive.Core
                 Dim EditLockKey2 As String
                 '
                 If (ContentName <> "") And (RecordID <> 0) Then
-                    EditLockKey2 = UCase(ContentName & "," & CStr(RecordID))
+                    EditLockKey2 = vbUCase(ContentName & "," & CStr(RecordID))
                     StringBuffer = cpCore.siteProperties.getText("EditLockTimeout", "5")
                     EditLockTimeoutMinutes = EncodeNumber(StringBuffer)
-                    EditLockDateExpires = Now.AddMinutes(EditLockTimeoutMinutes)
+                    EditLockDateExpires = DateTime.Now.AddMinutes(EditLockTimeoutMinutes)
                     If EditLockCount > 0 Then
                         For SourcePointer = 0 To EditLockCount - 1
                             If False Then
@@ -1164,8 +1164,8 @@ Namespace Contensive.Core
                 Dim DateNow As Date
                 '
                 If (ContentName <> "") And (RecordID <> 0) And (EditLockCount > 0) Then
-                    EditLockKey2 = UCase(ContentName & "," & CStr(RecordID))
-                    DateNow = Now
+                    EditLockKey2 = vbUCase(ContentName & "," & CStr(RecordID))
+                    DateNow = DateTime.Now
                     For SourcePointer = 0 To EditLockCount - 1
                         If (EditLockArray(SourcePointer).Key = EditLockKey2) Then
                             ReturnMemberID = EditLockArray(SourcePointer).MemberID

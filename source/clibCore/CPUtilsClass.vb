@@ -170,7 +170,7 @@ Namespace Contensive.Core
             Try
                 If (Expression Is Nothing) Then
                     EncodeInteger = 0
-                ElseIf IsNumeric(Expression) Then
+                ElseIf vbIsNumeric(Expression) Then
                     EncodeInteger = CInt(Expression)
                 ElseIf TypeOf Expression Is Boolean Then
                     If Expression Then
@@ -189,7 +189,7 @@ Namespace Contensive.Core
             Try
                 If (Expression Is Nothing) Then
                     EncodeNumber = 0
-                ElseIf IsNumeric(Expression) Then
+                ElseIf vbIsNumeric(Expression) Then
                     EncodeNumber = CDbl(Expression)
                 ElseIf TypeOf Expression Is Boolean Then
                     If Expression Then
@@ -226,7 +226,7 @@ Namespace Contensive.Core
                     EncodeBoolean = False
                 ElseIf TypeOf Expression Is Boolean Then
                     EncodeBoolean = Expression
-                ElseIf IsNumeric(Expression) Then
+                ElseIf vbIsNumeric(Expression) Then
                     EncodeBoolean = (CStr(Expression) <> "0")
                 ElseIf TypeOf Expression Is String Then
                     Select Case Expression.ToString.ToLower.Trim
@@ -432,7 +432,7 @@ Namespace Contensive.Core
         ''' <param name="Source"></param>
         ''' <returns></returns>
         Public Overrides Function EncodeHtmlForWysiwygEditor(Source As String) As String
-            Return CP.core.html_encodeContent10(Source, 0, "", 0, 0, False, False, False, True, True, False, "", "", False, 0, "", cpCoreClass.addonContextEnum.ContextSimple, False, Nothing, False)
+            Return CP.core.html_encodeContent10(Source, 0, "", 0, 0, False, False, False, True, True, False, "", "", False, 0, "", coreClass.addonContextEnum.ContextSimple, False, Nothing, False)
             'Return CP.core.encodeContent9(Source, 0, "", 0, 0, False, False, False, True, True, False, "", "", False, 0, "", 1)
         End Function
         '

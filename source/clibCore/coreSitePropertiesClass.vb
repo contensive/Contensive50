@@ -10,17 +10,31 @@ Namespace Contensive.Core
     ''' </summary>
     Public Class coreSitePropertiesClass
         '
-        Private cpCore As cpCoreClass
+        Private cpCore As coreClass
         '
         '====================================================================================================
         ''' <summary>
         ''' new
         ''' </summary>
         ''' <param name="cpCore"></param>
-        Public Sub New(cpCore As cpCoreClass)
+        Public Sub New(cpCore As coreClass)
             MyBase.New()
             Me.cpCore = cpCore
         End Sub
+        '
+        '====================================================================================================
+        '
+        Public ReadOnly Property allowVisitTracking() As Boolean
+            Get
+                If Not _allowVisitTrackingLoaded Then
+                    _allowVisitTracking = EncodeBoolean(getText("allowVisitTracking", "true"))
+                    _allowVisitTrackingLoaded = True
+                End If
+                Return _allowVisitTracking
+            End Get
+        End Property
+        Private _allowVisitTrackingLoaded As Boolean = False
+        Private _allowVisitTracking As Boolean
         '
         '====================================================================================================
         '
@@ -339,7 +353,7 @@ Namespace Contensive.Core
                 Dim Position As Integer
                 If Not _AdminURL_LocalLoaded Then
                     _AdminURL_Local = getText("AdminURL", cpCore.appConfig.adminRoute)
-                    Position = InStr(1, _AdminURL_Local, "?")
+                    Position = vbInstr(1, _AdminURL_Local, "?")
                     If Position <> 0 Then
                         _AdminURL_Local = Mid(_AdminURL_Local, 1, Position - 1)
                     End If
@@ -527,8 +541,8 @@ Namespace Contensive.Core
                 '
                 Dim cacheName As String = "siteProperty-" & PropertyName
                 Dim propertyFound As Boolean = False
-                returnString = EncodeText(cpCore.cache.getObject(Of String)(cacheName))
-                If returnString = "" Then
+                returnString = cpCore.cache.getObject(Of String)(cacheName)
+                If String.IsNullOrEmpty(returnString) Then
                     returnString = getText_noCache(PropertyName, DefaultValue, propertyFound)
                     If (propertyFound) And (returnString <> "") Then
                         Call cpCore.cache.setKey(cacheName, returnString, "Site Properties")

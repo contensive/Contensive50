@@ -18,7 +18,7 @@ Namespace Contensive.Core
 #End Region
         '
         Private cp As CPClass
-        Private cpCore As Contensive.Core.cpCoreClass
+        Private cpCore As Contensive.Core.coreClass
         'Private LocalVars As New Collection
         'Private LocalVarNameList As String
         Protected disposed As Boolean = False
@@ -28,7 +28,7 @@ Namespace Contensive.Core
         ''' constructor
         ''' </summary>
         ''' <param name="cpParent"></param>
-        Friend Sub New(ByVal cpParent As CPClass)
+        Public Sub New(ByVal cpParent As CPClass)
             MyBase.New()
             cp = cpParent
             cpCore = cp.core
@@ -383,23 +383,23 @@ Namespace Contensive.Core
         '
         '------------------------------------------------------------------------------------------------------------
         '
-        Friend Function encodeLegacyAddonOptionArgument(ByVal Arg As String) As String
+        Public Function encodeLegacyAddonOptionArgument(ByVal Arg As String) As String
             Dim a As String
             encodeLegacyAddonOptionArgument = ""
             If Arg <> "" Then
                 a = Arg
-                a = Replace(a, vbCrLf, "#0013#")
-                a = Replace(a, vbLf, "#0013#")
-                a = Replace(a, vbCr, "#0013#")
-                a = Replace(a, "&", "#0038#")
-                a = Replace(a, "=", "#0061#")
-                a = Replace(a, ",", "#0044#")
-                a = Replace(a, """", "#0034#")
-                a = Replace(a, "'", "#0039#")
-                a = Replace(a, "|", "#0124#")
-                a = Replace(a, "[", "#0091#")
-                a = Replace(a, "]", "#0093#")
-                a = Replace(a, ":", "#0058#")
+                a = vbReplace(a, vbCrLf, "#0013#")
+                a = vbReplace(a, vbLf, "#0013#")
+                a = vbReplace(a, vbCr, "#0013#")
+                a = vbReplace(a, "&", "#0038#")
+                a = vbReplace(a, "=", "#0061#")
+                a = vbReplace(a, ",", "#0044#")
+                a = vbReplace(a, """", "#0034#")
+                a = vbReplace(a, "'", "#0039#")
+                a = vbReplace(a, "|", "#0124#")
+                a = vbReplace(a, "[", "#0091#")
+                a = vbReplace(a, "]", "#0093#")
+                a = vbReplace(a, ":", "#0058#")
                 encodeLegacyAddonOptionArgument = a
             End If
         End Function
@@ -420,22 +420,22 @@ Namespace Contensive.Core
         '
         '------------------------------------------------------------------------------------------------------------
         '
-        Friend Function decodeLegacyAddonOptionArgument(ByVal EncodedArg As String) As String
+        Public Function decodeLegacyAddonOptionArgument(ByVal EncodedArg As String) As String
             Dim a As String
             '
             decodeLegacyAddonOptionArgument = ""
             If EncodedArg <> "" Then
                 a = EncodedArg
-                a = Replace(a, "#0058#", ":")
-                a = Replace(a, "#0093#", "]")
-                a = Replace(a, "#0091#", "[")
-                a = Replace(a, "#0124#", "|")
-                a = Replace(a, "#0039#", "'")
-                a = Replace(a, "#0034#", """")
-                a = Replace(a, "#0044#", ",")
-                a = Replace(a, "#0061#", "=")
-                a = Replace(a, "#0038#", "&")
-                a = Replace(a, "#0013#", vbCrLf)
+                a = vbReplace(a, "#0058#", ":")
+                a = vbReplace(a, "#0093#", "]")
+                a = vbReplace(a, "#0091#", "[")
+                a = vbReplace(a, "#0124#", "|")
+                a = vbReplace(a, "#0039#", "'")
+                a = vbReplace(a, "#0034#", """")
+                a = vbReplace(a, "#0044#", ",")
+                a = vbReplace(a, "#0061#", "=")
+                a = vbReplace(a, "#0038#", "&")
+                a = vbReplace(a, "#0013#", vbCrLf)
                 decodeLegacyAddonOptionArgument = a
             End If
         End Function
@@ -565,7 +565,7 @@ Namespace Contensive.Core
                 '    If LocalVars.Contains(lcName) Then
                 '        Call LocalVars.Remove(lcName)
                 '        If value = "" Then
-                '            LocalVarNameList = Replace(LocalVarNameList, vbCrLf & lcName, "", , , CompareMethod.Text)
+                '            LocalVarNameList = vbReplace(LocalVarNameList, vbCrLf & lcName, "", , , CompareMethod.Text)
                 '        Else
                 '            Call LocalVars.Add(value, lcName)
                 '            Call tp("Property var set, name found in localVars, removed and re-added, LocalVarNameList=" & LocalVarNameList)

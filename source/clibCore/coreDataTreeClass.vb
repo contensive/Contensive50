@@ -15,7 +15,7 @@ Namespace Contensive.Core
         '
         ' ----- global scope variables
         '
-        Private cpCore As cpCoreClass
+        Private cpCore As coreClass
         Private ClassInitialized As Boolean       ' if true, the module has been
         Private MSxml As XmlDocument
         '
@@ -48,7 +48,7 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="cpCore"></param>
         ''' <remarks></remarks>
-        Public Sub New(cpCore As cpCoreClass)
+        Public Sub New(cpCore As coreClass)
             MyBase.New()
             Me.cpCore = cpCore
             ClassInitialized = True
@@ -371,9 +371,9 @@ ErrorTrap:
             '
             AttrCnt = Tier(TierPtr).Node.Attributes.Count
             If AttrCnt > 0 And (AttrName <> "") Then
-                UCaseAttrName = UCase(AttrName)
+                UCaseAttrName = vbUCase(AttrName)
                 For AttrPtr = 0 To AttrCnt - 1
-                    If UCaseAttrName = UCase(Tier(TierPtr).Node.Attributes(AttrPtr).Name) Then
+                    If UCaseAttrName = vbUCase(Tier(TierPtr).Node.Attributes(AttrPtr).Name) Then
                         GetAttr = Tier(TierPtr).Node.Attributes(AttrPtr).Value
                         Exit For
                     End If

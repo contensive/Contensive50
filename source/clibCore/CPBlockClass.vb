@@ -20,7 +20,7 @@ Namespace Contensive.Core
         Public Const EventsId As String = "5911548D-7637-4021-BD08-C7676F3E12C6"
 #End Region
         '
-        Private cpCore As Contensive.Core.cpCoreClass
+        Private cpCore As Contensive.Core.coreClass
         Private cp As CPClass
         Private accum As String
         Private htmlTools As coreHtmlClass
@@ -28,7 +28,7 @@ Namespace Contensive.Core
         '
         ' Constructor - Initialize the Main and Csv objects
         '
-        Friend Sub New(ByRef cpParent As CPClass)
+        Public Sub New(ByRef cpParent As CPClass)
             MyBase.New()
             Try
                 accum = ""

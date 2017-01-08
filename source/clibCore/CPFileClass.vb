@@ -21,7 +21,7 @@ Namespace Contensive.Core
         Public Const EventsId As String = "8757DE11-C04D-4765-B46B-458E281BAE19"
 #End Region
         '
-        Private cpCore As Contensive.Core.cpCoreClass
+        Private cpCore As Contensive.Core.coreClass
         Protected disposed As Boolean = False
         '
         Private _cdnFiles As CPFileSystemClass
@@ -34,7 +34,7 @@ Namespace Contensive.Core
         ''' Constructor
         ''' </summary>
         ''' <param name="core"></param>
-        Public Sub New(ByVal core As Contensive.Core.cpCoreClass)
+        Public Sub New(ByVal core As Contensive.Core.coreClass)
             MyBase.New()
             Me.cpCore = core
         End Sub
@@ -239,7 +239,7 @@ Namespace Contensive.Core
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
         Public Overrides Function fileList(ByVal folderName As String, Optional ByVal pageSize As Integer = 0, Optional ByVal pageNumber As Integer = 1) As String
             Dim fi As IO.FileInfo() = serverFiles.fileList(folderName)
-            Return cpCore.cluster.clusterFiles.convertFileINfoArrayToParseString(fi)
+            Return cpCore.cluster.localClusterFiles.convertFileINfoArrayToParseString(fi)
         End Function
         '
         '==========================================================================================
@@ -251,7 +251,7 @@ Namespace Contensive.Core
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
         Public Overrides Function folderList(ByVal folderName As String) As String
             Dim di As IO.DirectoryInfo() = serverFiles.folderList(folderName)
-            Return cpCore.cluster.clusterFiles.convertDirectoryInfoArrayToParseString(di)
+            Return cpCore.cluster.localClusterFiles.convertDirectoryInfoArrayToParseString(di)
         End Function
         '
         '==========================================================================================

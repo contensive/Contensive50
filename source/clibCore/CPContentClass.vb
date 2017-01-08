@@ -20,12 +20,12 @@ Namespace Contensive.Core
 #End Region
         '
         Private cp As CPClass
-        Private cpCore As Contensive.Core.cpCoreClass
+        Private cpCore As Contensive.Core.coreClass
         Protected disposed As Boolean = False
         '
         '====================================================================================================
         '
-        Friend Sub New(ByVal cpParent As CPClass)
+        public Sub New(ByVal cpParent As CPClass)
             MyBase.New()
             cp = cpParent
             cpCore = cp.core
@@ -324,7 +324,7 @@ Namespace Contensive.Core
             field.Scramble = False
             field.TextBuffered = False
             field.UniqueName = False
-            Return builder.metaData_VerifyCDefField_ReturnID(ContentName, field)
+            Return cpCore.metaData.metaData_VerifyCDefField_ReturnID(ContentName, field)
         End Function
         '
         '====================================================================================================
@@ -343,7 +343,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function AddContent(ContentName As String, sqlTableName As String, dataSource As String) As Integer
             Dim builder As New coreBuilderClass(cpCore)
-            Return builder.metaData_CreateContent4(True _
+            Return cpCore.metaData.metaData_CreateContent4(True _
                 , dataSource _
                 , sqlTableName _
                 , ContentName _

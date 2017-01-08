@@ -9,7 +9,8 @@ Imports Xunit
 
 '
 Namespace Contensive.Core
-    Public Class cpCoreClass
+    Public Class coreClass
+        Implements IDisposable
         '
         '======================================================================
         '   see _readMe.txt for project details
@@ -19,6 +20,11 @@ Namespace Contensive.Core
         '------------------------------------------------------------------------
         '
         Private cp As CPClass                                   ' constructor -- top-level cp
+        '
+        ' ----- shared globals
+        '
+        Public serverConfig As serverConfigClass
+        Public clusterConfig As clusterConfigClass
         Public Property appConfig As appConfigClass             ' configuration loaded during construction
         Public Property appStatus As applicationStatusEnum      ' status of application
         '
@@ -33,12 +39,29 @@ Namespace Contensive.Core
         '
         '===================================================================================================
         ''' <summary>
-        ''' 
+        ''' menuFlyout
         ''' </summary>
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Friend ReadOnly Property userProperty As corePropertyCacheClass
+        Public ReadOnly Property menuFlyout As coreMenuFlyoutClass
+            Get
+                If (_menuFlyout Is Nothing) Then
+                    _menuFlyout = New coreMenuFlyoutClass(Me)
+                End If
+                Return _menuFlyout
+            End Get
+        End Property
+        Private _menuFlyout As coreMenuFlyoutClass
+        '
+        '===================================================================================================
+        ''' <summary>
+        ''' userProperty
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public ReadOnly Property userProperty As corePropertyCacheClass
             Get
                 If (_userProperty Is Nothing) Then
                     _userProperty = New corePropertyCacheClass(Me, PropertyTypeMember)
@@ -50,12 +73,12 @@ Namespace Contensive.Core
         '
         '===================================================================================================
         ''' <summary>
-        ''' 
+        ''' visitorProperty
         ''' </summary>
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Friend ReadOnly Property visitorProperty As corePropertyCacheClass
+        Public ReadOnly Property visitorProperty As corePropertyCacheClass
             Get
                 If (_visitorProperty Is Nothing) Then
                     _visitorProperty = New corePropertyCacheClass(Me, PropertyTypeVisitor)
@@ -67,12 +90,12 @@ Namespace Contensive.Core
         '
         '===================================================================================================
         ''' <summary>
-        ''' 
+        ''' visitProperty
         ''' </summary>
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Friend ReadOnly Property visitProperty As corePropertyCacheClass
+        Public ReadOnly Property visitProperty As corePropertyCacheClass
             Get
                 If (_visitProperty Is Nothing) Then
                     _visitProperty = New corePropertyCacheClass(Me, PropertyTypeVisit)
@@ -89,24 +112,7 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Friend ReadOnly Property menuFlyout As coreMenuFlyoutClass
-            Get
-                If (_menuFlyout Is Nothing) Then
-                    _menuFlyout = New coreMenuFlyoutClass(Me)
-                End If
-                Return _menuFlyout
-            End Get
-        End Property
-        Private _menuFlyout As coreMenuFlyoutClass
-        '
-        '===================================================================================================
-        ''' <summary>
-        ''' webServer
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Friend ReadOnly Property webServer As coreWebServerClass
+        Public ReadOnly Property webServer As coreWebServerClass
             Get
                 If (_webServer Is Nothing) Then
                     _webServer = New coreWebServerClass(Me)
@@ -118,7 +124,7 @@ Namespace Contensive.Core
         '
         '===================================================================================================
         ''' <summary>
-        ''' addonCache object
+        ''' security object
         ''' </summary>
         ''' <value></value>
         ''' <returns></returns>
@@ -135,7 +141,7 @@ Namespace Contensive.Core
         '
         '===================================================================================================
         ''' <summary>
-        ''' addonCache object
+        ''' docProperties object
         ''' </summary>
         ''' <value></value>
         ''' <returns></returns>
@@ -149,6 +155,114 @@ Namespace Contensive.Core
             End Get
         End Property
         Private _doc As coreDocPropertiesClass = Nothing
+        '
+        '===================================================================================================
+        ''' <summary>
+        ''' appRootFiles object
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public ReadOnly Property appRootFiles() As coreFileSystemClass
+            Get
+                If (_appRootFiles Is Nothing) Then
+                    If clusterConfig.isLocal Then
+                        '
+                        ' local server -- everything is ephemeral
+                        '
+                        appRootFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, serverConfig.clusterPath & appConfig.appRootFilesPath)
+                    Else
+                        '
+                        ' cluster mode - each filesystem is configured accordingly
+                        '
+                        appRootFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.activeSync, serverConfig.clusterPath & appConfig.appRootFilesPath)
+                    End If
+                End If
+                Return _appRootFiles
+            End Get
+        End Property
+        Private _appRootFiles As coreFileSystemClass = Nothing
+        '
+        '===================================================================================================
+        ''' <summary>
+        ''' serverFiles object
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public ReadOnly Property serverFiles() As coreFileSystemClass
+            Get
+                If (_serverFiles Is Nothing) Then
+                    If clusterConfig.isLocal Then
+                        '
+                        ' local server -- everything is ephemeral
+                        '
+                        serverFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, "")
+                    Else
+                        '
+                        ' cluster mode - each filesystem is configured accordingly
+                        '
+                        serverFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, "")
+                    End If
+                End If
+                Return _serverFiles
+            End Get
+        End Property
+        Private _serverFiles As coreFileSystemClass = Nothing
+        '
+        '===================================================================================================
+        ''' <summary>
+        ''' privateFiles object
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public ReadOnly Property privateFiles() As coreFileSystemClass
+            Get
+                If (_privateFiles Is Nothing) Then
+                    If clusterConfig.isLocal Then
+                        '
+                        ' local server -- everything is ephemeral
+                        '
+                        privateFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, serverConfig.clusterPath & appConfig.privateFilesPath)
+                    Else
+                        '
+                        ' cluster mode - each filesystem is configured accordingly
+                        '
+                        privateFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, serverConfig.clusterPath & appConfig.privateFilesPath)
+                    End If
+                End If
+                Return _privateFiles
+            End Get
+        End Property
+        Private _privateFiles As coreFileSystemClass = Nothing
+        '
+        '===================================================================================================
+        ''' <summary>
+        ''' cdnFiles object
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public ReadOnly Property cdnFiles() As coreFileSystemClass
+            Get
+                If (_cdnFiles Is Nothing) Then
+                    If clusterConfig.isLocal Then
+                        '
+                        ' local server -- everything is ephemeral
+                        '
+                        cdnFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, serverConfig.clusterPath & appConfig.cdnFilesPath)
+                    Else
+                        '
+                        ' cluster mode - each filesystem is configured accordingly
+                        '
+                        cdnFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, serverConfig.clusterPath & appConfig.cdnFilesPath)
+                    End If
+                End If
+                Return _cdnFiles
+            End Get
+        End Property
+        Private _cdnFiles As coreFileSystemClass = Nothing
         '
         '===================================================================================================
         ''' <summary>
@@ -386,7 +500,7 @@ Namespace Contensive.Core
         Public main_Private_StateString_In As String = ""    ' main_StateString from the incoming QS - Used to carry main_VisitId when cookies dont work (JSForms for example)
         Public main_Private_StateString_Out As String = ""   ' main_StateString to be set in outbound QS when needed - Used to carry main_VisitId when cookies dont work (JSForms for example)
         '
-        Friend visit_initialized As Boolean = False                ' true when visit has been initialized
+        Public visit_initialized As Boolean = False                ' true when visit has been initialized
         '
         Public visit_Id As Integer = 0                      ' Index into the visits table
         Public visit_name As String = ""                  '
@@ -960,13 +1074,13 @@ Namespace Contensive.Core
         End Enum
         '
         Private main_PleaseWaitStarted As Boolean = False
-        '
-        ' file systems
-        '
-        Public Property serverFiles As coreFileSystemClass           ' files written directly to the local server
-        Public Property appRootFiles As coreFileSystemClass         ' wwwRoot path for the app server, both local and scale modes
-        Public Property privateFiles As coreFileSystemClass         ' path not available to web interface, local: physcial storage location, scale mode mirror location
-        Public Property cdnFiles As coreFileSystemClass             ' file uploads etc. Local mode this should point to appRoot folder (or a virtual folder in appRoot). Scale mode it goes to an s3 mirror
+        ''
+        '' file systems
+        ''
+        'Public Property serverFiles As coreFileSystemClass           ' files written directly to the local server
+        ''Public Property appRootFiles As coreFileSystemClass         ' wwwRoot path for the app server, both local and scale modes
+        'Public Property privateFiles As coreFileSystemClass         ' path not available to web interface, local: physcial storage location, scale mode mirror location
+        'Public Property cdnFiles As coreFileSystemClass             ' file uploads etc. Local mode this should point to appRoot folder (or a virtual folder in appRoot). Scale mode it goes to an s3 mirror
         '
         ' SF Resize Algorithms
         '
@@ -1464,12 +1578,12 @@ ErrorTrap:
                     '
                     ' records did not delete
                     '
-                    Call Err.Raise(KmaErrorInternal, "dll", "Error deleting record chunks. No records were deleted and the process was not complete.")
+                    Call Err.Raise(ignoreInteger, "dll", "Error deleting record chunks. No records were deleted and the process was not complete.")
                 ElseIf (LoopCount >= iChunkCount) Then
                     '
                     ' records did not delete
                     '
-                    Call Err.Raise(KmaErrorInternal, "dll", "Error deleting record chunks. The maximum chunk count was exceeded while deleting records.")
+                    Call Err.Raise(ignoreInteger, "dll", "Error deleting record chunks. The maximum chunk count was exceeded while deleting records.")
                 End If
             End If
             '
@@ -1505,22 +1619,6 @@ ErrorTrap:
 ErrorTrap:
             Call handleLegacyError4(Err.Number, Err.Source, Err.Description, MethodName, True)
         End Function
-        '
-        '=============================================================================
-        ' Imports the named table into the content system
-        '   Note: ContentNames are unique, so you can not have the same name on different
-        '   datasources, so the datasource here is ...
-        '
-        '   What if...
-        '       - content is found on different datasource
-        '       - content does not exist
-        '=============================================================================
-        '
-        Public Sub db_CreateContentFromSQLTable(ByVal DataSourceName As String, ByVal TableName As String, ByVal ContentName As String, ByVal MemberID As Integer)
-
-            Dim bulder As New coreBuilderClass(Me)
-            bulder.db_CreateContentFromSQLTable(DataSourceName, TableName, ContentName, MemberID)
-        End Sub
         '
         '=============================================================================
         '   Update the content fields for all definitions that match this table
@@ -1579,7 +1677,7 @@ ErrorTrap:
                     '
                     ' --- no records were found, add a blank if we can
                     '
-                    DateAdded = Now()
+                    DateAdded = DateTime.Now()
                     CreateKey = getRandomLong()
                     SQL = "INSERT INTO " & TableName & " (CreateKey,DateAdded" _
                         & ")VALUES(" _
@@ -1614,8 +1712,7 @@ ErrorTrap:
                             SQL = "SELECT * FROM ccFields where (ContentID=" & ContentID & ")and(name=" & db.encodeSQLText(TableFieldName) & ")"
                             Dim dtField As DataTable = db.executeSql(SQL, "Default")
                             If dtField.Rows.Count = 0 Then
-                                Dim bulder As New coreBuilderClass(Me)
-                                Call bulder.db_CreateContentFieldFromTableField(ContentName, dc.ColumnName, EncodeInteger(dc.DataType))
+                                Call db.db_CreateContentFieldFromTableField(ContentName, dc.ColumnName, EncodeInteger(dc.DataType))
                                 'Call db_CreateContentFieldFromTableField(ContentName, dc.ColumnName, EncodeInteger(dc.DataType))
                             End If
                         Next
@@ -1811,7 +1908,7 @@ ErrorTrap:
                     ' block
                 ElseIf (InStr(1, FromAddress, "@") = 0) Or (InStr(1, FromAddress, ".") = 0) Then
                     ' block
-                ElseIf 0 <> InStr(1, getEmailBlockList_InternalOnly, vbCrLf & ToAddress & vbCrLf, vbTextCompare) Then
+                ElseIf 0 <> vbInstr(1, getEmailBlockList_InternalOnly, vbCrLf & ToAddress & vbCrLf, vbTextCompare) Then
                     '
                     ' They are in the block list
                     '
@@ -1822,7 +1919,7 @@ ErrorTrap:
                     '
                     ' Test for from-address / to-address matches
                     '
-                    If LCase(FromAddress) = LCase(ToAddress) Then
+                    If vbLCase(FromAddress) = vbLCase(ToAddress) Then
                         FromAddress = siteProperties.getText("EmailFromAddress", "")
                         If FromAddress = "" Then
                             '
@@ -1830,7 +1927,7 @@ ErrorTrap:
                             '
                             FromAddress = ToAddress
                             WarningMsg = "The from-address matches the to-address. This email was sent, but may be blocked by spam filtering."
-                        ElseIf LCase(FromAddress) = LCase(ToAddress) Then
+                        ElseIf vbLCase(FromAddress) = vbLCase(ToAddress) Then
                             '
                             '
                             '
@@ -1915,8 +2012,8 @@ ErrorTrap:
         '            '
         '            filterDomainName = Link
         '            csv_DomainName = appConfig.domainList(0)
-        '            If InStr(1, csv_DomainName, ",") <> 0 Then
-        '                csv_DomainName = Mid(csv_DomainName, 1, InStr(1, csv_DomainName, ",") - 1)
+        '            If vbInstr(1, csv_DomainName, ",") <> 0 Then
+        '                csv_DomainName = Mid(csv_DomainName, 1, vbInstr(1, csv_DomainName, ",") - 1)
         '            End If
         '            '
         '            ' ----- set the Links Host to the Site Property Domain for consistancy with Spider
@@ -2046,7 +2143,7 @@ ErrorTrap:
         '
         '========================================================================
         '
-        Friend Sub pageManager_cache_pageContent_clear()
+        Public Sub pageManager_cache_pageContent_clear()
             On Error GoTo ErrorTrap 'Const Tn = "pageManager_cache_pageContent_clear" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
             pageManager_cache_pageContent_rows = 0
@@ -2072,7 +2169,7 @@ ErrorTrap:
                 Dim Pointer As Integer
                 '
                 If Not (_db Is Nothing) Then
-                    If UCase(DataSourceName) = "DEFAULT" Then
+                    If vbUCase(DataSourceName) = "DEFAULT" Then
                         db_GetConnectionString = db.DefaultConnectionString
                     Else
                         Pointer = db.db_GetDataSourcePointer(DataSourceName)
@@ -2198,7 +2295,7 @@ ErrorTrap:
         '   BlockPointer    the current block being examined
         '========================================================================
         '
-        Friend Function html_EncodeActiveContent_Internal(ByVal Source As String, ByVal personalizationPeopleId As Integer, ByVal ContextContentName As String, ByVal ContextRecordID As Integer, ByVal moreInfoPeopleId As Integer, ByVal AddLinkEID As Boolean, ByVal EncodeCachableTags As Boolean, ByVal EncodeImages As Boolean, ByVal EncodeEditIcons As Boolean, ByVal EncodeNonCachableTags As Boolean, ByVal AddAnchorQuery As String, ByVal ProtocolHostString As String, ByVal IsEmailContent As Boolean, ByVal AdminURL As String, ByVal personalizationIsAuthenticated As Boolean, Optional ByVal context As addonContextEnum = addonContextEnum.ContextPage) As String
+        Public Function html_EncodeActiveContent_Internal(ByVal Source As String, ByVal personalizationPeopleId As Integer, ByVal ContextContentName As String, ByVal ContextRecordID As Integer, ByVal moreInfoPeopleId As Integer, ByVal AddLinkEID As Boolean, ByVal EncodeCachableTags As Boolean, ByVal EncodeImages As Boolean, ByVal EncodeEditIcons As Boolean, ByVal EncodeNonCachableTags As Boolean, ByVal AddAnchorQuery As String, ByVal ProtocolHostString As String, ByVal IsEmailContent As Boolean, ByVal AdminURL As String, ByVal personalizationIsAuthenticated As Boolean, Optional ByVal context As addonContextEnum = addonContextEnum.ContextPage) As String
             On Error GoTo ErrorTrap 'Const Tn = "EncodeActiveContent_Internal" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
             Dim pairNames As Object
@@ -2405,7 +2502,7 @@ ErrorTrap:
             ' ----- xml contensive process instruction
             '
             'TemplateBodyContent
-            'Pos = InStr(1, TemplateBodyContent, "<?contensive", vbTextCompare)
+            'Pos = vbInstr(1, TemplateBodyContent, "<?contensive", vbTextCompare)
             'If Pos > 0 Then
             '    '
             '    ' convert template body if provided - this is the content that replaces the content box addon
@@ -2414,7 +2511,7 @@ ErrorTrap:
             '    LayoutEngineOptionString = "data=" & encodeNvaArgument(TemplateBodyContent)
             '    TemplateBodyContent = csv_ExecuteActiveX("aoPrimitives.StructuredDataClass", "Structured Data Engine", nothing, LayoutEngineOptionString, "data=(structured data)", LayoutErrorMessage)
             'End If
-            Pos = InStr(1, workingContent, "<?contensive", vbTextCompare)
+            Pos = vbInstr(1, workingContent, "<?contensive", vbTextCompare)
             If Pos > 0 Then
                 Throw New ApplicationException("Structured xml data commands are no longer supported")
                 ''
@@ -2431,18 +2528,18 @@ ErrorTrap:
             ' Convert <!-- STARTGROUPACCESS 10,11,12 --> format to <AC type=GROUPACCESS AllowGroups="10,11,12">
             ' Convert <!-- ENDGROUPACCESS --> format to <AC type=GROUPACCESSEND>
             '
-            PosStart = InStr(1, workingContent, "<!-- STARTGROUPACCESS ", vbTextCompare)
+            PosStart = vbInstr(1, workingContent, "<!-- STARTGROUPACCESS ", vbTextCompare)
             If PosStart > 0 Then
-                PosEnd = InStr(PosStart, workingContent, "-->")
+                PosEnd = vbInstr(PosStart, workingContent, "-->")
                 If PosEnd > 0 Then
                     AllowGroups = Mid(workingContent, PosStart + 22, PosEnd - PosStart - 23)
                     workingContent = Mid(workingContent, 1, PosStart - 1) & "<AC type=""" & ACTypeAggregateFunction & """ name=""block text"" querystring=""allowgroups=" & AllowGroups & """>" & Mid(workingContent, PosEnd + 3)
                 End If
             End If
             '
-            PosStart = InStr(1, workingContent, "<!-- ENDGROUPACCESS ", vbTextCompare)
+            PosStart = vbInstr(1, workingContent, "<!-- ENDGROUPACCESS ", vbTextCompare)
             If PosStart > 0 Then
-                PosEnd = InStr(PosStart, workingContent, "-->")
+                PosEnd = vbInstr(PosStart, workingContent, "-->")
                 If PosEnd > 0 Then
                     workingContent = Mid(workingContent, 1, PosStart - 1) & "<AC type=""" & ACTypeAggregateFunction & """ name=""block text end"" >" & Mid(workingContent, PosEnd + 3)
                 End If
@@ -2458,24 +2555,24 @@ ErrorTrap:
                 '
                 IconIDControlString = "AC," & ACTypeTemplateContent & "," & NotUsedID & "," & ACName & ","
                 IconImg = GetAddonIconImg(AdminURL, 52, 64, 0, False, IconIDControlString, "/cclib/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as [Template Page Content]", "", 0)
-                workingContent = Replace(workingContent, "{{content}}", IconImg, 1, -1, vbTextCompare)
-                'WorkingContent = Replace(WorkingContent, "{{content}}", "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Page Content"" id=""AC," & ACTypeTemplateContent & "," & NotUsedID & "," & ACName & ","" src=""/cclib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>", 1, -1, vbTextCompare)
+                workingContent = vbReplace(workingContent, "{{content}}", IconImg, 1, 99, vbTextCompare)
+                'WorkingContent = vbReplace(WorkingContent, "{{content}}", "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Page Content"" id=""AC," & ACTypeTemplateContent & "," & NotUsedID & "," & ACName & ","" src=""/cclib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>", 1, -1, vbTextCompare)
                 '
                 ' replace all other {{...}}
                 '
                 LoopPtr = 0
                 Pos = 1
                 Do While Pos > 0 And LoopPtr < 100
-                    Pos = InStr(Pos, workingContent, "{{" & ACTypeDynamicMenu, vbTextCompare)
+                    Pos = vbInstr(Pos, workingContent, "{{" & ACTypeDynamicMenu, vbTextCompare)
                     If Pos > 0 Then
                         addonOptionString = ""
                         PosStart = Pos
                         If PosStart <> 0 Then
                             'PosStart = PosStart + 2 + Len(ACTypeDynamicMenu)
-                            PosEnd = InStr(PosStart, workingContent, "}}", vbTextCompare)
+                            PosEnd = vbInstr(PosStart, workingContent, "}}", vbTextCompare)
                             If PosEnd <> 0 Then
                                 Cmd = Mid(workingContent, PosStart + 2, PosEnd - PosStart - 2)
-                                Pos = InStr(1, Cmd, "?")
+                                Pos = vbInstr(1, Cmd, "?")
                                 If Pos <> 0 Then
                                     addonOptionString = decodeHtml(Mid(Cmd, Pos + 1))
                                 End If
@@ -2515,9 +2612,9 @@ ErrorTrap:
                     Do While ElementPointer < KmaHTML.ElementCount
                         Copy = KmaHTML.Text(ElementPointer)
                         If KmaHTML.IsTag(ElementPointer) Then
-                            ElementTag = UCase(KmaHTML.TagName(ElementPointer))
+                            ElementTag = vbUCase(KmaHTML.TagName(ElementPointer))
                             ACName = KmaHTML.ElementAttribute(ElementPointer, "NAME")
-                            UCaseACName = UCase(ACName)
+                            UCaseACName = vbUCase(ACName)
                             Select Case ElementTag
                                 Case "FORM"
                                     '
@@ -2534,8 +2631,8 @@ ErrorTrap:
                                             '
                                             ' if it has "contensiveuserform=1" in the form tag, remove it from the form and add the hidden that makes it work
                                             '
-                                            Copy = Replace(Copy, "ContensiveUserForm=1", "", , , vbTextCompare)
-                                            Copy = Replace(Copy, "ContensiveUserForm=""1""", "", , , vbTextCompare)
+                                            Copy = vbReplace(Copy, "ContensiveUserForm=1", "", 1, 99, vbTextCompare)
+                                            Copy = vbReplace(Copy, "ContensiveUserForm=""1""", "", 1, 99, vbTextCompare)
                                             If Not EncodeEditIcons Then
                                                 Copy = Copy & "<input type=hidden name=ContensiveUserForm value=1>"
                                             End If
@@ -2558,28 +2655,28 @@ ErrorTrap:
                                             For AttributePointer = 0 To AttributeCount - 1
                                                 Name = KmaHTML.ElementAttributeName(ElementPointer, AttributePointer)
                                                 Value = KmaHTML.ElementAttributeValue(ElementPointer, AttributePointer)
-                                                If UCase(Name) = "HREF" Then
+                                                If vbUCase(Name) = "HREF" Then
                                                     Dim linkDomain As String
                                                     Dim linkprotocol As String
                                                     Link = Value
                                                     'linkProtocol = ""
                                                     'linkDomain = ""
-                                                    Pos = InStr(1, Link, "://")
+                                                    Pos = vbInstr(1, Link, "://")
                                                     If Pos > 0 Then
                                                         'linkProtocol = Left(Link, Pos + 2)
                                                         Link = Mid(Link, Pos + 3)
-                                                        Pos = InStr(1, Link, "/")
+                                                        Pos = vbInstr(1, Link, "/")
                                                         If Pos > 0 Then
                                                             Link = Left(Link, Pos - 1)
                                                             'Link = Mid(Link, Pos + 1)
                                                         End If
                                                     End If
                                                     If (Link = "") Or (InStr(1, "," & appConfig.domainList(0) & ",", "," & Link & ",", vbTextCompare) <> 0) Then
-                                                        'If InStr(1, app.config.domainList(0), Value, vbTextCompare) <> 0 Then
+                                                        'If vbInstr(1, app.config.domainList(0), Value, vbTextCompare) <> 0 Then
                                                         '
                                                         ' ----- link is for this site
                                                         '
-                                                        '    If InStr(1, Value, "/") <> 0 Then
+                                                        '    If vbInstr(1, Value, "/") <> 0 Then
                                                         '        '
                                                         '        ' ----- link contains a slash
                                                         '        '
@@ -2588,12 +2685,12 @@ ErrorTrap:
                                                             ' Ends in a questionmark, must be Dwayne (?)
                                                             '
                                                             Value = Value & AnchorQuery
-                                                        ElseIf InStr(1, Value, "mailto:", vbTextCompare) <> 0 Then
+                                                        ElseIf vbInstr(1, Value, "mailto:", vbTextCompare) <> 0 Then
                                                             '
                                                             ' catch mailto
                                                             '
                                                             'Value = Value & AnchorQuery
-                                                        ElseIf InStr(1, Value, "?") = 0 Then
+                                                        ElseIf vbInstr(1, Value, "?") = 0 Then
                                                             '
                                                             ' No questionmark there, add it
                                                             '
@@ -2621,7 +2718,7 @@ ErrorTrap:
                                     ' if ACInstanceID=0, it can not create settings link in edit mode. ACInstanceID is added during edit save.
                                     ACInstanceID = KmaHTML.ElementAttribute(ElementPointer, "ACINSTANCEID")
                                     ACGuid = KmaHTML.ElementAttribute(ElementPointer, "GUID")
-                                    Select Case UCase(ACType)
+                                    Select Case vbUCase(ACType)
                                         Case ACTypeEnd
                                             '
                                             ' End Tag - Personalization
@@ -2644,14 +2741,14 @@ ErrorTrap:
                                                 Copy = IconImg
                                                 'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as the current date"" ID=""AC," & ACTypeDate & """ src=""/cclib/images/ACDate.GIF"">"
                                             ElseIf EncodeNonCachableTags Then
-                                                Copy = Now.ToString
+                                                Copy = DateTime.Now.ToString
                                             End If
                                         Case ACTypeMember, ACTypePersonalization
                                             '
                                             ' Member Tag works regardless of authentication
                                             ' cm must be sure not to reveal anything
                                             '
-                                            ACField = UCase(KmaHTML.ElementAttribute(ElementPointer, "FIELD"))
+                                            ACField = vbUCase(KmaHTML.ElementAttribute(ElementPointer, "FIELD"))
                                             If ACField = "" Then
                                                 ' compatibility for old personalization type
                                                 ACField = csv_GetAddonOptionStringValue("FIELD", KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING"))
@@ -2661,7 +2758,7 @@ ErrorTrap:
                                                 FieldName = "Name"
                                             End If
                                             If EncodeEditIcons Then
-                                                Select Case UCase(FieldName)
+                                                Select Case vbUCase(FieldName)
                                                     Case "FIRSTNAME"
                                                         '
                                                         IconIDControlString = "AC," & ACType & "," & FieldName
@@ -2683,7 +2780,7 @@ ErrorTrap:
                                                 End Select
                                             ElseIf EncodeNonCachableTags Then
                                                 If personalizationPeopleId <> 0 Then
-                                                    If UCase(FieldName) = "EID" Then
+                                                    If vbUCase(FieldName) = "EID" Then
                                                         Copy = security.encodeToken(personalizationPeopleId, Now())
                                                     Else
                                                         If Not CSPeopleSet Then
@@ -2749,9 +2846,9 @@ ErrorTrap:
                                             '
                                             ' Personalization Tag - block languages not from the visitor
                                             '
-                                            ACLanguageName = UCase(KmaHTML.ElementAttribute(ElementPointer, "NAME"))
+                                            ACLanguageName = vbUCase(KmaHTML.ElementAttribute(ElementPointer, "NAME"))
                                             If EncodeEditIcons Then
-                                                Select Case UCase(ACLanguageName)
+                                                Select Case vbUCase(ACLanguageName)
                                                     Case "ANY"
                                                         '
                                                         IconIDControlString = "AC," & ACType & ",," & ACLanguageName
@@ -2786,7 +2883,7 @@ ErrorTrap:
                                                         PeopleLanguageSet = True
                                                     End If
                                                 End If
-                                                UcasePeopleLanguage = UCase(PeopleLanguage)
+                                                UcasePeopleLanguage = vbUCase(PeopleLanguage)
                                                 If UcasePeopleLanguage = "ANY" Then
                                                     '
                                                     ' This person wants all the languages, put in language marker and continue
@@ -2799,9 +2896,9 @@ ErrorTrap:
                                                     Copy = ""
                                                     ElementPointer = ElementPointer + 1
                                                     Do While ElementPointer < KmaHTML.ElementCount
-                                                        ElementTag = UCase(KmaHTML.TagName(ElementPointer))
+                                                        ElementTag = vbUCase(KmaHTML.TagName(ElementPointer))
                                                         If (ElementTag = "AC") Then
-                                                            ACType = UCase(KmaHTML.ElementAttribute(ElementPointer, "TYPE"))
+                                                            ACType = vbUCase(KmaHTML.ElementAttribute(ElementPointer, "TYPE"))
                                                             If (ACType = ACTypeLanguage) Then
                                                                 ElementPointer = ElementPointer - 1
                                                                 Exit Do
@@ -2833,7 +2930,7 @@ ErrorTrap:
                                                     '
                                                     ' Only hardcoded Add-ons can run in Emails
                                                     '
-                                                    Select Case LCase(ACName)
+                                                    Select Case vbLCase(ACName)
                                                         Case "block text"
                                                             '
                                                             ' Email is always considered authenticated bc they need their login credentials to get the email.
@@ -2848,11 +2945,11 @@ ErrorTrap:
                                                                 '
                                                                 ElementPointer = ElementPointer + 1
                                                                 Do While ElementPointer < KmaHTML.ElementCount
-                                                                    ElementTag = UCase(KmaHTML.TagName(ElementPointer))
+                                                                    ElementTag = vbUCase(KmaHTML.TagName(ElementPointer))
                                                                     If (ElementTag = "AC") Then
-                                                                        ACType = UCase(KmaHTML.ElementAttribute(ElementPointer, "TYPE"))
+                                                                        ACType = vbUCase(KmaHTML.ElementAttribute(ElementPointer, "TYPE"))
                                                                         If (ACType = ACTypeAggregateFunction) Then
-                                                                            If LCase(KmaHTML.ElementAttribute(ElementPointer, "name")) = "block text end" Then
+                                                                            If vbLCase(KmaHTML.ElementAttribute(ElementPointer, "name")) = "block text end" Then
                                                                                 Exit Do
                                                                             End If
                                                                         End If
@@ -2913,7 +3010,7 @@ ErrorTrap:
                                                         IconAlt = ACName
                                                         IconTitle = "Rendered as the Add-on [" & ACName & "]"
                                                     Else
-                                                        Select Case LCase(ACName)
+                                                        Select Case vbLCase(ACName)
                                                             Case "block text"
                                                                 IconFilename = ""
                                                                 SrcOptionList = AddonOptionConstructor_ForBlockText
@@ -2958,8 +3055,8 @@ ErrorTrap:
                                                     Else
                                                         ResultOptionListHTMLEncoded = ""
                                                         REsultOptionValue = ""
-                                                        SrcOptionList = Replace(SrcOptionList, vbCrLf, vbCr)
-                                                        SrcOptionList = Replace(SrcOptionList, vbLf, vbCr)
+                                                        SrcOptionList = vbReplace(SrcOptionList, vbCrLf, vbCr)
+                                                        SrcOptionList = vbReplace(SrcOptionList, vbLf, vbCr)
                                                         SrcOptions = Split(SrcOptionList, vbCr)
                                                         For Ptr = 0 To UBound(SrcOptions)
                                                             SrcOptionName = SrcOptions(Ptr)
@@ -2972,12 +3069,12 @@ ErrorTrap:
                                                             Loop
                                                             SrcOptionValueSelector = ""
                                                             SrcOptionSelector = ""
-                                                            Pos = InStr(1, SrcOptionName, "=")
+                                                            Pos = vbInstr(1, SrcOptionName, "=")
                                                             If Pos > 0 Then
                                                                 SrcOptionValueSelector = Mid(SrcOptionName, Pos + 1)
                                                                 SrcOptionName = Mid(SrcOptionName, 1, Pos - 1)
                                                                 SrcOptionSelector = ""
-                                                                Pos = InStr(1, SrcOptionValueSelector, "[")
+                                                                Pos = vbInstr(1, SrcOptionValueSelector, "[")
                                                                 If Pos <> 0 Then
                                                                     SrcOptionSelector = Mid(SrcOptionValueSelector, Pos)
                                                                 End If
@@ -2996,7 +3093,7 @@ ErrorTrap:
                                                             ResultOptionListHTMLEncoded = Mid(ResultOptionListHTMLEncoded, 2)
                                                         End If
                                                     End If
-                                                    ACNameCaption = Replace(ACName, """", "")
+                                                    ACNameCaption = vbReplace(ACName, """", "")
                                                     ACNameCaption = html_EncodeHTML(ACNameCaption)
                                                     IDControlString = "AC," & ACType & "," & NotUsedID & "," & encodeNvaArgument(ACName) & "," & ResultOptionListHTMLEncoded & "," & ACGuid
                                                     Copy = GetAddonIconImg(AdminURL, IconWidth, IconHeight, IconSprites, AddonIsInline, IDControlString, IconFilename, serverFilePath, IconAlt, IconTitle, ACInstanceID, 0)
@@ -3050,8 +3147,8 @@ ErrorTrap:
                                                     'Filename = app.csv_GetCSField(CS, "FileName")
                                                     If Filename <> "" Then
                                                         Filename = lfFilename
-                                                        'Filename = Replace(Filename, " ", "%20")
-                                                        Filename = Replace(Filename, "\", "/")
+                                                        'Filename = vbReplace(Filename, " ", "%20")
+                                                        Filename = vbReplace(Filename, "\", "/")
                                                         Filename = EncodeURL(Filename)
                                                         Copy = Copy & "<img ID=""AC,IMAGE,," & ACAttrRecordID & """ src=""" & csv_getVirtualFileLink(serverFilePath, Filename) & """"
                                                         '
@@ -3155,7 +3252,7 @@ ErrorTrap:
                                             '
                                             ' ----- Create Template Content
                                             '
-                                            'ACName = UCase(KmaHTML.ElementAttribute(ElementPointer, "NAME"))
+                                            'ACName = vbUCase(KmaHTML.ElementAttribute(ElementPointer, "NAME"))
                                             AddonOptionStringHTMLEncoded = ""
                                             addonOptionString = ""
                                             NotUsedID = 0
@@ -3178,7 +3275,7 @@ ErrorTrap:
                                             '
                                             ' ----- Create Template Content
                                             '
-                                            'ACName = UCase(KmaHTML.ElementAttribute(ElementPointer, "NAME"))
+                                            'ACName = vbUCase(KmaHTML.ElementAttribute(ElementPointer, "NAME"))
                                             AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING")
                                             addonOptionString = decodeHtml(AddonOptionStringHTMLEncoded)
                                             NotUsedID = 0
@@ -3216,7 +3313,7 @@ ErrorTrap:
                                             '
                                             ' test for illegal characters (temporary patch to get around not addonencoding during the addon replacement
                                             '
-                                            Pos = InStr(1, addonOptionString, "menunew=", vbTextCompare)
+                                            Pos = vbInstr(1, addonOptionString, "menunew=", vbTextCompare)
                                             If Pos > 0 Then
                                                 NewName = Mid(addonOptionString, Pos + 8)
                                                 Dim IsOK As Boolean
@@ -3227,7 +3324,7 @@ ErrorTrap:
                                             End If
                                             NotUsedID = 0
                                             If EncodeEditIcons Then
-                                                If InStr(1, AddonOptionStringHTMLEncoded, "menu=", vbTextCompare) <> 0 Then
+                                                If vbInstr(1, AddonOptionStringHTMLEncoded, "menu=", vbTextCompare) <> 0 Then
                                                     '
                                                     ' Dynamic Menu
                                                     '
@@ -3265,7 +3362,7 @@ ErrorTrap:
                                             ' Content Watch replacement
                                             '   served by the web client because the
                                             '
-                                            'UCaseACName = UCase(Trim(KmaHTML.ElementAttribute(ElementPointer, "NAME")))
+                                            'UCaseACName = vbUCase(Trim(KmaHTML.ElementAttribute(ElementPointer, "NAME")))
                                             'ACName = encodeInitialCaps(UCaseACName)
                                             AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING")
                                             addonOptionString = decodeHtml(AddonOptionStringHTMLEncoded)
@@ -3496,10 +3593,10 @@ ErrorTrap:
                 ' leave this in to make sure old <acform tags are converted back
                 ' new editor deals with <form, so no more converting
                 '
-                html_DecodeActiveContent = Replace(html_DecodeActiveContent, "<ACFORM>", "<FORM>")
-                html_DecodeActiveContent = Replace(html_DecodeActiveContent, "<ACFORM ", "<FORM ")
-                html_DecodeActiveContent = Replace(html_DecodeActiveContent, "</ACFORM>", "</form>")
-                html_DecodeActiveContent = Replace(html_DecodeActiveContent, "</ACFORM ", "</FORM ")
+                html_DecodeActiveContent = vbReplace(html_DecodeActiveContent, "<ACFORM>", "<FORM>")
+                html_DecodeActiveContent = vbReplace(html_DecodeActiveContent, "<ACFORM ", "<FORM ")
+                html_DecodeActiveContent = vbReplace(html_DecodeActiveContent, "</ACFORM>", "</form>")
+                html_DecodeActiveContent = vbReplace(html_DecodeActiveContent, "</ACFORM ", "</FORM ")
                 If DHTML.Load(html_DecodeActiveContent) Then
                     html_DecodeActiveContent = ""
                     ElementCount = DHTML.ElementCount
@@ -3511,13 +3608,13 @@ ErrorTrap:
                         For ElementPointer = 0 To ElementCount - 1
                             ElementText = DHTML.Text(ElementPointer)
                             If DHTML.IsTag(ElementPointer) Then
-                                Select Case UCase(DHTML.TagName(ElementPointer))
+                                Select Case vbUCase(DHTML.TagName(ElementPointer))
                                     Case "FORM"
                                         '
                                         ' User created form - add the attribute "Contensive=1"
                                         '
                                         ' 5/14/2009 - DM said it is OK to remove UserResponseForm Processing
-                                        'ElementText = Replace(ElementText, "<FORM", "<FORM ContensiveUserForm=1 ", , , vbTextCompare)
+                                        'ElementText = vbReplace(ElementText, "<FORM", "<FORM ContensiveUserForm=1 ", vbTextCompare)
                                     Case "IMG"
                                         AttributeCount = DHTML.ElementAttributeCount(ElementPointer)
 
@@ -3526,12 +3623,12 @@ ErrorTrap:
                                             ImageSrcOriginal = DHTML.ElementAttribute(ElementPointer, "src")
                                             VirtualFilePathBad = appConfig.name & "/files/"
                                             serverFilePath = "/" & VirtualFilePathBad
-                                            If Left(LCase(ImageSrcOriginal), Len(VirtualFilePathBad)) = LCase(VirtualFilePathBad) Then
+                                            If Left(LCase(ImageSrcOriginal), Len(VirtualFilePathBad)) = vbLCase(VirtualFilePathBad) Then
                                                 '
                                                 ' if the image is from the virtual file path, but the editor did not include the root path, add it
                                                 '
-                                                ElementText = Replace(ElementText, VirtualFilePathBad, "/" & VirtualFilePathBad, 1, 1, CompareMethod.Text)
-                                                ImageSrcOriginal = Replace(ImageSrcOriginal, VirtualFilePathBad, "/" & VirtualFilePathBad, 1, 1, CompareMethod.Text)
+                                                ElementText = vbReplace(ElementText, VirtualFilePathBad, "/" & VirtualFilePathBad, 1, 99, vbTextCompare)
+                                                ImageSrcOriginal = vbReplace(ImageSrcOriginal, VirtualFilePathBad, "/" & VirtualFilePathBad, 1, 99, vbTextCompare)
                                             End If
                                             ImageSrc = decodeHtml(ImageSrcOriginal)
                                             ImageSrc = DecodeURL(ImageSrc)
@@ -3546,7 +3643,7 @@ ErrorTrap:
                                             ACInstanceName = ""
                                             ACGuid = ""
                                             ImageIDArrayCount = 0
-                                            If 0 <> InStr(1, ImageID, ",") Then
+                                            If 0 <> vbInstr(1, ImageID, ",") Then
                                                 ImageIDArray = Split(ImageID, ",")
                                                 ImageIDArrayCount = UBound(ImageIDArray) + 1
                                                 If ImageIDArrayCount > 5 Then
@@ -3572,7 +3669,7 @@ ErrorTrap:
                                                     Next
                                                 End If
                                                 If (ImageIDArrayCount > 1) Then
-                                                    ACIdentifier = UCase(ImageIDArray(0))
+                                                    ACIdentifier = vbUCase(ImageIDArray(0))
                                                     ACType = ImageIDArray(1)
                                                     If ImageIDArrayCount > 2 Then
                                                         ACFieldName = ImageIDArray(2)
@@ -3602,7 +3699,7 @@ ErrorTrap:
                                                         End If
                                                         ElementText = ""
                                                         '----------------------------- change to ACType
-                                                        Select Case UCase(ACType)
+                                                        Select Case vbUCase(ACType)
                                                             Case "IMAGE"
                                                                 '
                                                                 ' ----- AC Image, Decode Active Images to Resource Library references
@@ -3627,19 +3724,19 @@ ErrorTrap:
                                                                         ImageStyleArrayCount = UBound(IMageStyleArray) + 1
                                                                         For ImageStyleArrayPointer = 0 To ImageStyleArrayCount - 1
                                                                             ImageStylePair = Trim(IMageStyleArray(ImageStyleArrayPointer))
-                                                                            PositionColon = InStr(1, ImageStylePair, ":")
+                                                                            PositionColon = vbInstr(1, ImageStylePair, ":")
                                                                             If PositionColon > 1 Then
                                                                                 ImageStylePairName = Trim(Mid(ImageStylePair, 1, PositionColon - 1))
                                                                                 ImageStylePairValue = Trim(Mid(ImageStylePair, PositionColon + 1))
-                                                                                Select Case UCase(ImageStylePairName)
+                                                                                Select Case vbUCase(ImageStylePairName)
                                                                                     Case "WIDTH"
-                                                                                        ImageStylePairValue = Replace(ImageStylePairValue, "px", "")
+                                                                                        ImageStylePairValue = vbReplace(ImageStylePairValue, "px", "")
                                                                                         ImageWidthText = ImageStylePairValue
                                                                                     Case "HEIGHT"
-                                                                                        ImageStylePairValue = Replace(ImageStylePairValue, "px", "")
+                                                                                        ImageStylePairValue = vbReplace(ImageStylePairValue, "px", "")
                                                                                         ImageHeightText = ImageStylePairValue
                                                                                 End Select
-                                                                                'If InStr(1, ImageStylePair, "WIDTH", vbTextCompare) = 1 Then
+                                                                                'If vbInstr(1, ImageStylePair, "WIDTH", vbTextCompare) = 1 Then
                                                                                 '    End If
                                                                             End If
                                                                         Next
@@ -3686,7 +3783,7 @@ ErrorTrap:
                                                                     QueryString = decodeHtml(QSHTMLEncoded)
                                                                     QSSplit = Split(QueryString, "&")
                                                                     For QSPtr = 0 To UBound(QSSplit)
-                                                                        Pos = InStr(1, QSSplit(QSPtr), "[")
+                                                                        Pos = vbInstr(1, QSSplit(QSPtr), "[")
                                                                         If Pos > 0 Then
                                                                             QSSplit(QSPtr) = Mid(QSSplit(QSPtr), 1, Pos - 1)
                                                                         End If
@@ -3734,12 +3831,12 @@ ErrorTrap:
                                                                     '
                                                                     ' convert to new menu type
                                                                     '
-                                                                    Pos = InStr(1, QueryString, "[")
+                                                                    Pos = vbInstr(1, QueryString, "[")
                                                                     If Pos > 0 Then
                                                                         QueryString = Mid(QueryString, 1, Pos - 1)
                                                                     End If
 
-                                                                    QueryString = Replace(QueryString, "menu=", "Menu Name=", 1, 1, vbTextCompare) & "&Create New Menu="
+                                                                    QueryString = vbReplace(QueryString, "menu=", "Menu Name=", 1, 99, vbTextCompare) & "&Create New Menu="
                                                                     ElementText = "<AC type=""" & ACTypeAggregateFunction & """ name=""Dynamic Menu"" ACInstanceID=""" & ACInstanceID & """ querystring=""" & QueryString & """ guid=""" & ACGuid & """>"
                                                                 Else
                                                                     ElementText = "<AC type=""" & ACType & """ name=""" & ACInstanceName & """ ACInstanceID=""" & ACInstanceID & """ querystring=""" & QueryString & """>"
@@ -3807,22 +3904,22 @@ ErrorTrap:
                                                         End Select
                                                     End If
                                                 End If
-                                            ElseIf InStr(1, ImageSrc, "cclibraryfiles", vbTextCompare) <> 0 Then
+                                            ElseIf vbInstr(1, ImageSrc, "cclibraryfiles", vbTextCompare) <> 0 Then
                                                 ImageAllowSFResize = siteProperties.getBoolean("ImageAllowSFResize", True)
                                                 If ImageAllowSFResize And True Then
                                                     '
                                                     ' if it is a real image, check for resize
                                                     '
-                                                    Pos = InStr(1, ImageSrc, "cclibraryfiles", vbTextCompare)
+                                                    Pos = vbInstr(1, ImageSrc, "cclibraryfiles", vbTextCompare)
                                                     If Pos <> 0 Then
                                                         ImageVirtualFilename = Mid(ImageSrc, Pos)
                                                         Paths = Split(ImageVirtualFilename, "/")
                                                         If UBound(Paths) > 2 Then
-                                                            If LCase(Paths(1)) = "filename" Then
+                                                            If vbLCase(Paths(1)) = "filename" Then
                                                                 RecordID = EncodeInteger(Paths(2))
                                                                 If RecordID <> 0 Then
                                                                     ImageFilename = Paths(3)
-                                                                    ImageVirtualFilePath = Replace(ImageVirtualFilename, ImageFilename, "")
+                                                                    ImageVirtualFilePath = vbReplace(ImageVirtualFilename, ImageFilename, "")
                                                                     Pos = InStrRev(ImageFilename, ".")
                                                                     If Pos > 0 Then
                                                                         ImageFilenameExt = Mid(ImageFilename, Pos + 1)
@@ -3841,7 +3938,7 @@ ErrorTrap:
                                                                             If UBound(SizeTest) <> 1 Then
                                                                                 ImageFilenameAltSize = ""
                                                                             Else
-                                                                                If IsNumeric(SizeTest(0)) And IsNumeric(SizeTest(1)) Then
+                                                                                If vbIsNumeric(SizeTest(0)) And vbIsNumeric(SizeTest(1)) Then
                                                                                     ImageFilenameNoExt = Mid(ImageFilenameNoExt, 1, Pos - 1)
                                                                                     'RecordVirtualFilenameNoExt = Mid(RecordVirtualFilename, 1, Pos - 1)
                                                                                 Else
@@ -3850,7 +3947,7 @@ ErrorTrap:
                                                                             End If
                                                                             'ImageFilenameNoExt = Mid(ImageFilenameNoExt, 1, Pos - 1)
                                                                         End If
-                                                                        If InStr(1, sfImageExtList, ImageFilenameExt, vbTextCompare) <> 0 Then
+                                                                        If vbInstr(1, sfImageExtList, ImageFilenameExt, vbTextCompare) <> 0 Then
                                                                             '
                                                                             ' Determine ImageWidth and ImageHeight
                                                                             '
@@ -3862,17 +3959,17 @@ ErrorTrap:
                                                                                 For Ptr = 0 To UBound(Styles)
                                                                                     Style = Split(Styles(Ptr), ":")
                                                                                     If UBound(Style) > 0 Then
-                                                                                        StyleName = LCase(Trim(Style(0)))
+                                                                                        StyleName = vbLCase(Trim(Style(0)))
                                                                                         If StyleName = "width" Then
-                                                                                            StyleValue = LCase(Trim(Style(1)))
-                                                                                            StyleValue = Replace(StyleValue, "px", "")
+                                                                                            StyleValue = vbLCase(Trim(Style(1)))
+                                                                                            StyleValue = vbReplace(StyleValue, "px", "")
                                                                                             StyleValueInt = EncodeInteger(StyleValue)
                                                                                             If StyleValueInt > 0 Then
                                                                                                 ImageWidth = StyleValueInt
                                                                                             End If
                                                                                         ElseIf StyleName = "height" Then
-                                                                                            StyleValue = LCase(Trim(Style(1)))
-                                                                                            StyleValue = Replace(StyleValue, "px", "")
+                                                                                            StyleValue = vbLCase(Trim(Style(1)))
+                                                                                            StyleValue = vbReplace(StyleValue, "px", "")
                                                                                             StyleValueInt = EncodeInteger(StyleValue)
                                                                                             If StyleValueInt > 0 Then
                                                                                                 ImageHeight = StyleValueInt
@@ -3963,7 +4060,7 @@ ErrorTrap:
                                                                                         sf = Nothing
                                                                                         On Error GoTo ErrorTrap
                                                                                         If (ImageHeight = 0) And (ImageWidth = 0) Then
-                                                                                            Pos = InStr(1, ImageFilenameAltSize, "x")
+                                                                                            Pos = vbInstr(1, ImageFilenameAltSize, "x")
                                                                                             If Pos <> 0 Then
                                                                                                 ImageWidth = EncodeInteger(Mid(ImageFilenameAltSize, 1, Pos - 1))
                                                                                                 ImageHeight = EncodeInteger(Mid(ImageFilenameAltSize, Pos + 1))
@@ -3998,14 +4095,14 @@ ErrorTrap:
                                                                                         NewImageFilename = ImageFilenameNoExt & "-" & ImageAltSize & "." & ImageFilenameExt
                                                                                         ' images included in email have spaces that must be converted to "%20" or they 404
                                                                                         imageNewLink = EncodeURL(csv_getVirtualFileLink(serverFilePath, ImageVirtualFilePath) & NewImageFilename)
-                                                                                        ElementText = Replace(ElementText, ImageSrcOriginal, html_EncodeHTML(imageNewLink))
+                                                                                        ElementText = vbReplace(ElementText, ImageSrcOriginal, html_EncodeHTML(imageNewLink))
                                                                                     ElseIf (RecordWidth < ImageWidth) Or (RecordHeight < ImageHeight) Then
                                                                                         '
                                                                                         ' OK
                                                                                         ' reize image larger then original - go with it as is
                                                                                         '
                                                                                         ' images included in email have spaces that must be converted to "%20" or they 404
-                                                                                        ElementText = Replace(ElementText, ImageSrcOriginal, html_EncodeHTML(EncodeURL(csv_getVirtualFileLink(serverFilePath, RecordVirtualFilename))))
+                                                                                        ElementText = vbReplace(ElementText, ImageSrcOriginal, html_EncodeHTML(EncodeURL(csv_getVirtualFileLink(serverFilePath, RecordVirtualFilename))))
                                                                                     Else
                                                                                         '
                                                                                         ' resized image - create NewImageFilename (and add new alt size to the record)
@@ -4015,7 +4112,7 @@ ErrorTrap:
                                                                                             ' set back to Raw image untouched, use the record image filename
                                                                                             '
                                                                                             ElementText = ElementText
-                                                                                            'ElementText = Replace(ElementText, ImageVirtualFilename, RecordVirtualFilename)
+                                                                                            'ElementText = vbReplace(ElementText, ImageVirtualFilename, RecordVirtualFilename)
                                                                                         Else
                                                                                             '
                                                                                             ' Raw image filename in content, but it is resized, switch to an alternate size
@@ -4074,11 +4171,11 @@ ErrorTrap:
                                                                                                     '
                                                                                                     ' set HTML attributes so image properties will display
                                                                                                     '
-                                                                                                    If InStr(1, ElementText, "height=", vbTextCompare) = 0 Then
-                                                                                                        ElementText = Replace(ElementText, ">", " height=""" & ImageHeight & """>")
+                                                                                                    If vbInstr(1, ElementText, "height=", vbTextCompare) = 0 Then
+                                                                                                        ElementText = vbReplace(ElementText, ">", " height=""" & ImageHeight & """>")
                                                                                                     End If
-                                                                                                    If InStr(1, ElementText, "width=", vbTextCompare) = 0 Then
-                                                                                                        ElementText = Replace(ElementText, ">", " width=""" & ImageWidth & """>")
+                                                                                                    If vbInstr(1, ElementText, "width=", vbTextCompare) = 0 Then
+                                                                                                        ElementText = vbReplace(ElementText, ">", " width=""" & ImageWidth & """>")
                                                                                                     End If
                                                                                                     '
                                                                                                     ' Save new file
@@ -4097,7 +4194,7 @@ ErrorTrap:
                                                                                             '
                                                                                             ' Change the image src to the AltSize
                                                                                             '
-                                                                                            ElementText = Replace(ElementText, ImageSrcOriginal, html_EncodeHTML(EncodeURL(csv_getVirtualFileLink(serverFilePath, ImageVirtualFilePath) & NewImageFilename)))
+                                                                                            ElementText = vbReplace(ElementText, ImageSrcOriginal, html_EncodeHTML(EncodeURL(csv_getVirtualFileLink(serverFilePath, ImageVirtualFilePath) & NewImageFilename)))
                                                                                         End If
                                                                                     End If
                                                                                 End If
@@ -4190,7 +4287,7 @@ ErrorTrap:
             If ExportName = "" Then
                 TaskName = CStr(Now()) & " snapshot of unnamed data"
             Else
-                TaskName = CStr(Now()) & " snapshot of " & LCase(ExportName)
+                TaskName = CStr(Now()) & " snapshot of " & vbLCase(ExportName)
             End If
             CS = db.cs_insertRecord("Tasks", RequestedByMemberID)
             If db.cs_Ok(CS) Then
@@ -4232,15 +4329,15 @@ ErrorTrap:
             '
             ' ----- Add tablename to the front of SortFieldList fieldnames
             '
-            SortFieldList = " " & Replace(SortFieldList, ",", " , ") & " "
-            SortFieldList = Replace(SortFieldList, " ID ", " ccContentWatch.ID ")
-            SortFieldList = Replace(SortFieldList, " Link ", " ccContentWatch.Link ")
-            SortFieldList = Replace(SortFieldList, " LinkLabel ", " ccContentWatch.LinkLabel ")
-            SortFieldList = Replace(SortFieldList, " SortOrder ", " ccContentWatch.SortOrder ")
-            SortFieldList = Replace(SortFieldList, " DateAdded ", " ccContentWatch.DateAdded ")
-            SortFieldList = Replace(SortFieldList, " ContentID ", " ccContentWatch.ContentID ")
-            SortFieldList = Replace(SortFieldList, " RecordID ", " ccContentWatch.RecordID ")
-            SortFieldList = Replace(SortFieldList, " ModifiedDate ", " ccContentWatch.ModifiedDate ")
+            SortFieldList = " " & vbReplace(SortFieldList, ",", " , ") & " "
+            SortFieldList = vbReplace(SortFieldList, " ID ", " ccContentWatch.ID ")
+            SortFieldList = vbReplace(SortFieldList, " Link ", " ccContentWatch.Link ")
+            SortFieldList = vbReplace(SortFieldList, " LinkLabel ", " ccContentWatch.LinkLabel ")
+            SortFieldList = vbReplace(SortFieldList, " SortOrder ", " ccContentWatch.SortOrder ")
+            SortFieldList = vbReplace(SortFieldList, " DateAdded ", " ccContentWatch.DateAdded ")
+            SortFieldList = vbReplace(SortFieldList, " ContentID ", " ccContentWatch.ContentID ")
+            SortFieldList = vbReplace(SortFieldList, " RecordID ", " ccContentWatch.RecordID ")
+            SortFieldList = vbReplace(SortFieldList, " ModifiedDate ", " ccContentWatch.ModifiedDate ")
             '
             SQL = "SELECT ccContentWatch.ID AS ID, ccContentWatch.Link as Link, ccContentWatch.LinkLabel as LinkLabel, ccContentWatch.SortOrder as SortOrder, ccContentWatch.DateAdded as DateAdded, ccContentWatch.ContentID as ContentID, ccContentWatch.RecordID as RecordID, ccContentWatch.ModifiedDate as ModifiedDate" _
                 & " FROM (ccContentWatchLists LEFT JOIN ccContentWatchListRules ON ccContentWatchLists.ID = ccContentWatchListRules.ContentWatchListID) LEFT JOIN ccContentWatch ON ccContentWatchListRules.ContentWatchID = ccContentWatch.ID" _
@@ -4435,7 +4532,7 @@ ErrorTrap:
                     End If
                     Call db.cs_Close(CS)
                     '
-                    If UCase(iMenuName) = "DEFAULT" Then
+                    If vbUCase(iMenuName) = "DEFAULT" Then
                         '
                         ' Adding the Default menu - put all sections into this when it is created
                         '
@@ -4530,7 +4627,7 @@ ErrorTrap:
             '
             QS = QueryString
             If True Then
-                If InStr(1, QS, "Menu=", vbTextCompare) <> 0 Then
+                If vbInstr(1, QS, "Menu=", vbTextCompare) <> 0 Then
                     '
                     ' New menu
                     '
@@ -4547,7 +4644,7 @@ ErrorTrap:
                     ' fixup the tag so next encode it pulls a new list of Dynamic Menus
                     '
                     QS = "Menu=" & Menu
-                ElseIf InStr(1, QS, "MenuName=", vbTextCompare) <> 0 Then
+                ElseIf vbInstr(1, QS, "MenuName=", vbTextCompare) <> 0 Then
                     '
                     ' Old Style Menu Icon
                     '
@@ -4612,7 +4709,7 @@ ErrorTrap:
                     For Each row As DataRow In dt.Rows
                         styleId = EncodeInteger(row("id"))
                         StyleName = EncodeText(row("name"))
-                        StyleName = Replace(StyleName, "*/", "*-/")
+                        StyleName = vbReplace(StyleName, "*/", "*-/")
                         If (InStr(1, usedSharedStyleList & ",", "," & styleId & ",") = 0) Then
                             usedSharedStyleList = usedSharedStyleList & "," & styleId
                             Filename = EncodeText(row("stylefilename"))
@@ -4638,7 +4735,7 @@ ErrorTrap:
                         For Each dr As DataRow In dt.Rows
                             Filename = EncodeText(dr("stylesfilename"))
                             StyleName = EncodeText(dr("name"))
-                            StyleName = Replace(StyleName, "*/", "*-/")
+                            StyleName = vbReplace(StyleName, "*/", "*-/")
                             If Filename <> "" Then
                                 templateStyles = templateStyles _
                                     & vbCrLf & "/*" _
@@ -4659,7 +4756,7 @@ ErrorTrap:
                     If rs.Rows.Count > 0 Then
                         styleId = EncodeInteger(rs.Rows(0).Item("id"))
                         StyleName = EncodeText(rs.Rows(0).Item("name"))
-                        StyleName = Replace(StyleName, "*/", "*-/")
+                        StyleName = vbReplace(StyleName, "*/", "*-/")
                         If (InStr(1, usedSharedStyleList & ",", "," & styleId & ",") = 0) Then
                             usedSharedStyleList = usedSharedStyleList & "," & styleId
                             Filename = EncodeText(rs.Rows(0).Item("stylefilename"))
@@ -4689,7 +4786,7 @@ ErrorTrap:
                                 EMailTemplateID = EncodeInteger("EmailTemplateID")
                                 Filename = EncodeText(rsDr("stylesFilename"))
                                 StyleName = EncodeText(rsDr("name"))
-                                StyleName = Replace(StyleName, "*/", "*-/")
+                                StyleName = vbReplace(StyleName, "*/", "*-/")
                                 If Filename <> "" Then
                                     emailstyles = emailstyles _
                                         & vbCrLf & "/*" _
@@ -4708,7 +4805,7 @@ ErrorTrap:
                     For Each rsDr As DataRow In dt.Rows
                         styleId = EncodeInteger(rsDr("id"))
                         StyleName = EncodeText(rsDr("name"))
-                        StyleName = Replace(StyleName, "*/", "*-/")
+                        StyleName = vbReplace(StyleName, "*/", "*-/")
                         If (InStr(1, usedSharedStyleList & ",", "," & styleId & ",") = 0) Then
                             usedSharedStyleList = usedSharedStyleList & "," & styleId
                             Filename = EncodeText(rsDr("stylefilename"))
@@ -4873,9 +4970,9 @@ ErrorTrap:
             SrcSelectorInner = SrcSelector
             Dim PosLeft As Integer
             Dim PosRight As Integer
-            PosLeft = InStr(1, SrcSelector, "[")
+            PosLeft = vbInstr(1, SrcSelector, "[")
             If PosLeft <> 0 Then
-                PosRight = InStr(1, SrcSelector, "]")
+                PosRight = vbInstr(1, SrcSelector, "]")
                 If PosRight <> 0 Then
                     If (PosRight < Len(SrcSelector)) Then
                         SrcSelectorSuffix = Mid(SrcSelector, PosRight + 1)
@@ -4901,7 +4998,7 @@ ErrorTrap:
                     '
                     Pos = 0
                     If Pos = 0 Then
-                        Pos = InStr(1, Choice, ACFunctionList1 & "(", vbTextCompare)
+                        Pos = vbInstr(1, Choice, ACFunctionList1 & "(", vbTextCompare)
                         If Pos > 0 Then
                             IsContentList = True
                             IncludeID = False
@@ -4909,7 +5006,7 @@ ErrorTrap:
                         End If
                     End If
                     If Pos = 0 Then
-                        Pos = InStr(1, Choice, ACFunctionList2 & "(", vbTextCompare)
+                        Pos = vbInstr(1, Choice, ACFunctionList2 & "(", vbTextCompare)
                         If Pos > 0 Then
                             IsContentList = True
                             IncludeID = False
@@ -4917,7 +5014,7 @@ ErrorTrap:
                         End If
                     End If
                     If Pos = 0 Then
-                        Pos = InStr(1, Choice, ACFunctionList3 & "(", vbTextCompare)
+                        Pos = vbInstr(1, Choice, ACFunctionList3 & "(", vbTextCompare)
                         If Pos > 0 Then
                             IsContentList = True
                             IncludeID = False
@@ -4925,7 +5022,7 @@ ErrorTrap:
                         End If
                     End If
                     If Pos = 0 Then
-                        Pos = InStr(1, Choice, ACFunctionListID & "(", vbTextCompare)
+                        Pos = vbInstr(1, Choice, ACFunctionListID & "(", vbTextCompare)
                         If Pos > 0 Then
                             IsContentList = True
                             IncludeID = True
@@ -4933,7 +5030,7 @@ ErrorTrap:
                         End If
                     End If
                     If Pos = 0 Then
-                        Pos = InStr(1, Choice, ACFunctionList & "(", vbTextCompare)
+                        Pos = vbInstr(1, Choice, ACFunctionList & "(", vbTextCompare)
                         If Pos > 0 Then
                             IsContentList = True
                             IncludeID = False
@@ -4941,7 +5038,7 @@ ErrorTrap:
                         End If
                     End If
                     If Pos = 0 Then
-                        Pos = InStr(1, Choice, ACFunctionListFields & "(", vbTextCompare)
+                        Pos = vbInstr(1, Choice, ACFunctionListFields & "(", vbTextCompare)
                         If Pos > 0 Then
                             IsListField = True
                             IncludeID = False
@@ -5004,7 +5101,7 @@ ErrorTrap:
                             For RowPtr = 0 To RowCnt - 1
                                 '
                                 RecordName = EncodeText(Cell(1, RowPtr))
-                                RecordName = Replace(RecordName, vbCrLf, " ")
+                                RecordName = vbReplace(RecordName, vbCrLf, " ")
                                 RecordID = EncodeInteger(Cell(0, RowPtr))
                                 If RecordName = "" Then
                                     RecordName = "record " & RecordID
@@ -5042,7 +5139,7 @@ ErrorTrap:
                 '
                 ' empty list with no suffix, return with name=value
                 '
-            ElseIf LCase(SrcSelectorSuffix) = "resourcelink" Then
+            ElseIf vbLCase(SrcSelectorSuffix) = "resourcelink" Then
                 '
                 ' resource link, exit with empty list
                 '
@@ -5082,7 +5179,7 @@ ErrorTrap:
             '
             If Not email_BlockList_LocalLoaded Then
                 Filename = "Config\SMTPBlockList_" & appConfig.name & ".txt"
-                email_BlockList_Local = cluster.clusterFiles.ReadFile(Filename)
+                email_BlockList_Local = cluster.localClusterFiles.ReadFile(Filename)
                 email_BlockList_LocalLoaded = True
             End If
             getEmailBlockList_InternalOnly = email_BlockList_Local
@@ -5101,7 +5198,7 @@ ErrorTrap:
                 '
                 ' bad email address
                 '
-            ElseIf InStr(1, getEmailBlockList_InternalOnly(), vbCrLf & EmailAddress & vbTab, vbTextCompare) <> 0 Then
+            ElseIf vbInstr(1, getEmailBlockList_InternalOnly(), vbCrLf & EmailAddress & vbTab, vbTextCompare) <> 0 Then
                 '
                 ' They are already in the list
                 '
@@ -5110,7 +5207,7 @@ ErrorTrap:
                 ' add them to the list
                 '
                 email_BlockList_Local = getEmailBlockList_InternalOnly() & vbCrLf & EmailAddress & vbTab & Now()
-                Call cluster.clusterFiles.SaveFile("Config\SMTPBlockList_" & appConfig.name & ".txt", email_BlockList_Local)
+                Call cluster.localClusterFiles.SaveFile("Config\SMTPBlockList_" & appConfig.name & ".txt", email_BlockList_Local)
                 email_BlockList_LocalLoaded = False
             End If
         End Sub
@@ -5205,18 +5302,18 @@ ErrorTrap:
                     ConstructorSelector = ""
                     ConstructorValue = ""
                     ConstructorType = "text"
-                    Pos = InStr(1, ConstructorName, "=")
+                    Pos = vbInstr(1, ConstructorName, "=")
                     If Pos > 1 Then
                         ConstructorValue = Mid(ConstructorName, Pos + 1)
                         ConstructorName = Trim(Left(ConstructorName, Pos - 1))
-                        Pos = InStr(1, ConstructorValue, "[")
+                        Pos = vbInstr(1, ConstructorValue, "[")
                         If Pos > 0 Then
                             ConstructorSelector = Mid(ConstructorValue, Pos)
                             ConstructorValue = Mid(ConstructorValue, 1, Pos - 1)
                         End If
                     End If
                     If ConstructorName <> "" Then
-                        'Pos = InStr(1, ConstructorName, ",")
+                        'Pos = vbInstr(1, ConstructorName, ",")
                         'If Pos > 1 Then
                         '    ConstructorType = Mid(ConstructorName, Pos + 1)
                         '    ConstructorName = Left(ConstructorName, Pos - 1)
@@ -5247,22 +5344,22 @@ ErrorTrap:
                 For IPtr = 0 To InstanceCnt - 1
                     InstanceName = InstanceNameValues(IPtr)
                     InstanceValue = ""
-                    Pos = InStr(1, InstanceName, "=")
+                    Pos = vbInstr(1, InstanceName, "=")
                     If Pos > 1 Then
                         InstanceValue = Mid(InstanceName, Pos + 1)
                         InstanceName = Trim(Left(InstanceName, Pos - 1))
-                        Pos = InStr(1, InstanceValue, "[")
+                        Pos = vbInstr(1, InstanceValue, "[")
                         If Pos >= 1 Then
                             InstanceValue = Mid(InstanceValue, 1, Pos - 1)
                         End If
                     End If
                     If InstanceName <> "" Then
-                        'Pos = InStr(1, InstanceName, ",")
+                        'Pos = vbInstr(1, InstanceName, ",")
                         'If Pos > 1 Then
                         '    InstanceType = Mid(InstanceName, Pos + 1)
                         '    InstanceName = Left(InstanceName, Pos - 1)
                         'End If
-                        InstanceNames(SavePtr) = LCase(InstanceName)
+                        InstanceNames(SavePtr) = vbLCase(InstanceName)
                         InstanceValues(SavePtr) = InstanceValue
                         'InstanceTypes(IPtr) = InstanceType
                         '
@@ -5270,7 +5367,7 @@ ErrorTrap:
                         '
                         If ConstructorCnt > 0 Then
                             For ConstructorPtr = 0 To ConstructorCnt - 1
-                                If LCase(InstanceName) = LCase(ConstructorNames(ConstructorPtr)) Then
+                                If vbLCase(InstanceName) = vbLCase(ConstructorNames(ConstructorPtr)) Then
                                     Exit For
                                 End If
                             Next
@@ -5358,14 +5455,14 @@ ErrorTrap:
             WorkingString = OptionString
             csv_GetAddonOption = ""
             If WorkingString <> "" Then
-                TargetName = LCase(OptionName)
-                'targetName = LCase(encodeNvaArgument(OptionName))
+                TargetName = vbLCase(OptionName)
+                'targetName = vbLCase(encodeNvaArgument(OptionName))
                 Options = Split(OptionString, "&")
                 'Options = Split(OptionString, vbCrLf)
                 For Ptr = 0 To UBound(Options)
-                    Pos = InStr(1, Options(Ptr), "=")
+                    Pos = vbInstr(1, Options(Ptr), "=")
                     If Pos > 0 Then
-                        TestName = LCase(Trim(Left(Options(Ptr), Pos - 1)))
+                        TestName = vbLCase(Trim(Left(Options(Ptr), Pos - 1)))
                         Do While (TestName <> "") And (Left(TestName, 1) = vbTab)
                             TestName = Trim(Mid(TestName, 2))
                         Loop
@@ -5706,8 +5803,8 @@ ErrorTrap:
                     ' For now, skip the ones in content
                     '
                     ''hint = hint & ",020"
-                    TagPosEnd = InStr(1, LinkSplit(LinkPtr), ">")
-                    TagPosStart = InStr(1, LinkSplit(LinkPtr), "<")
+                    TagPosEnd = vbInstr(1, LinkSplit(LinkPtr), ">")
+                    TagPosStart = vbInstr(1, LinkSplit(LinkPtr), "<")
                     If TagPosEnd = 0 And TagPosStart = 0 Then
                         '
                         ' no tags found, skip it
@@ -5809,8 +5906,8 @@ ErrorTrap:
                                             End If
                                             Pos = InStrRev(RecordFilename, ".")
                                             If Pos > 0 Then
-                                                RecordFilenameExt = LCase(Mid(RecordFilename, Pos + 1))
-                                                RecordFilenameNoExt = LCase(Mid(RecordFilename, 1, Pos - 1))
+                                                RecordFilenameExt = vbLCase(Mid(RecordFilename, Pos + 1))
+                                                RecordFilenameNoExt = vbLCase(Mid(RecordFilename, 1, Pos - 1))
                                             End If
                                             'Pos = InStrRev(RecordFilenameNoExt, "-")
                                             'If Pos > 0 Then
@@ -5819,7 +5916,7 @@ ErrorTrap:
                                             '    If UBound(SizeTest) <> 1 Then
                                             '        RecordFilenameAltSize = ""
                                             '    Else
-                                            '        If IsNumeric(SizeTest(0)) And IsNumeric(SizeTest(1)) Then
+                                            '        If vbIsNumeric(SizeTest(0)) And vbIsNumeric(SizeTest(1)) Then
                                             '            RecordFilenameNoExt = Mid(RecordFilenameNoExt, 1, Pos - 1)
                                             '            'RecordFilenameNoExt = Mid(RecordFilename, 1, Pos - 1)
                                             '        Else
@@ -5837,7 +5934,7 @@ ErrorTrap:
                                                 ''hint = hint & ",090"
                                                 Pos = InStrRev(FilePrefixSegment, "<")
                                                 If Pos > 0 Then
-                                                    If LCase(Mid(FilePrefixSegment, Pos + 1, 3)) <> "ac " Then
+                                                    If vbLCase(Mid(FilePrefixSegment, Pos + 1, 3)) <> "ac " Then
                                                         '
                                                         ' look back in the FilePrefixSegment to find the character before the link
                                                         '
@@ -5849,8 +5946,8 @@ ErrorTrap:
                                                                     '
                                                                     ' Ends in ' ' or '>', find the first
                                                                     '
-                                                                    EndPos1 = InStr(1, FilenameSegment, " ")
-                                                                    EndPos2 = InStr(1, FilenameSegment, ">")
+                                                                    EndPos1 = vbInstr(1, FilenameSegment, " ")
+                                                                    EndPos2 = vbInstr(1, FilenameSegment, ">")
                                                                     If EndPos1 <> 0 And EndPos2 <> 0 Then
                                                                         If EndPos1 < EndPos2 Then
                                                                             EndPos = EndPos1
@@ -5880,7 +5977,7 @@ ErrorTrap:
                                                                     '
                                                                     ' Quoted, ends is '"'
                                                                     '
-                                                                    EndPos = InStr(1, FilenameSegment, """")
+                                                                    EndPos = vbInstr(1, FilenameSegment, """")
                                                                     'If EndPos <= 0 Then
                                                                     '    ParseError = True
                                                                     '    Exit For
@@ -5897,14 +5994,14 @@ ErrorTrap:
                                                                     '
                                                                     ' url() style, ends in ')' or a ' '
                                                                     '
-                                                                    If LCase(Mid(FilePrefixSegment, Ptr, 7)) = "(&quot;" Then
-                                                                        EndPos = InStr(1, FilenameSegment, "&quot;)")
-                                                                    ElseIf LCase(Mid(FilePrefixSegment, Ptr, 2)) = "('" Then
-                                                                        EndPos = InStr(1, FilenameSegment, "')")
-                                                                    ElseIf LCase(Mid(FilePrefixSegment, Ptr, 2)) = "(""" Then
-                                                                        EndPos = InStr(1, FilenameSegment, """)")
+                                                                    If vbLCase(Mid(FilePrefixSegment, Ptr, 7)) = "(&quot;" Then
+                                                                        EndPos = vbInstr(1, FilenameSegment, "&quot;)")
+                                                                    ElseIf vbLCase(Mid(FilePrefixSegment, Ptr, 2)) = "('" Then
+                                                                        EndPos = vbInstr(1, FilenameSegment, "')")
+                                                                    ElseIf vbLCase(Mid(FilePrefixSegment, Ptr, 2)) = "(""" Then
+                                                                        EndPos = vbInstr(1, FilenameSegment, """)")
                                                                     Else
-                                                                        EndPos = InStr(1, FilenameSegment, ")")
+                                                                        EndPos = vbInstr(1, FilenameSegment, ")")
                                                                     End If
 
                                                                     'If EndPos <= 0 Then
@@ -5922,7 +6019,7 @@ ErrorTrap:
                                                                     '
                                                                     ' Delimited within a javascript pair of apostophys
                                                                     '
-                                                                    EndPos = InStr(1, FilenameSegment, "'")
+                                                                    EndPos = vbInstr(1, FilenameSegment, "'")
                                                                     'If EndPos <= 0 Then
                                                                     '    ParseError = True
                                                                     '    Exit For
@@ -5967,8 +6064,8 @@ ErrorTrap:
                                                             ImageFilenameExt = ""
                                                             Pos = InStrRev(ImageFilename, ".")
                                                             If Pos > 0 Then
-                                                                ImageFilenameNoExt = LCase(Mid(ImageFilename, 1, Pos - 1))
-                                                                ImageFilenameExt = LCase(Mid(ImageFilename, Pos + 1))
+                                                                ImageFilenameNoExt = vbLCase(Mid(ImageFilename, 1, Pos - 1))
+                                                                ImageFilenameExt = vbLCase(Mid(ImageFilename, Pos + 1))
                                                             End If
                                                             '
                                                             ' Get ImageAltSize
@@ -5979,7 +6076,7 @@ ErrorTrap:
                                                                 '
                                                                 ' Exact match
                                                                 '
-                                                            ElseIf InStr(1, ImageFilenameNoExt, RecordFilenameNoExt, vbTextCompare) <> 1 Then
+                                                            ElseIf vbInstr(1, ImageFilenameNoExt, RecordFilenameNoExt, vbTextCompare) <> 1 Then
                                                                 '
                                                                 ' There was a change and the recordfilename is not part of the imagefilename
                                                                 '
@@ -5996,7 +6093,7 @@ ErrorTrap:
                                                                     If UBound(SizeTest) <> 1 Then
                                                                         ImageAltSize = ""
                                                                     Else
-                                                                        If IsNumeric(SizeTest(0)) And IsNumeric(SizeTest(1)) Then
+                                                                        If vbIsNumeric(SizeTest(0)) And vbIsNumeric(SizeTest(1)) Then
                                                                             ImageFilenameNoExt = RecordFilenameNoExt
                                                                             'ImageFilenameNoExt = Mid(ImageFilenameNoExt, 1, Pos - 1)
                                                                             'RecordFilenameNoExt = Mid(RecordFilename, 1, Pos - 1)
@@ -6057,9 +6154,9 @@ ErrorTrap:
                 '
                 ' Convert ACTypeDynamicForm to Add-on
                 '
-                If InStr(1, html_EncodeContentUpgrades, "<ac type=""" & ACTypeDynamicForm, vbTextCompare) <> 0 Then
-                    html_EncodeContentUpgrades = Replace(html_EncodeContentUpgrades, "type=""DYNAMICFORM""", "TYPE=""aggregatefunction""", , , vbTextCompare)
-                    html_EncodeContentUpgrades = Replace(html_EncodeContentUpgrades, "name=""DYNAMICFORM""", "name=""DYNAMIC FORM""", , , vbTextCompare)
+                If vbInstr(1, html_EncodeContentUpgrades, "<ac type=""" & ACTypeDynamicForm, vbTextCompare) <> 0 Then
+                    html_EncodeContentUpgrades = vbReplace(html_EncodeContentUpgrades, "type=""DYNAMICFORM""", "TYPE=""aggregatefunction""", 1, 99, vbTextCompare)
+                    html_EncodeContentUpgrades = vbReplace(html_EncodeContentUpgrades, "name=""DYNAMICFORM""", "name=""DYNAMIC FORM""", 1, 99, vbTextCompare)
                 End If
             End If
             ''hint = hint & ",930"
@@ -6074,8 +6171,8 @@ ErrorTrap:
             ' the merge is now handled in csv_EncodeActiveContent, but some sites have hand {{content}} tags entered
             '
             ''hint = hint & ",940"
-            If InStr(1, html_EncodeContentUpgrades, "{{content}}", vbTextCompare) <> 0 Then
-                html_EncodeContentUpgrades = Replace(html_EncodeContentUpgrades, "{{content}}", "<AC type=""" & ACTypeTemplateContent & """>", , , vbTextCompare)
+            If vbInstr(1, html_EncodeContentUpgrades, "{{content}}", vbTextCompare) <> 0 Then
+                html_EncodeContentUpgrades = vbReplace(html_EncodeContentUpgrades, "{{content}}", "<AC type=""" & ACTypeTemplateContent & """>", 1, 99, vbTextCompare)
             End If
             '
             'Call main_cpcore.testPoint(hint)
@@ -6097,7 +6194,7 @@ ErrorTrap:
                 '
                 ' error, do nothing but log
                 '
-                handleLegacyError3(appConfig.name, "Attempt to resize an image to 0,0. This is not allowed.", "dll", "cpCoreClass", "csv_ResizeImage2", KmaErrorInternal, "", "", False, True, "")
+                handleLegacyError3(appConfig.name, "Attempt to resize an image to 0,0. This is not allowed.", "dll", "cpCoreClass", "csv_ResizeImage2", ignoreInteger, "", "", False, True, "")
             Else
                 If sf.load(SrcFilename) Then
                     If Width = 0 Then
@@ -6242,7 +6339,7 @@ ErrorTrap:
             Dim s As String
             '
             s = getSimpleNameValue(OptionName, addonOptionString, "", "&")
-            Pos = InStr(1, s, "[")
+            Pos = vbInstr(1, s, "[")
             If Pos > 0 Then
                 s = Left(s, Pos - 1)
             End If
@@ -6417,20 +6514,20 @@ ErrorTrap:
                     ' remove nonsafe URL characters
                     '
                     Src = WorkingLinkAlias
-                    Src = Replace(Src, "’", "'")
-                    Src = Replace(Src, vbTab, " ")
+                    Src = vbReplace(Src, "’", "'")
+                    Src = vbReplace(Src, vbTab, " ")
                     WorkingLinkAlias = ""
                     For Ptr = 1 To Len(Src) + 1
                         TestChr = Mid(Src, Ptr, 1)
-                        If InStr(1, SafeString, TestChr, vbTextCompare) <> 0 Then
+                        If vbInstr(1, SafeString, TestChr, vbTextCompare) <> 0 Then
                         Else
                             TestChr = vbTab
                         End If
                         WorkingLinkAlias = WorkingLinkAlias & TestChr
                     Next
                     Ptr = 0
-                    Do While InStr(1, WorkingLinkAlias, vbTab & vbTab) <> 0 And (Ptr < 100)
-                        WorkingLinkAlias = Replace(WorkingLinkAlias, vbTab & vbTab, vbTab)
+                    Do While vbInstr(1, WorkingLinkAlias, vbTab & vbTab) <> 0 And (Ptr < 100)
+                        WorkingLinkAlias = vbReplace(WorkingLinkAlias, vbTab & vbTab, vbTab)
                         Ptr = Ptr + 1
                     Loop
                     If Right(WorkingLinkAlias, 1) = vbTab Then
@@ -6439,7 +6536,7 @@ ErrorTrap:
                     If Left(WorkingLinkAlias, 1) = vbTab Then
                         WorkingLinkAlias = Mid(WorkingLinkAlias, 2)
                     End If
-                    WorkingLinkAlias = Replace(WorkingLinkAlias, vbTab, "-")
+                    WorkingLinkAlias = vbReplace(WorkingLinkAlias, vbTab, "-")
                     If (WorkingLinkAlias <> "") Then
                         '
                         ' Make sure there is not a folder or page in the wwwroot that matches this Alias
@@ -6448,7 +6545,7 @@ ErrorTrap:
                             WorkingLinkAlias = "/" & WorkingLinkAlias
                         End If
                         '
-                        If LCase(WorkingLinkAlias) = LCase("/" & appConfig.name) Then
+                        If vbLCase(WorkingLinkAlias) = vbLCase("/" & appConfig.name) Then
                             '
                             ' This alias points to the cclib folder
                             '
@@ -6457,7 +6554,7 @@ ErrorTrap:
                                     & "The Link Alias being created (" & WorkingLinkAlias & ") can not be used because there is a virtual directory in your website directory that already uses this name." _
                                     & " Please change it to ensure the Link Alias is unique. To set or change the Link Alias, use the Link Alias tab and select a name not used by another page."
                             End If
-                        ElseIf LCase(WorkingLinkAlias) = "/cclib" Then
+                        ElseIf vbLCase(WorkingLinkAlias) = "/cclib" Then
                             '
                             ' This alias points to the cclib folder
                             '
@@ -6466,7 +6563,7 @@ ErrorTrap:
                                     & "The Link Alias being created (" & WorkingLinkAlias & ") can not be used because there is a virtual directory in your website directory that already uses this name." _
                                     & " Please change it to ensure the Link Alias is unique. To set or change the Link Alias, use the Link Alias tab and select a name not used by another page."
                             End If
-                        ElseIf appRootFiles.checkPath(cluster.config.clusterPhysicalPath & appConfig.appRootFilesPath & "\" & Mid(WorkingLinkAlias, 2)) Then
+                        ElseIf appRootFiles.checkPath(serverConfig.clusterPath & appConfig.appRootFilesPath & "\" & Mid(WorkingLinkAlias, 2)) Then
                             '
                             ' This alias points to a different link, call it an error
                             '
@@ -6663,8 +6760,8 @@ ErrorTrap:
                 '
                 'hint = hint & ",010"
                 If siteProperties.getBoolean("ConvertContentCRLF2BR", False) And (Not PlainText) Then
-                    returnValue = Replace(returnValue, vbCr, "")
-                    returnValue = Replace(returnValue, vbLf, "<br>")
+                    returnValue = vbReplace(returnValue, vbCr, "")
+                    returnValue = vbReplace(returnValue, vbLf, "<br>")
                 End If
                 '
                 ' ----- Do upgrade conversions (upgrade legacy objects and upgrade old images)
@@ -6706,7 +6803,7 @@ ErrorTrap:
                             '
                             returnValue = returnValue & Segment
                         ElseIf (Segment <> "") Then
-                            If InStr(1, Segment, "}}") = 0 Then
+                            If vbInstr(1, Segment, "}}") = 0 Then
                                 '
                                 ' No command found, return the marker and deliver the Segment
                                 '
@@ -6737,7 +6834,7 @@ ErrorTrap:
                                     '
                                     ' execute the command
                                     '
-                                    Select Case UCase(ACType)
+                                    Select Case vbUCase(ACType)
                                         Case ACTypeDynamicForm
                                             '
                                             ' Dynamic Form - run the core addon replacement instead
@@ -6812,8 +6909,8 @@ ErrorTrap:
                 '
                 If (InStr(1, returnValue, StartFlag) <> 0) Then
                     Do While (InStr(1, returnValue, StartFlag) <> 0)
-                        LineStart = InStr(1, returnValue, StartFlag)
-                        LineEnd = InStr(LineStart, returnValue, EndFlag)
+                        LineStart = vbInstr(1, returnValue, StartFlag)
+                        LineEnd = vbInstr(LineStart, returnValue, EndFlag)
                         If LineEnd = 0 Then
                             log_appendLog("csv_EncodeContent9, Addon could not be inserted into content because the HTML comment holding the position is not formated correctly")
                             Exit Do
@@ -6864,16 +6961,16 @@ ErrorTrap:
                 If (Not isEditingAnything) And (returnValue <> BlockTextStartMarker) Then
                     DoAnotherPass = True
                     Do While (InStr(1, returnValue, BlockTextStartMarker, vbTextCompare) <> 0) And DoAnotherPass
-                        LineStart = InStr(1, returnValue, BlockTextStartMarker, vbTextCompare)
+                        LineStart = vbInstr(1, returnValue, BlockTextStartMarker, vbTextCompare)
                         If LineStart = 0 Then
                             DoAnotherPass = False
                         Else
-                            LineEnd = InStr(LineStart, returnValue, BlockTextEndMarker, vbTextCompare)
+                            LineEnd = vbInstr(LineStart, returnValue, BlockTextEndMarker, vbTextCompare)
                             If LineEnd <= 0 Then
                                 DoAnotherPass = False
                                 returnValue = Mid(returnValue, 1, LineStart - 1)
                             Else
-                                LineEnd = InStr(LineEnd, returnValue, " -->")
+                                LineEnd = vbInstr(LineEnd, returnValue, " -->")
                                 If LineEnd <= 0 Then
                                     DoAnotherPass = False
                                 Else
@@ -6900,23 +6997,23 @@ ErrorTrap:
                             Call handleLegacyError7("returnValue", "AFScript Style edit wrappers are not supported")
                             Copy = main_GetEditWrapper("Aggregate Script", "##MARKER##")
                             Wrapper = Split(Copy, "##MARKER##")
-                            returnValue = Replace(returnValue, "<!-- AFScript -->", Wrapper(0), , , vbTextCompare)
-                            returnValue = Replace(returnValue, "<!-- /AFScript -->", Wrapper(1), , , vbTextCompare)
+                            returnValue = vbReplace(returnValue, "<!-- AFScript -->", Wrapper(0), 1, 99, vbTextCompare)
+                            returnValue = vbReplace(returnValue, "<!-- /AFScript -->", Wrapper(1), 1, 99, vbTextCompare)
                         End If
                         If (InStr(1, returnValue, "<!-- AFReplacement -->", vbTextCompare) <> 0) Then
                             Call handleLegacyError7("returnValue", "AFReplacement Style edit wrappers are not supported")
                             Copy = main_GetEditWrapper("Aggregate Replacement", "##MARKER##")
                             Wrapper = Split(Copy, "##MARKER##")
-                            returnValue = Replace(returnValue, "<!-- AFReplacement -->", Wrapper(0), , , vbTextCompare)
-                            returnValue = Replace(returnValue, "<!-- /AFReplacement -->", Wrapper(1), , , vbTextCompare)
+                            returnValue = vbReplace(returnValue, "<!-- AFReplacement -->", Wrapper(0), 1, 99, vbTextCompare)
+                            returnValue = vbReplace(returnValue, "<!-- /AFReplacement -->", Wrapper(1), 1, 99, vbTextCompare)
                         End If
                     End If
                     '
                     ' Process Feedback form
                     '
                     'hint = hint & ",600, Handle webclient features"
-                    If InStr(1, returnValue, FeedbackFormNotSupportedComment, vbTextCompare) <> 0 Then
-                        returnValue = Replace(returnValue, FeedbackFormNotSupportedComment, main_GetFeedbackForm(ContextContentName, ContextRecordID, ContextContactPeopleID), , , vbTextCompare)
+                    If vbInstr(1, returnValue, FeedbackFormNotSupportedComment, vbTextCompare) <> 0 Then
+                        returnValue = vbReplace(returnValue, FeedbackFormNotSupportedComment, main_GetFeedbackForm(ContextContentName, ContextRecordID, ContextContactPeopleID), 1, 99, vbTextCompare)
                     End If
                     '
                     ' if call from webpage, push addon js and css out to cpCoreClass
@@ -6941,7 +7038,7 @@ ErrorTrap:
                     '
                     Copy = csv_GetEncodeContent_JSFilename()
                     Do While Copy <> ""
-                        If InStr(1, Copy, "://") <> 0 Then
+                        If vbInstr(1, Copy, "://") <> 0 Then
                         ElseIf Left(Copy, 1) = "/" Then
                         Else
                             Copy = web_requestProtocol & webServer.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, Copy)
@@ -6958,7 +7055,7 @@ ErrorTrap:
                     '
                     Copy = csv_GetEncodeContent_StyleFilenames()
                     Do While Copy <> ""
-                        If InStr(1, Copy, "://") <> 0 Then
+                        If vbInstr(1, Copy, "://") <> 0 Then
                         ElseIf Left(Copy, 1) = "/" Then
                         Else
                             Copy = web_requestProtocol & webServer.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, Copy)
@@ -7042,13 +7139,13 @@ ErrorTrap:
                             templateEncoded = html_encodeContent10(templateEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & appConfig.domainList(0), True, 0, "", addonContextEnum.contextEmail, True, Nothing, False)
                             '
                             If (InStr(1, templateEncoded, fpoContentBox) <> 0) Then
-                                bodyEncoded = Replace(templateEncoded, fpoContentBox, bodyEncoded)
+                                bodyEncoded = vbReplace(templateEncoded, fpoContentBox, bodyEncoded)
                             Else
                                 bodyEncoded = templateEncoded & bodyEncoded
                             End If
                         End If
-                        bodyEncoded = Replace(bodyEncoded, "#member_id#", ToMemberID.ToString)
-                        bodyEncoded = Replace(bodyEncoded, "#member_email#", ToAddress)
+                        bodyEncoded = vbReplace(bodyEncoded, "#member_id#", ToMemberID.ToString)
+                        bodyEncoded = vbReplace(bodyEncoded, "#member_email#", ToAddress)
                         '
                         returnStatus = email_send3(ToAddress, FromAddress, subjectEncoded, bodyEncoded, "", "", "", Immediate, HTML, emailIdOrZeroForLog)
                     End If
@@ -7180,7 +7277,7 @@ ErrorTrap:
                 Call db.cs_set(CSEmail, "FromAddress", siteProperties.getText("EmailAdmin", "webmaster@" & appConfig.domainList(0)))
                 'Call app.csv_SetCS(CSEmail, "caption", EmailName)
                 Call db.cs_Close(CSEmail)
-                Call Err.Raise(KmaErrorInternal, "dll", "No system email was found with the name [" & EMailName & "]. A new email blank was created but not sent.")
+                Call Err.Raise(ignoreInteger, "dll", "No system email was found with the name [" & EMailName & "]. A new email blank was created but not sent.")
             Else
                 '
                 ' --- collect values needed for send
@@ -7358,7 +7455,7 @@ ErrorTrap:
             csv_GetLinkedText = ""
             iAnchorTag = EncodeText(AnchorTag)
             iAnchorText = EncodeText(AnchorText)
-            UcaseAnchorText = UCase(iAnchorText)
+            UcaseAnchorText = vbUCase(iAnchorText)
             If (iAnchorTag <> "") And (iAnchorText <> "") Then
                 LinkPosition = InStrRev(UcaseAnchorText, "<LINK>", -1)
                 If LinkPosition = 0 Then
@@ -7398,8 +7495,8 @@ ErrorTrap:
             Dim returnLink As String
             '
             returnLink = virtualFile
-            returnLink = Replace(returnLink, "\", "/")
-            If InStr(1, returnLink, "://") <> 0 Then
+            returnLink = vbReplace(returnLink, "\", "/")
+            If vbInstr(1, returnLink, "://") <> 0 Then
                 '
                 ' icon is an Absolute URL - leave it
                 '
@@ -7462,7 +7559,7 @@ ErrorTrap:
             Dim FieldValue As String
             Dim CSTest As Integer
             Dim PeopleCID As Integer
-            Dim ErrorMessage As String
+            Dim ErrorMessage As String = ""
             Dim ErrorCode As Integer
             Dim FirstName As String
             Dim LastName As String
@@ -7484,7 +7581,7 @@ ErrorTrap:
                     ' Sest to blank
                     '
                     AllowChange = True
-                ElseIf UCase(Newusername) <> UCase(user.username) Then
+                ElseIf vbUCase(Newusername) <> vbUCase(user.username) Then
                     '
                     ' ----- username changed, check if change is allowed
                     '
@@ -7696,7 +7793,7 @@ ErrorTrap:
         '       FullLink is 'http://www.docmc.main_com/index.asp'
         '===========================================================================================
         '
-        Friend Sub web_Redirect2(ByVal NonEncodedLink As String, ByVal RedirectReason As String, ByVal IsPageNotFound As Boolean)
+        Public Sub web_Redirect2(ByVal NonEncodedLink As String, ByVal RedirectReason As String, ByVal IsPageNotFound As Boolean)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Redirect2")
             '
             Const rnRedirectCycleFlag = "cycleFlag"
@@ -7721,7 +7818,7 @@ ErrorTrap:
                 '
                 ' convert link to a long link on this domain
                 '
-                If LCase(Mid(NonEncodedLink, 1, 4)) = "http" Then
+                If vbLCase(Mid(NonEncodedLink, 1, 4)) = "http" Then
                     FullLink = NonEncodedLink
                 Else
                     ShortLink = NonEncodedLink
@@ -7733,7 +7830,7 @@ ErrorTrap:
                     '
                     ' Link is not valid
                     '
-                    Call Err.Raise(KmaErrorInternal, "dll", "Redirect was called with a blank Link. Redirect Reason [" & RedirectReason & "]")
+                    Call Err.Raise(ignoreInteger, "dll", "Redirect was called with a blank Link. Redirect Reason [" & RedirectReason & "]")
                     Exit Sub
                     '
                     ' changed to main_ServerLinksource because if a redirect is caused by a link forward, and the host page for the iis 404 is
@@ -7744,7 +7841,7 @@ ErrorTrap:
                     '
                     ' Loop redirect error, throw trap and block redirect to prevent loop
                     '
-                    Call Err.Raise(KmaErrorInternal, "dll", "Redirect was called to the same URL, main_ServerLink is [" & main_ServerLink & "], main_ServerLinkSource is [" & webServer.requestLinkSource & "]. This redirect is only allowed if either the form or querystring has change to prevent cyclic redirects. Redirect Reason [" & RedirectReason & "]")
+                    Call Err.Raise(ignoreInteger, "dll", "Redirect was called to the same URL, main_ServerLink is [" & main_ServerLink & "], main_ServerLinkSource is [" & webServer.requestLinkSource & "]. This redirect is only allowed if either the form or querystring has change to prevent cyclic redirects. Redirect Reason [" & RedirectReason & "]")
                     Exit Sub
                 ElseIf IsPageNotFound Then
                     '
@@ -7814,7 +7911,7 @@ ErrorTrap:
                 '
                 ' ----- close the output stream
                 '
-                Call main_CloseStream()
+                Call doc_close()
             End If
             '
             ' Edit
@@ -7831,7 +7928,7 @@ ErrorTrap:
         ' Stop sending to the HTMLStream
         '========================================================================
         '
-        Public Sub main_CloseStream()
+        Public Sub doc_close()
             '
             ' 2011/3/11 - just stop future Contensive output, do not end the parent's response object, developer may want to add more
             '
@@ -7900,14 +7997,14 @@ ErrorTrap:
                 '
                 ' limit CRLF to 2
                 '
-                Do While InStr(main_RemoveControlCharacters, vbLf & vbLf & vbLf) <> 0
-                    main_RemoveControlCharacters = Replace(main_RemoveControlCharacters, vbLf & vbLf & vbLf, vbLf & vbLf)
+                Do While vbInstr(main_RemoveControlCharacters, vbLf & vbLf & vbLf) <> 0
+                    main_RemoveControlCharacters = vbReplace(main_RemoveControlCharacters, vbLf & vbLf & vbLf, vbLf & vbLf)
                 Loop
                 '
                 ' limit spaces to 1
                 '
-                Do While InStr(main_RemoveControlCharacters, "  ") <> 0
-                    main_RemoveControlCharacters = Replace(main_RemoveControlCharacters, "  ", " ")
+                Do While vbInstr(main_RemoveControlCharacters, "  ") <> 0
+                    main_RemoveControlCharacters = vbReplace(main_RemoveControlCharacters, "  ", " ")
                 Loop
             End If
             Exit Function
@@ -7933,8 +8030,8 @@ ErrorTrap:
             main_EncodeCRLF = ""
             If (iSource <> "") Then
                 main_EncodeCRLF = iSource
-                main_EncodeCRLF = Replace(main_EncodeCRLF, vbCr, "")
-                main_EncodeCRLF = Replace(main_EncodeCRLF, vbLf, "<br >")
+                main_EncodeCRLF = vbReplace(main_EncodeCRLF, vbCr, "")
+                main_EncodeCRLF = vbReplace(main_EncodeCRLF, vbLf, "<br >")
             End If
             Exit Function
             '
@@ -8110,9 +8207,9 @@ ErrorTrap:
                 ' write to debug log in virtual files - to read from a test verbose viewer
                 '
                 iMessage = EncodeText(Message)
-                iMessage = Replace(iMessage, vbCrLf, " ")
-                iMessage = Replace(iMessage, vbCr, " ")
-                iMessage = Replace(iMessage, vbLf, " ")
+                iMessage = vbReplace(iMessage, vbCrLf, " ")
+                iMessage = vbReplace(iMessage, vbCr, " ")
+                iMessage = vbReplace(iMessage, vbLf, " ")
                 iMessage = FormatDateTime(Now, vbShortTime) & vbTab & Format((ElapsedTime), "00.000") & vbTab & visit_Id & vbTab & iMessage
                 '
                 Call log_appendLog(iMessage, "", "testPoints_" & appConfig.name)
@@ -8187,7 +8284,7 @@ ErrorTrap:
                     ' ----- handle content special cases (prevent redirect to deleted records)
                     '
                     NonEncodedLink = main_DecodeUrl(EncodedLink)
-                    Select Case UCase(iContentName)
+                    Select Case vbUCase(iContentName)
                         Case "CONTENT WATCH"
                             '
                             ' ----- special case
@@ -8319,7 +8416,7 @@ ErrorTrap:
             '
             MethodName = "main_GetFormInputSelect2"
             '
-            LcaseCriteria = LCase(Criteria)
+            LcaseCriteria = vbLCase(Criteria)
             return_IsEmptyList = True
             '
             CurrentValueText = CStr(CurrentValue)
@@ -8404,7 +8501,7 @@ ErrorTrap:
                     DropDownFieldListLength = Len(DropDownFieldList)
                     For CharPointer = 1 To DropDownFieldListLength
                         CharTest = Mid(DropDownFieldList, CharPointer, 1)
-                        If InStr(1, CharAllowed, CharTest) = 0 Then
+                        If vbInstr(1, CharAllowed, CharTest) = 0 Then
                             '
                             ' Character not allowed, delimit Field name here
                             '
@@ -8492,7 +8589,7 @@ ErrorTrap:
                             '
                             UcaseFieldName = "ID"
                             For ColumnPointer = 0 To ColumnMax
-                                If UcaseFieldName = UCase(RowFieldArray(ColumnPointer)) Then
+                                If UcaseFieldName = vbUCase(RowFieldArray(ColumnPointer)) Then
                                     IDFieldPointer = ColumnPointer
                                     Exit For
                                 End If
@@ -8501,9 +8598,9 @@ ErrorTrap:
                             ' setup DropDownFieldPointer()
                             '
                             For FieldPointer = 0 To DropDownFieldCount - 1
-                                UcaseFieldName = UCase(DropDownFieldName(FieldPointer))
+                                UcaseFieldName = vbUCase(DropDownFieldName(FieldPointer))
                                 For ColumnPointer = 0 To ColumnMax
-                                    If UcaseFieldName = UCase(RowFieldArray(ColumnPointer)) Then
+                                    If UcaseFieldName = vbUCase(RowFieldArray(ColumnPointer)) Then
                                         DropDownFieldPointer(FieldPointer) = ColumnPointer
                                         Exit For
                                     End If
@@ -8591,10 +8688,10 @@ ErrorTrap:
                 End If
             End If
             '
-            SelectRaw = Replace(SelectRaw, MenuNameFPO, MenuName)
-            SelectRaw = Replace(SelectRaw, NoneCaptionFPO, NoneCaption)
+            SelectRaw = vbReplace(SelectRaw, MenuNameFPO, MenuName)
+            SelectRaw = vbReplace(SelectRaw, NoneCaptionFPO, NoneCaption)
             If HtmlClass <> "" Then
-                SelectRaw = Replace(SelectRaw, "<select ", "<select class=""" & HtmlClass & """")
+                SelectRaw = vbReplace(SelectRaw, "<select ", "<select class=""" & HtmlClass & """")
             End If
             main_GetFormInputSelect2 = SelectRaw
             '
@@ -8676,7 +8773,7 @@ ErrorTrap:
             iMenuName = EncodeText(MenuName)
             iCurrentValue = EncodeInteger(CurrentValue)
             iNoneCaption = encodeEmptyText(NoneCaption, "Select One")
-            'iCriteria = LCase(encodeMissingText(Criteria, ""))
+            'iCriteria = vbLCase(encodeMissingText(Criteria, ""))
             '
             If main_InputSelectCacheCnt > 0 Then
                 For CachePtr = 0 To main_InputSelectCacheCnt - 1
@@ -8749,7 +8846,7 @@ ErrorTrap:
                     DropDownFieldListLength = Len(DropDownFieldList)
                     For CharPointer = 1 To DropDownFieldListLength
                         CharTest = Mid(DropDownFieldList, CharPointer, 1)
-                        If InStr(1, CharAllowed, CharTest) = 0 Then
+                        If vbInstr(1, CharAllowed, CharTest) = 0 Then
                             '
                             ' Character not allowed, delimit Field name here
                             '
@@ -8859,7 +8956,7 @@ ErrorTrap:
                             '
                             UcaseFieldName = "ID"
                             For ColumnPointer = 0 To ColumnMax
-                                If UcaseFieldName = UCase(RowFieldArray(ColumnPointer)) Then
+                                If UcaseFieldName = vbUCase(RowFieldArray(ColumnPointer)) Then
                                     IDFieldPointer = ColumnPointer
                                     Exit For
                                 End If
@@ -8868,9 +8965,9 @@ ErrorTrap:
                             ' setup DropDownFieldPointer()
                             '
                             For FieldPointer = 0 To DropDownFieldCount - 1
-                                UcaseFieldName = UCase(DropDownFieldName(FieldPointer))
+                                UcaseFieldName = vbUCase(DropDownFieldName(FieldPointer))
                                 For ColumnPointer = 0 To ColumnMax
-                                    If UcaseFieldName = UCase(RowFieldArray(ColumnPointer)) Then
+                                    If UcaseFieldName = vbUCase(RowFieldArray(ColumnPointer)) Then
                                         DropDownFieldPointer(FieldPointer) = ColumnPointer
                                         Exit For
                                     End If
@@ -8924,8 +9021,8 @@ ErrorTrap:
                 main_InputSelectCache(CachePtr).SelectRaw = SelectRaw
             End If
             '
-            SelectRaw = Replace(SelectRaw, MenuNameFPO, iMenuName)
-            SelectRaw = Replace(SelectRaw, NoneCaptionFPO, iNoneCaption)
+            SelectRaw = vbReplace(SelectRaw, MenuNameFPO, iMenuName)
+            SelectRaw = vbReplace(SelectRaw, NoneCaptionFPO, iNoneCaption)
             main_GetFormInputMemberSelect2 = SelectRaw
             '
             Exit Function
@@ -9035,7 +9132,7 @@ ErrorTrap:
                     main_GetLoginLink = main_GetLoginLink & "<img alt=""Login"" src=""" & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, main_LoginIconFilename) & """ border=""0"" >"
                 Else
                     IconFilename = siteProperties.getText("LoginIconFilename", "/ccLib/images/ccLibLogin.GIF")
-                    If LCase(Mid(IconFilename, 1, 7)) <> "/cclib/" Then
+                    If vbLCase(Mid(IconFilename, 1, 7)) <> "/cclib/" Then
                         IconFilename = csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, IconFilename)
                     End If
                     main_GetLoginLink = main_GetLoginLink & "<img alt=""Login"" src=""" & IconFilename & """ border=""0"" >"
@@ -9081,7 +9178,7 @@ ErrorTrap:
         '       optionally calls main_dispose
         '========================================================================
         '
-        Friend Function main_GetClosePage3(AllowLogin As Boolean, AllowTools As Boolean, BlockNonContentExtras As Boolean, doNotDisposeOnExit As Boolean) As String
+        Public Function main_GetClosePage3(AllowLogin As Boolean, AllowTools As Boolean, BlockNonContentExtras As Boolean, doNotDisposeOnExit As Boolean) As String
             Try
                 main_GetClosePage3 = main_GetEndOfBody(AllowLogin, AllowTools, BlockNonContentExtras, False)
             Catch ex As Exception
@@ -9091,7 +9188,7 @@ ErrorTrap:
         '
         '
         '
-        Friend Function main_GetEndOfBody(AllowLogin As Boolean, AllowTools As Boolean, BlockNonContentExtras As Boolean, main_IsAdminSite As Boolean) As String
+        Public Function main_GetEndOfBody(AllowLogin As Boolean, AllowTools As Boolean, BlockNonContentExtras As Boolean, main_IsAdminSite As Boolean) As String
             Try
                 '
                 Dim AllowPopupErrors As Boolean
@@ -9192,7 +9289,7 @@ ErrorTrap:
                             If main_PageErrorWithoutCsv Then
                                 main_TrapLogMessage = "" _
                                     & "<div style=""padding: 20px;"">" _
-                                    & Replace(main_TrapLogMessage, vbCrLf, "<br>") _
+                                    & vbReplace(main_TrapLogMessage, vbCrLf, "<br>") _
                                     & "</div>"
                                 '  s = s & main_GetPopupMessage(main_TrapLogMessage, 600, 400, True, True)
                             ElseIf (main_PageErrorCount > 0) Then
@@ -9226,10 +9323,10 @@ ErrorTrap:
                                 End If
                                 If Not .IsLink Then
                                     JSCodeAsString = .Text
-                                    JSCodeAsString = Replace(JSCodeAsString, "'", "'+""'""+'")
-                                    JSCodeAsString = Replace(JSCodeAsString, vbCrLf, "\n")
-                                    JSCodeAsString = Replace(JSCodeAsString, vbCr, "\n")
-                                    JSCodeAsString = Replace(JSCodeAsString, vbLf, "\n")
+                                    JSCodeAsString = vbReplace(JSCodeAsString, "'", "'+""'""+'")
+                                    JSCodeAsString = vbReplace(JSCodeAsString, vbCrLf, "\n")
+                                    JSCodeAsString = vbReplace(JSCodeAsString, vbCr, "\n")
+                                    JSCodeAsString = vbReplace(JSCodeAsString, vbLf, "\n")
                                     JS = JS & vbCrLf & "cj.addHeadScriptCode('" & JSCodeAsString & "');"
                                     'JS = JS & vbCrLf & "cjAddHeadScriptCode('" & JSCodeAsString & "');"
                                 Else
@@ -9424,7 +9521,7 @@ ErrorTrap:
         '   If Name = Value, it returns value
         '=============================================================================
         '
-        Friend Function main_GetNameValue_Internal(NameValueString As String, Name As String) As String
+        Public Function main_GetNameValue_Internal(NameValueString As String, Name As String) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetNameValue_Internal")
             '
             'If Not (true) Then Exit Function
@@ -9443,20 +9540,20 @@ ErrorTrap:
             MethodName = "main_GetNameValue_Internal"
             '
             If ((NameValueString <> "") And (Name <> "")) Then
-                Do While InStr(1, NameValueStringWorking, " =") <> 0
-                    NameValueStringWorking = Replace(NameValueStringWorking, " =", "=")
+                Do While vbInstr(1, NameValueStringWorking, " =") <> 0
+                    NameValueStringWorking = vbReplace(NameValueStringWorking, " =", "=")
                 Loop
-                Do While InStr(1, NameValueStringWorking, "= ") <> 0
-                    NameValueStringWorking = Replace(NameValueStringWorking, "= ", "=")
+                Do While vbInstr(1, NameValueStringWorking, "= ") <> 0
+                    NameValueStringWorking = vbReplace(NameValueStringWorking, "= ", "=")
                 Loop
-                Do While InStr(1, NameValueStringWorking, "& ") <> 0
-                    NameValueStringWorking = Replace(NameValueStringWorking, "& ", "&")
+                Do While vbInstr(1, NameValueStringWorking, "& ") <> 0
+                    NameValueStringWorking = vbReplace(NameValueStringWorking, "& ", "&")
                 Loop
-                Do While InStr(1, NameValueStringWorking, " &") <> 0
-                    NameValueStringWorking = Replace(NameValueStringWorking, " &", "&")
+                Do While vbInstr(1, NameValueStringWorking, " &") <> 0
+                    NameValueStringWorking = vbReplace(NameValueStringWorking, " &", "&")
                 Loop
                 NameValueStringWorking = NameValueString & "&"
-                UcaseNameValueStringWorking = UCase(NameValueStringWorking)
+                UcaseNameValueStringWorking = vbUCase(NameValueStringWorking)
                 '
                 main_GetNameValue_Internal = ""
                 If NameValueStringWorking <> "" Then
@@ -9464,7 +9561,7 @@ ErrorTrap:
                     PairCount = UBound(pairs) + 1
                     For PairPointer = 0 To PairCount - 1
                         PairSplit = Split(pairs(PairPointer), "=")
-                        If UCase(PairSplit(0)) = UCase(Name) Then
+                        If vbUCase(PairSplit(0)) = vbUCase(Name) Then
                             If UBound(PairSplit) > 0 Then
                                 main_GetNameValue_Internal = PairSplit(1)
                             End If
@@ -9518,7 +9615,7 @@ ErrorTrap:
             MyPadding = Padding.ToString
             MyHeightMin = HeightMin.ToString
             '
-            If IsNumeric(MyWidth) Then
+            If vbIsNumeric(MyWidth) Then
                 ContentPanelWidth = (CInt(MyWidth) - 2).ToString
                 contentPanelWidthStyle = ContentPanelWidth & "px"
             Else
@@ -9658,7 +9755,7 @@ ErrorTrap:
             MyPadding = encodeEmptyText(Padding, "5")
             MyHeightMin = encodeEmptyText(HeightMin, "1")
             MethodName = "main_GetPanelTop"
-            If IsNumeric(MyWidth) Then
+            If vbIsNumeric(MyWidth) Then
                 ContentPanelWidth = (CInt(MyWidth) - 2).ToString
             Else
                 ContentPanelWidth = "100%"
@@ -9908,7 +10005,7 @@ ErrorTrap:
                         'helpLink = main_GetHelpLink(7, "Enable Editing", "Display the edit tools for basic content, such as pages, copy and sections. ")
                         iValueBoolean = visitProperty.getBoolean("AllowEditing")
                         Tag = html_GetFormInputCheckBox2(EditTagID, iValueBoolean, EditTagID)
-                        Tag = Replace(Tag, ">", " onClick=""document.getElementById('" & QuickEditTagID & "').checked=false;document.getElementById('" & AdvancedEditTagID & "').checked=false;"">")
+                        Tag = vbReplace(Tag, ">", " onClick=""document.getElementById('" & QuickEditTagID & "').checked=false;document.getElementById('" & AdvancedEditTagID & "').checked=false;"">")
                         OptionsPanel = OptionsPanel _
                             & cr & "<div class=""ccAdminSmall"">" _
                             & cr2 & "<LABEL for=""" & EditTagID & """>" & Tag & "&nbsp;Edit</LABEL>" & helpLink _
@@ -9920,7 +10017,7 @@ ErrorTrap:
                         'helpLink = main_GetHelpLink(8, "Enable Quick Edit", "Display the quick editor to edit the main page content.")
                         iValueBoolean = visitProperty.getBoolean("AllowQuickEditor")
                         Tag = html_GetFormInputCheckBox2(QuickEditTagID, iValueBoolean, QuickEditTagID)
-                        Tag = Replace(Tag, ">", " onClick=""document.getElementById('" & EditTagID & "').checked=false;document.getElementById('" & AdvancedEditTagID & "').checked=false;"">")
+                        Tag = vbReplace(Tag, ">", " onClick=""document.getElementById('" & EditTagID & "').checked=false;document.getElementById('" & AdvancedEditTagID & "').checked=false;"">")
                         OptionsPanel = OptionsPanel _
                             & cr & "<div class=""ccAdminSmall"">" _
                             & cr2 & "<LABEL for=""" & QuickEditTagID & """>" & Tag & "&nbsp;Quick Edit</LABEL>" & helpLink _
@@ -9932,7 +10029,7 @@ ErrorTrap:
                         'helpLink = main_GetHelpLink(0, "Enable Advanced Edit", "Display the edit tools for advanced content, such as templates and add-ons. Basic content edit tools are also displayed.")
                         iValueBoolean = visitProperty.getBoolean("AllowAdvancedEditor")
                         Tag = html_GetFormInputCheckBox2(AdvancedEditTagID, iValueBoolean, AdvancedEditTagID)
-                        Tag = Replace(Tag, ">", " onClick=""document.getElementById('" & QuickEditTagID & "').checked=false;document.getElementById('" & EditTagID & "').checked=false;"">")
+                        Tag = vbReplace(Tag, ">", " onClick=""document.getElementById('" & QuickEditTagID & "').checked=false;document.getElementById('" & EditTagID & "').checked=false;"">")
                         OptionsPanel = OptionsPanel _
                             & cr & "<div class=""ccAdminSmall"">" _
                             & cr2 & "<LABEL for=""" & AdvancedEditTagID & """>" & Tag & "&nbsp;Advanced Edit</LABEL>" & helpLink _
@@ -10338,7 +10435,7 @@ ErrorTrap:
                         SeeAlsoLink = (db.cs_getText(CS, "Link"))
                         If SeeAlsoLink <> "" Then
                             main_GetSeeAlso = main_GetSeeAlso & cr & "<li class=""ccListItem"">"
-                            If InStr(1, SeeAlsoLink, "://") = 0 Then
+                            If vbInstr(1, SeeAlsoLink, "://") = 0 Then
                                 SeeAlsoLink = web_requestProtocol & SeeAlsoLink
                             End If
                             If IsEditingLocal Then
@@ -10586,19 +10683,19 @@ ErrorTrap:
             '
             ' ----- Add tablename to the front of SortFieldList fieldnames
             '
-            iSortFieldList = " " & Replace(iSortFieldList, ",", " , ") & " "
-            iSortFieldList = Replace(iSortFieldList, " ID ", " ccContentWatch.ID ", , , vbTextCompare)
-            iSortFieldList = Replace(iSortFieldList, " Link ", " ccContentWatch.Link ", , , vbTextCompare)
-            iSortFieldList = Replace(iSortFieldList, " LinkLabel ", " ccContentWatch.LinkLabel ", , , vbTextCompare)
-            iSortFieldList = Replace(iSortFieldList, " SortOrder ", " ccContentWatch.SortOrder ", , , vbTextCompare)
-            iSortFieldList = Replace(iSortFieldList, " DateAdded ", " ccContentWatch.DateAdded ", , , vbTextCompare)
-            iSortFieldList = Replace(iSortFieldList, " ContentID ", " ccContentWatch.ContentID ", , , vbTextCompare)
-            iSortFieldList = Replace(iSortFieldList, " RecordID ", " ccContentWatch.RecordID ", , , vbTextCompare)
-            iSortFieldList = Replace(iSortFieldList, " ModifiedDate ", " ccContentWatch.ModifiedDate ", , , vbTextCompare)
+            iSortFieldList = " " & vbReplace(iSortFieldList, ",", " , ") & " "
+            iSortFieldList = vbReplace(iSortFieldList, " ID ", " ccContentWatch.ID ", 1, 99, vbTextCompare)
+            iSortFieldList = vbReplace(iSortFieldList, " Link ", " ccContentWatch.Link ", 1, 99, vbTextCompare)
+            iSortFieldList = vbReplace(iSortFieldList, " LinkLabel ", " ccContentWatch.LinkLabel ", 1, 99, vbTextCompare)
+            iSortFieldList = vbReplace(iSortFieldList, " SortOrder ", " ccContentWatch.SortOrder ", 1, 99, vbTextCompare)
+            iSortFieldList = vbReplace(iSortFieldList, " DateAdded ", " ccContentWatch.DateAdded ", 1, 99, vbTextCompare)
+            iSortFieldList = vbReplace(iSortFieldList, " ContentID ", " ccContentWatch.ContentID ", 1, 99, vbTextCompare)
+            iSortFieldList = vbReplace(iSortFieldList, " RecordID ", " ccContentWatch.RecordID ", 1, 99, vbTextCompare)
+            iSortFieldList = vbReplace(iSortFieldList, " ModifiedDate ", " ccContentWatch.ModifiedDate ", 1, 99, vbTextCompare)
             '
             ' ----- Special case
             '
-            iSortFieldList = Replace(iSortFieldList, " name ", " ccContentWatch.LinkLabel ", , , vbTextCompare)
+            iSortFieldList = vbReplace(iSortFieldList, " name ", " ccContentWatch.LinkLabel ", 1, 99, vbTextCompare)
             '
             SQL = "SELECT" _
                     & " ccContentWatch.ID AS ID" _
@@ -10746,7 +10843,7 @@ ErrorTrap:
         '                        '
         '                        Dim QS As String
         '                        FirstName = db.db_GetCSText(CSPeople, "firstName")
-        '                        If LCase(FirstName) = "guest" Then
+        '                        If vbLCase(FirstName) = "guest" Then
         '                            FirstName = ""
         '                        End If
         '                        QS = web_RefreshQueryString
@@ -11695,7 +11792,7 @@ ErrorTrap:
         '                    Call properties_SetMemberProperty(ContentName & ".copyFilename.PixelHeight", 50)
         '                End If
         '                quickEditor = html_GetFormInputHTML("copyFilename", main_QuickEditCopy)
-        '                main_GetContentPage = Replace(main_GetContentPage, main_fpo_QuickEditing, quickEditor)
+        '                main_GetContentPage = vbReplace(main_GetContentPage, main_fpo_QuickEditing, quickEditor)
         '            End If
         '            Exit Function
         '            '
@@ -11893,7 +11990,7 @@ ErrorTrap:
             Else
                 ActionQS = ActionQueryString
             End If
-            iMethod = LCase(htmlMethod)
+            iMethod = vbLCase(htmlMethod)
             If iMethod = "" Then
                 iMethod = "post"
             End If
@@ -12414,7 +12511,7 @@ ErrorTrap:
                     For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In Contentdefinition.fields
                         Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
                         With field
-                            If UCase(.nameLc) = UCase(FieldName) Then
+                            If vbUCase(.nameLc) = vbUCase(FieldName) Then
                                 FieldValueVariant = .defaultValue
                                 fieldTypeId = .fieldTypeId
                                 FieldReadOnly = .ReadOnly
@@ -12834,7 +12931,7 @@ ErrorTrap:
             Call web_setResponseContentType("text/plain")
             Call web_SetStreamBuffer(False)
             TableName = GetDbObjectTableName(db_GetContentTablename(iContentName))
-            Select Case UCase(TableName)
+            Select Case vbUCase(TableName)
                 Case "CCMEMBERS"
                     '
                     ' ----- People and member content export
@@ -12852,7 +12949,7 @@ ErrorTrap:
                             FieldNameVariant = db.db_GetCSFirstFieldName(CSPointer)
                             Do While (FieldNameVariant <> "")
                                 FieldName = EncodeText(FieldNameVariant)
-                                UcaseFieldName = UCase(FieldName)
+                                UcaseFieldName = vbUCase(FieldName)
                                 If (UcaseFieldName <> "USERNAME") And (UcaseFieldName <> "PASSWORD") Then
                                     Call sb.Append(Delimiter & """" & FieldName & """")
                                 End If
@@ -12872,14 +12969,14 @@ ErrorTrap:
                                 FieldNameVariant = db.db_GetCSFirstFieldName(CSPointer)
                                 Do While (FieldNameVariant <> "")
                                     FieldName = EncodeText(FieldNameVariant)
-                                    UcaseFieldName = UCase(FieldName)
+                                    UcaseFieldName = vbUCase(FieldName)
                                     If (UcaseFieldName <> "USERNAME") And (UcaseFieldName <> "PASSWORD") Then
                                         Copy = db.db_GetCS(CSPointer, FieldName)
                                         If Copy <> "" Then
-                                            Copy = Replace(Copy, """", "'")
-                                            Copy = Replace(Copy, vbCrLf, " ")
-                                            Copy = Replace(Copy, vbCr, " ")
-                                            Copy = Replace(Copy, vbLf, " ")
+                                            Copy = vbReplace(Copy, """", "'")
+                                            Copy = vbReplace(Copy, vbCrLf, " ")
+                                            Copy = vbReplace(Copy, vbCr, " ")
+                                            Copy = vbReplace(Copy, vbLf, " ")
                                         End If
                                         Call sb.Append(Delimiter & """" & Copy & """")
                                     End If
@@ -12932,10 +13029,10 @@ ErrorTrap:
                                         Copy = db.cs_getText(CSPointer, EncodeText(FieldNameVariant))
                                 End Select
                                 If Copy <> "" Then
-                                    Copy = Replace(Copy, """", "'")
-                                    Copy = Replace(Copy, vbCrLf, " ")
-                                    Copy = Replace(Copy, vbCr, " ")
-                                    Copy = Replace(Copy, vbLf, " ")
+                                    Copy = vbReplace(Copy, """", "'")
+                                    Copy = vbReplace(Copy, vbCrLf, " ")
+                                    Copy = vbReplace(Copy, vbCr, " ")
+                                    Copy = vbReplace(Copy, vbLf, " ")
                                 End If
                                 Call appRootFiles.appendFile(TestFilename, Delimiter & """" & Copy & """")
                                 Delimiter = ","
@@ -13032,8 +13129,8 @@ ErrorTrap:
                     _docBufferResponseHeader = _docBufferResponseHeader & vbCrLf
                 End If
                 _docBufferResponseHeader = _docBufferResponseHeader _
-                    & Replace(EncodeText(HeaderName), vbCrLf, "") _
-                    & vbCrLf & Replace(EncodeText(HeaderValue), vbCrLf, "")
+                    & vbReplace(EncodeText(HeaderName), vbCrLf, "") _
+                    & vbCrLf & vbReplace(EncodeText(HeaderValue), vbCrLf, "")
             End If
             '
             Exit Sub
@@ -13248,7 +13345,7 @@ ErrorTrap:
         '   main_AllowVisitTracking - if true a cookie will be written and the visit tracked
         '========================================================================
         '
-        Public Sub visit_init(ByVal allowVisitTracking As Boolean)
+        Public Sub visit_init(ByVal visitInit_allowVisitTracking As Boolean)
             Try
                 Dim NeedToWriteVisitCookie As Boolean
                 Dim TrackGuests As Boolean
@@ -13277,7 +13374,7 @@ ErrorTrap:
                 Dim AuthDomain As String
                 Dim main_appNameCookiePrefix As String
                 '
-                main_appNameCookiePrefix = LCase(main_encodeCookieName(appConfig.name))
+                main_appNameCookiePrefix = vbLCase(main_encodeCookieName(appConfig.name))
 
                 ' ----- Visit Defaults
                 '
@@ -13345,7 +13442,7 @@ ErrorTrap:
                     End If
                 End If
                 'hint = "200"
-                If (allowVisitTracking) Or (CookieVisit <> "") Or (MemberLinkLoginID <> 0) Or (MemberLinkRecognizeID <> 0) Then
+                If (visitInit_allowVisitTracking) Or (CookieVisit <> "") Or (MemberLinkLoginID <> 0) Or (MemberLinkRecognizeID <> 0) Then
                     '
                     ' ----- try cookie main_VisitId
                     '
@@ -13581,11 +13678,11 @@ ErrorTrap:
                         'hint = "320"
                         If webServer.requestReferrer <> "" Then
                             WorkingReferer = webServer.requestReferrer
-                            SlashPosition = InStr(1, WorkingReferer, "//")
+                            SlashPosition = vbInstr(1, WorkingReferer, "//")
                             If (SlashPosition <> 0) And (Len(WorkingReferer) > (SlashPosition + 2)) Then
                                 WorkingReferer = Mid(WorkingReferer, SlashPosition + 2)
                             End If
-                            SlashPosition = InStr(1, WorkingReferer, "/")
+                            SlashPosition = vbInstr(1, WorkingReferer, "/")
                             If SlashPosition = 0 Then
                                 visit_refererPathPage = ""
                                 visit_refererHost = WorkingReferer
@@ -13724,7 +13821,7 @@ ErrorTrap:
                         '--------------------------------------------------------------------------
                         '
                         'hint = "600"
-                        If allowVisitTracking Then
+                        If visitInit_allowVisitTracking Then
                             Call webServer.addResponseCookie(main_appNameCookiePrefix & main_cookieNameVisitor, security.encodeToken(visitor_id, visit_startTime), visit_startTime.AddYears(1), , www_requestRootPath, False)
                         End If
                         '
@@ -13928,7 +14025,7 @@ ErrorTrap:
                     'hint = "960"
                     CookieVisitNew = security.encodeToken(visit_Id, visit_lastTime)
                     'CookieVisitNew = encodeToken(main_VisitId, main_VisitStartTime)
-                    If allowVisitTracking And (CookieVisit <> CookieVisitNew) Then
+                    If visitInit_allowVisitTracking And (CookieVisit <> CookieVisitNew) Then
                         CookieVisit = CookieVisitNew
                         NeedToWriteVisitCookie = True
                     End If
@@ -14422,20 +14519,6 @@ ErrorTrap:
         End Function
         '
         '=============================================================================
-        ' Imports the named table into the content system
-        '   Note: ContentNames are unique, so you can not have the same name on different
-        '   datasources, so the datasource here is ...
-        '
-        '   What if...
-        '       - content is found on different datasource
-        '       - content does not exist
-        '=============================================================================
-        '
-        Public Sub db_CreateContentFromSQLTable(ByVal DataSourceName As String, ByVal TableName As String, ByVal ContentName As String)
-            Call db_CreateContentFromSQLTable(DataSourceName, TableName, ContentName, user.id)
-        End Sub
-        '
-        '=============================================================================
         ' Create a child content from a parent content
         '
         '   If child does not exist, copy everything from the parent
@@ -14490,16 +14573,16 @@ ErrorTrap:
             ' ----- Determine Language by browser
             '
             AcceptLanguageString = EncodeText(webServer.RequestLanguage) & ","
-            CommaPosition = InStr(1, AcceptLanguageString, ",")
+            CommaPosition = vbInstr(1, AcceptLanguageString, ",")
             Do While CommaPosition <> 0 And LanguageID = 0
                 AcceptLanguage = Trim(Mid(AcceptLanguageString, 1, CommaPosition - 1))
                 AcceptLanguageString = Mid(AcceptLanguageString, CommaPosition + 1)
                 If Len(AcceptLanguage) > 0 Then
-                    DashPosition = InStr(1, AcceptLanguage, "-")
+                    DashPosition = vbInstr(1, AcceptLanguage, "-")
                     If DashPosition > 1 Then
                         AcceptLanguage = Mid(AcceptLanguage, 1, DashPosition - 1)
                     End If
-                    DashPosition = InStr(1, AcceptLanguage, ";")
+                    DashPosition = vbInstr(1, AcceptLanguage, ";")
                     If DashPosition > 1 Then
                         AcceptLanguage = Mid(AcceptLanguage, 1, DashPosition - 1)
                     End If
@@ -14512,7 +14595,7 @@ ErrorTrap:
                         Call db.cs_Close(CS)
                     End If
                 End If
-                CommaPosition = InStr(1, AcceptLanguageString, ",")
+                CommaPosition = vbInstr(1, AcceptLanguageString, ",")
             Loop
             '
             If LanguageID = 0 Then
@@ -14579,10 +14662,10 @@ ErrorTrap:
             iRecordID = EncodeInteger(RecordID)
             iAllowCut = EncodeBoolean(AllowCut)
             ContentCaption = html_EncodeHTML(iContentName)
-            If LCase(ContentCaption) = "aggregate functions" Then
+            If vbLCase(ContentCaption) = "aggregate functions" Then
                 ContentCaption = "Add-on"
             End If
-            If LCase(ContentCaption) = "aggregate function objects" Then
+            If vbLCase(ContentCaption) = "aggregate function objects" Then
                 ContentCaption = "Add-on"
             End If
             ContentCaption = ContentCaption & " record"
@@ -14783,7 +14866,7 @@ ErrorTrap:
             If IsEditing Then
                 iContentName = EncodeText(ContentName)
                 iPresetNameValueList = EncodeText(PresetNameValueList)
-                iPresetNameValueList = Replace(iPresetNameValueList, "&", ",")
+                iPresetNameValueList = vbReplace(iPresetNameValueList, "&", ",")
                 iAllowPaste = EncodeBoolean(AllowPaste)
 
                 If iContentName = "" Then
@@ -14826,7 +14909,7 @@ ErrorTrap:
                     If iAllowPaste Then
                         ClipBoard = visitProperty.getText("Clipboard", "")
                         If ClipBoard <> "" Then
-                            Position = InStr(1, ClipBoard, ".")
+                            Position = vbInstr(1, ClipBoard, ".")
                             If Position <> 0 Then
                                 ClipBoardArray = Split(ClipBoard, ".")
                                 If UBound(ClipBoardArray) > 0 Then
@@ -14834,14 +14917,14 @@ ErrorTrap:
                                     ClipChildRecordID = EncodeInteger(ClipBoardArray(1))
                                     'iContentID = main_GetContentID(iContentName)
                                     If db_IsWithinContent(ClipboardContentID, iContentID) Then
-                                        If InStr(1, iPresetNameValueList, "PARENTID=", vbTextCompare) <> 0 Then
+                                        If vbInstr(1, iPresetNameValueList, "PARENTID=", vbTextCompare) <> 0 Then
                                             '
                                             ' must test for main_IsChildRecord
                                             '
                                             BufferString = iPresetNameValueList
-                                            BufferString = Replace(BufferString, "(", "")
-                                            BufferString = Replace(BufferString, ")", "")
-                                            BufferString = Replace(BufferString, ",", "&")
+                                            BufferString = vbReplace(BufferString, "(", "")
+                                            BufferString = vbReplace(BufferString, ")", "")
+                                            BufferString = vbReplace(BufferString, ",", "&")
                                             ParentID = EncodeInteger(main_GetNameValue_Internal(BufferString, "Parentid"))
                                         End If
 
@@ -14868,7 +14951,7 @@ ErrorTrap:
                     '
                     If LowestRequiredMenuName <> "" Then
                         main_GetRecordAddLink2 = main_GetRecordAddLink2 & menuFlyout.getMenu(LowestRequiredMenuName, 0)
-                        main_GetRecordAddLink2 = Replace(main_GetRecordAddLink2, "class=""ccFlyoutButton"" ", "", , , vbTextCompare)
+                        main_GetRecordAddLink2 = vbReplace(main_GetRecordAddLink2, "class=""ccFlyoutButton"" ", "", 1, 99, vbTextCompare)
                         If PasteLink <> "" Then
                             main_GetRecordAddLink2 = main_GetRecordAddLink2 & "<a TabIndex=-1 href=""" & html_EncodeHTML(PasteLink) & """><img src=""/ccLib/images/ContentPaste.gif"" border=""0"" alt=""Paste content from clipboard"" align=""absmiddle""></a>"
                         End If
@@ -14892,12 +14975,12 @@ ErrorTrap:
                     '
                     If LowestRequiredMenuName <> "" Then
                         main_GetRecordAddLink2 = main_GetRecordAddLink2 & menu_GetClose()
-                        If InStr(1, main_GetRecordAddLink2, "IconContentAdd.gif", vbTextCompare) <> 0 Then
-                            main_GetRecordAddLink2 = Replace(main_GetRecordAddLink2, "IconContentAdd.gif"" ", "IconContentAdd.gif"" align=""absmiddle"" ")
+                        If vbInstr(1, main_GetRecordAddLink2, "IconContentAdd.gif", vbTextCompare) <> 0 Then
+                            main_GetRecordAddLink2 = vbReplace(main_GetRecordAddLink2, "IconContentAdd.gif"" ", "IconContentAdd.gif"" align=""absmiddle"" ")
                         End If
                     End If
                     If main_ReturnAfterEdit Then
-                        main_GetRecordAddLink2 = Replace(main_GetRecordAddLink2, "target=", "xtarget=", , , vbTextCompare)
+                        main_GetRecordAddLink2 = vbReplace(main_GetRecordAddLink2, "target=", "xtarget=", 1, 99, vbTextCompare)
                     End If
                     'End If
                 End If
@@ -15015,10 +15098,10 @@ ErrorTrap:
             If (ContentName = "") Then
                 Call handleLegacyError14(MethodName, "main_GetRecordAddLink, ContentName is empty")
             Else
-                If (InStr(1, MyContentNameList, "," & UCase(ContentName) & ",") >= 0) Then
+                If (InStr(1, MyContentNameList, "," & vbUCase(ContentName) & ",") >= 0) Then
                     Call handleLegacyError14(MethodName, "main_GetRecordAddLink_AddMenuEntry, Content Child [" & ContentName & "] is one of its own parents")
                 Else
-                    MyContentNameList = MyContentNameList & "," & UCase(ContentName) & ","
+                    MyContentNameList = MyContentNameList & "," & vbUCase(ContentName) & ","
                     '
                     ' ----- Select the Content Record for the Menu Entry selected
                     '
@@ -15278,7 +15361,7 @@ ErrorTrap:
         '   main_Get a Random long value
         '=================================================================================
         '
-        Friend Function common_GetRandomLong_Internal() As Integer
+        Public Function common_GetRandomLong_Internal() As Integer
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetRandomLong_Internal")
             '
             Dim RandomLimit As Single
@@ -15526,9 +15609,9 @@ ErrorTrap:
                     If db.cs_Ok(CSAddon) Then
                         FoundAddon = True
                         AddonOptionConstructor = db.cs_getText(CSAddon, "ArgumentList")
-                        AddonOptionConstructor = Replace(AddonOptionConstructor, vbCrLf, vbCr)
-                        AddonOptionConstructor = Replace(AddonOptionConstructor, vbLf, vbCr)
-                        AddonOptionConstructor = Replace(AddonOptionConstructor, vbCr, vbCrLf)
+                        AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
+                        AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbLf, vbCr)
+                        AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
                         If True Then
                             If AddonOptionConstructor <> "" Then
                                 AddonOptionConstructor = AddonOptionConstructor & vbCrLf
@@ -15592,9 +15675,9 @@ ErrorTrap:
                 If addonPtr >= 0 Then
                     FoundAddon = True
                     AddonOptionConstructor = addonCache.localCache.addonList(addonPtr).addonCache_ArgumentList
-                    AddonOptionConstructor = Replace(AddonOptionConstructor, vbCrLf, vbCr)
-                    AddonOptionConstructor = Replace(AddonOptionConstructor, vbLf, vbCr)
-                    AddonOptionConstructor = Replace(AddonOptionConstructor, vbCr, vbCrLf)
+                    AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
+                    AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbLf, vbCr)
+                    AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
                     If AddonOptionConstructor <> "" Then
                         AddonOptionConstructor = AddonOptionConstructor & vbCrLf
                     End If
@@ -15609,9 +15692,9 @@ ErrorTrap:
                 '        If app.csv_IsCSOK(CSAddon) Then
                 '            FoundAddon = True
                 '            AddonOptionConstructor = db.db_GetCSText(CSAddon, "ArgumentList")
-                '            AddonOptionConstructor = Replace(AddonOptionConstructor, vbCrLf, vbCr)
-                '            AddonOptionConstructor = Replace(AddonOptionConstructor, vbLf, vbCr)
-                '            AddonOptionConstructor = Replace(AddonOptionConstructor, vbCr, vbCrLf)
+                '            AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
+                '            AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbLf, vbCr)
+                '            AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
                 '            If AddonOptionConstructor <> "" Then
                 '                AddonOptionConstructor = AddonOptionConstructor & vbCrLf
                 '            End If
@@ -15626,7 +15709,7 @@ ErrorTrap:
                     '
                     ' Hardcoded Addons
                     '
-                    Select Case LCase(AddonName)
+                    Select Case vbLCase(AddonName)
                         Case "block text"
                             FoundAddon = True
                             AddonOptionConstructor = AddonOptionConstructor_ForBlockText
@@ -15688,7 +15771,7 @@ ErrorTrap:
                         ' Field is given, find the position
                         '
                         Copy = db.db_GetCS(CS, FieldName)
-                        PosACInstanceID = InStr(1, Copy, "=""" & ACInstanceID & """ ", vbTextCompare)
+                        PosACInstanceID = vbInstr(1, Copy, "=""" & ACInstanceID & """ ", vbTextCompare)
                     Else
                         '
                         ' Find the field, then find the position
@@ -15699,7 +15782,7 @@ ErrorTrap:
                             Select Case fieldType
                                 Case FieldTypeIdLongText, FieldTypeIdText, FieldTypeIdFileTextPrivate, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate
                                     Copy = db.db_GetCS(CS, FieldName)
-                                    PosACInstanceID = InStr(1, Copy, "ACInstanceID=""" & ACInstanceID & """", vbTextCompare)
+                                    PosACInstanceID = vbInstr(1, Copy, "ACInstanceID=""" & ACInstanceID & """", vbTextCompare)
                                     If PosACInstanceID <> 0 Then
                                         '
                                         ' found the instance
@@ -15724,10 +15807,10 @@ ErrorTrap:
                             '
                             ' main_Get Addon Name to lookup Addon and main_Get most recent Argument List
                             '
-                            PosNameStart = InStr(PosStart, Copy, " name=", vbTextCompare)
+                            PosNameStart = vbInstr(PosStart, Copy, " name=", vbTextCompare)
                             If PosNameStart <> 0 Then
                                 PosNameStart = PosNameStart + 7
-                                PosNameEnd = InStr(PosNameStart, Copy, """")
+                                PosNameEnd = vbInstr(PosNameStart, Copy, """")
                                 If PosNameEnd <> 0 Then
                                     AddonName = Mid(Copy, PosNameStart, PosNameEnd - PosNameStart)
                                     '????? test this
@@ -15736,9 +15819,9 @@ ErrorTrap:
                                     If addonPtr >= 0 Then
                                         FoundAddon = True
                                         AddonOptionConstructor = EncodeText(addonCache.localCache.addonList(addonPtr).addonCache_ArgumentList)
-                                        AddonOptionConstructor = Replace(AddonOptionConstructor, vbCrLf, vbCr)
-                                        AddonOptionConstructor = Replace(AddonOptionConstructor, vbLf, vbCr)
-                                        AddonOptionConstructor = Replace(AddonOptionConstructor, vbCr, vbCrLf)
+                                        AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
+                                        AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbLf, vbCr)
+                                        AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
                                         If AddonOptionConstructor <> "" Then
                                             AddonOptionConstructor = AddonOptionConstructor & vbCrLf
                                         End If
@@ -15752,7 +15835,7 @@ ErrorTrap:
                                         '
                                         ' Hardcoded Addons
                                         '
-                                        Select Case LCase(AddonName)
+                                        Select Case vbLCase(AddonName)
                                             Case "block text"
                                                 FoundAddon = True
                                                 AddonOptionConstructor = AddonOptionConstructor_ForBlockText
@@ -15799,11 +15882,11 @@ ErrorTrap:
                             '
                             ' Replace the new querystring into the AC tag in the content
                             '
-                            PosIDStart = InStr(PosStart, Copy, " querystring=", vbTextCompare)
+                            PosIDStart = vbInstr(PosStart, Copy, " querystring=", vbTextCompare)
                             If PosIDStart <> 0 Then
                                 PosIDStart = PosIDStart + 14
                                 If PosIDStart <> 0 Then
-                                    PosIDEnd = InStr(PosIDStart, Copy, """")
+                                    PosIDEnd = vbInstr(PosIDStart, Copy, """")
                                     If PosIDEnd <> 0 Then
                                         ParseOK = True
                                         Copy = Mid(Copy, 1, PosIDStart - 1) & html_EncodeHTML(addonOption_String) & Mid(Copy, PosIDEnd)
@@ -15831,11 +15914,11 @@ ErrorTrap:
                 If ContentName <> "" Then
                     Call cache.invalidateTagCommaList(ContentName)
                     TableName = db_GetContentTablename(ContentName)
-                    If LCase(TableName) = "cctemplates" Then
+                    If vbLCase(TableName) = "cctemplates" Then
                         Call cache.setKey(pageManager_cache_pageTemplate_cacheName, EmptyVariant)
                         Call pageManager_cache_pageTemplate_load()
                     End If
-                    If LCase(TableName) = "ccpagecontent" Then
+                    If vbLCase(TableName) = "ccpagecontent" Then
                         Call pageManager_cache_pageContent_updateRow(RecordID, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
                     End If
                 End If
@@ -15873,7 +15956,7 @@ ErrorTrap:
             '
             HelpBubbleID = docProperties.getText("HelpBubbleID")
             IDSplit = Split(HelpBubbleID, "-")
-            Select Case LCase(IDSplit(0))
+            Select Case vbLCase(IDSplit(0))
                 Case "userfield"
                     '
                     ' main_Get the id of the field, and save the input as the caption and help
@@ -16014,7 +16097,7 @@ ErrorTrap:
                 menu_GetClose = menu_GetClose & menuFlyout.GetMenuClose()
                 MenuFlyoutIcon = siteProperties.getText("MenuFlyoutIcon", "&#187;")
                 If MenuFlyoutIcon <> "&#187;" Then
-                    menu_GetClose = Replace(menu_GetClose, "&#187;</a>", MenuFlyoutIcon & "</a>")
+                    menu_GetClose = vbReplace(menu_GetClose, "&#187;</a>", MenuFlyoutIcon & "</a>")
                 End If
             End If
             Exit Function
@@ -16055,7 +16138,7 @@ ErrorTrap:
             Return returnProperty
         End Function
         '
-        Friend Function properties_user_getInteger(ByVal PropertyName As String, Optional ByVal DefaultValue As Integer = 0, Optional ByVal TargetMemberID As Integer = SystemMemberID) As Integer
+        Public Function properties_user_getInteger(ByVal PropertyName As String, Optional ByVal DefaultValue As Integer = 0, Optional ByVal TargetMemberID As Integer = SystemMemberID) As Integer
             Return EncodeInteger(properties_user_getText(PropertyName, DefaultValue.ToString, TargetMemberID))
         End Function
         ''
@@ -16075,7 +16158,7 @@ ErrorTrap:
         '    End Try
         'End Sub
         ''
-        'Friend Sub userProperty_SetProperty(ByVal PropertyName As String, ByVal Value As Integer, Optional ByVal TargetMemberID As Integer = SystemMemberID)
+        'public Sub userProperty_SetProperty(ByVal PropertyName As String, ByVal Value As Integer, Optional ByVal TargetMemberID As Integer = SystemMemberID)
         '    userProperty_SetProperty(PropertyName, Value.ToString, TargetMemberID)
         'End Sub
         ''
@@ -16233,7 +16316,7 @@ ErrorTrap:
             MethodName = "main_GetContentProperty"
             '
             Contentdefinition = metaData.getCdef(EncodeText(ContentName))
-            Select Case UCase(EncodeText(PropertyName))
+            Select Case vbUCase(EncodeText(PropertyName))
                 Case "CONTENTCONTROLCRITERIA"
                     db_GetContentProperty = Contentdefinition.ContentControlCriteria
                 Case "ACTIVEONLY"
@@ -16317,7 +16400,7 @@ ErrorTrap:
             '
             db_GetContentFieldProperty = ""
             If True Then
-                UcaseFieldName = UCase(EncodeText(FieldName))
+                UcaseFieldName = vbUCase(EncodeText(FieldName))
                 Contentdefinition = metaData.getCdef(EncodeText(ContentName))
                 If (UcaseFieldName = "") Or (Contentdefinition.fields.Count < 1) Then
                     Call handleLegacyError14(MethodName, "Content Name [" & EncodeText(ContentName) & "] or FieldName [" & EncodeText(FieldName) & "] was not valid")
@@ -16325,8 +16408,8 @@ ErrorTrap:
                     For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In Contentdefinition.fields
                         Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
                         With field
-                            If UcaseFieldName = UCase(.nameLc) Then
-                                Select Case UCase(EncodeText(PropertyName))
+                            If UcaseFieldName = vbUCase(.nameLc) Then
+                                Select Case vbUCase(EncodeText(PropertyName))
                                     Case "FIELDTYPE", "TYPE"
                                         db_GetContentFieldProperty = .fieldTypeId
                                     Case "HTMLCONTENT"
@@ -16382,17 +16465,17 @@ ErrorTrap:
                 Dim ExpressionString As String = web_ReadStreamText(Key)
                 If Not IsNull(ExpressionString) Then
                     If ExpressionString <> "" Then
-                        If IsNumeric(ExpressionString) Then
+                        If vbIsNumeric(ExpressionString) Then
                             If ExpressionString <> "0" Then
                                 returnTrue = True
                             Else
                                 returnTrue = False
                             End If
-                        ElseIf UCase(ExpressionString) = "ON" Then
+                        ElseIf vbUCase(ExpressionString) = "ON" Then
                             returnTrue = True
-                        ElseIf UCase(ExpressionString) = "YES" Then
+                        ElseIf vbUCase(ExpressionString) = "YES" Then
                             returnTrue = True
-                        ElseIf UCase(ExpressionString) = "TRUE" Then
+                        ElseIf vbUCase(ExpressionString) = "TRUE" Then
                             returnTrue = True
                         Else
                             returnTrue = False
@@ -16459,7 +16542,7 @@ ErrorTrap:
             '
             testResults = web_ReadStreamText(Key)
             If Not IsNull(web_ReadStreamNumber) Then
-                If IsNumeric(testResults) Then
+                If vbIsNumeric(testResults) Then
                     web_ReadStreamNumber = CDbl(testResults)
                 Else
                     web_ReadStreamNumber = 0
@@ -16524,7 +16607,7 @@ ErrorTrap:
         '       The rest are the archive records.
         '========================================================================
         '
-        Friend Function db_csOpenRecord(ByVal ContentName As String, ByVal RecordID As Integer, Optional ByVal WorkflowAuthoringMode As Boolean = False, Optional ByVal WorkflowEditingMode As Boolean = False, Optional ByVal SelectFieldList As String = "") As Integer
+        Public Function db_csOpenRecord(ByVal ContentName As String, ByVal RecordID As Integer, Optional ByVal WorkflowAuthoringMode As Boolean = False, Optional ByVal WorkflowEditingMode As Boolean = False, Optional ByVal SelectFieldList As String = "") As Integer
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("OpenCSContentRecord_Internal")
             '
             'If Not (true) Then Exit Function
@@ -16637,7 +16720,7 @@ ErrorTrap:
         '
         '
         '
-        Friend Sub db_IncrementContentField_Internal(ByVal ContentName As String, ByVal RecordID As Integer, ByVal FieldName As String)
+        Public Sub db_IncrementContentField_Internal(ByVal ContentName As String, ByVal RecordID As Integer, ByVal FieldName As String)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00253")
             '
             'If Not (true) Then Exit Sub
@@ -16698,7 +16781,7 @@ ErrorTrap:
         '       All arguments typed
         '========================================================================
         '
-        Friend Function db_cs_GetField(ByVal CSPointer As Integer, ByVal FieldName As String) As Object
+        Public Function db_cs_GetField(ByVal CSPointer As Integer, ByVal FieldName As String) As Object
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetCSField_Internal")
             '
             'If Not (true) Then Exit Function
@@ -16965,12 +17048,12 @@ ErrorTrap:
             CDef = metaData.getCdef(ContentName)
             Link = siteProperties.adminURL & "?af=" & AdminFormPublishing
             Copy = Msg_AuthoringSubmittedNotification
-            Copy = Replace(Copy, "<DOMAINNAME>", "<a href=""" & html_EncodeHTML(Link) & """>" & main_ServerDomain & "</a>")
-            Copy = Replace(Copy, "<RECORDNAME>", RecordName)
-            Copy = Replace(Copy, "<CONTENTNAME>", ContentName)
-            Copy = Replace(Copy, "<RECORDID>", RecordID.ToString)
-            Copy = Replace(Copy, "<SUBMITTEDDATE>", main_PageStartTime.ToString)
-            Copy = Replace(Copy, "<SUBMITTEDNAME>", user.name)
+            Copy = vbReplace(Copy, "<DOMAINNAME>", "<a href=""" & html_EncodeHTML(Link) & """>" & main_ServerDomain & "</a>")
+            Copy = vbReplace(Copy, "<RECORDNAME>", RecordName)
+            Copy = vbReplace(Copy, "<CONTENTNAME>", ContentName)
+            Copy = vbReplace(Copy, "<RECORDID>", RecordID.ToString)
+            Copy = vbReplace(Copy, "<SUBMITTEDDATE>", main_PageStartTime.ToString)
+            Copy = vbReplace(Copy, "<SUBMITTEDNAME>", user.name)
             '
             Call main_SendGroupEmail(siteProperties.getText("WorkflowEditorGroup", "Content Editors"), FromAddress, "Authoring Submitted Notification", Copy, False, True)
             '
@@ -17037,9 +17120,9 @@ ErrorTrap:
                 ' ----- site does not support workflow authoring
                 '
                 If RecordEditLocked Then
-                    Copy = Replace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
-                    Copy = Replace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
-                    Copy = Replace(Copy, "<EDITEXPIRESMINUTES>", EncodeText(main_EditLockExpiresMinutes))
+                    Copy = vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
+                    Copy = vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
+                    Copy = vbReplace(Copy, "<EDITEXPIRESMINUTES>", EncodeText(main_EditLockExpiresMinutes))
                     main_GetAuthoringStatusMessage &= Delimiter & Copy
                     Delimiter = "<BR >"
                 End If
@@ -17050,9 +17133,9 @@ ErrorTrap:
                 ' ----- content does not support workflow authoring
                 '
                 If RecordEditLocked Then
-                    Copy = Replace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
-                    Copy = Replace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
-                    Copy = Replace(Copy, "<EDITEXPIRESMINUTES>", EncodeText(main_EditLockExpiresMinutes))
+                    Copy = vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
+                    Copy = vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
+                    Copy = vbReplace(Copy, "<EDITEXPIRESMINUTES>", EncodeText(main_EditLockExpiresMinutes))
                     main_GetAuthoringStatusMessage &= Delimiter & Copy
                     Delimiter = "<BR >"
                 End If
@@ -17067,11 +17150,11 @@ ErrorTrap:
                     ' Approved
                     '
                     If user.isAuthenticatedAdmin() Then
-                        Copy = Replace(Msg_AuthoringApprovedAdmin, "<EDITNAME>", ApprovedBy)
+                        Copy = vbReplace(Msg_AuthoringApprovedAdmin, "<EDITNAME>", ApprovedBy)
                         main_GetAuthoringStatusMessage &= Delimiter & Copy
                         Delimiter = "<BR >"
                     Else
-                        Copy = Replace(Msg_AuthoringApproved, "<EDITNAME>", ApprovedBy)
+                        Copy = vbReplace(Msg_AuthoringApproved, "<EDITNAME>", ApprovedBy)
                         main_GetAuthoringStatusMessage &= Delimiter & Copy
                         Delimiter = "<BR >"
                     End If
@@ -17080,11 +17163,11 @@ ErrorTrap:
                     ' Submitted
                     '
                     If user.isAuthenticatedAdmin() Then
-                        Copy = Replace(Msg_AuthoringSubmittedAdmin, "<EDITNAME>", SubmittedBy)
+                        Copy = vbReplace(Msg_AuthoringSubmittedAdmin, "<EDITNAME>", SubmittedBy)
                         main_GetAuthoringStatusMessage &= Delimiter & Copy
                         Delimiter = "<BR >"
                     Else
-                        Copy = Replace(Msg_AuthoringSubmitted, "<EDITNAME>", SubmittedBy)
+                        Copy = vbReplace(Msg_AuthoringSubmitted, "<EDITNAME>", SubmittedBy)
                         main_GetAuthoringStatusMessage &= Delimiter & Copy
                         Delimiter = "<BR >"
                     End If
@@ -17106,25 +17189,25 @@ ErrorTrap:
                     '
                     If user.isAuthenticatedAdmin() Then
                         If RecordEditLocked Then
-                            Copy = Replace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
-                            Copy = Replace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
-                            Copy = Replace(Copy, "<EDITEXPIRESMINUTES>", EncodeText(main_EditLockExpiresMinutes))
+                            Copy = vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
+                            Copy = vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
+                            Copy = vbReplace(Copy, "<EDITEXPIRESMINUTES>", EncodeText(main_EditLockExpiresMinutes))
                             main_GetAuthoringStatusMessage &= Delimiter & Copy
                             Delimiter = "<BR >"
                         End If
-                        Copy = Replace(Msg_AuthoringRecordModifedAdmin, "<EDITNAME>", ModifiedBy)
+                        Copy = vbReplace(Msg_AuthoringRecordModifedAdmin, "<EDITNAME>", ModifiedBy)
                         main_GetAuthoringStatusMessage &= Delimiter & Copy
                         'main_GetAuthoringStatusMessage &=  Delimiter & Msg_AuthoringRecordModifedAdmin
                         Delimiter = "<BR >"
                     Else
                         If RecordEditLocked Then
-                            Copy = Replace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
-                            Copy = Replace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
-                            Copy = Replace(Copy, "<EDITEXPIRESMINUTES>", EncodeText(main_EditLockExpiresMinutes))
+                            Copy = vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
+                            Copy = vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
+                            Copy = vbReplace(Copy, "<EDITEXPIRESMINUTES>", EncodeText(main_EditLockExpiresMinutes))
                             main_GetAuthoringStatusMessage &= Delimiter & Copy
                             Delimiter = "<BR >"
                         End If
-                        Copy = Replace(Msg_AuthoringRecordModifed, "<EDITNAME>", ModifiedBy)
+                        Copy = vbReplace(Msg_AuthoringRecordModifed, "<EDITNAME>", ModifiedBy)
                         main_GetAuthoringStatusMessage &= Delimiter & Copy
                         'main_GetAuthoringStatusMessage &=  Delimiter & Msg_AuthoringRecordModifed
                         Delimiter = "<BR >"
@@ -17138,9 +17221,9 @@ ErrorTrap:
                     ' no changes
                     '
                     If RecordEditLocked Then
-                        Copy = Replace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
-                        Copy = Replace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
-                        Copy = Replace(Copy, "<EDITEXPIRESMINUTES>", EncodeText(main_EditLockExpiresMinutes))
+                        Copy = vbReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName)
+                        Copy = vbReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString)
+                        Copy = vbReplace(Copy, "<EDITEXPIRESMINUTES>", EncodeText(main_EditLockExpiresMinutes))
                         main_GetAuthoringStatusMessage &= Delimiter & Copy
                         Delimiter = "<BR >"
                     End If
@@ -17503,7 +17586,7 @@ ErrorTrap:
             '
             iCS = EncodeInteger(CSPointer)
             If Not db.cs_Ok(iCS) Then
-                Call Err.Raise(KmaErrorInternal, "dll", "ContentSet is not main_CSOK")
+                Call Err.Raise(ignoreInteger, "dll", "ContentSet is not main_CSOK")
             Else
                 db_GetCSSource = db.db_GetCSSource(iCS)
             End If
@@ -17696,12 +17779,12 @@ ErrorTrap:
         '            '    ' converted array to dictionary - Dim FieldPointer As Integer
         '            '    Dim UcaseFieldName As String
         '            '    '
-        '            '    UcaseFieldName = UCase(encodeText(FieldName))
+        '            '    UcaseFieldName = vbUCase(encodeText(FieldName))
         '            '    If Not IsEmpty(main_oldCacheRS_FieldValues) Then
         '            '        FieldCount = UBound(main_oldCacheRS_FieldNames)
         '            '        If FieldCount > 0 Then
         '            '            For FieldPointer = 0 To FieldCount - 1
-        '            '                If UcaseFieldName = UCase(main_oldCacheRS_FieldNames(FieldPointer)) Then
+        '            '                If UcaseFieldName = vbUCase(main_oldCacheRS_FieldNames(FieldPointer)) Then
         '            '                    main_GetContentPageField = main_oldCacheRS_FieldValues(FieldPointer)
         '            '                    Exit For
         '            '                    End If
@@ -17869,9 +17952,9 @@ ErrorTrap:
                 Key = TagName.ToLower()
                 If docProperties.docPropertiesDict.ContainsKey(Key) Then
                     With docProperties.docPropertiesDict(TagName.ToLower())
-                        If (.IsFile) And (UCase(.Name) = UCase(Key)) Then
+                        If (.IsFile) And (UCase(.Name) = vbUCase(Key)) Then
                             iVirtualFilePath = EncodeText(VirtualFilePath)
-                            iVirtualFilePath = Replace(iVirtualFilePath, "/", "\")
+                            iVirtualFilePath = vbReplace(iVirtualFilePath, "/", "\")
 
                             If iVirtualFilePath <> "" Then
                                 If Left(iVirtualFilePath, 1) = "\" Then
@@ -17969,7 +18052,7 @@ ErrorTrap:
                             ' If x_wap, set mobile true
                             '
                             visit_browserIsMobile = True
-                        ElseIf InStr(1, webServer.requestHttpAccept, "wap", vbTextCompare) <> 0 Then
+                        ElseIf vbInstr(1, webServer.requestHttpAccept, "wap", vbTextCompare) <> 0 Then
                             '
                             ' If main_HTTP_Accept, set mobile true
                             '
@@ -17980,12 +18063,12 @@ ErrorTrap:
                             '
                             UserAgentSubstrings = main_GetMobileBrowserList()
                             If UserAgentSubstrings <> "" Then
-                                UserAgentSubstrings = Replace(UserAgentSubstrings, vbCrLf, vbLf)
+                                UserAgentSubstrings = vbReplace(UserAgentSubstrings, vbCrLf, vbLf)
                                 Subs = Split(UserAgentSubstrings, vbLf)
                                 Cnt = UBound(Subs) + 1
                                 If Cnt > 0 Then
                                     For Ptr = 0 To Cnt - 1
-                                        If InStr(1, BrowserUserAgent, Subs(Ptr), vbTextCompare) <> 0 Then
+                                        If vbInstr(1, BrowserUserAgent, Subs(Ptr), vbTextCompare) <> 0 Then
                                             visit_browserIsMobile = True
                                             Exit For
                                         End If
@@ -18008,7 +18091,7 @@ ErrorTrap:
                 visit_isBot = True
                 visit_isBadBot = False
             Else
-                DetailsStart = InStr(1, BrowserUserAgent, "(")
+                DetailsStart = vbInstr(1, BrowserUserAgent, "(")
                 '
                 If DetailsStart = 0 Then
                     '
@@ -18019,7 +18102,7 @@ ErrorTrap:
                     '"CompatibleAgent (details) DetailTail" format
                     '
                     Details = Mid(BrowserUserAgent, DetailsStart + 1)
-                    DetailsEnd = InStr(1, Details, ")")
+                    DetailsEnd = vbInstr(1, Details, ")")
                     If DetailsEnd <> 0 Then
                         If Len(Details) > DetailsEnd Then
                             DetailTail = Trim(Mid(Details, DetailsEnd + 1))
@@ -18030,10 +18113,10 @@ ErrorTrap:
                     '
                     ' Netscape puts phrase in the DetailTail
                     '
-                    PositionStart = InStr(1, DetailTail, "netscape", vbTextCompare)
+                    PositionStart = vbInstr(1, DetailTail, "netscape", vbTextCompare)
                     If PositionStart <> 0 Then
                         visit_browserIsNS = True
-                        PositionEnd = InStr(PositionStart, DetailTail, " ")
+                        PositionEnd = vbInstr(PositionStart, DetailTail, " ")
                         If PositionEnd = 0 Then
                             Agent = Mid(DetailTail, PositionStart)
                         Else
@@ -18056,20 +18139,20 @@ ErrorTrap:
                             If UBound(DetailsVersionSection) > 0 Then
                                 visit_browserVersion = Trim(DetailsVersionSection(1))
                             End If
-                        ElseIf InStr(1, Details, "netscape", vbTextCompare) <> 0 Then
+                        ElseIf vbInstr(1, Details, "netscape", vbTextCompare) <> 0 Then
                             '
                             visit_browserIsNS = True
                         End If
                         '
-                        If InStr(1, Detail, "win", vbTextCompare) <> 0 Then
+                        If vbInstr(1, Detail, "win", vbTextCompare) <> 0 Then
                             visit_browserIsWindows = True
                         End If
                         '
-                        If InStr(1, Detail, "mac", vbTextCompare) <> 0 Then
+                        If vbInstr(1, Detail, "mac", vbTextCompare) <> 0 Then
                             visit_browserIsMac = True
                         End If
                         '
-                        If InStr(1, Detail, "linux", vbTextCompare) <> 0 Then
+                        If vbInstr(1, Detail, "linux", vbTextCompare) <> 0 Then
                             visit_browserIsLinux = True
                         End If
                     Next
@@ -18089,7 +18172,7 @@ ErrorTrap:
                 End If
                 If BotList = "" Then
                     Filename = "config\VisitNameList.txt"
-                    BotList = cluster.clusterFiles.ReadFile(Filename)
+                    BotList = cluster.localClusterFiles.ReadFile(Filename)
                     If BotList = "" Then
                         BotList = "" _
                             & vbCrLf & "//" _
@@ -18112,14 +18195,14 @@ ErrorTrap:
                             & vbCrLf & "Unknown Bot" & vbTab & "robot" & vbTab & vbTab & "r" _
                             & vbCrLf & "Unknown Bot" & vbTab & "crawl" & vbTab & vbTab & "r" _
                             & ""
-                        Call cluster.clusterFiles.SaveFile(Filename, BotList)
+                        Call cluster.localClusterFiles.SaveFile(Filename, BotList)
                     End If
                     DateExpires = main_PageStartTime.AddHours(1)
                     Call cache.setKey("DefaultBotNameList", CStr(DateExpires) & vbCrLf & BotList)
                 End If
                 '
                 If BotList <> "" Then
-                    BotList = Replace(BotList, vbCrLf, vbLf)
+                    BotList = vbReplace(BotList, vbCrLf, vbLf)
                     Bots = Split(BotList, vbLf)
                     If UBound(Bots) >= 0 Then
                         For Ptr = 0 To UBound(Bots)
@@ -18131,7 +18214,7 @@ ErrorTrap:
                                 Args = Split(Arg, vbTab)
                                 If UBound(Args) > 0 Then
                                     If Trim(Args(1)) <> "" Then
-                                        If InStr(1, BrowserUserAgent, Args(1), vbTextCompare) <> 0 Then
+                                        If vbInstr(1, BrowserUserAgent, Args(1), vbTextCompare) <> 0 Then
                                             visit_name = Args(0)
                                             visitNameFound = True
                                             Exit For
@@ -18139,7 +18222,7 @@ ErrorTrap:
                                     End If
                                     If UBound(Args) > 1 Then
                                         If Trim(Args(2)) <> "" Then
-                                            If InStr(1, webServer.requestRemoteIP, Args(2), vbTextCompare) <> 0 Then
+                                            If vbInstr(1, webServer.requestRemoteIP, Args(2), vbTextCompare) <> 0 Then
                                                 visit_name = Args(0)
                                                 visitNameFound = True
                                                 Exit For
@@ -18384,7 +18467,7 @@ ErrorTrap:
         ' ----- Process the reply from the Authoring Tools Panel form
         '========================================================================
         '
-        Friend Sub pageManager_ProcessFormQuickEditing()
+        Public Sub pageManager_ProcessFormQuickEditing()
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00363")
             '
             Dim RecordParentID As Integer
@@ -18675,16 +18758,16 @@ ErrorTrap:
             '
             '
             If (PageName = "") Or (ContentName = "") Then
-                Call Err.Raise(KmaErrorInternal, "dll", "main_GetPageMenu requires a valid page name and content name")
+                Call Err.Raise(ignoreInteger, "dll", "main_GetPageMenu requires a valid page name and content name")
             Else
                 '
                 ' ----- Read Bake Version
                 '
                 BakeName = "main_GetMenu-" & web_requestProtocol & "-" & webServer.requestDomain & "-" & PageName & "-" & ContentName & "-" & DefaultLink & "-" & RootPageRecordID & "-" & DepthLimit & "-" & MenuStyle & "-" & StyleSheetPrefix
-                BakeName = Replace(BakeName, "/", "_")
-                BakeName = Replace(BakeName, ":", "_")
-                BakeName = Replace(BakeName, ".", "_")
-                BakeName = Replace(BakeName, " ", "_")
+                BakeName = vbReplace(BakeName, "/", "_")
+                BakeName = vbReplace(BakeName, ":", "_")
+                BakeName = vbReplace(BakeName, ".", "_")
+                BakeName = vbReplace(BakeName, " ", "_")
                 pageManager_GetSectionMenu_NameMenu = EncodeText(cache.getObject(Of String)(BakeName))
                 If pageManager_GetSectionMenu_NameMenu <> "" Then
                     pageManager_GetSectionMenu_NameMenu = pageManager_GetSectionMenu_NameMenu
@@ -18840,7 +18923,7 @@ ErrorTrap:
                                 Call db.executeSql("update ccpagecontent set ChildPagesFound=0 where id=" & MenuID)
                             End If
                         End If
-                        pageManager_GetSectionMenu_NameMenu = pageManager_GetSectionMenu_NameMenu & Replace(menuFlyout.getMenu(MenuNamePrefix & EncodeText(MenuID), MenuStyle, StyleSheetPrefix), vbCrLf, "")
+                        pageManager_GetSectionMenu_NameMenu = pageManager_GetSectionMenu_NameMenu & vbReplace(menuFlyout.getMenu(MenuNamePrefix & EncodeText(MenuID), MenuStyle, StyleSheetPrefix), vbCrLf, "")
                         pageManager_GetSectionMenu_NameMenu = pageManager_GetSectionMenu_NameMenu & menu_GetClose()
                         Call cache.setKey(BakeName, pageManager_GetSectionMenu_NameMenu, ContentName & ",Site Sections,Dynamic Menus,Dynamic Menu Section Rules")
                     End If
@@ -18897,16 +18980,16 @@ ErrorTrap:
             '$$$$$ cache this - somewhere in here it opens cs with contentname
             ContentName = "Page Content"
             If False Then
-                Call Err.Raise(KmaErrorInternal, "dll", "main_GetPageMenu requires a valid page name and content name")
+                Call Err.Raise(ignoreInteger, "dll", "main_GetPageMenu requires a valid page name and content name")
             Else
                 '
                 ' ----- Read Bake Version
                 '
                 BakeName = "main_GetMenu-" & web_requestProtocol & "-" & webServer.requestDomain & "-" & RootPageRecordID & "-" & DefaultLink & "-" & DepthLimit & "-" & MenuStyle & "-" & StyleSheetPrefix
-                BakeName = Replace(BakeName, "/", "_")
-                BakeName = Replace(BakeName, ":", "_")
-                BakeName = Replace(BakeName, ".", "_")
-                BakeName = Replace(BakeName, " ", "_")
+                BakeName = vbReplace(BakeName, "/", "_")
+                BakeName = vbReplace(BakeName, ":", "_")
+                BakeName = vbReplace(BakeName, ".", "_")
+                BakeName = vbReplace(BakeName, " ", "_")
                 pageManager_GetSectionMenu_IdMenu = EncodeText(cache.getObject(Of String)(BakeName))
                 If pageManager_GetSectionMenu_IdMenu <> "" Then
                     pageManager_GetSectionMenu_IdMenu = pageManager_GetSectionMenu_IdMenu
@@ -19108,7 +19191,7 @@ ErrorTrap:
                         '
                         ' ----- main_Get the Menu Header
                         '
-                        pageManager_GetSectionMenu_IdMenu = pageManager_GetSectionMenu_IdMenu & Replace(menuFlyout.getMenu(MenuNamePrefix & EncodeText(PageID), MenuStyle, StyleSheetPrefix), vbCrLf, "")
+                        pageManager_GetSectionMenu_IdMenu = pageManager_GetSectionMenu_IdMenu & vbReplace(menuFlyout.getMenu(MenuNamePrefix & EncodeText(PageID), MenuStyle, StyleSheetPrefix), vbCrLf, "")
                         '
                         ' ----- Add in the rest of the menu details
                         ' ##### this must be here because it must go into the bake, else a baked page fails without he menus
@@ -19237,7 +19320,7 @@ ErrorTrap:
                         End If
                         If (MenuCaption <> "") Then
                             PageID = EncodeInteger(cache_pageContent(PCC_ID, PCCPtr))
-                            If InStr(1, UsedPageIDStringLocal & ",", "," & EncodeText(PageID) & ",") = 0 Then
+                            If vbInstr(1, UsedPageIDStringLocal & ",", "," & EncodeText(PageID) & ",") = 0 Then
                                 UsedPageIDStringLocal = UsedPageIDStringLocal & "," & EncodeText(PageID)
                                 If ChildCount >= ChildSize Then
                                     ChildSize = ChildSize + 100
@@ -19413,7 +19496,7 @@ ErrorTrap:
             Dim pageAllowBrief As Boolean
             '
             ChildListCount = 0
-            UcaseRequestedListName = UCase(RequestedListName)
+            UcaseRequestedListName = vbUCase(RequestedListName)
             If (UcaseRequestedListName = "NONE") Or (UcaseRequestedListName = "ORPHAN") Then
                 UcaseRequestedListName = ""
             End If
@@ -19481,7 +19564,7 @@ ErrorTrap:
                     '
                     ' ----- Requested orphan List, Not AllowChildListDisplay, not Authoring, do not display
                     '
-                ElseIf (UcaseRequestedListName <> "") And (UcaseRequestedListName <> UCase(pageParentListName)) Then
+                ElseIf (UcaseRequestedListName <> "") And (UcaseRequestedListName <> vbUCase(pageParentListName)) Then
                     '
                     ' ----- requested named list and wrong RequestedListName, do not display
                     '
@@ -19603,7 +19686,7 @@ ErrorTrap:
         '   MenuName blank reverse menu to legacy mode (all sections on menu)
         '=============================================================================
         '
-        Friend Function pageManager_GetSectionMenu(ByVal DepthLimit As Integer, ByVal MenuStyle As Integer, ByVal StyleSheetPrefix As String, ByVal DefaultTemplateLink As String, ByVal MenuID As Integer, ByVal MenuName As String, ByVal UseContentWatchLink As Boolean) As String
+        Public Function pageManager_GetSectionMenu(ByVal DepthLimit As Integer, ByVal MenuStyle As Integer, ByVal StyleSheetPrefix As String, ByVal DefaultTemplateLink As String, ByVal MenuID As Integer, ByVal MenuName As String, ByVal UseContentWatchLink As Boolean) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("PageList_GetSectionMenu")
             '
             Dim layoutError As String
@@ -19857,7 +19940,7 @@ ErrorTrap:
                         ' main_Get Menu, remove crlf, and parse the line with crlf
                         '
                         MenuString = pageManager_GetSectionMenu_IdMenu(rootPageId, Link, DepthLimit, MenuStyle, StyleSheetPrefix, MenuImage, MenuImageOver, SectionCaption, SectionID, UseContentWatchLink)
-                        MenuString = Replace(AuthoringTag & MenuString, vbCrLf, "")
+                        MenuString = vbReplace(AuthoringTag & MenuString, vbCrLf, "")
                         If (MenuString <> "") Then
                             If (pageManager_GetSectionMenu = "") Then
                                 pageManager_GetSectionMenu = MenuString
@@ -19890,7 +19973,7 @@ ErrorTrap:
         '       Is This member allowed through the content block
         '=============================================================================
         '
-        Friend Function pageManager_BypassContentBlock(ByVal ContentID As Integer, ByVal RecordID As Integer) As Boolean
+        Public Function pageManager_BypassContentBlock(ByVal ContentID As Integer, ByVal RecordID As Integer) As Boolean
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00374")
             '
             Dim CS As Integer
@@ -19951,10 +20034,10 @@ ErrorTrap:
                 MsgLabel = "Msg" & EncodeText(GetRandomInteger)
                 '
                 main_JavaStream_Text = Join(main_JavaStreamHolder, "")
-                main_JavaStream_Text = Replace(main_JavaStream_Text, "'", "'+""'""+'")
-                main_JavaStream_Text = Replace(main_JavaStream_Text, vbCrLf, "\n")
-                main_JavaStream_Text = Replace(main_JavaStream_Text, vbCr, "\n")
-                main_JavaStream_Text = Replace(main_JavaStream_Text, vbLf, "\n")
+                main_JavaStream_Text = vbReplace(main_JavaStream_Text, "'", "'+""'""+'")
+                main_JavaStream_Text = vbReplace(main_JavaStream_Text, vbCrLf, "\n")
+                main_JavaStream_Text = vbReplace(main_JavaStream_Text, vbCr, "\n")
+                main_JavaStream_Text = vbReplace(main_JavaStream_Text, vbLf, "\n")
                 main_JavaStream_Text = "var " & MsgLabel & " = '" & main_JavaStream_Text & "'; document.write( " & MsgLabel & " ); " & vbCrLf
 
             End Get
@@ -19962,7 +20045,7 @@ ErrorTrap:
         '
         '
         '
-        Friend Sub main_GetPageArgs(ByVal PageID As Integer, ByVal main_IsWorkflowRendering As Boolean, ByVal main_IsQuickEditing As Boolean, ByRef return_CCID As Integer, ByRef return_TemplateID As Integer, ByRef return_ParentID As Integer, ByRef return_MenuLinkOverRide As String, ByRef return_IsRootPage As Boolean, ByRef return_SectionID As Integer, ByRef return_PageIsSecure As Boolean, ByVal UsedIDList As String)
+        Public Sub main_GetPageArgs(ByVal PageID As Integer, ByVal main_IsWorkflowRendering As Boolean, ByVal main_IsQuickEditing As Boolean, ByRef return_CCID As Integer, ByRef return_TemplateID As Integer, ByRef return_ParentID As Integer, ByRef return_MenuLinkOverRide As String, ByRef return_IsRootPage As Boolean, ByRef return_SectionID As Integer, ByRef return_PageIsSecure As Boolean, ByVal UsedIDList As String)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetPageArgs")
             '
             Dim TCPtr As Integer
@@ -20023,7 +20106,7 @@ ErrorTrap:
                     '
                     If pageManager_cache_pageTemplate_rows > 0 Then
                         For TCPtr = 0 To pageManager_cache_pageTemplate_rows - 1
-                            If LCase(EncodeText(cache_pageTemplate(TC_Name, TCPtr))) = "default" Then
+                            If vbLCase(EncodeText(cache_pageTemplate(TC_Name, TCPtr))) = "default" Then
                                 Exit For
                             End If
                         Next
@@ -20231,7 +20314,7 @@ ErrorTrap:
             '
             defaultPathPage = siteProperties.serverPageDefault
             If defaultPathPage <> "" Then
-                Pos = InStr(1, defaultPathPage, "?")
+                Pos = vbInstr(1, defaultPathPage, "?")
                 If Pos <> 0 Then
                     defaultPathPage = Mid(defaultPathPage, 1, Pos - 1)
                 End If
@@ -20253,7 +20336,7 @@ ErrorTrap:
             Else
                 If pageManager_cache_pageTemplate_rows > 0 Then
                     For TCPtr = 0 To pageManager_cache_pageTemplate_rows - 1
-                        If LCase(EncodeText(cache_pageTemplate(TC_Name, TCPtr))) = "default" Then
+                        If vbLCase(EncodeText(cache_pageTemplate(TC_Name, TCPtr))) = "default" Then
                             Exit For
                         End If
                     Next
@@ -20292,7 +20375,7 @@ ErrorTrap:
                         Call cache_linkAlias_load()
                     End If
                     If cache_linkAliasCnt > 0 Then
-                        Key = LCase(CStr(PageID) & QueryStringSuffix)
+                        Key = vbLCase(CStr(PageID) & QueryStringSuffix)
                         Ptr = cache_linkAlias_PageIdQSSIndex.getPtr(Key)
                         If Ptr >= 0 Then
                             linkAlias = EncodeText(cache_linkAlias(1, Ptr))
@@ -20417,7 +20500,7 @@ ErrorTrap:
         '   If you already have all the info, lik the parents templateid, etc, call the ...WithArgs call
         '====================================================================================================
         '
-        Friend Function main_GetPageDynamicLink(ByVal PageID As Integer, ByVal UseContentWatchLink As Boolean) As String
+        Public Function main_GetPageDynamicLink(ByVal PageID As Integer, ByVal UseContentWatchLink As Boolean) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetPageDynamicLink")
             '
             Dim CS As Integer
@@ -20872,7 +20955,7 @@ ErrorTrap:
                     Call main_addMetaDescription2(html_EncodeHTML(db.cs_getText(CS, "MetaDescription")), "page content")
                     Call main_AddHeadTag2(db.cs_getText(CS, "OtherHeadTags"), "page content")
                     If True Then
-                        KeywordList = Replace(db.cs_getText(CS, "MetaKeywordList"), vbCrLf, ",")
+                        KeywordList = vbReplace(db.cs_getText(CS, "MetaKeywordList"), vbCrLf, ",")
                     End If
                     'main_MetaContent_Title = encodeHTML(app.csv_GetCSText(CS, "Name"))
                     'main_MetaContent_Description = encodeHTML(app.csv_GetCSText(CS, "MetaDescription"))
@@ -21041,12 +21124,12 @@ ErrorTrap:
             Dim BodyStart As Integer
             Dim BodyEnd As Integer
             '
-            BodyStart = InStr(1, PageSource, "<body", vbTextCompare)
+            BodyStart = vbInstr(1, PageSource, "<body", vbTextCompare)
             If BodyStart <> 0 Then
-                BodyStart = InStr(BodyStart, PageSource, ">", vbTextCompare)
+                BodyStart = vbInstr(BodyStart, PageSource, ">", vbTextCompare)
                 If BodyStart <> 0 Then
                     BodyStart = BodyStart + 1
-                    BodyEnd = InStr(BodyStart, PageSource, "</body", vbTextCompare)
+                    BodyEnd = vbInstr(BodyStart, PageSource, "</body", vbTextCompare)
                     If BodyEnd <> 0 Then
                         PageSourceBody = Mid(PageSource, BodyStart, BodyEnd - BodyStart)
                         PageSourcePreBody = Left(PageSource, BodyStart - 1)
@@ -21143,7 +21226,7 @@ ErrorTrap:
                     '--------------------------------------------------------------------------
                     '
                     Dim AllowCookieTest As Boolean
-                    AllowCookieTest = siteProperties.getBoolean("allowVisitTracking", True) And (visit_pages = 1)
+                    AllowCookieTest = siteProperties.allowVisitTracking And (visit_pages = 1)
                     If AllowCookieTest Then
                         Call main_AddOnLoadJavascript2("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" & security.encodeToken(visit_Id, main_PageStartTime) & "')};", "Cookie Test")
                     End If
@@ -21299,7 +21382,7 @@ ErrorTrap:
                                 '
                                 ' Current identity is a content manager for this content
                                 '
-                                Dim Position As Integer = InStr(1, ClipBoard, ".")
+                                Dim Position As Integer = vbInstr(1, ClipBoard, ".")
                                 If Position = 0 Then
                                     Call error_AddUserError("The paste operation failed because the clipboard data is configured incorrectly.")
                                 Else
@@ -21460,17 +21543,17 @@ ErrorTrap:
                                 ' build link variations needed later
                                 '
                                 '
-                                Pos = InStr(1, webServer.requestPathPage, "://", vbTextCompare)
+                                Pos = vbInstr(1, webServer.requestPathPage, "://", vbTextCompare)
                                 If Pos <> 0 Then
                                     LinkNoProtocol = Mid(webServer.requestPathPage, Pos + 3)
-                                    Pos = InStr(Pos + 3, webServer.requestPathPage, "/", vbBinaryCompare)
+                                    Pos = vbInstr(Pos + 3, webServer.requestPathPage, "/", vbBinaryCompare)
                                     If Pos <> 0 Then
                                         linkDomain = Mid(webServer.requestPathPage, 1, Pos - 1)
                                         LinkFullPath = Mid(webServer.requestPathPage, Pos)
                                         '
                                         ' strip off leading or trailing slashes, and return only the string between the leading and secton slash
                                         '
-                                        If InStr(1, LinkFullPath, "/") <> 0 Then
+                                        If vbInstr(1, LinkFullPath, "/") <> 0 Then
                                             LinkSplit = Split(LinkFullPath, "/")
                                             LinkFullPathNoSlash = LinkSplit(0)
                                             If LinkFullPathNoSlash = "" Then
@@ -21491,19 +21574,19 @@ ErrorTrap:
                                 '
                                 Call cache_linkForward_load()
                                 If cache_linkForward <> "" Then
-                                    If 0 < InStr(1, cache_linkForward, "," & webServer.requestPathPage & ",", vbTextCompare) Then
+                                    If 0 < vbInstr(1, cache_linkForward, "," & webServer.requestPathPage & ",", vbTextCompare) Then
                                         isLinkForward = True
                                         LinkForwardCriteria = "(active<>0)and(SourceLink=" & db.encodeSQLText(webServer.requestPathPage) & ")"
-                                    ElseIf 0 < InStr(1, cache_linkForward, "," & webServer.requestPathPage & "/,", vbTextCompare) Then
+                                    ElseIf 0 < vbInstr(1, cache_linkForward, "," & webServer.requestPathPage & "/,", vbTextCompare) Then
                                         isLinkForward = True
                                         LinkForwardCriteria = "(active<>0)and(SourceLink=" & db.encodeSQLText(webServer.requestPathPage & "/") & ")"
-                                    ElseIf 0 < InStr(1, cache_linkForward, "," & LinkNoProtocol & ",", vbTextCompare) Then
+                                    ElseIf 0 < vbInstr(1, cache_linkForward, "," & LinkNoProtocol & ",", vbTextCompare) Then
                                         isLinkForward = True
                                         LinkForwardCriteria = "(active<>0)and(SourceLink=" & db.encodeSQLText(LinkNoProtocol) & ")"
-                                    ElseIf 0 < InStr(1, cache_linkForward, "," & LinkFullPath & ",", vbTextCompare) Then
+                                    ElseIf 0 < vbInstr(1, cache_linkForward, "," & LinkFullPath & ",", vbTextCompare) Then
                                         isLinkForward = True
                                         LinkForwardCriteria = "(active<>0)and(SourceLink=" & db.encodeSQLText(LinkFullPath) & ")"
-                                    ElseIf 0 < InStr(1, cache_linkForward, "," & LinkFullPathNoSlash & ",", vbTextCompare) Then
+                                    ElseIf 0 < vbInstr(1, cache_linkForward, "," & LinkFullPathNoSlash & ",", vbTextCompare) Then
                                         isLinkForward = True
                                         LinkForwardCriteria = "(active<>0)and(SourceLink=" & db.encodeSQLText(LinkFullPathNoSlash) & ")"
                                     End If
@@ -21658,7 +21741,7 @@ ErrorTrap:
                     ' ----- do anonymous access blocking
                     '
                     If Not user.isAuthenticated() Then
-                        If (web_requestPath <> "/") And InStr(1, siteProperties.adminURL, web_requestPath, vbTextCompare) <> 0 Then
+                        If (web_requestPath <> "/") And vbInstr(1, siteProperties.adminURL, web_requestPath, vbTextCompare) <> 0 Then
                             '
                             ' admin page is excluded from custom blocking
                             '
@@ -21755,7 +21838,7 @@ ErrorTrap:
                     '
                     '--------------------------------------------------------------------------
                     '
-                    If LCase(webServer.requestPathPage) = LCase(www_requestRootPath & siteProperties.serverPageDefault) Then
+                    If vbLCase(webServer.requestPathPage) = vbLCase(www_requestRootPath & siteProperties.serverPageDefault) Then
                         '
                         ' This is a 404 caused by Contensive returning a 404
                         '   possibly because the pageid was not found or was inactive.
@@ -21785,7 +21868,7 @@ ErrorTrap:
                         Dim Position As Integer
                         main_ServerReferrerURL = webServer.requestReferrer
                         main_ServerReferrerQs = ""
-                        Position = InStr(1, main_ServerReferrerURL, "?")
+                        Position = vbInstr(1, main_ServerReferrerURL, "?")
                         If Position <> 0 Then
                             main_ServerReferrerQs = Mid(main_ServerReferrerURL, Position + 1)
                             main_ServerReferrerURL = Mid(main_ServerReferrerURL, 1, Position - 1)
@@ -21866,7 +21949,7 @@ ErrorTrap:
         '
         ' assemble all the html parts
         '
-        Friend Function main_assembleHtmlDoc(ByVal docType As String, ByVal head As String, ByVal bodyTag As String, ByVal Body As String) As String
+        Public Function main_assembleHtmlDoc(ByVal docType As String, ByVal head As String, ByVal bodyTag As String, ByVal Body As String) As String
             main_assembleHtmlDoc = "" _
                 & docType _
                 & vbCrLf & "<html>" _
@@ -21995,7 +22078,7 @@ ErrorTrap:
             If VirtualFilename <> "" Then
                 Pos = InStrRev(VirtualFilename, ".")
                 If Pos > 0 Then
-                    Ext = LCase(Mid(VirtualFilename, Pos))
+                    Ext = vbLCase(Mid(VirtualFilename, Pos))
                     Select Case Ext
                         Case ".ico"
                             main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/vnd.microsoft.icon"" href=""" & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
@@ -22073,7 +22156,7 @@ ErrorTrap:
                 If Left(OtherHeadTags, 2) <> vbCrLf Then
                     OtherHeadTags = vbCrLf & OtherHeadTags
                 End If
-                main_GetHTMLInternalHead = main_GetHTMLInternalHead & Replace(OtherHeadTags, vbCrLf, cr)
+                main_GetHTMLInternalHead = main_GetHTMLInternalHead & vbReplace(OtherHeadTags, vbCrLf, cr)
             End If
             '
             Exit Function
@@ -22086,7 +22169,7 @@ ErrorTrap:
         '
         '=============================================================
         '
-        Friend Function main_GetRecordID_Internal(ByVal ContentName As String, ByVal RecordName As String) As Integer
+        Public Function main_GetRecordID_Internal(ByVal ContentName As String, ByVal RecordName As String) As Integer
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetRecordID_Internal")
             '
             If True Then
@@ -22169,7 +22252,7 @@ ErrorTrap:
         '   Create the default landing page if it is missing
         '---------------------------------------------------------------------------
         '
-        Friend Function main_CreatePageGetID(ByVal PageName As String, ByVal ContentName As String, ByVal CreatedBy As Integer, ByVal pageGuid As String) As Integer
+        Public Function main_CreatePageGetID(ByVal PageName As String, ByVal ContentName As String, ByVal CreatedBy As Integer, ByVal pageGuid As String) As Integer
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("CreatePageGetID")
             '
             Dim CS As Integer
@@ -22382,7 +22465,7 @@ ErrorTrap:
         '       Returns DefaultLink if it can not be determined
         '=============================================================================
         '
-        Friend Function main_GetLinkByContentRecordKey(ByVal ContentRecordKey As String, Optional ByVal DefaultLink As String = "") As String
+        Public Function main_GetLinkByContentRecordKey(ByVal ContentRecordKey As String, Optional ByVal DefaultLink As String = "") As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetLinkByContentRecordKey")
             '
             'If Not (true) Then Exit Function
@@ -22609,7 +22692,7 @@ ErrorTrap:
         '
         '
         '
-        Friend Sub menu_AddComboTabEntry(Caption As String, Link As String, AjaxLink As String, LiveBody As String, IsHit As Boolean, ContainerClass As String)
+        Public Sub menu_AddComboTabEntry(Caption As String, Link As String, AjaxLink As String, LiveBody As String, IsHit As Boolean, ContainerClass As String)
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("AddComboTabEntry")
             '
             ' should use the ccNav object, no the ccCommon module for this code
@@ -22626,7 +22709,7 @@ ErrorTrap:
         '
         '
         '
-        Friend Function menu_GetComboTabs() As String
+        Public Function menu_GetComboTabs() As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetComboTabs")
             '
             ' should use the ccNav object, no the ccCommon module for this code
@@ -22648,7 +22731,7 @@ ErrorTrap:
         '   read it first to main_Get the correct contentid
         '============================================================================================================
         '
-        Friend Function content_SetContentControl(ByVal ContentID As Integer, ByVal RecordID As Integer, ByVal NewContentControlID As Integer, Optional ByVal UsedIDString As String = "") As Integer
+        Public Function content_SetContentControl(ByVal ContentID As Integer, ByVal RecordID As Integer, ByVal NewContentControlID As Integer, Optional ByVal UsedIDString As String = "") As Integer
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SetContentControl")
             '
             Dim SQL As String
@@ -22729,7 +22812,7 @@ ErrorTrap:
         '
         '========================================================================
         '
-        Friend Function menu_GetDynamicMenuACSelect() As String
+        Public Function menu_GetDynamicMenuACSelect() As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetDynamicMenuACSelect")
             '
             'If Not (true) Then Exit Function
@@ -22748,7 +22831,7 @@ ErrorTrap:
         ''
         ''========================================================================
         ''
-        'Friend Function main_GetDynamicFormACSelect() As String
+        'public Function main_GetDynamicFormACSelect() As String
         '    On Error GoTo ErrorTrap: 'Dim th as integer: th = profileLogMethodEnter("GetDynamicFormACSelect")
         '    '
         '    'If Not (true) Then Exit Function
@@ -22764,7 +22847,7 @@ ErrorTrap:
         ''
         ''========================================================================
         ''
-        'Friend Function Mergetemplate(EncodedTemplateHTML As String, EncodedContentHTML As String) As String
+        'public Function Mergetemplate(EncodedTemplateHTML As String, EncodedContentHTML As String) As String
         '    On Error GoTo ErrorTrap: 'Dim th as integer: th = profileLogMethodEnter("Mergetemplate")
         '    '
         '    'If Not (true) Then Exit Function
@@ -22872,15 +22955,15 @@ ErrorTrap:
             Dim f As main_FormPagetype
             '
             If True Then
-                PtrFront = InStr(1, Formhtml, "{{REPEATSTART", vbTextCompare)
+                PtrFront = vbInstr(1, Formhtml, "{{REPEATSTART", vbTextCompare)
                 If PtrFront > 0 Then
-                    PtrBack = InStr(PtrFront, Formhtml, "}}")
+                    PtrBack = vbInstr(PtrFront, Formhtml, "}}")
                     If PtrBack > 0 Then
                         f.PreRepeat = Mid(Formhtml, 1, PtrFront - 1)
-                        PtrFront = InStr(PtrBack, Formhtml, "{{REPEATEND", vbTextCompare)
+                        PtrFront = vbInstr(PtrBack, Formhtml, "{{REPEATEND", vbTextCompare)
                         If PtrFront > 0 Then
                             f.RepeatCell = Mid(Formhtml, PtrBack + 2, PtrFront - PtrBack - 2)
-                            PtrBack = InStr(PtrFront, Formhtml, "}}")
+                            PtrBack = vbInstr(PtrFront, Formhtml, "}}")
                             If PtrBack > 0 Then
                                 f.PostRepeat = Mid(Formhtml, PtrBack + 2)
                                 '
@@ -23012,8 +23095,8 @@ ErrorTrap:
                             End If
                             If db.cs_Ok(CSPeople) Then
                                 Body = f.RepeatCell
-                                Body = Replace(Body, "{{CAPTION}}", CaptionSpan & Caption & "</span>", , , vbTextCompare)
-                                Body = Replace(Body, "{{FIELD}}", html_GetFormInputCS(CSPeople, "People", .PeopleField), , , vbTextCompare)
+                                Body = vbReplace(Body, "{{CAPTION}}", CaptionSpan & Caption & "</span>", 1, 99, vbTextCompare)
+                                Body = vbReplace(Body, "{{FIELD}}", html_GetFormInputCS(CSPeople, "People", .PeopleField), 1, 99, vbTextCompare)
                                 RepeatBody = RepeatBody & Body
                                 HasRequiredFields = HasRequiredFields Or .REquired
                             End If
@@ -23023,8 +23106,8 @@ ErrorTrap:
                             '
                             GroupValue = user.IsMemberOfGroup2(.GroupName)
                             Body = f.RepeatCell
-                            Body = Replace(Body, "{{CAPTION}}", html_GetFormInputCheckBox2("Group" & .GroupName, GroupValue), , , vbTextCompare)
-                            Body = Replace(Body, "{{FIELD}}", .Caption)
+                            Body = vbReplace(Body, "{{CAPTION}}", html_GetFormInputCheckBox2("Group" & .GroupName, GroupValue), 1, 99, vbTextCompare)
+                            Body = vbReplace(Body, "{{FIELD}}", .Caption)
                             RepeatBody = RepeatBody & Body
                             GroupRowPtr = GroupRowPtr + 1
                             HasRequiredFields = HasRequiredFields Or .REquired
@@ -23034,8 +23117,8 @@ ErrorTrap:
             Call db.cs_Close(CSPeople)
             If HasRequiredFields Then
                 Body = f.RepeatCell
-                Body = Replace(Body, "{{CAPTION}}", "&nbsp;", , , vbTextCompare)
-                Body = Replace(Body, "{{FIELD}}", "*&nbsp;Required Fields")
+                Body = vbReplace(Body, "{{CAPTION}}", "&nbsp;", 1, 99, vbTextCompare)
+                Body = vbReplace(Body, "{{FIELD}}", "*&nbsp;Required Fields")
                 RepeatBody = RepeatBody & Body
             End If
             '
@@ -23131,7 +23214,7 @@ ErrorTrap:
                                         CSPeople = db_csOpen("people", user.id)
                                     End If
                                     If db.cs_Ok(CSPeople) Then
-                                        Select Case UCase(.PeopleField)
+                                        Select Case vbUCase(.PeopleField)
                                             Case "NAME"
                                                 PeopleName = FormValue
                                                 Call db.cs_set(CSPeople, .PeopleField, FormValue)
@@ -23323,7 +23406,7 @@ ErrorTrap:
             '
             ' Check for MenuID - if present, arguments are in the Dynamic Menu content - else it is old, and they are in the addonOption_String
             '
-            If True And InStr(1, addonOption_String, "menu=", vbTextCompare) <> 0 Then
+            If True And vbInstr(1, addonOption_String, "menu=", vbTextCompare) <> 0 Then
                 MenuNew = main_GetAddonOption("menunew", addonOption_String)
                 'MenuNew = Trim(decodeResponseVariable(main_GetArgument("menunew", addonOption_String, "", "&")))
                 If MenuNew <> "" Then
@@ -23377,7 +23460,7 @@ ErrorTrap:
                     If True Then
                         StylesFilename = db.cs_getText(CS, "StylesFilename")
                         If StylesFilename <> "" Then
-                            If LCase(Right(StylesFilename, 4)) <> ".css" Then
+                            If vbLCase(Right(StylesFilename, 4)) <> ".css" Then
                                 Call handleLegacyError15("Dynamic Menu [" & MenuName & "] StylesFilename is not a '.css' file, and will not display correct. Check that the field is setup as a CSSFile.", "main_GetDynamicMenu")
                             Else
                                 Call main_AddStylesheetLink2(web_requestProtocol & webServer.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, StylesFilename), "dynamic menu")
@@ -23420,7 +23503,7 @@ ErrorTrap:
                 Else
                     MenuStyle = 4
                 End If
-                Select Case UCase(FlyoutDirection)
+                Select Case vbUCase(FlyoutDirection)
                     Case "RIGHT"
                         MenuStyle = MenuStyle + 1
                     Case "UP"
@@ -23433,11 +23516,11 @@ ErrorTrap:
             '
             ' Now adjust results using arguments
             '
-            If UCase(Layout) = "VERTICAL" Then
+            If vbUCase(Layout) = "VERTICAL" Then
                 '
                 ' vertical menu: Set dislay block
                 '
-                pageManager_GetDynamicMenu = Replace(pageManager_GetDynamicMenu, "class=""" & MenuStylePrefix & "Button""", "style=""display:block;"" class=""" & MenuStylePrefix & "Button""")
+                pageManager_GetDynamicMenu = vbReplace(pageManager_GetDynamicMenu, "class=""" & MenuStylePrefix & "Button""", "style=""display:block;"" class=""" & MenuStylePrefix & "Button""")
                 '
                 PreButton = "<div style=""WHITE-SPACE: nowrap;"">"
                 PostButton = "</div>"
@@ -23449,7 +23532,7 @@ ErrorTrap:
                 '
                 ' horizontal menu: Set dislay inline
                 '
-                pageManager_GetDynamicMenu = Replace(pageManager_GetDynamicMenu, "class=""" & MenuStylePrefix & "Button""", "style=""display:inline;"" class=""" & MenuStylePrefix & "Button""")
+                pageManager_GetDynamicMenu = vbReplace(pageManager_GetDynamicMenu, "class=""" & MenuStylePrefix & "Button""", "style=""display:inline;"" class=""" & MenuStylePrefix & "Button""")
                 '
                 If CompatibilitySpanAroundButton Then
                     PreButton = "<span style=""WHITE-SPACE: nowrap"">"
@@ -23460,7 +23543,7 @@ ErrorTrap:
                     MenuDelimiter = "<span style=""WHITE-SPACE: nowrap;"" class=""" & MenuStylePrefix & "Delimiter"">" & MenuDelimiter & "</span>"
                 End If
             End If
-            pageManager_GetDynamicMenu = PreButton & Replace(pageManager_GetDynamicMenu, vbCrLf, PostButton & MenuDelimiter & PreButton) & PostButton
+            pageManager_GetDynamicMenu = PreButton & vbReplace(pageManager_GetDynamicMenu, vbCrLf, PostButton & MenuDelimiter & PreButton) & PostButton
             If user.isAdvancedEditing("") Then
                 pageManager_GetDynamicMenu = "<div style=""border-bottom:1px dashed #404040; padding:5px;margin-bottom:5px;"">Dynamic Menu [" & MenuName & "]" & EditLink & "</div><div>" & pageManager_GetDynamicMenu & "</div>"
             End If
@@ -23472,7 +23555,7 @@ ErrorTrap:
         '
         ' This is a copy of the routine in CSrv -- duplicated so I do not have to make a public until the interface is worked-out
         '
-        Friend Function db_GetSQLSelect(ByVal DataSourceName As String, ByVal From As String, Optional ByVal FieldList As String = "", Optional ByVal Where As String = "", Optional ByVal OrderBy As String = "", Optional ByVal GroupBy As String = "", Optional ByVal RecordLimit As Integer = 0) As String
+        Public Function db_GetSQLSelect(ByVal DataSourceName As String, ByVal From As String, Optional ByVal FieldList As String = "", Optional ByVal Where As String = "", Optional ByVal OrderBy As String = "", Optional ByVal GroupBy As String = "", Optional ByVal RecordLimit As Integer = 0) As String
             On Error GoTo ErrorTrap
             '
             'If Not (true) Then Exit Function
@@ -23568,8 +23651,8 @@ ErrorTrap:
                         If Filename <> "" Then
                             Path = db.db_GetCSFilename(CSPointer, FieldName, Filename)
                             Call db.db_SetCSField(CSPointer, FieldName, Path)
-                            Path = Replace(Path, "\", "/")
-                            Path = Replace(Path, "/" & Filename, "")
+                            Path = vbReplace(Path, "\", "/")
+                            Path = vbReplace(Path, "/" & Filename, "")
                             Call web_ProcessFormInputFile2(LocalRequestName, appRootFiles, Path)
                         End If
                     Case Else
@@ -23856,7 +23939,7 @@ ErrorTrap:
         '       RulesSecondaryFieldName = "GroupID"
         '========================================================================
         '
-        Friend Function main_GetFormInputCheckListCategories_Content(ByVal TagName As String, ByVal PrimaryContentName As String, ByVal PrimaryRecordID As Integer, ByVal SecondaryContentName As String, ByVal RulesContentName As String, ByVal RulesPrimaryFieldname As String, ByVal RulesSecondaryFieldName As String, ByVal SecondaryContentSelectCriteria As String, ByVal CaptionFieldName As String, ByVal readOnlyField As Boolean, ByVal IncludeContentFolderDivs As Boolean, ByVal DefaultSecondaryIDList As String) As String
+        Public Function main_GetFormInputCheckListCategories_Content(ByVal TagName As String, ByVal PrimaryContentName As String, ByVal PrimaryRecordID As Integer, ByVal SecondaryContentName As String, ByVal RulesContentName As String, ByVal RulesPrimaryFieldname As String, ByVal RulesSecondaryFieldName As String, ByVal SecondaryContentSelectCriteria As String, ByVal CaptionFieldName As String, ByVal readOnlyField As Boolean, ByVal IncludeContentFolderDivs As Boolean, ByVal DefaultSecondaryIDList As String) As String
             Dim returnHtml As String = ""
             Try
                 Dim main_MemberShipText() As String
@@ -24251,7 +24334,7 @@ ErrorTrap:
                         Id = db.cs_getInteger(CS, "ID")
                         CurrentFolderID = db.cs_getInteger(CS, "ContentCategoryID")
                         '
-                        Caption = Replace(Caption, " ", "&nbsp;")
+                        Caption = vbReplace(Caption, " ", "&nbsp;")
                         If FirstCaption = "" Then
                             FirstCaption = Caption
                         End If
@@ -24273,7 +24356,7 @@ ErrorTrap:
                     '
                     JSCaption = "All"
                     JSSwitchAll = "switchContentFolderDiv( '" & TagName & ".All',  OldFolder" & main_CheckListCnt & ",'" & TagName & ".ContentCaption','" & JSCaption & "','" & EmptyDivID & "'); OldFolder" & main_CheckListCnt & "='" & TagName & ".All';"
-                    If InStr(1, LeftPane, "<LI", vbTextCompare) = 0 Then
+                    If vbInstr(1, LeftPane, "<LI", vbTextCompare) = 0 Then
                         AllNode = "<div class=""caption""><a href=""#"" onClick=""" & JSSwitchAll & ";return false;"">Show all</a></div>"
                         LeftPane = cr & AllNode & LeftPane
                     Else
@@ -24341,7 +24424,7 @@ ErrorTrap:
             Dim s As String
             '
             s = main_OnLoadJavascript
-            If NewCode <> "" And InStr(1, s, NewCode, vbTextCompare) = 0 Then
+            If NewCode <> "" And vbInstr(1, s, NewCode, vbTextCompare) = 0 Then
                 If s <> "" Then
                     s = s & ";"
                 End If
@@ -24375,7 +24458,7 @@ ErrorTrap:
             Dim s As String
             '
             s = ""
-            If NewCode <> "" And InStr(1, main_endOfBodyJavascript, NewCode, vbTextCompare) = 0 Then
+            If NewCode <> "" And vbInstr(1, main_endOfBodyJavascript, NewCode, vbTextCompare) = 0 Then
                 's = s & vbCrLf
                 If (addedByMessage <> "") And visitProperty.getBoolean("AllowDebugging") Then
                     s = s & "/* from " & addedByMessage & "*/"
@@ -24410,11 +24493,11 @@ ErrorTrap:
             '
             If NewCode <> "" Then
                 s = NewCode
-                StartPos = InStr(1, s, "<script", vbTextCompare)
+                StartPos = vbInstr(1, s, "<script", vbTextCompare)
                 If StartPos <> 0 Then
-                    EndPos = InStr(StartPos, s, "</script", vbTextCompare)
+                    EndPos = vbInstr(StartPos, s, "</script", vbTextCompare)
                     If EndPos <> 0 Then
-                        EndPos = InStr(EndPos, s, ">", vbTextCompare)
+                        EndPos = vbInstr(EndPos, s, ">", vbTextCompare)
                         If EndPos <> 0 Then
                             s = Left(s, StartPos - 1) & Mid(s, EndPos + 1)
                         End If
@@ -24423,28 +24506,28 @@ ErrorTrap:
                 '
                 ' I am going to regret this...
                 '
-                Do While InStr(1, NewCode, vbTab & vbTab) <> 0
-                    NewCode = Replace(NewCode, vbTab & vbTab, vbTab)
+                Do While vbInstr(1, NewCode, vbTab & vbTab) <> 0
+                    NewCode = vbReplace(NewCode, vbTab & vbTab, vbTab)
                 Loop
-                Do While InStr(1, NewCode, cr) <> 0
-                    NewCode = Replace(NewCode, cr, vbCrLf)
+                Do While vbInstr(1, NewCode, cr) <> 0
+                    NewCode = vbReplace(NewCode, cr, vbCrLf)
                 Loop
-                NewCode = Replace(NewCode, vbCrLf & vbCrLf, vbCrLf)
-                NewCode = Replace(NewCode, vbCrLf & vbCrLf, vbCrLf)
-                NewCode = Replace(NewCode, vbCrLf, cr2)
+                NewCode = vbReplace(NewCode, vbCrLf & vbCrLf, vbCrLf)
+                NewCode = vbReplace(NewCode, vbCrLf & vbCrLf, vbCrLf)
+                NewCode = vbReplace(NewCode, vbCrLf, cr2)
                 ReDim Preserve main_HeadScripts(main_HeadScriptCnt)
                 main_HeadScripts(main_HeadScriptCnt).IsLink = False
                 main_HeadScripts(main_HeadScriptCnt).Text = NewCode
-                main_HeadScripts(main_HeadScriptCnt).addedByMessage = LCase(addedByMessage)
+                main_HeadScripts(main_HeadScriptCnt).addedByMessage = vbLCase(addedByMessage)
                 main_HeadScriptCnt = main_HeadScriptCnt + 1
             End If
-            '    If NewCode <> "" And InStr(1, main_HeadScriptCode, NewCode, vbTextCompare) = 0 Then
+            '    If NewCode <> "" And vbInstr(1, main_HeadScriptCode, NewCode, vbTextCompare) = 0 Then
             '        s = NewCode
-            '        StartPos = InStr(1, s, "<script", vbTextCompare)
+            '        StartPos = vbInstr(1, s, "<script", vbTextCompare)
             '        If StartPos <> 0 Then
-            '            EndPos = InStr(StartPos, s, "</script", vbTextCompare)
+            '            EndPos = vbInstr(StartPos, s, "</script", vbTextCompare)
             '            If EndPos <> 0 Then
-            '                EndPos = InStr(EndPos, s, ">", vbTextCompare)
+            '                EndPos = vbInstr(EndPos, s, ">", vbTextCompare)
             '                If EndPos <> 0 Then
             '                    s = Left(s, StartPos - 1) & Mid(s, EndPos + 1)
             '                End If
@@ -24481,7 +24564,7 @@ ErrorTrap:
                 main_HeadScripts(main_HeadScriptCnt).addedByMessage = addedByMessage
                 main_HeadScriptCnt = main_HeadScriptCnt + 1
             End If
-            '    If Filename <> "" And InStr(1, s, Filename, vbTextCompare) = 0 Then
+            '    If Filename <> "" And vbInstr(1, s, Filename, vbTextCompare) = 0 Then
             '
             '        main_HeadScriptLinkList = main_HeadScriptLinkList & vbCrLf & Filename & vbTab & AddedByMessage
             '    End If
@@ -24504,7 +24587,7 @@ ErrorTrap:
         Public Sub main_AddPagetitle2(PageTitle As String, addedByMessage As String)
             On Error GoTo ErrorTrap
             '
-            If PageTitle <> "" And InStr(1, main_MetaContent_Title, PageTitle, vbTextCompare) = 0 Then
+            If PageTitle <> "" And vbInstr(1, main_MetaContent_Title, PageTitle, vbTextCompare) = 0 Then
                 If (addedByMessage <> "") And visitProperty.getBoolean("AllowDebugging") Then
                     Call main_AddHeadTag2("<!-- title from " & addedByMessage & " -->", "")
                 End If
@@ -24533,7 +24616,7 @@ ErrorTrap:
         Public Sub main_addMetaDescription2(MetaDescription As String, addedByMessage As String)
             On Error GoTo ErrorTrap
             '
-            If MetaDescription <> "" And InStr(1, main_MetaContent_Description, MetaDescription, vbTextCompare) = 0 Then
+            If MetaDescription <> "" And vbInstr(1, main_MetaContent_Description, MetaDescription, vbTextCompare) = 0 Then
                 If (addedByMessage <> "") And visitProperty.getBoolean("AllowDebugging") Then
                     Call main_AddHeadTag2("<!-- meta description from " & addedByMessage & " -->", "")
                 End If
@@ -24567,7 +24650,7 @@ ErrorTrap:
                     main_MetaContent_StyleSheetTags = main_MetaContent_StyleSheetTags & "<!-- from " & addedByMessage & " -->"
                 End If
                 If visitProperty.getBoolean("AllowAdvancedEditor") Then
-                    If InStr(1, StyleSheetLink, "&") <> 0 Then
+                    If vbInstr(1, StyleSheetLink, "&") <> 0 Then
                         main_MetaContent_StyleSheetTags = main_MetaContent_StyleSheetTags & "<link rel=""stylesheet"" type=""text/css"" href=""" & StyleSheetLink & """>"
                     Else
                         main_MetaContent_StyleSheetTags = main_MetaContent_StyleSheetTags & "<link rel=""stylesheet"" type=""text/css"" href=""" & StyleSheetLink & """>"
@@ -24595,7 +24678,7 @@ ErrorTrap:
         Public Sub main_AddSharedStyleID2(ByVal styleId As Integer, Optional ByVal addedByMessage As String = "")
             On Error GoTo ErrorTrap
             '
-            If InStr(1, main_MetaContent_SharedStyleIDList & ",", "," & styleId & ",") = 0 Then
+            If vbInstr(1, main_MetaContent_SharedStyleIDList & ",", "," & styleId & ",") = 0 Then
                 If (addedByMessage <> "") And visitProperty.getBoolean("AllowDebugging") Then
                     Call main_AddHeadTag2("<!-- shared style " & styleId & " from " & addedByMessage & " -->", "")
                 End If
@@ -24620,7 +24703,7 @@ ErrorTrap:
         Public Sub main_addMetaKeywordList2(MetaKeywordList As String, addedByMessage As String)
             On Error GoTo ErrorTrap
             '
-            If MetaKeywordList <> "" And InStr(1, main_MetaContent_KeyWordList, MetaKeywordList, vbTextCompare) = 0 Then
+            If MetaKeywordList <> "" And vbInstr(1, main_MetaContent_KeyWordList, MetaKeywordList, vbTextCompare) = 0 Then
                 If (addedByMessage <> "") And visitProperty.getBoolean("AllowDebugging") Then
                     Call main_AddHeadTag2("<!-- meta keyword list from " & addedByMessage & " -->", "")
                 End If
@@ -24648,7 +24731,7 @@ ErrorTrap:
         Public Sub main_AddHeadTag2(HeadTag As String, addedByMessage As String)
             On Error GoTo ErrorTrap
             '
-            If HeadTag <> "" And InStr(1, main_MetaContent_OtherHeadTags, HeadTag, vbTextCompare) = 0 Then
+            If HeadTag <> "" And vbInstr(1, main_MetaContent_OtherHeadTags, HeadTag, vbTextCompare) = 0 Then
                 If main_MetaContent_OtherHeadTags <> "" Then
                     main_MetaContent_OtherHeadTags = main_MetaContent_OtherHeadTags & vbCrLf
                 End If
@@ -24699,7 +24782,7 @@ ErrorTrap:
         '       AddonOptionExpandedConstructor = pass this to the bubble editor to create the the selectr
         '===================================================================================================
         '
-        Friend Sub executeAddon_buildAddonOptionLists(Option_String_ForObjectCall As String, AddonOptionExpandedConstructor As String, AddonOptionConstructor As String, InstanceOptionList As String, InstanceID As String, IncludeEditWrapper As Boolean)
+        Public Sub executeAddon_buildAddonOptionLists(Option_String_ForObjectCall As String, AddonOptionExpandedConstructor As String, AddonOptionConstructor As String, InstanceOptionList As String, InstanceID As String, IncludeEditWrapper As Boolean)
             Call csv_BuildAddonOptionLists(Option_String_ForObjectCall, AddonOptionExpandedConstructor, AddonOptionConstructor, InstanceOptionList, InstanceID, IncludeEditWrapper)
         End Sub
         '
@@ -24827,8 +24910,8 @@ ErrorTrap:
                         LinkAliasPageID = EncodeText(cache_linkAlias(3, Ptr))
                         LinkAliasQueryStringSuffix = EncodeText(cache_linkAlias(4, Ptr))
                         Call cache_linkAlias_NameIndex.setPtr(LCase(LinkAliasName), Ptr)
-                        Key = LCase(LinkAliasPageID & LinkAliasQueryStringSuffix)
-                        If InStr(1, "," & usedKeys & ",", "," & Key & ",") = 0 Then
+                        Key = vbLCase(LinkAliasPageID & LinkAliasQueryStringSuffix)
+                        If vbInstr(1, "," & usedKeys & ",", "," & Key & ",") = 0 Then
                             usedKeys = usedKeys & "," & Key
                             Call cache_linkAlias_PageIdQSSIndex.setPtr(Key, Ptr)
                         End If
@@ -24845,8 +24928,8 @@ ErrorTrap:
                         LinkAliasPageID = EncodeText(cache_linkAlias(3, Ptr))
                         LinkAliasQueryStringSuffix = EncodeText(cache_linkAlias(4, Ptr))
                         Call cache_linkAlias_NameIndex.setPtr(LCase(LinkAliasName), Ptr)
-                        Key = LCase(LinkAliasPageID & LinkAliasQueryStringSuffix)
-                        If InStr(1, "," & usedKeys & ",", "," & Key & ",") = 0 Then
+                        Key = vbLCase(LinkAliasPageID & LinkAliasQueryStringSuffix)
+                        If vbInstr(1, "," & usedKeys & ",", "," & Key & ",") = 0 Then
                             usedKeys = usedKeys & "," & Key
                             Call cache_linkAlias_PageIdQSSIndex.setPtr(Key, Ptr)
                         End If
@@ -24884,7 +24967,7 @@ ErrorTrap:
         '
         '
         '
-        Friend Sub cache_linkAlias_clear()
+        Public Sub cache_linkAlias_clear()
             On Error GoTo ErrorTrap 'Const Tn = "cache_linkAlias_clear": 'Dim th as integer: th = profileLogMethodEnter(Tn)
             '
             cache_linkAliasCnt = 0
@@ -24901,7 +24984,7 @@ ErrorTrap:
         '
         '
         '
-        Friend Function cache_linkAlias_getPtrByPageIdQss(PageID As Integer, QueryStringSuffix As String) As Integer
+        Public Function cache_linkAlias_getPtrByPageIdQss(PageID As Integer, QueryStringSuffix As String) As Integer
             On Error GoTo ErrorTrap 'Const Tn = "cache_linkAlias_getPtrByPageIdQss": 'Dim th as integer: th = profileLogMethodEnter(Tn)
             '
             Dim Key As String
@@ -24911,7 +24994,7 @@ ErrorTrap:
                 Call cache_linkAlias_load()
             End If
             If cache_linkAliasCnt > 0 Then
-                Key = LCase(CStr(PageID) & QueryStringSuffix)
+                Key = vbLCase(CStr(PageID) & QueryStringSuffix)
                 cache_linkAlias_getPtrByPageIdQss = cache_linkAlias_PageIdQSSIndex.getPtr(Key)
             End If
             '
@@ -24925,7 +25008,7 @@ ErrorTrap:
         '
         '
         '
-        Friend Function cache_linkAlias_getPtrByName(aliasName As String) As Integer
+        Public Function cache_linkAlias_getPtrByName(aliasName As String) As Integer
             On Error GoTo ErrorTrap 'Const Tn = "cache_linkAlias_getPtrByName": 'Dim th as integer: th = profileLogMethodEnter(Tn)
             '
             Dim Key As String
@@ -24935,7 +25018,7 @@ ErrorTrap:
                 Call cache_linkAlias_load()
             End If
             If cache_linkAliasCnt > 0 Then
-                Key = LCase(aliasName)
+                Key = vbLCase(aliasName)
                 cache_linkAlias_getPtrByName = cache_linkAlias_NameIndex.getPtr(Key)
             End If
             '
@@ -24981,7 +25064,7 @@ ErrorTrap:
         '
         '====================================================================================================
         '
-        Friend Function main_GetURLRewriteLink(ByVal linkAlias As String) As String
+        Public Function main_GetURLRewriteLink(ByVal linkAlias As String) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetURLRewriteLink")
             '
             Dim Ptr As Integer
@@ -25004,7 +25087,7 @@ ErrorTrap:
         ''
         ''
         ''
-        'Friend Function main_GetCsv() As ContentServerClass
+        'public Function main_GetCsv() As ContentServerClass
         '    On Error GoTo ErrorTrap: 'Dim th as integer: th = profileLogMethodEnter("GetCsv")
         '    '
         '    main_GetCsv = main_cmc
@@ -25093,15 +25176,15 @@ ErrorTrap:
                 ' Add the Referrer to the Admin Msg
                 '
                 If web_requestReferer <> "" Then
-                    Pos = InStr(1, webServer.requestReferrer, "main_AdminWarningPageID=", vbTextCompare)
+                    Pos = vbInstr(1, webServer.requestReferrer, "main_AdminWarningPageID=", vbTextCompare)
                     If Pos <> 0 Then
                         webServer.requestReferrer = Left(webServer.requestReferrer, Pos - 2)
                     End If
-                    Pos = InStr(1, webServer.requestReferrer, "main_AdminWarningMsg=", vbTextCompare)
+                    Pos = vbInstr(1, webServer.requestReferrer, "main_AdminWarningMsg=", vbTextCompare)
                     If Pos <> 0 Then
                         webServer.requestReferrer = Left(webServer.requestReferrer, Pos - 2)
                     End If
-                    Pos = InStr(1, webServer.requestReferrer, "blockcontenttracking=", vbTextCompare)
+                    Pos = vbInstr(1, webServer.requestReferrer, "blockcontenttracking=", vbTextCompare)
                     If Pos <> 0 Then
                         webServer.requestReferrer = Left(webServer.requestReferrer, Pos - 2)
                     End If
@@ -25177,7 +25260,7 @@ ErrorTrap:
         '
         '---------------------------------------------------------------------------
         '
-        Friend Function main_GetLandingPageName(LandingPageID As Integer) As String
+        Public Function main_GetLandingPageName(LandingPageID As Integer) As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetLandingPageName")
             '
             Dim PCCPtr As Integer
@@ -25202,7 +25285,7 @@ ErrorTrap:
         ''
         ''
         ''
-        'Friend Function main_GetHelpLinkRemote(FieldName As String, ContentName As String, Caption As String) As String
+        'public Function main_GetHelpLinkRemote(FieldName As String, ContentName As String, Caption As String) As String
         '    On Error GoTo ErrorTrap: 'Dim th as integer: th = profileLogMethodEnter("GetHelpLinkRemote")
         '    '
         '    Dim QueryString As String
@@ -25337,27 +25420,27 @@ ErrorTrap:
                 '
                 ' remove crlf
                 '
-                StyleFile = Replace(StyleFile, vbCrLf, vbLf)
+                StyleFile = vbReplace(StyleFile, vbCrLf, vbLf)
                 Do
-                    Pos = InStr(1, StyleFile, vbLf)
+                    Pos = vbInstr(1, StyleFile, vbLf)
                     If Pos > 0 Then
-                        StyleFile = Replace(StyleFile, vbLf, " ")
+                        StyleFile = vbReplace(StyleFile, vbLf, " ")
                     End If
                 Loop While Pos > 0
                 '
                 ' remove double spaces
                 '
                 Do
-                    Pos = InStr(1, StyleFile, "  ")
+                    Pos = vbInstr(1, StyleFile, "  ")
                     If Pos > 0 Then
-                        StyleFile = Replace(StyleFile, "  ", " ")
+                        StyleFile = vbReplace(StyleFile, "  ", " ")
                     End If
                 Loop While Pos > 0
                 StyleLines = Split(StyleFile, "}")
                 StyleCnt = UBound(StyleLines) + 1
                 For Ptr = 0 To StyleCnt - 1
                     StyleLine = StyleLines(Ptr)
-                    Pos = InStr(1, StyleLine, "{")
+                    Pos = vbInstr(1, StyleLine, "{")
                     If Pos > 0 Then
                         StyleNameList = StyleNameList & vbCrLf & "<div>" & Mid(StyleLine, 1, Pos - 1) & "</div>"
                     End If
@@ -25402,7 +25485,7 @@ ErrorTrap:
         '
         '==========================================================================================================================================
         '
-        Friend Function main_GetFormInputStyles_Editor(StyleName As String, StyleDetails As String) As String
+        Public Function main_GetFormInputStyles_Editor(StyleName As String, StyleDetails As String) As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetFormInputStyles_Editor")
             '
             '
@@ -25415,7 +25498,7 @@ ErrorTrap:
         '   page content cache
         '====================================================================================================
         '
-        Friend Sub pageManager_cache_pageContent_load(main_IsWorkflowRendering As Boolean, main_IsQuickEditing As Boolean)
+        Public Sub pageManager_cache_pageContent_load(main_IsWorkflowRendering As Boolean, main_IsQuickEditing As Boolean)
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("pageManager_cache_pageContent_load")
             '
             Dim bag As String
@@ -25502,7 +25585,7 @@ ErrorTrap:
                             '
                             ' if menulinkoverride is encoded, decode it
                             '
-                            If InStr(1, cache_pageContent(PCC_Link, Ptr), "%") <> 0 Then
+                            If vbInstr(1, cache_pageContent(PCC_Link, Ptr), "%") <> 0 Then
                                 cache_pageContent(PCC_Link, Ptr) = main_DecodeUrl(cache_pageContent(PCC_Link, Ptr))
                             End If
                         Next
@@ -25532,7 +25615,7 @@ ErrorTrap:
         '
         '
         '
-        Friend Sub pageManager_cache_pageContent_save()
+        Public Sub pageManager_cache_pageContent_save()
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("MainClass.pageManager_cache_pageContent_save")
             '
             Dim cacheArray() As Object
@@ -25593,7 +25676,7 @@ ErrorTrap:
                         If (pageManager_cache_pageContent_getPtr < 0) Then
                             ' do not through error, this can happen if someone deletes a page.
                             Call log_appendLog("pageManager_cache_pageContent_getPtr, pageID[" & PageID & "] not found in cache after reload. ERROR")
-                            'Call Err.Raise(KmaErrorInternal, "cpCoreClass", "pageManager_cache_pageContent_getPtr, pageID [" & PageID & "] reload failed. ERROR")
+                            'Call Err.Raise(ignoreInteger, "cpCoreClass", "pageManager_cache_pageContent_getPtr, pageID [" & PageID & "] reload failed. ERROR")
                             'Call AppendLog("pageManager_cache_pageContent_getPtr, pageID[" & PageID & "] reload failed. ERROR")
                         End If
                         'CS = app.db_csOpen("page content", "id=" & PageID, "id", , , , "ID")
@@ -25757,7 +25840,7 @@ ErrorTrap:
                         Call pageManager_cache_pageContent_nameIndex.setPtr(PageName, RowPtr)
                     End If
                     '
-                    If InStr(1, cache_pageContent(PCC_Link, RowPtr), "%") <> 0 Then
+                    If vbInstr(1, cache_pageContent(PCC_Link, RowPtr), "%") <> 0 Then
                         cache_pageContent(PCC_Link, RowPtr) = main_DecodeUrl(cache_pageContent(PCC_Link, RowPtr))
                     End If
                     '
@@ -25870,12 +25953,12 @@ ErrorTrap:
                 SortSplit = Split(OrderByCriteria, ",")
                 SortSplitCnt = UBound(SortSplit) + 1
                 For SortPtr = 0 To SortSplitCnt - 1
-                    SortFieldName = LCase(SortSplit(SortPtr))
+                    SortFieldName = vbLCase(SortSplit(SortPtr))
                     SortForward = True
-                    If InStr(1, SortFieldName, " asc", vbTextCompare) <> 0 Then
-                        SortFieldName = Replace(SortFieldName, " asc", "")
-                    ElseIf InStr(1, SortFieldName, " desc", vbTextCompare) <> 0 Then
-                        SortFieldName = Replace(SortFieldName, " desc", "")
+                    If vbInstr(1, SortFieldName, " asc", vbTextCompare) <> 0 Then
+                        SortFieldName = vbReplace(SortFieldName, " asc", "")
+                    ElseIf vbInstr(1, SortFieldName, " desc", vbTextCompare) <> 0 Then
+                        SortFieldName = vbReplace(SortFieldName, " desc", "")
                         SortForward = False
                     End If
                     PCCSortFieldPtr = pageManager_cache_pageContent_getColPtr(SortFieldName)
@@ -25945,11 +26028,11 @@ ErrorTrap:
         '
         '
         '
-        Friend Function pageManager_cache_pageContent_getColPtr(FieldName As String) As Integer
+        Public Function pageManager_cache_pageContent_getColPtr(FieldName As String) As Integer
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetPCCColPtr")
             '
             pageManager_cache_pageContent_getColPtr = -1
-            Select Case LCase(FieldName)
+            Select Case vbLCase(FieldName)
                 Case "active"
                     pageManager_cache_pageContent_getColPtr = PCC_Active
                 Case "allowchildlistdisplay"
@@ -26229,7 +26312,7 @@ ErrorTrap:
         '
         '====================================================================================================
         '
-        Friend Function pageManager_cache_siteSection_getPtr(Id As Integer) As Integer
+        Public Function pageManager_cache_siteSection_getPtr(Id As Integer) As Integer
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("pageManager_cache_siteSection_getPtr")
             '
             Dim CS As Integer
@@ -26258,7 +26341,7 @@ ErrorTrap:
         '
         '====================================================================================================
         '
-        Friend Sub pageManager_cache_siteSection_clear()
+        Public Sub pageManager_cache_siteSection_clear()
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("pageManager_cache_siteSection_clear")
             '
             Call cache.invalidateTagCommaList("site sections")
@@ -26277,7 +26360,7 @@ ErrorTrap:
         '
         '====================================================================================================
         '
-        Friend Function pageManager_cache_siteSection_get() As Object
+        Public Function pageManager_cache_siteSection_get() As Object
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetSSC")
             '
             If pageManager_cache_siteSection_rows = 0 Then
@@ -26449,7 +26532,7 @@ ErrorTrap:
         '
         '
         '
-        Friend Sub pageManager_cache_pageTemplate_save()
+        Public Sub pageManager_cache_pageTemplate_save()
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("MainClass.pageManager_cache_pageTemplate_save")
             '
             Dim cacheArray() As Object
@@ -26487,7 +26570,7 @@ ErrorTrap:
         '   Returns a pointer into the cache_pageTemplate(x,ptr) array
         '====================================================================================================
         '
-        Friend Function pageManager_cache_pageTemplate_getPtr(Id As Integer) As Integer
+        Public Function pageManager_cache_pageTemplate_getPtr(Id As Integer) As Integer
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("pageManager_cache_pageTemplate_getPtr")
             '
             Dim CS As Integer
@@ -26564,7 +26647,7 @@ ErrorTrap:
                     '
                     ' Link is included in template
                     '
-                    If InStr(1, Link, "://", vbTextCompare) <> 0 Then
+                    If vbInstr(1, Link, "://", vbTextCompare) <> 0 Then
                         '
                         ' Template link is Full URL, IsSecure checkbox does nothing
                         '
@@ -26653,7 +26736,7 @@ ErrorTrap:
         '
         '
         '
-        Friend Function main_GetMobileBrowserList() As String
+        Public Function main_GetMobileBrowserList() As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetMobileBrowserList")
             '
             'If Not (true) Then Exit Function
@@ -26672,13 +26755,13 @@ ErrorTrap:
             End If
             If main_GetMobileBrowserList = "" Then
                 Filename = "config\MobileBrowserList.txt"
-                main_GetMobileBrowserList = cluster.clusterFiles.ReadFile(Filename)
+                main_GetMobileBrowserList = cluster.localClusterFiles.ReadFile(Filename)
                 If main_GetMobileBrowserList = "" Then
                     main_GetMobileBrowserList = "midp,j2me,avantg,docomo,novarra,palmos,palmsource,240x320,opwv,chtml,pda,windows ce,mmp/,blackberry,mib/,symbian,wireless,nokia,hand,mobi,phone,cdm,up.b,audio,SIE-,SEC-,samsung,HTC,mot-,mitsu,sagem,sony,alcatel,lg,erics,vx,NEC,philips,mmm,xx,panasonic,sharp,wap,sch,rover,pocket,benq,java,pt,pg,vox,amoi,bird,compal,kg,voda,sany,kdd,dbt,sendo,sgh,gradi,jb,moto"
-                    main_GetMobileBrowserList = Replace(main_GetMobileBrowserList, ",", vbCrLf)
+                    main_GetMobileBrowserList = vbReplace(main_GetMobileBrowserList, ",", vbCrLf)
                     'Call app.publicFiles.SaveFile(Filename, main_GetMobileBrowserList)
                 End If
-                datetext = Now.AddHours(1).ToString
+                datetext = DateTime.Now.AddHours(1).ToString
                 Call cache.setKey("MobileBrowserList", datetext & vbCrLf & main_GetMobileBrowserList)
             End If
             '
@@ -26714,14 +26797,14 @@ ErrorTrap:
         '
         '=================================================================================================================
         '
-        Friend Function main_GetAddonOptionConstructorValue(OptionName As String, AddonOptionConstructorList As String) As String
+        Public Function main_GetAddonOptionConstructorValue(OptionName As String, AddonOptionConstructorList As String) As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetAddonOptionConstructorValue")
             '
             Dim Pos As Integer
             Dim s As String
             '
             s = main_GetAddonOption(OptionName, AddonOptionConstructorList)
-            Pos = InStr(1, s, "[")
+            Pos = vbInstr(1, s, "[")
             If Pos > 0 Then
                 s = Left(s, Pos - 1)
             End If
@@ -26843,7 +26926,7 @@ ErrorTrap:
             '
             '    End If
             'hint = hint & ",100"
-            Select Case LCase(TableName)
+            Select Case vbLCase(TableName)
                 Case "linkaliases"
                     'Call cache_linkAlias_clear
                 Case "ccmembers"
@@ -26876,7 +26959,7 @@ ErrorTrap:
                     ' Site Properties
                     '
                     'hint = hint & ",130"
-                    Select Case LCase(RecordName)
+                    Select Case vbLCase(RecordName)
                         Case "allowlinkalias"
                             Call cache.invalidateTagCommaList("Page Content")
                         Case "sectionlandinglink"
@@ -26908,7 +26991,7 @@ ErrorTrap:
                         ' Clear the Landing page and page not found site properties
                         '
 
-                        If LCase(TableName) = "ccpagecontent" Then
+                        If vbLCase(TableName) = "ccpagecontent" Then
                             Call pageManager_cache_pageContent_removeRow(RecordID, pagemanager_IsWorkflowRendering, False)
                             If RecordID = EncodeInteger(siteProperties.getText("PageNotFoundPageID", "0")) Then
                                 Call siteProperties.setProperty("PageNotFoundPageID", "0")
@@ -27007,7 +27090,7 @@ ErrorTrap:
                                 If Pos > 0 Then
                                     FilenameExt = Mid(Filename, Pos + 1)
                                     FilenameNoExt = Mid(Filename, 1, Pos - 1)
-                                    If InStr(1, "jpg,gif,png", FilenameExt, vbTextCompare) <> 0 Then
+                                    If vbInstr(1, "jpg,gif,png", FilenameExt, vbTextCompare) <> 0 Then
                                         sf = New coreImageEditClass
                                         If sf.load(appRootFiles.rootLocalFolderPath & FilePath & Filename) Then
                                             '
@@ -27228,8 +27311,8 @@ ErrorTrap:
                     styleId = db.cs_getInteger(CS, "ID")
                     If styleId <> LastStyleID Then
                         Filename = db.db_GetCS(CS, "StyleFilename")
-                        Prefix = Replace(main_encodeHTML(db.db_GetCS(CS, "Prefix")), ",", "&#44;")
-                        Suffix = Replace(main_encodeHTML(db.db_GetCS(CS, "Suffix")), ",", "&#44;")
+                        Prefix = vbReplace(main_encodeHTML(db.db_GetCS(CS, "Prefix")), ",", "&#44;")
+                        Suffix = vbReplace(main_encodeHTML(db.db_GetCS(CS, "Suffix")), ",", "&#44;")
                         If (Not main_IsAdminSite) And db.cs_getBoolean(CS, "alwaysinclude") Then
                             MapList = MapList & vbCrLf & "0" & vbTab & Filename & "<" & Prefix & "<" & Suffix
                         Else
@@ -27259,8 +27342,8 @@ ErrorTrap:
                 '
                 FileList = ""
                 For MapRow = 0 To MapCnt - 1
-                    If InStr(1, Map(MapRow), "0" & vbTab) = 1 Then
-                        Pos = InStr(1, Map(MapRow), vbTab)
+                    If vbInstr(1, Map(MapRow), "0" & vbTab) = 1 Then
+                        Pos = vbInstr(1, Map(MapRow), vbTab)
                         If Pos > 0 Then
                             FileList = FileList & "," & Mid(Map(MapRow), Pos + 1)
                         End If
@@ -27273,8 +27356,8 @@ ErrorTrap:
                     SrcID = EncodeInteger(Srcs(Ptr))
                     If SrcID <> 0 Then
                         For MapRow = 0 To MapCnt - 1
-                            If InStr(1, Map(MapRow), SrcID & vbTab) <> 0 Then
-                                Pos = InStr(1, Map(MapRow), vbTab)
+                            If vbInstr(1, Map(MapRow), SrcID & vbTab) <> 0 Then
+                                Pos = vbInstr(1, Map(MapRow), vbTab)
                                 If Pos > 0 Then
                                     FileList = FileList & "," & Mid(Map(MapRow), Pos + 1)
                                 End If
@@ -27289,7 +27372,7 @@ ErrorTrap:
                     Files = Split(FileList, ",")
                     For Ptr = 0 To UBound(Files)
                         Filename = Files(Ptr)
-                        If InStr(1, main_GetSharedStyleFileList, Filename, vbTextCompare) = 0 Then
+                        If vbInstr(1, main_GetSharedStyleFileList, Filename, vbTextCompare) = 0 Then
                             main_GetSharedStyleFileList = main_GetSharedStyleFileList & vbCrLf & Filename
                         End If
                     Next
@@ -27335,7 +27418,7 @@ ErrorTrap:
                 If kmaParse.IsTag(ElementPointer) Then
                     TagCount = TagCount + 1
                     TagName = kmaParse.TagName(ElementPointer)
-                    Select Case UCase(TagName)
+                    Select Case vbUCase(TagName)
                         Case "LINK"
                             '
                             Link = kmaParse.ElementAttribute(ElementPointer, "HREF")
@@ -27403,12 +27486,12 @@ ErrorTrap:
             '
             RootRelativeLink = ConvertLinkToRootRelative(Link, BasePath)
             main_GetStyleListFromLink = ""
-            If InStr(1, BlockRootRelativeLinkList, RootRelativeLink, vbTextCompare) = 0 Then
+            If vbInstr(1, BlockRootRelativeLinkList, RootRelativeLink, vbTextCompare) = 0 Then
                 ImportLink = SourceHost & RootRelativeLink
                 ImportedStyle = HTTP.getURL(ImportLink)
                 Dim HTTPStatus As String
                 HTTPStatus = getLine(HTTP.responseHeader)
-                If InStr(1, HTTPStatus, "200") = 0 Then
+                If vbInstr(1, HTTPStatus, "200") = 0 Then
                     main_GetStyleListFromLink = ""
                 Else
                 End If
@@ -27462,17 +27545,17 @@ ErrorTrap:
             ' convert imports
             '
             Do While (Pos <> 0) And LoopCnt < 100
-                Pos = InStr(Pos, StyleSheet, "@import", vbTextCompare)
+                Pos = vbInstr(Pos, StyleSheet, "@import", vbTextCompare)
                 If Pos <> 0 Then
                     '
                     ' style includes an import -- convert filename and load the file
                     '
-                    Pos = InStr(Pos, StyleSheet, "url", vbTextCompare)
+                    Pos = vbInstr(Pos, StyleSheet, "url", vbTextCompare)
                     If Pos <> 0 Then
-                        PosStart = InStr(Pos, StyleSheet, "(", vbTextCompare)
+                        PosStart = vbInstr(Pos, StyleSheet, "(", vbTextCompare)
                         If PosStart <> 0 Then
                             PosStart = PosStart + 1
-                            PosEnd = InStr(PosStart, StyleSheet, ")", vbTextCompare)
+                            PosEnd = vbInstr(PosStart, StyleSheet, ")", vbTextCompare)
                             If PosEnd <> 0 Then
                                 PosEnd = PosEnd - 1
                                 Link = Mid(StyleSheet, PosStart, PosEnd - PosStart + 1)
@@ -27535,7 +27618,7 @@ ErrorTrap:
         '
         '
         '
-        Friend Sub pageManager_MarkRecordReviewed(ContentName As String, RecordID As Integer)
+        Public Sub pageManager_MarkRecordReviewed(ContentName As String, RecordID As Integer)
             '
             Dim SQL As String
             'Dim SQLNow As String
@@ -27569,7 +27652,7 @@ ErrorTrap:
         '
         Public Function main_GetPleaseWaitStart() As String
             '
-            main_GetPleaseWaitStart = cluster.clusterFiles.ReadFile("ccLib\Popup\WaitPageOpen.htm")
+            main_GetPleaseWaitStart = cluster.localClusterFiles.ReadFile("ccLib\Popup\WaitPageOpen.htm")
             '
         End Function
         '
@@ -27589,7 +27672,7 @@ ErrorTrap:
         '
         Public Function main_GetPleaseWaitEnd() As String
             '
-            main_GetPleaseWaitEnd = cluster.clusterFiles.ReadFile("ccLib\Popup\WaitPageClose.htm")
+            main_GetPleaseWaitEnd = cluster.localClusterFiles.ReadFile("ccLib\Popup\WaitPageClose.htm")
             '
         End Function
         '
@@ -27703,7 +27786,7 @@ ErrorTrap:
 
                 PageSize = docProperties.getInteger("pagesize")
                 PageNumber = docProperties.getInteger("pagenumber")
-                Select Case LCase(docProperties.getText("responseformat"))
+                Select Case vbLCase(docProperties.getText("responseformat"))
                     Case "jsonnamevalue"
                         RemoteFormat = RemoteFormatEnum.RemoteFormatJsonNameValue
                     Case "jsonnamearray"
@@ -27731,7 +27814,7 @@ ErrorTrap:
                     ReDim ArgName(ArgCnt)
                     ReDim ArgValue(ArgCnt)
                     For Ptr = 0 To ArgCnt - 1
-                        Pos = InStr(1, ArgArray(Ptr), "=")
+                        Pos = vbInstr(1, ArgArray(Ptr), "=")
                         If Pos > 0 Then
                             ArgName(Ptr) = DecodeResponseVariable(Mid(ArgArray(Ptr), 1, Pos - 1))
                             ArgValue(Ptr) = DecodeResponseVariable(Mid(ArgArray(Ptr), Pos + 1))
@@ -27761,7 +27844,7 @@ ErrorTrap:
                         '
                         ' Try Hardcoded queries
                         '
-                        Select Case LCase(RemoteKey)
+                        Select Case vbLCase(RemoteKey)
                             Case "ccfieldhelpupdate"
                                 '
                                 ' developers editing field help
@@ -27805,8 +27888,8 @@ ErrorTrap:
                         '    '
                         '    If SQLQuery <> "" Then
                         '        For Ptr = 0 To ArgCnt - 1
-                        '            SQLQuery = Replace(SQLQuery, ArgName(Ptr), ArgValue(Ptr), , , vbTextCompare)
-                        '            'Criteria = Replace(Criteria, ArgName(Ptr), ArgValue(Ptr), , , vbTextCompare)
+                        '            SQLQuery = vbReplace(SQLQuery, ArgName(Ptr), ArgValue(Ptr), vbTextCompare)
+                        '            'Criteria = vbReplace(Criteria, ArgName(Ptr), ArgValue(Ptr), vbTextCompare)
                         '        Next
                         '        On Error Resume Next
                         '        RS = main_ExecuteSQLCommand(DataSource, SQLQuery, 30, PageSize, PageNumber)
@@ -27931,9 +28014,9 @@ ErrorTrap:
                                 SetPairString = ""
                                 Criteria = ""
                                 For Ptr = 0 To ArgCnt - 1
-                                    If LCase(ArgName(Ptr)) = "setpairs" Then
+                                    If vbLCase(ArgName(Ptr)) = "setpairs" Then
                                         SetPairString = ArgValue(Ptr)
-                                    ElseIf LCase(ArgName(Ptr)) = "criteria" Then
+                                    ElseIf vbLCase(ArgName(Ptr)) = "criteria" Then
                                         Criteria = ArgValue(Ptr)
                                     End If
                                 Next
@@ -27948,7 +28031,7 @@ ErrorTrap:
                                     SetPairs = Split(SetPairString, "&")
                                     For Ptr = 0 To UBound(SetPairs)
                                         If SetPairs(Ptr) <> "" Then
-                                            Pos = InStr(1, SetPairs(Ptr), "=")
+                                            Pos = vbInstr(1, SetPairs(Ptr), "=")
                                             If Pos > 0 Then
                                                 FieldValue = DecodeResponseVariable(Mid(SetPairs(Ptr), Pos + 1))
                                                 FieldName = DecodeResponseVariable(Mid(SetPairs(Ptr), 1, Pos - 1))
@@ -28026,7 +28109,7 @@ ErrorTrap:
         '
         '
         '
-        Friend Function main_FormatRemoteQueryOutput(gd As GoogleDataType, RemoteFormat As RemoteFormatEnum) As String
+        Public Function main_FormatRemoteQueryOutput(gd As GoogleDataType, RemoteFormat As RemoteFormatEnum) As String
             '
             Dim s As coreFastStringClass
             Dim ColDelim As String
@@ -28167,9 +28250,9 @@ ErrorTrap:
             Found = False
             ResultNode = Node.Attributes.GetNamedItem(Name)
             If (ResultNode Is Nothing) Then
-                UcaseName = UCase(Name)
+                UcaseName = vbUCase(Name)
                 For Each NodeAttribute In Node.Attributes
-                    If UCase(NodeAttribute.Name) = UcaseName Then
+                    If vbUCase(NodeAttribute.Name) = UcaseName Then
                         main_GetXMLAttribute = NodeAttribute.Value
                         Found = True
                         Exit For
@@ -28452,7 +28535,7 @@ ErrorTrap:
             Dim PageCopy As String
             Dim OrderByClause As String
             '
-            Select Case LCase(HardCodedPage)
+            Select Case vbLCase(HardCodedPage)
                 Case HardCodedPageSendPassword
                     '
                     ' send password to the email address in the querystring
@@ -28625,7 +28708,7 @@ ErrorTrap:
                     ' Special case - set the current URL to the Refresh Query String
                     ' Because you want the form created to save the refresh values
                     '
-                    If UCase(HardCodedPage) = "LOGOUTLOGIN" Then
+                    If vbUCase(HardCodedPage) = "LOGOUTLOGIN" Then
                         Call user.logout()
                     End If
                     web_RefreshQueryString = webServer.requestQueryString
@@ -28685,7 +28768,7 @@ ErrorTrap:
                     InsertTestOK = False
                     CS = db.cs_insertRecord("Trap Log")
                     If Not db.cs_Ok(CS) Then
-                        Call handleLegacyError10(KmaErrorInternal, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was not OK.", "Init", False, True)
+                        Call handleLegacyError10(ignoreInteger, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was not OK.", "Init", False, True)
                     Else
                         InsertTestOK = True
                         TrapID = db.cs_getInteger(CS, "ID")
@@ -28693,13 +28776,13 @@ ErrorTrap:
                     Call db.cs_Close(CS)
                     If InsertTestOK Then
                         If TrapID = 0 Then
-                            Call handleLegacyError10(KmaErrorInternal, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was OK, but ID=0.", "Init", False, True)
+                            Call handleLegacyError10(ignoreInteger, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was OK, but ID=0.", "Init", False, True)
                         Else
                             Call db_DeleteContentRecord("Trap Log", TrapID)
                         End If
                     End If
                     If Err.Number <> 0 Then
-                        Call handleLegacyError10(KmaErrorInternal, "dll", "Error during Status. After traplog insert, " & GetErrString(Err), "Init", False, True)
+                        Call handleLegacyError10(ignoreInteger, "dll", "Error during Status. After traplog insert, " & GetErrString(Err), "Init", False, True)
                         Err.Clear()
                     End If
                     '
@@ -28727,10 +28810,10 @@ ErrorTrap:
                         ' Determine bid (PageID) from referer querystring
                         '
                         Copy = webServer.requestReferrer
-                        Pos = InStr(1, Copy, "bid=")
+                        Pos = vbInstr(1, Copy, "bid=")
                         If Pos <> 0 Then
                             Copy = Trim(Mid(Copy, Pos + 4))
-                            Pos = InStr(1, Copy, "&")
+                            Pos = vbInstr(1, Copy, "&")
                             If Pos <> 0 Then
                                 Copy = Trim(Mid(Copy, 1, Pos))
                             End If
@@ -28747,9 +28830,9 @@ ErrorTrap:
                         Copy = main_GetHtmlBody_GetSection_GetContent(PageID, rootPageId, "Page Content", "", True, True, False, 0, siteProperties.useContentWatchLink, allowPageWithoutSectionDisplay)
                         'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2g")
                         Copy = Copy & main_GetEndOfBody(False, True, False, False)
-                        Copy = Replace(Copy, "'", "'+""'""+'")
-                        Copy = Replace(Copy, vbCr, "\n")
-                        Copy = Replace(Copy, vbLf, " ")
+                        Copy = vbReplace(Copy, "'", "'+""'""+'")
+                        Copy = vbReplace(Copy, vbCr, "\n")
+                        Copy = vbReplace(Copy, vbLf, " ")
                         '
                         ' Write the page to the stream, with a javascript wrapper
                         '
@@ -28775,9 +28858,9 @@ ErrorTrap:
                     'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2h")
                     Copy = Copy & main_GetEndOfBody(True, True, False, False)
                     Copy = Copy & "</CENTER></p>"
-                    Copy = Replace(Copy, "'", "'+""'""+'")
-                    Copy = Replace(Copy, vbCr, "")
-                    Copy = Replace(Copy, vbLf, "")
+                    Copy = vbReplace(Copy, "'", "'+""'""+'")
+                    Copy = vbReplace(Copy, vbCr, "")
+                    Copy = vbReplace(Copy, vbLf, "")
                     'Copy = "<b>login Page</b>"
                     '
                     ' Write the page to the stream, with a javascript wrapper
@@ -28880,7 +28963,7 @@ ErrorTrap:
                         ' TEmp fix until HardCodedPage is complete
                         '
                         Recipient = siteProperties.getText("EmailOrderNotifyAddress", siteProperties.emailAdmin)
-                        If InStr(EncodeText(Recipient), "@") = 0 Then
+                        If vbInstr(EncodeText(Recipient), "@") = 0 Then
                             Call handleLegacyError12("Init", "PayPal confirmation Order Process Notification email was not sent because EmailOrderNotifyAddress SiteProperty is not valid")
                         Else
                             Sender = siteProperties.getText("EmailOrderFromAddress")
@@ -28973,7 +29056,7 @@ ErrorTrap:
         ' ----- Process the active editor form
         '========================================================================
         '
-        Friend Sub main_ProcessActiveEditor()
+        Public Sub main_ProcessActiveEditor()
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("innovaEditorAddonClassFPO.ProcessActiveEditor")
             '
             Dim MethodName As String
@@ -29088,7 +29171,7 @@ ErrorTrap:
                 End If
                 Copy = db.cs_getText(CS, "stylesfilename")
                 If Copy <> "" Then
-                    If InStr(1, Copy, "://") <> 0 Then
+                    If vbInstr(1, Copy, "://") <> 0 Then
                     ElseIf Left(Copy, 1) = "/" Then
                     Else
                         Copy = web_requestProtocol & webServer.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, Copy)
@@ -29097,9 +29180,9 @@ ErrorTrap:
                 End If
                 '
                 If Wrapper <> "" Then
-                    Pos = InStr(1, Wrapper, TargetString, vbTextCompare)
+                    Pos = vbInstr(1, Wrapper, TargetString, vbTextCompare)
                     If Pos <> 0 Then
-                        s = Replace(Wrapper, TargetString, s, , , vbTextCompare)
+                        s = vbReplace(Wrapper, TargetString, s, 1, 99, vbTextCompare)
                     Else
                         s = "" _
                             & "<!-- the selected wrapper does not include the Target String marker to locate the position of the content. -->" _
@@ -29130,10 +29213,10 @@ ErrorTrap:
             Dim JSCodeAsString As String
             '
             JSCodeAsString = Javascript
-            JSCodeAsString = Replace(JSCodeAsString, "'", "'+""'""+'")
-            JSCodeAsString = Replace(JSCodeAsString, vbCrLf, "\n")
-            JSCodeAsString = Replace(JSCodeAsString, vbCr, "\n")
-            JSCodeAsString = Replace(JSCodeAsString, vbLf, "\n")
+            JSCodeAsString = vbReplace(JSCodeAsString, "'", "'+""'""+'")
+            JSCodeAsString = vbReplace(JSCodeAsString, vbCrLf, "\n")
+            JSCodeAsString = vbReplace(JSCodeAsString, vbCr, "\n")
+            JSCodeAsString = vbReplace(JSCodeAsString, vbLf, "\n")
             JSCodeAsString = "'" & JSCodeAsString & "'"
             '
             Call main_AddOnLoadJavascript("" _
@@ -29183,7 +29266,7 @@ ErrorTrap:
                     '
                     html_GetFormInputField = html_GetFormInputCheckBox2(InputName, EncodeBoolean(HtmlValue) = True, HtmlId, False, HtmlClass)
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = Replace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdFileCSS
                     '
@@ -29191,7 +29274,7 @@ ErrorTrap:
                     '
                     html_GetFormInputField = html_GetFormInputTextExpandable2(InputName, HtmlValue, , , HtmlId, False, False, HtmlClass)
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = Replace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdCurrency
                     '
@@ -29199,7 +29282,7 @@ ErrorTrap:
                     '
                     html_GetFormInputField = html_GetFormInputText2(InputName, HtmlValue, , , HtmlId, False, False, HtmlClass)
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = Replace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdDate
                     '
@@ -29207,10 +29290,10 @@ ErrorTrap:
                     '
                     html_GetFormInputField = html_GetFormInputDate(InputName, HtmlValue, , HtmlId)
                     If HtmlClass <> "" Then
-                        html_GetFormInputField = Replace(html_GetFormInputField, ">", " class=""" & HtmlClass & """>")
+                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " class=""" & HtmlClass & """>")
                     End If
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = Replace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdFile
                     '
@@ -29224,7 +29307,7 @@ ErrorTrap:
                         html_GetFormInputField = html_GetFormInputField & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & html_GetFormInputFile2(InputName, HtmlId, HtmlClass)
                     End If
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = Replace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdFloat
                     '
@@ -29232,7 +29315,7 @@ ErrorTrap:
                     '
                     html_GetFormInputField = html_GetFormInputText2(InputName, HtmlValue, , , HtmlId, False, False, HtmlClass)
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = Replace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdFileImage
                     '
@@ -29246,7 +29329,7 @@ ErrorTrap:
                         html_GetFormInputField = html_GetFormInputField & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & html_GetFormInputFile2(InputName, HtmlId, HtmlClass)
                     End If
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = Replace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdInteger
                     '
@@ -29254,7 +29337,7 @@ ErrorTrap:
                     '
                     html_GetFormInputField = html_GetFormInputText2(InputName, HtmlValue, , , HtmlId, False, False, HtmlClass)
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = Replace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdFileJavascript
                     '
@@ -29262,7 +29345,7 @@ ErrorTrap:
                     '
                     html_GetFormInputField = html_GetFormInputTextExpandable2(InputName, HtmlValue, , , HtmlId, False, False, HtmlClass)
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = Replace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdLink
                     '
@@ -29270,7 +29353,7 @@ ErrorTrap:
                     '
                     html_GetFormInputField = html_GetFormInputText2(InputName, HtmlValue, , , HtmlId, False, False, HtmlClass)
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = Replace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdLookup
                     '
@@ -29282,7 +29365,7 @@ ErrorTrap:
                         For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In CDef.fields
                             Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
                             With field
-                                If UCase(.nameLc) = UCase(FieldName) Then
+                                If vbUCase(.nameLc) = vbUCase(FieldName) Then
                                     If .lookupContentID <> 0 Then
                                         LookupContentName = EncodeText(metaData.getContentNameByID(.lookupContentID))
                                     End If
@@ -29292,7 +29375,7 @@ ErrorTrap:
                                         html_GetFormInputField = main_GetFormInputSelectList2(InputName, EncodeInteger(HtmlValue), .lookupList, "Select One", HtmlId, HtmlClass)
                                     End If
                                     If HtmlStyle <> "" Then
-                                        html_GetFormInputField = Replace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                                     End If
                                     Exit For
                                 End If
@@ -29319,10 +29402,10 @@ ErrorTrap:
                     GroupID = EncodeInteger(db_GetContentFieldProperty(ContentName, FieldName, "memberselectgroupid"))
                     html_GetFormInputField = main_GetFormInputMemberSelect(InputName, EncodeInteger(HtmlValue), GroupID, , , HtmlId)
                     If HtmlClass <> "" Then
-                        html_GetFormInputField = Replace(html_GetFormInputField, ">", " class=""" & HtmlClass & """>")
+                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " class=""" & HtmlClass & """>")
                     End If
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = Replace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdResourceLink
                     '
@@ -29330,7 +29413,7 @@ ErrorTrap:
                     '
                     html_GetFormInputField = html_GetFormInputText2(InputName, HtmlValue, , , HtmlId, False, False, HtmlClass)
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = Replace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdText
                     '
@@ -29338,7 +29421,7 @@ ErrorTrap:
                     '
                     html_GetFormInputField = html_GetFormInputText2(InputName, HtmlValue, , , HtmlId, False, False, HtmlClass)
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = Replace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdLongText, FieldTypeIdFileTextPrivate
                     '
@@ -29346,7 +29429,7 @@ ErrorTrap:
                     '
                     html_GetFormInputField = html_GetFormInputTextExpandable2(InputName, HtmlValue, , , HtmlId, False, False, HtmlClass)
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = Replace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdFileXML
                     '
@@ -29354,7 +29437,7 @@ ErrorTrap:
                     '
                     html_GetFormInputField = html_GetFormInputTextExpandable2(InputName, HtmlValue, , , HtmlId, False, False, HtmlClass)
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = Replace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                 Case FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate
                     '
@@ -29362,10 +29445,10 @@ ErrorTrap:
                     '
                     html_GetFormInputField = html_GetFormInputHTML(InputName, HtmlValue)
                     If HtmlStyle <> "" Then
-                        html_GetFormInputField = Replace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
+                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " style=""" & HtmlStyle & """>")
                     End If
                     If HtmlClass <> "" Then
-                        html_GetFormInputField = Replace(html_GetFormInputField, ">", " class=""" & HtmlClass & """>")
+                        html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " class=""" & HtmlClass & """>")
                     End If
                 Case Else
                     '
@@ -29414,7 +29497,7 @@ ErrorTrap:
         '
         '
         '
-        Friend Function main_GetEditorAddonListJSON(ByVal ContentType As csv_contentTypeEnum) As String
+        Public Function main_GetEditorAddonListJSON(ByVal ContentType As csv_contentTypeEnum) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("main_GetEditorAddonListJSON")
             '
             Dim AddonName As String
@@ -29523,7 +29606,7 @@ ErrorTrap:
                     ' Personalization Tag
                     '
                     FieldList = db_GetContentProperty("people", "SelectFieldList")
-                    FieldList = Replace(FieldList, ",", "|")
+                    FieldList = vbReplace(FieldList, ",", "|")
                     IconIDControlString = "AC,PERSONALIZATION,0,Personalization,field=[" & FieldList & "]"
                     IconImg = GetAddonIconImg(siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", appConfig.cdnFilesNetprefix, "Any Personalization Field", "Renders as any Personalization Field", "", 0)
                     IconImg = EncodeJavascript(IconImg)
@@ -29712,8 +29795,8 @@ ErrorTrap:
         '
         '
         '
-        Friend Function main_GetDefaultAddonOption_String(ByVal ArgumentList As String, ByVal AddonGuid As String, ByVal IsInline As Boolean) As String
-            'Friend Function main_GetDefaultAddonOption_String(ArgumentList As String, AddonGuid As String, IsInline As Boolean, cmc As cpCoreClass) As String
+        Public Function main_GetDefaultAddonOption_String(ByVal ArgumentList As String, ByVal AddonGuid As String, ByVal IsInline As Boolean) As String
+            'public Function main_GetDefaultAddonOption_String(ArgumentList As String, AddonGuid As String, IsInline As Boolean, cmc As cpCoreClass) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("main_GetDefaultAddonOption_String")
             '
             Dim AddonName As String
@@ -29727,9 +29810,9 @@ ErrorTrap:
             Dim NameValue As String
             Dim Ptr As Integer
             '
-            ArgumentList = Replace(ArgumentList, vbCrLf, vbCr)
-            ArgumentList = Replace(ArgumentList, vbLf, vbCr)
-            ArgumentList = Replace(ArgumentList, vbCr, vbCrLf)
+            ArgumentList = vbReplace(ArgumentList, vbCrLf, vbCr)
+            ArgumentList = vbReplace(ArgumentList, vbLf, vbCr)
+            ArgumentList = vbReplace(ArgumentList, vbCr, vbCrLf)
             If (InStr(1, ArgumentList, "wrapper", vbTextCompare) = 0) Then
                 '
                 ' Add in default constructors, like wrapper
@@ -29737,7 +29820,7 @@ ErrorTrap:
                 If ArgumentList <> "" Then
                     ArgumentList = ArgumentList & vbCrLf
                 End If
-                If LCase(AddonGuid) = LCase(ContentBoxGuid) Then
+                If vbLCase(AddonGuid) = vbLCase(ContentBoxGuid) Then
                     ArgumentList = ArgumentList & AddonOptionConstructor_BlockNoAjax
                 ElseIf IsInline Then
                     ArgumentList = ArgumentList & AddonOptionConstructor_Inline
@@ -29763,27 +29846,27 @@ ErrorTrap:
                         '
                         ' split on equal
                         '
-                        NameValue = Replace(NameValue, "\=", vbCrLf)
-                        Pos = InStr(1, NameValue, "=")
+                        NameValue = vbReplace(NameValue, "\=", vbCrLf)
+                        Pos = vbInstr(1, NameValue, "=")
                         If Pos = 0 Then
                             OptionName = NameValue
                         Else
                             OptionName = Mid(NameValue, 1, Pos - 1)
                             OptionValue = Mid(NameValue, Pos + 1)
                         End If
-                        OptionName = Replace(OptionName, vbCrLf, "\=")
-                        OptionValue = Replace(OptionValue, vbCrLf, "\=")
+                        OptionName = vbReplace(OptionName, vbCrLf, "\=")
+                        OptionValue = vbReplace(OptionValue, vbCrLf, "\=")
                         '
                         ' split optionvalue on [
                         '
-                        OptionValue = Replace(OptionValue, "\[", vbCrLf)
-                        Pos = InStr(1, OptionValue, "[")
+                        OptionValue = vbReplace(OptionValue, "\[", vbCrLf)
+                        Pos = vbInstr(1, OptionValue, "[")
                         If Pos <> 0 Then
                             OptionSelector = Mid(OptionValue, Pos)
                             OptionValue = Mid(OptionValue, 1, Pos - 1)
                         End If
-                        OptionValue = Replace(OptionValue, vbCrLf, "\[")
-                        OptionSelector = Replace(OptionSelector, vbCrLf, "\[")
+                        OptionValue = vbReplace(OptionValue, vbCrLf, "\[")
+                        OptionSelector = vbReplace(OptionSelector, vbCrLf, "\[")
                         '
                         ' Decode AddonConstructor format
                         '
@@ -29801,7 +29884,7 @@ ErrorTrap:
                         NameValuePair = pageManager_GetAddonSelector(OptionName, OptionValue, OptionSelector)
                         NameValuePair = EncodeJavascript(NameValuePair)
                         main_GetDefaultAddonOption_String = main_GetDefaultAddonOption_String & "&" & NameValuePair
-                        If InStr(1, NameValuePair, "=") = 0 Then
+                        If vbInstr(1, NameValuePair, "=") = 0 Then
                             main_GetDefaultAddonOption_String = main_GetDefaultAddonOption_String & "="
                         End If
                     End If
@@ -29836,7 +29919,7 @@ ErrorTrap:
         '   to use it, split the list on comma and use the fieldtype as index
         '========================================================================
         '
-        Friend Function getFieldTypeDefaultEditorAddonIdList() As String
+        Public Function getFieldTypeDefaultEditorAddonIdList() As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("main_GetDefaultAddonOption_String")
             '
             Dim editorAddonIds() As String
@@ -29922,15 +30005,15 @@ ErrorTrap:
             'Dim kmafs As New fileSystemClass
             '
             main_guessDefaultPage = "index.php"
-            If Not appRootFiles.checkFile(cluster.config.clusterPhysicalPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
+            If Not appRootFiles.checkFile(serverConfig.clusterPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
                 main_guessDefaultPage = "index.asp"
-                If Not appRootFiles.checkFile(cluster.config.clusterPhysicalPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
+                If Not appRootFiles.checkFile(serverConfig.clusterPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
                     main_guessDefaultPage = "default.asp"
-                    If Not appRootFiles.checkFile(cluster.config.clusterPhysicalPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
+                    If Not appRootFiles.checkFile(serverConfig.clusterPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
                         main_guessDefaultPage = "default.aspx"
-                        If Not appRootFiles.checkFile(cluster.config.clusterPhysicalPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
+                        If Not appRootFiles.checkFile(serverConfig.clusterPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
                             main_guessDefaultPage = "index.php"
-                            If Not appRootFiles.checkFile(cluster.config.clusterPhysicalPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
+                            If Not appRootFiles.checkFile(serverConfig.clusterPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
                                 main_guessDefaultPage = ""
                             End If
                         End If
@@ -29954,7 +30037,7 @@ ErrorTrap:
             '
             main_verifyTemplateLink = linkSrc
             If main_verifyTemplateLink <> "" Then
-                If InStr(1, main_verifyTemplateLink, "://") <> 0 Then
+                If vbInstr(1, main_verifyTemplateLink, "://") <> 0 Then
                     '
                     ' protocol provided, do not fixup
                     '
@@ -30069,7 +30152,7 @@ ErrorTrap:
         '                For ampSplitPointer = 0 To ampSplitCount - 1
         '                    newNameValue = ampSplit(ampSplitPointer)
         '                    If newNameValue <> "" Then
-        '                        equalPtr = InStr(1, newNameValue, "=")
+        '                        equalPtr = vbInstr(1, newNameValue, "=")
         '                        If equalPtr > 0 Then
         '                            NewName = main_DecodeUrl(Mid(newNameValue, 1, equalPtr - 1))
         '                            NewValue = Mid(newNameValue, equalPtr + 1)
@@ -30079,7 +30162,7 @@ ErrorTrap:
         '                        End If
         '                        If docPropertiesArrayCount > 0 Then
         '                            For inStreamPtr = 0 To docPropertiesArrayCount - 1
-        '                                If LCase(NewName) = LCase(docPropertiesDict(inStreamPtr).Name) Then
+        '                                If vbLCase(NewName) = vbLCase(docPropertiesDict(inStreamPtr).Name) Then
         '                                    '
         '                                    ' Current entry found
         '                                    '
@@ -30134,7 +30217,7 @@ ErrorTrap:
                 localSource = Source
                 For SourcePointer = 1 To Len(localSource)
                     Character = Mid(localSource, SourcePointer, 1)
-                    If InStr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-_!*()", Character, vbTextCompare) <> 0 Then
+                    If vbInstr(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-_!*()", Character, vbTextCompare) <> 0 Then
                         main_encodeCookieName = main_encodeCookieName & Character
                     Else
                         main_encodeCookieName = main_encodeCookieName & "%" & Hex(Asc(Character))
@@ -30276,7 +30359,7 @@ ErrorTrap:
                         ' It will be true in all cases, except a possible unforseen exception
                         '
                         EmailBody = EmailBody & "<div style=""clear:both;padding:10px;"">" & main_GetLinkedText("<a href=""" & html_EncodeHTML(web_requestProtocol & webServer.requestDomain & www_requestRootPath & siteProperties.serverPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
-                        EmailBody = Replace(EmailBody, "#member_email#", "UserEmailAddress")
+                        EmailBody = vbReplace(EmailBody, "#member_email#", "UserEmailAddress")
                     End If
                     '
                     ' Confirm footer
@@ -30309,7 +30392,7 @@ ErrorTrap:
                                 End If
                             End If
                             EmailLen = Len(Email)
-                            Posat = InStr(1, Email, "@")
+                            Posat = vbInstr(1, Email, "@")
                             PosDot = InStrRev(Email, ".")
                             If EmailLen < 6 Then
                                 BadCnt = BadCnt + 1
@@ -30419,7 +30502,7 @@ ErrorTrap:
             For Each kvp As KeyValuePair(Of String, docPropertiesClass) In docProperties.docPropertiesDict
                 With kvp.Value
                     If .IsForm Then
-                        If UCase(.Value) = "ON" Then
+                        If vbUCase(.Value) = "ON" Then
                             Message = Message & .Name & ": Yes" & vbCrLf & vbCrLf
                         Else
                             Message = Message & .Name & ": " & .Value & vbCrLf & vbCrLf
@@ -30485,7 +30568,7 @@ ErrorTrap:
                 iiGroupList = iGroupList
                 Do While iiGroupList <> ""
                     ReDim Preserve Groups(GroupCount)
-                    ParsePosition = InStr(1, iiGroupList, ",")
+                    ParsePosition = vbInstr(1, iiGroupList, ",")
                     If ParsePosition = 0 Then
                         Groups(GroupCount) = iiGroupList
                         iiGroupList = ""
@@ -30555,7 +30638,7 @@ ErrorTrap:
         '   Used to send the email and as body on the email test
         '========================================================================
         '
-        Friend Function main_GetGroupEmailSQL(ByVal ignore_ToAll As Boolean, ByVal EmailID As Integer) As String
+        Public Function main_GetGroupEmailSQL(ByVal ignore_ToAll As Boolean, ByVal EmailID As Integer) As String
             main_GetGroupEmailSQL = email_getGroupEmailSQL(False, EmailID)
             Exit Function
         End Function
@@ -30575,9 +30658,9 @@ ErrorTrap:
             Found = False
             ResultNode = Node.Attributes.GetNamedItem(Name)
             If (ResultNode Is Nothing) Then
-                UcaseName = UCase(Name)
+                UcaseName = vbUCase(Name)
                 For Each NodeAttribute In Node.Attributes
-                    If UCase(NodeAttribute.Name) = UcaseName Then
+                    If vbUCase(NodeAttribute.Name) = UcaseName Then
                         csv_GetXMLAttribute = NodeAttribute.Value
                         Found = True
                         Exit For
@@ -30718,7 +30801,7 @@ ErrorTrap:
         ''' <param name="properties">properties are nameValue pairs consumable by the addon during execution. These properties are added to docProperties and made available. Originally this argument was for the nameValues modified in the page instance where the addon was placed.</param>
         ''' <param name="context">member of addonContextEnum</param>
         ''' <returns></returns>
-        Friend Function executeAddon(ByVal addonId As Integer, properties As Dictionary(Of String, String), context As addonContextEnum) As Object
+        Public Function executeAddon(ByVal addonId As Integer, properties As Dictionary(Of String, String), context As addonContextEnum) As Object
             Dim optionString As String = ""
             Dim return_StatusOk As Boolean
             For Each kvp As KeyValuePair(Of String, String) In properties
@@ -30755,7 +30838,7 @@ ErrorTrap:
         ''' <param name="personalizationPeopleId"></param>
         ''' <param name="personalizationIsAuthenticated"></param>
         ''' <returns></returns>
-        Friend Function executeAddon(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal OptionString As String, ByVal Context As addonContextEnum, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal IsIncludeAddon As Boolean, ByVal DefaultWrapperID As Integer, ByVal ignore_TemplateCaseOnly_PageContent As String, ByRef return_StatusOK As Boolean, ByVal nothingObject As Object, ByVal ignore_addonCallingItselfIdList As String, ByVal nothingObject2 As Object, ByVal ignore_AddonsRunOnThisPageIdList As String, ByVal personalizationPeopleId As Integer, ByVal personalizationIsAuthenticated As Boolean) As String
+        Public Function executeAddon(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal OptionString As String, ByVal Context As addonContextEnum, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal IsIncludeAddon As Boolean, ByVal DefaultWrapperID As Integer, ByVal ignore_TemplateCaseOnly_PageContent As String, ByRef return_StatusOK As Boolean, ByVal nothingObject As Object, ByVal ignore_addonCallingItselfIdList As String, ByVal nothingObject2 As Object, ByVal ignore_AddonsRunOnThisPageIdList As String, ByVal personalizationPeopleId As Integer, ByVal personalizationIsAuthenticated As Boolean) As String
             Dim returnVal As String = ""
             Try
                 '
@@ -30948,9 +31031,9 @@ ErrorTrap:
                     Link = EncodeText(addonCache.localCache.addonList(addonCachePtr).addonCache_Link)
                     DotNetClassFullName = EncodeText(addonCache.localCache.addonList(addonCachePtr).addonCache_DotNetClass)
                     AddonOptionConstructor = EncodeText(addonCache.localCache.addonList(addonCachePtr).addonCache_ArgumentList)
-                    AddonOptionConstructor = Replace(AddonOptionConstructor, vbCrLf, vbCr)
-                    AddonOptionConstructor = Replace(AddonOptionConstructor, vbLf, vbCr)
-                    AddonOptionConstructor = Replace(AddonOptionConstructor, vbCr, vbCrLf)
+                    AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
+                    AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbLf, vbCr)
+                    AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
                     '
                     AddonBlockEditTools = False
                     TextContent = ""
@@ -31053,7 +31136,7 @@ ErrorTrap:
                     '
                     ' temporary fix for Content Box not handling ajax or inframe
                     '
-                    If LCase(AddonGuid) = LCase(ContentBoxGuid) Then
+                    If vbLCase(AddonGuid) = vbLCase(ContentBoxGuid) Then
                         AsAjax = False
                         InFrame = False
                         AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_BlockNoAjax
@@ -31069,7 +31152,7 @@ ErrorTrap:
                         ' Build-in Add-ons
                         '-----------------------------------------------------------------------------------------------------
                         '
-                        If LCase(AddonName) = "block text" Then
+                        If vbLCase(AddonName) = "block text" Then
                             AddonNameOrGuid_Local = AddonName
                             FoundAddon = True
                             'IsProcess = False
@@ -31109,7 +31192,7 @@ ErrorTrap:
                             '    End If
                             ' End If
                             '
-                        ElseIf LCase(AddonName) = "block text end" Then
+                        ElseIf vbLCase(AddonName) = "block text end" Then
                             AddonNameOrGuid_Local = AddonName
                             FoundAddon = True
                             'IsProcess = False
@@ -31232,7 +31315,7 @@ ErrorTrap:
                             '
                             OptionCnt = 0
                             If WorkingOptionString <> "" Then
-                                If InStr(1, WorkingOptionString, vbCrLf) <> 0 Then
+                                If vbInstr(1, WorkingOptionString, vbCrLf) <> 0 Then
                                     '
                                     ' this should never be the case
                                     '
@@ -31252,7 +31335,7 @@ ErrorTrap:
                                 For OptionPtr = 0 To OptionCnt - 1
                                     With OptionsForCPVars(OptionPtr)
                                         .Name = Trim(Options(OptionPtr))
-                                        If InStr(1, .Name, "=") <> 0 Then
+                                        If vbInstr(1, .Name, "=") <> 0 Then
                                             OptionPair = Split(.Name, "=")
                                             .Name = Trim(EncodeText(OptionPair(0)))
                                             .Value = EncodeText(OptionPair(1))
@@ -31266,18 +31349,18 @@ ErrorTrap:
                                             .Value = decodeNvaArgument(.Value)
                                             '
                                             '
-                                            If LCase(.Name) = "wrapper" Then
+                                            If vbLCase(.Name) = "wrapper" Then
                                                 WrapperID = EncodeInteger(.Value)
                                                 If WrapperID = 0 Then
                                                     WrapperID = DefaultWrapperID
                                                 End If
-                                            ElseIf LCase(.Name) = "as ajax" Then
+                                            ElseIf vbLCase(.Name) = "as ajax" Then
                                                 If EncodeBoolean(.Value) Then
                                                     AsAjax = True
                                                 End If
-                                            ElseIf LCase(.Name) = "css container id" Then
+                                            ElseIf vbLCase(.Name) = "css container id" Then
                                                 ContainerCssID = .Value
-                                            ElseIf LCase(.Name) = "css container class" Then
+                                            ElseIf vbLCase(.Name) = "css container class" Then
                                                 ContainerCssClass = .Value
                                             End If
                                             OptionNames(OptionPtr) = OptionsForCPVars(OptionPtr).Name
@@ -31292,24 +31375,24 @@ ErrorTrap:
                                 '
                                 ' convert from AddonConstructor format (crlf delimited, constructorincoded) to AddonOption format without selector (& delimited, addonencoded)
                                 '
-                                AddonOptionConstructor = Replace(AddonOptionConstructor, vbCrLf, vbCr)
-                                AddonOptionConstructor = Replace(AddonOptionConstructor, vbLf, vbCr)
-                                AddonOptionConstructor = Replace(AddonOptionConstructor, vbCr, vbCrLf)
+                                AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
+                                AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbLf, vbCr)
+                                AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
                                 Options = SplitCRLF(AddonOptionConstructor)
                                 OptionCnt = UBound(Options) + 1
                                 For OptionPtr = 0 To OptionCnt - 1
                                     OptionName = Options(OptionPtr)
                                     OptionValue = ""
                                     '
-                                    OptionName = Replace(OptionName, "\=", vbCrLf)
-                                    If InStr(1, OptionName, "=") <> 0 Then
+                                    OptionName = vbReplace(OptionName, "\=", vbCrLf)
+                                    If vbInstr(1, OptionName, "=") <> 0 Then
                                         OptionPair = Split(OptionName, "=")
                                         OptionName = OptionPair(0)
                                         OptionPair(0) = ""
                                         OptionValue = Mid(Join(OptionPair, "="), 2)
                                     End If
-                                    OptionName = Replace(OptionName, vbCrLf, "\=")
-                                    OptionValue = Replace(OptionValue, vbCrLf, "\=")
+                                    OptionName = vbReplace(OptionName, vbCrLf, "\=")
+                                    OptionValue = vbReplace(OptionValue, vbCrLf, "\=")
                                     '
                                     Do While (Mid(OptionName, 1, 1) = vbTab) And Len(OptionName) > 1
                                         OptionName = Mid(OptionName, 2)
@@ -31317,11 +31400,11 @@ ErrorTrap:
                                     OptionName = Trim(OptionName)
                                     '
                                     ' split on [, throw out the right side
-                                    OptionValue = Replace(OptionValue, "\[", vbCrLf)
-                                    If InStr(1, OptionValue, "[") <> 0 Then
-                                        OptionValue = Left(OptionValue, InStr(1, OptionValue, "[") - 1)
+                                    OptionValue = vbReplace(OptionValue, "\[", vbCrLf)
+                                    If vbInstr(1, OptionValue, "[") <> 0 Then
+                                        OptionValue = Left(OptionValue, vbInstr(1, OptionValue, "[") - 1)
                                     End If
-                                    OptionValue = Replace(OptionValue, vbCrLf, "\[")
+                                    OptionValue = vbReplace(OptionValue, vbCrLf, "\[")
                                     '
                                     ' Decode Constructor format
                                     '
@@ -31331,7 +31414,7 @@ ErrorTrap:
                                     ' check for duplicates
                                     '
                                     For Ptr = 0 To OptionsForCPVars_Cnt - 1
-                                        If LCase(OptionName) = LCase(OptionsForCPVars(Ptr).Name) Then
+                                        If vbLCase(OptionName) = vbLCase(OptionsForCPVars(Ptr).Name) Then
                                             Exit For
                                         End If
                                     Next
@@ -31410,7 +31493,7 @@ ErrorTrap:
                                     ' web-only
                                     '
                                     Link = web_requestProtocol & webServer.requestDomain & www_requestRootPath & siteProperties.serverPageDefault
-                                    If InStr(1, Link, "?") = 0 Then
+                                    If vbInstr(1, Link, "?") = 0 Then
                                         Link = Link & "?"
                                     Else
                                         Link = Link & "&"
@@ -31585,13 +31668,13 @@ ErrorTrap:
                                         ' 20131221 - 4.2.317 - try test first to save time
                                         If isInStr(1, TestString, ReplaceSource) Then
                                             ReplaceValue = ReplaceValues(Ptr)
-                                            HTMLContent = Replace(HTMLContent, ReplaceSource, ReplaceValue, , , vbTextCompare)
-                                            TextContent = Replace(TextContent, ReplaceSource, ReplaceValue, , , vbTextCompare)
-                                            PageTitle = Replace(PageTitle, ReplaceSource, ReplaceValue, , , vbTextCompare)
-                                            MetaDescription = Replace(MetaDescription, ReplaceSource, ReplaceValue, , , vbTextCompare)
-                                            MetaKeywordList = Replace(MetaKeywordList, ReplaceSource, ReplaceValue, , , vbTextCompare)
-                                            OtherHeadTags = Replace(OtherHeadTags, ReplaceSource, ReplaceValue, , , vbTextCompare)
-                                            FormXML = Replace(FormXML, ReplaceSource, ReplaceValue, , , vbTextCompare)
+                                            HTMLContent = vbReplace(HTMLContent, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
+                                            TextContent = vbReplace(TextContent, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
+                                            PageTitle = vbReplace(PageTitle, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
+                                            MetaDescription = vbReplace(MetaDescription, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
+                                            MetaKeywordList = vbReplace(MetaKeywordList, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
+                                            OtherHeadTags = vbReplace(OtherHeadTags, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
+                                            FormXML = vbReplace(FormXML, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
                                         End If
                                     Next
                                 End If
@@ -31718,7 +31801,7 @@ ErrorTrap:
                                 If (True) Then
                                     If RemoteAssetLink <> "" Then
                                         WorkingLink = RemoteAssetLink
-                                        If InStr(1, WorkingLink, "://") = 0 Then
+                                        If vbInstr(1, WorkingLink, "://") = 0 Then
                                             If isMainOk Then
                                                 '
                                                 ' use request object to build link
@@ -31742,12 +31825,12 @@ ErrorTrap:
                                         Dim PosStart As Integer
                                         kmaHTTP = New coreHttpRequestClass()
                                         RemoteAssetContent = kmaHTTP.getURL(WorkingLink)
-                                        Pos = InStr(1, RemoteAssetContent, "<body", vbTextCompare)
+                                        Pos = vbInstr(1, RemoteAssetContent, "<body", vbTextCompare)
                                         If Pos > 0 Then
-                                            Pos = InStr(Pos, RemoteAssetContent, ">")
+                                            Pos = vbInstr(Pos, RemoteAssetContent, ">")
                                             If Pos > 0 Then
                                                 PosStart = Pos + 1
-                                                Pos = InStr(Pos, RemoteAssetContent, "</body", vbTextCompare)
+                                                Pos = vbInstr(Pos, RemoteAssetContent, "</body", vbTextCompare)
                                                 If Pos > 0 Then
                                                     RemoteAssetContent = Mid(RemoteAssetContent, PosStart, Pos - PosStart)
                                                 End If
@@ -31781,7 +31864,7 @@ ErrorTrap:
                                 '#End If
                                 If isMainOk And (Link <> "") Then
                                     If WorkingOptionString <> "" Then
-                                        If InStr(1, Link, "?") = 0 Then
+                                        If vbInstr(1, Link, "?") = 0 Then
                                             Link = Link & "?" & WorkingOptionString
                                         Else
                                             Link = Link & "&" & WorkingOptionString
@@ -31864,7 +31947,7 @@ ErrorTrap:
                                 '' +++++ 9/8/2011, 4.1.482
                                 ''
                                 's = TextContent & HTMLContent & IncludeContent & ScriptCallbackContent & FormContent & RemoteAssetContent & ScriptContent & ObjectContent & AssemblyContent & inlineScriptContent
-                                's = Replace(s, "{%", "{<!---->%")
+                                's = vbReplace(s, "{%", "{<!---->%")
                                 '
                                 '-----------------------------------------------------------------
                                 ' check for xml contensive process instruction
@@ -31875,7 +31958,7 @@ ErrorTrap:
                                 '#If traceExecuteAddon Then
                                 'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") ac"
                                 '#End If
-                                Pos = InStr(1, s, "<?contensive", vbTextCompare)
+                                Pos = vbInstr(1, s, "<?contensive", vbTextCompare)
                                 If Pos > 0 Then
                                     Throw New ApplicationException("xml structured commands are no longer supported")
                                     ''
@@ -31989,7 +32072,7 @@ ErrorTrap:
                                                 HTMLViewerEditIcon = executeAddon_getHTMLViewerBubble(addonId, "editWrapper" & pageManager_EditWrapperCnt, DialogList)
                                                 HelpIcon = executeAddon_getHelpBubble(addonId, helpCopy, addonCollectionId, DialogList)
                                                 ToolBar = InstanceSettingsEditIcon & AddonEditIcon & AddonStylesEditIcon & SiteStylesEditIcon & HTMLViewerEditIcon & HelpIcon
-                                                ToolBar = Replace(ToolBar, "&nbsp;", "", , , vbTextCompare)
+                                                ToolBar = vbReplace(ToolBar, "&nbsp;", "", 1, 99, vbTextCompare)
                                                 s = main_GetEditWrapper("<div class=""ccAddonEditTools"">" & ToolBar & "&nbsp;" & AddonName & DialogList & "</div>", s)
                                                 's = GetEditWrapper("<div class=""ccAddonEditCaption"">" & AddonName & "</div><div class=""ccAddonEditTools"">" & ToolBar & "</div>", s)
                                             ElseIf visitProperty.getBoolean("AllowEditing") Then
@@ -32003,7 +32086,7 @@ ErrorTrap:
                                     '
                                     If isMainOk And (Context <> addonContextEnum.ContextAdmin) And (Context <> addonContextEnum.contextEmail) And (Context <> addonContextEnum.ContextRemoteMethod) And (Context <> addonContextEnum.ContextSimple) Then
                                         If visitProperty.getBoolean("AllowDebugging") Then
-                                            AddonCommentName = Replace(AddonName, "-->", "..>")
+                                            AddonCommentName = vbReplace(AddonName, "-->", "..>")
                                             If IsInline Then
                                                 s = "<!-- Add-on " & AddonCommentName & " -->" & s & "<!-- /Add-on " & AddonCommentName & " -->"
                                             Else
@@ -32026,7 +32109,7 @@ ErrorTrap:
                             ' this completes the execute of this addon. remove it from the 'running' list
                             '
                             addonsCurrentlyRunningIdList.Remove(addonId)
-                            'csv_ExecuteAddon_AddonsCurrentlyRunningIdList = Replace(csv_ExecuteAddon_AddonsCurrentlyRunningIdList & ",", "," & addonId & ",", ",")
+                            'csv_ExecuteAddon_AddonsCurrentlyRunningIdList = vbReplace(csv_ExecuteAddon_AddonsCurrentlyRunningIdList & ",", "," & addonId & ",", ",")
                         End If
                     End If
                 End If
@@ -32145,7 +32228,7 @@ exitNoError:
                         '
                         ' data is OK
                         '
-                        If LCase(Doc.DocumentElement.Name) <> "form" Then
+                        If vbLCase(Doc.DocumentElement.Name) <> "form" Then
                             '
                             ' error - Need a way to reach the user that submitted the file
                             '
@@ -32158,16 +32241,16 @@ exitNoError:
                             If (Button = ButtonSave) Or (Button = ButtonOK) Then
                                 With Doc.DocumentElement
                                     For Each SettingNode In .ChildNodes
-                                        Select Case LCase(SettingNode.Name)
+                                        Select Case vbLCase(SettingNode.Name)
                                             Case "tab"
                                                 For Each TabNode In SettingNode.ChildNodes
-                                                    Select Case LCase(TabNode.Name)
+                                                    Select Case vbLCase(TabNode.Name)
                                                         Case "siteproperty"
                                                             '
                                                             FieldName = csv_GetXMLAttribute(IsFound, TabNode, "name", "")
                                                             FieldValue = docProperties.getText(FieldName)
                                                             fieldType = csv_GetXMLAttribute(IsFound, TabNode, "type", "")
-                                                            Select Case LCase(fieldType)
+                                                            Select Case vbLCase(fieldType)
                                                                 Case "integer"
                                                                     '
                                                                     If FieldValue <> "" Then
@@ -32318,7 +32401,7 @@ exitNoError:
                             Name = csv_GetXMLAttribute(IsFound, Doc.DocumentElement, "name", "")
                             With Doc.DocumentElement
                                 For Each SettingNode In .ChildNodes
-                                    Select Case LCase(SettingNode.Name)
+                                    Select Case vbLCase(SettingNode.Name)
                                         Case "description"
                                             Description = SettingNode.InnerText
                                         Case "tab"
@@ -32331,7 +32414,7 @@ exitNoError:
                                             End If
                                             TabCell = New coreFastStringClass
                                             For Each TabNode In SettingNode.ChildNodes
-                                                Select Case LCase(TabNode.Name)
+                                                Select Case vbLCase(TabNode.Name)
                                                     Case "heading"
                                                         '
                                                         ' Heading
@@ -32371,7 +32454,7 @@ exitNoError:
                                                                 '
                                                                 ' Use default editor for each field type
                                                                 '
-                                                                Select Case LCase(fieldType)
+                                                                Select Case vbLCase(fieldType)
                                                                     Case "integer"
                                                                         '
                                                                         If FieldReadOnly Then
@@ -32382,7 +32465,7 @@ exitNoError:
                                                                     Case "boolean"
                                                                         If FieldReadOnly Then
                                                                             Copy = html_GetFormInputCheckBox2(FieldName, EncodeBoolean(FieldValue))
-                                                                            Copy = Replace(Copy, ">", " disabled>")
+                                                                            Copy = vbReplace(Copy, ">", " disabled>")
                                                                             Copy = Copy & html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
                                                                             Copy = html_GetFormInputCheckBox2(FieldName, EncodeBoolean(FieldValue))
@@ -32753,25 +32836,25 @@ ErrorTrap:
             FastString = New coreFastStringClass
             '
             Call csv_BuildAddonOptionLists(ignore, ExpandedSelector, SitePropertyName & "=" & selector, SitePropertyName & "=" & SitePropertyValue, "0", True)
-            Pos = InStr(1, ExpandedSelector, "[")
+            Pos = vbInstr(1, ExpandedSelector, "[")
             If Pos <> 0 Then
                 '
                 ' List of Options, might be select, radio or checkbox
                 '
-                LCaseOptionDefault = LCase(Mid(ExpandedSelector, 1, Pos - 1))
+                LCaseOptionDefault = vbLCase(Mid(ExpandedSelector, 1, Pos - 1))
                 Dim PosEqual As Integer
 
-                PosEqual = InStr(1, LCaseOptionDefault, "=")
+                PosEqual = vbInstr(1, LCaseOptionDefault, "=")
                 If PosEqual > 0 Then
                     LCaseOptionDefault = Mid(LCaseOptionDefault, PosEqual + 1)
                 End If
 
                 LCaseOptionDefault = decodeNvaArgument(LCaseOptionDefault)
                 ExpandedSelector = Mid(ExpandedSelector, Pos + 1)
-                Pos = InStr(1, ExpandedSelector, "]")
+                Pos = vbInstr(1, ExpandedSelector, "]")
                 If Pos > 0 Then
                     If Pos < Len(ExpandedSelector) Then
-                        OptionSuffix = LCase(Trim(Mid(ExpandedSelector, Pos + 1)))
+                        OptionSuffix = vbLCase(Trim(Mid(ExpandedSelector, Pos + 1)))
                     End If
                     ExpandedSelector = Mid(ExpandedSelector, 1, Pos - 1)
                 End If
@@ -32781,7 +32864,7 @@ ErrorTrap:
                 For OptionPtr = 0 To OptionCnt - 1
                     OptionValue_AddonEncoded = Trim(OptionValues(OptionPtr))
                     If OptionValue_AddonEncoded <> "" Then
-                        Pos = InStr(1, OptionValue_AddonEncoded, ":")
+                        Pos = vbInstr(1, OptionValue_AddonEncoded, ":")
                         If Pos = 0 Then
                             OptionValue = decodeNvaArgument(OptionValue_AddonEncoded)
                             OptionCaption = OptionValue
@@ -32794,7 +32877,7 @@ ErrorTrap:
                                 '
                                 ' Create checkbox executeAddon_getFormContent_decodeSelector
                                 '
-                                If InStr(1, "," & LCaseOptionDefault & ",", "," & LCase(OptionValue) & ",") <> 0 Then
+                                If vbInstr(1, "," & LCaseOptionDefault & ",", "," & vbLCase(OptionValue) & ",") <> 0 Then
                                     executeAddon_getFormContent_decodeSelector = executeAddon_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & SitePropertyName & OptionPtr & """ value=""" & OptionValue & """ checked=""checked"">" & OptionCaption & "</div>"
                                 Else
                                     executeAddon_getFormContent_decodeSelector = executeAddon_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & SitePropertyName & OptionPtr & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
@@ -32803,7 +32886,7 @@ ErrorTrap:
                                 '
                                 ' Create Radio executeAddon_getFormContent_decodeSelector
                                 '
-                                If LCase(OptionValue) = LCaseOptionDefault Then
+                                If vbLCase(OptionValue) = LCaseOptionDefault Then
                                     executeAddon_getFormContent_decodeSelector = executeAddon_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & SitePropertyName & """ value=""" & OptionValue & """ checked=""checked"" >" & OptionCaption & "</div>"
                                 Else
                                     executeAddon_getFormContent_decodeSelector = executeAddon_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & SitePropertyName & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
@@ -32812,7 +32895,7 @@ ErrorTrap:
                                 '
                                 ' Create select executeAddon_getFormContent_decodeSelector
                                 '
-                                If LCase(OptionValue) = LCaseOptionDefault Then
+                                If vbLCase(OptionValue) = LCaseOptionDefault Then
                                     executeAddon_getFormContent_decodeSelector = executeAddon_getFormContent_decodeSelector & "<option value=""" & OptionValue & """ selected>" & OptionCaption & "</option>"
                                 Else
                                     executeAddon_getFormContent_decodeSelector = executeAddon_getFormContent_decodeSelector & "<option value=""" & OptionValue & """>" & OptionCaption & "</option>"
@@ -32829,7 +32912,7 @@ ErrorTrap:
                         '
                         ' Create Radio executeAddon_getFormContent_decodeSelector
                         '
-                        'executeAddon_getFormContent_decodeSelector = "<div>" & Replace(executeAddon_getFormContent_decodeSelector, "><", "></div><div><") & "</div>"
+                        'executeAddon_getFormContent_decodeSelector = "<div>" & vbReplace(executeAddon_getFormContent_decodeSelector, "><", "></div><div><") & "</div>"
                     Case Else
                         '
                         ' Create select executeAddon_getFormContent_decodeSelector
@@ -32860,7 +32943,7 @@ ErrorTrap:
         '       - cp argument should be set during csv_OpenConnection3, not passed in here as nothingObject
         ' ================================================================================================================
         '
-        Public Function executeAddon_executeScript(ByVal Language As String, ByVal Code As String, ByVal EntryPoint As String, ByVal cmcObj As cpCoreClass, ByVal nothingObject As Object, ByRef return_AddonErrorMessage As String) As String
+        Public Function executeAddon_executeScript(ByVal Language As String, ByVal Code As String, ByVal EntryPoint As String, ByVal cmcObj As coreClass, ByVal nothingObject As Object, ByRef return_AddonErrorMessage As String) As String
             Dim ScriptName As String
             Dim FirstLine As String
             Dim Pos As Integer
@@ -32870,8 +32953,8 @@ ErrorTrap:
                 ScriptName = "unnamed script with method [" & EntryPoint & "] and length [" & Len(Code) & "]"
             Else
                 FirstLine = Code
-                FirstLine = Replace(FirstLine, vbTab, "")
-                Pos = InStr(1, FirstLine, vbCrLf)
+                FirstLine = vbReplace(FirstLine, vbTab, "")
+                Pos = vbInstr(1, FirstLine, vbCrLf)
                 If (Pos <= 0) Or (Pos > 50) Then
                     FirstLine = Left(FirstLine, 50)
                 Else
@@ -32888,7 +32971,7 @@ ErrorTrap:
         '   returns the results
         ' ================================================================================================================
         '
-        Public Function executeAddon_executeScript2(ByVal Language As String, ByVal Code As String, ByVal EntryPoint As String, ByVal cmcObj As cpCoreClass, ByVal nothingObject As Object, ByRef return_AddonErrorMessage As String, ByVal ScriptingTimeout As Integer, ByVal ScriptName As String) As String
+        Public Function executeAddon_executeScript2(ByVal Language As String, ByVal Code As String, ByVal EntryPoint As String, ByVal cmcObj As coreClass, ByVal nothingObject As Object, ByRef return_AddonErrorMessage As String, ByVal ScriptingTimeout As Integer, ByVal ScriptName As String) As String
             Dim EmptyArray(0) As String
             executeAddon_executeScript2 = executeAddon_executeScript3(Language, Code, EntryPoint, cmcObj, nothingObject, return_AddonErrorMessage, ScriptingTimeout, ScriptName, 0, EmptyArray, EmptyArray)
         End Function
@@ -32952,14 +33035,14 @@ ErrorTrap:
                     For Ptr = 0 To ReplaceCnt - 1
                         ReplaceName = "$" & ReplaceNames(Ptr) & "$"
                         ReplaceValue = ReplaceValues(Ptr)
-                        WorkingEntryPoint = Replace(WorkingEntryPoint, ReplaceName, ReplaceValue, , , vbTextCompare)
-                        WorkingCode = Replace(WorkingCode, ReplaceName, ReplaceValue, , , vbTextCompare)
+                        WorkingEntryPoint = vbReplace(WorkingEntryPoint, ReplaceName, ReplaceValue, 1, 99, vbTextCompare)
+                        WorkingCode = vbReplace(WorkingCode, ReplaceName, ReplaceValue, 1, 99, vbTextCompare)
                     Next
                 End If
                 EntryPointName = WorkingEntryPoint
-                Pos = InStr(1, EntryPointName, "(")
+                Pos = vbInstr(1, EntryPointName, "(")
                 If Pos = 0 Then
-                    Pos = InStr(1, EntryPointName, " ")
+                    Pos = vbInstr(1, EntryPointName, " ")
                 End If
                 If Pos > 1 Then
                     EntryPointArgs = Trim(Mid(EntryPointName, Pos))
@@ -33106,7 +33189,7 @@ ErrorTrap:
                 '
                 ' first try debug folder -- cclibCommonAssemblies
                 '
-                commonAssemblyPath = cluster.clusterFiles.joinPath(cluster.clusterFiles.rootLocalFolderPath, "clibCommonAssemblies\")
+                commonAssemblyPath = cluster.localClusterFiles.joinPath(cluster.localClusterFiles.rootLocalFolderPath, "clibCommonAssemblies\")
                 result = executeAddon_executeAssembly_byFilePath(addonId, AddonCaption, commonAssemblyPath, AssemblyClassFullName, True, AddonFound, return_ErrorMessageForAdmin)
                 If Not AddonFound Then
                     '
@@ -33480,7 +33563,7 @@ ErrorTrap:
         '
         Public Function executeAddon_legacy3(ByVal AddonIDGuidOrName As String, Optional ByVal Option_String As String = "", Optional ByVal WrapperID As Integer = 0, Optional ByVal nothingObject As Object = Nothing) As String
             Dim AddonStatusOK As Boolean
-            If IsNumeric(AddonIDGuidOrName) Then
+            If vbIsNumeric(AddonIDGuidOrName) Then
                 executeAddon_legacy3 = executeAddon_legacy2(EncodeInteger(AddonIDGuidOrName), "", Option_String, addonContextEnum.ContextPage, "", 0, "", "", False, WrapperID, "", AddonStatusOK, nothingObject)
             Else
                 executeAddon_legacy3 = executeAddon_legacy2(0, AddonIDGuidOrName, Option_String, addonContextEnum.ContextPage, "", 0, "", "", False, WrapperID, "", AddonStatusOK, nothingObject)
@@ -33497,7 +33580,7 @@ ErrorTrap:
             If workingContext = 0 Then
                 workingContext = addonContextEnum.ContextPage
             End If
-            If IsNumeric(AddonIDGuidOrName) Then
+            If vbIsNumeric(AddonIDGuidOrName) Then
                 executeAddon_legacy4 = executeAddon_legacy2(EncodeInteger(AddonIDGuidOrName), "", Option_String, workingContext, "", 0, "", "", False, 0, "", AddonStatusOK, nothingObject)
             Else
                 executeAddon_legacy4 = executeAddon_legacy2(0, AddonIDGuidOrName, Option_String, workingContext, "", 0, "", "", False, 0, "", AddonStatusOK, nothingObject)
@@ -33520,7 +33603,7 @@ ErrorTrap:
         ' REFACTOR - unify interface, remove main_ and csv_ class references
         '=============================================================================================================
         '
-        Friend Function executeAddon_legacy2(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal Option_String As String, ByVal Context As addonContextEnum, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal IsIncludeAddon As Boolean, ByVal DefaultWrapperID As Integer, ByVal ignore_TemplateCaseOnly_PageContent As String, ByRef return_StatusOK As Boolean, ByVal nothingObject As Object, Optional ByVal AddonInUseIdList As String = "") As String
+        Public Function executeAddon_legacy2(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal Option_String As String, ByVal Context As addonContextEnum, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal IsIncludeAddon As Boolean, ByVal DefaultWrapperID As Integer, ByVal ignore_TemplateCaseOnly_PageContent As String, ByRef return_StatusOK As Boolean, ByVal nothingObject As Object, Optional ByVal AddonInUseIdList As String = "") As String
             executeAddon_legacy2 = executeAddon(addonId, AddonNameOrGuid, Option_String, Context, HostContentName, HostRecordID, HostFieldName, ACInstanceID, IsIncludeAddon, DefaultWrapperID, ignore_TemplateCaseOnly_PageContent, return_StatusOK, nothingObject, AddonInUseIdList, Nothing, main_page_IncludedAddonIDList, user.id, user.isAuthenticated)
         End Function
         '
@@ -33608,7 +33691,7 @@ ErrorTrap:
                             OptionDefault = ""
                             LCaseOptionDefault = ""
                             OptionSelector = ""
-                            Pos = InStr(1, OptionName, "=")
+                            Pos = vbInstr(1, OptionName, "=")
                             If Pos <> 0 Then
                                 If (Pos < Len(OptionName)) Then
                                     OptionSelector = Trim(Mid(OptionName, Pos + 1))
@@ -33616,21 +33699,21 @@ ErrorTrap:
                                 OptionName = Trim(Left(OptionName, Pos - 1))
                             End If
                             OptionName = decodeNvaArgument(OptionName)
-                            Pos = InStr(1, OptionSelector, "[")
+                            Pos = vbInstr(1, OptionSelector, "[")
                             If Pos <> 0 Then
                                 '
                                 ' List of Options, might be select, radio, checkbox, resourcelink
                                 '
                                 OptionDefault = Mid(OptionSelector, 1, Pos - 1)
                                 OptionDefault = decodeNvaArgument(OptionDefault)
-                                LCaseOptionDefault = LCase(OptionDefault)
+                                LCaseOptionDefault = vbLCase(OptionDefault)
                                 'LCaseOptionDefault = decodeNvaArgument(LCaseOptionDefault)
 
                                 OptionSelector = Mid(OptionSelector, Pos + 1)
-                                Pos = InStr(1, OptionSelector, "]")
+                                Pos = vbInstr(1, OptionSelector, "]")
                                 If Pos > 0 Then
                                     If Pos < Len(OptionSelector) Then
-                                        OptionSuffix = LCase(Trim(Mid(OptionSelector, Pos + 1)))
+                                        OptionSuffix = vbLCase(Trim(Mid(OptionSelector, Pos + 1)))
                                     End If
                                     OptionSelector = Mid(OptionSelector, 1, Pos - 1)
                                 End If
@@ -33640,7 +33723,7 @@ ErrorTrap:
                                 For OptionPtr = 0 To OptionCnt - 1
                                     OptionValue_AddonEncoded = Trim(OptionValues(OptionPtr))
                                     If OptionValue_AddonEncoded <> "" Then
-                                        Pos = InStr(1, OptionValue_AddonEncoded, ":")
+                                        Pos = vbInstr(1, OptionValue_AddonEncoded, ":")
                                         If Pos = 0 Then
                                             OptionValue = decodeNvaArgument(OptionValue_AddonEncoded)
                                             OptionCaption = OptionValue
@@ -33653,7 +33736,7 @@ ErrorTrap:
                                                 '
                                                 ' Create checkbox FormInput
                                                 '
-                                                If InStr(1, "," & LCaseOptionDefault & ",", "," & LCase(OptionValue) & ",") <> 0 Then
+                                                If vbInstr(1, "," & LCaseOptionDefault & ",", "," & vbLCase(OptionValue) & ",") <> 0 Then
                                                     FormInput = FormInput & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & OptionName & OptionPtr & """ value=""" & OptionValue & """ checked=""checked"">" & OptionCaption & "</div>"
                                                 Else
                                                     FormInput = FormInput & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & OptionName & OptionPtr & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
@@ -33662,7 +33745,7 @@ ErrorTrap:
                                                 '
                                                 ' Create Radio FormInput
                                                 '
-                                                If LCase(OptionValue) = LCaseOptionDefault Then
+                                                If vbLCase(OptionValue) = LCaseOptionDefault Then
                                                     FormInput = FormInput & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & OptionName & """ value=""" & OptionValue & """ checked=""checked"" >" & OptionCaption & "</div>"
                                                 Else
                                                     FormInput = FormInput & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & OptionName & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
@@ -33671,10 +33754,10 @@ ErrorTrap:
                                                 '
                                                 ' Create select FormInput
                                                 '
-                                                If LCase(OptionValue) = LCaseOptionDefault Then
+                                                If vbLCase(OptionValue) = LCaseOptionDefault Then
                                                     FormInput = FormInput & "<option value=""" & OptionValue & """ selected>" & OptionCaption & "</option>"
                                                 Else
-                                                    OptionCaption = Replace(OptionCaption, vbCrLf, " ")
+                                                    OptionCaption = vbReplace(OptionCaption, vbCrLf, " ")
                                                     FormInput = FormInput & "<option value=""" & OptionValue & """>" & OptionCaption & "</option>"
                                                 End If
                                         End Select
@@ -34224,7 +34307,7 @@ ErrorTrap:
                         '
                         ' data is OK
                         '
-                        If LCase(Doc.DocumentElement.Name) <> "form" Then
+                        If vbLCase(Doc.DocumentElement.Name) <> "form" Then
                             '
                             ' error - Need a way to reach the user that submitted the file
                             '
@@ -34237,16 +34320,16 @@ ErrorTrap:
                             If (Button = ButtonSave) Or (Button = ButtonOK) Then
                                 With Doc.DocumentElement
                                     For Each SettingNode In .ChildNodes
-                                        Select Case LCase(SettingNode.Name)
+                                        Select Case vbLCase(SettingNode.Name)
                                             Case "tab"
                                                 For Each TabNode In SettingNode.ChildNodes
-                                                    Select Case LCase(TabNode.Name)
+                                                    Select Case vbLCase(TabNode.Name)
                                                         Case "siteproperty"
                                                             '
                                                             FieldName = main_GetXMLAttribute(IsFound, TabNode, "name", "")
                                                             FieldValue = docProperties.getText(FieldName)
                                                             fieldType = main_GetXMLAttribute(IsFound, TabNode, "type", "")
-                                                            Select Case LCase(fieldType)
+                                                            Select Case vbLCase(fieldType)
                                                                 Case "integer"
                                                                     '
                                                                     If FieldValue <> "" Then
@@ -34397,7 +34480,7 @@ ErrorTrap:
                             Name = main_GetXMLAttribute(IsFound, Doc.DocumentElement, "name", "")
                             With Doc.DocumentElement
                                 For Each SettingNode In .ChildNodes
-                                    Select Case LCase(SettingNode.Name)
+                                    Select Case vbLCase(SettingNode.Name)
                                         Case "description"
                                             Description = SettingNode.InnerText
                                         Case "tab"
@@ -34407,7 +34490,7 @@ ErrorTrap:
                                             TabHeading = main_GetXMLAttribute(IsFound, SettingNode, "heading", "")
                                             TabCell = New coreFastStringClass
                                             For Each TabNode In SettingNode.ChildNodes
-                                                Select Case LCase(TabNode.Name)
+                                                Select Case vbLCase(TabNode.Name)
                                                     Case "heading"
                                                         '
                                                         ' Heading
@@ -34454,7 +34537,7 @@ ErrorTrap:
                                                                 '
                                                                 ' Use default editor for each field type
                                                                 '
-                                                                Select Case LCase(fieldType)
+                                                                Select Case vbLCase(fieldType)
                                                                     Case "integer"
                                                                         '
                                                                         If FieldReadOnly Then
@@ -34465,7 +34548,7 @@ ErrorTrap:
                                                                     Case "boolean"
                                                                         If FieldReadOnly Then
                                                                             Copy = html_GetFormInputCheckBox2(FieldName, EncodeBoolean(FieldValue))
-                                                                            Copy = Replace(Copy, ">", " disabled>")
+                                                                            Copy = vbReplace(Copy, ">", " disabled>")
                                                                             Copy = Copy & html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
                                                                             Copy = html_GetFormInputCheckBox2(FieldName, EncodeBoolean(FieldValue))
@@ -34836,25 +34919,25 @@ ErrorTrap:
             FastString = New coreFastStringClass
             '
             Call executeAddon_buildAddonOptionLists(ignore, ExpandedSelector, SitePropertyName & "=" & selector, SitePropertyName & "=" & SitePropertyValue, "0", True)
-            Pos = InStr(1, ExpandedSelector, "[")
+            Pos = vbInstr(1, ExpandedSelector, "[")
             If Pos <> 0 Then
                 '
                 ' List of Options, might be select, radio or checkbox
                 '
-                LCaseOptionDefault = LCase(Mid(ExpandedSelector, 1, Pos - 1))
+                LCaseOptionDefault = vbLCase(Mid(ExpandedSelector, 1, Pos - 1))
                 Dim PosEqual As Integer
 
-                PosEqual = InStr(1, LCaseOptionDefault, "=")
+                PosEqual = vbInstr(1, LCaseOptionDefault, "=")
                 If PosEqual > 0 Then
                     LCaseOptionDefault = Mid(LCaseOptionDefault, PosEqual + 1)
                 End If
 
                 LCaseOptionDefault = decodeNvaArgument(LCaseOptionDefault)
                 ExpandedSelector = Mid(ExpandedSelector, Pos + 1)
-                Pos = InStr(1, ExpandedSelector, "]")
+                Pos = vbInstr(1, ExpandedSelector, "]")
                 If Pos > 0 Then
                     If Pos < Len(ExpandedSelector) Then
-                        OptionSuffix = LCase(Trim(Mid(ExpandedSelector, Pos + 1)))
+                        OptionSuffix = vbLCase(Trim(Mid(ExpandedSelector, Pos + 1)))
                     End If
                     ExpandedSelector = Mid(ExpandedSelector, 1, Pos - 1)
                 End If
@@ -34864,7 +34947,7 @@ ErrorTrap:
                 For OptionPtr = 0 To OptionCnt - 1
                     OptionValue_AddonEncoded = Trim(OptionValues(OptionPtr))
                     If OptionValue_AddonEncoded <> "" Then
-                        Pos = InStr(1, OptionValue_AddonEncoded, ":")
+                        Pos = vbInstr(1, OptionValue_AddonEncoded, ":")
                         If Pos = 0 Then
                             OptionValue = decodeNvaArgument(OptionValue_AddonEncoded)
                             OptionCaption = OptionValue
@@ -34877,7 +34960,7 @@ ErrorTrap:
                                 '
                                 ' Create checkbox
                                 '
-                                If InStr(1, "," & LCaseOptionDefault & ",", "," & LCase(OptionValue) & ",") <> 0 Then
+                                If vbInstr(1, "," & LCaseOptionDefault & ",", "," & vbLCase(OptionValue) & ",") <> 0 Then
                                     executeAddon_getFormContent_decodeSelector = executeAddon_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & SitePropertyName & OptionPtr & """ value=""" & OptionValue & """ checked=""checked"">" & OptionCaption & "</div>"
                                 Else
                                     executeAddon_getFormContent_decodeSelector = executeAddon_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & SitePropertyName & OptionPtr & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
@@ -34886,7 +34969,7 @@ ErrorTrap:
                                 '
                                 ' Create Radio
                                 '
-                                If LCase(OptionValue) = LCaseOptionDefault Then
+                                If vbLCase(OptionValue) = LCaseOptionDefault Then
                                     executeAddon_getFormContent_decodeSelector = executeAddon_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & SitePropertyName & """ value=""" & OptionValue & """ checked=""checked"" >" & OptionCaption & "</div>"
                                 Else
                                     executeAddon_getFormContent_decodeSelector = executeAddon_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & SitePropertyName & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
@@ -34895,7 +34978,7 @@ ErrorTrap:
                                 '
                                 ' Create select 
                                 '
-                                If LCase(OptionValue) = LCaseOptionDefault Then
+                                If vbLCase(OptionValue) = LCaseOptionDefault Then
                                     executeAddon_getFormContent_decodeSelector = executeAddon_getFormContent_decodeSelector & "<option value=""" & OptionValue & """ selected>" & OptionCaption & "</option>"
                                 Else
                                     executeAddon_getFormContent_decodeSelector = executeAddon_getFormContent_decodeSelector & "<option value=""" & OptionValue & """>" & OptionCaption & "</option>"
@@ -34912,7 +34995,7 @@ ErrorTrap:
                         '
                         ' Create Radio 
                         '
-                        'main_executeAddon_GetFormContent_decodeSelector = "<div>" & Replace(main_executeAddon_GetFormContent_decodeSelector, "><", "></div><div><") & "</div>"
+                        'main_executeAddon_GetFormContent_decodeSelector = "<div>" & vbReplace(main_executeAddon_GetFormContent_decodeSelector, "><", "></div><div><") & "</div>"
                     Case Else
                         '
                         ' Create select 
@@ -34958,7 +35041,7 @@ ErrorTrap:
         '
         '   clear addonIncludeRules cache
         '
-        Friend Sub cache_addonIncludeRules_clear()
+        Public Sub cache_addonIncludeRules_clear()
             On Error GoTo ErrorTrap 'Const Tn = "cache_addonIncludeRules_clear": 'Dim th as integer: th = profileLogMethodEnter(Tn)
             '
             cache_addonIncludeRules = New addonIncludeRulesClass
@@ -34974,7 +35057,7 @@ ErrorTrap:
             Call handleLegacyError4(Err.Number, Err.Source, Err.Description, "cache_addonIncludeRules_clear", True)
         End Sub
         '
-        Friend Sub cache_addonIncludeRules_save()
+        Public Sub cache_addonIncludeRules_save()
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("MainClass.cache_addonIncludeRules_save")
             '
             'Dim cacheArray As Object()
@@ -35092,7 +35175,7 @@ ErrorTrap:
         '
         '   getPtr addonIncludeRules cache
         '
-        Friend Function cache_addonIncludeRules_getFirstPtr(addonId As Integer) As Integer
+        Public Function cache_addonIncludeRules_getFirstPtr(addonId As Integer) As Integer
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("cache_addonIncludeRules_getFirstPtr")
             '
             Dim returnPtr As Integer
@@ -35152,7 +35235,7 @@ ErrorTrap:
                     cacheValue &= "," & dr.Item("sourceLink").ToString
                 Next
                 If cacheValue <> "" Then
-                    cacheValue = Replace(cacheValue, "\", "/")
+                    cacheValue = vbReplace(cacheValue, "\", "/")
                     Call cache.setKey(cache_linkForward_cacheName, cacheValue)
                     'Call cache.cache_savex("dummyValue", "dummyKey")
                 End If
@@ -35176,7 +35259,7 @@ ErrorTrap:
         '
         '   clear addonIncludeRules cache
         '
-        Friend Sub cache_libraryFiles_clear()
+        Public Sub cache_libraryFiles_clear()
             On Error GoTo ErrorTrap 'Const Tn = "cache_libraryFiles_clear": 'Dim th as integer: th = profileLogMethodEnter(Tn)
             '
             cache_libraryFilesCnt = 0
@@ -35193,7 +35276,7 @@ ErrorTrap:
         '
         '
         '
-        Friend Sub cache_libraryFiles_save()
+        Public Sub cache_libraryFiles_save()
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("MainClass.cache_libraryFiles_save")
             '
             Dim cacheArray As Object()
@@ -35389,8 +35472,8 @@ ErrorTrap:
                         IsNotPublished = ((PubDate > Date.MinValue) And (PubDate > main_PageStartTime))
                         'IsArchived = ((DateArchive > Date.MinValue) And (DateArchive < main_PageStartTime))
                         '
-                        RecordName = Replace(RecordName, vbCrLf, " ")
-                        RecordName = Replace(RecordName, vbTab, " ")
+                        RecordName = vbReplace(RecordName, vbCrLf, " ")
+                        RecordName = vbReplace(RecordName, vbTab, " ")
                         '
                         If IsNotActive Or IsExpired Or IsNotPublished Then
                             pageManager_RedirectSourcePageID = PageID
@@ -35456,11 +35539,11 @@ ErrorTrap:
                             '                        .Active = Active
                             '                        .parentId = parentId
                             '                        .headline = Trim(encodeText(main_pcc(PCC_Headline, main_RenderCache_CurrentPage_PCCPtr)))
-                            '                        .headline = Replace(.headline, vbCrLf, " ")
-                            '                        .headline = Replace(.headline, vbTab, " ")
+                            '                        .headline = vbReplace(.headline, vbCrLf, " ")
+                            '                        .headline = vbReplace(.headline, vbTab, " ")
                             '                        .MenuHeadline = Trim(encodeText(main_pcc(PCC_MenuHeadline, main_RenderCache_CurrentPage_PCCPtr)))
-                            '                        .MenuHeadline = Replace(.MenuHeadline, vbCrLf, " ")
-                            '                        .MenuHeadline = Replace(.MenuHeadline, vbTab, " ")
+                            '                        .MenuHeadline = vbReplace(.MenuHeadline, vbCrLf, " ")
+                            '                        .MenuHeadline = vbReplace(.MenuHeadline, vbTab, " ")
                             '                        .dateArchive = dateArchive
                             '                        .DateExpires = DateExpires
                             '                        .PubDate = PubDate
@@ -35633,10 +35716,10 @@ ErrorTrap:
                             pageCaption = "Related Page"
                         End If
                     End If
-                    PageName = Replace(PageName, vbCrLf, " ")
-                    PageName = Replace(PageName, vbTab, " ")
-                    pageCaption = Replace(pageCaption, vbCrLf, " ")
-                    pageCaption = Replace(pageCaption, vbTab, " ")
+                    PageName = vbReplace(PageName, vbCrLf, " ")
+                    PageName = vbReplace(PageName, vbTab, " ")
+                    pageCaption = vbReplace(pageCaption, vbCrLf, " ")
+                    pageCaption = vbReplace(pageCaption, vbTab, " ")
                     '
                     ' Store results in main_oldCacheArray_ParentBranch Storage
                     '
@@ -35814,16 +35897,16 @@ ErrorTrap:
                         '            pageCaption = "Related Page"
                         '        End If
                         '    End If
-                        '    If InStr(1, pageCaption, "<ac", vbTextCompare) <> 0 Then
+                        '    If vbInstr(1, pageCaption, "<ac", vbTextCompare) <> 0 Then
                         '        pageCaption = pageCaption & ACTagEnd
                         '    End If
                         '    '
                         '    ' remove crlf because not allowed (in main_RenderedNavigationStructure if nothing else)
                         '    '
-                        '    PageName = Replace(PageName, vbCrLf, " ")
-                        '    PageName = Replace(PageName, vbTab, " ")
-                        '    pageCaption = Replace(pageCaption, vbCrLf, " ")
-                        '    pageCaption = Replace(pageCaption, vbTab, " ")
+                        '    PageName = vbReplace(PageName, vbCrLf, " ")
+                        '    PageName = vbReplace(PageName, vbTab, " ")
+                        '    pageCaption = vbReplace(pageCaption, vbCrLf, " ")
+                        '    pageCaption = vbReplace(pageCaption, vbTab, " ")
                         '    '
                         '    .Name = PageName
                         '    .Active = encodeBoolean(main_pcc(PCC_Active, PCCPtr))
@@ -36069,7 +36152,7 @@ ErrorTrap:
                     ' If Content was not found, add it to the end
                     '
                     If (InStr(1, returnHtmlBody, fpoContentBox) <> 0) Then
-                        returnHtmlBody = Replace(returnHtmlBody, fpoContentBox, PageContent)
+                        returnHtmlBody = vbReplace(returnHtmlBody, fpoContentBox, PageContent)
                     Else
                         returnHtmlBody = returnHtmlBody & PageContent
                     End If
@@ -36133,16 +36216,16 @@ ErrorTrap:
                                                 Result.Add(ContentIndent)
                                                 ContentIndent = ""
                                             End If
-                                            Content = Replace(Content, vbCrLf, " ")
-                                            Content = Replace(Content, vbTab, " ")
-                                            Content = Replace(Content, vbCr, " ")
-                                            Content = Replace(Content, vbLf, " ")
+                                            Content = vbReplace(Content, vbCrLf, " ")
+                                            Content = vbReplace(Content, vbTab, " ")
+                                            Content = vbReplace(Content, vbCr, " ")
+                                            Content = vbReplace(Content, vbLf, " ")
                                             Result.Add(Content)
                                             ContentCnt = ContentCnt + 1
                                         End If
                                     End If
                                 Else
-                                    Select Case LCase(Parse.TagName(Ptr))
+                                    Select Case vbLCase(Parse.TagName(Ptr))
                                         Case "pre", "script"
                                             '
                                             ' End block formating
@@ -36165,7 +36248,7 @@ ErrorTrap:
                                                 '
                                                 ' format the tag
                                                 '
-                                                Select Case LCase(Parse.TagName(Ptr))
+                                                Select Case vbLCase(Parse.TagName(Ptr))
                                                     Case "p", "h1", "h2", "h3", "h4", "h5", "h6", "li", "br"
                                                         '
                                                         ' new line
@@ -36235,7 +36318,7 @@ ErrorTrap:
         '           else - (IsSectionRootPageIDMode) SectionRecord has a RootPageID field
         '=============================================================================
         '
-        Friend Function main_GetHtmlBody_GetSection(AllowChildPageList As Boolean, AllowReturnLink As Boolean, AllowEditWrapper As Boolean, ByRef return_blockSiteWithLogin As Boolean) As String
+        Public Function main_GetHtmlBody_GetSection(AllowChildPageList As Boolean, AllowReturnLink As Boolean, AllowEditWrapper As Boolean, ByRef return_blockSiteWithLogin As Boolean) As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("main_GetHtmlBody_GetSection")
             '
             Dim returnHtml As String
@@ -36690,7 +36773,7 @@ ErrorTrap:
                                 '
                                 Call pageManager_cache_pageTemplate_load()
                                 For TCPtr = 0 To pageManager_cache_pageTemplate_rows - 1
-                                    If LCase(EncodeText(cache_pageTemplate(TC_Name, TCPtr))) = "default" Then
+                                    If vbLCase(EncodeText(cache_pageTemplate(TC_Name, TCPtr))) = "default" Then
                                         templateId = EncodeInteger(cache_pageTemplate(TC_ID, TCPtr))
                                         Exit For
                                     End If
@@ -36742,7 +36825,7 @@ ErrorTrap:
                             ' Add exclusive styles
                             '
                             If StylesFilename <> "" Then
-                                If LCase(Right(StylesFilename, 4)) <> ".css" Then
+                                If vbLCase(Right(StylesFilename, 4)) <> ".css" Then
                                     Call handleLegacyError15("Template [" & pageManager_TemplateName & "] StylesFilename is not a '.css' file, and will not display correct. Check that the field is setup as a CSSFile.", "main_GetHtmlBody_GetSection")
                                 Else
                                     main_MetaContent_TemplateStyleSheetTag = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & web_requestProtocol & webServer.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, StylesFilename) & """ >"
@@ -36786,10 +36869,10 @@ ErrorTrap:
                                         ' redirect because protocol is wrong
                                         '
                                         If SecureLink_CurrentURL Then
-                                            pageManager_RedirectLink = Replace(main_ServerLink, "https://", "http://")
+                                            pageManager_RedirectLink = vbReplace(main_ServerLink, "https://", "http://")
                                             pageManager_RedirectReason = "Redirecting because neither the page or the template requires a secure link."
                                         Else
-                                            pageManager_RedirectLink = Replace(main_ServerLink, "http://", "https://")
+                                            pageManager_RedirectLink = vbReplace(main_ServerLink, "http://", "https://")
                                             If SecureLink_Page_Required Then
                                                 pageManager_RedirectReason = "Redirecting because this page [" & main_RenderedPageName & "] requires a secure link."
                                             Else
@@ -36802,7 +36885,7 @@ ErrorTrap:
                                     ' ----- TemplateLink given
                                     '
                                     CurrentLink = main_ServerLink
-                                    If InStr(1, templateLink, "://", vbTextCompare) <> 0 Then
+                                    If vbInstr(1, templateLink, "://", vbTextCompare) <> 0 Then
                                         '
                                         ' ----- TemplateLink is full
                                         '       this includes a short template with the secure checked case
@@ -36810,7 +36893,7 @@ ErrorTrap:
                                         '
                                         LinkSplit = Split(CurrentLink, "?")
                                         CurrentLinkNoQuery = LinkSplit(0)
-                                        If (UCase(templateLink) <> UCase(CurrentLinkNoQuery)) Then
+                                        If (UCase(templateLink) <> vbUCase(CurrentLinkNoQuery)) Then
                                             '
                                             ' redirect to template link
                                             '
@@ -36831,12 +36914,12 @@ ErrorTrap:
                                         ' ----- TemplateLink is short
                                         '       test current short link vs template short link, and protocols
                                         '
-                                        CurrentLink = Replace(CurrentLink, "https://", "http://", 1, -1, vbTextCompare)
+                                        CurrentLink = vbReplace(CurrentLink, "https://", "http://", 1, 99, vbTextCompare)
                                         CurrentLink = ConvertLinkToShortLink(CurrentLink, webServer.requestDomain, web_requestVirtualFilePath)
                                         CurrentLink = EncodeAppRootPath(CurrentLink, web_requestVirtualFilePath, www_requestRootPath, webServer.requestDomain)
                                         LinkSplit = Split(CurrentLink, "?")
                                         CurrentLinkNoQuery = LinkSplit(0)
-                                        If (SecureLink_CurrentURL <> SecureLink_Required) Or (UCase(templateLink) <> UCase(CurrentLinkNoQuery)) Then
+                                        If (SecureLink_CurrentURL <> SecureLink_Required) Or (UCase(templateLink) <> vbUCase(CurrentLinkNoQuery)) Then
                                             '
                                             ' This is not the correct page for this content, redirect
                                             ' This is NOT a pagenotfound - but a correctable condition that can not be avoided
@@ -36847,11 +36930,11 @@ ErrorTrap:
                                                 '
                                                 ' Redirect to Secure
                                                 '
-                                                If InStr(1, pageManager_RedirectLink, "http", vbTextCompare) = 1 Then
+                                                If vbInstr(1, pageManager_RedirectLink, "http", vbTextCompare) = 1 Then
                                                     '
                                                     ' link is full
                                                     '
-                                                    pageManager_RedirectLink = Replace(pageManager_RedirectLink, "http://", "https://", , , vbTextCompare)
+                                                    pageManager_RedirectLink = vbReplace(pageManager_RedirectLink, "http://", "https://", 1, 99, vbTextCompare)
                                                 Else
                                                     '
                                                     ' link is root relative
@@ -36862,11 +36945,11 @@ ErrorTrap:
                                                 '
                                                 ' Redirect to non-Secure
                                                 '
-                                                If InStr(1, pageManager_RedirectLink, "http", vbTextCompare) = 1 Then
+                                                If vbInstr(1, pageManager_RedirectLink, "http", vbTextCompare) = 1 Then
                                                     '
                                                     ' link is full
                                                     '
-                                                    pageManager_RedirectLink = Replace(pageManager_RedirectLink, "https://", "http://", , , vbTextCompare)
+                                                    pageManager_RedirectLink = vbReplace(pageManager_RedirectLink, "https://", "http://", 1, 99, vbTextCompare)
                                                 Else
                                                     '
                                                     ' link is root relative
@@ -36910,7 +36993,7 @@ ErrorTrap:
                                         Next
                                         linkDomain = main_GetRecordName("domains", setdomainId)
                                         If linkDomain <> "" Then
-                                            pageManager_RedirectLink = Replace(main_ServerLink, "://" & webServer.requestDomain, "://" & linkDomain, , , vbTextCompare)
+                                            pageManager_RedirectLink = vbReplace(main_ServerLink, "://" & webServer.requestDomain, "://" & linkDomain, 1, 99, vbTextCompare)
                                             pageManager_RedirectBecausePageNotFound = False
                                             pageManager_RedirectReason = "Redirecting because this template [" & main_RenderedTemplateName & "] requires a different domain [" & linkDomain & "]." & pageManager_TemplateReason
                                         End If
@@ -36936,7 +37019,7 @@ ErrorTrap:
                         styleList = main_GetStyleSheet2(csv_contentTypeEnum.contentTypeWeb, templateId, 0)
                         addonListJSON = main_GetEditorAddonListJSON(csv_contentTypeEnum.contentTypeWeb)
                         Editor = html_GetFormInputHTML3("copyFilename", pageManager_quickEdit_copy, CStr(FieldRows), "100%", False, True, addonListJSON, styleList, styleOptionList)
-                        returnHtml = Replace(returnHtml, pageManager_quickEdit_fpo, Editor)
+                        returnHtml = vbReplace(returnHtml, pageManager_quickEdit_fpo, Editor)
                     End If
                 End If
             End If
@@ -37033,7 +37116,7 @@ ErrorTrap:
         '   RootPageID has to be the ID of the root page for PageID
         '=============================================================================
         '
-        Friend Function main_GetHtmlBody_GetSection_GetContent(PageID As Integer, rootPageId As Integer, RootPageContentName As String, OrderByClause As String, AllowChildPageList As Boolean, AllowReturnLink As Boolean, ArchivePages As Boolean, SectionID As Integer, UseContentWatchLink As Boolean, allowPageWithoutSectionDisplay As Boolean) As String
+        Public Function main_GetHtmlBody_GetSection_GetContent(PageID As Integer, rootPageId As Integer, RootPageContentName As String, OrderByClause As String, AllowChildPageList As Boolean, AllowReturnLink As Boolean, ArchivePages As Boolean, SectionID As Integer, UseContentWatchLink As Boolean, allowPageWithoutSectionDisplay As Boolean) As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("main_GetHtmlBody_GetSection_GetContent")
             '
             Dim ParentPtr As Integer
@@ -37237,7 +37320,7 @@ ErrorTrap:
                         CS = db.cs_openSql(SQL)
                         BlockedRecordIDList = "," & BlockedRecordIDList
                         Do While db.cs_Ok(CS)
-                            BlockedRecordIDList = Replace(BlockedRecordIDList, "," & db.cs_getText(CS, "RecordID"), "")
+                            BlockedRecordIDList = vbReplace(BlockedRecordIDList, "," & db.cs_getText(CS, "RecordID"), "")
                             db.db_csGoNext(CS)
                         Loop
                         Call db.cs_Close(CS)
@@ -37260,7 +37343,7 @@ ErrorTrap:
                                 & " AND ((ManagementMemberRules.MemberID)=" & user.id & " ));"
                             CS = db.cs_openSql(SQL)
                             Do While db.cs_Ok(CS)
-                                BlockedRecordIDList = Replace(BlockedRecordIDList, "," & db.cs_getText(CS, "RecordID"), "")
+                                BlockedRecordIDList = vbReplace(BlockedRecordIDList, "," & db.cs_getText(CS, "RecordID"), "")
                                 db.db_csGoNext(CS)
                             Loop
                             Call db.cs_Close(CS)
@@ -37418,7 +37501,7 @@ ErrorTrap:
                     'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, 0, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
                     RQS = web_RefreshQueryString
                     If RQS <> "" Then
-                        returnHtml = Replace(returnHtml, "?method=login", "?method=Login&" & RQS, , , vbTextCompare)
+                        returnHtml = vbReplace(returnHtml, "?method=login", "?method=Login&" & RQS, 1, 99, vbTextCompare)
                     End If
                     '
                     ' Add in content padding required for integration with the template
@@ -37888,7 +37971,7 @@ ErrorTrap:
                     '                'main_oldCacheRS_FieldNames = Split(SelectFieldList, ",")
                     '                'main_oldCacheRS_FieldValues = db.db_GetCSRow(main_oldCacheRS_cs)
                     '                'For Pointer = 0 To UBound(main_oldCacheRS_FieldValues)
-                    '                '    main_oldCacheRS_FieldValues(Pointer) = Replace(Replace(main_oldCacheRS_FieldValues(Pointer), vbTab, ""), vbCrLf, "")
+                    '                '    main_oldCacheRS_FieldValues(Pointer) = vbReplace(Replace(main_oldCacheRS_FieldValues(Pointer), vbTab, ""), vbCrLf, "")
                     '                'Next
                     '            End If
                     '
@@ -37931,25 +38014,25 @@ ErrorTrap:
                             ' buffer text fields because this excode format does not allow them
                             '
                             PageName = EncodeText(cache_pageContent(PCC_Name, pagePCCPtr))
-                            PageName = Replace(PageName, vbCrLf, " ")
-                            PageName = Replace(PageName, vbCr, " ")
-                            PageName = Replace(PageName, vbLf, " ")
-                            PageName = Replace(PageName, vbTab, " ")
+                            PageName = vbReplace(PageName, vbCrLf, " ")
+                            PageName = vbReplace(PageName, vbCr, " ")
+                            PageName = vbReplace(PageName, vbLf, " ")
+                            PageName = vbReplace(PageName, vbTab, " ")
                             PageName = Trim(PageName)
                             '
                             PageLink = EncodeText(cache_pageContent(PCC_Link, pagePCCPtr))
-                            PageLink = Replace(PageLink, vbCrLf, " ")
-                            PageLink = Replace(PageLink, vbCr, " ")
-                            PageLink = Replace(PageLink, vbLf, " ")
-                            PageLink = Replace(PageLink, vbTab, " ")
+                            PageLink = vbReplace(PageLink, vbCrLf, " ")
+                            PageLink = vbReplace(PageLink, vbCr, " ")
+                            PageLink = vbReplace(PageLink, vbLf, " ")
+                            PageLink = vbReplace(PageLink, vbTab, " ")
                             PageLink = Trim(PageLink)
                             '
                             pageMenuHeadline = Trim(EncodeText(cache_pageContent(PCC_MenuHeadline, pagePCCPtr)))
                             If pageMenuHeadline <> "" Then
-                                pageMenuHeadline = Replace(pageMenuHeadline, vbCrLf, " ")
-                                pageMenuHeadline = Replace(pageMenuHeadline, vbCr, " ")
-                                pageMenuHeadline = Replace(pageMenuHeadline, vbLf, " ")
-                                pageMenuHeadline = Replace(pageMenuHeadline, vbTab, " ")
+                                pageMenuHeadline = vbReplace(pageMenuHeadline, vbCrLf, " ")
+                                pageMenuHeadline = vbReplace(pageMenuHeadline, vbCr, " ")
+                                pageMenuHeadline = vbReplace(pageMenuHeadline, vbLf, " ")
+                                pageMenuHeadline = vbReplace(pageMenuHeadline, vbTab, " ")
                                 pageMenuHeadline = Trim(pageMenuHeadline)
                             Else
                                 pageMenuHeadline = PageName
@@ -37977,25 +38060,25 @@ ErrorTrap:
                         ' buffer text fields because this excode format does not allow them
                         '
                         PageName = EncodeText(cache_pageContent(PCC_Name, pagePCCPtr))
-                        PageName = Replace(PageName, vbCrLf, " ")
-                        PageName = Replace(PageName, vbCr, " ")
-                        PageName = Replace(PageName, vbLf, " ")
-                        PageName = Replace(PageName, vbTab, " ")
+                        PageName = vbReplace(PageName, vbCrLf, " ")
+                        PageName = vbReplace(PageName, vbCr, " ")
+                        PageName = vbReplace(PageName, vbLf, " ")
+                        PageName = vbReplace(PageName, vbTab, " ")
                         PageName = Trim(PageName)
                         '
                         PageLink = EncodeText(cache_pageContent(PCC_Link, pagePCCPtr))
-                        PageLink = Replace(PageLink, vbCrLf, " ")
-                        PageLink = Replace(PageLink, vbCr, " ")
-                        PageLink = Replace(PageLink, vbLf, " ")
-                        PageLink = Replace(PageLink, vbTab, " ")
+                        PageLink = vbReplace(PageLink, vbCrLf, " ")
+                        PageLink = vbReplace(PageLink, vbCr, " ")
+                        PageLink = vbReplace(PageLink, vbLf, " ")
+                        PageLink = vbReplace(PageLink, vbTab, " ")
                         PageLink = Trim(PageLink)
                         '
                         pageMenuHeadline = Trim(EncodeText(cache_pageContent(PCC_MenuHeadline, pagePCCPtr)))
                         If pageMenuHeadline <> "" Then
-                            pageMenuHeadline = Replace(pageMenuHeadline, vbCrLf, " ")
-                            pageMenuHeadline = Replace(pageMenuHeadline, vbCr, " ")
-                            pageMenuHeadline = Replace(pageMenuHeadline, vbLf, " ")
-                            pageMenuHeadline = Replace(pageMenuHeadline, vbTab, " ")
+                            pageMenuHeadline = vbReplace(pageMenuHeadline, vbCrLf, " ")
+                            pageMenuHeadline = vbReplace(pageMenuHeadline, vbCr, " ")
+                            pageMenuHeadline = vbReplace(pageMenuHeadline, vbLf, " ")
+                            pageMenuHeadline = vbReplace(pageMenuHeadline, vbTab, " ")
                             pageMenuHeadline = Trim(pageMenuHeadline)
                         Else
                             pageMenuHeadline = PageName
@@ -38025,25 +38108,25 @@ ErrorTrap:
                             '
                             'hint = hint & ",430 pagePCCPtr=" & pagePCCPtr
                             PageName = EncodeText(cache_pageContent(PCC_Name, pagePCCPtr))
-                            PageName = Replace(PageName, vbCrLf, " ")
-                            PageName = Replace(PageName, vbCr, " ")
-                            PageName = Replace(PageName, vbLf, " ")
-                            PageName = Replace(PageName, vbTab, " ")
+                            PageName = vbReplace(PageName, vbCrLf, " ")
+                            PageName = vbReplace(PageName, vbCr, " ")
+                            PageName = vbReplace(PageName, vbLf, " ")
+                            PageName = vbReplace(PageName, vbTab, " ")
                             PageName = Trim(PageName)
                             '
                             PageLink = EncodeText(cache_pageContent(PCC_Link, pagePCCPtr))
-                            PageLink = Replace(PageLink, vbCrLf, " ")
-                            PageLink = Replace(PageLink, vbCr, " ")
-                            PageLink = Replace(PageLink, vbLf, " ")
-                            PageLink = Replace(PageLink, vbTab, " ")
+                            PageLink = vbReplace(PageLink, vbCrLf, " ")
+                            PageLink = vbReplace(PageLink, vbCr, " ")
+                            PageLink = vbReplace(PageLink, vbLf, " ")
+                            PageLink = vbReplace(PageLink, vbTab, " ")
                             PageLink = Trim(PageLink)
                             '
                             pageMenuHeadline = Trim(EncodeText(cache_pageContent(PCC_MenuHeadline, pagePCCPtr)))
                             If pageMenuHeadline <> "" Then
-                                pageMenuHeadline = Replace(pageMenuHeadline, vbCrLf, " ")
-                                pageMenuHeadline = Replace(pageMenuHeadline, vbCr, " ")
-                                pageMenuHeadline = Replace(pageMenuHeadline, vbLf, " ")
-                                pageMenuHeadline = Replace(pageMenuHeadline, vbTab, " ")
+                                pageMenuHeadline = vbReplace(pageMenuHeadline, vbCrLf, " ")
+                                pageMenuHeadline = vbReplace(pageMenuHeadline, vbCr, " ")
+                                pageMenuHeadline = vbReplace(pageMenuHeadline, vbLf, " ")
+                                pageMenuHeadline = vbReplace(pageMenuHeadline, vbTab, " ")
                                 pageMenuHeadline = Trim(pageMenuHeadline)
                             Else
                                 pageMenuHeadline = PageName
@@ -38255,7 +38338,7 @@ ErrorTrap:
                             '                    QueryString = ModifyQueryString(QueryString, RequestNameOrderByClause, OrderByClause, True)
                             '                    QueryString = ModifyQueryString(QueryString, RequestNameHardCodedPage, HardCodedPagePrinterVersion, True)
                             Caption = siteProperties.getText("PagePrinterVersionCaption", "Printer Version")
-                            Caption = Replace(Caption, " ", "&nbsp;")
+                            Caption = vbReplace(Caption, " ", "&nbsp;")
                             IconRow = IconRow & cr & "&nbsp;&nbsp;<a href=""" & html_EncodeHTML(web_requestPage & "?" & QueryString) & """ target=""_blank""><img alt=""image"" src=""/ccLib/images/IconSmallPrinter.gif"" width=""13"" height=""13"" border=""0"" align=""absmiddle""></a>&nbsp<a href=""" & html_EncodeHTML(web_requestPage & "?" & QueryString) & """ target=""_blank"" style=""text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;"">" & Caption & "</a>"
                         End If
                         If AllowEmailPage Then
@@ -38265,7 +38348,7 @@ ErrorTrap:
                             End If
                             EmailBody = web_requestProtocol & webServer.requestDomain & webServer.requestPathPage & QueryString
                             Caption = siteProperties.getText("PageAllowEmailCaption", "Email This Page")
-                            Caption = Replace(Caption, " ", "&nbsp;")
+                            Caption = vbReplace(Caption, " ", "&nbsp;")
                             IconRow = IconRow & cr & "&nbsp;&nbsp;<a HREF=""mailto:?SUBJECT=You might be interested in this&amp;BODY=" & EmailBody & """><img alt=""image"" src=""/ccLib/images/IconSmallEmail.gif"" width=""13"" height=""13"" border=""0"" align=""absmiddle""></a>&nbsp;<a HREF=""mailto:?SUBJECT=You might be interested in this&amp;BODY=" & EmailBody & """ style=""text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;"">" & Caption & "</a>"
                         End If
                     End If
@@ -38632,7 +38715,7 @@ ErrorTrap:
             '
             ChildListInstanceOptions = EncodeText(cache_pageContent(PCC_ChildListInstanceOptions, main_RenderCache_CurrentPage_PCCPtr))
             PageList = executeAddon_legacy2(siteProperties.childListAddonID, "", ChildListInstanceOptions, addonContextEnum.ContextPage, ContentName, RecordID, "", PageChildListInstanceID, False, -1, "", AddonStatusOK, Nothing)
-            If InStr(1, PageList, "<ul", vbTextCompare) = 0 Then
+            If vbInstr(1, PageList, "<ul", vbTextCompare) = 0 Then
                 PageList = "(there are no child pages)"
             End If
             s = s _
@@ -38879,7 +38962,7 @@ ErrorTrap:
                                     Dim refQueryString As String = ""
                                     Dim cs As Integer
                                     Call SeparateURL(webServer.requestReferrer, refProtocol, refHost, refPath, refPage, refQueryString)
-                                    If UCase(refHost) <> UCase(webServer.requestDomain) Then
+                                    If vbUCase(refHost) <> vbUCase(webServer.requestDomain) Then
                                         '
                                         ' Not from this site
                                         '
@@ -38938,7 +39021,7 @@ ErrorTrap:
                                     For addonPtr = 0 To UBound(pairs)
                                         pairName = pairs(addonPtr)
                                         pairValue = ""
-                                        pos = InStr(1, pairName, "=")
+                                        pos = vbInstr(1, pairName, "=")
                                         If pos > 0 Then
                                             pairValue = DecodeResponseVariable(Mid(pairName, pos + 1))
                                             pairName = DecodeResponseVariable(Mid(pairName, 1, pos - 1))
@@ -38962,15 +39045,15 @@ ErrorTrap:
                         web_BlockClosePageCopyright = True
                         main_BlockClosePageLink = True
                         If (web_OutStreamDevice = web_OutStreamJavaScript) Then
-                            If InStr(1, returnResult, "<form ", vbTextCompare) <> 0 Then
+                            If vbInstr(1, returnResult, "<form ", vbTextCompare) <> 0 Then
                                 Dim FormSplit As String() = Split(returnResult, "<form ", , vbTextCompare)
                                 returnResult = FormSplit(0)
                                 For addonPtr = 1 To UBound(FormSplit)
-                                    Dim FormEndPos As Integer = InStr(1, FormSplit(addonPtr), ">")
+                                    Dim FormEndPos As Integer = vbInstr(1, FormSplit(addonPtr), ">")
                                     Dim FormInner As String = Mid(FormSplit(addonPtr), 1, FormEndPos)
                                     Dim FormSuffix As String = Mid(FormSplit(addonPtr), FormEndPos + 1)
-                                    FormInner = Replace(FormInner, "method=""post""", "method=""main_Get""", , , vbTextCompare)
-                                    FormInner = Replace(FormInner, "method=post", "method=""main_Get""", , , vbTextCompare)
+                                    FormInner = vbReplace(FormInner, "method=""post""", "method=""main_Get""", 1, 99, vbTextCompare)
+                                    FormInner = vbReplace(FormInner, "method=post", "method=""main_Get""", 1, 99, vbTextCompare)
                                     returnResult = returnResult & "<form " & FormInner & FormSuffix
                                 Next
                             End If
@@ -39335,7 +39418,7 @@ ErrorTrap:
                                         If contentName <> "" Then
                                             Call cache.invalidateTagCommaList(contentName)
                                             tableName = db_GetContentTablename(contentName)
-                                            If LCase(tableName) = "cctemplates" Then
+                                            If vbLCase(tableName) = "cctemplates" Then
                                                 Call cache.setKey(pageManager_cache_pageTemplate_cacheName, nothingObject)
                                                 Call pageManager_cache_pageTemplate_load()
                                             End If
@@ -39488,22 +39571,47 @@ ErrorTrap:
         ''' <remarks></remarks>
         Private Sub constructorCommonInitialize(appName As String)
             Try
-                '
-                ' refactor - I think the app should be initialized right here, as soon as the appname and permissions are set
-                '   and appName should be set only through the new app( appName )
+                Dim JSONTemp As String
+                Dim tempFiles As coreFileSystemClass
                 '
                 constructorTickCount = GetTickCount
-                main_ClosePageCounter = 0
-                allowDebugLog = True
-                main_PageStartTime = Now()
-                main_PageTestPointPrinting = True
-                main_AllowCookielessDetection = True
-                main_LoginIconFilename = ""
                 CPTickCountBase = GetTickCount
-                main_IconFileDefault = "/ccLib/images/IconDoc.gif"
-                main_IconFolderClosed = "/ccLib/images/main_IconFolderClosed.gif"
-                main_IconFolderOpen = "/ccLib/images/main_IconFolderOpen.gif"
-                main_IconFolderUp = "/ccLib/images/main_IconFolderOpen.gif"
+                '
+                ' ----- read/create serverConfig
+                '
+                tempFiles = New coreFileSystemClass(Me, True, coreFileSystemClass.fileSyncModeEnum.noSync, getProgramDataFolder)
+                JSONTemp = tempFiles.ReadFile("serverConfig.json")
+                If String.IsNullOrEmpty(JSONTemp) Then
+                    '
+                    ' initialize serverConfig (do not let anything take a site down)
+                    '
+                    serverConfig = New serverConfigClass
+                    serverConfig.clusterPath = "d:\"
+                    If (Not System.IO.Directory.Exists(serverConfig.clusterPath)) Then
+                        serverConfig.clusterPath = "c:\"
+                    End If
+                    serverConfig.clusterPath &= "inetPub"
+                    If Not (System.IO.Directory.Exists(serverConfig.clusterPath)) Then
+                        System.IO.Directory.CreateDirectory(serverConfig.clusterPath)
+                    End If
+                    serverConfig.allowTaskRunnerService = False
+                    serverConfig.allowTaskSchedulerService = False
+                    tempFiles.SaveFile("serverConfig.json", json.Serialize(serverConfig))
+                Else
+                    serverConfig = json.Deserialize(Of serverConfigClass)(JSONTemp)
+                End If
+                '
+                ' ----- read/create clusterConfig
+                '
+                tempFiles = New coreFileSystemClass(Me, True, coreFileSystemClass.fileSyncModeEnum.noSync, serverConfig.clusterPath)
+                JSONTemp = tempFiles.ReadFile("clusterConfig.json")
+                If String.IsNullOrEmpty(JSONTemp) Then
+                    '
+                    ' for now it fails, maybe later let it autobuild a local cluster
+                    '
+                Else
+                    clusterConfig = json.Deserialize(Of clusterConfigClass)(JSONTemp)
+                End If
                 '
                 If (Not String.IsNullOrEmpty(appName)) Then
                     '
@@ -39517,7 +39625,7 @@ ErrorTrap:
                         '
                         Throw New ApplicationException("appServices constructor failed because clusterServices are not valid.")
                     Else
-                        If (Not cluster.config.apps.ContainsKey(appName.ToLower())) Then
+                        If (Not clusterConfig.apps.ContainsKey(appName.ToLower())) Then
                             '
                             ' application now configured
                             '
@@ -39525,49 +39633,40 @@ ErrorTrap:
                             appStatus = applicationStatusEnum.ApplicationStatusAppConfigNotValid
                             Throw New Exception("application [" & appName & "] was not found in this cluster.")
                         Else
-                            appConfig = cluster.config.apps(appName.ToLower())
+                            appConfig = clusterConfig.apps(appName.ToLower())
                         End If
                         '
-                        If InStr(1, appConfig.domainList(0), ",") > 1 Then
+                        If vbInstr(1, appConfig.domainList(0), ",") > 1 Then
                             '
                             ' if first entry in domain list is comma delimited, save only the first entry
                             '
-                            appConfig.domainList(0) = Mid(appConfig.domainList(0), 1, InStr(1, appConfig.domainList(0), ",") - 1)
+                            appConfig.domainList(0) = Mid(appConfig.domainList(0), 1, vbInstr(1, appConfig.domainList(0), ",") - 1)
                         End If
                         '
                         ' initialize datasource
                         '
-                        db.db_AddDataSource("Default", -1, cluster.config.defaultDataSourceODBCConnectionString)
+                        db.db_AddDataSource("Default", -1, clusterConfig.defaultDataSourceODBCConnectionString)
                         '
                         ' REFACTOR - this was removed because during debug is costs 300msec, and only helps case with small edge case of Db loss -- test that case for risks
                         '
                         appStatus = applicationStatusEnum.ApplicationStatusReady
                     End If
                     '
-                    ' initialie filesystem, public and rivate now, setup virtual when site property is available
-                    '
-                    If cluster.config.isLocal Then
-                        '
-                        ' REFACTOR -- move this to lazy constructors so they are not created when not used
-                        '
-                        ' local server -- everything is ephemeral
-                        '
-                        serverFiles = New coreFileSystemClass(Me, cluster.config, coreFileSystemClass.fileSyncModeEnum.noSync, "")
-                        appRootFiles = New coreFileSystemClass(Me, cluster.config, coreFileSystemClass.fileSyncModeEnum.noSync, cluster.config.clusterPhysicalPath & appConfig.appRootFilesPath)
-                        privateFiles = New coreFileSystemClass(Me, cluster.config, coreFileSystemClass.fileSyncModeEnum.noSync, cluster.config.clusterPhysicalPath & appConfig.privateFilesPath)
-                        cdnFiles = New coreFileSystemClass(Me, cluster.config, coreFileSystemClass.fileSyncModeEnum.noSync, cluster.config.clusterPhysicalPath & appConfig.cdnFilesPath)
-                    Else
-                        '
-                        ' cluster mode - each filesystem is configured accordingly
-                        '
-                        serverFiles = New coreFileSystemClass(Me, cluster.config, coreFileSystemClass.fileSyncModeEnum.noSync, "")
-                        appRootFiles = New coreFileSystemClass(Me, cluster.config, coreFileSystemClass.fileSyncModeEnum.activeSync, cluster.config.clusterPhysicalPath & appConfig.appRootFilesPath)
-                        privateFiles = New coreFileSystemClass(Me, cluster.config, coreFileSystemClass.fileSyncModeEnum.passiveSync, cluster.config.clusterPhysicalPath & appConfig.privateFilesPath)
-                        cdnFiles = New coreFileSystemClass(Me, cluster.config, coreFileSystemClass.fileSyncModeEnum.passiveSync, cluster.config.clusterPhysicalPath & appConfig.cdnFilesPath)
-                    End If
-                    '
-                    cache_addonStyleRules = New coreCacheKeyPtrClass(Me, cacheNameAddonStyleRules, sqlAddonStyles)
+                    cache_addonStyleRules = New coreCacheKeyPtrClass(Me, cacheNameAddonStyleRules, sqlAddonStyles, "shared style add-on rules,add-ons,shared styles")
                 End If
+                '
+                '
+                '
+                main_ClosePageCounter = 0
+                allowDebugLog = True
+                main_PageStartTime = DateTime.Now()
+                main_PageTestPointPrinting = True
+                main_AllowCookielessDetection = True
+                main_LoginIconFilename = ""
+                main_IconFileDefault = "/ccLib/images/IconDoc.gif"
+                main_IconFolderClosed = "/ccLib/images/main_IconFolderClosed.gif"
+                main_IconFolderOpen = "/ccLib/images/main_IconFolderOpen.gif"
+                main_IconFolderUp = "/ccLib/images/main_IconFolderOpen.gif"
             Catch ex As Exception
                 handleExceptionAndRethrow(ex)
             End Try
@@ -39579,7 +39678,7 @@ ErrorTrap:
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <remarks></remarks>
-        Friend Sub New(cp As CPClass)
+        Public Sub New(cp As CPClass)
             MyBase.New()
             Me.cp = cp
             iisContext = Nothing
@@ -39592,7 +39691,7 @@ ErrorTrap:
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <remarks></remarks>
-        Friend Sub New(cp As CPClass, applicationName As String)
+        Public Sub New(cp As CPClass, applicationName As String)
             MyBase.New()
             Me.cp = cp
             iisContext = Nothing
@@ -39606,7 +39705,7 @@ ErrorTrap:
         ''' <remarks>
         ''' All iis httpContext is loaded here and the context should not be used after this method.
         ''' </remarks>
-        Friend Sub New(cp As CPClass, applicationName As String, httpContext As System.Web.HttpContext)
+        Public Sub New(cp As CPClass, applicationName As String, httpContext As System.Web.HttpContext)
             MyBase.New()
             Me.cp = cp
             constructorCommonInitialize(applicationName)
@@ -39677,7 +39776,7 @@ ErrorTrap:
                             If ((key & "    ").Substring(0, 4) = "404;") Then
                                 ' 404 hit with url like 404;http://domain/page?name0=value0&etc... , qsName is http://domain/page?name0 qsValue is value0
                                 key = key.Substring(4)
-                                pos = InStr(1, key, "?")
+                                pos = vbInstr(1, key, "?")
                                 If pos <> 0 Then
                                     aliasRoute = Mid(key, 1, pos - 1)
                                     key = Mid(key, pos + 1)
@@ -39693,7 +39792,7 @@ ErrorTrap:
                         '
                         ' set context domain and pathPath from the URL from in the 404 string 
                         '
-                        pos = InStr(1, aliasRoute, "://")
+                        pos = vbInstr(1, aliasRoute, "://")
                         If pos > 0 Then
                             '
                             ' remove protocol
@@ -39701,14 +39800,14 @@ ErrorTrap:
                             testPage = aliasRoute
                             SourceProtocol = Mid(testPage, 1, pos + 2)
                             testPage = Mid(testPage, pos + 3)
-                            pos = InStr(1, testPage, "/")
+                            pos = vbInstr(1, testPage, "/")
                             If pos > 0 Then
                                 '
                                 ' remove domain and port
                                 '
                                 aliasDomain = Mid(testPage, 1, pos - 1)
                                 aliasPathPage = Mid(testPage, pos)
-                                pos = InStr(1, aliasDomain, ":")
+                                pos = vbInstr(1, aliasDomain, ":")
                                 If pos > 0 Then
                                     aliasPort = Mid(aliasDomain, pos + 1)
                                     aliasDomain = Left(aliasDomain, pos - 1)
@@ -39819,7 +39918,7 @@ ErrorTrap:
         ''' </summary>
         ''' <remarks></remarks>
         Public Function common_version() As String
-            Dim myType As Type = GetType(cpCoreClass)
+            Dim myType As Type = GetType(coreClass)
             Dim myAssembly As Assembly = Assembly.GetAssembly(myType)
             Dim myAssemblyname As AssemblyName = myAssembly.GetName()
             Dim myVersion As Version = myAssemblyname.Version
@@ -39900,7 +39999,7 @@ ErrorTrap:
                         '
                         ' no cluster object
                         '
-                    ElseIf (cluster.clusterFiles Is Nothing) Then
+                    ElseIf (cluster.localClusterFiles Is Nothing) Then
                         '
                         ' no cluster files object
                         '
@@ -39913,11 +40012,11 @@ ErrorTrap:
                             logPath = logPath & "\"
                         End If
                         logPath = "clibLogs\" & logPath
-                        logPathRoot = cluster.clusterFiles.rootLocalFolderPath
-                        If Not cluster.clusterFiles.checkPath(logPath) Then
-                            Call cluster.clusterFiles.createPath(logPath)
+                        logPathRoot = cluster.localClusterFiles.rootLocalFolderPath
+                        If Not cluster.localClusterFiles.checkPath(logPath) Then
+                            Call cluster.localClusterFiles.createPath(logPath)
                         Else
-                            Dim logFiles As IO.FileInfo() = cluster.clusterFiles.GetFolderFiles(logPath)
+                            Dim logFiles As IO.FileInfo() = cluster.localClusterFiles.GetFolderFiles(logPath)
                             For Each fileInfo As IO.FileInfo In logFiles
                                 If fileInfo.Name.ToLower = FilenameNoExt.ToLower & ".log" Then
                                     FileSize = CInt(fileInfo.Length)
@@ -39936,7 +40035,7 @@ ErrorTrap:
                             Do While (Not SaveOK) And (RetryCnt < 10)
                                 SaveOK = True
                                 Try
-                                    Dim absFile As String = LCase(logPathRoot & PathFilenameNoExt & FileSuffix & ".log")
+                                    Dim absFile As String = vbLCase(logPathRoot & PathFilenameNoExt & FileSuffix & ".log")
                                     Dim absContent As String = LogFileCopyPrep(FormatDateTime(Now(), vbGeneralDate)) & vbTab & threadName & vbTab & LogLine & vbCrLf
 
                                     If Not IO.File.Exists(absFile) Then
@@ -40074,7 +40173,7 @@ ErrorTrap:
         ''' <param name="stackPtr">How far down in the stack to look for the method error. Pass 1 if the method calling has the error, 2 if there is an intermediate routine.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Friend Sub handleException(ByVal ex As Exception, ByVal cause As String, stackPtr As Integer)
+        Public Sub handleException(ByVal ex As Exception, ByVal cause As String, stackPtr As Integer)
             If (Not _handlingExceptionRecursionBlock) Then
                 _handlingExceptionRecursionBlock = True
                 Dim frame As StackFrame = New StackFrame(stackPtr)
@@ -40396,7 +40495,7 @@ ErrorTrap:
         ''' </summary>
         ''' <param name="MethodName"></param>
         ''' <remarks></remarks>
-        Friend Sub handleLegacyError18(ByVal MethodName As String)
+        Public Sub handleLegacyError18(ByVal MethodName As String)
             handleException(New Exception("Legacy error, MethodName=[" & MethodName & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), "n/a", 2)
             Throw New ApplicationException("handleLegacyError")
         End Sub
@@ -40478,7 +40577,7 @@ ErrorTrap:
         ''' <param name="sourceDate"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Friend Function log_getDateString(sourceDate As Date) As String
+        Public Function log_getDateString(sourceDate As Date) As String
             Return sourceDate.Year & sourceDate.Month.ToString.PadLeft(2, CChar("0")) & sourceDate.Day.ToString.PadLeft(2, CChar("0"))
 
         End Function
@@ -40489,7 +40588,7 @@ ErrorTrap:
         ''' </summary>
         ''' <param name="groupName"></param>
         ''' <returns></returns>
-        Friend Function group_add(ByVal groupName As String) As Integer
+        Public Function group_add(ByVal groupName As String) As Integer
             Dim returnGroupId As Integer = 0
             Try
                 Dim dt As DataTable
@@ -40527,7 +40626,7 @@ ErrorTrap:
         ''' <param name="GroupNameOrGuid"></param>
         ''' <param name="groupCaption"></param>
         ''' <returns></returns>
-        Friend Function group_add2(ByVal GroupNameOrGuid As String, Optional ByVal groupCaption As String = "") As Integer
+        Public Function group_add2(ByVal GroupNameOrGuid As String, Optional ByVal groupCaption As String = "") As Integer
             Dim returnGroupId As Integer = 0
             Try
                 '
@@ -40684,7 +40783,7 @@ ErrorTrap:
         ''' Delete a group matching the argument. If the argument is a number it is assumed to be an id, else if it is guid compatible a guid match is tried, else name.
         ''' </summary>
         ''' <param name="GroupNameIdOrGuid"></param>
-        Friend Sub group_delete(ByVal GroupNameIdOrGuid As String)
+        Public Sub group_delete(ByVal GroupNameIdOrGuid As String)
             Try
                 Dim sqlCriteria As String = db.getNameIdOrGuidSqlCriteria(GroupNameIdOrGuid)
                 If sqlCriteria <> "" Then
@@ -40697,7 +40796,7 @@ ErrorTrap:
         '
         '============================================================================
         '
-        Friend Function common_getHttpRequest(url As String) As IO.Stream
+        Public Function common_getHttpRequest(url As String) As IO.Stream
             Dim returnstream As IO.Stream = Nothing
             Try
                 Dim rq As System.Net.WebRequest
@@ -40809,24 +40908,47 @@ ErrorTrap:
             Return "addons\"
         End Function
         '
-        '=============================================================================================================
-        '   used both csv and main
-        '=============================================================================================================
+        '====================================================================================================
+#Region " IDisposable Support "
         '
-        Public Sub dispose()
-            Try
-                '
-                ' test - see header
-                '
-                Dim SQL As String
-                Dim ViewingName As String
-                Dim CSMax As Integer
-                Dim PageID As Integer
-                Dim FieldNames As String
-                Dim Form As String
-                '
-                If Not _isDisposed Then
+        ' this class must implement System.IDisposable
+        ' never throw an exception in dispose
+        ' Do not change or add Overridable to these methods.
+        ' Put cleanup code in Dispose(ByVal disposing As Boolean).
+        '====================================================================================================
+        '
+        Protected disposed As Boolean = False
+        '
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+            ' do not add code here. Use the Dispose(disposing) overload
+            Dispose(True)
+            GC.SuppressFinalize(Me)
+        End Sub
+        '
+        Protected Overrides Sub Finalize()
+            ' do not add code here. Use the Dispose(disposing) overload
+            Dispose(False)
+            MyBase.Finalize()
+        End Sub
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' dispose.
+        ''' </summary>
+        ''' <param name="disposing"></param>
+        Protected Overridable Overloads Sub Dispose(ByVal disposing As Boolean)
+            Dim SQL As String
+            Dim ViewingName As String
+            Dim CSMax As Integer
+            Dim PageID As Integer
+            Dim FieldNames As String
+            Dim Form As String
+            '
+            If Not Me.disposed Then
+                Me.disposed = True
+                If disposing Then
                     '
+                    ' call .dispose for managed objects
                     ' delete tmp files
                     '
                     If deleteOnDisposeFileList.Count > 0 Then
@@ -40838,84 +40960,173 @@ ErrorTrap:
                     ' ----- Block all output from underlying routines
                     '
                     blockExceptionReporting = True
-                    docOpen = False
-                    Call main_CloseStream()
+                    'docOpen = False
+                    Call doc_close()
                     '
-                    ' content server object is valie
+                    ' content server object is valid
                     '
-                    If siteProperties.getBoolean("allowVisitTracking", True) Then
-                        '
-                        ' If visit tracking, save the viewing record
-                        '
-                        ViewingName = Left(visit_Id & "." & visit_pages, 10)
-                        PageID = main_RenderedPageID
-                        FieldNames = "Name,VisitId,MemberID,Host,Path,Page,QueryString,Form,Referer,DateAdded,StateOK,ContentControlID,pagetime,Active,CreateKey,RecordID"
-                        If True Then
+                    If (appConfig IsNot Nothing) Then
+                        If siteProperties.allowVisitTracking Then
+                            '
+                            ' If visit tracking, save the viewing record
+                            '
+                            ViewingName = Left(visit_Id & "." & visit_pages, 10)
+                            PageID = main_RenderedPageID
+                            FieldNames = "Name,VisitId,MemberID,Host,Path,Page,QueryString,Form,Referer,DateAdded,StateOK,ContentControlID,pagetime,Active,CreateKey,RecordID"
                             FieldNames = FieldNames & ",ExcludeFromAnalytics"
-                        End If
-                        If True Then
                             FieldNames = FieldNames & ",pagetitle"
-                        End If
-                        Form = main_ServerFormOriginal
-                        If Form <> "" Then
-                            If siteProperties.getBoolean("Block Viewing Form Field") Then
-                                Form = "[blocked]"
+                            Form = main_ServerFormOriginal
+                            If Form <> "" Then
+                                If siteProperties.getBoolean("Block Viewing Form Field") Then
+                                    Form = "[blocked]"
+                                End If
                             End If
-                        End If
-                        SQL = "INSERT INTO ccViewings (" _
-                            & FieldNames _
-                            & ")VALUES(" _
-                            & " " & db.encodeSQLText(ViewingName) _
-                            & "," & db.encodeSQLNumber(visit_Id) _
-                            & "," & db.encodeSQLNumber(user.id) _
-                            & "," & db.encodeSQLText(webServer.requestDomain) _
-                            & "," & db.encodeSQLText(web_requestPath) _
-                            & "," & db.encodeSQLText(web_requestPage) _
-                            & "," & db.encodeSQLText(Left(webServer.requestQueryString, 255)) _
-                            & "," & db.encodeSQLText(Left(Form, 255)) _
-                            & "," & db.encodeSQLText(Left(webServer.requestReferrer, 255)) _
-                            & "," & db.encodeSQLDate(main_PageStartTime) _
-                            & "," & db.encodeSQLBoolean(visit_stateOK) _
-                            & "," & db.encodeSQLNumber(main_GetContentID("Viewings")) _
-                            & "," & db.encodeSQLNumber(GetTickCount - constructorTickCount) _
-                            & ",1" _
-                            & "," & db.encodeSQLNumber(CSMax) _
-                            & "," & db.encodeSQLNumber(PageID)
-                        If True Then
+                            SQL = "INSERT INTO ccViewings (" _
+                                & FieldNames _
+                                & ")VALUES(" _
+                                & " " & db.encodeSQLText(ViewingName) _
+                                & "," & db.encodeSQLNumber(visit_Id) _
+                                & "," & db.encodeSQLNumber(user.id) _
+                                & "," & db.encodeSQLText(webServer.requestDomain) _
+                                & "," & db.encodeSQLText(web_requestPath) _
+                                & "," & db.encodeSQLText(web_requestPage) _
+                                & "," & db.encodeSQLText(Left(webServer.requestQueryString, 255)) _
+                                & "," & db.encodeSQLText(Left(Form, 255)) _
+                                & "," & db.encodeSQLText(Left(webServer.requestReferrer, 255)) _
+                                & "," & db.encodeSQLDate(main_PageStartTime) _
+                                & "," & db.encodeSQLBoolean(visit_stateOK) _
+                                & "," & db.encodeSQLNumber(main_GetContentID("Viewings")) _
+                                & "," & db.encodeSQLNumber(GetTickCount - constructorTickCount) _
+                                & ",1" _
+                                & "," & db.encodeSQLNumber(CSMax) _
+                                & "," & db.encodeSQLNumber(PageID)
                             SQL &= "," & db.encodeSQLBoolean(web_PageExcludeFromAnalytics)
-                        End If
-                        If True Then
                             SQL &= "," & db.encodeSQLText(main_MetaContent_Title)
+                            SQL &= ");"
+                            Call db.executeSqlAsync(SQL)
                         End If
-                        SQL &= ");"
-                        Call db.executeSql(SQL)
                     End If
                     '
                     ' ----- dispose objects created here
                     '
-                    If Not (_cache Is Nothing) Then
-                        Call _cache.Dispose()
+                    If Not (_addonCache Is Nothing) Then
+                            ' no dispose
+                            'Call _addonCache.Dispose()
+                            _addonCache = Nothing
+                        End If
+                        '
+                        If Not (_db Is Nothing) Then
+                            Call _db.Dispose()
+                            _db = Nothing
+                        End If
+                        '
+                        If Not (_metaData Is Nothing) Then
+                            Call _metaData.Dispose()
+                            _metaData = Nothing
+                        End If
+                        '
+                        If Not (_cluster Is Nothing) Then
+                            Call _cluster.Dispose()
+                            _cluster = Nothing
+                        End If
+                        '
+                        If Not (_cache Is Nothing) Then
+                            Call _cache.Dispose()
+                            _cache = Nothing
+                        End If
+                        '
+                        If Not (_workflow Is Nothing) Then
+                            Call _workflow.Dispose()
+                            _workflow = Nothing
+                        End If
+                        '
+                        If Not (_siteProperties Is Nothing) Then
+                            ' no dispose
+                            'Call _siteProperties.Dispose()
+                            _siteProperties = Nothing
+                        End If
+                        '
+                        If Not (_json Is Nothing) Then
+                            ' no dispose
+                            'Call _json.Dispose()
+                            _json = Nothing
+                        End If
+                        '
+                        If Not (_user Is Nothing) Then
+                            ' no dispose
+                            'Call _user.Dispose()
+                            _user = Nothing
+                        End If
+                        '
+                        If Not (_domains Is Nothing) Then
+                            ' no dispose
+                            'Call _domains.Dispose()
+                            _domains = Nothing
+                        End If
+                        '
+                        If Not (_doc Is Nothing) Then
+                            ' no dispose
+                            'Call _doc.Dispose()
+                            _doc = Nothing
+                        End If
+                        '
+                        If Not (_security Is Nothing) Then
+                            ' no dispose
+                            'Call _security.Dispose()
+                            _security = Nothing
+                        End If
+                        '
+                        If Not (_webServer Is Nothing) Then
+                            ' no dispose
+                            'Call _webServer.Dispose()
+                            _webServer = Nothing
+                        End If
+                        '
+                        If Not (_menuFlyout Is Nothing) Then
+                            ' no dispose
+                            'Call _menuFlyout.Dispose()
+                            _menuFlyout = Nothing
+                        End If
+                        '
+                        If Not (_visitProperty Is Nothing) Then
+                            ' no dispose
+                            'Call _visitProperty.Dispose()
+                            _visitProperty = Nothing
+                        End If
+                        '
+                        If Not (_visitorProperty Is Nothing) Then
+                            ' no dispose
+                            'Call _visitorProperty.Dispose()
+                            _visitorProperty = Nothing
+                        End If
+                        '
+                        If Not (_userProperty Is Nothing) Then
+                            ' no dispose
+                            'Call _userProperty.Dispose()
+                            _userProperty = Nothing
+                        End If
+                        '
+                        If Not (_db Is Nothing) Then
+                            Call _db.Dispose()
+                            _db = Nothing
+                        End If
+                        '
+                        If Not (_cluster Is Nothing) Then
+                            Call _cluster.Dispose()
+                            _cluster = Nothing
+                        End If
+                        '
+                        If Not (_metaData Is Nothing) Then
+                            _metaData.Dispose()
+                            _metaData = Nothing
+                        End If
                     End If
                     '
-                    If Not (_db Is Nothing) Then
-                        Call _db.Dispose()
-                    End If
+                    ' cleanup non-managed objects
                     '
-                    If Not (_cluster Is Nothing) Then
-                        Call _cluster.Dispose()
-                    End If
-                    '
-                    If Not (_metaData Is Nothing) Then
-                        _metaData.Dispose()
-                    End If
-                    '
-                    _isDisposed = True
                 End If
-            Catch ex As Exception
-                '
-            End Try
         End Sub
-        Private _isDisposed As Boolean = False
+#End Region        '
     End Class
     '
     '====================================================================================================
@@ -40925,16 +41136,16 @@ ErrorTrap:
             ' arrange
             ' act
             ' assert
-            Assert.Equal("", cpCoreClass.db_encodeSqlTableName(""))
-            Assert.Equal("", cpCoreClass.db_encodeSqlTableName("-----"))
-            Assert.Equal("", cpCoreClass.db_encodeSqlTableName("01234567879"))
-            Assert.Equal("a", cpCoreClass.db_encodeSqlTableName("a"))
-            Assert.Equal("aa", cpCoreClass.db_encodeSqlTableName("a a"))
-            Assert.Equal("aA", cpCoreClass.db_encodeSqlTableName(" aA"))
-            Assert.Equal("aA", cpCoreClass.db_encodeSqlTableName(" aA "))
-            Assert.Equal("aA", cpCoreClass.db_encodeSqlTableName("aA "))
-            Assert.Equal("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", cpCoreClass.db_encodeSqlTableName("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"))
-            Assert.Equal("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_@#", cpCoreClass.db_encodeSqlTableName("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_@#"))
+            Assert.Equal("", coreClass.db_encodeSqlTableName(""))
+            Assert.Equal("", coreClass.db_encodeSqlTableName("-----"))
+            Assert.Equal("", coreClass.db_encodeSqlTableName("01234567879"))
+            Assert.Equal("a", coreClass.db_encodeSqlTableName("a"))
+            Assert.Equal("aa", coreClass.db_encodeSqlTableName("a a"))
+            Assert.Equal("aA", coreClass.db_encodeSqlTableName(" aA"))
+            Assert.Equal("aA", coreClass.db_encodeSqlTableName(" aA "))
+            Assert.Equal("aA", coreClass.db_encodeSqlTableName("aA "))
+            Assert.Equal("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", coreClass.db_encodeSqlTableName("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+            Assert.Equal("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_@#", coreClass.db_encodeSqlTableName("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_@#"))
             '
         End Sub
     End Class

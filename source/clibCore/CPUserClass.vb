@@ -18,13 +18,13 @@ Namespace Contensive.Core
         Public Const EventsId As String = "DBE2B6CB-6339-4FFB-92D7-BE37AEA841CC"
 #End Region
         '
-        Private cpCore As Contensive.Core.cpCoreClass
+        Private cpCore As Contensive.Core.coreClass
         Private CP As CPClass
         Protected disposed As Boolean = False
         '
         '====================================================================================================
         '
-        Public Sub New(ByVal cpCoreObj As Contensive.Core.cpCoreClass, ByVal CPParent As CPClass)
+        Public Sub New(ByVal cpCoreObj As Contensive.Core.coreClass, ByVal CPParent As CPClass)
             MyBase.New()
             cpCore = cpCoreObj
             CP = CPParent
@@ -358,7 +358,9 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function IsNewLoginOK(ByVal Username As String, ByVal Password As String) As Boolean 'Inherits BaseClasses.CPUserBaseClass.NewLoginIsOK
-            Return cpCore.user.isNewLoginOK(Username, Password)
+            Dim errorMessage As String = ""
+            Dim errorCode As Integer = 0
+            Return cpCore.user.isNewLoginOK(Username, Password, errorMessage, errorCode)
         End Function
         '
         '====================================================================================================

@@ -9,7 +9,7 @@ Namespace Contensive.Core
         '
         ' constructor sets cp from argument for use in calls to other objects, then cpCore because cp cannot be uses since that would be a circular depenancy
         '
-        Private cpCore As cpCoreClass
+        Private cpCore As coreClass
         '
         ' To interigate Add-on Collections to check for re-use
         '
@@ -39,7 +39,7 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <remarks></remarks>
-        Public Sub New(cpCore As cpCoreClass)
+        Public Sub New(cpCore As coreClass)
             MyBase.New()
             Me.cpCore = cpCore
         End Sub
@@ -50,7 +50,7 @@ Namespace Contensive.Core
         '       Eventually, this should be substituted with a "Addon Manager Addon" - so the interface can be improved with Contensive recompile
         '==========================================================================================================================================
         '
-        Friend Function GetForm_SafeModeAddonManager() As String
+        public Function GetForm_SafeModeAddonManager() As String
             Dim addonManager As String = ""
             Try
                 Dim LocalCollectionXML As String
@@ -243,17 +243,17 @@ Namespace Contensive.Core
                                         '                                        '
                                         '                                    Else
                                         '                                        With Doc.documentElement
-                                        '                                            If LCase(.baseName) = "collection" Then
+                                        '                                            If vbLCase(.baseName) = "collection" Then
                                         '                                                CollectionName = GetXMLAttribute(IsFound, Doc.documentElement, "name", "")
                                         '                                                CollectionSystem = encodeBoolean(GetXMLAttribute(IsFound, Doc.documentElement, "system", ""))
                                         '                                                For Each CDef_Node In .childNodes
-                                        '                                                    Select Case LCase(CDef_Node.name)
+                                        '                                                    Select Case vbLCase(CDef_Node.name)
                                         '                                                        Case "interfaces"
                                         '                                                            For Each InterfaceNode In CDef_Node.childNodes
-                                        '                                                                Select Case LCase(InterfaceNode.name)
+                                        '                                                                Select Case vbLCase(InterfaceNode.name)
                                         '                                                                    Case "page"
                                         '                                                                        For Each PageNode In InterfaceNode.childNodes
-                                        '                                                                            If LCase(PageNode.name) = "navigator" Then
+                                        '                                                                            If vbLCase(PageNode.name) = "navigator" Then
                                         '                                                                                NavigatorCnt = Collections(CollectionCnt).NavigatorCnt
                                         '                                                                                ReDim Preserve Collections(CollectionCnt).Navigators(NavigatorCnt)
                                         '                                                                                Collections(CollectionCnt).Navigators(NavigatorCnt).name = GetXMLAttribute(IsFound, PageNode, "name", "")
@@ -269,13 +269,13 @@ Namespace Contensive.Core
                                         '                                                            ' load menu entries
                                         '                                                            '
                                         '                                                            For Each CDefNode In CDef_Node.childNodes
-                                        '                                                                If LCase(CDefNode.name) = "adminmenu" Then
+                                        '                                                                If vbLCase(CDefNode.name) = "adminmenu" Then
                                         '                                                                    MenuCnt = Collections(CollectionCnt).MenuCnt
                                         '                                                                    ReDim Preserve Collections(CollectionCnt).Menus(MenuCnt)
                                         '                                                                    Collections(CollectionCnt).Menus(MenuCnt) = GetXMLAttribute(IsFound, CDefNode, "name", "")
                                         '                                                                    Collections(CollectionCnt).MenuCnt = MenuCnt + 1
                                         '                                                                End If
-                                        '                                                                If LCase(CDefNode.name) = "navigatorentry" Then
+                                        '                                                                If vbLCase(CDefNode.name) = "navigatorentry" Then
                                         '                                                                    NavigatorCnt = Collections(CollectionCnt).NavigatorCnt
                                         '                                                                    ReDim Preserve Collections(CollectionCnt).Navigators(NavigatorCnt)
                                         '                                                                    Collections(CollectionCnt).Navigators(NavigatorCnt).name = GetXMLAttribute(IsFound, CDefNode, "name", "")
@@ -630,9 +630,9 @@ Namespace Contensive.Core
                                 LocalCollectionXML = addonInstall.getCollectionListFile()
                                 Call LocalCollections.LoadXml(LocalCollectionXML)
                                 For Each CDef_Node In LocalCollections.DocumentElement.ChildNodes
-                                    If LCase(CDef_Node.Name) = "collection" Then
+                                    If vbLCase(CDef_Node.Name) = "collection" Then
                                         For Each CollectionNode In CDef_Node.ChildNodes
-                                            If LCase(CollectionNode.Name) = "guid" Then
+                                            If vbLCase(CollectionNode.Name) = "guid" Then
                                                 OnServerGuidList &= "," & CollectionNode.InnerText
                                                 Exit For
                                             End If
@@ -653,7 +653,7 @@ Namespace Contensive.Core
                                 End Try
                                 Ptr = 0
                                 If Not parseError Then
-                                    If LCase(LibCollections.DocumentElement.Name) <> LCase(CollectionListRootNode) Then
+                                    If vbLCase(LibCollections.DocumentElement.Name) <> vbLCase(CollectionListRootNode) Then
                                         UserError = "There was an error reading the Collection Library file. The '" & CollectionListRootNode & "' element was not found."
                                         Call HandleClassAppendLog("AddonManager", UserError)
                                         status &= "<br>" & UserError
@@ -664,13 +664,13 @@ Namespace Contensive.Core
                                         '
                                         RowPtr = 0
                                         For Each CDef_Node In LibCollections.DocumentElement.ChildNodes
-                                            Select Case LCase(CDef_Node.Name)
+                                            Select Case vbLCase(CDef_Node.Name)
                                                 Case "collection"
                                                     '
                                                     ' Read the collection
                                                     '
                                                     For Each CollectionNode In CDef_Node.ChildNodes
-                                                        Select Case LCase(CollectionNode.Name)
+                                                        Select Case vbLCase(CollectionNode.Name)
                                                             Case "name"
                                                                 '
                                                                 ' Name
@@ -963,9 +963,9 @@ ErrorTrap:
             Found = False
             ResultNode = Node.Attributes.GetNamedItem(Name)
             If (ResultNode Is Nothing) Then
-                UcaseName = UCase(Name)
+                UcaseName = vbUCase(Name)
                 For Each NodeAttribute In Node.Attributes
-                    If UCase(NodeAttribute.Name) = UcaseName Then
+                    If vbUCase(NodeAttribute.Name) = UcaseName Then
                         GetXMLAttribute = NodeAttribute.Value
                         Found = True
                         Exit For
@@ -1005,7 +1005,7 @@ ErrorTrap:
         '
         '
         '
-        Friend Function GetParentIDFromNameSpace(ByVal ContentName As String, ByVal menuNameSpace As String) As Integer
+        public Function GetParentIDFromNameSpace(ByVal ContentName As String, ByVal menuNameSpace As String) As Integer
             On Error GoTo ErrorTrap
             '
             Dim NameSplit() As String
@@ -1018,7 +1018,7 @@ ErrorTrap:
             GetParentIDFromNameSpace = 0
             If menuNameSpace <> "" Then
                 'ParentName = ParentNameSpace
-                Pos = InStr(1, menuNameSpace, ".")
+                Pos = vbInstr(1, menuNameSpace, ".")
                 If Pos = 0 Then
                     ParentName = menuNameSpace
                     ParentNameSpace = ""

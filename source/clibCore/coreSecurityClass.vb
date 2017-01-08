@@ -11,7 +11,7 @@ Namespace Contensive.Core
         ' privateKey
         '
         Private _privateKey As String = ""
-        Private cpCore As Contensive.Core.cpCoreClass
+        Private cpCore As Contensive.Core.coreClass
         '
         '====================================================================================================
         ''' <summary>
@@ -19,7 +19,7 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="cpCore"></param>
         ''' <param name="privateKey"></param>
-        Public Sub New(cpCore As Contensive.Core.cpCoreClass, privateKey As String)
+        Public Sub New(cpCore As Contensive.Core.coreClass, privateKey As String)
             Me.cpCore = cpCore
             _privateKey = privateKey
         End Sub

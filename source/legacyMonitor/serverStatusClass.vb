@@ -5,9 +5,9 @@
 Namespace Contensive.Core
     Public Class statusServerClass
         Private cmdListener As New coreIpDaemonClass
-        Private cpCore As cpCoreClass
+        Private cpCore As coreClass
         '
-        Friend Sub startListening()
+        public Sub startListening()
             Try
                 '
                 Dim config As New monitorConfigClass(cpcore)
@@ -17,7 +17,7 @@ Namespace Contensive.Core
             End Try
         End Sub
         '
-        Friend Sub stopListening()
+        public Sub stopListening()
             Try
                 Call cmdListener.stopListening()
             Catch ex As Exception
@@ -84,7 +84,7 @@ Namespace Contensive.Core
                 ReDim errors(0)
                 '
                 ClearAppErrors = (Left(LCase(RequestPath), 6) = "/reset")
-                DisplayStatusMethod = ClearAppErrors Or (Left(LCase(RequestPath), Len(monitorConfig.StatusMethod) + 1) = "/" & LCase(monitorConfig.StatusMethod))
+                DisplayStatusMethod = ClearAppErrors Or (Left(LCase(RequestPath), Len(monitorConfig.StatusMethod) + 1) = "/" & vbLCase(monitorConfig.StatusMethod))
                 logMessage = "GetStatusPage hit, RequestPath=" & RequestPath & ", from " & remoteHost
                 If Not (DisplayStatusMethod Or ClearAppErrors) Then
                     '
@@ -230,7 +230,7 @@ Namespace Contensive.Core
                             Content = Content & StatusLine(0, "")
                             Content = Content & StatusLine(0, "Applications")
 
-                            For Each kvp As KeyValuePair(Of String, appConfigClass) In cpCore.cluster.config.apps
+                            For Each kvp As KeyValuePair(Of String, appConfigClass) In cpCore.clusterConfig.apps
                                 AppName = kvp.Value.name
                                 cpApp = New CPClass(AppName)
                                 If cpApp.core.appConfig.allowSiteMonitor Then
@@ -422,7 +422,7 @@ Namespace Contensive.Core
             Call appendMonitorLog("unexepected error in " & methodName & ", " & exToString)
         End Sub
 
-        Public Sub New(cpCore As cpCoreClass)
+        Public Sub New(cpCore As coreClass)
             MyBase.New()
             Me.cpcore = cpCore
         End Sub

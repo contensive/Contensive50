@@ -122,31 +122,31 @@ ErrorTrap:
                     ' This tab is hit
                     '
                     GetTabs = GetTabs & "<td valign=bottom>" & TabBlank & "</td>"
-                    GetTabs = Replace(GetTabs, "Replace-TabID", TabID)
-                    GetTabs = Replace(GetTabs, "Replace-StyleEdge", TabEdgeStyle)
+                    GetTabs = vbReplace(GetTabs, "Replace-TabID", TabID)
+                    GetTabs = vbReplace(GetTabs, "Replace-StyleEdge", TabEdgeStyle)
                     If TabAjaxLink <> "" Then
                         '
                         ' Ajax tab
                         '
-                        GetTabs = Replace(GetTabs, "Replace-HotSpot", "<a href=# Class=""" & TabLinkStyle & """ name=tabLink onClick=""if(document.getElementById('unloaded_" & LiveBodyID & "')){GetURLAjax('" & TabAjaxLink & "','','" & LiveBodyID & "','','')};switchLiveTab2('" & LiveBodyID & "', this,'" & TabID & "','" & TabStyle & "','" & TabWrapperID & "');return false;"">" & Tabs(TabPtr).Caption & "</a>")
-                        GetTabs = Replace(GetTabs, "Replace-StyleHit", TabStyle)
+                        GetTabs = vbReplace(GetTabs, "Replace-HotSpot", "<a href=# Class=""" & TabLinkStyle & """ name=tabLink onClick=""if(document.getElementById('unloaded_" & LiveBodyID & "')){GetURLAjax('" & TabAjaxLink & "','','" & LiveBodyID & "','','')};switchLiveTab2('" & LiveBodyID & "', this,'" & TabID & "','" & TabStyle & "','" & TabWrapperID & "');return false;"">" & Tabs(TabPtr).Caption & "</a>")
+                        GetTabs = vbReplace(GetTabs, "Replace-StyleHit", TabStyle)
                         TabBody = TabBody & "<div id=""" & LiveBodyID & """ class=""" & TabBodyStyle & """ style=""display:none;text-align:center""><div id=""unloaded_" & LiveBodyID & """  style=""text-align:center;padding-top:50px;""><img src=""/cclib/images/ajax-loader-big.gif"" border=0 width=32 height=32></div></div>"
                         'TabBody = TabBody & "<div onload=""alert('" & LiveBodyID & " onload');"" id=""" & LiveBodyID & """ class=""" & TabBodyStyle & """ style=""display:none;text-align:center""><div id=""unloaded_" & LiveBodyID & """  style=""text-align:center;padding-top:50px;""><img src=""/cclib/images/ajax-loader-big.gif"" border=0 width=32 height=32></div></div>"
                     ElseIf TabLink <> "" Then
                         '
                         ' Link back to server tab
                         '
-                        GetTabs = Replace(GetTabs, "Replace-HotSpot", "<a href=""" & TabLink & """ Class=""" & TabHitLinkStyle & """>" & Tabs(TabPtr).Caption & "</a>")
-                        'GetTabs = Replace(GetTabs, "Replace-HotSpot", "<a href=# Class=""" & TabLinkStyle & """ name=tabLink onClick=""switchLiveTab2('" & LiveBodyID & "', this,'" & TabID & "','" & TabStyle & "','" & TabWrapperID & "');return false;"">" & Tabs(TabPtr).Caption & "</a>")
-                        GetTabs = Replace(GetTabs, "Replace-StyleHit", TabStyle)
+                        GetTabs = vbReplace(GetTabs, "Replace-HotSpot", "<a href=""" & TabLink & """ Class=""" & TabHitLinkStyle & """>" & Tabs(TabPtr).Caption & "</a>")
+                        'GetTabs = vbReplace(GetTabs, "Replace-HotSpot", "<a href=# Class=""" & TabLinkStyle & """ name=tabLink onClick=""switchLiveTab2('" & LiveBodyID & "', this,'" & TabID & "','" & TabStyle & "','" & TabWrapperID & "');return false;"">" & Tabs(TabPtr).Caption & "</a>")
+                        GetTabs = vbReplace(GetTabs, "Replace-StyleHit", TabStyle)
                     Else
                         '
                         ' Live Tab
                         '
                         If Not FirstLiveBodyShown Then
                             FirstLiveBodyShown = True
-                            GetTabs = Replace(GetTabs, "Replace-HotSpot", "<a href=# Class=""" & TabHitLinkStyle & """ name=tabLink onClick=""switchLiveTab2('" & LiveBodyID & "', this,'" & TabID & "','" & TabStyle & "','" & TabWrapperID & "');return false;"">" & Tabs(TabPtr).Caption & "</a>")
-                            GetTabs = Replace(GetTabs, "Replace-StyleHit", TabHitStyle)
+                            GetTabs = vbReplace(GetTabs, "Replace-HotSpot", "<a href=# Class=""" & TabHitLinkStyle & """ name=tabLink onClick=""switchLiveTab2('" & LiveBodyID & "', this,'" & TabID & "','" & TabStyle & "','" & TabWrapperID & "');return false;"">" & Tabs(TabPtr).Caption & "</a>")
+                            GetTabs = vbReplace(GetTabs, "Replace-StyleHit", TabHitStyle)
                             JSClose = JSClose & "ActiveTabTableID=""" & TabID & """;ActiveContentDivID=""" & LiveBodyID & """;"
                             TabBody = TabBody _
                                 & "<div id=""" & LiveBodyID & """ class=""" & TabBodyWrapShowStyle & """>" _
@@ -156,8 +156,8 @@ ErrorTrap:
                                 & "</div>" _
                                 & ""
                         Else
-                            GetTabs = Replace(GetTabs, "Replace-HotSpot", "<a href=# Class=""" & TabLinkStyle & """ name=tabLink onClick=""switchLiveTab2('" & LiveBodyID & "', this,'" & TabID & "','" & TabStyle & "','" & TabWrapperID & "');return false;"">" & Tabs(TabPtr).Caption & "</a>")
-                            GetTabs = Replace(GetTabs, "Replace-StyleHit", TabStyle)
+                            GetTabs = vbReplace(GetTabs, "Replace-HotSpot", "<a href=# Class=""" & TabLinkStyle & """ name=tabLink onClick=""switchLiveTab2('" & LiveBodyID & "', this,'" & TabID & "','" & TabStyle & "','" & TabWrapperID & "');return false;"">" & Tabs(TabPtr).Caption & "</a>")
+                            GetTabs = vbReplace(GetTabs, "Replace-StyleHit", TabStyle)
                             TabBody = TabBody _
                                 & "<div id=""" & LiveBodyID & """ class=""" & TabBodyWrapHideStyle & """>" _
                                 & "<div class=""" & TabBodyStyle & """>" _
@@ -183,7 +183,7 @@ ErrorTrap:
         '
         '
         '
-        Friend Function GetTabBlank() As String
+        public Function GetTabBlank() As String
             On Error GoTo ErrorTrap
             '
             Dim TabPtr As Integer

@@ -60,7 +60,7 @@ Namespace Contensive.Core
         '
         ' ----- Local storage
         '
-        Private cpCore As cpCoreClass
+        Private cpCore As coreClass
         Private iMenuFilePath As String
         '
         ' ----- Menu Entry storage
@@ -93,7 +93,7 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="cpCore"></param>
         ''' <remarks></remarks>
-        Public Sub New(cpCore As cpCoreClass)
+        Public Sub New(cpCore As coreClass)
             MyBase.New()
             Me.cpCore = cpCore
             EntryIndexName = New coreKeyPtrIndexClass
@@ -113,8 +113,8 @@ Namespace Contensive.Core
             Dim UcaseEntryName As String
             Dim iNewWindow As Boolean
             '
-            iEntryName = Replace(encodeEmptyText(EntryName, ""), ",", " ")
-            UcaseEntryName = UCase(iEntryName)
+            iEntryName = vbReplace(encodeEmptyText(EntryName, ""), ",", " ")
+            UcaseEntryName = vbUCase(iEntryName)
             '
             If (iEntryName <> "") And (InStr(1, UsedEntries & ",", "," & UcaseEntryName & ",", vbBinaryCompare) = 0) Then
                 UsedEntries = UsedEntries & "," & UcaseEntryName
@@ -138,7 +138,7 @@ Namespace Contensive.Core
                         .Caption = encodeEmptyText(Caption, "")
                     End If
                     .Name = UcaseEntryName
-                    .ParentName = UCase(encodeEmptyText(ParentiEntryName, ""))
+                    .ParentName = vbUCase(encodeEmptyText(ParentiEntryName, ""))
                     .ImageOver = encodeEmptyText(ImageOverLink, "")
                     .ImageOpen = encodeEmptyText(ImageOpenLink, "")
                     .NewWindow = NewWindow
@@ -289,7 +289,7 @@ ErrorTrap:
             ' ----- Get the menu pointer
             '
             If iEntryCount > 0 Then
-                UcaseMenuName = UCase(MenuName)
+                UcaseMenuName = vbUCase(MenuName)
                 EntryPointer = EntryIndexName.getPtr(UcaseMenuName)
                 GetMenuTreeList = GetMenuTreeListBranch2(EntryPointer, "", OpenNodesList)
                 Exit Function
@@ -317,7 +317,7 @@ ErrorTrap:
                 '
                 ' Output this node
                 '
-                If InStr(1, "," & CStr(NodePointer) & ",", "," & UsedEntriesList & ",") = 0 Then
+                If vbInstr(1, "," & CStr(NodePointer) & ",", "," & UsedEntriesList & ",") = 0 Then
                     GetMenuTreeListBranch2 = GetMenuTreeListBranch2 & "<ul Style=""list-style-type: none; margin-left: 20px"">"
                     '
                     ' The Node has not already been used in this branch
@@ -328,7 +328,7 @@ ErrorTrap:
                         Caption = "<A TARGET=""_blank"" HREF=""" & Link & """>" & Caption & "</A>"
                     End If
                     '
-                    If InStr(1, "," & OpenNodesList & ",", "," & CStr(NodePointer) & ",") = 0 Then
+                    If vbInstr(1, "," & OpenNodesList & ",", "," & CStr(NodePointer) & ",") = 0 Then
                         '
                         ' The branch is closed
                         '
@@ -350,7 +350,7 @@ ErrorTrap:
                         '
                         ' Now output any child branches of this node
                         '
-                        UcaseNodeName = UCase(iEntry(NodePointer).Name)
+                        UcaseNodeName = vbUCase(iEntry(NodePointer).Name)
                         For EntryPointer = 0 To iEntryCount - 1
                             If (iEntry(EntryPointer).ParentName = UcaseNodeName) Then
                                 GetMenuTreeListBranch2 = GetMenuTreeListBranch2 & GetMenuTreeListBranch2(EntryPointer, UsedEntriesList & "," & NodePointer, OpenNodesList)
@@ -389,7 +389,7 @@ ErrorTrap:
             ' ----- Get the menu pointer
             '
             If iEntryCount > 0 Then
-                UcaseMenuName = UCase(MenuName)
+                UcaseMenuName = vbUCase(MenuName)
                 If StyleSheetPrefix = "" Then
                     StyleSheetPrefix = "ccTree"
                 End If
@@ -440,10 +440,10 @@ ErrorTrap:
                         & GetTree
                     GetTree = GetTree & "<script type=""text/javascript"">convertTrees();"
                     If OpenMenuName <> "" Then
-                        JSString = UCase(OpenMenuName)
-                        JSString = Replace(JSString, "\", "\\")
-                        JSString = Replace(JSString, vbCrLf, "\n")
-                        JSString = Replace(JSString, "'", "\'")
+                        JSString = vbUCase(OpenMenuName)
+                        JSString = vbReplace(JSString, "\", "\\")
+                        JSString = vbReplace(JSString, vbCrLf, "\n")
+                        JSString = vbReplace(JSString, "'", "\'")
                         'Call cmc.main_AddOnLoadJavascript("expandToItem('tree" & iTreeCount & "','" & JSString & "');")
                         GetTree = GetTree & "expandToItem('tree" & iTreeCount & "','" & JSString & "');"
                     End If

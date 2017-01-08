@@ -18,7 +18,7 @@ Namespace Contensive.Core
         Public Const EventsId As String = "B9E3C450-CDC4-4590-8BCD-FEDDF7338D4B"
 #End Region
         '
-        Private cpCore As Contensive.Core.cpCoreClass
+        Private cpCore As Contensive.Core.coreClass
         Private cp As CPClass
         Protected disposed As Boolean = False
         '
@@ -96,7 +96,7 @@ Namespace Contensive.Core
         Public Overrides Function GetName(ByVal GroupNameIdOrGuid As String) As String
             Dim returnText As String = ""
             Try
-                If IsNumeric(GroupNameIdOrGuid) Then
+                If vbIsNumeric(GroupNameIdOrGuid) Then
                     returnText = cpCore.db_GetRecordName("groups", EncodeInteger(GroupNameIdOrGuid))
                 Else
                     Dim sqlCriteria As String = cpCore.db.getNameIdOrGuidSqlCriteria(GroupNameIdOrGuid)

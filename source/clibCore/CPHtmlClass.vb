@@ -21,7 +21,7 @@ Namespace Contensive.Core
 #End Region
         '
         Private cp As CPClass
-        Private cpCore As Contensive.Core.cpCoreClass
+        Private cpCore As Contensive.Core.coreClass
         Protected disposed As Boolean = False
         '
         ' Constructor
@@ -333,12 +333,12 @@ Namespace Contensive.Core
             Dim post As String
             Dim target As String
             '
-            posStart = InStr(1, SourceHtml, "<![CDATA[", CompareMethod.Text)
+            posStart = vbInstr(1, SourceHtml, "<![CDATA[", CompareMethod.Text)
             If posStart = 0 Then
                 '
                 ' no cdata
                 '
-                posStart = InStr(1, SourceHtml, "<textarea", CompareMethod.Text)
+                posStart = vbInstr(1, SourceHtml, "<textarea", CompareMethod.Text)
                 If posStart = 0 Then
                     '
                     ' no textarea
@@ -348,12 +348,12 @@ Namespace Contensive.Core
                     Else
                         Indent = SourceHtml.Replace(vbCrLf, vbCrLf & vbTab)
                     End If
-                    'Indent = Replace(SourceHtml, vbCrLf & vbTab, vbCrLf & vbTab & vbTab)
+                    'Indent = vbReplace(SourceHtml, vbCrLf & vbTab, vbCrLf & vbTab & vbTab)
                 Else
                     '
                     ' text area found, isolate it and indent before and after
                     '
-                    posEnd = InStr(posStart, SourceHtml, "</textarea>", CompareMethod.Text)
+                    posEnd = vbInstr(posStart, SourceHtml, "</textarea>", CompareMethod.Text)
                     pre = Mid(SourceHtml, 1, posStart - 1)
                     If posEnd = 0 Then
                         target = Mid(SourceHtml, posStart)
@@ -368,7 +368,7 @@ Namespace Contensive.Core
                 '
                 ' cdata found, isolate it and indent before and after
                 '
-                posEnd = InStr(posStart, SourceHtml, "]]>", CompareMethod.Text)
+                posEnd = vbInstr(posStart, SourceHtml, "]]>", CompareMethod.Text)
                 pre = Mid(SourceHtml, 1, posStart - 1)
                 If posEnd = 0 Then
                     target = Mid(SourceHtml, posStart)

@@ -14,12 +14,9 @@ Namespace Contensive.Core
     Public Class coreClusterClass
         Implements IDisposable
         '
-        ' the cp parent for this object
+        ' ----- objects passed in constructor, do not dispose
         '
-        Private cpCore As cpCoreClass
-        '
-        Public config As clusterConfigClass
-        Public clusterFiles As coreFileSystemClass
+        Private cpCore As coreClass
         '
         '========================================================================
         ''' <summary>
@@ -27,105 +24,35 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <remarks></remarks>
-        Friend Sub New(cpCore As cpCoreClass)
+        Public Sub New(cpCore As coreClass)
             '
             ' called during core constructor - so cp.core is not valid
             '
             MyBase.New()
             Me.cpCore = cpCore
             Try
-                'Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer
-                Dim JSONTemp As String
-                'Dim serverPortSplit As String()
-                Dim port As Integer = 11211
-                Dim serverConfig As serverConfigClass
-                Dim programDataFiles As coreFileSystemClass
-                Dim tmpPath As String = ""
-                '
-                ' setup programData\clib to bootstrap clusterConfig file
-                '
-                config = New clusterConfigClass()
-                config.isLocal = True
-                config.clusterPhysicalPath = getProgramDataFolder() & "\"
-                _ok = False
-                '
-                ' load server config
-                '
-                programDataFiles = New coreFileSystemClass(cpCore, config, coreFileSystemClass.fileSyncModeEnum.noSync, getProgramDataFolder)
-                JSONTemp = programDataFiles.ReadFile("serverConfig.json")
-                If String.IsNullOrEmpty(JSONTemp) Then
-                    serverConfig = New serverConfigClass
-                    serverConfig.clusterPath = "d:\"
-                    If (Not System.IO.Directory.Exists(serverConfig.clusterPath)) Then
-                        serverConfig.clusterPath = "c:\"
-                    End If
-                    serverConfig.clusterPath &= "inetPub"
-                    If Not (System.IO.Directory.Exists(serverConfig.clusterPath)) Then
-                        System.IO.Directory.CreateDirectory(serverConfig.clusterPath)
-                    End If
-                    serverConfig.allowTaskRunnerService = False
-                    serverConfig.allowTaskSchedulerService = False
-                    programDataFiles.SaveFile("serverConfig.json", cpCore.json.Serialize(serverConfig))
-                Else
-                    serverConfig = cpCore.json.Deserialize(Of serverConfigClass)(JSONTemp)
-                End If
-                clusterFiles = New coreFileSystemClass(cpCore, config, coreFileSystemClass.fileSyncModeEnum.activeSync, serverConfig.clusterPath)
-                JSONTemp = clusterFiles.ReadFile("clusterConfig.json")
-                If String.IsNullOrEmpty(JSONTemp) Then
-                    '
-                    ' for now it fails, maybe later let it autobuild a local cluster
-                    '
-                Else
-                    config = cpCore.json.Deserialize(Of clusterConfigClass)(JSONTemp)
-                    _ok = True
-                End If
-                '
-                ' backfill with default in case it was set blank
-                '
-                If String.IsNullOrEmpty(config.clusterPhysicalPath) Then
-                    config.clusterPhysicalPath = serverConfig.clusterPath
-                End If
-                '
-                ' init file system
-                '
-                If _ok Then
-                    If Not config.isLocal Then
-                        clusterFiles = New coreFileSystemClass(cpCore, config, coreFileSystemClass.fileSyncModeEnum.noSync, localDataPath, "")
-                    Else
-                        clusterFiles = New coreFileSystemClass(cpCore, config, coreFileSystemClass.fileSyncModeEnum.activeSync, localDataPath, config.clusterFilesEndpoint)
-                    End If
-                End If
-                '
-                ' setup cache
-                '
-                If config.isLocalCache Then
-                    '
-                    ' implemented as file save/read to appCache private folder
-                    '
-                    'Throw New NotImplementedException("local cache not implemented yet")
-                Else
-                    '
-                    ' converted to lazy constructor, remove this after test
-                    '
-                    'If Not String.IsNullOrEmpty(config.awsElastiCacheConfigurationEndpoint) Then
-                    '    serverPortSplit = config.awsElastiCacheConfigurationEndpoint.Split(":"c)
-                    '    If serverPortSplit.Count > 1 Then
-                    '        port = EncodeInteger(serverPortSplit(1))
-                    '    End If
-                    '    Dim cacheConfig As Amazon.ElastiCacheCluster.ElastiCacheClusterConfig
-                    '    cacheConfig = New Amazon.ElastiCacheCluster.ElastiCacheClusterConfig(serverPortSplit(0), port)
-                    '    cacheConfig.Protocol = Enyim.Caching.Memcached.MemcachedProtocol.Binary
-                    '    cacheClient = New Enyim.Caching.MemcachedClient(cacheConfig)
-                    '    '
-                    '    ' REFACTOR - removed because during debug it costs 20 msec. test cache fail case to measure benefit
-                    '    '
-                    '    'mc.Store(Enyim.Caching.Memcached.StoreMode.Set, "testing", "123", Now.AddMinutes(10))
-                    'End If
-                End If
+                _ok = True
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
+        '
+        '===================================================================================================
+        ''' <summary>
+        ''' file object pointed to the cluster folder in the serverconfig file. Used initially to boot the cluster.
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public ReadOnly Property localClusterFiles As coreFileSystemClass
+            Get
+                If (_localClusterFiles Is Nothing) Then
+                    localClusterFiles = New coreFileSystemClass(cpCore, cpCore.clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.activeSync, cpCore.serverConfig.clusterPath)
+                End If
+                Return _localClusterFiles
+            End Get
+        End Property
+        Private _localClusterFiles As coreFileSystemClass
         '
         '====================================================================================================
         ''' <summary>
@@ -150,20 +77,20 @@ Namespace Contensive.Core
         ''' <remarks></remarks>
         Public ReadOnly Property localDataPath As String
             Get
-                If (config Is Nothing) Then
+                If (cpCore.clusterConfig Is Nothing) Then
                     Return ""
                 Else
-                    Return config.clusterPhysicalPath
+                    Return cpCore.serverConfig.clusterPath
                 End If
             End Get
         End Property
         '
         Public ReadOnly Property localAppsPath As String
             Get
-                If (config Is Nothing) Then
+                If (cpCore.clusterConfig Is Nothing) Then
                     Return ""
                 Else
-                    Return config.clusterPhysicalPath & "apps\"
+                    Return cpCore.serverConfig.clusterPath & "apps\"
                 End If
             End Get
         End Property
@@ -173,19 +100,19 @@ Namespace Contensive.Core
         ''' return the correctly formated connection string for this datasource
         ''' </summary>
         ''' <returns></returns>
-        Friend Function getConnectionString(catalogName As String) As String
+        Public Function getConnectionString(catalogName As String) As String
             Dim returnString As String = ""
             Try
                 Dim dataSourceUrl As String
-                dataSourceUrl = config.defaultDataSourceAddress
+                dataSourceUrl = cpCore.clusterConfig.defaultDataSourceAddress
                 If (dataSourceUrl.IndexOf(":") > 0) Then
                     dataSourceUrl = dataSourceUrl.Substring(0, dataSourceUrl.IndexOf(":"))
                 End If
                 '
                 returnString = "" _
                     & "data source=" & dataSourceUrl & ";" _
-                    & "UID=" & config.defaultDataSourceUsername & ";" _
-                    & "PWD=" & config.defaultDataSourcePassword & ";" _
+                    & "UID=" & cpCore.clusterConfig.defaultDataSourceUsername & ";" _
+                    & "PWD=" & cpCore.clusterConfig.defaultDataSourcePassword & ";" _
                     & ""
                 If Not String.IsNullOrEmpty(catalogName) Then
                     returnString &= "initial catalog=" & catalogName & ";"
@@ -198,7 +125,7 @@ Namespace Contensive.Core
         '
         ' execute sql on default connection and return datatable
         '
-        Public Function executeSql(ByVal sql As String, Optional ByVal startRecord As Integer = 0, Optional ByVal maxRecords As Integer = 9999) As DataTable
+        Public Function db_executeSql(ByVal sql As String, Optional ByVal startRecord As Integer = 0, Optional ByVal maxRecords As Integer = 9999) As DataTable
             Dim returnData As New DataTable
             Try
                 Dim connString As String = getConnectionString("")
@@ -219,6 +146,25 @@ Namespace Contensive.Core
             Return returnData
         End Function
         '
+        ' execute sql on default connection and return datatable
+        '
+        Public Sub db_executeSqlAsync(ByVal sql As String)
+            Try
+                Dim connString As String = getConnectionString("")
+                Using connSQL As New SqlConnection(connString)
+                    connSQL.Open()
+                    Using cmdSQL As New SqlCommand()
+                        cmdSQL.CommandType = Data.CommandType.Text
+                        cmdSQL.CommandText = sql
+                        cmdSQL.Connection = connSQL
+                        cmdSQL.BeginExecuteNonQuery()
+                    End Using
+                End Using
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+        End Sub
+        '
         ' verify database exists
         '
         Public Function checkDatabaseExists(databaseName As String) As Boolean
@@ -229,7 +175,7 @@ Namespace Contensive.Core
                 Dim dt As DataTable
                 '
                 sql = String.Format("SELECT database_id FROM sys.databases WHERE Name = '{0}'", databaseName)
-                dt = executeSql(sql)
+                dt = db_executeSql(sql)
                 returnOk = (dt.Rows.Count > 0)
                 dt.Dispose()
             Catch ex As Exception
@@ -243,8 +189,8 @@ Namespace Contensive.Core
         ''' save config changes to the clusterConfig.json file
         ''' </summary>
         Public Sub saveConfig()
-            Dim jsonTemp As String = cpCore.json.Serialize(config)
-            clusterFiles.SaveFile("clusterConfig.json", jsonTemp)
+            Dim jsonTemp As String = cpCore.json.Serialize(cpCore.clusterConfig)
+            localClusterFiles.SaveFile("clusterConfig.json", jsonTemp)
         End Sub
         '
         '====================================================================================================
@@ -258,40 +204,51 @@ Namespace Contensive.Core
         Private Sub handleClassException(ByVal ex As Exception, ByVal methodName As String, ByVal Cause As String)
             cpCore.handleExceptionAndRethrow(ex, "Unexpected exception in clusterServicesClass." & methodName & ", cause=[" & Cause & "]")
         End Sub
+
+
+
         '
         '====================================================================================================
-        ' dispose
-        '====================================================================================================
-        '
 #Region " IDisposable Support "
+        '
+        ' this class must implement System.IDisposable
+        ' never throw an exception in dispose
+        ' Do not change or add Overridable to these methods.
+        ' Put cleanup code in Dispose(ByVal disposing As Boolean).
+        '====================================================================================================
+        '
         Protected disposed As Boolean = False
+        '
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+            ' do not add code here. Use the Dispose(disposing) overload
+            Dispose(True)
+            GC.SuppressFinalize(Me)
+        End Sub
+        '
+        Protected Overrides Sub Finalize()
+            ' do not add code here. Use the Dispose(disposing) overload
+            Dispose(False)
+            MyBase.Finalize()
+        End Sub
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' dispose.
+        ''' </summary>
+        ''' <param name="disposing"></param>
         Protected Overridable Overloads Sub Dispose(ByVal disposing As Boolean)
             If Not Me.disposed Then
+                Me.disposed = True
                 If disposing Then
                     '
                     ' call .dispose for managed objects
                     '
-                    'CP = Nothing
-
-                    '
-                    ' ----- Close all open csv_ContentSets, and make sure the RS is killed
-                    '
+                    'If Not (AddonObj Is Nothing) Then AddonObj.Dispose()
                 End If
                 '
-                ' Add code here to release the unmanaged resource.
+                ' cleanup non-managed objects
                 '
             End If
-            Me.disposed = True
-        End Sub
-        ' Do not change or add Overridable to these methods.
-        ' Put cleanup code in Dispose(ByVal disposing As Boolean).
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
-            Dispose(True)
-            GC.SuppressFinalize(Me)
-        End Sub
-        Protected Overrides Sub Finalize()
-            Dispose(False)
-            MyBase.Finalize()
         End Sub
 #End Region
     End Class

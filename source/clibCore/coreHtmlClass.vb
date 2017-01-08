@@ -19,7 +19,7 @@ Imports Contensive.Core.coreCommonModule
 Namespace Contensive.Core
     Public Class coreHtmlClass
         '
-        Private cpCore As cpCoreClass
+        Private cpCore As coreClass
         '
         '====================================================================================================
         ''' <summary>
@@ -27,7 +27,7 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="cpCore"></param>
         ''' <remarks></remarks>
-        Public Sub New(cpCore As cpCoreClass)
+        Public Sub New(cpCore As coreClass)
             Me.cpCore = cpCore
         End Sub
         '
@@ -88,7 +88,7 @@ Namespace Contensive.Core
                     If posStart <> 0 Then
                         posEnd = getTagEndPos(ignore, layout, posStart)
                         If posEnd > 0 Then
-                            posStart = InStr(posStart + 1, layout, ">")
+                            posStart = vbInstr(posStart + 1, layout, ">")
                             If posStart <> 0 Then
                                 posStart = posStart + 1
                                 posEnd = InStrRev(layout, "<", posEnd - 1)
@@ -132,7 +132,7 @@ Namespace Contensive.Core
                     If posStart <> 0 Then
                         posEnd = getTagEndPos(ignore, layout, posStart)
                         If posEnd > 0 Then
-                            posStart = InStr(posStart + 1, layout, ">")
+                            posStart = vbInstr(posStart + 1, layout, ">")
                             If posStart <> 0 Then
                                 posStart = posStart + 1
                                 posEnd = InStrRev(layout, "<", posEnd - 1)
@@ -217,17 +217,17 @@ Namespace Contensive.Core
                 Dim Ptr As Integer
                 '
                 returnValue = False
-                Pos = InStr(posStartTag, layout, ">")
+                Pos = vbInstr(posStartTag, layout, ">")
                 If Pos > 0 Then
                     returnValue = True
                     Tag = Mid(layout, posStartTag, Pos - posStartTag + 1)
-                    tagLower = LCase(Tag)
+                    tagLower = vbLCase(Tag)
                     tagLength = Len(Tag)
                     '
                     ' check searchId
                     '
                     If returnValue And (searchId <> "") Then
-                        Pos = InStr(1, tagLower, " id=", vbTextCompare)
+                        Pos = vbInstr(1, tagLower, " id=", vbTextCompare)
                         If Pos <= 0 Then
                             '
                             ' id required but this tag has no id attr
@@ -291,7 +291,7 @@ Namespace Contensive.Core
                     ' check searchClass
                     '
                     If returnValue And (searchClass <> "") Then
-                        Pos = InStr(1, tagLower, " class=", vbTextCompare)
+                        Pos = vbInstr(1, tagLower, " class=", vbTextCompare)
                         If Pos <= 0 Then
                             '
                             ' class required but this tag has no class attr
@@ -389,34 +389,34 @@ Namespace Contensive.Core
                 's = layout
                 returnPos = 0
                 workingKey = Key
-                If InStr(1, workingKey, ">") <> 0 Then
+                If vbInstr(1, workingKey, ">") <> 0 Then
                     '
                     ' does not support > yet.
                     '
-                    workingKey = Replace(workingKey, ">", " ")
+                    workingKey = vbReplace(workingKey, ">", " ")
                 End If
                 '
                 ' eliminate whitespace
                 '
-                Do While InStr(1, workingKey, vbTab) <> 0
-                    workingKey = Replace(workingKey, vbTab, " ")
+                Do While vbInstr(1, workingKey, vbTab) <> 0
+                    workingKey = vbReplace(workingKey, vbTab, " ")
                 Loop
                 '
-                Do While InStr(1, workingKey, vbCr) <> 0
-                    workingKey = Replace(workingKey, vbCr, " ")
+                Do While vbInstr(1, workingKey, vbCr) <> 0
+                    workingKey = vbReplace(workingKey, vbCr, " ")
                 Loop
                 '
-                Do While InStr(1, workingKey, vbLf) <> 0
-                    workingKey = Replace(workingKey, vbLf, " ")
+                Do While vbInstr(1, workingKey, vbLf) <> 0
+                    workingKey = vbReplace(workingKey, vbLf, " ")
                 Loop
                 '
-                Do While InStr(1, workingKey, "  ") <> 0
-                    workingKey = Replace(workingKey, "  ", " ")
+                Do While vbInstr(1, workingKey, "  ") <> 0
+                    workingKey = vbReplace(workingKey, "  ", " ")
                 Loop
                 '
                 workingKey = Trim(workingKey)
                 '
-                If InStr(1, workingKey, " ") <> 0 Then
+                If vbInstr(1, workingKey, " ") <> 0 Then
                     '
                     ' if there are spaces, do them sequentially
                     '
@@ -445,7 +445,7 @@ Namespace Contensive.Core
                         searchClass = Mid(workingKey, 2)
                         searchTag = ""
                         searchId = ""
-                        Pos = InStr(1, searchClass, "#")
+                        Pos = vbInstr(1, searchClass, "#")
                         If Pos <> 0 Then
                             searchId = Mid(searchClass, Pos)
                             searchClass = Mid(searchClass, 1, Pos - 1)
@@ -460,7 +460,7 @@ Namespace Contensive.Core
                         searchClass = ""
                         searchTag = ""
                         searchId = Mid(workingKey, 2)
-                        Pos = InStr(1, searchId, ".")
+                        Pos = vbInstr(1, searchId, ".")
                         If Pos <> 0 Then
                             searchClass = Mid(searchId, Pos)
                             searchId = Mid(searchId, 1, Pos - 1)
@@ -476,21 +476,21 @@ Namespace Contensive.Core
                         searchTag = workingKey
                         searchId = ""
                         '
-                        Pos = InStr(1, searchTag, "#")
+                        Pos = vbInstr(1, searchTag, "#")
                         If Pos <> 0 Then
                             searchId = Mid(searchTag, Pos + 1)
                             searchTag = Mid(searchTag, 1, Pos - 1)
-                            Pos = InStr(1, searchId, ".")
+                            Pos = vbInstr(1, searchId, ".")
                             If Pos <> 0 Then
                                 searchClass = Mid(searchId, Pos)
                                 searchId = Mid(searchId, 1, Pos - 1)
                             End If
                         End If
-                        Pos = InStr(1, searchTag, ".")
+                        Pos = vbInstr(1, searchTag, ".")
                         If Pos <> 0 Then
                             searchClass = Mid(searchTag, Pos + 1)
                             searchTag = Mid(searchTag, 1, Pos - 1)
-                            Pos = InStr(1, searchClass, "#")
+                            Pos = vbInstr(1, searchClass, "#")
                             If Pos <> 0 Then
                                 searchId = Mid(searchClass, Pos)
                                 searchClass = Mid(searchClass, 1, Pos - 1)
@@ -501,11 +501,11 @@ Namespace Contensive.Core
                     End If
                     lenSearchKey = Len(searchKey)
                     Pos = layoutStartPos
-                    'posMatch = InStr(layoutStartPos, layout, searchKey)
+                    'posMatch = vbInstr(layoutStartPos, layout, searchKey)
                     'pos = posMatch
                     'searchIsOver = False
                     Do
-                        Pos = InStr(Pos, layout, searchKey)
+                        Pos = vbInstr(Pos, layout, searchKey)
                         If Pos = 0 Then
                             '
                             ' not found, return empty
@@ -547,7 +547,7 @@ Namespace Contensive.Core
                     '
                     '
                     If LoopPtr >= 1000 Then
-                        Call Err.Raise(KmaErrorInternal, "aoPrimitives.htmlToolsClass.getTagStartPos2", "Tag limit of 1000 tags per block reached.")
+                        Call Err.Raise(ignoreInteger, "aoPrimitives.htmlToolsClass.getTagStartPos2", "Tag limit of 1000 tags per block reached.")
                     End If
                 End If
                 '
@@ -590,13 +590,13 @@ Namespace Contensive.Core
                 Dim posComment As Integer
                 Dim c As String
                 '
-                Pos = InStr(startPos, Source, "<")
+                Pos = vbInstr(startPos, Source, "<")
                 TagName = ""
                 returnValue = 0
                 If Pos <> 0 Then
                     Pos = Pos + 1
                     Do While Pos < Len(Source)
-                        c = LCase(Mid(Source, Pos, 1))
+                        c = vbLCase(Mid(Source, Pos, 1))
                         If (c >= "a") And (c <= "z") Then
                             TagName = TagName & c
                         Else
@@ -608,25 +608,25 @@ Namespace Contensive.Core
                         endTag = "</" & TagName
                         startTag = "<" & TagName
                         Do While (Pos <> 0)
-                            posEnd = InStr(Pos + 1, Source, endTag, vbTextCompare)
+                            posEnd = vbInstr(Pos + 1, Source, endTag, vbTextCompare)
                             If posEnd = 0 Then
                                 '
                                 ' no end was found, return the tag or rest of the string
                                 '
-                                returnValue = InStr(Pos + 1, Source, ">") + 1
+                                returnValue = vbInstr(Pos + 1, Source, ">") + 1
                                 If posEnd = 1 Then
                                     returnValue = Len(Source)
                                 End If
                                 Exit Do
                             Else
-                                posNest = InStr(Pos + 1, Source, startTag, vbTextCompare)
+                                posNest = vbInstr(Pos + 1, Source, startTag, vbTextCompare)
                                 If posNest = 0 Then
                                     '
                                     ' no nest found, set to end
                                     '
                                     posNest = Len(Source)
                                 End If
-                                posComment = InStr(Pos + 1, Source, "<!--")
+                                posComment = vbInstr(Pos + 1, Source, "<!--")
                                 If posComment = 0 Then
                                     '
                                     ' no comment found, set to end
@@ -649,7 +649,7 @@ Namespace Contensive.Core
                                     '
                                     ' ----- there is a comment between the tag and the first tagend, skip it
                                     '
-                                    Pos = InStr(posComment, Source, "-->")
+                                    Pos = vbInstr(posComment, Source, "-->")
                                     If Pos = 0 Then
                                         '
                                         ' start comment with no end, exit now
@@ -661,7 +661,7 @@ Namespace Contensive.Core
                                     '
                                     ' ----- end position is here, go to the end of it and exit
                                     '
-                                    Pos = InStr(posEnd, Source, ">")
+                                    Pos = vbInstr(posEnd, Source, ">")
                                     If Pos = 0 Then
                                         '
                                         ' no end was found, just exit

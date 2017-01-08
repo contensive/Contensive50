@@ -17,7 +17,7 @@ Namespace Contensive.Core
         Public Const EventsId As String = "11B23802-CBD3-48E6-9C3E-1DC26ED8775A"
 #End Region
         '
-        Private cpCore As Contensive.Core.cpCoreClass
+        Private cpCore As Contensive.Core.coreClass
         Private cp As CPClass
         '
         '====================================================================================================
@@ -26,7 +26,7 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="cpParent"></param>
         ''' <remarks></remarks>
-        Friend Sub New(ByRef cpParent As CPClass)
+        public Sub New(ByRef cpParent As CPClass)
             MyBase.New()
             cp = cpParent
             cpCore = cp.core

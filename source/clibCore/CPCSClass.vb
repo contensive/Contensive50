@@ -17,7 +17,7 @@ Namespace Contensive.Core
         Public Const EventsId As String = "04B8E338-ABB7-44FE-A8DF-2681A36DCA46"
 #End Region
         '
-        Private cpCore As Contensive.Core.cpCoreClass
+        Private cpCore As Contensive.Core.coreClass
         Private CSPointer As Integer
         Private OpeningMemberID As Integer
         Private cp As CPClass
@@ -25,7 +25,7 @@ Namespace Contensive.Core
         '
         ' Constructor - Initialize the Main and Csv objects
         '
-        Friend Sub New(ByRef cpParent As CPClass)
+        public Sub New(ByRef cpParent As CPClass)
             MyBase.New()
             cp = cpParent
             cpCore = cp.core

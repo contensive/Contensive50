@@ -76,7 +76,7 @@ Namespace Contensive.Core
         '   Log a reported error
         '======================================================================================
         '
-        Public Sub handleExceptionResume(cpCore As cpCoreClass, ByVal ex As Exception, ByVal MethodName As String, ByVal LogCopy As String)
+        Public Sub handleExceptionResume(cpCore As coreClass, ByVal ex As Exception, ByVal MethodName As String, ByVal LogCopy As String)
             cpCore.appendLogWithLegacyRow("(service)", LogCopy, "server", "ccService2", MethodName, -1, ex.Source, ex.ToString, True, True, "", "", "")
         End Sub
         '

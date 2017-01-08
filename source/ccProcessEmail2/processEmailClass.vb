@@ -2,7 +2,7 @@
 Namespace Contensive.Core
     Public Class processEmailClass
         '
-        Private cpCore As cpCoreClass
+        Private cpCore As coreClass
         '
         ' copy of object from csv
         '
@@ -29,7 +29,7 @@ Namespace Contensive.Core
         '
         '
         '
-        Public Sub New(cpCore As cpCoreClass)
+        Public Sub New(cpCore As coreClass)
             MyBase.New()
             cpCore = Me.cpCore
         End Sub
@@ -390,7 +390,7 @@ ErrorTrap:
             BounceAddress = cpCore.siteProperties.getText("EmailBounceAddress", "")
             siteStyles = cpCore.csv_getStyleSheetProcessed()
             '
-            rightNow = Now()
+            rightNow = DateTime.Now()
             rightNowDate = Int(rightNow)
 
 
@@ -674,8 +674,8 @@ ErrorTrap:
                         End If
                         '
                         emailWorkingStyles = emailStyles
-                        emailWorkingStyles = Replace(emailWorkingStyles, StyleSheetStart, StyleSheetStart & "<!-- ", , , vbTextCompare)
-                        emailWorkingStyles = Replace(emailWorkingStyles, StyleSheetEnd, " // -->" & StyleSheetEnd, , , vbTextCompare)
+                        emailWorkingStyles = vbReplace(emailWorkingStyles, StyleSheetStart, StyleSheetStart & "<!-- ", 1, 99, vbTextCompare)
+                        emailWorkingStyles = vbReplace(emailWorkingStyles, StyleSheetEnd, " // -->" & StyleSheetEnd, 1, 99, vbTextCompare)
                         '
                         ' Create the clickflag to be added to all anchors
                         '
@@ -706,13 +706,13 @@ ErrorTrap:
                             EmailTemplateEncoded = cpCore.html_encodeContent10(EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, 0, "", AddonContextEnum.contextEmail, True, Nothing, False)
                             'EmailTemplateEncoded = cpCore.csv_EncodeContent8(Nothing, EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, "", True, AddonContextEnum.contextEmail)
                             'EmailTemplateEncoded = cpCore.csv_encodecontent8(Nothing, EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, ContentPlaceHolder, True, addonContextEnum.contextemail)
-                            If InStr(1, EmailTemplateEncoded, fpoContentBox) <> 0 Then
-                                EmailBodyEncoded = Replace(EmailTemplateEncoded, fpoContentBox, EmailBodyEncoded)
+                            If vbInstr(1, EmailTemplateEncoded, fpoContentBox) <> 0 Then
+                                EmailBodyEncoded = vbReplace(EmailTemplateEncoded, fpoContentBox, EmailBodyEncoded)
                             Else
                                 EmailBodyEncoded = EmailTemplateEncoded & "<div style=""padding:10px;"">" & EmailBodyEncoded & "</div>"
                             End If
-                            '                If InStr(1, EmailTemplateEncoded, ContentPlaceHolder) <> 0 Then
-                            '                    EmailBodyEncoded = Replace(EmailTemplateEncoded, ContentPlaceHolder, EmailBodyEncoded)
+                            '                If vbInstr(1, EmailTemplateEncoded, ContentPlaceHolder) <> 0 Then
+                            '                    EmailBodyEncoded = vbReplace(EmailTemplateEncoded, ContentPlaceHolder, EmailBodyEncoded)
                             '                Else
                             '                    EmailBodyEncoded = EmailTemplateEncoded & "<div style=""padding:10px;"">" & EmailBodyEncoded & "</div>"
                             '                End If
@@ -721,7 +721,7 @@ ErrorTrap:
                         ' Spam Footer under template
                         ' remove the marker for any other place in the email then add it as needed
                         '
-                        EmailBodyEncoded = Replace(EmailBodyEncoded, RequestNameEmailSpamFlag, "", , , vbTextCompare)
+                        EmailBodyEncoded = vbReplace(EmailBodyEncoded, RequestNameEmailSpamFlag, "", 1, 99, vbTextCompare)
                         If AllowSpamFooter Then
                             '
                             ' non-authorable, default true - leave it as an option in case there is an important exception
@@ -732,8 +732,8 @@ ErrorTrap:
                         ' open trigger under footer (so it does not shake as the image comes in)
                         '
                         EmailBodyEncoded = EmailBodyEncoded & OpenTriggerCode
-                        EmailBodyEncoded = Replace(EmailBodyEncoded, "#member_id#", MemberID)
-                        EmailBodyEncoded = Replace(EmailBodyEncoded, "#member_email#", ToAddress)
+                        EmailBodyEncoded = vbReplace(EmailBodyEncoded, "#member_id#", MemberID)
+                        EmailBodyEncoded = vbReplace(EmailBodyEncoded, "#member_email#", ToAddress)
                         '
                         ' Now convert URLS to absolute
                         '
@@ -792,7 +792,7 @@ ErrorTrap:
             Dim CopySplit
             '
             GetPrimaryDomainName = cpCore.app_domainList
-            If InStr(1, GetPrimaryDomainName, ",", 1) <> 0 Then
+            If vbInstr(1, GetPrimaryDomainName, ",", 1) <> 0 Then
                 CopySplit = Split(GetPrimaryDomainName, ",")
                 GetPrimaryDomainName = CopySplit(0)
             End If
@@ -877,13 +877,13 @@ ErrorTrap:
                         WorkingTemplate = cpCore.html_executeContentCommands(Nothing, WorkingTemplate, AddonContextEnum.contextEmail, ConfirmationMemberID, True, errorMessage)
                         WorkingTemplate = cpCore.html_encodeContent10(WorkingTemplate, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, False, "http://" & GetPrimaryDomainName(), True, 0, "", AddonContextEnum.contextEmail, True, Nothing, False)
                         'WorkingTemplate = cpCore.csv_encodecontent8(Nothing, EmailTemplate, ConfirmationMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, False, "http://" & GetPrimaryDomainName(), True, "", 0, ContentPlaceHolder, True, addonContextEnum.contextemail)
-                        If InStr(1, WorkingTemplate, fpoContentBox) <> 0 Then
-                            EmailBody = Replace(WorkingTemplate, fpoContentBox, EmailBody)
+                        If vbInstr(1, WorkingTemplate, fpoContentBox) <> 0 Then
+                            EmailBody = vbReplace(WorkingTemplate, fpoContentBox, EmailBody)
                         Else
                             EmailBody = WorkingTemplate & "<div style=""padding:10px"">" & EmailBody & "</div>"
                         End If
-                        '            If InStr(1, WorkingTemplate, ContentPlaceHolder) <> 0 Then
-                        '                EmailBody = Replace(WorkingTemplate, ContentPlaceHolder, EmailBody)
+                        '            If vbInstr(1, WorkingTemplate, ContentPlaceHolder) <> 0 Then
+                        '                EmailBody = vbReplace(WorkingTemplate, ContentPlaceHolder, EmailBody)
                         '            Else
                         '                EmailBody = WorkingTemplate & "<div style=""padding:10px"">" & EmailBody & "</div>"
                         '            End If

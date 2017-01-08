@@ -41,7 +41,7 @@ Namespace Contensive.Core
         '
         '   Internal Storage
         '
-        Private cpCore As cpCoreClass
+        Private cpCore As coreClass
         '
         Const NewWay = True
         '
@@ -81,7 +81,7 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <remarks></remarks>
-        Public Sub New(cpCore As cpCoreClass)
+        Public Sub New(cpCore As coreClass)
             Me.cpCore = cpCore
         End Sub
         '
@@ -138,9 +138,9 @@ Namespace Contensive.Core
                 Cnt = UBound(splittest) + 1
                 If Cnt > 1 Then
                     For Ptr = 1 To Cnt - 1
-                        PosScriptEnd = InStr(1, splittest(Ptr), ">")
+                        PosScriptEnd = vbInstr(1, splittest(Ptr), ">")
                         If PosScriptEnd > 0 Then
-                            PosEndScript = InStr(PosScriptEnd, splittest(Ptr), "</script", vbTextCompare)
+                            PosEndScript = vbInstr(PosScriptEnd, splittest(Ptr), "</script", vbTextCompare)
                             If PosEndScript > 0 Then
                                 ReDim Preserve Blobs(BlobCnt)
                                 Blobs(BlobCnt) = Mid(splittest(Ptr), PosScriptEnd + 1, (PosEndScript - 1) - (PosScriptEnd + 1) + 1)
@@ -158,9 +158,9 @@ Namespace Contensive.Core
                 Cnt = UBound(splittest) + 1
                 If Cnt > 1 Then
                     For Ptr = 1 To Cnt - 1
-                        PosScriptEnd = InStr(1, splittest(Ptr), ">")
+                        PosScriptEnd = vbInstr(1, splittest(Ptr), ">")
                         If PosScriptEnd > 0 Then
-                            PosEndScript = InStr(PosScriptEnd, splittest(Ptr), "</style", vbTextCompare)
+                            PosEndScript = vbInstr(PosScriptEnd, splittest(Ptr), "</style", vbTextCompare)
                             If PosEndScript > 0 Then
                                 ReDim Preserve Blobs(BlobCnt)
                                 Blobs(BlobCnt) = Mid(splittest(Ptr), PosScriptEnd + 1, (PosEndScript - 1) - (PosScriptEnd + 1) + 1)
@@ -178,7 +178,7 @@ Namespace Contensive.Core
                 Cnt = UBound(splittest) + 1
                 If Cnt > 1 Then
                     For Ptr = 1 To Cnt - 1
-                        PosScriptEnd = InStr(1, splittest(Ptr), "-->")
+                        PosScriptEnd = vbInstr(1, splittest(Ptr), "-->")
                         If PosScriptEnd > 0 Then
                             ReDim Preserve Blobs(BlobCnt)
                             Blobs(BlobCnt) = Mid(splittest(Ptr), 1, PosScriptEnd - 1)
@@ -206,7 +206,7 @@ Namespace Contensive.Core
                 If Not IsNull(WorkingSrc) Then
                     TagEnd = 0
                     TagStartString = "<"
-                    TagStart = InStr(1, WorkingSrc, TagStartString)
+                    TagStart = vbInstr(1, WorkingSrc, TagStartString)
                     Do While TagStart <> 0
                         If (LocalElementCount / 1000) = Int(LocalElementCount / 1000) Then
                             LocalElementCount = LocalElementCount
@@ -240,7 +240,7 @@ Namespace Contensive.Core
                             '
                             ' Comment Tag
                             '
-                            TagEnd = InStr(TagStart, WorkingSrc, "-->")
+                            TagEnd = vbInstr(TagStart, WorkingSrc, "-->")
                             If TagEnd = 0 Then
                                 LocalElements(LocalElementCount).Text = Mid(WorkingSrc, TagStart)
                             Else
@@ -250,11 +250,11 @@ Namespace Contensive.Core
                             LocalElements(LocalElementCount).TagName = "!--"
                             LocalElements(LocalElementCount).Loaded = True
                             TagStartString = "<"
-                        ElseIf LCase(Mid(WorkingSrc, TagStart, 7)) = "<script" Then
+                        ElseIf vbLCase(Mid(WorkingSrc, TagStart, 7)) = "<script" Then
                             '
                             ' Script tag - include everything up to the </script> in the next non-tag
                             '
-                            TagEnd = InStr(TagStart, WorkingSrc, ">")
+                            TagEnd = vbInstr(TagStart, WorkingSrc, ">")
                             If TagEnd = 0 Then
                                 LocalElements(LocalElementCount).Text = Mid(WorkingSrc, TagStart)
                             Else
@@ -267,7 +267,7 @@ Namespace Contensive.Core
                             '
                             ' All other tags
                             '
-                            TagEnd = InStr(TagStart, WorkingSrc, ">")
+                            TagEnd = vbInstr(TagStart, WorkingSrc, ">")
                             If TagEnd = 0 Then
                                 LocalElements(LocalElementCount).Text = Mid(WorkingSrc, TagStart)
                             Else
@@ -282,10 +282,10 @@ Namespace Contensive.Core
                         If TagEnd = 0 Then
                             TagStart = 0
                         Else
-                            TagStart = InStr(TagEnd, WorkingSrc, TagStartString, vbTextCompare)
+                            TagStart = vbInstr(TagEnd, WorkingSrc, TagStartString, vbTextCompare)
                         End If
                         Do While TagStart <> 0 And (Mid(WorkingSrc, TagStart + 1, 1) = " ")
-                            TagStart = InStr(TagStart + 1, WorkingSrc, TagStartString, vbTextCompare)
+                            TagStart = vbInstr(TagStart + 1, WorkingSrc, TagStartString, vbTextCompare)
                         Loop
                     Loop
                     '
@@ -467,7 +467,7 @@ ErrorTrap:
             If ElementPointer < LocalElementCount Then
                 With LocalElements(ElementPointer)
                     If .AttributeCount > 0 Then
-                        UcaseName = UCase(Name)
+                        UcaseName = vbUCase(Name)
                         For AttributePointer = 0 To .AttributeCount - 1
                             If .Attributes(AttributePointer).UcaseName = UcaseName Then
                                 ElementAttribute = .Attributes(AttributePointer).Value
@@ -517,13 +517,13 @@ ErrorTrap:
                 If Right(TagString, 1) = "/" Then
                     TagString = Mid(TagString, 1, Len(TagString) - 1)
                 End If
-                'TagString = Replace(TagString, ">", " ") & " "
-                TagString = Replace(TagString, vbCr, " ")
-                TagString = Replace(TagString, vbLf, " ")
-                TagString = Replace(TagString, "  ", " ")
-                'TagString = Replace(TagString, " =", "=")
-                'TagString = Replace(TagString, "= ", "=")
-                'TagString = Replace(TagString, "'", """")
+                'TagString = vbReplace(TagString, ">", " ") & " "
+                TagString = vbReplace(TagString, vbCr, " ")
+                TagString = vbReplace(TagString, vbLf, " ")
+                TagString = vbReplace(TagString, "  ", " ")
+                'TagString = vbReplace(TagString, " =", "=")
+                'TagString = vbReplace(TagString, "= ", "=")
+                'TagString = vbReplace(TagString, "'", """")
                 .AttributeCount = 0
                 .AttributeSize = 1
                 ReDim .Attributes(0)  ' allocates the first
@@ -557,10 +557,10 @@ ErrorTrap:
                                             .AttributeSize = .AttributeSize + 5
                                             ReDim Preserve .Attributes(.AttributeSize)
                                         End If
-                                        EqualPosition = InStr(1, AttrName, "=")
+                                        EqualPosition = vbInstr(1, AttrName, "=")
                                         If EqualPosition = 0 Then
                                             .Attributes(.AttributeCount).Name = AttrName
-                                            .Attributes(.AttributeCount).UcaseName = UCase(AttrName)
+                                            .Attributes(.AttributeCount).UcaseName = vbUCase(AttrName)
                                             .Attributes(.AttributeCount).Value = AttrName
                                         Else
                                             AttrValue = Mid(AttrName, EqualPosition + 1)
@@ -572,7 +572,7 @@ ErrorTrap:
                                             End If
                                             AttrName = Mid(AttrName, 1, EqualPosition - 1)
                                             .Attributes(.AttributeCount).Name = AttrName
-                                            .Attributes(.AttributeCount).UcaseName = UCase(AttrName)
+                                            .Attributes(.AttributeCount).UcaseName = vbUCase(AttrName)
                                             .Attributes(.AttributeCount).Value = AttrValue
                                         End If
                                         .AttributeCount = .AttributeCount + 1
@@ -602,7 +602,7 @@ ErrorTrap:
                 '                    '
                 '                    Name = Mid(TagString, CursorPosition, SpacePosition - CursorPosition)
                 '                    .Attributes(.AttributeCount).Name = Name
-                '                    .Attributes(.AttributeCount).UcaseName = UCase(Name)
+                '                    .Attributes(.AttributeCount).UcaseName = vbUCase(Name)
                 '                    .Attributes(.AttributeCount).Value = Name
                 '                    CursorPosition = SpacePosition
                 '                ElseIf QuotePosition < SpacePosition Then
@@ -612,7 +612,7 @@ ErrorTrap:
                 '                    CloseQuotePosition = GetLesserNonZero(InStr(QuotePosition + 1, TagString, """"), ClosePosition)
                 '                    Name = Mid(TagString, CursorPosition, EqualPosition - CursorPosition)
                 '                    .Attributes(.AttributeCount).Name = Name
-                '                    .Attributes(.AttributeCount).UcaseName = UCase(Name)
+                '                    .Attributes(.AttributeCount).UcaseName = vbUCase(Name)
                 '                    .Attributes(.AttributeCount).Value = Mid(TagString, QuotePosition + 1, CloseQuotePosition - QuotePosition - 1)
                 '                    CursorPosition = CloseQuotePosition
                 '                Else
@@ -621,7 +621,7 @@ ErrorTrap:
                 '                    '
                 '                    Name = Mid(TagString, CursorPosition, EqualPosition - CursorPosition)
                 '                    .Attributes(.AttributeCount).Name = Name
-                '                    .Attributes(.AttributeCount).UcaseName = UCase(Name)
+                '                    .Attributes(.AttributeCount).UcaseName = vbUCase(Name)
                 '                    .Attributes(.AttributeCount).Value = Mid(TagString, EqualPosition + 1, SpacePosition - EqualPosition - 1)
                 '                    CursorPosition = SpacePosition
                 '                    End If
@@ -736,11 +736,11 @@ ErrorTrap:
         '                '
         '                ' make sure base does not have anchors or querystrings
         '                '
-        '                Position = InStr(1, URIBase, "#")
+        '                Position = vbInstr(1, URIBase, "#")
         '                If Position <> 0 Then
         '                    URIBase = Mid(URIBase, 1, Position - 1)
         '                End If
-        '                Position = InStr(1, URIBase, "?")
+        '                Position = vbInstr(1, URIBase, "?")
         '                If Position <> 0 Then
         '                    URIBase = Mid(URIBase, 1, Position - 1)
         '                End If
@@ -766,7 +766,7 @@ ErrorTrap:
         '                If Mid(URIWorking, 1, 1) <> "/" Then
         '                    URIWorking = BasePath & URIWorking
         '                End If
-        '                Position = InStr(1, URIWorking, "../")
+        '                Position = vbInstr(1, URIWorking, "../")
         '                Do Until Position = 0
         '                    '
         '                    ' if path contains directory changes, do the move
@@ -779,10 +779,10 @@ ErrorTrap:
         '                        'DoEvents()
         '                    Loop
         '                    URIWorking = LeftSide + RightSide
-        '                    Position = InStr(1, URIWorking, "../")
+        '                    Position = vbInstr(1, URIWorking, "../")
         '                    'DoEvents()
         '                Loop
-        '                Position = InStr(1, URIWorking, "./")
+        '                Position = vbInstr(1, URIWorking, "./")
         '                Do Until Position = 0
         '                    '
         '                    ' if path contains directory marks, remove them
@@ -794,7 +794,7 @@ ErrorTrap:
         '                        'DoEvents()
         '                    Loop
         '                    URIWorking = LeftSide + RightSide
-        '                    Position = InStr(1, URIWorking, "./")
+        '                    Position = vbInstr(1, URIWorking, "./")
         '                    'DoEvents()
         '                Loop
         '                '
@@ -832,7 +832,7 @@ ErrorTrap:
                 If LocalElements(ElementPointer).IsTag Then
                     iElementPointer = ElementPointer + 1
 
-                    TagName = UCase(LocalElements(ElementPointer).TagName)
+                    TagName = vbUCase(LocalElements(ElementPointer).TagName)
                     TagNameEnd = "/" & TagName
                     TagCount = 1
                     Do While TagCount <> 0 And iElementPointer < LocalElementCount
@@ -841,7 +841,7 @@ ErrorTrap:
                             If Not .IsTag Then
                                 TagInnerText = TagInnerText & .Text
                             Else
-                                Select Case UCase(.TagName)
+                                Select Case vbUCase(.TagName)
                                     Case TagName
                                         TagCount = TagCount + 1
                                         TagInnerText = TagInnerText & .Text
@@ -885,7 +885,7 @@ ErrorTrap:
                     SplitPtr = CInt(ElementPtr / 2)
                     ElementBasePtr = SplitPtr * 2
                     SplitSrc = SplitStore(SplitPtr)
-                    Ptr = InStr(1, SplitSrc, ">")
+                    Ptr = vbInstr(1, SplitSrc, ">")
                     '
                     ' replace blobs
                     '
@@ -970,14 +970,14 @@ ErrorTrap:
             Dim Blob As String
             '
             ReplaceBlob = Src
-            Pos = InStr(1, Src, BlobSN)
+            Pos = vbInstr(1, Src, BlobSN)
             If Pos <> 0 Then
-                PosEnd = InStr(Pos + 1, Src, "/")
+                PosEnd = vbInstr(Pos + 1, Src, "/")
                 If PosEnd > 0 Then
-                    PosNum = InStr(Pos + 1, Src, ":")
+                    PosNum = vbInstr(Pos + 1, Src, ":")
                     If PosNum > 0 Then
                         PtrText = Mid(Src, PosNum + 1, PosEnd - PosNum - 1)
-                        If IsNumeric(PtrText) Then
+                        If vbIsNumeric(PtrText) Then
                             Ptr = CInt(PtrText)
                             If Ptr < BlobCnt Then
                                 Blob = Blobs(Ptr)

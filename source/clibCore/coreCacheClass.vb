@@ -6,21 +6,35 @@ Imports System.Text.RegularExpressions
 '
 Namespace Contensive.Core
     '
+    '====================================================================================================
+    ''' <summary>
+    ''' Interface to cache systems
+    ''' </summary>
     Public Class coreCacheClass
         Implements IDisposable
         '
-        ' store just for live of object. Cannot load in constructor without global code update
+        ' ----- objects passed in constructor, do not dispose
         '
-        Private cpCore As cpCoreClass
+        Private cpCore As coreClass
+        '
+        ' ----- objects constructed that must be disposed
+        '
         Private cacheClient As Enyim.Caching.MemcachedClient
-        Private rightNow As Date
-        Private cacheLogPrefix As String
+        '
+        ' ----- constants
         '
         Private Const invalidationDaysDefault As Double = 365
+        '
+        ' ----- private globals
+        '
+        Private rightNow As Date
+        Private cacheLogPrefix As String
         Private remoteCacheDisabled As Boolean
         '
         '====================================================================================================
-        '
+        ''' <summary>
+        ''' cache data wrapper to include tags and save datetime
+        ''' </summary>
         <Serializable()>
         Public Class cacheDataClass
             Public tagList As New List(Of String)
@@ -30,21 +44,30 @@ Namespace Contensive.Core
         End Class
         '
         '====================================================================================================
-        '
+        ''' <summary>
+        ''' get an object from cache based on a key name (it will be appended with clusterName and appName)
+        ''' </summary>
+        ''' <typeparam name="returnType"></typeparam>
+        ''' <param name="key"></param>
+        ''' <returns></returns>
         Private Function getObjectRaw(Of returnType)(ByVal key As String) As returnType
             Dim returnObj As returnType = Nothing
+            Dim hint As Integer = 0
             Try
                 If (String.IsNullOrEmpty(key)) Then
                     Throw New ArgumentException("Cache key cannot be blank")
                 Else
+                    hint = 100
                     If (Not cpCore.appConfig.enableCache) Or (Not cpCore.siteProperties.allowCache_notCached) Then
                         returnObj = returnObj
                     Else
+                        hint = 200
                         Dim rawCacheName As String = encodeCacheKey(cpCore.appConfig.name, key)
-                        If cpCore.cluster.config.isLocalCache Or remoteCacheDisabled Then
+                        If cpCore.clusterConfig.isLocalCache Or remoteCacheDisabled Then
                             '
                             ' implement a simple local cache using the filesystem
                             '
+                            hint = 300
                             Dim serializedDataObject As String = Nothing
                             Using mutex As New System.Threading.Mutex(False, rawCacheName)
                                 mutex.WaitOne()
@@ -61,6 +84,7 @@ Namespace Contensive.Core
                             '
                             ' use remote cache
                             '
+                            hint = 400
                             Try
                                 returnObj = cacheClient.Get(Of returnType)(rawCacheName)
                             Catch ex As Exception
@@ -84,7 +108,7 @@ Namespace Contensive.Core
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndRethrow(ex, "getObjectRaw(" & key & "), hint:" & hint.ToString())
             End Try
             Return returnObj
         End Function
@@ -94,7 +118,7 @@ Namespace Contensive.Core
         ''' new constructor. Initializes properties and cache client. For now, called from each public routine. Eventually this is contructor.
         ''' </summary>
         ''' <remarks></remarks>
-        Public Sub New(cpCore As cpCoreClass)
+        Public Sub New(cpCore As coreClass)
             Dim logMsg As String = "new cache instance"
             Try
                 Me.cpCore = cpCore
@@ -103,11 +127,11 @@ Namespace Contensive.Core
                 Dim cacheEndpoint As String
                 Dim cacheConfig As Amazon.ElastiCacheCluster.ElastiCacheClusterConfig
                 '
-                rightNow = Now()
+                rightNow = DateTime.Now()
                 cacheLogPrefix = "cacheLog"
                 '
                 remoteCacheDisabled = True
-                cacheEndpoint = cpCore.cluster.config.awsElastiCacheConfigurationEndpoint
+                cacheEndpoint = cpCore.clusterConfig.awsElastiCacheConfigurationEndpoint
                 If String.IsNullOrEmpty(cacheEndpoint) Then
                     '
                     logMsg &= ", elasticache disabled"
@@ -178,7 +202,7 @@ Namespace Contensive.Core
                 Else
                     If (cpCore.appConfig.enableCache) And (cpCore.siteProperties.allowCache_notCached) Then
                         Dim rawCacheName As String = encodeCacheKey(cpCore.appConfig.name, Key)
-                        If cpCore.cluster.config.isLocalCache Or remoteCacheDisabled Then
+                        If cpCore.clusterConfig.isLocalCache Or remoteCacheDisabled Then
                             '
                             ' implement a simple local cache using the filesystem
                             '
@@ -245,7 +269,7 @@ Namespace Contensive.Core
 
                 If (String.IsNullOrEmpty(Key)) Then
                     cpCore.handleExceptionAndRethrow(New Exception("key cannot be empty"))
-                ElseIf (invalidationDate <= Now()) Then
+                ElseIf (invalidationDate <= DateTime.Now()) Then
                     cpCore.handleExceptionAndRethrow(New Exception("invalidationDate must be > current date/time"))
                 Else
                     allowSave = False
@@ -306,7 +330,7 @@ Namespace Contensive.Core
                     'addCacheNameToList(CP, cacheName)
                     cacheData = New cacheDataClass()
                     cacheData.data = cacheObject
-                    cacheData.saveDate = Now()
+                    cacheData.saveDate = DateTime.Now()
                     cacheData.invalidationDate = invalidationDate
                     cacheData.tagList = invalidationTagList
                     '
@@ -335,7 +359,7 @@ Namespace Contensive.Core
                     '
                     invalidationTagList.Add(invalidationTag)
                     cacheData.data = cacheObject
-                    cacheData.saveDate = Now()
+                    cacheData.saveDate = DateTime.Now()
                     cacheData.invalidationDate = invalidationDate
                     cacheData.tagList = invalidationTagList
                     '
@@ -655,59 +679,47 @@ Namespace Contensive.Core
         Private Function getTagInvalidationDateCacheName(tag As String) As String
             Return "TagInvalidationDate-" & tag.ToLower()
         End Function
-
-#Region " IDisposable Support "
-        Protected disposed As Boolean = False
         '
-        '==========================================================================================
-        ''' <summary>
-        ''' dispose
-        ''' </summary>
-        ''' <param name="disposing"></param>
-        ''' <remarks></remarks>
-        Protected Overridable Overloads Sub Dispose(ByVal disposing As Boolean)
-            If Not Me.disposed Then
-                '
-                appendCacheLog("disposing")
-                '
-                If disposing Then
-                    '
-                    ' ----- call .dispose for managed objects
-                    '
-                    If Not (cacheClient Is Nothing) Then
-                        '
-                        appendCacheLog("dispose mc")
-                        '
-                        cacheClient.Dispose()
-                    Else
-                        '
-                        appendCacheLog("dispose NO mc")
-                        '
-                    End If
-                End If
-                '
-                ' Add code here to release the unmanaged resource.
-                '
-            End If
-            Me.disposed = True
-        End Sub
-
-
+        '====================================================================================================
+#Region " IDisposable Support "
+        '
+        ' this class must implement System.IDisposable
+        ' never throw an exception in dispose
         ' Do not change or add Overridable to these methods.
         ' Put cleanup code in Dispose(ByVal disposing As Boolean).
+        '====================================================================================================
+        '
+        Protected disposed As Boolean = False
+        '
         Public Overloads Sub Dispose() Implements IDisposable.Dispose
+            ' do not add code here. Use the Dispose(disposing) overload
             Dispose(True)
             GC.SuppressFinalize(Me)
         End Sub
         '
-        '====================================================================================================
-        ''' <summary>
-        ''' finalize
-        ''' </summary>
-        ''' <remarks></remarks>
         Protected Overrides Sub Finalize()
+            ' do not add code here. Use the Dispose(disposing) overload
             Dispose(False)
             MyBase.Finalize()
+        End Sub
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' dispose.
+        ''' </summary>
+        ''' <param name="disposing"></param>
+        Protected Overridable Overloads Sub Dispose(ByVal disposing As Boolean)
+            If Not Me.disposed Then
+                Me.disposed = True
+                If disposing Then
+                    If (cacheClient IsNot Nothing) Then
+                        cacheClient.Dispose()
+                    End If
+                End If
+                '
+                ' cleanup non-managed objects
+                '
+            End If
         End Sub
 #End Region
     End Class

@@ -23,7 +23,7 @@ Namespace Contensive.Core
         Private cp As CPClass
         Private Property UpgradeOK As Boolean
         '
-        Friend Sub New(ByVal cp As CPClass)
+        public Sub New(ByVal cp As CPClass)
             MyBase.New()
             Me.cp = cp
         End Sub

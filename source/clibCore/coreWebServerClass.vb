@@ -10,7 +10,7 @@ Namespace Contensive.Core
     ''' </summary>
     Public Class coreWebServerClass
         '
-        Dim cpCore As cpCoreClass
+        Dim cpCore As coreClass
         '
         '   State values that must be initialized before Init()
         '   Everything else is derived from these
@@ -48,7 +48,7 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         '
-        Public Sub New(cpCore As cpCoreClass)
+        Public Sub New(cpCore As coreClass)
             MyBase.New
             Me.cpCore = cpCore
             requestCookies = New Dictionary(Of String, cookieClass)
@@ -74,9 +74,9 @@ Namespace Contensive.Core
                 Call runProcess(cpCore, Cmd, arg, True)
                 Copy = cpCore.privateFiles.ReadFile(LogFilename)
                 Call cpCore.privateFiles.DeleteFile(LogFilename)
-                Copy = Replace(Copy, vbCrLf, "\n")
-                Copy = Replace(Copy, vbCr, "\n")
-                Copy = Replace(Copy, vbLf, "\n")
+                Copy = vbReplace(Copy, vbCrLf, "\n")
+                Copy = vbReplace(Copy, vbCr, "\n")
+                Copy = vbReplace(Copy, vbLf, "\n")
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -100,9 +100,9 @@ Namespace Contensive.Core
                 Call runProcess(cpCore, Cmd, , True)
                 Copy = cpCore.privateFiles.ReadFile(LogFilename)
                 Call cpCore.privateFiles.DeleteFile(LogFilename)
-                Copy = Replace(Copy, vbCrLf, "\n")
-                Copy = Replace(Copy, vbCr, "\n")
-                Copy = Replace(Copy, vbLf, "\n")
+                Copy = vbReplace(Copy, vbCrLf, "\n")
+                Copy = vbReplace(Copy, vbCr, "\n")
+                Copy = vbReplace(Copy, vbLf, "\n")
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -126,9 +126,9 @@ Namespace Contensive.Core
                 Call runProcess(cpCore, Cmd, , True)
                 Copy = cpCore.privateFiles.ReadFile(LogFilename)
                 Call cpCore.privateFiles.DeleteFile(LogFilename)
-                Copy = Replace(Copy, vbCrLf, "\n")
-                Copy = Replace(Copy, vbCr, "\n")
-                Copy = Replace(Copy, vbLf, "\n")
+                Copy = vbReplace(Copy, vbCrLf, "\n")
+                Copy = vbReplace(Copy, vbCr, "\n")
+                Copy = vbReplace(Copy, vbLf, "\n")
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -161,7 +161,7 @@ Namespace Contensive.Core
         '       returns responseOpen
         '==================================================================================
         '
-        Friend Function initWebContext() As Boolean
+        Public Function initWebContext() As Boolean
             Try
                 '
                 Dim forwardDomain As String
@@ -286,7 +286,7 @@ Namespace Contensive.Core
                         ' /***** removed so the new system does not cpcore.main_Get the referrers QS
                         ' /***** the best we remember, only Aspen uses this, and they are moving
                         '
-                        If InStr(1, requestReferrer, "?") <> 0 Then
+                        If vbInstr(1, requestReferrer, "?") <> 0 Then
                             LinkSplit = Split(requestReferrer, "?")
                             ampSplit = Split(LinkSplit(1), "&")
                             ampSplitCount = UBound(ampSplit) + 1
@@ -484,7 +484,7 @@ Namespace Contensive.Core
                             '
                             ' normal domain, leave it
                             '
-                        ElseIf InStr(1, requestPathPage, cpCore.siteProperties.adminURL, vbTextCompare) <> 0 Then
+                        ElseIf vbInstr(1, requestPathPage, cpCore.siteProperties.adminURL, vbTextCompare) <> 0 Then
                             '
                             ' forwarding does not work in the admin site
                             '
@@ -495,7 +495,7 @@ Namespace Contensive.Core
                             '
                             'Call AppendLog("main_init(), 1710 - exit for domain forward")
                             '
-                            If InStr(1, cpCore.domains.domainDetails.forwardUrl, "://") = 0 Then
+                            If vbInstr(1, cpCore.domains.domainDetails.forwardUrl, "://") = 0 Then
                                 cpCore.domains.domainDetails.forwardUrl = "http://" & cpCore.domains.domainDetails.forwardUrl
                             End If
                             Call cpCore.web_Redirect2(cpCore.domains.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domains.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this URL", False)
@@ -506,13 +506,13 @@ Namespace Contensive.Core
                             '
                             forwardDomain = cpCore.main_GetRecordName("domains", cpCore.domains.domainDetails.forwardDomainId)
                             If forwardDomain <> "" Then
-                                Pos = InStr(1, requestLinkSource, requestDomain, vbTextCompare)
+                                Pos = vbInstr(1, requestLinkSource, requestDomain, vbTextCompare)
                                 If (Pos > 0) Then
                                     '
                                     'Call AppendLog("main_init(), 1720 - exit for forward domain")
                                     '
                                     cpCore.domains.domainDetails.forwardUrl = Mid(requestLinkSource, 1, Pos - 1) & forwardDomain & Mid(requestLinkSource, Pos + Len(requestDomain))
-                                    'main_domainForwardUrl = Replace(main_ServerLinkSource, cpcore.main_ServerHost, forwardDomain)
+                                    'main_domainForwardUrl = vbReplace(main_ServerLinkSource, cpcore.main_ServerHost, forwardDomain)
                                     Call cpCore.web_Redirect2(cpCore.domains.domainDetails.forwardUrl, "Forwarding to [" & cpCore.domains.domainDetails.forwardUrl & "] because the current domain [" & requestDomain & "] is in the domain content set to forward to this replacement domain", False)
                                     Return cpCore.docOpen
                                 End If
@@ -666,7 +666,7 @@ Namespace Contensive.Core
                     '
                     'Call AppendLog("main_init(), 2300")
                     '
-                    If (RedirectLink = "") And (Not cpCore.domains.ServerMultiDomainMode) And (LCase(requestDomain) <> LCase(cpCore.main_ServerDomain)) Then
+                    If (RedirectLink = "") And (Not cpCore.domains.ServerMultiDomainMode) And (LCase(requestDomain) <> vbLCase(cpCore.main_ServerDomain)) Then
                         '
                         'Call AppendLog("main_init(), 2310 - exit in domain and path check")
                         '
@@ -684,7 +684,7 @@ Namespace Contensive.Core
                     '
                     If (RedirectLink = "") And (cpCore.www_requestRootPath = "/") And (InStr(1, cpCore.web_requestPath, cpCore.web_requestVirtualFilePath & "/", vbTextCompare) = 1) Then
                         Copy = "Redirecting because this site can not be run in the path [" & cpCore.web_requestVirtualFilePath & "]"
-                        cpCore.web_requestPath = Replace(cpCore.web_requestPath, cpCore.appConfig.name & "/", "", , , vbTextCompare)
+                        cpCore.web_requestPath = vbReplace(cpCore.web_requestPath, cpCore.appConfig.name & "/", "", 1, 99, vbTextCompare)
                         If requestQueryString <> "" Then
                             Call cpCore.web_Redirect2(cpCore.web_requestProtocol & cpCore.main_ServerDomain & cpCore.www_requestRootPath & cpCore.web_requestPath & cpCore.web_requestPage & "?" & requestQueryString, Copy, False)
                         Else
@@ -707,7 +707,7 @@ Namespace Contensive.Core
                     'Call AppendLog("main_init(), 2400")
                     '
                     ''hint = "Initializing Visit"
-                    Call cpCore.visit_init(cpCore.siteProperties.getBoolean("allowVisitTracking", True))
+                    Call cpCore.visit_init(cpCore.siteProperties.allowVisitTracking)
                     '
                     '--------------------------------------------------------------------------
                     ' ----- Process Early redirects, like PageNotFound
@@ -757,7 +757,7 @@ Namespace Contensive.Core
             Dim cookieValue As String = ""
             Try
                 If requestCookies.ContainsKey(CookieName) Then
-                    cookieValue = requestCookies(CookieName).Value
+                    cookieValue = requestCookies(CookieName).value
                 End If
                 ''
                 'Dim Pointer As Integer
@@ -765,9 +765,9 @@ Namespace Contensive.Core
                 ''
                 'web_GetStreamCookie = ""
                 'If web.cookieArrayCount > 0 Then
-                '    UName = UCase(CookieName)
+                '    UName = vbUCase(CookieName)
                 '    For Pointer = 0 To web.cookieArrayCount - 1
-                '        If UName = UCase(web.requestCookies(Pointer).Name) Then
+                '        If UName = vbUCase(web.requestCookies(Pointer).Name) Then
                 '            web_GetStreamCookie = web.requestCookies(Pointer).Value
                 '            Exit For
                 '        End If
@@ -832,7 +832,7 @@ Namespace Contensive.Core
                                 '
                                 ' valid, non-repeat domain
                                 '
-                                If LCase(domainSet) = LCase(requestDomain) Then
+                                If vbLCase(domainSet) = vbLCase(requestDomain) Then
                                     '
                                     ' current domain, set cookie
                                     '
@@ -894,13 +894,13 @@ Namespace Contensive.Core
                                     If Not isMissing(Path) Then
                                         C = EncodeText(Path)
                                         C = EncodeRequestVariable(C)
-                                        C = Replace(C, "/", "%2F")
+                                        C = vbReplace(C, "/", "%2F")
                                         Link = Link & "&p=" & C
                                     End If
                                     If Not isMinDate(DateExpires) Then
                                         C = EncodeText(DateExpires)
                                         C = EncodeRequestVariable(C)
-                                        C = Replace(C, "/", "%2F")
+                                        C = vbReplace(C, "/", "%2F")
                                         Link = Link & "&e=" & C
                                     End If
                                     Link = html_EncodeHTML(Link)

@@ -5,12 +5,19 @@ Option Strict On
 Imports System.Xml
 '
 Namespace Contensive.Core
+    '
+    '====================================================================================================
+    ''' <summary>
+    ''' install addon collections
+    ''' </summary>
     Public Class coreAddonInstallClass
+        Private cpCore As coreClass
         '
-        Private cpCore As cpCoreClass
+        ' not IDisposable - not contained classes that need to be disposed
         '
         Private ManagerAddonNavID_Local As Integer
-        Public Sub New(cpCore As cpCoreClass)
+        '
+        Public Sub New(cpCore As coreClass)
             MyBase.New()
             Me.cpCore = cpCore
         End Sub
@@ -165,7 +172,7 @@ ErrorTrap:
                     ' continue if no errors
                     '
                     With Doc.DocumentElement
-                        If (LCase(Doc.DocumentElement.Name) <> LCase(DownloadFileRootNode)) Then
+                        If (LCase(Doc.DocumentElement.Name) <> vbLCase(DownloadFileRootNode)) Then
                             return_ErrorMessage = "The collection file from the server was Not valid for collection [" & CollectionGuid & "]"
                             DownloadCollectionFiles = False
                             Call appendInstallLog("Server", "AddonInstallClass", errorPrefix & "The response has a basename [" & Doc.DocumentElement.Name & "] but [" & DownloadFileRootNode & "] was expected.")
@@ -182,7 +189,7 @@ ErrorTrap:
                             Else
                                 With Doc.DocumentElement
                                     For Each CDefSection In .ChildNodes
-                                        Select Case LCase(CDefSection.Name)
+                                        Select Case vbLCase(CDefSection.Name)
                                             Case "collection"
                                                 '
                                                 ' Read in the interfaces and save to Add-ons
@@ -194,7 +201,7 @@ ErrorTrap:
                                                 CollectionVersion = ""
                                                 CollectionFileLink = ""
                                                 For Each CDefInterfaces In CDefSection.ChildNodes
-                                                    Select Case LCase(CDefInterfaces.Name)
+                                                    Select Case vbLCase(CDefInterfaces.Name)
                                                         Case "name"
                                                             Collectionname = CDefInterfaces.InnerText
                                                         Case "help"
@@ -220,7 +227,7 @@ ErrorTrap:
                                                                     CollectionFilePath = WorkingFolder & Mid(CollectionFileLink, Pos + 1)
                                                                     Call cpCore.privateFiles.SaveRemoteFile(CollectionFileLink, CollectionFilePath)
                                                                     ' BuildCollectionFolder takes care of the unzipping.
-                                                                    'If LCase(Right(CollectionFilePath, 4)) = ".zip" Then
+                                                                    'If vbLCase(Right(CollectionFilePath, 4)) = ".zip" Then
                                                                     '    Call UnzipAndDeleteFile_AndWait(CollectionFilePath)
                                                                     'End If
                                                                     'DownloadCollectionFiles = True
@@ -233,7 +240,7 @@ ErrorTrap:
                                                             ResourceFilename = ""
                                                             ResourceLink = ""
                                                             For Each ActiveXNode In CDefInterfaces.ChildNodes
-                                                                Select Case LCase(ActiveXNode.Name)
+                                                                Select Case vbLCase(ActiveXNode.Name)
                                                                     Case "filename"
                                                                         ResourceFilename = ActiveXNode.InnerText
                                                                     Case "link"
@@ -414,7 +421,7 @@ ErrorTrap:
                         returnOk = False
                     End Try
                     If returnOk Then
-                        If LCase(LocalCollections.DocumentElement.Name) <> LCase(CollectionListRootNode) Then
+                        If vbLCase(LocalCollections.DocumentElement.Name) <> vbLCase(CollectionListRootNode) Then
                             If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), The addons\Collections.xml file has an invalid root node")
                             Copy = "The addons\Collections.xml has an invalid root node, [" & LocalCollections.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected."
                             'Copy = "The LocalCollections file [" & App.Path & "\Addons\Collections.xml] has an invalid root node, [" & LocalCollections.DocumentElement.name & "] was received and [" & CollectionListRootNode & "] was expected."
@@ -428,12 +435,12 @@ ErrorTrap:
 
                             GuidCnt = 0
                             With LocalCollections.DocumentElement
-                                If LCase(.Name) = "collectionlist" Then
+                                If vbLCase(.Name) = "collectionlist" Then
                                     For Each LocalListNode In .ChildNodes
-                                        Select Case LCase(LocalListNode.Name)
+                                        Select Case vbLCase(LocalListNode.Name)
                                             Case "collection"
                                                 For Each CollectionNode In LocalListNode.ChildNodes
-                                                    If LCase(CollectionNode.Name) = "guid" Then
+                                                    If vbLCase(CollectionNode.Name) = "guid" Then
                                                         ReDim Preserve GuidArray(GuidCnt)
                                                         GuidArray(GuidCnt) = CollectionNode.InnerText
                                                         GuidCnt = GuidCnt + 1
@@ -461,7 +468,7 @@ ErrorTrap:
                                     '
                                     ' Request these 10 from the support library
                                     '
-                                    'If InStr(1, GuidList, "58c9", vbTextCompare) <> 0 Then
+                                    'If vbInstr(1, GuidList, "58c9", vbTextCompare) <> 0 Then
                                     '    GuidList = GuidList
                                     'End If
                                     If GuidList <> "" Then
@@ -492,7 +499,7 @@ ErrorTrap:
                                         End Try
                                         If loadOK Then
                                             If True Then
-                                                If LCase(LibraryCollections.DocumentElement.Name) <> LCase(CollectionListRootNode) Then
+                                                If vbLCase(LibraryCollections.DocumentElement.Name) <> vbLCase(CollectionListRootNode) Then
                                                     Copy = "The GetCollectionList support site remote method returned an xml file with an invalid root node, [" & LibraryCollections.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected."
                                                     If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), " & Copy)
                                                     Call appendInstallLog("Server", "UpgradeAllLocalCollecionFilesFileLib2", Copy & ", the request was [" & SupportURL & "]")
@@ -500,7 +507,7 @@ ErrorTrap:
                                                     returnOk = False
                                                 Else
                                                     With LocalCollections.DocumentElement
-                                                        If LCase(.Name) <> "collectionlist" Then
+                                                        If vbLCase(.Name) <> "collectionlist" Then
                                                             cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), The Library response did not have a collectioinlist top node, the request was [" & SupportURL & "]")
                                                         Else
                                                             '
@@ -511,20 +518,20 @@ ErrorTrap:
                                                             For Each LocalListNode In .ChildNodes
                                                                 localCollectionUpToDate = False
                                                                 If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), Process local collection.xml node [" & LocalListNode.Name & "]")
-                                                                Select Case LCase(LocalListNode.Name)
+                                                                Select Case vbLCase(LocalListNode.Name)
                                                                     Case "collection"
                                                                         LocalGuid = ""
                                                                         LocalLastChangeDateStr = ""
                                                                         LocalLastChangeDate = Date.MinValue
                                                                         LocalLastChangeNode = Nothing
                                                                         For Each CollectionNode In LocalListNode.ChildNodes
-                                                                            Select Case LCase(CollectionNode.Name)
+                                                                            Select Case vbLCase(CollectionNode.Name)
                                                                                 Case "guid"
                                                                                     '
-                                                                                    LocalGuid = LCase(CollectionNode.InnerText)
-                                                                                    'LocalGUID = Replace(LocalGUID, "{", "")
-                                                                                    'LocalGUID = Replace(LocalGUID, "}", "")
-                                                                                    'LocalGUID = Replace(LocalGUID, "-", "")
+                                                                                    LocalGuid = vbLCase(CollectionNode.InnerText)
+                                                                                    'LocalGUID = vbReplace(LocalGUID, "{", "")
+                                                                                    'LocalGUID = vbReplace(LocalGUID, "}", "")
+                                                                                    'LocalGUID = vbReplace(LocalGUID, "-", "")
                                                                                 Case "lastchangedate"
                                                                                     '
                                                                                     LocalLastChangeDateStr = CollectionNode.InnerText
@@ -546,25 +553,25 @@ ErrorTrap:
                                                                             If localCollectionUpToDate Then
                                                                                 Exit For
                                                                             End If
-                                                                            Select Case LCase(LibListNode.Name)
+                                                                            Select Case vbLCase(LibListNode.Name)
                                                                                 Case "collection"
                                                                                     LibGUID = ""
                                                                                     LibLastChangeDateStr = ""
                                                                                     LibLastChangeDate = Date.MinValue
                                                                                     For Each CollectionNode In LibListNode.ChildNodes
-                                                                                        Select Case LCase(CollectionNode.Name)
+                                                                                        Select Case vbLCase(CollectionNode.Name)
                                                                                             Case "name"
                                                                                                 '
-                                                                                                LibName = LCase(CollectionNode.InnerText)
+                                                                                                LibName = vbLCase(CollectionNode.InnerText)
                                                                                             Case "system"
                                                                                                 '
                                                                                                 LibSystem = EncodeBoolean(CollectionNode.InnerText)
                                                                                             Case "guid"
                                                                                                 '
-                                                                                                LibGUID = LCase(CollectionNode.InnerText)
-                                                                                                'LibGUID = Replace(LibGUID, "{", "")
-                                                                                                'LibGUID = Replace(LibGUID, "}", "")
-                                                                                                'LibGUID = Replace(LibGUID, "-", "")
+                                                                                                LibGUID = vbLCase(CollectionNode.InnerText)
+                                                                                                'LibGUID = vbReplace(LibGUID, "{", "")
+                                                                                                'LibGUID = vbReplace(LibGUID, "}", "")
+                                                                                                'LibGUID = vbReplace(LibGUID, "-", "")
                                                                                             Case "lastchangedate"
                                                                                                 '
                                                                                                 LibLastChangeDateStr = CollectionNode.InnerText
@@ -575,7 +582,7 @@ ErrorTrap:
                                                                                         End Select
                                                                                     Next
                                                                                     If LibGUID <> "" Then
-                                                                                        If InStr(1, LibGUID, "58c9", vbTextCompare) <> 0 Then
+                                                                                        If vbInstr(1, LibGUID, "58c9", vbTextCompare) <> 0 Then
                                                                                             LibGUID = LibGUID
                                                                                         End If
                                                                                         If (LibGUID <> "") And (LibGUID = LocalGuid) And ((LibContensiveVersion = "") Or (LibContensiveVersion <= cpCore.common_version())) Then
@@ -583,7 +590,7 @@ ErrorTrap:
                                                                                             ' LibCollection matches the LocalCollection - process the upgrade
                                                                                             '
                                                                                             If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), Library collection node found that matches")
-                                                                                            If InStr(1, LibGUID, "58c9", vbTextCompare) <> 0 Then
+                                                                                            If vbInstr(1, LibGUID, "58c9", vbTextCompare) <> 0 Then
                                                                                                 LibGUID = LibGUID
                                                                                             End If
                                                                                             If Not IsDate(LibLastChangeDateStr) Then
@@ -680,7 +687,7 @@ ErrorTrap:
         '   This is the routine that updates the Collections.xml file
         '       - if it parses ok
         '
-        Friend Function BuildLocalCollectionFolder(ByVal privateFolderPath As String, ByRef Return_IISResetRequired As Boolean, ByRef Return_RegisterList As String, ByVal CollectionLastChangeDate As Date, ByRef return_CollectionGUID As String, ByRef return_ErrorMessage As String, ByVal allowLogging As Boolean) As Boolean
+        Public Function BuildLocalCollectionFolder(ByVal privateFolderPath As String, ByRef Return_IISResetRequired As Boolean, ByRef Return_RegisterList As String, ByVal CollectionLastChangeDate As Date, ByRef return_CollectionGUID As String, ByRef return_ErrorMessage As String, ByVal allowLogging As Boolean) As Boolean
             ' On Error GoTo ErrorTrap
             '
             Dim WorkingPath As String
@@ -755,7 +762,7 @@ ErrorTrap:
                     For Each file As IO.FileInfo In SrcFileNamelist
                         Filename = file.Name
                         Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, processing files, filename=[" & Filename & "]")
-                        If LCase(Right(Filename, 4)) = ".xml" Then
+                        If vbLCase(Right(Filename, 4)) = ".xml" Then
                             '
                             Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, processing xml file [" & Filename & "]")
                             'hint = hint & ",320"
@@ -777,8 +784,8 @@ ErrorTrap:
                             End Try
                             If loadOk Then
                                 'hint = hint & ",400"
-                                CollectionFileBaseName = LCase(CollectionFile.DocumentElement.Name)
-                                If (CollectionFileBaseName <> "contensivecdef") And (CollectionFileBaseName <> CollectionFileRootNode) And (CollectionFileBaseName <> LCase(CollectionFileRootNodeOld)) Then
+                                CollectionFileBaseName = vbLCase(CollectionFile.DocumentElement.Name)
+                                If (CollectionFileBaseName <> "contensivecdef") And (CollectionFileBaseName <> CollectionFileRootNode) And (CollectionFileBaseName <> vbLCase(CollectionFileRootNodeOld)) Then
                                     '
                                     ' Not a problem, this is just not a collection file
                                     '
@@ -821,7 +828,7 @@ ErrorTrap:
                                                 '
                                                 'hint = hint & ",450"
                                                 UpdatingCollection = True
-                                                Pos = InStr(1, CollectionVersionFolderName, "\")
+                                                Pos = vbInstr(1, CollectionVersionFolderName, "\")
                                                 If Pos > 0 Then
                                                     CollectionFolderName = Mid(CollectionVersionFolderName, 1, Pos - 1)
                                                 End If
@@ -831,10 +838,10 @@ ErrorTrap:
                                                 '
                                                 'hint = hint & ",460"
                                                 CollectionFolderName = CollectionGuid
-                                                CollectionFolderName = Replace(CollectionFolderName, "{", "")
-                                                CollectionFolderName = Replace(CollectionFolderName, "}", "")
-                                                CollectionFolderName = Replace(CollectionFolderName, "-", "")
-                                                CollectionFolderName = Replace(CollectionFolderName, " ", "")
+                                                CollectionFolderName = vbReplace(CollectionFolderName, "{", "")
+                                                CollectionFolderName = vbReplace(CollectionFolderName, "}", "")
+                                                CollectionFolderName = vbReplace(CollectionFolderName, "-", "")
+                                                CollectionFolderName = vbReplace(CollectionFolderName, " ", "")
                                                 CollectionFolderName = Collectionname & "_" & CollectionFolderName
                                             End If
                                             CollectionFolder = cpCore.addon_getPrivateFilesAddonPath() & CollectionFolderName & "\"
@@ -849,7 +856,7 @@ ErrorTrap:
                                             ' create a collection 'version' folder for these new files
                                             '
                                             TimeStamp = ""
-                                            NowTime = Now()
+                                            NowTime = DateTime.Now()
                                             NowPart = NowTime.Year
                                             TimeStamp &= NowPart.ToString()
                                             NowPart = NowTime.Month
@@ -883,13 +890,13 @@ ErrorTrap:
                                             '
                                             'hint = hint & ",500"
                                             For Each CDefSection In CollectionFile.DocumentElement.ChildNodes
-                                                Select Case LCase(CDefSection.Name)
+                                                Select Case vbLCase(CDefSection.Name)
                                                     Case "resource"
                                                         '
                                                         ' resource node, if executable node, save to RegisterList
                                                         '
                                                         'hint = hint & ",510"
-                                                        ResourceType = LCase(GetXMLAttribute(IsFound, CDefSection, "type", ""))
+                                                        ResourceType = vbLCase(GetXMLAttribute(IsFound, CDefSection, "type", ""))
                                                         Filename = Trim(GetXMLAttribute(IsFound, CDefSection, "name", ""))
                                                         PathFilename = CollectionVersionFolder & Filename
                                                         If Filename = "" Then
@@ -912,7 +919,7 @@ ErrorTrap:
                                                                     ' Executable resources - add to register list
                                                                     '
                                                                     'hint = hint & ",520"
-                                                                    If InStr(1, Return_RegisterList, PathFilename) <> 0 Then
+                                                                    If vbInstr(1, Return_RegisterList, PathFilename) <> 0 Then
                                                                         '
                                                                         ' file is already installed
                                                                         '
@@ -943,7 +950,7 @@ ErrorTrap:
                                                             If AOGuid = "" Then
                                                                 AOGuid = AOName
                                                             End If
-                                                            Select Case LCase(CDefInterfaces.Name)
+                                                            Select Case vbLCase(CDefInterfaces.Name)
                                                                 Case "page", "process"
                                                                     '
                                                                     ' Page Interface
@@ -951,7 +958,7 @@ ErrorTrap:
                                                                     'hint = hint & ",531"
                                                                     If True Then
                                                                         For Each PageInterface In CDefInterfaces.ChildNodes
-                                                                            Select Case LCase(PageInterface.Name)
+                                                                            Select Case vbLCase(PageInterface.Name)
                                                                                 Case "activexdll"
                                                                                     '
                                                                                     ' Compatibility load - these should all be execuatable resources
@@ -964,7 +971,7 @@ ErrorTrap:
                                                                                         ' filename is blank
                                                                                         '
                                                                                         'hint = hint & ",533"
-                                                                                    ElseIf InStr(1, Return_RegisterList, PathFilename) <> 0 Then
+                                                                                    ElseIf vbInstr(1, Return_RegisterList, PathFilename) <> 0 Then
                                                                                         '
                                                                                         ' file is already installed
                                                                                         '
@@ -1002,7 +1009,7 @@ ErrorTrap:
                                                             ChildCollectionGUID = CDefSection.InnerText
                                                         End If
                                                         Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, getCollection or importcollection, childCollectionName [" & ChildCollectionName & "], childCollectionGuid [" & ChildCollectionGUID & "]")
-                                                        If InStr(1, privateFolderPath, ChildCollectionGUID, vbTextCompare) = 0 Then
+                                                        If vbInstr(1, privateFolderPath, ChildCollectionGUID, vbTextCompare) = 0 Then
                                                             If ChildCollectionGUID = "" Then
                                                                 '
                                                                 ' Needs a GUID to install
@@ -1122,7 +1129,7 @@ ErrorTrap:
         '   ImportFromCollectionsGuidList - If this collection is from an import, this is the guid of the import.
         '=========================================================================================================================
         '
-        Friend Function installCollectionFromLocalRepo(ByVal builder As coreBuilderClass, ByRef return_IISResetRequired As Boolean, ByVal CollectionGuid As String, ByVal ignore_BuildVersion As String, ByRef return_ErrorMessage As String, ByRef return_RegisterList As String, ByVal ImportFromCollectionsGuidList As String, IsNewBuild As Boolean) As Boolean
+        Public Function installCollectionFromLocalRepo(ByVal builder As coreBuilderClass, ByRef return_IISResetRequired As Boolean, ByVal CollectionGuid As String, ByVal ignore_BuildVersion As String, ByRef return_ErrorMessage As String, ByRef return_RegisterList As String, ByVal ImportFromCollectionsGuidList As String, IsNewBuild As Boolean) As Boolean
             Try
                 '
                 Dim NodeName As String
@@ -1329,7 +1336,7 @@ ErrorTrap:
                                 ' Read in the help file
                                 '
                                 For Each file As IO.FileInfo In srcFileInfoArray
-                                    If LCase(file.Name) = "collection.hlp" Then
+                                    If vbLCase(file.Name) = "collection.hlp" Then
                                         CollectionHelp = CollectionHelp & cpCore.privateFiles.ReadFile(CollectionVersionFolder & file.Name)
                                     End If
                                 Next
@@ -1338,7 +1345,7 @@ ErrorTrap:
                                 '
                                 For Each file As IO.FileInfo In srcFileInfoArray
                                     Filename = file.Name
-                                    If LCase(Right(Filename, 4)) = ".xml" Then
+                                    If vbLCase(Right(Filename, 4)) = ".xml" Then
                                         '
                                         ' XML file -- open it to figure out if it is one we can use
                                         '
@@ -1358,7 +1365,7 @@ ErrorTrap:
                                         End Try
                                         If loadOK Then
                                             With Doc.DocumentElement
-                                                If (LCase(.Name) = LCase(CollectionFileRootNode)) Or (LCase(.Name) = LCase(CollectionFileRootNodeOld)) Then
+                                                If (LCase(.Name) = vbLCase(CollectionFileRootNode)) Or (LCase(.Name) = vbLCase(CollectionFileRootNodeOld)) Then
                                                     '
                                                     '------------------------------------------------------------------------------------------------------
                                                     ' Collection File - import from sub so it can be re-entrant
@@ -1386,7 +1393,7 @@ ErrorTrap:
                                                         If FileGuid = "" Then
                                                             FileGuid = Collectionname
                                                         End If
-                                                        If (LCase(CollectionGuid) <> LCase(FileGuid)) Then
+                                                        If (LCase(CollectionGuid) <> vbLCase(FileGuid)) Then
                                                             '
                                                             '
                                                             '
@@ -1415,19 +1422,19 @@ ErrorTrap:
                                                             ContentFileList = ""
                                                             ExecFileList = ""
                                                             For Each CDefSection In .ChildNodes
-                                                                Select Case LCase(CDefSection.Name)
+                                                                Select Case vbLCase(CDefSection.Name)
                                                                     Case "resource"
                                                                         '
                                                                         ' set wwwfilelist, contentfilelist, execfilelist
                                                                         '
-                                                                        ResourceType = LCase(GetXMLAttribute(IsFound, CDefSection, "type", ""))
-                                                                        ResourcePath = LCase(GetXMLAttribute(IsFound, CDefSection, "path", ""))
-                                                                        Filename = LCase(GetXMLAttribute(IsFound, CDefSection, "name", ""))
+                                                                        ResourceType = vbLCase(GetXMLAttribute(IsFound, CDefSection, "type", ""))
+                                                                        ResourcePath = vbLCase(GetXMLAttribute(IsFound, CDefSection, "path", ""))
+                                                                        Filename = vbLCase(GetXMLAttribute(IsFound, CDefSection, "name", ""))
                                                                         Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 1, resource found, name [" & Filename & "], type [" & ResourceType & "], path [" & ResourcePath & "]")
-                                                                        Filename = Replace(Filename, "/", "\")
+                                                                        Filename = vbReplace(Filename, "/", "\")
                                                                         SrcPath = ""
                                                                         DstPath = ResourcePath
-                                                                        Pos = InStr(1, Filename, "\")
+                                                                        Pos = vbInstr(1, Filename, "\")
                                                                         If Pos <> 0 Then
                                                                             '
                                                                             ' Source path is in filename
@@ -1447,7 +1454,7 @@ ErrorTrap:
                                                                             End If
                                                                         End If
 
-                                                                        DstFilePath = Replace(DstPath, "/", "\")
+                                                                        DstFilePath = vbReplace(DstPath, "/", "\")
                                                                         If DstFilePath = "\" Then
                                                                             DstFilePath = ""
                                                                         End If
@@ -1463,17 +1470,17 @@ ErrorTrap:
                                                                         Select Case ResourceType
                                                                             Case "www"
                                                                                 wwwFileList = wwwFileList & vbCrLf & DstFilePath & Filename
-                                                                                Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, copying file to www, src [" & CollectionVersionFolder & SrcPath & "], dst [" & cpCore.cluster.config.clusterPhysicalPath & cpCore.appConfig.appRootFilesPath & DstFilePath & "].")
+                                                                                Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, copying file to www, src [" & CollectionVersionFolder & SrcPath & "], dst [" & cpCore.serverConfig.clusterPath & cpCore.appConfig.appRootFilesPath & DstFilePath & "].")
                                                                                 Call cpCore.privateFiles.copyFile(CollectionVersionFolder & SrcPath & Filename, DstFilePath & Filename, cpCore.appRootFiles)
-                                                                                If LCase(Right(Filename, 4)) = ".zip" Then
-                                                                                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, unzipping www file [" & cpCore.cluster.config.clusterPhysicalPath & cpCore.appConfig.appRootFilesPath & DstFilePath & Filename & "].")
+                                                                                If vbLCase(Right(Filename, 4)) = ".zip" Then
+                                                                                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, unzipping www file [" & cpCore.serverConfig.clusterPath & cpCore.appConfig.appRootFilesPath & DstFilePath & Filename & "].")
                                                                                     Call cpCore.privateFiles.UnzipFile(DstFilePath & Filename)
                                                                                 End If
                                                                             Case "file", "content"
                                                                                 ContentFileList = ContentFileList & vbCrLf & DstFilePath & Filename
                                                                                 Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, copying file to content, src [" & CollectionVersionFolder & SrcPath & "], dst [" & DstFilePath & "].")
                                                                                 Call cpCore.privateFiles.copyFile(CollectionVersionFolder & SrcPath & Filename, DstFilePath & Filename, cpCore.cdnFiles)
-                                                                                If LCase(Right(Filename, 4)) = ".zip" Then
+                                                                                If vbLCase(Right(Filename, 4)) = ".zip" Then
                                                                                     Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, unzipping content file [" & DstFilePath & Filename & "].")
                                                                                     Call cpCore.cdnFiles.UnzipFile(DstFilePath & Filename)
                                                                                 End If
@@ -1576,7 +1583,7 @@ ErrorTrap:
                                                                 ' ----- gather help nodes
                                                                 '
                                                                 For Each CDefSection In .ChildNodes
-                                                                    If LCase(CDefSection.Name) = "help" Then
+                                                                    If vbLCase(CDefSection.Name) = "help" Then
                                                                         CollectionHelp = CollectionHelp & CDefSection.InnerText
                                                                     End If
                                                                     If (CollectionHelpLink = "") And (LCase(CDefSection.Name) = "helplink") Then
@@ -1647,13 +1654,13 @@ ErrorTrap:
                                                                         For Ptr = 0 To UBound(Files)
                                                                             PathFilename = Files(Ptr)
                                                                             If Trim(PathFilename) <> "" Then
-                                                                                PathFilename = Replace(PathFilename, "/", "\")
+                                                                                PathFilename = vbReplace(PathFilename, "/", "\")
                                                                                 FileExt = ""
                                                                                 Filename = PathFilename
                                                                                 FilePath = ""
                                                                                 Pos = InStrRev(PathFilename, ".")
                                                                                 If Pos > 0 Then
-                                                                                    FileExt = LCase(Mid(PathFilename, Pos + 1))
+                                                                                    FileExt = vbLCase(Mid(PathFilename, Pos + 1))
                                                                                 End If
                                                                                 Pos = InStrRev(PathFilename, "\")
                                                                                 If Pos > 0 Then
@@ -1705,7 +1712,7 @@ ErrorTrap:
                                                                     CollectionWrapper = ""
                                                                     Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 2")
                                                                     For Each CDefSection In .ChildNodes
-                                                                        Select Case LCase(CDefSection.Name)
+                                                                        Select Case vbLCase(CDefSection.Name)
                                                                             Case "contensivecdef"
                                                                                 '
                                                                                 ' old cdef xection -- take the inner
@@ -1761,7 +1768,7 @@ ErrorTrap:
                                                                         If loadOK Then
                                                                             With NavDoc.DocumentElement
                                                                                 For Each CDefNode In .ChildNodes
-                                                                                    Select Case LCase(CDefNode.Name)
+                                                                                    Select Case vbLCase(CDefNode.Name)
                                                                                         Case "cdef"
                                                                                             ContentName = GetXMLAttribute(IsFound, CDefNode, "name", "")
                                                                                             '
@@ -1812,14 +1819,14 @@ ErrorTrap:
                                                                     '
                                                                     Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 3")
                                                                     For Each CDefSection In .ChildNodes
-                                                                        Select Case LCase(CDefSection.Name)
+                                                                        Select Case vbLCase(CDefSection.Name)
                                                                             Case "data"
                                                                                 '
                                                                                 ' import content
                                                                                 '   This can only be done with matching guid
                                                                                 '
                                                                                 For Each ContentNode In CDefSection.ChildNodes
-                                                                                    If LCase(ContentNode.Name) = "record" Then
+                                                                                    If vbLCase(ContentNode.Name) = "record" Then
                                                                                         '
                                                                                         ' Data.Record node
                                                                                         '
@@ -1907,7 +1914,7 @@ ErrorTrap:
                                                                     '
                                                                     Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 4")
                                                                     For Each CDefSection In .ChildNodes
-                                                                        Select Case LCase(CDefSection.Name)
+                                                                        Select Case vbLCase(CDefSection.Name)
                                                                             Case "data"
                                                                                 '
                                                                                 ' import content
@@ -1916,7 +1923,7 @@ ErrorTrap:
                                                                                 'OtherXML = OtherXML & vbCrLf & CDefSection.xml
                                                                                 '
                                                                                 For Each ContentNode In CDefSection.ChildNodes
-                                                                                    If LCase(ContentNode.Name) = "record" Then
+                                                                                    If vbLCase(ContentNode.Name) = "record" Then
                                                                                         '
                                                                                         ' Data.Record node
                                                                                         '
@@ -1942,12 +1949,12 @@ ErrorTrap:
                                                                                                     ' Update the record
                                                                                                     '
                                                                                                     For Each FieldNode In ContentNode.ChildNodes
-                                                                                                        If LCase(FieldNode.Name) = "field" Then
+                                                                                                        If vbLCase(FieldNode.Name) = "field" Then
                                                                                                             IsFieldFound = False
-                                                                                                            FieldName = LCase(GetXMLAttribute(IsFound, FieldNode, "name", ""))
+                                                                                                            FieldName = vbLCase(GetXMLAttribute(IsFound, FieldNode, "name", ""))
                                                                                                             For Each keyValuePair In CDef.fields
                                                                                                                 Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
-                                                                                                                If LCase(field.nameLc) = FieldName Then
+                                                                                                                If vbLCase(field.nameLc) = FieldName Then
                                                                                                                     fieldTypeId = field.fieldTypeId
                                                                                                                     FieldLookupContentID = field.lookupContentID
                                                                                                                     IsFieldFound = True
@@ -1956,7 +1963,7 @@ ErrorTrap:
                                                                                                             Next
                                                                                                             'For Ptr = 0 To CDef.fields.count - 1
                                                                                                             '    CDefField = CDef.fields(Ptr)
-                                                                                                            '    If LCase(CDefField.Name) = FieldName Then
+                                                                                                            '    If vbLCase(CDefField.Name) = FieldName Then
                                                                                                             '        fieldType = CDefField.fieldType
                                                                                                             '        FieldLookupContentID = CDefField.LookupContentID
                                                                                                             '        IsFieldFound = True
@@ -2001,7 +2008,7 @@ ErrorTrap:
                                                                                                                                     End If
                                                                                                                                 End If
                                                                                                                             End If
-                                                                                                                        ElseIf (IsNumeric(FieldValue)) Then
+                                                                                                                        ElseIf (vbIsNumeric(FieldValue)) Then
                                                                                                                             '
                                                                                                                             ' must be lookup list
                                                                                                                             '
@@ -2044,7 +2051,7 @@ ErrorTrap:
                                                                     '
                                                                     Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 5")
                                                                     For Each CDefSection In .ChildNodes
-                                                                        Select Case LCase(CDefSection.Name)
+                                                                        Select Case vbLCase(CDefSection.Name)
                                                                             Case "cdef", "data", "help", "resource", "helplink"
                                                                                 '
                                                                                 ' ignore - processed in previous passes
@@ -2217,7 +2224,7 @@ ErrorTrap:
                                                                                 '
                                                                                 ' otherxml
                                                                                 '
-                                                                                If LCase(CDefSection.OuterXml) <> "<otherxml></otherxml>" Then
+                                                                                If vbLCase(CDefSection.OuterXml) <> "<otherxml></otherxml>" Then
                                                                                     OtherXML = OtherXML & vbCrLf & CDefSection.OuterXml
                                                                                 End If
                                                                             Case Else
@@ -2239,7 +2246,7 @@ ErrorTrap:
                                                                     '
                                                                     Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 6")
                                                                     For Each CDefSection In .ChildNodes
-                                                                        Select Case LCase(CDefSection.Name)
+                                                                        Select Case vbLCase(CDefSection.Name)
                                                                             Case "addon", "add-on"
                                                                                 '
                                                                                 ' Add-on Node, do part 1 of 2
@@ -2307,7 +2314,7 @@ ErrorTrap:
         ''' Return the collectionList file stored in the root of the addon folder.
         ''' </summary>
         ''' <returns></returns>
-        Friend Function getCollectionListFile() As String
+        Public Function getCollectionListFile() As String
             Dim returnXml As String = ""
             Try
                 '
@@ -2328,12 +2335,12 @@ ErrorTrap:
                     If FolderList.Count > 0 Then
                         For Each folder As IO.DirectoryInfo In FolderList
                             FolderName = folder.Name
-                            Pos = InStr(1, FolderName, vbTab)
+                            Pos = vbInstr(1, FolderName, vbTab)
                             If Pos > 1 Then
                                 'hint = hint & ",800"
                                 FolderName = Mid(FolderName, 1, Pos - 1)
                                 If Len(FolderName) > 34 Then
-                                    If LCase(Left(FolderName, 4)) <> "temp" Then
+                                    If vbLCase(Left(FolderName, 4)) <> "temp" Then
                                         CollectionGuid = Right(FolderName, 32)
                                         Collectionname = Left(FolderName, Len(FolderName) - Len(CollectionGuid) - 1)
                                         CollectionGuid = Mid(CollectionGuid, 1, 8) & "-" & Mid(CollectionGuid, 9, 4) & "-" & Mid(CollectionGuid, 13, 4) & "-" & Mid(CollectionGuid, 17, 4) & "-" & Mid(CollectionGuid, 21)
@@ -2391,28 +2398,28 @@ ErrorTrap:
                 Call appendInstallLog("Server", "", "UpdateConfig, Error loading Collections.xml file.")
             End Try
             If loadOK Then
-                If LCase(Doc.DocumentElement.Name) <> LCase(CollectionListRootNode) Then
+                If vbLCase(Doc.DocumentElement.Name) <> vbLCase(CollectionListRootNode) Then
                     Call appendInstallLog("Server", "", "UpdateConfig, The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.")
                 Else
                     With Doc.DocumentElement
-                        If LCase(.Name) = "collectionlist" Then
+                        If vbLCase(.Name) = "collectionlist" Then
                             CollectionFound = False
                             For Each LocalListNode In .ChildNodes
-                                Select Case LCase(LocalListNode.Name)
+                                Select Case vbLCase(LocalListNode.Name)
                                     Case "collection"
                                         LocalGuid = ""
                                         For Each CollectionNode In LocalListNode.ChildNodes
-                                            Select Case LCase(CollectionNode.Name)
+                                            Select Case vbLCase(CollectionNode.Name)
                                                 Case "guid"
                                                     '
-                                                    LocalGuid = LCase(CollectionNode.InnerText)
+                                                    LocalGuid = vbLCase(CollectionNode.InnerText)
                                                     Exit For
                                             End Select
                                         Next
-                                        If LCase(LocalGuid) = LCase(CollectionGuid) Then
+                                        If vbLCase(LocalGuid) = vbLCase(CollectionGuid) Then
                                             CollectionFound = True
                                             For Each CollectionNode In LocalListNode.ChildNodes
-                                                Select Case LCase(CollectionNode.Name)
+                                                Select Case vbLCase(CollectionNode.Name)
                                                     Case "name"
                                                         CollectionNode.InnerText = Collectionname
                                                     Case "lastchangedate"
@@ -2478,7 +2485,7 @@ ErrorTrap:
         ''' <param name="return_CollectionPath"></param>
         ''' <param name="return_LastChagnedate"></param>
         ''' <param name="return_CollectionName"></param>
-        Friend Sub GetCollectionConfig(ByVal CollectionGuid As String, ByRef return_CollectionPath As String, ByRef return_LastChagnedate As Date, ByRef return_CollectionName As String)
+        Public Sub GetCollectionConfig(ByVal CollectionGuid As String, ByRef return_CollectionPath As String, ByRef return_LastChagnedate As Date, ByRef return_CollectionName As String)
             Try
                 Dim LocalPath As String
                 Dim LocalGuid As String
@@ -2505,12 +2512,12 @@ ErrorTrap:
                     loadOK = False
                 End Try
                 If loadOK Then
-                    If LCase(Doc.DocumentElement.Name) <> LCase(CollectionListRootNode) Then
+                    If vbLCase(Doc.DocumentElement.Name) <> vbLCase(CollectionListRootNode) Then
                         Call appendInstallLog("Server", "GetCollectionConfig", "Hint=[" & hint & "], The Collections.xml file has an invalid root node")
                     Else
                         With Doc.DocumentElement
                             If True Then
-                                'If LCase(.name) <> "collectionlist" Then
+                                'If vbLCase(.name) <> "collectionlist" Then
                                 '    Call AppendClassLogFile("Server", "GetCollectionConfig", "Collections.xml file error, root node was not collectionlist, [" & .name & "].")
                                 'Else
                                 CollectionFound = False
@@ -2518,27 +2525,27 @@ ErrorTrap:
                                 For Each LocalListNode In .ChildNodes
                                     LocalName = "no name found"
                                     LocalPath = ""
-                                    Select Case LCase(LocalListNode.Name)
+                                    Select Case vbLCase(LocalListNode.Name)
                                         Case "collection"
                                             LocalGuid = ""
                                             For Each CollectionNode In LocalListNode.ChildNodes
-                                                Select Case LCase(CollectionNode.Name)
+                                                Select Case vbLCase(CollectionNode.Name)
                                                     Case "name"
                                                         '
-                                                        LocalName = LCase(CollectionNode.InnerText)
+                                                        LocalName = vbLCase(CollectionNode.InnerText)
                                                     Case "guid"
                                                         '
-                                                        LocalGuid = LCase(CollectionNode.InnerText)
+                                                        LocalGuid = vbLCase(CollectionNode.InnerText)
                                                     Case "path"
                                                         '
-                                                        CollectionPath = LCase(CollectionNode.InnerText)
+                                                        CollectionPath = vbLCase(CollectionNode.InnerText)
                                                     Case "lastchangedate"
                                                         LastChangeDate = EncodeDate(CollectionNode.InnerText)
                                                 End Select
                                             Next
                                     End Select
                                     'hint = hint & ",checking node [" & LocalName & "]"
-                                    If LCase(CollectionGuid) = LocalGuid Then
+                                    If vbLCase(CollectionGuid) = LocalGuid Then
                                         return_CollectionPath = CollectionPath
                                         return_LastChagnedate = LastChangeDate
                                         return_CollectionName = LocalName
@@ -2560,13 +2567,13 @@ ErrorTrap:
         ' Installs Addons in a source folder
         '======================================================================================================
         '
-        Friend Function InstallCollectionFromPrivateFolder(builder As coreBuilderClass, ignore_buildVersion As String, ByVal privateFolder As String, ByRef return_IISResetRequired As Boolean, ByVal TargetInstallAppName As String, ByRef return_ErrorMessage As String, ByRef return_CollectionGUID As String, IsNewBuild As Boolean) As Boolean
+        Public Function InstallCollectionFromPrivateFolder(builder As coreBuilderClass, ignore_buildVersion As String, ByVal privateFolder As String, ByRef return_IISResetRequired As Boolean, ByVal TargetInstallAppName As String, ByRef return_ErrorMessage As String, ByRef return_CollectionGUID As String, IsNewBuild As Boolean) As Boolean
             Dim returnSuccess As Boolean = False
             Try
                 Dim CollectionLastChangeDate As Date
                 Dim ignoreRefactorOut As String
                 '
-                CollectionLastChangeDate = Now()
+                CollectionLastChangeDate = DateTime.Now()
                 returnSuccess = BuildLocalCollectionFolder(privateFolder, return_IISResetRequired, ignoreRefactorOut, CollectionLastChangeDate, return_CollectionGUID, return_ErrorMessage, False)
                 If Not returnSuccess Then
                     '
@@ -2748,9 +2755,9 @@ ErrorTrap:
         '    If Not (Node.Attributes Is Nothing) Then
         '        ResultNode = Node.Attributes.GetNamedItem(Name)
         '        If (ResultNode Is Nothing) Then
-        '            LcaseName = LCase(Name)
+        '            LcaseName = vbLCase(Name)
         '            For Each NodeAttribute In Node.Attributes
-        '                If LCase(NodeAttribute.Name) = LcaseName Then
+        '                If vbLCase(NodeAttribute.Name) = LcaseName Then
         '                    GetXMLAttribute = NodeAttribute.Value
         '                    Found = True
         '                    Exit For
@@ -2852,7 +2859,7 @@ ErrorTrap:
                 Dim Doc As XmlDocument
                 Dim navAdminOnly As Boolean
                 '
-                Basename = LCase(AddonNode.Name)
+                Basename = vbLCase(AddonNode.Name)
                 If (Basename = "page") Or (Basename = "process") Or (Basename = "addon") Or (Basename = "add-on") Then
                     addonName = GetXMLAttribute(IsFound, AddonNode, "name", "No Name")
                     If addonName = "" Then
@@ -2920,7 +2927,7 @@ ErrorTrap:
                         NavDeveloperOnly = True
                         If AddonNode.ChildNodes.Count > 0 Then
                             For Each PageInterface In AddonNode.ChildNodes
-                                Select Case LCase(PageInterface.Name)
+                                Select Case vbLCase(PageInterface.Name)
                                     Case "activexdll"
                                         '
                                         ' This is handled in BuildLocalCollectionFolder
@@ -2930,7 +2937,7 @@ ErrorTrap:
                                         ' list of editors
                                         '
                                         For Each TriggerNode In PageInterface.ChildNodes
-                                            Select Case LCase(TriggerNode.Name)
+                                            Select Case vbLCase(TriggerNode.Name)
                                                 Case "type"
                                                     fieldType = TriggerNode.InnerText
                                                     fieldTypeID = cpCore.db.getRecordID("Content Field Types", fieldType)
@@ -2954,7 +2961,7 @@ ErrorTrap:
                                         ' list of events that trigger a process run for this addon
                                         '
                                         For Each TriggerNode In PageInterface.ChildNodes
-                                            Select Case LCase(TriggerNode.Name)
+                                            Select Case vbLCase(TriggerNode.Name)
                                                 Case "contentchange"
                                                     TriggerContentID = 0
                                                     ContentNameorGuid = TriggerNode.InnerText
@@ -3018,7 +3025,7 @@ ErrorTrap:
                                         ScriptingCode = ""
                                         'Call cpCore.app.csv_SetCS(CS, "ScriptingCode", ScriptingCode)
                                         For Each ScriptingNode In PageInterface.ChildNodes
-                                            Select Case LCase(ScriptingNode.Name)
+                                            Select Case vbLCase(ScriptingNode.Name)
                                                 Case "code"
                                                     ScriptingCode = ScriptingCode & ScriptingNode.InnerText
                                                 Case "includemodule"
@@ -3155,10 +3162,10 @@ ErrorTrap:
                                         ' import exclusive stylesheet if more then whitespace
                                         '
                                         test = PageInterface.InnerText
-                                        test = Replace(test, " ", "")
-                                        test = Replace(test, vbCr, "")
-                                        test = Replace(test, vbLf, "")
-                                        test = Replace(test, vbTab, "")
+                                        test = vbReplace(test, " ", "")
+                                        test = vbReplace(test, vbCr, "")
+                                        test = vbReplace(test, vbLf, "")
+                                        test = vbReplace(test, vbTab, "")
                                         If test <> "" Then
                                             StyleSheet = StyleSheet & vbCrLf & PageInterface.InnerText
                                         End If
@@ -3190,8 +3197,8 @@ ErrorTrap:
                                             '
                                             ' Icons can be either in the root of the website or in content files
                                             '
-                                            FieldValue = Replace(FieldValue, "\", "/")   ' make it a link, not a file
-                                            If InStr(1, FieldValue, "://") <> 0 Then
+                                            FieldValue = vbReplace(FieldValue, "\", "/")   ' make it a link, not a file
+                                            If vbInstr(1, FieldValue, "://") <> 0 Then
                                                 '
                                                 ' the link is an absolute URL, leave it link this
                                                 '
@@ -3298,7 +3305,7 @@ ErrorTrap:
                                         '
                                         If (TypeOf (TestObject) Is XmlElement) Then
                                             SrcMainNode = DirectCast(TestObject, XmlElement)
-                                            If LCase(SrcMainNode.Name) = "addon" Then
+                                            If vbLCase(SrcMainNode.Name) = "addon" Then
                                                 SrcAddonGuid = SrcMainNode.GetAttribute("guid")
                                                 SrcAddonName = SrcMainNode.GetAttribute("name")
                                                 If SrcMainNode.HasChildNodes Then
@@ -3313,7 +3320,7 @@ ErrorTrap:
                                                                 '    Err.Clear
                                                                 'Else
                                                                 'On Error GoTo ErrorTrap
-                                                                If LCase(SrcAddonNode.Name) = "includeaddon" Then
+                                                                If vbLCase(SrcAddonNode.Name) = "includeaddon" Then
                                                                     TestGuid = SrcAddonNode.GetAttribute("guid")
                                                                     TestName = SrcAddonNode.GetAttribute("name")
                                                                     Criteria = ""
@@ -3439,7 +3446,7 @@ ErrorTrap:
             Dim Doc As XmlDocument
             Dim navAdminOnly As Boolean
             '
-            Basename = LCase(AddonNode.Name)
+            Basename = vbLCase(AddonNode.Name)
             If (Basename = "page") Or (Basename = "process") Or (Basename = "addon") Or (Basename = "add-on") Then
                 AOName = GetXMLAttribute(IsFound, AddonNode, "name", "No Name")
                 If AOName = "" Then
@@ -3477,7 +3484,7 @@ ErrorTrap:
                     NavDeveloperOnly = True
                     If AddonNode.ChildNodes.Count > 0 Then
                         For Each PageInterface In AddonNode.ChildNodes
-                            Select Case LCase(PageInterface.Name)
+                            Select Case vbLCase(PageInterface.Name)
                                 Case "includeaddon", "includeadd-on", "include addon", "include add-on"
                                     '
                                     ' include add-ons - NOTE - import collections must be run before interfaces
@@ -3576,7 +3583,7 @@ ErrorTrap:
         '            '
         '            Call AppendClassLogFile("Server", "RegisterAddonFolder", "Collection.xml loaded ok")
         '            '
-        '            If LCase(Doc.DocumentElement.Name) <> LCase(CollectionListRootNode) Then
+        '            If vbLCase(Doc.DocumentElement.Name) <> vbLCase(CollectionListRootNode) Then
         '                Call AppendClassLogFile("Server", "", "RegisterAddonFolder, Hint=[" & hint & "], The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.")
         '            Else
         '                '
@@ -3584,7 +3591,7 @@ ErrorTrap:
         '                '
         '                With Doc.DocumentElement
         '                    If True Then
-        '                        'If LCase(.name) <> "collectionlist" Then
+        '                        'If vbLCase(.name) <> "collectionlist" Then
         '                        '    Call AppendClassLogFile("Server", "", "RegisterAddonFolder, basename was not collectionlist, [" & .name & "].")
         '                        'Else
         '                        NodeCnt = 0
@@ -3597,20 +3604,20 @@ ErrorTrap:
         '                            LocalGuid = ""
         '                            LocalName = "no name found"
         '                            LocalPath = ""
-        '                            Select Case LCase(LocalListNode.Name)
+        '                            Select Case vbLCase(LocalListNode.Name)
         '                                Case "collection"
         '                                    LocalGuid = ""
         '                                    For Each CollectionNode In LocalListNode.ChildNodes
-        '                                        Select Case LCase(CollectionNode.Name)
+        '                                        Select Case vbLCase(CollectionNode.Name)
         '                                            Case "name"
         '                                                '
-        '                                                LocalName = LCase(CollectionNode.InnerText)
+        '                                                LocalName = vbLCase(CollectionNode.InnerText)
         '                                            Case "guid"
         '                                                '
-        '                                                LocalGuid = LCase(CollectionNode.InnerText)
+        '                                                LocalGuid = vbLCase(CollectionNode.InnerText)
         '                                            Case "path"
         '                                                '
-        '                                                CollectionPath = LCase(CollectionNode.InnerText)
+        '                                                CollectionPath = vbLCase(CollectionNode.InnerText)
         '                                            Case "lastchangedate"
         '                                                LastChangeDate = EncodeDate(CollectionNode.InnerText)
         '                                        End Select
@@ -3627,7 +3634,7 @@ ErrorTrap:
         '                                Call AppendClassLogFile("Server", "RegisterAddonFolder", "no collection path, skipping")
         '                                '
         '                            Else
-        '                                CollectionPath = LCase(CollectionPath)
+        '                                CollectionPath = vbLCase(CollectionPath)
         '                                CollectionRootPath = CollectionPath
         '                                Pos = InStrRev(CollectionRootPath, "\")
         '                                If Pos <= 0 Then
@@ -3788,7 +3795,7 @@ ErrorTrap:
         '            Dim SupportInstalledByCollectionID As Boolean
         '            '
         '            If Trim(EntryName) <> "" Then
-        '                If LCase(EntryName) = "manage add-ons" Then
+        '                If vbLCase(EntryName) = "manage add-ons" Then
         '                    EntryName = EntryName
         '                End If
         '                '
@@ -4078,7 +4085,7 @@ ErrorTrap:
                     Dim ignoreRefactor As Boolean
                     '
                     If True Then
-                        baseCollectionXml = cpCore.cluster.clusterFiles.ReadFile("clibResources\baseCollection.xml")
+                        baseCollectionXml = cpCore.cluster.localClusterFiles.ReadFile("clibResources\baseCollection.xml")
                         Call installCollection_LoadXmlToMiniCollection(baseCollectionXml, CollectionNew, True, True, isNewBuild, CollectionWorking)
                         Call installCollection_BuildDbFromMiniCollection(CollectionNew, ignoreRefactor, cpCore.db.dataBuildVersion, isNewBuild)
                         Call cpCore.db.executeSql("update ccfields set IsBaseField=1")
@@ -4089,7 +4096,7 @@ ErrorTrap:
                 ' now treat as a regular collection and install - to pickup everything else 
                 '
                 cpCore.privateFiles.createPath(tmpFolderPath)
-                cpCore.cluster.clusterFiles.copyFile("clibResources\baseCollection.xml", tmpFolderPath & "baseCollection.xml", cpCore.privateFiles)
+                cpCore.cluster.localClusterFiles.copyFile("clibResources\baseCollection.xml", tmpFolderPath & "baseCollection.xml", cpCore.privateFiles)
                 If Not InstallCollectionFromPrivateFolder(builder, ignoreString, tmpFolderPath, ignoreBoolean, cpCore.appConfig.name, returnErrorMessage, ignoreString, isNewBuild) Then
                     Throw New ApplicationException(returnErrorMessage)
                 End If
@@ -4128,7 +4135,7 @@ ErrorTrap:
         '
         '=========================================================================================
         '
-        Friend Sub installCollection_BuildDbFromXmlData(ByVal XMLText As String, ByRef return_IISResetRequired As Boolean, isNewBuild As Boolean, isBaseCollection As Boolean)
+        Public Sub installCollection_BuildDbFromXmlData(ByVal XMLText As String, ByRef return_IISResetRequired As Boolean, isNewBuild As Boolean, isBaseCollection As Boolean)
             Try
                 '
                 Dim miniCollectionWorking As MiniCollectionClass
@@ -4233,7 +4240,7 @@ ErrorTrap:
                     With srcXmlDom.DocumentElement
                         'hint = "verify basename"
                         If (LCase(.Name) <> CollectionFileRootNode) And (LCase(.Name) <> "contensivecdef") Then
-                            Call Err.Raise(KmaErrorInternal, "dll", "the archive file has a syntax error. Application name must be the first node.")
+                            Call Err.Raise(ignoreInteger, "dll", "the archive file has a syntax error. Application name must be the first node.")
                         Else
                             returnCollection.isBaseCollection = IsccBaseFile
                             '
@@ -4263,7 +4270,7 @@ ErrorTrap:
                             '
                             For Each CDef_Node In .ChildNodes
                                 'isCdefTarget = False
-                                NodeName = LCase(CDef_Node.Name)
+                                NodeName = vbLCase(CDef_Node.Name)
                                 'hint = "read node " & NodeName
                                 Select Case NodeName
                                     Case "cdef"
@@ -4271,7 +4278,7 @@ ErrorTrap:
                                         ' Content Definitions
                                         '
                                         ContentName = GetXMLAttribute(Found, CDef_Node, "name", "")
-                                        contentNameLc = LCase(ContentName)
+                                        contentNameLc = vbLCase(ContentName)
                                         If ContentName = "" Then
                                             cpCore.handleLegacyError3(cpCore.appConfig.name, "collection file contains a CDEF node with no name attribute. This is not allowed.", "dll", "builderClass", "UpgradeCDef_LoadDataToCollection", 0, "", "", False, True, "")
                                         Else
@@ -4335,9 +4342,9 @@ ErrorTrap:
                                                     .DefaultSortMethod = GetXMLAttribute(Found, CDef_Node, "DefaultSortMethod", DefaultCDef.DefaultSortMethod)
                                                     If (.DefaultSortMethod = "") Or (LCase(.DefaultSortMethod) = "name") Then
                                                         .DefaultSortMethod = "By Name"
-                                                    ElseIf LCase(.DefaultSortMethod) = "sortorder" Then
+                                                    ElseIf vbLCase(.DefaultSortMethod) = "sortorder" Then
                                                         .DefaultSortMethod = "By Alpha Sort Order Field"
-                                                    ElseIf LCase(.DefaultSortMethod) = "date" Then
+                                                    ElseIf vbLCase(.DefaultSortMethod) = "date" Then
                                                         .DefaultSortMethod = "By Date"
                                                     End If
                                                     .DeveloperOnly = GetXMLAttributeBoolean(Found, CDef_Node, "DeveloperOnly", DefaultCDef.DeveloperOnly)
@@ -4399,7 +4406,7 @@ ErrorTrap:
                                                             Dim fieldTypeName As String = GetXMLAttribute(Found, CDefChildNode, "FieldType", defaultFieldTypeName)
                                                             .fieldTypeId = cpCore.db.getFieldTypeIdFromFieldTypeName(fieldTypeName)
                                                             'FieldTypeDescriptor = GetXMLAttribute(Found, CDefChildNode, "FieldType", DefaultCDefField.fieldType)
-                                                            'If IsNumeric(FieldTypeDescriptor) Then
+                                                            'If vbIsNumeric(FieldTypeDescriptor) Then
                                                             '    .fieldType = EncodeInteger(FieldTypeDescriptor)
                                                             'Else
                                                             '    .fieldType = cpCore.app.csv_GetFieldTypeByDescriptor(FieldTypeDescriptor)
@@ -4511,9 +4518,9 @@ ErrorTrap:
                                         ' make a local out of getdatabuildversion
                                         '
                                         If Not IsNavigator Then
-                                            MenuKey = LCase(MenuName)
+                                            MenuKey = vbLCase(MenuName)
                                         ElseIf False Then
-                                            MenuKey = LCase("nav." & menuNameSpace & "." & MenuName)
+                                            MenuKey = vbLCase("nav." & menuNameSpace & "." & MenuName)
                                         Else
                                             MenuKey = MenuGuid
                                         End If
@@ -4788,9 +4795,9 @@ ErrorTrap:
                         With workingCdef
                             If .dataChanged Then
                                 Call appendInstallLog(cpCore.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "creating sql table [" & .ContentTableName & "], datasource [" & .ContentDataSourceName & "]")
-                                If LCase(.ContentDataSourceName) = "default" Or .ContentDataSourceName = "" Then
+                                If vbLCase(.ContentDataSourceName) = "default" Or .ContentDataSourceName = "" Then
                                     TableName = .ContentTableName
-                                    If InStr(1, "," & UsedTables & ",", "," & TableName & ",", vbTextCompare) <> 0 Then
+                                    If vbInstr(1, "," & UsedTables & ",", "," & TableName & ",", vbTextCompare) <> 0 Then
                                         TableName = TableName
                                     Else
                                         UsedTables = UsedTables & "," & TableName
@@ -4823,7 +4830,7 @@ ErrorTrap:
                             With workingCdef
                                 Call appendInstallLog(cpCore.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "adding cdef name [" & .Name & "]")
                                 ContentName = .Name
-                                If InStr(1, "," & UsedTables & ",", "," & ContentName & ",", vbTextCompare) = 0 Then
+                                If vbInstr(1, "," & UsedTables & ",", "," & ContentName & ",", vbTextCompare) = 0 Then
                                     SQL = "Insert into ccContent (name,active,createkey)values(" & cpCore.db.encodeSQLText(ContentName) & ",1,0);"
                                     Call cpCore.db.executeSql(SQL)
                                     UsedTables = UsedTables & "," & ContentName
@@ -4858,7 +4865,7 @@ ErrorTrap:
                         Dim workingCdef As coreMetaDataClass.CDefClass = keypairvalue.Value
                         ContentName = workingCdef.Name
                         With workingCdef
-                            ContentName = LCase(.Name)
+                            ContentName = vbLCase(.Name)
                             If ContentName = "content" Then
                                 Call appendInstallLog(cpCore.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "adding cdef [" & .Name & "]")
                                 '
@@ -4887,7 +4894,7 @@ ErrorTrap:
                                 If ContentName.ToLower() = "people" Then
                                     ContentName = ContentName
                                 End If
-                                If LCase(ContentName) <> "content" Then
+                                If vbLCase(ContentName) <> "content" Then
                                     Call appendInstallLog(cpCore.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "adding cdef [" & .Name & "]")
                                     '
                                     ' stop the errors here, so a bad field does not block the upgrade
@@ -4980,7 +4987,7 @@ ErrorTrap:
                             If Ptr = 140 Then
                                 Ptr = Ptr
                             End If
-                            If LCase(.Name) = "manage add-ons" And .IsNavigator Then
+                            If vbLCase(.Name) = "manage add-ons" And .IsNavigator Then
                                 .Name = .Name
                             End If
                             If .dataChanged Then
@@ -5097,8 +5104,8 @@ ErrorTrap:
                                 If .dataChanged Then
                                     NewStyleName = .Name
                                     NewStyleValue = .Copy
-                                    NewStyleValue = Replace(NewStyleValue, "}", "")
-                                    NewStyleValue = Replace(NewStyleValue, "{", "")
+                                    NewStyleValue = vbReplace(NewStyleValue, "}", "")
+                                    NewStyleValue = vbReplace(NewStyleValue, "{", "")
                                     If SiteStyleCnt > 0 Then
                                         For SiteStylePtr = 0 To SiteStyleCnt - 1
                                             StyleLine = SiteStyleSplit(SiteStylePtr)
@@ -5111,7 +5118,7 @@ ErrorTrap:
                                                     '
                                                     PosNameLineStart = PosNameLineStart + 2
                                                     TestStyleName = Trim(Mid(StyleLine, PosNameLineStart, PosNameLineEnd - PosNameLineStart))
-                                                    If LCase(TestStyleName) = LCase(NewStyleName) Then
+                                                    If vbLCase(TestStyleName) = vbLCase(NewStyleName) Then
                                                         Found = True
                                                         If .Overwrite Then
                                                             '
@@ -5245,12 +5252,14 @@ ErrorTrap:
                                 '
                                 ' Can not update a base content with a non-base content
                                 '
-                                cpCore.handleLegacyError3(cpCore.appConfig.name, "Warning: An attempt was made to update Content Definition [" & .Name & "] from base to non-base. This should only happen when a base cdef is removed from the base collection.", "dll", "builderClass", "UpgradeCDef_BuildDbFromCollection_AddCDefToDb", 0, "", "", False, True, "")
+                                cpCore.handleExceptionAndNoThrow(New ApplicationException("Warning: An attempt was made to update Content Definition [" & .Name & "] from base to non-base. This should only happen when a base cdef is removed from the base collection. The update was ignored."))
+                                .IsBaseContent = ContentIsBaseContent
+                                'cpCore.handleLegacyError3(cpCore.appConfig.name, "", "dll", "builderClass", "UpgradeCDef_BuildDbFromCollection_AddCDefToDb", 0, "", "", False, True, "")
                             End If
                             '
                             ' ----- update definition (use SingleRecord as an update flag)
                             '
-                            Call builder.metaData_CreateContent4(True _
+                            Call cpCore.metaData.metaData_CreateContent4(True _
                                     , .ContentDataSourceName _
                                     , .ContentTableName _
                                     , ContentName _
@@ -5317,7 +5326,7 @@ ErrorTrap:
                                 Dim field As coreMetaDataClass.CDefFieldClass = nameValuePair.Value
                                 With field
                                     If (.dataChanged) Then
-                                        fieldId = builder.metaData_VerifyCDefField_ReturnID(ContentName, field)
+                                        fieldId = cpCore.metaData.metaData_VerifyCDefField_ReturnID(ContentName, field)
                                     End If
                                     '
                                     ' ----- update content field help records
@@ -5468,11 +5477,11 @@ ErrorTrap:
                     srcCollectionCdef = srcKeyValuePair.Value
 
                     SrcContentName = srcCollectionCdef.Name
-                    If LCase(SrcContentName) = "site sections" Then
+                    If vbLCase(SrcContentName) = "site sections" Then
                         SrcContentName = SrcContentName
                     End If
                     DebugSrcFound = False
-                    If InStr(1, SrcContentName, DebugName, vbTextCompare) <> 0 Then
+                    If vbInstr(1, SrcContentName, DebugName, vbTextCompare) <> 0 Then
                         DebugSrcFound = True
                     End If
                     '
@@ -5956,9 +5965,9 @@ ErrorTrap:
                 DataBuildVersion = cpCore.db.dataBuildVersion
                 For SrcMenuPtr = 0 To srcCollection.MenuCnt - 1
                     DstMenuPtr = 0
-                    SrcContentName = LCase(srcCollection.Menus(SrcMenuPtr).Name)
-                    SrcParentName = LCase(srcCollection.Menus(SrcMenuPtr).ParentName)
-                    SrcNameSpace = LCase(srcCollection.Menus(SrcMenuPtr).menuNameSpace)
+                    SrcContentName = vbLCase(srcCollection.Menus(SrcMenuPtr).Name)
+                    SrcParentName = vbLCase(srcCollection.Menus(SrcMenuPtr).ParentName)
+                    SrcNameSpace = vbLCase(srcCollection.Menus(SrcMenuPtr).menuNameSpace)
                     SrcIsNavigator = srcCollection.Menus(SrcMenuPtr).IsNavigator
                     If SrcIsNavigator Then
                         If (SrcContentName = "manage add-ons") Then
@@ -5967,18 +5976,18 @@ ErrorTrap:
                     End If
                     okToUpdateDstFromSrc = False
                     '
-                    SrcKey = LCase(srcCollection.Menus(SrcMenuPtr).Key)
+                    SrcKey = vbLCase(srcCollection.Menus(SrcMenuPtr).Key)
                     '
                     ' Search for match using guid
                     '
                     IsMatch = False
                     For DstMenuPtr = 0 To dstCollection.MenuCnt - 1
-                        DstName = LCase(dstCollection.Menus(DstMenuPtr).Name)
+                        DstName = vbLCase(dstCollection.Menus(DstMenuPtr).Name)
                         If DstName = SrcContentName Then
                             DstName = DstName
                             DstIsNavigator = dstCollection.Menus(DstMenuPtr).IsNavigator
-                            DstKey = LCase(dstCollection.Menus(DstMenuPtr).Key)
-                            If LCase(DstName) = "settings" Then
+                            DstKey = vbLCase(dstCollection.Menus(DstMenuPtr).Key)
+                            If vbLCase(DstName) = "settings" Then
                                 DstName = DstName
                             End If
                             IsMatch = (DstKey = SrcKey) And (SrcIsNavigator = DstIsNavigator)
@@ -5992,8 +6001,8 @@ ErrorTrap:
                         ' no match found on guid, try name and ( either namespace or parentname )
                         '
                         For DstMenuPtr = 0 To dstCollection.MenuCnt - 1
-                            DstName = LCase(dstCollection.Menus(DstMenuPtr).Name)
-                            If LCase(DstName) = "settings" Then
+                            DstName = vbLCase(dstCollection.Menus(DstMenuPtr).Name)
+                            If vbLCase(DstName) = "settings" Then
                                 DstName = DstName
                             End If
                             If ((SrcContentName = DstName) And (SrcIsNavigator = DstIsNavigator)) Then
@@ -6001,12 +6010,12 @@ ErrorTrap:
                                     '
                                     ' Navigator - check namespace if Dst.guid is blank (builder to new version of menu)
                                     '
-                                    IsMatch = (SrcNameSpace = LCase(dstCollection.Menus(DstMenuPtr).menuNameSpace)) And (dstCollection.Menus(DstMenuPtr).Guid = "")
+                                    IsMatch = (SrcNameSpace = vbLCase(dstCollection.Menus(DstMenuPtr).menuNameSpace)) And (dstCollection.Menus(DstMenuPtr).Guid = "")
                                 Else
                                     '
                                     ' AdminMenu - check parentname
                                     '
-                                    IsMatch = (SrcParentName = LCase(dstCollection.Menus(DstMenuPtr).ParentName))
+                                    IsMatch = (SrcParentName = vbLCase(dstCollection.Menus(DstMenuPtr).ParentName))
                                 End If
                                 If IsMatch Then
                                     Exit For
@@ -6089,13 +6098,13 @@ ErrorTrap:
                 '    '
                 '    '
                 '    For SrcPtr = 0 To srcCollection.AddOnCnt - 1
-                '        SrcContentName = LCase(srcCollection.AddOns(SrcPtr).Name)
+                '        SrcContentName = vbLCase(srcCollection.AddOns(SrcPtr).Name)
                 '        okToUpdateDstFromSrc = False
                 '        '
                 '        ' Search for this name in the Dst
                 '        '
                 '        For DstPtr = 0 To dstCollection.AddOnCnt - 1
-                '            DstName = LCase(dstCollection.AddOns(DstPtr).Name)
+                '            DstName = vbLCase(dstCollection.AddOns(DstPtr).Name)
                 '            If DstName = SrcContentName Then
                 '                '
                 '                ' found a match between Src and Dst
@@ -6148,13 +6157,13 @@ ErrorTrap:
                 Dim srcStylePtr As Integer
                 Dim dstStylePtr As Integer
                 For srcStylePtr = 0 To srcCollection.StyleCnt - 1
-                    SrcContentName = LCase(srcCollection.Styles(srcStylePtr).Name)
+                    SrcContentName = vbLCase(srcCollection.Styles(srcStylePtr).Name)
                     okToUpdateDstFromSrc = False
                     '
                     ' Search for this name in the Dst
                     '
                     For dstStylePtr = 0 To dstCollection.StyleCnt - 1
-                        DstName = LCase(dstCollection.Styles(dstStylePtr).Name)
+                        DstName = vbLCase(dstCollection.Styles(dstStylePtr).Name)
                         If DstName = SrcContentName Then
                             '
                             ' found a match between Src and Dst
@@ -6276,7 +6285,7 @@ ErrorTrap:
         ' ----- Get an XML nodes attribute based on its name
         '========================================================================
         '
-        Friend Function GetXMLAttribute(ByVal Found As Boolean, ByVal Node As XmlNode, ByVal Name As String, ByVal DefaultIfNotFound As String) As String
+        Public Function GetXMLAttribute(ByVal Found As Boolean, ByVal Node As XmlNode, ByVal Name As String, ByVal DefaultIfNotFound As String) As String
             Dim returnAttr As String = ""
             Try
                 Dim NodeAttribute As XmlAttribute
@@ -6286,9 +6295,9 @@ ErrorTrap:
                 Found = False
                 ResultNode = Node.Attributes.GetNamedItem(Name)
                 If (ResultNode Is Nothing) Then
-                    UcaseName = UCase(Name)
+                    UcaseName = vbUCase(Name)
                     For Each NodeAttribute In Node.Attributes
-                        If UCase(NodeAttribute.Name) = UcaseName Then
+                        If vbUCase(NodeAttribute.Name) = UcaseName Then
                             returnAttr = NodeAttribute.Value
                             Found = True
                             Exit For
@@ -6336,7 +6345,7 @@ ErrorTrap:
         '==================================================================================================================
         '
         Private Function TextMatch(ByVal Source1 As String, ByVal Source2 As String) As Boolean
-            TextMatch = (LCase(Source1) = LCase(Source2))
+            TextMatch = (LCase(Source1) = vbLCase(Source2))
         End Function
         '
         '
@@ -6353,10 +6362,10 @@ ErrorTrap:
                 With Collection
                     ParentName = .Menus(MenuPtr).ParentName
                     If ParentName <> "" Then
-                        LCaseParentName = LCase(ParentName)
+                        LCaseParentName = vbLCase(ParentName)
                         For Ptr = 0 To .MenuCnt - 1
-                            If InStr(1, "," & UsedIDList & ",", "," & CStr(Ptr) & ",") = 0 Then
-                                If LCaseParentName = LCase(.Menus(Ptr).Name) And (IsNavigator = .Menus(Ptr).IsNavigator) Then
+                            If vbInstr(1, "," & UsedIDList & ",", "," & CStr(Ptr) & ",") = 0 Then
+                                If LCaseParentName = vbLCase(.Menus(Ptr).Name) And (IsNavigator = .Menus(Ptr).IsNavigator) Then
                                     Prefix = GetMenuNameSpace(Collection, Ptr, IsNavigator, UsedIDList & "," & MenuPtr)
                                     If Prefix = "" Then
                                         returnAttr = ParentName
@@ -6412,7 +6421,7 @@ ErrorTrap:
         '
         '=========================================================================================
         '
-        Friend Sub VerifySortMethods()
+        Public Sub VerifySortMethods()
             Try
                 '
                 Call appendInstallLog(cpCore.appConfig.name, "VerifySortMethods", "Verify Sort Records")
@@ -6485,7 +6494,7 @@ ErrorTrap:
                         '
                         ' Problem
                         '
-                        Call Err.Raise(KmaErrorInternal, "dll", "Content Field Types content definition was not found")
+                        Call Err.Raise(ignoreInteger, "dll", "Content Field Types content definition was not found")
                     Else
                         Do While RowsNeeded > 0
                             Call cpCore.db.executeSql("Insert into ccFieldTypes (active,contentcontrolid)values(1," & CID & ")")
@@ -6561,7 +6570,7 @@ ErrorTrap:
                 Dim SupportInstalledByCollectionID As Boolean
                 '
                 If Trim(EntryName) <> "" Then
-                    If LCase(EntryName) = "manage add-ons" Then
+                    If vbLCase(EntryName) = "manage add-ons" Then
                         EntryName = EntryName
                     End If
                     '

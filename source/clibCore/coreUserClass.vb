@@ -10,7 +10,7 @@ Namespace Contensive.Core
     ''' </summary>
     Public Class coreUserClass
         '
-        Private cpCore As cpCoreClass
+        Private cpCore As coreClass
         '
         '====================================================================================================
         ''' <summary>
@@ -106,7 +106,7 @@ Namespace Contensive.Core
         Public loginForm_AutoLogin As Boolean = False    '   =
         '
         '
-        Public Const main_maxVisitLoginAttempts = 20
+        Public Const main_maxVisitLoginAttempts As Integer = 20
         Public main_loginFormDefaultProcessed As Boolean = False       ' prevent main_ProcessLoginFormDefault from running twice (multiple user messages, popups, etc.)
         '
         '------------------------------------------------------------------------
@@ -178,18 +178,18 @@ Namespace Contensive.Core
                         If cacheTestName = "" Then
                             cacheTestName = "iseditingall"
                         End If
-                        cacheTestName = LCase(cacheTestName)
-                        If IsInDelimitedString(main_IsEditingContentList, cacheTestName, ",") Then
+                        cacheTestName = vbLCase(cacheTestName)
+                        If coreCommonModule.IsInDelimitedString(main_IsEditingContentList, cacheTestName, ",") Then
                             Call cpCore.testPoint("...is in main_IsEditingContentList")
                             returnResult = True
-                        ElseIf IsInDelimitedString(main_IsNotEditingContentList, cacheTestName, ",") Then
+                        ElseIf coreCommonModule.IsInDelimitedString(main_IsNotEditingContentList, cacheTestName, ",") Then
                             Call cpCore.testPoint("...is in main_IsNotEditingContentList")
                         Else
                             If isAuthenticated() Then
                                 If Not cpCore.pageManager_printVersion Then
                                     If (cpCore.visitProperty.getBoolean("AllowEditing") Or cpCore.visitProperty.getBoolean("AllowAdvancedEditor")) Then
                                         If localContentNameOrId <> "" Then
-                                            If IsNumeric(localContentNameOrId) Then
+                                            If vbIsNumeric(localContentNameOrId) Then
                                                 localContentNameOrId = cpCore.metaData.getContentNameByID(EncodeInteger(localContentNameOrId))
                                             End If
                                         End If
@@ -373,7 +373,7 @@ Namespace Contensive.Core
                     '
                     ' Custom Login
                     '
-                    returnHtml = cpCore.executeAddon_legacy2(loginAddonID, "", "", cpCoreClass.addonContextEnum.ContextPage, "", 0, "", "", False, 0, "", isAddonOk, Nothing)
+                    returnHtml = cpCore.executeAddon_legacy2(loginAddonID, "", "", coreClass.addonContextEnum.ContextPage, "", 0, "", "", False, 0, "", isAddonOk, Nothing)
                     If Not isAddonOk Then
                         loginAddonID = 0
                     ElseIf (returnHtml = "") And (isAddonOk) Then
@@ -437,7 +437,7 @@ Namespace Contensive.Core
                     For Each kvp As KeyValuePair(Of String, docPropertiesClass) In cpCore.docProperties.docPropertiesDict
                         With kvp.Value
                             If .IsForm Then
-                                Select Case UCase(.Name)
+                                Select Case vbUCase(.Name)
                                     Case "S", "MA", "MB", "USERNAME", "PASSWORD", "EMAIL"
                                     Case Else
                                         returnResult = returnResult & cpCore.html_GetFormInputHidden(.Name, .Value)
@@ -486,25 +486,25 @@ Namespace Contensive.Core
                 returnREsult = False
                 If isAuthenticated Then
                     WorkingIDList = GroupIDList
-                    WorkingIDList = Replace(WorkingIDList, " ", "")
-                    Do While InStr(1, WorkingIDList, ",,") <> 0
-                        WorkingIDList = Replace(WorkingIDList, ",,", ",")
+                    WorkingIDList = vbReplace(WorkingIDList, " ", "")
+                    Do While vbInstr(1, WorkingIDList, ",,") <> 0
+                        WorkingIDList = vbReplace(WorkingIDList, ",,", ",")
                     Loop
                     If (WorkingIDList <> "") Then
-                        If Left(WorkingIDList, 1) = "," Then
-                            If Len(WorkingIDList) <= 1 Then
+                        If vbMid(WorkingIDList, 1) = "," Then
+                            If vbLen(WorkingIDList) <= 1 Then
                                 WorkingIDList = ""
                             Else
-                                WorkingIDList = Mid(WorkingIDList, 2)
+                                WorkingIDList = vbMid(WorkingIDList, 2)
                             End If
                         End If
                     End If
                     If (WorkingIDList <> "") Then
-                        If Right(WorkingIDList, 1) = "," Then
-                            If Len(WorkingIDList) <= 1 Then
+                        If vbRight(WorkingIDList, 1) = "," Then
+                            If vbLen(WorkingIDList) <= 1 Then
                                 WorkingIDList = ""
                             Else
-                                WorkingIDList = Mid(WorkingIDList, 1, Len(WorkingIDList) - 1)
+                                WorkingIDList = vbMid(WorkingIDList, 1, vbLen(WorkingIDList) - 1)
                             End If
                         End If
                     End If
@@ -531,7 +531,7 @@ Namespace Contensive.Core
                         '
                         ' check if they are admin or in the group list
                         '
-                        If InStr(1, WorkingIDList, ",") <> 0 Then
+                        If vbInstr(1, WorkingIDList, ",") <> 0 Then
                             Criteria = "r.GroupID in (" & WorkingIDList & ")"
                         Else
                             Criteria = "r.GroupID=" & WorkingIDList
@@ -539,7 +539,7 @@ Namespace Contensive.Core
                         Criteria = "" _
                         & "(" & Criteria & ")" _
                         & " and(r.id is not null)" _
-                        & " and((r.DateExpires is null)or(r.DateExpires>" & cpCore.db.encodeSQLDate(Now) & "))" _
+                        & " and((r.DateExpires is null)or(r.DateExpires>" & cpCore.db.encodeSQLDate(DateTime.Now) & "))" _
                         & " "
                         If adminReturnsTrue Then
                             Criteria = "(" & Criteria & ")or(m.admin<>0)or(m.developer<>0)"
@@ -711,7 +711,7 @@ Namespace Contensive.Core
         ' ----- Process the login form
         '========================================================================
         '
-        Friend Function processFormLoginDefault() As Boolean
+        Public Function processFormLoginDefault() As Boolean
             Dim returnREsult As Boolean = False
             Try
                 Dim LocalMemberID As Integer
@@ -790,8 +790,8 @@ Namespace Contensive.Core
                 Dim hint As String
                 Dim Ptr As Integer
                 '
-                Const passwordChrs = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345678999999"
-                Const passwordChrsLength = 62
+                Const passwordChrs As String = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345678999999"
+                Const passwordChrsLength As Integer = 62
                 '
                 'hint = "100"
                 workingEmail = EncodeText(Email)
@@ -802,7 +802,7 @@ Namespace Contensive.Core
                     cpCore.error_AddUserError("Please enter your email address before requesting your username and password.")
                 Else
                     'hint = "120"
-                    atPtr = InStr(1, workingEmail, "@")
+                    atPtr = vbInstr(1, workingEmail, "@")
                     If atPtr < 2 Then
                         '
                         ' email not valid
@@ -811,7 +811,7 @@ Namespace Contensive.Core
                         cpCore.error_AddUserError("Please enter a valid email address before requesting your username and password.")
                     Else
                         'hint = "140"
-                        EMailName = Mid(workingEmail, 1, atPtr - 1)
+                        EMailName = vbMid(workingEmail, 1, atPtr - 1)
                         '
                         Call cpCore.log_LogActivity2("password request for email " & workingEmail, id, organizationId)
                         '
@@ -819,19 +819,19 @@ Namespace Contensive.Core
                         recordCnt = 0
                         sqlCriteria = "(email=" & cpCore.db.encodeSQLText(workingEmail) & ")"
                         If True Then
-                            sqlCriteria = sqlCriteria & "and((dateExpires is null)or(dateExpires>" & cpCore.db.encodeSQLDate(Now) & "))"
+                            sqlCriteria = sqlCriteria & "and((dateExpires is null)or(dateExpires>" & cpCore.db.encodeSQLDate(DateTime.Now) & "))"
                         End If
-                        CS = cpCore.db.csOpen("People", sqlCriteria, "ID", , , ,, "username,password", 1)
+                        CS = cpCore.db.csOpen("People", sqlCriteria, "ID", SelectFieldList:="username,password", PageSize:=1)
                         If Not cpCore.db.cs_Ok(CS) Then
                             '
                             ' valid login account for this email not found
                             '
-                            If (LCase(Mid(workingEmail, atPtr + 1)) = "contensive.com") Then
+                            If (LCase(vbMid(workingEmail, atPtr + 1)) = "contensive.com") Then
                                 '
                                 ' look for expired account to renew
                                 '
                                 Call cpCore.db.cs_Close(CS)
-                                CS = cpCore.db.csOpen("People", "((email=" & cpCore.db.encodeSQLText(workingEmail) & "))", "ID", , , , , , 1)
+                                CS = cpCore.db.csOpen("People", "((email=" & cpCore.db.encodeSQLText(workingEmail) & "))", "ID", PageSize:=1)
                                 If cpCore.db.cs_Ok(CS) Then
                                     '
                                     ' renew this old record
@@ -839,7 +839,7 @@ Namespace Contensive.Core
                                     'hint = "150"
                                     Call cpCore.db.db_SetCSField(CS, "developer", "1")
                                     Call cpCore.db.db_SetCSField(CS, "admin", "1")
-                                    Call cpCore.db.db_SetCSField(CS, "dateExpires", Now.AddDays(7).Date.ToString)
+                                    Call cpCore.db.db_SetCSField(CS, "dateExpires", DateTime.Now.AddDays(7).Date.ToString())
                                 Else
                                     '
                                     ' inject support record
@@ -851,7 +851,7 @@ Namespace Contensive.Core
                                     Call cpCore.db.db_SetCSField(CS, "email", workingEmail)
                                     Call cpCore.db.db_SetCSField(CS, "developer", "1")
                                     Call cpCore.db.db_SetCSField(CS, "admin", "1")
-                                    Call cpCore.db.db_SetCSField(CS, "dateExpires", Now.AddDays(7).Date.ToString)
+                                    Call cpCore.db.db_SetCSField(CS, "dateExpires", DateTime.Now.AddDays(7).Date.ToString())
                                 End If
                                 Call cpCore.db.db_SaveCSRecord(CS)
                             Else
@@ -885,9 +885,9 @@ Namespace Contensive.Core
                                 usernameOK = True
                                 If Not allowEmailLogin Then
                                     'hint = "210"
-                                    If Username <> Trim(Username) Then
+                                    If Username <> Username.Trim() Then
                                         'hint = "220"
-                                        Username = Trim(Username)
+                                        Username = Username.Trim()
                                         updateUser = True
                                     End If
                                     If Username = "" Then
@@ -916,9 +916,9 @@ Namespace Contensive.Core
                                     '
                                     'hint = "280"
                                     Password = cpCore.db.cs_getText(CS, "Password")
-                                    If Trim(Password) <> Password Then
+                                    If Password.Trim() <> Password Then
                                         'hint = "290"
-                                        Password = Trim(Password)
+                                        Password = Password.Trim()
                                         updateUser = True
                                     End If
                                     'hint = "300"
@@ -927,7 +927,7 @@ Namespace Contensive.Core
                                         For Ptr = 0 To 8
                                             'hint = "320"
                                             Index = CInt(Rnd() * passwordChrsLength)
-                                            Password = Password & Mid(passwordChrs, Index, 1)
+                                            Password = Password & vbMid(passwordChrs, Index, 1)
                                         Next
                                         'hint = "330"
                                         updateUser = True
@@ -949,7 +949,7 @@ Namespace Contensive.Core
                 End If
                 'hint = "360"
                 If returnREsult Then
-                    Call cpCore.main_SendEmail(workingEmail, FromAddress, subject, Message, , True, False)
+                    Call cpCore.main_SendEmail(workingEmail, FromAddress, subject, Message, 0, True, False)
                     '    main_ClosePageHTML = main_ClosePageHTML & main_GetPopupMessage(app.publicFiles.ReadFile("ccLib\Popup\PasswordSent.htm"), 300, 300, "no")
                 End If
             Catch ex As Exception
@@ -958,7 +958,7 @@ Namespace Contensive.Core
             Return returnREsult
         End Function
 
-        Public Sub New(cpCore As cpCoreClass)
+        Public Sub New(cpCore As coreClass)
             MyBase.New()
             Me.cpCore = cpCore
         End Sub
@@ -971,7 +971,7 @@ Namespace Contensive.Core
         '========================================================================
         '
         Public Function isAuthenticatedContentManager(Optional ByVal ContentName As String = "") As Boolean
-            Dim returnIsContentManager = False
+            Dim returnIsContentManager As Boolean = False
             Try
                 Dim SQL As String
                 Dim CS As Integer
@@ -1079,7 +1079,7 @@ Namespace Contensive.Core
                     If cpCore.visit_startTime = Date.MinValue Then
                         cpCore.visit_startTime = cpCore.main_PageStartTime
                     End If
-                    If Not cpCore.siteProperties.getBoolean("allowVisitTracking", True) Then
+                    If Not cpCore.siteProperties.allowVisitTracking Then
                         Call cpCore.visit_init(True)
                     End If
                     '
@@ -1100,28 +1100,6 @@ Namespace Contensive.Core
             End Try
             Return returnREsult
         End Function
-        ''
-        ''========================================================================
-        ''   main_SetMemberIdentity
-        ''
-        ''   See RecognizeMember for details
-        ''========================================================================
-        ''
-        'Public Function user_SetMemberIdentity(Optional ByVal Criteria As String = "") As Boolean
-        '    Dim returnREsult As Boolean = False
-        '    Try
-        '        Dim CS As Integer
-        '        '
-        '        returnREsult = False
-        '        CS = cpCore.db.csOpen("people", Criteria, , , , , , "ID")
-        '        If cpCore.db.cs_Ok(CS) Then
-        '            returnREsult = user_RecognizeMemberByID(cpCore.db.cs_getInteger(CS, "ID"))
-        '        End If
-        '    Catch ex As Exception
-        '        cpCore.handleExceptionAndRethrow(ex)
-        '    End Try
-        '    Return returnREsult
-        'End Function
         '
         '========================================================================
         '   RecognizeMember
@@ -1145,13 +1123,13 @@ Namespace Contensive.Core
                     & " (ccMembers.active<>" & SQLFalse & ")" _
                     & " and(ccMembers.ID=" & RecordID & ")"
                 SQL &= "" _
-                    & " and((ccMembers.dateExpires is null)or(ccMembers.dateExpires>" & cpCore.db.encodeSQLDate(Now) & "))" _
+                    & " and((ccMembers.dateExpires is null)or(ccMembers.dateExpires>" & cpCore.db.encodeSQLDate(DateTime.Now) & "))" _
                     & ""
                 CS = cpCore.db.cs_openSql(SQL)
                 If cpCore.db.cs_Ok(CS) Then
                     If cpCore.visit_Id = 0 Then
                         '
-                        ' Visit was blocked during init, init the visit now
+                        ' Visit was blocked during init, init the visit DateTime.Now
                         '
                         Call cpCore.visit_init(True)
                     End If
@@ -1239,7 +1217,7 @@ Namespace Contensive.Core
                     Call cpCore.db.cs_set(CSMember, "LastVisit", lastVisit)
                     '
                     '
-                    CSlanguage = cpCore.db_csOpenRecord("Languages", cpCore.web_GetBrowserLanguageID, , , "Name")
+                    CSlanguage = cpCore.db_csOpenRecord("Languages", cpCore.web_GetBrowserLanguageID(), SelectFieldList:="Name")
                     If cpCore.db.cs_Ok(CSlanguage) Then
                         languageId = cpCore.db.cs_getInteger(CSlanguage, "ID")
                         language = cpCore.db.cs_getText(CSlanguage, "Name")
@@ -1274,7 +1252,7 @@ Namespace Contensive.Core
         '   a people record to save them
         '========================================================================
         '
-        Friend Sub createUserDefaults(ByVal DefaultName As String)
+        Public Sub createUserDefaults(ByVal DefaultName As String)
             Try
                 Dim CSlanguage As Integer
                 '
@@ -1319,7 +1297,7 @@ Namespace Contensive.Core
                 lastVisit = cpCore.main_PageStartTime
                 '
                 '
-                CSlanguage = cpCore.db_csOpenRecord("Languages", cpCore.web_GetBrowserLanguageID, , , "Name")
+                CSlanguage = cpCore.db_csOpenRecord("Languages", cpCore.web_GetBrowserLanguageID(), SelectFieldList:="Name")
                 If cpCore.db.cs_Ok(CSlanguage) Then
                     languageId = cpCore.db.cs_getInteger(CSlanguage, "ID")
                     language = cpCore.db.cs_getText(CSlanguage, "Name")
@@ -1410,6 +1388,7 @@ Namespace Contensive.Core
                 Dim LastName As String
                 Dim FullName As String
                 Dim Email As String
+                Dim errorCode As Integer = 0
                 '
                 loginForm_Username = cpCore.docProperties.getText("username")
                 loginForm_Password = cpCore.docProperties.getText("password")
@@ -1417,7 +1396,7 @@ Namespace Contensive.Core
                 If Not EncodeBoolean(cpCore.siteProperties.getBoolean("AllowMemberJoin", False)) Then
                     cpCore.error_AddUserError("This site does not accept public main_MemberShip.")
                 Else
-                    If Not isNewLoginOK(loginForm_Username, loginForm_Password, ErrorMessage) Then
+                    If Not isNewLoginOK(loginForm_Username, loginForm_Password, ErrorMessage, errorCode) Then
                         Call cpCore.error_AddUserError(ErrorMessage)
                     Else
                         If Not cpCore.error_IsUserError() Then
@@ -1511,7 +1490,7 @@ Namespace Contensive.Core
         '   default login form
         '========================================================================
         '
-        Friend Function getLoginForm_Default() As String
+        Public Function getLoginForm_Default() As String
             Dim returnHtml As String = ""
             Try
                 Dim Panel As String
@@ -1673,60 +1652,6 @@ Namespace Contensive.Core
         '        cpCore.handleExceptionAndRethrow(ex)
         '    End Try
         'End Sub
-        ''
-        ''========================================================================
-        ''   Create Member
-        ''       creates a new member account
-        ''       iUsername is required and must be unique
-        ''       Returns the new member ID if OK.
-        ''       If failure, returns 0 and adds a user error
-        ''       iUsername must be included and must be unique
-        ''       does NOT log the visitor into the new account
-        ''========================================================================
-        ''
-        'Public Function user_CreateMember(ByVal username As String, Optional ByVal password As String = "", Optional ByVal email As String = "") As Integer
-        '    Dim returnREsult As Integer = 0
-        '    Try
-        '        Dim CS As Integer
-        '        Dim CSPointer As Integer
-        '        '
-        '        returnREsult = 0
-        '        If username = "" Then
-        '            cpCore.error_AddUserError("A Username is required to create a new site member.")
-        '        Else
-        '            '
-        '            ' ----- check if the iUsername is in use (con not use main_OpenContent because active tested)
-        '            '
-        '            CS = cpCore.db.csOpen("People", "(Username=" & cpCore.db.encodeSQLText(username) & ")", , False)
-        '            If cpCore.db.cs_Ok(CS) Then
-        '                '
-        '                ' ----- iUsername is taken
-        '                '
-        '                Call cpCore.db.cs_Close(CS)
-        '                cpCore.error_AddUserError("This Username is currently in use.")
-        '            Else
-        '                Call cpCore.db.cs_Close(CS)
-        '                '
-        '                ' ----- Create the new people with whatever you got
-        '                '
-        '                Call user_CreateUser()
-        '                '
-        '                CSPointer = cpCore.db.csOpen("people", "ID=" & cpCore.db.encodeSQLNumber(id))
-        '                If cpCore.db.cs_Ok(CSPointer) Then
-        '                    Call cpCore.db.cs_set(CSPointer, "Username", username)
-        '                    Call cpCore.db.cs_set(CSPointer, "password", password)
-        '                    Call cpCore.db.cs_set(CSPointer, "email", email)
-        '                    Call cpCore.db.cs_set(CSPointer, "ContentControlID", cpCore.main_GetContentID("Members"))
-        '                End If
-        '                Call cpCore.db.cs_Close(CSPointer)
-        '                returnREsult = id
-        '            End If
-        '        End If
-        '    Catch ex As Exception
-        '        cpCore.handleExceptionAndRethrow(ex)
-        '    End Try
-        '    Return returnREsult
-        'End Function
         '
         '===================================================================================================
         '   Returns the ID of a member given their Username and Password
@@ -1737,7 +1662,7 @@ Namespace Contensive.Core
         Public Function authenticateGetId(ByVal username As String, ByVal password As String) As Integer
             Dim returnUserId As Integer = 0
             Try
-                Const badLoginUserError = "Your login was not successful. Please try again."
+                Const badLoginUserError As String = "Your login was not successful. Please try again."
                 '
                 Dim SQL As String
                 Dim recordIsAdmin As Boolean
@@ -1745,17 +1670,8 @@ Namespace Contensive.Core
                 Dim Criteria As String
                 Dim CS As Integer
                 Dim iPassword As String
-                Dim iReturnErrorMessage As Boolean
-                Dim iReturnErrorCode As Boolean
-                Dim iErrorMessage As String
-                Dim iErrorCode As Integer
-                Dim RecordPassword As String
-                Dim RecordID As Integer
                 Dim allowEmailLogin As Boolean
                 Dim allowNoPasswordLogin As Boolean
-                Dim PeopleCID As Integer
-                Dim Ptr As Integer
-                Dim CDef As coreMetaDataClass.CDefClass
                 Dim iLoginFieldValue As String
                 '
                 iLoginFieldValue = EncodeText(username)
@@ -1796,9 +1712,9 @@ Namespace Contensive.Core
                         Criteria = "(username=" & cpCore.db.encodeSQLText(iLoginFieldValue) & ")"
                     End If
                     If True Then
-                        Criteria = Criteria & "and((dateExpires is null)or(dateExpires>" & cpCore.db.encodeSQLDate(Now()) & "))"
+                        Criteria = Criteria & "and((dateExpires is null)or(dateExpires>" & cpCore.db.encodeSQLDate(DateTime.Now) & "))"
                     End If
-                    CS = cpCore.db.csOpen("People", Criteria, "id", , , , , "ID ,password,admin,developer", 2)
+                    CS = cpCore.db.csOpen("People", Criteria, "id", SelectFieldList:="ID ,password,admin,developer", PageSize:=2)
                     If Not cpCore.db.cs_Ok(CS) Then
                         '
                         ' ----- loginFieldValue not found, stop here
@@ -1848,7 +1764,7 @@ Namespace Contensive.Core
                                 '
                                 ' password login
                                 '
-                                If LCase(cpCore.db.cs_getText(CS, "password")) = LCase(iPassword) Then
+                                If vbLCase(cpCore.db.cs_getText(CS, "password")) = vbLCase(iPassword) Then
                                     returnUserId = cpCore.db.cs_getInteger(CS, "ID")
                                 End If
                             End If
@@ -1874,7 +1790,7 @@ Namespace Contensive.Core
         '       returns true if this can be used
         '       returns false, and a User Error response if it can not be used
         '
-        Public Function isNewLoginOK(ByVal Username As String, ByVal Password As String, Optional ByRef ErrorMessage As String = "", Optional ByVal ErrorCode As Integer = 0) As Boolean
+        Public Function isNewLoginOK(ByVal Username As String, ByVal Password As String, ByRef returnErrorMessage As String, ByRef returnErrorCode As Integer) As Boolean
             Dim returnOk As Boolean = False
             Try
                 Dim CSPointer As Integer
@@ -1884,14 +1800,14 @@ Namespace Contensive.Core
                     '
                     ' ----- username blank, stop here
                     '
-                    ErrorCode = 1
-                    ErrorMessage = "A valid login requires a non-blank username."
+                    returnErrorCode = 1
+                    returnErrorMessage = "A valid login requires a non-blank username."
                 ElseIf Password = "" Then
                     '
                     ' ----- password blank, stop here
                     '
-                    ErrorCode = 4
-                    ErrorMessage = "A valid login requires a non-blank password."
+                    returnErrorCode = 4
+                    returnErrorMessage = "A valid login requires a non-blank password."
                     '    ElseIf Not main_VisitCookieSupport Then
                     '        '
                     '        ' No Cookie Support, can not log in
@@ -1900,13 +1816,13 @@ Namespace Contensive.Core
                     '        errorMessage = "You currently have cookie support disabled in your browser. Without cookies, your browser can not support the level of security required to login."
                 Else
 
-                    CSPointer = cpCore.db.csOpen("People", "username=" & cpCore.db.encodeSQLText(Username), , False, , , , "ID", 2)
+                    CSPointer = cpCore.db.csOpen("People", "username=" & cpCore.db.encodeSQLText(Username), "", False, SelectFieldList:="ID", PageSize:=2)
                     If cpCore.db.cs_Ok(CSPointer) Then
                         '
                         ' ----- username was found, stop here
                         '
-                        ErrorCode = 3
-                        ErrorMessage = "The username you supplied is currently in use."
+                        returnErrorCode = 3
+                        returnErrorMessage = "The username you supplied is currently in use."
                     Else
                         returnOk = True
                     End If
@@ -1921,7 +1837,7 @@ Namespace Contensive.Core
         '====================================================================================================
         ' main_GetContentAccessRights( ContentIdOrName, returnAllowEdit, returnAllowAdd, returnAllowDelete )
         '
-        Friend Sub getContentAccessRights(ByVal ContentName As String, ByRef returnAllowEdit As Boolean, ByRef returnAllowAdd As Boolean, ByRef returnAllowDelete As Boolean)
+        Public Sub getContentAccessRights(ByVal ContentName As String, ByRef returnAllowEdit As Boolean, ByRef returnAllowAdd As Boolean, ByRef returnAllowDelete As Boolean)
             Try
                 Dim ContentID As Integer
                 Dim CDef As coreMetaDataClass.CDefClass
@@ -1988,26 +1904,26 @@ Namespace Contensive.Core
                 returnAllowEdit = False
                 returnAllowAdd = False
                 returnAllowDelete = False
-                If IsInDelimitedString(usedContentIdList, CStr(ContentID), ",") Then
+                If coreCommonModule.IsInDelimitedString(usedContentIdList, CStr(ContentID), ",") Then
                     '
                     ' failed usedContentIdList test, this content id was in the child path
                     '
-                    Call Err.Raise(KmaErrorInternal, "dll", "ContentID [" & ContentID & "] was found to be in it's own parentid path.")
+                    Throw New ArgumentException("ContentID [" & ContentID & "] was found to be in it's own parentid path.")
                 ElseIf ContentID < 1 Then
                     '
                     ' ----- not a valid contentname
                     '
-                ElseIf IsInDelimitedString(contentAccessRights_NotList, CStr(ContentID), ",") Then
+                ElseIf coreCommonModule.IsInDelimitedString(contentAccessRights_NotList, CStr(ContentID), ",") Then
                     '
                     ' ----- was previously found to not be a Content Manager
                     '
-                ElseIf IsInDelimitedString(contentAccessRights_List, CStr(ContentID), ",") Then
+                ElseIf coreCommonModule.IsInDelimitedString(contentAccessRights_List, CStr(ContentID), ",") Then
                     '
                     ' ----- was previously found to be a Content Manager
                     '
                     returnAllowEdit = True
-                    returnAllowAdd = IsInDelimitedString(contentAccessRights_AllowAddList, CStr(ContentID), ",")
-                    returnAllowDelete = IsInDelimitedString(contentAccessRights_AllowDeleteList, CStr(ContentID), ",")
+                    returnAllowAdd = coreCommonModule.IsInDelimitedString(contentAccessRights_AllowAddList, CStr(ContentID), ",")
+                    returnAllowDelete = coreCommonModule.IsInDelimitedString(contentAccessRights_AllowDeleteList, CStr(ContentID), ",")
                 Else
                     '
                     ' ----- Must test it
@@ -2064,5 +1980,6 @@ Namespace Contensive.Core
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
+        '
     End Class
 End Namespace

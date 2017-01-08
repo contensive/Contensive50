@@ -29,7 +29,7 @@ Namespace Contensive.Core
         '
         '
         '
-        Friend Sub New(ByRef cpParent As CPClass)
+        public Sub New(ByRef cpParent As CPClass)
             MyBase.New()
             cp = cpParent
         End Sub

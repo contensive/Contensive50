@@ -5,7 +5,7 @@ Imports Contensive.Core
 Namespace Contensive.Core
 
     Public Class tasksClass
-        Private cpCore As cpCoreClass
+        Private cpCore As coreClass
         '
         Dim LogCheckDateLast As Date
         '
@@ -72,14 +72,14 @@ Namespace Contensive.Core
             '                            Else
             '                                SQLFieldName = "SQL"
             '                            End If
-            '                            Select Case UCase(cmc.cpCore.app.csv_GetCSText(CS, "Command"))
+            '                            Select Case vbUCase(cmc.cpCore.app.csv_GetCSText(CS, "Command"))
             '                                Case "BUILDCSV"
             '                                    '
             '                                    ' Build CSV
             '                                    '
             '                                    DataSource = cmc.cpCore.app.csv_GetCSText(CS, "DataSource")
             '                                    SQL = cmc.cpCore.app.csv_GetCSText(CS, SQLFieldName)
-            '                                    Filename = Replace(cmc.cpCore.app.csv_GetCSText(CS, "Filename"), "/", "\")
+            '                                    Filename = vbReplace(cmc.cpCore.app.csv_GetCSText(CS, "Filename"), "/", "\")
             '                                    ResultMessage = BuildCSV(cmc, DataSource, SQL, cmc.cpCore.app.config.physicalFilePath & Filename)
             '                                    If ResultMessage <> "" Then
             '                                        NotifyBody = "This email is to notify you that there was a problem with your export data [" & ResultMessage & "]  on [" & cmc.appEnvironment.name & "]"
@@ -94,7 +94,7 @@ Namespace Contensive.Core
             '                                    '
             '                                    DataSource = cmc.cpCore.app.csv_GetCSText(CS, "DataSource")
             '                                    SQL = cmc.cpCore.app.csv_GetCSText(CS, SQLFieldName)
-            '                                    Filename = Replace(cmc.cpCore.app.csv_GetCSText(CS, "Filename"), "/", "\")
+            '                                    Filename = vbReplace(cmc.cpCore.app.csv_GetCSText(CS, "Filename"), "/", "\")
             '                                    ResultMessage = BuildXML(cmc, DataSource, SQL, cmc.cpCore.app.config.physicalFilePath & Filename)
             '                                    NotifyBody = "This email is to notify you that your XML export is ready on [" & cmc.appEnvironment.name & "]"
             '                                    NotifySubject = "XML export is ready"
@@ -108,8 +108,8 @@ Namespace Contensive.Core
             '                                    ''
             '                                    'Set ImportProcessor = New ProcessImportClass
             '                                    ''
-            '                                    'CSVFilename = Replace(cmc.cpCore.app.csv_GetCSText(CS, "Filename"), "/", "\")
-            '                                    'ImportMapFilename = Replace(cmc.cpCore.app.csv_GetCSText(CS, "ImportMapFilename"), "/", "\")
+            '                                    'CSVFilename = vbReplace(cmc.cpCore.app.csv_GetCSText(CS, "Filename"), "/", "\")
+            '                                    'ImportMapFilename = vbReplace(cmc.cpCore.app.csv_GetCSText(CS, "ImportMapFilename"), "/", "\")
             '                                    ''
             '                                    'ResultMessage = ImportProcessor.ProcessCSV(cmc, CSVFilename, ImportMapFilename)
             '                                    'If ResultMessage <> "" Then
@@ -205,11 +205,11 @@ Namespace Contensive.Core
                         RowBuffer = ""
                         For FieldNamePtr = 0 To FieldNameCnt - 1
                             Copy = cpCore.db.db_GetCS(CS, FieldNames(FieldNamePtr))
-                            Copy = Replace(Copy, """", """""")
+                            Copy = vbReplace(Copy, """", """""")
                             ' if propertly quoted, line breaks can be preserved
-                            'Copy = Replace(Copy, vbCrLf, " ")
-                            'Copy = Replace(Copy, vbCr, " ")
-                            'Copy = Replace(Copy, vbLf, " ")
+                            'Copy = vbReplace(Copy, vbCrLf, " ")
+                            'Copy = vbReplace(Copy, vbCr, " ")
+                            'Copy = vbReplace(Copy, vbLf, " ")
                             RowBuffer = RowBuffer & ",""" & Copy & """"
                             'DoEvents()
                         Next
@@ -328,7 +328,7 @@ ErrorTrap:
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <remarks></remarks>
-        Public Sub New(cpCore As cpCoreClass)
+        Public Sub New(cpCore As coreClass)
             MyBase.New()
             Me.cpCore = cpCore
         End Sub

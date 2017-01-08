@@ -21,7 +21,7 @@ Namespace Contensive.Core
         Public Const EventsId As String = "987E6DDE-E9E6-46C5-9467-BAE79A129A15"
 #End Region
         '
-        Private core As Contensive.Core.cpCoreClass
+        Private core As Contensive.Core.coreClass
         Protected disposed As Boolean = False
         '
         Private fileSystem As Core.coreFileSystemClass
@@ -31,7 +31,7 @@ Namespace Contensive.Core
         ''' Constructor
         ''' </summary>
         ''' <param name="core"></param>
-        Public Sub New(ByVal core As Contensive.Core.cpCoreClass, fileSystem As coreFileSystemClass)
+        Public Sub New(ByVal core As Contensive.Core.coreClass, fileSystem As coreFileSystemClass)
             MyBase.New()
             Me.core = core
             Me.fileSystem = fileSystem

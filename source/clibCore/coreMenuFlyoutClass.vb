@@ -56,14 +56,14 @@ Namespace Contensive.Core
         '
         Private MenuFlyoutNamePrefix As String    ' Random prefix added to element IDs to avoid namespace collision
         Private MenuFlyoutIcon_Local As String      ' string used to mark a button that has a non-hover flyout
-        Private cpCore As cpCoreClass
+        Private cpCore As coreClass
         '
         '==================================================================================================
         ''' <summary>
         ''' constructor
         ''' </summary>
         ''' <remarks></remarks>
-        Public Sub New(cpCore As cpCoreClass)
+        Public Sub New(cpCore As coreClass)
             MyBase.New()
             Me.cpCore = cpCore
             '
@@ -168,8 +168,8 @@ ErrorTrap:
             Dim UcaseEntryName As String
             Dim iNewWindow As Boolean
             '
-            iEntryName = Replace(encodeEmptyText(EntryName, ""), ",", " ")
-            UcaseEntryName = UCase(iEntryName)
+            iEntryName = vbReplace(encodeEmptyText(EntryName, ""), ",", " ")
+            UcaseEntryName = vbUCase(iEntryName)
             '
             If (iEntryName <> "") And (InStr(1, UsedEntries & ",", "," & UcaseEntryName & ",", vbBinaryCompare) = 0) Then
                 UsedEntries = UsedEntries & "," & UcaseEntryName
@@ -193,7 +193,7 @@ ErrorTrap:
                     End If
                     .CaptionImage = encodeEmptyText(CaptionImageLink, "")
                     .Name = UcaseEntryName
-                    .ParentName = UCase(encodeEmptyText(ParentiEntryName, ""))
+                    .ParentName = vbUCase(encodeEmptyText(ParentiEntryName, ""))
                     .ImageOver = ImageOverLink
                     .NewWindow = NewWindow
                 End With
@@ -234,7 +234,7 @@ ErrorTrap:
             Dim EndOfLine As Integer
             '
             ReadLine = ""
-            EndOfLine = InStr(StartPosition, Source, vbCrLf)
+            EndOfLine = vbInstr(StartPosition, Source, vbCrLf)
             If EndOfLine <> 0 Then
                 ReadLine = Mid(Source, StartPosition, EndOfLine)
                 StartPosition = EndOfLine + 2
@@ -282,7 +282,7 @@ ErrorTrap:
                 If LocalStyleSheetPrefix = "" Then
                     LocalStyleSheetPrefix = "ccFlyout"
                 End If
-                UcaseMenuName = UCase(MenuName)
+                UcaseMenuName = vbUCase(MenuName)
                 For EntryPointer = 0 To iEntryCount - 1
                     If iEntry(EntryPointer).Name = UcaseMenuName Then
                         Exit For

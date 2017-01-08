@@ -10,11 +10,11 @@ Namespace Contensive.Core
     ''' </summary>
     Public Class coreDocPropertiesClass
         '
-        Private cpCore As cpCoreClass
+        Private cpCore As coreClass
         '
         Public docPropertiesDict As New Dictionary(Of String, docPropertiesClass)
         '
-        Public Sub New(cpCore As cpCoreClass)
+        Public Sub New(cpCore As coreClass)
             MyBase.New()
             Me.cpCore = cpCore
         End Sub
@@ -125,10 +125,10 @@ Namespace Contensive.Core
                 If Not String.IsNullOrEmpty(sourceKey) Then
                     returnResult = sourceKey.ToLower()
                     If cpCore.webServer.requestSpaceAsUnderscore Then
-                        returnResult = Replace(returnResult, " ", "_")
+                        returnResult = vbReplace(returnResult, " ", "_")
                     End If
                     If cpCore.webServer.requestDotAsUnderscore Then
-                        returnResult = Replace(returnResult, ".", "_")
+                        returnResult = vbReplace(returnResult, ".", "_")
                     End If
                 End If
             Catch ex As Exception
@@ -160,7 +160,7 @@ Namespace Contensive.Core
                     Dim docProperty As New docPropertiesClass
                     With docProperty
                         If Not String.IsNullOrEmpty(nameValuePair) Then
-                            If InStr(1, nameValuePair, "=") <> 0 Then
+                            If vbInstr(1, nameValuePair, "=") <> 0 Then
                                 ValuePair = Split(nameValuePair, "=")
                                 key = DecodeResponseVariable(CStr(ValuePair(0)))
                                 If key <> "" Then
@@ -170,8 +170,8 @@ Namespace Contensive.Core
                                     End If
                                     .IsForm = False
                                     .IsFile = False
-                                    cpCore.web_ReadStreamJSForm = cpCore.web_ReadStreamJSForm Or (UCase(.Name) = UCase(RequestNameJSForm))
-                                    cpCore.main_ReadStreamJSProcess = cpCore.main_ReadStreamJSProcess Or (UCase(.Name) = UCase(RequestNameJSProcess))
+                                    cpCore.web_ReadStreamJSForm = cpCore.web_ReadStreamJSForm Or (UCase(.Name) = vbUCase(RequestNameJSForm))
+                                    cpCore.main_ReadStreamJSProcess = cpCore.main_ReadStreamJSProcess Or (UCase(.Name) = vbUCase(RequestNameJSProcess))
                                     If .Name = RequestNameStateString Then
                                         cpCore.main_Private_StateString_In = .Value
                                     End If

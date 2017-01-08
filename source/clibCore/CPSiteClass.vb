@@ -20,11 +20,11 @@ Namespace Contensive.Core
         Public Const EventsId As String = "5E88DB23-E8D7-4CE8-9793-9C7A20F4CF3A"
 #End Region
         '
-        Private cpCore As Contensive.Core.cpCoreClass
+        Private cpCore As Contensive.Core.coreClass
         Private CP As CPClass
         Protected disposed As Boolean = False
         '
-        Public Sub New(ByVal cpCoreObj As Contensive.Core.cpCoreClass, ByRef CPParent As CPClass)
+        Public Sub New(ByVal cpCoreObj As Contensive.Core.coreClass, ByRef CPParent As CPClass)
             MyBase.New()
             cpCore = cpCoreObj
             CP = CPParent
@@ -114,7 +114,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property MultiDomainMode() As Boolean 'Inherits BaseClasses.CPSiteBaseClass.MultiDomainMode
             Get
                 MultiDomainMode = False
-                If InStr(1, "," & cpCore.app_domainList & ",", ",*,", vbTextCompare) <> 0 Then
+                If vbInstr(1, "," & cpCore.app_domainList & ",", ",*,", vbTextCompare) <> 0 Then
                     MultiDomainMode = True
                 End If
             End Get
@@ -346,7 +346,7 @@ Namespace Contensive.Core
                     & " from (ccAddonEvents e" _
                     & " left join ccAddonEventCatchers c on c.eventId=e.id)" _
                     & " where "
-                If IsNumeric(eventNameIdOrGuid) Then
+                If vbIsNumeric(eventNameIdOrGuid) Then
                     sql &= "e.id=" & CP.Db.EncodeSQLNumber(CDbl(eventNameIdOrGuid))
                 ElseIf CP.Utils.isGuid(eventNameIdOrGuid) Then
                     sql &= "e.ccGuid=" & CP.Db.EncodeSQLText(eventNameIdOrGuid)
@@ -357,7 +357,7 @@ Namespace Contensive.Core
                     '
                     ' event not found
                     '
-                    If IsNumeric(eventNameIdOrGuid) Then
+                    If vbIsNumeric(eventNameIdOrGuid) Then
                         '
                         ' can not create an id
                         '

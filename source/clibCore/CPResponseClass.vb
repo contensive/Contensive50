@@ -17,12 +17,12 @@ Namespace Contensive.Core
         Public Const EventsId As String = "C7FCA224-8542-46F2-9019-52A7B5BAE4DB"
 #End Region
         '
-        Private cpCore As Contensive.Core.cpCoreClass
+        Private cpCore As Contensive.Core.coreClass
         Protected disposed As Boolean = False
         '
         ' Constructor
         '
-        Public Sub New(ByVal cpCoreObj As Contensive.Core.cpCoreClass)
+        Public Sub New(ByVal cpCoreObj As Contensive.Core.coreClass)
             MyBase.New()
             cpCore = cpCoreObj
         End Sub
@@ -94,7 +94,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub Close() 'Inherits BaseClasses.CPResponseBaseClass.Close
             If True Then
-                Call cpCore.main_CloseStream()
+                Call cpCore.doc_close()
             End If
         End Sub
 

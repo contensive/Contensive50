@@ -53,7 +53,7 @@ Namespace Contensive.Core
             '
             FieldExists = False
             If (ItemCount > 0) And Not IsNull(Key) Then
-                UcaseKey = UCase(Key)
+                UcaseKey = vbUCase(Key)
                 For ItemPointer = 0 To ItemCount - 1
                     If ItemNames(ItemPointer) = UcaseKey Then
                         FieldExists = True

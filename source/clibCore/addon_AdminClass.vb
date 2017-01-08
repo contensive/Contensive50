@@ -17,7 +17,7 @@ Namespace Contensive.Addons
         '====================================================================================================
         '
         Private cp As CPClass                   ' local cp set in constructor
-        Private cpCore As cpCoreClass           ' cpCore -- short term, this is the migration solution from a built-in tool, to an addon
+        Private cpCore As coreClass           ' cpCore -- short term, this is the migration solution from a built-in tool, to an addon
         '
         '====================================================================================================
         ''' <summary>
@@ -33,7 +33,7 @@ Namespace Contensive.Addons
                 Dim SaveContent As String
                 Dim BinaryHeader() As Byte
                 Dim BinaryHeaderString As String
-                Dim rightNow As Date = Now
+                Dim rightNow As Date = DateTime.Now
                 '
                 Me.cp = DirectCast(cp, CPClass)
                 cpCore = Me.cp.core
@@ -250,7 +250,7 @@ leak200:
                     & "<p>" & SpanClassAdminNormal _
                     & "You are attempting to enter an area which your account does not have access." _
                     & cr & "<ul class=""ccList"">" _
-                    & cr & "<li class=""ccListItem"">To return to the public web site, use your back button, or <a href=""" & cpCoreClass.www_requestRootPath & """>Click Here</A>." _
+                    & cr & "<li class=""ccListItem"">To return to the public web site, use your back button, or <a href=""" & coreClass.www_requestRootPath & """>Click Here</A>." _
                     & cr & "<li class=""ccListItem"">To login under a different account, <a href=""" & cpCore.appConfig.adminRoute & "?method=logout"" rel=""nofollow"">Click Here</A>" _
                     & cr & "<li class=""ccListItem"">To have your account access changed to include this area, please contact the <a href=""mailto:" & cpCore.siteProperties.getText("EmailAdmin") & """>system administrator</A>. " _
                     & cr & "</ul>" _
@@ -333,7 +333,7 @@ leak200:
                     If (Not cpCore.error_IsUserError()) And cpCore.main_ReturnAfterEdit And ((AdminButton = ButtonOK) Or (AdminButton = ButtonCancel) Or (AdminButton = ButtonDelete) Or (AdminButton = ButtonPublish) Or (AdminButton = ButtonPublishApprove) Or (AdminButton = ButtonAbortEdit) Or (AdminButton = ButtonPublishSubmit)) Then
                         EditReferer = cpCore.docProperties.getText("EditReferer")
                         CurrentLink = modifyLinkQuery(cpCore.main_ServerLink, "editreferer", "", False)
-                        CurrentLink = LCase(CurrentLink)
+                        CurrentLink = vbLCase(CurrentLink)
                         '
                         ' check if this editreferer includes cid=thisone and id=thisone -- if so, go to index form for this cid
                         '
@@ -436,13 +436,13 @@ leak200:
                         Case AdminFormMetaKeywordTool
                             ContentCell = GetForm_MetaKeywordTool()
                         Case AdminFormMobileBrowserControl, AdminFormPageControl, AdminFormEmailControl
-                            ContentCell = cpCore.executeAddon_legacy4(AddonGuidPreferences, "", cpCoreClass.addonContextEnum.ContextAdmin)
+                            ContentCell = cpCore.executeAddon_legacy4(AddonGuidPreferences, "", coreClass.addonContextEnum.ContextAdmin)
                         Case AdminFormClearCache
                             ContentCell = GetForm_ClearCache()
                         Case AdminFormEDGControl
                             ContentCell = (GetForm_StaticPublishControl())
                         Case AdminFormSpiderControl
-                            ContentCell = cpCore.executeAddon_legacy4("Content Spider Control", "", cpCoreClass.addonContextEnum.ContextAdmin)
+                            ContentCell = cpCore.executeAddon_legacy4("Content Spider Control", "", coreClass.addonContextEnum.ContextAdmin)
                         Case AdminFormResourceLibrary
                             ContentCell = cpCore.main_GetResourceLibrary2("", False, "", "", True)
                         Case AdminFormQuickStats
@@ -472,11 +472,11 @@ leak200:
                         Case AdminformRSSControl
                             Call cpCore.web_Redirect2("?cid=" & cpCore.main_GetContentID("RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.", False)
                         Case AdminFormImportWizard
-                            ContentCell = cpCore.executeAddon_legacy4(ImportWizardGuid, "", cpCoreClass.addonContextEnum.ContextAdmin)
+                            ContentCell = cpCore.executeAddon_legacy4(ImportWizardGuid, "", coreClass.addonContextEnum.ContextAdmin)
                         Case AdminFormCustomReports
                             ContentCell = GetForm_CustomReports()
                         Case AdminFormFormWizard
-                            ContentCell = cpCore.executeAddon_legacy4(FormWizardGuid, "", cpCoreClass.addonContextEnum.ContextAdmin)
+                            ContentCell = cpCore.executeAddon_legacy4(FormWizardGuid, "", coreClass.addonContextEnum.ContextAdmin)
                         Case AdminFormLegacyAddonManager
                             ContentCell = GetAddonManager()
                         Case AdminFormEditorConfig
@@ -530,7 +530,7 @@ leak200:
                         ' default wrapper does not apply to admin
                         DefaultWrapperID = -1
                         'DefaultWrapperID = cpCore.main_GetSiteProperty2("DefaultWrapperID", "0")
-                        ContentCell = cpCore.executeAddon_legacy1(addonId, "", InstanceOptionString, cpCoreClass.addonContextEnum.ContextAdmin, "", 0, AddonName, "-2", DefaultWrapperID)
+                        ContentCell = cpCore.executeAddon_legacy1(addonId, "", InstanceOptionString, coreClass.addonContextEnum.ContextAdmin, "", 0, AddonName, "-2", DefaultWrapperID)
                         ' no must allow for an add-on to return blank to return to root
                         'If ContentCell = "" Then
                         '    ContentCell = "<div class=""ccAdminMsg"">The Add-on you requested did not return a valid response.</div>"
@@ -724,8 +724,8 @@ ErrorTrap:
                 ' ***** really needs a server.URLDecode() function
                 '
                 Call cpCore.web_addRefreshQueryString("wc", WhereClauseContent)
-                'WhereClauseContent = Replace(WhereClauseContent, "%3D", "=")
-                'WhereClauseContent = Replace(WhereClauseContent, "%26", "&")
+                'WhereClauseContent = vbReplace(WhereClauseContent, "%3D", "=")
+                'WhereClauseContent = vbReplace(WhereClauseContent, "%26", "&")
                 If WhereClauseContent <> "" Then
                     QSSplit = Split(WhereClauseContent, ",")
                     For QSPointer = 0 To UBound(QSSplit)
@@ -794,7 +794,7 @@ ErrorTrap:
                     AdminButton = ""
                     AdminAction = AdminActionEditRefresh
                     AdminForm = AdminFormEdit
-                    Pos = InStr(1, fieldEditorPreference, ":")
+                    Pos = vbInstr(1, fieldEditorPreference, ":")
                     If Pos > 0 Then
                         fieldEditorFieldId = EncodeInteger(Mid(fieldEditorPreference, 1, Pos - 1))
                         fieldEditorAddonId = EncodeInteger(Mid(fieldEditorPreference, Pos + 1))
@@ -847,7 +847,7 @@ ErrorTrap:
                                     Cnt = UBound(Parts) + 1
                                     If Cnt > 0 Then
                                         For Ptr = 1 To Cnt - 1
-                                            Pos = InStr(1, Parts(Ptr), ",")
+                                            Pos = vbInstr(1, Parts(Ptr), ",")
                                             If Pos = 0 Then
                                                 Parts(Ptr) = ""
                                             ElseIf Pos > 0 Then
@@ -1357,7 +1357,7 @@ ErrorTrap:
                                             '
                                             ' Page Content special cases
                                             '
-                                            If LCase(adminContent.ContentTableName) = "ccpagecontent" Then
+                                            If vbLCase(adminContent.ContentTableName) = "ccpagecontent" Then
                                                 Call cpCore.pageManager_cache_pageContent_removeRow(RecordID, False, False)
                                                 If RecordID = (cpCore.siteProperties.getinteger("PageNotFoundPageID", 0)) Then
                                                     Call cpCore.siteProperties.getText("PageNotFoundPageID", "0")
@@ -1744,7 +1744,7 @@ ErrorTrap:
                 '
                 ' ----- Set Read Only: if non-developer tries to edit a developer record
                 '
-                If UCase(adminContent.ContentTableName) = UCase("ccMembers") Then
+                If vbUCase(adminContent.ContentTableName) = vbUCase("ccMembers") Then
                     If Not cpCore.user.isAuthenticatedDeveloper Then
                         If editRecord.fieldsLc.ContainsKey("developer") Then
                             If EncodeBoolean(editRecord.fieldsLc.Item("developer").value) Then
@@ -1784,12 +1784,12 @@ ErrorTrap:
             '
             Dim WhereCount As Integer
             '
-            FieldName = UCase(FieldName)
+            FieldName = vbUCase(FieldName)
             '
             GetWherePairValue = ""
             If WherePairCount > 0 Then
                 For WhereCount = 0 To WherePairCount - 1
-                    If FieldName = UCase(WherePair(0, WhereCount)) Then
+                    If FieldName = vbUCase(WherePair(0, WhereCount)) Then
                         GetWherePairValue = WherePair(1, WhereCount)
                         Exit For
                     End If
@@ -1857,7 +1857,7 @@ ErrorTrap:
 
                                     DefaultValueText = EncodeText(.defaultValue)
                                     If DefaultValueText <> "" Then
-                                        If IsNumeric(DefaultValueText) Then
+                                        If vbIsNumeric(DefaultValueText) Then
                                             editrecord.fieldsLc(field.nameLc).value = DefaultValueText
                                         Else
                                             If .lookupContentID <> 0 Then
@@ -1866,10 +1866,10 @@ ErrorTrap:
                                                     editrecord.fieldsLc(field.nameLc).value = cpCore.main_GetRecordID(LookupContentName, DefaultValueText)
                                                 End If
                                             ElseIf .lookupList <> "" Then
-                                                UCaseDefaultValueText = UCase(DefaultValueText)
+                                                UCaseDefaultValueText = vbUCase(DefaultValueText)
                                                 lookups = Split(.lookupList, ",")
                                                 For Ptr = 0 To UBound(lookups)
-                                                    If UCaseDefaultValueText = UCase(lookups(Ptr)) Then
+                                                    If UCaseDefaultValueText = vbUCase(lookups(Ptr)) Then
                                                         editrecord.fieldsLc(field.nameLc).value = Ptr + 1
                                                         Exit For
                                                     End If
@@ -1887,7 +1887,7 @@ ErrorTrap:
                         ' process reserved fields (set defaults just makes it look good)
                         ' (also, this presets readonly/devonly/adminonly fields not set to member)
                         '
-                        Select Case UCase(.nameLc)
+                        Select Case vbUCase(.nameLc)
                             'Case "ID"
                             '    .readonlyfield = True
                             '    .Required = False
@@ -2157,7 +2157,7 @@ ErrorTrap:
                                 '
                                 ' Save EditRecord values
                                 '
-                                Select Case UCase(.nameLc)
+                                Select Case vbUCase(.nameLc)
                                     Case "DATEADDED"
                                         editrecord.dateAdded = cpCore.db.db_GetCSDate(CSLiveRecord, .nameLc)
                                     Case "MODIFIEDDATE"
@@ -2261,7 +2261,7 @@ ErrorTrap:
                     '
                     ' if page content, check for the 'pagenotfound','landingpageid' checkboxes in control tab
                     '
-                    If LCase(adminContent.ContentTableName) = "ccpagecontent" Then
+                    If vbLCase(adminContent.ContentTableName) = "ccpagecontent" Then
                         '
                         PageNotFoundPageID = (cpCore.siteProperties.getinteger("PageNotFoundPageID", 0))
                         If cpCore.main_GetStreamBoolean2("PageNotFound") Then
@@ -2312,10 +2312,10 @@ ErrorTrap:
         '    FieldFound = False
         '    DataSourceName = cpCore.db.getDataSourceNameByID(AdminContent.DataSourceID)
         '    If (FieldName <> "") Then
-        '        UcaseFieldName = UCase(FieldName)
+        '        UcaseFieldName = vbUCase(FieldName)
         '        If AdminContent.fields.count > 0 Then
         '            For FieldPointer = 0 To AdminContent.fields.count - 1
-        '                If UCase(AdminContent.fields(FieldPointer).Name) = UcaseFieldName Then
+        '                If vbUCase(AdminContent.fields(FieldPointer).Name) = UcaseFieldName Then
         '                    Call LoadEditResponseByPointer(FormID, FieldPointer, DataSourceName)
         '                    FieldFound = True
         '                    Exit For
@@ -2394,19 +2394,19 @@ ErrorTrap:
                     ' Assume OK, mark not ok if there is a problem
                     '
                     ResponseFieldValueIsOKToSave = True
-                    FieldName = UCase(.nameLc)
+                    FieldName = vbUCase(.nameLc)
                     responseName = FieldName
                     InLoadedFieldList = (InStr(1, FormFieldListToBeLoaded, "," & FieldName & ",", vbTextCompare) <> 0)
                     InEmptyFieldList = (InStr(1, FormEmptyFieldList, "," & responseName & ",", vbTextCompare) <> 0)
                     InResponse = cpCore.docProperties.containsKey(responseName)
-                    FormFieldListToBeLoaded = Replace(FormFieldListToBeLoaded, "," & FieldName & ",", ",", , , vbTextCompare)
+                    FormFieldListToBeLoaded = vbReplace(FormFieldListToBeLoaded, "," & FieldName & ",", ",", 1, 99, vbTextCompare)
                     ResponseFieldValueText = cpCore.web_ReadStreamText(responseName)
                     ResponseFieldIsEmpty = String.IsNullOrEmpty(ResponseFieldValueText)
                     If .editTabName <> "" Then
                         TabCopy = " In the " & .editTabName & " tab"
                     End If
                     '
-                    If InStr(1, FieldName, "PARENTID", vbTextCompare) <> 0 Then
+                    If vbInstr(1, FieldName, "PARENTID", vbTextCompare) <> 0 Then
                         FieldName = FieldName
                     End If
                     '
@@ -2567,7 +2567,7 @@ ErrorTrap:
                                         '
                                         ResponseFieldIsEmpty = ResponseFieldIsEmpty Or (ResponseFieldValueText = "")
                                         If Not ResponseFieldIsEmpty Then
-                                            If IsNumeric(ResponseFieldValueText) Then
+                                            If vbIsNumeric(ResponseFieldValueText) Then
                                                 'ResponseValueVariant = EncodeInteger(ResponseValueVariant)
                                             Else
                                                 cpCore.error_AddUserError("The record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be a numeric value.")
@@ -2580,7 +2580,7 @@ ErrorTrap:
                                         '
                                         ResponseFieldIsEmpty = ResponseFieldIsEmpty Or (ResponseFieldValueText = "")
                                         If Not ResponseFieldIsEmpty Then
-                                            If IsNumeric(ResponseFieldValueText) Then
+                                            If vbIsNumeric(ResponseFieldValueText) Then
                                                 'ResponseValueVariant = EncodeNumber(ResponseValueVariant)
                                             Else
                                                 cpCore.error_AddUserError("This record cannot be saved because the field [" & .caption & "]" & TabCopy & " must be a numeric value.")
@@ -2593,7 +2593,7 @@ ErrorTrap:
                                         '
                                         ResponseFieldIsEmpty = ResponseFieldIsEmpty Or (ResponseFieldValueText = "")
                                         If Not ResponseFieldIsEmpty Then
-                                            If IsNumeric(ResponseFieldValueText) Then
+                                            If vbIsNumeric(ResponseFieldValueText) Then
                                                 'ResponseValueVariant = EncodeInteger(ResponseValueVariant)
                                             Else
                                                 cpCore.error_AddUserError("This record cannot be saved because the field [" & .caption & "]" & TabCopy & " had an invalid selection.")
@@ -2639,9 +2639,9 @@ ErrorTrap:
                                         End If
                                         '
                                         If Not .htmlContent Then
-                                            lcaseCopy = LCase(ResponseFieldValueText)
-                                            lcaseCopy = Replace(lcaseCopy, vbCr, "")
-                                            lcaseCopy = Replace(lcaseCopy, vbLf, "")
+                                            lcaseCopy = vbLCase(ResponseFieldValueText)
+                                            lcaseCopy = vbReplace(lcaseCopy, vbCr, "")
+                                            lcaseCopy = vbReplace(lcaseCopy, vbLf, "")
                                             lcaseCopy = Trim(lcaseCopy)
                                             If (lcaseCopy = HTMLEditorDefaultCopyNoCr) Or (lcaseCopy = HTMLEditorDefaultCopyNoCr2) Then
                                                 '
@@ -2649,12 +2649,12 @@ ErrorTrap:
                                                 '
                                                 ResponseFieldValueText = ""
                                             Else
-                                                If InStr(1, ResponseFieldValueText, HTMLEditorDefaultCopyStartMark) <> 0 Then
+                                                If vbInstr(1, ResponseFieldValueText, HTMLEditorDefaultCopyStartMark) <> 0 Then
                                                     '
                                                     ' if the default copy was editing, remote the markers
                                                     '
-                                                    ResponseFieldValueText = Replace(ResponseFieldValueText, HTMLEditorDefaultCopyStartMark, "")
-                                                    ResponseFieldValueText = Replace(ResponseFieldValueText, HTMLEditorDefaultCopyEndMark, "")
+                                                    ResponseFieldValueText = vbReplace(ResponseFieldValueText, HTMLEditorDefaultCopyStartMark, "")
+                                                    ResponseFieldValueText = vbReplace(ResponseFieldValueText, HTMLEditorDefaultCopyEndMark, "")
                                                     'ResponseValueVariant = ResponseValueText
                                                 End If
                                                 '
@@ -2663,7 +2663,7 @@ ErrorTrap:
                                                 '   then cannot fixgure out how to remove it
                                                 '
                                                 ResponseFieldValueText = cpCore.html_DecodeContent(ResponseFieldValueText)
-                                                ResponseFieldValueText = LCase(EncodeText(ResponseFieldValueText))
+                                                ResponseFieldValueText = vbLCase(EncodeText(ResponseFieldValueText))
                                                 If Len(ResponseFieldValueText) < 20 Then
                                                     HasInput = (InStr(1, ResponseFieldValueText, "<input ") <> 0)
                                                     If Not HasInput Then
@@ -2751,11 +2751,11 @@ ErrorTrap:
                                 '
                                 ' special case - people records without Allowduplicateusername require username to be unique
                                 '
-                                If LCase(adminContent.ContentTableName) = "ccmembers" Then
-                                    If LCase(.nameLc) = "username" Then
+                                If vbLCase(adminContent.ContentTableName) = "ccmembers" Then
+                                    If vbLCase(.nameLc) = "username" Then
                                         blockDuplicateUsername = Not (cpCore.siteProperties.getBoolean("allowduplicateusername", False))
                                     End If
-                                    If LCase(.nameLc) = "email" Then
+                                    If vbLCase(.nameLc) = "email" Then
                                         blockDuplicateEmail = (cpCore.siteProperties.getBoolean("allowemaillogin", False))
                                     End If
                                 End If
@@ -3015,15 +3015,15 @@ ErrorTrap:
                     If True Then ' 3.3.930" Then
                         Call cpCore.db.cs_set(CS, "OtherHeadTags", cpCore.docProperties.getText("MetaContent.OtherHeadTags"))
                         MetaKeywordList = cpCore.docProperties.getText("MetaContent.MetaKeywordList")
-                        MetaKeywordList = Replace(MetaKeywordList, ",", vbCrLf)
-                        Do While InStr(1, MetaKeywordList, vbCrLf & " ") <> 0
-                            MetaKeywordList = Replace(MetaKeywordList, vbCrLf & " ", vbCrLf)
+                        MetaKeywordList = vbReplace(MetaKeywordList, ",", vbCrLf)
+                        Do While vbInstr(1, MetaKeywordList, vbCrLf & " ") <> 0
+                            MetaKeywordList = vbReplace(MetaKeywordList, vbCrLf & " ", vbCrLf)
                         Loop
-                        Do While InStr(1, MetaKeywordList, " " & vbCrLf) <> 0
-                            MetaKeywordList = Replace(MetaKeywordList, " " & vbCrLf, vbCrLf)
+                        Do While vbInstr(1, MetaKeywordList, " " & vbCrLf) <> 0
+                            MetaKeywordList = vbReplace(MetaKeywordList, " " & vbCrLf, vbCrLf)
                         Loop
-                        Do While InStr(1, MetaKeywordList, vbCrLf & vbCrLf) <> 0
-                            MetaKeywordList = Replace(MetaKeywordList, vbCrLf & vbCrLf, vbCrLf)
+                        Do While vbInstr(1, MetaKeywordList, vbCrLf & vbCrLf) <> 0
+                            MetaKeywordList = vbReplace(MetaKeywordList, vbCrLf & vbCrLf, vbCrLf)
                         Loop
                         Do While (MetaKeywordList <> "") And (Right(MetaKeywordList, 2) = vbCrLf)
                             MetaKeywordList = Left(MetaKeywordList, Len(MetaKeywordList) - 2)
@@ -3265,7 +3265,7 @@ ErrorTrap:
                             FieldValueText = EncodeText(FieldValueVariant)
                             FieldChanged = False
                             FieldName = .nameLc
-                            UcaseFieldName = UCase(FieldName)
+                            UcaseFieldName = vbUCase(FieldName)
                             '
                             ' ----- Handle special case fields
                             '
@@ -3368,8 +3368,8 @@ ErrorTrap:
                                         If FieldValueText <> "" Then
                                             Filename = cpCore.db.db_GetCSFilename(CSEditRecord, FieldName, FieldValueText, adminContent.Name)
                                             Path = Filename
-                                            Path = Replace(Path, "\", "/")
-                                            Path = Replace(Path, "/" & FieldValueText, "")
+                                            Path = vbReplace(Path, "\", "/")
+                                            Path = vbReplace(Path, "/" & FieldValueText, "")
                                             Call cpCore.db.db_SetCSField(CSEditRecord, FieldName, Filename)
                                             Call cpCore.web_ProcessFormInputFile2(FieldName, cpCore.appRootFiles, Path)
                                             RecordChanged = True
@@ -3454,8 +3454,8 @@ ErrorTrap:
                         ' Log Activity for changes to people and organizattions
                         '
                         If FieldChanged Then
-                            Select Case LCase(adminContent.ContentTableName)
-                                Case LCase("ccMembers")
+                            Select Case vbLCase(adminContent.ContentTableName)
+                                Case vbLCase("ccMembers")
                                     'Case "ccmembers"
                                     '
                                     ' Log people
@@ -3550,7 +3550,7 @@ ErrorTrap:
             '
             GetJustTableName = Trim(UCase(SQL))
             Do While (GetJustTableName <> "") And (InStr(GetJustTableName, " ") <> 0)
-                GetJustTableName = Mid(GetJustTableName, InStr(GetJustTableName, " ") + 1)
+                GetJustTableName = Mid(GetJustTableName, vbInstr(GetJustTableName, " ") + 1)
             Loop
             Exit Function
             '
@@ -3608,7 +3608,7 @@ ErrorTrap:
                         '    Stream.Add( Mid(cpCore.app.db_GetCS(CS, .Name), 7 + Len(.Name) + Len(AdminContent.ContentTableName)))
                         Case FieldTypeIdFile, FieldTypeIdFileImage
                             Filename = cpCore.db.db_GetCS(CS, .nameLc)
-                            Filename = Replace(Filename, "\", "/")
+                            Filename = vbReplace(Filename, "\", "/")
                             Pos = InStrRev(Filename, "/")
                             If Pos <> 0 Then
                                 Filename = Mid(Filename, Pos + 1)
@@ -3661,7 +3661,7 @@ ErrorTrap:
                             Filename = cpCore.db.db_GetCS(CS, .nameLc)
                             If Filename <> "" Then
                                 Copy = cpCore.cdnFiles.ReadFile(Filename)
-                                Copy = cpCore.html_encodeContent10(Copy, cpCore.user.id, "", 0, 0, True, False, False, False, True, False, "", "", IsEmailContent, 0, "", cpCoreClass.addonContextEnum.ContextAdmin, cpCore.user.isAuthenticated, Nothing, cpCore.user.isEditingAnything)
+                                Copy = cpCore.html_encodeContent10(Copy, cpCore.user.id, "", 0, 0, True, False, False, False, True, False, "", "", IsEmailContent, 0, "", coreClass.addonContextEnum.ContextAdmin, cpCore.user.isAuthenticated, Nothing, cpCore.user.isEditingAnything)
                                 Stream.Add(Copy)
                             End If
                         Case FieldTypeIdRedirect, FieldTypeIdManyToMany
@@ -3893,11 +3893,11 @@ ErrorTrap:
                         '
                         ' special case - if you are coming from the advanced search, go back to the list page
                         '
-                        EditReferer = Replace(EditReferer, "&af=39", "")
+                        EditReferer = vbReplace(EditReferer, "&af=39", "")
                         '
                         ' if referer includes AdminWarningMsg (admin hint message), remove it -- this edit may fix the problem
                         '
-                        Pos = InStr(1, EditReferer, "AdminWarningMsg=", vbTextCompare)
+                        Pos = vbInstr(1, EditReferer, "AdminWarningMsg=", vbTextCompare)
                         If Pos <> 0 Then
                             EditReferer = Left(EditReferer, Pos - 2)
                         End If
@@ -4207,11 +4207,11 @@ ErrorTrap:
                 '
                 ' ----- determine contentType for editor
                 '
-                If LCase(adminContent.Name) = "email templates" Then
+                If vbLCase(adminContent.Name) = "email templates" Then
                     ContentType = csv_contentTypeEnum.contentTypeEmailTemplate
-                ElseIf LCase(adminContent.ContentTableName) = "cctemplates" Then
+                ElseIf vbLCase(adminContent.ContentTableName) = "cctemplates" Then
                     ContentType = csv_contentTypeEnum.contentTypeWebTemplate
-                ElseIf LCase(adminContent.ContentTableName) = "ccemail" Then
+                ElseIf vbLCase(adminContent.ContentTableName) = "ccemail" Then
                     ContentType = csv_contentTypeEnum.contentTypeEmail
                 Else
                     ContentType = csv_contentTypeEnum.contentTypeWeb
@@ -4224,8 +4224,8 @@ ErrorTrap:
                 '
                 ' ----- Create edit page
                 '
-                Select Case UCase(adminContent.ContentTableName)
-                    Case UCase("ccMembers")
+                Select Case vbUCase(adminContent.ContentTableName)
+                    Case vbUCase("ccMembers")
                         If Not (cpCore.user.isAuthenticatedAdmin) Then
                             '
                             ' Must be admin
@@ -4236,7 +4236,7 @@ ErrorTrap:
                             ))
                         Else
                             EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, AllowDelete, allowSave, AllowAdd)
-                            EditSectionButtonBar = Replace(EditSectionButtonBar, ButtonDelete, ButtonDeletePerson)
+                            EditSectionButtonBar = vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeletePerson)
                             Call Stream.Add(EditSectionButtonBar)
                             Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                             Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
@@ -4262,7 +4262,7 @@ ErrorTrap:
                             ))
                         Else
                             EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, AllowDelete, allowSave, AllowAdd)
-                            EditSectionButtonBar = Replace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
+                            EditSectionButtonBar = vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
                             Call Stream.Add(EditSectionButtonBar)
                             Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                             Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
@@ -4452,7 +4452,7 @@ ErrorTrap:
                             ))
                         Else
                             EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, AllowDelete, allowSave, AllowAdd)
-                            EditSectionButtonBar = Replace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
+                            EditSectionButtonBar = vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
                             Call Stream.Add(EditSectionButtonBar)
                             Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                             Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
@@ -4471,7 +4471,7 @@ ErrorTrap:
                         '
                         TableID = cpCore.main_GetRecordID("Tables", "ccPageContent")
                         EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, (Not IsLandingPage) And (Not IsLandingPageParent) And AllowDelete, allowSave, AllowAdd, True)
-                        EditSectionButtonBar = Replace(EditSectionButtonBar, ButtonDelete, ButtonDeletePage)
+                        EditSectionButtonBar = vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeletePage)
                         Call Stream.Add(EditSectionButtonBar)
                         Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                         Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, IsLandingPage Or IsLandingPageParent, IsRootPage, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
@@ -4491,7 +4491,7 @@ ErrorTrap:
                         ' Site Sections
                         '
                         EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, (Not IsLandingSection) And AllowDelete, allowSave, AllowAdd)
-                        EditSectionButtonBar = Replace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
+                        EditSectionButtonBar = vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
                         Call Stream.Add(EditSectionButtonBar)
                         Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                         Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, IsLandingSection, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
@@ -4508,7 +4508,7 @@ ErrorTrap:
                         ' Edit Dynamic Sections
                         '
                         EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, AllowDelete, allowSave, AllowAdd)
-                        EditSectionButtonBar = Replace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
+                        EditSectionButtonBar = vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
                         Call Stream.Add(EditSectionButtonBar)
                         Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                         Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
@@ -4524,7 +4524,7 @@ ErrorTrap:
                         ' Library Folders
                         '
                         EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, AllowDelete, allowSave, AllowAdd)
-                        EditSectionButtonBar = Replace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
+                        EditSectionButtonBar = vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
                         Call Stream.Add(EditSectionButtonBar)
                         Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                         Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
@@ -4534,13 +4534,13 @@ ErrorTrap:
                             Call Stream.Add(cpCore.menu_GetComboTabs())
                         End If
                         Call Stream.Add(EditSectionButtonBar)
-                    Case UCase("ccGroups")
+                    Case vbUCase("ccGroups")
                         'Case "CCGROUPS"
                         '
                         ' Groups
                         '
                         EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, AllowDelete, allowSave, AllowAdd)
-                        EditSectionButtonBar = Replace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
+                        EditSectionButtonBar = vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
                         Call Stream.Add(EditSectionButtonBar)
                         Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                         Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
@@ -4566,7 +4566,7 @@ ErrorTrap:
                     '            '   Site Properties
                     '            '
                     '            EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord,)
-                    '            EditSectionButtonBar = Replace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
+                    '            EditSectionButtonBar = vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
                     '            Call Stream.Add(EditSectionButtonBar)
                     '            Call Stream.Add(Adminui.GetTitleBar( GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                     '            Call Stream.Add(GetForm_Edit_UserFieldTabs(adminContent, editRecord,FormID, editrecord.read_only, False, False, ContentType, AllowAjaxTabs))
@@ -4581,7 +4581,7 @@ ErrorTrap:
                         ' LAYOUTS
                         '
                         EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, AllowDelete, allowSave, AllowAdd)
-                        EditSectionButtonBar = Replace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
+                        EditSectionButtonBar = vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
                         Call Stream.Add(EditSectionButtonBar)
                         Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                         Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
@@ -4596,7 +4596,7 @@ ErrorTrap:
                         ' All other tables (User definined)
                         '
                         EditSectionButtonBar = GetForm_Edit_ButtonBar(adminContent, editRecord, AllowDelete, allowSave, AllowAdd)
-                        EditSectionButtonBar = Replace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
+                        EditSectionButtonBar = vbReplace(EditSectionButtonBar, ButtonDelete, ButtonDeleteRecord)
                         Call Stream.Add(EditSectionButtonBar)
                         Call Stream.Add(Adminui.GetTitleBar(GetForm_EditTitle(adminContent, editRecord), HeaderDescription))
                         Call Stream.Add(GetForm_Edit_Tabs(adminContent, editRecord, editRecord.Read_Only, False, False, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON))
@@ -5018,7 +5018,7 @@ ErrorTrap:
                                 '
                                 ' make sure the record exists
                                 '
-                                If UCase(TableName) = "CCPAGECONTENT" Then
+                                If vbUCase(TableName) = "CCPAGECONTENT" Then
                                     FieldList = "ID,Name,Headline,MenuHeadline"
                                     'SQL = "SELECT ID,Name,Headline,MenuHeadline from " & TableName & " WHERE ID=" & RecordID
                                 Else
@@ -5352,7 +5352,7 @@ ErrorTrap:
                             fieldId = .id
                             WhyReadOnlyMsg = ""
                             FieldName = .nameLc
-                            FormFieldLCaseName = LCase(FieldName)
+                            FormFieldLCaseName = vbLCase(FieldName)
                             fieldTypeId = .fieldTypeId
                             FieldValueObject = editRecord.fieldsLc(.nameLc).value
                             FieldValueText = EncodeText(FieldValueObject)
@@ -5381,7 +5381,7 @@ ErrorTrap:
                             ' Read only Special Cases
                             '
                             If IsLandingPage Then
-                                Select Case LCase(.nameLc)
+                                Select Case vbLCase(.nameLc)
                                     Case "active"
                                         '
                                         ' if active, it is read only -- if inactive, let them set it active.
@@ -5400,7 +5400,7 @@ ErrorTrap:
                             End If
                             '
                             If IsRootPage Then
-                                Select Case LCase(.nameLc)
+                                Select Case vbLCase(.nameLc)
                                     Case "dateexpires", "pubdate", "datearchive", "archiveparentid"
                                         FieldReadOnly = True
                                         WhyReadOnlyMsg = "&nbsp;(disabled for root pages)"
@@ -5414,7 +5414,7 @@ ErrorTrap:
                             '
                             ' Special Case - ccemail table Alloweid should be disabled if siteproperty AllowLinkLogin is false
                             '
-                            If LCase(adminContent.ContentTableName) = "ccemail" And LCase(FieldName) = "allowlinkeid" Then
+                            If vbLCase(adminContent.ContentTableName) = "ccemail" And vbLCase(FieldName) = "allowlinkeid" Then
                                 If Not (cpCore.siteProperties.getBoolean("AllowLinkLogin", True)) Then
                                     '.ValueVariant = "0"
                                     FieldValueObject = "0"
@@ -5423,7 +5423,7 @@ ErrorTrap:
                                     FieldValueText = "0"
                                 End If
                             End If
-                            EditorStyleModifier = LCase(cpCore.db.getFieldTypeNameFromFieldTypeId(fieldTypeId))
+                            EditorStyleModifier = vbLCase(cpCore.db.getFieldTypeNameFromFieldTypeId(fieldTypeId))
                             EditorString = ""
                             editorReadOnly = (RecordReadOnly Or .ReadOnly Or (editRecord.id <> 0 And .NotEditable) Or (FieldReadOnly))
                             '
@@ -5431,16 +5431,16 @@ ErrorTrap:
                             '
                             editorAddonID = 0
                             'editorPreferenceAddonId = 0
-                            fieldIdPos = InStr(1, "," & fieldEditorPreferenceList, "," & CStr(fieldId) & ":")
+                            fieldIdPos = vbInstr(1, "," & fieldEditorPreferenceList, "," & CStr(fieldId) & ":")
                             Do While (editorAddonID = 0) And (fieldIdPos > 0)
                                 fieldIdPos = fieldIdPos + 1 + Len(CStr(fieldId))
-                                Pos = InStr(fieldIdPos, fieldEditorPreferenceList & ",", ",")
+                                Pos = vbInstr(fieldIdPos, fieldEditorPreferenceList & ",", ",")
                                 If Pos > 0 Then
                                     editorAddonID = EncodeInteger(Mid(fieldEditorPreferenceList, fieldIdPos, Pos - fieldIdPos))
                                     'editorPreferenceAddonId = encodeInteger(Mid(fieldEditorPreferenceList, fieldIdPos, Pos - fieldIdPos))
                                     'editorAddonID = editorPreferenceAddonId
                                 End If
-                                fieldIdPos = InStr(fieldIdPos + 1, "," & fieldEditorPreferenceList, "," & CStr(fieldId) & ":")
+                                fieldIdPos = vbInstr(fieldIdPos + 1, "," & fieldEditorPreferenceList, "," & CStr(fieldId) & ":")
                             Loop
                             If editorAddonID = 0 Then
                                 fieldTypeDefaultEditorAddonId = EncodeInteger(fieldTypeDefaultEditors(fieldTypeId))
@@ -5482,7 +5482,7 @@ ErrorTrap:
                                         & ""
                                 End If
 
-                                EditorString = cpCore.executeAddon(editorAddonID, "", addonOptionString, cpCoreClass.addonContextEnum.ContextEditor, "", 0, "", "", False, 0, "", useEditorAddon, Nothing, "", Nothing, "", 0, False)
+                                EditorString = cpCore.executeAddon(editorAddonID, "", addonOptionString, coreClass.addonContextEnum.ContextEditor, "", 0, "", "", False, 0, "", useEditorAddon, Nothing, "", Nothing, "", 0, False)
                                 If useEditorAddon Then
                                     return_NewFieldList = return_NewFieldList & "," & FieldName
                                 Else
@@ -5511,9 +5511,9 @@ ErrorTrap:
                                         Dim PosStart As Integer
                                         Dim PosEnd As Integer
                                         tmpList = cpCore.userProperty.getText("editorPreferencesForContent:" & adminContent.Id, "")
-                                        PosStart = InStr(1, "," & tmpList, "," & fieldId & ":")
+                                        PosStart = vbInstr(1, "," & tmpList, "," & fieldId & ":")
                                         If PosStart > 0 Then
-                                            PosEnd = InStr(PosStart + 1, "," & tmpList, ",")
+                                            PosEnd = vbInstr(PosStart + 1, "," & tmpList, ",")
                                             If PosEnd = 0 Then
                                                 tmpList = Mid(tmpList, 1, PosStart - 1)
                                             Else
@@ -5556,7 +5556,7 @@ ErrorTrap:
                                     If editRecord.id = 0 Then
                                         EditorString &= ("[available after save]")
                                     Else
-                                        RedirectPath = Replace(RedirectPath, "'", "\'")
+                                        RedirectPath = vbReplace(RedirectPath, "'", "\'")
                                         EditorString &= ("<a href=""#""")
                                         EditorString &= (" onclick=""" _
                                             & " window.open('" & RedirectPath & "', '_blank', 'scrollbars=yes,toolbar=no,status=no,resizable=yes');" _
@@ -6159,7 +6159,7 @@ ErrorTrap:
                             HelpMsgDefault = ""
                             HelpMsgCustom = ""
                             EditorHelp = ""
-                            LcaseName = LCase(.nameLc)
+                            LcaseName = vbLCase(.nameLc)
                             If AllowHelpMsgCustom Then
                                 HelpMsgDefault = .HelpDefault
                                 HelpMsgCustom = .HelpCustom
@@ -6613,7 +6613,7 @@ ErrorTrap:
                 '
                 ' ----- If Page Content , check if this is the default PageNotFound page
                 '
-                If LCase(adminContent.ContentTableName) = "ccpagecontent" Then
+                If vbLCase(adminContent.ContentTableName) = "ccpagecontent" Then
                     '
                     ' Landing Page
                     '
@@ -6660,7 +6660,7 @@ ErrorTrap:
                 '
                 ' ----- Widget Code
                 '
-                If LCase(adminContent.ContentTableName) = "ccaggregatefunctions" Then
+                If vbLCase(adminContent.ContentTableName) = "ccaggregatefunctions" Then
                     '
                     ' ----- Add-ons
                     '
@@ -6734,7 +6734,7 @@ ErrorTrap:
                 ' ----- EID (Encoded ID)
                 '
                 FieldHelp = ""
-                If UCase(adminContent.ContentTableName) = UCase("ccMembers") Then
+                If vbUCase(adminContent.ContentTableName) = vbUCase("ccMembers") Then
                     AllowEID = (cpCore.siteProperties.getBoolean("AllowLinkLogin", True)) Or (cpCore.siteProperties.getBoolean("AllowLinkRecognize", True))
                     If (Not AllowEID) Then
                         HTMLFieldString = "(link login and link recognize are disabled in security preferences)"
@@ -7001,7 +7001,7 @@ ErrorTrap:
                 Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
                 '
                 FieldName = field.nameLc
-                If LCase(FieldName) = "name" Then
+                If vbLCase(FieldName) = "name" Then
                     SitePropertyName = EncodeText(editRecord.fieldsLc(field.nameLc).value)
                 ElseIf (LCase(FieldName) = "fieldvalue") Then
                     SitePropertyValue = EncodeText(editRecord.fieldsLc(field.nameLc).value)
@@ -7019,19 +7019,19 @@ ErrorTrap:
 
                 '--------------
 
-                Pos = InStr(1, ExpandedSelector, "[")
+                Pos = vbInstr(1, ExpandedSelector, "[")
                 If Pos <> 0 Then
                     '
                     ' List of Options, might be select, radio or checkbox
                     '
-                    LCaseOptionDefault = LCase(Mid(ExpandedSelector, 1, Pos - 1))
+                    LCaseOptionDefault = vbLCase(Mid(ExpandedSelector, 1, Pos - 1))
                     LCaseOptionDefault = decodeNvaArgument(LCaseOptionDefault)
 
                     ExpandedSelector = Mid(ExpandedSelector, Pos + 1)
-                    Pos = InStr(1, ExpandedSelector, "]")
+                    Pos = vbInstr(1, ExpandedSelector, "]")
                     If Pos > 0 Then
                         If Pos < Len(ExpandedSelector) Then
-                            OptionSuffix = LCase(Trim(Mid(ExpandedSelector, Pos + 1)))
+                            OptionSuffix = vbLCase(Trim(Mid(ExpandedSelector, Pos + 1)))
                         End If
                         ExpandedSelector = Mid(ExpandedSelector, 1, Pos - 1)
                     End If
@@ -7041,7 +7041,7 @@ ErrorTrap:
                     For OptionPtr = 0 To OptionCnt - 1
                         OptionValue_AddonEncoded = Trim(OptionValues(OptionPtr))
                         If OptionValue_AddonEncoded <> "" Then
-                            Pos = InStr(1, OptionValue_AddonEncoded, ":")
+                            Pos = vbInstr(1, OptionValue_AddonEncoded, ":")
                             If Pos = 0 Then
                                 OptionValue = decodeNvaArgument(OptionValue_AddonEncoded)
                                 OptionCaption = OptionValue
@@ -7054,7 +7054,7 @@ ErrorTrap:
                                     '
                                     ' Create checkbox HTMLFieldString
                                     '
-                                    If InStr(1, "," & LCaseOptionDefault & ",", "," & LCase(OptionValue) & ",") <> 0 Then
+                                    If vbInstr(1, "," & LCaseOptionDefault & ",", "," & vbLCase(OptionValue) & ",") <> 0 Then
                                         HTMLFieldString = HTMLFieldString & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & SitePropertyName & OptionPtr & """ value=""" & OptionValue & """ checked=""checked"">" & OptionCaption & "</div>"
                                     Else
                                         HTMLFieldString = HTMLFieldString & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & SitePropertyName & OptionPtr & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
@@ -7063,7 +7063,7 @@ ErrorTrap:
                                     '
                                     ' Create Radio HTMLFieldString
                                     '
-                                    If LCase(OptionValue) = LCaseOptionDefault Then
+                                    If vbLCase(OptionValue) = LCaseOptionDefault Then
                                         HTMLFieldString = HTMLFieldString & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & SitePropertyName & """ value=""" & OptionValue & """ checked=""checked"" >" & OptionCaption & "</div>"
                                     Else
                                         HTMLFieldString = HTMLFieldString & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & SitePropertyName & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
@@ -7072,7 +7072,7 @@ ErrorTrap:
                                     '
                                     ' Create select HTMLFieldString
                                     '
-                                    If LCase(OptionValue) = LCaseOptionDefault Then
+                                    If vbLCase(OptionValue) = LCaseOptionDefault Then
                                         HTMLFieldString = HTMLFieldString & "<option value=""" & OptionValue & """ selected>" & OptionCaption & "</option>"
                                     Else
                                         HTMLFieldString = HTMLFieldString & "<option value=""" & OptionValue & """>" & OptionCaption & "</option>"
@@ -7091,7 +7091,7 @@ ErrorTrap:
                             '
                             ' Create Radio HTMLFieldString
                             '
-                            'HTMLFieldString = "<div>" & Replace(HTMLFieldString, "><", "></div><div><") & "</div>"
+                            'HTMLFieldString = "<div>" & vbReplace(HTMLFieldString, "><", "></div><div><") & "</div>"
                         Case Else
                             '
                             ' Create select HTMLFieldString
@@ -7108,7 +7108,7 @@ ErrorTrap:
                 End If
                 '--------------
 
-                'HTMLFieldString = cpCore.main_GetFormInputText2( LCase(FieldName), VAlue)
+                'HTMLFieldString = cpCore.main_GetFormInputText2( vbLCase(FieldName), VAlue)
             End If
             Call FastString.Add(Adminui.GetEditRow(HTMLFieldString, SitePropertyName, "", False, False, ""))
             GetForm_Edit_SiteProperties = Adminui.GetEditPanel((Not allowAdminTabs), "Control Information", "", Adminui.EditTableOpen & FastString.Text & Adminui.EditTableClose)
@@ -7160,7 +7160,7 @@ ErrorTrap:
                         ' the desktop has been set to none - go with default desktop
                         '
                         addonId = 0
-                    ElseIf IsNumeric(AddonIDText) Then
+                    ElseIf vbIsNumeric(AddonIDText) Then
                         '
                         ' it has been set to a non-zero number
                         '
@@ -7200,7 +7200,7 @@ ErrorTrap:
                         & "<div style=""clear:both;margin-top:20px;"">&nbsp;</div>" _
                         & "<div style=""clear:both;margin-top:20px;"">" & cpCore.error_GetUserError() & "</div>"
                     End If
-                    returnHtml = returnHtml & cpCore.executeAddon_legacy4(CStr(addonId), "", cpCoreClass.addonContextEnum.ContextAdmin)
+                    returnHtml = returnHtml & cpCore.executeAddon_legacy4(CStr(addonId), "", coreClass.addonContextEnum.ContextAdmin)
                 End If
                 If returnHtml = "" Then
                     '
@@ -7742,12 +7742,12 @@ ErrorTrap:
                 For Ptr = 0 To Cnt - 1
                     GroupID = 0
                     Dim HiddenPos As Integer
-                    HiddenPos = InStr(1, GroupSplit(Ptr), "hidden", vbTextCompare)
+                    HiddenPos = vbInstr(1, GroupSplit(Ptr), "hidden", vbTextCompare)
                     If HiddenPos > 0 Then
-                        IDPtr = InStr(1, GroupSplit(Ptr), "value=", vbTextCompare)
-                        'IDPtr = InStr(HiddenPos, GroupSplit(Ptr), "value=", vbTextCompare)
+                        IDPtr = vbInstr(1, GroupSplit(Ptr), "value=", vbTextCompare)
+                        'IDPtr = vbInstr(HiddenPos, GroupSplit(Ptr), "value=", vbTextCompare)
                         If IDPtr > 0 Then
-                            IDEndPtr = InStr(IDPtr, GroupSplit(Ptr), ">")
+                            IDEndPtr = vbInstr(IDPtr, GroupSplit(Ptr), ">")
                             If IDEndPtr > 0 Then
                                 GroupID = EncodeInteger(Mid(GroupSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
                             End If
@@ -7822,9 +7822,9 @@ ErrorTrap:
             'Else
             '    For Ptr = 0 To UBound(GroupSplit)
             '        GroupID = 0
-            '        IDPtr = InStr(1, GroupSplit(Ptr), "value=", vbTextCompare)
+            '        IDPtr = vbInstr(1, GroupSplit(Ptr), "value=", vbTextCompare)
             '        If IDPtr > 0 Then
-            '            IDEndPtr = InStr(IDPtr, GroupSplit(Ptr), ">")
+            '            IDEndPtr = vbInstr(IDPtr, GroupSplit(Ptr), ">")
             '            If IDEndPtr > 0 Then
             '                GroupID = EncodeInteger(Mid(GroupSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
             '            End If
@@ -8162,9 +8162,9 @@ ErrorTrap:
             GroupSplit = Split(GroupList, "<br >", , vbTextCompare)
             For Ptr = 0 To UBound(GroupSplit)
                 GroupID = 0
-                IDPtr = InStr(1, GroupSplit(Ptr), "value=", vbTextCompare)
+                IDPtr = vbInstr(1, GroupSplit(Ptr), "value=", vbTextCompare)
                 If IDPtr > 0 Then
-                    IDEndPtr = InStr(IDPtr, GroupSplit(Ptr), ">")
+                    IDEndPtr = vbInstr(IDPtr, GroupSplit(Ptr), ">")
                     If IDEndPtr > 0 Then
                         GroupID = EncodeInteger(Mid(GroupSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
                     End If
@@ -8210,9 +8210,9 @@ ErrorTrap:
             GroupSplit = Split(GroupList, "<br >", , vbTextCompare)
             For Ptr = 0 To UBound(GroupSplit)
                 GroupID = 0
-                IDPtr = InStr(1, GroupSplit(Ptr), "value=", vbTextCompare)
+                IDPtr = vbInstr(1, GroupSplit(Ptr), "value=", vbTextCompare)
                 If IDPtr > 0 Then
-                    IDEndPtr = InStr(IDPtr, GroupSplit(Ptr), ">")
+                    IDEndPtr = vbInstr(IDPtr, GroupSplit(Ptr), ">")
                     If IDEndPtr > 0 Then
                         GroupID = EncodeInteger(Mid(GroupSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
                     End If
@@ -8260,7 +8260,7 @@ ErrorTrap:
             '
             If WherePairCount > 0 Then
                 For WCPtr = 0 To WherePairCount - 1
-                    If UCase(WherePair(0, WCPtr)) = "MENUID" Then
+                    If vbUCase(WherePair(0, WCPtr)) = "MENUID" Then
                         ForcedMenuID = EncodeInteger(WherePair(1, WCPtr))
                         Exit For
                     End If
@@ -8279,21 +8279,21 @@ ErrorTrap:
             DynamicMenuSplit = Split(DynamicMenuList, "<br >", , vbTextCompare)
             For Ptr = 0 To UBound(DynamicMenuSplit)
                 DynamicMenuID = -1
-                IDPtr = InStr(1, DynamicMenuSplit(Ptr), "value=", vbTextCompare)
+                IDPtr = vbInstr(1, DynamicMenuSplit(Ptr), "value=", vbTextCompare)
                 If IDPtr > 0 Then
-                    IDEndPtr = InStr(IDPtr, DynamicMenuSplit(Ptr), ">")
+                    IDEndPtr = vbInstr(IDPtr, DynamicMenuSplit(Ptr), ">")
                     If IDEndPtr > 0 Then
                         DynamicMenuID = EncodeInteger(Mid(DynamicMenuSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
                     End If
                 End If
                 If ForcedMenuID = DynamicMenuID Then
-                    DynamicMenuSplit(Ptr) = Replace(DynamicMenuSplit(Ptr), "type=checkbox ", "type=checkbox checked ", 1, 1, vbTextCompare)
+                    DynamicMenuSplit(Ptr) = vbReplace(DynamicMenuSplit(Ptr), "type=checkbox ", "type=checkbox checked ", 1, 99, vbTextCompare)
                 End If
                 'If WherePairCount > 0 Then
                 '    For WCPtr = 0 To WherePairCount - 1
-                '        If UCase(WherePair(0, WCPtr)) = "MENUID" Then
+                '        If vbUCase(WherePair(0, WCPtr)) = "MENUID" Then
                 '            If WherePair(1, WCPtr) = CStr(DynamicMenuID) Then
-                '                DynamicMenuSplit(Ptr) = Replace(DynamicMenuSplit(Ptr), "<input ", "<input checked ", 1, 1, vbTextCompare)
+                '                DynamicMenuSplit(Ptr) = vbReplace(DynamicMenuSplit(Ptr), "<input ", "<input checked ", 1, 1, vbTextCompare)
                 '            End If
                 '            Exit For
                 '        End If
@@ -8340,9 +8340,9 @@ ErrorTrap:
             SectionSplit = Split(SectionList, "<br >", , vbTextCompare)
             For Ptr = 0 To UBound(SectionSplit)
                 SectionID = 0
-                IDPtr = InStr(1, SectionSplit(Ptr), "value=", vbTextCompare)
+                IDPtr = vbInstr(1, SectionSplit(Ptr), "value=", vbTextCompare)
                 If IDPtr > 0 Then
-                    IDEndPtr = InStr(IDPtr, SectionSplit(Ptr), ">")
+                    IDEndPtr = vbInstr(IDPtr, SectionSplit(Ptr), ">")
                     If IDEndPtr > 0 Then
                         SectionID = EncodeInteger(Mid(SectionSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
                     End If
@@ -8387,9 +8387,9 @@ ErrorTrap:
             GroupSplit = Split(GroupList, "<br >", , vbTextCompare)
             For Ptr = 0 To UBound(GroupSplit)
                 GroupID = 0
-                IDPtr = InStr(1, GroupSplit(Ptr), "value=", vbTextCompare)
+                IDPtr = vbInstr(1, GroupSplit(Ptr), "value=", vbTextCompare)
                 If IDPtr > 0 Then
-                    IDEndPtr = InStr(IDPtr, GroupSplit(Ptr), ">")
+                    IDEndPtr = vbInstr(IDPtr, GroupSplit(Ptr), ">")
                     If IDEndPtr > 0 Then
                         GroupID = EncodeInteger(Mid(GroupSplit(Ptr), IDPtr + 6, IDEndPtr - IDPtr - 6))
                     End If
@@ -8681,12 +8681,12 @@ ErrorTrap:
         '            ''Dim arrayOfFields() As appServices_metaDataClass.CDefFieldClass
         '            '
         '            GetFieldPtrNoError = -1
-        '            UcaseTargetField = UCase(TargetField)
+        '            UcaseTargetField = vbUCase(TargetField)
         '            If adminContent.fields.Count > 0 Then
         '                arrayOfFields = adminContent.fields
         '                For GetFieldPtrNoError = 0 To adminContent.fields.Count - 1
 
-        '                    If UCase(arrayOfFields(GetFieldPtrNoError).Name) = UcaseTargetField Then
+        '                    If vbUCase(arrayOfFields(GetFieldPtrNoError).Name) = UcaseTargetField Then
         '                        Exit For
         '                    End If
         '                Next
@@ -8769,7 +8769,7 @@ ErrorTrap:
             '
             IncludeWidth = False
             If ButtonWidth <> "" Then
-                If IsNumeric(ButtonWidth) Then
+                If vbIsNumeric(ButtonWidth) Then
                     IncludeWidth = True
                 End If
             End If
@@ -9034,7 +9034,7 @@ ErrorTrap:
         '                            If MenuPage = "" Then
         '                                MenuPage = cpCore.siteProperties.serverPageDefault
         '                            End If
-        '                            If InStr(MenuPage, "?") = 0 Then
+        '                            If vbInstr(MenuPage, "?") = 0 Then
         '                                MenuPage = MenuPage & "?s=0"
         '                                'Else
         '                                '    MenuPage = MenuPage
@@ -9691,12 +9691,12 @@ ErrorTrap:
                                 '
                                 ' delete all templateid based editorstylerule files, build on-demand
                                 '
-                                EditorStyleRulesFilename = Replace(EditorStyleRulesFilenamePattern, "$templateid$", "0", , , vbTextCompare)
+                                EditorStyleRulesFilename = vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, vbTextCompare)
                                 Call cpCore.cdnFiles.DeleteFile(EditorStyleRulesFilename)
                                 '
                                 CS = cpCore.db.db_openCsSql_rev("default", "select id from cctemplates")
                                 Do While cpCore.db.cs_Ok(CS)
-                                    EditorStyleRulesFilename = Replace(EditorStyleRulesFilenamePattern, "$templateid$", cpCore.main_GetCS2Text(CS, "ID"), , , vbTextCompare)
+                                    EditorStyleRulesFilename = vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", cpCore.main_GetCS2Text(CS, "ID"), 1, 99, vbTextCompare)
                                     Call cpCore.cdnFiles.DeleteFile(EditorStyleRulesFilename)
                                     Call cpCore.db.db_csGoNext(CS)
                                 Loop
@@ -9812,9 +9812,9 @@ ErrorTrap:
             Call cpCore.main_AddHeadScriptCode("var docLoaded=false", "Form loader")
             Call cpCore.main_AddOnLoadJavascript2("docLoaded=true;", "Form loader")
             s = cpCore.html_GetUploadFormStart()
-            s = Replace(s, ">", " onSubmit=""cj.admin.saveEmptyFieldList('" & "FormEmptyFieldList');"">")
-            s = Replace(s, ">", " autocomplete=""off"">")
-            s = Replace(s, ">", " id=""adminEditForm"">")
+            s = vbReplace(s, ">", " onSubmit=""cj.admin.saveEmptyFieldList('" & "FormEmptyFieldList');"">")
+            s = vbReplace(s, ">", " autocomplete=""off"">")
+            s = vbReplace(s, ">", " id=""adminEditForm"">")
             s = s & vbCrLf & "<input TYPE=""hidden"" NAME=""" & RequestNameAdminSourceForm & """ VALUE=""" & AdminFormID.ToString & """>"
             s = s & vbCrLf & "<input TYPE=""hidden"" NAME=""" & RequestNameTitleExtension & """ VALUE=""" & TitleExtension & """>"
             s = s & vbCrLf & "<input TYPE=""hidden"" NAME=""" & RequestNameAdminDepth & """ VALUE=""" & MenuDepth & """>"
@@ -9855,7 +9855,7 @@ ErrorTrap:
                 ' ccpagecontent.linkalias is a control field that is not in control tab
                 '
             Else
-                Select Case UCase(Name)
+                Select Case vbUCase(Name)
                     Case "ID", "CONTENTCONTROLID", "CREATEDBY", "DATEADDED", "MODIFIEDBY", "MODIFIEDDATE", "CREATEKEY", "EDITSOURCEID", "EDITBLANK", "EDITARCHIVE", "CONTENTCATEGORYID", "CCGUID"
                         '
                         ' ----- control fields are not editable user fields
@@ -9963,8 +9963,8 @@ ErrorTrap:
                 '
                 '
                 If Not cpCore.error_IsUserError Then
-                    Select Case UCase(adminContent.ContentTableName)
-                        Case UCase("ccMembers")
+                    Select Case vbUCase(adminContent.ContentTableName)
+                        Case vbUCase("ccMembers")
                             '
                             '
                             '
@@ -10065,7 +10065,7 @@ ErrorTrap:
                                     End If
                                 End If
                             End If
-                        Case UCase("ccGroups")
+                        Case vbUCase("ccGroups")
                             'Case "CCGROUPS"
                             '
                             '
@@ -10091,7 +10091,7 @@ ErrorTrap:
                             'call SaveTopicRules
                             Call SaveContentTracking(adminContent, editRecord)
                             '
-                            EditorStyleRulesFilename = Replace(EditorStyleRulesFilenamePattern, "$templateid$", editRecord.id.ToString, , , vbTextCompare)
+                            EditorStyleRulesFilename = vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", editRecord.id.ToString, 1, 99, vbTextCompare)
                             Call cpCore.privateFiles.DeleteFile(EditorStyleRulesFilename)
                         Case "CCSHAREDSTYLES"
                             '
@@ -10105,12 +10105,12 @@ ErrorTrap:
                             'call SaveTopicRules
                             Call SaveContentTracking(adminContent, editRecord)
                             '
-                            EditorStyleRulesFilename = Replace(EditorStyleRulesFilenamePattern, "$templateid$", "0", , , vbTextCompare)
+                            EditorStyleRulesFilename = vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, vbTextCompare)
                             Call cpCore.cdnFiles.DeleteFile(EditorStyleRulesFilename)
                             '
                             CS = cpCore.db.db_openCsSql_rev("default", "select id from cctemplates")
                             Do While cpCore.db.cs_Ok(CS)
-                                EditorStyleRulesFilename = Replace(EditorStyleRulesFilenamePattern, "$templateid$", cpCore.main_GetCS2Text(CS, "ID"), , , vbTextCompare)
+                                EditorStyleRulesFilename = vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", cpCore.main_GetCS2Text(CS, "ID"), 1, 99, vbTextCompare)
                                 Call cpCore.cdnFiles.DeleteFile(EditorStyleRulesFilename)
                                 Call cpCore.db.db_csGoNext(CS)
                             Loop
@@ -10158,7 +10158,7 @@ ErrorTrap:
             ' converted array to dictionary - Dim FieldPointer As Integer
             '
             If Not cpCore.error_IsUserError Then
-                Select Case UCase(adminContent.ContentTableName)
+                Select Case vbUCase(adminContent.ContentTableName)
                     Case "CCEMAIL"
                         '
                         ' --- preload array with values that may not come back in response
@@ -10219,7 +10219,7 @@ ErrorTrap:
                             For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In adminContent.fields
                                 Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
                                 With field
-                                    If LCase(.nameLc) = "email" Then
+                                    If vbLCase(.nameLc) = "email" Then
                                         If (LCase(adminContent.ContentTableName) = "ccmembers") And (EncodeBoolean(cpCore.siteProperties.getBoolean("allowemaillogin", False))) Then
                                             editRecord.fieldsLc(.nameLc).value = ""
                                         End If
@@ -10291,7 +10291,7 @@ ErrorTrap:
                 '
                 BakeName = "AdminMenu" & Format(cpCore.user.id, "00000000")
                 GetMenuTopMode = EncodeText(cpCore.cache.getObject(Of String)(BakeName))
-                MenuDelimiterPosition = InStr(1, GetMenuTopMode, MenuDelimiter, vbTextCompare)
+                MenuDelimiterPosition = vbInstr(1, GetMenuTopMode, MenuDelimiter, vbTextCompare)
                 If MenuDelimiterPosition > 1 Then
                     MenuClose = Mid(GetMenuTopMode, MenuDelimiterPosition + Len(MenuDelimiter))
                     GetMenuTopMode = Mid(GetMenuTopMode, 1, MenuDelimiterPosition - 1)
@@ -10330,7 +10330,7 @@ ErrorTrap:
                             ParentID = cpCore.db.cs_getInteger(CSMenus, "ParentID")
                             If AccessOK Then
                                 Link = GetMenuLink(cpCore.db.db_GetCS(CSMenus, "LinkPage"), ContentID)
-                                If InStr(1, Link, "?") = 1 Then
+                                If vbInstr(1, Link, "?") = 1 Then
                                     Link = cpCore.appConfig.adminRoute & Link
                                 End If
                             Else
@@ -11108,7 +11108,7 @@ ErrorTrap:
                 End If
                 '
                 Copy = cpCore.html_GetFormInputTextExpandable("StyleEditor", cpCore.cdnFiles.ReadFile(DynamicStylesFilename), 20)
-                Copy = Replace(Copy, " cols=""100""", " style=""width:100%;""", , , vbTextCompare)
+                Copy = vbReplace(Copy, " cols=""100""", " style=""width:100%;""", 1, 99, vbTextCompare)
                 Copy = "" _
                     & "<div style=""padding:10px;"">" & cpCore.html_GetFormInputCheckBox2(RequestNameAllowCSSReset, AllowCSSReset) & "&nbsp;Include Contensive reset styles</div>" _
                     & "<div style=""padding:10px;"">" & Copy & "</div>"
@@ -11322,7 +11322,7 @@ ErrorTrap:
         '                & "<option value=2>Clear all member Email addresses that match the Email address</option>" _
         '                & "<option value=3>Delete all Members with a matching Email address</option>" _
         '                & "</select>"
-        '            Copy = Replace(Copy, "value=" & FieldValue, "selected value=" & FieldValue)
+        '            Copy = vbReplace(Copy, "value=" & FieldValue, "selected value=" & FieldValue)
         '            Call Content.Add(AdminUI.GetEditRow( Copy, "Bounce Email Action", HelpCopy, False, False))
         '            '
         '            HelpCopy = "Bounce emails are retrieved about every minute. This is the status of the last check."
@@ -11500,7 +11500,7 @@ ErrorTrap:
                                             If cpCore.db.cs_Ok(CSDst) Then
                                                 Call cpCore.db.cs_set(CSDst, "Name", cpCore.db.cs_getText(CSSrc, "name"))
                                                 Call cpCore.db.cs_set(CSDst, SQLFieldName, cpCore.db.cs_getText(CSSrc, SQLFieldName))
-                                                If LCase(cpCore.db.cs_getText(CSSrc, "command")) = "xml" Then
+                                                If vbLCase(cpCore.db.cs_getText(CSSrc, "command")) = "xml" Then
                                                     Call cpCore.db.cs_set(CSDst, "Filename", "DupDownload_" & CStr(dateToSeconds(cpCore.main_PageStartTime)) & CStr(GetRandomInteger()) & ".xml")
                                                     Call cpCore.db.cs_set(CSDst, "Command", "BUILDXML")
                                                 Else
@@ -11528,7 +11528,7 @@ ErrorTrap:
                                     TableName = cpCore.db_GetContentTablename(ContentName)
                                     Criteria = cpCore.db_GetContentControlCriteria(ContentName)
                                     Name = "CSV Download, " & ContentName
-                                    Filename = Replace(ContentName, " ", "") & "_" & CStr(dateToSeconds(cpCore.main_PageStartTime)) & CStr(GetRandomInteger()) & ".csv"
+                                    Filename = vbReplace(ContentName, " ", "") & "_" & CStr(dateToSeconds(cpCore.main_PageStartTime)) & CStr(GetRandomInteger()) & ".csv"
                                     Call cpCore.db.cs_set(CS, "Name", Name)
                                     Call cpCore.db.cs_set(CS, "Filename", Filename)
                                     Call cpCore.db.cs_set(CS, "Command", "BUILDCSV")
@@ -11545,7 +11545,7 @@ ErrorTrap:
                                     TableName = cpCore.db_GetContentTablename(ContentName)
                                     Criteria = cpCore.db_GetContentControlCriteria(ContentName)
                                     Name = "XML Download, " & ContentName
-                                    Filename = Replace(ContentName, " ", "") & "_" & CStr(dateToSeconds(cpCore.main_PageStartTime)) & CStr(GetRandomInteger()) & ".xml"
+                                    Filename = vbReplace(ContentName, " ", "") & "_" & CStr(dateToSeconds(cpCore.main_PageStartTime)) & CStr(GetRandomInteger()) & ".xml"
                                     Call cpCore.db.cs_set(CS, "Name", Name)
                                     Call cpCore.db.cs_set(CS, "Filename", Filename)
                                     Call cpCore.db.cs_set(CS, "Command", "BUILDXML")
@@ -11937,28 +11937,28 @@ ErrorTrap:
         '            CS = cpCore.main_OpenCSContentRecord("Dynamic Menus", MenuID)
         '            If cpCore.app.db_IsCSOK(CS) Then
         '                StylePrefix = cpCore.db.db_GetCSText(CS, "StylePrefix")
-        '                If StylePrefix <> "" And UCase(StylePrefix) <> "CCFLYOUT" Then
+        '                If StylePrefix <> "" And vbUCase(StylePrefix) <> "CCFLYOUT" Then
         '                    if true then ' 3.3.951" Then
         '                        TestSTyles = cpCore.app.db_GetCS(CS, "StylesFilename")
         '                    Else
         '                        TestSTyles = cpCore.main_GetStyleSheet
         '                    End If
-        '                    If InStr(1, TestSTyles, "." & StylePrefix, vbTextCompare) = 0 Then
+        '                    If vbInstr(1, TestSTyles, "." & StylePrefix, vbTextCompare) = 0 Then
         '                        '
         '                        ' style not found, get the default ccFlyout styles
         '                        '
         '                        DefaultStyles = RemoveStyleTags(cpCore.cluster.programDataFiles.ReadFile("ccLib\" & "Styles\" & defaultStyleFilename))
-        '                        'DefaultStyles = Replace(DefaultStyles, vbCrLf, " ")
-        '                        Do While InStr(1, DefaultStyles, "  ") <> 0
-        '                            DefaultStyles = Replace(DefaultStyles, "  ", " ")
+        '                        'DefaultStyles = vbReplace(DefaultStyles, vbCrLf, " ")
+        '                        Do While vbInstr(1, DefaultStyles, "  ") <> 0
+        '                            DefaultStyles = vbReplace(DefaultStyles, "  ", " ")
         '                        Loop
         '                        StyleSplit = Split(DefaultStyles, "}")
         '                        For StylePtr = 0 To UBound(StyleSplit)
         '                            StyleLine = StyleSplit(StylePtr)
         '                            If StyleLine <> "" Then
-        '                                If InStr(1, StyleLine, ".ccflyout", vbTextCompare) <> 0 Then
-        '                                    StyleLine = Replace(StyleLine, vbCrLf, " ")
-        '                                    StyleLine = Replace(StyleLine, ".ccflyout", "." & StylePrefix, , , vbTextCompare)
+        '                                If vbInstr(1, StyleLine, ".ccflyout", vbTextCompare) <> 0 Then
+        '                                    StyleLine = vbReplace(StyleLine, vbCrLf, " ")
+        '                                    StyleLine = vbReplace(StyleLine, ".ccflyout", "." & StylePrefix, vbTextCompare)
         '                                    Do While Left(StyleLine, 1) = " "
         '                                        StyleLine = Mid(StyleLine, 2)
         '                                    Loop
@@ -12860,7 +12860,7 @@ ErrorTrap:
                                     Next
                                 End If
                                 ButtonFace = adminContent.fields(FieldName.ToLower()).caption
-                                ButtonFace = Replace(ButtonFace, " ", "&nbsp;")
+                                ButtonFace = vbReplace(ButtonFace, " ", "&nbsp;")
                                 SortTitle = "Sort A-Z"
                                 '
                                 If IndexConfig.Sorts.ContainsKey(FieldName) Then
@@ -12945,7 +12945,7 @@ ErrorTrap:
                                         If FieldUsedInColumns.ContainsKey(columnNameLc) Then
                                             If FieldUsedInColumns.Item(columnNameLc) Then
                                                 DataTable_DataRows &= (vbCrLf & "<td valign=""middle"" " & RowColor & " align=""left"">" & SpanClassAdminNormal)
-                                                DataTable_DataRows &= GetForm_Index_GetCell(adminContent, editRecord, column.Name, CS, IsLookupFieldValid(columnNameLc), LCase(adminContent.ContentTableName) = "ccemail")
+                                                DataTable_DataRows &= GetForm_Index_GetCell(adminContent, editRecord, column.Name, CS, IsLookupFieldValid(columnNameLc), vbLCase(adminContent.ContentTableName) = "ccemail")
                                                 DataTable_DataRows &= ("&nbsp;</span></td>")
                                             End If
                                         End If
@@ -13009,7 +13009,7 @@ ErrorTrap:
                             'ReDim Findstring(IndexConfig.Columns.Count)
                             'For ColumnPointer = 0 To IndexConfig.Columns.Count - 1
                             '    FieldName = IndexConfig.Columns(ColumnPointer).Name
-                            '    If LCase(FieldName) = FindWordName Then
+                            '    If vbLCase(FieldName) = FindWordName Then
                             '        Findstring(ColumnPointer) = FindWordValue
                             '    End If
                             'Next
@@ -13017,7 +13017,7 @@ ErrorTrap:
                             '        For ColumnPointer = 0 To CustomAdminColumnCount - 1
                             '            FieldPtr = CustomAdminColumn(ColumnPointer).FieldPointer
                             '            With AdminContent.fields(FieldPtr)
-                            '                If LCase(.Name) = FindWordName Then
+                            '                If vbLCase(.Name) = FindWordName Then
                             '                    Findstring(ColumnPointer) = FindWordValue
                             '                End If
                             '            End With
@@ -13046,7 +13046,7 @@ ErrorTrap:
                                 With column
                                     ColumnWidth = .Width
                                     'fieldId = .FieldId
-                                    FieldName = LCase(.Name)
+                                    FieldName = vbLCase(.Name)
                                 End With
                                 FindWordValue = ""
                                 If IndexConfig.FindWords.ContainsKey(FieldName) Then
@@ -13132,9 +13132,9 @@ ErrorTrap:
             Found = False
             ResultNode = Node.Attributes.GetNamedItem(Name)
             If (ResultNode Is Nothing) Then
-                UcaseName = UCase(Name)
+                UcaseName = vbUCase(Name)
                 For Each NodeAttribute In Node.Attributes
-                    If UCase(NodeAttribute.Name) = UcaseName Then
+                    If vbUCase(NodeAttribute.Name) = UcaseName Then
                         GetXMLAttribute = NodeAttribute.Value
                         Found = True
                         Exit For
@@ -13162,7 +13162,7 @@ ErrorTrap:
         ''' </summary>
         ''' <param name="adminContent"></param>
         ''' <returns></returns>
-        Friend Function GetForm_IndexFilterContent(adminContent As coreMetaDataClass.CDefClass) As String
+        Public Function GetForm_IndexFilterContent(adminContent As coreMetaDataClass.CDefClass) As String
             Dim returnContent As String = ""
             Try
                 Dim RecordID As Integer
@@ -13301,7 +13301,7 @@ ErrorTrap:
                         '
                         If .ContentCategoryID <> 0 Then
                             ContentCategoryName = cpCore.main_GetRecordName("Content Categories", .ContentCategoryID)
-                            Copy = Replace(ContentCategoryName, " ", "&nbsp;")
+                            Copy = vbReplace(ContentCategoryName, " ", "&nbsp;")
                             returnContent &= "<div class=""ccFilterSubHead"">Content&nbsp;Category</div>"
                             QS = RQS
                             QS = ModifyQueryString(QS, "IndexFilterCategoryID", CStr(0), True)
@@ -13361,7 +13361,7 @@ ErrorTrap:
                             Id = cpCore.db.cs_getInteger(CS, "ID")
                             CurrentFolderID = cpCore.db.cs_getInteger(CS, "ContentCategoryID")
                             '
-                            Caption = Replace(Caption, " ", "&nbsp;")
+                            Caption = vbReplace(Caption, " ", "&nbsp;")
                             If FirstCaption = "" Then
                                 FirstCaption = Caption
                             End If
@@ -13426,7 +13426,7 @@ ErrorTrap:
                         Cnt = UBound(ListSplit) + 1
                         If Cnt > 0 Then
                             For Ptr = 0 To Cnt - 1
-                                Pos = InStr(1, ListSplit(Ptr), ")")
+                                Pos = vbInstr(1, ListSplit(Ptr), ")")
                                 If Pos > 0 Then
                                     subContentID = EncodeInteger(Mid(ListSplit(Ptr), 1, Pos - 1))
                                     If subContentID > 0 And (subContentID <> adminContent.Id) And (subContentID <> .SubCDefID) Then
@@ -13448,7 +13448,7 @@ ErrorTrap:
                     '
                     TableName = cpCore.db_GetContentTablename(ContentName)
                     SubFilterList = ""
-                    If LCase(TableName) = LCase("ccMembers") Then
+                    If vbLCase(TableName) = vbLCase("ccMembers") Then
                         SQL = cpCore.db_GetSQLSelect("default", "ccGroups", "ID,Caption,Name", "(active<>0)", "Caption,Name")
                         CS = cpCore.db.db_openCsSql_rev("default", SQL)
                         Do While cpCore.db.cs_Ok(CS)
@@ -13600,7 +13600,7 @@ ErrorTrap:
                             '
                             ' check next line
                             '
-                            ConfigListLine = LCase(ConfigListLines(Ptr))
+                            ConfigListLine = vbLCase(ConfigListLines(Ptr))
                             If ConfigListLine <> "" Then
                                 Select Case ConfigListLine
                                     Case "columns"
@@ -13656,7 +13656,7 @@ ErrorTrap:
                             '
                             ' check next line
                             '
-                            ConfigListLine = LCase(ConfigListLines(Ptr))
+                            ConfigListLine = vbLCase(ConfigListLines(Ptr))
                             If ConfigListLine <> "" Then
                                 Select Case ConfigListLine
                                     Case "findwordlist"
@@ -13747,7 +13747,7 @@ ErrorTrap:
                     '    If .Columns.Count > 0 Then
                     '        For Ptr = 0 To .Columns.Count - 1
                     '            With .Columns(Ptr)
-                    '                If LCase(.Name) = field.Name.ToLower Then
+                    '                If vbLCase(.Name) = field.Name.ToLower Then
                     '                    .FieldId = SrcPtr
                     '                    Exit For
                     '                End If
@@ -13758,7 +13758,7 @@ ErrorTrap:
                     '    If .SortCnt > 0 Then
                     '        For Ptr = 0 To .SortCnt - 1
                     '            With .Sorts(Ptr)
-                    '                If LCase(.FieldName) = field.Name Then
+                    '                If vbLCase(.FieldName) = field.Name Then
                     '                    .FieldPtr = SrcPtr
                     '                    Exit For
                     '                End If
@@ -13788,7 +13788,7 @@ ErrorTrap:
                     '            For Ptr = 0 To .SortCnt - 1
                     '                With .Sorts(Ptr)
                     '                    For SrcPtr = 0 To AdminContent.fields.count - 1
-                    '                        If LCase(.FieldName) = LCase(AdminContent.fields(SrcPtr).Name) Then
+                    '                        If vbLCase(.FieldName) = vbLCase(AdminContent.fields(SrcPtr).Name) Then
                     '                            .FieldPtr = SrcPtr
                     '                            Exit For
                     '                        End If
@@ -13898,7 +13898,7 @@ ErrorTrap:
                                 If (ColumnCnt > 0) Then
                                     For ColumnPtr = 0 To ColumnCnt - 1
                                         FindValue = Trim(cpCore.docProperties.getText("FindValue" & ColumnPtr))
-                                        FindName = LCase(cpCore.docProperties.getText("FindName" & ColumnPtr))
+                                        FindName = vbLCase(cpCore.docProperties.getText("FindName" & ColumnPtr))
                                         If (Not String.IsNullOrEmpty(FindValue)) And (Not String.IsNullOrEmpty(FindName)) Then
                                             If Not .FindWords.ContainsKey(FindName) Then
                                                 Dim findWord As New indexConfigFindWordClass
@@ -14142,7 +14142,7 @@ ErrorTrap:
                             sort.Forward = Not sortReverse
                             .Sorts.Add(VarText, sort)
                         End If
-                        'VarText = LCase(VarText)
+                        'VarText = vbLCase(VarText)
                         'If .SortCnt > 0 Then
                         '    For Ptr = 0 To .SortCnt - 1
                         '        If .Sorts(Ptr).FieldName = VarText Then
@@ -14171,7 +14171,7 @@ ErrorTrap:
                         '    '
                         '    .SortCnt = 1
                         '    ReDim .Sorts(0)
-                        '    .Sorts(0).FieldName = LCase(VarText)
+                        '    .Sorts(0).FieldName = vbLCase(VarText)
                         '    .Sorts(0).Forward = True
                         '    .PageNumber = 1
                         'End If
@@ -14252,7 +14252,7 @@ ErrorTrap:
                 '        If .Columns.Count > 0 Then
                 '            For Ptr = 0 To .Columns.Count - 1
                 '                With .Columns(Ptr)
-                '                    If LCase(.Name) = field.Name Then
+                '                    If vbLCase(.Name) = field.Name Then
                 '                        .FieldId = SrcPtr
                 '                        Exit For
                 '                    End If
@@ -14263,7 +14263,7 @@ ErrorTrap:
                 '        If .SortCnt > 0 Then
                 '            For Ptr = 0 To .SortCnt - 1
                 '                With .Sorts(Ptr)
-                '                    If LCase(.FieldName) = field.Name Then
+                '                    If vbLCase(.FieldName) = field.Name Then
                 '                        .FieldPtr = SrcPtr
                 '                        Exit For
                 '                    End If
@@ -14437,10 +14437,10 @@ ErrorTrap:
         Private Function GetFormInputWithFocus2(ByVal ElementName As String, Optional ByVal CurrentValue As String = "", Optional ByVal Height As Integer = -1, Optional ByVal Width As Integer = -1, Optional ByVal ElementID As String = "", Optional ByVal OnFocusJavascript As String = "", Optional ByVal HtmlClass As String = "") As String
             GetFormInputWithFocus2 = cpCore.html_GetFormInputText2(ElementName, CurrentValue, Height, Width, ElementID)
             If OnFocusJavascript <> "" Then
-                GetFormInputWithFocus2 = Replace(GetFormInputWithFocus2, ">", " onFocus=""" & OnFocusJavascript & """>", 1, 1, vbBinaryCompare)
+                GetFormInputWithFocus2 = vbReplace(GetFormInputWithFocus2, ">", " onFocus=""" & OnFocusJavascript & """>")
             End If
             If HtmlClass <> "" Then
-                GetFormInputWithFocus2 = Replace(GetFormInputWithFocus2, ">", " class=""" & HtmlClass & """>", 1, 1, vbBinaryCompare)
+                GetFormInputWithFocus2 = vbReplace(GetFormInputWithFocus2, ">", " class=""" & HtmlClass & """>")
             End If
         End Function
         '
@@ -14455,10 +14455,10 @@ ErrorTrap:
         Private Function GetFormInputDateWithFocus2(ByVal ElementName As String, Optional ByVal CurrentValue As String = "", Optional ByVal Width As String = "", Optional ByVal ElementID As String = "", Optional ByVal OnFocusJavascript As String = "", Optional ByVal HtmlClass As String = "") As String
             GetFormInputDateWithFocus2 = cpCore.html_GetFormInputDate(ElementName, CurrentValue, Width, ElementID)
             If OnFocusJavascript <> "" Then
-                GetFormInputDateWithFocus2 = Replace(GetFormInputDateWithFocus2, ">", " onFocus=""" & OnFocusJavascript & """>", 1, 1, vbBinaryCompare)
+                GetFormInputDateWithFocus2 = vbReplace(GetFormInputDateWithFocus2, ">", " onFocus=""" & OnFocusJavascript & """>")
             End If
             If HtmlClass <> "" Then
-                GetFormInputDateWithFocus2 = Replace(GetFormInputDateWithFocus2, ">", " class=""" & HtmlClass & """>", 1, 1, vbBinaryCompare)
+                GetFormInputDateWithFocus2 = vbReplace(GetFormInputDateWithFocus2, ">", " class=""" & HtmlClass & """>")
             End If
         End Function
         '
@@ -14522,7 +14522,7 @@ ErrorTrap:
                                     FormFieldCnt = cpCore.docProperties.getInteger("fieldcnt")
                                     If FormFieldCnt > 0 Then
                                         For FormFieldPtr = 0 To FormFieldCnt - 1
-                                            FieldName = LCase(cpCore.docProperties.getText("fieldname" & FormFieldPtr))
+                                            FieldName = vbLCase(cpCore.docProperties.getText("fieldname" & FormFieldPtr))
                                             MatchOption = DirectCast(cpCore.docProperties.getInteger("FieldMatch" & FormFieldPtr), FindWordMatchEnum)
                                             Select Case MatchOption
                                                 Case FindWordMatchEnum.MatchEquals, FindWordMatchEnum.MatchGreaterThan, FindWordMatchEnum.matchincludes, FindWordMatchEnum.MatchLessThan
@@ -14609,7 +14609,7 @@ ErrorTrap:
                             ReDim Preserve FieldLookupList(FieldSize)
                         End If
                         With field
-                            FieldName = LCase(.nameLc)
+                            FieldName = vbLCase(.nameLc)
                             FieldNames(FieldPtr) = FieldName
                             FieldCaption(FieldPtr) = .caption
                             fieldId(FieldPtr) = .id
@@ -14648,7 +14648,7 @@ ErrorTrap:
                     '                ReDim Preserve FieldLookupContentName(FieldSize)
                     '                ReDim Preserve FieldLookupList(FieldSize)
                     '            End If
-                    '            FieldName = LCase(cpCore.db.db_GetCSText(CS, "name"))
+                    '            FieldName = vbLCase(cpCore.db.db_GetCSText(CS, "name"))
                     '            FieldNames(FieldPtr) = FieldName
                     '            FieldCaption(FieldPtr) = cpCore.db.db_GetCSText(CS, "Caption")
                     '            FieldID(FieldPtr) = cpCore.app.db_GetCSInteger(CS, "ID")
@@ -14677,15 +14677,15 @@ ErrorTrap:
                     ''            If CriteriaCount > 0 Then
                     ''                For CriteriaPointer = 0 To CriteriaCount - 1
                     ''                    FieldMatchOptions(FieldPtr) = 0
-                    ''                    If InStr(1, CriteriaValues(CriteriaPointer), FieldNames(FieldPtr) & "=", vbTextCompare) = 1 Then
+                    ''                    If vbInstr(1, CriteriaValues(CriteriaPointer), FieldNames(FieldPtr) & "=", vbTextCompare) = 1 Then
                     ''                        NameValues = Split(CriteriaValues(CriteriaPointer), "=")
                     ''                        FieldValue(FieldPtr) = NameValues(1)
                     ''                        FieldMatchOptions(FieldPtr) = 1
-                    ''                    ElseIf InStr(1, CriteriaValues(CriteriaPointer), FieldNames(FieldPtr) & ">", vbTextCompare) = 1 Then
+                    ''                    ElseIf vbInstr(1, CriteriaValues(CriteriaPointer), FieldNames(FieldPtr) & ">", vbTextCompare) = 1 Then
                     ''                        NameValues = Split(CriteriaValues(CriteriaPointer), ">")
                     ''                        FieldValue(FieldPtr) = NameValues(1)
                     ''                        FieldMatchOptions(FieldPtr) = 2
-                    ''                    ElseIf InStr(1, CriteriaValues(CriteriaPointer), FieldNames(FieldPtr) & "<", vbTextCompare) = 1 Then
+                    ''                    ElseIf vbInstr(1, CriteriaValues(CriteriaPointer), FieldNames(FieldPtr) & "<", vbTextCompare) = 1 Then
                     ''                        NameValues = Split(CriteriaValues(CriteriaPointer), "<")
                     ''                        FieldValue(FieldPtr) = NameValues(1)
                     ''                        FieldMatchOptions(FieldPtr) = 3
@@ -14899,7 +14899,7 @@ ErrorTrap:
                                 'Else
                                 '    selector = cpCore.main_GetFormInputSelectList2("FieldValue" & FieldPtr, FieldValue(FieldPtr), FieldLookupList(FieldPtr))
                                 'End If
-                                'selector = Replace(selector, ">", "onFocus=""var e=getElementById('t" & FieldPtr & "');e.checked=1;"">", 1, 1, vbBinaryCompare)
+                                'selector = vbReplace(selector, ">", "onFocus=""var e=getElementById('t" & FieldPtr & "');e.checked=1;"">")
                                 returnForm = returnForm _
                                 & "<tr>" _
                                 & "<td class=""ccAdminEditCaption"">" & FieldCaption(FieldPtr) & "</td>" _
@@ -15324,7 +15324,7 @@ ErrorTrap:
             TargetFieldID = cpCore.docProperties.getInteger("fi")
             TargetFieldName = cpCore.docProperties.getText("FieldName")
             ColumnPointer = cpCore.docProperties.getInteger("dtcn")
-            FieldNameToAdd = UCase(cpCore.docProperties.getText(RequestNameAddField))
+            FieldNameToAdd = vbUCase(cpCore.docProperties.getText(RequestNameAddField))
             FieldIDToAdd = cpCore.docProperties.getInteger(RequestNameAddFieldID)
             'ButtonList = ButtonCancel & "," & ButtonSelect
             NeedToReloadConfig = cpCore.main_GetStreamBoolean2("NeedToReloadConfig")
@@ -15857,7 +15857,7 @@ ErrorTrap:
                     ' Throw out all the details of what happened, and add one simple error
                     '
                     ErrorList = cpCore.error_GetUserError
-                    ErrorList = Replace(ErrorList, UserErrorHeadline, "", , , vbTextCompare)
+                    ErrorList = vbReplace(ErrorList, UserErrorHeadline, "", 1, 99, vbTextCompare)
                     Call cpCore.error_AddUserError("The following errors occurred while verifying Link Alias entries for your existing pages." & ErrorList)
                     'Call cpCore.main_AddUserError(ErrorList)
                 End If
@@ -15946,7 +15946,7 @@ ErrorTrap:
                         '
                         For Ptr = 0 To UBound(DefaultFeatures)
                             FeatureName = DefaultFeatures(Ptr)
-                            If LCase(FeatureName) = "styleandformatting" Then
+                            If vbLCase(FeatureName) = "styleandformatting" Then
                                 '
                                 ' must always be on or it throws js error (editor bug I guess)
                                 '
@@ -15969,12 +15969,12 @@ ErrorTrap:
                         '
                         ' Clear the editor style rules template cache so next edit gets new background color
                         '
-                        EditorStyleRulesFilename = Replace(EditorStyleRulesFilenamePattern, "$templateid$", "0", , , vbTextCompare)
+                        EditorStyleRulesFilename = vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, vbTextCompare)
                         Call cpCore.privateFiles.DeleteFile(EditorStyleRulesFilename)
                         '
                         CS = cpCore.db.db_openCsSql_rev("default", "select id from cctemplates")
                         Do While cpCore.db.cs_Ok(CS)
-                            EditorStyleRulesFilename = Replace(EditorStyleRulesFilenamePattern, "$templateid$", cpCore.main_GetCS2Text(CS, "ID"), , , vbTextCompare)
+                            EditorStyleRulesFilename = vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", cpCore.main_GetCS2Text(CS, "ID"), 1, 99, vbTextCompare)
                             Call cpCore.privateFiles.DeleteFile(EditorStyleRulesFilename)
                             Call cpCore.db.db_csGoNext(CS)
                         Loop
@@ -15992,7 +15992,7 @@ ErrorTrap:
                         '
                         FeatureList = cpCore.cdnFiles.ReadFile(InnovaEditorFeaturefilename)
                         If FeatureList = "" Then
-                            FeatureList = cpCore.cluster.clusterFiles.ReadFile("ccLib\" & "Config\DefaultEditorConfig.txt")
+                            FeatureList = cpCore.cluster.localClusterFiles.ReadFile("ccLib\" & "Config\DefaultEditorConfig.txt")
                             Call cpCore.privateFiles.SaveFile(InnovaEditorFeaturefilename, FeatureList)
                         End If
                         If FeatureList = "" Then
@@ -16000,11 +16000,11 @@ ErrorTrap:
                         End If
                         If FeatureList <> "" Then
                             Features = Split(FeatureList, vbCrLf)
-                            AdminList = Replace(Features(0), "admin:", "", , , vbTextCompare)
+                            AdminList = vbReplace(Features(0), "admin:", "", 1, 99, vbTextCompare)
                             If UBound(Features) > 0 Then
-                                CMList = Replace(Features(1), "contentmanager:", "", , , vbTextCompare)
+                                CMList = vbReplace(Features(1), "contentmanager:", "", 1, 99, vbTextCompare)
                                 If UBound(Features) > 1 Then
-                                    PublicList = Replace(Features(2), "public:", "", , , vbTextCompare)
+                                    PublicList = vbReplace(Features(2), "public:", "", 1, 99, vbTextCompare)
                                 End If
                             End If
                         End If
@@ -16019,7 +16019,7 @@ ErrorTrap:
                         RowPtr = 0
                         For Ptr = 0 To UBound(DefaultFeatures)
                             FeatureName = DefaultFeatures(Ptr)
-                            If LCase(FeatureName) = "styleandformatting" Then
+                            If vbLCase(FeatureName) = "styleandformatting" Then
                                 '
                                 ' hide and force on during process - editor bug I think.
                                 '
@@ -16657,7 +16657,7 @@ ErrorTrap:
                         Dim CS As Integer
                         KeywordList = cpCore.docProperties.getText("KeywordList")
                         If KeywordList <> "" Then
-                            KeywordList = Replace(KeywordList, vbCrLf, ",")
+                            KeywordList = vbReplace(KeywordList, vbCrLf, ",")
                             Keywords = Split(KeywordList, ",")
                             Cnt = UBound(Keywords) + 1
                             For Ptr = 0 To Cnt - 1
@@ -16747,7 +16747,7 @@ ErrorTrap:
                 Dim helpLink As String = ""
                 Dim FoundAddon As Boolean
                 '
-                If InStr(1, "," & UsedIDString & ",", "," & CStr(HelpAddonID) & ",") = 0 Then
+                If vbInstr(1, "," & UsedIDString & ",", "," & CStr(HelpAddonID) & ",") = 0 Then
                     CS = cpCore.db_csOpen("Add-ons", HelpAddonID)
                     If cpCore.db.cs_Ok(CS) Then
                         FoundAddon = True
@@ -16826,7 +16826,7 @@ ErrorTrap:
                 Dim IncludeHelp As String = ""
                 Dim addonId As Integer
                 '
-                If InStr(1, "," & UsedIDString & ",", "," & CStr(HelpCollectionID) & ",") = 0 Then
+                If vbInstr(1, "," & UsedIDString & ",", "," & CStr(HelpCollectionID) & ",") = 0 Then
                     CS = cpCore.db_csOpen("Add-on Collections", HelpCollectionID)
                     If cpCore.db.cs_Ok(CS) Then
                         Collectionname = cpCore.db.db_GetCS(CS, "Name")
@@ -16904,7 +16904,7 @@ ErrorTrap:
                 Dim AddonMan As addon_AddonMngrSafeClass
                 '
                 Try
-                    addonManager = cpCore.executeAddon_legacy2(0, AddonManagerGuid, "", cpCoreClass.addonContextEnum.ContextAdmin, "", 0, "", "0", False, -1, "", AddonStatusOK, Nothing)
+                    addonManager = cpCore.executeAddon_legacy2(0, AddonManagerGuid, "", coreClass.addonContextEnum.ContextAdmin, "", 0, "", "0", False, -1, "", AddonStatusOK, Nothing)
                 Catch ex As Exception
                     Call cpCore.handleExceptionAndNoThrow(New Exception("Error calling ExecuteAddon with AddonManagerGuid, will attempt Safe Mode Addon Manager. Exception=[" & ex.ToString & "]"))
                     AddonStatusOK = False
@@ -17015,7 +17015,7 @@ ErrorTrap:
                             Case FieldTypeIdFileCSS, FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdFileJavascript, FieldTypeIdLongText, FieldTypeIdManyToMany, FieldTypeIdRedirect, FieldTypeIdFileTextPrivate, FieldTypeIdFileXML, FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate
                                 IncludedInColumns = False
                         End Select
-                        'FieldName = LCase(.Name)
+                        'FieldName = vbLCase(.Name)
                         If (.fieldTypeId = FieldTypeIdMemberSelect) Or ((.fieldTypeId = FieldTypeIdLookup) And (.lookupContentID <> 0)) Then
                             '
                             ' This is a lookup field -- test if IncludedInLeftJoins
@@ -17085,17 +17085,17 @@ ErrorTrap:
                 Dim groupTableAlias As String
                 Dim sqlRightNow As String
                 Dim rightNow As Date
-                rightNow = Now()
+                rightNow = DateTime.Now()
                 sqlRightNow = cpCore.db.encodeSQLDate(rightNow)
-                If LCase(adminContent.ContentTableName) = LCase("ccMembers") Then
-                    'If LCase(AdminContent.ContentTableName) = "ccmembers" Then
+                If vbLCase(adminContent.ContentTableName) = vbLCase("ccMembers") Then
+                    'If vbLCase(AdminContent.ContentTableName) = "ccmembers" Then
                     With IndexConfig
                         If .GroupListCnt > 0 Then
                             For Ptr = 0 To .GroupListCnt - 1
                                 GroupName = .GroupList(Ptr)
                                 If GroupName <> "" Then
                                     GroupID = cpCore.main_GetRecordID("Groups", GroupName)
-                                    If GroupID = 0 And IsNumeric(GroupName) Then
+                                    If GroupID = 0 And vbIsNumeric(GroupName) Then
                                         GroupID = EncodeInteger(GroupName)
                                     End If
                                     groupTableAlias = "GroupFilter" & Ptr
@@ -17139,7 +17139,7 @@ ErrorTrap:
                         Cnt = UBound(ListSplit) + 1
                         If Cnt > 0 Then
                             For Ptr = 0 To Cnt - 1
-                                Pos = InStr(1, ListSplit(Ptr), ")")
+                                Pos = vbInstr(1, ListSplit(Ptr), ")")
                                 If Pos > 0 Then
                                     ContentID = EncodeInteger(Mid(ListSplit(Ptr), 1, Pos - 1))
                                     If ContentID > 0 And (ContentID <> adminContent.Id) And userHasContentAccess(ContentID) Then
@@ -17228,12 +17228,12 @@ ErrorTrap:
                             For Each keyValuePair As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In adminContent.fields
                                 Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
                                 With field
-                                    If UCase(.nameLc) = UCase(WherePair(0, WCount)) Then
+                                    If vbUCase(.nameLc) = vbUCase(WherePair(0, WCount)) Then
                                         '
                                         ' found it, add it in the sql
                                         '
                                         return_SQLWhere &= "AND(" & adminContent.ContentTableName & "." & WherePair(0, WCount) & "="
-                                        If IsNumeric(WherePair(1, WCount)) Then
+                                        If vbIsNumeric(WherePair(1, WCount)) Then
                                             return_SQLWhere &= WherePair(1, WCount) & ")"
                                         Else
                                             return_SQLWhere &= "'" & WherePair(1, WCount) & "')"
@@ -17253,7 +17253,7 @@ ErrorTrap:
                         Dim findword As indexConfigFindWordClass = kvp.Value
                         FindMatchOption = findword.MatchOption
                         If FindMatchOption <> FindWordMatchEnum.MatchIgnore Then
-                            FindWordName = LCase(findword.Name)
+                            FindWordName = vbLCase(findword.Name)
                             FindWordValue = findword.Value
                             '
                             ' Get FieldType
@@ -17263,13 +17263,13 @@ ErrorTrap:
                                     Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
                                     With field
                                         FieldPtr = .id ' quick fix for a replacement for the old fieldPtr (so multiple for loops will always use the same "table"+ptr string
-                                        If LCase(.nameLc) = FindWordName Then
+                                        If vbLCase(.nameLc) = FindWordName Then
                                             Select Case .fieldTypeId
                                                 Case FieldTypeIdAutoIdIncrement, FieldTypeIdInteger, FieldTypeIdCurrency, FieldTypeIdFloat
                                                     '
                                                     ' Numbers
                                                     '
-                                                    If SupportWorkflowFields And LCase(.nameLc) = "id" Then
+                                                    If SupportWorkflowFields And vbLCase(.nameLc) = "id" Then
                                                         FindWordName = "EditSourceID"
                                                     End If
                                                     Select Case FindMatchOption
@@ -17348,7 +17348,7 @@ ErrorTrap:
                                                                 lookups = Split(.lookupList, ",")
                                                                 LookupQuery = ""
                                                                 For LookupPtr = 0 To UBound(lookups)
-                                                                    If InStr(1, lookups(LookupPtr), FindWordValue, vbTextCompare) <> 0 Then
+                                                                    If vbInstr(1, lookups(LookupPtr), FindWordValue, vbTextCompare) <> 0 Then
                                                                         LookupQuery = LookupQuery & "OR(" & adminContent.ContentTableName & "." & FindWordName & "=" & cpCore.db.encodeSQLNumber(LookupPtr + 1) & ")"
                                                                     End If
                                                                 Next
@@ -17409,7 +17409,7 @@ ErrorTrap:
                 Dim orderByDelim As String = " "
                 For Each kvp In IndexConfig.Sorts
                     Dim sort As indexConfigSortClass = kvp.Value
-                    SortFieldName = LCase(sort.fieldName)
+                    SortFieldName = vbLCase(sort.fieldName)
                     '
                     ' Get FieldType
                     '
