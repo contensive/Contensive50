@@ -155,9 +155,9 @@ Namespace Contensive.Core
             ' ----- Read config file
             '
             ConfigFilename = "HouseKeepConfig.txt"
-            Config = cp.core.privateFiles.ReadFile("config\" & ConfigFilename)
+            Config = cp.core.privateFiles.readFile("config\" & ConfigFilename)
             If Config = "" Then
-                Config = cp.core.privateFiles.ReadFile("" & ConfigFilename)
+                Config = cp.core.privateFiles.readFile("" & ConfigFilename)
             End If
             If Config <> "" Then
                 ConfigLines = Split(Config, vbCrLf)
@@ -185,7 +185,7 @@ Namespace Contensive.Core
             Content = "" _
                 & "lastcheck=" & rightNow & vbCrLf _
                 & "serverhousekeeptime=" & ServerHousekeepTime & vbCrLf
-            Call cp.core.privateFiles.SaveFile("config\" & ConfigFilename, Content)
+            Call cp.core.privateFiles.saveFile("config\" & ConfigFilename, Content)
             '
             ' ----- Run Server Housekeep
             '
@@ -1551,7 +1551,7 @@ ErrorTrap:
                     FieldName = cp.core.db.cs_getText(CS, "FieldName")
                     TableName = cp.core.db.cs_getText(CS, "TableName")
                     PathName = TableName & "\" & FieldName
-                    FileList = cp.core.cdnFiles.GetFolderFiles(PathName)
+                    FileList = cp.core.cdnFiles.getFileList(PathName)
                     If FileList.Count > 0 Then
                         On Error Resume Next
                         SQL = "CREATE INDEX temp" & FieldName & " ON " & TableName & " (" & FieldName & ")"
@@ -1565,12 +1565,12 @@ ErrorTrap:
                             If FileSize = 0 Then
                                 SQL = "update " & TableName & " set " & FieldName & "=null where (" & FieldName & "=" & cp.core.db.encodeSQLText(VirtualFileName) & ")or(" & FieldName & "=" & cp.core.db.encodeSQLText(VirtualLink) & ")"
                                 Call cp.core.db.executeSql(SQL)
-                                Call cp.core.cdnFiles.DeleteFile(VirtualFileName)
+                                Call cp.core.cdnFiles.deleteFile(VirtualFileName)
                             Else
                                 SQL = "SELECT ID FROM " & TableName & " WHERE (" & FieldName & "=" & cp.core.db.encodeSQLText(VirtualFileName) & ")or(" & FieldName & "=" & cp.core.db.encodeSQLText(VirtualLink) & ")"
                                 CSTest = cp.core.db.db_openCsSql_rev("default", SQL)
                                 If Not cp.core.db.cs_Ok(CSTest) Then
-                                    Call cp.core.cdnFiles.DeleteFile(VirtualFileName)
+                                    Call cp.core.cdnFiles.deleteFile(VirtualFileName)
                                 End If
                                 Call cp.core.db.cs_Close(CSTest)
                             End If
@@ -2307,10 +2307,10 @@ ErrorTrap:
             '
             LogDate = DateTime.Now.AddDays(-30)
             Call AppendClassLog("", "HouseKeep", "Deleting Logs [" & FolderName & "] older than 30 days")
-            FileList = cp.core.cluster.localClusterFiles.GetFolderFiles(FolderName)
+            FileList = cp.core.cluster.localClusterFiles.getFileList(FolderName)
             For Each file As IO.FileInfo In FileList
                 If file.CreationTime < LogDate Then
-                    cp.core.privateFiles.DeleteFile(FolderName & "\" & file.Name)
+                    cp.core.privateFiles.deleteFile(FolderName & "\" & file.Name)
                 End If
             Next
             '
@@ -2347,10 +2347,10 @@ ErrorTrap:
             Dim FileSplit() As String
             '
             Call AppendClassLog(cp.core.appConfig.name, "HouseKeep_App_Daily_LogFolder(" & cp.core.appConfig.name & ")", "Deleting files from folder [" & FolderName & "] older than " & LastMonth)
-            FileList = cp.core.privateFiles.GetFolderFiles(FolderName)
+            FileList = cp.core.privateFiles.getFileList(FolderName)
             For Each file As IO.FileInfo In FileList
                 If file.CreationTime < LastMonth Then
-                    Call cp.core.privateFiles.DeleteFile(FolderName & "/" & file.Name)
+                    Call cp.core.privateFiles.deleteFile(FolderName & "/" & file.Name)
                 End If
             Next
             Exit Sub
@@ -2389,19 +2389,19 @@ ErrorTrap:
                                             '
                                             ' Read in the interfaces and save to Add-ons
                                             '
-                                            Call cp.core.privateFiles.SaveFile("config\VisitNameList.txt", Copy)
+                                            Call cp.core.privateFiles.saveFile("config\VisitNameList.txt", Copy)
                                             'Call cp.Core.app.privateFiles.SaveFile(getAppPath & "\config\DefaultBotNameList.txt", copy)
                                         Case "masteremailbouncefilters"
                                             '
                                             ' save the updated filters file
                                             '
-                                            Call cp.core.privateFiles.SaveFile("config\EmailBounceFilters.txt", Copy)
+                                            Call cp.core.privateFiles.saveFile("config\EmailBounceFilters.txt", Copy)
                                             'Call cp.Core.app.privateFiles.SaveFile(getAppPath & "\cclib\config\Filters.txt", copy)
                                         Case "mastermobilebrowserlist"
                                             '
                                             ' save the updated filters file
                                             '
-                                            Call cp.core.privateFiles.SaveFile("config\MobileBrowserList.txt", Copy)
+                                            Call cp.core.privateFiles.saveFile("config\MobileBrowserList.txt", Copy)
                                     End Select
                                 Next
                             End With
@@ -2852,8 +2852,8 @@ ErrorTrap:
                                             Path = cp.core.addon_getPrivateFilesAddonPath() & "\" & CollectionRootPath & "\"
                                             'Path = GetProgramPath & "\addons\" & CollectionRootPath & "\"
                                             'On Error Resume Next
-                                            If cp.core.privateFiles.checkPath(Path) Then
-                                                FolderList = cp.core.privateFiles.getFolders(Path)
+                                            If cp.core.privateFiles.pathExists(Path) Then
+                                                FolderList = cp.core.privateFiles.getFolderList(Path)
                                                 If Err.Number <> 0 Then
                                                     Err.Clear()
                                                 End If

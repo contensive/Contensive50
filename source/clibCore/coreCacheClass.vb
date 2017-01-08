@@ -71,7 +71,7 @@ Namespace Contensive.Core
                             Dim serializedDataObject As String = Nothing
                             Using mutex As New System.Threading.Mutex(False, rawCacheName)
                                 mutex.WaitOne()
-                                serializedDataObject = cpCore.privateFiles.ReadFile("appCache\" & encodeFilename(rawCacheName & ".txt"))
+                                serializedDataObject = cpCore.privateFiles.readFile("appCache\" & encodeFilename(rawCacheName & ".txt"))
                                 mutex.ReleaseMutex()
                             End Using
                             If String.IsNullOrEmpty(serializedDataObject) Then
@@ -210,7 +210,7 @@ Namespace Contensive.Core
                             'Dim serializedData As String = cpCore.json.Serialize(data)
                             Using mutex As New System.Threading.Mutex(False, rawCacheName)
                                 mutex.WaitOne()
-                                cpCore.privateFiles.SaveFile("appCache\" & encodeFilename(rawCacheName & ".txt"), serializedData)
+                                cpCore.privateFiles.saveFile("appCache\" & encodeFilename(rawCacheName & ".txt"), serializedData)
                                 mutex.ReleaseMutex()
                             End Using
                         Else

@@ -24,11 +24,6 @@ Namespace Contensive.Core
         Private cpCore As Contensive.Core.coreClass
         Protected disposed As Boolean = False
         '
-        Private _cdnFiles As CPFileSystemClass
-        Private _appRootFiles As CPFileSystemClass
-        Private _privateFiles As CPFileSystemClass
-        Private _serverFiles As CPFileSystemClass
-        '
         '==========================================================================================
         ''' <summary>
         ''' Constructor
@@ -38,42 +33,6 @@ Namespace Contensive.Core
             MyBase.New()
             Me.cpCore = core
         End Sub
-        '
-        Public Overrides ReadOnly Property cdnFiles() As CPFileSystemBaseClass
-            Get
-                If (_cdnFiles Is Nothing) Then
-                    _cdnFiles = New CPFileSystemClass(cpCore, cpCore.cdnFiles)
-                End If
-                Return _cdnFiles
-            End Get
-        End Property
-        '
-        Public Overrides ReadOnly Property appRootFiles() As CPFileSystemBaseClass
-            Get
-                If (_appRootFiles Is Nothing) Then
-                    _appRootFiles = New CPFileSystemClass(cpCore, cpCore.appRootFiles)
-                End If
-                Return _appRootFiles
-            End Get
-        End Property
-        '
-        Public Overrides ReadOnly Property privateFiles() As CPFileSystemBaseClass
-            Get
-                If (_privateFiles Is Nothing) Then
-                    _privateFiles = New CPFileSystemClass(cpCore, cpCore.privateFiles)
-                End If
-                Return _privateFiles
-            End Get
-        End Property
-        '
-        Public Overrides ReadOnly Property serverFiles() As CPFileSystemBaseClass
-            Get
-                If (_serverFiles Is Nothing) Then
-                    _serverFiles = New CPFileSystemClass(cpCore, cpCore.serverFiles)
-                End If
-                Return _serverFiles
-            End Get
-        End Property
         '
         '==========================================================================================
         ''' <summary>
@@ -86,10 +45,6 @@ Namespace Contensive.Core
                     '
                     ' call .dispose for managed objects
                     '
-                    If Not (_cdnFiles Is Nothing) Then _cdnFiles.Dispose()
-                    If Not (_appRootFiles Is Nothing) Then _appRootFiles.Dispose()
-                    If Not (_privateFiles Is Nothing) Then _privateFiles.Dispose()
-                    If Not (_serverFiles Is Nothing) Then _serverFiles.Dispose()
                     cpCore = Nothing
                 End If
                 '
@@ -118,7 +73,7 @@ Namespace Contensive.Core
         ''' <param name="fileContent"></param>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
         Public Overrides Sub appendVirtual(ByVal filename As String, ByVal fileContent As String)
-            Call cdnFiles.append(filename, fileContent)
+            Call cpCore.cdnFiles.appendFile(filename, fileContent)
         End Sub
         '
         '==========================================================================================
@@ -129,7 +84,7 @@ Namespace Contensive.Core
         ''' <param name="destinationFilename"></param>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
         Public Overrides Sub copyVirtual(ByVal sourceFilename As String, ByVal destinationFilename As String)
-            Call cdnFiles.copy(sourceFilename, destinationFilename)
+            Call cpCore.cdnFiles.copyFile(sourceFilename, destinationFilename)
         End Sub
         '
         '==========================================================================================
@@ -139,7 +94,7 @@ Namespace Contensive.Core
         ''' <param name="folderPath"></param>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
         Public Overrides Sub createFolder(ByVal folderPath As String)
-            Call serverFiles.createFolder(folderPath)
+            Call cpCore.appRootFiles.createPath(folderPath)
         End Sub
         '
         '==========================================================================================
@@ -149,7 +104,7 @@ Namespace Contensive.Core
         ''' <param name="filename"></param>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
         Public Overrides Sub delete(ByVal filename As String)
-            Call serverFiles.delete(filename)
+            Call cpCore.appRootFiles.deleteFile(filename)
         End Sub
         '
         '==========================================================================================
@@ -159,7 +114,7 @@ Namespace Contensive.Core
         ''' <param name="filename"></param>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
         Public Overrides Sub deleteVirtual(ByVal filename As String)
-            Call cdnFiles.delete(filename)
+            Call cpCore.cdnFiles.deleteFile(filename)
         End Sub
         '
         '==========================================================================================
@@ -170,7 +125,7 @@ Namespace Contensive.Core
         ''' <returns></returns>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
         Public Overrides Function read(ByVal filename As String) As String
-            Return cpCore.appRootFiles.ReadFile(filename)
+            Return cpCore.appRootFiles.readFile(filename)
         End Function
         '
         '==========================================================================================
@@ -181,7 +136,7 @@ Namespace Contensive.Core
         ''' <returns></returns>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
         Public Overrides Function readVirtual(ByVal filename As String) As String
-            Return cdnFiles.read(filename)
+            Return cpCore.cdnFiles.readFile(filename)
         End Function
         '
         '==========================================================================================
@@ -192,7 +147,7 @@ Namespace Contensive.Core
         ''' <param name="fileContent"></param>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
         Public Overrides Sub save(ByVal filename As String, ByVal fileContent As String)
-            Call serverFiles.save(filename, fileContent)
+            Call cpCore.appRootFiles.saveFile(filename, fileContent)
         End Sub
         '
         '==========================================================================================
@@ -203,7 +158,7 @@ Namespace Contensive.Core
         ''' <param name="fileContent"></param>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
         Public Overrides Sub saveVirtual(ByVal filename As String, ByVal fileContent As String)
-            Call cdnFiles.save(filename, fileContent)
+            Call cpCore.cdnFiles.saveFile(filename, fileContent)
         End Sub
         '
         '==========================================================================================
@@ -214,7 +169,7 @@ Namespace Contensive.Core
         ''' <returns></returns>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
         Public Overrides Function fileExists(ByVal pathFileName As String) As Boolean
-            fileExists = serverFiles.fileExists(pathFileName)
+            fileExists = cpCore.appRootFiles.fileExists(pathFileName)
         End Function
         '
         '==========================================================================================
@@ -225,7 +180,7 @@ Namespace Contensive.Core
         ''' <returns></returns>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
         Public Overrides Function folderExists(ByVal folderName As String) As Boolean
-            folderExists = serverFiles.folderExists(folderName)
+            folderExists = cpCore.appRootFiles.pathExists(folderName)
         End Function
         '
         '==========================================================================================
@@ -238,7 +193,7 @@ Namespace Contensive.Core
         ''' <returns></returns>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
         Public Overrides Function fileList(ByVal folderName As String, Optional ByVal pageSize As Integer = 0, Optional ByVal pageNumber As Integer = 1) As String
-            Dim fi As IO.FileInfo() = serverFiles.fileList(folderName)
+            Dim fi As IO.FileInfo() = cpCore.appRootFiles.getFileList(folderName)
             Return cpCore.cluster.localClusterFiles.convertFileINfoArrayToParseString(fi)
         End Function
         '
@@ -250,7 +205,7 @@ Namespace Contensive.Core
         ''' <returns></returns>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
         Public Overrides Function folderList(ByVal folderName As String) As String
-            Dim di As IO.DirectoryInfo() = serverFiles.folderList(folderName)
+            Dim di As IO.DirectoryInfo() = cpCore.appRootFiles.getFolderList(folderName)
             Return cpCore.cluster.localClusterFiles.convertDirectoryInfoArrayToParseString(di)
         End Function
         '

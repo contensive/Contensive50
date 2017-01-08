@@ -182,7 +182,7 @@ Namespace Contensive.Core
             Copy = Copy & EncodeText(BodyMessage)
             Filename = "Out" & CStr(GetRandomInteger()) & ".txt"
             '
-            Call cpCore.appRootFiles.SaveFile(iEmailOutPath & Filename, Copy)
+            Call cpCore.appRootFiles.saveFile(iEmailOutPath & Filename, Copy)
             '
             If Err.Number <> 0 Then
                 Call HandleClassTrapError("AddQueue", True)
@@ -248,13 +248,13 @@ ErrorTrap:
                 iEmailOutPath = "emailout\"
             End If
             '
-            FileList = cpCore.appRootFiles.GetFolderFiles(iEmailOutPath)
+            FileList = cpCore.appRootFiles.getFileList(iEmailOutPath)
             For Each file As IO.FileInfo In FileList
-                Copy = cpCore.appRootFiles.ReadFile(iEmailOutPath & Filename)
+                Copy = cpCore.appRootFiles.readFile(iEmailOutPath & Filename)
                 '
                 ' No - no way to manage all the files for now. Later work up something
                 'Call cpCore.app.publicFiles.CopyFile(iEmailOutPath & Filename, iEmailOutPath & "sent\" & Filename)
-                cpCore.appRootFiles.DeleteFile(iEmailOutPath & Filename)
+                cpCore.appRootFiles.deleteFile(iEmailOutPath & Filename)
                 '
                 ' Decode the file into the email arguments
                 '

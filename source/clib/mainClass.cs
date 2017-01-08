@@ -170,7 +170,7 @@ namespace Contensive.Core
                                 {
                                     using (programDataFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib"))
                                     {
-                                        JSONTemp = programDataFiles.ReadFile("serverConfig.json");
+                                        JSONTemp = programDataFiles.readFile("serverConfig.json");
                                         if (string.IsNullOrEmpty(JSONTemp))
                                         {
                                             Console.WriteLine("The serverConfig.json file was not found in c:\\programData\\clib. Please run -n to initialize the server.");
@@ -203,7 +203,7 @@ namespace Contensive.Core
                                                     //
                                                     serverConfig.allowTaskSchedulerService = cpCluster.Utils.EncodeBoolean(args[i]);
                                                     Console.WriteLine("allowtaskscheduler set " + serverConfig.allowTaskSchedulerService.ToString());
-                                                    programDataFiles.SaveFile("serverConfig.json", cpCluster.core.json.Serialize(serverConfig));
+                                                    programDataFiles.saveFile("serverConfig.json", cpCluster.core.json.Serialize(serverConfig));
                                                 }
                                             }
                                         }
@@ -215,7 +215,7 @@ namespace Contensive.Core
                                 {
                                     using (programDataFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib"))
                                     {
-                                        JSONTemp = programDataFiles.ReadFile("serverConfig.json");
+                                        JSONTemp = programDataFiles.readFile("serverConfig.json");
                                         if (string.IsNullOrEmpty(JSONTemp))
                                         {
                                             Console.WriteLine("The serverConfig.json file was no found in c:\\programData\\clib. Please run -n to initialize the server.");
@@ -248,7 +248,7 @@ namespace Contensive.Core
                                                     //
                                                     serverConfig.allowTaskRunnerService = cpCluster.Utils.EncodeBoolean(args[i]);
                                                     Console.WriteLine("allowtaskrunner set " + serverConfig.allowTaskRunnerService.ToString());
-                                                    programDataFiles.SaveFile("serverConfig.json", cpCluster.core.json.Serialize(serverConfig));
+                                                    programDataFiles.saveFile("serverConfig.json", cpCluster.core.json.Serialize(serverConfig));
                                                 }
                                             }
                                         }
@@ -265,7 +265,7 @@ namespace Contensive.Core
                                     {
                                         cpCluster = new CPClass();
                                         programDataFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib");
-                                        JSONTemp = programDataFiles.ReadFile("serverConfig.json");
+                                        JSONTemp = programDataFiles.readFile("serverConfig.json");
                                         if (string.IsNullOrEmpty(JSONTemp))
                                         {
                                             Console.WriteLine("The serverConfig.json file was no found in c:\\programData\\clib. Please run -n to initialize the server.");
@@ -309,7 +309,7 @@ namespace Contensive.Core
                                                     serverConfig.allowTaskRunnerService = cpCluster.Utils.EncodeBoolean(args[i]);
                                                     Console.WriteLine("allowTaskRunner set " + serverConfig.allowTaskRunnerService.ToString());
                                                     //
-                                                    programDataFiles.SaveFile("serverConfig.json", cpCluster.core.json.Serialize(serverConfig));
+                                                    programDataFiles.saveFile("serverConfig.json", cpCluster.core.json.Serialize(serverConfig));
                                                 }
                                             }
                                         }

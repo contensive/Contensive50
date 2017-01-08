@@ -190,7 +190,7 @@ Namespace Contensive.Core
         ''' </summary>
         Public Sub saveConfig()
             Dim jsonTemp As String = cpCore.json.Serialize(cpCore.clusterConfig)
-            localClusterFiles.SaveFile("clusterConfig.json", jsonTemp)
+            localClusterFiles.saveFile("clusterConfig.json", jsonTemp)
         End Sub
         '
         '====================================================================================================

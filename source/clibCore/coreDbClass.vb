@@ -2172,7 +2172,7 @@ ErrorTrap:
                                             '
                                             Filename = cs_getText(CSPointer, fieldName)
                                             If Filename <> "" Then
-                                                Call cpCore.cdnFiles.DeleteFile(cpCore.cdnFiles.joinPath(cpCore.appConfig.cdnFilesNetprefix, Filename))
+                                                Call cpCore.cdnFiles.deleteFile(cpCore.cdnFiles.joinPath(cpCore.appConfig.cdnFilesNetprefix, Filename))
                                             End If
                                         Case FieldTypeIdFileTextPrivate, FieldTypeIdFileHTMLPrivate
                                             '
@@ -2180,7 +2180,7 @@ ErrorTrap:
                                             '
                                             Filename = cs_getText(CSPointer, fieldName)
                                             If Filename <> "" Then
-                                                Call cpCore.privateFiles.DeleteFile(Filename)
+                                                Call cpCore.privateFiles.deleteFile(Filename)
                                             End If
                                     End Select
                                 End With
@@ -2955,15 +2955,15 @@ ErrorTrap:
                             '
                             ' Filename changed, mark record changed
                             '
-                            Call cpCore.privateFiles.SaveFile(Filename, Copy)
+                            Call cpCore.privateFiles.saveFile(Filename, Copy)
                             Call db_SetCSField(CSPointer, FieldName, Filename)
                         Else
-                            OldCopy = cpCore.cdnFiles.ReadFile(Filename)
+                            OldCopy = cpCore.cdnFiles.readFile(Filename)
                             If OldCopy <> Copy Then
                                 '
                                 ' copy changed, mark record changed
                                 '
-                                Call cpCore.privateFiles.SaveFile(Filename, Copy)
+                                Call cpCore.privateFiles.saveFile(Filename, Copy)
                                 Call db_SetCSField(CSPointer, FieldName, Filename)
                             End If
                         End If
@@ -2994,7 +2994,7 @@ ErrorTrap:
             '
             Filename = cs_getText(CSPointer, FieldName)
             If Filename <> "" Then
-                db_csGetTextFile = cpCore.cdnFiles.ReadFile(Filename)
+                db_csGetTextFile = cpCore.cdnFiles.readFile(Filename)
             End If
             '
             Exit Function
@@ -3703,12 +3703,12 @@ ErrorTrap:
                                                 '
                                                 '
                                                 '
-                                                db_GetCS = cpCore.privateFiles.ReadFile(EncodeText(FieldValueVariant))
+                                                db_GetCS = cpCore.privateFiles.readFile(EncodeText(FieldValueVariant))
                                             Case FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript
                                                 '
                                                 '
                                                 '
-                                                db_GetCS = cpCore.cdnFiles.ReadFile(EncodeText(FieldValueVariant))
+                                                db_GetCS = cpCore.cdnFiles.readFile(EncodeText(FieldValueVariant))
                                             'NeedsHTMLEncode = False
                                             Case FieldTypeIdText, FieldTypeIdLongText, FieldTypeIdHTML
                                                 '
@@ -3809,7 +3809,7 @@ ErrorTrap:
                                                 FieldValueText = EncodeText(FieldValueVariantLocal)
                                                 If FieldValueText = "" Then
                                                     If fileNameNoExt <> "" Then
-                                                        Call cpCore.privateFiles.DeleteFile(fileNameNoExt)
+                                                        Call cpCore.privateFiles.deleteFile(fileNameNoExt)
                                                         'Call publicFiles.DeleteFile(fileNameNoExt)
                                                         fileNameNoExt = ""
                                                     End If
@@ -3817,7 +3817,7 @@ ErrorTrap:
                                                     If fileNameNoExt = "" Then
                                                         fileNameNoExt = db_GetCSFilename(CSPointer, FieldName, "", ContentName)
                                                     End If
-                                                    Call cpCore.privateFiles.SaveFile(fileNameNoExt, FieldValueText)
+                                                    Call cpCore.privateFiles.saveFile(fileNameNoExt, FieldValueText)
                                                     'Call publicFiles.SaveFile(fileNameNoExt, FieldValueText)
                                                 End If
                                                 FieldValueVariantLocal = fileNameNoExt
@@ -3841,7 +3841,7 @@ ErrorTrap:
                                                 BlankTest = vbReplace(BlankTest, vbTab, "")
                                                 If BlankTest = "" Then
                                                     If PathFilename <> "" Then
-                                                        Call cpCore.cdnFiles.DeleteFile(PathFilename)
+                                                        Call cpCore.cdnFiles.deleteFile(PathFilename)
                                                         PathFilename = ""
                                                     End If
                                                 Else
@@ -3886,9 +3886,9 @@ ErrorTrap:
                                                     End If
                                                     If (pathFilenameOriginal <> "") And (pathFilenameOriginal <> PathFilename) Then
                                                         pathFilenameOriginal = convertCdnUrlToCdnPathFilename(pathFilenameOriginal)
-                                                        Call cpCore.cdnFiles.DeleteFile(pathFilenameOriginal)
+                                                        Call cpCore.cdnFiles.deleteFile(pathFilenameOriginal)
                                                     End If
-                                                    Call cpCore.cdnFiles.SaveFile(PathFilename, FieldValueText)
+                                                    Call cpCore.cdnFiles.saveFile(PathFilename, FieldValueText)
                                                 End If
                                                 FieldValueVariantLocal = PathFilename
                                                 SetNeeded = True

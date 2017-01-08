@@ -691,7 +691,7 @@ Namespace Contensive.Core
                                     End Select
                                 Next
                                 If ArgName <> "" Then
-                                    CmdAccumulator = cpCore.appRootFiles.ReadFile(ArgName)
+                                    CmdAccumulator = cpCore.appRootFiles.readFile(ArgName)
                                 End If
                             Case "import"
                                 '
@@ -711,7 +711,7 @@ Namespace Contensive.Core
                                     End Select
                                 Next
                                 If ArgName <> "" Then
-                                    CmdAccumulator = cpCore.appRootFiles.ReadFile(ArgName)
+                                    CmdAccumulator = cpCore.appRootFiles.readFile(ArgName)
                                     If CmdAccumulator <> "" Then
                                         importHead = GetTagInnerHTML(CmdAccumulator, "head", False)
                                         If importHead <> "" Then

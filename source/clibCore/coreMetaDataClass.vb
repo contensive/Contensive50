@@ -2090,11 +2090,11 @@ Namespace Contensive.Core
                                                                     EditFilename = csv_GetVirtualFilenameByTable(AuthoringTableName, field.nameLc, EditRecordID, "", field.fieldTypeId)
                                                                     FieldValueVariant = EditFilename
                                                                     If EditFilename <> "" Then
-                                                                        Copy = cpCore.privateFiles.ReadFile(convertCdnUrlToCdnPathFilename(EditFilename))
+                                                                        Copy = cpCore.privateFiles.readFile(convertCdnUrlToCdnPathFilename(EditFilename))
                                                                     End If
                                                                     'Copy = contentFiles.ReadFile(LiveFilename)
                                                                     If Copy <> "" Then
-                                                                        Call cpCore.privateFiles.SaveFile(convertCdnUrlToCdnPathFilename(EditFilename), Copy)
+                                                                        Call cpCore.privateFiles.saveFile(convertCdnUrlToCdnPathFilename(EditFilename), Copy)
                                                                         'Call publicFiles.SaveFile(EditFilename, Copy)
                                                                     End If
                                                                 End If
@@ -2109,11 +2109,11 @@ Namespace Contensive.Core
                                                                     EditFilename = csv_GetVirtualFilenameByTable(AuthoringTableName, field.nameLc, EditRecordID, "", field.fieldTypeId)
                                                                     FieldValueVariant = EditFilename
                                                                     If EditFilename <> "" Then
-                                                                        Copy = cpCore.cdnFiles.ReadFile(convertCdnUrlToCdnPathFilename(EditFilename))
+                                                                        Copy = cpCore.cdnFiles.readFile(convertCdnUrlToCdnPathFilename(EditFilename))
                                                                     End If
                                                                     'Copy = contentFiles.ReadFile(LiveFilename)
                                                                     If Copy <> "" Then
-                                                                        Call cpCore.cdnFiles.SaveFile(convertCdnUrlToCdnPathFilename(EditFilename), Copy)
+                                                                        Call cpCore.cdnFiles.saveFile(convertCdnUrlToCdnPathFilename(EditFilename), Copy)
                                                                         'Call publicFiles.SaveFile(EditFilename, Copy)
                                                                     End If
                                                                 End If

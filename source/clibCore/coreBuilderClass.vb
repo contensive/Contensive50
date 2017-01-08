@@ -81,8 +81,8 @@ Namespace Contensive.Core
                 If Not web_existsSite(appName) Then
                     '
                     Using iisManager As ServerManager = New ServerManager()
-                        cpCore.appRootFiles.SaveFile("deleteMe.txt", "Temp document to create path")
-                        cpCore.appRootFiles.DeleteFile("deleteMe.txt")
+                        cpCore.appRootFiles.saveFile("deleteMe.txt", "Temp document to create path")
+                        cpCore.appRootFiles.deleteFile("deleteMe.txt")
                         bindinginformation = "*:80:" & DomainName
                         mySite = iisManager.Sites.Add(appName, "http", bindinginformation, cpCore.serverConfig.clusterPath & cpCore.appConfig.appRootFilesPath)
                         'iisManager.Sites.Item(0).)
@@ -2251,7 +2251,7 @@ Namespace Contensive.Core
                 '
                 Call appendUpgradeLogAddStep(cpCore.appConfig.name, "VerifyCountries", "Verify Countries")
                 '
-                list = cpCore.appRootFiles.ReadFile("cclib\config\isoCountryList.txt")
+                list = cpCore.appRootFiles.readFile("cclib\config\isoCountryList.txt")
                 Rows = Split(list, vbCrLf)
                 For RowPtr = 0 To UBound(Rows)
                     Row = Rows(RowPtr)

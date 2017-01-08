@@ -96,10 +96,10 @@ Namespace Contensive.Core
         '
         '========================================================================
         '
-        Public Function ReadFile(ByVal PathFilename As String) As String
+        Public Function readFile(ByVal PathFilename As String) As String
             Dim returnContent As String = ""
             Try
-                If (PathFilename = "") Then
+                If (String.IsNullOrEmpty(PathFilename)) Then
                     '
                     ' Not an error because an empty pathname returns an empty result
                     '
@@ -107,8 +107,8 @@ Namespace Contensive.Core
                     If Not isLocal Then
                         ' check local cache, download if needed
                     End If
-                    If checkFile(PathFilename) Then
-                        Using sr As StreamReader = File.OpenText(rootLocalFolderPath & PathFilename)
+                    If fileExists(PathFilename) Then
+                        Using sr As StreamReader = File.OpenText(convertToAbsPath(PathFilename))
                             returnContent = sr.ReadToEnd()
                         End Using
                     End If
@@ -133,8 +133,8 @@ Namespace Contensive.Core
                     If Not isLocal Then
                         ' check local cache, download if needed
                     End If
-                    If checkFile(PathFilename) Then
-                        Using sr As FileStream = File.OpenRead(rootLocalFolderPath & PathFilename)
+                    If fileExists(PathFilename) Then
+                        Using sr As FileStream = File.OpenRead(convertToAbsPath(PathFilename))
                             bytesRead = sr.Read(returnContent, 0, 1000000000)
                         End Using
                     End If
@@ -151,7 +151,7 @@ Namespace Contensive.Core
         '   Save data to a file
         '========================================================================
         '
-        Public Sub SaveFile(ByVal pathFilename As String, ByVal FileContent As String)
+        Public Sub saveFile(ByVal pathFilename As String, ByVal FileContent As String)
             Call SaveDualFile(pathFilename, FileContent, Nothing, False)
         End Sub
         '
@@ -175,14 +175,14 @@ Namespace Contensive.Core
                     'localPathFilename = rootLocalPath & PathFilename
                     '
                     path = getPath(pathFilename)
-                    If Not checkPath(path) Then
+                    If Not pathExists(path) Then
                         Call createPath(path)
                     End If
                     Try
                         If isBinary Then
-                            File.WriteAllBytes(rootLocalFolderPath & pathFilename, binaryContent)
+                            File.WriteAllBytes(convertToAbsPath(pathFilename), binaryContent)
                         Else
-                            File.WriteAllText(rootLocalFolderPath & pathFilename, textContent)
+                            File.WriteAllText(convertToAbsPath(pathFilename), textContent)
                         End If
                     Catch ex As Exception
                         Call cpCore.handleExceptionAndRethrow(ex)
@@ -208,13 +208,13 @@ Namespace Contensive.Core
         Public Sub appendFile(ByVal PathFilename As String, ByVal FileContent As String)
             Try
                 Dim FileFolder As String
-                Dim absFile As String = rootLocalFolderPath & PathFilename
+                Dim absFile As String = convertToAbsPath(PathFilename)
                 '
                 If (PathFilename = "") Then
                     Throw New ArgumentException("appendFile called with blank pathname.")
                 Else
                     FileFolder = getPath(PathFilename)
-                    If Not checkPath(FileFolder) Then
+                    If Not pathExists(FileFolder) Then
                         Call createPath(FileFolder)
                     End If
                     If Not IO.File.Exists(absFile) Then
@@ -226,7 +226,7 @@ Namespace Contensive.Core
                             sw.Write(FileContent)
                         End Using
                     End If
-                    'File.AppendAllText(rootLocalFolderPath & PathFilename, FileContent)
+                    'File.AppendAllText(getFullPath(PathFilename), FileContent)
                 End If
                 'If Not clusterConfig.isLocal Then
                 '    ' s3 transfer
@@ -312,7 +312,7 @@ Namespace Contensive.Core
         '   Deletes a file if it exists
         '========================================================================
         '
-        Public Sub DeleteFile(ByVal PathFilename As String)
+        Public Sub deleteFile(ByVal PathFilename As String)
             Try
                 If (PathFilename = "") Then
                     '
@@ -321,8 +321,8 @@ Namespace Contensive.Core
                 Else
                     'Dim localPathFilename As String
                     'localPathFilename = rootLocalPath & PathFilename
-                    If checkFile(PathFilename) Then
-                        Call File.Delete(rootLocalFolderPath & PathFilename)
+                    If fileExists(PathFilename) Then
+                        Call File.Delete(convertToAbsPath(PathFilename))
                     End If
                     If Not isLocal Then
                         ' s3 transfer
@@ -360,7 +360,7 @@ Namespace Contensive.Core
                     If Right(localPath, 1) = "\" Then
                         localPath = Left(localPath, Len(localPath) - 1)
                     End If
-                    If checkPath(PathName) Then
+                    If pathExists(PathName) Then
                         Call Directory.Delete(localPath, True)
                     End If
                     If Not isLocal Then
@@ -395,19 +395,19 @@ Namespace Contensive.Core
                     If Not isLocal Then
                         ' s3 transfer
                     Else
-                        If Not checkFile(srcPathFilename) Then
+                        If Not fileExists(srcPathFilename) Then
                             '
                             ' not an error, to minimize file use, empty files are not created, so missing files are just empty
                             '
                         Else
                             dstPath = getPath(dstPathFilename)
-                            If Not dstFileSystem.checkPath(dstPath) Then
+                            If Not dstFileSystem.pathExists(dstPath) Then
                                 Call dstFileSystem.createPath(dstPath)
                             End If
                             srcFullPathFilename = rootLocalFolderPath & srcPathFilename
                             DstFullPathFilename = dstFileSystem.rootLocalFolderPath & dstPathFilename
-                            If dstFileSystem.checkFile(dstPathFilename) Then
-                                dstFileSystem.DeleteFile(dstPathFilename)
+                            If dstFileSystem.fileExists(dstPathFilename) Then
+                                dstFileSystem.deleteFile(dstPathFilename)
                             End If
                             File.Copy(srcFullPathFilename, DstFullPathFilename)
                         End If
@@ -422,13 +422,13 @@ Namespace Contensive.Core
         '
         ' list of files, each row is delimited by a comma
         '
-        Public Function GetFolderFiles(ByVal FolderPath As String) As FileInfo()
+        Public Function getFileList(ByVal FolderPath As String) As FileInfo()
             Dim returnFileInfoList As FileInfo() = {}
             Try
                 If Not isLocal Then
                     ' s3 transfer
                 Else
-                    If checkPath(FolderPath) Then
+                    If pathExists(FolderPath) Then
                         Dim localPath As String
                         localPath = rootLocalFolderPath & FolderPath
                         Dim di As New IO.DirectoryInfo(localPath)
@@ -447,11 +447,11 @@ Namespace Contensive.Core
         '   Returns a list of folders in a path, comma delimited
         '========================================================================
         '
-        Public Function getFolderList(ByVal FolderPath As String) As String
+        Public Function getFolderNameList(ByVal FolderPath As String) As String
             Dim returnList As String = ""
             Try
                 Dim di As System.IO.DirectoryInfo()
-                di = getFolders(FolderPath)
+                di = getFolderList(FolderPath)
                 For Each d As System.IO.DirectoryInfo In di
                     returnList &= "," & d.Name
                 Next
@@ -468,13 +468,13 @@ Namespace Contensive.Core
         '
         '
         '
-        Public Function getFolders(ByVal FolderPath As String) As IO.DirectoryInfo()
+        Public Function getFolderList(ByVal FolderPath As String) As IO.DirectoryInfo()
             Dim returnFolders As IO.DirectoryInfo() = {}
             Try
                 If Not isLocal Then
                     returnFolders = {}
                 Else
-                    If Not checkPath(FolderPath) Then
+                    If Not pathExists(FolderPath) Then
                         returnFolders = {}
                     Else
                         Dim localPath As String = rootLocalFolderPath & FolderPath
@@ -510,12 +510,12 @@ Namespace Contensive.Core
         '
         '   Returns true if the file exists
         '
-        Public Function checkFile(ByVal pathFilename As String) As Boolean
+        Public Function fileExists(ByVal pathFilename As String) As Boolean
             Dim returnOK As Boolean = False
             Try
                 If Not isLocal Then
                 Else
-                    Dim localPathFilename As String = rootLocalFolderPath & pathFilename
+                    Dim localPathFilename As String = convertToAbsPath(pathFilename)
                     returnOK = File.Exists(localPathFilename)
                 End If
             Catch ex As Exception
@@ -528,13 +528,13 @@ Namespace Contensive.Core
         '
         '   Returns true if the folder exists
         '
-        Public Function checkPath(ByVal path As String) As Boolean
+        Public Function pathExists(ByVal path As String) As Boolean
             Dim returnOK As Boolean = False
             Try
                 If Not isLocal Then
                 Else
-                    Dim localFileFolder As String = rootLocalFolderPath & path
-                    returnOK = Directory.Exists(localFileFolder)
+                    Dim absPath As String = convertToAbsPath(path)
+                    returnOK = Directory.Exists(absPath)
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -575,7 +575,7 @@ Namespace Contensive.Core
                                 Throw New ApplicationException("Invalid '\' character in destination filename [" & DestinationFilename & "]")
                             ElseIf (InStr(1, DestinationFilename, "/") <> 0) Then
                                 Throw New ApplicationException("Invalid '/' character in destination filename [" & DestinationFilename & "]")
-                            ElseIf Not checkFile(SourcePathFilename) Then
+                            ElseIf Not fileExists(SourcePathFilename) Then
                                 '
                                 ' not an error, to minimize file use, empty files are not created, so missing files are just empty
                                 '
@@ -717,7 +717,7 @@ Namespace Contensive.Core
         '
         '=========================================================================================================
         '
-        public Sub SaveRemoteFile(ByVal Link As String, ByVal pathFilename As String)
+        Public Sub SaveRemoteFile(ByVal Link As String, ByVal pathFilename As String)
             Try
                 '
                 Dim HTTP As New coreHttpRequestClass()
@@ -727,7 +727,7 @@ Namespace Contensive.Core
                     pathFilename = vbReplace(pathFilename, "/", "\")
                     URLLink = vbReplace(Link, " ", "%20")
                     HTTP.timeout = 600
-                    Call HTTP.getUrlToFile(CStr(URLLink), rootLocalFolderPath & pathFilename)
+                    Call HTTP.getUrlToFile(CStr(URLLink), convertToAbsPath(pathFilename))
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -748,36 +748,10 @@ Namespace Contensive.Core
                 '
                 Dim fastZip As FastZip = New FastZip()
                 Dim fileFilter As String = Nothing
-
-                fastZip.ExtractZip(rootLocalFolderPath & PathFilename, rootLocalFolderPath & getPath(PathFilename), fileFilter)                '
-                'Call DeleteFile(PathFilename)
-                'Dim Path As String
-                'Dim Filename As String
-                'Dim Pos As Integer
-                'Dim Cmd As String
-                'Path = PathFilename
-                'Pos = InStrRev(PathFilename, "\")
-                'If Pos > 0 Then
-                '    Filename = Mid(PathFilename, Pos + 1)
-                '    Path = Mid(PathFilename, 1, Pos - 1)
-                '    Cmd = getProgramFilesPath() & "7-zip\7z.exe"
-                '    '
-                '    ' Unzip
-                '    '
-                '    Cmd = """" & Cmd & """ x """ & rootFullPath & PathFilename & """ -o""" & Path & """ -y "
-                '    Call runProcess(cp, Cmd, vbHide, True)
-                '    '
-                '    ' Clear read-only attributes
-                '    '
-                '    Cmd = "attrib -R """ & Path & "\*.*"" /S"
-                '    Call runProcess(cp, Cmd, vbHide, True)
-                '    '
-                '    ' Now delete the zip file - this is used by the calling program
-                '    ' in case it needs to wait until the is done. This routine is called
-                '    ' from teh ccCmd commandline running background tasks asynchronously.
-                '    '
-                '    Call DeleteFile(PathFilename)
-                'End If
+                Dim absPathFilename As String
+                '
+                absPathFilename = convertToAbsPath(PathFilename)
+                fastZip.ExtractZip(absPathFilename, getPath(absPathFilename), fileFilter)                '
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -806,6 +780,22 @@ Namespace Contensive.Core
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub        '
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' convert a path argument (relative to rootPath) into a full absolute path. Allow for the case where the path is incorrectly a full path within the rootpath
+        ''' </summary>
+        ''' <param name="path"></param>
+        ''' <returns></returns>
+        Private Function convertToAbsPath(path As String) As String
+            If (String.IsNullOrEmpty(path)) Then
+                Return rootLocalFolderPath
+            ElseIf (rootLocalFolderPath.ToLower().IndexOf(path.ToLower()) = 0) Then
+                Return path
+            Else
+                Return rootLocalFolderPath & path
+            End If
+        End Function
         '
         '====================================================================================================
         ' dispose

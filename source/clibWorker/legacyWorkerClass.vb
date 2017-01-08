@@ -630,14 +630,14 @@ Namespace Contensive
                                 ' ----- Set shared Mail out folder
                                 '
                                 EmailFolder = "\EmailOut"
-                                If Not cpCore.cluster.localClusterFiles.checkPath(EmailFolder) Then
+                                If Not cpCore.cluster.localClusterFiles.pathExists(EmailFolder) Then
                                     Call cpCore.cluster.localClusterFiles.createPath(EmailFolder)
                                 End If
                                 '
                                 ' ----- Set shared log folder
                                 '
                                 LogFolder = "\Logs"
-                                If Not cpCore.cluster.localClusterFiles.checkPath(LogFolder) Then
+                                If Not cpCore.cluster.localClusterFiles.pathExists(LogFolder) Then
                                     Call cpCore.cluster.localClusterFiles.createPath(LogFolder)
                                 End If
                                 '
@@ -1000,7 +1000,7 @@ Namespace Contensive
                                 returnString = "ERROR: file is empty"
                             Else
                                 'fs = New fileSystemClass
-                                Call cpCore.appRootFiles.DeleteFile(File)
+                                Call cpCore.appRootFiles.deleteFile(File)
                                 returnString = "ok"
                             End If
                             '

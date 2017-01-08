@@ -170,12 +170,12 @@ Namespace Contensive.Core
                         '
                         ' local server -- everything is ephemeral
                         '
-                        appRootFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, serverConfig.clusterPath & appConfig.appRootFilesPath)
+                        _appRootFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, serverConfig.clusterPath & appConfig.appRootFilesPath)
                     Else
                         '
                         ' cluster mode - each filesystem is configured accordingly
                         '
-                        appRootFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.activeSync, serverConfig.clusterPath & appConfig.appRootFilesPath)
+                        _appRootFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.activeSync, serverConfig.clusterPath & appConfig.appRootFilesPath)
                     End If
                 End If
                 Return _appRootFiles
@@ -197,12 +197,12 @@ Namespace Contensive.Core
                         '
                         ' local server -- everything is ephemeral
                         '
-                        serverFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, "")
+                        _serverFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, "")
                     Else
                         '
                         ' cluster mode - each filesystem is configured accordingly
                         '
-                        serverFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, "")
+                        _serverFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, "")
                     End If
                 End If
                 Return _serverFiles
@@ -224,12 +224,12 @@ Namespace Contensive.Core
                         '
                         ' local server -- everything is ephemeral
                         '
-                        privateFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, serverConfig.clusterPath & appConfig.privateFilesPath)
+                        _privateFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, serverConfig.clusterPath & appConfig.privateFilesPath)
                     Else
                         '
                         ' cluster mode - each filesystem is configured accordingly
                         '
-                        privateFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, serverConfig.clusterPath & appConfig.privateFilesPath)
+                        _privateFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, serverConfig.clusterPath & appConfig.privateFilesPath)
                     End If
                 End If
                 Return _privateFiles
@@ -251,12 +251,12 @@ Namespace Contensive.Core
                         '
                         ' local server -- everything is ephemeral
                         '
-                        cdnFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, serverConfig.clusterPath & appConfig.cdnFilesPath)
+                        _cdnFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, serverConfig.clusterPath & appConfig.cdnFilesPath)
                     Else
                         '
                         ' cluster mode - each filesystem is configured accordingly
                         '
-                        cdnFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, serverConfig.clusterPath & appConfig.cdnFilesPath)
+                        _cdnFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, serverConfig.clusterPath & appConfig.cdnFilesPath)
                     End If
                 End If
                 Return _cdnFiles
@@ -4698,7 +4698,7 @@ ErrorTrap:
                     & vbCrLf & "/*" _
                     & vbCrLf & "Site Styles" _
                     & vbCrLf & "*/" _
-                    & vbCrLf & RemoveStyleTags(cdnFiles.ReadFile("templates\styles.css"))
+                    & vbCrLf & RemoveStyleTags(cdnFiles.readFile("templates\styles.css"))
                 '
                 ' shared styles marked AlwaysInclude
                 '
@@ -4718,7 +4718,7 @@ ErrorTrap:
                                     & vbCrLf & "/*" _
                                     & vbCrLf & "Shared Style " & StyleName & " marked always include" _
                                     & vbCrLf & "*/" _
-                                    & vbCrLf & RemoveStyleTags(cdnFiles.ReadFile(Filename))
+                                    & vbCrLf & RemoveStyleTags(cdnFiles.readFile(Filename))
                             End If
                         End If
                     Next
@@ -4741,7 +4741,7 @@ ErrorTrap:
                                     & vbCrLf & "/*" _
                                     & vbCrLf & "Template Styles" _
                                     & vbCrLf & "*/" _
-                                    & vbCrLf & RemoveStyleTags(cdnFiles.ReadFile(Filename))
+                                    & vbCrLf & RemoveStyleTags(cdnFiles.readFile(Filename))
                             End If
 
                         Next
@@ -4765,7 +4765,7 @@ ErrorTrap:
                                     & vbCrLf & "/*" _
                                     & vbCrLf & "Shared Style " & StyleName & " included in template" _
                                     & vbCrLf & "*/" _
-                                    & vbCrLf & RemoveStyleTags(cdnFiles.ReadFile(Filename))
+                                    & vbCrLf & RemoveStyleTags(cdnFiles.readFile(Filename))
                             End If
                         End If
                     End If
@@ -4792,7 +4792,7 @@ ErrorTrap:
                                         & vbCrLf & "/*" _
                                         & vbCrLf & "Email Styles" _
                                         & vbCrLf & "*/" _
-                                        & vbCrLf & RemoveStyleTags(cdnFiles.ReadFile(Filename))
+                                        & vbCrLf & RemoveStyleTags(cdnFiles.readFile(Filename))
                                 End If
                             End If
                         Next
@@ -4814,7 +4814,7 @@ ErrorTrap:
                                     & vbCrLf & "/*" _
                                     & vbCrLf & "Shared Styles included in email" _
                                     & vbCrLf & "*/" _
-                                    & vbCrLf & RemoveStyleTags(cdnFiles.ReadFile(Filename))
+                                    & vbCrLf & RemoveStyleTags(cdnFiles.readFile(Filename))
                             End If
                         End If
                     Next
@@ -4869,13 +4869,13 @@ ErrorTrap:
                     & vbCrLf & "/*" _
                     & vbCrLf & "Reset Styles" _
                     & vbCrLf & "*/" _
-                    & vbCrLf & RemoveStyleTags(appRootFiles.ReadFile("\cclib\styles\ccreset.css"))
+                    & vbCrLf & RemoveStyleTags(appRootFiles.readFile("\cclib\styles\ccreset.css"))
             End If
             pageManager_GetStyleSheetDefault2 = pageManager_GetStyleSheetDefault2 _
                 & vbCrLf & "/*" _
                 & vbCrLf & "Contensive Styles" _
                 & vbCrLf & "*/" _
-                & vbCrLf & RemoveStyleTags(appRootFiles.ReadFile("\cclib\styles\" & defaultStyleFilename))
+                & vbCrLf & RemoveStyleTags(appRootFiles.readFile("\cclib\styles\" & defaultStyleFilename))
             '
             Exit Function
 ErrorTrap:
@@ -5179,7 +5179,7 @@ ErrorTrap:
             '
             If Not email_BlockList_LocalLoaded Then
                 Filename = "Config\SMTPBlockList_" & appConfig.name & ".txt"
-                email_BlockList_Local = cluster.localClusterFiles.ReadFile(Filename)
+                email_BlockList_Local = cluster.localClusterFiles.readFile(Filename)
                 email_BlockList_LocalLoaded = True
             End If
             getEmailBlockList_InternalOnly = email_BlockList_Local
@@ -5207,7 +5207,7 @@ ErrorTrap:
                 ' add them to the list
                 '
                 email_BlockList_Local = getEmailBlockList_InternalOnly() & vbCrLf & EmailAddress & vbTab & Now()
-                Call cluster.localClusterFiles.SaveFile("Config\SMTPBlockList_" & appConfig.name & ".txt", email_BlockList_Local)
+                Call cluster.localClusterFiles.saveFile("Config\SMTPBlockList_" & appConfig.name & ".txt", email_BlockList_Local)
                 email_BlockList_LocalLoaded = False
             End If
         End Sub
@@ -6563,7 +6563,7 @@ ErrorTrap:
                                     & "The Link Alias being created (" & WorkingLinkAlias & ") can not be used because there is a virtual directory in your website directory that already uses this name." _
                                     & " Please change it to ensure the Link Alias is unique. To set or change the Link Alias, use the Link Alias tab and select a name not used by another page."
                             End If
-                        ElseIf appRootFiles.checkPath(serverConfig.clusterPath & appConfig.appRootFilesPath & "\" & Mid(WorkingLinkAlias, 2)) Then
+                        ElseIf appRootFiles.pathExists(serverConfig.clusterPath & appConfig.appRootFilesPath & "\" & Mid(WorkingLinkAlias, 2)) Then
                             '
                             ' This alias points to a different link, call it an error
                             '
@@ -9384,7 +9384,7 @@ ErrorTrap:
                     ' ----- Add Member Stylesheet if left over
                     '
                     If user.styleFilename <> "" Then
-                        Copy = cdnFiles.ReadFile(user.styleFilename)
+                        Copy = cdnFiles.readFile(user.styleFilename)
                         headTags = headTags & cr & "<style type=""text/css"">" & Copy & "</style>"
                         'JS = JS & vbCrLf & vbTab & "cjAddHeadTag('<style type=""text/css"">" & Copy & "</style>');"
                         user.styleFilename = ""
@@ -12562,7 +12562,7 @@ ErrorTrap:
                                 Case FieldTypeIdFileHTMLPrivate
                                     FieldValueText = EncodeText(FieldValueVariant)
                                     If FieldValueText <> "" Then
-                                        FieldValueText = privateFiles.ReadFile(FieldValueText)
+                                        FieldValueText = privateFiles.readFile(FieldValueText)
                                     End If
                                     If FieldReadOnly Then
                                         returnResult = FieldValueText
@@ -12576,7 +12576,7 @@ ErrorTrap:
                                 Case FieldTypeIdFileTextPrivate
                                     FieldValueText = EncodeText(FieldValueVariant)
                                     If FieldValueText <> "" Then
-                                        FieldValueText = privateFiles.ReadFile(FieldValueText)
+                                        FieldValueText = privateFiles.readFile(FieldValueText)
                                     End If
                                     If FieldReadOnly Then
                                         returnResult = FieldValueText
@@ -12590,7 +12590,7 @@ ErrorTrap:
                                 Case FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript
                                     FieldValueText = EncodeText(FieldValueVariant)
                                     If FieldValueText <> "" Then
-                                        FieldValueText = cdnFiles.ReadFile(FieldValueText)
+                                        FieldValueText = cdnFiles.readFile(FieldValueText)
                                     End If
                                     If FieldReadOnly Then
                                         returnResult = FieldValueText
@@ -13045,8 +13045,8 @@ ErrorTrap:
                         Loop
                     End If
             End Select
-            exportAscii_GetAsciiExport = appRootFiles.ReadFile(TestFilename)
-            Call appRootFiles.DeleteFile(TestFilename)
+            exportAscii_GetAsciiExport = appRootFiles.readFile(TestFilename)
+            Call appRootFiles.deleteFile(TestFilename)
             Exit Function
             '
             ' ----- Error Trap
@@ -14321,12 +14321,12 @@ ErrorTrap:
         '   main_Get a list of files in a folder
         '========================================================================
         '
-        Public Function main_GetFolderList(ByVal FolderPath As Object) As String
+        Public Function getFolderNameList(ByVal FolderPath As Object) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetFolderList")
             '
             'If Not (true) Then Exit Function
             '
-            main_GetFolderList = appRootFiles.getFolderList(EncodeText(FolderPath))
+            getFolderNameList = appRootFiles.getFolderNameList(EncodeText(FolderPath))
             '
             Exit Function
             '
@@ -14383,7 +14383,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            main_GetVirtualFolderList = cdnFiles.getFolderList(EncodeText(FolderPath))
+            main_GetVirtualFolderList = cdnFiles.getFolderNameList(EncodeText(FolderPath))
             '
             Exit Function
             '
@@ -17973,7 +17973,7 @@ ErrorTrap:
                                 web_ProcessFormInputFile2 = "Upload\"
                             End If
                             web_ProcessFormInputFile2 = returnString & encodeFilename(.Value)
-                            Call files.DeleteFile(web_ProcessFormInputFile2)
+                            Call files.deleteFile(web_ProcessFormInputFile2)
                             If .tmpPrivatefile <> "" Then
                                 '
                                 ' copy tmp private files to the appropriate folder in the destination file system
@@ -18172,7 +18172,7 @@ ErrorTrap:
                 End If
                 If BotList = "" Then
                     Filename = "config\VisitNameList.txt"
-                    BotList = cluster.localClusterFiles.ReadFile(Filename)
+                    BotList = cluster.localClusterFiles.readFile(Filename)
                     If BotList = "" Then
                         BotList = "" _
                             & vbCrLf & "//" _
@@ -18195,7 +18195,7 @@ ErrorTrap:
                             & vbCrLf & "Unknown Bot" & vbTab & "robot" & vbTab & vbTab & "r" _
                             & vbCrLf & "Unknown Bot" & vbTab & "crawl" & vbTab & vbTab & "r" _
                             & ""
-                        Call cluster.localClusterFiles.SaveFile(Filename, BotList)
+                        Call cluster.localClusterFiles.saveFile(Filename, BotList)
                     End If
                     DateExpires = main_PageStartTime.AddHours(1)
                     Call cache.setKey("DefaultBotNameList", CStr(DateExpires) & vbCrLf & BotList)
@@ -19633,7 +19633,7 @@ ErrorTrap:
                     ' if AllowBrief is false, BriefFilename is not loaded
                     '
                     If (pageBriefFilename <> "") And (pageAllowBrief) Then
-                        Brief = Trim(cdnFiles.ReadFile(pageBriefFilename))
+                        Brief = Trim(cdnFiles.readFile(pageBriefFilename))
                         If Brief <> "" Then
                             ActiveList = ActiveList & "<div class=""ccListCopy"">" & Brief & "</div>"
                         End If
@@ -21697,13 +21697,13 @@ ErrorTrap:
                                             Dim Filename As String = "config/RobotsTxtBase.txt"
                                             ' set this way because the preferences page needs a filename in a site property (enhance later)
                                             Call siteProperties.setProperty("RobotsTxtFilename", Filename)
-                                            Dim Content As String = cdnFiles.ReadFile(Filename)
+                                            Dim Content As String = cdnFiles.readFile(Filename)
                                             If Content = "" Then
                                                 '
                                                 ' save default robots.txt
                                                 '
                                                 Content = "User-agent: *" & vbCrLf & "Disallow: /admin/" & vbCrLf & "Disallow: /images/"
-                                                Call appRootFiles.SaveFile(Filename, Content)
+                                                Call appRootFiles.saveFile(Filename, Content)
                                             End If
                                             Content = Content & addonCache.localCache.robotsTxt
                                             Call web_setResponseContentType("text/plain")
@@ -23715,8 +23715,8 @@ ErrorTrap:
                 ' Save new public stylesheet
                 '
                 'Dim kmafs As New fileSystemClass
-                Call cdnFiles.SaveFile(convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), csv_getStyleSheetProcessed)
-                Call cdnFiles.SaveFile(convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css"), pageManager_GetStyleSheetDefault2)
+                Call cdnFiles.saveFile(convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), csv_getStyleSheetProcessed)
+                Call cdnFiles.saveFile(convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css"), pageManager_GetStyleSheetDefault2)
 
             End If
             If (StyleSN = 0) Then
@@ -23759,8 +23759,8 @@ ErrorTrap:
                     ' Save new public stylesheet
                     '
                     'Dim kmafs As New fileSystemClass
-                    Call cdnFiles.SaveFile(convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), csv_getStyleSheetProcessed)
-                    Call cdnFiles.SaveFile(convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css"), pageManager_GetStyleSheetDefault2)
+                    Call cdnFiles.saveFile(convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), csv_getStyleSheetProcessed)
+                    Call cdnFiles.saveFile(convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css"), pageManager_GetStyleSheetDefault2)
                 End If
                 admin_GetStyleTagAdmin = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & web_requestProtocol & main_ServerDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, "templates/Admin" & StyleSN & ".css") & """ >"
             End If
@@ -25413,9 +25413,9 @@ ErrorTrap:
             RightPane = "Style Tag Editor"
             TempFilename = "AppCache\StyleTemp" & GetRandomInteger() & ".css"
             '
-            StyleFile = cdnFiles.ReadFile(TempFilename)
+            StyleFile = cdnFiles.readFile(TempFilename)
             If StyleFile <> "" Then
-                Call appRootFiles.SaveFile(TempFilename, StyleCopy)
+                Call appRootFiles.saveFile(TempFilename, StyleCopy)
                 'Call main_CopyVirtualFile(StylesFilename, TempFilename)
                 '
                 ' remove crlf
@@ -26755,7 +26755,7 @@ ErrorTrap:
             End If
             If main_GetMobileBrowserList = "" Then
                 Filename = "config\MobileBrowserList.txt"
-                main_GetMobileBrowserList = cluster.localClusterFiles.ReadFile(Filename)
+                main_GetMobileBrowserList = cluster.localClusterFiles.readFile(Filename)
                 If main_GetMobileBrowserList = "" Then
                     main_GetMobileBrowserList = "midp,j2me,avantg,docomo,novarra,palmos,palmsource,240x320,opwv,chtml,pda,windows ce,mmp/,blackberry,mib/,symbian,wireless,nokia,hand,mobi,phone,cdm,up.b,audio,SIE-,SEC-,samsung,HTC,mot-,mitsu,sagem,sony,alcatel,lg,erics,vx,NEC,philips,mmm,xx,panasonic,sharp,wap,sch,rover,pocket,benq,java,pt,pg,vox,amoi,bird,compal,kg,voda,sany,kdd,dbt,sendo,sgh,gradi,jb,moto"
                     main_GetMobileBrowserList = vbReplace(main_GetMobileBrowserList, ",", vbCrLf)
@@ -27652,7 +27652,7 @@ ErrorTrap:
         '
         Public Function main_GetPleaseWaitStart() As String
             '
-            main_GetPleaseWaitStart = cluster.localClusterFiles.ReadFile("ccLib\Popup\WaitPageOpen.htm")
+            main_GetPleaseWaitStart = cluster.localClusterFiles.readFile("ccLib\Popup\WaitPageOpen.htm")
             '
         End Function
         '
@@ -27672,7 +27672,7 @@ ErrorTrap:
         '
         Public Function main_GetPleaseWaitEnd() As String
             '
-            main_GetPleaseWaitEnd = cluster.localClusterFiles.ReadFile("ccLib\Popup\WaitPageClose.htm")
+            main_GetPleaseWaitEnd = cluster.localClusterFiles.readFile("ccLib\Popup\WaitPageClose.htm")
             '
         End Function
         '
@@ -28485,7 +28485,7 @@ ErrorTrap:
         '
         '
         Private Function main_GetFileSize(ByVal VirtualFilePathPage As String) As Integer
-            Dim files As IO.FileInfo() = appRootFiles.GetFolderFiles(VirtualFilePathPage)
+            Dim files As IO.FileInfo() = appRootFiles.getFileList(VirtualFilePathPage)
             Return CInt(files(0).Length)
         End Function
         '
@@ -30005,15 +30005,15 @@ ErrorTrap:
             'Dim kmafs As New fileSystemClass
             '
             main_guessDefaultPage = "index.php"
-            If Not appRootFiles.checkFile(serverConfig.clusterPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
+            If Not appRootFiles.fileExists(serverConfig.clusterPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
                 main_guessDefaultPage = "index.asp"
-                If Not appRootFiles.checkFile(serverConfig.clusterPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
+                If Not appRootFiles.fileExists(serverConfig.clusterPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
                     main_guessDefaultPage = "default.asp"
-                    If Not appRootFiles.checkFile(serverConfig.clusterPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
+                    If Not appRootFiles.fileExists(serverConfig.clusterPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
                         main_guessDefaultPage = "default.aspx"
-                        If Not appRootFiles.checkFile(serverConfig.clusterPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
+                        If Not appRootFiles.fileExists(serverConfig.clusterPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
                             main_guessDefaultPage = "index.php"
-                            If Not appRootFiles.checkFile(serverConfig.clusterPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
+                            If Not appRootFiles.fileExists(serverConfig.clusterPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
                                 main_guessDefaultPage = ""
                             End If
                         End If
@@ -31119,7 +31119,7 @@ ErrorTrap:
                         Do While db.cs_Ok(CSRules)
                             CodeFilename = db.db_GetCS(CSRules, "code")
                             If CodeFilename <> "" Then
-                                ScriptingCode = ScriptingCode & vbCrLf & cdnFiles.ReadFile(CodeFilename)
+                                ScriptingCode = ScriptingCode & vbCrLf & cdnFiles.readFile(CodeFilename)
                             End If
                             Call db.db_csGoNext(CSRules)
                         Loop
@@ -32294,7 +32294,7 @@ exitNoError:
                                                                         Filename = DefaultFilename
                                                                         Call siteProperties.setProperty(FieldName, DefaultFilename)
                                                                     End If
-                                                                    Call appRootFiles.SaveFile(Filename, FieldValue)
+                                                                    Call appRootFiles.saveFile(Filename, FieldValue)
                                                                 Case "cssfile"
                                                                     '
                                                                     DefaultFilename = "Settings/" & FieldName & ".css"
@@ -32303,7 +32303,7 @@ exitNoError:
                                                                         Filename = DefaultFilename
                                                                         Call siteProperties.setProperty(FieldName, DefaultFilename)
                                                                     End If
-                                                                    Call appRootFiles.SaveFile(Filename, FieldValue)
+                                                                    Call appRootFiles.saveFile(Filename, FieldValue)
                                                                 Case "xmlfile"
                                                                     '
                                                                     DefaultFilename = "Settings/" & FieldName & ".xml"
@@ -32312,7 +32312,7 @@ exitNoError:
                                                                         Filename = DefaultFilename
                                                                         Call siteProperties.setProperty(FieldName, DefaultFilename)
                                                                     End If
-                                                                    Call appRootFiles.SaveFile(Filename, FieldValue)
+                                                                    Call appRootFiles.saveFile(Filename, FieldValue)
                                                                 Case "currency"
                                                                     '
                                                                     If FieldValue <> "" Then
@@ -32374,7 +32374,7 @@ exitNoError:
                                                                 FieldName = csv_GetXMLAttribute(IsFound, TabNode, "name", "")
                                                                 fieldfilename = csv_GetXMLAttribute(IsFound, TabNode, "filename", "")
                                                                 FieldValue = docProperties.getText(FieldName)
-                                                                Call appRootFiles.SaveFile(fieldfilename, FieldValue)
+                                                                Call appRootFiles.saveFile(fieldfilename, FieldValue)
                                                             End If
                                                         Case "dbquery"
                                                             '
@@ -32514,7 +32514,7 @@ exitNoError:
                                                                         If FieldReadOnly Then
                                                                             Copy = FieldValue & html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
-                                                                            FieldValue = cdnFiles.ReadFile(FieldValue)
+                                                                            FieldValue = cdnFiles.readFile(FieldValue)
                                                                             If FieldHTML Then
                                                                                 Copy = html_GetFormInputHTML(FieldName, FieldValue)
                                                                             Else
@@ -32621,10 +32621,10 @@ exitNoError:
                                                         FieldDefaultValue = TabNode.InnerText
                                                         Copy = ""
                                                         If fieldfilename <> "" Then
-                                                            If appRootFiles.checkFile(fieldfilename) Then
+                                                            If appRootFiles.fileExists(fieldfilename) Then
                                                                 Copy = FieldDefaultValue
                                                             Else
-                                                                Copy = cdnFiles.ReadFile(fieldfilename)
+                                                                Copy = cdnFiles.readFile(fieldfilename)
                                                             End If
                                                             If Not FieldReadOnly Then
                                                                 Copy = html_GetFormInputTextExpandable(FieldName, Copy, 10)
@@ -34373,7 +34373,7 @@ ErrorTrap:
                                                                         Filename = DefaultFilename
                                                                         Call siteProperties.setProperty(FieldName, DefaultFilename)
                                                                     End If
-                                                                    Call appRootFiles.SaveFile(Filename, FieldValue)
+                                                                    Call appRootFiles.saveFile(Filename, FieldValue)
                                                                 Case "cssfile"
                                                                     '
                                                                     DefaultFilename = "Settings/" & FieldName & ".css"
@@ -34382,7 +34382,7 @@ ErrorTrap:
                                                                         Filename = DefaultFilename
                                                                         Call siteProperties.setProperty(FieldName, DefaultFilename)
                                                                     End If
-                                                                    Call appRootFiles.SaveFile(Filename, FieldValue)
+                                                                    Call appRootFiles.saveFile(Filename, FieldValue)
                                                                 Case "xmlfile"
                                                                     '
                                                                     DefaultFilename = "Settings/" & FieldName & ".xml"
@@ -34391,7 +34391,7 @@ ErrorTrap:
                                                                         Filename = DefaultFilename
                                                                         Call siteProperties.setProperty(FieldName, DefaultFilename)
                                                                     End If
-                                                                    Call appRootFiles.SaveFile(Filename, FieldValue)
+                                                                    Call appRootFiles.saveFile(Filename, FieldValue)
                                                                 Case "currency"
                                                                     '
                                                                     If FieldValue <> "" Then
@@ -34453,7 +34453,7 @@ ErrorTrap:
                                                                 FieldName = main_GetXMLAttribute(IsFound, TabNode, "name", "")
                                                                 fieldfilename = main_GetXMLAttribute(IsFound, TabNode, "filename", "")
                                                                 FieldValue = docProperties.getText(FieldName)
-                                                                Call appRootFiles.SaveFile(fieldfilename, FieldValue)
+                                                                Call appRootFiles.saveFile(fieldfilename, FieldValue)
                                                             End If
                                                         Case "dbquery"
                                                             '
@@ -34597,7 +34597,7 @@ ErrorTrap:
                                                                         If FieldReadOnly Then
                                                                             Copy = FieldValue & html_GetFormInputHidden(FieldName, FieldValue)
                                                                         Else
-                                                                            FieldValue = cdnFiles.ReadFile(FieldValue)
+                                                                            FieldValue = cdnFiles.readFile(FieldValue)
                                                                             If FieldHTML Then
                                                                                 Copy = html_GetFormInputHTML(FieldName, FieldValue)
                                                                             Else
@@ -34702,10 +34702,10 @@ ErrorTrap:
                                                         FieldDefaultValue = TabNode.InnerText
                                                         Copy = ""
                                                         If fieldfilename <> "" Then
-                                                            If appRootFiles.checkFile(fieldfilename) Then
+                                                            If appRootFiles.fileExists(fieldfilename) Then
                                                                 Copy = FieldDefaultValue
                                                             Else
-                                                                Copy = cdnFiles.ReadFile(fieldfilename)
+                                                                Copy = cdnFiles.readFile(fieldfilename)
                                                             End If
                                                             If Not FieldReadOnly Then
                                                                 Copy = html_GetFormInputTextExpandable(FieldName, Copy, 10)
@@ -37383,7 +37383,7 @@ ErrorTrap:
                             '
                             ' ----- Custom Message
                             '
-                            returnHtml = cdnFiles.ReadFile(CustomBlockMessageFilename)
+                            returnHtml = cdnFiles.readFile(CustomBlockMessageFilename)
                         Case main_BlockSourceLogin
                             '
                             ' ----- Login page
@@ -38270,7 +38270,7 @@ ErrorTrap:
                 'headline = app.csv_GetCS(CSPointer, "Headline")
                 copyFilename = EncodeText(cache_pageContent(PCC_CopyFilename, main_RenderCache_CurrentPage_PCCPtr))
                 If copyFilename <> "" Then
-                    Copy = cdnFiles.ReadFile(copyFilename)
+                    Copy = cdnFiles.readFile(copyFilename)
                 End If
                 'copy = app.csv_GetCS(CSPointer, "copyFilename")
                 allowSeeAlso = EncodeBoolean(cache_pageContent(pcc_allowSeeAlso, main_RenderCache_CurrentPage_PCCPtr))
@@ -38780,7 +38780,7 @@ ErrorTrap:
             dateArchive = EncodeDate(cache_pageContent(PCC_DateArchive, main_RenderCache_CurrentPage_PCCPtr))
             copyFilename = EncodeText(cache_pageContent(PCC_CopyFilename, main_RenderCache_CurrentPage_PCCPtr))
             If copyFilename <> "" Then
-                Copy = cdnFiles.ReadFile(copyFilename)
+                Copy = cdnFiles.readFile(copyFilename)
             End If
             '
             ' ----- Page Copy
@@ -39371,7 +39371,7 @@ ErrorTrap:
                                         '
                                         ' Save the site sites
                                         '
-                                        Call appRootFiles.SaveFile(DynamicStylesFilename, docProperties.getText("SiteStyles"))
+                                        Call appRootFiles.saveFile(DynamicStylesFilename, docProperties.getText("SiteStyles"))
                                         If main_GetStreamBoolean2(RequestNameInlineStyles) Then
                                             '
                                             ' Inline Styles
@@ -39388,8 +39388,8 @@ ErrorTrap:
                                             '
                                             ' Save new public stylesheet
                                             '
-                                            Call appRootFiles.SaveFile("templates\Public" & StyleSN & ".css", pageManager_GetStyleSheet)
-                                            Call appRootFiles.SaveFile("templates\Admin" & StyleSN & ".css", pageManager_GetStyleSheetDefault)
+                                            Call appRootFiles.saveFile("templates\Public" & StyleSN & ".css", pageManager_GetStyleSheet)
+                                            Call appRootFiles.saveFile("templates\Admin" & StyleSN & ".css", pageManager_GetStyleSheetDefault)
                                         End If
                                     End If
                                 Case FormTypeAddonStyleEditor
@@ -39580,7 +39580,7 @@ ErrorTrap:
                 ' ----- read/create serverConfig
                 '
                 tempFiles = New coreFileSystemClass(Me, True, coreFileSystemClass.fileSyncModeEnum.noSync, getProgramDataFolder)
-                JSONTemp = tempFiles.ReadFile("serverConfig.json")
+                JSONTemp = tempFiles.readFile("serverConfig.json")
                 If String.IsNullOrEmpty(JSONTemp) Then
                     '
                     ' initialize serverConfig (do not let anything take a site down)
@@ -39596,7 +39596,7 @@ ErrorTrap:
                     End If
                     serverConfig.allowTaskRunnerService = False
                     serverConfig.allowTaskSchedulerService = False
-                    tempFiles.SaveFile("serverConfig.json", json.Serialize(serverConfig))
+                    tempFiles.saveFile("serverConfig.json", json.Serialize(serverConfig))
                 Else
                     serverConfig = json.Deserialize(Of serverConfigClass)(JSONTemp)
                 End If
@@ -39604,7 +39604,7 @@ ErrorTrap:
                 ' ----- read/create clusterConfig
                 '
                 tempFiles = New coreFileSystemClass(Me, True, coreFileSystemClass.fileSyncModeEnum.noSync, serverConfig.clusterPath)
-                JSONTemp = tempFiles.ReadFile("clusterConfig.json")
+                JSONTemp = tempFiles.readFile("clusterConfig.json")
                 If String.IsNullOrEmpty(JSONTemp) Then
                     '
                     ' for now it fails, maybe later let it autobuild a local cluster
@@ -39944,7 +39944,7 @@ ErrorTrap:
                 Dim iisResetRequired As Boolean = False
                 '
                 If returnUserError = "" Then
-                    If privateFiles.checkPath(privateFolder) Then
+                    If privateFiles.pathExists(privateFolder) Then
                         returnOk = addonInstall.InstallCollectionFromPrivateFolder(builder, db.dataBuildVersion, privateFolder, iisResetRequired, appConfig.name, returnUserError, installedCollectionGuid, False)
                         'If iisResetRequired Then
                         '    Dim sitebuilder As New builderClass(Me)
@@ -40013,10 +40013,10 @@ ErrorTrap:
                         End If
                         logPath = "clibLogs\" & logPath
                         logPathRoot = cluster.localClusterFiles.rootLocalFolderPath
-                        If Not cluster.localClusterFiles.checkPath(logPath) Then
+                        If Not cluster.localClusterFiles.pathExists(logPath) Then
                             Call cluster.localClusterFiles.createPath(logPath)
                         Else
-                            Dim logFiles As IO.FileInfo() = cluster.localClusterFiles.GetFolderFiles(logPath)
+                            Dim logFiles As IO.FileInfo() = cluster.localClusterFiles.getFileList(logPath)
                             For Each fileInfo As IO.FileInfo In logFiles
                                 If fileInfo.Name.ToLower = FilenameNoExt.ToLower & ".log" Then
                                     FileSize = CInt(fileInfo.Length)
@@ -40953,7 +40953,7 @@ ErrorTrap:
                     '
                     If deleteOnDisposeFileList.Count > 0 Then
                         For Each filename As String In deleteOnDisposeFileList
-                            privateFiles.DeleteFile(filename)
+                            privateFiles.deleteFile(filename)
                         Next
                     End If
                     '

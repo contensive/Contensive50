@@ -164,7 +164,7 @@ Namespace Contensive.Core
             Dim headTags As String = ""
             Try
                 If wwwFileName <> "" Then
-                    accum = cp.File.appRootFiles.read(wwwFileName)
+                    accum = cp.wwwFiles.read(wwwFileName)
                     If accum <> "" Then
                         headTags = coreCommonModule.GetTagInnerHTML(accum, "head", False)
                         If headTags <> "" Then
@@ -202,7 +202,7 @@ Namespace Contensive.Core
             Try
                 accum = ""
                 If (Not String.IsNullOrEmpty(wwwFileName)) Then
-                    accum = cp.File.appRootFiles.read(wwwFileName)
+                    accum = cp.wwwFiles.read(wwwFileName)
                 End If
             Catch ex As Exception
                 cp.core.handleExceptionAndRethrow(ex, "Unexpected Error in block.OpenFile")

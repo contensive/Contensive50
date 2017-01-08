@@ -5,12 +5,6 @@
 Namespace Contensive.BaseClasses
     Public MustInherit Class CPFileBaseClass
         '
-        '
-        '
-        Public MustOverride ReadOnly Property cdnFiles() As CPFileSystemBaseClass
-        Public MustOverride ReadOnly Property appRootFiles() As CPFileSystemBaseClass
-        Public MustOverride ReadOnly Property privateFiles() As CPFileSystemBaseClass
-        Public MustOverride ReadOnly Property serverFiles() As CPFileSystemBaseClass
         ''' <summary>
         ''' Append content to a text file in the content files. If the file does not exist it will be created.
         ''' </summary>

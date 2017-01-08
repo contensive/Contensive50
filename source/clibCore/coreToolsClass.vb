@@ -1198,7 +1198,7 @@ ErrorTrap:
                     SQLFilename = "SQLArchive" & Format(cpCore.user.id, "000000000") & ".txt"
                     Call cpCore.userProperty.setProperty("SQLArchive", SQLFilename)
                 End If
-                SQLArchive = cpCore.cdnFiles.ReadFile(SQLFilename)
+                SQLArchive = cpCore.cdnFiles.readFile(SQLFilename)
                 '
                 ' Read in arguments if available
                 '
@@ -1241,7 +1241,7 @@ ErrorTrap:
                         Do While (LineCounter < 10) And (SQLArchiveOld <> "")
                             SQLArchive = SQLArchive & getLine(SQLArchiveOld) & vbCrLf
                         Loop
-                        Call cpCore.appRootFiles.SaveFile(SQLFilename, SQLArchive)
+                        Call cpCore.appRootFiles.saveFile(SQLFilename, SQLArchive)
                     End If
                     '
                     ' Run the SQL
@@ -3902,7 +3902,7 @@ ErrorTrap:
                 '
 
                 Call cpCore.web_setResponseContentType("text/text")
-                Call cpCore.writeAltBuffer(cpCore.appRootFiles.ReadFile(cpCore.docProperties.getText("SourceFile")))
+                Call cpCore.writeAltBuffer(cpCore.appRootFiles.readFile(cpCore.docProperties.getText("SourceFile")))
                 Call cpCore.doc_close()
                 'GetForm_LogFiles_Details = cpCore.app.publicFiles.ReadFile(cpCore.main_GetStreamText2("SourceFile"))
             Else
@@ -3919,7 +3919,7 @@ ErrorTrap:
                 ' Sub-Folders
                 '
 
-                SourceFolders = cpCore.main_GetFolderList(StartPath & CurrentPath)
+                SourceFolders = cpCore.getFolderNameList(StartPath & CurrentPath)
                 If SourceFolders <> "" Then
                     FolderSplit = Split(SourceFolders, vbCrLf)
                     FolderCount = UBound(FolderSplit) + 1
@@ -3937,7 +3937,7 @@ ErrorTrap:
                 '
                 ' Files
                 '
-                SourceFolders = cpCore.appRootFiles.convertFileINfoArrayToParseString(cpCore.appRootFiles.GetFolderFiles(StartPath & CurrentPath))
+                SourceFolders = cpCore.appRootFiles.convertFileINfoArrayToParseString(cpCore.appRootFiles.getFileList(StartPath & CurrentPath))
                 If SourceFolders = "" Then
                     FileSize = ""
                     FileDate = ""
@@ -4295,7 +4295,7 @@ ErrorTrap:
             Dim Copy As String
             'dim buildversion As String
             '
-            FileList = cpCore.appRootFiles.convertFileINfoArrayToParseString(cpCore.appRootFiles.GetFolderFiles(FileRootPath & AppPath))
+            FileList = cpCore.appRootFiles.convertFileINfoArrayToParseString(cpCore.appRootFiles.getFileList(FileRootPath & AppPath))
             Files = Split(FileList, vbCrLf)
             For Ptr = 0 To UBound(Files)
                 FileDetailString = Files(Ptr)
@@ -4330,7 +4330,7 @@ ErrorTrap:
                     '
                     ' HTML, import body
                     '
-                    PageSource = cpCore.appRootFiles.ReadFile(Filename)
+                    PageSource = cpCore.appRootFiles.readFile(Filename)
                     PageSource = cpCore.main_GetBody(PageSource)
                     Link = vbReplace(AppPath & Filename, "\", "/")
                     TemplateName = vbReplace(Link, "/", "-")
@@ -4371,21 +4371,21 @@ ErrorTrap:
                     '
                     Dim DynamicFilename As String
                     DynamicFilename = "templates\styles.css"
-                    Copy = cpCore.appRootFiles.ReadFile(DynamicFilename)
+                    Copy = cpCore.appRootFiles.readFile(DynamicFilename)
                     Copy = RemoveStyleTags(Copy)
                     Copy = Copy _
                             & vbCrLf _
                             & vbCrLf & "/* Import of " & FileRootPath & AppPath & Filename & "*/" _
                             & vbCrLf _
                             & vbCrLf
-                    Copy = Copy & RemoveStyleTags(cpCore.appRootFiles.ReadFile(Filename))
-                    Call cpCore.appRootFiles.SaveFile(DynamicFilename, Copy)
+                    Copy = Copy & RemoveStyleTags(cpCore.appRootFiles.readFile(Filename))
+                    Call cpCore.appRootFiles.saveFile(DynamicFilename, Copy)
                 End If
             Next
             '
             ' Now process all subfolders
             '
-            FolderList = cpCore.main_GetFolderList(FileRootPath & AppPath)
+            FolderList = cpCore.getFolderNameList(FileRootPath & AppPath)
             If FolderList <> "" Then
                 Folders = Split(FolderList, vbCrLf)
                 For Ptr = 0 To UBound(Folders)

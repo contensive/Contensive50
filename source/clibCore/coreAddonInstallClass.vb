@@ -206,7 +206,7 @@ ErrorTrap:
                                                             Collectionname = CDefInterfaces.InnerText
                                                         Case "help"
                                                             'CollectionHelp = CDefInterfaces.innerText
-                                                            Call cpCore.privateFiles.SaveFile(WorkingFolder & "Collection.hlp", CDefInterfaces.InnerText)
+                                                            Call cpCore.privateFiles.saveFile(WorkingFolder & "Collection.hlp", CDefInterfaces.InnerText)
                                                         Case "guid"
                                                             CollectionGuid = CDefInterfaces.InnerText
                                                         Case "lastchangedate"
@@ -733,7 +733,7 @@ ErrorTrap:
             '
             If allowLogging Then cpCore.log_appendLog("BuildLocalCollectionFolder(), Enter")
             '
-            If Not cpCore.privateFiles.checkPath(privateFolderPath) Then
+            If Not cpCore.privateFiles.pathExists(privateFolderPath) Then
                 '
                 ' The working folder is not there
                 '
@@ -742,19 +742,19 @@ ErrorTrap:
                 Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, CheckFileFolder was false for the private folder [" & privateFolderPath & "]")
             Else
                 Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, processing files in private folder [" & privateFolderPath & "]")
-                SrcFileNamelist = cpCore.privateFiles.GetFolderFiles(privateFolderPath)
+                SrcFileNamelist = cpCore.privateFiles.getFileList(privateFolderPath)
                 For Each file As IO.FileInfo In SrcFileNamelist
                     If file.Extension = ".zip" Then
                         '
                         ZipFileFound = True
                         Call cpCore.privateFiles.UnzipFile(privateFolderPath & file.Name)
-                        Call cpCore.privateFiles.DeleteFile(privateFolderPath & file.Name)
+                        Call cpCore.privateFiles.deleteFile(privateFolderPath & file.Name)
                     End If
                 Next
                 '
                 ' Now get all the unzipped files
                 '
-                SrcFileNamelist = cpCore.privateFiles.GetFolderFiles(privateFolderPath)
+                SrcFileNamelist = cpCore.privateFiles.getFileList(privateFolderPath)
                 If True Then
                     '
                     ' Process all non-zip files
@@ -845,7 +845,7 @@ ErrorTrap:
                                                 CollectionFolderName = Collectionname & "_" & CollectionFolderName
                                             End If
                                             CollectionFolder = cpCore.addon_getPrivateFilesAddonPath() & CollectionFolderName & "\"
-                                            If Not cpCore.privateFiles.checkPath(CollectionFolder) Then
+                                            If Not cpCore.privateFiles.pathExists(CollectionFolder) Then
                                                 '
                                                 ' Create collection folder
                                                 '
@@ -904,7 +904,7 @@ ErrorTrap:
                                                             ' filename is blank
                                                             '
                                                             'hint = hint & ",511"
-                                                        ElseIf Not cpCore.privateFiles.checkFile(PathFilename) Then
+                                                        ElseIf Not cpCore.privateFiles.fileExists(PathFilename) Then
                                                             '
                                                             ' resource is not here
                                                             '
@@ -976,7 +976,7 @@ ErrorTrap:
                                                                                         ' file is already installed
                                                                                         '
                                                                                         'hint = hint & ",534"
-                                                                                    ElseIf Not cpCore.privateFiles.checkFile(PathFilename) Then
+                                                                                    ElseIf Not cpCore.privateFiles.fileExists(PathFilename) Then
                                                                                         '
                                                                                         ' the file is not here
                                                                                         '
@@ -1326,7 +1326,7 @@ ErrorTrap:
                         'CollectionVersionFolder = GetProgramPath & "\Addons\" & CollectionVersionFolderName & "\"
                         CollectionHelp = ""
                         CollectionHelpLink = ""
-                        srcFileInfoArray = cpCore.privateFiles.GetFolderFiles(CollectionVersionFolder)
+                        srcFileInfoArray = cpCore.privateFiles.getFileList(CollectionVersionFolder)
                         If srcFileInfoArray.Count = 0 Then
                             UpgradeOK = False
                             return_ErrorMessage = return_ErrorMessage & "<P>The collection was not installed because the folder containing the Add-on's resources was empty.</P>"
@@ -1337,7 +1337,7 @@ ErrorTrap:
                                 '
                                 For Each file As IO.FileInfo In srcFileInfoArray
                                     If vbLCase(file.Name) = "collection.hlp" Then
-                                        CollectionHelp = CollectionHelp & cpCore.privateFiles.ReadFile(CollectionVersionFolder & file.Name)
+                                        CollectionHelp = CollectionHelp & cpCore.privateFiles.readFile(CollectionVersionFolder & file.Name)
                                     End If
                                 Next
                                 '
@@ -2329,9 +2329,9 @@ ErrorTrap:
                 Dim FolderList As IO.DirectoryInfo()
                 '
                 collectionFilePathFilename = cpCore.addon_getPrivateFilesAddonPath & "Collections.xml"
-                returnXml = cpCore.privateFiles.ReadFile(collectionFilePathFilename)
+                returnXml = cpCore.privateFiles.readFile(collectionFilePathFilename)
                 If returnXml = "" Then
-                    FolderList = cpCore.privateFiles.getFolders(cpCore.addon_getPrivateFilesAddonPath)
+                    FolderList = cpCore.privateFiles.getFolderList(cpCore.addon_getPrivateFilesAddonPath)
                     If FolderList.Count > 0 Then
                         For Each folder As IO.DirectoryInfo In FolderList
                             FolderName = folder.Name
@@ -2345,7 +2345,7 @@ ErrorTrap:
                                         Collectionname = Left(FolderName, Len(FolderName) - Len(CollectionGuid) - 1)
                                         CollectionGuid = Mid(CollectionGuid, 1, 8) & "-" & Mid(CollectionGuid, 9, 4) & "-" & Mid(CollectionGuid, 13, 4) & "-" & Mid(CollectionGuid, 17, 4) & "-" & Mid(CollectionGuid, 21)
                                         CollectionGuid = "{" & CollectionGuid & "}"
-                                        SubFolderList = cpCore.privateFiles.getFolders(cpCore.addon_getPrivateFilesAddonPath() & "\" & FolderName)
+                                        SubFolderList = cpCore.privateFiles.getFolderList(cpCore.addon_getPrivateFilesAddonPath() & "\" & FolderName)
                                         If SubFolderList.Count > 0 Then
                                             SubFolder = SubFolderList(SubFolderList.Count - 1)
                                             FolderName = FolderName & "\" & SubFolder.Name
@@ -2366,7 +2366,7 @@ ErrorTrap:
                         Next
                     End If
                     returnXml = "<CollectionList>" & returnXml & vbCrLf & "</CollectionList>"
-                    Call cpCore.privateFiles.SaveFile(collectionFilePathFilename, returnXml)
+                    Call cpCore.privateFiles.saveFile(collectionFilePathFilename, returnXml)
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -2648,8 +2648,8 @@ ErrorTrap:
                 DstFolder = Left(DstFolder, Len(DstFolder) - 1)
             End If
             '
-            If cpCore.privateFiles.checkPath(SrcFolder) Then
-                FileInfoArray = cpCore.privateFiles.GetFolderFiles(SrcFolder)
+            If cpCore.privateFiles.pathExists(SrcFolder) Then
+                FileInfoArray = cpCore.privateFiles.getFileList(SrcFolder)
                 For Each file As IO.FileInfo In FileInfoArray
                     If (file.Extension = "dll") Or (file.Extension = "exe") Or (file.Extension = "zip") Then
                         '
@@ -2671,7 +2671,7 @@ ErrorTrap:
                 '
                 ' copy folders to dst
                 '
-                FolderInfoArray = cpCore.privateFiles.getFolders(SrcFolder)
+                FolderInfoArray = cpCore.privateFiles.getFolderList(SrcFolder)
                 For Each folder As IO.DirectoryInfo In FolderInfoArray
                     If (InStr(1, "," & BlockFolderList & ",", "," & folder.Name & ",", vbTextCompare) = 0) Then
                         Call CopyInstallToDst(SrcPath & folder.Name & "\", DstPath & folder.Name & "\", BlockFileList, "")
@@ -2706,8 +2706,8 @@ ErrorTrap:
                 SrcFolder = Left(SrcFolder, Len(SrcFolder) - 1)
             End If
             '
-            If cpCore.privateFiles.checkPath(SrcFolder) Then
-                FileInfoArray = cpCore.privateFiles.GetFolderFiles(SrcFolder)
+            If cpCore.privateFiles.pathExists(SrcFolder) Then
+                FileInfoArray = cpCore.privateFiles.getFileList(SrcFolder)
                 For Each file As IO.FileInfo In FileInfoArray
                     If (InStr(1, "," & ExcludeFileList & ",", "," & file.Name & ",", vbTextCompare) <> 0) Then
                         '
@@ -2729,7 +2729,7 @@ ErrorTrap:
                 '
                 ' copy folders to dst
                 '
-                FolderInfoArray = cpCore.privateFiles.getFolders(SrcFolder)
+                FolderInfoArray = cpCore.privateFiles.getFolderList(SrcFolder)
                 For Each folder As IO.DirectoryInfo In FolderInfoArray
                     GetCollectionFileList = GetCollectionFileList & GetCollectionFileList(SrcPath, SubFolder & folder.Name & "\", ExcludeFileList)
                 Next
@@ -4085,7 +4085,7 @@ ErrorTrap:
                     Dim ignoreRefactor As Boolean
                     '
                     If True Then
-                        baseCollectionXml = cpCore.cluster.localClusterFiles.ReadFile("clibResources\baseCollection.xml")
+                        baseCollectionXml = cpCore.cluster.localClusterFiles.readFile("clibResources\baseCollection.xml")
                         Call installCollection_LoadXmlToMiniCollection(baseCollectionXml, CollectionNew, True, True, isNewBuild, CollectionWorking)
                         Call installCollection_BuildDbFromMiniCollection(CollectionNew, ignoreRefactor, cpCore.db.dataBuildVersion, isNewBuild)
                         Call cpCore.db.executeSql("update ccfields set IsBaseField=1")
@@ -5090,7 +5090,7 @@ ErrorTrap:
                     '
                     NodeCount = 0
                     If .StyleCnt > 0 Then
-                        SiteStyles = cpCore.cdnFiles.ReadFile("templates/styles.css")
+                        SiteStyles = cpCore.cdnFiles.readFile("templates/styles.css")
                         If Trim(SiteStyles) <> "" Then
                             '
                             ' Split with an extra character at the end to guarantee there is an extra split at the end
@@ -5150,7 +5150,7 @@ ErrorTrap:
                             & vbCrLf & "*/" _
                             & vbCrLf & StyleSheetAdd
                         End If
-                        Call cpCore.appRootFiles.SaveFile("templates/styles.css", SiteStyles)
+                        Call cpCore.appRootFiles.saveFile("templates/styles.css", SiteStyles)
                         '
                         ' Update stylesheet cache
                         '
@@ -6271,8 +6271,8 @@ ErrorTrap:
                     ExportFilename = "cdef_export_" & CStr(GetRandomInteger()) & ".xml"
                     ExportPathPage = "tmp\" & ExportFilename
                     Call exportApplicationCDefXml(ExportPathPage, True)
-                    CollectionData = cpCore.privateFiles.ReadFile(ExportPathPage)
-                    Call cpCore.privateFiles.DeleteFile(ExportPathPage)
+                    CollectionData = cpCore.privateFiles.readFile(ExportPathPage)
+                    Call cpCore.privateFiles.deleteFile(ExportPathPage)
                     Call installCollection_LoadXmlToMiniCollection(CollectionData, returnColl, False, False, isNewBuild, New MiniCollectionClass)
                 End If
             Catch ex As Exception
@@ -6939,7 +6939,7 @@ ErrorTrap:
                 '
                 XML = New coreXmlToolsClass(cpCore)
                 Content = XML.GetXMLContentDefinition3("", IncludeBaseFields)
-                Call cpCore.privateFiles.SaveFile(privateFilesPathFilename, Content)
+                Call cpCore.privateFiles.saveFile(privateFilesPathFilename, Content)
                 XML = Nothing
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)

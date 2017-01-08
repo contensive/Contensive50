@@ -136,6 +136,7 @@ namespace integrationTests
         {
             // arrange
             CPClass cp = new CPClass("testapp");
+            cp.core.siteProperties.setProperty("AllowBake", true);
             // act
             cp.Cache.Save("testString", "testValue");
             // assert
@@ -153,6 +154,7 @@ namespace integrationTests
             // arrange
             CPClass cp = new CPClass("testapp");
             DateTime testDate = new DateTime(1990, 8, 7);
+            cp.core.siteProperties.setProperty("AllowBake", true);
             // act
             cp.Cache.setKey("testString", "testValue");
             cp.Cache.setKey("testInt", 12345);
@@ -178,6 +180,7 @@ namespace integrationTests
             // arrange
             CPClass cp = new CPClass("testapp");
             DateTime testDate = new DateTime(1990, 8, 7);
+            cp.core.siteProperties.setProperty("AllowBake", true);
             // act
             cp.Cache.setKey("testString", "testValue", "a");
             cp.Cache.setKey("testInt", 12345, "a");
@@ -211,6 +214,7 @@ namespace integrationTests
         {
             // arrange
             CPClass cp = new CPClass("testapp");
+            cp.core.siteProperties.setProperty("AllowBake", true);
             DateTime testDate = new DateTime(1990, 8, 7);
             List<string> tagList = new List<string>();
             tagList.Add("a");
@@ -251,6 +255,7 @@ namespace integrationTests
         {
             // arrange
             CPClass cp = new CPClass("testapp");
+            cp.core.siteProperties.setProperty("AllowBake", true);
             string contentName = "testContent" + cp.Utils.GetRandomInteger().ToString();
             try
             {
@@ -294,6 +299,7 @@ namespace integrationTests
         {
             // arrange
             CPClass cp = new CPClass("testapp");
+            cp.core.siteProperties.setProperty("AllowBake", true);
             // act
             cp.Cache.Save("keyA", "testValue", "a,b,c,d,e");
             // assert

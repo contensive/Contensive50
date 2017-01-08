@@ -99,14 +99,14 @@ Namespace integrationTests
             Try
                 Dim block As CPBlockClass = cp.BlockNew()
                 ' act
-                cp.File.appRootFiles.save(filename, templateA)
+                cp.core.appRootFiles.saveFile(filename, templateA)
                 block.ImportFile(filename)
                 ' assert
                 Assert.Equal(layoutC, block.GetHtml())
             Catch ex As Exception
                 '
             Finally
-                cp.File.appRootFiles.delete(filename)
+                cp.core.appRootFiles.deleteFile(filename)
             End Try
         End Sub
         '
@@ -147,12 +147,12 @@ Namespace integrationTests
             Try
                 Dim block As CPBlockClass = cp.BlockNew()
                 ' act
-                cp.File.appRootFiles.save(filename, layoutA)
+                cp.core.appRootFiles.saveFile(filename, layoutA)
                 block.OpenFile(filename)
                 ' assert
                 Assert.Equal(layoutA, block.GetHtml())
             Finally
-                cp.File.appRootFiles.delete(filename)
+                cp.core.appRootFiles.deleteFile(filename)
             End Try
         End Sub
         '

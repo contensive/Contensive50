@@ -188,7 +188,7 @@ namespace  Contensive.Core {
                     //
                     //
                     coreFileSystemClass installFiles = new coreFileSystemClass(cp.core,  cp.core.clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
-                    if (!cp.core.cluster.localClusterFiles.checkPath("clibCommonAssemblies\\"))
+                    if (!cp.core.cluster.localClusterFiles.pathExists("clibCommonAssemblies\\"))
                     {
                         cp.core.cluster.localClusterFiles.createPath("clibCommonAssemblies\\");
                     }
@@ -207,7 +207,7 @@ namespace  Contensive.Core {
                         Console.WriteLine("Select one of the application patterns setup in the installation folder:");
                         appPatternCnt = 1;
                         appPatterns.Add("");
-                        foreach (System.IO.DirectoryInfo di in cp.core.cluster.localClusterFiles.getFolders(appPatternsSrc))
+                        foreach (System.IO.DirectoryInfo di in cp.core.cluster.localClusterFiles.getFolderList(appPatternsSrc))
                         {
                             appPatterns.Add(di.Name);
                             Console.Write("\n" + appPatternCnt.ToString() + ") " + di.Name);
@@ -383,9 +383,9 @@ namespace  Contensive.Core {
                 // replace "appName" with the name of this app in the default document in the apps public folder
                 //
                 string defaultFile = "apps\\" + appName + "\\appRoot\\" + iisDefaultDoc;
-                string defaultContent = cp.core.cluster.localClusterFiles.ReadFile(defaultFile);
+                string defaultContent = cp.core.cluster.localClusterFiles.readFile(defaultFile);
                 defaultContent = defaultContent.Replace("appName", appName);
-                cp.core.cluster.localClusterFiles.SaveFile(defaultFile, defaultContent);
+                cp.core.cluster.localClusterFiles.saveFile(defaultFile, defaultContent);
                 cp.Dispose();
                 //
                 // initialize the new app, use the save authentication that was used to authorize this object
@@ -424,11 +424,11 @@ namespace  Contensive.Core {
                 //
                 // unpack the install resources
                 //
-                if (installFiles.checkFile("clibresources.zip"))
+                if (installFiles.fileExists("clibresources.zip"))
                 {
                     installFiles.copyFile("clibresources.zip", "clibresources.zip", cp.core.cluster.localClusterFiles);
                     cp.core.cluster.localClusterFiles.UnzipFile("clibresources.zip");
-                    cp.core.cluster.localClusterFiles.DeleteFile("clibresources.zip");
+                    cp.core.cluster.localClusterFiles.deleteFile("clibresources.zip");
                 };
             //}
 

@@ -526,7 +526,7 @@ Namespace Contensive.Core
                         '
                         If AllowInstallFromFolder Then
                             'InstallFolder = cpcore.asv.config.physicalFilePath & InstallFolderName & "\"
-                            If cpCore.privateFiles.checkPath(privateFilesInstallPath) Then
+                            If cpCore.privateFiles.pathExists(privateFilesInstallPath) Then
                                 UpgradeOK = addonInstall.InstallCollectionFromPrivateFolder(builder, cpCore.db.dataBuildVersion, privateFilesInstallPath, IISResetRequired, cpCore.appConfig.name, ErrorMessage, InstalledCollectionGuid, False)
                                 If Not UpgradeOK Then
                                     If ErrorMessage = "" Then
@@ -540,7 +540,7 @@ Namespace Contensive.Core
                         '
                         ' and delete the install folder if it was created
                         '
-                        If cpCore.privateFiles.checkPath(privateFilesInstallPath) Then
+                        If cpCore.privateFiles.pathExists(privateFilesInstallPath) Then
                             Call cpCore.privateFiles.DeleteFileFolder(privateFilesInstallPath)
                         End If
                         '

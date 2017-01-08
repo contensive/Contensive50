@@ -18,25 +18,6 @@ Namespace Contensive.Core
         Public Const EventsId As String = "4FADD1C2-6A89-4A8E-ADD0-9850D3EB6DBC"
 #End Region
         '
-        Private AddonObj As CPAddonClass
-        Private CacheObj As CPCacheClass
-        Private ContentObj As CPContentClass
-        Private ContextObj As CPContextClass
-        Private DbObj As CPDbClass
-        Private DocObj As CPDocClass
-        Private EmailObj As CPEmailClass
-        Private FileObj As CPFileClass
-        Private GroupObj As CPGroupClass
-        Private HtmlObj As CPHtmlClass
-        Private MyAddonObj As CPAddonClass
-        Private RequestObj As CPRequestClass
-        Private ResponseObj As CPResponseClass
-        Private SiteObj As CPSiteClass
-        Private UserObj As CPUserClass
-        Private UserErrorObj As CPUserErrorClass
-        Private UtilsObj As CPUtilsClass
-        Private VisitObj As CPVisitClass
-        Private VisitorObj As CPVisitorClass
         ''
         '' 'Inherits the .thisaddon feature. before calling an addon that uses this BaseClass,
         '' the parent must 
@@ -209,211 +190,29 @@ Namespace Contensive.Core
             End Get
         End Property
         '
-        ' Implement Cp.Group
-        '
-        Public Overrides ReadOnly Property Group() As CPGroupBaseClass 'Inherits BaseClasses.CPBaseClass.Group
-            Get
-                If GroupObj Is Nothing Then
-                    GroupObj = New CPGroupClass(Me)
-                End If
-                Return GroupObj
-            End Get
-        End Property
-        '
-        ' Implement Cp.Request
-        '
-        Public Overrides ReadOnly Property Request() As CPRequestBaseClass 'Inherits BaseClasses.CPBaseClass.Request
-            Get
-                If RequestObj Is Nothing Then
-                    RequestObj = New CPRequestClass(core)
-                End If
-                Return RequestObj
-            End Get
-        End Property
-        '
-        ' Implement Cp.Response
-        '
-        Public Overrides ReadOnly Property Response() As CPResponseBaseClass 'Inherits BaseClasses.CPBaseClass.Response
-            Get
-                If ResponseObj Is Nothing Then
-                    ResponseObj = New CPResponseClass(core)
-                End If
-                Return ResponseObj
-            End Get
-        End Property
-        '
         ' Implement Cp.UserError
         '
         Public Overrides ReadOnly Property UserError() As CPUserErrorBaseClass 'Inherits BaseClasses.CPBaseClass.UserError
             Get
-                If UserErrorObj Is Nothing Then
-                    UserErrorObj = New CPUserErrorClass(core)
+                If _userErrorObj Is Nothing Then
+                    _userErrorObj = New CPUserErrorClass(core)
                 End If
-                Return UserErrorObj
+                Return _userErrorObj
             End Get
         End Property
-        '
-        ' Implement Cp.Visit
-        '
-        Public Overrides ReadOnly Property Visit() As CPVisitBaseClass 'Inherits BaseClasses.CPBaseClass.Visit
-            Get
-                If VisitObj Is Nothing Then
-                    VisitObj = New CPVisitClass(core, Me)
-                End If
-                Return VisitObj
-            End Get
-        End Property
-        '
-        ' Implement Cp.Visitor
-        '
-        Public Overrides ReadOnly Property Visitor() As CPVisitorBaseClass 'Inherits BaseClasses.CPBaseClass.Visitor
-            Get
-                If VisitorObj Is Nothing Then
-                    VisitorObj = New CPVisitorClass(core, Me)
-                End If
-                Return VisitorObj
-            End Get
-        End Property
+        Private _userErrorObj As CPUserErrorClass
         '
         ' Implement Cp.Visitor
         '
         Public Overrides ReadOnly Property User() As CPUserBaseClass 'Inherits BaseClasses.CPBaseClass.User
             Get
-                If UserObj Is Nothing Then
-                    UserObj = New CPUserClass(core, Me)
+                If _userObj Is Nothing Then
+                    _userObj = New CPUserClass(core, Me)
                 End If
-                Return UserObj
+                Return _userObj
             End Get
         End Property
-        '
-        ' Implement Cp.Html
-        '
-        Public Overrides ReadOnly Property Html() As CPHtmlBaseClass 'Inherits BaseClasses.CPBaseClass.Html
-            Get
-                If HtmlObj Is Nothing Then
-                    HtmlObj = New CPHtmlClass(Me)
-                End If
-                Return HtmlObj
-            End Get
-        End Property
-        '
-        ' Implement Cp.Cache
-        '
-        Public Overrides ReadOnly Property Cache() As CPCacheBaseClass 'Inherits BaseClasses.CPBaseClass.Cache
-            Get
-                If CacheObj Is Nothing Then
-                    CacheObj = New CPCacheClass(Me)
-                End If
-                Return CacheObj
-            End Get
-        End Property
-        '
-        ' Implement Cp.Db
-        '
-        Public Overrides ReadOnly Property Db() As CPDbBaseClass 'Inherits BaseClasses.CPBaseClass.Db
-            Get
-                If DbObj Is Nothing Then
-                    DbObj = New CPDbClass(Me)
-                End If
-                Return DbObj
-            End Get
-        End Property
-        '
-        ' Implement Cp.Email
-        '
-        Public Overrides ReadOnly Property Email() As CPEmailBaseClass 'Inherits BaseClasses.CPBaseClass.Email
-            Get
-                If EmailObj Is Nothing Then
-                    EmailObj = New CPEmailClass(core)
-                End If
-                Return EmailObj
-            End Get
-        End Property
-        '
-        ' Implement Cp.Content
-        '
-        Public Overrides ReadOnly Property Content() As CPContentBaseClass 'Inherits BaseClasses.CPBaseClass.Content
-            Get
-                If ContentObj Is Nothing Then
-                    ContentObj = New CPContentClass(Me)
-                End If
-                Return ContentObj
-            End Get
-        End Property
-        '
-        ' Implement Cp.Context
-        '
-        Public ReadOnly Property Context() As CPContextClass
-            Get
-                If ContextObj Is Nothing Then
-                    ContextObj = New CPContextClass(Me)
-                End If
-                Return ContextObj
-            End Get
-        End Property
-        '
-        ' Implement Cp.Addon
-        '
-        Public Overrides ReadOnly Property Addon() As CPAddonBaseClass 'Inherits BaseClasses.CPBaseClass.Addon
-            Get
-                If AddonObj Is Nothing Then
-                    AddonObj = New CPAddonClass(Me)
-                End If
-                Return AddonObj
-            End Get
-        End Property
-        '
-        ' Implement Cp.Utils
-        '
-        Public Overrides ReadOnly Property Utils() As CPUtilsBaseClass 'Inherits BaseClasses.CPBaseClass.Utils
-            Get
-                If UtilsObj Is Nothing Then
-                    UtilsObj = New CPUtilsClass(Me)
-                End If
-                Return UtilsObj
-            End Get
-        End Property
-        '
-        ' CP.Doc
-        '
-        Public Overrides ReadOnly Property Doc() As CPDocBaseClass  'Inherits BaseClasses.CPBaseClass.Doc
-            Get
-                If DocObj Is Nothing Then
-                    DocObj = New CPDocClass(Me)
-                End If
-                Return DocObj
-            End Get
-        End Property
-        '
-        ' CP.Site
-        '
-        Public Overrides ReadOnly Property Site() As CPSiteBaseClass 'Inherits BaseClasses.CPBaseClass.Site
-            Get
-                If SiteObj Is Nothing Then
-                    SiteObj = New CPSiteClass(core, Me)
-                End If
-                Return SiteObj
-            End Get
-        End Property
-
-        Public Overrides ReadOnly Property MyAddon() As CPAddonBaseClass 'Inherits BaseClasses.CPBaseClass.MyAddon
-            Get
-                If MyAddonObj Is Nothing Then
-                    MyAddonObj = New CPAddonClass(Me)
-                    MyAddonObj.Open(MyAddonID)
-                End If
-                Return MyAddonObj
-            End Get
-        End Property
-
-        Public Overrides ReadOnly Property File() As CPFileBaseClass
-            Get
-                If FileObj Is Nothing Then
-                    FileObj = New CPFileClass(core)
-                End If
-                Return FileObj
-            End Get
-        End Property
+        Private _userObj As CPUserClass
         '
         '====================================================================================================
         ''' <summary>
@@ -440,11 +239,236 @@ Namespace Contensive.Core
             ' 'My.Computer.FileSystem.WriteAllText(System.AppDocmc.main_CurrentDocmc.main_BaseDirectory() & "cpLog.txt", Now & " - " & copy & vbCrLf, True)
         End Sub
         '
-        ' testpoint
+        ' Implement Cp.Addon
         '
-        Private Sub tp(ByVal msg As String)
-            'Call appendDebugLog(msg)
-        End Sub
+        Public Overrides ReadOnly Property Addon() As CPAddonBaseClass 'Inherits BaseClasses.CPBaseClass.Addon
+            Get
+                If _addonObj Is Nothing Then
+                    _addonObj = New CPAddonClass(Me)
+                End If
+                Return _addonObj
+            End Get
+        End Property
+        Private _addonObj As CPAddonClass
+        '
+        Public Overrides ReadOnly Property cdnFiles() As CPFileSystemBaseClass
+            Get
+                If (_cdnFiles Is Nothing) Then
+                    _cdnFiles = New CPFileSystemClass(core, core.cdnFiles)
+                End If
+                Return _cdnFiles
+            End Get
+        End Property
+        Private _cdnFiles As CPFileSystemClass
+        '
+        ' Implement Cp.Cache
+        '
+        Public Overrides ReadOnly Property Cache() As CPCacheBaseClass 'Inherits BaseClasses.CPBaseClass.Cache
+            Get
+                If _cacheObj Is Nothing Then
+                    _cacheObj = New CPCacheClass(Me)
+                End If
+                Return _cacheObj
+            End Get
+        End Property
+        Private _cacheObj As CPCacheClass
+        '
+        ' Implement Cp.Content
+        '
+        Public Overrides ReadOnly Property Content() As CPContentBaseClass 'Inherits BaseClasses.CPBaseClass.Content
+            Get
+                If _contentObj Is Nothing Then
+                    _contentObj = New CPContentClass(Me)
+                End If
+                Return _contentObj
+            End Get
+        End Property
+        Private _contentObj As CPContentClass
+        '
+        ' Implement Cp.Context
+        '
+        Public ReadOnly Property Context() As CPContextClass
+            Get
+                If _contextObj Is Nothing Then
+                    _contextObj = New CPContextClass(Me)
+                End If
+                Return _contextObj
+            End Get
+        End Property
+        Private _contextObj As CPContextClass
+        '
+        ' Implement Cp.Db
+        '
+        Public Overrides ReadOnly Property Db() As CPDbBaseClass 'Inherits BaseClasses.CPBaseClass.Db
+            Get
+                If _dbObj Is Nothing Then
+                    _dbObj = New CPDbClass(Me)
+                End If
+                Return _dbObj
+            End Get
+        End Property
+        Private _dbObj As CPDbClass
+        '
+        ' CP.Doc
+        '
+        Public Overrides ReadOnly Property Doc() As CPDocBaseClass  'Inherits BaseClasses.CPBaseClass.Doc
+            Get
+                If _docObj Is Nothing Then
+                    _docObj = New CPDocClass(Me)
+                End If
+                Return _docObj
+            End Get
+        End Property
+        Private _docObj As CPDocClass
+        '
+        ' Implement Cp.Email
+        '
+        Public Overrides ReadOnly Property Email() As CPEmailBaseClass 'Inherits BaseClasses.CPBaseClass.Email
+            Get
+                If _emailObj Is Nothing Then
+                    _emailObj = New CPEmailClass(core)
+                End If
+                Return _emailObj
+            End Get
+        End Property
+        Private _emailObj As CPEmailClass
+
+        Public Overrides ReadOnly Property File() As CPFileBaseClass
+            Get
+                If _fileObj Is Nothing Then
+                    _fileObj = New CPFileClass(core)
+                End If
+                Return _fileObj
+            End Get
+        End Property
+        Private _fileObj As CPFileClass
+        '
+        ' Implement Cp.Group
+        '
+        Public Overrides ReadOnly Property Group() As CPGroupBaseClass 'Inherits BaseClasses.CPBaseClass.Group
+            Get
+                If _groupObj Is Nothing Then
+                    _groupObj = New CPGroupClass(Me)
+                End If
+                Return _groupObj
+            End Get
+        End Property
+        Private _groupObj As CPGroupClass
+        '
+        ' Implement Cp.Html
+        '
+        Public Overrides ReadOnly Property Html() As CPHtmlBaseClass 'Inherits BaseClasses.CPBaseClass.Html
+            Get
+                If _htmlObj Is Nothing Then
+                    _htmlObj = New CPHtmlClass(Me)
+                End If
+                Return _htmlObj
+            End Get
+        End Property
+        '
+        Private _htmlObj As CPHtmlClass
+        Public Overrides ReadOnly Property MyAddon() As CPAddonBaseClass 'Inherits BaseClasses.CPBaseClass.MyAddon
+            Get
+                If _myAddonObj Is Nothing Then
+                    _myAddonObj = New CPAddonClass(Me)
+                    _myAddonObj.Open(MyAddonID)
+                End If
+                Return _myAddonObj
+            End Get
+        End Property
+        Private _myAddonObj As CPAddonClass
+        '
+        Public Overrides ReadOnly Property privateFiles() As CPFileSystemBaseClass
+            Get
+                If (_privateFiles Is Nothing) Then
+                    _privateFiles = New CPFileSystemClass(core, core.privateFiles)
+                End If
+                Return _privateFiles
+            End Get
+        End Property
+        Private _privateFiles As CPFileSystemClass
+        '
+        ' Implement Cp.Request
+        '
+        Public Overrides ReadOnly Property Request() As CPRequestBaseClass 'Inherits BaseClasses.CPBaseClass.Request
+            Get
+                If _requestObj Is Nothing Then
+                    _requestObj = New CPRequestClass(core)
+                End If
+                Return _requestObj
+            End Get
+        End Property
+        Private _requestObj As CPRequestClass
+        '
+        ' Implement Cp.Response
+        '
+        Public Overrides ReadOnly Property Response() As CPResponseBaseClass 'Inherits BaseClasses.CPBaseClass.Response
+            Get
+                If _responseObj Is Nothing Then
+                    _responseObj = New CPResponseClass(core)
+                End If
+                Return _responseObj
+            End Get
+        End Property
+        Private _responseObj As CPResponseClass
+        '
+        ' CP.Site
+        '
+        Public Overrides ReadOnly Property Site() As CPSiteBaseClass 'Inherits BaseClasses.CPBaseClass.Site
+            Get
+                If _siteObj Is Nothing Then
+                    _siteObj = New CPSiteClass(core, Me)
+                End If
+                Return _siteObj
+            End Get
+        End Property
+        Private _siteObj As CPSiteClass
+        '
+        ' Implement Cp.Utils
+        '
+        Public Overrides ReadOnly Property Utils() As CPUtilsBaseClass 'Inherits BaseClasses.CPBaseClass.Utils
+            Get
+                If _utilsObj Is Nothing Then
+                    _utilsObj = New CPUtilsClass(Me)
+                End If
+                Return _utilsObj
+            End Get
+        End Property
+        Private _utilsObj As CPUtilsClass
+        '
+        ' Implement Cp.Visit
+        '
+        Public Overrides ReadOnly Property Visit() As CPVisitBaseClass 'Inherits BaseClasses.CPBaseClass.Visit
+            Get
+                If _visitObj Is Nothing Then
+                    _visitObj = New CPVisitClass(core, Me)
+                End If
+                Return _visitObj
+            End Get
+        End Property
+        Private _visitObj As CPVisitClass
+        '
+        ' Implement Cp.Visitor
+        '
+        Public Overrides ReadOnly Property Visitor() As CPVisitorBaseClass 'Inherits BaseClasses.CPBaseClass.Visitor
+            Get
+                If _visitorObj Is Nothing Then
+                    _visitorObj = New CPVisitorClass(core, Me)
+                End If
+                Return _visitorObj
+            End Get
+        End Property
+        Private _visitorObj As CPVisitorClass
+        '
+        Public Overrides ReadOnly Property wwwFiles() As CPFileSystemBaseClass
+            Get
+                If (_appRootFiles Is Nothing) Then
+                    _appRootFiles = New CPFileSystemClass(core, core.appRootFiles)
+                End If
+                Return _appRootFiles
+            End Get
+        End Property
+        Private _appRootFiles As CPFileSystemClass
         '
         '====================================================================================================
 #Region " IDisposable Support "
@@ -479,25 +503,25 @@ Namespace Contensive.Core
                     '
                     ' call .dispose for managed objects
                     '
-                    If Not (AddonObj Is Nothing) Then AddonObj.Dispose()
-                    If Not (CacheObj Is Nothing) Then CacheObj.Dispose()
-                    If Not (ContentObj Is Nothing) Then ContentObj.Dispose()
-                    If Not (ContextObj Is Nothing) Then ContextObj.Dispose()
-                    If Not (DbObj Is Nothing) Then DbObj.Dispose()
-                    If Not (DocObj Is Nothing) Then DocObj.Dispose()
-                    If Not (EmailObj Is Nothing) Then EmailObj.Dispose()
-                    If Not (FileObj Is Nothing) Then FileObj.Dispose()
-                    If Not (GroupObj Is Nothing) Then GroupObj.Dispose()
-                    If Not (HtmlObj Is Nothing) Then HtmlObj.Dispose()
-                    If Not (MyAddonObj Is Nothing) Then MyAddonObj.Dispose()
-                    If Not (RequestObj Is Nothing) Then RequestObj.Dispose()
-                    If Not (ResponseObj Is Nothing) Then ResponseObj.Dispose()
-                    If Not (SiteObj Is Nothing) Then SiteObj.Dispose()
-                    If Not (UserErrorObj Is Nothing) Then UserErrorObj.Dispose()
-                    If Not (UserObj Is Nothing) Then UserObj.Dispose()
-                    If Not (UtilsObj Is Nothing) Then UtilsObj.Dispose()
-                    If Not (VisitObj Is Nothing) Then VisitObj.Dispose()
-                    If Not (VisitorObj Is Nothing) Then VisitorObj.Dispose()
+                    If Not (_addonObj Is Nothing) Then _addonObj.Dispose()
+                    If Not (_cacheObj Is Nothing) Then _cacheObj.Dispose()
+                    If Not (_contentObj Is Nothing) Then _contentObj.Dispose()
+                    If Not (_contextObj Is Nothing) Then _contextObj.Dispose()
+                    If Not (_dbObj Is Nothing) Then _dbObj.Dispose()
+                    If Not (_docObj Is Nothing) Then _docObj.Dispose()
+                    If Not (_emailObj Is Nothing) Then _emailObj.Dispose()
+                    If Not (_fileObj Is Nothing) Then _fileObj.Dispose()
+                    If Not (_groupObj Is Nothing) Then _groupObj.Dispose()
+                    If Not (_htmlObj Is Nothing) Then _htmlObj.Dispose()
+                    If Not (_myAddonObj Is Nothing) Then _myAddonObj.Dispose()
+                    If Not (_requestObj Is Nothing) Then _requestObj.Dispose()
+                    If Not (_responseObj Is Nothing) Then _responseObj.Dispose()
+                    If Not (_siteObj Is Nothing) Then _siteObj.Dispose()
+                    If Not (_userErrorObj Is Nothing) Then _userErrorObj.Dispose()
+                    If Not (_userObj Is Nothing) Then _userObj.Dispose()
+                    If Not (_utilsObj Is Nothing) Then _utilsObj.Dispose()
+                    If Not (_visitObj Is Nothing) Then _visitObj.Dispose()
+                    If Not (_visitorObj Is Nothing) Then _visitorObj.Dispose()
                 End If
                 '
                 ' cleanup non-managed objects

@@ -74,12 +74,12 @@ Namespace Contensive.Core
         '
         '==========================================================================================
         Public Overrides Sub delete(ByVal filename As String)
-            Call fileSystem.DeleteFile(filename)
+            Call fileSystem.deleteFile(filename)
         End Sub
         '
         '==========================================================================================
         Public Overrides Function read(ByVal filename As String) As String
-            Return fileSystem.ReadFile(filename)
+            Return fileSystem.readFile(filename)
         End Function
         '
         '==========================================================================================
@@ -89,7 +89,7 @@ Namespace Contensive.Core
         '
         '==========================================================================================
         Public Overrides Sub save(ByVal filename As String, ByVal fileContent As String)
-            Call fileSystem.SaveFile(filename, fileContent)
+            Call fileSystem.saveFile(filename, fileContent)
         End Sub
         '
         '==========================================================================================
@@ -99,22 +99,22 @@ Namespace Contensive.Core
         '
         '==========================================================================================
         Public Overrides Function fileExists(ByVal pathFileName As String) As Boolean
-            fileExists = fileSystem.checkFile(pathFileName)
+            fileExists = fileSystem.fileExists(pathFileName)
         End Function
         '
         '==========================================================================================
         Public Overrides Function folderExists(ByVal folderName As String) As Boolean
-            folderExists = fileSystem.checkPath(folderName)
+            folderExists = fileSystem.pathExists(folderName)
         End Function
         '
         '==========================================================================================
         Public Overrides Function fileList(ByVal folderName As String, Optional ByVal pageSize As Integer = 0, Optional ByVal pageNumber As Integer = 1) As IO.FileInfo()
-            Return fileSystem.GetFolderFiles(folderName)
+            Return fileSystem.getFileList(folderName)
         End Function
         '
         '==========================================================================================
         Public Overrides Function folderList(ByVal folderName As String) As IO.DirectoryInfo()
-            Return fileSystem.getFolders(folderName)
+            Return fileSystem.getFolderList(folderName)
         End Function
         '
         '==========================================================================================

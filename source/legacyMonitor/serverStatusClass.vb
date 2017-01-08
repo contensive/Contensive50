@@ -181,7 +181,7 @@ Namespace Contensive.Core
                         '
                         Content = Content & StatusLine(0, "")
                         Content = Content & StatusLine(0, "Log Check")
-                        LogFileStruct = cpCore.appRootFiles.GetFolderFiles(getProgramFilesPath() & "logs")
+                        LogFileStruct = cpCore.appRootFiles.getFileList(getProgramFilesPath() & "logs")
                         For Each logFile As IO.FileInfo In LogFileStruct
                             If logFile.Length > LargestLogSize Then
                                 LargestLogSize = EncodeInteger(logFile.Length)
@@ -205,7 +205,7 @@ Namespace Contensive.Core
                         '
                         Content = Content & StatusLine(0, "")
                         Content = Content & StatusLine(0, "Alarms Log Check")
-                        LogFileStruct = cpCore.appRootFiles.GetFolderFiles(getProgramFilesPath() & "\logs\alarms")
+                        LogFileStruct = cpCore.appRootFiles.getFileList(getProgramFilesPath() & "\logs\alarms")
                         If LogFileStruct.Count = 0 Then
                             Content = Content & StatusLine(1, "No alarm logs.")
                         Else

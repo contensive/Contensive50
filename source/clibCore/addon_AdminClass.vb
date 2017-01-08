@@ -3660,7 +3660,7 @@ ErrorTrap:
                             ' rw( "n/a" )
                             Filename = cpCore.db.db_GetCS(CS, .nameLc)
                             If Filename <> "" Then
-                                Copy = cpCore.cdnFiles.ReadFile(Filename)
+                                Copy = cpCore.cdnFiles.readFile(Filename)
                                 Copy = cpCore.html_encodeContent10(Copy, cpCore.user.id, "", 0, 0, True, False, False, False, True, False, "", "", IsEmailContent, 0, "", coreClass.addonContextEnum.ContextAdmin, cpCore.user.isAuthenticated, Nothing, cpCore.user.isEditingAnything)
                                 Stream.Add(Copy)
                             End If
@@ -9664,7 +9664,7 @@ ErrorTrap:
                             Case ButtonSave, ButtonOK
                                 '
                                 Call cpCore.siteProperties.setProperty("Allow CSS Reset", cpCore.main_GetStreamBoolean2(RequestNameAllowCSSReset))
-                                Call cpCore.cdnFiles.SaveFile(DynamicStylesFilename, cpCore.docProperties.getText("StyleEditor"))
+                                Call cpCore.cdnFiles.saveFile(DynamicStylesFilename, cpCore.docProperties.getText("StyleEditor"))
                                 If cpCore.main_GetStreamBoolean2(RequestNameInlineStyles) Then
                                     '
                                     ' Inline Styles
@@ -9692,12 +9692,12 @@ ErrorTrap:
                                 ' delete all templateid based editorstylerule files, build on-demand
                                 '
                                 EditorStyleRulesFilename = vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, vbTextCompare)
-                                Call cpCore.cdnFiles.DeleteFile(EditorStyleRulesFilename)
+                                Call cpCore.cdnFiles.deleteFile(EditorStyleRulesFilename)
                                 '
                                 CS = cpCore.db.db_openCsSql_rev("default", "select id from cctemplates")
                                 Do While cpCore.db.cs_Ok(CS)
                                     EditorStyleRulesFilename = vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", cpCore.main_GetCS2Text(CS, "ID"), 1, 99, vbTextCompare)
-                                    Call cpCore.cdnFiles.DeleteFile(EditorStyleRulesFilename)
+                                    Call cpCore.cdnFiles.deleteFile(EditorStyleRulesFilename)
                                     Call cpCore.db.db_csGoNext(CS)
                                 Loop
                                 Call cpCore.db.cs_Close(CS)
@@ -10092,7 +10092,7 @@ ErrorTrap:
                             Call SaveContentTracking(adminContent, editRecord)
                             '
                             EditorStyleRulesFilename = vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", editRecord.id.ToString, 1, 99, vbTextCompare)
-                            Call cpCore.privateFiles.DeleteFile(EditorStyleRulesFilename)
+                            Call cpCore.privateFiles.deleteFile(EditorStyleRulesFilename)
                         Case "CCSHAREDSTYLES"
                             '
                             ' save and clear editorstylerules for any template
@@ -10106,12 +10106,12 @@ ErrorTrap:
                             Call SaveContentTracking(adminContent, editRecord)
                             '
                             EditorStyleRulesFilename = vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, vbTextCompare)
-                            Call cpCore.cdnFiles.DeleteFile(EditorStyleRulesFilename)
+                            Call cpCore.cdnFiles.deleteFile(EditorStyleRulesFilename)
                             '
                             CS = cpCore.db.db_openCsSql_rev("default", "select id from cctemplates")
                             Do While cpCore.db.cs_Ok(CS)
                                 EditorStyleRulesFilename = vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", cpCore.main_GetCS2Text(CS, "ID"), 1, 99, vbTextCompare)
-                                Call cpCore.cdnFiles.DeleteFile(EditorStyleRulesFilename)
+                                Call cpCore.cdnFiles.deleteFile(EditorStyleRulesFilename)
                                 Call cpCore.db.db_csGoNext(CS)
                             Loop
                             Call cpCore.db.cs_Close(CS)
@@ -11107,7 +11107,7 @@ ErrorTrap:
                     AllowCSSReset = (cpCore.siteProperties.getBoolean("Allow CSS Reset", False))
                 End If
                 '
-                Copy = cpCore.html_GetFormInputTextExpandable("StyleEditor", cpCore.cdnFiles.ReadFile(DynamicStylesFilename), 20)
+                Copy = cpCore.html_GetFormInputTextExpandable("StyleEditor", cpCore.cdnFiles.readFile(DynamicStylesFilename), 20)
                 Copy = vbReplace(Copy, " cols=""100""", " style=""width:100%;""", 1, 99, vbTextCompare)
                 Copy = "" _
                     & "<div style=""padding:10px;"">" & cpCore.html_GetFormInputCheckBox2(RequestNameAllowCSSReset, AllowCSSReset) & "&nbsp;Include Contensive reset styles</div>" _
@@ -15965,17 +15965,17 @@ ErrorTrap:
                                 End If
                             End If
                         Next
-                        Call cpCore.privateFiles.SaveFile(InnovaEditorFeaturefilename, "admin:" & AdminList & vbCrLf & "contentmanager:" & CMList & vbCrLf & "public:" & PublicList)
+                        Call cpCore.privateFiles.saveFile(InnovaEditorFeaturefilename, "admin:" & AdminList & vbCrLf & "contentmanager:" & CMList & vbCrLf & "public:" & PublicList)
                         '
                         ' Clear the editor style rules template cache so next edit gets new background color
                         '
                         EditorStyleRulesFilename = vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, vbTextCompare)
-                        Call cpCore.privateFiles.DeleteFile(EditorStyleRulesFilename)
+                        Call cpCore.privateFiles.deleteFile(EditorStyleRulesFilename)
                         '
                         CS = cpCore.db.db_openCsSql_rev("default", "select id from cctemplates")
                         Do While cpCore.db.cs_Ok(CS)
                             EditorStyleRulesFilename = vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", cpCore.main_GetCS2Text(CS, "ID"), 1, 99, vbTextCompare)
-                            Call cpCore.privateFiles.DeleteFile(EditorStyleRulesFilename)
+                            Call cpCore.privateFiles.deleteFile(EditorStyleRulesFilename)
                             Call cpCore.db.db_csGoNext(CS)
                         Loop
                         Call cpCore.db.cs_Close(CS)
@@ -15990,10 +15990,10 @@ ErrorTrap:
                         '
                         ' Draw the form
                         '
-                        FeatureList = cpCore.cdnFiles.ReadFile(InnovaEditorFeaturefilename)
+                        FeatureList = cpCore.cdnFiles.readFile(InnovaEditorFeaturefilename)
                         If FeatureList = "" Then
-                            FeatureList = cpCore.cluster.localClusterFiles.ReadFile("ccLib\" & "Config\DefaultEditorConfig.txt")
-                            Call cpCore.privateFiles.SaveFile(InnovaEditorFeaturefilename, FeatureList)
+                            FeatureList = cpCore.cluster.localClusterFiles.readFile("ccLib\" & "Config\DefaultEditorConfig.txt")
+                            Call cpCore.privateFiles.saveFile(InnovaEditorFeaturefilename, FeatureList)
                         End If
                         If FeatureList = "" Then
                             FeatureList = "admin:" & InnovaEditorFeatureList & vbCrLf & "contentmanager:" & InnovaEditorFeatureList & vbCrLf & "public:" & InnovaEditorPublicFeatureList

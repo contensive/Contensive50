@@ -136,7 +136,7 @@ ErrorTrap:
         '
         '
         Public Sub LoadFile(ByVal Filename As String)
-            Call Load(cpCore.appRootFiles.ReadFile(Filename), 0)
+            Call Load(cpCore.appRootFiles.readFile(Filename), 0)
         End Sub
         '
         ' Get Name
@@ -457,7 +457,7 @@ ErrorTrap:
         '
         '
         Public Sub SaveFile(ByVal Filename As String)
-            Call cpCore.appRootFiles.SaveFile(Filename, XML)
+            Call cpCore.appRootFiles.saveFile(Filename, XML)
         End Sub
         '
         '

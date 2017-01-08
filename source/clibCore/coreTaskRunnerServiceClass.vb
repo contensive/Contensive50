@@ -143,7 +143,7 @@ Namespace Contensive
                     '
                     Using cpCluster As New CPClass
                         Using programDataFiles As New coreFileSystemClass(cpCluster.core, cpCluster.core.clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib")
-                            Dim JSONTemp = programDataFiles.ReadFile("serverConfig.json")
+                            Dim JSONTemp = programDataFiles.readFile("serverConfig.json")
                             Dim serverConfig As serverConfigClass = cpCluster.core.json.Deserialize(Of serverConfigClass)(JSONTemp)
                             If (Not serverConfig.allowTaskRunnerService) Then
                                 appendLog("taskRunnerService.processTimerTick, allowTaskRunnerService false, skip")

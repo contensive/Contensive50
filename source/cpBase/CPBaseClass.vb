@@ -150,14 +150,36 @@ Namespace Contensive.BaseClasses
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public MustOverride ReadOnly Property MyAddon() As CPAddonBaseClass 'Implements BaseClasses.CPBaseClass.MyAddon
+        Public MustOverride ReadOnly Property MyAddon() As CPAddonBaseClass
         ''' <summary>
         ''' The file object handles file system methods. See CPFileBaseClass for more details.
         ''' </summary>
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public MustOverride ReadOnly Property File() As CPFileBaseClass 'Implements BaseClasses.CPBaseClass.File
+        Public MustOverride ReadOnly Property File() As CPFileBaseClass
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' read and write cdn files, like content uploads
+        ''' </summary>
+        ''' <returns></returns>
+        Public MustOverride ReadOnly Property cdnFiles() As CPFileSystemBaseClass
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' read and write files in the root folder of the application (wwwRoot,htdocs,etc)
+        ''' </summary>
+        ''' <returns></returns>
+        Public MustOverride ReadOnly Property wwwFiles() As CPFileSystemBaseClass
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' read and write files not available to the Internet
+        ''' </summary>
+        ''' <returns></returns>
+        Public MustOverride ReadOnly Property privateFiles() As CPFileSystemBaseClass
+        '
     End Class
 
 End Namespace
