@@ -1,4 +1,7 @@
 
+Option Explicit On
+Option Strict On
+
 Imports Contensive.BaseClasses
 Imports System.Runtime.InteropServices
 
@@ -311,12 +314,21 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         '
-        Public Overrides Function LoginByID(ByVal RecordID As String, Optional ByVal SetAutoLogin As Boolean = False) As Boolean 'Inherits BaseClasses.CPUserBaseClass.LoginById
-            If True Then
-                Return cpCore.user.authenticateById(RecordID, SetAutoLogin)
-            Else
-                Return False
-            End If
+        <Obsolete("Use LoginById(integer) instead", False)>
+        Public Overrides Function LoginByID(ByVal RecordID As String, Optional ByVal SetAutoLogin As Boolean = False) As Boolean
+            Return cpCore.user.authenticateById(EncodeInteger(RecordID), SetAutoLogin)
+        End Function
+        '
+        '====================================================================================================
+        '
+        Public Overrides Function LoginByID(ByVal RecordID As Integer) As Boolean
+            Return cpCore.user.authenticateById(RecordID, False)
+        End Function
+        '
+        '====================================================================================================
+        '
+        Public Overrides Function LoginByID(ByVal RecordID As Integer, ByVal SetAutoLogin As Boolean) As Boolean
+            Return cpCore.user.authenticateById(RecordID, SetAutoLogin)
         End Function
         '
         '====================================================================================================
@@ -422,7 +434,7 @@ Namespace Contensive.Core
         '=======================================================================================================
         '
         Public Overrides Function GetBoolean(PropertyName As String, Optional DefaultValue As String = "") As Boolean
-            Return cpCore.userProperty.getBoolean(PropertyName, DefaultValue)
+            Return cpCore.userProperty.getBoolean(PropertyName, EncodeBoolean(DefaultValue))
         End Function
         '
         '=======================================================================================================
@@ -430,7 +442,7 @@ Namespace Contensive.Core
         '=======================================================================================================
         '
         Public Overrides Function GetDate(PropertyName As String, Optional DefaultValue As String = "") As Date
-            Return cpCore.userProperty.getDate(PropertyName, DefaultValue)
+            Return cpCore.userProperty.getDate(PropertyName, EncodeDate(DefaultValue))
         End Function
         '
         '=======================================================================================================
@@ -438,7 +450,7 @@ Namespace Contensive.Core
         '=======================================================================================================
         '
         Public Overrides Function GetInteger(PropertyName As String, Optional DefaultValue As String = "") As Integer
-            Return cpCore.userProperty.getInteger(PropertyName, DefaultValue)
+            Return cpCore.userProperty.getInteger(PropertyName, EncodeInteger(DefaultValue))
         End Function
         '
         '=======================================================================================================
@@ -446,7 +458,7 @@ Namespace Contensive.Core
         '=======================================================================================================
         '
         Public Overrides Function GetNumber(PropertyName As String, Optional DefaultValue As String = "") As Double
-            Return cpCore.userProperty.getNumber(PropertyName, DefaultValue)
+            Return cpCore.userProperty.getNumber(PropertyName, EncodeNumber(DefaultValue))
         End Function
         '
         '=======================================================================================================

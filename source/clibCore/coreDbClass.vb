@@ -215,10 +215,8 @@ Namespace Contensive.Core
         ''' app services constructor
         ''' </summary>
         ''' <param name="cp"></param>
-        ''' <param name="cluster"></param>
-        ''' <param name="appName"></param>
         ''' <remarks></remarks>
-        Public Sub New(cpCore As coreClass, ByVal appName As String)
+        Public Sub New(cpCore As coreClass)
             MyBase.New()
             Try
                 '
@@ -238,347 +236,286 @@ Namespace Contensive.Core
                 Throw (ex)
             End Try
         End Sub
-#Region " IDisposable Support "
-        Protected disposed As Boolean = False
-        '
-        '==========================================================================================
-        ''' <summary>
-        ''' dispose
-        ''' </summary>
-        ''' <param name="disposing"></param>
-        ''' <remarks></remarks>
-        Protected Overridable Overloads Sub Dispose(ByVal disposing As Boolean)
-            If Not Me.disposed Then
-                If disposing Then
-                    '
-                    ' ----- call .dispose for managed objects
-                    '
-                    '
-                    ' ----- Close all open csv_ContentSets, and make sure the RS is killed
-                    '
-                    If csv_ContentSetCount > 0 Then
-                        Dim CSPointer As Integer
-                        For CSPointer = 1 To csv_ContentSetCount
-                            If db_ContentSet(CSPointer).IsOpen Then
-                                Call cs_Close(CSPointer)
-                            End If
-                        Next
-                    End If
-                End If
-                '
-                ' Add code here to release the unmanaged resource.
-                '
-            End If
-            Me.disposed = True
-        End Sub
-        ' Do not change or add Overridable to these methods.
-        ' Put cleanup code in Dispose(ByVal disposing As Boolean).
-        Public Overloads Sub Dispose() Implements IDisposable.Dispose
-            Dispose(True)
-            GC.SuppressFinalize(Me)
-        End Sub
-        Protected Overrides Sub Finalize()
-            Dispose(False)
-            MyBase.Finalize()
-        End Sub
-#End Region
         '
         '====================================================================================================
         ''' <summary>
-        ''' returns the addon install object. It only has access to the current app, so there is no access protection.
+        ''' return the correctly formated connection string for a connection to the cluster's database (default connection no catalog) -- used to create new catalogs (appication databases) in the database
         ''' </summary>
-        ''' <value></value>
         ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public ReadOnly Property addonInstall() As coreAddonInstallClass
-            Get
-                If _addonInstall Is Nothing Then
-                    _addonInstall = New coreAddonInstallClass(cpCore)
-                End If
-                Return _addonInstall
-            End Get
-        End Property
-        '
-        '========================================================================
-        ' Add a DataSource to the DataSourceLocal
-        '   Returns the AddDataSource
-        '   If found, it updates
-        '========================================================================
-        '
-        Public Function db_AddDataSource(ByVal DataSourceName As String, ByVal Id As Integer, ByVal ConnectionString As String) As Integer
-            Dim returnPtr As Integer = 0
-            Try
-                Dim dataSourceNameLower As String
-                '
-                If dataSources.Length > 0 Then
-                    '
-                    ' Find it
-                    '
-                    dataSourceNameLower = DataSourceName.ToLower
-                    For returnPtr = 0 To dataSources.Length - 1
-                        If vbUCase(dataSources(returnPtr).NameLower) = dataSourceNameLower Then
-                            Exit For
-                        End If
-                    Next
-                End If
-                '
-                If returnPtr >= dataSources.Length Then
-                    '
-                    ' Add it if not found
-                    '
-                    returnPtr = dataSources.Length
-                    ReDim Preserve dataSources(returnPtr)
-                    dataSources(returnPtr) = New dataSourceClass
-                End If
-                With dataSources(returnPtr)
-                    .NameLower = DataSourceName.ToLower
-                    .Id = Id
-                    .odbcConnectionString = ConnectionString
-                    .password = ""
-                    .dataSourceType = dataSourceTypeEnum.mySqlNative
-                    .username = ""
-                    .endPoint = ""
-                End With
-                '
-            Catch ex As Exception
-                handleLegacyClassError5(ex, "addDataSource", "trap")
-            End Try
-            Return returnPtr
+        Public Function getMasterADONETConnectionString() As String
+            Return getConnectionStringADONET("", "")
         End Function
         '
-        '========================================================================
-        ' Get Data Source By Pointer
-        '   If failure, return an empty DataSourceType (.ID=0)
-        '========================================================================
-        '
-        Public Function GetDataSourceByPointer(ByVal DataSourcePointer As Integer) As dataSourceClass
-            Dim DataSource As dataSourceClass = Nothing
-            If DataSourcePointer >= 0 Then
-                DataSource = dataSources(DataSourcePointer)
-            End If
-            Return DataSource
-        End Function
-        '
-        '========================================================================
-        ' Get Data Source By ID
-        '   If failure, return an empty DataSourceType (.ID=0)
-        '========================================================================
-        '
-        Public Function GetDataSourceByID(ByVal DataSourceID As Integer) As dataSourceClass
-            Dim DataSource As dataSourceClass = Nothing
-            Dim DataSourcePointer As Integer
+        '====================================================================================================
+        ''' <summary>
+        ''' return the correctly formated connection string for this datasource. Called only from within this class
+        ''' </summary>
+        ''' <returns>
+        ''' </returns>
+        Private Function getConnectionStringADONET(catalogName As String, dataSourceName As String) As String
             '
-            If dataSources.Length > 0 Then
-                For DataSourcePointer = 0 To dataSources.Length - 1
-                    If dataSources(DataSourcePointer).Id = DataSourceID Then
-                        GetDataSourceByID = dataSources(dataSources.Length)
-                        Exit For
-                    End If
-                Next
-            End If
-            Return DataSource
-        End Function
-        '
-        '========================================================================
-        ' Get Data Source By Name
-        '   If failure, return an empty DataSourceType (.ID=0)
-        '========================================================================
-        '
-        Public Function GetDataSource(ByVal DataSourceName As String) As dataSourceClass
-            Dim returnDataSource As New dataSourceClass
+            ' (OLEDB) OLE DB Provider for SQL Server > "Provider=sqloledb;Data Source=MyServerName;Initial Catalog=MyDatabaseName;User Id=MyUsername;Password=MyPassword;"
+            '     https://www.codeproject.com/Articles/2304/ADO-Connection-Strings#OLE%20DB%20SqlServer
+            '
+            ' (OLEDB) Microsoft OLE DB Provider for SQL Server connection strings > "Provider=sqloledb;Data Source=myServerAddress;Initial Catalog=myDataBase;User Id = myUsername;Password=myPassword;"
+            '     https://www.connectionstrings.com/microsoft-ole-db-provider-for-sql-server-sqloledb/
+            '
+            ' (ADONET) .NET Framework Data Provider for SQL Server > Server=myServerAddress;Database=myDataBase;User Id=myUsername;Password = myPassword;
+            '     https://www.connectionstrings.com/sql-server/
+            '
+            Dim returnConnString As String = ""
             Try
-
-                Dim DataSourcePointer As Integer
-                Dim lowerDataSourceName As String
-                '
-                If dataSources.Length > 0 Then
-                    lowerDataSourceName = DataSourceName.ToLower
-                    For DataSourcePointer = 0 To dataSources.Length - 1
-                        If vbUCase(dataSources(DataSourcePointer).NameLower) = lowerDataSourceName Then
-                            returnDataSource = dataSources(dataSources.Length)
-                            Exit For
-                        End If
-                    Next
+                Dim normalizedDataSourceName As String = dataSourceName.Trim().ToLower()
+                Dim masterConnString As String = ""
+                Dim defaultDataSourceConnString As String = ""
+                Dim serverUrl As String
+                serverUrl = cpCore.clusterConfig.defaultDataSourceAddress
+                If (serverUrl.IndexOf(":") > 0) Then
+                    serverUrl = serverUrl.Substring(0, serverUrl.IndexOf(":"))
+                End If
+                'If Not String.IsNullOrEmpty(provider) Then
+                '    '
+                '    ' add provider if required by connection
+                '    '
+                '    masterConnString &= "Provider=" & provider & ";"
+                '    'masterConnString &= "Provider=SQLOLEDB;"
+                'End If
+                ''
+                masterConnString &= "" _
+                    & "server=" & serverUrl & ";" _
+                    & "User Id=" & cpCore.clusterConfig.defaultDataSourceUsername & ";" _
+                    & "Password=" & cpCore.clusterConfig.defaultDataSourcePassword & ";" _
+                    & ""
+                ''
+                'masterConnString &= "" _
+                '    & "data source=" & dataSourceUrl & ";" _
+                '    & "UID=" & cpCore.clusterConfig.defaultDataSourceUsername & ";" _
+                '    & "PWD=" & cpCore.clusterConfig.defaultDataSourcePassword & ";" _
+                '    & ""
+                If String.IsNullOrEmpty(catalogName) Then
+                    '
+                    ' if no catalog, uses masterConnectionString
+                    '
+                    returnConnString = masterConnString
+                Else
+                    defaultDataSourceConnString = masterConnString & "Database=" & catalogName & ";"
+                    'defaultDataSourceConnString = masterConnString & "initial catalog=" & catalogName & ";"
+                    If (String.IsNullOrEmpty(normalizedDataSourceName)) Or (normalizedDataSourceName = "default") Then
+                        '
+                        ' use default datasource
+                        '
+                        returnConnString = defaultDataSourceConnString
+                    ElseIf (_dataSourceDictionary.ContainsKey(normalizedDataSourceName)) Then
+                        returnConnString = _dataSourceDictionary(normalizedDataSourceName)
+                    Else
+                        Dim sql As String = "select connString from ccDataSources where name=" & cpCore.db.encodeSQLText(normalizedDataSourceName) & " order by id"
+                        Using dt As DataTable = executeSql_getDataTable_internal(sql, defaultDataSourceConnString, 0, 1)
+                            If (dt Is Nothing) Then
+                                Throw New ApplicationException("dataSourceName [" & dataSourceName & "] is not valid.")
+                            ElseIf (dt.Rows.Count = 0) Then
+                                Throw New ApplicationException("dataSourceName [" & dataSourceName & "] is not valid.")
+                            Else
+                                returnConnString = dt.Rows(0).Field(Of String)("connString")
+                                _dataSourceDictionary.Add(normalizedDataSourceName, returnConnString)
+                            End If
+                        End Using
+                    End If
                 End If
             Catch ex As Exception
-                handleLegacyClassError5(ex, "getDataSource", "trap")
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
-            Return returnDataSource
+            Return returnConnString
         End Function
-        '        '
-        '        '========================================================================
-        '        '   Open a Connection
-        '        '   Increments Active Connections
-        '        '   Returns a connection handle
-        '        '========================================================================
-        '        '
-        '        Public Function OpenConnection() As AppConnectionType
-        '            On Error GoTo ErrorTrap
-        '            Dim returnString As String
-
-        '            'Const Tn = "AppServicesClass.OpenConnection" : Call logMethodEntry(Tn) : 'Dim th as integer
-        '            '
-        '            '-------------------------------------------------------------------------------
-        '            ' Open TimerTrace if needed
-        '            '-------------------------------------------------------------------------------
-        '            '
-        '            If vbInstr(1, "," & DomainName & ",", ",TRACE,", vbTextCompare) <> 0 Then
-        '                Call TimerTraceOpen("TimerTrace_AppServicesClass_" & Name & "_" & ConnectionHandleCount & ".txt")
-        '                th = TimerTraceStart(Tn)
-        '            End If
-
-        '            '
-        '            'ConnectionsActive = ConnectionsActive + 1
-        '            OpenConnection.metaCache.metaCache.cdefCount = CDefCount
-        '            If CDefCount > 0 Then
-        '                OpenConnection.CDefID = CDefID
-        '                OpenConnection.CDefName = CDefName
-        '            End If
-        '            OpenConnection.ConnectionHandle = ConnectionHandleCount
-        '            OpenConnection.DomainName = DomainName
-        '            OpenConnection.PhysicalFilePath = PhysicalFilePath
-        '            OpenConnection.QueryStringExcludeList = QueryStringExcludeList
-        '            OpenConnection.RootPath = RootPath
-        '            OpenConnection.status = status
-        '            OpenConnection.URLEncoder = URLEncoder
-        '            '
-        '            Call GetSiteProperty("AllowTransactionLog", False, SystemMemberID, returnString)
-        '            OpenConnection.AllowTransactionLog = EncodeBoolean(returnString)
-        '            '
-        '            '
-        '            Call GetSiteProperty("AllowWorkflowAuthoring", False, SystemMemberID, returnString)
-        '            OpenConnection.AllowWorkflowAuthoring = EncodeBoolean(returnString)
-        '            '
-        '            Call GetSiteProperty(siteproperty_serverPageDefault_name, siteproperty_serverPageDefault_defaultValue, SystemMemberID, returnString)
-        '            OpenConnection.ServerPageDefault = EncodeText(returnString)
-        '            '
-        '            ConnectionHandleCount = ConnectionHandleCount + 1
-        '            '
-
-        '            'Call logMethodExit(Tn) : Call TimerTraceStop(th)
-
-        '            Exit Function
-        '            '
-        '            ' ----- Error Trap
-        '            '
-        'ErrorTrap:
-        '            Call HandleClassTrapError(config.Name, "OpenConnection")
-        '        End Function
-        '        '
-        '        '========================================================================
-        '        '   Close a Connection
-        '        '   Decrements Active Connections
-        '        '   Returns the number of open connections
-        '        '========================================================================
-        '        '
-        '        Public Function CloseConnection() As Integer
-        '            On Error GoTo ErrorTrap
-
-        '            'Const Tn = "AppServicesClass.CloseConnection" : Call logMethodEntry(Tn) : ''Dim th as integer : th = TimerTraceStart(Tn)
-
-        '            '
-        '            ConnectionsActive = ConnectionsActive - 1
-        '            CloseConnection = ConnectionsActive
-        '            '
-
-        '            'Call logMethodExit(Tn) : Call TimerTraceStop(th) : Call TimerTraceClose()
-
-        '            Exit Function
-        '            '
-        '            ' ----- Error Trap
-        '            '
-        'ErrorTrap:
-        '            Call HandleClassTrapError(config.Name, "CloseConnection")
-        '        End Function
+        Private _dataSourceDictionary As New Dictionary(Of String, String)
         '
-        ''========================================================================
-        '''' <summary>
-        '''' return the last modified date for the records in this table 
-        '''' </summary>
-        '''' <param name="tag">A tag that represents the source of the data in a cache entry. When that data source is modifed, the tag can be used to invalidate the cache entries based on it.</param>
-        '''' <returns></returns>
-        '''' <remarks></remarks>
-        'Private Function cache_getTagInvalidationDate(ByVal tag As String) As Date
-        '    Dim returnTagInvalidationDate As Date = Date.MinValue
-        '    Try
-        '        'Dim cacheData As Object
-        '        Dim cacheNameTagInvalidateDate As String = "tagInvalidationDate-" & tag
-        '        Dim tableName As String = ""
-        '        Dim sql As String
-        '        '
-        '        If db.config.enableCache Then
-        '            If Not String.IsNullOrEmpty(tag) Then
-        '                '
-        '                ' get it from raw cache
-        '                '
-        '                returnTagInvalidationDate = EncodeDate(cache_readRaw(cacheNameTagInvalidateDate))
-        '                'If (TypeOf cacheData Is Date) Then
-        '                '    returnTagInvalidationDate = EncodeDate(cacheData)
-        '                'End If
-        '                If returnTagInvalidationDate = Date.MinValue Then
-        '                    '
-        '                    ' if tag is a content name, use the last modified date from Db
-        '                    '
-        '                    Try
-        '                        sql = "select top 1 t.modifiedDate" _
-        '                            & " From cccontent c" _
-        '                            & " left join cctables t on t.id=c.contenttableId" _
-        '                            & " where c.name=" & db_EncodeSQLText(tag) _
-        '                            & " order by t.modifiedDate desc"
-        '                        Using dt As DataTable = executeSql(sql)
-        '                            If dt.Rows.Count > 0 Then
-        '                                returnTagInvalidationDate = EncodeDate(dt.Rows(0).Item(0))
-        '                            End If
-        '                        End Using
-        '                    Catch ex As Exception
-        '                        '
-        '                    End Try
-        '                    If returnTagInvalidationDate = Date.MinValue Then
-        '                        returnTagInvalidationDate = date.minvalue
-        '                    End If
-        '                    cache_saveRaw(cacheNameTagInvalidateDate, returnTagInvalidationDate)
-        '                End If
-        '            End If
-        '        End If
-        '    Catch ex As Exception
-        '        cpCore.handleException(ex)
-        '    End Try
-        '    Return returnTagInvalidationDate
-        'End Function
-        ''
-        ''========================================================================
-        ''   a Content definitions TimeStamp
-        ''========================================================================
-        ''
-        'Public Sub SetContentTimeStamp(ByVal ContentName As String)
-        '    Try
-        '        Dim cacheName As String = "tagInvalidationDate-" & ContentName
-        '        '
-        '        If Not String.IsNullOrEmpty(ContentName) Then
-        '            '
-        '            ' set the current time
-        '            '
-        '            cache_saveRaw(cacheName, Now.ToString)
-        '        End If
-        '    Catch ex As Exception
-        '        cpCore.handleException(ex)
-        '    End Try
-        'End Sub
-
-        Public Property ConnectionString() As String
-            Get
-                ConnectionString = DefaultConnectionString
-            End Get
-            Set(ByVal value As String)
-                DefaultConnectionString = value
-            End Set
-        End Property
+        '====================================================================================================
+        ''' <summary>
+        ''' return the correctly formated connection string for this datasource. Called only from within this class
+        ''' </summary>
+        ''' <returns>
+        ''' </returns>
+        Private Function getConnectionStringOLEDB(catalogName As String, dataSourceName As String) As String
+            '
+            ' (OLEDB) OLE DB Provider for SQL Server > "Provider=sqloledb;Data Source=MyServerName;Initial Catalog=MyDatabaseName;User Id=MyUsername;Password=MyPassword;"
+            '     https://www.codeproject.com/Articles/2304/ADO-Connection-Strings#OLE%20DB%20SqlServer
+            '
+            ' (OLEDB) Microsoft OLE DB Provider for SQL Server connection strings > "Provider=sqloledb;Data Source=myServerAddress;Initial Catalog=myDataBase;User Id = myUsername;Password=myPassword;"
+            '     https://www.connectionstrings.com/microsoft-ole-db-provider-for-sql-server-sqloledb/
+            '
+            ' (ADONET) .NET Framework Data Provider for SQL Server > Server=myServerAddress;Database=myDataBase;User Id=myUsername;Password = myPassword;
+            '     https://www.connectionstrings.com/sql-server/
+            '
+            Dim returnConnString As String = ""
+            Try
+                Dim normalizedDataSourceName As String = dataSourceName.Trim().ToLower()
+                Dim masterConnString As String = ""
+                Dim defaultDataSourceConnString As String = ""
+                Dim serverUrl As String
+                serverUrl = cpCore.clusterConfig.defaultDataSourceAddress
+                If (serverUrl.IndexOf(":") > 0) Then
+                    serverUrl = serverUrl.Substring(0, serverUrl.IndexOf(":"))
+                End If
+                'If Not String.IsNullOrEmpty(provider) Then
+                '    '
+                '    ' add provider if required by connection
+                '    '
+                '    masterConnString &= "Provider=" & provider & ";"
+                '    'masterConnString &= "Provider=SQLOLEDB;"
+                'End If
+                ''
+                masterConnString &= "" _
+                    & "Provider=sqloledb;" _
+                    & "Data Source=" & serverUrl & ";" _
+                    & "User Id=" & cpCore.clusterConfig.defaultDataSourceUsername & ";" _
+                    & "Password=" & cpCore.clusterConfig.defaultDataSourcePassword & ";" _
+                    & ""
+                ''
+                'masterConnString &= "" _
+                '    & "data source=" & dataSourceUrl & ";" _
+                '    & "UID=" & cpCore.clusterConfig.defaultDataSourceUsername & ";" _
+                '    & "PWD=" & cpCore.clusterConfig.defaultDataSourcePassword & ";" _
+                '    & ""
+                If String.IsNullOrEmpty(catalogName) Then
+                    '
+                    ' if no catalog, uses masterConnectionString
+                    '
+                    returnConnString = masterConnString
+                Else
+                    defaultDataSourceConnString = masterConnString & "Initial Catalog=" & catalogName & ";"
+                    'defaultDataSourceConnString = masterConnString & "initial catalog=" & catalogName & ";"
+                    If (String.IsNullOrEmpty(normalizedDataSourceName)) Or (normalizedDataSourceName = "default") Then
+                        '
+                        ' use default datasource
+                        '
+                        returnConnString = defaultDataSourceConnString
+                    ElseIf (_dataSourceDictionary.ContainsKey(normalizedDataSourceName)) Then
+                        returnConnString = _dataSourceDictionary(normalizedDataSourceName)
+                    Else
+                        Dim sql As String = "select connString from ccDataSources where name=" & cpCore.db.encodeSQLText(normalizedDataSourceName) & " order by id"
+                        Using dt As DataTable = executeSql_getDataTable_internal(sql, defaultDataSourceConnString, 0, 1)
+                            If (dt Is Nothing) Then
+                                Throw New ApplicationException("dataSourceName [" & dataSourceName & "] is not valid.")
+                            ElseIf (dt.Rows.Count = 0) Then
+                                Throw New ApplicationException("dataSourceName [" & dataSourceName & "] is not valid.")
+                            Else
+                                returnConnString = dt.Rows(0).Field(Of String)("connString")
+                                _dataSourceDictionary.Add(normalizedDataSourceName, returnConnString)
+                            End If
+                        End Using
+                    End If
+                End If
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+            Return returnConnString
+        End Function
         '
-        ' execute sql on default connection and return datatable
+        '====================================================================================================
+        ''' <summary>
+        ''' Create a new catalog in the database
+        ''' </summary>
+        ''' <param name="catalogName"></param>
+        Public Sub createCatalog(catalogName As String)
+            Try
+                executeMasterSql_ReturnDataTable("create database " + catalogName)
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+        End Sub
         '
-        Public Function executeSql(ByVal sql As String, Optional ByVal dataSourceName As String = "", Optional ByVal startRecord As Integer = 0, Optional ByVal maxRecords As Integer = 9999) As DataTable
+        '====================================================================================================
+        ''' <summary>
+        ''' Check if the database exists
+        ''' </summary>
+        ''' <param name="catalog"></param>
+        ''' <returns></returns>
+        Public Function checkCatalogExists(catalog As String) As Boolean
+            Dim returnOk As Boolean = False
+            Try
+                Dim sql As String
+                Dim databaseId As Integer = 0
+                Dim dt As DataTable
+                '
+                sql = String.Format("SELECT database_id FROM sys.databases WHERE Name = '{0}'", catalog)
+                dt = executeMasterSql_ReturnDataTable(sql)
+                returnOk = (dt.Rows.Count > 0)
+                dt.Dispose()
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+            Return returnOk
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Execute a command (sql statemwent) and return a dataTable object
+        ''' </summary>
+        ''' <param name="sql"></param>
+        ''' <param name="dataSourceName"></param>
+        ''' <param name="startRecord"></param>
+        ''' <param name="maxRecords"></param>
+        ''' <returns></returns>
+        Public Function executeMasterSql_ReturnDataTable(ByVal sql As String) As DataTable
             Dim returnData As New DataTable
-            Dim connString As String = cpCore.cluster.getConnectionString(cpCore.appConfig.name)
+            Try
+                Dim connString As String = getMasterADONETConnectionString()
+                If dbEnabled Then
+                    Using connSQL As New SqlConnection(connString)
+                        connSQL.Open()
+                        Using cmdSQL As New SqlCommand()
+                            cmdSQL.CommandType = Data.CommandType.Text
+                            cmdSQL.CommandText = sql
+                            cmdSQL.Connection = connSQL
+                            Using adptSQL = New SqlClient.SqlDataAdapter(cmdSQL)
+                                adptSQL.Fill(returnData)
+                            End Using
+                        End Using
+                    End Using
+                    dbVerified = True
+                End If
+            Catch ex As Exception
+                Dim newEx As New ApplicationException("Exception [" & ex.Message & "] executing master sql [" & sql & "]", ex)
+                cpCore.handleExceptionAndRethrow(newEx)
+            End Try
+            Return returnData
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Execute a command (sql statemwent) and return a dataTable object
+        ''' </summary>
+        ''' <param name="sql"></param>
+        ''' <param name="dataSourceName"></param>
+        ''' <param name="startRecord"></param>
+        ''' <param name="maxRecords"></param>
+        ''' <returns></returns>
+        Public Function executeSql_getDataTable(ByVal sql As String, Optional ByVal dataSourceName As String = "", Optional ByVal startRecord As Integer = 0, Optional ByVal maxRecords As Integer = 9999) As DataTable
+            Dim returnData As New DataTable
+            Try
+                returnData = executeSql_getDataTable_internal(sql, getConnectionStringADONET(cpCore.appConfig.name, dataSourceName), startRecord, maxRecords)
+            Catch ex As Exception
+                Dim newEx As New ApplicationException("Exception [" & ex.Message & "] executing sql [" & sql & "], datasource [" & dataSourceName & "], startRecord [" & startRecord & "], maxRecords [" & maxRecords & "]", ex)
+                cpCore.handleExceptionAndRethrow(newEx)
+            End Try
+            Return returnData
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' execute a command given the connection string. This method is provided to allow getConnectionString() to query the dataSources table. startRecord is 0 based. maxRecords=0 returns all rows.
+        ''' </summary>
+        ''' <param name="sql"></param>
+        ''' <param name="connString"></param>
+        ''' <param name="startRecord"></param>
+        ''' <param name="maxRecords"></param>
+        ''' <returns></returns>
+        Private Function executeSql_getDataTable_internal(ByVal sql As String, ByVal connString As String, ByVal startRecord As Integer, ByVal maxRecords As Integer) As DataTable
+            '
+            ' REFACTOR
+            ' consider writing cs intrface to sql dataReader object -- one row at a time, vaster.
+            ' https://msdn.microsoft.com/en-us/library/system.data.sqlclient.sqldatareader.aspx
+            '
+            Dim returnData As New DataTable
             Try
                 If dbEnabled Then
                     Using connSQL As New SqlConnection(connString)
@@ -595,19 +532,61 @@ Namespace Contensive.Core
                     dbVerified = True
                 End If
             Catch ex As Exception
-                Dim newEx As New ApplicationException("Exception [" & ex.Message & "] executing sql [" & sql & "], datasource [" & dataSourceName & "], startRecord [" & startRecord & "], maxRecords [" & maxRecords & "]", ex)
+                Dim newEx As New ApplicationException("Exception [" & ex.Message & "] executing sql [" & sql & "], connString [" & connString & "], startRecord [" & startRecord & "], maxRecords [" & maxRecords & "]", ex)
                 cpCore.handleExceptionAndRethrow(newEx)
-                Throw newEx
             End Try
             Return returnData
         End Function
         '
-        ' execute sql on default connection and return datatable
-        '
-        Public Sub executeSqlAsync(ByVal sql As String, Optional ByVal dataSourceName As String = "")
-            Dim connString As String = cpCore.cluster.getConnectionString(cpCore.appConfig.name)
+        '====================================================================================================
+        ''' <summary>
+        ''' Execute a command via ADO and return a recordset. Note the recordset must be disposed by the caller.
+        ''' </summary>
+        ''' <param name="sql"></param>
+        ''' <param name="dataSourceName"></param>
+        ''' <param name="startRecord"></param>
+        ''' <param name="maxRecords"></param>
+        ''' <returns>You must close the recordset after use.</returns>
+        Public Function executeSql_getRecordSet(ByVal sql As String, Optional ByVal dataSourceName As String = "", Optional ByVal startRecord As Integer = 0, Optional ByVal maxRecords As Integer = 9999) As ADODB.Recordset
+            ' from - https://support.microsoft.com/en-us/kb/308611
+            '
+            ' REFACTOR 
+            ' - add start recrod And max record in
+            ' - add dataSourceName into the getConnectionString call - if no dataSourceName, return catalog in cluster Db, else return connstring
+            '
+            'Dim cn As ADODB.Connection = New ADODB.Connection()
+            Dim rs As ADODB.Recordset = New ADODB.Recordset()
+            Dim connString As String = getConnectionStringOLEDB(cpCore.appConfig.name, dataSourceName)
+            '
             Try
                 If dbEnabled Then
+                    If (maxRecords > 0) Then
+                        rs.MaxRecords = maxRecords
+                    End If
+                    ' Open Recordset without connection object.
+                    rs.Open(sql, connString, ADODB.CursorTypeEnum.adOpenKeyset, ADODB.LockTypeEnum.adLockOptimistic, -1)
+                    ' REFACTOR -- dbVerified Is only for the datasource. Need one for each...
+                    dbVerified = True
+                End If
+            Catch ex As Exception
+                Dim newEx As New ApplicationException("Exception [" & ex.Message & "] executing sql [" & sql & "], datasource [" & dataSourceName & "], startRecord [" & startRecord & "], maxRecords [" & maxRecords & "]", ex)
+                cpCore.handleExceptionAndRethrow(newEx)
+                Throw newEx
+            End Try
+            Return rs
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' execute sql on a specific datasource asynchonously. No data is returned.
+        ''' </summary>
+        ''' <param name="sql"></param>
+        ''' <param name="dataSourceName"></param>
+        '
+        Public Sub executeSqlAsync(ByVal sql As String, Optional ByVal dataSourceName As String = "")
+            Try
+                If dbEnabled Then
+                    Dim connString As String = getConnectionStringADONET(cpCore.appConfig.name, dataSourceName)
                     Using connSQL As New SqlConnection(connString)
                         connSQL.Open()
                         Using cmdSQL As New SqlCommand()
@@ -628,7 +607,7 @@ Namespace Contensive.Core
         '
         '
         '
-        Public ReadOnly Property dataBuildVersion As String
+        Public ReadOnly Property siteproperty_dataBuildVersion As String
             Get
                 Dim returnString = ""
                 Try
@@ -748,7 +727,7 @@ ErrorTrap:
                 '
                 SQL = "UPDATE " & TableName & " SET " & sqlList.getNameValueList
                 SQL &= " WHERE " & Criteria & ";"
-                Call executeSql(SQL, DataSourceName)
+                Call executeSql_getDataTable(SQL, DataSourceName)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -817,7 +796,7 @@ ErrorTrap:
                 '
                 If sqlList.count > 0 Then
                     sql = "INSERT INTO " & TableName & "(" & sqlList.getNameList & ")values(" & sqlList.getValueList & ")"
-                    Call executeSql(sql, DataSourceName)
+                    Call executeSql_getDataTable(sql, DataSourceName)
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -890,7 +869,7 @@ ErrorTrap:
                 SQL &= " ORDER BY " & SortFieldList
             End If
             SQL &= ";"
-            db_openTable = executeSql(SQL, DataSourceName, (PageNumber - 1) * PageSize, PageSize)
+            db_openTable = executeSql_getDataTable(SQL, DataSourceName, (PageNumber - 1) * PageSize, PageSize)
             '
             Exit Function
             '
@@ -1053,10 +1032,10 @@ ErrorTrap:
                 If Not TableFound Then
                     If Not iAllowAutoIncrement Then
                         SQL = "Create Table " & TableName & "(ID " & db_GetSQLAlterColumnType(DataSourceName, FieldTypeIdInteger) & ");"
-                        Call executeSql(SQL, DataSourceName)
+                        Call executeSql_getDataTable(SQL, DataSourceName)
                     Else
                         SQL = "Create Table " & TableName & "(ID " & db_GetSQLAlterColumnType(DataSourceName, FieldTypeIdAutoIdIncrement) & ");"
-                        Call executeSql(SQL, DataSourceName)
+                        Call executeSql_getDataTable(SQL, DataSourceName)
                     End If
                 End If
                 '
@@ -1168,7 +1147,7 @@ ErrorTrap:
                         SQL &= db_GetSQLAlterColumnType(DataSourceName, fieldType)
                     End If
                     On Error GoTo ErrorTrap_SQL
-                    Call executeSql(SQL, DataSourceName)
+                    Call executeSql_getDataTable(SQL, DataSourceName)
                     '
                     '
                     '
@@ -1196,7 +1175,7 @@ ErrorTrap:
         '
         Public Sub db_DeleteTable(ByVal DataSourceName As String, ByVal TableName As String)
             Try
-                Call executeSql("DROP TABLE " & TableName, DataSourceName)
+                Call executeSql_getDataTable("DROP TABLE " & TableName, DataSourceName)
                 cpCore.cache.invalidateAll()
                 cpCore.metaData.clear()
             Catch ex As Exception
@@ -1279,7 +1258,7 @@ ErrorTrap:
                     ts = cpCore.metaData.getTableSchema(TableName, DataSourceName)
                     If (Not ts Is Nothing) Then
                         If Not ts.indexes.Contains(IndexName.ToLower) Then
-                            Call executeSql("CREATE INDEX " & IndexName & " ON " & TableName & "( " & FieldNames & " );", DataSourceName)
+                            Call executeSql_getDataTable("CREATE INDEX " & IndexName & " ON " & TableName & "( " & FieldNames & " );", DataSourceName)
                             If clearMetaCache Then
                                 cpCore.cache.invalidateAll()
                                 cpCore.metaData.clear()
@@ -1359,49 +1338,29 @@ ErrorTrap:
         '========================================================================
         '
         Public Function db_GetSQLAlterColumnType(ByVal DataSourceName As String, ByVal fieldType As Integer) As String
-            On Error GoTo ErrorTrap
-            '
-            Dim MethodName As String
-            Dim Pointer As Integer
-            '
-            MethodName = "csv_GetSQLAlterColumnType(" & DataSourceName & "," & fieldType & ")"
-            '
-            db_GetSQLAlterColumnType = ""
-            '
-            ' ----- It may depend on the datasource
-            '
-            Pointer = db_GetDataSourcePointer(DataSourceName)
-            If Pointer < 0 Then
-                Call handleLegacyClassError4(ignoreInteger, "dll", "Data Source [" & DataSourceName & "] was not found", MethodName, True)
-            Else
-                'If Not DataSourceConnectionObjs(Pointer).IsOpen Then
-                '    Call csv_OpenDataSource(DataSourceName, 30)
-                'End If
-                If True Then
-                    '    Call csv_HandleClassTrapError(ignoreInteger, "dll", "Data Source [" & DataSourceName & "] could not be opened", MethodName, True)
-                    'Else
-                    Select Case fieldType
-                        Case FieldTypeIdBoolean
-                            db_GetSQLAlterColumnType = "Int NULL"
-                        Case FieldTypeIdCurrency
-                            db_GetSQLAlterColumnType = "Float NULL"
-                        Case FieldTypeIdDate
-                            db_GetSQLAlterColumnType = "DateTime NULL"
-                        Case FieldTypeIdFloat
-                            db_GetSQLAlterColumnType = "Float NULL"
-                        Case FieldTypeIdCurrency
-                            db_GetSQLAlterColumnType = "Float NULL"
-                        Case FieldTypeIdInteger
-                            db_GetSQLAlterColumnType = "Int NULL"
-                        Case FieldTypeIdLookup, FieldTypeIdMemberSelect
-                            db_GetSQLAlterColumnType = "Int NULL"
-                        Case FieldTypeIdManyToMany, FieldTypeIdRedirect, FieldTypeIdFileImage, FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdText, FieldTypeIdFile, FieldTypeIdFileTextPrivate, FieldTypeIdFileJavascript, FieldTypeIdFileXML, FieldTypeIdFileCSS, FieldTypeIdFileHTMLPrivate
-                            db_GetSQLAlterColumnType = "VarChar(255) NULL"
-                        Case FieldTypeIdLongText, FieldTypeIdHTML
-                            '
-                            ' ----- Longtext, depends on datasource
-                            '
-                            db_GetSQLAlterColumnType = "Text Null"
+            Try
+                Select Case fieldType
+                    Case FieldTypeIdBoolean
+                        db_GetSQLAlterColumnType = "Int NULL"
+                    Case FieldTypeIdCurrency
+                        db_GetSQLAlterColumnType = "Float NULL"
+                    Case FieldTypeIdDate
+                        db_GetSQLAlterColumnType = "DateTime NULL"
+                    Case FieldTypeIdFloat
+                        db_GetSQLAlterColumnType = "Float NULL"
+                    Case FieldTypeIdCurrency
+                        db_GetSQLAlterColumnType = "Float NULL"
+                    Case FieldTypeIdInteger
+                        db_GetSQLAlterColumnType = "Int NULL"
+                    Case FieldTypeIdLookup, FieldTypeIdMemberSelect
+                        db_GetSQLAlterColumnType = "Int NULL"
+                    Case FieldTypeIdManyToMany, FieldTypeIdRedirect, FieldTypeIdFileImage, FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdText, FieldTypeIdFile, FieldTypeIdFileTextPrivate, FieldTypeIdFileJavascript, FieldTypeIdFileXML, FieldTypeIdFileCSS, FieldTypeIdFileHTMLPrivate
+                        db_GetSQLAlterColumnType = "VarChar(255) NULL"
+                    Case FieldTypeIdLongText, FieldTypeIdHTML
+                        '
+                        ' ----- Longtext, depends on datasource
+                        '
+                        db_GetSQLAlterColumnType = "Text Null"
                             'Select Case DataSourceConnectionObjs(Pointer).Type
                             '    Case DataSourceTypeODBCSQLServer
                             '        csv_GetSQLAlterColumnType = "Text Null"
@@ -1412,38 +1371,30 @@ ErrorTrap:
                             '    Case Else
                             '        csv_GetSQLAlterColumnType = "VarChar(65535)"
                             'End Select
-                        Case FieldTypeIdAutoIdIncrement
-                            '
-                            ' ----- autoincrement type, depends on datasource
-                            '
-                            db_GetSQLAlterColumnType = "INT IDENTITY PRIMARY KEY"
-                            'Select Case DataSourceConnectionObjs(Pointer).Type
-                            '    Case DataSourceTypeODBCSQLServer
-                            '        csv_GetSQLAlterColumnType = "INT IDENTITY PRIMARY KEY"
-                            '    Case DataSourceTypeODBCAccess
-                            '        csv_GetSQLAlterColumnType = "COUNTER CONSTRAINT PrimaryKey PRIMARY KEY"
-                            '    Case DataSourceTypeODBCMySQL
-                            '        csv_GetSQLAlterColumnType = "INT AUTO_INCREMENT PRIMARY KEY"
-                            '    Case Else
-                            '        csv_GetSQLAlterColumnType = "INT AUTO_INCREMENT PRIMARY KEY"
-                            'End Select
-                        Case Else
-                            '
-                            '
-                            ' Invalid field type
-                            Call Err.Raise(ignoreInteger, "dll", "Can not proceed because the field being created has an invalid FieldType [" & fieldType & "]")
-                            'csv_GetSQLAlterColumnType = "VarChar(255) NULL"
-                            'Call HandleClassTrapError(ignoreString, "dll", "Unknown FieldType [" & FieldType & "], used FieldTypeText", MethodName, False, True)
-                    End Select
-                End If
-            End If
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassError1(MethodName, "trap")
+                    Case FieldTypeIdAutoIdIncrement
+                        '
+                        ' ----- autoincrement type, depends on datasource
+                        '
+                        db_GetSQLAlterColumnType = "INT IDENTITY PRIMARY KEY"
+                        'Select Case DataSourceConnectionObjs(Pointer).Type
+                        '    Case DataSourceTypeODBCSQLServer
+                        '        csv_GetSQLAlterColumnType = "INT IDENTITY PRIMARY KEY"
+                        '    Case DataSourceTypeODBCAccess
+                        '        csv_GetSQLAlterColumnType = "COUNTER CONSTRAINT PrimaryKey PRIMARY KEY"
+                        '    Case DataSourceTypeODBCMySQL
+                        '        csv_GetSQLAlterColumnType = "INT AUTO_INCREMENT PRIMARY KEY"
+                        '    Case Else
+                        '        csv_GetSQLAlterColumnType = "INT AUTO_INCREMENT PRIMARY KEY"
+                        'End Select
+                    Case Else
+                        '
+                        ' Invalid field type
+                        '
+                        Throw New ApplicationException("Can not proceed because the field being created has an invalid FieldType [" & fieldType & "]")
+                End Select
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
         End Function
         '
         '========================================================================
@@ -1468,7 +1419,7 @@ ErrorTrap:
                             Case Else
                                 sql = "DROP INDEX " & TableName & "." & IndexName & ";"
                         End Select
-                        Call executeSql(sql, DataSourceName)
+                        Call executeSql_getDataTable(sql, DataSourceName)
                         cpCore.cache.invalidateAll()
                         cpCore.metaData.clear()
                     End If
@@ -1543,7 +1494,7 @@ ErrorTrap:
         Public Function db_isCdefField(ByVal ContentID As Integer, ByVal FieldName As String) As Boolean
             Dim RS As DataTable
             '
-            RS = executeSql("select top 1 id from ccFields where name=" & encodeSQLText(FieldName) & " and contentid=" & ContentID)
+            RS = executeSql_getDataTable("select top 1 id from ccFields where name=" & encodeSQLText(FieldName) & " and contentid=" & ContentID)
             db_isCdefField = isDataTableOk(RS)
             If (isDataTableOk(RS)) Then
                 RS.Dispose()
@@ -2061,7 +2012,7 @@ ErrorTrap:
                                 '
                                 ' Run the query
                                 '
-                                db_ContentSet(csOpen).dt = executeSql(SQL, DataSourceName, .PageSize * (.PageNumber - 1), .PageSize)
+                                db_ContentSet(csOpen).dt = executeSql_getDataTable(SQL, DataSourceName, .PageSize * (.PageNumber - 1), .PageSize)
                             End If
                         End With
                         'hint = hint & ",600"
@@ -2251,11 +2202,11 @@ ErrorTrap:
                 End With
                 '
                 If useCSReadCacheMultiRow Then
-                    db_ContentSet(returnCs).dt = executeSql(SQL, DataSourceName, PageSize * (PageNumber - 1), PageSize)
+                    db_ContentSet(returnCs).dt = executeSql_getDataTable(SQL, DataSourceName, PageSize * (PageNumber - 1), PageSize)
                     Call db_initCSData(returnCs)
                     Call db_LoadContentSetCurrentRow(returnCs)
                 Else
-                    db_ContentSet(returnCs).dt = executeSql(SQL, DataSourceName, PageSize * (PageNumber - 1), PageSize)
+                    db_ContentSet(returnCs).dt = executeSql_getDataTable(SQL, DataSourceName, PageSize * (PageNumber - 1), PageSize)
                     Call db_initCSData(returnCs)
                     Call db_LoadContentSetCurrentRow(returnCs)
                 End If
@@ -2778,7 +2729,7 @@ ErrorTrap:
         '   if no recordid, create filename from a random
         '=====================================================================================
         '
-        Public Function db_GetCSFilename(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal OriginalFilename As String, Optional ByVal ContentName As String = "") As String
+        Public Function cs_getFilename(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal OriginalFilename As String, Optional ByVal ContentName As String = "") As String
             On Error GoTo ErrorTrap 'Const Tn = "MethodName-066" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
             Dim fieldTypeId As Integer
@@ -2799,8 +2750,8 @@ ErrorTrap:
                 Call Err.Raise(ignoreInteger, "dll", "Fieldname Is blank")
             Else
                 UcaseFieldName = vbUCase(Trim(FieldName))
-                db_GetCSFilename = EncodeText(db_GetCSField(CSPointer, UcaseFieldName))
-                If db_GetCSFilename <> "" Then
+                cs_getFilename = EncodeText(db_GetCSField(CSPointer, UcaseFieldName))
+                If cs_getFilename <> "" Then
                     '
                     ' ----- A filename came from the record
                     '
@@ -2809,22 +2760,22 @@ ErrorTrap:
                         ' ----- there was an original filename, make sure it matches the one in the record
                         '
                         LenOriginalFilename = Len(OriginalFilename)
-                        LenFilename = Len(db_GetCSFilename)
+                        LenFilename = Len(cs_getFilename)
                         Pos = (1 + LenFilename - LenOriginalFilename)
                         If Pos <= 0 Then
                             '
                             ' Original Filename changed, create a new csv_GetCSFilename
                             '
-                            db_GetCSFilename = ""
-                        ElseIf Mid(db_GetCSFilename, Pos) <> OriginalFilename Then
+                            cs_getFilename = ""
+                        ElseIf Mid(cs_getFilename, Pos) <> OriginalFilename Then
                             '
                             ' Original Filename changed, create a new csv_GetCSFilename
                             '
-                            db_GetCSFilename = ""
+                            cs_getFilename = ""
                         End If
                     End If
                 End If
-                If db_GetCSFilename = "" Then
+                If cs_getFilename = "" Then
                     With db_ContentSet(CSPointer)
                         '
                         ' ----- no filename present, get id field
@@ -2873,8 +2824,8 @@ ErrorTrap:
                         Else
                             fieldTypeId = .CDef.fields(FieldName.ToLower()).fieldTypeId
                         End If
-                        db_GetCSFilename = csv_GetVirtualFilenameByTable(TableName, FieldName, RecordID, OriginalFilename, fieldTypeId)
-                        Call db_SetCSField(CSPointer, UcaseFieldName, db_GetCSFilename)
+                        cs_getFilename = csv_GetVirtualFilenameByTable(TableName, FieldName, RecordID, OriginalFilename, fieldTypeId)
+                        Call cs_setField(CSPointer, UcaseFieldName, cs_getFilename)
                     End With
                 End If
             End If
@@ -2950,13 +2901,13 @@ ErrorTrap:
                         Call handleLegacyClassError3("csv_SetCSTextFile", ("Attempting To update an unupdateable Content Set"))
                     Else
                         OldFilename = cs_getText(CSPointer, FieldName)
-                        Filename = db_GetCSFilename(CSPointer, FieldName, "", ContentName)
+                        Filename = cs_getFilename(CSPointer, FieldName, "", ContentName)
                         If OldFilename <> Filename Then
                             '
                             ' Filename changed, mark record changed
                             '
                             Call cpCore.privateFiles.saveFile(Filename, Copy)
-                            Call db_SetCSField(CSPointer, FieldName, Filename)
+                            Call cs_setField(CSPointer, FieldName, Filename)
                         Else
                             OldCopy = cpCore.cdnFiles.readFile(Filename)
                             If OldCopy <> Copy Then
@@ -2964,7 +2915,7 @@ ErrorTrap:
                                 ' copy changed, mark record changed
                                 '
                                 Call cpCore.privateFiles.saveFile(Filename, Copy)
-                                Call db_SetCSField(CSPointer, FieldName, Filename)
+                                Call cs_setField(CSPointer, FieldName, Filename)
                             End If
                         End If
                     End If
@@ -3010,7 +2961,7 @@ ErrorTrap:
         ' set the value of a field within a csv_ContentSet
         '========================================================================
         '
-        Public Sub db_SetCSField(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal FieldValue As Object)
+        Public Sub cs_setField(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal FieldValue As Object)
             Try
                 Dim FieldNameLocal As String
                 Dim FieldNameLocalUcase As String
@@ -3485,31 +3436,31 @@ ErrorTrap:
                                     '
                                     ' ----- cdn file
                                     '
-                                    SourceFilename = db_GetCSFilename(CSSource, FieldName, "")
+                                    SourceFilename = cs_getFilename(CSSource, FieldName, "")
                                     'SourceFilename = (csv_GetCSText(CSSource, FieldName))
                                     If (SourceFilename <> "") Then
-                                        DestFilename = db_GetCSFilename(CSDestination, FieldName, "")
+                                        DestFilename = cs_getFilename(CSDestination, FieldName, "")
                                         'DestFilename = csv_GetVirtualFilename(DestContentName, FieldName, DestRecordID)
-                                        Call db_SetCSField(CSDestination, FieldName, DestFilename)
+                                        Call cs_setField(CSDestination, FieldName, DestFilename)
                                         Call cpCore.cdnFiles.copyFile(SourceFilename, DestFilename)
                                     End If
                                 Case FieldTypeIdFileTextPrivate, FieldTypeIdFileHTMLPrivate
                                     '
                                     ' ----- private file
                                     '
-                                    SourceFilename = db_GetCSFilename(CSSource, FieldName, "")
+                                    SourceFilename = cs_getFilename(CSSource, FieldName, "")
                                     'SourceFilename = (csv_GetCSText(CSSource, FieldName))
                                     If (SourceFilename <> "") Then
-                                        DestFilename = db_GetCSFilename(CSDestination, FieldName, "")
+                                        DestFilename = cs_getFilename(CSDestination, FieldName, "")
                                         'DestFilename = csv_GetVirtualFilename(DestContentName, FieldName, DestRecordID)
-                                        Call db_SetCSField(CSDestination, FieldName, DestFilename)
+                                        Call cs_setField(CSDestination, FieldName, DestFilename)
                                         Call cpCore.privateFiles.copyFile(SourceFilename, DestFilename)
                                     End If
                                 Case Else
                                     '
                                     ' ----- value
                                     '
-                                    Call db_SetCSField(CSDestination, FieldName, db_GetCSField(CSSource, FieldName))
+                                    Call cs_setField(CSDestination, FieldName, db_GetCSField(CSSource, FieldName))
                             End Select
                     End Select
                     FieldName = db_GetCSNextFieldName(CSSource)
@@ -3615,7 +3566,7 @@ ErrorTrap:
                                             ContentName = cpCore.metaData.getContentNameByID(.manyToManyRuleContentID)
                                             DbTable = cpCore.metaData.getContentTablename(ContentName)
                                             SQL = "Select " & .ManyToManyRuleSecondaryField & " from " & DbTable & " where " & .ManyToManyRulePrimaryField & "=" & RecordID
-                                            rs = executeSql(SQL)
+                                            rs = executeSql_getDataTable(SQL)
                                             If (isDataTableOk(rs)) Then
                                                 For Each dr As DataRow In rs.Rows
                                                     db_GetCS &= "," & dr.Item(0).ToString
@@ -3815,7 +3766,7 @@ ErrorTrap:
                                                     End If
                                                 Else
                                                     If fileNameNoExt = "" Then
-                                                        fileNameNoExt = db_GetCSFilename(CSPointer, FieldName, "", ContentName)
+                                                        fileNameNoExt = cs_getFilename(CSPointer, FieldName, "", ContentName)
                                                     End If
                                                     Call cpCore.privateFiles.saveFile(fileNameNoExt, FieldValueText)
                                                     'Call publicFiles.SaveFile(fileNameNoExt, FieldValueText)
@@ -3846,7 +3797,7 @@ ErrorTrap:
                                                     End If
                                                 Else
                                                     If PathFilename = "" Then
-                                                        PathFilename = db_GetCSFilename(CSPointer, FieldNameLc, "", ContentName)
+                                                        PathFilename = cs_getFilename(CSPointer, FieldNameLc, "", ContentName)
                                                     End If
                                                     If Left(PathFilename, 1) = "/" Then
                                                         '
@@ -4127,7 +4078,7 @@ ErrorTrap:
                                 & " where editsourceid=" & LiveRecordID _
                                 & " And (EditArchive=0) And (editblank=0)" _
                                 & " order by id desc;"
-                            rs = executeSql(SQL, EditDataSourceName)
+                            rs = executeSql_getDataTable(SQL, EditDataSourceName)
                             If isDataTableOk(rs) Then
                                 EditRecordID = EncodeInteger(db_getDataRowColumnName(rs.Rows(0), "ID"))
                             End If
@@ -4365,7 +4316,7 @@ ErrorTrap:
                         UniqueViolation = False
                         If SQLUnique <> "" Then
                             SQLUnique = "SELECT ID FROM " & LiveTableName & " WHERE (ID<>" & LiveRecordID & ")AND(" & SQLUnique & ")and(editsourceid is null)and(" & .CDef.ContentControlCriteria & ");"
-                            RSUnique = executeSql(SQLUnique, LiveDataSourceName)
+                            RSUnique = executeSql_getDataTable(SQLUnique, LiveDataSourceName)
                             If (RSUnique.Rows.Count > 0) Then
                                 UniqueViolation = True
                             End If
@@ -4382,14 +4333,14 @@ ErrorTrap:
                             '
                             If (SQLLiveUpdate <> "") Then
                                 SQLUpdate = "UPDATE " & LiveTableName & " SET " & SQLLiveUpdate & " WHERE ID=" & LiveRecordID & ";"
-                                Call executeSql(SQLUpdate, EditDataSourceName)
+                                Call executeSql_getDataTable(SQLUpdate, EditDataSourceName)
                             End If
                             '
                             ' ----- update edit table (authoring and non-authoring fields)
                             '
                             If (SQLEditUpdate <> "") Then
                                 SQLUpdate = "UPDATE " & EditTableName & " SET " & SQLEditUpdate & " WHERE ID=" & EditRecordID & ";"
-                                Call executeSql(SQLUpdate, EditDataSourceName)
+                                Call executeSql_getDataTable(SQLUpdate, EditDataSourceName)
                             End If
                             '
                             ' ----- Live record has changed
@@ -4407,7 +4358,7 @@ ErrorTrap:
                                 If (LCase(EditTableName) = "ccpagecontent") And (LiveRecordID <> 0) Then
                                     If db_IsSQLTableField("default", "ccSpiderDocs", "PageID") Then
                                         SQL = "UPDATE ccspiderdocs SET UpToDate = 0 WHERE PageID=" & LiveRecordID
-                                        Call executeSql(SQL)
+                                        Call executeSql_getDataTable(SQL)
                                     End If
                                 End If
                             End If
@@ -4944,7 +4895,7 @@ ErrorTrap:
             Dim SQL As String
             '
             SQL = "select ContentTableID from ccContent where name=" & encodeSQLText(ContentName) & ";"
-            rs = executeSql(SQL)
+            rs = executeSql_getDataTable(SQL)
             If Not isDataTableOk(rs) Then
                 cpCore.handleLegacyError2("cpCoreClass", "csv_GetContentTableID", cpCore.appConfig.name & ", Content [" & ContentName & "] was not found in ccContent table")
             Else
@@ -5232,7 +5183,7 @@ ErrorTrap:
                             'Call main_testPoint("csv_GetCSRows2, problem with RS, try requerying")
                             On Error GoTo ErrorTrap
                             'hint = hint & ",70"
-                            rs = executeSql(db_ContentSet(CSPointer).Source, db_ContentSet(CSPointer).DataSource)
+                            rs = executeSql_getDataTable(db_ContentSet(CSPointer).Source, db_ContentSet(CSPointer).DataSource)
                             If isDataTableOk(rs) Then
                                 db_GetCSRows2 = convertDataTabletoArray(rs)
                             End If
@@ -5354,7 +5305,7 @@ ErrorTrap:
             Else
                 SQL = "DELETE FROM " & TableName & " WHERE " & Criteria & ";"
             End If
-            Call executeSql(SQL, DataSourceName)
+            Call executeSql_getDataTable(SQL, DataSourceName)
             '
             Exit Sub
             '
@@ -5544,11 +5495,11 @@ ErrorTrap:
             Call handleLegacyClassError4(Err.Number, Err.Source, Err.Description, MethodName, True)
         End Function
 
-        Public Property db_SQLCommandTimeout() As Integer
+        Public Property sqlCommandTimeout() As Integer
             Get
                 On Error GoTo ErrorTrap 'Const Tn = "MethodName-192" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
                 '
-                db_SQLCommandTimeout = db_SQLTimeout
+                sqlCommandTimeout = db_SQLTimeout
                 '
                 Exit Property
                 '
@@ -5622,7 +5573,7 @@ ErrorTrap:
                     csv_OpenCSWithoutRecords = OldState
                     '
                     If db_ContentSet(CS).Source <> "" Then
-                        rs = executeSql(db_ContentSet(CS).Source, db_ContentSet(CS).DataSource)
+                        rs = executeSql_getDataTable(db_ContentSet(CS).Source, db_ContentSet(CS).DataSource)
                         'RS = executeSql(csv_ContentSet(CS).DataSource, csv_ContentSet(CS).Source)
                         If isDataTableOk(rs) Then
                             returnRows = convertDataTabletoArray(rs)
@@ -5786,19 +5737,7 @@ ErrorTrap:
         Public Function getTableSchemaData(tableName As String) As DataTable
             Dim returnDt As New DataTable
             Try
-                Dim connString As String = cpCore.cluster.getConnectionString(cpCore.appConfig.name)
-                'Dim dataSourceUrl As String
-                'dataSourceUrl = cpCore.cluster.config.defaultDataSourceAddress
-                'If (dataSourceUrl.IndexOf(":") > 0) Then
-                '    dataSourceUrl = dataSourceUrl.Substring(0, dataSourceUrl.IndexOf(":"))
-                'End If
-                ''
-                'connString = "" _
-                '    & "data source=" & dataSourceUrl & ";" _
-                '    & "initial catalog=" & config.name & ";" _
-                '    & "UID=" & cpCore.cluster.config.defaultDataSourceUsername & ";" _
-                '    & "PWD=" & cpCore.cluster.config.defaultDataSourcePassword & ";" _
-                '    & ""
+                Dim connString As String = getConnectionStringADONET(cpCore.appConfig.name, "default")
                 Using connSQL As New SqlConnection(connString)
                     connSQL.Open()
                     returnDt = connSQL.GetSchema("Tables", {cpCore.appConfig.name, Nothing, tableName, Nothing})
@@ -5814,19 +5753,7 @@ ErrorTrap:
         Public Function getColumnSchemaData(tableName As String) As DataTable
             Dim returnDt As New DataTable
             Try
-                Dim connString As String = cpCore.cluster.getConnectionString(cpCore.appConfig.name)
-                'Dim dataSourceUrl As String
-                'dataSourceUrl = cpCore.cluster.config.defaultDataSourceAddress
-                'If (dataSourceUrl.IndexOf(":") > 0) Then
-                '    dataSourceUrl = dataSourceUrl.Substring(0, dataSourceUrl.IndexOf(":"))
-                'End If
-                ''
-                'connString = "" _
-                '    & "data source=" & dataSourceUrl & ";" _
-                '    & "initial catalog=" & config.name & ";" _
-                '    & "UID=" & cpCore.cluster.config.defaultDataSourceUsername & ";" _
-                '    & "PWD=" & cpCore.cluster.config.defaultDataSourcePassword & ";" _
-                '    & ""
+                Dim connString As String = getConnectionStringADONET(cpCore.appConfig.name, "default")
                 Using connSQL As New SqlConnection(connString)
                     connSQL.Open()
                     returnDt = connSQL.GetSchema("Columns", {cpCore.appConfig.name, Nothing, tableName, Nothing})
@@ -5842,19 +5769,7 @@ ErrorTrap:
         Public Function getIndexSchemaData(tableName As String) As DataTable
             Dim returnDt As New DataTable
             Try
-                Dim connString As String = cpCore.cluster.getConnectionString(cpCore.appConfig.name)
-                'Dim dataSourceUrl As String
-                'dataSourceUrl = cpCore.cluster.config.defaultDataSourceAddress
-                'If (dataSourceUrl.IndexOf(":") > 0) Then
-                '    dataSourceUrl = dataSourceUrl.Substring(0, dataSourceUrl.IndexOf(":"))
-                'End If
-                ''
-                'connString = "" _
-                '    & "data source=" & dataSourceUrl & ";" _
-                '    & "initial catalog=" & cpCore.app.config.name & ";" _
-                '    & "UID=" & cpCore.cluster.config.defaultDataSourceUsername & ";" _
-                '    & "PWD=" & cpCore.cluster.config.defaultDataSourcePassword & ";" _
-                '    & ""
+                Dim connString As String = getConnectionStringADONET(cpCore.appConfig.name, "default")
                 Using connSQL As New SqlConnection(connString)
                     connSQL.Open()
                     returnDt = connSQL.GetSchema("Indexes", {cpCore.appConfig.name, Nothing, tableName, Nothing})
@@ -5942,7 +5857,7 @@ ErrorTrap:
                 Dim dt As DataTable
                 '
                 getDbContentID = 0
-                dt = executeSql("Select ID from ccContent where name=" & encodeSQLText(ContentName))
+                dt = executeSql_getDataTable("Select ID from ccContent where name=" & encodeSQLText(ContentName))
                 If dt.Rows.Count > 0 Then
                     getDbContentID = EncodeInteger(dt.Rows(0).Item("id"))
                 End If
@@ -6038,7 +5953,7 @@ ErrorTrap:
                         rsTable = cpCore.db.db_InsertTableRecordGetDataTable(DataSourceName, TableName, cpCore.user.id)
                         If rsTable.Rows.Count > 0 Then
                             RecordID = EncodeInteger(rsTable.Rows(0).Item("ID"))
-                            Call cpCore.db.executeSql("Update " & TableName & " Set active=0 where id=" & RecordID & ";", DataSourceName)
+                            Call cpCore.db.executeSql_getDataTable("Update " & TableName & " Set active=0 where id=" & RecordID & ";", DataSourceName)
                         End If
                     End If
                     If rsTable.Rows.Count = 0 Then
@@ -6060,12 +5975,12 @@ ErrorTrap:
                             'ContentID = csv_GetContentID(ContentName)
                             SQL = "Select ID from ccContent where name=" & cpCore.db.encodeSQLText(ContentName)
                             Dim rsContent As DataTable
-                            rsContent = cpCore.db.executeSql(SQL)
+                            rsContent = cpCore.db.executeSql_getDataTable(SQL)
                             If rsContent.Rows.Count = 0 Then
                                 Call cpCore.handleExceptionAndRethrow(New ApplicationException("Content Definition [" & ContentName & "] could Not be selected by name after it was inserted"))
                             Else
                                 ContentID = EncodeInteger(rsContent(0).Item("ID"))
-                                Call cpCore.db.executeSql("update ccContent Set CreateKey=0 where id=" & ContentID)
+                                Call cpCore.db.executeSql_getDataTable("update ccContent Set CreateKey=0 where id=" & ContentID)
                             End If
                             rsContent = Nothing
                             cpCore.cache.invalidateAll()
@@ -6079,7 +5994,7 @@ ErrorTrap:
                         ' ----- locate the field in the content field table
                         '
                         SQL = "Select name from ccFields where ContentID=" & ContentID & ";"
-                        dtFields = cpCore.db.executeSql(SQL)
+                        dtFields = cpCore.db.executeSql_getDataTable(SQL)
                         '
                         ' ----- verify all the table fields
                         '
@@ -6105,7 +6020,7 @@ ErrorTrap:
                                 '
                                 ' touch field so upgrade does not delete it
                                 '
-                                Call cpCore.db.executeSql("update ccFields Set CreateKey=0 where (Contentid=" & ContentID & ") And (name = " & cpCore.db.encodeSQLText(UcaseTableColumnName) & ")")
+                                Call cpCore.db.executeSql_getDataTable("update ccFields Set CreateKey=0 where (Contentid=" & ContentID & ") And (name = " & cpCore.db.encodeSQLText(UcaseTableColumnName) & ")")
                             End If
                         Next
                     End If
@@ -6114,7 +6029,7 @@ ErrorTrap:
                 ' Fill ContentControlID fields with new ContentID
                 '
                 SQL = "Update " & TableName & " Set ContentControlID=" & ContentID & " where (ContentControlID Is null);"
-                Call cpCore.db.executeSql(SQL, DataSourceName)
+                Call cpCore.db.executeSql_getDataTable(SQL, DataSourceName)
                 '
                 ' ----- Load CDef
                 '       Load only if the previous state of autoload was true
@@ -6329,8 +6244,50 @@ ErrorTrap:
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
-
-
+#Region " IDisposable Support "
+        Protected disposed As Boolean = False
+        '
+        '==========================================================================================
+        ''' <summary>
+        ''' dispose
+        ''' </summary>
+        ''' <param name="disposing"></param>
+        ''' <remarks></remarks>
+        Protected Overridable Overloads Sub Dispose(ByVal disposing As Boolean)
+            If Not Me.disposed Then
+                If disposing Then
+                    '
+                    ' ----- call .dispose for managed objects
+                    '
+                    '
+                    ' ----- Close all open csv_ContentSets, and make sure the RS is killed
+                    '
+                    If csv_ContentSetCount > 0 Then
+                        Dim CSPointer As Integer
+                        For CSPointer = 1 To csv_ContentSetCount
+                            If db_ContentSet(CSPointer).IsOpen Then
+                                Call cs_Close(CSPointer)
+                            End If
+                        Next
+                    End If
+                End If
+                '
+                ' Add code here to release the unmanaged resource.
+                '
+            End If
+            Me.disposed = True
+        End Sub
+        ' Do not change or add Overridable to these methods.
+        ' Put cleanup code in Dispose(ByVal disposing As Boolean).
+        Public Overloads Sub Dispose() Implements IDisposable.Dispose
+            Dispose(True)
+            GC.SuppressFinalize(Me)
+        End Sub
+        Protected Overrides Sub Finalize()
+            Dispose(False)
+            MyBase.Finalize()
+        End Sub
+#End Region
 
 #Region "handleLegacyErrors"
         '
@@ -6395,6 +6352,7 @@ ErrorTrap:
         End Sub
 
 #End Region
+
     End Class
     '
     Public Class sqlFieldListClass

@@ -328,41 +328,7 @@ Namespace Contensive.Core
                 End If
             End Set
         End Property
-        '
-        '====================================================================================================
-        '
-        Public Function getLegacyOptionStringFromVar() As String
-            Dim returnString As String = ""
-            '
-            Try
-                For Each kvp As KeyValuePair(Of String, docPropertiesClass) In cpCore.docProperties.docPropertiesDict
-                    returnString &= "" & "&" & encodeLegacyAddonOptionArgument(kvp.Key) & "=" & encodeLegacyAddonOptionArgument(kvp.Value.Value)
-                Next
-                'Dim Value As String
-                'Dim lcName As String
-                'Dim lcNames() As String
-                'Dim Ptr As Integer
-                ''
-                'getLegacyOptionStringFromVar = ""
-                'Call tp("getLegacyOptionStringFromVar enter, LocalVarNameList=" & LocalVarNameList)
-                'If LocalVarNameList <> "" Then
-                '    lcNames = Split(LocalVarNameList, vbCrLf)
-                '    If lcNames.Length > 0 Then
-                '        For Ptr = 0 To lcNames.Length - 1
-                '            lcName = lcNames(Ptr)
-                '            If lcName <> "" Then
-                '                Value = var(lcName)
-                '                getLegacyOptionStringFromVar = getLegacyOptionStringFromVar & "&" & encodeLegacyAddonOptionArgument(lcName) & "=" & encodeLegacyAddonOptionArgument(Value)
-                '            End If
-                '        Next
-                '    End If
-                'End If
-                'Call tp("getLegacyOptionStringFromVar exit, getLegacyOptionStringFromVar=" & getLegacyOptionStringFromVar)
-            Catch ex As Exception
 
-            End Try
-            Return returnString
-        End Function
         '
         '====================================================================================================
         '
@@ -371,38 +337,6 @@ Namespace Contensive.Core
                 Return cpCore.pageManager_GetStyleSheet2()
             End Get
         End Property
-        '
-        '====================================================================================================
-        '   Encodes an argument in an Addon OptionString (QueryString) for all non-allowed characters
-        '       call this before parsing them together
-        '       call decodeAddonOptionArgument after parsing them apart
-        '
-        '       Arg0,Arg1,Arg2,Arg3,Name=Value&Name=VAlue[Option1|Option2]
-        '
-        '       This routine is needed for all Arg, Name, Value, Option values
-        '
-        '------------------------------------------------------------------------------------------------------------
-        '
-        Public Function encodeLegacyAddonOptionArgument(ByVal Arg As String) As String
-            Dim a As String
-            encodeLegacyAddonOptionArgument = ""
-            If Arg <> "" Then
-                a = Arg
-                a = vbReplace(a, vbCrLf, "#0013#")
-                a = vbReplace(a, vbLf, "#0013#")
-                a = vbReplace(a, vbCr, "#0013#")
-                a = vbReplace(a, "&", "#0038#")
-                a = vbReplace(a, "=", "#0061#")
-                a = vbReplace(a, ",", "#0044#")
-                a = vbReplace(a, """", "#0034#")
-                a = vbReplace(a, "'", "#0039#")
-                a = vbReplace(a, "|", "#0124#")
-                a = vbReplace(a, "[", "#0091#")
-                a = vbReplace(a, "]", "#0093#")
-                a = vbReplace(a, ":", "#0058#")
-                encodeLegacyAddonOptionArgument = a
-            End If
-        End Function
         '
         '====================================================================================================
         '   Decodes an argument parsed from an AddonOptionString for all non-allowed characters

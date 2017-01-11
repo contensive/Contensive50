@@ -1,4 +1,7 @@
 
+Option Explicit On
+Option Strict On
+
 Imports System.Runtime.InteropServices
 Imports Contensive.BaseClasses
 Imports Xunit
@@ -18,16 +21,11 @@ Namespace Contensive.Core
         Public Const EventsId As String = "4FADD1C2-6A89-4A8E-ADD0-9850D3EB6DBC"
 #End Region
         '
-        ''
-        '' 'Inherits the .thisaddon feature. before calling an addon that uses this BaseClass,
-        '' the parent must 
-        ''
-        Private MyAddonID As Integer
-        Private cpCredentialKey As String
-        '
         '   cp creates and uses and instance of cpCore (all heavy lifting)
         '
         Public core As Contensive.Core.coreClass
+        '
+        Private MyAddonID As Integer
         '
         '=========================================================================================================
         ''' <summary>
@@ -99,6 +97,7 @@ Namespace Contensive.Core
                 End If
             End Get
         End Property
+        '
         '==========================================================================================
         ''' <summary>
         ''' Executes a specific route. The route can be a remote method, link alias, admin route, etc. If the route is not provided, the default route set in the admin settings is used.
@@ -121,12 +120,10 @@ Namespace Contensive.Core
         ''' <param name="addonNameOrGuid"></param>
         ''' <param name="addonContext"></param>
         ''' <returns></returns>
-        Public Function executeAddon(addonNameOrGuid As String, Optional addonContext As coreClass.addonContextEnum = coreClass.addonContextEnum.ContextSimple) As String
+        Public Function executeAddon(addonNameOrGuid As String, Optional addonContext As Contensive.BaseClasses.CPUtilsBaseClass.addonContext = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple) As String
             Dim result As String = ""
             Try
-                Dim MyDoc As CPDocClass = Doc
-                Dim LegacyOptionString As String = MyDoc.getLegacyOptionStringFromVar()
-                result = core.executeAddon_legacy4(addonNameOrGuid, LegacyOptionString, addonContext, Nothing)
+                result = core.addon_execute_legacy4(addonNameOrGuid, core.getLegacyOptionStringFromVar(), addonContext, Nothing)
             Catch ex As Exception
                 Site.ErrorReport(ex, "Unexpected error in cp.executeRoute()")
             End Try
@@ -139,16 +136,14 @@ Namespace Contensive.Core
         ''' <param name="addonId"></param>
         ''' <param name="addonContext"></param>
         ''' <returns></returns>
-        Public Function executeAddon(addonId As Integer, Optional addonContext As coreClass.addonContextEnum = coreClass.addonContextEnum.ContextSimple) As String
+        Public Function executeAddon(addonId As Integer, Optional addonContext As Contensive.BaseClasses.CPUtilsBaseClass.addonContext = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple) As String
             Dim result As String = ""
             Try
                 If Response.isOpen Then
-                    If Response.isOpen Then
-                        Dim MyDoc As CPDocClass = Doc
-                        Dim LegacyOptionString As String = MyDoc.getLegacyOptionStringFromVar()
-                        result = core.executeAddon_legacy4(addonId.ToString(), LegacyOptionString, addonContext, Nothing)
-                    End If
-                    result = core.executeAddon(addonId, "", "", addonContext, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", core.user.id, core.visit_isAuthenticated)
+                    'If Response.isOpen Then
+                    '    result = core.addon_execute_legacy4(addonId.ToString(), core.getLegacyOptionStringFromVar(), addonContext, Nothing)
+                    'End If
+                    result = core.addon_execute(addonId, "", "", addonContext, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", core.user.id, core.visit_isAuthenticated)
                 End If
                 '
             Catch ex As Exception
@@ -522,6 +517,9 @@ Namespace Contensive.Core
                     If Not (_utilsObj Is Nothing) Then _utilsObj.Dispose()
                     If Not (_visitObj Is Nothing) Then _visitObj.Dispose()
                     If Not (_visitorObj Is Nothing) Then _visitorObj.Dispose()
+                    If Not (_cdnFiles Is Nothing) Then _cdnFiles.Dispose()
+                    If Not (_appRootFiles Is Nothing) Then _appRootFiles.Dispose()
+                    If Not (_privateFiles Is Nothing) Then _privateFiles.Dispose()
                 End If
                 '
                 ' cleanup non-managed objects

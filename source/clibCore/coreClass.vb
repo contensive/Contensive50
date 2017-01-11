@@ -6,7 +6,7 @@ Imports System.Xml
 Imports System.Reflection
 Imports HttpMultipartParser
 Imports Xunit
-
+Imports Contensive.BaseClasses
 '
 Namespace Contensive.Core
     Public Class coreClass
@@ -170,12 +170,12 @@ Namespace Contensive.Core
                         '
                         ' local server -- everything is ephemeral
                         '
-                        _appRootFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, serverConfig.clusterPath & appConfig.appRootFilesPath)
+                        _appRootFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, normalizeFilePath(serverConfig.clusterPath) & normalizeFilePath(appConfig.appRootFilesPath))
                     Else
                         '
                         ' cluster mode - each filesystem is configured accordingly
                         '
-                        _appRootFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.activeSync, serverConfig.clusterPath & appConfig.appRootFilesPath)
+                        _appRootFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.activeSync, normalizeFilePath(serverConfig.clusterPath) & normalizeFilePath(appConfig.appRootFilesPath))
                     End If
                 End If
                 Return _appRootFiles
@@ -224,12 +224,12 @@ Namespace Contensive.Core
                         '
                         ' local server -- everything is ephemeral
                         '
-                        _privateFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, serverConfig.clusterPath & appConfig.privateFilesPath)
+                        _privateFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, normalizeFilePath(serverConfig.clusterPath) & normalizeFilePath(appConfig.privateFilesPath))
                     Else
                         '
                         ' cluster mode - each filesystem is configured accordingly
                         '
-                        _privateFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, serverConfig.clusterPath & appConfig.privateFilesPath)
+                        _privateFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, normalizeFilePath(serverConfig.clusterPath) & normalizeFilePath(appConfig.privateFilesPath))
                     End If
                 End If
                 Return _privateFiles
@@ -251,12 +251,12 @@ Namespace Contensive.Core
                         '
                         ' local server -- everything is ephemeral
                         '
-                        _cdnFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, serverConfig.clusterPath & appConfig.cdnFilesPath)
+                        _cdnFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, normalizeFilePath(serverConfig.clusterPath) & normalizeFilePath(appConfig.cdnFilesPath))
                     Else
                         '
                         ' cluster mode - each filesystem is configured accordingly
                         '
-                        _cdnFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, serverConfig.clusterPath & appConfig.cdnFilesPath)
+                        _cdnFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, normalizeFilePath(serverConfig.clusterPath) & normalizeFilePath(appConfig.cdnFilesPath))
                     End If
                 End If
                 Return _cdnFiles
@@ -421,8 +421,8 @@ Namespace Contensive.Core
         ''' <remarks>_app created duirng init(), after cp.context() is loaded</remarks>
         Public ReadOnly Property db As coreDbClass
             Get
-                If (_db Is Nothing) And (Not String.IsNullOrEmpty(appConfig.name)) Then
-                    _db = New coreDbClass(Me, appConfig.name)
+                If (_db Is Nothing) Then
+                    _db = New coreDbClass(Me)
                 End If
                 Return _db
             End Get
@@ -1031,29 +1031,29 @@ Namespace Contensive.Core
         '
         '========================================================================================================================
         '
-        '========================================================================================================================
-        ' should have been addonTypeEnum
-        '
-        Public Enum addonContextEnum
-            ' these should have been addonContextPage, etc.
-            ContextPage = 1
-            ContextAdmin = 2
-            ContextTemplate = 3
-            contextEmail = 4
-            ContextRemoteMethod = 5
-            ContextOnNewVisit = 6
-            ContextOnPageEnd = 7
-            ContextOnPageStart = 8
-            ContextEditor = 9
-            ContextHelpUser = 10
-            ContextHelpAdmin = 11
-            ContextHelpDeveloper = 12
-            ContextOnContentChange = 13
-            ContextFilter = 14
-            ContextSimple = 15
-            ContextOnBodyStart = 16
-            ContextOnBodyEnd = 17
-        End Enum
+        ''========================================================================================================================
+        '' should have been addonTypeEnum
+        ''
+        'Public Enum CPUtilsBaseClass.addonContext
+        '    ' these should have been addonContextPage, etc.
+        '    ContextPage = 1
+        '    ContextAdmin = 2
+        '    ContextTemplate = 3
+        '    contextEmail = 4
+        '    ContextRemoteMethod = 5
+        '    ContextOnNewVisit = 6
+        '    ContextOnPageEnd = 7
+        '    ContextOnPageStart = 8
+        '    ContextEditor = 9
+        '    ContextHelpUser = 10
+        '    ContextHelpAdmin = 11
+        '    ContextHelpDeveloper = 12
+        '    ContextOnContentChange = 13
+        '    ContextFilter = 14
+        '    ContextSimple = 15
+        '    ContextOnBodyStart = 16
+        '    ContextOnBodyEnd = 17
+        'End Enum
         '
         ' should have been userTypeEnum
         ' only for main_GetFormInputWysiwig - to be deprecated anyway
@@ -1147,7 +1147,7 @@ Namespace Contensive.Core
         '================================================================================
         '
         Private addonsRunOnThisPageIdList As New List(Of Integer)
-        'Private csv_ExecuteAddon_AddonsRunOnThisPageIdList As String = ""
+        'Private csv_addon_execute_AddonsRunOnThisPageIdList As String = ""
         '
         '================================================================================
         '   (NOT thread safe)
@@ -1157,7 +1157,7 @@ Namespace Contensive.Core
         '================================================================================
         '
         Private addonsCurrentlyRunningIdList As New List(Of Integer)
-        'Private csv_ExecuteAddon_AddonsCurrentlyRunningIdList As String = ""
+        'Private csv_addon_execute_AddonsCurrentlyRunningIdList As String = ""
         ''
         '' deprecated - here for compatibiity
         ''
@@ -1555,7 +1555,7 @@ ErrorTrap:
                 CurrentCount = 0
                 SQL = "select count(*) as RecordCount from " & TableName & " where " & Criteria
                 Dim dt As DataTable
-                dt = db.executeSql(SQL)
+                dt = db.executeSql_getDataTable(SQL)
                 If dt.Rows.Count > 0 Then
                     CurrentCount = EncodeInteger(dt.Rows(0).Item(0))
                 End If
@@ -1565,10 +1565,10 @@ ErrorTrap:
                     Else
                         SQL = "delete from " & TableName & " where id in (select top " & iChunkSize & " ID from " & TableName & " where " & Criteria & ")"
                     End If
-                    Call db.executeSql(SQL, DataSourceName)
+                    Call db.executeSql_getDataTable(SQL, DataSourceName)
                     PreviousCount = CurrentCount
                     SQL = "select count(*) as RecordCount from " & TableName & " where " & Criteria
-                    dt = db.executeSql(SQL)
+                    dt = db.executeSql_getDataTable(SQL)
                     If dt.Rows.Count > 0 Then
                         CurrentCount = EncodeInteger(dt.Rows(0).Item(0))
                     End If
@@ -1657,7 +1657,7 @@ ErrorTrap:
             Const dtColumnContentId As Integer = 2
             '
             Dim dt As DataTable
-            dt = db.executeSql(SQL)
+            dt = db.executeSql_getDataTable(SQL)
             If dt.Rows.Count = 0 Then
                 Call handleLegacyError25(MethodName, ("No Content Definition could be found for records in table [" & TableName & "]"))
             Else
@@ -1672,7 +1672,7 @@ ErrorTrap:
                 'Else
                 '    SQL = "select top 1 * from " & TableName & ";"
                 'End If
-                Dim dtTargetTable As DataTable = db.executeSql(SQL, DataSourceName)
+                Dim dtTargetTable As DataTable = db.executeSql_getDataTable(SQL, DataSourceName)
                 If dtTargetTable.Rows.Count = 0 Then
                     '
                     ' --- no records were found, add a blank if we can
@@ -1684,16 +1684,16 @@ ErrorTrap:
                         & " " & db.encodeSQLNumber(CreateKey) _
                         & "," & db.encodeSQLDate(DateAdded) _
                         & ");"
-                    Call db.executeSql(SQL, DataSourceName)
+                    Call db.executeSql_getDataTable(SQL, DataSourceName)
                     SQL = db.db_GetSQLSelect("default", TableName, "ID", "DateAdded=" & db.encodeSQLDate(DateAdded) & " AND CreateKey=" & db.encodeSQLNumber(CreateKey))
-                    dtTargetTable = db.executeSql(SQL, DataSourceName)
+                    dtTargetTable = db.executeSql_getDataTable(SQL, DataSourceName)
                     If dtTargetTable.Rows.Count = 0 Then
                         Call handleLegacyError25(MethodName, ("Could not locate a new re   cord added to table [" & TableName & "]"))
                     Else
                         BlankRecordID = EncodeInteger(dtTargetTable.Rows(0).Item("id"))
                     End If
                     SQL = db.db_GetSQLSelect("default", TableName, , , , , 1)
-                    dtTargetTable = db.executeSql(SQL, DataSourceName)
+                    dtTargetTable = db.executeSql_getDataTable(SQL, DataSourceName)
                     If dtTargetTable.Rows.Count = 0 Then
                         Call handleLegacyError25(MethodName, ("Could not open a record to table [" & TableName & "]."))
                     End If
@@ -1710,7 +1710,7 @@ ErrorTrap:
                         For Each dc As DataColumn In dtTargetTable.Rows
                             TableFieldName = dc.ColumnName
                             SQL = "SELECT * FROM ccFields where (ContentID=" & ContentID & ")and(name=" & db.encodeSQLText(TableFieldName) & ")"
-                            Dim dtField As DataTable = db.executeSql(SQL, "Default")
+                            Dim dtField As DataTable = db.executeSql_getDataTable(SQL, "Default")
                             If dtField.Rows.Count = 0 Then
                                 Call db.db_CreateContentFieldFromTableField(ContentName, dc.ColumnName, EncodeInteger(dc.DataType))
                                 'Call db_CreateContentFieldFromTableField(ContentName, dc.ColumnName, EncodeInteger(dc.DataType))
@@ -2214,7 +2214,7 @@ ErrorTrap:
         '   see csv_EncodeActiveContent_Internal
         '========================================================================
         '
-        Public Function html_EncodeActiveContent5(ByVal Source As String, ByVal PeopleID As Integer, ByVal ContextContentName As String, ByVal ContextRecordID As Integer, ByVal ContextContactPeopleID As Integer, ByVal AddLinkEID As Boolean, ByVal EncodeCachableTags As Boolean, ByVal EncodeImages As Boolean, ByVal EncodeEditIcons As Boolean, ByVal EncodeNonCachableTags As Boolean, ByVal AddAnchorQuery As String, ByVal ProtocolHostString As String, ByVal IsEmailContent As Boolean, ByVal AdminURL As String, ByVal personalizationIsAuthenticated As Boolean, ByVal Context As addonContextEnum) As String
+        Public Function html_EncodeActiveContent5(ByVal Source As String, ByVal PeopleID As Integer, ByVal ContextContentName As String, ByVal ContextRecordID As Integer, ByVal ContextContactPeopleID As Integer, ByVal AddLinkEID As Boolean, ByVal EncodeCachableTags As Boolean, ByVal EncodeImages As Boolean, ByVal EncodeEditIcons As Boolean, ByVal EncodeNonCachableTags As Boolean, ByVal AddAnchorQuery As String, ByVal ProtocolHostString As String, ByVal IsEmailContent As Boolean, ByVal AdminURL As String, ByVal personalizationIsAuthenticated As Boolean, ByVal Context As CPUtilsBaseClass.addonContext) As String
             html_EncodeActiveContent5 = html_EncodeActiveContent_Internal(Source, PeopleID, ContextContentName, ContextRecordID, ContextContactPeopleID, AddLinkEID, EncodeCachableTags, EncodeImages, EncodeEditIcons, EncodeNonCachableTags, AddAnchorQuery, ProtocolHostString, IsEmailContent, AdminURL, user.isAuthenticated, Context)
         End Function
         '
@@ -2222,7 +2222,7 @@ ErrorTrap:
         '   encode (execute) all {% -- %} commands
         '========================================================================
         '
-        Public Function html_executeContentCommands(ByVal nothingObject As Object, ByVal Source As String, ByVal Context As addonContextEnum, ByVal personalizationPeopleId As Integer, ByVal personalizationIsAuthenticated As Boolean, ByRef Return_ErrorMessage As String) As String
+        Public Function html_executeContentCommands(ByVal nothingObject As Object, ByVal Source As String, ByVal Context As CPUtilsBaseClass.addonContext, ByVal personalizationPeopleId As Integer, ByVal personalizationIsAuthenticated As Boolean, ByRef Return_ErrorMessage As String) As String
             Dim returnValue As String = ""
             Try
                 Dim LoopPtr As Integer
@@ -2295,7 +2295,7 @@ ErrorTrap:
         '   BlockPointer    the current block being examined
         '========================================================================
         '
-        Public Function html_EncodeActiveContent_Internal(ByVal Source As String, ByVal personalizationPeopleId As Integer, ByVal ContextContentName As String, ByVal ContextRecordID As Integer, ByVal moreInfoPeopleId As Integer, ByVal AddLinkEID As Boolean, ByVal EncodeCachableTags As Boolean, ByVal EncodeImages As Boolean, ByVal EncodeEditIcons As Boolean, ByVal EncodeNonCachableTags As Boolean, ByVal AddAnchorQuery As String, ByVal ProtocolHostString As String, ByVal IsEmailContent As Boolean, ByVal AdminURL As String, ByVal personalizationIsAuthenticated As Boolean, Optional ByVal context As addonContextEnum = addonContextEnum.ContextPage) As String
+        Public Function html_EncodeActiveContent_Internal(ByVal Source As String, ByVal personalizationPeopleId As Integer, ByVal ContextContentName As String, ByVal ContextRecordID As Integer, ByVal moreInfoPeopleId As Integer, ByVal AddLinkEID As Boolean, ByVal EncodeCachableTags As Boolean, ByVal EncodeImages As Boolean, ByVal EncodeEditIcons As Boolean, ByVal EncodeNonCachableTags As Boolean, ByVal AddAnchorQuery As String, ByVal ProtocolHostString As String, ByVal IsEmailContent As Boolean, ByVal AdminURL As String, ByVal personalizationIsAuthenticated As Boolean, Optional ByVal context As CPUtilsBaseClass.addonContext = CPUtilsBaseClass.addonContext.ContextPage) As String
             On Error GoTo ErrorTrap 'Const Tn = "EncodeActiveContent_Internal" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
             Dim pairNames As Object
@@ -2554,9 +2554,9 @@ ErrorTrap:
                 ' replace {{DYNAMICMENU?menu=menu Name}} with <ac dynamic menu>
                 '
                 IconIDControlString = "AC," & ACTypeTemplateContent & "," & NotUsedID & "," & ACName & ","
-                IconImg = GetAddonIconImg(AdminURL, 52, 64, 0, False, IconIDControlString, "/cclib/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as [Template Page Content]", "", 0)
+                IconImg = GetAddonIconImg(AdminURL, 52, 64, 0, False, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as [Template Page Content]", "", 0)
                 workingContent = vbReplace(workingContent, "{{content}}", IconImg, 1, 99, vbTextCompare)
-                'WorkingContent = vbReplace(WorkingContent, "{{content}}", "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Page Content"" id=""AC," & ACTypeTemplateContent & "," & NotUsedID & "," & ACName & ","" src=""/cclib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>", 1, -1, vbTextCompare)
+                'WorkingContent = vbReplace(WorkingContent, "{{content}}", "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Page Content"" id=""AC," & ACTypeTemplateContent & "," & NotUsedID & "," & ACName & ","" src=""/ccLib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>", 1, -1, vbTextCompare)
                 '
                 ' replace all other {{...}}
                 '
@@ -2582,7 +2582,7 @@ ErrorTrap:
                                 AddonOptionStringHTMLEncoded = html_EncodeHTML("Menu=" & TextName & "[" & csv_GetDynamicMenuACSelect() & "]&NewMenu=")
                                 '
                                 IconIDControlString = "AC," & ACTypeDynamicMenu & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded
-                                IconImg = GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/cclib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as [Dynamic Menu]", "", 0)
+                                IconImg = GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as [Dynamic Menu]", "", 0)
                                 workingContent = Mid(workingContent, 1, PosStart - 1) & IconImg & Mid(workingContent, PosEnd + 2)
                             End If
                         End If
@@ -2739,7 +2739,7 @@ ErrorTrap:
                                                 IconIDControlString = "AC," & ACTypeDate
                                                 IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "Current Date", "Renders as [Current Date]", ACInstanceID, 0)
                                                 Copy = IconImg
-                                                'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as the current date"" ID=""AC," & ACTypeDate & """ src=""/cclib/images/ACDate.GIF"">"
+                                                'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as the current date"" ID=""AC," & ACTypeDate & """ src=""/ccLib/images/ACDate.GIF"">"
                                             ElseIf EncodeNonCachableTags Then
                                                 Copy = DateTime.Now.ToString
                                             End If
@@ -2820,7 +2820,7 @@ ErrorTrap:
                                                 IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "Contact Information Line", "Renders as [Contact Information Line]", ACInstanceID, 0)
                                                 Copy = IconImg
                                                 '
-                                                'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as a line of text with contact information for this record's primary contact"" id=""AC," & ACType & """ src=""/cclib/images/ACContact.GIF"">"
+                                                'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as a line of text with contact information for this record's primary contact"" id=""AC," & ACType & """ src=""/ccLib/images/ACContact.GIF"">"
                                             ElseIf EncodeCachableTags Then
                                                 If moreInfoPeopleId <> 0 Then
                                                     Copy = pageManager_getMoreInfoHtml(moreInfoPeopleId)
@@ -2836,7 +2836,7 @@ ErrorTrap:
                                                 IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, False, IconIDControlString, "", serverFilePath, "Feedback Form", "Renders as [Feedback Form]", ACInstanceID, 0)
                                                 Copy = IconImg
                                                 '
-                                                'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as a feedback form, sent to this record's primary contact."" id=""AC," & ACType & """ src=""/cclib/images/ACFeedBack.GIF"">"
+                                                'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as a feedback form, sent to this record's primary contact."" id=""AC," & ACType & """ src=""/ccLib/images/ACFeedBack.GIF"">"
                                             ElseIf EncodeNonCachableTags Then
                                                 If (moreInfoPeopleId <> 0) And (ContextContentName <> "") And (ContextRecordID <> 0) Then
                                                     Copy = FeedbackFormNotSupportedComment
@@ -2855,16 +2855,16 @@ ErrorTrap:
                                                         IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "All copy following this point is rendered, regardless of the member's language setting", "Renders as [Begin Rendering All Languages]", ACInstanceID, 0)
                                                         Copy = IconImg
                                                         '
-                                                        'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""All copy following this point is rendered, regardless of the member's language setting"" id=""AC," & ACType & ",," & ACLanguageName & """ src=""/cclib/images/ACLanguageAny.GIF"">"
+                                                        'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""All copy following this point is rendered, regardless of the member's language setting"" id=""AC," & ACType & ",," & ACLanguageName & """ src=""/ccLib/images/ACLanguageAny.GIF"">"
                                                         'Case "ENGLISH", "FRENCH", "GERMAN", "PORTUGEUESE", "ITALIAN", "SPANISH", "CHINESE", "HINDI"
-                                                        '   Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""All copy following this point is rendered if the member's language setting matchs [" & ACLanguageName & "]"" id=""AC," & ACType & ",," & ACLanguageName & """ src=""/cclib/images/ACLanguage" & ACLanguageName & ".GIF"">"
+                                                        '   Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""All copy following this point is rendered if the member's language setting matchs [" & ACLanguageName & "]"" id=""AC," & ACType & ",," & ACLanguageName & """ src=""/ccLib/images/ACLanguage" & ACLanguageName & ".GIF"">"
                                                     Case Else
                                                         '
                                                         IconIDControlString = "AC," & ACType & ",," & ACLanguageName
                                                         IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "All copy following this point is rendered if the member's language setting matchs [" & ACLanguageName & "]", "Begin Rendering for language [" & ACLanguageName & "]", ACInstanceID, 0)
                                                         Copy = IconImg
                                                         '
-                                                        'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""All copy following this point is rendered if the member's language setting matchs [" & ACLanguageName & "]"" id=""AC," & ACType & ",," & ACLanguageName & """ src=""/cclib/images/ACLanguageOther.GIF"">"
+                                                        'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""All copy following this point is rendered if the member's language setting matchs [" & ACLanguageName & "]"" id=""AC," & ACType & ",," & ACLanguageName & """ src=""/ccLib/images/ACLanguageOther.GIF"">"
                                                 End Select
                                             ElseIf EncodeNonCachableTags Then
                                                 If personalizationPeopleId = 0 Then
@@ -2966,7 +2966,7 @@ ErrorTrap:
                                                             '
                                                             ' all other add-ons, pass out to cpCoreClass to process
                                                             '
-                                                            Copy = executeAddon(0, ACName, AddonOptionStringHTMLEncoded, addonContextEnum.contextEmail, "", 0, "", ACInstanceID, False, 0, "", True, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
+                                                            Copy = addon_execute(0, ACName, AddonOptionStringHTMLEncoded, CPUtilsBaseClass.addonContext.ContextEmail, "", 0, "", ACInstanceID, False, 0, "", True, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
                                                             'Copy = "" _
                                                             '    & "" _
                                                             '    & "<!-- ADDON " _
@@ -3224,10 +3224,10 @@ ErrorTrap:
                                                 ' Encoding the edit icons for the active editor form
                                                 '
                                                 IconIDControlString = "AC," & ACTypeDownload & ",," & ACAttrRecordID
-                                                IconImg = GetAddonIconImg(AdminURL, 16, 16, 0, True, IconIDControlString, "/cclib/images/IconDownload3.gif", serverFilePath, "Download Icon with a link to a resource", "Renders as [Download Icon with a link to a resource]", ACInstanceID, 0)
+                                                IconImg = GetAddonIconImg(AdminURL, 16, 16, 0, True, IconIDControlString, "/ccLib/images/IconDownload3.gif", serverFilePath, "Download Icon with a link to a resource", "Renders as [Download Icon with a link to a resource]", ACInstanceID, 0)
                                                 Copy = IconImg
                                                 '
-                                                'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Renders as a download icon"" id=""AC," & ACTypeDownload & ",," & ACAttrRecordID & """ src=""/cclib/images/IconDownload3.GIF"">"
+                                                'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Renders as a download icon"" id=""AC," & ACTypeDownload & ",," & ACAttrRecordID & """ src=""/ccLib/images/IconDownload3.GIF"">"
                                             ElseIf EncodeImages Then
                                                 '
                                                 Dim libraryFilePtr As Integer
@@ -3246,7 +3246,7 @@ ErrorTrap:
                                                 '                                        End If
                                                 '                                        Call app.csv_CloseCS(CS)
                                                 '
-                                                Copy = "<a href=""" & ProtocolHostString & www_requestRootPath & siteProperties.serverPageDefault & "?" & RequestNameDownloadID & "=" & ACAttrRecordID & """ target=""_blank""><img src=""" & ProtocolHostString & "/cclib/images/IconDownload3.gif"" width=""16"" height=""16"" border=""0"" alt=""" & ACAttrAlt & """></a>"
+                                                Copy = "<a href=""" & ProtocolHostString & www_requestRootPath & siteProperties.serverPageDefault & "?" & RequestNameDownloadID & "=" & ACAttrRecordID & """ target=""_blank""><img src=""" & ProtocolHostString & "/ccLib/images/IconDownload3.gif"" width=""16"" height=""16"" border=""0"" alt=""" & ACAttrAlt & """></a>"
                                             End If
                                         Case ACTypeTemplateContent
                                             '
@@ -3259,10 +3259,10 @@ ErrorTrap:
                                             If EncodeEditIcons Then
                                                 '
                                                 IconIDControlString = "AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded
-                                                IconImg = GetAddonIconImg(AdminURL, 52, 64, 0, False, IconIDControlString, "/cclib/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as the Template Page Content", ACInstanceID, 0)
+                                                IconImg = GetAddonIconImg(AdminURL, 52, 64, 0, False, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as the Template Page Content", ACInstanceID, 0)
                                                 Copy = IconImg
                                                 '
-                                                'Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Page Content"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/cclib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>"
+                                                'Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Page Content"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/ccLib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>"
                                             ElseIf EncodeNonCachableTags Then
                                                 '
                                                 ' Add in the Content
@@ -3282,10 +3282,10 @@ ErrorTrap:
                                             If EncodeEditIcons Then
                                                 '
                                                 IconIDControlString = "AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded
-                                                IconImg = GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/cclib/images/ACTemplateTextIcon.gif", serverFilePath, "Template Text", "Renders as a Template Text Box", ACInstanceID, 0)
+                                                IconImg = GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", serverFilePath, "Template Text", "Renders as a Template Text Box", ACInstanceID, 0)
                                                 Copy = IconImg
                                                 '
-                                                'Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as Template Text"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/cclib/images/ACTemplateTextIcon.gif"" WIDTH=52 HEIGHT=52>"
+                                                'Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as Template Text"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/ccLib/images/ACTemplateTextIcon.gif"" WIDTH=52 HEIGHT=52>"
                                             ElseIf EncodeNonCachableTags Then
                                                 '
                                                 ' Add in the Content Page
@@ -3334,19 +3334,19 @@ ErrorTrap:
                                                     'TextName = csv_GetAddonOption("Menu", AddonOptionString)
                                                     '
                                                     IconIDControlString = "AC," & ACType & "," & NotUsedID & "," & ACName & ",Menu=" & TextName & "[" & csv_GetDynamicMenuACSelect() & "]&NewMenu="
-                                                    IconImg = GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/cclib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as a Dynamic Menu", ACInstanceID, 0)
+                                                    IconImg = GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as a Dynamic Menu", ACInstanceID, 0)
                                                     Copy = IconImg
                                                     '
-                                                    'Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as a Dynamic Menu"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & ",Menu=" & TextName & "[" & csv_GetDynamicMenuACSelect & "]&NewMenu="" src=""/cclib/images/ACDynamicMenuIcon.gif"" WIDTH=52 HEIGHT=52>"
+                                                    'Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as a Dynamic Menu"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & ",Menu=" & TextName & "[" & csv_GetDynamicMenuACSelect & "]&NewMenu="" src=""/ccLib/images/ACDynamicMenuIcon.gif"" WIDTH=52 HEIGHT=52>"
                                                 Else
                                                     '
                                                     ' Old Dynamic Menu - values are stored in the icon
                                                     '
                                                     IconIDControlString = "AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded
-                                                    IconImg = GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/cclib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as a Dynamic Menu", ACInstanceID, 0)
+                                                    IconImg = GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as a Dynamic Menu", ACInstanceID, 0)
                                                     Copy = IconImg
                                                     '
-                                                    'Copy = "<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as a Dynamic Menu"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/cclib/images/ACDynamicMenuIcon.gif"" WIDTH=52 HEIGHT=52>"
+                                                    'Copy = "<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as a Dynamic Menu"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/ccLib/images/ACDynamicMenuIcon.gif"" WIDTH=52 HEIGHT=52>"
                                                 End If
                                             ElseIf EncodeNonCachableTags Then
                                                 '
@@ -3369,10 +3369,10 @@ ErrorTrap:
                                             If EncodeEditIcons Then
                                                 '
                                                 IconIDControlString = "AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded
-                                                IconImg = GetAddonIconImg(AdminURL, 109, 10, 0, True, IconIDControlString, "/cclib/images/ACWatchList.gif", serverFilePath, "Watch List", "Renders as the Watch List [" & ACName & "]", ACInstanceID, 0)
+                                                IconImg = GetAddonIconImg(AdminURL, 109, 10, 0, True, IconIDControlString, "/ccLib/images/ACWatchList.gif", serverFilePath, "Watch List", "Renders as the Watch List [" & ACName & "]", ACInstanceID, 0)
                                                 Copy = IconImg
                                                 '
-                                                'Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Watch List [" & ACName & "]"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/cclib/images/ACWatchList.GIF"">"
+                                                'Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Watch List [" & ACName & "]"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/ccLib/images/ACWatchList.GIF"">"
                                             ElseIf EncodeNonCachableTags Then
                                                 '
                                                 Copy = "{{" & ACTypeWatchList & "?" & addonOptionString & "}}"
@@ -4201,7 +4201,7 @@ ErrorTrap:
                                                                             End If
                                                                             If recordUpdateSql <> "" Then
                                                                                 recordUpdateSql = Mid(recordUpdateSql, 2)
-                                                                                Call db.executeSql("update cclibraryfiles set " & recordUpdateSql & " where id=" & RecordID)
+                                                                                Call db.executeSql_getDataTable("update cclibraryfiles set " & recordUpdateSql & " where id=" & RecordID)
                                                                             End If
                                                                             'Call app.csv_CloseCS(CS)
                                                                         End If
@@ -4291,7 +4291,7 @@ ErrorTrap:
             End If
             CS = db.cs_insertRecord("Tasks", RequestedByMemberID)
             If db.cs_Ok(CS) Then
-                Call db.db_GetCSFilename(CS, "Filename", Filename)
+                Call db.cs_getFilename(CS, "Filename", Filename)
                 Call db.cs_set(CS, "Name", TaskName)
                 Call db.cs_set(CS, "Command", Command)
                 Call db.cs_set(CS, "SQLQuery", SQL)
@@ -4704,7 +4704,7 @@ ErrorTrap:
                 '
                 SQL = "select s.name,s.id,s.StyleFilename from ccSharedStyles s where (s.active<>0)and(s.AlwaysInclude<>0)"
                 Dim dt As DataTable
-                dt = db.executeSql(SQL)
+                dt = db.executeSql_getDataTable(SQL)
                 If dt.Rows.Count > 0 Then
                     For Each row As DataRow In dt.Rows
                         styleId = EncodeInteger(row("id"))
@@ -4730,7 +4730,7 @@ ErrorTrap:
                     '
                     SQL = "select name,stylesFilename from cctemplates where (id=" & templateId & ")and(stylesFilename is not null)"
                     'Dim dt As DataTable
-                    dt = db.executeSql(SQL)
+                    dt = db.executeSql_getDataTable(SQL)
                     If dt.Rows.Count > 0 Then
                         For Each dr As DataRow In dt.Rows
                             Filename = EncodeText(dr("stylesfilename"))
@@ -4752,7 +4752,7 @@ ErrorTrap:
                     Dim rs As DataTable
 
                     SQL = "select s.name,s.id,s.StyleFilename from ccSharedStyles s left join ccSharedStylesTemplateRules r on s.id=r.styleid where (s.active<>0)and(r.templateid=" & templateId & ")and((s.AlwaysInclude=0)or(s.AlwaysInclude is null))"
-                    rs = db.executeSql(SQL)
+                    rs = db.executeSql_getDataTable(SQL)
                     If rs.Rows.Count > 0 Then
                         styleId = EncodeInteger(rs.Rows(0).Item("id"))
                         StyleName = EncodeText(rs.Rows(0).Item("name"))
@@ -4778,7 +4778,7 @@ ErrorTrap:
                     SQL = "select name,blockSiteStyles,stylesFilename,emailTemplateID from ccemail where id=" & EmailID
                     'Dim dt As DataTable
 
-                    dt = db.executeSql(SQL)
+                    dt = db.executeSql_getDataTable(SQL)
                     If dt.Rows.Count > 0 Then
                         For Each rsDr As DataRow In dt.Rows
                             blockStyles = EncodeBoolean(rsDr("blockSiteStyles"))
@@ -4801,7 +4801,7 @@ ErrorTrap:
                     ' email shared styles
                     '
                     SQL = "select s.name,s.id,s.StyleFilename from ccSharedStyles s left join ccEmailStyleRules r on s.id=r.sharedstylesid where (s.active<>0)and(r.emailid=" & EmailID & ")and((s.AlwaysInclude=0)or(s.AlwaysInclude is null))"
-                    dt = db.executeSql(SQL)
+                    dt = db.executeSql_getDataTable(SQL)
                     For Each rsDr As DataRow In dt.Rows
                         styleId = EncodeInteger(rsDr("id"))
                         StyleName = EncodeText(rsDr("name"))
@@ -6397,7 +6397,7 @@ ErrorTrap:
                 & " and(specificKey=" & db.encodeSQLText(specificKey) & ")" _
                 & ""
             Dim dt As DataTable
-            dt = db.executeSql(SQL)
+            dt = db.executeSql_getDataTable(SQL)
             If dt.Rows.Count > 0 Then
                 warningId = EncodeInteger(dt.Rows(0).Item("id"))
             End If
@@ -6407,7 +6407,7 @@ ErrorTrap:
                 ' increment count for matching warning
                 '
                 SQL = "update ccsitewarnings set count=count+1,DateLastReported=" & db.encodeSQLDate(Now()) & " where id=" & warningId
-                Call db.executeSql(SQL)
+                Call db.executeSql_getDataTable(SQL)
             Else
                 '
                 ' insert new record
@@ -6619,7 +6619,7 @@ ErrorTrap:
                                     End If
                                     Call db.cs_Close(CS2)
                                     If resaveLinkAlias Then
-                                        Call db.executeSql("delete from ccLinkAliases where id=" & CurrentLinkAliasID)
+                                        Call db.executeSql_getDataTable("delete from ccLinkAliases where id=" & CurrentLinkAliasID)
                                         Call db.cs_Close(CS)
                                         CS = db.cs_insertRecord("Link Aliases", 0)
                                         If db.cs_Ok(CS) Then
@@ -6680,7 +6680,7 @@ ErrorTrap:
         '
         ' To support the special case when the template calls this to encode itself, and the page content has already been rendered.
         '
-        Public Function html_encodeContent10(Source As String, personalizationPeopleId As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, queryStringForLinkAppend As String, ProtocolHostString As String, IsEmailContent As Boolean, ignore_DefaultWrapperID As Integer, ignore_TemplateCaseOnly_Content As String, Context As addonContextEnum, personalizationIsAuthenticated As Boolean, nothingObject As Object, isEditingAnything As Boolean) As String
+        Public Function html_encodeContent10(Source As String, personalizationPeopleId As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, queryStringForLinkAppend As String, ProtocolHostString As String, IsEmailContent As Boolean, ignore_DefaultWrapperID As Integer, ignore_TemplateCaseOnly_Content As String, Context As CPUtilsBaseClass.addonContext, personalizationIsAuthenticated As Boolean, nothingObject As Object, isEditingAnything As Boolean) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("EncodeContent9")
             '
             Const StartFlag = "<!-- ADDON"
@@ -6840,7 +6840,7 @@ ErrorTrap:
                                             ' Dynamic Form - run the core addon replacement instead
                                             '
                                             'hint = hint & ",310"
-                                            returnValue = returnValue & executeAddon(0, DynamicFormGuid, addonOptionString, addonContextEnum.ContextPage, ContextContentName, ContextRecordID, "", "", False, ignore_DefaultWrapperID, "", AddonStatusOK, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
+                                            returnValue = returnValue & addon_execute(0, DynamicFormGuid, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", "", False, ignore_DefaultWrapperID, "", AddonStatusOK, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
                                         Case ACTypeChildList
                                             '
                                             ' Child Page List
@@ -6942,9 +6942,9 @@ ErrorTrap:
                                 End If
                                 ' dont have any way of getting fieldname yet
                                 If AddonGuid <> "" Then
-                                    Copy = executeAddon(0, AddonGuid, addonOptionString, addonContextEnum.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, AddonStatusOK, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
+                                    Copy = addon_execute(0, AddonGuid, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, AddonStatusOK, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
                                 Else
-                                    Copy = executeAddon(0, AddonName, addonOptionString, addonContextEnum.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, AddonStatusOK, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
+                                    Copy = addon_execute(0, AddonName, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, AddonStatusOK, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
                                 End If
                             End If
                         End If
@@ -7124,19 +7124,19 @@ ErrorTrap:
                         '
                         ' encode subject
                         '
-                        subjectEncoded = html_executeContentCommands(Nothing, subjectEncoded, addonContextEnum.contextEmail, ToMemberID, True, layoutError)
-                        subjectEncoded = html_encodeContent10(subjectEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & appConfig.domainList(0), True, 0, "", addonContextEnum.contextEmail, True, Nothing, False)
+                        subjectEncoded = html_executeContentCommands(Nothing, subjectEncoded, CPUtilsBaseClass.addonContext.ContextEmail, ToMemberID, True, layoutError)
+                        subjectEncoded = html_encodeContent10(subjectEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
                         '
                         ' encode Body
                         '
-                        bodyEncoded = html_executeContentCommands(Nothing, bodyEncoded, addonContextEnum.contextEmail, ToMemberID, True, layoutError)
-                        bodyEncoded = html_encodeContent10(bodyEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & appConfig.domainList(0), True, 0, "", addonContextEnum.contextEmail, True, Nothing, False)
+                        bodyEncoded = html_executeContentCommands(Nothing, bodyEncoded, CPUtilsBaseClass.addonContext.ContextEmail, ToMemberID, True, layoutError)
+                        bodyEncoded = html_encodeContent10(bodyEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
                         '
                         ' encode template
                         '
                         If (templateEncoded <> "") Then
-                            templateEncoded = html_executeContentCommands(Nothing, templateEncoded, addonContextEnum.contextEmail, ToMemberID, True, layoutError)
-                            templateEncoded = html_encodeContent10(templateEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & appConfig.domainList(0), True, 0, "", addonContextEnum.contextEmail, True, Nothing, False)
+                            templateEncoded = html_executeContentCommands(Nothing, templateEncoded, CPUtilsBaseClass.addonContext.ContextEmail, ToMemberID, True, layoutError)
+                            templateEncoded = html_encodeContent10(templateEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
                             '
                             If (InStr(1, templateEncoded, fpoContentBox) <> 0) Then
                                 bodyEncoded = vbReplace(templateEncoded, fpoContentBox, bodyEncoded)
@@ -7748,7 +7748,7 @@ ErrorTrap:
             '
             Dim FieldValue As Boolean
             '
-            FieldValue = main_GetStreamBoolean2(FieldName)
+            FieldValue = doc_getBoolean2(FieldName)
             If db.cs_getBoolean(CSMember, FieldName) <> FieldValue Then
                 Call log_LogActivity2("profile changed " & FieldName, user.id, user.organizationId)
                 Call db.cs_set(CSMember, FieldName, FieldValue)
@@ -7849,7 +7849,7 @@ ErrorTrap:
                     '
                     Call log_appendLogPageNotFound(webServer.requestLinkSource)
                     If ShortLink <> "" Then
-                        Call db.executeSql("Update ccContentWatch set link=null where link=" & db.encodeSQLText(ShortLink))
+                        Call db.executeSql_getDataTable("Update ccContentWatch set link=null where link=" & db.encodeSQLText(ShortLink))
                     End If
                     '
                     If main_PageTestPointPrinting Then
@@ -8457,7 +8457,7 @@ ErrorTrap:
                     SQL &= " and " & LcaseCriteria
                 End If
                 Dim dt As DataTable
-                dt = db.executeSql(SQL)
+                dt = db.executeSql_getDataTable(SQL)
                 If dt.Rows.Count > 0 Then
                     RowCnt = EncodeInteger(dt.Rows(0).Item("cnt"))
                 End If
@@ -9132,7 +9132,7 @@ ErrorTrap:
                     main_GetLoginLink = main_GetLoginLink & "<img alt=""Login"" src=""" & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, main_LoginIconFilename) & """ border=""0"" >"
                 Else
                     IconFilename = siteProperties.getText("LoginIconFilename", "/ccLib/images/ccLibLogin.GIF")
-                    If vbLCase(Mid(IconFilename, 1, 7)) <> "/cclib/" Then
+                    If vbLCase(Mid(IconFilename, 1, 7)) <> "/ccLib/" Then
                         IconFilename = csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, IconFilename)
                     End If
                     main_GetLoginLink = main_GetLoginLink & "<img alt=""Login"" src=""" & IconFilename & """ border=""0"" >"
@@ -9459,7 +9459,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Sub main_IncrementTableField(ByVal TableName As String, ByVal RecordID As Integer, ByVal FieldName As String, Optional ByVal DataSourceName As String = "")
-            Call db.executeSql("update " & TableName & " set " & FieldName & "=" & FieldName & "+1 where id=" & RecordID, DataSourceName)
+            Call db.executeSql_getDataTable("update " & TableName & " set " & FieldName & "=" & FieldName & "+1 where id=" & RecordID, DataSourceName)
 
             '            On Error GoTo ErrorTrap : ''Dim th as integer : th = profileLogMethodEnter("IncrementTableField")
             '            '
@@ -10211,7 +10211,7 @@ ErrorTrap:
                         & cr3 & "<td width=""100%"" class=""ccPanel""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""1"" ></td>" _
                         & cr2 & "</tr>"
                     '
-                    DebugPanel = DebugPanel & main_DebugPanelRow("DOM", "<a class=""ccAdminLink"" href=""/cclib/clientside/DOMViewer.htm"" target=""_blank"">Click</A>")
+                    DebugPanel = DebugPanel & main_DebugPanelRow("DOM", "<a class=""ccAdminLink"" href=""/ccLib/clientside/DOMViewer.htm"" target=""_blank"">Click</A>")
                     DebugPanel = DebugPanel & main_DebugPanelRow("Trap Errors", html_EncodeHTML(siteProperties.trapErrors.ToString))
                     DebugPanel = DebugPanel & main_DebugPanelRow("Trap Email", html_EncodeHTML(siteProperties.getText("TrapEmail")))
                     DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerLink", html_EncodeHTML(main_ServerLink))
@@ -11433,7 +11433,7 @@ ErrorTrap:
                 '
                 ' ----- main_Get the Group ID
                 '
-                dt = db.executeSql("select top 1 id from ccGroups where name=" & db.encodeSQLText(iGroupName))
+                dt = db.executeSql_getDataTable("select top 1 id from ccGroups where name=" & db.encodeSQLText(iGroupName))
                 If dt.Rows.Count > 0 Then
                     group_GetGroupID = EncodeInteger(dt.Rows(0).Item(0))
                 End If
@@ -11504,7 +11504,7 @@ ErrorTrap:
             '
             group_Add = -1
             Dim dt As DataTable
-            dt = db.executeSql("SELECT ID FROM ccgroups WHERE NAME=" & db.encodeSQLText(iGroupName))
+            dt = db.executeSql_getDataTable("SELECT ID FROM ccgroups WHERE NAME=" & db.encodeSQLText(iGroupName))
             If dt.Rows.Count > 0 Then
                 group_Add = EncodeInteger(dt.Rows(0).Item(0))
             Else
@@ -11707,7 +11707,7 @@ ErrorTrap:
             '
             '  BuildVersion = app.dataBuildVersion
             If False Then '.3.210" Then
-                handleExceptionAndRethrow(New Exception("Contensive database was created with version " & db.dataBuildVersion & ". main_SetContentCopy requires an builder."))
+                handleExceptionAndRethrow(New Exception("Contensive database was created with version " & db.siteproperty_dataBuildVersion & ". main_SetContentCopy requires an builder."))
             Else
                 iCopyName = EncodeText(CopyName)
                 iContent = EncodeText(Content)
@@ -12228,12 +12228,12 @@ ErrorTrap:
 
             If main_InputDateCnt = 0 Then
                 HeadJS = "" _
-                    & vbCrLf & "<SCRIPT LANGUAGE=""JavaScript"" SRC=""/cclib/mktree/CalendarPopup.js""></SCRIPT>" _
+                    & vbCrLf & "<SCRIPT LANGUAGE=""JavaScript"" SRC=""/ccLib/mktree/CalendarPopup.js""></SCRIPT>" _
                     & vbCrLf & "<SCRIPT LANGUAGE=""JavaScript"">" _
                     & vbCrLf & "var cal = new CalendarPopup();" _
                     & vbCrLf & "cal.showNavigationDropdowns();" _
                     & vbCrLf & "</SCRIPT>"
-                Call main_AddHeadScriptLink("/cclib/mktree/CalendarPopup.js", "Calendar Popup")
+                Call main_AddHeadScriptLink("/ccLib/mktree/CalendarPopup.js", "Calendar Popup")
                 Call main_AddHeadScriptCode("var cal=new CalendarPopup();cal.showNavigationDropdowns();", "Calendar Popup")
             End If
 
@@ -13286,7 +13286,7 @@ ErrorTrap:
                         & ""
                 End If
                 SQL &= " WHERE (ID=" & visit_Id & ");"
-                Call db.executeSql(SQL)
+                Call db.executeSql_getDataTable(SQL)
             End If
             Exit Sub
             '
@@ -13329,7 +13329,7 @@ ErrorTrap:
                         & ",OrderID = " & db.encodeSQLNumber(visitor_orderID) _
                         & " WHERE ID=" & visitor_id & ";"
                 End If
-                Call db.executeSql(SQL)
+                Call db.executeSql_getDataTable(SQL)
             End If
             Exit Sub
             '
@@ -14044,7 +14044,7 @@ ErrorTrap:
                     ' $$$$$ make ptr list on load
                     CS = db.csOpen("Add-ons", "(OnNewVisitEvent<>0)", "Name", , , , , "id")
                     Do While db.cs_Ok(CS)
-                        Call executeAddon_legacy5(db.cs_getInteger(CS, "ID"), "", "", addonContextEnum.ContextOnNewVisit, "", 0, "", 0)
+                        Call addon_execute_legacy5(db.cs_getInteger(CS, "ID"), "", "", CPUtilsBaseClass.addonContext.ContextOnNewVisit, "", 0, "", 0)
                         db.db_csGoNext(CS)
                     Loop
                     Call db.cs_Close(CS)
@@ -15429,7 +15429,7 @@ ErrorTrap:
                         & "&editorStyles=" & encodeNvaArgument(styleList) _
                         & "&editorStyleOptions=" & encodeNvaArgument(styleOptionList) _
                         & ""
-                    returnHtml = executeAddon_legacy4(FieldTypeDefaultEditorAddonId.ToString, addonOption_String, addonContextEnum.ContextEditor)
+                    returnHtml = addon_execute_legacy4(FieldTypeDefaultEditorAddonId.ToString, addonOption_String, CPUtilsBaseClass.addonContext.ContextEditor)
                 End If
 
             Catch ex As Exception
@@ -15489,28 +15489,28 @@ ErrorTrap:
                             '
                             ' ----- AllowAdminLinks
                             '
-                            Call visitProperty.setProperty("AllowEditing", EncodeText(main_GetStreamBoolean2("AllowEditing")))
+                            Call visitProperty.setProperty("AllowEditing", EncodeText(doc_getBoolean2("AllowEditing")))
                             '
                             ' ----- Quick Editor
                             '
-                            Call visitProperty.setProperty("AllowQuickEditor", EncodeText(main_GetStreamBoolean2("AllowQuickEditor")))
+                            Call visitProperty.setProperty("AllowQuickEditor", EncodeText(doc_getBoolean2("AllowQuickEditor")))
                             '
                             ' ----- Advanced Editor
                             '
-                            Call visitProperty.setProperty("AllowAdvancedEditor", EncodeText(main_GetStreamBoolean2("AllowAdvancedEditor")))
+                            Call visitProperty.setProperty("AllowAdvancedEditor", EncodeText(doc_getBoolean2("AllowAdvancedEditor")))
                             '
                             ' ----- Allow Workflow authoring Render Mode - Visit Property
                             '
-                            Call visitProperty.setProperty("AllowWorkflowRendering", EncodeText(main_GetStreamBoolean2("AllowWorkflowRendering")))
+                            Call visitProperty.setProperty("AllowWorkflowRendering", EncodeText(doc_getBoolean2("AllowWorkflowRendering")))
                             '
                             ' ----- developer Only parts
                             '
-                            Call visitProperty.setProperty("AllowDebugging", EncodeText(main_GetStreamBoolean2("AllowDebugging")))
+                            Call visitProperty.setProperty("AllowDebugging", EncodeText(doc_getBoolean2("AllowDebugging")))
                             If user.isAuthenticatedDeveloper() Then
                                 '
                                 ' ----- Create Path Block record, if requested
                                 '
-                                CreatePathBlock = main_GetStreamBoolean2("CreatePathBlock")
+                                CreatePathBlock = doc_getBoolean2("CreatePathBlock")
                                 CS = db.csOpen("Paths", "name=" & db.encodeSQLText(web_requestPath))
                                 PathID = 0
                                 If db.cs_Ok(CS) Then
@@ -15655,7 +15655,7 @@ ErrorTrap:
                     End If
                     Call db.cs_Close(CSAddon)
                     ' ????? need to test
-                    Call db.executeSql("update ccpagecontent set ChildListInstanceOptions=" & db.encodeSQLText(addonOption_String) & " where id=" & RecordID)
+                    Call db.executeSql_getDataTable("update ccpagecontent set ChildListInstanceOptions=" & db.encodeSQLText(addonOption_String) & " where id=" & RecordID)
                     needToClearCache = True
                     'CS = main_OpenCSContentRecord("page content", RecordID)
                     'If app.csv_IsCSOK(CS) Then
@@ -15967,7 +15967,7 @@ ErrorTrap:
                             HelpCaption = docProperties.getText("helpcaption")
                             HelpMessage = docProperties.getText("helptext")
                             SQL = "update ccfields set caption=" & db.encodeSQLText(HelpCaption) & ",HelpMessage=" & db.encodeSQLText(HelpMessage) & " where id=" & RecordID
-                            Call db.executeSql(SQL)
+                            Call db.executeSql_getDataTable(SQL)
                             cache.invalidateAll()
                             metaData.clear()
                         End If
@@ -17299,7 +17299,7 @@ ErrorTrap:
                 & "&SelectLinkObjectName=" & SelectLinkObjectName _
                 & "&AllowGroupAdd=" & AllowGroupAdd _
                 & ""
-            main_GetResourceLibrary2 = executeAddon_legacy4("{564EF3F5-9673-4212-A692-0942DD51FF1A}", Option_String, addonContextEnum.ContextAdmin)
+            main_GetResourceLibrary2 = addon_execute_legacy4("{564EF3F5-9673-4212-A692-0942DD51FF1A}", Option_String, CPUtilsBaseClass.addonContext.ContextAdmin)
             '
             Exit Function
             '
@@ -17371,7 +17371,7 @@ ErrorTrap:
                 rulesTablename = db_GetContentTablename(RulesContentName)
                 SQL = "select " & RulesSecondaryFieldName & ",id from " & rulesTablename & " where (" & RulesPrimaryFieldname & "=" & PrimaryRecordID & ")and(active<>0) order by " & RulesSecondaryFieldName
                 currentRulesCnt = 0
-                currentRules = db.executeSql(SQL)
+                currentRules = db.executeSql_getDataTable(SQL)
                 currentRulesCnt = currentRules.Rows.Count
                 For GroupPtr = 0 To GroupCnt - 1
                     '
@@ -17379,7 +17379,7 @@ ErrorTrap:
                     '
                     SecondaryRecordID = docProperties.getInteger(TagName & "." & GroupPtr & ".ID")
                     RuleCopy = docProperties.getText(TagName & "." & GroupPtr & ".RuleCopy")
-                    RuleNeeded = main_GetStreamBoolean2(TagName & "." & GroupPtr)
+                    RuleNeeded = doc_getBoolean2(TagName & "." & GroupPtr)
                     '
                     ' ----- Update Record
                     '
@@ -17413,7 +17413,7 @@ ErrorTrap:
                         ' Record exists and is needed, update the rule copy
                         '
                         SQL = "update " & rulesTablename & " set rulecopy=" & db.encodeSQLText(RuleCopy) & " where id=" & RuleId
-                        Call db.executeSql(SQL)
+                        Call db.executeSql_getDataTable(SQL)
                     ElseIf RuleNeeded And (Not RuleFound) Then
                         '
                         ' No record exists, and one is needed
@@ -17434,7 +17434,7 @@ ErrorTrap:
                         ' Record exists and it is not needed
                         '
                         SQL = "delete from " & rulesTablename & " where id=" & RuleId
-                        Call db.executeSql(SQL)
+                        Call db.executeSql_getDataTable(SQL)
                         RuleContentChanged = True
                     End If
                 Next
@@ -17443,7 +17443,7 @@ ErrorTrap:
                 '
                 If dupRuleIdList <> "" Then
                     SQL = "delete from " & rulesTablename & " where id in (" & Mid(dupRuleIdList, 2) & ")"
-                    Call db.executeSql(SQL)
+                    Call db.executeSql_getDataTable(SQL)
                     RuleContentChanged = True
                 End If
                 '        For GroupPtr = 0 To GroupCnt - 1
@@ -17515,7 +17515,7 @@ ErrorTrap:
                 RecordID = db.cs_getInteger(CSPointer, "id")
                 ContentName = metaData.getContentNameByID(db.cs_getInteger(CSPointer, "contentcontrolId"))
             End If
-            main_GetCSEncodedField = html_encodeContent10(db.db_GetCS(EncodeInteger(CSPointer), EncodeText(FieldName)), user.id, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, 0, "", addonContextEnum.ContextPage, user.isAuthenticated, Nothing, user.isEditingAnything)
+            main_GetCSEncodedField = html_encodeContent10(db.db_GetCS(EncodeInteger(CSPointer), EncodeText(FieldName)), user.id, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, user.isAuthenticated, Nothing, user.isEditingAnything)
             Exit Function
             '
             ' ----- Error Trap
@@ -17830,7 +17830,7 @@ ErrorTrap:
                 web_GetAuthoringLink = web_GetAuthoringLink & " target=""_blank"""
             End If
             web_GetAuthoringLink = web_GetAuthoringLink & " class=""ccAuthoringLink""><span class=""ccAuthoringLink"">" & Label & "</span></a>"
-            web_GetAuthoringLink = web_GetAuthoringLink & "<br ><img alt=""space"" src=""/cclib/image/spacer.gif"" width=""30"" height=""1""></td>"
+            web_GetAuthoringLink = web_GetAuthoringLink & "<br ><img alt=""space"" src=""/ccLib/image/spacer.gif"" width=""30"" height=""1""></td>"
             If SideCaption <> "" Then
                 web_GetAuthoringLink = web_GetAuthoringLink & "<td align=""center"" bgcolor=""#FFFFFF"" width=""1""><nobr><span class=""ccAdminSmall""><font color=""#000000"">&nbsp;" & SideCaption & "&nbsp;</font></span></nobr></td>"
             End If
@@ -17930,57 +17930,42 @@ ErrorTrap:
         End Function
         '
         '========================================================================
-        ' ----- Starts an HTML form for uploads
-        '       Should be closed with main_GetUploadFormEnd
-        '========================================================================
-        '
-        Public Function web_ProcessFormInputFile(ByVal TagName As String, Optional ByVal VirtualFilePath As String = "") As String
-            web_ProcessFormInputFile = web_ProcessFormInputFile2(TagName, cdnFiles, VirtualFilePath)
+        ''' <summary>
+        ''' process the request for an input file, storing the file in cdnFiles in an optional filePath. Return the filepath and filename uploaded.
+        ''' </summary>
+        ''' <param name="TagName"></param>
+        ''' <param name="filePath"></param>
+        ''' <returns></returns>
+        Public Function web_processFormInputFile(ByVal TagName As String, Optional ByVal filePath As String = "") As String
+            web_processFormInputFile = web_processFormInputFile(TagName, cdnFiles, filePath)
         End Function
         '
         '========================================================================
-        ' ----- Starts an HTML form for uploads
-        '       Should be closed with main_GetUploadFormEnd
-        '========================================================================
-        '
-        Public Function web_ProcessFormInputFile2(ByVal TagName As String, files As coreFileSystemClass, Optional ByVal VirtualFilePath As String = "") As String
-            Dim returnString As String = ""
+        ''' <summary>
+        ''' process the request for an input file, storing the file system provided, in an optional filePath. Return the filepath and filename uploaded. 
+        ''' </summary>
+        ''' <param name="TagName"></param>
+        ''' <param name="files"></param>
+        ''' <param name="filePath"></param>
+        ''' <returns></returns>
+        Public Function web_processFormInputFile(ByVal TagName As String, files As coreFileSystemClass, Optional ByVal filePath As String = "Upload") As String
+            Dim returnPathFilename As String = ""
             Try
-                Dim Key As String
-                Dim iVirtualFilePath As String
+                Dim key As String
+                'Dim iVirtualFilePath As String
                 '
-                Key = TagName.ToLower()
-                If docProperties.docPropertiesDict.ContainsKey(Key) Then
-                    With docProperties.docPropertiesDict(TagName.ToLower())
-                        If (.IsFile) And (UCase(.Name) = vbUCase(Key)) Then
-                            iVirtualFilePath = EncodeText(VirtualFilePath)
-                            iVirtualFilePath = vbReplace(iVirtualFilePath, "/", "\")
-
-                            If iVirtualFilePath <> "" Then
-                                If Left(iVirtualFilePath, 1) = "\" Then
-                                    If Len(iVirtualFilePath) = 1 Then
-                                        iVirtualFilePath = ""
-                                    Else
-                                        iVirtualFilePath = Mid(iVirtualFilePath, 2)
-                                    End If
-                                End If
-                                If Right(iVirtualFilePath, 1) <> "\" Then
-                                    iVirtualFilePath = iVirtualFilePath & "\"
-                                End If
-                                web_ProcessFormInputFile2 = iVirtualFilePath
-                            End If
-                            If iVirtualFilePath = "" Then
-                                web_ProcessFormInputFile2 = "Upload\"
-                            End If
-                            web_ProcessFormInputFile2 = returnString & encodeFilename(.Value)
-                            Call files.deleteFile(web_ProcessFormInputFile2)
-                            If .tmpPrivatefile <> "" Then
+                key = TagName.ToLower()
+                If docProperties.docPropertiesDict.ContainsKey(key) Then
+                    With docProperties.docPropertiesDict(key)
+                        If (.IsFile) And (.Name.ToLower() = key) Then
+                            returnPathFilename = normalizeFilePath(filePath)
+                            returnPathFilename &= encodeFilename(.Value)
+                            Call files.deleteFile(returnPathFilename)
+                            If .tmpPrivatePathfilename <> "" Then
                                 '
                                 ' copy tmp private files to the appropriate folder in the destination file system
                                 '
-                                Call privateFiles.copyFile(.tmpPrivatefile, web_ProcessFormInputFile2, files)
-                            Else
-                                Call files.SaveFile(web_ProcessFormInputFile2, .FileContent)
+                                Call privateFiles.copyFile(.tmpPrivatePathfilename, returnPathFilename, files)
                             End If
                         End If
                     End With
@@ -17988,6 +17973,7 @@ ErrorTrap:
             Catch ex As Exception
                 handleExceptionAndRethrow(ex)
             End Try
+            Return returnPathFilename
         End Function
         ''
         ''   2.1 compatibility
@@ -18530,7 +18516,7 @@ ErrorTrap:
                 '
                 ' Determine is the record should be saved
                 '
-                If (Not IsApproved) And (Not main_GetStreamBoolean2("RENDERMODE")) Then
+                If (Not IsApproved) And (Not doc_getBoolean2("RENDERMODE")) Then
                     If iIsAdmin Then
                         '
                         ' cases that admin can save
@@ -18920,7 +18906,7 @@ ErrorTrap:
                         If ChildPagesFound Then
                             ChildPageCount = main_GetSectionMenu_AddChildMenu_ReturnChildCount(MenuID, ContentName, LinkWorking, Tier1MenuCaption, "," & EncodeText(MenuID), MenuNamePrefix, 1, DepthLimit, childListSortMethodId, SectionID, AddRootButton, UseContentWatchLink)
                             If (ChildPageCount = 0) And (True) Then
-                                Call db.executeSql("update ccpagecontent set ChildPagesFound=0 where id=" & MenuID)
+                                Call db.executeSql_getDataTable("update ccpagecontent set ChildPagesFound=0 where id=" & MenuID)
                             End If
                         End If
                         pageManager_GetSectionMenu_NameMenu = pageManager_GetSectionMenu_NameMenu & vbReplace(menuFlyout.getMenu(MenuNamePrefix & EncodeText(MenuID), MenuStyle, StyleSheetPrefix), vbCrLf, "")
@@ -19174,14 +19160,14 @@ ErrorTrap:
                                         '
                                         ' ChildPagesFound flag is true, but no pages were found - clear flag
                                         '
-                                        Call db.executeSql("update ccpagecontent set ChildPagesFound=0 where id=" & PageID)
+                                        Call db.executeSql_getDataTable("update ccpagecontent set ChildPagesFound=0 where id=" & PageID)
                                         'Call AppendLog("main_GetSectionMenu_IdMenu, 4-call pageManager_cache_pageContent_updateRow")
                                         Call pageManager_cache_pageContent_updateRow(PageID, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
                                     ElseIf (ChildPageCount > 0) And (Not ChildPagesFound) Then
                                         '
                                         ' ChildPagesFlag is cleared, but pages were found -- set the flag
                                         '
-                                        Call db.executeSql("update ccpagecontent set ChildPagesFound=1 where id=" & PageID)
+                                        Call db.executeSql_getDataTable("update ccpagecontent set ChildPagesFound=1 where id=" & PageID)
                                         'Call AppendLog("main_GetSectionMenu_IdMenu, 5-call pageManager_cache_pageContent_updateRow")
                                         Call pageManager_cache_pageContent_updateRow(PageID, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
                                     End If
@@ -19416,7 +19402,7 @@ ErrorTrap:
                                                 ' no pages were found, clear the child pages found property
                                                 ' child pages found property is set at admin site when a page is saved with this as the parent id
                                                 '
-                                                Call db.executeSql("update ccpagecontent set ChildPagesFound=0 where id=" & MenuID)
+                                                Call db.executeSql_getDataTable("update ccpagecontent set ChildPagesFound=0 where id=" & MenuID)
                                                 'Call AppendLog("main_GetHtmlBody_GetSection_GetContentMenu_AddChildMenu, 6-call pageManager_cache_pageContent_updateRow -- fix here to NOT call pageManager_cache_pageContent_updateRow()")
                                                 cache_pageContent(PCC_ChildPagesFound, ChildPointer) = "0"
                                                 'Call pageManager_cache_pageContent_updateRow(MenuID, main_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
@@ -19424,7 +19410,7 @@ ErrorTrap:
                                                 '
                                                 ' pages were found, set the child pages found property
                                                 '
-                                                Call db.executeSql("update ccpagecontent set ChildPagesFound=1 where id=" & MenuID)
+                                                Call db.executeSql_getDataTable("update ccpagecontent set ChildPagesFound=1 where id=" & MenuID)
                                                 'Call AppendLog("main_GetHtmlBody_GetSection_GetContentMenu_AddChildMenu, 7-call pageManager_cache_pageContent_updateRow -- fix here to NOT call pageManager_cache_pageContent_updateRow()")
                                                 cache_pageContent(PCC_ChildPagesFound, ChildPointer) = "1"
                                                 'Call pageManager_cache_pageContent_updateRow(MenuID, main_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
@@ -19837,12 +19823,12 @@ ErrorTrap:
                     SectionName = Trim(db.cs_getText(CSSections, "Name"))
                     If SectionName = "" Then
                         SectionName = "Section " & SectionID
-                        Call db.executeSql("update ccSections set Name=" & db.encodeSQLText(SectionName) & " where ID=" & SectionID)
+                        Call db.executeSql_getDataTable("update ccSections set Name=" & db.encodeSQLText(SectionName) & " where ID=" & SectionID)
                     End If
                     SectionCaption = db.cs_getText(CSSections, "Caption")
                     If SectionCaption = "" Then
                         SectionCaption = SectionName
-                        Call db.executeSql("update ccSections set Caption=" & db.encodeSQLText(SectionCaption) & " where ID=" & SectionID)
+                        Call db.executeSql_getDataTable("update ccSections set Caption=" & db.encodeSQLText(SectionCaption) & " where ID=" & SectionID)
                     End If
                     If HideMenu Then
                         SectionCaption = "[Hidden: " & SectionCaption & "]"
@@ -19860,7 +19846,7 @@ ErrorTrap:
                         If ContentName = "" Then
                             ContentName = "Page Content"
                             ContentID = main_GetContentID(ContentName)
-                            Call db.executeSql("update ccSections set ContentID=" & ContentID & " where ID=" & SectionID)
+                            Call db.executeSql_getDataTable("update ccSections set ContentID=" & ContentID & " where ID=" & SectionID)
                         End If
                     End If
                     MenuImage = db.cs_getText(CSSections, "MenuImageFilename")
@@ -19959,8 +19945,8 @@ ErrorTrap:
             End If
             Call db.cs_Close(CSSections)
             '
-            pageManager_GetSectionMenu = html_executeContentCommands(Nothing, pageManager_GetSectionMenu, addonContextEnum.ContextPage, user.id, user.isAuthenticated, layoutError)
-            pageManager_GetSectionMenu = html_encodeContent10(pageManager_GetSectionMenu, user.id, "", 0, 0, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, 0, "", addonContextEnum.ContextPage, user.isAuthenticated, Nothing, user.isEditingAnything)
+            pageManager_GetSectionMenu = html_executeContentCommands(Nothing, pageManager_GetSectionMenu, CPUtilsBaseClass.addonContext.ContextPage, user.id, user.isAuthenticated, layoutError)
+            pageManager_GetSectionMenu = html_encodeContent10(pageManager_GetSectionMenu, user.id, "", 0, 0, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, user.isAuthenticated, Nothing, user.isEditingAnything)
             'pageManager_GetSectionMenu = main_EncodeContent5(pageManager_GetSectionMenu, memberID, "", 0, 0, False, False, True, True, False, True, "", "", False, 0)
             '
             Exit Function
@@ -20718,7 +20704,7 @@ ErrorTrap:
                             '
                             ' the defaultemplateid in the domain is not valid
                             '
-                            Call db.executeSql("update ccdomains set defaulttemplateid=0 where defaulttemplateid=" & domains.domainDetails.defaultTemplateId)
+                            Call db.executeSql_getDataTable("update ccdomains set defaulttemplateid=0 where defaulttemplateid=" & domains.domainDetails.defaultTemplateId)
                             Call cache.invalidateTagCommaList("domains")
                         End If
                     End If
@@ -21058,10 +21044,10 @@ ErrorTrap:
         '
         Public Property main_SQLCommandTimeout() As Integer
             Get
-                Return db.db_SQLCommandTimeout
+                Return db.sqlCommandTimeout
             End Get
             Set(ByVal value As Integer)
-                db.db_SQLCommandTimeout = value
+                db.sqlCommandTimeout = value
             End Set
         End Property
         '
@@ -21326,7 +21312,7 @@ ErrorTrap:
                             If libraryFilePtr >= 0 Then
                                 libraryFileClicks = EncodeInteger(cache_libraryFiles(LibraryFilesCache_clicks, libraryFilePtr))
                                 link = EncodeText(cache_libraryFiles(LibraryFilesCache_filename, libraryFilePtr))
-                                Call db.executeSql("update cclibraryfiles set clicks=" & (libraryFileClicks + 1) & " where id=" & downloadId)
+                                Call db.executeSql_getDataTable("update cclibraryfiles set clicks=" & (libraryFileClicks + 1) & " where id=" & downloadId)
                             End If
                             If link <> "" Then
                                 '
@@ -21608,7 +21594,7 @@ ErrorTrap:
                                             IsInLinkForwardTable = True
                                             Viewings = db.cs_getInteger(CSPointer, "Viewings") + 1
                                             Sql = "update ccLinkForwards set Viewings=" & Viewings & " where ID=" & db.cs_getInteger(CSPointer, "ID")
-                                            Call db.executeSql(Sql)
+                                            Call db.executeSql_getDataTable(Sql)
                                             Link = db.cs_getText(CSPointer, "DestinationLink")
                                             If Link <> "" Then
                                                 '
@@ -21797,7 +21783,7 @@ ErrorTrap:
                     '
                     bodyAddonId = EncodeInteger(siteProperties.getText("Html Body AddonId", "0"))
                     If bodyAddonId <> 0 Then
-                        htmlBody = executeAddon(bodyAddonId, "", "", addonContextEnum.ContextPage, "", 0, "", "", False, 0, "", bodyAddonStatusOK, Nothing, "", Nothing, "", user.id, user.isAuthenticated)
+                        htmlBody = addon_execute(bodyAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", bodyAddonStatusOK, Nothing, "", Nothing, "", user.id, user.isAuthenticated)
                     Else
                         htmlBody = main_GetHtmlBody()
                     End If
@@ -22003,7 +21989,7 @@ ErrorTrap:
                 '
                 ' reset styles
                 '
-                main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & web_requestProtocol & main_ServerDomain & "/cclib/styles/ccreset.css"" >"
+                main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & web_requestProtocol & main_ServerDomain & "/ccLib/styles/ccreset.css"" >"
             End If
             main_GetHTMLInternalHead = main_GetHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""/ccLib/Styles/" & defaultStyleFilename & """>"
             If Not main_IsAdminSite Then
@@ -22763,7 +22749,7 @@ ErrorTrap:
                     ' either Workflow on non-workflow - it changes everything
                     '
                     SQL = "update " & RecordTableName & " set ContentControlID=" & NewContentControlID & " where ID=" & RecordID & " or EditSourceID=" & RecordID
-                    Call db.executeSql(SQL, DataSourceName)
+                    Call db.executeSql_getDataTable(SQL, DataSourceName)
                     If HasParentID Then
                         SQL = "select contentcontrolid,ID from " & RecordTableName & " where ParentID=" & RecordID
                         CS = db.db_openCsSql_rev(DataSourceName, SQL)
@@ -22777,7 +22763,7 @@ ErrorTrap:
                     ' fix content watch
                     '
                     SQL = "update ccContentWatch set ContentID=" & NewContentControlID & ", ContentRecordKey='" & NewContentControlID & "." & RecordID & "' where ContentID=" & ContentID & " and RecordID=" & RecordID
-                    Call db.executeSql(SQL)
+                    Call db.executeSql_getDataTable(SQL)
                     '            '
                     '            ' fix Topic Rules
                     '            '
@@ -23242,7 +23228,7 @@ ErrorTrap:
                                 '
                                 ' Group main_MemberShip
                                 '
-                                IsInGroup = main_GetStreamBoolean2("Group" & .GroupName)
+                                IsInGroup = doc_getBoolean2("Group" & .GroupName)
                                 WasInGroup = user.IsMemberOfGroup2(.GroupName)
                                 If WasInGroup And Not IsInGroup Then
                                     group_DeleteGroupMember(.GroupName)
@@ -23358,7 +23344,7 @@ ErrorTrap:
         Public Function contactManager_GetContactManager(Option_String As String) As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("main_GetContactManager")
             '
-            contactManager_GetContactManager = executeAddon_legacy5(0, "Contact Manager", "", addonContextEnum.ContextPage, "", 0, "", 0)
+            contactManager_GetContactManager = addon_execute_legacy5(0, "Contact Manager", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", 0)
             '
             Exit Function
             '
@@ -23632,7 +23618,7 @@ ErrorTrap:
                         '
                         ' Boolean
                         '
-                        Call db.cs_set(CSPointer, FieldName, main_GetStreamBoolean2(LocalRequestName))
+                        Call db.cs_set(CSPointer, FieldName, doc_getBoolean2(LocalRequestName))
                     Case FieldTypeIdCurrency, FieldTypeIdFloat, FieldTypeIdInteger, FieldTypeIdLookup, FieldTypeIdManyToMany
                         '
                         ' Numbers
@@ -23649,11 +23635,11 @@ ErrorTrap:
                         '
                         Filename = docProperties.getText(LocalRequestName)
                         If Filename <> "" Then
-                            Path = db.db_GetCSFilename(CSPointer, FieldName, Filename)
-                            Call db.db_SetCSField(CSPointer, FieldName, Path)
+                            Path = db.cs_getFilename(CSPointer, FieldName, Filename)
+                            Call db.cs_setField(CSPointer, FieldName, Path)
                             Path = vbReplace(Path, "\", "/")
                             Path = vbReplace(Path, "/" & Filename, "")
-                            Call web_ProcessFormInputFile2(LocalRequestName, appRootFiles, Path)
+                            Call web_processFormInputFile(LocalRequestName, appRootFiles, Path)
                         End If
                     Case Else
                         '
@@ -23701,7 +23687,7 @@ ErrorTrap:
             Dim StyleSN As Integer
             '
             If siteProperties.getBoolean("Allow CSS Reset") Then
-                pageManager_GetStyleTagPublic = pageManager_GetStyleTagPublic & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & web_requestProtocol & main_ServerDomain & "/cclib/styles/ccreset.css"" >"
+                pageManager_GetStyleTagPublic = pageManager_GetStyleTagPublic & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & web_requestProtocol & main_ServerDomain & "/ccLib/styles/ccreset.css"" >"
             End If
             StyleSN = EncodeInteger(siteProperties.getText("StylesheetSerialNumber", "0"))
             If StyleSN < 0 Then
@@ -23724,7 +23710,7 @@ ErrorTrap:
                 ' Put styles inline if requested, and if there has been an upgrade
                 '
                 pageManager_GetStyleTagPublic = pageManager_GetStyleTagPublic & cr & StyleSheetStart & pageManager_GetStyleSheet() & cr & StyleSheetEnd
-            ElseIf (db.dataBuildVersion <> cp.Version()) Then
+            ElseIf (db.siteproperty_dataBuildVersion <> cp.Version()) Then
                 '
                 ' Put styles inline if requested, and if there has been an upgrade
                 '
@@ -23745,7 +23731,7 @@ ErrorTrap:
             StyleSN = EncodeInteger(siteProperties.getText("StylesheetSerialNumber", "0"))
             If StyleSN = 0 Then
                 admin_GetStyleTagAdmin = cr & StyleSheetStart & pageManager_GetStyleSheetDefault() & cr & StyleSheetEnd
-            ElseIf (db.dataBuildVersion <> cp.Version()) Then
+            ElseIf (db.siteproperty_dataBuildVersion <> cp.Version()) Then
                 admin_GetStyleTagAdmin = cr & "<!-- styles forced inline because database upgrade needed -->" & StyleSheetStart & pageManager_GetStyleSheetDefault() & cr & StyleSheetEnd
             Else
                 If StyleSN < 0 Then
@@ -23781,7 +23767,7 @@ ErrorTrap:
         '   encode content moved to csv so support cp.content.GetCopy()
         '====================================================================================================
         '
-        Public Function html_encodeContent9(Source As String, personalizationPeopleId As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, AddAnchorQuery As String, ProtocolHostString As String, IsEmailContent As Boolean, DefaultWrapperID As Integer, ignore_TemplateCaseOnly_Content As String, addonContext As addonContextEnum) As String
+        Public Function html_encodeContent9(Source As String, personalizationPeopleId As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, AddAnchorQuery As String, ProtocolHostString As String, IsEmailContent As Boolean, DefaultWrapperID As Integer, ignore_TemplateCaseOnly_Content As String, addonContext As CPUtilsBaseClass.addonContext) As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("EncodeContent9")
             '
             'If Not (true) Then Exit Function
@@ -23802,7 +23788,7 @@ ErrorTrap:
         ''
         '' To support the special case when the template calls this to encode itself, and the page content has already been rendered.
         ''
-        'Public Function main_EncodeContent8(Source As String, ForMemberID As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, AddAnchorQuery As String, ProtocolHostString As String, IsEmailContent As Boolean, DefaultWrapperID As Integer, ignore_TemplateCaseOnly_Content As String, Context As addonContextEnum) As String
+        'Public Function main_EncodeContent8(Source As String, ForMemberID As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, AddAnchorQuery As String, ProtocolHostString As String, IsEmailContent As Boolean, DefaultWrapperID As Integer, ignore_TemplateCaseOnly_Content As String, Context As CPUtilsBaseClass.addonContext) As String
         '    '
         '    main_EncodeContent8 = encodeContent9(Source, ForMemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, IsEmailContent, DefaultWrapperID, ignore_TemplateCaseOnly_Content, Context)
         'End Function
@@ -23810,7 +23796,7 @@ ErrorTrap:
         '' To support wrappers
         ''
         'Public Function main_EncodeContent5(Source As String, ForMemberID As Integer, ContextContentName As String, ContextRecordID As Integer, ContextContactPeopleID As Integer, PlainText As Boolean, AddLinkEID As Boolean, EncodeActiveFormatting As Boolean, EncodeActiveImages As Boolean, EncodeActiveEditIcons As Boolean, EncodeActivePersonalization As Boolean, AddAnchorQuery As String, ProtocolHostString As String, IsEmailContent As Boolean, DefaultWrapperID As Integer) As String
-        '    main_EncodeContent5 = main_EncodeContent8(Source, ForMemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, IsEmailContent, DefaultWrapperID, "", addonContextEnum.ContextPage)
+        '    main_EncodeContent5 = main_EncodeContent8(Source, ForMemberID, ContextContentName, ContextRecordID, ContextContactPeopleID, PlainText, AddLinkEID, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, AddAnchorQuery, ProtocolHostString, IsEmailContent, DefaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
         'End Function
         ''
         '' created just to keep in sync with content server changes, needing AdminURL
@@ -23899,7 +23885,7 @@ ErrorTrap:
         Public Function html_encodeContentForWeb(Source As String, ContextContentName As String, ContextRecordID As Integer, Ignore_BasePath As String, WrapperID As Integer) As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("EncodeContentForWeb")
             '
-            html_encodeContentForWeb = html_encodeContent9(Source, user.id, ContextContentName, ContextRecordID, 0, False, False, True, True, False, True, "", "", False, WrapperID, "", addonContextEnum.ContextPage)
+            html_encodeContentForWeb = html_encodeContent9(Source, user.id, ContextContentName, ContextRecordID, 0, False, False, True, True, False, True, "", "", False, WrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
             '
             Exit Function
 ErrorTrap:
@@ -24782,7 +24768,7 @@ ErrorTrap:
         '       AddonOptionExpandedConstructor = pass this to the bubble editor to create the the selectr
         '===================================================================================================
         '
-        Public Sub executeAddon_buildAddonOptionLists(Option_String_ForObjectCall As String, AddonOptionExpandedConstructor As String, AddonOptionConstructor As String, InstanceOptionList As String, InstanceID As String, IncludeEditWrapper As Boolean)
+        Public Sub addon_execute_buildAddonOptionLists(Option_String_ForObjectCall As String, AddonOptionExpandedConstructor As String, AddonOptionConstructor As String, InstanceOptionList As String, InstanceID As String, IncludeEditWrapper As Boolean)
             Call csv_BuildAddonOptionLists(Option_String_ForObjectCall, AddonOptionExpandedConstructor, AddonOptionConstructor, InstanceOptionList, InstanceID, IncludeEditWrapper)
         End Sub
         '
@@ -24894,7 +24880,7 @@ ErrorTrap:
             On Error GoTo ErrorTrap
             If cache_linkAliasCnt = 0 Then
                 Dim rs As DataTable
-                rs = db.executeSql("select " & cache_linkAlias_fieldList & " from ccLinkAliases where (active<>0) order by id desc")
+                rs = db.executeSql_getDataTable("select " & cache_linkAlias_fieldList & " from ccLinkAliases where (active<>0) order by id desc")
                 If rs.Rows.Count > 0 Then
                     cache_linkAlias_NameIndex = New coreKeyPtrIndexClass
                     cache_linkAlias_PageIdQSSIndex = New coreKeyPtrIndexClass
@@ -26446,7 +26432,7 @@ ErrorTrap:
                     & " Left Join ccSharedStylesTemplateRules r on r.templateid=t.id" _
                     & " where (t.active<>0)" _
                     & " order by t.id"
-                Dim dt As DataTable = db.executeSql(SQL)
+                Dim dt As DataTable = db.executeSql_getDataTable(SQL)
                 If dt.Rows.Count > 0 Then
                     For Each rsDr As DataRow In dt.Rows
                         templateId = EncodeInteger(rsDr("ID"))
@@ -26495,7 +26481,7 @@ ErrorTrap:
                             ' gather domains for this templates
                             '
                             SQL = "select domainid from ccDomainTemplateRules where templateid=" & templateId
-                            Dim dtdomains As DataTable = db.executeSql(SQL)
+                            Dim dtdomains As DataTable = db.executeSql_getDataTable(SQL)
                             If dtdomains.Rows.Count > 0 Then
                                 cacheArray(TC_DomainIdList, Ptr) = EncodeText(dtdomains.Rows.Item(0))
                                 'cacheArray(TC_DomainIdList, Ptr) = rsdomains.GetString(StringFormatEnum.adClipString, , "", ",")
@@ -26975,7 +26961,7 @@ ErrorTrap:
                     If RecordParentID > 0 Then
                         Call pageManager_cache_pageContent_updateRow(RecordParentID, False, False)
                         If Not IsDelete Then
-                            Call db.executeSql("update ccpagecontent set ChildPagesfound=1 where ID=" & RecordParentID)
+                            Call db.executeSql_getDataTable("update ccpagecontent set ChildPagesfound=1 where ID=" & RecordParentID)
                         End If
                     End If
                     '
@@ -26985,7 +26971,7 @@ ErrorTrap:
                         '
                         ' If this was a section's root page, clear the rootpageid so a new page will be created
                         '
-                        Call db.executeSql("update ccsections set RootPageID=0 where RootPageID=" & RecordID)
+                        Call db.executeSql_getDataTable("update ccsections set RootPageID=0 where RootPageID=" & RecordID)
                         Call pageManager_cache_siteSection_clear()
                         '
                         ' Clear the Landing page and page not found site properties
@@ -27003,7 +26989,7 @@ ErrorTrap:
                         '
                         ' Delete Link Alias entries with this PageID
                         '
-                        Call db.executeSql("delete from cclinkAliases where PageID=" & RecordID)
+                        Call db.executeSql_getDataTable("delete from cclinkAliases where PageID=" & RecordID)
                         Call cache_linkAlias_clear()
                     Else
                         '
@@ -27085,14 +27071,14 @@ ErrorTrap:
                                     FilePath = Mid(Filename, 1, Pos)
                                     Filename = Mid(Filename, Pos + 1)
                                 End If
-                                Call db.cs_set(CS, "filesize", main_GetFileSize(appRootFiles.rootLocalFolderPath & FilePath & Filename))
+                                Call db.cs_set(CS, "filesize", main_GetFileSize(appRootFiles.rootLocalPath & FilePath & Filename))
                                 Pos = InStrRev(Filename, ".")
                                 If Pos > 0 Then
                                     FilenameExt = Mid(Filename, Pos + 1)
                                     FilenameNoExt = Mid(Filename, 1, Pos - 1)
                                     If vbInstr(1, "jpg,gif,png", FilenameExt, vbTextCompare) <> 0 Then
                                         sf = New coreImageEditClass
-                                        If sf.load(appRootFiles.rootLocalFolderPath & FilePath & Filename) Then
+                                        If sf.load(appRootFiles.rootLocalPath & FilePath & Filename) Then
                                             '
                                             '
                                             '
@@ -27108,7 +27094,7 @@ ErrorTrap:
                                                 If sf.width >= 640 Then
                                                     sf.height = CInt(sf.height * (640 / sf.width))
                                                     sf.width = 640
-                                                    Call sf.save(appRootFiles.rootLocalFolderPath & FilePath & FilenameNoExt & "-640x" & sf.height & "." & FilenameExt)
+                                                    Call sf.save(appRootFiles.rootLocalPath & FilePath & FilenameNoExt & "-640x" & sf.height & "." & FilenameExt)
                                                     AltSizeList = AltSizeList & vbCrLf & "640x" & sf.height
                                                 End If
                                                 '
@@ -27117,7 +27103,7 @@ ErrorTrap:
                                                 If sf.width >= 320 Then
                                                     sf.height = CInt(sf.height * (320 / sf.width))
                                                     sf.width = 320
-                                                    Call sf.save(appRootFiles.rootLocalFolderPath & FilePath & FilenameNoExt & "-320x" & sf.height & "." & FilenameExt)
+                                                    Call sf.save(appRootFiles.rootLocalPath & FilePath & FilenameNoExt & "-320x" & sf.height & "." & FilenameExt)
 
                                                     AltSizeList = AltSizeList & vbCrLf & "320x" & sf.height
                                                 End If
@@ -27127,7 +27113,7 @@ ErrorTrap:
                                                 If sf.width >= 160 Then
                                                     sf.height = CInt(sf.height * (160 / sf.width))
                                                     sf.width = 160
-                                                    Call sf.save(appRootFiles.rootLocalFolderPath & FilePath & FilenameNoExt & "-160x" & sf.height & "." & FilenameExt)
+                                                    Call sf.save(appRootFiles.rootLocalPath & FilePath & FilenameNoExt & "-160x" & sf.height & "." & FilenameExt)
                                                     AltSizeList = AltSizeList & vbCrLf & "160x" & sf.height
                                                 End If
                                                 '
@@ -27136,7 +27122,7 @@ ErrorTrap:
                                                 If sf.width >= 80 Then
                                                     sf.height = CInt(sf.height * (80 / sf.width))
                                                     sf.width = 80
-                                                    Call sf.save(appRootFiles.rootLocalFolderPath & FilePath & FilenameNoExt & "-180x" & sf.height & "." & FilenameExt)
+                                                    Call sf.save(appRootFiles.rootLocalPath & FilePath & FilenameNoExt & "-180x" & sf.height & "." & FilenameExt)
                                                     AltSizeList = AltSizeList & vbCrLf & "80x" & sf.height
                                                 End If
                                                 Call db.cs_set(CS, "AltSizeList", AltSizeList)
@@ -27638,12 +27624,12 @@ ErrorTrap:
                 '
                 ' Mark the live record
                 '
-                Call db.executeSql(SQL, DataSourceName & " where id=" & RecordID)
+                Call db.executeSql_getDataTable(SQL, DataSourceName & " where id=" & RecordID)
                 '
                 ' Mark the edit record if in workflow
                 '
                 If main_IsContentFieldSupported(ContentName, "editsourceid") Then
-                    Call db.executeSql(SQL, DataSourceName & " where (editsourceid=" & RecordID & ")and(editarchive=0)")
+                    Call db.executeSql_getDataTable(SQL, DataSourceName & " where (editsourceid=" & RecordID & ")and(editarchive=0)")
                 End If
             End If
         End Sub
@@ -28384,10 +28370,10 @@ ErrorTrap:
         '
         '=============================================================================================
         '
-        Public Function main_GetStreamBoolean2(ByVal RequestName As String) As Boolean
+        Public Function doc_getBoolean2(ByVal RequestName As String) As Boolean
             On Error GoTo ErrorTrap
             '
-            main_GetStreamBoolean2 = EncodeBoolean(docProperties.getText(RequestName))
+            doc_getBoolean2 = EncodeBoolean(docProperties.getText(RequestName))
             '
             Exit Function
 ErrorTrap:
@@ -28735,7 +28721,7 @@ ErrorTrap:
                         Call web_addRefreshQueryString("LinkObjectName", LinkObjectName)
                         Call main_AddPagetitle("Site Explorer")
                         Call main_SetMetaContent(0, 0)
-                        Copy = executeAddon_legacy5(0, "Site Explorer", "", addonContextEnum.ContextPage, "", 0, "", 0)
+                        Copy = addon_execute_legacy5(0, "Site Explorer", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", 0)
                         Call main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Site Explorer")
                         'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2d")
                         Copy = "" _
@@ -29122,7 +29108,7 @@ ErrorTrap:
             Get
                 Dim returnStatus As Boolean = False
                 If Not main_Private_SiteStructure_LocalLoaded Then
-                    main_Private_SiteStructure = executeAddon_legacy2(0, "{8CDD7960-0FCA-4042-B5D8-3A65BE487AC4}", "", addonContextEnum.ContextSimple, "", 0, "", "", False, -1, "", returnStatus, Nothing)
+                    main_Private_SiteStructure = addon_execute_legacy2(0, "{8CDD7960-0FCA-4042-B5D8-3A65BE487AC4}", "", CPUtilsBaseClass.addonContext.ContextSimple, "", 0, "", "", False, -1, "", returnStatus, Nothing)
                     main_Private_SiteStructure_LocalLoaded = True
                 End If
                 main_SiteStructure = main_Private_SiteStructure
@@ -29134,7 +29120,7 @@ ErrorTrap:
         '   Apply a wrapper to content
         '========================================================================
         '
-        Public Function executeAddon_WrapContent(ByVal Content As String, ByVal WrapperID As Integer, Optional ByVal WrapperSourceForComment As String = "") As String
+        Public Function addon_execute_WrapContent(ByVal Content As String, ByVal WrapperID As Integer, Optional ByVal WrapperSourceForComment As String = "") As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("WrapContent")
             '
             Dim Pos As Integer
@@ -29193,7 +29179,7 @@ ErrorTrap:
             End If
             Call db.cs_Close(CS)
             '
-            executeAddon_WrapContent = s
+            addon_execute_WrapContent = s
             '
             Exit Function
             '
@@ -29937,7 +29923,7 @@ ErrorTrap:
                     & " from ccFieldTypes t" _
                     & " left join ccaggregatefunctions a on a.id=t.editorAddonId" _
                     & " where (t.active<>0)and(a.active<>0) order by t.id"
-                RS = db.executeSql(SQL)
+                RS = db.executeSql_getDataTable(SQL)
                 For Each dr As DataRow In RS.Rows
                     fieldTypeID = EncodeInteger(dr("id"))
                     If (fieldTypeID <= FieldTypeIdMax) Then
@@ -30079,7 +30065,7 @@ ErrorTrap:
                     If True And (pageManager_Private_ServerDomainCrossList = "") Then
                         pageManager_Private_ServerDomainCrossList = ","
                         SQL = "select name from ccDomains where (typeId=1)and(allowCrossLogin<>0)"
-                        Dim dt As DataTable = db.executeSql(SQL)
+                        Dim dt As DataTable = db.executeSql_getDataTable(SQL)
                         For Each dr As DataRow In dt.Rows
                             pageManager_Private_ServerDomainCrossList &= dr(0).ToString
                         Next
@@ -30772,7 +30758,7 @@ ErrorTrap:
         '       type of data returned, and other actions taken. For instance, a ContextPage is used when the add-on
         '       results will be put on a page for output. In this case, javascript in the add-on will be put into
         '       the current document head.
-        '       * these are in addonContextEnum and are duplicated in the contentserver object also
+        '       * these are in CPUtilsBaseClass.addonContext and are duplicated in the contentserver object also
         '       ContextPage = 1
         '       ContextAdmin = 2
         '       ContextTemplate = 3
@@ -30799,20 +30785,24 @@ ErrorTrap:
         ''' </summary>
         ''' <param name="addonId">The Id of the addon to execute.</param>
         ''' <param name="properties">properties are nameValue pairs consumable by the addon during execution. These properties are added to docProperties and made available. Originally this argument was for the nameValues modified in the page instance where the addon was placed.</param>
-        ''' <param name="context">member of addonContextEnum</param>
+        ''' <param name="context">member of CPUtilsBaseClass.addonContext</param>
         ''' <returns></returns>
-        Public Function executeAddon(ByVal addonId As Integer, properties As Dictionary(Of String, String), context As addonContextEnum) As Object
-            Dim optionString As String = ""
-            Dim return_StatusOk As Boolean
-            For Each kvp As KeyValuePair(Of String, String) In properties
-                If Not String.IsNullOrEmpty(kvp.Key) Then
-                    optionString &= "&" & EncodeRequestVariable(kvp.Key) & "=" & EncodeRequestVariable(kvp.Value)
+        Public Function addon_execute(ByVal addonId As Integer, properties As Dictionary(Of String, String), context As CPUtilsBaseClass.addonContext) As Object
+            Try
+                Dim optionString As String = ""
+                Dim return_StatusOk As Boolean
+                For Each kvp As KeyValuePair(Of String, String) In properties
+                    If Not String.IsNullOrEmpty(kvp.Key) Then
+                        optionString &= "&" & EncodeRequestVariable(kvp.Key) & "=" & EncodeRequestVariable(kvp.Value)
+                    End If
+                Next
+                If Not String.IsNullOrEmpty(optionString) Then
+                    optionString = optionString.Substring(1)
                 End If
-            Next
-            If Not String.IsNullOrEmpty(optionString) Then
-                optionString = optionString.Substring(1)
-            End If
-            Return executeAddon(addonId, "", optionString, context, "", 0, "", "", False, 0, "", return_StatusOk, Nothing, "", Nothing, "", 0, False)
+                Return addon_execute(addonId, "", optionString, context, "", 0, "", "", False, 0, "", return_StatusOk, Nothing, "", Nothing, "", 0, False)
+            Catch ex As Exception
+                handleExceptionAndNoThrow(ex)
+            End Try
         End Function
         '
         '====================================================================================================
@@ -30838,8 +30828,8 @@ ErrorTrap:
         ''' <param name="personalizationPeopleId"></param>
         ''' <param name="personalizationIsAuthenticated"></param>
         ''' <returns></returns>
-        Public Function executeAddon(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal OptionString As String, ByVal Context As addonContextEnum, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal IsIncludeAddon As Boolean, ByVal DefaultWrapperID As Integer, ByVal ignore_TemplateCaseOnly_PageContent As String, ByRef return_StatusOK As Boolean, ByVal nothingObject As Object, ByVal ignore_addonCallingItselfIdList As String, ByVal nothingObject2 As Object, ByVal ignore_AddonsRunOnThisPageIdList As String, ByVal personalizationPeopleId As Integer, ByVal personalizationIsAuthenticated As Boolean) As String
-            Dim returnVal As String = ""
+        Public Function addon_execute(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal OptionString As String, ByVal Context As CPUtilsBaseClass.addonContext, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal IsIncludeAddon As Boolean, ByVal DefaultWrapperID As Integer, ByVal ignore_TemplateCaseOnly_PageContent As String, ByRef return_StatusOK As Boolean, ByVal nothingObject As Object, ByVal ignore_addonCallingItselfIdList As String, ByVal nothingObject2 As Object, ByVal ignore_AddonsRunOnThisPageIdList As String, ByVal personalizationPeopleId As Integer, ByVal personalizationIsAuthenticated As Boolean) As String
+            Dim returnVal As String
             Try
                 '
                 Dim styleId As Integer
@@ -30895,7 +30885,7 @@ ErrorTrap:
                 Dim kmaHTTP As coreHttpRequestClass
                 Dim WorkingLink As String
                 Dim FormContent As String
-                Dim ExitRequest As Boolean
+                Dim ExitAddonWithBlankResponse As Boolean
                 Dim RemoteAssetLink As String
                 Dim AsAjax As Boolean
                 Dim InFrame As Boolean
@@ -30939,7 +30929,6 @@ ErrorTrap:
                 Dim Options() As String
                 Dim OptionName As String
                 Dim OptionValue As String
-                Dim s As String
                 Dim HTMLContent As String
                 Dim TextContent As String
                 Dim ObjectContent As String
@@ -31228,7 +31217,7 @@ ErrorTrap:
                         '
                         ' web-only
                         '
-                        If (Context = addonContextEnum.contextEmail) Or (Context = addonContextEnum.ContextRemoteMethod) Or (Context = addonContextEnum.ContextSimple) Then
+                        If (Context = CPUtilsBaseClass.addonContext.ContextEmail) Or (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) Or (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) Or (Context = CPUtilsBaseClass.addonContext.ContextSimple) Then
                             '
                             ' Block all output even on error
                             '
@@ -31239,12 +31228,12 @@ ErrorTrap:
                             If AddonName = "" And addonId <> 0 Then
                                 AddonName = "Addon #" & addonId
                             End If
-                            If Context = addonContextEnum.ContextAdmin Then
-                                s = "The Add-on '" & AddonName & "' could not be found. It may have been deleted or marked inactive. If you are receiving this message after clicking an Add-on from the Navigator, their may be a problem with this Add-on. If you are receiving this message from the main admin page, your Dashboard Add-on may be set incorrectly. Use the Admin tab under Preferences to select the Dashboard, or <a href=""?" & RequestNameDashboardReset & "=" & visit_Id & """>click here</a> to automatically reset the dashboard."
+                            If Context = CPUtilsBaseClass.addonContext.ContextAdmin Then
+                                returnVal = "The Add-on '" & AddonName & "' could not be found. It may have been deleted or marked inactive. If you are receiving this message after clicking an Add-on from the Navigator, their may be a problem with this Add-on. If you are receiving this message from the main admin page, your Dashboard Add-on may be set incorrectly. Use the Admin tab under Preferences to select the Dashboard, or <a href=""?" & RequestNameDashboardReset & "=" & visit_Id & """>click here</a> to automatically reset the dashboard."
                             Else
-                                s = "The Add-on '" & AddonName & "' could not be found. It may have been deleted or marked inactive. Please use the Add-on Manager to replace it, or edit this page and remove it."
+                                returnVal = "The Add-on '" & AddonName & "' could not be found. It may have been deleted or marked inactive. Please use the Add-on Manager to replace it, or edit this page and remove it."
                             End If
-                            s = main_GetAdminHintWrapper(s)
+                            returnVal = main_GetAdminHintWrapper(returnVal)
                         End If
                         If (addonId > 0) Then
                             Call handleLegacyError7("executeAddon", "The Add-on could not be found by id [" & addonId & "] or name/guid [" & AddonNameOrGuid & "]")
@@ -31266,8 +31255,8 @@ ErrorTrap:
                         Else
                             addonsRunOnThisPageIdList.Add(addonId)
                         End If
-                        'blockJavascriptAndCss = (InStr(1, "," & csv_ExecuteAddon_AddonsRunOnThisPageIdList & ",", "," & addonId & ",") <> 0)
-                        'csv_ExecuteAddon_AddonsRunOnThisPageIdList = csv_ExecuteAddon_AddonsRunOnThisPageIdList & "," & addonId
+                        'blockJavascriptAndCss = (InStr(1, "," & csv_addon_execute_AddonsRunOnThisPageIdList & ",", "," & addonId & ",") <> 0)
+                        'csv_addon_execute_AddonsRunOnThisPageIdList = csv_addon_execute_AddonsRunOnThisPageIdList & "," & addonId
                         '
                         '-----------------------------------------------------------------
                         ' Enable Edit Wrapper for Page Content and Dynamic Menu for edit mode
@@ -31276,15 +31265,16 @@ ErrorTrap:
                         If isMainOk Then
                             IncludeEditWrapper =
                                 (Not AddonBlockEditTools) _
-                                And (Context <> addonContextEnum.ContextEditor) _
-                                And (Context <> addonContextEnum.contextEmail) _
-                                And (Context <> addonContextEnum.ContextRemoteMethod) _
-                                And (Context <> addonContextEnum.ContextSimple) _
+                                And (Context <> CPUtilsBaseClass.addonContext.ContextEditor) _
+                                And (Context <> CPUtilsBaseClass.addonContext.ContextEmail) _
+                                And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) _
+                                And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) _
+                                And (Context <> CPUtilsBaseClass.addonContext.ContextSimple) _
                                 And (Not IsIncludeAddon)
                             If IncludeEditWrapper Then
                                 IncludeEditWrapper = IncludeEditWrapper _
                                     And (visitProperty.getBoolean("AllowAdvancedEditor") _
-                                    And ((Context = addonContextEnum.ContextAdmin) Or user.isEditing(HostContentName)))
+                                    And ((Context = CPUtilsBaseClass.addonContext.ContextAdmin) Or user.isEditing(HostContentName)))
                                 'IncludeEditWrapper = IncludeEditWrapper _
                                 '    And ( _
                                 '        ( _
@@ -31302,10 +31292,10 @@ ErrorTrap:
                             '
                             ' This addon is running, can not reenter
                             '
-                            Call log_appendLog("executeAddon, Addon [" & AddonName & "] was called by itself. This is not allowed. AddonID [" & addonId & "], AddonNameOrGuid [" & AddonNameOrGuid_Local & "]")
+                            Call log_appendLog("addon_execute, Addon [" & AddonName & "] was called by itself. This is not allowed. AddonID [" & addonId & "], AddonNameOrGuid [" & AddonNameOrGuid_Local & "]")
                         Else
                             addonsCurrentlyRunningIdList.Add(addonId)
-                            'csv_ExecuteAddon_AddonsCurrentlyRunningIdList = csv_ExecuteAddon_AddonsCurrentlyRunningIdList & "," & addonId
+                            'csv_addon_execute_AddonsCurrentlyRunningIdList = csv_addon_execute_AddonsCurrentlyRunningIdList & "," & addonId
                             '
                             '-----------------------------------------------------------------------------------------------------
                             ' Preprocess arguments into OptionsForCPVars, and set generic instance values wrapperid and asajax
@@ -31430,7 +31420,7 @@ ErrorTrap:
                                 Next
                             End If
                             '
-                            ' this is a hack -- add instanceID to the OptionsForCPVars. do the same in executeAddonAsProcess
+                            ' this is a hack -- add instanceID to the OptionsForCPVars. do the same in addon_executeAsProcess
                             '   it is also added in csv_BuildAddonOptionLists() which is called by both, but does not effect OptionsForCPVars.
                             '   the cpCoreClass execute should call executeAsProcess and share all this code.
                             '
@@ -31481,7 +31471,7 @@ ErrorTrap:
                             ' Process the content for each context as needed
                             '-----------------------------------------------------------------------------------------------------
                             '
-                            If (InFrame And (Context <> addonContextEnum.ContextRemoteMethod)) Then
+                            If (InFrame And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) Then
                                 '
                                 '-----------------------------------------------------------------
                                 ' inFrame and this is NOT the callback - setup the iframe for a callback
@@ -31506,13 +31496,13 @@ ErrorTrap:
                                         & "&optionstring=" & EncodeRequestVariable(WorkingOptionString) _
                                         & ""
                                     FrameID = "frame" & getRandomLong()
-                                    s = "<iframe src=""" & Link & """ id=""" & FrameID & """ onload=""cj.setFrameHeight('" & FrameID & "');"" class=""ccAddonFrameCon"" frameborder=""0"" scrolling=""no"">This content is not visible because your browser does not support iframes</iframe>" _
+                                    returnVal = "<iframe src=""" & Link & """ id=""" & FrameID & """ onload=""cj.setFrameHeight('" & FrameID & "');"" class=""ccAddonFrameCon"" frameborder=""0"" scrolling=""no"">This content is not visible because your browser does not support iframes</iframe>" _
                                         & cr & "<script language=javascript type=""text/javascript"">" _
                                         & cr & "// Safari and Opera need a kick-start." _
                                         & cr & "var e=document.getElementById('" & FrameID & "');if(e){var iSource=e.src;e.src='';e.src = iSource;}" _
                                         & cr & "</script>"
                                 End If
-                            ElseIf (AsAjax And (Context <> addonContextEnum.ContextRemoteMethod)) Then
+                            ElseIf (AsAjax And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) Then
                                 '
                                 '-----------------------------------------------------------------
                                 ' AsAjax and this is NOT the callback - setup the ajax callback
@@ -31533,11 +31523,11 @@ ErrorTrap:
                                         & "&optionstring=" & EncodeRequestVariable(WorkingOptionString) _
                                         & ""
                                     If IsInline Then
-                                        s = cr & "<div ID=" & AsAjaxID & " Class=""ccAddonAjaxCon"" style=""display:inline;""><img src=""/ccLib/images/ajax-loader-small.gif"" width=""16"" height=""16""></div>"
+                                        returnVal = cr & "<div ID=" & AsAjaxID & " Class=""ccAddonAjaxCon"" style=""display:inline;""><img src=""/ccLib/images/ajax-loader-small.gif"" width=""16"" height=""16""></div>"
                                     Else
-                                        s = cr & "<div ID=" & AsAjaxID & " Class=""ccAddonAjaxCon""><img src=""/ccLib/images/ajax-loader-small.gif"" width=""16"" height=""16""></div>"
+                                        returnVal = cr & "<div ID=" & AsAjaxID & " Class=""ccAddonAjaxCon""><img src=""/ccLib/images/ajax-loader-small.gif"" width=""16"" height=""16""></div>"
                                     End If
-                                    s = s _
+                                    returnVal = returnVal _
                                         & cr & "<script Language=""javaScript"" type=""text/javascript"">" _
                                         & cr & "cj.ajax.qs('" & QS & "','','" & AsAjaxID & "');AdminNavPop=true;" _
                                         & cr & "</script>"
@@ -31590,7 +31580,7 @@ ErrorTrap:
                                 '   setup RQS as needed - RQS provides the querystring for add-ons to create links that return to the same page
                                 '-----------------------------------------------------------------------------------------------------
                                 '
-                                If (InFrame And (Context = addonContextEnum.ContextRemoteMethod)) Then
+                                If (InFrame And (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) Then
                                     '
                                     ' Add-on setup for InFrame, running the call-back - this page must think it is just the remotemethod
                                     '
@@ -31598,7 +31588,7 @@ ErrorTrap:
                                         Call web_addRefreshQueryString(RequestNameRemoteMethodAddon, AddonNameOrGuid_Local)
                                         Call web_addRefreshQueryString("optionstring", WorkingOptionString)
                                     End If
-                                ElseIf (AsAjax And (Context = addonContextEnum.ContextRemoteMethod)) Then
+                                ElseIf (AsAjax And (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) Then
                                     '
                                     ' Add-on setup for AsAjax, running the call-back - put the referring page's QS as the RQS
                                     ' restore form values
@@ -31710,7 +31700,7 @@ ErrorTrap:
                                                 '    IsAuthenticated = main_IsAuthenticated
                                                 'End If
                                                 'hint = hint & ",8"
-                                                IncludeContent = IncludeContent & executeAddon(includedAddonId, "", "", addonContextEnum.ContextAdmin, HostContentName, HostRecordID, HostFieldName, ACInstanceID, True, DefaultWrapperID, ignore_TemplateCaseOnly_PageContent, AddonStatusOK, Nothing, ignore_addonCallingItselfIdList & "," & addonId, Nothing, ignore_AddonsRunOnThisPageIdList, personalizationPeopleId, personalizationIsAuthenticated)
+                                                IncludeContent = IncludeContent & addon_execute(includedAddonId, "", "", CPUtilsBaseClass.addonContext.ContextAdmin, HostContentName, HostRecordID, HostFieldName, ACInstanceID, True, DefaultWrapperID, ignore_TemplateCaseOnly_PageContent, AddonStatusOK, Nothing, ignore_addonCallingItselfIdList & "," & addonId, Nothing, ignore_AddonsRunOnThisPageIdList, personalizationPeopleId, personalizationIsAuthenticated)
                                             End If
                                         Next
                                     End If
@@ -31721,7 +31711,7 @@ ErrorTrap:
                                     If (ScriptingCode <> "") Then
                                         'hint = "Processing Addon [" & AddonName & "], calling script component."
                                         Try
-                                            ScriptContent = executeAddon_executeScript4(ScriptingLanguage, ScriptingCode, ScriptingEntryPoint, errorMessageForAdmin, ScriptingTimeout, "Addon [" & AddonName & "]", ReplaceCnt, ReplaceNames, ReplaceValues)
+                                            ScriptContent = addon_execute_executeScript4(ScriptingLanguage, ScriptingCode, ScriptingEntryPoint, errorMessageForAdmin, ScriptingTimeout, "Addon [" & AddonName & "]", ReplaceCnt, ReplaceNames, ReplaceValues)
                                         Catch ex As Exception
                                             handleExceptionAndRethrow(ex, "There was an error executing the script component of Add-on [" & AddonName & "], AddonOptionString [" & WorkingOptionString & "]. The details of this error follow.</p><p>" & errorMessageForAdmin & "")
                                         End Try
@@ -31741,16 +31731,16 @@ ErrorTrap:
                                         End If
                                         Call db.cs_Close(csTmp)
                                         '
-                                        AssemblyContent = executeAddon_executeAssembly(addonId, AddonName, DotNetClassFullName, CollectionGuid, Nothing, errorMessageForAdmin)
+                                        AssemblyContent = addon_execute_executeAssembly(addonId, AddonName, DotNetClassFullName, CollectionGuid, Nothing, errorMessageForAdmin)
                                         If (errorMessageForAdmin <> "") Then
                                             '
                                             ' log the error
                                             '
-                                            Call handleLegacyError8("Error during cmc.csv_ExecuteAssembly [" & errorMessageForAdmin & "]", "cpCoreClass.ExecuteAddon_internal", True)
+                                            Call handleLegacyError8("Error during cmc.csv_ExecuteAssembly [" & errorMessageForAdmin & "]", "cpCoreClass.addon_execute_internal", True)
                                             '
                                             ' Put up an admin hint
                                             '
-                                            If (Not isMainOk) Or (Context = addonContextEnum.contextEmail) Or (Context = addonContextEnum.ContextRemoteMethod) Or (Context = addonContextEnum.ContextSimple) Then
+                                            If (Not isMainOk) Or (Context = CPUtilsBaseClass.addonContext.ContextEmail) Or (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) Or (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) Or (Context = CPUtilsBaseClass.addonContext.ContextSimple) Then
                                                 '
                                                 ' Block all output even on error
                                                 '
@@ -31845,13 +31835,9 @@ ErrorTrap:
                                 '-----------------------------------------------------------------------------------------------------
                                 '
                                 If isMainOk And (FormXML <> "") Then
-                                    FormContent = executeAddon_getFormContent(Nothing, FormXML, ExitRequest)
-                                    If ExitRequest Then
-                                        '
-                                        ' This is really messy
-                                        '
-                                        GoTo exitNoError
-                                        'Exit Function
+                                    FormContent = addon_execute_getFormContent(Nothing, FormXML, ExitAddonWithBlankResponse)
+                                    If ExitAddonWithBlankResponse Then
+                                        Exit Function
                                     End If
                                 End If
                                 '
@@ -31915,12 +31901,12 @@ ErrorTrap:
                                 'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") ab"
                                 '#End If
                                 Dim layoutErrors As String
-                                If (Context = addonContextEnum.ContextEditor) Then
+                                If (Context = CPUtilsBaseClass.addonContext.ContextEditor) Then
                                     '
                                     ' editor -- no encoding and no contentcommands
                                     '
-                                    s = TextContent & HTMLContent
-                                    s = s & IncludeContent & ScriptCallbackContent & FormContent & RemoteAssetContent & ScriptContent & ObjectContent & AssemblyContent & inlineScriptContent
+                                    returnVal = TextContent & HTMLContent
+                                    returnVal = returnVal & IncludeContent & ScriptCallbackContent & FormContent & RemoteAssetContent & ScriptContent & ObjectContent & AssemblyContent & inlineScriptContent
                                     '
                                     ' csv_EncodeContent everything
                                     '
@@ -31929,19 +31915,19 @@ ErrorTrap:
                                     '
                                     ' encode the content parts of the addon
                                     '
-                                    s = TextContent & HTMLContent
-                                    If s <> "" Then
-                                        s = html_executeContentCommands(Nothing, s, addonContextEnum.ContextAdmin, personalizationPeopleId, personalizationIsAuthenticated, layoutErrors)
+                                    returnVal = TextContent & HTMLContent
+                                    If returnVal <> "" Then
+                                        returnVal = html_executeContentCommands(Nothing, returnVal, CPUtilsBaseClass.addonContext.ContextAdmin, personalizationPeopleId, personalizationIsAuthenticated, layoutErrors)
                                         's = csv_EncodeContent9(s, personalizationPeopleId, HostContentName, HostRecordID, 0, False, False, True, True, False, True, "", "", (Context = ContextEmail), WrapperID, ignore_TemplateCaseOnly_PageContent, Context, personalizationIsAuthenticated, nothing, False)
                                     End If
                                     '
                                     ' add in the rest
                                     '
-                                    s = s & IncludeContent & ScriptCallbackContent & FormContent & RemoteAssetContent & ScriptContent & ObjectContent & AssemblyContent & inlineScriptContent
+                                    returnVal = returnVal & IncludeContent & ScriptCallbackContent & FormContent & RemoteAssetContent & ScriptContent & ObjectContent & AssemblyContent & inlineScriptContent
                                     '
                                     ' csv_EncodeContent everything
                                     '
-                                    s = html_encodeContent10(s, personalizationPeopleId, HostContentName, HostRecordID, 0, False, False, True, True, False, True, "", "", (Context = addonContextEnum.contextEmail), WrapperID, ignore_TemplateCaseOnly_PageContent, Context, personalizationIsAuthenticated, Nothing, False)
+                                    returnVal = html_encodeContent10(returnVal, personalizationPeopleId, HostContentName, HostRecordID, 0, False, False, True, True, False, True, "", "", (Context = CPUtilsBaseClass.addonContext.ContextEmail), WrapperID, ignore_TemplateCaseOnly_PageContent, Context, personalizationIsAuthenticated, Nothing, False)
                                 End If
                                 ''
                                 '' +++++ 9/8/2011, 4.1.482
@@ -31958,7 +31944,7 @@ ErrorTrap:
                                 '#If traceExecuteAddon Then
                                 'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") ac"
                                 '#End If
-                                Pos = vbInstr(1, s, "<?contensive", vbTextCompare)
+                                Pos = vbInstr(1, returnVal, "<?contensive", vbTextCompare)
                                 If Pos > 0 Then
                                     Throw New ApplicationException("xml structured commands are no longer supported")
                                     ''
@@ -31975,7 +31961,7 @@ ErrorTrap:
                                     '    '
                                     '    ' Put up an admin hint
                                     '    '
-                                    '    If (Not isMainOk) Or (Context = addonContextEnum.contextEmail) Or (Context = addonContextEnum.ContextRemoteMethod) Or (Context = addonContextEnum.ContextSimple) Then
+                                    '    If (Not isMainOk) Or (Context = CPUtilsBaseClass.addonContext.contextEmail) Or (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethod) Or (Context = CPUtilsBaseClass.addonContext.ContextSimple) Then
                                     '        '
                                     '        ' Block all output even on error
                                     '        '
@@ -32000,9 +31986,9 @@ ErrorTrap:
                                 '#End If
                                 If ContainerCssID <> "" Or ContainerCssClass <> "" Then
                                     If IsInline Then
-                                        s = cr & "<div id=""" & ContainerCssID & """ class=""" & ContainerCssClass & """ style=""display:inline;"">" & s & "</div>"
+                                        returnVal = cr & "<div id=""" & ContainerCssID & """ class=""" & ContainerCssClass & """ style=""display:inline;"">" & returnVal & "</div>"
                                     Else
-                                        s = cr & "<div id=""" & ContainerCssID & """ class=""" & ContainerCssClass & """>" & kmaIndent(s) & cr & "</div>"
+                                        returnVal = cr & "<div id=""" & ContainerCssID & """ class=""" & ContainerCssClass & """>" & kmaIndent(returnVal) & cr & "</div>"
                                     End If
                                 End If
                             End If
@@ -32015,14 +32001,14 @@ ErrorTrap:
                             'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") ae"
                             '#End If
                             If isMainOk Then
-                                If (InFrame And (Context = addonContextEnum.ContextRemoteMethod)) Then
+                                If (InFrame And (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) Then
                                     '
                                     ' Return IFrame content
                                     '   Framed in content, during the remote method call
                                     '   add in the rest of the html page
                                     '
                                     Call main_SetMetaContent(0, 0)
-                                    s = "" _
+                                    returnVal = "" _
                                         & main_docType _
                                         & vbCrLf & "<html>" _
                                         & cr & "<head>" _
@@ -32031,22 +32017,22 @@ ErrorTrap:
                                         & cr & TemplateDefaultBodyTag _
                                         & cr & "</body>" _
                                         & vbCrLf & "</html>"
-                                ElseIf (AsAjax And (Context = addonContextEnum.ContextRemoteMethod)) Then
+                                ElseIf (AsAjax And (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) Then
                                     '
                                     ' Return Ajax content
                                     '   AsAjax addon, during the Ajax callback
                                     '   need to create an onload event that runs everything appended to onload within this content
                                     '
-                                    s = s
-                                ElseIf (Context = addonContextEnum.ContextRemoteMethod) Then
+                                    returnVal = returnVal
+                                ElseIf ((Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) Or (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) Then
                                     '
                                     ' Return non-ajax/non-Iframe remote method content (no wrapper)
                                     '
-                                ElseIf (Context = addonContextEnum.contextEmail) Then
+                                ElseIf (Context = CPUtilsBaseClass.addonContext.ContextEmail) Then
                                     '
                                     ' Return Email context (no wrappers)
                                     '
-                                ElseIf (Context = addonContextEnum.ContextSimple) Then
+                                ElseIf (Context = CPUtilsBaseClass.addonContext.ContextSimple) Then
                                     '
                                     ' Add-on called by another add-on, subroutine style (no wrappers)
                                     '
@@ -32067,16 +32053,16 @@ ErrorTrap:
                                             If visitProperty.getBoolean("AllowAdvancedEditor") Then
                                                 AddonEditIcon = GetIconSprite("", 0, "/ccLib/images/tooledit.png", 22, 22, "Edit the " & AddonName & " Add-on", "Edit the " & AddonName & " Add-on", "", True, "")
                                                 AddonEditIcon = "<a href=""" & siteProperties.adminURL & "?cid=" & metaData.getContentId("add-ons") & "&id=" & addonId & "&af=4&aa=2&ad=1"" tabindex=""-1"">" & AddonEditIcon & "</a>"
-                                                InstanceSettingsEditIcon = executeAddon_getInstanceBubble(AddonName, AddonOptionExpandedConstructor, HostContentName, HostRecordID, HostFieldName, ACInstanceID, Context, DialogList)
-                                                AddonStylesEditIcon = executeAddon_getAddonStylesBubble(addonId, DialogList)
-                                                HTMLViewerEditIcon = executeAddon_getHTMLViewerBubble(addonId, "editWrapper" & pageManager_EditWrapperCnt, DialogList)
-                                                HelpIcon = executeAddon_getHelpBubble(addonId, helpCopy, addonCollectionId, DialogList)
+                                                InstanceSettingsEditIcon = addon_execute_getInstanceBubble(AddonName, AddonOptionExpandedConstructor, HostContentName, HostRecordID, HostFieldName, ACInstanceID, Context, DialogList)
+                                                AddonStylesEditIcon = addon_execute_getAddonStylesBubble(addonId, DialogList)
+                                                HTMLViewerEditIcon = addon_execute_getHTMLViewerBubble(addonId, "editWrapper" & pageManager_EditWrapperCnt, DialogList)
+                                                HelpIcon = addon_execute_getHelpBubble(addonId, helpCopy, addonCollectionId, DialogList)
                                                 ToolBar = InstanceSettingsEditIcon & AddonEditIcon & AddonStylesEditIcon & SiteStylesEditIcon & HTMLViewerEditIcon & HelpIcon
                                                 ToolBar = vbReplace(ToolBar, "&nbsp;", "", 1, 99, vbTextCompare)
-                                                s = main_GetEditWrapper("<div class=""ccAddonEditTools"">" & ToolBar & "&nbsp;" & AddonName & DialogList & "</div>", s)
+                                                returnVal = main_GetEditWrapper("<div class=""ccAddonEditTools"">" & ToolBar & "&nbsp;" & AddonName & DialogList & "</div>", returnVal)
                                                 's = GetEditWrapper("<div class=""ccAddonEditCaption"">" & AddonName & "</div><div class=""ccAddonEditTools"">" & ToolBar & "</div>", s)
                                             ElseIf visitProperty.getBoolean("AllowEditing") Then
-                                                s = main_GetEditWrapper("<div class=""ccAddonEditCaption"">" & AddonName & "&nbsp;" & HelpIcon & "</div>", s)
+                                                returnVal = main_GetEditWrapper("<div class=""ccAddonEditCaption"">" & AddonName & "&nbsp;" & HelpIcon & "</div>", returnVal)
                                             End If
                                         End If
                                     End If
@@ -32084,15 +32070,15 @@ ErrorTrap:
                                     '
                                     ' Add Comment wrapper - to help debugging except email, remote methods and admin (empty is used to detect no result)
                                     '
-                                    If isMainOk And (Context <> addonContextEnum.ContextAdmin) And (Context <> addonContextEnum.contextEmail) And (Context <> addonContextEnum.ContextRemoteMethod) And (Context <> addonContextEnum.ContextSimple) Then
+                                    If isMainOk And (Context <> CPUtilsBaseClass.addonContext.ContextAdmin) And (Context <> CPUtilsBaseClass.addonContext.ContextEmail) And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) And (Context <> CPUtilsBaseClass.addonContext.ContextSimple) Then
                                         If visitProperty.getBoolean("AllowDebugging") Then
                                             AddonCommentName = vbReplace(AddonName, "-->", "..>")
                                             If IsInline Then
-                                                s = "<!-- Add-on " & AddonCommentName & " -->" & s & "<!-- /Add-on " & AddonCommentName & " -->"
+                                                returnVal = "<!-- Add-on " & AddonCommentName & " -->" & returnVal & "<!-- /Add-on " & AddonCommentName & " -->"
                                             Else
-                                                s = "" _
+                                                returnVal = "" _
                                                     & cr & "<!-- Add-on " & AddonCommentName & " -->" _
-                                                    & kmaIndent(s) _
+                                                    & kmaIndent(returnVal) _
                                                     & cr & "<!-- /Add-on " & AddonCommentName & " -->"
                                             End If
                                         End If
@@ -32100,8 +32086,8 @@ ErrorTrap:
                                     '
                                     ' Add Design Wrapper
                                     '
-                                    If (s <> "") And (Not IsInline) And (WrapperID > 0) And (True) Then
-                                        s = executeAddon_WrapContent(s, WrapperID, "for Add-on " & AddonName)
+                                    If (returnVal <> "") And (Not IsInline) And (WrapperID > 0) And (True) Then
+                                        returnVal = addon_execute_WrapContent(returnVal, WrapperID, "for Add-on " & AddonName)
                                     End If
                                 End If
                             End If
@@ -32109,31 +32095,26 @@ ErrorTrap:
                             ' this completes the execute of this addon. remove it from the 'running' list
                             '
                             addonsCurrentlyRunningIdList.Remove(addonId)
-                            'csv_ExecuteAddon_AddonsCurrentlyRunningIdList = vbReplace(csv_ExecuteAddon_AddonsCurrentlyRunningIdList & ",", "," & addonId & ",", ",")
+                            'csv_addon_execute_AddonsCurrentlyRunningIdList = vbReplace(csv_addon_execute_AddonsCurrentlyRunningIdList & ",", "," & addonId & ",", ",")
                         End If
                     End If
                 End If
-                '================================================================================================================================
-exitNoError:
-                '
-                ' Pop the previous values for Optionstring and FilterInput back
-                '
                 OptionString = PushOptionString
                 '
                 pageManager_PageAddonCnt = pageManager_PageAddonCnt + 1
-                executeAddon = s
             Catch ex As Exception
                 '
                 ' protect environment from addon error
                 '
                 handleExceptionAndNoThrow(ex)
             End Try
+            Return returnVal
         End Function
         '
         '
         '
-        Private Function executeAddon_getFormContent(ByVal nothingObject As Object, ByVal FormXML As String, ByRef return_ExitRequest As Boolean) As String
-            'Const Tn = "ExecuteAddon_internal_getFormContent" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
+        Private Function addon_execute_getFormContent(ByVal nothingObject As Object, ByVal FormXML As String, ByRef return_ExitAddonBlankWithResponse As Boolean) As String
+            'Const Tn = "addon_execute_internal_getFormContent" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
             Const LoginMode_None = 1
             Const LoginMode_AutoRecognize = 2
@@ -32206,7 +32187,7 @@ exitNoError:
                 '
                 ' Cancel just exits with no content
                 '
-                return_ExitRequest = True
+                return_ExitAddonBlankWithResponse = True
                 Exit Function
             ElseIf Not user.isAuthenticatedAdmin() Then
                 '
@@ -32282,7 +32263,7 @@ exitNoError:
                                                                     End If
                                                                     If FieldValue <> "" Then
                                                                         VirtualFilePath = "Settings/" & FieldName
-                                                                        Call web_ProcessFormInputFile(FieldName, VirtualFilePath)
+                                                                        Call web_processFormInputFile(FieldName, VirtualFilePath)
                                                                         FieldValue = VirtualFilePath & "/" & FieldValue
                                                                         Call siteProperties.setProperty(FieldName, FieldValue)
                                                                     End If
@@ -32391,7 +32372,7 @@ exitNoError:
                                 '
                                 ' Exit on OK or cancel
                                 '
-                                return_ExitRequest = True
+                                return_ExitAddonBlankWithResponse = True
                                 Exit Function
                             End If
                             '
@@ -32444,12 +32425,12 @@ exitNoError:
                                                                 ' Use Editor Addon
                                                                 '
                                                                 OptionString = "FieldName=" & FieldName & "&FieldValue=" & encodeNvaArgument(siteProperties.getText(FieldName, FieldDefaultValue))
-                                                                Copy = executeAddon_legacy5(0, FieldAddon, OptionString, addonContextEnum.ContextAdmin, "", 0, "", 0)
+                                                                Copy = addon_execute_legacy5(0, FieldAddon, OptionString, CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", 0)
                                                             ElseIf FieldSelector <> "" Then
                                                                 '
                                                                 ' Use Selector
                                                                 '
-                                                                Copy = executeAddon_getFormContent_decodeSelector(nothingObject, FieldName, FieldValue, FieldSelector)
+                                                                Copy = addon_execute_getFormContent_decodeSelector(nothingObject, FieldName, FieldValue, FieldSelector)
                                                             Else
                                                                 '
                                                                 ' Use default editor for each field type
@@ -32650,7 +32631,7 @@ exitNoError:
                                                         Dim rs As DataTable
                                                         If FieldSQL <> "" Then
                                                             Try
-                                                                rs = db.executeSql(FieldSQL, FieldDataSource, , SQLPageSize)
+                                                                rs = db.executeSql_getDataTable(FieldSQL, FieldDataSource, , SQLPageSize)
                                                                 'RS = app.csv_ExecuteSQLCommand(FieldDataSource, FieldSQL, 30, SQLPageSize, 1)
 
                                                             Catch ex As Exception
@@ -32776,7 +32757,7 @@ exitNoError:
                 End If
             End If
             '
-            executeAddon_getFormContent = Adminui.GetBody(Name, ButtonList, "", True, True, Description, "", 0, Content.Text)
+            addon_execute_getFormContent = Adminui.GetBody(Name, ButtonList, "", True, True, Description, "", 0, Content.Text)
             Content = Nothing
             '
             '
@@ -32785,15 +32766,15 @@ exitNoError:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError5("executeAddon_getFormContent", "trap", Err.Number, Err.Source, Err.Description, False)
+            Call handleLegacyError5("addon_execute_getFormContent", "trap", Err.Number, Err.Source, Err.Description, False)
         End Function
         '
         '========================================================================
         '   Display field in the admin/edit
         '========================================================================
         '
-        Private Function executeAddon_getFormContent_decodeSelector(ByVal nothingObject As Object, ByVal SitePropertyName As String, ByVal SitePropertyValue As String, ByVal selector As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("AdminClass.ExecuteAddon_internal_getFormContent_decodeSelector")
+        Private Function addon_execute_getFormContent_decodeSelector(ByVal nothingObject As Object, ByVal SitePropertyName As String, ByVal SitePropertyValue As String, ByVal selector As String) As String
+            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("AdminClass.addon_execute_internal_getFormContent_decodeSelector")
             '
             Dim ExpandedSelector As String = ""
             Dim ignore As String = ""
@@ -32859,7 +32840,7 @@ ErrorTrap:
                     ExpandedSelector = Mid(ExpandedSelector, 1, Pos - 1)
                 End If
                 OptionValues = Split(ExpandedSelector, "|")
-                executeAddon_getFormContent_decodeSelector = ""
+                addon_execute_getFormContent_decodeSelector = ""
                 OptionCnt = UBound(OptionValues) + 1
                 For OptionPtr = 0 To OptionCnt - 1
                     OptionValue_AddonEncoded = Trim(OptionValues(OptionPtr))
@@ -32875,30 +32856,30 @@ ErrorTrap:
                         Select Case OptionSuffix
                             Case "checkbox"
                                 '
-                                ' Create checkbox executeAddon_getFormContent_decodeSelector
+                                ' Create checkbox addon_execute_getFormContent_decodeSelector
                                 '
                                 If vbInstr(1, "," & LCaseOptionDefault & ",", "," & vbLCase(OptionValue) & ",") <> 0 Then
-                                    executeAddon_getFormContent_decodeSelector = executeAddon_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & SitePropertyName & OptionPtr & """ value=""" & OptionValue & """ checked=""checked"">" & OptionCaption & "</div>"
+                                    addon_execute_getFormContent_decodeSelector = addon_execute_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & SitePropertyName & OptionPtr & """ value=""" & OptionValue & """ checked=""checked"">" & OptionCaption & "</div>"
                                 Else
-                                    executeAddon_getFormContent_decodeSelector = executeAddon_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & SitePropertyName & OptionPtr & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
+                                    addon_execute_getFormContent_decodeSelector = addon_execute_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & SitePropertyName & OptionPtr & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
                                 End If
                             Case "radio"
                                 '
-                                ' Create Radio executeAddon_getFormContent_decodeSelector
+                                ' Create Radio addon_execute_getFormContent_decodeSelector
                                 '
                                 If vbLCase(OptionValue) = LCaseOptionDefault Then
-                                    executeAddon_getFormContent_decodeSelector = executeAddon_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & SitePropertyName & """ value=""" & OptionValue & """ checked=""checked"" >" & OptionCaption & "</div>"
+                                    addon_execute_getFormContent_decodeSelector = addon_execute_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & SitePropertyName & """ value=""" & OptionValue & """ checked=""checked"" >" & OptionCaption & "</div>"
                                 Else
-                                    executeAddon_getFormContent_decodeSelector = executeAddon_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & SitePropertyName & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
+                                    addon_execute_getFormContent_decodeSelector = addon_execute_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & SitePropertyName & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
                                 End If
                             Case Else
                                 '
-                                ' Create select executeAddon_getFormContent_decodeSelector
+                                ' Create select addon_execute_getFormContent_decodeSelector
                                 '
                                 If vbLCase(OptionValue) = LCaseOptionDefault Then
-                                    executeAddon_getFormContent_decodeSelector = executeAddon_getFormContent_decodeSelector & "<option value=""" & OptionValue & """ selected>" & OptionCaption & "</option>"
+                                    addon_execute_getFormContent_decodeSelector = addon_execute_getFormContent_decodeSelector & "<option value=""" & OptionValue & """ selected>" & OptionCaption & "</option>"
                                 Else
-                                    executeAddon_getFormContent_decodeSelector = executeAddon_getFormContent_decodeSelector & "<option value=""" & OptionValue & """>" & OptionCaption & "</option>"
+                                    addon_execute_getFormContent_decodeSelector = addon_execute_getFormContent_decodeSelector & "<option value=""" & OptionValue & """>" & OptionCaption & "</option>"
                                 End If
                         End Select
                     End If
@@ -32910,22 +32891,22 @@ ErrorTrap:
                         Copy = Copy & "<input type=""hidden"" name=""" & SitePropertyName & "CheckBoxCnt"" value=""" & OptionCnt & """ >"
                     Case "radio"
                         '
-                        ' Create Radio executeAddon_getFormContent_decodeSelector
+                        ' Create Radio addon_execute_getFormContent_decodeSelector
                         '
-                        'executeAddon_getFormContent_decodeSelector = "<div>" & vbReplace(executeAddon_getFormContent_decodeSelector, "><", "></div><div><") & "</div>"
+                        'addon_execute_getFormContent_decodeSelector = "<div>" & vbReplace(addon_execute_getFormContent_decodeSelector, "><", "></div><div><") & "</div>"
                     Case Else
                         '
-                        ' Create select executeAddon_getFormContent_decodeSelector
+                        ' Create select addon_execute_getFormContent_decodeSelector
                         '
-                        executeAddon_getFormContent_decodeSelector = "<select name=""" & SitePropertyName & """>" & executeAddon_getFormContent_decodeSelector & "</select>"
+                        addon_execute_getFormContent_decodeSelector = "<select name=""" & SitePropertyName & """>" & addon_execute_getFormContent_decodeSelector & "</select>"
                 End Select
             Else
                 '
-                ' Create Text executeAddon_getFormContent_decodeSelector
+                ' Create Text addon_execute_getFormContent_decodeSelector
                 '
 
                 selector = decodeNvaArgument(selector)
-                executeAddon_getFormContent_decodeSelector = html_GetFormInputText2(SitePropertyName, selector, 1, 20)
+                addon_execute_getFormContent_decodeSelector = html_GetFormInputText2(SitePropertyName, selector, 1, 20)
             End If
 
             FastString = Nothing
@@ -32933,7 +32914,7 @@ ErrorTrap:
             '
 ErrorTrap:
             FastString = Nothing
-            Call handleLegacyError7("executeAddon_getFormContent_decodeSelector", "trap")
+            Call handleLegacyError7("addon_execute_getFormContent_decodeSelector", "trap")
         End Function
         '
         ' ================================================================================================================
@@ -32943,7 +32924,7 @@ ErrorTrap:
         '       - cp argument should be set during csv_OpenConnection3, not passed in here as nothingObject
         ' ================================================================================================================
         '
-        Public Function executeAddon_executeScript(ByVal Language As String, ByVal Code As String, ByVal EntryPoint As String, ByVal cmcObj As coreClass, ByVal nothingObject As Object, ByRef return_AddonErrorMessage As String) As String
+        Public Function addon_execute_executeScript(ByVal Language As String, ByVal Code As String, ByVal EntryPoint As String, ByVal cmcObj As coreClass, ByVal nothingObject As Object, ByRef return_AddonErrorMessage As String) As String
             Dim ScriptName As String
             Dim FirstLine As String
             Dim Pos As Integer
@@ -32963,7 +32944,7 @@ ErrorTrap:
                 ScriptName = "unnamed script with length [" & Len(Code) & "] starting with [" & FirstLine & "]"
             End If
             '
-            executeAddon_executeScript = executeAddon_executeScript3(Language, Code, EntryPoint, cmcObj, nothingObject, return_AddonErrorMessage, 60000, ScriptName, 0, EmptyArray, EmptyArray)
+            addon_execute_executeScript = addon_execute_executeScript3(Language, Code, EntryPoint, cmcObj, nothingObject, return_AddonErrorMessage, 60000, ScriptName, 0, EmptyArray, EmptyArray)
         End Function
         '
         ' ================================================================================================================
@@ -32971,20 +32952,20 @@ ErrorTrap:
         '   returns the results
         ' ================================================================================================================
         '
-        Public Function executeAddon_executeScript2(ByVal Language As String, ByVal Code As String, ByVal EntryPoint As String, ByVal cmcObj As coreClass, ByVal nothingObject As Object, ByRef return_AddonErrorMessage As String, ByVal ScriptingTimeout As Integer, ByVal ScriptName As String) As String
+        Public Function addon_execute_executeScript2(ByVal Language As String, ByVal Code As String, ByVal EntryPoint As String, ByVal cmcObj As coreClass, ByVal nothingObject As Object, ByRef return_AddonErrorMessage As String, ByVal ScriptingTimeout As Integer, ByVal ScriptName As String) As String
             Dim EmptyArray(0) As String
-            executeAddon_executeScript2 = executeAddon_executeScript3(Language, Code, EntryPoint, cmcObj, nothingObject, return_AddonErrorMessage, ScriptingTimeout, ScriptName, 0, EmptyArray, EmptyArray)
+            addon_execute_executeScript2 = addon_execute_executeScript3(Language, Code, EntryPoint, cmcObj, nothingObject, return_AddonErrorMessage, ScriptingTimeout, ScriptName, 0, EmptyArray, EmptyArray)
         End Function
         '
         ' ================================================================================================================
         '   conversion to 2005 - pass 2
         ' ================================================================================================================
         '
-        Public Function executeAddon_executeScript3(ByVal Language As String, ByVal Code As String, ByVal EntryPoint As String, ByVal nothingObject As Object, ByVal nothingObject2 As Object, ByRef return_AddonErrorMessage As String, ByVal ScriptingTimeout As Integer, ByVal ScriptName As String, ByVal ReplaceCnt As Integer, ByVal ReplaceNames() As String, ByVal ReplaceValues() As String) As String
+        Public Function addon_execute_executeScript3(ByVal Language As String, ByVal Code As String, ByVal EntryPoint As String, ByVal nothingObject As Object, ByVal nothingObject2 As Object, ByRef return_AddonErrorMessage As String, ByVal ScriptingTimeout As Integer, ByVal ScriptName As String, ByVal ReplaceCnt As Integer, ByVal ReplaceNames() As String, ByVal ReplaceValues() As String) As String
             'Dim legacyMain As Object
             'Dim legacyCsv As Object
             '
-            executeAddon_executeScript3 = executeAddon_executeScript4(Language, Code, EntryPoint, return_AddonErrorMessage, ScriptingTimeout, ScriptName, ReplaceCnt, ReplaceNames, ReplaceValues)
+            addon_execute_executeScript3 = addon_execute_executeScript4(Language, Code, EntryPoint, return_AddonErrorMessage, ScriptingTimeout, ScriptName, ReplaceCnt, ReplaceNames, ReplaceValues)
         End Function
         '
         ' ================================================================================================================
@@ -33002,7 +32983,7 @@ ErrorTrap:
         ''' <param name="ReplaceValues"></param>
         ''' <returns></returns>
         ''' <remarks>long run, use either csscript.net, or use .net tools to build compile/run funtion</remarks>
-        Public Function executeAddon_executeScript4(ByVal Language As String, ByVal Code As String, ByVal EntryPoint As String, ByRef return_errorMessage As String, ByVal ScriptingTimeout As Integer, ByVal ScriptName As String, ByVal ReplaceCnt As Integer, ByVal ReplaceNames() As String, ByVal ReplaceValues() As String) As String
+        Public Function addon_execute_executeScript4(ByVal Language As String, ByVal Code As String, ByVal EntryPoint As String, ByRef return_errorMessage As String, ByVal ScriptingTimeout As Integer, ByVal ScriptName As String, ByVal ReplaceCnt As Integer, ByVal ReplaceNames() As String, ByVal ReplaceValues() As String) As String
             Dim returnText As String
             Try
                 '
@@ -33118,30 +33099,30 @@ ErrorTrap:
                                         End If
                                         Try
                                             If EntryPointArgs = "" Then
-                                                executeAddon_executeScript4 = EncodeText(sc.Run(EntryPointName))
+                                                addon_execute_executeScript4 = EncodeText(sc.Run(EntryPointName))
 
                                             Else
                                                 Select Case UBound(Args)
                                                     Case 0
-                                                        executeAddon_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0)))
+                                                        addon_execute_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0)))
                                                     Case 1
-                                                        executeAddon_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0), Args(1)))
+                                                        addon_execute_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0), Args(1)))
                                                     Case 2
-                                                        executeAddon_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2)))
+                                                        addon_execute_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2)))
                                                     Case 3
-                                                        executeAddon_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3)))
+                                                        addon_execute_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3)))
                                                     Case 4
-                                                        executeAddon_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4)))
+                                                        addon_execute_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4)))
                                                     Case 5
-                                                        executeAddon_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5)))
+                                                        addon_execute_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5)))
                                                     Case 6
-                                                        executeAddon_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5), Args(6)))
+                                                        addon_execute_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5), Args(6)))
                                                     Case 7
-                                                        executeAddon_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5), Args(6), Args(7)))
+                                                        addon_execute_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5), Args(6), Args(7)))
                                                     Case 8
-                                                        executeAddon_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5), Args(6), Args(7), Args(8)))
+                                                        addon_execute_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5), Args(6), Args(7), Args(8)))
                                                     Case 9
-                                                        executeAddon_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5), Args(6), Args(7), Args(8), Args(9)))
+                                                        addon_execute_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5), Args(6), Args(7), Args(8), Args(9)))
                                                     Case Else
                                                         Call handleLegacyError6("csv_ExecuteScript4", "Scripting only supports 10 arguments.")
                                                 End Select
@@ -33176,7 +33157,7 @@ ErrorTrap:
         '
         '
         '
-        Public Function executeAddon_executeAssembly(ByVal addonId As Integer, ByVal AddonCaption As String, ByVal AssemblyClassFullName As String, ByVal CollectionGuid As String, ByVal nothingObject As Object, ByRef return_ErrorMessageForAdmin As String) As String
+        Public Function addon_execute_executeAssembly(ByVal addonId As Integer, ByVal AddonCaption As String, ByVal AssemblyClassFullName As String, ByVal CollectionGuid As String, ByVal nothingObject As Object, ByRef return_ErrorMessageForAdmin As String) As String
             Dim result As String = ""
             Try
                 Dim AddonFound As Boolean = False
@@ -33189,14 +33170,14 @@ ErrorTrap:
                 '
                 ' first try debug folder -- cclibCommonAssemblies
                 '
-                commonAssemblyPath = cluster.localClusterFiles.joinPath(cluster.localClusterFiles.rootLocalFolderPath, "clibCommonAssemblies\")
-                result = executeAddon_executeAssembly_byFilePath(addonId, AddonCaption, commonAssemblyPath, AssemblyClassFullName, True, AddonFound, return_ErrorMessageForAdmin)
+                commonAssemblyPath = cluster.localClusterFiles.joinPath(cluster.localClusterFiles.rootLocalPath, "clibCommonAssemblies\")
+                result = addon_execute_executeAssembly_byFilePath(addonId, AddonCaption, commonAssemblyPath, AssemblyClassFullName, True, AddonFound, return_ErrorMessageForAdmin)
                 If Not AddonFound Then
                     '
                     ' try app /bin folder
                     '
-                    addonAppRootPath = privateFiles.joinPath(appRootFiles.rootLocalFolderPath, "bin\")
-                    result = executeAddon_executeAssembly_byFilePath(addonId, AddonCaption, addonAppRootPath, AssemblyClassFullName, True, AddonFound, return_ErrorMessageForAdmin)
+                    addonAppRootPath = privateFiles.joinPath(appRootFiles.rootLocalPath, "bin\")
+                    result = addon_execute_executeAssembly_byFilePath(addonId, AddonCaption, addonAppRootPath, AssemblyClassFullName, True, AddonFound, return_ErrorMessageForAdmin)
                     If Not AddonFound Then
                         '
                         ' legacy mode, consider eliminating this and storing addon binaries in apps /bin folder
@@ -33211,8 +33192,8 @@ ErrorTrap:
                                 Throw New ApplicationException("The assembly for addon [" & AddonCaption & "] could not be executed because it's assembly could not be found in cclibCommonAssemblies, and no collection folder was found.")
                             Else
                                 AddonPath = privateFiles.joinPath(Me.addon_getPrivateFilesAddonPath(), AddonVersionPath)
-                                appAddonPath = privateFiles.joinPath(privateFiles.rootLocalFolderPath, AddonPath)
-                                result = executeAddon_executeAssembly_byFilePath(addonId, AddonCaption, appAddonPath, AssemblyClassFullName, False, AddonFound, return_ErrorMessageForAdmin)
+                                appAddonPath = privateFiles.joinPath(privateFiles.rootLocalPath, AddonPath)
+                                result = addon_execute_executeAssembly_byFilePath(addonId, AddonCaption, appAddonPath, AssemblyClassFullName, False, AddonFound, return_ErrorMessageForAdmin)
                                 If (Not AddonFound) Then
                                     '
                                     ' assembly not found in addon path and in development path, if core collection, try in local /bin nm 
@@ -33242,7 +33223,7 @@ ErrorTrap:
         '   services, and they should never call this.
         '==================================================================================================
         '
-        Private Function executeAddon_executeAssembly_byFilePath(ByVal AddonID As Integer, ByVal AddonDisplayName As String, ByVal fullPath As String, ByVal typeFullName As String, ByVal IsDevAssembliesFolder As Boolean, ByRef AddonFound As Boolean, ByRef return_userErrorMessage As String) As String
+        Private Function addon_execute_executeAssembly_byFilePath(ByVal AddonID As Integer, ByVal AddonDisplayName As String, ByVal fullPath As String, ByVal typeFullName As String, ByVal IsDevAssembliesFolder As Boolean, ByRef AddonFound As Boolean, ByRef return_userErrorMessage As String) As String
             Dim returnValue As String = ""
             Try
                 Dim objTypes() As Type = Nothing
@@ -33251,7 +33232,7 @@ ErrorTrap:
                 Dim testAssembly As [Assembly] = Nothing
                 Dim testAssemblyType As Type = Nothing
                 Dim objInterface As Type = Nothing
-                Dim AddonObj As Contensive.BaseClasses.AddonBaseClass
+                Dim AddonObj As AddonBaseClass
                 'Dim addonObj As Object
                 Dim IsClassFound As Boolean = False
                 Dim TestFilePathname As String = ""
@@ -33271,49 +33252,54 @@ ErrorTrap:
                     filePtr = 0
                     Do
                         TestFilePathname = dllFilenames(filePtr)
-                        testFileIsValidAssembly = True
-                        Try
+                        If TestFilePathname.IndexOf("\xunit.runner") >= 0 Then
                             '
-                            ' ##### consider using refectiononlyload first, then if it is right, do the loadfrom - so dependancies are not loaded.
+                            ' unknown issue with xunit DLL, skip for now
                             '
-                            testAssembly = System.Reflection.Assembly.LoadFrom(TestFilePathname)
-                            testAssemblyName = testAssembly.FullName
-                        Catch ex As Exception
-                            testFileIsValidAssembly = False
-                        End Try
-                        Try
-                            If testFileIsValidAssembly Then
+                        Else
+                            testFileIsValidAssembly = True
+                            Try
                                 '
-                                ' problem loading types, use try to debug
+                                ' ##### consider using refectiononlyload first, then if it is right, do the loadfrom - so dependancies are not loaded.
                                 '
-                                Try
-                                    For Each testAssemblyType In testAssembly.GetTypes
-                                        '
-                                        ' Loop through each type in the Assembly looking for our typename, public, and non-abstract
-                                        '
-                                        If (testAssemblyType.FullName.Trim.ToLower = typeFullName.Trim.ToLower) _
+                                testAssembly = System.Reflection.Assembly.LoadFrom(TestFilePathname)
+                                testAssemblyName = testAssembly.FullName
+                            Catch ex As Exception
+                                testFileIsValidAssembly = False
+                            End Try
+                            Try
+                                If testFileIsValidAssembly Then
+                                    '
+                                    ' problem loading types, use try to debug
+                                    '
+                                    Try
+                                        For Each testAssemblyType In testAssembly.GetTypes
+                                            '
+                                            ' Loop through each type in the Assembly looking for our typename, public, and non-abstract
+                                            '
+                                            If (testAssemblyType.FullName.Trim.ToLower = typeFullName.Trim.ToLower) _
                                                 And (testAssemblyType.IsPublic = True) _
                                                 And (Not ((testAssemblyType.Attributes And TypeAttributes.Abstract) = TypeAttributes.Abstract)) _
                                                 And Not (testAssemblyType.BaseType Is Nothing) _
                                                 Then
-                                            If (testAssemblyType.BaseType.FullName.ToLower = "contensive.baseclasses.addonbaseclass") Then
-                                                '
-                                                ' This assembly matches the TypeFullName, use it
-                                                '
-                                                AddonFound = True
-                                                Try
+                                                If (testAssemblyType.BaseType.FullName.ToLower = "addonbaseclass") Or (testAssemblyType.BaseType.FullName.ToLower = "contensive.baseclasses.addonbaseclass") Then
                                                     '
-                                                    ' Create the object from the Assembly
+                                                    ' This assembly matches the TypeFullName, use it
                                                     '
-                                                    AddonObj = DirectCast(testAssembly.CreateInstance(testAssemblyType.FullName), Contensive.BaseClasses.AddonBaseClass)
+                                                    AddonFound = True
                                                     Try
                                                         '
-                                                        ' Call Execute
+                                                        ' Create the object from the Assembly
                                                         '
-                                                        AddonReturnObj = AddonObj.Execute(cp)
-                                                        If Not (AddonReturnObj Is Nothing) Then
-                                                            Select Case AddonReturnObj.GetType().ToString
-                                                                Case "System.Object[,]"
+                                                        AddonObj = DirectCast(testAssembly.CreateInstance(testAssemblyType.FullName), AddonBaseClass)
+                                                        Try
+                                                            '
+                                                            ' Call Execute
+                                                            '
+                                                            AddonReturnObj = AddonObj.Execute(cp)
+                                                            If Not (AddonReturnObj Is Nothing) Then
+                                                                Select Case AddonReturnObj.GetType().ToString
+                                                                    Case "System.Object[,]"
                                                                 '
                                                                 '   a 2-D Array of objects
                                                                 '   each cell can contain 
@@ -33321,63 +33307,65 @@ ErrorTrap:
                                                                 '   return xml as dataset to another computer
                                                                 '   return json as dataset for browser
                                                                 '
-                                                                Case "System.String[,]"
-                                                                    '
-                                                                    '   return array for internal use constructing data/layout merge
-                                                                    '   return xml as dataset to another computer
-                                                                    '   return json as dataset for browser
-                                                                    '
-                                                                Case Else
-                                                                    returnValue = AddonReturnObj.ToString
-                                                            End Select
-                                                        End If
+                                                                    Case "System.String[,]"
+                                                                        '
+                                                                        '   return array for internal use constructing data/layout merge
+                                                                        '   return xml as dataset to another computer
+                                                                        '   return json as dataset for browser
+                                                                        '
+                                                                    Case Else
+                                                                        returnValue = AddonReturnObj.ToString
+                                                                End Select
+                                                            End If
+                                                        Catch Ex As Exception
+                                                            '
+                                                            ' Error in the addon
+                                                            '
+                                                            return_userErrorMessage = "There was an error executing the addon Dot Net assembly."
+                                                            detailedErrorMessage = "There was an error in the addon [" & AddonDisplayName & "]. It could not be executed because there was an error in the addon assembly [" & TestFilePathname & "], in class [" & testAssemblyType.FullName.Trim.ToLower & "]. The error was [" & Ex.ToString() & "]"
+                                                            handleExceptionAndNoThrow(Ex, detailedErrorMessage)
+                                                            'Throw New ApplicationException(detailedErrorMessage)
+                                                        End Try
                                                     Catch Ex As Exception
-                                                        '
-                                                        ' Error Creating instance of the class, exit wrapper 
-                                                        '
-                                                        return_userErrorMessage = "There was an error executing the addon's Dot Net DLL."
-                                                        detailedErrorMessage = AddonDisplayName & " could not be executed because there was an error executing the addon DLL [" & TestFilePathname & "], in class [" & testAssemblyType.FullName.Trim.ToLower & "]. The error was [" & Ex.ToString() & "]"
+                                                        return_userErrorMessage = "There was an error initializing the addon's Dot Net DLL."
+                                                        detailedErrorMessage = AddonDisplayName & " could not be executed because there was an error creating an object from the assembly, DLL [" & testAssemblyType.FullName & "]. The error was [" & Ex.ToString() & "]"
                                                         Throw New ApplicationException(detailedErrorMessage)
                                                     End Try
-                                                Catch Ex As Exception
-                                                    return_userErrorMessage = "There was an error initializing the addon's Dot Net DLL."
-                                                    detailedErrorMessage = AddonDisplayName & " could not be executed because there was an error creating an object from the assembly, DLL [" & testAssemblyType.FullName & "]. The error was [" & Ex.ToString() & "]"
-                                                    Throw New ApplicationException(detailedErrorMessage)
-                                                End Try
-                                                '
-                                                ' addon was found, no need to look for more
-                                                '
-                                                Exit For
+                                                    '
+                                                    ' addon was found, no need to look for more
+                                                    '
+                                                    Exit For
+                                                End If
                                             End If
-                                        End If
-                                    Next
-                                Catch ex As ReflectionTypeLoadException
-                                    '
-                                    ' exceptin thrown out of application bin folder when xunit library included -- ignore
-                                    '
-                                Catch ex As Exception
-                                    '
-                                    ' problem loading types
-                                    '
-                                    detailedErrorMessage = "While locating assembly for addon [" & AddonDisplayName & "], there was an error loading types for assembly [" & testAssemblyType.FullName & "]. This assembly was skipped and should be removed from the folder [" & fullPath & "]"
-                                    handleExceptionAndRethrow(ex, detailedErrorMessage)
-                                End Try
-                            End If
-                        Catch ex As Reflection.ReflectionTypeLoadException
-                            return_userErrorMessage = "The addon's Dot Net DLL does not appear to be valid [" & TestFilePathname & "]."
-                            detailedErrorMessage = "A load exception occured for addon [" & AddonDisplayName & "], DLL [" & testAssemblyType.FullName & "]. The error was [" & ex.ToString() & "] Any internal exception follow:"
-                            objTypes = ex.Types
-                            For Each exLoader As Exception In ex.LoaderExceptions
-                                detailedErrorMessage &= vbCrLf & "--LoaderExceptions: " & exLoader.Message
-                            Next
-                            Throw New ApplicationException(detailedErrorMessage)
-                        Catch ex As Exception
-                            '
-                            ' ignore these errors
-                            '
-                            return_userErrorMessage = "There was an unknown error in the addon's Dot Net DLL [" & AddonDisplayName & "]."
-                            detailedErrorMessage = "A non-load exception occured while loading the addon [" & AddonDisplayName & "], DLL [" & testAssemblyType.FullName & "]. The error was [" & ex.ToString() & "]."
-                        End Try
+                                        Next
+                                    Catch ex As ReflectionTypeLoadException
+                                        '
+                                        ' exceptin thrown out of application bin folder when xunit library included -- ignore
+                                        '
+                                    Catch ex As Exception
+                                        '
+                                        ' problem loading types
+                                        '
+                                        detailedErrorMessage = "While locating assembly for addon [" & AddonDisplayName & "], there was an error loading types for assembly [" & testAssemblyType.FullName & "]. This assembly was skipped and should be removed from the folder [" & fullPath & "]"
+                                        handleExceptionAndRethrow(ex, detailedErrorMessage)
+                                    End Try
+                                End If
+                            Catch ex As Reflection.ReflectionTypeLoadException
+                                return_userErrorMessage = "The addon's Dot Net DLL does not appear to be valid [" & TestFilePathname & "]."
+                                detailedErrorMessage = "A load exception occured for addon [" & AddonDisplayName & "], DLL [" & testAssemblyType.FullName & "]. The error was [" & ex.ToString() & "] Any internal exception follow:"
+                                objTypes = ex.Types
+                                For Each exLoader As Exception In ex.LoaderExceptions
+                                    detailedErrorMessage &= vbCrLf & "--LoaderExceptions: " & exLoader.Message
+                                Next
+                                Throw New ApplicationException(detailedErrorMessage)
+                            Catch ex As Exception
+                                '
+                                ' ignore these errors
+                                '
+                                return_userErrorMessage = "There was an unknown error in the addon's Dot Net DLL [" & AddonDisplayName & "]."
+                                detailedErrorMessage = "A non-load exception occured while loading the addon [" & AddonDisplayName & "], DLL [" & testAssemblyType.FullName & "]. The error was [" & ex.ToString() & "]."
+                            End Try
+                        End If
                         filePtr += 1
                     Loop While (Not AddonFound) And (filePtr < dllFilenames.Length)
                 End If
@@ -33533,9 +33521,9 @@ ErrorTrap:
         ' REFACTOR - unify interface, remove main_ and csv_ class references
         '=============================================================================================================
         '
-        Public Function executeAddon_legacy5(ByVal addonId As Integer, ByVal AddonName As String, ByVal Option_String As String, ByVal Context As addonContextEnum, ByVal ContentName As String, ByVal RecordID As Integer, ByVal FieldName As String, ByVal ACInstanceID As Integer) As String
+        Public Function addon_execute_legacy5(ByVal addonId As Integer, ByVal AddonName As String, ByVal Option_String As String, ByVal Context As CPUtilsBaseClass.addonContext, ByVal ContentName As String, ByVal RecordID As Integer, ByVal FieldName As String, ByVal ACInstanceID As Integer) As String
             Dim AddonStatusOK As Boolean
-            executeAddon_legacy5 = executeAddon_legacy2(addonId, AddonName, Option_String, Context, ContentName, RecordID, FieldName, CStr(ACInstanceID), False, 0, "", AddonStatusOK, Nothing)
+            addon_execute_legacy5 = addon_execute_legacy2(addonId, AddonName, Option_String, Context, ContentName, RecordID, FieldName, CStr(ACInstanceID), False, 0, "", AddonStatusOK, Nothing)
         End Function
         '
         '====================================================================================================
@@ -33543,15 +33531,15 @@ ErrorTrap:
         ' REFACTOR - unify interface, remove main_ and csv_ class references
         '====================================================================================================
         '
-        Public Function executeAddon_legacy1(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal Option_String As String, ByVal Context As addonContextEnum, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal DefaultWrapperID As Integer) As String
+        Public Function addon_execute_legacy1(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal Option_String As String, ByVal Context As CPUtilsBaseClass.addonContext, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal DefaultWrapperID As Integer) As String
             Dim AddonStatusOK As Boolean
-            Dim workingContext As addonContextEnum
+            Dim workingContext As CPUtilsBaseClass.addonContext
             '
             workingContext = Context
             If workingContext = 0 Then
-                workingContext = addonContextEnum.ContextPage
+                workingContext = CPUtilsBaseClass.addonContext.ContextPage
             End If
-            executeAddon_legacy1 = executeAddon_legacy2(addonId, AddonNameOrGuid, Option_String, workingContext, HostContentName, HostRecordID, HostFieldName, ACInstanceID, False, DefaultWrapperID, "", AddonStatusOK, Nothing)
+            addon_execute_legacy1 = addon_execute_legacy2(addonId, AddonNameOrGuid, Option_String, workingContext, HostContentName, HostRecordID, HostFieldName, ACInstanceID, False, DefaultWrapperID, "", AddonStatusOK, Nothing)
         End Function
         '
         '====================================================================================================
@@ -33561,29 +33549,29 @@ ErrorTrap:
         ' REFACTOR - unify interface, remove main_ and csv_ class references
         '====================================================================================================
         '
-        Public Function executeAddon_legacy3(ByVal AddonIDGuidOrName As String, Optional ByVal Option_String As String = "", Optional ByVal WrapperID As Integer = 0, Optional ByVal nothingObject As Object = Nothing) As String
+        Public Function addon_execute_legacy3(ByVal AddonIDGuidOrName As String, Optional ByVal Option_String As String = "", Optional ByVal WrapperID As Integer = 0, Optional ByVal nothingObject As Object = Nothing) As String
             Dim AddonStatusOK As Boolean
             If vbIsNumeric(AddonIDGuidOrName) Then
-                executeAddon_legacy3 = executeAddon_legacy2(EncodeInteger(AddonIDGuidOrName), "", Option_String, addonContextEnum.ContextPage, "", 0, "", "", False, WrapperID, "", AddonStatusOK, nothingObject)
+                addon_execute_legacy3 = addon_execute_legacy2(EncodeInteger(AddonIDGuidOrName), "", Option_String, CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, WrapperID, "", AddonStatusOK, nothingObject)
             Else
-                executeAddon_legacy3 = executeAddon_legacy2(0, AddonIDGuidOrName, Option_String, addonContextEnum.ContextPage, "", 0, "", "", False, WrapperID, "", AddonStatusOK, nothingObject)
+                addon_execute_legacy3 = addon_execute_legacy2(0, AddonIDGuidOrName, Option_String, CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, WrapperID, "", AddonStatusOK, nothingObject)
             End If
         End Function
         '
         ' Public Interface to support AsProcess
         '
-        Public Function executeAddon_legacy4(ByVal AddonIDGuidOrName As String, Optional ByVal Option_String As String = "", Optional ByVal Context As addonContextEnum = addonContextEnum.ContextPage, Optional ByVal nothingObject As Object = Nothing) As String
+        Public Function addon_execute_legacy4(ByVal AddonIDGuidOrName As String, Optional ByVal Option_String As String = "", Optional ByVal Context As CPUtilsBaseClass.addonContext = CPUtilsBaseClass.addonContext.ContextPage, Optional ByVal nothingObject As Object = Nothing) As String
             Dim AddonStatusOK As Boolean
-            Dim workingContext As addonContextEnum
+            Dim workingContext As CPUtilsBaseClass.addonContext
             '
             workingContext = Context
             If workingContext = 0 Then
-                workingContext = addonContextEnum.ContextPage
+                workingContext = CPUtilsBaseClass.addonContext.ContextPage
             End If
             If vbIsNumeric(AddonIDGuidOrName) Then
-                executeAddon_legacy4 = executeAddon_legacy2(EncodeInteger(AddonIDGuidOrName), "", Option_String, workingContext, "", 0, "", "", False, 0, "", AddonStatusOK, nothingObject)
+                addon_execute_legacy4 = addon_execute_legacy2(EncodeInteger(AddonIDGuidOrName), "", Option_String, workingContext, "", 0, "", "", False, 0, "", AddonStatusOK, nothingObject)
             Else
-                executeAddon_legacy4 = executeAddon_legacy2(0, AddonIDGuidOrName, Option_String, workingContext, "", 0, "", "", False, 0, "", AddonStatusOK, nothingObject)
+                addon_execute_legacy4 = addon_execute_legacy2(0, AddonIDGuidOrName, Option_String, workingContext, "", 0, "", "", False, 0, "", AddonStatusOK, nothingObject)
             End If
         End Function
         ''
@@ -33603,8 +33591,8 @@ ErrorTrap:
         ' REFACTOR - unify interface, remove main_ and csv_ class references
         '=============================================================================================================
         '
-        Public Function executeAddon_legacy2(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal Option_String As String, ByVal Context As addonContextEnum, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal IsIncludeAddon As Boolean, ByVal DefaultWrapperID As Integer, ByVal ignore_TemplateCaseOnly_PageContent As String, ByRef return_StatusOK As Boolean, ByVal nothingObject As Object, Optional ByVal AddonInUseIdList As String = "") As String
-            executeAddon_legacy2 = executeAddon(addonId, AddonNameOrGuid, Option_String, Context, HostContentName, HostRecordID, HostFieldName, ACInstanceID, IsIncludeAddon, DefaultWrapperID, ignore_TemplateCaseOnly_PageContent, return_StatusOK, nothingObject, AddonInUseIdList, Nothing, main_page_IncludedAddonIDList, user.id, user.isAuthenticated)
+        Public Function addon_execute_legacy2(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal Option_String As String, ByVal Context As CPUtilsBaseClass.addonContext, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal IsIncludeAddon As Boolean, ByVal DefaultWrapperID As Integer, ByVal ignore_TemplateCaseOnly_PageContent As String, ByRef return_StatusOK As Boolean, ByVal nothingObject As Object, Optional ByVal AddonInUseIdList As String = "") As String
+            addon_execute_legacy2 = addon_execute(addonId, AddonNameOrGuid, Option_String, Context, HostContentName, HostRecordID, HostFieldName, ACInstanceID, IsIncludeAddon, DefaultWrapperID, ignore_TemplateCaseOnly_PageContent, return_StatusOK, nothingObject, AddonInUseIdList, Nothing, main_page_IncludedAddonIDList, user.id, user.isAuthenticated)
         End Function
         '
         '===============================================================================================================================================
@@ -33614,8 +33602,8 @@ ErrorTrap:
         ' REFACTOR - unify interface, remove main_ and csv_ class references
         '===============================================================================================================================================
         '
-        Public Function executeAddon_getInstanceBubble(ByVal AddonName As String, ByVal Option_String As String, ByVal ContentName As String, ByVal RecordID As Integer, ByVal FieldName As String, ByVal ACInstanceID As String, ByVal Context As addonContextEnum, ByRef return_DialogList As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("executeAddon_GetInstanceBubble")
+        Public Function addon_execute_getInstanceBubble(ByVal AddonName As String, ByVal Option_String As String, ByVal ContentName As String, ByVal RecordID As Integer, ByVal FieldName As String, ByVal ACInstanceID As String, ByVal Context As CPUtilsBaseClass.addonContext, ByRef return_DialogList As String) As String
+            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("addon_execute_GetInstanceBubble")
             '
             Dim Dialog As String
             Dim OptionDefault As String
@@ -33662,7 +33650,7 @@ ErrorTrap:
                         '
                         CopyContent = "This addon does not support instance options."
                         CopyContent = "<div style=""width:400px;background-color:transparent;"" class=""ccAdminSmall"">" & CopyContent & "</div>"
-                    ElseIf (Context <> addonContextEnum.ContextAdmin) And (siteProperties.allowWorkflowAuthoring And Not visitProperty.getBoolean("AllowWorkflowRendering")) Then
+                    ElseIf (Context <> CPUtilsBaseClass.addonContext.ContextAdmin) And (siteProperties.allowWorkflowAuthoring And Not visitProperty.getBoolean("AllowWorkflowRendering")) Then
                         '
                         ' workflow with no rendering (or within admin site)
                         '
@@ -33847,7 +33835,7 @@ ErrorTrap:
                         & "</table>" _
                         & "</form>" _
                         & "</div>"
-                    executeAddon_getInstanceBubble = "" _
+                    addon_execute_getInstanceBubble = "" _
                         & "&nbsp;<a href=""#"" tabindex=-1 target=""_blank""" & BubbleJS & ">" _
                         & GetIconSprite("", 0, "/ccLib/images/toolsettings.png", 22, 22, "Edit options used just for this instance of the " & AddonName & " Add-on", "Edit options used just for this instance of the " & AddonName & " Add-on", "", True, "") _
                         & "</a>" _
@@ -33871,15 +33859,15 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError18("executeAddon_GetInstanceBubble")
+            Call handleLegacyError18("addon_execute_GetInstanceBubble")
         End Function
         '
         '===============================================================================================================================================
         '   main_Get Addon Styles Bubble Editor
         '===============================================================================================================================================
         '
-        Public Function executeAddon_getAddonStylesBubble(ByVal addonId As Integer, ByRef return_DialogList As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("executeAddon_GetAddonStylesBubble")
+        Public Function addon_execute_getAddonStylesBubble(ByVal addonId As Integer, ByRef return_DialogList As String) As String
+            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("addon_execute_GetAddonStylesBubble")
             '
             Dim DefaultStylesheet As String
             Dim StyleSheet As String
@@ -33965,7 +33953,7 @@ ErrorTrap:
                         & "</form>" _
                         & "</div>"
                     return_DialogList = return_DialogList & Dialog
-                    executeAddon_getAddonStylesBubble = "" _
+                    addon_execute_getAddonStylesBubble = "" _
                         & "&nbsp;<a href=""#"" tabindex=-1 target=""_blank""" & BubbleJS & ">" _
                         & GetIconSprite("", 0, "/ccLib/images/toolstyles.png", 22, 22, "Edit " & AddonName & " Stylesheets", "Edit " & AddonName & " Stylesheets", "", True, "") _
                         & "</a>"
@@ -33982,7 +33970,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError18("executeAddon_GetAddonStylesBubble")
+            Call handleLegacyError18("addon_execute_GetAddonStylesBubble")
         End Function
         '
         '===============================================================================================================================================
@@ -33990,8 +33978,8 @@ ErrorTrap:
         '===============================================================================================================================================
         '
 
-        Public Function executeAddon_getHelpBubble(ByVal addonId As Integer, ByVal helpCopy As String, ByVal CollectionID As Integer, ByRef return_DialogList As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("executeAddon_GetHelpBubble")
+        Public Function addon_execute_getHelpBubble(ByVal addonId As Integer, ByVal helpCopy As String, ByVal CollectionID As Integer, ByRef return_DialogList As String) As String
+            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("addon_execute_GetHelpBubble")
             '
             Dim DefaultStylesheet As String
             Dim StyleSheet As String
@@ -34084,7 +34072,7 @@ ErrorTrap:
                     pageManager_HelpDialogCnt = pageManager_HelpDialogCnt + 1
                     'SiteStylesBubbleCache = "x"
                     'End If
-                    executeAddon_getHelpBubble = "" _
+                    addon_execute_getHelpBubble = "" _
                         & "&nbsp;<a href=""#"" tabindex=-1 tarGet=""_blank""" & BubbleJS & " >" _
                         & GetIconSprite("", 0, "/ccLib/images/toolhelp.png", 22, 22, "View help resources for this Add-on", "View help resources for this Add-on", "", True, "") _
                         & "</a>"
@@ -34093,15 +34081,15 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError18("executeAddon_GetHelpBubble")
+            Call handleLegacyError18("addon_execute_GetHelpBubble")
         End Function
         '
         '===============================================================================================================================================
         '   main_Get inner HTML viewer Bubble
         '===============================================================================================================================================
         '
-        Public Function executeAddon_getHTMLViewerBubble(ByVal addonId As Integer, ByVal HTMLSourceID As String, ByRef return_DialogList As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("executeAddon_GetHTMLViewerBubble")
+        Public Function addon_execute_getHTMLViewerBubble(ByVal addonId As Integer, ByVal HTMLSourceID As String, ByRef return_DialogList As String) As String
+            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("addon_execute_GetHTMLViewerBubble")
             '
             Dim DefaultStylesheet As String
             Dim StyleSheet As String
@@ -34177,7 +34165,7 @@ ErrorTrap:
                         Call main_AddOnLoadJavascript2("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
                     End If
                     pageManager_HelpDialogCnt = pageManager_HelpDialogCnt + 1
-                    executeAddon_getHTMLViewerBubble = "" _
+                    addon_execute_getHTMLViewerBubble = "" _
                         & "&nbsp;<a href=""#"" tabindex=-1 target=""_blank""" & BubbleJS & " >" _
                         & GetIconSprite("", 0, "/ccLib/images/toolhtml.png", 22, 22, "View the source HTML produced by this Add-on", "View the source HTML produced by this Add-on", "", True, "") _
                         & "</A>"
@@ -34186,13 +34174,13 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError18("executeAddon_GetHTMLViewerBubble")
+            Call handleLegacyError18("addon_execute_GetHTMLViewerBubble")
         End Function
         '
         '
         '
-        Private Function executeAddon_getFormContent(ByVal FormXML As String, ByRef return_ExitRequest As Boolean) As String
-            ''Dim th as integer : th = profileLogMethodEnter("executeAddon_GetFormContent")
+        Private Function addon_execute_getFormContent(ByVal FormXML As String, ByRef return_ExitRequest As Boolean) As String
+            ''Dim th as integer : th = profileLogMethodEnter("addon_execute_GetFormContent")
             '
             Const LoginMode_None = 1
             Const LoginMode_AutoRecognize = 2
@@ -34356,12 +34344,12 @@ ErrorTrap:
                                                                     Call siteProperties.setProperty(FieldName, FieldValue)
                                                                 Case "file", "imagefile"
                                                                     '
-                                                                    If main_GetStreamBoolean2(FieldName & ".DeleteFlag") Then
+                                                                    If doc_getBoolean2(FieldName & ".DeleteFlag") Then
                                                                         Call siteProperties.setProperty(FieldName, "")
                                                                     End If
                                                                     If FieldValue <> "" Then
                                                                         VirtualFilePath = "Settings/" & FieldName
-                                                                        Call web_ProcessFormInputFile(FieldName, VirtualFilePath)
+                                                                        Call web_processFormInputFile(FieldName, VirtualFilePath)
                                                                         FieldValue = VirtualFilePath & "/" & FieldValue
                                                                         Call siteProperties.setProperty(FieldName, FieldValue)
                                                                     End If
@@ -34527,12 +34515,12 @@ ErrorTrap:
                                                                 ' Use Editor Addon
                                                                 '
                                                                 Option_String = "FieldName=" & FieldName & "&FieldValue=" & encodeNvaArgument(siteProperties.getText(FieldName, FieldDefaultValue))
-                                                                Copy = executeAddon_legacy5(0, FieldAddon, Option_String, addonContextEnum.ContextAdmin, "", 0, "", 0)
+                                                                Copy = addon_execute_legacy5(0, FieldAddon, Option_String, CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", 0)
                                                             ElseIf FieldSelector <> "" Then
                                                                 '
                                                                 ' Use Selector
                                                                 '
-                                                                Copy = executeAddon_getFormContent_decodeSelector(FieldName, FieldValue, FieldSelector)
+                                                                Copy = addon_execute_getFormContent_decodeSelector(FieldName, FieldValue, FieldSelector)
                                                             Else
                                                                 '
                                                                 ' Use default editor for each field type
@@ -34732,7 +34720,7 @@ ErrorTrap:
 
                                                         If FieldSQL <> "" Then
                                                             Try
-                                                                dt = db.executeSql(FieldSQL, FieldDataSource, , SQLPageSize)
+                                                                dt = db.executeSql_getDataTable(FieldSQL, FieldDataSource, , SQLPageSize)
                                                             Catch ex As Exception
                                                                 ErrorDescription = ex.ToString
                                                                 loadOK = False
@@ -34858,7 +34846,7 @@ ErrorTrap:
                 End If
             End If
             '
-            executeAddon_getFormContent = Adminui.GetBody(Name, ButtonList, "", True, True, Description, "", 0, Content.Text)
+            addon_execute_getFormContent = Adminui.GetBody(Name, ButtonList, "", True, True, Description, "", 0, Content.Text)
             Content = Nothing
             '
             '
@@ -34867,15 +34855,15 @@ ErrorTrap:
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError10(Err.Number, Err.Source, Err.Description, "executeAddon_GetFormContent", True, False)
+            Call handleLegacyError10(Err.Number, Err.Source, Err.Description, "addon_execute_GetFormContent", True, False)
         End Function
         '
         '========================================================================
         '   Display field in the admin/edit
         '========================================================================
         '
-        Private Function executeAddon_getFormContent_decodeSelector(SitePropertyName As String, SitePropertyValue As String, selector As String) As String
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("AdminClass.executeAddon_GetFormContent_decodeSelector")
+        Private Function addon_execute_getFormContent_decodeSelector(SitePropertyName As String, SitePropertyValue As String, selector As String) As String
+            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("AdminClass.addon_execute_GetFormContent_decodeSelector")
             '
             Dim ExpandedSelector As String
             Dim ignore As String
@@ -34918,7 +34906,7 @@ ErrorTrap:
             '
             FastString = New coreFastStringClass
             '
-            Call executeAddon_buildAddonOptionLists(ignore, ExpandedSelector, SitePropertyName & "=" & selector, SitePropertyName & "=" & SitePropertyValue, "0", True)
+            Call addon_execute_buildAddonOptionLists(ignore, ExpandedSelector, SitePropertyName & "=" & selector, SitePropertyName & "=" & SitePropertyValue, "0", True)
             Pos = vbInstr(1, ExpandedSelector, "[")
             If Pos <> 0 Then
                 '
@@ -34942,7 +34930,7 @@ ErrorTrap:
                     ExpandedSelector = Mid(ExpandedSelector, 1, Pos - 1)
                 End If
                 OptionValues = Split(ExpandedSelector, "|")
-                executeAddon_getFormContent_decodeSelector = ""
+                addon_execute_getFormContent_decodeSelector = ""
                 OptionCnt = UBound(OptionValues) + 1
                 For OptionPtr = 0 To OptionCnt - 1
                     OptionValue_AddonEncoded = Trim(OptionValues(OptionPtr))
@@ -34961,27 +34949,27 @@ ErrorTrap:
                                 ' Create checkbox
                                 '
                                 If vbInstr(1, "," & LCaseOptionDefault & ",", "," & vbLCase(OptionValue) & ",") <> 0 Then
-                                    executeAddon_getFormContent_decodeSelector = executeAddon_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & SitePropertyName & OptionPtr & """ value=""" & OptionValue & """ checked=""checked"">" & OptionCaption & "</div>"
+                                    addon_execute_getFormContent_decodeSelector = addon_execute_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & SitePropertyName & OptionPtr & """ value=""" & OptionValue & """ checked=""checked"">" & OptionCaption & "</div>"
                                 Else
-                                    executeAddon_getFormContent_decodeSelector = executeAddon_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & SitePropertyName & OptionPtr & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
+                                    addon_execute_getFormContent_decodeSelector = addon_execute_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & SitePropertyName & OptionPtr & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
                                 End If
                             Case "radio"
                                 '
                                 ' Create Radio
                                 '
                                 If vbLCase(OptionValue) = LCaseOptionDefault Then
-                                    executeAddon_getFormContent_decodeSelector = executeAddon_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & SitePropertyName & """ value=""" & OptionValue & """ checked=""checked"" >" & OptionCaption & "</div>"
+                                    addon_execute_getFormContent_decodeSelector = addon_execute_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & SitePropertyName & """ value=""" & OptionValue & """ checked=""checked"" >" & OptionCaption & "</div>"
                                 Else
-                                    executeAddon_getFormContent_decodeSelector = executeAddon_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & SitePropertyName & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
+                                    addon_execute_getFormContent_decodeSelector = addon_execute_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & SitePropertyName & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
                                 End If
                             Case Else
                                 '
                                 ' Create select 
                                 '
                                 If vbLCase(OptionValue) = LCaseOptionDefault Then
-                                    executeAddon_getFormContent_decodeSelector = executeAddon_getFormContent_decodeSelector & "<option value=""" & OptionValue & """ selected>" & OptionCaption & "</option>"
+                                    addon_execute_getFormContent_decodeSelector = addon_execute_getFormContent_decodeSelector & "<option value=""" & OptionValue & """ selected>" & OptionCaption & "</option>"
                                 Else
-                                    executeAddon_getFormContent_decodeSelector = executeAddon_getFormContent_decodeSelector & "<option value=""" & OptionValue & """>" & OptionCaption & "</option>"
+                                    addon_execute_getFormContent_decodeSelector = addon_execute_getFormContent_decodeSelector & "<option value=""" & OptionValue & """>" & OptionCaption & "</option>"
                                 End If
                         End Select
                     End If
@@ -34995,20 +34983,20 @@ ErrorTrap:
                         '
                         ' Create Radio 
                         '
-                        'main_executeAddon_GetFormContent_decodeSelector = "<div>" & vbReplace(main_executeAddon_GetFormContent_decodeSelector, "><", "></div><div><") & "</div>"
+                        'main_addon_execute_GetFormContent_decodeSelector = "<div>" & vbReplace(main_addon_execute_GetFormContent_decodeSelector, "><", "></div><div><") & "</div>"
                     Case Else
                         '
                         ' Create select 
                         '
-                        executeAddon_getFormContent_decodeSelector = "<select name=""" & SitePropertyName & """>" & executeAddon_getFormContent_decodeSelector & "</select>"
+                        addon_execute_getFormContent_decodeSelector = "<select name=""" & SitePropertyName & """>" & addon_execute_getFormContent_decodeSelector & "</select>"
                 End Select
             Else
                 '
-                ' Create Text executeAddon_GetFormContent_decodeSelector
+                ' Create Text addon_execute_GetFormContent_decodeSelector
                 '
 
                 selector = decodeNvaArgument(selector)
-                executeAddon_getFormContent_decodeSelector = html_GetFormInputText2(SitePropertyName, selector, 1, 20)
+                addon_execute_getFormContent_decodeSelector = html_GetFormInputText2(SitePropertyName, selector, 1, 20)
             End If
 
             FastString = Nothing
@@ -35016,7 +35004,7 @@ ErrorTrap:
             '
 ErrorTrap:
             FastString = Nothing
-            Call handleLegacyError18("executeAddon_GetFormContent_decodeSelector")
+            Call handleLegacyError18("addon_execute_GetFormContent_decodeSelector")
         End Function
         '
         Public Function main_GetPCCPtr(PageID As Integer, main_IsWorkflowRendering As Boolean, main_IsQuickEditing As Boolean) As Integer
@@ -35149,7 +35137,7 @@ ErrorTrap:
                 '
                 'hint = hint & ",20 cnt=0 rebuild"
                 SQL = "select " & cache_addonIncludeRules_fieldList & " from ccaddonIncludeRules where (active<>0) order by id"
-                cache_addonIncludeRules.item = convertDataTabletoArray(db.executeSql(SQL))
+                cache_addonIncludeRules.item = convertDataTabletoArray(db.executeSql_getDataTable(SQL))
                 'hint = hint & ",21"
                 If True Then
                     'hint = hint & ",22"
@@ -35230,7 +35218,7 @@ ErrorTrap:
             '
             cacheValue = DirectCast(cache.getObject(Of String)(cache_linkForward_cacheName), String)
             If cacheValue = "" Then
-                RS = db.executeSql("select sourceLink from ccLinkForwards where (sourceLink<>'')and(DestinationLink<>'')and(active<>0) order by id desc")
+                RS = db.executeSql_getDataTable("select sourceLink from ccLinkForwards where (sourceLink<>'')and(DestinationLink<>'')and(active<>0) order by id desc")
                 For Each dr As DataRow In RS.Rows
                     cacheValue &= "," & dr.Item("sourceLink").ToString
                 Next
@@ -35344,7 +35332,7 @@ ErrorTrap:
                     '
                     'hint = hint & ",cnt=0 rebuild"
                     SQL = "select " & cache_LibraryFiles_fieldList & " from cclibraryFiles where (active<>0) order by id"
-                    cache_libraryFiles = convertDataTabletoArray(db.executeSql(SQL))
+                    cache_libraryFiles = convertDataTabletoArray(db.executeSql_getDataTable(SQL))
                     '    RS = app.csv_OpenRSSQL_Internal("Default", SQL, 120, 1000, 1, False, CursorLocationEnum.adUseClient, LockTypeEnum.adLockOptimistic, CursorTypeEnum.adOpenForwardOnly)
                     'cacheLoaded = False
                     'If (isDataTableOk(rs)) Then
@@ -36094,7 +36082,7 @@ ErrorTrap:
                         If addonId > 0 Then
                             AddonName = addonCache.localCache.addonList(addonCachePtr).addonCache_name
                             'hint = hint & ",AddonName=" & AddonName
-                            returnHtmlBody = returnHtmlBody & executeAddon_legacy2(addonId, "", "", addonContextEnum.ContextOnBodyStart, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
+                            returnHtmlBody = returnHtmlBody & addon_execute_legacy2(addonId, "", "", CPUtilsBaseClass.addonContext.ContextOnBodyStart, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
                             If Not FilterStatusOK Then
                                 Call handleLegacyError12("main_GetHtmlBody", "There was an error processing OnAfterBody [" & addonCache.localCache.addonList(addonCachePtr).addonCache_name & "]. Filtering was aborted.")
                                 Exit For
@@ -36144,8 +36132,8 @@ ErrorTrap:
                     ' ----- Encode Template
                     '
                     If Not pageManager_printVersion Then
-                        LocalTemplateBody = html_executeContentCommands(Nothing, LocalTemplateBody, addonContextEnum.ContextTemplate, user.id, user.isAuthenticated, layoutError)
-                        returnHtmlBody = returnHtmlBody & html_encodeContent9(LocalTemplateBody, user.id, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", web_requestProtocol & webServer.requestDomain, False, siteProperties.defaultWrapperID, PageContent, addonContextEnum.ContextTemplate)
+                        LocalTemplateBody = html_executeContentCommands(Nothing, LocalTemplateBody, CPUtilsBaseClass.addonContext.ContextTemplate, user.id, user.isAuthenticated, layoutError)
+                        returnHtmlBody = returnHtmlBody & html_encodeContent9(LocalTemplateBody, user.id, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", web_requestProtocol & webServer.requestDomain, False, siteProperties.defaultWrapperID, PageContent, CPUtilsBaseClass.addonContext.ContextTemplate)
                         'returnHtmlBody = returnHtmlBody & EncodeContent8(LocalTemplateBody, memberID, "Page Templates", LocalTemplateID, 0, False, False, True, True, False, True, "", main_ServerProtocol, False, app.SiteProperty_DefaultWrapperID, PageContent, ContextTemplate)
                     End If
                     '
@@ -36188,7 +36176,7 @@ ErrorTrap:
                                 AddonName = addonCache.localCache.addonList(addonCachePtr).addonCache_name
                                 'hint = hint & ",AddonName=" & AddonName
                                 main_FilterInput = main_GetHtmlBody
-                                AddonReturn = executeAddon_legacy2(addonId, "", "", addonContextEnum.ContextFilter, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
+                                AddonReturn = addon_execute_legacy2(addonId, "", "", CPUtilsBaseClass.addonContext.ContextFilter, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
                                 returnHtmlBody = main_FilterInput & AddonReturn
                                 If Not FilterStatusOK Then
                                     Call handleLegacyError12("main_GetHtmlBody", "There was an error processing OnBodyEnd for [" & AddonName & "]. Filtering was aborted.")
@@ -36508,7 +36496,7 @@ ErrorTrap:
                         ' OK to create page here because section has a good record with a 0 RootPageID (this is not AutoHomeCreate)
                         '
                         rootPageId = main_CreatePageGetID(SectionName, "Page Content", SystemMemberID, "")
-                        Call db.executeSql("update ccsections set RootPageID=" & rootPageId & " where id=" & SectionID)
+                        Call db.executeSql_getDataTable("update ccsections set RootPageID=" & rootPageId & " where id=" & SectionID)
                         Call pageManager_cache_siteSection_clear()
                         main_AdminWarning = "<p>This page was created automatically because the section [" & SectionName & "] was requested, and it did not reference a page. Use the links below to edit the new page.</p>"
                         main_AdminWarningPageID = rootPageId
@@ -37275,7 +37263,7 @@ ErrorTrap:
                 If (pageManager_RedirectLink = "") Then
                     Link = EncodeText(cache_pageContent(PCC_Link, main_RenderCache_CurrentPage_PCCPtr))
                     If (Link <> "") Then
-                        Call db.executeSql("update ccpagecontent set clicks=clicks+1 where id=" & main_RenderedPageID)
+                        Call db.executeSql_getDataTable("update ccpagecontent set clicks=clicks+1 where id=" & main_RenderedPageID)
                         pageManager_RedirectLink = Link
                         pageManager_RedirectReason = "Redirect required because this page (PageRecordID=" & main_RenderedPageID & ") has a Link Override [" & pageManager_RedirectLink & "]."
                     End If
@@ -37496,8 +37484,8 @@ ErrorTrap:
                     '
                     ' Encode the copy
                     '
-                    returnHtml = html_executeContentCommands(Nothing, returnHtml, addonContextEnum.ContextPage, user.id, user.isAuthenticated, layoutError)
-                    returnHtml = html_encodeContent9(returnHtml, user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, siteProperties.defaultWrapperID, "", addonContextEnum.ContextPage)
+                    returnHtml = html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, user.id, user.isAuthenticated, layoutError)
+                    returnHtml = html_encodeContent9(returnHtml, user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
                     'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, 0, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
                     RQS = web_RefreshQueryString
                     If RQS <> "" Then
@@ -37542,16 +37530,16 @@ ErrorTrap:
                             '
                             ' Link authoring, workflow rendering -> do encoding, but no tracking
                             '
-                            returnHtml = html_executeContentCommands(Nothing, returnHtml, addonContextEnum.ContextPage, user.id, user.isAuthenticated, layoutError)
-                            returnHtml = html_encodeContent9(returnHtml, user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, siteProperties.defaultWrapperID, "", addonContextEnum.ContextPage)
+                            returnHtml = html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, user.id, user.isAuthenticated, layoutError)
+                            returnHtml = html_encodeContent9(returnHtml, user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
                         ElseIf pageManager_printVersion Then
                             '
                             ' Printer Version -> personalize and count viewings, no tracking
                             '
-                            returnHtml = html_executeContentCommands(Nothing, returnHtml, addonContextEnum.ContextPage, user.id, user.isAuthenticated, layoutError)
-                            returnHtml = html_encodeContent9(returnHtml, user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, siteProperties.defaultWrapperID, "", addonContextEnum.ContextPage)
+                            returnHtml = html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, user.id, user.isAuthenticated, layoutError)
+                            returnHtml = html_encodeContent9(returnHtml, user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
                             'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
-                            Call db.executeSql("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & main_RenderedPageID)
+                            Call db.executeSql_getDataTable("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & main_RenderedPageID)
                             'Call app.csv_SetCS(CS, "Viewings", app.csv_GetCSInteger(CS, "Viewings") + 1)
                         Else
                             '
@@ -37561,12 +37549,12 @@ ErrorTrap:
                             ' this should be done before the contentbox is added
                             ' so a stray blocktext does not truncate the html
                             '!!!!!!!!!!!!!!!!!!!!!!!!!
-                            returnHtml = html_executeContentCommands(Nothing, returnHtml, addonContextEnum.ContextPage, user.id, user.isAuthenticated, layoutError)
-                            returnHtml = html_encodeContent9(returnHtml, user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, siteProperties.defaultWrapperID, "", addonContextEnum.ContextPage)
+                            returnHtml = html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, user.id, user.isAuthenticated, layoutError)
+                            returnHtml = html_encodeContent9(returnHtml, user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
                             'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
                             'Call main_TrackContent(main_RenderCache_CurrentPage_ContentName, main_RenderedPageID)
                             'Call main_TrackContentSet(CS)
-                            Call db.executeSql("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & main_RenderedPageID)
+                            Call db.executeSql_getDataTable("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & main_RenderedPageID)
                             'Call app.csv_SetCS(CS, "Viewings", app.csv_GetCSInteger(CS, "Viewings") + 1)
                         End If
                         '
@@ -37726,7 +37714,7 @@ ErrorTrap:
                             addonId = addonCache.localCache.addonList(addonCachePtr).addonCache_Id
                             If addonId > 0 Then
                                 AddonName = addonCache.localCache.addonList(addonCachePtr).addonCache_name
-                                AddonContent = executeAddon_legacy5(addonId, AddonName, "CSPage=-1", addonContextEnum.ContextOnPageStart, "", 0, "", -1)
+                                AddonContent = addon_execute_legacy5(addonId, AddonName, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
                                 main_PageContent = AddonContent & main_PageContent
                             End If
                         End If
@@ -37745,7 +37733,7 @@ ErrorTrap:
                             addonId = addonCache.localCache.addonList(addonCachePtr).addonCache_Id
                             If addonId > 0 Then
                                 AddonName = addonCache.localCache.addonList(addonCachePtr).addonCache_name
-                                AddonContent = executeAddon_legacy5(addonId, AddonName, "CSPage=-1", addonContextEnum.ContextOnPageStart, "", 0, "", -1)
+                                AddonContent = addon_execute_legacy5(addonId, AddonName, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
                                 main_PageContent = main_PageContent & AddonContent
                             End If
                         End If
@@ -38425,7 +38413,7 @@ ErrorTrap:
                         'hint = hint & ",048"
                         ChildListInstanceOptions = EncodeText(cache_pageContent(PCC_ChildListInstanceOptions, main_RenderCache_CurrentPage_PCCPtr))
                         'hint = hint & ",049"
-                        Cell = Cell & executeAddon_legacy2(siteProperties.childListAddonID, "", ChildListInstanceOptions, addonContextEnum.ContextPage, ContentName, PageID, "", PageChildListInstanceID, False, siteProperties.defaultWrapperID, "", AddonStatusOK, Nothing)
+                        Cell = Cell & addon_execute_legacy2(siteProperties.childListAddonID, "", ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, ContentName, PageID, "", PageChildListInstanceID, False, siteProperties.defaultWrapperID, "", AddonStatusOK, Nothing)
                     End If
                 End If
                 '
@@ -38584,7 +38572,7 @@ ErrorTrap:
             Dim PCCPtr As Integer
             Dim ChildListInstanceOptions As String
             '
-            Call main_AddStylesheetLink2("/cclib/styles/ccQuickEdit.css", "Quick Editor")
+            Call main_AddStylesheetLink2("/ccLib/styles/ccQuickEdit.css", "Quick Editor")
             '
             ' ----- First Active Record - Output Quick Editor form
             '
@@ -38714,7 +38702,7 @@ ErrorTrap:
             ' ----- Child pages
             '
             ChildListInstanceOptions = EncodeText(cache_pageContent(PCC_ChildListInstanceOptions, main_RenderCache_CurrentPage_PCCPtr))
-            PageList = executeAddon_legacy2(siteProperties.childListAddonID, "", ChildListInstanceOptions, addonContextEnum.ContextPage, ContentName, RecordID, "", PageChildListInstanceID, False, -1, "", AddonStatusOK, Nothing)
+            PageList = addon_execute_legacy2(siteProperties.childListAddonID, "", ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, ContentName, RecordID, "", PageChildListInstanceID, False, -1, "", AddonStatusOK, Nothing)
             If vbInstr(1, PageList, "<ul", vbTextCompare) = 0 Then
                 PageList = "(there are no child pages)"
             End If
@@ -39037,7 +39025,10 @@ ErrorTrap:
                             ' remote methods are add-ons
                             '
                             Dim AddonStatusOK As Boolean = True
-                            returnResult = executeAddon(0, addonRoute, Option_String, addonContextEnum.ContextRemoteMethod, HostContentName, hostRecordId, "", "0", False, 0, "", AddonStatusOK, Nothing, "", Nothing, "", user.id, user.isAuthenticated)
+                            '
+                            ' REFACTOR -- must know if this is json or html remote before call because it is an argument -- assume this is a json for now -- must deal with it somehow
+                            '
+                            returnResult = addon_execute(0, addonRoute, Option_String, CPUtilsBaseClass.addonContext.ContextRemoteMethodJson, HostContentName, hostRecordId, "", "0", False, 0, "", AddonStatusOK, Nothing, "", Nothing, "", user.id, user.isAuthenticated)
                         End If
                         '
                         ' deliver styles, javascript and other head tags as javascript appends
@@ -39102,7 +39093,7 @@ ErrorTrap:
                                         & " f.ID = " & fieldId _
                                         & ""
                                     Dim dt As DataTable
-                                    dt = db.executeSql(Sql)
+                                    dt = db.executeSql_getDataTable(Sql)
                                     If dt.Rows.Count > 0 Then
                                         For Each rsDr As DataRow In dt.Rows
                                             addonDefaultEditorName = "&nbsp;(" & EncodeText(rsDr("name")) & ")"
@@ -39120,7 +39111,7 @@ ErrorTrap:
                                         & " left join ccAggregateFunctions a on a.id=r.AddonId)" _
                                         & " where f.id=" & fieldId
 
-                                    dt = db.executeSql(Sql)
+                                    dt = db.executeSql_getDataTable(Sql)
                                     If dt.Rows.Count > 0 Then
                                         For Each rsDr As DataRow In dt.Rows
                                             Dim addonId As Integer = EncodeInteger(rsDr("addonid"))
@@ -39345,7 +39336,7 @@ ErrorTrap:
                                 End If
                                 Call db.cs_Close(CSLog)
                             End If
-                            Call web_Redirect2(web_requestProtocol & webServer.requestDomain & "/cclib/popup/EmailBlocked.htm", "Group Email Spam Block hit. Redirecting to EmailBlocked page.", False)
+                            Call web_Redirect2(web_requestProtocol & webServer.requestDomain & "/ccLib/popup/EmailBlocked.htm", "Group Email Spam Block hit. Redirecting to EmailBlocked page.", False)
                         End If
                     End If
                     '
@@ -39372,7 +39363,7 @@ ErrorTrap:
                                         ' Save the site sites
                                         '
                                         Call appRootFiles.saveFile(DynamicStylesFilename, docProperties.getText("SiteStyles"))
-                                        If main_GetStreamBoolean2(RequestNameInlineStyles) Then
+                                        If doc_getBoolean2(RequestNameInlineStyles) Then
                                             '
                                             ' Inline Styles
                                             '
@@ -39527,7 +39518,7 @@ ErrorTrap:
                         '
                         ' REFACTOR -- when admin code is broken cleanly into an addon, run it through execute
                         '
-                        'returnResult = executeAddon(0, adminSiteAddonGuid, "", addonContextEnum.ContextAdmin, "", 0, "", "", False, 0, "", returnStatusOK, Nothing, "", Nothing, "", user.userid, visit_isAuthenticated)
+                        'returnResult = executeAddon(0, adminSiteAddonGuid, "", CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "", False, 0, "", returnStatusOK, Nothing, "", Nothing, "", user.userid, visit_isAuthenticated)
                         '
                         ' until then, run it as an internal class
                         '
@@ -39546,7 +39537,7 @@ ErrorTrap:
                         Dim defaultAddonId As Integer = cp.Site.GetInteger("Default Route AddonId")
                         If defaultAddonId <> 0 Then
                             Dim addonStatusOk As Boolean = False
-                            returnResult = executeAddon(defaultAddonId, "", "", addonContextEnum.ContextPage, "", 0, "", "", False, 0, "", addonStatusOk, Nothing, "", Nothing, "", user.id, visit_isAuthenticated)
+                            returnResult = addon_execute(defaultAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", addonStatusOk, Nothing, "", Nothing, "", user.id, visit_isAuthenticated)
                         End If
                         'returnResult = addonToBe_pageManager()
                     End If
@@ -39579,7 +39570,7 @@ ErrorTrap:
                 '
                 ' ----- read/create serverConfig
                 '
-                tempFiles = New coreFileSystemClass(Me, True, coreFileSystemClass.fileSyncModeEnum.noSync, getProgramDataFolder)
+                tempFiles = New coreFileSystemClass(Me, True, coreFileSystemClass.fileSyncModeEnum.noSync, getProgramDataPath)
                 JSONTemp = tempFiles.readFile("serverConfig.json")
                 If String.IsNullOrEmpty(JSONTemp) Then
                     '
@@ -39642,10 +39633,6 @@ ErrorTrap:
                             '
                             appConfig.domainList(0) = Mid(appConfig.domainList(0), 1, vbInstr(1, appConfig.domainList(0), ",") - 1)
                         End If
-                        '
-                        ' initialize datasource
-                        '
-                        db.db_AddDataSource("Default", -1, clusterConfig.defaultDataSourceODBCConnectionString)
                         '
                         ' REFACTOR - this was removed because during debug is costs 300msec, and only helps case with small edge case of Db loss -- test that case for risks
                         '
@@ -39868,26 +39855,32 @@ ErrorTrap:
                         If parser.Files.Count > 0 Then
                             Dim ptr As Integer = 0
                             Dim ptrText As String
-                            Dim tmpFilename As String
                             Dim instanceId As String = cp.Utils.CreateGuid()
                             For Each file As FilePart In parser.Files
                                 If file.FileName.Length > 0 Then
+                                    Dim prop As New docPropertiesClass
                                     ptrText = ptr.ToString
-                                    tmpFilename = instanceId & ptrText & ".bin"
-                                    deleteOnDisposeFileList.Add(tmpFilename)
-                                    '0formname=formname&0filename=filename&0type=fileType&0file=tempfile&0error=errors&0size=fileSize
-                                    Using fileStream As System.IO.FileStream = System.IO.File.OpenWrite(privateFiles.rootLocalFolderPath & tmpFilename)
+                                    prop.Name = file.Name
+                                    prop.Value = file.FileName
+                                    prop.NameValue = EncodeRequestVariable(prop.Name) & "=" & EncodeRequestVariable(prop.Value)
+                                    prop.IsFile = True
+                                    prop.IsForm = True
+                                    prop.tmpPrivatePathfilename = instanceId & "-" & ptrText & ".bin"
+                                    deleteOnDisposeFileList.Add(prop.tmpPrivatePathfilename)
+                                    Using fileStream As System.IO.FileStream = System.IO.File.OpenWrite(privateFiles.rootLocalPath & prop.tmpPrivatePathfilename)
                                         file.Data.CopyTo(fileStream)
                                     End Using
-                                    docProperties.setProperty(file.Name, file.FileName, True, True)
+                                    prop.FileSize = CInt(file.Data.Length)
+                                    docProperties.setProperty(file.Name, prop)
+                                    '
                                     webServer.requesFilesString = "" _
-                                    & "&" & ptrText & "formname=" & file.Name _
-                                    & "&" & ptrText & "filename=" & file.FileName _
-                                    & "&" & ptrText & "type=" _
-                                    & "&" & ptrText & "tmpFile=" & tmpFilename _
-                                    & "&" & ptrText & "error=" _
-                                    & "&" & ptrText & "size=" _
-                                    & ""
+                                        & "&" & ptrText & "formname=" & EncodeRequestVariable(prop.Name) _
+                                        & "&" & ptrText & "filename=" & EncodeRequestVariable(prop.Value) _
+                                        & "&" & ptrText & "type=" _
+                                        & "&" & ptrText & "tmpFile=" & EncodeRequestVariable(prop.tmpPrivatePathfilename) _
+                                        & "&" & ptrText & "error=" _
+                                        & "&" & ptrText & "size=" & prop.FileSize _
+                                        & ""
                                     ptr += 1
                                 End If
                             Next
@@ -39945,7 +39938,7 @@ ErrorTrap:
                 '
                 If returnUserError = "" Then
                     If privateFiles.pathExists(privateFolder) Then
-                        returnOk = addonInstall.InstallCollectionFromPrivateFolder(builder, db.dataBuildVersion, privateFolder, iisResetRequired, appConfig.name, returnUserError, installedCollectionGuid, False)
+                        returnOk = addonInstall.InstallCollectionFromPrivateFolder(builder, db.siteproperty_dataBuildVersion, privateFolder, iisResetRequired, appConfig.name, returnUserError, installedCollectionGuid, False)
                         'If iisResetRequired Then
                         '    Dim sitebuilder As New builderClass(Me)
                         '    sitebuilder.web.reset()
@@ -40012,7 +40005,7 @@ ErrorTrap:
                             logPath = logPath & "\"
                         End If
                         logPath = "clibLogs\" & logPath
-                        logPathRoot = cluster.localClusterFiles.rootLocalFolderPath
+                        logPathRoot = cluster.localClusterFiles.rootLocalPath
                         If Not cluster.localClusterFiles.pathExists(logPath) Then
                             Call cluster.localClusterFiles.createPath(logPath)
                         Else
@@ -40597,17 +40590,17 @@ ErrorTrap:
                 Dim cid As Integer
                 Dim sqlGroupName As String = db.encodeSQLText(groupName)
                 '
-                dt = db.executeSql("SELECT ID FROM CCGROUPS WHERE NAME=" & sqlGroupName & "")
+                dt = db.executeSql_getDataTable("SELECT ID FROM CCGROUPS WHERE NAME=" & sqlGroupName & "")
                 If dt.Rows.Count > 0 Then
                     returnGroupId = EncodeInteger(dt.Rows(0).Item("ID"))
                 Else
                     cid = metaData.getContentId("groups")
                     createkey = GetRandomInteger()
                     sql = "insert into ccgroups (contentcontrolid,active,createkey,name,caption) values (" & cid & ",1," & createkey & "," & sqlGroupName & "," & sqlGroupName & ")"
-                    Call db.executeSql(sql)
+                    Call db.executeSql_getDataTable(sql)
                     '
                     sql = "select top 1 id from ccgroups where createkey=" & createkey & " order by id desc"
-                    dt = db.executeSql(sql)
+                    dt = db.executeSql_getDataTable(sql)
                     If dt.Rows.Count > 0 Then
                         returnGroupId = EncodeInteger(dt.Rows(0).Item(0))
                     End If
@@ -40630,7 +40623,7 @@ ErrorTrap:
             Dim returnGroupId As Integer = 0
             Try
                 '
-                Dim cs As Contensive.BaseClasses.CPCSBaseClass = cp.CSNew
+                Dim cs As CPCSBaseClass = cp.CSNew
                 Dim IsAlreadyThere As Boolean = False
                 Dim sqlCriteria As String = db.getNameIdOrGuidSqlCriteria(GroupNameOrGuid)
                 Dim groupName As String
@@ -40679,7 +40672,7 @@ ErrorTrap:
         Public Sub group_addUser(ByVal groupId As Integer, Optional ByVal userid As Integer = 0, Optional ByVal dateExpires As Date = #12:00:00 AM#)
             Try
                 '
-                Dim CS As Contensive.BaseClasses.CPCSBaseClass
+                Dim CS As CPCSBaseClass
                 Dim groupName As String
                 '
                 If True Then
@@ -40722,7 +40715,7 @@ ErrorTrap:
             Try
                 '
                 Dim GroupID As Integer
-                Dim CS As Contensive.BaseClasses.CPCSBaseClass
+                Dim CS As CPCSBaseClass
                 '
                 If groupNameOrGuid <> "" Then
                     GroupID = db.getRecordID("groups", groupNameOrGuid)
@@ -40844,8 +40837,8 @@ ErrorTrap:
                     RecordID = db.cs_getInteger(CS, "ID")
                     contactPeopleId = db.cs_getInteger(CS, "modifiedBy")
                     returnCopy = db.db_GetCS(CS, "Copy")
-                    returnCopy = html_executeContentCommands(Nothing, returnCopy, addonContextEnum.ContextPage, personalizationPeopleId, personalizationIsAuthenticated, Return_ErrorMessage)
-                    returnCopy = html_encodeContent10(returnCopy, personalizationPeopleId, "copy content", RecordID, contactPeopleId, False, False, True, True, False, True, "", "", False, 0, "", addonContextEnum.ContextPage, False, Nothing, False)
+                    returnCopy = html_executeContentCommands(Nothing, returnCopy, CPUtilsBaseClass.addonContext.ContextPage, personalizationPeopleId, personalizationIsAuthenticated, Return_ErrorMessage)
+                    returnCopy = html_encodeContent10(returnCopy, personalizationPeopleId, "copy content", RecordID, contactPeopleId, False, False, True, True, False, True, "", "", False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, False, Nothing, False)
                     '
                     If True Then
                         If user.isEditingAnything() Then
@@ -40906,6 +40899,54 @@ ErrorTrap:
         '
         Public Function addon_getPrivateFilesAddonPath() As String
             Return "addons\"
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' return the docProperties collection as the legacy optionString
+        ''' </summary>
+        ''' <returns></returns>
+        Public Function getLegacyOptionStringFromVar() As String
+            Dim returnString As String = ""
+            Try
+                For Each kvp As KeyValuePair(Of String, docPropertiesClass) In docProperties.docPropertiesDict
+                    returnString &= "" & "&" & encodeLegacyAddonOptionArgument(kvp.Key) & "=" & encodeLegacyAddonOptionArgument(kvp.Value.Value)
+                Next
+            Catch ex As Exception
+                handleExceptionAndRethrow(ex)
+            End Try
+            Return returnString
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Encodes an argument in an Addon OptionString (QueryString) for all non-allowed characters
+        ''' Arg0,Arg1,Arg2,Arg3,Name=Value&Name=VAlue[Option1|Option2]
+        ''' call this before parsing them together
+        ''' call decodeAddonOptionArgument after parsing them apart
+        ''' </summary>
+        ''' <param name="Arg"></param>
+        ''' <returns></returns>
+        '------------------------------------------------------------------------------------------------------------
+        '
+        Private Function encodeLegacyAddonOptionArgument(ByVal Arg As String) As String
+            Dim a As String = ""
+            If Not String.IsNullOrEmpty(Arg) Then
+                a = Arg
+                a = vbReplace(a, vbCrLf, "#0013#")
+                a = vbReplace(a, vbLf, "#0013#")
+                a = vbReplace(a, vbCr, "#0013#")
+                a = vbReplace(a, "&", "#0038#")
+                a = vbReplace(a, "=", "#0061#")
+                a = vbReplace(a, ",", "#0044#")
+                a = vbReplace(a, """", "#0034#")
+                a = vbReplace(a, "'", "#0039#")
+                a = vbReplace(a, "|", "#0124#")
+                a = vbReplace(a, "[", "#0091#")
+                a = vbReplace(a, "]", "#0093#")
+                a = vbReplace(a, ":", "#0058#")
+            End If
+            Return a
         End Function
         '
         '====================================================================================================
@@ -41010,121 +41051,121 @@ ErrorTrap:
                     ' ----- dispose objects created here
                     '
                     If Not (_addonCache Is Nothing) Then
-                            ' no dispose
-                            'Call _addonCache.Dispose()
-                            _addonCache = Nothing
-                        End If
-                        '
-                        If Not (_db Is Nothing) Then
-                            Call _db.Dispose()
-                            _db = Nothing
-                        End If
-                        '
-                        If Not (_metaData Is Nothing) Then
-                            Call _metaData.Dispose()
-                            _metaData = Nothing
-                        End If
-                        '
-                        If Not (_cluster Is Nothing) Then
-                            Call _cluster.Dispose()
-                            _cluster = Nothing
-                        End If
-                        '
-                        If Not (_cache Is Nothing) Then
-                            Call _cache.Dispose()
-                            _cache = Nothing
-                        End If
-                        '
-                        If Not (_workflow Is Nothing) Then
-                            Call _workflow.Dispose()
-                            _workflow = Nothing
-                        End If
-                        '
-                        If Not (_siteProperties Is Nothing) Then
-                            ' no dispose
-                            'Call _siteProperties.Dispose()
-                            _siteProperties = Nothing
-                        End If
-                        '
-                        If Not (_json Is Nothing) Then
-                            ' no dispose
-                            'Call _json.Dispose()
-                            _json = Nothing
-                        End If
-                        '
-                        If Not (_user Is Nothing) Then
-                            ' no dispose
-                            'Call _user.Dispose()
-                            _user = Nothing
-                        End If
-                        '
-                        If Not (_domains Is Nothing) Then
-                            ' no dispose
-                            'Call _domains.Dispose()
-                            _domains = Nothing
-                        End If
-                        '
-                        If Not (_doc Is Nothing) Then
-                            ' no dispose
-                            'Call _doc.Dispose()
-                            _doc = Nothing
-                        End If
-                        '
-                        If Not (_security Is Nothing) Then
-                            ' no dispose
-                            'Call _security.Dispose()
-                            _security = Nothing
-                        End If
-                        '
-                        If Not (_webServer Is Nothing) Then
-                            ' no dispose
-                            'Call _webServer.Dispose()
-                            _webServer = Nothing
-                        End If
-                        '
-                        If Not (_menuFlyout Is Nothing) Then
-                            ' no dispose
-                            'Call _menuFlyout.Dispose()
-                            _menuFlyout = Nothing
-                        End If
-                        '
-                        If Not (_visitProperty Is Nothing) Then
-                            ' no dispose
-                            'Call _visitProperty.Dispose()
-                            _visitProperty = Nothing
-                        End If
-                        '
-                        If Not (_visitorProperty Is Nothing) Then
-                            ' no dispose
-                            'Call _visitorProperty.Dispose()
-                            _visitorProperty = Nothing
-                        End If
-                        '
-                        If Not (_userProperty Is Nothing) Then
-                            ' no dispose
-                            'Call _userProperty.Dispose()
-                            _userProperty = Nothing
-                        End If
-                        '
-                        If Not (_db Is Nothing) Then
-                            Call _db.Dispose()
-                            _db = Nothing
-                        End If
-                        '
-                        If Not (_cluster Is Nothing) Then
-                            Call _cluster.Dispose()
-                            _cluster = Nothing
-                        End If
-                        '
-                        If Not (_metaData Is Nothing) Then
-                            _metaData.Dispose()
-                            _metaData = Nothing
-                        End If
+                        ' no dispose
+                        'Call _addonCache.Dispose()
+                        _addonCache = Nothing
                     End If
                     '
-                    ' cleanup non-managed objects
+                    If Not (_db Is Nothing) Then
+                        Call _db.Dispose()
+                        _db = Nothing
+                    End If
                     '
+                    If Not (_metaData Is Nothing) Then
+                        Call _metaData.Dispose()
+                        _metaData = Nothing
+                    End If
+                    '
+                    If Not (_cluster Is Nothing) Then
+                        Call _cluster.Dispose()
+                        _cluster = Nothing
+                    End If
+                    '
+                    If Not (_cache Is Nothing) Then
+                        Call _cache.Dispose()
+                        _cache = Nothing
+                    End If
+                    '
+                    If Not (_workflow Is Nothing) Then
+                        Call _workflow.Dispose()
+                        _workflow = Nothing
+                    End If
+                    '
+                    If Not (_siteProperties Is Nothing) Then
+                        ' no dispose
+                        'Call _siteProperties.Dispose()
+                        _siteProperties = Nothing
+                    End If
+                    '
+                    If Not (_json Is Nothing) Then
+                        ' no dispose
+                        'Call _json.Dispose()
+                        _json = Nothing
+                    End If
+                    '
+                    If Not (_user Is Nothing) Then
+                        ' no dispose
+                        'Call _user.Dispose()
+                        _user = Nothing
+                    End If
+                    '
+                    If Not (_domains Is Nothing) Then
+                        ' no dispose
+                        'Call _domains.Dispose()
+                        _domains = Nothing
+                    End If
+                    '
+                    If Not (_doc Is Nothing) Then
+                        ' no dispose
+                        'Call _doc.Dispose()
+                        _doc = Nothing
+                    End If
+                    '
+                    If Not (_security Is Nothing) Then
+                        ' no dispose
+                        'Call _security.Dispose()
+                        _security = Nothing
+                    End If
+                    '
+                    If Not (_webServer Is Nothing) Then
+                        ' no dispose
+                        'Call _webServer.Dispose()
+                        _webServer = Nothing
+                    End If
+                    '
+                    If Not (_menuFlyout Is Nothing) Then
+                        ' no dispose
+                        'Call _menuFlyout.Dispose()
+                        _menuFlyout = Nothing
+                    End If
+                    '
+                    If Not (_visitProperty Is Nothing) Then
+                        ' no dispose
+                        'Call _visitProperty.Dispose()
+                        _visitProperty = Nothing
+                    End If
+                    '
+                    If Not (_visitorProperty Is Nothing) Then
+                        ' no dispose
+                        'Call _visitorProperty.Dispose()
+                        _visitorProperty = Nothing
+                    End If
+                    '
+                    If Not (_userProperty Is Nothing) Then
+                        ' no dispose
+                        'Call _userProperty.Dispose()
+                        _userProperty = Nothing
+                    End If
+                    '
+                    If Not (_db Is Nothing) Then
+                        Call _db.Dispose()
+                        _db = Nothing
+                    End If
+                    '
+                    If Not (_cluster Is Nothing) Then
+                        Call _cluster.Dispose()
+                        _cluster = Nothing
+                    End If
+                    '
+                    If Not (_metaData Is Nothing) Then
+                        _metaData.Dispose()
+                        _metaData = Nothing
+                    End If
                 End If
+                '
+                ' cleanup non-managed objects
+                '
+            End If
         End Sub
 #End Region        '
     End Class

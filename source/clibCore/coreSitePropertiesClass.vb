@@ -438,24 +438,24 @@ Namespace Contensive.Core
 
                 RecordID = 0
                 SQL = "SELECT ID FROM CCSETUP WHERE NAME=" & cpCore.db.encodeSQLText(propertyName) & " order by id"
-                dt = cpCore.db.executeSql(SQL)
+                dt = cpCore.db.executeSql_getDataTable(SQL)
                 If dt.Rows.Count > 0 Then
                     RecordID = EncodeInteger(dt.Rows(0).Item("ID"))
                 End If
                 If RecordID <> 0 Then
                     SQL = "UPDATE ccSetup Set FieldValue=" & cpCore.db.encodeSQLText(Value) & ",ModifiedDate=" & SQLNow & " WHERE ID=" & RecordID
-                    Call cpCore.db.executeSql(SQL)
+                    Call cpCore.db.executeSql_getDataTable(SQL)
                 Else
                     ' get contentId manually, getContentId call checks cache, which gets site property, which may set
                     ContentID = 0
                     SQL = "SELECT ID FROM cccontent WHERE NAME='site properties' order by id"
-                    dt = cpCore.db.executeSql(SQL)
+                    dt = cpCore.db.executeSql_getDataTable(SQL)
                     If dt.Rows.Count > 0 Then
                         ContentID = EncodeInteger(dt.Rows(0).Item("ID"))
                     End If
                     'ContentID = csv_GetContentID("Site Properties")
                     SQL = "INSERT INTO ccSetup (ACTIVE,CONTENTCONTROLID,NAME,FIELDVALUE,ModifiedDate,DateAdded)VALUES(" & SQLTrue & "," & cpCore.db.encodeSQLNumber(ContentID) & "," & cpCore.db.encodeSQLText(UCase(propertyName)) & "," & cpCore.db.encodeSQLText(Value) & "," & SQLNow & "," & SQLNow & ");"
-                    Call cpCore.db.executeSql(SQL)
+                    Call cpCore.db.executeSql_getDataTable(SQL)
                 End If
                 Call cpCore.cache.setKey(cacheName, Value, "site properties")
 
@@ -504,7 +504,7 @@ Namespace Contensive.Core
                 Dim dt As DataTable
 
                 SQL = "select FieldValue from ccSetup where name=" & cpCore.db.encodeSQLText(PropertyName) & " order by id"
-                dt = cpCore.db.executeSql(SQL)
+                dt = cpCore.db.executeSql_getDataTable(SQL)
                 If dt.Rows.Count > 0 Then
                     returnString = EncodeText(dt.Rows(0).Item("FieldValue"))
                     return_propertyFound = True

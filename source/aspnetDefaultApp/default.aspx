@@ -3,7 +3,7 @@
         Dim cp As Contensive.Core.CPClass
         Dim doc As String
         '
-        cp = New Contensive.Core.CPClass("appName", HttpContext.Current)
+        cp = New Contensive.Core.CPClass("testapp", HttpContext.Current)
         doc = cp.executeRoute()
         If cp.Response.isOpen() Then
             '

@@ -297,9 +297,9 @@ Namespace Contensive
                 If returnTaskAdded Then
                     cs = cpSiteCore.db.cs_insertRecord("tasks")
                     If cpSiteCore.db.cs_Ok(cs) Then
-                        cpSiteCore.db.db_SetCSField(cs, "name", "")
-                        cpSiteCore.db.db_SetCSField(cs, "command", Command)
-                        cpSiteCore.db.db_SetCSField(cs, "cmdDetail", cmdDetailJson)
+                        cpSiteCore.db.cs_setField(cs, "name", "")
+                        cpSiteCore.db.cs_setField(cs, "command", Command)
+                        cpSiteCore.db.cs_setField(cs, "cmdDetail", cmdDetailJson)
                         returnTaskAdded = True
                     End If
                     Call cpSiteCore.db.cs_Close(cs)

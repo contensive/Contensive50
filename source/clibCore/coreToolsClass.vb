@@ -600,7 +600,7 @@ ErrorTrap:
                                                         Case Else
                                                             SQL = "alter table " & CDef.ContentTableName & " alter column " & .nameLc & " " & cpCore.db_GetSQLAlterColumnType(DataSourceName, formFieldTypeId) & ";"
                                                     End Select
-                                                    Call cpCore.db.executeSql(SQL, DataSourceName)
+                                                    Call cpCore.db.executeSql_getDataTable(SQL, DataSourceName)
                                                 End If
                                                 SQL = "Update ccFields" _
                                                 & " Set name=" & cpCore.db.encodeSQLText(formFieldName) _
@@ -626,7 +626,7 @@ ErrorTrap:
                                                     SQL &= ",DeveloperOnly=" & cpCore.db.encodeSQLBoolean(cpCore.doc_getBoolean("dtfaDeveloperOnly." & RecordPointer))
                                                 End If
                                                 SQL &= " where ID=" & formFieldId
-                                                Call cpCore.db.executeSql(SQL)
+                                                Call cpCore.db.executeSql_getDataTable(SQL)
                                                 'CSPointer = cpCore.app.db_csOpen("Content Fields", "ID=" & RecordID, , False)
                                                 'If cpCore.asv.csv_IsCSOK(CSPointer) Then
                                                 '    Call cpCore.app.db_SetCS(CSPointer, "name", FieldName)
@@ -836,7 +836,7 @@ ErrorTrap:
                             '
                             ' edit button
                             '
-                            streamRow.Add("<td class=""ccPanelInput"" align=""left""><img src=""/cclib/images/spacer.gif"" width=""1"" height=""10"">")
+                            streamRow.Add("<td class=""ccPanelInput"" align=""left""><img src=""/ccLib/images/spacer.gif"" width=""1"" height=""10"">")
                             ContentFieldsCID = Local_GetContentID("Content Fields")
                             If (ContentFieldsCID <> 0) Then
                                 streamRow.Add("<nobr>" & SpanClassAdminSmall & "[<a href=""?aa=" & AdminActionNop & "&af=" & AdminFormEdit & "&id=" & formFieldId & "&cid=" & ContentFieldsCID & "&mm=0"">EDIT</a>]</span></nobr>")
@@ -1115,7 +1115,7 @@ ErrorTrap:
             GetForm_RootRow = GetForm_RootRow & SpanClassAdminNormal & "<P class=""ccAdminNormal""><A href=""" & cpCore.web_requestPage & "?af=" & AdminFormToolId.ToString() & """><B>" & Caption & "</b></SPAN></A></p>"
             GetForm_RootRow = GetForm_RootRow & "</td></tr>"
             If Description <> "" Then
-                GetForm_RootRow = GetForm_RootRow & "<tr><td width=""30""><img src=""/cclib/images/spacer.gif"" height=""1"" width=""30""></td>"
+                GetForm_RootRow = GetForm_RootRow & "<tr><td width=""30""><img src=""/ccLib/images/spacer.gif"" height=""1"" width=""30""></td>"
                 GetForm_RootRow = GetForm_RootRow & "<td width=""100%""><P class=""ccAdminsmall"">" & Description & "</p></td></tr>"
             End If
             Exit Function
@@ -1249,7 +1249,7 @@ ErrorTrap:
                     Call Stream.Add("<P>" & SpanClassAdminSmall)
                     Stream.Add(Now() & " Executing sql [" & SQL & "] on DataSource [" & DataSourceName & "]")
                     Try
-                        RS = cpCore.db.executeSql(SQL, DataSourceName, PageSize * (PageNumber - 1), PageSize)
+                        RS = cpCore.db.executeSql_getDataTable(SQL, DataSourceName, PageSize * (PageNumber - 1), PageSize)
                     Catch ex As Exception
                         '
                         ' ----- error
@@ -2799,7 +2799,7 @@ ErrorTrap:
                 '
                 Call Stream.Add("<br>")
                 Call Stream.Add("<br>Clearing Content Watch Link field...")
-                Call cpCore.db.executeSql("update ccContentWatch set Link=null;")
+                Call cpCore.db.executeSql_getDataTable("update ccContentWatch set Link=null;")
                 Call Stream.Add("<br>Content Watch Link field cleared.")
             End If
             '
@@ -3017,7 +3017,7 @@ ErrorTrap:
                 NextTicks = 0
                 For TestPointer = 1 To TestCount
                     TestTicks = GetTickCount
-                    RS = cpCore.db.executeSql(SQL)
+                    RS = cpCore.db.executeSql_getDataTable(SQL)
                     OpenTicks = OpenTicks + GetTickCount - TestTicks
                     RecordCount = 0
                     TestTicks = GetTickCount
@@ -3138,7 +3138,7 @@ ErrorTrap:
             Dim dt As DataTable
             '
             Local_GetContentID = 0
-            dt = cpCore.db.executeSql("Select ID from ccContent where name=" & cpCore.db.encodeSQLText(ContentName))
+            dt = cpCore.db.executeSql_getDataTable("Select ID from ccContent where name=" & cpCore.db.encodeSQLText(ContentName))
             If dt.Rows.Count > 0 Then
                 Local_GetContentID = EncodeInteger(dt.Rows(0).Item(0))
             End If
@@ -3161,7 +3161,7 @@ ErrorTrap:
             Dim dt As DataTable
             '
             Local_GetContentNameByID = ""
-            dt = cpCore.db.executeSql("Select name from ccContent where id=" & ContentID)
+            dt = cpCore.db.executeSql_getDataTable("Select name from ccContent where id=" & ContentID)
             If dt.Rows.Count > 0 Then
                 Local_GetContentNameByID = EncodeText(dt.Rows(0).Item(0))
             End If
@@ -3184,7 +3184,7 @@ ErrorTrap:
             Dim RS As DataTable
             '
             Local_GetContentTableName = ""
-            RS = cpCore.db.executeSql("Select ccTables.Name as TableName from ccContent Left Join ccTables on ccContent.ContentTableID=ccTables.ID where ccContent.name=" & cpCore.db.encodeSQLText(ContentName))
+            RS = cpCore.db.executeSql_getDataTable("Select ccTables.Name as TableName from ccContent Left Join ccTables on ccContent.ContentTableID=ccTables.ID where ccContent.name=" & cpCore.db.encodeSQLText(ContentName))
             If RS.Rows.Count > 0 Then
                 Local_GetContentTableName = EncodeText(RS.Rows(0).Item(0))
             End If
@@ -3212,7 +3212,7 @@ ErrorTrap:
                     & " from ( ccContent Left Join ccTables on ccContent.ContentTableID=ccTables.ID )" _
                     & " Left Join ccDataSources on ccTables.DataSourceID=ccDataSources.ID" _
                     & " where ccContent.name=" & cpCore.db.encodeSQLText(ContentName)
-            RS = cpCore.db.executeSql(SQL)
+            RS = cpCore.db.executeSql_getDataTable(SQL)
             If isDataTableOk(RS) Then
                 Local_GetContentDataSource = EncodeText(RS.Rows(0).Item("Name"))
             End If
@@ -4574,7 +4574,7 @@ ErrorTrap:
             '
             InstanceOptionString = "AdminLayout=1&filesystem=content files"
             'InstanceOptionString = cpCore.main_GetMemberProperty("Addon [File Manager] Options", "")
-            Content = cpCore.executeAddon_legacy1(0, "{B966103C-DBF4-4655-856A-3D204DEF6B21}", InstanceOptionString, coreClass.addonContextEnum.ContextAdmin, "", 0, "", "-2", -1)
+            Content = cpCore.addon_execute_legacy1(0, "{B966103C-DBF4-4655-856A-3D204DEF6B21}", InstanceOptionString, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "-2", -1)
             'If Content = "" Then
             '    IsContentManager = cpCore.user.main_IsContentManager()
             '    Content = FileView.GetContentFileView2( "", IsContentManager, IsContentManager, True, False, True, False)
@@ -4611,7 +4611,7 @@ ErrorTrap:
             '
             InstanceOptionString = "AdminLayout=1&filesystem=website files"
             'InstanceOptionString = cpCore.main_GetMemberProperty("Addon [File Manager] Options", "")
-            Content = cpCore.executeAddon_legacy1(0, "{B966103C-DBF4-4655-856A-3D204DEF6B21}", InstanceOptionString, coreClass.addonContextEnum.ContextAdmin, "", 0, "", "-2", -1)
+            Content = cpCore.addon_execute_legacy1(0, "{B966103C-DBF4-4655-856A-3D204DEF6B21}", InstanceOptionString, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "-2", -1)
             'If Content = "" Then
             '    IsContentManager = cpCore.user.main_IsContentManager()
             '    Content = FileView.GetContentFileView2( "", IsContentManager, IsContentManager, True, False, True, False)

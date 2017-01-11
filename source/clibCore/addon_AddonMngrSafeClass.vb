@@ -121,7 +121,7 @@ Namespace Contensive.Core
                 Dim builder As New coreBuilderClass(cpCore)
                 '
                 ' BuildVersion = cpcore.app.dataBuildVersion
-                Dim dataBuildVersion As String = cpCore.db.dataBuildVersion
+                Dim dataBuildVersion As String = cpCore.db.siteproperty_dataBuildVersion
                 Dim coreVersion As String = cpCore.common_version()
 
                 DbUpToDate = (dataBuildVersion = coreVersion)
@@ -182,7 +182,7 @@ Namespace Contensive.Core
                             Cnt = cpCore.docProperties.getInteger("accnt")
                             If Cnt > 0 Then
                                 For Ptr = 0 To Cnt - 1
-                                    If cpCore.main_GetStreamBoolean2("ac" & Ptr) Then
+                                    If cpCore.doc_getBoolean2("ac" & Ptr) Then
                                         TargetCollectionID = cpCore.doc_getInteger("acID" & Ptr)
                                         TargetCollectionName = cpCore.main_GetRecordName("Add-on Collections", TargetCollectionID)
                                         '
@@ -449,7 +449,7 @@ Namespace Contensive.Core
                             Cnt = cpCore.docProperties.getInteger("aocnt")
                             If Cnt > 0 Then
                                 For Ptr = 0 To Cnt - 1
-                                    If cpCore.main_GetStreamBoolean2("ao" & Ptr) Then
+                                    If cpCore.doc_getBoolean2("ao" & Ptr) Then
                                         Call cpCore.db_DeleteContentRecord("Add-ons", cpCore.docProperties.getInteger("aoID" & Ptr))
                                     End If
                                 Next
@@ -467,7 +467,7 @@ Namespace Contensive.Core
                             ' Upload new collection files
                             '---------------------------------------------------------------------------------------------
                             '
-                            CollectionFilePathPage = cpCore.web_ProcessFormInputFile2("MetaFile", cpCore.privateFiles, InstallFolder)
+                            CollectionFilePathPage = cpCore.web_processFormInputFile("MetaFile", cpCore.privateFiles, InstallFolder)
                             '
                             ' Process the MetaFile
                             '
@@ -480,7 +480,7 @@ Namespace Contensive.Core
                                 UploadsCnt = cpCore.docProperties.getInteger("UploadCount")
                                 ReDim Uploads(UploadsCnt)
                                 For Ptr = 0 To UploadsCnt - 1
-                                    UploadPathPage = cpCore.web_ProcessFormInputFile2("Upload" & Ptr, cpCore.privateFiles, InstallFolder)
+                                    UploadPathPage = cpCore.web_processFormInputFile("Upload" & Ptr, cpCore.privateFiles, InstallFolder)
                                     If UploadPathPage <> "" Then
                                         Uploads(Ptr) = Mid(Replace(UploadPathPage, InstallFolder, ""), 2)
                                         Call HandleClassAppendLog("AddonManager", " app=" & cpCore.appConfig.name & ", Member=" & cpCore.user.name & " (" & cpCore.user.id & "), Uploads=" & Uploads(Ptr))
@@ -527,7 +527,7 @@ Namespace Contensive.Core
                         If AllowInstallFromFolder Then
                             'InstallFolder = cpcore.asv.config.physicalFilePath & InstallFolderName & "\"
                             If cpCore.privateFiles.pathExists(privateFilesInstallPath) Then
-                                UpgradeOK = addonInstall.InstallCollectionFromPrivateFolder(builder, cpCore.db.dataBuildVersion, privateFilesInstallPath, IISResetRequired, cpCore.appConfig.name, ErrorMessage, InstalledCollectionGuid, False)
+                                UpgradeOK = addonInstall.InstallCollectionFromPrivateFolder(builder, cpCore.db.siteproperty_dataBuildVersion, privateFilesInstallPath, IISResetRequired, cpCore.appConfig.name, ErrorMessage, InstalledCollectionGuid, False)
                                 If Not UpgradeOK Then
                                     If ErrorMessage = "" Then
                                         cpCore.error_AddUserError("The Add-on Collection did not install correctly, but no detailed error message was given.")

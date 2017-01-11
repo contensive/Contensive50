@@ -130,8 +130,8 @@ ErrorTrap:
                         '
                         GetTabs = vbReplace(GetTabs, "Replace-HotSpot", "<a href=# Class=""" & TabLinkStyle & """ name=tabLink onClick=""if(document.getElementById('unloaded_" & LiveBodyID & "')){GetURLAjax('" & TabAjaxLink & "','','" & LiveBodyID & "','','')};switchLiveTab2('" & LiveBodyID & "', this,'" & TabID & "','" & TabStyle & "','" & TabWrapperID & "');return false;"">" & Tabs(TabPtr).Caption & "</a>")
                         GetTabs = vbReplace(GetTabs, "Replace-StyleHit", TabStyle)
-                        TabBody = TabBody & "<div id=""" & LiveBodyID & """ class=""" & TabBodyStyle & """ style=""display:none;text-align:center""><div id=""unloaded_" & LiveBodyID & """  style=""text-align:center;padding-top:50px;""><img src=""/cclib/images/ajax-loader-big.gif"" border=0 width=32 height=32></div></div>"
-                        'TabBody = TabBody & "<div onload=""alert('" & LiveBodyID & " onload');"" id=""" & LiveBodyID & """ class=""" & TabBodyStyle & """ style=""display:none;text-align:center""><div id=""unloaded_" & LiveBodyID & """  style=""text-align:center;padding-top:50px;""><img src=""/cclib/images/ajax-loader-big.gif"" border=0 width=32 height=32></div></div>"
+                        TabBody = TabBody & "<div id=""" & LiveBodyID & """ class=""" & TabBodyStyle & """ style=""display:none;text-align:center""><div id=""unloaded_" & LiveBodyID & """  style=""text-align:center;padding-top:50px;""><img src=""/ccLib/images/ajax-loader-big.gif"" border=0 width=32 height=32></div></div>"
+                        'TabBody = TabBody & "<div onload=""alert('" & LiveBodyID & " onload');"" id=""" & LiveBodyID & """ class=""" & TabBodyStyle & """ style=""display:none;text-align:center""><div id=""unloaded_" & LiveBodyID & """  style=""text-align:center;padding-top:50px;""><img src=""/ccLib/images/ajax-loader-big.gif"" border=0 width=32 height=32></div></div>"
                     ElseIf TabLink <> "" Then
                         '
                         ' Link back to server tab
@@ -193,9 +193,9 @@ ErrorTrap:
                 & "<table cellspacing=0 cellPadding=0 border=0 id=Replace-TabID>"
             GetTabBlank = GetTabBlank _
                 & vbCrLf & "<tr>" _
-                & vbCrLf & "<td id=Replace-TabIDR00 colspan=2 class="""" height=1 width=2><img src=""/cclib/images/spacer.gif"" width=2 height=1></td>" _
+                & vbCrLf & "<td id=Replace-TabIDR00 colspan=2 class="""" height=1 width=2><img src=""/ccLib/images/spacer.gif"" width=2 height=1></td>" _
                 & vbCrLf & "<td id=Replace-TabIDR01 colspan=1 class=""Replace-StyleEdge"" height=1></td>" _
-                & vbCrLf & "<td id=Replace-TabIDR02 colspan=3 class="""" height=1 width=3><img src=""/cclib/images/spacer.gif"" width=3 height=1></td>" _
+                & vbCrLf & "<td id=Replace-TabIDR02 colspan=3 class="""" height=1 width=3><img src=""/ccLib/images/spacer.gif"" width=3 height=1></td>" _
                 & vbCrLf & "</tr>"
             GetTabBlank = GetTabBlank _
                 & vbCrLf & "<tr>" _

@@ -29,6 +29,8 @@ Namespace Contensive.BaseClasses
         '
         Public MustOverride Function Login(ByVal UsernameOrEmail As String, ByVal Password As String, Optional ByVal SetAutoLogin As Boolean = False) As Boolean
         Public MustOverride Function LoginByID(ByVal RecordID As String, Optional ByVal SetAutoLogin As Boolean = False) As Boolean
+        Public MustOverride Function LoginByID(ByVal RecordID As Integer) As Boolean
+        Public MustOverride Function LoginByID(ByVal RecordID As Integer, ByVal SetAutoLogin As Boolean) As Boolean
         Public MustOverride Function LoginIsOK(ByVal UsernameOrEmail As String, ByVal Password As String) As Boolean
         Public MustOverride Sub Logout()
         Public MustOverride Function IsNewLoginOK(ByVal Username As String, ByVal Password As String) As Boolean

@@ -40,31 +40,23 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Sub setProperty(key As String, value As String)
-            setProperty(key, value, False, False)
+            setProperty(key, value, False)
         End Sub
         '
         '====================================================================================================
         '
         Public Sub setProperty(key As String, value As String, isForm As Boolean)
-            setProperty(key, value, isForm, False)
-        End Sub
-        '
-        '====================================================================================================
-        '
-        Public Sub setProperty(key As String, value As String, isForm As Boolean, isFile As Boolean)
             Try
                 Dim prop As New docPropertiesClass
                 prop.NameValue = key
-                prop.FileContent = Nothing
                 prop.FileSize = 0
                 prop.fileType = ""
-                prop.IsFile = isFile
+                prop.IsFile = False
                 prop.IsForm = isForm
                 prop.Name = key
                 prop.NameValue = key & "=" & value
                 prop.Value = value
                 setProperty(key, prop)
-
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try

@@ -243,7 +243,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub ProcessInputFile(ByVal HtmlName As String, Optional ByVal VirtualFilePath As String = "") 'Inherits BaseClasses.CPHtmlBaseClass.ProcessInputFile
             If True Then
-                Call cpCore.web_ProcessFormInputFile(HtmlName, VirtualFilePath)
+                Call cpCore.web_processFormInputFile(HtmlName, VirtualFilePath)
             End If
         End Sub
         '

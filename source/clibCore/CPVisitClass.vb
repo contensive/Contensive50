@@ -60,17 +60,16 @@ Namespace Contensive.Core
         '
         '
         Public Overrides Function GetProperty(ByVal PropertyName As String, Optional ByVal DefaultValue As String = "", Optional ByVal TargetVisitId As Integer = 0) As String
-            If True Then
-                Return cpCore.visitProperty.getText(PropertyName, DefaultValue, TargetVisitId)
+            If TargetVisitId = 0 Then
+                Return cpCore.visitProperty.getText(PropertyName, DefaultValue)
             Else
-                Return ""
+                Return cpCore.visitProperty.getText(PropertyName, DefaultValue, TargetVisitId)
             End If
         End Function
         '
         '
         '
-
-        Public Overrides ReadOnly Property Id() As Integer 'Inherits BaseClasses.CPVisitBaseClass.Id
+        Public Overrides ReadOnly Property Id() As Integer
             Get
                 If True Then
                     Return cpCore.visit_Id
@@ -132,8 +131,10 @@ Namespace Contensive.Core
         '
         '
         '
-        Public Overrides Sub SetProperty(ByVal PropertyName As String, ByVal Value As String, Optional ByVal TargetVisitId As Integer = 0) 'Inherits BaseClasses.CPVisitBaseClass.SetProperty
-            If True Then
+        Public Overrides Sub SetProperty(ByVal PropertyName As String, ByVal Value As String, Optional ByVal TargetVisitId As Integer = 0)
+            If TargetVisitId = 0 Then
+                Call cpCore.visitProperty.setProperty(PropertyName, Value)
+            Else
                 Call cpCore.visitProperty.setProperty(PropertyName, Value, TargetVisitId)
             End If
         End Sub

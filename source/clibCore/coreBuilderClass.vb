@@ -420,7 +420,7 @@ Namespace Contensive.Core
                     '
                     Call appendUpgradeLog("LoadDataSources...")
                     Call cpCore.metaData.loadMetaCache_DataSources()
-                    DataBuildVersion = cpCore.db.dataBuildVersion
+                    DataBuildVersion = cpCore.db.siteproperty_dataBuildVersion
                     Call appendUpgradeLog("DataBuildVersion=[" & DataBuildVersion & "]")
                     '
                     '---------------------------------------------------------------------
@@ -443,7 +443,7 @@ Namespace Contensive.Core
                         '
                         Dim cid As Integer
                         cid = cpCore.db.db_GetContentID("people")
-                        dt = cpCore.db.executeSql("select id from ccmembers where (Developer<>0)")
+                        dt = cpCore.db.executeSql_getDataTable("select id from ccmembers where (Developer<>0)")
                         If dt.Rows.Count = 0 Then
                             SQL = "" _
                                 & "insert into ccmembers" _
@@ -452,7 +452,7 @@ Namespace Contensive.Core
                                 & "" _
                                 & "" _
                                 & ""
-                            cpCore.db.executeSql(SQL)
+                            cpCore.db.executeSql_getDataTable(SQL)
                         End If
                         '
                         ' Copy default styles into Template Styles
@@ -686,7 +686,7 @@ Namespace Contensive.Core
                                                 '
                                                 Call appendUpgradeLog("...Open site collectons, iterate through all collections")
                                                 'Dim dt As DataTable
-                                                dt = cpCore.db.executeSql("select * from ccaddoncollections where (ccguid is not null)and(updatable<>0)")
+                                                dt = cpCore.db.executeSql_getDataTable("select * from ccaddoncollections where (ccguid is not null)and(updatable<>0)")
                                                 If dt.Rows.Count > 0 Then
                                                     Dim rowptr As Integer
                                                     For rowptr = 0 To dt.Rows.Count - 1
@@ -1417,14 +1417,14 @@ Namespace Contensive.Core
                 Dim FieldLast As String
                 Dim FieldRecordID As Integer
                 'Dim dt As DataTable
-                dt = cpCore.db.executeSql("Select ID,Name,ParentID from ccMenuEntries where (active<>0) Order By ParentID,Name")
+                dt = cpCore.db.executeSql_getDataTable("Select ID,Name,ParentID from ccMenuEntries where (active<>0) Order By ParentID,Name")
                 If dt.Rows.Count > 0 Then
                     FieldLast = ""
                     For rowptr = 0 To dt.Rows.Count - 1
                         FieldNew = EncodeText(dt.Rows(rowptr).Item("name")) & "." & EncodeText(dt.Rows(rowptr).Item("parentid"))
                         If (FieldNew = FieldLast) Then
                             FieldRecordID = EncodeInteger(dt.Rows(rowptr).Item("ID"))
-                            Call cpCore.db.executeSql("Update ccMenuEntries set active=0 where ID=" & FieldRecordID & ";")
+                            Call cpCore.db.executeSql_getDataTable("Update ccMenuEntries set active=0 where ID=" & FieldRecordID & ";")
                         End If
                         FieldLast = FieldNew
                     Next
@@ -1474,7 +1474,7 @@ Namespace Contensive.Core
                 Dim tableName As String = cdef.ContentTableName
                 Dim cid As Integer = cdef.Id
                 '
-                dt = cpCore.db.executeSql("SELECT ID FROM " & tableName & " WHERE NAME=" & cpCore.db.encodeSQLText(Name) & ";")
+                dt = cpCore.db.executeSql_getDataTable("SELECT ID FROM " & tableName & " WHERE NAME=" & cpCore.db.encodeSQLText(Name) & ";")
                 If dt.Rows.Count = 0 Then
                     ' cid = GetContentID(ContentName)
                     'tableName = cpcore.app.csv_GetContentTablename(ContentName)
@@ -1485,7 +1485,7 @@ Namespace Contensive.Core
                         sql1 &= "," & CodeFieldName
                         sql2 &= "," & Code
                     End If
-                    Call cpCore.db.executeSql(sql1 & sql2 & sql3)
+                    Call cpCore.db.executeSql_getDataTable(sql1 & sql2 & sql3)
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -1720,8 +1720,8 @@ Namespace Contensive.Core
                     '
                     CID = cpCore.db.db_GetContentID("Add-ons")
                     If CID <> 0 Then
-                        Call cpCore.db.executeSql("update ccaggregatefunctions set contentcontrolid=" & CID)
-                        Call cpCore.db.executeSql("delete from cccontent where id in (select c.id from cccontent c left join cctables t on t.id=c.contenttableid where t.name='ccAggregateFunctions' and c.id<>" & CID & ")")
+                        Call cpCore.db.executeSql_getDataTable("update ccaggregatefunctions set contentcontrolid=" & CID)
+                        Call cpCore.db.executeSql_getDataTable("delete from cccontent where id in (select c.id from cccontent c left join cctables t on t.id=c.contenttableid where t.name='ccAggregateFunctions' and c.id<>" & CID & ")")
                     End If
                 End If
                 '
@@ -1769,7 +1769,7 @@ Namespace Contensive.Core
                 & " FROM ccTables LEFT JOIN ccDataSources ON ccTables.DataSourceID = ccDataSources.ID" _
                 & " Where (((ccTables.active) <> 0))" _
                 & " ORDER BY ccDataSources.Name, ccTables.Name;"
-                dt = cpCore.db.executeSql(SQL)
+                dt = cpCore.db.executeSql_getDataTable(SQL)
                 ptr = 0
                 Do While (ptr < dt.Rows.Count)
                     IDVariant = EncodeInteger(dt.Rows(ptr).Item("DataSourceID"))
@@ -1834,7 +1834,7 @@ Namespace Contensive.Core
                 '
                 Call appendUpgradeLogAddStep(cpCore.appConfig.name, "VerifyLibraryFolders", "Verify Library Folders: Images and Downloads")
                 '
-                dt = cpCore.db.executeSql("select id from cclibraryfiles")
+                dt = cpCore.db.executeSql_getDataTable("select id from cclibraryfiles")
                 If dt.Rows.Count = 0 Then
                     Call VerifyRecord("Library Folders", "Images")
                     Call VerifyRecord("Library Folders", "Downloads")
@@ -1995,7 +1995,7 @@ Namespace Contensive.Core
                 '
                 Dim rs As DataTable
                 '
-                rs = cpCore.db.executeSql("Select ID from " & TableName & " where name=" & cpCore.db.encodeSQLText(RecordName))
+                rs = cpCore.db.executeSql_getDataTable("Select ID from " & TableName & " where name=" & cpCore.db.encodeSQLText(RecordName))
                 If isDataTableOk(rs) Then
                     GetIDBYName = EncodeInteger(rs.Rows(0).Item("ID"))
                 End If
@@ -2017,7 +2017,7 @@ Namespace Contensive.Core
                 '
                 If Not (False) Then
                     '
-                    ' Load basic records -- default images are handled in the REsource Library through the /cclib/config/DefaultValues.txt GetDefaultValue(key) mechanism
+                    ' Load basic records -- default images are handled in the REsource Library through the /ccLib/config/DefaultValues.txt GetDefaultValue(key) mechanism
                     '
                     If cpCore.db.getRecordID("Library File Types", "Image") = 0 Then
                         Call VerifyRecord("Library File Types", "Image", "ExtensionList", "'GIF,JPG,JPE,JPEG,BMP,PNG'", False)
@@ -2113,17 +2113,17 @@ Namespace Contensive.Core
                     '
                     Call cpCore.db.cs_Close(CS)
                     CS = cpCore.db.cs_insertRecord(ContentName, SystemMemberID)
-                    Call cpCore.db.db_SetCSField(CS, "NAME", Name)
-                    Call cpCore.db.db_SetCSField(CS, "ACTIVE", True)
-                    Call cpCore.db.db_SetCSField(CS, "Abbreviation", Abbreviation)
-                    Call cpCore.db.db_SetCSField(CS, "CountryID", CountryID)
-                    Call cpCore.db.db_SetCSField(CS, "FIPSState", FIPSState)
+                    Call cpCore.db.cs_setField(CS, "NAME", Name)
+                    Call cpCore.db.cs_setField(CS, "ACTIVE", True)
+                    Call cpCore.db.cs_setField(CS, "Abbreviation", Abbreviation)
+                    Call cpCore.db.cs_setField(CS, "CountryID", CountryID)
+                    Call cpCore.db.cs_setField(CS, "FIPSState", FIPSState)
                 Else
                     '
                     ' verify only fields needed for contensive
                     '
-                    Call cpCore.db.db_SetCSField(CS, "CountryID", CountryID)
-                    Call cpCore.db.db_SetCSField(CS, "Abbreviation", Abbreviation)
+                    Call cpCore.db.cs_setField(CS, "CountryID", CountryID)
+                    Call cpCore.db.cs_setField(CS, "Abbreviation", Abbreviation)
                 End If
                 Call cpCore.db.cs_Close(CS)
             Catch ex As Exception
@@ -2218,12 +2218,12 @@ Namespace Contensive.Core
                     Call cpCore.db.cs_Close(CS)
                     CS = cpCore.db.cs_insertRecord("Countries", SystemMemberID)
                     If cpCore.db.cs_Ok(CS) Then
-                        Call cpCore.db.db_SetCSField(CS, "ACTIVE", True)
+                        Call cpCore.db.cs_setField(CS, "ACTIVE", True)
                     End If
                 End If
                 If cpCore.db.cs_Ok(CS) Then
-                    Call cpCore.db.db_SetCSField(CS, "NAME", Name)
-                    Call cpCore.db.db_SetCSField(CS, "Abbreviation", Abbreviation)
+                    Call cpCore.db.cs_setField(CS, "NAME", Name)
+                    Call cpCore.db.cs_setField(CS, "Abbreviation", Abbreviation)
                     If vbLCase(Name) = "united states" Then
                         Call cpCore.db.cs_set(CS, "DomesticShipping", "1")
                     End If
@@ -2283,7 +2283,7 @@ Namespace Contensive.Core
                 '
                 GroupID = cpCore.group_add("Content Editors")
                 SQL = "Update ccContent Set EditorGroupID=" & cpCore.db.encodeSQLNumber(GroupID) & " where EditorGroupID is null;"
-                Call cpCore.db.executeSql(SQL)
+                Call cpCore.db.executeSql_getDataTable(SQL)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -2705,28 +2705,28 @@ Namespace Contensive.Core
                     cpCore.db.cs_Close(CSEntry)
                     CSEntry = cpCore.db.cs_insertRecord(MenuContentName, SystemMemberID)
                     If cpCore.db.cs_Ok(CSEntry) Then
-                        Call cpCore.db.db_SetCSField(CSEntry, "name", EntryName)
+                        Call cpCore.db.cs_setField(CSEntry, "name", EntryName)
                     End If
                 End If
                 If cpCore.db.cs_Ok(CSEntry) Then
                     If ParentID = 0 Then
-                        Call cpCore.db.db_SetCSField(CSEntry, "ParentID", Nothing)
+                        Call cpCore.db.cs_setField(CSEntry, "ParentID", Nothing)
                     Else
-                        Call cpCore.db.db_SetCSField(CSEntry, "ParentID", ParentID)
+                        Call cpCore.db.cs_setField(CSEntry, "ParentID", ParentID)
                     End If
                     If (ContentID = -1) Then
-                        Call cpCore.db.db_SetCSField(CSEntry, "ContentID", Nothing)
+                        Call cpCore.db.cs_setField(CSEntry, "ContentID", Nothing)
                     Else
-                        Call cpCore.db.db_SetCSField(CSEntry, "ContentID", ContentID)
+                        Call cpCore.db.cs_setField(CSEntry, "ContentID", ContentID)
                     End If
-                    Call cpCore.db.db_SetCSField(CSEntry, "LinkPage", LinkPage)
-                    Call cpCore.db.db_SetCSField(CSEntry, "SortOrder", SortOrder)
-                    Call cpCore.db.db_SetCSField(CSEntry, "AdminOnly", AdminOnly)
-                    Call cpCore.db.db_SetCSField(CSEntry, "DeveloperOnly", DeveloperOnly)
-                    Call cpCore.db.db_SetCSField(CSEntry, "NewWindow", NewWindow)
-                    Call cpCore.db.db_SetCSField(CSEntry, "Active", Active)
+                    Call cpCore.db.cs_setField(CSEntry, "LinkPage", LinkPage)
+                    Call cpCore.db.cs_setField(CSEntry, "SortOrder", SortOrder)
+                    Call cpCore.db.cs_setField(CSEntry, "AdminOnly", AdminOnly)
+                    Call cpCore.db.cs_setField(CSEntry, "DeveloperOnly", DeveloperOnly)
+                    Call cpCore.db.cs_setField(CSEntry, "NewWindow", NewWindow)
+                    Call cpCore.db.cs_setField(CSEntry, "Active", Active)
                     If SupportAddonID Then
-                        Call cpCore.db.db_SetCSField(CSEntry, "AddonID", addonId)
+                        Call cpCore.db.cs_setField(CSEntry, "AddonID", addonId)
                     End If
                 End If
                 Call cpCore.db.cs_Close(CSEntry)

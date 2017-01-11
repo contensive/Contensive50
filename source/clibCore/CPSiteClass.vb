@@ -126,7 +126,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property PhysicalFilePath() As String 'Inherits BaseClasses.CPSiteBaseClass.PhysicalFilePath
             Get
                 'cpCore.handleException(New ApplicationException("PhysicalFilePath is no longer supported. Use cp.file.cdnFiles instead to support scale modes"))
-                Return cpCore.cdnFiles.rootLocalFolderPath
+                Return cpCore.cdnFiles.rootLocalPath
             End Get
         End Property
         '
@@ -136,7 +136,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property PhysicalInstallPath() As String 'Inherits BaseClasses.CPSiteBaseClass.PhysicalInstallPath
             Get
                 'cpCore.handleException(New ApplicationException("physicalInstallPath is no longer supported"))
-                Return cpCore.privateFiles.rootLocalFolderPath
+                Return cpCore.privateFiles.rootLocalPath
             End Get
         End Property
         '
@@ -146,7 +146,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property PhysicalWWWPath() As String 'Inherits BaseClasses.CPSiteBaseClass.PhysicalWWWPath
             Get
                 'cpCore.handleException(New ApplicationException("PhysicalFilePath is no longer supported. Use cp.file.appRootFiles instead to support scale modes"))
-                Return cpCore.appRootFiles.rootLocalFolderPath
+                Return cpCore.appRootFiles.rootLocalPath
             End Get
         End Property
         '

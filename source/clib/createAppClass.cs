@@ -373,7 +373,7 @@ namespace  Contensive.Core {
                 //
                 // create the database on the server
                 //
-                cp.core.cluster.db_executeSql("create database " + appName);
+                cp.core.db.createCatalog(appName);
                 //
                 // copy in the pattern files
                 //

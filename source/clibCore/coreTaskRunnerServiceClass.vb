@@ -142,7 +142,7 @@ Namespace Contensive
                     ' run tasks in task
                     '
                     Using cpCluster As New CPClass
-                        Using programDataFiles As New coreFileSystemClass(cpCluster.core, cpCluster.core.clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib")
+                        Using programDataFiles As New coreFileSystemClass(cpCluster.core, cpCluster.core.clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, normalizeFilePath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) + "clib\")
                             Dim JSONTemp = programDataFiles.readFile("serverConfig.json")
                             Dim serverConfig As serverConfigClass = cpCluster.core.json.Deserialize(Of serverConfigClass)(JSONTemp)
                             If (Not serverConfig.allowTaskRunnerService) Then
@@ -204,7 +204,7 @@ Namespace Contensive
                                     & vbCrLf & " BEGIN TRANSACTION" _
                                     & vbCrLf & " update cctasks set cmdRunner=" & cpSite.core.db.encodeSQLText(runnerGuid) & " where id in (select top 1 id from cctasks where (cmdRunner is null)and(datestarted is null))" _
                                     & vbCrLf & " COMMIT TRANSACTION"
-                                    cpSite.core.db.executeSql(sql)
+                                    cpSite.core.db.executeSql_getDataTable(sql)
                                     CS = cpSite.core.db.csOpen("tasks", "(cmdRunner=" & cpSite.core.db.encodeSQLText(runnerGuid) & ")and(datestarted is null)", "id")
                                     If cpSite.core.db.cs_Ok(CS) Then
                                         'Dim json As New System.Web.Script.Serialization.JavaScriptSerializer
@@ -220,7 +220,7 @@ Namespace Contensive
                                         '
                                         Select Case command.ToLower()
                                             Case taskQueueCommandEnumModule.runAddon
-                                                Call cpSite.core.executeAddon(cmdDetail.addonId, cmdDetail.docProperties, coreClass.addonContextEnum.ContextSimple)
+                                                Call cpSite.core.addon_execute(cmdDetail.addonId, cmdDetail.docProperties, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple)
                                         End Select
                                     End If
                                     cpSite.core.db.cs_Close(CS)

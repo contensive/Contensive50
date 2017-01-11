@@ -337,7 +337,7 @@ Namespace Contensive.Core
             '
             result = New String("")
             Try
-                result = cpCore.db.db_GetCSFilename(CSPointer, FieldName, OriginalFilename, ContentName)
+                result = cpCore.db.cs_getFilename(CSPointer, FieldName, OriginalFilename, ContentName)
                 If result Is Nothing Then
                     result = New String("")
                 End If

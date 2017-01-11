@@ -82,8 +82,8 @@ Namespace Contensive.Core
                     '
                     Call cpCore.db.db_csGoNext(CS)
                     Do While cpCore.db.cs_Ok(CS)
-                        Call cpCore.db.executeSql("update ccmenuentries set parentid=" & GetNavigatorID & " where parentid=" & cpCore.db.cs_getInteger(CS, "ID"))
-                        Call cpCore.db.executeSql("delete from ccmenuentries where id=" & cpCore.db.cs_getInteger(CS, "ID"))
+                        Call cpCore.db.executeSql_getDataTable("update ccmenuentries set parentid=" & GetNavigatorID & " where parentid=" & cpCore.db.cs_getInteger(CS, "ID"))
+                        Call cpCore.db.executeSql_getDataTable("delete from ccmenuentries where id=" & cpCore.db.cs_getInteger(CS, "ID"))
                         Call cpCore.db.db_csGoNext(CS)
                     Loop
                 End If
@@ -355,7 +355,7 @@ ErrorTrap:
                 ' Upgrade the server from the collection files
                 '
                 If UpgradeOK Then
-                    UpgradeOK = installCollectionFromLocalRepo(builder, return_IISResetRequired, CollectionGuid, cpCore.db.dataBuildVersion, return_ErrorMessage, return_RegisterList, ImportFromCollectionsGuidList, IsNewBuild)
+                    UpgradeOK = installCollectionFromLocalRepo(builder, return_IISResetRequired, CollectionGuid, cpCore.db.siteproperty_dataBuildVersion, return_ErrorMessage, return_RegisterList, ImportFromCollectionsGuidList, IsNewBuild)
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -627,7 +627,7 @@ ErrorTrap:
                                                                                                 ' Upgrade the apps from the collection files, do not install on any apps
                                                                                                 '
                                                                                                 If returnOk Then
-                                                                                                    returnOk = installCollectionFromLocalRepo(builder, return_IISResetRequired, LibGUID, cpCore.db.dataBuildVersion, return_ErrorMessage, return_RegisterList, "", IsNewBuild)
+                                                                                                    returnOk = installCollectionFromLocalRepo(builder, return_IISResetRequired, LibGUID, cpCore.db.siteproperty_dataBuildVersion, return_ErrorMessage, return_RegisterList, "", IsNewBuild)
                                                                                                     If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), UpgradeAllAppsFromLocalCollection returned " & returnOk)
                                                                                                 End If
                                                                                                 '
@@ -770,7 +770,7 @@ ErrorTrap:
 
                             Dim loadOk = True
                             Try
-                                Call CollectionFile.Load(cpCore.privateFiles.rootLocalFolderPath & privateFolderPath & Filename)
+                                Call CollectionFile.Load(cpCore.privateFiles.rootLocalPath & privateFolderPath & Filename)
                             Catch ex As Exception
                                 '
                                 ' There was a parse error in this xml file. Set the return message and the flag
@@ -875,7 +875,7 @@ ErrorTrap:
                                             If (NowPart < 10) Then TimeStamp &= "0"
                                             TimeStamp &= NowPart.ToString()
                                             CollectionVersionFolderName = CollectionFolderName & "\" & TimeStamp
-                                            CollectionVersionFolder = cpCore.addon_getPrivateFilesAddonPath() & "\" & CollectionVersionFolderName & "\"
+                                            CollectionVersionFolder = cpCore.addon_getPrivateFilesAddonPath() & CollectionVersionFolderName & "\"
                                             Call cpCore.privateFiles.createPath(CollectionVersionFolder)
                                             '
                                             ' copy all files from source to CollectionVersionFolder
@@ -1352,7 +1352,7 @@ ErrorTrap:
                                         CollectionFilename = Filename
                                         Dim loadOK As Boolean = True
                                         Try
-                                            Call Doc.Load(cpCore.privateFiles.rootLocalFolderPath & CollectionVersionFolder & Filename)
+                                            Call Doc.Load(cpCore.privateFiles.rootLocalPath & CollectionVersionFolder & Filename)
                                         Catch ex As Exception
                                             '
                                             ' error - Need a way to reach the user that submitted the file
@@ -1524,7 +1524,7 @@ ErrorTrap:
                                                                                         ' It is installed in the local collections, update just this site
                                                                                         '
                                                                                         'Call AppendClassLogFile(cmc.appEnvironment.name, "UpgradeAppFromLocalCollection", "processing importcollection node [" & ChildCollectionName & "] of collection [" & Collectionname & "], GUID [" & CollectionGuid & "]. The collection is installed locally, so only this site will be updated.")
-                                                                                        UpgradeOK = UpgradeOK And installCollectionFromLocalRepo(builder, return_IISResetRequired, ChildCollectionGUID, cpCore.db.dataBuildVersion, return_ErrorMessage, return_RegisterList, ImportFromCollectionsGuidList & "," & CollectionGuid, IsNewBuild)
+                                                                                        UpgradeOK = UpgradeOK And installCollectionFromLocalRepo(builder, return_IISResetRequired, ChildCollectionGUID, cpCore.db.siteproperty_dataBuildVersion, return_ErrorMessage, return_RegisterList, ImportFromCollectionsGuidList & "," & CollectionGuid, IsNewBuild)
                                                                                         'UpgradeOK = UpgradeOK And UpgradeAppFromLocalCollection(cmc, Upgrade, Parent_NavID, Return_IISResetRequired, ChildCollectionGUID, cpCore.app.dataBuildVersion, Return_ErrorMessage, Return_RegisterList, ImportFromCollectionsGuidList & "," & CollectionGuid)
                                                                                     Else
                                                                                         '
@@ -2212,13 +2212,13 @@ ErrorTrap:
                                                                                 ' Add-on Node, do part 1 of 2
                                                                                 '   (include add-on node must be done after all add-ons are installed)
                                                                                 '
-                                                                                Call InstallCollectionFromLocalRepo_addonNode_Phase1(CDefSection, AddonGuidFieldName, cpCore.db.dataBuildVersion, CollectionID, UpgradeOK, return_ErrorMessage)
+                                                                                Call InstallCollectionFromLocalRepo_addonNode_Phase1(CDefSection, AddonGuidFieldName, cpCore.db.siteproperty_dataBuildVersion, CollectionID, UpgradeOK, return_ErrorMessage)
                                                                             Case "interfaces"
                                                                                 '
                                                                                 ' Legacy Interface Node
                                                                                 '
                                                                                 For Each CDefInterfaces In CDefSection.ChildNodes
-                                                                                    Call InstallCollectionFromLocalRepo_addonNode_Phase1(CDefInterfaces, AddonGuidFieldName, cpCore.db.dataBuildVersion, CollectionID, UpgradeOK, return_ErrorMessage)
+                                                                                    Call InstallCollectionFromLocalRepo_addonNode_Phase1(CDefInterfaces, AddonGuidFieldName, cpCore.db.siteproperty_dataBuildVersion, CollectionID, UpgradeOK, return_ErrorMessage)
                                                                                 Next
                                                                             Case "otherxml", "importcollection", "sqlindex", "style", "styles", "stylesheet", "adminmenu", "menuentry", "navigatorentry"
                                                                                 '
@@ -2252,13 +2252,13 @@ ErrorTrap:
                                                                                 ' Add-on Node, do part 1 of 2
                                                                                 '   (include add-on node must be done after all add-ons are installed)
                                                                                 '
-                                                                                Call InstallCollectionFromLocalRepo_addonNode_Phase2(CDefSection, AddonGuidFieldName, cpCore.db.dataBuildVersion, CollectionID, UpgradeOK, return_ErrorMessage)
+                                                                                Call InstallCollectionFromLocalRepo_addonNode_Phase2(CDefSection, AddonGuidFieldName, cpCore.db.siteproperty_dataBuildVersion, CollectionID, UpgradeOK, return_ErrorMessage)
                                                                             Case "interfaces"
                                                                                 '
                                                                                 ' Legacy Interface Node
                                                                                 '
                                                                                 For Each CDefInterfaces In CDefSection.ChildNodes
-                                                                                    Call InstallCollectionFromLocalRepo_addonNode_Phase2(CDefInterfaces, AddonGuidFieldName, cpCore.db.dataBuildVersion, CollectionID, UpgradeOK, return_ErrorMessage)
+                                                                                    Call InstallCollectionFromLocalRepo_addonNode_Phase2(CDefInterfaces, AddonGuidFieldName, cpCore.db.siteproperty_dataBuildVersion, CollectionID, UpgradeOK, return_ErrorMessage)
                                                                                 Next
                                                                         End Select
                                                                     Next
@@ -2458,7 +2458,7 @@ ErrorTrap:
                             '
                             LocalFilename = cpCore.addon_getPrivateFilesAddonPath() & "Collections.xml"
                             'LocalFilename = GetProgramPath & "\Addons\Collections.xml"
-                            Call Doc.Save(cpCore.privateFiles.rootLocalFolderPath & LocalFilename)
+                            Call Doc.Save(cpCore.privateFiles.rootLocalPath & LocalFilename)
                         End If
                     End With
                 End If
@@ -2581,7 +2581,7 @@ ErrorTrap:
                     '
                     Call appendInstallLog(TargetInstallAppName, "AddonInstallClass.InstallCollectionFilesFromFolder3", "BuildLocalCollectionFolder returned false with Error Message [" & return_ErrorMessage & "], exiting without calling UpgradeAllAppsFromLocalCollection")
                 Else
-                    returnSuccess = installCollectionFromLocalRepo(builder, return_IISResetRequired, return_CollectionGUID, cpCore.db.dataBuildVersion, return_ErrorMessage, ignoreRefactorOut, "", IsNewBuild)
+                    returnSuccess = installCollectionFromLocalRepo(builder, return_IISResetRequired, return_CollectionGUID, cpCore.db.siteproperty_dataBuildVersion, return_ErrorMessage, ignoreRefactorOut, "", IsNewBuild)
                     If Not returnSuccess Then
                         '
                         ' Upgrade all apps failed
@@ -2592,8 +2592,11 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndNoThrow(ex)
                 returnSuccess = False
+                If (String.IsNullOrEmpty(return_ErrorMessage)) Then
+                    return_ErrorMessage = "There was an unexpected error installing the collection, details [" & ex.Message & "]"
+                End If
             End Try
             Return returnSuccess
         End Function
@@ -4087,9 +4090,9 @@ ErrorTrap:
                     If True Then
                         baseCollectionXml = cpCore.cluster.localClusterFiles.readFile("clibResources\baseCollection.xml")
                         Call installCollection_LoadXmlToMiniCollection(baseCollectionXml, CollectionNew, True, True, isNewBuild, CollectionWorking)
-                        Call installCollection_BuildDbFromMiniCollection(CollectionNew, ignoreRefactor, cpCore.db.dataBuildVersion, isNewBuild)
-                        Call cpCore.db.executeSql("update ccfields set IsBaseField=1")
-                        Call cpCore.db.executeSql("update cccontent set IsBaseContent=1")
+                        Call installCollection_BuildDbFromMiniCollection(CollectionNew, ignoreRefactor, cpCore.db.siteproperty_dataBuildVersion, isNewBuild)
+                        Call cpCore.db.executeSql_getDataTable("update ccfields set IsBaseField=1")
+                        Call cpCore.db.executeSql_getDataTable("update cccontent set IsBaseContent=1")
                     End If
                 End If
                 '
@@ -4155,7 +4158,7 @@ ErrorTrap:
                 Call installCollection_AddMiniCollectionSrcToDst(miniCollectionWorking, miniCollectionToAdd, True)
                 '
                 Call appendInstallLog(cpCore.appConfig.name, "ImportCDefData", "Application: " & cpCore.appConfig.name & ", ImportCDefData, calling BuildDbFromCollection")
-                Call installCollection_BuildDbFromMiniCollection(miniCollectionWorking, return_IISResetRequired, cpCore.db.dataBuildVersion, isNewBuild)
+                Call installCollection_BuildDbFromMiniCollection(miniCollectionWorking, return_IISResetRequired, cpCore.db.siteproperty_dataBuildVersion, isNewBuild)
                 '
                 Call appendInstallLog(cpCore.appConfig.name, "ImportCDefData", "Application: " & cpCore.appConfig.name & ", ImportCDefData done, returning Return_IISResetRequired=" & return_IISResetRequired)
             Catch ex As Exception
@@ -4817,7 +4820,7 @@ ErrorTrap:
                     NodeCount = 0
                     UsedTables = ""
                     SQL = "SELECT Name from ccContent where (active<>0)"
-                    rs = cpCore.db.executeSql(SQL)
+                    rs = cpCore.db.executeSql_getDataTable(SQL)
                     If isDataTableOk(rs) Then
                         UsedTables = convertDataTableColumntoItemList(rs)
                     End If
@@ -4832,7 +4835,7 @@ ErrorTrap:
                                 ContentName = .Name
                                 If vbInstr(1, "," & UsedTables & ",", "," & ContentName & ",", vbTextCompare) = 0 Then
                                     SQL = "Insert into ccContent (name,active,createkey)values(" & cpCore.db.encodeSQLText(ContentName) & ",1,0);"
-                                    Call cpCore.db.executeSql(SQL)
+                                    Call cpCore.db.executeSql_getDataTable(SQL)
                                     UsedTables = UsedTables & "," & ContentName
                                     RequireReload = True
                                 End If
@@ -4900,7 +4903,7 @@ ErrorTrap:
                                     ' stop the errors here, so a bad field does not block the upgrade
                                     '
                                     'On Error Resume Next
-                                    Call installCollection_BuildDbFromCollection_AddCDefToDb(workingCdef, cpCore.db.dataBuildVersion)
+                                    Call installCollection_BuildDbFromCollection_AddCDefToDb(workingCdef, cpCore.db.siteproperty_dataBuildVersion)
                                     RequireReload = True
                                 End If
                             End With
@@ -4924,7 +4927,7 @@ ErrorTrap:
                                 If .HelpChanged Then
                                     fieldId = 0
                                     SQL = "select f.id from ccfields f left join cccontent c on c.id=f.contentid where (f.name=" & cpCore.db.encodeSQLText(FieldName) & ")and(c.name=" & cpCore.db.encodeSQLText(ContentName) & ") order by f.id"
-                                    rs = cpCore.db.executeSql(SQL)
+                                    rs = cpCore.db.executeSql_getDataTable(SQL)
                                     If isDataTableOk(rs) Then
                                         fieldId = EncodeInteger(cpCore.db.db_getDataRowColumnName(rs.Rows(0), "id"))
                                     End If
@@ -4933,7 +4936,7 @@ ErrorTrap:
                                         cpCore.handleLegacyError3(cpCore.appConfig.name, "Can not update help field for content [" & ContentName & "], field [" & FieldName & "] because the field was not found in the Db.", "dll", "builderClass", "UpgradeCDef_BuildDbFromCollection", 0, "", "", False, True, "")
                                     Else
                                         SQL = "select id from ccfieldhelp where fieldid=" & fieldId & " order by id"
-                                        rs = cpCore.db.executeSql(SQL)
+                                        rs = cpCore.db.executeSql_getDataTable(SQL)
                                         If isDataTableOk(rs) Then
                                             FieldHelpID = EncodeInteger(rs.Rows(0).Item("id"))
                                         Else
@@ -4949,7 +4952,7 @@ ErrorTrap:
                                                 End If
                                             End If
                                             SQL = "update ccfieldhelp set active=1,contentcontrolid=" & FieldHelpCID & ",fieldid=" & fieldId & ",helpdefault=" & cpCore.db.encodeSQLText(Copy) & " where id=" & FieldHelpID
-                                            Call cpCore.db.executeSql(SQL)
+                                            Call cpCore.db.executeSql_getDataTable(SQL)
                                         End If
                                     End If
                                 End If
@@ -5232,7 +5235,7 @@ ErrorTrap:
                         ' get contentid and protect content with IsBaseContent true
                         '
                         SQL = cpCore.db.db_GetSQLSelect("default", "ccContent", "ID,IsBaseContent", "name=" & cpCore.db.encodeSQLText(ContentName), "ID", , 1)
-                        rs = cpCore.db.executeSql(SQL)
+                        rs = cpCore.db.executeSql_getDataTable(SQL)
                         If (isDataTableOk(rs)) Then
                             If rs.Rows.Count > 0 Then
                                 'EditorGroupID = cpcore.app.getDataRowColumnName(RS.rows(0), "ID")
@@ -5292,7 +5295,7 @@ ErrorTrap:
                                 '
                                 EditorGroupID = 0
                                 If .EditorGroupName <> "" Then
-                                    rs = cpCore.db.executeSql("select ID from ccGroups where name=" & cpCore.db.encodeSQLText(.EditorGroupName))
+                                    rs = cpCore.db.executeSql_getDataTable("select ID from ccGroups where name=" & cpCore.db.encodeSQLText(.EditorGroupName))
                                     If (isDataTableOk(rs)) Then
                                         If rs.Rows.Count > 0 Then
                                             EditorGroupID = EncodeInteger(cpCore.db.db_getDataRowColumnName(rs.Rows(0), "ID"))
@@ -5305,7 +5308,7 @@ ErrorTrap:
                                     & ",isbasecontent=" & cpCore.db.encodeSQLBoolean(.IsBaseContent) _
                                     & " where id=" & ContentID _
                                     & ""
-                                Call cpCore.db.executeSql(SQL)
+                                Call cpCore.db.executeSql_getDataTable(SQL)
                             End If
                         End If
                         '
@@ -5332,7 +5335,7 @@ ErrorTrap:
                                     ' ----- update content field help records
                                     '
                                     If (.HelpChanged) Then
-                                        rs = cpCore.db.executeSql("select ID from ccFieldHelp where fieldid=" & fieldId)
+                                        rs = cpCore.db.executeSql_getDataTable("select ID from ccFieldHelp where fieldid=" & fieldId)
                                         If (isDataTableOk(rs)) Then
                                             If rs.Rows.Count > 0 Then
                                                 FieldHelpID = EncodeInteger(cpCore.db.db_getDataRowColumnName(rs.Rows(0), "ID"))
@@ -5351,7 +5354,7 @@ ErrorTrap:
                                                 & ",helpdefault=" & cpCore.db.encodeSQLText(.HelpDefault) _
                                                 & ",helpcustom=" & cpCore.db.encodeSQLText(.HelpCustom) _
                                                 & " where id=" & FieldHelpID
-                                            Call cpCore.db.executeSql(SQL)
+                                            Call cpCore.db.executeSql_getDataTable(SQL)
                                         End If
                                     End If
                                 End With
@@ -5962,7 +5965,7 @@ ErrorTrap:
                 Dim DstMenuPtr As Integer
                 Dim SrcNameSpace As String
                 Dim SrcParentName As String
-                DataBuildVersion = cpCore.db.dataBuildVersion
+                DataBuildVersion = cpCore.db.siteproperty_dataBuildVersion
                 For SrcMenuPtr = 0 To srcCollection.MenuCnt - 1
                     DstMenuPtr = 0
                     SrcContentName = vbLCase(srcCollection.Menus(SrcMenuPtr).Name)
@@ -6452,7 +6455,7 @@ ErrorTrap:
                 '
                 TableBad = False
                 RowsFound = 0
-                Using rs As DataTable = cpCore.db.executeSql("Select ID from ccFieldTypes order by id")
+                Using rs As DataTable = cpCore.db.executeSql_getDataTable("Select ID from ccFieldTypes order by id")
                     If (Not isDataTableOk(rs)) Then
                         '
                         ' problem
@@ -6497,7 +6500,7 @@ ErrorTrap:
                         Call Err.Raise(ignoreInteger, "dll", "Content Field Types content definition was not found")
                     Else
                         Do While RowsNeeded > 0
-                            Call cpCore.db.executeSql("Insert into ccFieldTypes (active,contentcontrolid)values(1," & CID & ")")
+                            Call cpCore.db.executeSql_getDataTable("Insert into ccFieldTypes (active,contentcontrolid)values(1," & CID & ")")
                             RowsNeeded = RowsNeeded - 1
                         Loop
                     End If
@@ -6505,28 +6508,28 @@ ErrorTrap:
                 '
                 ' ----- Update the Names of each row
                 '
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='Integer' where ID=1;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='Text' where ID=2;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='LongText' where ID=3;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='Boolean' where ID=4;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='Date' where ID=5;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='File' where ID=6;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='Lookup' where ID=7;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='Redirect' where ID=8;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='Currency' where ID=9;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='TextFile' where ID=10;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='Image' where ID=11;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='Float' where ID=12;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='AutoIncrement' where ID=13;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='ManyToMany' where ID=14;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='Member Select' where ID=15;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='CSS File' where ID=16;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='XML File' where ID=17;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='Javascript File' where ID=18;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='Link' where ID=19;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='Resource Link' where ID=20;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='HTML' where ID=21;")
-                Call cpCore.db.executeSql("Update ccFieldTypes Set active=1,Name='HTML File' where ID=22;")
+                Call cpCore.db.executeSql_getDataTable("Update ccFieldTypes Set active=1,Name='Integer' where ID=1;")
+                Call cpCore.db.executeSql_getDataTable("Update ccFieldTypes Set active=1,Name='Text' where ID=2;")
+                Call cpCore.db.executeSql_getDataTable("Update ccFieldTypes Set active=1,Name='LongText' where ID=3;")
+                Call cpCore.db.executeSql_getDataTable("Update ccFieldTypes Set active=1,Name='Boolean' where ID=4;")
+                Call cpCore.db.executeSql_getDataTable("Update ccFieldTypes Set active=1,Name='Date' where ID=5;")
+                Call cpCore.db.executeSql_getDataTable("Update ccFieldTypes Set active=1,Name='File' where ID=6;")
+                Call cpCore.db.executeSql_getDataTable("Update ccFieldTypes Set active=1,Name='Lookup' where ID=7;")
+                Call cpCore.db.executeSql_getDataTable("Update ccFieldTypes Set active=1,Name='Redirect' where ID=8;")
+                Call cpCore.db.executeSql_getDataTable("Update ccFieldTypes Set active=1,Name='Currency' where ID=9;")
+                Call cpCore.db.executeSql_getDataTable("Update ccFieldTypes Set active=1,Name='TextFile' where ID=10;")
+                Call cpCore.db.executeSql_getDataTable("Update ccFieldTypes Set active=1,Name='Image' where ID=11;")
+                Call cpCore.db.executeSql_getDataTable("Update ccFieldTypes Set active=1,Name='Float' where ID=12;")
+                Call cpCore.db.executeSql_getDataTable("Update ccFieldTypes Set active=1,Name='AutoIncrement' where ID=13;")
+                Call cpCore.db.executeSql_getDataTable("Update ccFieldTypes Set active=1,Name='ManyToMany' where ID=14;")
+                Call cpCore.db.executeSql_getDataTable("Update ccFieldTypes Set active=1,Name='Member Select' where ID=15;")
+                Call cpCore.db.executeSql_getDataTable("Update ccFieldTypes Set active=1,Name='CSS File' where ID=16;")
+                Call cpCore.db.executeSql_getDataTable("Update ccFieldTypes Set active=1,Name='XML File' where ID=17;")
+                Call cpCore.db.executeSql_getDataTable("Update ccFieldTypes Set active=1,Name='Javascript File' where ID=18;")
+                Call cpCore.db.executeSql_getDataTable("Update ccFieldTypes Set active=1,Name='Link' where ID=19;")
+                Call cpCore.db.executeSql_getDataTable("Update ccFieldTypes Set active=1,Name='Resource Link' where ID=20;")
+                Call cpCore.db.executeSql_getDataTable("Update ccFieldTypes Set active=1,Name='HTML' where ID=21;")
+                Call cpCore.db.executeSql_getDataTable("Update ccFieldTypes Set active=1,Name='HTML File' where ID=22;")
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -6696,30 +6699,30 @@ ErrorTrap:
                             Call cpCore.db.cs_set(CSEntry, "ParentID", ParentID)
                         End If
                         If (ContentID = -1) Then
-                            Call cpCore.db.db_SetCSField(CSEntry, "ContentID", Nothing)
+                            Call cpCore.db.cs_setField(CSEntry, "ContentID", Nothing)
                         Else
-                            Call cpCore.db.db_SetCSField(CSEntry, "ContentID", ContentID)
+                            Call cpCore.db.cs_setField(CSEntry, "ContentID", ContentID)
                         End If
-                        Call cpCore.db.db_SetCSField(CSEntry, "LinkPage", LinkPage)
-                        Call cpCore.db.db_SetCSField(CSEntry, "SortOrder", SortOrder)
-                        Call cpCore.db.db_SetCSField(CSEntry, "AdminOnly", AdminOnly)
-                        Call cpCore.db.db_SetCSField(CSEntry, "DeveloperOnly", DeveloperOnly)
-                        Call cpCore.db.db_SetCSField(CSEntry, "NewWindow", NewWindow)
-                        Call cpCore.db.db_SetCSField(CSEntry, "Active", Active)
+                        Call cpCore.db.cs_setField(CSEntry, "LinkPage", LinkPage)
+                        Call cpCore.db.cs_setField(CSEntry, "SortOrder", SortOrder)
+                        Call cpCore.db.cs_setField(CSEntry, "AdminOnly", AdminOnly)
+                        Call cpCore.db.cs_setField(CSEntry, "DeveloperOnly", DeveloperOnly)
+                        Call cpCore.db.cs_setField(CSEntry, "NewWindow", NewWindow)
+                        Call cpCore.db.cs_setField(CSEntry, "Active", Active)
                         If SupportAddonID Then
-                            Call cpCore.db.db_SetCSField(CSEntry, "AddonID", addonId)
+                            Call cpCore.db.cs_setField(CSEntry, "AddonID", addonId)
                         End If
                         If SupportGuid Then
-                            Call cpCore.db.db_SetCSField(CSEntry, GuidFieldName, ccGuid)
+                            Call cpCore.db.cs_setField(CSEntry, GuidFieldName, ccGuid)
                         End If
                         If SupportNavIcon Then
-                            Call cpCore.db.db_SetCSField(CSEntry, "NavIconTitle", NavIconTitle)
+                            Call cpCore.db.cs_setField(CSEntry, "NavIconTitle", NavIconTitle)
                             Dim NavIconID As Integer
                             NavIconID = GetListIndex(NavIconType, NavIconTypeList)
-                            Call cpCore.db.db_SetCSField(CSEntry, "NavIconType", NavIconID)
+                            Call cpCore.db.cs_setField(CSEntry, "NavIconType", NavIconID)
                         End If
                         If SupportInstalledByCollectionID Then
-                            Call cpCore.db.db_SetCSField(CSEntry, "InstalledByCollectionID", InstalledByCollectionID)
+                            Call cpCore.db.cs_setField(CSEntry, "InstalledByCollectionID", InstalledByCollectionID)
                         End If
                         '
                         ' merge any duplicate guid matches
@@ -6727,7 +6730,7 @@ ErrorTrap:
                         Call cpCore.db.db_csGoNext(CSEntry)
                         Do While cpCore.db.cs_Ok(CSEntry)
                             DuplicateID = cpCore.db.cs_getInteger(CSEntry, "ID")
-                            Call cpCore.db.executeSql("update ccMenuEntries set ParentID=" & EntryID & " where ParentID=" & DuplicateID)
+                            Call cpCore.db.executeSql_getDataTable("update ccMenuEntries set ParentID=" & EntryID & " where ParentID=" & DuplicateID)
                             Call cpCore.db.db_DeleteContentRecord(MenuContentName, DuplicateID)
                             Call cpCore.db.db_csGoNext(CSEntry)
                         Loop
@@ -6744,7 +6747,7 @@ ErrorTrap:
                         End If
                         Do While cpCore.db.cs_Ok(CSEntry)
                             DuplicateID = cpCore.db.cs_getInteger(CSEntry, "ID")
-                            Call cpCore.db.executeSql("update ccMenuEntries set ParentID=" & EntryID & " where ParentID=" & DuplicateID)
+                            Call cpCore.db.executeSql_getDataTable("update ccMenuEntries set ParentID=" & EntryID & " where ParentID=" & DuplicateID)
                             Call cpCore.db.db_DeleteContentRecord(MenuContentName, DuplicateID)
                             Call cpCore.db.db_csGoNext(CSEntry)
                         Loop
@@ -6781,13 +6784,13 @@ ErrorTrap:
                     cpCore.db.cs_Close(CSEntry)
                     CSEntry = cpCore.db.cs_insertRecord(ContentName, SystemMemberID)
                     If cpCore.db.cs_Ok(CSEntry) Then
-                        Call cpCore.db.db_SetCSField(CSEntry, "name", Name)
+                        Call cpCore.db.cs_setField(CSEntry, "name", Name)
                     End If
                 End If
                 If cpCore.db.cs_Ok(CSEntry) Then
-                    Call cpCore.db.db_SetCSField(CSEntry, "Link", Link)
-                    Call cpCore.db.db_SetCSField(CSEntry, "ArgumentList", ArgumentList)
-                    Call cpCore.db.db_SetCSField(CSEntry, "SortOrder", SortOrder)
+                    Call cpCore.db.cs_setField(CSEntry, "Link", Link)
+                    Call cpCore.db.cs_setField(CSEntry, "ArgumentList", ArgumentList)
+                    Call cpCore.db.cs_setField(CSEntry, "SortOrder", SortOrder)
                 End If
                 Call cpCore.db.cs_Close(CSEntry)
             Catch ex As Exception
@@ -6825,7 +6828,7 @@ ErrorTrap:
                     cpCore.db.cs_Close(CSEntry)
                     CSEntry = cpCore.db.cs_insertRecord(ContentName, SystemMemberID)
                     If cpCore.db.cs_Ok(CSEntry) Then
-                        Call cpCore.db.db_SetCSField(CSEntry, "name", Name)
+                        Call cpCore.db.cs_setField(CSEntry, "name", Name)
                     End If
                 End If
                 If cpCore.db.cs_Ok(CSEntry) Then
@@ -6863,13 +6866,13 @@ ErrorTrap:
                     cpCore.db.cs_Close(CSEntry)
                     CSEntry = cpCore.db.cs_insertRecord(ContentName, SystemMemberID)
                     If cpCore.db.cs_Ok(CSEntry) Then
-                        Call cpCore.db.db_SetCSField(CSEntry, "name", Name)
+                        Call cpCore.db.cs_setField(CSEntry, "name", Name)
                     End If
                 End If
                 If cpCore.db.cs_Ok(CSEntry) Then
-                    Call cpCore.db.db_SetCSField(CSEntry, "ObjectProgramID", ObjectProgramID)
-                    Call cpCore.db.db_SetCSField(CSEntry, "ArgumentList", ArgumentList)
-                    Call cpCore.db.db_SetCSField(CSEntry, "SortOrder", SortOrder)
+                    Call cpCore.db.cs_setField(CSEntry, "ObjectProgramID", ObjectProgramID)
+                    Call cpCore.db.cs_setField(CSEntry, "ArgumentList", ArgumentList)
+                    Call cpCore.db.cs_setField(CSEntry, "SortOrder", SortOrder)
                 End If
                 Call cpCore.db.cs_Close(CSEntry)
             Catch ex As Exception

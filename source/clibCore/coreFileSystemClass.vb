@@ -43,7 +43,7 @@ Namespace Contensive.Core
         '
         Private cpCore As coreClass
         Private Property isLocal As Boolean
-        Public Property rootLocalFolderPath As String                ' path ends in \, folder ends in foldername 
+        Public Property rootLocalPath As String                ' path ends in \, folder ends in foldername 
         Private Property clusterFileEndpoint As String
         Private Property fileSyncMode As fileSyncModeEnum
         '
@@ -53,19 +53,14 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="cpCore"></param>
         ''' <param name="isLocal">If true, thie object reads/saves to the local filesystem</param>
-        ''' <param name="rootLocalFolder"></param>
+        ''' <param name="rootLocalPath"></param>
         ''' <param name="remoteFileEndpoint">If not isLocal, this endpoint is used for file sync</param>
-        Public Sub New(cpCore As coreClass, isLocal As Boolean, fileSyncMode As fileSyncModeEnum, rootLocalFolder As String, Optional remoteFileEndpoint As String = "")
+        Public Sub New(cpCore As coreClass, isLocal As Boolean, fileSyncMode As fileSyncModeEnum, rootLocalPath As String, Optional remoteFileEndpoint As String = "")
             Me.cpCore = cpCore
             Me.isLocal = isLocal
             Me.clusterFileEndpoint = remoteFileEndpoint
             Me.fileSyncMode = fileSyncMode
-            Me.rootLocalFolderPath = rootLocalFolder
-            If (Not String.IsNullOrEmpty(rootLocalFolder)) Then
-                If (Me.rootLocalFolderPath.Substring(Me.rootLocalFolderPath.Length - 1, 1) <> "\") Then
-                    Me.rootLocalFolderPath &= "\"
-                End If
-            End If
+            Me.rootLocalPath = normalizeFilePath(rootLocalPath)
         End Sub
         '
         '==============================================================================================================
@@ -76,8 +71,8 @@ Namespace Contensive.Core
         Public Function joinPath(ByVal pathPrefix As String, ByVal pathSuffix As String) As String
             Dim returnPath As String = pathPrefix & pathSuffix
             Try
-                pathPrefix = pathPrefix.Replace("/", "\")
-                pathSuffix = pathSuffix.Replace("/", "\")
+                pathPrefix = normalizePath(pathPrefix)
+                pathSuffix = normalizePath(pathSuffix)
                 returnPath = Path.Combine(pathPrefix & pathSuffix)
             Catch ex As Exception
                 '
@@ -167,7 +162,7 @@ Namespace Contensive.Core
             Try
                 Dim path As String
                 '
-                pathFilename = pathFilename.Replace("/", "\")
+                pathFilename = normalizePath(pathFilename)
                 If Not isValidPathFilename(pathFilename) Then
                     Throw New ArgumentException("PathFilename argument is not valid [" & pathFilename & "]")
                 Else
@@ -265,13 +260,10 @@ Namespace Contensive.Core
                 '
                 'MethodName = "CreateFileFolder( " & WorkingPath & " )"
                 '
-                If (physicalFolderPath = "") Then
-                    Throw New ArgumentException("CreateLocalFileFolder called with blank pathname.")
+                If (String.IsNullOrEmpty(physicalFolderPath)) Then
+                    Throw New ArgumentException("CreateLocalFileFolder called with blank path.")
                 Else
-                    WorkingPath = physicalFolderPath.Replace("/", "\")
-                    If Right(WorkingPath, 1) <> "\" Then
-                        WorkingPath = WorkingPath & "\"
-                    End If
+                    WorkingPath = normalizeFilePath(physicalFolderPath)
                     If Not Directory.Exists(WorkingPath) Then
                         Position = vbInstr(1, WorkingPath, "\")
                         Do While Position <> 0
@@ -296,8 +288,8 @@ Namespace Contensive.Core
         '
         Public Sub createPath(ByVal FolderPath As String)
             Try
-                '
-                Call CreatefullPath(joinPath(rootLocalFolderPath, FolderPath))
+                Dim abspath As String = convertToAbsPath(FolderPath)
+                Call CreatefullPath(abspath)
                 If Not isLocal Then
                     ' s3 transfer
                 End If
@@ -356,7 +348,7 @@ Namespace Contensive.Core
                 If (PathName <> "") Then
                     'WorkingPath = PathName
                     Dim localPath As String
-                    localPath = joinPath(rootLocalFolderPath, PathName)
+                    localPath = joinPath(rootLocalPath, PathName)
                     If Right(localPath, 1) = "\" Then
                         localPath = Left(localPath, Len(localPath) - 1)
                     End If
@@ -404,8 +396,8 @@ Namespace Contensive.Core
                             If Not dstFileSystem.pathExists(dstPath) Then
                                 Call dstFileSystem.createPath(dstPath)
                             End If
-                            srcFullPathFilename = rootLocalFolderPath & srcPathFilename
-                            DstFullPathFilename = dstFileSystem.rootLocalFolderPath & dstPathFilename
+                            srcFullPathFilename = rootLocalPath & srcPathFilename
+                            DstFullPathFilename = dstFileSystem.rootLocalPath & dstPathFilename
                             If dstFileSystem.fileExists(dstPathFilename) Then
                                 dstFileSystem.deleteFile(dstPathFilename)
                             End If
@@ -430,7 +422,7 @@ Namespace Contensive.Core
                 Else
                     If pathExists(FolderPath) Then
                         Dim localPath As String
-                        localPath = rootLocalFolderPath & FolderPath
+                        localPath = rootLocalPath & FolderPath
                         Dim di As New IO.DirectoryInfo(localPath)
                         returnFileInfoList = di.GetFiles()
                     End If
@@ -477,7 +469,7 @@ Namespace Contensive.Core
                     If Not pathExists(FolderPath) Then
                         returnFolders = {}
                     Else
-                        Dim localPath As String = rootLocalFolderPath & FolderPath
+                        Dim localPath As String = rootLocalPath & FolderPath
                         Dim di As New DirectoryInfo(localPath)
                         returnFolders = di.GetDirectories()
                     End If
@@ -562,8 +554,8 @@ Namespace Contensive.Core
                 Else
                     If Not isLocal Then
                     Else
-                        SourcePathFilename = SourcePathFilename.Replace("/", "\")
-                        srcFullPathFilename = rootLocalFolderPath & SourcePathFilename
+                        SourcePathFilename = normalizePath(SourcePathFilename)
+                        srcFullPathFilename = joinPath(rootLocalPath, SourcePathFilename)
                         Pos = InStrRev(SourcePathFilename, "\")
                         If Pos >= 0 Then
                             sourceFullPath = Mid(SourcePathFilename, 1, Pos)
@@ -603,7 +595,7 @@ Namespace Contensive.Core
                 '
                 ' Drive Space
                 '
-                driveLetter = rootLocalFolderPath.Substring(0, 1)
+                driveLetter = rootLocalPath.Substring(0, 1)
                 scriptingDrive = New IO.DriveInfo(driveLetter)
                 If scriptingDrive.IsReady Then
                     returnSize = scriptingDrive.AvailableFreeSpace
@@ -666,7 +658,7 @@ Namespace Contensive.Core
                     If dstFileSystem Is Nothing Then
                         dstFileSystem = Me
                     End If
-                    Call copyLocalFileFolder(rootLocalFolderPath & srcPath, dstFileSystem.rootLocalFolderPath & dstPath)
+                    Call copyLocalFileFolder(rootLocalPath & srcPath, dstFileSystem.rootLocalPath & dstPath)
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -724,7 +716,7 @@ Namespace Contensive.Core
                 Dim URLLink As String
                 '
                 If (pathFilename <> "") And (Link <> "") Then
-                    pathFilename = vbReplace(pathFilename, "/", "\")
+                    pathFilename = normalizePath(pathFilename)
                     URLLink = vbReplace(Link, " ", "%20")
                     HTTP.timeout = 600
                     Call HTTP.getUrlToFile(CStr(URLLink), convertToAbsPath(pathFilename))
@@ -775,7 +767,7 @@ Namespace Contensive.Core
                 Dim archivepath As String = getPath(archivePathFilename)
                 Dim archiveFilename As String = GetFilename(archivePathFilename)
                 '
-                fastZip.CreateZip(rootLocalFolderPath & archivePathFilename, rootLocalFolderPath & addPathFilename, recurse, fileFilter)
+                fastZip.CreateZip(rootLocalPath & archivePathFilename, rootLocalPath & addPathFilename, recurse, fileFilter)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -788,13 +780,29 @@ Namespace Contensive.Core
         ''' <param name="path"></param>
         ''' <returns></returns>
         Private Function convertToAbsPath(path As String) As String
-            If (String.IsNullOrEmpty(path)) Then
-                Return rootLocalFolderPath
-            ElseIf (rootLocalFolderPath.ToLower().IndexOf(path.ToLower()) = 0) Then
-                Return path
+            Dim normalizedPath As String = normalizePath(path)
+            If (String.IsNullOrEmpty(normalizedPath)) Then
+                Return rootLocalPath
+            ElseIf (rootLocalPath.ToLower().IndexOf(normalizedPath.ToLower()) = 0) Then
+                Return normalizedPath
+            ElseIf (normalizedPath.IndexOf(":\") >= 0) Then
+                Throw New ApplicationException("Attempt to access an invalid relative path [" & normalizedPath & "] within the physical path [" & rootLocalPath & "].")
             Else
-                Return rootLocalFolderPath & path
+                Return joinPath(rootLocalPath, normalizedPath)
             End If
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Fix the most common issues with file path, wrong slash and double slash
+        ''' </summary>
+        ''' <param name="path"></param>
+        ''' <returns></returns>
+        Private Function normalizePath(path As String) As String
+            Dim returnPath As String = path
+            returnPath = returnPath.Replace("/", "\")
+            returnPath = returnPath.Replace("\\", "\")
+            Return returnPath
         End Function
         '
         '====================================================================================================

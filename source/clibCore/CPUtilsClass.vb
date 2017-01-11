@@ -1,4 +1,7 @@
 
+Option Strict On
+Option Explicit On
+
 Imports cl = Contensive.Core.coreCommonModule
 Imports System.Web.Security.FormsAuthentication
 Imports System.Guid
@@ -173,7 +176,7 @@ Namespace Contensive.Core
                 ElseIf vbIsNumeric(Expression) Then
                     EncodeInteger = CInt(Expression)
                 ElseIf TypeOf Expression Is Boolean Then
-                    If Expression Then
+                    If DirectCast(Expression, Boolean) Then
                         EncodeInteger = 1
                     End If
                 End If
@@ -192,7 +195,7 @@ Namespace Contensive.Core
                 ElseIf vbIsNumeric(Expression) Then
                     EncodeNumber = CDbl(Expression)
                 ElseIf TypeOf Expression Is Boolean Then
-                    If Expression Then
+                    If DirectCast(Expression, Boolean) Then
                         EncodeNumber = 1
                     End If
                 End If
@@ -207,6 +210,8 @@ Namespace Contensive.Core
             EncodeText = ""
             Try
                 If (Expression Is Nothing) Then
+                    EncodeText = ""
+                ElseIf (Expression Is DBNull.Value) Then
                     EncodeText = ""
                 Else
                     EncodeText = CStr(Expression)
@@ -225,7 +230,7 @@ Namespace Contensive.Core
                 If (Expression Is Nothing) Then
                     EncodeBoolean = False
                 ElseIf TypeOf Expression Is Boolean Then
-                    EncodeBoolean = Expression
+                    EncodeBoolean = DirectCast(Expression, Boolean)
                 ElseIf vbIsNumeric(Expression) Then
                     EncodeBoolean = (CStr(Expression) <> "0")
                 ElseIf TypeOf Expression Is String Then
@@ -260,51 +265,27 @@ Namespace Contensive.Core
         '
         '
         Public Overrides Function ExecuteAddon(ByVal IdGuidOrName As String) As String
-            '
-            Dim LegacyOptionString As String
-            Dim MyDoc As CPDocClass
-            '
-            MyDoc = CP.Doc
-            LegacyOptionString = MyDoc.getLegacyOptionStringFromVar()
-            Return CP.core.executeAddon_legacy3(IdGuidOrName, LegacyOptionString, 0, Nothing)
+            Return CP.core.addon_execute_legacy3(IdGuidOrName, CP.core.getLegacyOptionStringFromVar(), 0, Nothing)
         End Function
         '
         '
         '
         Public Overrides Function ExecuteAddon(ByVal IdGuidOrName As String, ByVal WrapperId As Integer) As String
-            '
-            Dim LegacyOptionString As String
-            Dim MyDoc As CPDocClass
-            '
-            MyDoc = CP.Doc
-            LegacyOptionString = MyDoc.getLegacyOptionStringFromVar()
-            Return CP.core.executeAddon_legacy3(IdGuidOrName, LegacyOptionString, WrapperId, Nothing)
+            Return CP.core.addon_execute_legacy3(IdGuidOrName, CP.core.getLegacyOptionStringFromVar(), WrapperId, Nothing)
         End Function
         '
         '
         '
         Public Overrides Function ExecuteAddon(ByVal IdGuidOrName As String, ByVal context As addonContext) As String
-            '
-            Dim LegacyOptionString As String
-            Dim MyDoc As CPDocClass
-            '
-            MyDoc = CP.Doc
-            LegacyOptionString = MyDoc.getLegacyOptionStringFromVar()
-            Return CP.core.executeAddon_legacy4(IdGuidOrName, LegacyOptionString, context, Nothing)
+            Return CP.core.addon_execute_legacy4(IdGuidOrName, CP.core.getLegacyOptionStringFromVar(), context, Nothing)
         End Function
 
         Public Overrides Function ExecuteAddonAsProcess(ByVal IdGuidOrName As String) As String
-            '
-            Dim LegacyOptionString As String
-            Dim MyDoc As CPDocClass
-            '
-            MyDoc = CP.Doc
-            LegacyOptionString = MyDoc.getLegacyOptionStringFromVar()
-            Return CP.core.executeAddonAsProcess(IdGuidOrName, LegacyOptionString)
+            Return CP.core.executeAddonAsProcess(IdGuidOrName, CP.core.getLegacyOptionStringFromVar())
         End Function
 
 
-        Public Overrides Sub AppendLog(ByVal Text As String, ByVal logFolder As String)
+        Public Overrides Sub AppendLog(ByVal logFolder As String, ByVal Text As String)
             CP.core.log_appendLog(Text, logFolder)
         End Sub
 
@@ -432,7 +413,7 @@ Namespace Contensive.Core
         ''' <param name="Source"></param>
         ''' <returns></returns>
         Public Overrides Function EncodeHtmlForWysiwygEditor(Source As String) As String
-            Return CP.core.html_encodeContent10(Source, 0, "", 0, 0, False, False, False, True, True, False, "", "", False, 0, "", coreClass.addonContextEnum.ContextSimple, False, Nothing, False)
+            Return CP.core.html_encodeContent10(Source, 0, "", 0, 0, False, False, False, True, True, False, "", "", False, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple, False, Nothing, False)
             'Return CP.core.encodeContent9(Source, 0, "", 0, 0, False, False, False, True, True, False, "", "", False, 0, "", 1)
         End Function
         '

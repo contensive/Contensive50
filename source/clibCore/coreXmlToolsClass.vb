@@ -177,7 +177,7 @@ Namespace Contensive.Core
             iContentName = ContentName
             If iContentName <> "" Then
                 SQL = "select id from cccontent where name=" & cpCore.db.encodeSQLText(iContentName)
-                RS = cpCore.db.executeSql(SQL)
+                RS = cpCore.db.executeSql_getDataTable(SQL)
                 If RS.Rows.Count > 0 Then
                     ContentID = EncodeInteger(RS.Rows(0).Item("id"))
                 End If
@@ -191,7 +191,7 @@ Namespace Contensive.Core
                 ' Build table lookup
                 '
                 SQL = "select T.ID,T.Name as TableName,D.Name as DataSourceName from ccTables T Left Join ccDataSources D on D.ID=T.DataSourceID"
-                RS = cpCore.db.executeSql(SQL)
+                RS = cpCore.db.executeSql_getDataTable(SQL)
                 Tables = convertDataTabletoArray(RS)
                 If Tables Is Nothing Then
                     TableCnt = 0
@@ -202,7 +202,7 @@ Namespace Contensive.Core
                 ' Build SortMethod lookup
                 '
                 SQL = "select ID,Name from ccSortMethods"
-                RS = cpCore.db.executeSql(SQL)
+                RS = cpCore.db.executeSql_getDataTable(SQL)
                 Sorts = convertDataTabletoArray(RS)
                 If Sorts Is Nothing Then
                     SortCnt = 0
@@ -213,7 +213,7 @@ Namespace Contensive.Core
                 ' Build SortMethod lookup
                 '
                 SQL = "select ID,Name from ccGroups"
-                RS = cpCore.db.executeSql(SQL)
+                RS = cpCore.db.executeSql_getDataTable(SQL)
                 Groups = convertDataTabletoArray(RS)
                 If Groups Is Nothing Then
                     GroupCnt = 0
@@ -224,7 +224,7 @@ Namespace Contensive.Core
                 ' Build Content lookup
                 '
                 SQL = "select id,name from ccContent"
-                RS = cpCore.db.executeSql(SQL)
+                RS = cpCore.db.executeSql_getDataTable(SQL)
                 Contents = convertDataTabletoArray(RS)
                 If Contents Is Nothing Then
                     ContentCnt = 0
@@ -249,7 +249,7 @@ Namespace Contensive.Core
                     SQL &= " and ((f.IsBaseField is null)or(f.IsBaseField=0))"
                 End If
                 SQL &= " order by f.contentid,f.id,h.id desc"
-                RS = cpCore.db.executeSql(SQL)
+                RS = cpCore.db.executeSql_getDataTable(SQL)
                 CFields = convertDataTabletoArray(RS)
                 CFieldCnt = UBound(CFields, 2) + 1
                 '
@@ -260,7 +260,7 @@ Namespace Contensive.Core
                 Else
                     SQL = "select " & ContentSelectList & " from ccContent where (name<>'')and(name is not null)and(contenttableid is not null)and(contentcontrolid is not null) order by id"
                 End If
-                RS = cpCore.db.executeSql(SQL)
+                RS = cpCore.db.executeSql_getDataTable(SQL)
                 '
                 ' create output
                 '
@@ -846,7 +846,7 @@ ErrorTrap:
             '
             appName = cpCore.appConfig.name
             MenuContentID = cpCore.db_GetRecordID("Content", "Navigator Entries")
-            dt = cpCore.db.executeSql("select * from ccMenuEntries where (contentcontrolid=" & MenuContentID & ")and(name<>'')")
+            dt = cpCore.db.executeSql_getDataTable("select * from ccMenuEntries where (contentcontrolid=" & MenuContentID & ")and(name<>'')")
             If dt.Rows.Count > 0 Then
                 NavIconType = 0
                 NavIconTitle = ""
@@ -921,7 +921,7 @@ ErrorTrap:
             ' ****************************** if cdef not loaded, this fails
             '
             MenuContentID = cpCore.db_GetRecordID("Content", "Menu Entries")
-            rs = cpCore.db.executeSql("select * from ccMenuEntries where (contentcontrolid=" & MenuContentID & ")and(name<>'')")
+            rs = cpCore.db.executeSql_getDataTable("select * from ccMenuEntries where (contentcontrolid=" & MenuContentID & ")and(name<>'')")
             If (isDataTableOk(rs)) Then
                 If True Then
                     For Each dr As DataRow In rs.Rows
@@ -963,7 +963,7 @@ ErrorTrap:
             Dim appName As String
             '
             appName = cpCore.appConfig.name
-            rs = cpCore.db.executeSql("select * from ccAggregateFunctions")
+            rs = cpCore.db.executeSql_getDataTable("select * from ccAggregateFunctions")
             If (isDataTableOk(rs)) Then
                 If True Then
                     For Each rsdr As DataRow In rs.Rows
@@ -1007,7 +1007,7 @@ ErrorTrap:
             '
             appName = cpCore.appConfig.name
             If RecordID <> 0 And TableName <> "" Then
-                dt = cpCore.db.executeSql("select Name from " & TableName & " where ID=" & RecordID)
+                dt = cpCore.db.executeSql_getDataTable("select Name from " & TableName & " where ID=" & RecordID)
                 If dt.Rows.Count > 0 Then
                     GetTableRecordName = dt.Rows(0).Item(0).ToString
                 End If
@@ -1072,7 +1072,7 @@ ErrorTrap:
                     UsedIDString = UsedIDString & "," & RecordID
                     ParentID = 0
                     If RecordID <> 0 Then
-                        rs = cpCore.db.executeSql("select Name,ParentID from ccMenuEntries where ID=" & RecordID)
+                        rs = cpCore.db.executeSql_getDataTable("select Name,ParentID from ccMenuEntries where ID=" & RecordID)
                         If (isDataTableOk(rs)) Then
                             ParentID = EncodeInteger(rs.Rows(0).Item("ParentID"))
                             RecordName = EncodeText(rs.Rows(0).Item("Name"))

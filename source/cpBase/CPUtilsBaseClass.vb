@@ -46,8 +46,8 @@ Namespace Contensive.BaseClasses
         Public MustOverride Function ExecuteAddon(ByVal IdGuidOrName As String, ByVal WrapperId As Integer) As String
         Public MustOverride Function ExecuteAddon(ByVal IdGuidOrName As String, ByVal context As addonContext) As String
         Public MustOverride Function ExecuteAddonAsProcess(ByVal IdGuidOrName As String) As String
-        Public MustOverride Sub AppendLog(ByVal Filename As String, ByVal Text As String)
-        Public MustOverride Sub AppendLog(ByVal Text As String)
+        Public MustOverride Sub AppendLog(ByVal pathFilename As String, ByVal logText As String)
+        Public MustOverride Sub AppendLog(ByVal logText As String)
         Public MustOverride Function ConvertLinkToShortLink(ByVal URL As String, ByVal ServerHost As String, ByVal ServerVirtualPath As String) As String
         Public MustOverride Function ConvertShortLinkToLink(ByVal URL As String, ByVal PathPagePrefix As String) As String
         Public MustOverride Function DecodeGMTDate(ByVal GMTDate As String) As Date

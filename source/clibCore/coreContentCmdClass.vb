@@ -150,7 +150,7 @@ Namespace Contensive.Core
         '           user firstname
         '           site propertyname
         '
-        public Function ExecuteCmd(src As String, Context As coreClass.addonContextEnum, personalizationPeopleId As Integer, personalizationIsAuthenticated As Boolean) As String
+        Public Function ExecuteCmd(src As String, Context As Contensive.BaseClasses.CPUtilsBaseClass.addonContext, personalizationPeopleId As Integer, personalizationIsAuthenticated As Boolean) As String
             Dim returnValue As String = ""
             Try
                 Dim badCmd As Boolean
@@ -311,9 +311,10 @@ Namespace Contensive.Core
         '
         '=================================================================================================================
         '   EncodeActiveContent - Execute Content Command Source
+        ' refactor -- go through all the parsing sections and setup specific exceptions to help users get the syntax correct
         '=================================================================================================================
         '
-        Private Function ExecuteAllCmdLists_Execute(cmdSrc As String, return_BadCmd As Boolean, Context As coreClass.addonContextEnum, personalizationPeopleId As Integer, personalizationIsAuthenticated As Boolean) As String
+        Private Function ExecuteAllCmdLists_Execute(cmdSrc As String, return_BadCmd As Boolean, Context As Contensive.BaseClasses.CPUtilsBaseClass.addonContext, personalizationPeopleId As Integer, personalizationIsAuthenticated As Boolean) As String
             Dim returnValue As String = ""
             Try
                 '
@@ -330,14 +331,14 @@ Namespace Contensive.Core
                 Dim ArgInstanceId As String
                 Dim ArgGuid As String
                 Dim ArgOptionString As String = ""
-                Dim Cmd As String = ""
+                Dim cmdText As String = ""
                 Dim cmdArg As String
                 Dim Pos As Integer
                 Dim addonName As String
                 Dim CSPeople As CPCSBaseClass
                 Dim CSPeopleSet As Boolean = False
                 Dim Ptr As Integer
-                Dim cmdStringOrDictionary As Object
+                Dim cmd As Object
                 Dim cmdDictionaryOrCollection As Object
                 Dim cmdDictionary As New Dictionary(Of String, Object)
                 Dim cmdCollection As Collection
@@ -403,40 +404,21 @@ Namespace Contensive.Core
                         Catch ex As Exception
                             cpCore.handleExceptionAndRethrow(ex, "Error parsing JSON command list [" & GetErrString() & "]")
                         End Try
-                        If True Then
-                            'End If
-                            'If (LCase(TypeName(cmdDictionaryOrCollection)) <> "dictionary") Then
-                            '    Throw New ApplicationException("Error parsing JSON command list, expected a single command, command list [" & cmdSrc & "]")
-                            'Else
-                            '
-                            '   Top leve should be an array of commands (or objects) [a,b,c,d]
-                            '       if it is an object {a:b,c:d,}, convert to arry [{a:b},{c:d}]
-                            ' convert dictionary of objects to a collection of objects
-                            '
-                            '
-                            dictionaryKeys = cmdDictionary.Keys
-                            For Each Key In dictionaryKeys
-                                If Not (cmdDictionary.Item(Key) Is Nothing) Then
-                                    cmdObject = New Dictionary(Of String, Object)
-                                    itemObject = cmdDictionary.Item(Key)
-                                    Call cmdObject.Add(Key, itemObject)
-                                    Call cmdCollection.Add(cmdObject)
-                                Else
-                                    cmdObject = New Dictionary(Of String, Object)
-                                    itemVariant = cmdDictionary.Item(Key)
-                                    Call cmdObject.Add(Key, itemVariant)
-                                    Call cmdCollection.Add(cmdObject)
-                                End If
-                            Next
-                            '                If (cmdDictionary.Count = 1) Then
-                            '                    Set cmdCollection = New Collection
-                            '                    Call cmdCollection.Add(cmdDictionary.Item(0), cmdDictionary.key(0))
-                            '                Else
-                            '                    For Each cmdString In cmdDictionary
-                            '                        cmdCollection.Add (cmdString)
-                            '                    Next
-                            '                End If
-                        End If
+                        '
+                        dictionaryKeys = cmdDictionary.Keys
+                        For Each Key In dictionaryKeys
+                            If Not (cmdDictionary.Item(Key) Is Nothing) Then
+                                cmdObject = New Dictionary(Of String, Object)
+                                itemObject = cmdDictionary.Item(Key)
+                                Call cmdObject.Add(Key, itemObject)
+                                Call cmdCollection.Add(cmdObject)
+                            Else
+                                cmdObject = New Dictionary(Of String, Object)
+                                itemVariant = cmdDictionary.Item(Key)
+                                Call cmdObject.Add(Key, itemVariant)
+                                Call cmdCollection.Add(cmdObject)
+                            End If
+                        Next
                     ElseIf (Left(cmdSrc, 1) = "[") And (Right(cmdSrc, 1) = "]") Then
                         '
                         ' JSON is a command list in the form of an array, like:
@@ -463,34 +445,34 @@ Namespace Contensive.Core
                         '   "content box"
                         '   all other posibilities are syntax errors
                         '
-                        Cmd = Trim(cmdSrc)
+                        cmdText = Trim(cmdSrc)
                         cmdArg = ""
-                        If Mid(Cmd, 1, 1) = """" Then
+                        If Mid(cmdText, 1, 1) = """" Then
                             '
                             'cmd is quoted
                             '   "open"
                             '   "Open" file
                             '   "Open" "file"
                             '
-                            Pos = vbInstr(2, Cmd, """")
+                            Pos = vbInstr(2, cmdText, """")
                             If Pos <= 1 Then
                                 Throw New ApplicationException("Error parsing content command [" & cmdSrc & "], expected a close quote around position " & Pos)
                             Else
-                                If Pos = Len(Cmd) Then
+                                If Pos = Len(cmdText) Then
                                     '
                                     ' cmd like "open"
                                     '
                                     cmdArg = ""
-                                    Cmd = Mid(Cmd, 2, Pos - 2)
-                                ElseIf Mid(Cmd, Pos + 1, 1) <> " " Then
+                                    cmdText = Mid(cmdText, 2, Pos - 2)
+                                ElseIf Mid(cmdText, Pos + 1, 1) <> " " Then
                                     '
                                     ' syntax error, must be a space between cmd and argument
                                     '
                                     Throw New ApplicationException("Error parsing content command [" & cmdSrc & "], expected a space between command and argument around position " & Pos)
                                     Exit Function
                                 Else
-                                    cmdArg = Trim(Mid(Cmd, Pos + 1))
-                                    Cmd = Mid(Cmd, 2, Pos - 2)
+                                    cmdArg = Trim(Mid(cmdText, Pos + 1))
+                                    cmdText = Mid(cmdText, 2, Pos - 2)
                                 End If
                             End If
 
@@ -500,10 +482,10 @@ Namespace Contensive.Core
                             '   open
                             '   open file
                             '
-                            Pos = vbInstr(1, Cmd, " ")
+                            Pos = vbInstr(1, cmdText, " ")
                             If Pos > 0 Then
                                 cmdArg = Mid(cmdSrc, Pos + 1)
-                                Cmd = Trim(Mid(cmdSrc, 1, Pos - 1))
+                                cmdText = Trim(Mid(cmdSrc, 1, Pos - 1))
                             End If
                         End If
                         If Mid(cmdArg, 1, 1) = """" Then
@@ -523,7 +505,8 @@ Namespace Contensive.Core
                             '   { "text name": "my text" }
                             '
                             cmdDictionaryOrCollection = cpCore.json.Deserialize(Of Object)(cmdArg)
-                            If (LCase(TypeName(cmdDictionaryOrCollection)) <> "dictionary") Then
+                            Dim cmdDictionaryOrCollectionTypeName As String = LCase(TypeName(cmdDictionaryOrCollection))
+                            If (cmdDictionaryOrCollectionTypeName <> "dictionary") And (cmdDictionaryOrCollectionTypeName <> "dictionary(of string,object)") Then
                                 Throw New ApplicationException("Error parsing JSON command argument list, expected a single command, command list [" & cmdSrc & "]")
                                 Exit Function
                             Else
@@ -533,7 +516,7 @@ Namespace Contensive.Core
                                 Call cmdCollection.Add(cmdDictionaryOrCollection)
                             End If
                             cmdDef = New Dictionary(Of String, Object)
-                            Call cmdDef.Add(Cmd, cmdDictionaryOrCollection)
+                            Call cmdDef.Add(cmdText, cmdDictionaryOrCollection)
                             cmdCollection = New Collection
                             Call cmdCollection.Add(cmdDef)
                         Else
@@ -541,7 +524,7 @@ Namespace Contensive.Core
                             ' command and arguments are strings
                             '
                             cmdDef = New Dictionary(Of String, Object)
-                            Call cmdDef.Add(Cmd, cmdArg)
+                            Call cmdDef.Add(cmdText, cmdArg)
                             cmdCollection = New Collection
                             Call cmdCollection.Add(cmdDef)
                         End If
@@ -551,7 +534,7 @@ Namespace Contensive.Core
                     '
                     'Dim cmdVariant As Variant
 
-                    For Each cmdStringOrDictionary In cmdCollection
+                    For Each cmd In cmdCollection
                         '
                         ' repeat for all commands in the collection:
                         ' convert each command in the command array to a cmd string, and a cmdArgDef dictionary
@@ -562,31 +545,37 @@ Namespace Contensive.Core
                         '   D - { "command" : { "name" : "The Name"} }
                         '   E - { "command" : { "name" : "The Name" , "secondArgument" : "secondValue" } }
                         '
-                        If vbLCase(TypeName(cmdStringOrDictionary)) = "string" Then
+                        Dim cmdTypeName As String = TypeName(cmd).ToLower()
+                        If cmdTypeName = "string" Then
                             '
                             ' case A & B, the cmdDef is a string
                             '
-                            Cmd = DirectCast(cmdStringOrDictionary, String)
+                            cmdText = DirectCast(cmd, String)
                             cmdArgDef = New Dictionary(Of String, Object)
-                        ElseIf vbLCase(TypeName(cmdStringOrDictionary)) = "dictionary" Then
+                        ElseIf (cmdTypeName = "dictionary") Or (cmdTypeName = "dictionary(of string,object)") Then
                             '
                             ' cases C-E, (0).key=cmd, (0).value = argument (might be string or object)
                             '
-                            cmdDef = DirectCast(cmdStringOrDictionary, Dictionary(Of String, Object))
+                            cmdDef = DirectCast(cmd, Dictionary(Of String, Object))
                             If cmdDef.Count <> 1 Then
                                 '
                                 ' syntax error
                                 '
                             Else
-                                Cmd = cmdDef.Keys(0)
-                                If vbLCase(TypeName(cmdDef.Item(Cmd))) = "string" Then
+                                Dim cmdDefKey As String = cmdDef.Keys(0)
+                                Dim cmdDefValueTypeName As String = TypeName(cmdDef.Item(cmdDefKey)).ToLower()
+                                '
+                                ' command is the key for these cases
+                                '
+                                cmdText = cmdDefKey
+                                If cmdDefValueTypeName = "string" Then
                                     '
                                     ' command definition with default argument
                                     '
                                     cmdArgDef = New Dictionary(Of String, Object)
-                                    Call cmdArgDef.Add("default", cmdDef.Item(Cmd))
-                                ElseIf vbLCase(TypeName(cmdDef.Item(Cmd))) = "dictionary" Then
-                                    cmdArgDef = DirectCast(cmdDef.Item(Cmd), Dictionary(Of String, Object))
+                                    cmdArgDef.Add("default", cmdDef.Item(cmdDefKey))
+                                ElseIf (cmdDefValueTypeName = "dictionary") Or (cmdDefValueTypeName = "dictionary(of string,object)") Then
+                                    cmdArgDef = DirectCast(cmdDef.Item(cmdDefKey), Dictionary(Of String, Object))
                                 Else
                                     '
                                     ' syntax error, bad command
@@ -607,7 +596,7 @@ Namespace Contensive.Core
                         '
                         ' execute the cmd with cmdArgDef dictionary
                         '
-                        Select Case vbLCase(Cmd)
+                        Select Case vbLCase(cmdText)
                             Case "textbox"
                                 '
                                 ' Opens a textbox addon (patch for text box name being "text name" so it requies json)copy content record
@@ -667,7 +656,7 @@ Namespace Contensive.Core
                                 Next
                                 If ArgName <> "" Then
                                     'CmdAccumulator = cpCore.main_GetContentCopy(ArgName, "copy content")
-                                    Dim dt As DataTable = cpCore.db.executeSql("select layout from ccLayouts where name=" & cpCore.db.encodeSQLText(ArgName))
+                                    Dim dt As DataTable = cpCore.db.executeSql_getDataTable("select layout from ccLayouts where name=" & cpCore.db.encodeSQLText(ArgName))
                                     If Not (dt Is Nothing) Then
                                         CmdAccumulator = EncodeText(dt.Rows(0).Item("layout"))
                                     End If
@@ -905,12 +894,12 @@ Namespace Contensive.Core
                                 Next
                                 ArgOptionString &= "&cmdAccumulator=" & encodeNvaArgument(CmdAccumulator)
                                 ArgOptionString = Mid(ArgOptionString, 2)
-                                CmdAccumulator = cpCore.executeAddon(0, addonName, ArgOptionString, Context, "", 0, "", "", False, 0, "", addonStatusOK, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
+                                CmdAccumulator = cpCore.addon_execute(0, addonName, ArgOptionString, Context, "", 0, "", "", False, 0, "", addonStatusOK, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
                             Case Else
                                 '
                                 ' attempts to execute an add-on with the command name
                                 '
-                                addonName = Cmd
+                                addonName = cmdText
                                 ArgInstanceId = ""
                                 ArgGuid = ""
                                 For Each kvp As KeyValuePair(Of String, Object) In cmdArgDef
@@ -925,7 +914,7 @@ Namespace Contensive.Core
                                 Next
                                 ArgOptionString = ArgOptionString & "&cmdAccumulator=" & encodeNvaArgument(CmdAccumulator)
                                 ArgOptionString = Mid(ArgOptionString, 2)
-                                CmdAccumulator = cpCore.executeAddon(0, addonName, ArgOptionString, Context, "", 0, "", "", False, 0, "", addonStatusOK, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
+                                CmdAccumulator = cpCore.addon_execute(0, addonName, ArgOptionString, Context, "", 0, "", "", False, 0, "", addonStatusOK, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
                                 'CmdAccumulator = mainOrNothing.ExecuteAddon3(addonName, ArgOptionString, Context)
                         End Select
                     Next

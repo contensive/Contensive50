@@ -211,7 +211,7 @@ ErrorTrap:
                                     & "menuBase.s[0] = new so(0,'" & .Caption & "','" & .Link & "','_blank',''); " & vbCrLf _
                                     & GetMenuTreeBranch(.Name, "menuBase.s[0]", "," & EntryPointer) _
                                     & "</SCRIPT>" & vbCrLf
-                                ' & "<SCRIPT LANGUAGE=""JavaScript"" src=""/cclib/ClientSide/tree30.js""></SCRIPT>" & vbCrLf
+                                ' & "<SCRIPT LANGUAGE=""JavaScript"" src=""/ccLib/ClientSide/tree30.js""></SCRIPT>" & vbCrLf
                                 Exit For
                             End If
                         End With
@@ -431,12 +431,12 @@ ErrorTrap:
                             & vbCrLf & "</ul>" & vbCrLf
                     End If
                     '
-                    'Call cmc.main_AddStylesheetLink("/cclib/mktree/mktree.css")
-                    'Call cmc.main_AddHeadScriptLink("/cclib/mktree/mktree.js", "mktree")
+                    'Call cmc.main_AddStylesheetLink("/ccLib/mktree/mktree.css")
+                    'Call cmc.main_AddHeadScriptLink("/ccLib/mktree/mktree.js", "mktree")
                     'Call cmc.main_AddOnLoadJavascript("convertTrees();")
                     GetTree = "" _
-                        & vbCrLf & "<link rel=stylesheet href=/cclib/mktree/mktree.css type=text/css>" _
-                        & vbCrLf & "<script type=""text/javascript"" src=/cclib/mktree/mktree.js></script>" _
+                        & vbCrLf & "<link rel=stylesheet href=/ccLib/mktree/mktree.css type=text/css>" _
+                        & vbCrLf & "<script type=""text/javascript"" src=/ccLib/mktree/mktree.js></script>" _
                         & GetTree
                     GetTree = GetTree & "<script type=""text/javascript"">convertTrees();"
                     If OpenMenuName <> "" Then

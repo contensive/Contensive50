@@ -1,3 +1,4 @@
+Imports System.Data
 '
 ' documentation should be in a new project that inherits these classes. The class names should be the object names in the actual cp project
 '
@@ -18,6 +19,16 @@ Namespace Contensive.BaseClasses
         Public MustOverride Function EncodeSQLNumber(ByVal SourceNumber As Double) As String
         Public MustOverride Function EncodeSQLText(ByVal SourceText As String) As String
         Public MustOverride Function ExecuteSQL(ByVal SQL As String, Optional ByVal DataSourcename As String = "Default", Optional ByVal Retries As String = "0", Optional ByVal PageSize As String = "10", Optional ByVal PageNumber As String = "1") As Object
+        Public MustOverride Function ExecuteSQL_GetRecordSet(ByVal SQL As String) As ADODB.Recordset
+        Public MustOverride Function ExecuteSQL_GetRecordSet(ByVal SQL As String, ByVal MaxRows As Integer) As ADODB.Recordset
+        Public MustOverride Function ExecuteSQL_GetRecordSet(ByVal SQL As String, ByVal MaxRows As Integer, ByVal PageSize As Integer, ByVal PageNumber As Integer) As ADODB.Recordset
+        Public MustOverride Function ExecuteSQL_GetRecordSet(ByVal SQL As String, ByVal DataSourcename As String) As ADODB.Recordset
+        Public MustOverride Function ExecuteSQL_GetRecordSet(ByVal SQL As String, ByVal DataSourcename As String, ByVal MaxRows As Integer, ByVal PageSize As Integer, ByVal PageNumber As Integer) As ADODB.Recordset
+        Public MustOverride Function ExecuteSQL_GetDataTable(ByVal SQL As String) As DataTable
+        Public MustOverride Function ExecuteSQL_GetDataTable(ByVal SQL As String, ByVal MaxRows As Integer) As DataTable
+        Public MustOverride Function ExecuteSQL_GetDataTable(ByVal SQL As String, ByVal MaxRows As Integer, PageSize As Integer, ByVal PageNumber As Integer) As DataTable
+        Public MustOverride Function ExecuteSQL_GetDataTable(ByVal SQL As String, ByVal DataSourcename As String) As DataTable
+        Public MustOverride Function ExecuteSQL_GetDataTable(ByVal SQL As String, ByVal DataSourcename As String, ByVal MaxRows As Integer, ByVal PageSize As Integer, ByVal PageNumber As Integer) As DataTable
         Public MustOverride Property SQLTimeout() As Integer
         Public MustOverride Function GetRemoteQueryKey(ByVal sql As String, Optional ByVal DataSourceName As String = "Default", Optional ByVal pageSize As Integer = 100) As String
         '

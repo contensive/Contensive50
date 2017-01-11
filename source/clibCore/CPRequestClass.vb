@@ -152,7 +152,7 @@ Namespace Contensive.Core
 
         Public Overrides Function GetBoolean(ByVal RequestName As String) As Boolean 'Inherits BaseClasses.CPRequestBaseClass.GetBoolean
             If True Then
-                Return cpCore.main_GetStreamBoolean2(RequestName)
+                Return cpCore.doc_getBoolean2(RequestName)
             Else
                 Return False
             End If

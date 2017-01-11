@@ -338,6 +338,15 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <COMReference Include="ADODB">
+      <Guid>{2A75196C-D9EB-4129-B803-931327F72D5C}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>8</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
     <COMReference Include="MSScriptControl">
       <Guid>{0E59F1D2-1FBE-11D0-8FF2-00A0D10038BC}</Guid>
       <VersionMajor>1</VersionMajor>

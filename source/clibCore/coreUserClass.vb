@@ -347,7 +347,7 @@ Namespace Contensive.Core
                             SQL &= ",ExcludeFromAnalytics=" & cpCore.db.encodeSQLBoolean(excludeFromAnalytics)
                         End If
                         SQL &= " WHERE ID=" & id & ";"
-                        Call cpCore.db.executeSql(SQL)
+                        Call cpCore.db.executeSql_getDataTable(SQL)
                     End If
                 End If
             Catch ex As Exception
@@ -373,7 +373,7 @@ Namespace Contensive.Core
                     '
                     ' Custom Login
                     '
-                    returnHtml = cpCore.executeAddon_legacy2(loginAddonID, "", "", coreClass.addonContextEnum.ContextPage, "", 0, "", "", False, 0, "", isAddonOk, Nothing)
+                    returnHtml = cpCore.addon_execute_legacy2(loginAddonID, "", "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", isAddonOk, Nothing)
                     If Not isAddonOk Then
                         loginAddonID = 0
                     ElseIf (returnHtml = "") And (isAddonOk) Then
@@ -727,7 +727,7 @@ Namespace Contensive.Core
                     main_loginFormDefaultProcessed = True
                     loginForm_Username = cpCore.docProperties.getText("username")
                     loginForm_Password = cpCore.docProperties.getText("password")
-                    loginForm_AutoLogin = cpCore.main_GetStreamBoolean2("autologin")
+                    loginForm_AutoLogin = cpCore.doc_getBoolean2("autologin")
                     '
                     If (cpCore.visit_loginAttempts < main_maxVisitLoginAttempts) And (cpCore.visit_cookieSupport) Then
                         LocalMemberID = authenticateGetId(loginForm_Username, loginForm_Password)
@@ -837,9 +837,9 @@ Namespace Contensive.Core
                                     ' renew this old record
                                     '
                                     'hint = "150"
-                                    Call cpCore.db.db_SetCSField(CS, "developer", "1")
-                                    Call cpCore.db.db_SetCSField(CS, "admin", "1")
-                                    Call cpCore.db.db_SetCSField(CS, "dateExpires", DateTime.Now.AddDays(7).Date.ToString())
+                                    Call cpCore.db.cs_setField(CS, "developer", "1")
+                                    Call cpCore.db.cs_setField(CS, "admin", "1")
+                                    Call cpCore.db.cs_setField(CS, "dateExpires", DateTime.Now.AddDays(7).Date.ToString())
                                 Else
                                     '
                                     ' inject support record
@@ -847,11 +847,11 @@ Namespace Contensive.Core
                                     'hint = "150"
                                     Call cpCore.db.cs_Close(CS)
                                     CS = cpCore.db.cs_insertRecord("people")
-                                    Call cpCore.db.db_SetCSField(CS, "name", "Contensive Support")
-                                    Call cpCore.db.db_SetCSField(CS, "email", workingEmail)
-                                    Call cpCore.db.db_SetCSField(CS, "developer", "1")
-                                    Call cpCore.db.db_SetCSField(CS, "admin", "1")
-                                    Call cpCore.db.db_SetCSField(CS, "dateExpires", DateTime.Now.AddDays(7).Date.ToString())
+                                    Call cpCore.db.cs_setField(CS, "name", "Contensive Support")
+                                    Call cpCore.db.cs_setField(CS, "email", workingEmail)
+                                    Call cpCore.db.cs_setField(CS, "developer", "1")
+                                    Call cpCore.db.cs_setField(CS, "admin", "1")
+                                    Call cpCore.db.cs_setField(CS, "dateExpires", DateTime.Now.AddDays(7).Date.ToString())
                                 End If
                                 Call cpCore.db.db_SaveCSRecord(CS)
                             Else
@@ -1345,7 +1345,7 @@ Namespace Contensive.Core
                         & ",AutoLogin=" & cpCore.db.encodeSQLBoolean(autoLogin)
                         SQL &= ",ExcludeFromAnalytics=" & cpCore.db.encodeSQLBoolean(excludeFromAnalytics)
                         SQL &= " WHERE ID=" & id & ";"
-                        Call cpCore.db.executeSql(SQL)
+                        Call cpCore.db.executeSql_getDataTable(SQL)
                     End If
                 End If
             Catch ex As Exception

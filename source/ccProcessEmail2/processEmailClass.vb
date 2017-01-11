@@ -105,7 +105,7 @@ ErrorTrap:
                         'If cp.execute_initContext() Then
                         '
                         'hint = "4"
-                        cpCore.db.db_SQLCommandTimeout = 120
+                        cpCore.db.sqlCommandTimeout = 120
                         EmailServiceLastCheck = EncodeDate(cpCore.siteProperties.getText("EmailServiceLastCheck", 0))
                         Call cpCore.siteProperties.setProperty("EmailServiceLastCheck", CStr(Now()))
                         'buildversion = cpCore.app.GetSiteProperty("BuildVersion", 0, 0)
@@ -115,12 +115,12 @@ ErrorTrap:
                         ' Send Submitted Group Email (submitted, not sent, no conditions)
                         '
                         'hint = "5"
-                        Call ProcessEmail_GroupEmail(cpCore.db.dataBuildVersion)
+                        Call ProcessEmail_GroupEmail(cpCore.db.siteproperty_dataBuildVersion)
                         '
                         ' Send Conditional Email - Offset days after Joining
                         '
                         'hint = "6"
-                        Call ProcessEmail_ConditionalEmail(cpCore.db.dataBuildVersion, IsNewHour, IsNewDay)
+                        Call ProcessEmail_ConditionalEmail(cpCore.db.siteproperty_dataBuildVersion, IsNewHour, IsNewDay)
                         '
                     End If
                 End Using
@@ -213,7 +213,7 @@ ErrorTrap:
                     '
                     ' Mark this email sent and go to the next
                     '
-                    Call cpCore.db.db_SetCSField(CSEmail, "sent", True)
+                    Call cpCore.db.cs_setField(CSEmail, "sent", True)
                     Call cpCore.db.db_SaveCSRecord(CSEmail)
                     '
                     ' Create Drop Record
@@ -225,8 +225,8 @@ ErrorTrap:
                         If ScheduleDate < CDate("1/1/2000") Then
                             ScheduleDate = CDate("1/1/2000")
                         End If
-                        Call cpCore.db.db_SetCSField(CSDrop, "Name", "Drop " & EmailDropID & " - Scheduled for " & FormatDateTime(ScheduleDate, vbShortDate) & " " & FormatDateTime(ScheduleDate, vbShortTime))
-                        Call cpCore.db.db_SetCSField(CSDrop, "EmailID", emailID)
+                        Call cpCore.db.cs_setField(CSDrop, "Name", "Drop " & EmailDropID & " - Scheduled for " & FormatDateTime(ScheduleDate, vbShortDate) & " " & FormatDateTime(ScheduleDate, vbShortTime))
+                        Call cpCore.db.cs_setField(CSDrop, "EmailID", emailID)
                         'Call cpCore.asv.csv_SetCSField(CSDrop, "CreatedBy", EmailMemberID)
                     End If
                     Call cpCore.db.cs_Close(CSDrop)
@@ -639,13 +639,13 @@ ErrorTrap:
                 'buildversion = cpCore.app.dataBuildVersion
                 CSLog = cpCore.db.cs_insertRecord("Email Log", 0)
                 If cpCore.db.cs_Ok(CSLog) Then
-                    Call cpCore.db.db_SetCSField(CSLog, "Name", "Sent " & CStr(Now()))
-                    Call cpCore.db.db_SetCSField(CSLog, "EmailDropID", EmailDropID)
-                    Call cpCore.db.db_SetCSField(CSLog, "EmailID", emailID)
-                    Call cpCore.db.db_SetCSField(CSLog, "MemberID", MemberID)
-                    Call cpCore.db.db_SetCSField(CSLog, "LogType", EmailLogTypeDrop)
-                    Call cpCore.db.db_SetCSField(CSLog, "DateBlockExpires", DateBlockExpires)
-                    Call cpCore.db.db_SetCSField(CSLog, "SendStatus", "Send attempted but not completed")
+                    Call cpCore.db.cs_setField(CSLog, "Name", "Sent " & CStr(Now()))
+                    Call cpCore.db.cs_setField(CSLog, "EmailDropID", EmailDropID)
+                    Call cpCore.db.cs_setField(CSLog, "EmailID", emailID)
+                    Call cpCore.db.cs_setField(CSLog, "MemberID", MemberID)
+                    Call cpCore.db.cs_setField(CSLog, "LogType", EmailLogTypeDrop)
+                    Call cpCore.db.cs_setField(CSLog, "DateBlockExpires", DateBlockExpires)
+                    Call cpCore.db.cs_setField(CSLog, "SendStatus", "Send attempted but not completed")
                     If True Then
                         Call cpCore.db.cs_set(CSLog, "fromaddress", FromAddress)
                         Call cpCore.db.cs_set(CSLog, "Subject", EmailSubject)

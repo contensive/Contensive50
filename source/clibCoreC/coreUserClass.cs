@@ -453,7 +453,7 @@
 //                    //
 //                    // Custom Login
 //                    //
-//                    returnHtml = cpCore.executeAddon_legacy2(loginAddonID, "", "", cpCoreClass.addonContextEnum.ContextPage, "", 0, "", "", false, 0,
+//                    returnHtml = cpCore.addon_execute_legacy2(loginAddonID, "", "", cpCoreClass.addonContextEnum.ContextPage, "", 0, "", "", false, 0,
 //                    "", ref isAddonOk, null);
 //                    if (!isAddonOk)
 //                    {

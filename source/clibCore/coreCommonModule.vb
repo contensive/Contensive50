@@ -27,8 +27,8 @@ Namespace Contensive.Core
         Public NameValue As String
         Public IsForm As Boolean
         Public IsFile As Boolean
-        Public FileContent() As Byte
-        Public tmpPrivatefile As String
+        'Public FileContent() As Byte
+        Public tmpPrivatePathfilename As String
         Public FileSize As Integer
         Public fileType As String
     End Class
@@ -7333,9 +7333,8 @@ ErrorTrap:
         '   -- path means no trailing slash
         '====================================================================================================
         '
-        Public Function getProgramDataFolder() As String
-            'Return "c:\inetpub"
-            Return Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) & "\clib"
+        Public Function getProgramDataPath() As String
+            Return normalizeFilePath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) & "clib\"
         End Function
         '
         '====================================================================================================
@@ -7665,6 +7664,12 @@ ErrorTrap:
             End If
         End Function
         '
+        '====================================================================================================
+        ''' <summary>
+        ''' replacement for visual basic isNumeric
+        ''' </summary>
+        ''' <param name="Expression"></param>
+        ''' <returns></returns>
         Public Function vbIsNumeric(Expression As Object) As Boolean
             If (TypeOf Expression Is DateTime) Then
                 Return False
@@ -7679,9 +7684,46 @@ ErrorTrap:
                 Return False
             End If
         End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Ensures a path uses the correct file delimiter "\", and ends in a "\"
+        ''' </summary>
+        ''' <param name="pathOrFolder"></param>
+        ''' <returns></returns>
+        Public Function normalizeFilePath(ByVal pathOrFolder As String) As String
+            If String.IsNullOrEmpty(pathOrFolder) Then
+                Return ""
+            Else
+                pathOrFolder = pathOrFolder.Replace("/", "\")
+                If (pathOrFolder.Substring(0, 1) = "\") Then
+                    pathOrFolder = pathOrFolder.Substring(1)
+                End If
+                If (pathOrFolder.Substring(pathOrFolder.Length - 1, 1) <> "\") Then
+                    Return pathOrFolder & "\"
+                Else
+                    Return pathOrFolder
+                End If
+            End If
+        End Function
     End Module
     '
     Public Class coreCommonTests
+        '
+        <Fact> Public Sub normalizeFilePath_unit()
+            ' arrange
+            ' act
+            ' assert
+            Assert.Equal(normalizeFilePath(""), "")
+            Assert.Equal(normalizeFilePath("c:\"), "c:\")
+            Assert.Equal(normalizeFilePath("c:\test\"), "c:\test\")
+            Assert.Equal(normalizeFilePath("c:\test"), "c:\test\")
+            Assert.Equal(normalizeFilePath("c:\test/test"), "c:\test\test\")
+            Assert.Equal(normalizeFilePath("test"), "test\")
+            Assert.Equal(normalizeFilePath("\test"), "test\")
+            Assert.Equal(normalizeFilePath("\test\"), "test\")
+            Assert.Equal(normalizeFilePath("/test/"), "test\")
+        End Sub
         '
         <Fact> Public Sub normalizeRoute_unit()
             ' arrange
