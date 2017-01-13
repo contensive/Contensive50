@@ -439,7 +439,7 @@ Namespace Contensive.Core
                     cdefNameIdXref = cpCore.cache.getObject(Of Dictionary(Of String, Integer))("cdefNameIdXref")
                     'cdefNameIdXref = DirectCast(cpCore.cache.getObject(Of Dictionary(Of String, Integer))("cdefNameIdXref"), Dictionary(Of String, Integer))
                 Catch ex As Exception
-                    cpCore.handleExceptionAndNoThrow(ex)
+                    cpCore.handleExceptionAndContinue(ex)
                 End Try
                 If (cdefNameIdXref Is Nothing) OrElse (cdefNameIdXref.Count = 0) Then
                     '
@@ -459,7 +459,7 @@ Namespace Contensive.Core
                     Try
                         Call cpCore.cache.setKey("cdefNameIdXref", cdefNameIdXref, "content")
                     Catch ex As Exception
-                        cpCore.handleExceptionAndNoThrow(ex)
+                        cpCore.handleExceptionAndContinue(ex)
                     End Try
                 End If
             Catch ex As Exception
@@ -517,7 +517,7 @@ Namespace Contensive.Core
                         Try
                             returnCdef = cpCore.cache.getObject(Of CDefClass)("cdefId" & contentId.ToString)
                         Catch ex As Exception
-                            cpCore.handleExceptionAndNoThrow(ex)
+                            cpCore.handleExceptionAndContinue(ex)
                         End Try
                     End If
                     If returnCdef Is Nothing Then
@@ -884,7 +884,7 @@ Namespace Contensive.Core
                         Try
                             Call cpCore.cache.setKey("cdefId" & contentId.ToString, returnCdef, "content,content fields")
                         Catch ex As Exception
-                            cpCore.handleExceptionAndNoThrow(ex)
+                            cpCore.handleExceptionAndContinue(ex)
                         End Try
                     End If
                     cdefList.Add(contentId, returnCdef)
@@ -2301,7 +2301,7 @@ ErrorTrap:
                         returnList.AddRange(CDef.childIdList)
                     End If
                     ''main_GetContentManagementList = main_GetContentManagementList & "," & CStr(ContentID)
-                    'ContentName = metaData.getContentNameByID(ContentID)
+                    'ContentName = cpcore.metaData.getContentNameByID(ContentID)
                     'If ContentName <> "" Then
                     '    CDef = getCdef(ContentName)
                     '    If CDef.ChildIDList.Count > 0 Then

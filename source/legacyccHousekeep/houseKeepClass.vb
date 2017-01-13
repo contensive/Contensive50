@@ -313,10 +313,10 @@ Namespace Contensive.Core
                                 '
                                 ' Get ArchiveAgeDays - use this as the oldest data they care about
                                 '
-                                VisitArchiveAgeDays = EncodeInteger(cp.core.siteproperties.getText("ArchiveRecordAgeDays", "365"))
+                                VisitArchiveAgeDays = EncodeInteger(cp.core.siteProperties.getText("ArchiveRecordAgeDays", "365"))
                                 If (VisitArchiveAgeDays < 2) Then
                                     VisitArchiveAgeDays = 2
-                                    Call cp.core.siteproperties.setProperty("ArchiveRecordAgeDays", "2")
+                                    Call cp.core.siteProperties.setProperty("ArchiveRecordAgeDays", "2")
                                 End If
                                 VisitArchiveDate = rightNow.AddDays(-VisitArchiveAgeDays).Date
                                 OldestVisitSummaryWeCareAbout = Int(Now) - 120
@@ -327,18 +327,18 @@ Namespace Contensive.Core
                                 '
                                 ' Get GuestArchiveAgeDays
                                 '
-                                GuestArchiveAgeDays = EncodeInteger(cp.core.siteproperties.getText("ArchivePeopleAgeDays", "2"))
+                                GuestArchiveAgeDays = EncodeInteger(cp.core.siteProperties.getText("ArchivePeopleAgeDays", "2"))
                                 If (GuestArchiveAgeDays < 2) Then
                                     GuestArchiveAgeDays = 2
-                                    Call cp.core.siteproperties.setProperty("ArchivePeopleAgeDays", CStr(GuestArchiveAgeDays))
+                                    Call cp.core.siteProperties.setProperty("ArchivePeopleAgeDays", CStr(GuestArchiveAgeDays))
                                 End If
                                 '
                                 ' Get EmailDropArchiveAgeDays
                                 '
-                                EmailDropArchiveAgeDays = EncodeInteger(cp.core.siteproperties.getText("ArchiveEmailDropAgeDays", "90"))
+                                EmailDropArchiveAgeDays = EncodeInteger(cp.core.siteProperties.getText("ArchiveEmailDropAgeDays", "90"))
                                 If (EmailDropArchiveAgeDays < 2) Then
                                     EmailDropArchiveAgeDays = 2
-                                    Call cp.core.siteproperties.setProperty("ArchiveEmailDropAgeDays", CStr(EmailDropArchiveAgeDays))
+                                    Call cp.core.siteProperties.setProperty("ArchiveEmailDropAgeDays", CStr(EmailDropArchiveAgeDays))
                                 End If
                                 '
                                 ' Do non-optional housekeeping
@@ -624,14 +624,14 @@ Namespace Contensive.Core
                                     '
                                     ' Check for site's archive time of day
                                     '
-                                    AlarmTimeString = cp.core.siteproperties.getText("ArchiveTimeOfDay", "12:00:00 AM")
+                                    AlarmTimeString = cp.core.siteProperties.getText("ArchiveTimeOfDay", "12:00:00 AM")
                                     If AlarmTimeString = "" Then
                                         AlarmTimeString = "12:00:00 AM"
-                                        Call cp.core.siteproperties.setProperty("ArchiveTimeOfDate", AlarmTimeString)
+                                        Call cp.core.siteProperties.setProperty("ArchiveTimeOfDate", AlarmTimeString)
                                     End If
                                     If Not IsDate(AlarmTimeString) Then
                                         AlarmTimeString = "12:00:00 AM"
-                                        Call cp.core.siteproperties.setProperty("ArchiveTimeOfDate", AlarmTimeString)
+                                        Call cp.core.siteProperties.setProperty("ArchiveTimeOfDate", AlarmTimeString)
                                     End If
                                     AlarmTimeMinutesSinceMidnight = EncodeDate(AlarmTimeString).TimeOfDay.TotalMinutes
                                     minutesSinceMidnight = rightNow.TimeOfDay.TotalMinutes
@@ -737,7 +737,7 @@ ErrorTrap:
             MidnightTwoDaysAgo = rightNow.AddDays(-2).Date
             thirtyDaysAgo = rightNow.AddDays(-30).Date
             appName = cp.core.appConfig.name
-            ArchiveDeleteNoCookie = EncodeBoolean(cp.core.siteproperties.getText("ArchiveDeleteNoCookie", "1"))
+            ArchiveDeleteNoCookie = EncodeBoolean(cp.core.siteProperties.getText("ArchiveDeleteNoCookie", "1"))
             DataSourceType = cp.core.db.db_GetDataSourceType("default")
             TimeoutSave = cp.core.db.sqlCommandTimeout
             cp.core.db.sqlCommandTimeout = 1800
@@ -2778,7 +2778,7 @@ ErrorTrap:
                 '
                 Dim loadOK As Boolean = True
                 Try
-                    collectionFileFilename = cp.core.addon_getPrivateFilesAddonPath & "Collections.xml"
+                    collectionFileFilename = cp.core.addon.getPrivateFilesAddonPath & "Collections.xml"
                     Call Doc.LoadXml(collectionFileFilename)
                 Catch ex As Exception
                     'hint = hint & ",parse error"
@@ -2849,7 +2849,7 @@ ErrorTrap:
                                             '
                                         Else
                                             CollectionRootPath = Left(CollectionRootPath, Pos - 1)
-                                            Path = cp.core.addon_getPrivateFilesAddonPath() & "\" & CollectionRootPath & "\"
+                                            Path = cp.core.addon.getPrivateFilesAddonPath() & "\" & CollectionRootPath & "\"
                                             'Path = GetProgramPath & "\addons\" & CollectionRootPath & "\"
                                             'On Error Resume Next
                                             If cp.core.privateFiles.pathExists(Path) Then

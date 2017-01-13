@@ -19,6 +19,16 @@ Namespace Contensive.Core
         Public docProperties As Dictionary(Of String, String)
     End Class
     '
+    '-----------------------------------------------------------------------
+    '   legacy mainClass arguments
+    '   REFACTOR - organize and rename
+    '-----------------------------------------------------------------------
+    '
+    Public Structure NameValuePrivateType
+        Dim Name As String
+        Dim Value As String
+    End Structure
+    '
     '====================================================================================================
     '
     Public Class docPropertiesClass
@@ -5785,25 +5795,6 @@ ErrorTrap:
                     End If
                 Next
             End If
-            '
-        End Function
-        '
-        '========================================================================
-        ' EncodeHTML
-        '
-        '   Convert all characters that are not allowed in HTML to their Text equivalent
-        '   in preperation for use on an HTML page
-        '========================================================================
-        '
-        Public Function html_EncodeHTML(ByVal Source As String) As String
-            ' ##### removed to catch err<>0 problem on error resume next
-            '
-            html_EncodeHTML = Source
-            html_EncodeHTML = vbReplace(html_EncodeHTML, "&", "&amp;")
-            html_EncodeHTML = vbReplace(html_EncodeHTML, "<", "&lt;")
-            html_EncodeHTML = vbReplace(html_EncodeHTML, ">", "&gt;")
-            html_EncodeHTML = vbReplace(html_EncodeHTML, """", "&quot;")
-            html_EncodeHTML = vbReplace(html_EncodeHTML, "'", "&apos;")
             '
         End Function
         ''

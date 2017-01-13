@@ -123,7 +123,7 @@ Namespace Contensive.Core
         Public Function executeAddon(addonNameOrGuid As String, Optional addonContext As Contensive.BaseClasses.CPUtilsBaseClass.addonContext = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple) As String
             Dim result As String = ""
             Try
-                result = core.addon_execute_legacy4(addonNameOrGuid, core.getLegacyOptionStringFromVar(), addonContext, Nothing)
+                result = core.addon.execute_legacy4(addonNameOrGuid, core.getLegacyOptionStringFromVar(), addonContext, Nothing)
             Catch ex As Exception
                 Site.ErrorReport(ex, "Unexpected error in cp.executeRoute()")
             End Try
@@ -141,9 +141,9 @@ Namespace Contensive.Core
             Try
                 If Response.isOpen Then
                     'If Response.isOpen Then
-                    '    result = core.addon_execute_legacy4(addonId.ToString(), core.getLegacyOptionStringFromVar(), addonContext, Nothing)
+                    '    result = core.addon.addon_execute_legacy4(addonId.ToString(), core.getLegacyOptionStringFromVar(), addonContext, Nothing)
                     'End If
-                    result = core.addon_execute(addonId, "", "", addonContext, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", core.user.id, core.visit_isAuthenticated)
+                    result = core.addon.execute(addonId, "", "", addonContext, "", 0, "", "", False, 0, "", False, Nothing, "", Nothing, "", core.user.id, core.visit_isAuthenticated)
                 End If
                 '
             Catch ex As Exception

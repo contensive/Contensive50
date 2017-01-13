@@ -454,7 +454,7 @@ Namespace Contensive.Core
                 Dim sourceText As String = keyInteger.ToString & vbTab & keyDate.ToString
                 returnToken = twoWayEncrypt(sourceText)
             Catch ex As Exception
-                cpCore.handleExceptionAndNoThrow(ex, "EncodeToken failure. Returning blank result for keyInteger [" & keyInteger & "], keyDate [" & keyDate & "]")
+                cpCore.handleExceptionAndContinue(ex, "EncodeToken failure. Returning blank result for keyInteger [" & keyInteger & "], keyDate [" & keyDate & "]")
                 returnToken = ""
             End Try
             Return returnToken
@@ -477,7 +477,7 @@ Namespace Contensive.Core
                     returnDate = EncodeDate(parts(1))
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndNoThrow(ex, "DecodeToken failure. Returning blank result for token [" & token & "]")
+                cpCore.handleExceptionAndContinue(ex, "DecodeToken failure. Returning blank result for token [" & token & "]")
                 returnNumber = 0
                 returnDate = Date.MinValue
             End Try

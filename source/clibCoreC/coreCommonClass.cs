@@ -6259,17 +6259,17 @@
 //        //   in preperation for use on an HTML page
 //        //========================================================================
 //        //
-//        public static string html_EncodeHTML(string Source)
+//        public static string cpcore.html.html_EncodeHTML(string Source)
 //        {
 //            string functionReturnValue = null;
 //            // ##### removed to catch err<>0 problem on error resume next
 //            //
 //            functionReturnValue = Source;
-//            functionReturnValue = vbReplace(html_EncodeHTML(), "&", "&amp;");
-//            functionReturnValue = vbReplace(html_EncodeHTML(), "<", "&lt;");
-//            functionReturnValue = vbReplace(html_EncodeHTML(), ">", "&gt;");
-//            functionReturnValue = vbReplace(html_EncodeHTML(), "\"", "&quot;");
-//            functionReturnValue = vbReplace(html_EncodeHTML(), "'", "&apos;");
+//            functionReturnValue = vbReplace(cpcore.html.html_EncodeHTML(), "&", "&amp;");
+//            functionReturnValue = vbReplace(cpcore.html.html_EncodeHTML(), "<", "&lt;");
+//            functionReturnValue = vbReplace(cpcore.html.html_EncodeHTML(), ">", "&gt;");
+//            functionReturnValue = vbReplace(cpcore.html.html_EncodeHTML(), "\"", "&quot;");
+//            functionReturnValue = vbReplace(cpcore.html.html_EncodeHTML(), "'", "&apos;");
 //            return functionReturnValue;
 //            //
 //        }

@@ -293,7 +293,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub ErrorReport(ByVal Ex As System.Exception, Optional ByVal Message As String = "") 'Inherits BaseClasses.CPSiteBaseClass.ErrorReport
             If Message = "" Then
-                Call cpCore.handleExceptionAndRethrow(Ex, 2)
+                Call cpCore.handleException(Ex, "n/a", 2)
             Else
                 Call cpCore.handleException(Ex, Message, 2)
             End If

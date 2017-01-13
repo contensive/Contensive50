@@ -421,19 +421,19 @@ Namespace Contensive.Core
                                 '
                                 RecordID = EncodeInteger(CFields(f_LookupContentID, CFieldPtr))
                                 RecordName = CacheLookup(RecordID, Contents)
-                                sb.Append(" LookupContent=""" & html_EncodeHTML(RecordName) & """")
+                                sb.Append(" LookupContent=""" & cpCore.html.html_EncodeHTML(RecordName) & """")
                                 '
                                 RecordID = EncodeInteger(CFields(f_RedirectContentID, CFieldPtr))
                                 RecordName = CacheLookup(RecordID, Contents)
-                                sb.Append(" RedirectContent=""" & html_EncodeHTML(RecordName) & """")
+                                sb.Append(" RedirectContent=""" & cpCore.html.html_EncodeHTML(RecordName) & """")
                                 '
                                 RecordID = EncodeInteger(CFields(f_ManyToManyContentID, CFieldPtr))
                                 RecordName = CacheLookup(RecordID, Contents)
-                                sb.Append(" ManyToManyContent=""" & html_EncodeHTML(RecordName) & """")
+                                sb.Append(" ManyToManyContent=""" & cpCore.html.html_EncodeHTML(RecordName) & """")
                                 '
                                 RecordID = EncodeInteger(CFields(f_ManyToManyRuleContentID, CFieldPtr))
                                 RecordName = CacheLookup(RecordID, Contents)
-                                sb.Append(" ManyToManyRuleContent=""" & html_EncodeHTML(RecordName) & """")
+                                sb.Append(" ManyToManyRuleContent=""" & cpCore.html.html_EncodeHTML(RecordName) & """")
                                 '
                                 sb.Append(" >")
                                 '
@@ -991,7 +991,7 @@ ErrorTrap:
         '
         '
         Private Function EncodeXMLattribute(ByVal Source As String) As String
-            EncodeXMLattribute = html_EncodeHTML(Source)
+            EncodeXMLattribute = cpCore.html.html_EncodeHTML(Source)
             EncodeXMLattribute = vbReplace(EncodeXMLattribute, vbCrLf, " ")
             EncodeXMLattribute = vbReplace(EncodeXMLattribute, vbCr, "")
             EncodeXMLattribute = vbReplace(EncodeXMLattribute, vbLf, "")

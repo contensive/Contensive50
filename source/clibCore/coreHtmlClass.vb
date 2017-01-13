@@ -685,6 +685,26 @@ Namespace Contensive.Core
             End Try
             Return returnValue
         End Function
+        '
+        '========================================================================
+        ' EncodeHTML
+        '
+        '   Convert all characters that are not allowed in HTML to their Text equivalent
+        '   in preperation for use on an HTML page
+        '========================================================================
+        '
+        Public Function html_EncodeHTML(ByVal Source As String) As String
+            ' ##### removed to catch err<>0 problem on error resume next
+            '
+            html_EncodeHTML = Source
+            html_EncodeHTML = vbReplace(html_EncodeHTML, "&", "&amp;")
+            html_EncodeHTML = vbReplace(html_EncodeHTML, "<", "&lt;")
+            html_EncodeHTML = vbReplace(html_EncodeHTML, ">", "&gt;")
+            html_EncodeHTML = vbReplace(html_EncodeHTML, """", "&quot;")
+            html_EncodeHTML = vbReplace(html_EncodeHTML, "'", "&apos;")
+            '
+        End Function
+
 
     End Class
 End Namespace

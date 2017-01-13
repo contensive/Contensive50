@@ -5101,24 +5101,24 @@ ErrorTrap:
         '            csv_GetContentFieldPointer = -1
         '            iFieldName = Trim(FieldName)
         '            If (ContentName <> "") And (iFieldName <> "") Then
-        '                cdefPtr = cpcore.metaData.metaCache.cdefContentNameIndex.getPtr(ContentName)
+        '                cdefPtr = cpCore.metaData.metaCache.cdefContentNameIndex.getPtr(ContentName)
         '                If cdefPtr = -1 Then
-        '                    Call cpcore.metaData.getCdef(ContentName)
-        '                    cdefPtr = cpcore.metaData.metaCache.cdefContentNameIndex.getPtr(ContentName)
+        '                    Call cpCore.metaData.getCdef(ContentName)
+        '                    cdefPtr = cpCore.metaData.metaCache.cdefContentNameIndex.getPtr(ContentName)
         '                End If
-        '                FieldPointer = cpcore.metaData.metaCache.cdefContentFieldIndex(cdefPtr).getPtr(iFieldName)
+        '                FieldPointer = cpCore.metaData.metaCache.cdefContentFieldIndex(cdefPtr).getPtr(iFieldName)
         '                If FieldPointer = -1 Then
-        '                    If Not cpcore.metaData.metaCache.cdefContentFieldIndexPopulated(cdefPtr) Then
-        '                        With cpcore.metaData.metaCache.cdef(cdefPtr)
+        '                    If Not cpCore.metaData.metaCache.cdefContentFieldIndexPopulated(cdefPtr) Then
+        '                        With cpCore.metaData.metaCache.cdef(cdefPtr)
         '                            For Ptr = 0 To (.fields.Count - 1)
         '                                Dim arrayOfFields As appServices_metaDataClass.CDefFieldClass()
         '                                arrayOfFields = .fields
-        '                                Call cpcore.metaData.metaCache.cdefContentFieldIndex(cdefPtr).setPtr(arrayOfFields(Ptr).Name, Ptr)
+        '                                Call cpCore.metaData.metaCache.cdefContentFieldIndex(cdefPtr).setPtr(arrayOfFields(Ptr).Name, Ptr)
         '                                'Call properties.contentFieldPtrIndex(cdfptr).SetPointer(.Fields(Ptr).Name, Ptr)
         '                            Next
         '                        End With
-        '                        cpcore.metaData.metaCache.cdefContentFieldIndexPopulated(cdefPtr) = True
-        '                        FieldPointer = cpcore.metaData.metaCache.cdefContentFieldIndex(cdefPtr).getPtr(iFieldName)
+        '                        cpCore.metaData.metaCache.cdefContentFieldIndexPopulated(cdefPtr) = True
+        '                        FieldPointer = cpCore.metaData.metaCache.cdefContentFieldIndex(cdefPtr).getPtr(iFieldName)
         '                    Else
         '                        test = test
         '                    End If

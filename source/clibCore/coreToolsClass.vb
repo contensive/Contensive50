@@ -1308,7 +1308,7 @@ ErrorTrap:
                                 ElseIf CellData = "" Then
                                     Stream.Add(ColumnStart & "[empty]" & ColumnEnd)
                                 Else
-                                    Stream.Add(ColumnStart & html_EncodeHTML(EncodeText(CellData)) & ColumnEnd)
+                                    Stream.Add(ColumnStart & cpcore.html.html_EncodeHTML(EncodeText(CellData)) & ColumnEnd)
                                 End If
                             Next
                             Stream.Add(RowEnd)
@@ -4574,7 +4574,7 @@ ErrorTrap:
             '
             InstanceOptionString = "AdminLayout=1&filesystem=content files"
             'InstanceOptionString = cpCore.main_GetMemberProperty("Addon [File Manager] Options", "")
-            Content = cpCore.addon_execute_legacy1(0, "{B966103C-DBF4-4655-856A-3D204DEF6B21}", InstanceOptionString, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "-2", -1)
+            Content = cpCore.addon.execute_legacy1(0, "{B966103C-DBF4-4655-856A-3D204DEF6B21}", InstanceOptionString, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "-2", -1)
             'If Content = "" Then
             '    IsContentManager = cpCore.user.main_IsContentManager()
             '    Content = FileView.GetContentFileView2( "", IsContentManager, IsContentManager, True, False, True, False)
@@ -4611,7 +4611,7 @@ ErrorTrap:
             '
             InstanceOptionString = "AdminLayout=1&filesystem=website files"
             'InstanceOptionString = cpCore.main_GetMemberProperty("Addon [File Manager] Options", "")
-            Content = cpCore.addon_execute_legacy1(0, "{B966103C-DBF4-4655-856A-3D204DEF6B21}", InstanceOptionString, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "-2", -1)
+            Content = cpCore.addon.execute_legacy1(0, "{B966103C-DBF4-4655-856A-3D204DEF6B21}", InstanceOptionString, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "-2", -1)
             'If Content = "" Then
             '    IsContentManager = cpCore.user.main_IsContentManager()
             '    Content = FileView.GetContentFileView2( "", IsContentManager, IsContentManager, True, False, True, False)

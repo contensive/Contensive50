@@ -19,7 +19,7 @@ Namespace Contensive.Core
         '   objects passed by constructor - do not dispose
         '------------------------------------------------------------------------
         '
-        Private cp As CPClass                                   ' constructor -- top-level cp
+        Friend cp As CPClass                                   ' constructor -- top-level cp
         '
         ' ----- shared globals
         '
@@ -36,6 +36,57 @@ Namespace Contensive.Core
         ' if this instance is a webRole, retain pointer for callbacks
         '
         Public iisContext As System.Web.HttpContext
+        '
+        '===================================================================================================
+        ''' <summary>
+        ''' menuFlyout
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public ReadOnly Property menuTab As coreMenuTabClass
+            Get
+                If (_menuTab Is Nothing) Then
+                    _menuTab = New coreMenuTabClass(Me)
+                End If
+                Return _menuTab
+            End Get
+        End Property
+        Private _menuTab As coreMenuTabClass
+        '
+        '===================================================================================================
+        ''' <summary>
+        ''' menuFlyout
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public ReadOnly Property html As coreHtmlClass
+            Get
+                If (_html Is Nothing) Then
+                    _html = New coreHtmlClass(Me)
+                End If
+                Return _html
+            End Get
+        End Property
+        Private _html As coreHtmlClass
+        '
+        '===================================================================================================
+        ''' <summary>
+        ''' menuFlyout
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public ReadOnly Property addon As coreAddonClass
+            Get
+                If (_addon Is Nothing) Then
+                    _addon = New coreAddonClass(Me)
+                End If
+                Return _addon
+            End Get
+        End Property
+        Private _addon As coreAddonClass
         '
         '===================================================================================================
         ''' <summary>
@@ -448,16 +499,6 @@ Namespace Contensive.Core
         Public _docBufferResponseHeader As String = ""
         Public _docBufferResponseStatus As String = ""
         '
-        '-----------------------------------------------------------------------
-        '   legacy mainClass arguments
-        '   REFACTOR - organize and rename
-        '-----------------------------------------------------------------------
-        '
-        Private Structure NameValuePrivateType
-            Dim Name As String
-            Dim Value As String
-        End Structure
-        '
         Const pageManager_quickEdit_fpo = "<quickeditor>"
         Private pageManager_quickEdit_copy As String = ""
         '
@@ -471,7 +512,7 @@ Namespace Contensive.Core
         '
         ' Public view bubble editors
         '
-        Private pageManager_HelpViewerButtonID As String = ""
+        Public pageManager_HelpViewerButtonID As String = ""
         Public pageManager_EditWrapperCnt As Integer = 0
         '
         Public main_Private_LegacySiteSites_Loaded As Boolean = False
@@ -546,14 +587,14 @@ Namespace Contensive.Core
         ' ----- Help Subsystem
         '-----------------------------------------------------------------------
         '
-        Private pageManager_HelpCodeCount As Integer = 0
-        Private pageManager_HelpCodeSize As Integer = 0
-        Private pageManager_HelpCodes As String()
-        Private pageManager_HelpCaptions As String()
+        Friend pageManager_HelpCodeCount As Integer = 0
+        Friend pageManager_HelpCodeSize As Integer = 0
+        Friend pageManager_HelpCodes As String()
+        Friend pageManager_HelpCaptions As String()
         '
         ' Count of Help Dialogs
         '
-        Private pageManager_HelpDialogCnt As Integer = 0
+        Friend pageManager_HelpDialogCnt As Integer = 0
         '
         '-----------------------------------------------------------------------
         ' ----- appTimer
@@ -913,11 +954,11 @@ Namespace Contensive.Core
         '   values collected from add-ons as the page progresses
         ' ----------------------------------------------------------------------------------------
         '
-        Private main_page_IncludedAddonIDList As String = ""
+        Friend main_page_IncludedAddonIDList As String = ""
         '
-        Private main_OnLoadJavascript As String = ""
-        Private main_endOfBodyJavascript As String = ""           ' javascript that goes at the end of the close page
-        Private main_endOfBodyString As String = ""
+        Friend main_OnLoadJavascript As String = ""
+        Friend main_endOfBodyJavascript As String = ""           ' javascript that goes at the end of the close page
+        Friend main_endOfBodyString As String = ""
         '
         ' block of js code that goes into a script tag
         '
@@ -1013,7 +1054,7 @@ Namespace Contensive.Core
             Public itemCnt As Integer = 0
             Public addonIdIndex As coreKeyPtrIndexClass
         End Class
-        Private cache_addonIncludeRules As addonIncludeRulesClass
+        Public cache_addonIncludeRules As addonIncludeRulesClass
         '
         'Private cache_addonIncludeRules.item As String(,)
         'Private cache_addonIncludeRules.itemCnt As Integer = 0
@@ -1146,8 +1187,8 @@ Namespace Contensive.Core
         '   - used to prevent javascript and styles from being added to cpCoreClass twice
         '================================================================================
         '
-        Private addonsRunOnThisPageIdList As New List(Of Integer)
-        'Private csv_addon_execute_AddonsRunOnThisPageIdList As String = ""
+        Friend addonsRunOnThisPageIdList As New List(Of Integer)
+        'Private csv_addon.addon_execute_AddonsRunOnThisPageIdList As String = ""
         '
         '================================================================================
         '   (NOT thread safe)
@@ -1156,8 +1197,8 @@ Namespace Contensive.Core
         '       - append removed when the addon exits
         '================================================================================
         '
-        Private addonsCurrentlyRunningIdList As New List(Of Integer)
-        'Private csv_addon_execute_AddonsCurrentlyRunningIdList As String = ""
+        Friend addonsCurrentlyRunningIdList As New List(Of Integer)
+        'Private csv_addon.addon_execute_AddonsCurrentlyRunningIdList As String = ""
         ''
         '' deprecated - here for compatibiity
         ''
@@ -1414,17 +1455,17 @@ Namespace Contensive.Core
         Private web_EncodeContent_JSFilename_Cnt As Integer
         Private web_EncodeContent_JSFilename() As String
         '
-        Private web_EncodeContent_JavascriptBodyEnd_cnt As Integer
-        Private web_EncodeContent_JavascriptBodyEnd() As String
+        Friend web_EncodeContent_JavascriptBodyEnd_cnt As Integer
+        Friend web_EncodeContent_JavascriptBodyEnd() As String
         '
-        Private web_EncodeContent_StyleFilenames_Cnt As Integer
-        Private web_EncodeContent_StyleFilenames() As String
+        Friend web_EncodeContent_StyleFilenames_Cnt As Integer
+        Friend web_EncodeContent_StyleFilenames() As String
         '
-        Private web_EncodeContent_HeadTags As String = ""
+        Friend web_EncodeContent_HeadTags As String = ""
         '
         ' storage moved here from main - if addon move to csv is successful, this will stay
         '
-        Private pageManager_PageAddonCnt As Integer = 0
+        Friend pageManager_PageAddonCnt As Integer = 0
         ''
         '' ----- Get a DataSource ID from its Name
         ''       If it is not found, -1 is returned (for system datasource)
@@ -2579,7 +2620,7 @@ ErrorTrap:
                                 TextName = csv_GetAddonOptionStringValue("menu", addonOptionString)
                                 '
                                 addonOptionString = "Menu=" & TextName & "[" & csv_GetDynamicMenuACSelect() & "]&NewMenu="
-                                AddonOptionStringHTMLEncoded = html_EncodeHTML("Menu=" & TextName & "[" & csv_GetDynamicMenuACSelect() & "]&NewMenu=")
+                                AddonOptionStringHTMLEncoded = html.html_EncodeHTML("Menu=" & TextName & "[" & csv_GetDynamicMenuACSelect() & "]&NewMenu=")
                                 '
                                 IconIDControlString = "AC," & ACTypeDynamicMenu & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded
                                 IconImg = GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as [Dynamic Menu]", "", 0)
@@ -2966,7 +3007,7 @@ ErrorTrap:
                                                             '
                                                             ' all other add-ons, pass out to cpCoreClass to process
                                                             '
-                                                            Copy = addon_execute(0, ACName, AddonOptionStringHTMLEncoded, CPUtilsBaseClass.addonContext.ContextEmail, "", 0, "", ACInstanceID, False, 0, "", True, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
+                                                            Copy = addon.execute(0, ACName, AddonOptionStringHTMLEncoded, CPUtilsBaseClass.addonContext.ContextEmail, "", 0, "", ACInstanceID, False, 0, "", True, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
                                                             'Copy = "" _
                                                             '    & "" _
                                                             '    & "<!-- ADDON " _
@@ -3094,7 +3135,7 @@ ErrorTrap:
                                                         End If
                                                     End If
                                                     ACNameCaption = vbReplace(ACName, """", "")
-                                                    ACNameCaption = html_EncodeHTML(ACNameCaption)
+                                                    ACNameCaption = html.html_EncodeHTML(ACNameCaption)
                                                     IDControlString = "AC," & ACType & "," & NotUsedID & "," & encodeNvaArgument(ACName) & "," & ResultOptionListHTMLEncoded & "," & ACGuid
                                                     Copy = GetAddonIconImg(AdminURL, IconWidth, IconHeight, IconSprites, AddonIsInline, IDControlString, IconFilename, serverFilePath, IconAlt, IconTitle, ACInstanceID, 0)
                                                 ElseIf EncodeNonCachableTags Then
@@ -3708,7 +3749,7 @@ ErrorTrap:
                                                                     RecordID = EncodeInteger(ACInstanceName)
                                                                     ImageWidthText = DHTML.ElementAttribute(ElementPointer, "WIDTH")
                                                                     ImageHeightText = DHTML.ElementAttribute(ElementPointer, "HEIGHT")
-                                                                    ImageAlt = html_EncodeHTML(DHTML.ElementAttribute(ElementPointer, "Alt"))
+                                                                    ImageAlt = html.html_EncodeHTML(DHTML.ElementAttribute(ElementPointer, "Alt"))
                                                                     ImageVSpace = EncodeInteger(DHTML.ElementAttribute(ElementPointer, "vspace"))
                                                                     ImageHSpace = EncodeInteger(DHTML.ElementAttribute(ElementPointer, "hspace"))
                                                                     ImageAlign = DHTML.ElementAttribute(ElementPointer, "Align")
@@ -3787,7 +3828,7 @@ ErrorTrap:
                                                                         If Pos > 0 Then
                                                                             QSSplit(QSPtr) = Mid(QSSplit(QSPtr), 1, Pos - 1)
                                                                         End If
-                                                                        QSSplit(QSPtr) = html_EncodeHTML(QSSplit(QSPtr))
+                                                                        QSSplit(QSPtr) = html.html_EncodeHTML(QSSplit(QSPtr))
                                                                     Next
                                                                     QueryString = Join(QSSplit, "&")
                                                                 End If
@@ -3806,7 +3847,7 @@ ErrorTrap:
                                                                     QueryString = EncodeText(ImageIDArray(4))
                                                                     QSSplit = Split(QueryString, "&")
                                                                     For QSPtr = 0 To UBound(QSSplit)
-                                                                        QSSplit(QSPtr) = html_EncodeHTML(QSSplit(QSPtr))
+                                                                        QSSplit(QSPtr) = html.html_EncodeHTML(QSSplit(QSPtr))
                                                                     Next
                                                                     QueryString = Join(QSSplit, "&")
 
@@ -3823,7 +3864,7 @@ ErrorTrap:
                                                                     QueryString = html_DecodeActiveContent_ProcessDynamicMenu(QueryString)
                                                                     QSSplit = Split(QueryString, "&")
                                                                     For QSPtr = 0 To UBound(QSSplit)
-                                                                        QSSplit(QSPtr) = html_EncodeHTML(QSSplit(QSPtr))
+                                                                        QSSplit(QSPtr) = html.html_EncodeHTML(QSSplit(QSPtr))
                                                                     Next
                                                                     QueryString = Join(QSSplit, "&")
                                                                 End If
@@ -3851,7 +3892,7 @@ ErrorTrap:
                                                                     QueryString = decodeHtml(QueryString)
                                                                     QSSplit = Split(QueryString, "&")
                                                                     For QSPtr = 0 To UBound(QSSplit)
-                                                                        QSSplit(QSPtr) = html_EncodeHTML(QSSplit(QSPtr))
+                                                                        QSSplit(QSPtr) = html.html_EncodeHTML(QSSplit(QSPtr))
                                                                     Next
                                                                     QueryString = Join(QSSplit, "&")
                                                                 End If
@@ -3866,7 +3907,7 @@ ErrorTrap:
                                                                     QueryString = decodeHtml(QueryString)
                                                                     QSSplit = Split(QueryString, "&")
                                                                     For QSPtr = 0 To UBound(QSSplit)
-                                                                        QSSplit(QSPtr) = html_EncodeHTML(QSSplit(QSPtr))
+                                                                        QSSplit(QSPtr) = html.html_EncodeHTML(QSSplit(QSPtr))
                                                                     Next
                                                                     QueryString = Join(QSSplit, "&")
                                                                 End If
@@ -3881,7 +3922,7 @@ ErrorTrap:
                                                                     QueryString = decodeHtml(QueryString)
                                                                     QSSplit = Split(QueryString, "&")
                                                                     For QSPtr = 0 To UBound(QSSplit)
-                                                                        QSSplit(QSPtr) = html_EncodeHTML(QSSplit(QSPtr))
+                                                                        QSSplit(QSPtr) = html.html_EncodeHTML(QSSplit(QSPtr))
                                                                     Next
                                                                     QueryString = Join(QSSplit, "&")
                                                                 End If
@@ -3896,7 +3937,7 @@ ErrorTrap:
                                                                     QueryString = decodeHtml(QueryString)
                                                                     QSSplit = Split(QueryString, "&")
                                                                     For QSPtr = 0 To UBound(QSSplit)
-                                                                        QSSplit(QSPtr) = html_EncodeHTML(QSSplit(QSPtr))
+                                                                        QSSplit(QSPtr) = html.html_EncodeHTML(QSSplit(QSPtr))
                                                                     Next
                                                                     QueryString = Join(QSSplit, "&")
                                                                 End If
@@ -4095,14 +4136,14 @@ ErrorTrap:
                                                                                         NewImageFilename = ImageFilenameNoExt & "-" & ImageAltSize & "." & ImageFilenameExt
                                                                                         ' images included in email have spaces that must be converted to "%20" or they 404
                                                                                         imageNewLink = EncodeURL(csv_getVirtualFileLink(serverFilePath, ImageVirtualFilePath) & NewImageFilename)
-                                                                                        ElementText = vbReplace(ElementText, ImageSrcOriginal, html_EncodeHTML(imageNewLink))
+                                                                                        ElementText = vbReplace(ElementText, ImageSrcOriginal, html.html_EncodeHTML(imageNewLink))
                                                                                     ElseIf (RecordWidth < ImageWidth) Or (RecordHeight < ImageHeight) Then
                                                                                         '
                                                                                         ' OK
                                                                                         ' reize image larger then original - go with it as is
                                                                                         '
                                                                                         ' images included in email have spaces that must be converted to "%20" or they 404
-                                                                                        ElementText = vbReplace(ElementText, ImageSrcOriginal, html_EncodeHTML(EncodeURL(csv_getVirtualFileLink(serverFilePath, RecordVirtualFilename))))
+                                                                                        ElementText = vbReplace(ElementText, ImageSrcOriginal, html.html_EncodeHTML(EncodeURL(csv_getVirtualFileLink(serverFilePath, RecordVirtualFilename))))
                                                                                     Else
                                                                                         '
                                                                                         ' resized image - create NewImageFilename (and add new alt size to the record)
@@ -4194,7 +4235,7 @@ ErrorTrap:
                                                                                             '
                                                                                             ' Change the image src to the AltSize
                                                                                             '
-                                                                                            ElementText = vbReplace(ElementText, ImageSrcOriginal, html_EncodeHTML(EncodeURL(csv_getVirtualFileLink(serverFilePath, ImageVirtualFilePath) & NewImageFilename)))
+                                                                                            ElementText = vbReplace(ElementText, ImageSrcOriginal, html.html_EncodeHTML(EncodeURL(csv_getVirtualFileLink(serverFilePath, ImageVirtualFilePath) & NewImageFilename)))
                                                                                         End If
                                                                                     End If
                                                                                 End If
@@ -5131,9 +5172,9 @@ ErrorTrap:
             ' Build output string
             '
             'csv_GetAddonSelector = encodeNvaArgument(SrcOptionName)
-            pageManager_GetAddonSelector = html_EncodeHTML(encodeNvaArgument(SrcOptionName)) & "="
+            pageManager_GetAddonSelector = html.html_EncodeHTML(encodeNvaArgument(SrcOptionName)) & "="
             If InstanceOptionValue_AddonEncoded <> "" Then
-                pageManager_GetAddonSelector = pageManager_GetAddonSelector & html_EncodeHTML(InstanceOptionValue_AddonEncoded)
+                pageManager_GetAddonSelector = pageManager_GetAddonSelector & html.html_EncodeHTML(InstanceOptionValue_AddonEncoded)
             End If
             If SrcSelectorSuffix = "" And list = "" Then
                 '
@@ -5232,190 +5273,6 @@ ErrorTrap:
             End If
             Call db.cs_Close(CS)
             '
-            Exit Sub
-            '
-ErrorTrap:
-            handleExceptionAndRethrow(New Exception("Unexpected exception"))
-        End Sub
-        '
-        '===================================================================================================
-        '   Build AddonOptionLists
-        '
-        '   On entry:
-        '       AddonOptionConstructor = the addon-encoded version of the list that comes from the Addon Record
-        '           It is crlf delimited and all escape characters converted
-        '       AddonOptionString = addonencoded version of the list that comes from the HTML AC tag
-        '           that means & delimited
-        '
-        '   On Exit:
-        '       OptionString_ForObjectCall
-        '               pass this string to the addon when it is run, crlf delimited name=value pair.
-        '               This should include just the name=values pairs, with no selectors
-        '               it should include names from both Addon and Instance
-        '               If the Instance has a value, include it. Otherwise include Addon value
-        '       AddonOptionExpandedConstructor = pass this to the bubble editor to create the the selectr
-        '===================================================================================================
-        '
-        Public Sub csv_BuildAddonOptionLists(ByRef OptionString_ForObjectCall As String, ByRef AddonOptionExpandedConstructor As String, AddonOptionConstructor As String, addonOptionString As String, InstanceID As String, IncludeSettingsBubbleOptions As Boolean)
-            On Error GoTo ErrorTrap 'Const Tn = "BuildAddonOptionLists": 'Dim th as integer: th = profileLogMethodEnter(Tn)
-            '
-            Dim SavePtr As Integer
-            Dim InstanceTypes() As String
-            Dim InstanceType As String
-            Dim ConstructorTypes() As String
-            Dim ConstructorType As String
-            Dim ConstructorValue As String
-            Dim ConstructorSelector As String
-            Dim ConstructorName As String
-            Dim ConstructorPtr As Integer
-            Dim Pos As Integer
-            Dim InstanceNameValues() As String
-            Dim InstanceNames() As String
-            Dim InstanceValues() As String
-            Dim InstanceCnt As Integer
-            Dim InstanceName As String
-            Dim InstanceValue As String
-            '
-            Dim ConstructorNameValues() As String
-            Dim ConstructorNames() As String
-            Dim ConstructorSelectors() As String
-            Dim ConstructorValues() As String
-            '
-            Dim IPtr As Integer
-            Dim ConstructorCnt As Integer
-
-
-            ConstructorCnt = 0
-            If (AddonOptionConstructor <> "") Then
-                '
-                ' Initially Build Constructor from AddonOptions
-                '
-                ConstructorNameValues = Split(AddonOptionConstructor, vbCrLf)
-                ConstructorCnt = UBound(ConstructorNameValues) + 1
-                ReDim ConstructorNames(ConstructorCnt)
-                ReDim ConstructorSelectors(ConstructorCnt)
-                ReDim ConstructorValues(ConstructorCnt)
-                ReDim ConstructorTypes(ConstructorCnt)
-                SavePtr = 0
-                For ConstructorPtr = 0 To ConstructorCnt - 1
-                    ConstructorName = ConstructorNameValues(ConstructorPtr)
-                    ConstructorSelector = ""
-                    ConstructorValue = ""
-                    ConstructorType = "text"
-                    Pos = vbInstr(1, ConstructorName, "=")
-                    If Pos > 1 Then
-                        ConstructorValue = Mid(ConstructorName, Pos + 1)
-                        ConstructorName = Trim(Left(ConstructorName, Pos - 1))
-                        Pos = vbInstr(1, ConstructorValue, "[")
-                        If Pos > 0 Then
-                            ConstructorSelector = Mid(ConstructorValue, Pos)
-                            ConstructorValue = Mid(ConstructorValue, 1, Pos - 1)
-                        End If
-                    End If
-                    If ConstructorName <> "" Then
-                        'Pos = vbInstr(1, ConstructorName, ",")
-                        'If Pos > 1 Then
-                        '    ConstructorType = Mid(ConstructorName, Pos + 1)
-                        '    ConstructorName = Left(ConstructorName, Pos - 1)
-                        'End If
-
-                        ConstructorNames(SavePtr) = ConstructorName
-                        ConstructorValues(SavePtr) = ConstructorValue
-                        ConstructorSelectors(SavePtr) = ConstructorSelector
-                        'ConstructorTypes(ConstructorPtr) = ConstructorType
-                        SavePtr = SavePtr + 1
-                    End If
-                Next
-                ConstructorCnt = SavePtr
-            End If
-            InstanceCnt = 0
-            '
-            ' Now update the values with Instance - if a name is not found, add it
-            '
-            If addonOptionString <> "" Then
-                '
-                InstanceNameValues = Split(addonOptionString, "&")
-                InstanceCnt = UBound(InstanceNameValues) + 1
-                ReDim InstanceNames(InstanceCnt - 1)
-                ReDim InstanceValues(InstanceCnt - 1)
-
-                ReDim InstanceTypes(InstanceCnt - 1)
-                SavePtr = 0
-                For IPtr = 0 To InstanceCnt - 1
-                    InstanceName = InstanceNameValues(IPtr)
-                    InstanceValue = ""
-                    Pos = vbInstr(1, InstanceName, "=")
-                    If Pos > 1 Then
-                        InstanceValue = Mid(InstanceName, Pos + 1)
-                        InstanceName = Trim(Left(InstanceName, Pos - 1))
-                        Pos = vbInstr(1, InstanceValue, "[")
-                        If Pos >= 1 Then
-                            InstanceValue = Mid(InstanceValue, 1, Pos - 1)
-                        End If
-                    End If
-                    If InstanceName <> "" Then
-                        'Pos = vbInstr(1, InstanceName, ",")
-                        'If Pos > 1 Then
-                        '    InstanceType = Mid(InstanceName, Pos + 1)
-                        '    InstanceName = Left(InstanceName, Pos - 1)
-                        'End If
-                        InstanceNames(SavePtr) = vbLCase(InstanceName)
-                        InstanceValues(SavePtr) = InstanceValue
-                        'InstanceTypes(IPtr) = InstanceType
-                        '
-                        ' if the name is not in the Constructor, add it
-                        '
-                        If ConstructorCnt > 0 Then
-                            For ConstructorPtr = 0 To ConstructorCnt - 1
-                                If vbLCase(InstanceName) = vbLCase(ConstructorNames(ConstructorPtr)) Then
-                                    Exit For
-                                End If
-                            Next
-                        End If
-                        If ConstructorPtr >= ConstructorCnt Then
-                            '
-                            ' not found, add this instance name and value to the Constructor values
-                            '
-                            ReDim Preserve ConstructorNames(ConstructorCnt)
-                            ReDim Preserve ConstructorValues(ConstructorCnt)
-                            ReDim Preserve ConstructorSelectors(ConstructorCnt)
-                            ConstructorNames(ConstructorCnt) = InstanceName
-                            ConstructorValues(ConstructorCnt) = InstanceValue
-                            ConstructorCnt = ConstructorCnt + 1
-                        Else
-                            '
-                            ' found, set the ConstructorValue to the instance value
-                            '
-                            ConstructorValues(ConstructorPtr) = InstanceValue
-                        End If
-                        SavePtr = SavePtr + 1
-                    End If
-                Next
-            End If
-            AddonOptionExpandedConstructor = ""
-            '
-            ' Build output strings from name and value found
-            '
-            For ConstructorPtr = 0 To ConstructorCnt - 1
-                ConstructorName = ConstructorNames(ConstructorPtr)
-                ConstructorValue = ConstructorValues(ConstructorPtr)
-                ConstructorSelector = ConstructorSelectors(ConstructorPtr)
-                ' here goes nothing!!
-                OptionString_ForObjectCall = OptionString_ForObjectCall & ConstructorName & "=" & ConstructorValue & "&"
-                'OptionString_ForObjectCall = OptionString_ForObjectCall & csv_DecodeAddonOptionArgument(ConstructorName) & "=" & csv_DecodeAddonOptionArgument(ConstructorValue) & vbCrLf
-                If IncludeSettingsBubbleOptions Then
-                    AddonOptionExpandedConstructor = AddonOptionExpandedConstructor & vbCrLf & pageManager_GetAddonSelector(ConstructorName, ConstructorValue, ConstructorSelector)
-                End If
-            Next
-            OptionString_ForObjectCall = OptionString_ForObjectCall & "InstanceID=" & InstanceID
-            'If OptionString_ForObjectCall <> "" Then
-            '    OptionString_ForObjectCall = Mid(OptionString_ForObjectCall, 1, Len(OptionString_ForObjectCall) - 1)
-            '    'OptionString_ForObjectCall = Mid(OptionString_ForObjectCall, 1, Len(OptionString_ForObjectCall) - 2)
-            'End If
-            If AddonOptionExpandedConstructor <> "" Then
-                AddonOptionExpandedConstructor = Mid(AddonOptionExpandedConstructor, 3)
-            End If
-
             Exit Sub
             '
 ErrorTrap:
@@ -6175,7 +6032,7 @@ ErrorTrap:
                 html_EncodeContentUpgrades = vbReplace(html_EncodeContentUpgrades, "{{content}}", "<AC type=""" & ACTypeTemplateContent & """>", 1, 99, vbTextCompare)
             End If
             '
-            'Call main_cpcore.testPoint(hint)
+            'Call main_testPoint(hint)
             '
             Exit Function
 ErrorTrap:
@@ -6840,7 +6697,7 @@ ErrorTrap:
                                             ' Dynamic Form - run the core addon replacement instead
                                             '
                                             'hint = hint & ",310"
-                                            returnValue = returnValue & addon_execute(0, DynamicFormGuid, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", "", False, ignore_DefaultWrapperID, "", AddonStatusOK, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
+                                            returnValue = returnValue & addon.execute(0, DynamicFormGuid, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", "", False, ignore_DefaultWrapperID, "", AddonStatusOK, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
                                         Case ACTypeChildList
                                             '
                                             ' Child Page List
@@ -6942,9 +6799,9 @@ ErrorTrap:
                                 End If
                                 ' dont have any way of getting fieldname yet
                                 If AddonGuid <> "" Then
-                                    Copy = addon_execute(0, AddonGuid, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, AddonStatusOK, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
+                                    Copy = addon.execute(0, AddonGuid, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, AddonStatusOK, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
                                 Else
-                                    Copy = addon_execute(0, AddonName, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, AddonStatusOK, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
+                                    Copy = addon.execute(0, AddonName, addonOptionString, CPUtilsBaseClass.addonContext.ContextPage, ContextContentName, ContextRecordID, "", ACInstanceID, False, ignore_DefaultWrapperID, ignore_TemplateCaseOnly_Content, AddonStatusOK, Nothing, "", Nothing, "", iPersonalizationPeopleId, personalizationIsAuthenticated)
                                 End If
                             End If
                         End If
@@ -7319,7 +7176,7 @@ ErrorTrap:
                     ' This field is default true, and non-authorable
                     ' It will be true in all cases, except a possible unforseen exception
                     '
-                    EmailTemplateSource = EmailTemplateSource & "<div style=""clear: both;padding:10px;"">" & csv_GetLinkedText("<a href=""" & html_EncodeHTML("http://" & appConfig.domainList(0) & "/" & siteProperties.serverPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
+                    EmailTemplateSource = EmailTemplateSource & "<div style=""clear: both;padding:10px;"">" & csv_GetLinkedText("<a href=""" & html.html_EncodeHTML("http://" & appConfig.domainList(0) & "/" & siteProperties.serverPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
                 End If
                 '
                 ' --- Send message to the additional member
@@ -7888,7 +7745,7 @@ ErrorTrap:
 
                         EncodedLink = NonEncodedLink
                         'EncodedLink = encodeURL(NonEncodedLink)
-                        writeAltBuffer("<div style=""padding:20px;border:1px dashed black;background-color:white;color:black;"">" & RedirectReason & "<p>Click to continue the redirect to <a href=" & EncodedLink & ">" & html_EncodeHTML(NonEncodedLink) & "</a>...</p></div>")
+                        writeAltBuffer("<div style=""padding:20px;border:1px dashed black;background-color:white;color:black;"">" & RedirectReason & "<p>Click to continue the redirect to <a href=" & EncodedLink & ">" & html.html_EncodeHTML(NonEncodedLink) & "</a>...</p></div>")
                     Else
                         '
                         ' Redirect now
@@ -8052,7 +7909,7 @@ ErrorTrap:
         Public Function main_encodeHTML(ByVal Source As Object) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("encodeHTML")
             '
-            main_encodeHTML = html_EncodeHTML(EncodeText(Source))
+            main_encodeHTML = html.html_EncodeHTML(EncodeText(Source))
             Exit Function
             '
             ' ----- Error Trap
@@ -8071,7 +7928,7 @@ ErrorTrap:
         Public Function html_convertText2HTML(ByVal Source As Object) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("ConvertText2HTML")
             '
-            html_convertText2HTML = html_EncodeHTML(EncodeText(Source))
+            html_convertText2HTML = html.html_EncodeHTML(EncodeText(Source))
             html_convertText2HTML = main_EncodeCRLF(html_convertText2HTML)
             '
             Exit Function
@@ -8629,7 +8486,7 @@ ErrorTrap:
                                         Copy = Left(Copy, siteProperties.selectFieldWidthLimit) & "...+"
                                     End If
                                 End If
-                                Call FastString.Add(">" & html_EncodeHTML(Copy) & "</option>")
+                                Call FastString.Add(">" & html.html_EncodeHTML(Copy) & "</option>")
                             Next
                             If Not SelectedFound And (CurrentValue <> 0) Then
                                 Call db.cs_Close(CSPointer)
@@ -8664,7 +8521,7 @@ ErrorTrap:
                                             Copy = Left(Copy, siteProperties.selectFieldWidthLimit) & "...+"
                                         End If
                                     End If
-                                    Call FastString.Add(">" & html_EncodeHTML(Copy) & "</option>")
+                                    Call FastString.Add(">" & html.html_EncodeHTML(Copy) & "</option>")
                                 End If
                             End If
                         End If
@@ -9121,12 +8978,12 @@ ErrorTrap:
                 main_GetLoginLink = main_GetLoginLink & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"">"
                 main_GetLoginLink = main_GetLoginLink & "<tr><td align=""right"">"
                 If user.isAuthenticatedContentManager() Then
-                    main_GetLoginLink = main_GetLoginLink & "<a href=""" & html_EncodeHTML(siteProperties.adminURL) & """ target=""_blank"">"
+                    main_GetLoginLink = main_GetLoginLink & "<a href=""" & html.html_EncodeHTML(siteProperties.adminURL) & """ target=""_blank"">"
                 Else
                     Link = web_requestPage & "?" & web_RefreshQueryString
                     Link = modifyLinkQuery(Link, RequestNameHardCodedPage, HardCodedPageLogin, True)
                     'Link = modifyLinkQuery(Link, RequestNameInterceptpage, LegacyInterceptPageSNLogin, True)
-                    main_GetLoginLink = main_GetLoginLink & "<a href=""" & html_EncodeHTML(Link) & """ >"
+                    main_GetLoginLink = main_GetLoginLink & "<a href=""" & html.html_EncodeHTML(Link) & """ >"
                 End If
                 If (main_LoginIconFilename <> "") Then
                     main_GetLoginLink = main_GetLoginLink & "<img alt=""Login"" src=""" & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, main_LoginIconFilename) & """ border=""0"" >"
@@ -9948,9 +9805,9 @@ ErrorTrap:
                 LinkPanel.Add("Contensive " & cp.Version() & " | ")
                 LinkPanel.Add(FormatDateTime(main_PageStartTime) & " | ")
                 LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""http://support.Contensive.com/"">Support</A> | ")
-                LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html_EncodeHTML(siteProperties.adminURL) & """>Admin Home</A> | ")
-                LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html_EncodeHTML("http://" & main_ServerDomain) & """>Public Home</A> | ")
-                LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & html_EncodeHTML(siteProperties.adminURL & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
+                LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html.html_EncodeHTML(siteProperties.adminURL) & """>Admin Home</A> | ")
+                LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html.html_EncodeHTML("http://" & main_ServerDomain) & """>Public Home</A> | ")
+                LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & html.html_EncodeHTML(siteProperties.adminURL & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
                 If siteProperties.getBoolean("AllowMobileTemplates", False) Then
                     If visit_browserIsMobile Then
                         QS = web_RefreshQueryString
@@ -10074,7 +9931,7 @@ ErrorTrap:
                                     '
                                     ' Path is blocked
                                     '
-                                    Tag = html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [" & web_requestPath & "] [<a href=""" & html_EncodeHTML(siteProperties.adminURL & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & main_GetContentID("paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
+                                    Tag = html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [" & web_requestPath & "] [<a href=""" & html.html_EncodeHTML(siteProperties.adminURL & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & main_GetContentID("paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
                                 Else
                                     '
                                     ' Path is not blocked
@@ -10195,9 +10052,9 @@ ErrorTrap:
                     LinkPanel.Add("Contensive " & cp.Version() & " | ")
                     LinkPanel.Add(FormatDateTime(main_PageStartTime) & " | ")
                     LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""http: //support.Contensive.com/"">Support</A> | ")
-                    LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html_EncodeHTML(siteProperties.adminURL) & """>Admin Home</A> | ")
-                    LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html_EncodeHTML("http://" & main_ServerDomain) & """>Public Home</A> | ")
-                    LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & html_EncodeHTML(siteProperties.adminURL & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
+                    LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html.html_EncodeHTML(siteProperties.adminURL) & """>Admin Home</A> | ")
+                    LinkPanel.Add("<a class=""ccAdminLink"" href=""" & html.html_EncodeHTML("http://" & main_ServerDomain) & """>Public Home</A> | ")
+                    LinkPanel.Add("<a class=""ccAdminLink"" target=""_blank"" href=""" & html.html_EncodeHTML(siteProperties.adminURL & "?" & RequestNameHardCodedPage & "=" & HardCodedPageMyProfile) & """>My Profile</A> | ")
                     LinkPanel.Add("</span>")
                     '
                     '
@@ -10212,14 +10069,14 @@ ErrorTrap:
                         & cr2 & "</tr>"
                     '
                     DebugPanel = DebugPanel & main_DebugPanelRow("DOM", "<a class=""ccAdminLink"" href=""/ccLib/clientside/DOMViewer.htm"" target=""_blank"">Click</A>")
-                    DebugPanel = DebugPanel & main_DebugPanelRow("Trap Errors", html_EncodeHTML(siteProperties.trapErrors.ToString))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("Trap Email", html_EncodeHTML(siteProperties.getText("TrapEmail")))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerLink", html_EncodeHTML(main_ServerLink))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerDomain", html_EncodeHTML(main_ServerDomain))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerProtocol", html_EncodeHTML(web_requestProtocol))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerHost", html_EncodeHTML(webServer.requestDomain))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerPath", html_EncodeHTML(web_requestPath))
-                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerPage", html_EncodeHTML(web_requestPage))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Trap Errors", html.html_EncodeHTML(siteProperties.trapErrors.ToString))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("Trap Email", html.html_EncodeHTML(siteProperties.getText("TrapEmail")))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerLink", html.html_EncodeHTML(main_ServerLink))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerDomain", html.html_EncodeHTML(main_ServerDomain))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerProtocol", html.html_EncodeHTML(web_requestProtocol))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerHost", html.html_EncodeHTML(webServer.requestDomain))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerPath", html.html_EncodeHTML(web_requestPath))
+                    DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerPage", html.html_EncodeHTML(web_requestPage))
                     Copy = ""
                     If webServer.requestQueryString <> "" Then
                         CopySplit = Split(webServer.requestQueryString, "&")
@@ -10232,7 +10089,7 @@ ErrorTrap:
                                 If UBound(copyNameValueSplit) > 0 Then
                                     copyValue = DecodeResponseVariable(copyNameValueSplit(1))
                                 End If
-                                Copy = Copy & cr & "<br>" & html_EncodeHTML(CopyName & "=" & copyValue)
+                                Copy = Copy & cr & "<br>" & html.html_EncodeHTML(CopyName & "=" & copyValue)
                             End If
                         Next
                         Copy = Mid(Copy, 8)
@@ -10241,15 +10098,15 @@ ErrorTrap:
                     Copy = ""
                     For Each kvp As KeyValuePair(Of String, docPropertiesClass) In docProperties.docPropertiesDict
                         If kvp.Value.IsForm Then
-                            Copy = Copy & cr & "<br>" & html_EncodeHTML(kvp.Value.NameValue)
+                            Copy = Copy & cr & "<br>" & html.html_EncodeHTML(kvp.Value.NameValue)
                         End If
                     Next
 
                     'DebugPanel = DebugPanel & main_DebugPanelRow("ServerForm", Copy)
-                    'DebugPanel = DebugPanel & main_DebugPanelRow("Request Path", html_EncodeHTML(web_requestPath))
-                    'DebugPanel = DebugPanel & main_DebugPanelRow("CDN Files Path", html_EncodeHTML(appConfig.cdnFilesNetprefix))
-                    'DebugPanel = DebugPanel & main_DebugPanelRow("Referrer", html_EncodeHTML(web.requestReferrer))
-                    'DebugPanel = DebugPanel & main_DebugPanelRow("Cookies", html_EncodeHTML(web.requestCookieString))
+                    'DebugPanel = DebugPanel & main_DebugPanelRow("Request Path", html.html_EncodeHTML(web_requestPath))
+                    'DebugPanel = DebugPanel & main_DebugPanelRow("CDN Files Path", html.html_EncodeHTML(appConfig.cdnFilesNetprefix))
+                    'DebugPanel = DebugPanel & main_DebugPanelRow("Referrer", html.html_EncodeHTML(web.requestReferrer))
+                    'DebugPanel = DebugPanel & main_DebugPanelRow("Cookies", html.html_EncodeHTML(web.requestCookieString))
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Visit Id", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("visits") & "&af=4&id=" & main_VisitId & """>" & main_VisitId & "</a>")
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Visit Start Date", EncodeText(main_VisitStartDateValue))
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Visit Start Time", EncodeText(main_VisitStartTime))
@@ -10259,7 +10116,7 @@ ErrorTrap:
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Visitor ID", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("visitors") & "&af=4&id=" & main_VisitorID & """>" & main_VisitorID & "</a>")
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Visitor New", EncodeText(main_VisitorNew))
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Member ID", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("people") & "&af=4&id=" & user.userId & """>" & user.userId & "</a>")
-                    'DebugPanel = DebugPanel & main_DebugPanelRow("Member Name", html_EncodeHTML(user.userName))
+                    'DebugPanel = DebugPanel & main_DebugPanelRow("Member Name", html.html_EncodeHTML(user.userName))
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Member New", EncodeText(user.userIsNew))
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Member Language", user.userLanguage)
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Page", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("page content") & "&af=4&id=" & main_RenderedPageID & """>" & main_RenderedPageID & ", " & main_RenderedPageName & "</a>")
@@ -10441,7 +10298,7 @@ ErrorTrap:
                             If IsEditingLocal Then
                                 main_GetSeeAlso = main_GetSeeAlso & main_GetRecordEditLink2("See Also", (db.cs_getInteger(CS, "ID")), False, "", user.isEditing("See Also"))
                             End If
-                            main_GetSeeAlso = main_GetSeeAlso & "<a href=""" & html_EncodeHTML(SeeAlsoLink) & """ target=""_blank"">" & (db.cs_getText(CS, "Name")) & "</A>"
+                            main_GetSeeAlso = main_GetSeeAlso & "<a href=""" & html.html_EncodeHTML(SeeAlsoLink) & """ target=""_blank"">" & (db.cs_getText(CS, "Name")) & "</A>"
                             Copy = (db.cs_getText(CS, "Brief"))
                             If Copy <> "" Then
                                 main_GetSeeAlso = main_GetSeeAlso & "<br >" & AddSpan(Copy, "ccListCopy")
@@ -10598,14 +10455,14 @@ ErrorTrap:
                     '
                     Copy = user.name
                     Panel = Panel & "<td align=""right"" width=""100""><p>Your Name</p></td>"
-                    Panel = Panel & "<td align=""left""><input type=""text"" name=""NoteFromName"" value=""" & html_EncodeHTML(Copy) & """></span></td>"
+                    Panel = Panel & "<td align=""left""><input type=""text"" name=""NoteFromName"" value=""" & html.html_EncodeHTML(Copy) & """></span></td>"
                     Panel = Panel & "</tr><tr>"
                     '
                     ' ----- From Email address
                     '
                     Copy = user.email
                     Panel = Panel & "<td align=""right"" width=""100""><p>Your Email</p></td>"
-                    Panel = Panel & "<td align=""left""><input type=""text"" name=""NoteFromEmail"" value=""" & html_EncodeHTML(Copy) & """></span></td>"
+                    Panel = Panel & "<td align=""left""><input type=""text"" name=""NoteFromEmail"" value=""" & html.html_EncodeHTML(Copy) & """></span></td>"
                     Panel = Panel & "</tr><tr>"
                     '
                     ' ----- Message
@@ -10773,7 +10630,7 @@ ErrorTrap:
                     If (LinkLabel <> "") Then
                         main_GetWhatsNew = main_GetWhatsNew & cr & "<li class=""ccListItem"">"
                         If (Link <> "") Then
-                            main_GetWhatsNew = main_GetWhatsNew & main_GetLinkedText("<a href=""" & html_EncodeHTML(web_requestPage & "?rc=" & ContentID & "&ri=" & RecordID) & """>", LinkLabel)
+                            main_GetWhatsNew = main_GetWhatsNew & main_GetLinkedText("<a href=""" & html.html_EncodeHTML(web_requestPage & "?rc=" & ContentID & "&ri=" & RecordID) & """>", LinkLabel)
                         Else
                             main_GetWhatsNew = main_GetWhatsNew & LinkLabel
                         End If
@@ -10854,19 +10711,19 @@ ErrorTrap:
         '                        returnHtml = returnHtml & "<table border=""0"" cellpadding=""5"" cellspacing=""0"" width=""100%"">"
         '                        returnHtml = returnHtml & "<tr>"
         '                        returnHtml = returnHtml & "<td align=""right"" width=""30%"">" & SpanClassAdminNormal & "First Name</span></td>"
-        '                        returnHtml = returnHtml & "<td align=""left""  width=""70%""><input NAME=""" & "firstname"" VALUE=""" & html_EncodeHTML(FirstName) & """ SIZE=""20"" MAXLENGTH=""50""></td>"
+        '                        returnHtml = returnHtml & "<td align=""left""  width=""70%""><input NAME=""" & "firstname"" VALUE=""" & html.html_EncodeHTML(FirstName) & """ SIZE=""20"" MAXLENGTH=""50""></td>"
         '                        returnHtml = returnHtml & "</tr>"
         '                        returnHtml = returnHtml & "<tr>"
         '                        returnHtml = returnHtml & "<td align=""right"" width=""30%"">" & SpanClassAdminNormal & "Last Name</span></td>"
-        '                        returnHtml = returnHtml & "<td align=""left""  width=""70%""><input NAME=""" & "lastname"" VALUE=""" & html_EncodeHTML(db.db_GetCSText(CSPeople, "lastname")) & """ SIZE=""20"" MAXLENGTH=""50""></td>"
+        '                        returnHtml = returnHtml & "<td align=""left""  width=""70%""><input NAME=""" & "lastname"" VALUE=""" & html.html_EncodeHTML(db.db_GetCSText(CSPeople, "lastname")) & """ SIZE=""20"" MAXLENGTH=""50""></td>"
         '                        returnHtml = returnHtml & "</tr>"
         '                        returnHtml = returnHtml & "<tr>"
         '                        returnHtml = returnHtml & "<td align=""right"" width=""30%"">" & SpanClassAdminNormal & "Email</span></td>"
-        '                        returnHtml = returnHtml & "<td align=""left""  width=""70%""><input NAME=""" & "email"" VALUE=""" & html_EncodeHTML(db.db_GetCSText(CSPeople, "email")) & """ SIZE=""20"" MAXLENGTH=""50""></td>"
+        '                        returnHtml = returnHtml & "<td align=""left""  width=""70%""><input NAME=""" & "email"" VALUE=""" & html.html_EncodeHTML(db.db_GetCSText(CSPeople, "email")) & """ SIZE=""20"" MAXLENGTH=""50""></td>"
         '                        returnHtml = returnHtml & "</tr>"
         '                        returnHtml = returnHtml & "<tr>"
         '                        returnHtml = returnHtml & "<td align=""right"" width=""30%"">" & SpanClassAdminNormal & "Username</span></td>"
-        '                        returnHtml = returnHtml & "<td align=""left""  width=""70%""><input NAME=""" & "username"" VALUE=""" & html_EncodeHTML(db.db_GetCSText(CSPeople, "username")) & """ SIZE=""20"" MAXLENGTH=""50""></td>"
+        '                        returnHtml = returnHtml & "<td align=""left""  width=""70%""><input NAME=""" & "username"" VALUE=""" & html.html_EncodeHTML(db.db_GetCSText(CSPeople, "username")) & """ SIZE=""20"" MAXLENGTH=""50""></td>"
         '                        returnHtml = returnHtml & "</tr>"
         '                        returnHtml = returnHtml & "<tr>"
         '                        returnHtml = returnHtml & "<td align=""right"" width=""30%"">" & SpanClassAdminNormal & "Password</span></td>"
@@ -12015,7 +11872,7 @@ ErrorTrap:
                         Else
                             QSName = DecodeResponseVariable(QSNameValues(0))
                             QSValue = DecodeResponseVariable(QSNameValues(1))
-                            RefreshHiddens = RefreshHiddens & cr & "<input type=""hidden"" name=""" & html_EncodeHTML(QSName) & """ value=""" & html_EncodeHTML(QSValue) & """>"
+                            RefreshHiddens = RefreshHiddens & cr & "<input type=""hidden"" name=""" & html.html_EncodeHTML(QSName) & """ value=""" & html.html_EncodeHTML(QSValue) & """>"
                         End If
                     Next
                 End If
@@ -12065,7 +11922,7 @@ ErrorTrap:
             If True Then
                 TagID = ""
                 '
-                iDefaultValue = html_EncodeHTML(DefaultValue)
+                iDefaultValue = html.html_EncodeHTML(DefaultValue)
                 If HtmlId <> "" Then
                     TagID = TagID & " id=""" & encodeEmptyText(HtmlId, "") & """"
                 End If
@@ -12132,7 +11989,7 @@ ErrorTrap:
             Dim EditorClosed As String
             Dim EditorOpened As String
             '
-            Value_Local = html_EncodeHTML(Value)
+            Value_Local = html.html_EncodeHTML(Value)
             IDRoot = Id
             If IDRoot = "" Then
                 IDRoot = "TextArea" & main_FormInputTextCnt
@@ -12212,7 +12069,7 @@ ErrorTrap:
             If (iDefaultValue = "0") Or (iDefaultValue = "12:00:00 AM") Then
                 iDefaultValue = ""
             Else
-                iDefaultValue = html_EncodeHTML(iDefaultValue)
+                iDefaultValue = html.html_EncodeHTML(iDefaultValue)
             End If
             If encodeEmptyText(Id, "") <> "" Then
                 TagID = " ID=""" & encodeEmptyText(Id, "") & """"
@@ -12758,16 +12615,16 @@ ErrorTrap:
             Dim ihtmlId As String
             Dim s As String
             '
-            s = cr & "<input type=""hidden"" NAME=""" & html_EncodeHTML(EncodeText(TagName)) & """"
+            s = cr & "<input type=""hidden"" NAME=""" & html.html_EncodeHTML(EncodeText(TagName)) & """"
             '
-            iTagValue = html_EncodeHTML(EncodeText(TagValue))
+            iTagValue = html.html_EncodeHTML(EncodeText(TagValue))
             If iTagValue <> "" Then
                 s = s & " VALUE=""" & iTagValue & """"
             End If
             '
             ihtmlId = EncodeText(htmlId)
             If ihtmlId <> "" Then
-                s = s & " ID=""" & html_EncodeHTML(ihtmlId) & """"
+                s = s & " ID=""" & html.html_EncodeHTML(ihtmlId) & """"
             End If
             '
             s = s & ">"
@@ -14044,7 +13901,7 @@ ErrorTrap:
                     ' $$$$$ make ptr list on load
                     CS = db.csOpen("Add-ons", "(OnNewVisitEvent<>0)", "Name", , , , , "id")
                     Do While db.cs_Ok(CS)
-                        Call addon_execute_legacy5(db.cs_getInteger(CS, "ID"), "", "", CPUtilsBaseClass.addonContext.ContextOnNewVisit, "", 0, "", 0)
+                        Call addon.execute_legacy5(db.cs_getInteger(CS, "ID"), "", "", CPUtilsBaseClass.addonContext.ContextOnNewVisit, "", 0, "", 0)
                         db.db_csGoNext(CS)
                     Loop
                     Call db.cs_Close(CS)
@@ -14661,7 +14518,7 @@ ErrorTrap:
             iContentName = EncodeText(ContentName)
             iRecordID = EncodeInteger(RecordID)
             iAllowCut = EncodeBoolean(AllowCut)
-            ContentCaption = html_EncodeHTML(iContentName)
+            ContentCaption = html.html_EncodeHTML(iContentName)
             If vbLCase(ContentCaption) = "aggregate functions" Then
                 ContentCaption = "Add-on"
             End If
@@ -14692,7 +14549,7 @@ ErrorTrap:
                             & "<a" _
                             & " class=""ccRecordEditLink"" " _
                             & " TabIndex=-1" _
-                            & " href=""" & html_EncodeHTML(siteProperties.adminURL & "?cid=" & ContentID & "&id=" & iRecordID & "&af=4&aa=2&ad=1") & """"
+                            & " href=""" & html.html_EncodeHTML(siteProperties.adminURL & "?cid=" & ContentID & "&id=" & iRecordID & "&af=4&aa=2&ad=1") & """"
                         If Not main_ReturnAfterEdit Then
                             main_GetRecordEditLink2 = main_GetRecordEditLink2 & " target=""_blank"""
                         End If
@@ -14700,8 +14557,8 @@ ErrorTrap:
                             & "><img" _
                             & " src=""/ccLib/images/IconContentEdit.gif""" _
                             & " border=""0""" _
-                            & " alt=""Edit this " & html_EncodeHTML(ContentCaption) & """" _
-                            & " title=""Edit this " & html_EncodeHTML(ContentCaption) & """" _
+                            & " alt=""Edit this " & html.html_EncodeHTML(ContentCaption) & """" _
+                            & " title=""Edit this " & html.html_EncodeHTML(ContentCaption) & """" _
                             & " align=""absmiddle""" _
                             & "></a>"
                         '
@@ -14711,7 +14568,7 @@ ErrorTrap:
                             WorkingLink = modifyLinkQuery(web_requestPage & "?" & web_RefreshQueryString, RequestNameCut, EncodeText(ContentID) & "." & EncodeText(RecordID), True)
                             main_GetRecordEditLink2 = "" _
                                 & main_GetRecordEditLink2 _
-                                & "<a class=""ccRecordCutLink"" TabIndex=""-1"" href=""" & html_EncodeHTML(WorkingLink) & """><img src=""/ccLib/images/Contentcut.gif"" border=""0"" alt=""Cut this " & ContentCaption & " to clipboard"" title=""Cut this " & ContentCaption & " to clipboard"" align=""absmiddle""></a>"
+                                & "<a class=""ccRecordCutLink"" TabIndex=""-1"" href=""" & html.html_EncodeHTML(WorkingLink) & """><img src=""/ccLib/images/Contentcut.gif"" border=""0"" alt=""Cut this " & ContentCaption & " to clipboard"" title=""Cut this " & ContentCaption & " to clipboard"" align=""absmiddle""></a>"
                         End If
                         '
                         ' Help link if enabled
@@ -14885,7 +14742,7 @@ ErrorTrap:
                         main_GetRecordAddLink2 = main_GetRecordAddLink2 _
                             & "<a" _
                             & " TabIndex=-1" _
-                            & " href=""" & html_EncodeHTML(Link) & """"
+                            & " href=""" & html.html_EncodeHTML(Link) & """"
                         If Not main_ReturnAfterEdit Then
                             main_GetRecordAddLink2 = main_GetRecordAddLink2 & " target=""_blank"""
                         End If
@@ -14939,7 +14796,7 @@ ErrorTrap:
                                             PasteLink = modifyLinkQuery(PasteLink, RequestNamePasteParentRecordID, CStr(ParentID), True)
                                             PasteLink = modifyLinkQuery(PasteLink, RequestNamePasteFieldList, iPresetNameValueList, True)
                                             main_GetRecordAddLink2 = main_GetRecordAddLink2 _
-                                                & "<a class=""ccRecordCutLink"" TabIndex=""-1"" href=""" & html_EncodeHTML(PasteLink) & """><img src=""/ccLib/images/ContentPaste.gif"" border=""0"" alt=""Paste record in clipboard here"" title=""Paste record in clipboard here"" align=""absmiddle""></a>"
+                                                & "<a class=""ccRecordCutLink"" TabIndex=""-1"" href=""" & html.html_EncodeHTML(PasteLink) & """><img src=""/ccLib/images/ContentPaste.gif"" border=""0"" alt=""Paste record in clipboard here"" title=""Paste record in clipboard here"" align=""absmiddle""></a>"
                                         End If
                                     End If
                                 End If
@@ -14953,7 +14810,7 @@ ErrorTrap:
                         main_GetRecordAddLink2 = main_GetRecordAddLink2 & menuFlyout.getMenu(LowestRequiredMenuName, 0)
                         main_GetRecordAddLink2 = vbReplace(main_GetRecordAddLink2, "class=""ccFlyoutButton"" ", "", 1, 99, vbTextCompare)
                         If PasteLink <> "" Then
-                            main_GetRecordAddLink2 = main_GetRecordAddLink2 & "<a TabIndex=-1 href=""" & html_EncodeHTML(PasteLink) & """><img src=""/ccLib/images/ContentPaste.gif"" border=""0"" alt=""Paste content from clipboard"" align=""absmiddle""></a>"
+                            main_GetRecordAddLink2 = main_GetRecordAddLink2 & "<a TabIndex=-1 href=""" & html.html_EncodeHTML(PasteLink) & """><img src=""/ccLib/images/ContentPaste.gif"" border=""0"" alt=""Paste content from clipboard"" align=""absmiddle""></a>"
                         End If
                     End If
                     '
@@ -15429,7 +15286,7 @@ ErrorTrap:
                         & "&editorStyles=" & encodeNvaArgument(styleList) _
                         & "&editorStyleOptions=" & encodeNvaArgument(styleOptionList) _
                         & ""
-                    returnHtml = addon_execute_legacy4(FieldTypeDefaultEditorAddonId.ToString, addonOption_String, CPUtilsBaseClass.addonContext.ContextEditor)
+                    returnHtml = addon.execute_legacy4(FieldTypeDefaultEditorAddonId.ToString, addonOption_String, CPUtilsBaseClass.addonContext.ContextEditor)
                 End If
 
             Catch ex As Exception
@@ -15889,7 +15746,7 @@ ErrorTrap:
                                     PosIDEnd = vbInstr(PosIDStart, Copy, """")
                                     If PosIDEnd <> 0 Then
                                         ParseOK = True
-                                        Copy = Mid(Copy, 1, PosIDStart - 1) & html_EncodeHTML(addonOption_String) & Mid(Copy, PosIDEnd)
+                                        Copy = Mid(Copy, 1, PosIDStart - 1) & html.html_EncodeHTML(addonOption_String) & Mid(Copy, PosIDEnd)
                                         Call db.cs_set(CS, FieldName, Copy)
                                         needToClearCache = True
                                     End If
@@ -17048,7 +16905,7 @@ ErrorTrap:
             CDef = metaData.getCdef(ContentName)
             Link = siteProperties.adminURL & "?af=" & AdminFormPublishing
             Copy = Msg_AuthoringSubmittedNotification
-            Copy = vbReplace(Copy, "<DOMAINNAME>", "<a href=""" & html_EncodeHTML(Link) & """>" & main_ServerDomain & "</a>")
+            Copy = vbReplace(Copy, "<DOMAINNAME>", "<a href=""" & html.html_EncodeHTML(Link) & """>" & main_ServerDomain & "</a>")
             Copy = vbReplace(Copy, "<RECORDNAME>", RecordName)
             Copy = vbReplace(Copy, "<CONTENTNAME>", ContentName)
             Copy = vbReplace(Copy, "<RECORDID>", RecordID.ToString)
@@ -17299,7 +17156,7 @@ ErrorTrap:
                 & "&SelectLinkObjectName=" & SelectLinkObjectName _
                 & "&AllowGroupAdd=" & AllowGroupAdd _
                 & ""
-            main_GetResourceLibrary2 = addon_execute_legacy4("{564EF3F5-9673-4212-A692-0942DD51FF1A}", Option_String, CPUtilsBaseClass.addonContext.ContextAdmin)
+            main_GetResourceLibrary2 = addon.execute_legacy4("{564EF3F5-9673-4212-A692-0942DD51FF1A}", Option_String, CPUtilsBaseClass.addonContext.ContextAdmin)
             '
             Exit Function
             '
@@ -17825,7 +17682,7 @@ ErrorTrap:
             ' Old style non-flyout Authoring Links
             '
             web_GetAuthoringLink = "<div align=""left""><table border=""0"" cellpadding=""1"" cellspacing=""0"" class=""ccAuthoringLink""><tr><td>"
-            web_GetAuthoringLink = web_GetAuthoringLink & "<table border=""0"" cellpadding=""1"" cellspacing=""0"" width=""31"" class=""ccAuthoringLink""><tr><td width=""30"" align=""center""><a href=""" & html_EncodeHTML(Link) & """"
+            web_GetAuthoringLink = web_GetAuthoringLink & "<table border=""0"" cellpadding=""1"" cellspacing=""0"" width=""31"" class=""ccAuthoringLink""><tr><td width=""30"" align=""center""><a href=""" & html.html_EncodeHTML(Link) & """"
             If NewWindow Then
                 web_GetAuthoringLink = web_GetAuthoringLink & " target=""_blank"""
             End If
@@ -19531,7 +19388,7 @@ ErrorTrap:
                 Else
                     BlockContentComposite = False
                 End If
-                LinkedText = main_GetLinkedText("<a href=""" & html_EncodeHTML(Link) & """>", pageMenuHeadline)
+                LinkedText = main_GetLinkedText("<a href=""" & html.html_EncodeHTML(Link) & """>", pageMenuHeadline)
                 If (UcaseRequestedListName = "") And (pageParentListName <> "") And (Not main_RenderCache_CurrentPage_IsAuthoring) Then
                     '
                     ' ----- Requested orphan list, and this record is in a named list, and not editing, do not display
@@ -20937,8 +20794,8 @@ ErrorTrap:
                 CS = db.csOpen("Meta Content", Criteria, , , , ,, FieldList)
                 If db.cs_Ok(CS) Then
                     MetaContentID = db.cs_getInteger(CS, "ID")
-                    Call main_AddPagetitle2(html_EncodeHTML(db.cs_getText(CS, "Name")), "page content")
-                    Call main_addMetaDescription2(html_EncodeHTML(db.cs_getText(CS, "MetaDescription")), "page content")
+                    Call main_AddPagetitle2(html.html_EncodeHTML(db.cs_getText(CS, "Name")), "page content")
+                    Call main_addMetaDescription2(html.html_EncodeHTML(db.cs_getText(CS, "MetaDescription")), "page content")
                     Call main_AddHeadTag2(db.cs_getText(CS, "OtherHeadTags"), "page content")
                     If True Then
                         KeywordList = vbReplace(db.cs_getText(CS, "MetaKeywordList"), vbCrLf, ",")
@@ -20965,7 +20822,7 @@ ErrorTrap:
                         KeywordList = Mid(KeywordList, 2)
                     End If
                     'KeyWordList = Mid(KeyWordList, 2)
-                    KeywordList = html_EncodeHTML(KeywordList)
+                    KeywordList = html.html_EncodeHTML(KeywordList)
                     Call main_addMetaKeywordList2(KeywordList, "page content")
                 End If
                 Call db.cs_Close(CS)
@@ -21783,7 +21640,7 @@ ErrorTrap:
                     '
                     bodyAddonId = EncodeInteger(siteProperties.getText("Html Body AddonId", "0"))
                     If bodyAddonId <> 0 Then
-                        htmlBody = addon_execute(bodyAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", bodyAddonStatusOK, Nothing, "", Nothing, "", user.id, user.isAuthenticated)
+                        htmlBody = addon.execute(bodyAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", bodyAddonStatusOK, Nothing, "", Nothing, "", user.id, user.isAuthenticated)
                     Else
                         htmlBody = main_GetHtmlBody()
                     End If
@@ -22081,7 +21938,7 @@ ErrorTrap:
             ' misc caching, etc
             '
             Dim encoding As String
-            encoding = html_EncodeHTML(siteProperties.getText("Site Character Encoding", "utf-8"))
+            encoding = html.html_EncodeHTML(siteProperties.getText("Site Character Encoding", "utf-8"))
             main_GetHTMLInternalHead = main_GetHTMLInternalHead _
                 & OtherHeadTags _
                 & cr & "<meta http-equiv=""content-type"" content=""text/html; charset=" & encoding & """ >" _
@@ -22611,10 +22468,7 @@ ErrorTrap:
             '
             ' should use the ccNav object, no the ccCommon module for this code
             '
-            If (main_TabObject Is Nothing) Then
-                main_TabObject = New coreMenuTabClass
-            End If
-            Call main_TabObject.AddEntry(EncodeText(Caption), EncodeText(Link), EncodeBoolean(IsHit), EncodeText(StylePrefix))
+            Call menuTab.AddEntry(EncodeText(Caption), EncodeText(Link), EncodeBoolean(IsHit), EncodeText(StylePrefix))
 
             'Call ccAddTabEntry(encodeText(Caption), encodeText(Link), encodeBoolean(IsHit), encodeText(StylePrefix), encodeText(LiveBody))
             '
@@ -22631,10 +22485,7 @@ ErrorTrap:
             ' should use the ccNav object, no the ccCommon module for this code
             '
             '
-            If (main_TabObject Is Nothing) Then
-                main_TabObject = New coreMenuTabClass
-            End If
-            main_GetTabs = main_TabObject.GetTabs()
+            main_GetTabs = menuTab.GetTabs()
             '    main_GetTabs = ccGetTabs()
             '
             Exit Function
@@ -23189,12 +23040,12 @@ ErrorTrap:
                                     End If
                                     Call db.cs_Close(CS)
                                     If Not Success Then
-                                        error_AddUserError("The field [" & .Caption & "] must be unique, and the value [" & html_EncodeHTML(FormValue) & "] has already been used.")
+                                        error_AddUserError("The field [" & .Caption & "] must be unique, and the value [" & html.html_EncodeHTML(FormValue) & "] has already been used.")
                                     End If
                                 End If
                                 If (.REquired Or EncodeBoolean(db_GetContentFieldProperty("people", .PeopleField, "required"))) And FormValue = "" Then
                                     Success = False
-                                    error_AddUserError("The field [" & html_EncodeHTML(.Caption) & "] is required.")
+                                    error_AddUserError("The field [" & html.html_EncodeHTML(.Caption) & "] is required.")
                                 Else
                                     If Not db.cs_Ok(CSPeople) Then
                                         CSPeople = db_csOpen("people", user.id)
@@ -23344,7 +23195,7 @@ ErrorTrap:
         Public Function contactManager_GetContactManager(Option_String As String) As String
             On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("main_GetContactManager")
             '
-            contactManager_GetContactManager = addon_execute_legacy5(0, "Contact Manager", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", 0)
+            contactManager_GetContactManager = addon.execute_legacy5(0, "Contact Manager", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", 0)
             '
             Exit Function
             '
@@ -24007,7 +23858,7 @@ ErrorTrap:
                     '
                     '
                     rulesTablename = db_GetContentTablename(RulesContentName)
-                    SingularPrefixHtmlEncoded = html_EncodeHTML(GetSingular(SecondaryContentName)) & "&nbsp;"
+                    SingularPrefixHtmlEncoded = html.html_EncodeHTML(GetSingular(SecondaryContentName)) & "&nbsp;"
                     '
                     main_MemberShipCount = 0
                     main_MemberShipSize = 0
@@ -24191,7 +24042,7 @@ ErrorTrap:
                                         If OptionCaption = "" Then
                                             optionCaptionHtmlEncoded = SingularPrefixHtmlEncoded & RecordID
                                         Else
-                                            optionCaptionHtmlEncoded = html_EncodeHTML(OptionCaption)
+                                            optionCaptionHtmlEncoded = html.html_EncodeHTML(OptionCaption)
                                         End If
                                         If DivCheckBoxCnt <> 0 Then
                                             ' leave this between checkboxes - it is searched in the admin page
@@ -24735,13 +24586,13 @@ ErrorTrap:
         '
         '
         Public Sub main_addMeta(metaName As String, metaContent As String, addedByMessage As String)
-            Call main_AddHeadTag2("<meta name=""" & html_EncodeHTML(metaName) & """ content=""" & html_EncodeHTML(metaContent) & """>", addedByMessage)
+            Call main_AddHeadTag2("<meta name=""" & html.html_EncodeHTML(metaName) & """ content=""" & html.html_EncodeHTML(metaContent) & """>", addedByMessage)
         End Sub
         '
         '
         '
         Public Sub main_addMetaProperty(metaProperty As String, metaContent As String, addedByMessage As String)
-            Call main_AddHeadTag2("<meta property=""" & html_EncodeHTML(metaProperty) & """ content=""" & html_EncodeHTML(metaContent) & """>", addedByMessage)
+            Call main_AddHeadTag2("<meta property=""" & html.html_EncodeHTML(metaProperty) & """ content=""" & html.html_EncodeHTML(metaContent) & """>", addedByMessage)
         End Sub
         '
         Friend ReadOnly Property main_ReturnAfterEdit() As Boolean
@@ -24749,28 +24600,6 @@ ErrorTrap:
                 Return True
             End Get
         End Property
-        '
-        '===================================================================================================
-        '   Build AddonOptionLists
-        '
-        '   On entry:
-        '       AddonOptionConstructor = the addon-encoded Version of the list that comes from the Addon Record
-        '           It is line-delimited with &, and all escape characters converted
-        '       InstanceOptionList = addonencoded Version of the list that comes from the HTML AC tag
-        '           that means crlf line-delimited
-        '
-        '   On Exit:
-        '       AddonOptionNameValueList
-        '               pass this string to the addon when it is run, crlf delimited name=value pair.
-        '               This should include just the name=values pairs, with no selectors
-        '               it should include names from both Addon and Instance
-        '               If the Instance has a value, include it. Otherwise include Addon value
-        '       AddonOptionExpandedConstructor = pass this to the bubble editor to create the the selectr
-        '===================================================================================================
-        '
-        Public Sub addon_execute_buildAddonOptionLists(Option_String_ForObjectCall As String, AddonOptionExpandedConstructor As String, AddonOptionConstructor As String, InstanceOptionList As String, InstanceID As String, IncludeEditWrapper As Boolean)
-            Call csv_BuildAddonOptionLists(Option_String_ForObjectCall, AddonOptionExpandedConstructor, AddonOptionConstructor, InstanceOptionList, InstanceID, IncludeEditWrapper)
-        End Sub
         '
         '===================================================================================================
         '   Wrap the content in a common wrapper if authoring is enabled
@@ -25365,7 +25194,7 @@ ErrorTrap:
             Dim FieldOptionRow As String
             Dim Copy As String
             '
-            Copy = html_EncodeHTML(StyleCopy)
+            Copy = html.html_EncodeHTML(StyleCopy)
             main_GetFormInputStyles = html_GetFormInputTextExpandable2(TagName, StyleCopy, 10, , HtmlId, , , HtmlClass)
             'FieldRows = main_GetMemberProperty("StyleEditorRowHeight", 10)
             'FieldOptionRow = "<input TYPE=""Text"" TabIndex=-1 NAME=""" & TagName & "Rows"" SIZE=""3"" VALUE=""" & FieldRows & """ ID=""""  onchange=""" & TagName & ".rows=" & TagName & "Rows.value; return true""> Rows"
@@ -27209,7 +27038,7 @@ ErrorTrap:
                 Do While db.cs_Ok(CS)
                     addonId = db.cs_getInteger(CS, "Addonid")
                     'hint = hint & ",210 addonid=[" & addonId & "]"
-                    Call executeAddonAsProcess(CStr(addonId), Option_String)
+                    Call addon.executeAddonAsProcess(CStr(addonId), Option_String)
                     Call db.db_csGoNext(CS)
                 Loop
                 Call db.cs_Close(CS)
@@ -28046,7 +27875,7 @@ ErrorTrap:
                         ' output
                         '
                         Copy = main_FormatRemoteQueryOutput(gd, RemoteFormat)
-                        Copy = html_EncodeHTML(Copy)
+                        Copy = html.html_EncodeHTML(Copy)
                         result = "<data>" & Copy & "</data>"
                     End If
                 End If
@@ -28226,7 +28055,7 @@ ErrorTrap:
         ' ----- main_Get an XML nodes attribute based on its name
         '========================================================================
         '
-        Private Function main_GetXMLAttribute(ByVal Found As Boolean, ByVal Node As XmlNode, ByVal Name As String, ByVal DefaultIfNotFound As String) As String
+        Friend Function main_GetXMLAttribute(ByVal Found As Boolean, ByVal Node As XmlNode, ByVal Name As String, ByVal DefaultIfNotFound As String) As String
             On Error GoTo ErrorTrap
             '
             Dim NodeAttribute As XmlAttribute
@@ -28721,7 +28550,7 @@ ErrorTrap:
                         Call web_addRefreshQueryString("LinkObjectName", LinkObjectName)
                         Call main_AddPagetitle("Site Explorer")
                         Call main_SetMetaContent(0, 0)
-                        Copy = addon_execute_legacy5(0, "Site Explorer", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", 0)
+                        Copy = addon.execute_legacy5(0, "Site Explorer", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", 0)
                         Call main_AddOnLoadJavascript2("document.body.style.overflow='scroll';", "Site Explorer")
                         'Call AppendLog("call main_getEndOfBody, from main_init_printhardcodedpage2d")
                         Copy = "" _
@@ -29108,86 +28937,13 @@ ErrorTrap:
             Get
                 Dim returnStatus As Boolean = False
                 If Not main_Private_SiteStructure_LocalLoaded Then
-                    main_Private_SiteStructure = addon_execute_legacy2(0, "{8CDD7960-0FCA-4042-B5D8-3A65BE487AC4}", "", CPUtilsBaseClass.addonContext.ContextSimple, "", 0, "", "", False, -1, "", returnStatus, Nothing)
+                    main_Private_SiteStructure = addon.execute_legacy2(0, "{8CDD7960-0FCA-4042-B5D8-3A65BE487AC4}", "", CPUtilsBaseClass.addonContext.ContextSimple, "", 0, "", "", False, -1, "", returnStatus, Nothing)
                     main_Private_SiteStructure_LocalLoaded = True
                 End If
                 main_SiteStructure = main_Private_SiteStructure
 
             End Get
         End Property
-        '
-        '========================================================================
-        '   Apply a wrapper to content
-        '========================================================================
-        '
-        Public Function addon_execute_WrapContent(ByVal Content As String, ByVal WrapperID As Integer, Optional ByVal WrapperSourceForComment As String = "") As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("WrapContent")
-            '
-            Dim Pos As Integer
-            Dim CS As Integer
-            Dim JSFilename As String
-            Dim Copy As String
-            Dim s As String
-            Dim SelectFieldList As String
-            Dim Wrapper As String
-            Dim wrapperName As String
-            Dim SourceComment As String
-            Dim TargetString As String
-            '
-            s = Content
-            SelectFieldList = "name,copytext,javascriptonload,javascriptbodyend,stylesfilename,otherheadtags,JSFilename,targetString"
-            CS = db_csOpen("Wrappers", WrapperID, , , SelectFieldList)
-            If db.cs_Ok(CS) Then
-                Wrapper = db.cs_getText(CS, "copytext")
-                wrapperName = db.cs_getText(CS, "name")
-                TargetString = db.cs_getText(CS, "targetString")
-                '
-                SourceComment = "wrapper " & wrapperName
-                If WrapperSourceForComment <> "" Then
-                    SourceComment = SourceComment & " for " & WrapperSourceForComment
-                End If
-                Call main_AddOnLoadJavascript2(db.cs_getText(CS, "javascriptonload"), SourceComment)
-                Call main_AddEndOfBodyJavascript2(db.cs_getText(CS, "javascriptbodyend"), SourceComment)
-                Call main_AddHeadTag2(db.cs_getText(CS, "OtherHeadTags"), SourceComment)
-                '
-                JSFilename = db.cs_getText(CS, "jsfilename")
-                If JSFilename <> "" Then
-                    JSFilename = web_requestProtocol & webServer.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, JSFilename)
-                    Call main_AddHeadScriptLink(JSFilename, SourceComment)
-                End If
-                Copy = db.cs_getText(CS, "stylesfilename")
-                If Copy <> "" Then
-                    If vbInstr(1, Copy, "://") <> 0 Then
-                    ElseIf Left(Copy, 1) = "/" Then
-                    Else
-                        Copy = web_requestProtocol & webServer.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, Copy)
-                    End If
-                    Call main_AddStylesheetLink2(Copy, SourceComment)
-                End If
-                '
-                If Wrapper <> "" Then
-                    Pos = vbInstr(1, Wrapper, TargetString, vbTextCompare)
-                    If Pos <> 0 Then
-                        s = vbReplace(Wrapper, TargetString, s, 1, 99, vbTextCompare)
-                    Else
-                        s = "" _
-                            & "<!-- the selected wrapper does not include the Target String marker to locate the position of the content. -->" _
-                            & Wrapper _
-                            & s
-                    End If
-                End If
-            End If
-            Call db.cs_Close(CS)
-            '
-            addon_execute_WrapContent = s
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18("WrapContent")
-        End Function
         '
         '=========================================================================================
         '
@@ -30344,7 +30100,7 @@ ErrorTrap:
                         ' This field is default true, and non-authorable
                         ' It will be true in all cases, except a possible unforseen exception
                         '
-                        EmailBody = EmailBody & "<div style=""clear:both;padding:10px;"">" & main_GetLinkedText("<a href=""" & html_EncodeHTML(web_requestProtocol & webServer.requestDomain & www_requestRootPath & siteProperties.serverPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
+                        EmailBody = EmailBody & "<div style=""clear:both;padding:10px;"">" & main_GetLinkedText("<a href=""" & html.html_EncodeHTML(web_requestProtocol & webServer.requestDomain & www_requestRootPath & siteProperties.serverPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
                         EmailBody = vbReplace(EmailBody, "#member_email#", "UserEmailAddress")
                     End If
                     '
@@ -30634,7 +30390,7 @@ ErrorTrap:
         ' ----- Get an XML nodes attribute based on its name
         '========================================================================
         '
-        Private Function csv_GetXMLAttribute(ByVal Found As Boolean, ByVal Node As XmlNode, ByVal Name As String, ByVal DefaultIfNotFound As String) As String
+        Friend Function csv_GetXMLAttribute(ByVal Found As Boolean, ByVal Node As XmlNode, ByVal Name As String, ByVal DefaultIfNotFound As String) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("csv_GetXMLAttribute")
             '
             Dim NodeAttribute As XmlAttribute
@@ -30665,4346 +30421,6 @@ ErrorTrap:
             '
 ErrorTrap:
             Call handleLegacyError6("csv_GetXMLAttribute", "trap")
-        End Function
-        '
-        '=============================================================================================================
-        '   Get Addon Content - internal (to support include add-ons)
-        '
-        '   Argument field in addons is encode as "AddonOptionConstructor"
-        '   the input argument OptionString to executeAddon is encoded as "OptionString"
-        '       delmited with "&" and all elements encoded with encodeNvaArgument
-        '   the optionstring passed to addons is like OptionString encoding, except it is crlf delimited
-        '       only ever decode with main_GetAddonOption( name, string )
-        '
-        '
-        '   OptionString
-        '       This is a string, similar to a QueryString.
-        '           It is used (htmlencoded) in AC Edit Icons to hold instance properties in the 5th comma delimited position of the AC Tag's ID attribute
-        '           It is (htmlencoded) in AC Tags as the QueryString value "... Querystring=OptionString ..."
-        '           It is used internally to carry properties from the csv to the websclient for:
-        '               1) AC tags that have to be executed at the webclient but are interpreted in the cmc.csv_
-        '                   not htmlencoded
-        '                   like {{ACTextBox?name=&new name=text name}}
-        '               2) Addons found in csv during csv_EncodeContent that must be executed in the webclient.
-        '                   htmlencoded
-        '                   <!-- Addon "acname","htmlencodedOptionString","instanceid" -->
-        '       This is called "AddonOption" format, or AddonOptionEncoding
-        '       It usually contains the instance prefernces for the Add-on placed in the content
-        '       It's basic form is:
-        '           name=value[selector]&name=value[selector]
-        '           ( why are the selector's necessary, since the add-on will be looked up before arguments are prepared for any editor )
-        '       To get a value from the string:
-        '           value = csv_GetAddonOption( OptionString )
-        '           csv_DecodeAddonOptionArgument(RemoveSelector(GetArgument(name,string,default,"&")))
-        '       To add a value to the string
-        '           s = s & "&" & encodeNvaArgument(name) & "=" & encodeNvaArgument(value)
-        '       "&" delimits the name=value pairs
-        '       encodeNvaArgument() is used to encode each name and value
-        '       csv_DecodeAddonOptionArgument() is used to decode each name and value
-        '       Previously, I wrote:
-        '           this is the name=value&name=value set of arguments that come from the AC tag in the content
-        '           it includes all name=value pairs set the last time the page was edited.
-        '           it may contain names that are not in the add-on, these may be valid
-        '
-        '   AddonOptionConstructor
-        '       This is the format saved in the addon record in the argument field.
-        '       This is as crlf delimited list of name=default[selector] that is stored in the Add-on record and controls the building of the instance selectors
-        '       It's basic form is:
-        '           name=DefaultValue[selector]descriptor
-        '           name=DefaultValue[option:integer|option:integer]descriptor
-        '           name=DefaultValue[option:integer|option:integer]descriptor
-        '           name=DefaultValue[list(contentname)]descriptor
-        '       for example:
-        '           link=http://www.contensive.com/index.asp?i=1\&u=2
-        '
-        '       This is called "AddonConstructor" format, or AddonConstructorEncoding
-        '           ConstructorEncoding is similiar to how javascript encodes strings
-        '           This standard is used because it is visible to the end user
-        '           name can not include:
-        '               '\', instead use '\\'
-        '               '=', instead use '\='
-        '           DefaultValue can not include:
-        '               '\', instead use '\\'
-        '               '[', instead use '\['
-        '               ']', instead use '\]'
-        '               ':', instead use '\:'
-        '               newline, instead use '\n'
-        '           selector can not include:
-        '               '['
-        '               ']'
-        '               '|'
-        '
-        '       crlf delimits arguments
-        '       EncodeAddonConstructorArgument() is used to encode each name and value
-        '       DecodeAddonConstructorArgument() is used to decode each name and value
-        '
-        '   AddonOptionNameValueList
-        '       This is as crlf delimited list of name=value that is sent to the Add-ons in the OptionString
-        '
-        '   AddonOptionExpandedConstructor
-        '       passed to the editors to create instance selectors
-        '       Similar to the AddonOptionConstructor, but all the list and listid functions are expanded
-        '
-        '
-        '
-        '   Wrappers
-        '       Instance WrapperID is forced into the Instance properies, choose from:
-        '           none = -1
-        '           default = 0, use the DefaultWrapperId passed into the call
-        '           or id of a wrapper record
-        '
-        '   Context
-        '       These values represent the situation around the call for execute addon. This determines the
-        '       type of data returned, and other actions taken. For instance, a ContextPage is used when the add-on
-        '       results will be put on a page for output. In this case, javascript in the add-on will be put into
-        '       the current document head.
-        '       * these are in CPUtilsBaseClass.addonContext and are duplicated in the contentserver object also
-        '       ContextPage = 1
-        '       ContextAdmin = 2
-        '       ContextTemplate = 3
-        '       ContextEmail = 4
-        '       ContextRemoteMethod = 5
-        '       ContextOnNewVisit = 6
-        '       ContextOnPageEnd = 7
-        '       ContextOnPageStart = 8
-        '       ContextEditor = 9
-        '       ContextHelpUser = 10
-        '       ContextHelpAdmin = 11
-        '       ContextHelpDeveloper = 12
-        '       ContextOnContentChange = 13
-        '       ContextFilter = 14
-        '       ContextSimple = 15
-        '       ContextOnBodyStart = 16
-        '       ContextOnBodyEnd = 17
-        '
-        '=============================================================================================================
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' execute addon
-        ''' </summary>
-        ''' <param name="addonId">The Id of the addon to execute.</param>
-        ''' <param name="properties">properties are nameValue pairs consumable by the addon during execution. These properties are added to docProperties and made available. Originally this argument was for the nameValues modified in the page instance where the addon was placed.</param>
-        ''' <param name="context">member of CPUtilsBaseClass.addonContext</param>
-        ''' <returns></returns>
-        Public Function addon_execute(ByVal addonId As Integer, properties As Dictionary(Of String, String), context As CPUtilsBaseClass.addonContext) As Object
-            Try
-                Dim optionString As String = ""
-                Dim return_StatusOk As Boolean
-                For Each kvp As KeyValuePair(Of String, String) In properties
-                    If Not String.IsNullOrEmpty(kvp.Key) Then
-                        optionString &= "&" & EncodeRequestVariable(kvp.Key) & "=" & EncodeRequestVariable(kvp.Value)
-                    End If
-                Next
-                If Not String.IsNullOrEmpty(optionString) Then
-                    optionString = optionString.Substring(1)
-                End If
-                Return addon_execute(addonId, "", optionString, context, "", 0, "", "", False, 0, "", return_StatusOk, Nothing, "", Nothing, "", 0, False)
-            Catch ex As Exception
-                handleExceptionAndNoThrow(ex)
-            End Try
-        End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' 
-        ''' </summary>
-        ''' <param name="addonId"></param>
-        ''' <param name="AddonNameOrGuid"></param>
-        ''' <param name="OptionString"></param>
-        ''' <param name="Context"></param>
-        ''' <param name="HostContentName"></param>
-        ''' <param name="HostRecordID"></param>
-        ''' <param name="HostFieldName"></param>
-        ''' <param name="ACInstanceID"></param>
-        ''' <param name="IsIncludeAddon"></param>
-        ''' <param name="DefaultWrapperID"></param>
-        ''' <param name="ignore_TemplateCaseOnly_PageContent"></param>
-        ''' <param name="return_StatusOK"></param>
-        ''' <param name="nothingObject"></param>
-        ''' <param name="ignore_addonCallingItselfIdList"></param>
-        ''' <param name="nothingObject2"></param>
-        ''' <param name="ignore_AddonsRunOnThisPageIdList"></param>
-        ''' <param name="personalizationPeopleId"></param>
-        ''' <param name="personalizationIsAuthenticated"></param>
-        ''' <returns></returns>
-        Public Function addon_execute(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal OptionString As String, ByVal Context As CPUtilsBaseClass.addonContext, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal IsIncludeAddon As Boolean, ByVal DefaultWrapperID As Integer, ByVal ignore_TemplateCaseOnly_PageContent As String, ByRef return_StatusOK As Boolean, ByVal nothingObject As Object, ByVal ignore_addonCallingItselfIdList As String, ByVal nothingObject2 As Object, ByVal ignore_AddonsRunOnThisPageIdList As String, ByVal personalizationPeopleId As Integer, ByVal personalizationIsAuthenticated As Boolean) As String
-            Dim returnVal As String
-            Try
-                '
-                Dim styleId As Integer
-                Dim inlineScriptContent As String
-                Dim inlineScript As String
-                Dim blockJavascriptAndCss As Boolean
-                Dim JSOnLoad As String
-                Dim JSBodyEnd As String
-                Dim JSFilename As String
-                Dim DefaultStylesFilename As String
-                Dim CustomStylesFilename As String
-                Dim TestString As String
-                Dim addon_IncludedAddonIDList As String
-                Dim includedAddonId As Integer
-                Dim includedAddonIds() As String
-                Dim ReplaceSource As String
-                Dim ReplaceValue As String
-                Dim AddonStylesEditIcon As String
-                Dim SiteStylesEditIcon As String
-                Dim DialogList As String
-                Dim ToolBar As String
-                Dim ScriptingTimeout As Integer
-                Dim ScriptCallbackContent As String
-                Dim errorMessageForAdmin As String
-                Dim CollectionGuid As String
-                Dim DotNetClassFullName As String
-                Dim CodeFilename As String
-                Dim ScriptingEntryPoint As String
-                Dim scriptinglanguageid As Integer
-                Dim ScriptingLanguage As String
-                Dim ScriptingCode As String
-                Dim AddonStatusOK As Boolean
-                Dim EditWrapperHTMLID As String
-                Dim AddonNameOrGuid_Local As String
-                Dim AddonName As String
-                Dim AddonGuid As String
-                Dim QS As String
-                Dim QSSplit() As String
-                Dim NVPair As String
-                Dim NVSplit() As String
-                Dim FrameID As String
-                Dim AsAjaxID As String
-                Dim AsAjaxContent As String
-                'Dim runAtServer As runAtServerClass
-                Dim OptionNames() As String
-                Dim OptionValues() As String
-                Dim OptionsForCPVars() As NameValuePrivateType
-                Dim OptionsForCPVars_Cnt As Integer
-                'Dim IsProcess As Boolean
-                Dim SelectFieldList As String
-                Dim RemoteAssetContent As String
-                'Dim runAtServer As New runAtServerClass
-                Dim kmaHTTP As coreHttpRequestClass
-                Dim WorkingLink As String
-                Dim FormContent As String
-                Dim ExitAddonWithBlankResponse As Boolean
-                Dim RemoteAssetLink As String
-                Dim AsAjax As Boolean
-                Dim InFrame As Boolean
-                Dim IncludeEditWrapper As Boolean
-                Dim Copy As String
-                Dim Wrapper As String
-                Dim wrapperName As String
-                Dim AddedByName As String
-                Dim AddonCommentName As String
-                Dim IncludeContent As String
-                Dim GroupIDList As String
-                Dim AddonOptionConstructor As String
-                Dim AddonOptionExpandedConstructor As String
-                Dim OptionString_ForObjectCall As String
-                Dim SrcNameValues() As String
-                Dim SrcName As String
-                Dim SrcSelector As String
-                Dim SrcPtr As Integer
-                Dim InstanceNameValues() As String
-                Dim InstanceNames() As String
-                Dim InstanceValues() As String
-                Dim InstanceCnt As Integer
-                Dim InstanceName As String
-                Dim InstanceValue As String
-                Dim IPtr As Integer
-                Dim Pos As Integer
-                Dim Ptr As Integer
-                Dim SQL As String
-                Dim CSRules As Integer
-                Dim HelpIcon As String
-                Dim InstanceSettingsEditIcon As String
-                Dim OptionPair() As String
-                Dim OptionPtr As Integer
-                Dim OptionCnt As Integer
-                Dim AggrObject As Object
-                Dim hint As String
-                'Dim addonCallingItselfIdList_Save As String
-                Dim CS As Integer
-                Dim Link As String
-                Dim ProgramID As String
-                Dim Options() As String
-                Dim OptionName As String
-                Dim OptionValue As String
-                Dim HTMLContent As String
-                Dim TextContent As String
-                Dim ObjectContent As String
-                Dim AssemblyContent As String
-                Dim ScriptContent As String
-                Dim helpCopy As String
-                Dim helpLink As String
-                Dim PageTitle As String
-                Dim MetaDescription As String
-                Dim MetaKeywordList As String
-                Dim OtherHeadTags As String
-                '
-                Dim AddonEditIcon As String
-                Dim OptionStringParsed As String
-                Dim Err_Number As Integer
-                Dim Err_Source As String
-                Dim Err_Description As String
-                Dim ErrString As String
-                Dim FoundAddon As Boolean
-                Dim FormXML As String
-                Dim WrapperID As Integer
-                Dim ContainerCssID As String
-                Dim ContainerCssClass As String
-                Dim IsInline As Boolean
-                Dim WorkingOptionString As String
-                Dim HTMLViewerEditIcon As String
-                'Dim CollectionID as integer
-                Dim AddonBlockEditTools As Boolean
-                Dim ReplaceCnt As Integer
-                Dim ReplaceNames() As String
-                Dim ReplaceValues() As String
-                Dim isMainOk As Boolean
-                Dim StartTickCount As Integer
-                Dim sqlCriteria As String
-                Dim addonCachePtr As Integer
-                Dim addonNameGuidOrId As String
-                Dim addonCollectionId As Integer
-
-                '
-                ' ----- OptionString and FilterInput values before this call are saved on the stack
-                '
-                Dim PushOptionString As String
-                PushOptionString = OptionString
-                '
-                isMainOk = True
-                '
-                ' ----- Debug timer
-                '
-                If isMainOk Then
-                    StartTickCount = GetTickCount
-                End If
-                return_StatusOK = True
-                WrapperID = DefaultWrapperID
-                If (personalizationPeopleId = 0) And isMainOk Then
-                    '
-                    ' just in case - during transition from cpCoreClass to csv, in case a call is missing.
-                    '
-                    personalizationPeopleId = user.id
-                    personalizationIsAuthenticated = user.isAuthenticated()
-                End If
-                '
-                ' ----- Set WorkingOptionString to what came in from the tag of the object
-                '       This may be replaced later if the tag is empty, and the actual add-on arguments have default values
-                '
-                WorkingOptionString = OptionString
-                '
-                ' ----- Lookup the addon
-                '
-                If addonId <> 0 Then
-                    addonCachePtr = addonCache.getPtr(CStr(addonId))
-                Else
-                    addonCachePtr = addonCache.getPtr(AddonNameOrGuid)
-                End If
-                If (addonCachePtr < 0) Then
-                    FoundAddon = False
-                Else
-                    FoundAddon = True
-                    ProgramID = EncodeText(addonCache.localCache.addonList(addonCachePtr).addonCache_ObjectProgramID)
-                    AddonName = EncodeText(addonCache.localCache.addonList(addonCachePtr).addonCache_name)
-                    addonId = EncodeInteger(addonCache.localCache.addonList(addonCachePtr).addonCache_Id)
-                    addonCollectionId = EncodeInteger(addonCache.localCache.addonList(addonCachePtr).addonCache_collectionid)
-                    AddonGuid = EncodeText(addonCache.localCache.addonList(addonCachePtr).addonCache_ccguid)
-                    If AddonGuid <> "" Then
-                        AddonNameOrGuid_Local = AddonGuid
-                    Else
-                        AddonNameOrGuid_Local = AddonName
-                    End If
-                    HTMLContent = EncodeText(addonCache.localCache.addonList(addonCachePtr).addonCache_Copy)
-                    Link = EncodeText(addonCache.localCache.addonList(addonCachePtr).addonCache_Link)
-                    DotNetClassFullName = EncodeText(addonCache.localCache.addonList(addonCachePtr).addonCache_DotNetClass)
-                    AddonOptionConstructor = EncodeText(addonCache.localCache.addonList(addonCachePtr).addonCache_ArgumentList)
-                    AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
-                    AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbLf, vbCr)
-                    AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
-                    '
-                    AddonBlockEditTools = False
-                    TextContent = ""
-                    FormXML = ""
-                    TextContent = EncodeText(addonCache.localCache.addonList(addonCachePtr).addonCache_CopyText)
-                    IsInline = EncodeBoolean(addonCache.localCache.addonList(addonCachePtr).addonCache_IsInline)
-                    '
-                    ' Support BlockDefaultStyles and CustomStylesFilename
-                    '
-                    If Not addonCache.localCache.addonList(addonCachePtr).addonCache_BlockDefaultStyles Then
-                        '
-                        ' Add default styles
-                        '
-                        DefaultStylesFilename = EncodeText(addonCache.localCache.addonList(addonCachePtr).addonCache_StylesFilename)
-                    End If
-                    '
-                    ' Add custom styles
-                    '
-                    CustomStylesFilename = EncodeText(addonCache.localCache.addonList(addonCachePtr).addonCache_CustomStylesFilename)
-                    FormXML = EncodeText(addonCache.localCache.addonList(addonCachePtr).addonCache_formxml)
-                    RemoteAssetLink = EncodeText(addonCache.localCache.addonList(addonCachePtr).addonCache_RemoteAssetLink)
-                    AsAjax = EncodeBoolean(addonCache.localCache.addonList(addonCachePtr).addonCache_AsAjax)
-                    InFrame = EncodeBoolean(addonCache.localCache.addonList(addonCachePtr).addonCache_InFrame)
-                    ScriptingEntryPoint = EncodeText(addonCache.localCache.addonList(addonCachePtr).addonCache_ScriptingEntryPoint)
-                    scriptinglanguageid = EncodeInteger(addonCache.localCache.addonList(addonCachePtr).addonCache_ScriptingLanguageID)
-                    '
-                    ' Get Language
-                    '
-                    ScriptingLanguage = ""
-                    If scriptinglanguageid <> 0 Then
-                        ScriptingLanguage = db_GetRecordName("Scripting Languages", scriptinglanguageid)
-                    End If
-                    If ScriptingLanguage = "" Then
-                        ScriptingLanguage = "VBScript"
-                    End If
-                    ScriptingCode = EncodeText(addonCache.localCache.addonList(addonCachePtr).addonCache_ScriptingCode)
-                    AddonBlockEditTools = EncodeBoolean(addonCache.localCache.addonList(addonCachePtr).addonCache_BlockEditTools)
-                    ScriptingTimeout = EncodeInteger(addonCache.localCache.addonList(addonCachePtr).addonCache_ScriptingTimeout)
-                    inlineScript = EncodeText(addonCache.localCache.addonList(addonCachePtr).addonCache_inlineScript)
-                    helpCopy = EncodeText(addonCache.localCache.addonList(addonCachePtr).addonCache_help)
-                    helpLink = EncodeText(addonCache.localCache.addonList(addonCachePtr).addonCache_helpLink)
-                    JSOnLoad = EncodeText(addonCache.localCache.addonList(addonCachePtr).addonCache_JavaScriptOnLoad)
-                    JSBodyEnd = EncodeText(addonCache.localCache.addonList(addonCachePtr).addonCache_JavaScriptBodyEnd)
-                    PageTitle = EncodeText(addonCache.localCache.addonList(addonCachePtr).addonCache_PageTitle)
-                    MetaDescription = EncodeText(addonCache.localCache.addonList(addonCachePtr).addonCache_MetaDescription)
-                    MetaKeywordList = EncodeText(addonCache.localCache.addonList(addonCachePtr).addonCache_MetaKeywordList)
-                    OtherHeadTags = EncodeText(addonCache.localCache.addonList(addonCachePtr).addonCache_OtherHeadTags)
-                    JSFilename = EncodeText(addonCache.localCache.addonList(addonCachePtr).addonCache_JSFilename)
-                    If JSFilename <> "" Then
-                        JSFilename = web_requestProtocol & webServer.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, JSFilename)
-                    End If
-                End If
-                If Not String.IsNullOrEmpty(ProgramID) Then
-                    '
-                    ' addons with activeX components are deprecated
-                    '
-                    handleExceptionAndRethrow(New ApplicationException("This add-on [#" & addonId & ", " & AddonName & "] is no longer supported because it contains an active-X component."))
-                Else
-                    '
-                    '----------------------------------------------------------------------------------------------------
-                    ' add shared styles
-                    '----------------------------------------------------------------------------------------------------
-                    '
-                    Dim addonIdKey As String
-                    addonIdKey = addonId.ToString
-                    Ptr = cache_addonStyleRules.getFirstPtr(addonIdKey)
-                    Do While Ptr >= 0
-                        styleId = EncodeInteger(cache_addonStyleRules.getValue(Ptr))
-                        Call main_AddSharedStyleID2(styleId, AddonName)
-                        Ptr = cache_addonStyleRules.getNextPtr()
-                    Loop
-                    '
-                    '----------------------------------------------------------------------------------------------------
-                    ' Add ScriptingCode
-                    '----------------------------------------------------------------------------------------------------
-                    '
-                    If ScriptingEntryPoint <> "" Then
-                        '
-                        ' Get Modules
-                        '
-                        SQL = "select c.code from ccScriptingModules c left join ccAddonScriptingModuleRules r on r.ScriptingModuleID=c.id where r.Addonid=" & addonId & " order by c.sortorder"
-                        CSRules = db.db_openCsSql_rev("default", SQL)
-                        Do While db.cs_Ok(CSRules)
-                            CodeFilename = db.db_GetCS(CSRules, "code")
-                            If CodeFilename <> "" Then
-                                ScriptingCode = ScriptingCode & vbCrLf & cdnFiles.readFile(CodeFilename)
-                            End If
-                            Call db.db_csGoNext(CSRules)
-                        Loop
-                        Call db.cs_Close(CSRules)
-                    End If
-                    '
-                    '----------------------------------------------------------------------------------------------------
-                    ' Add the common addon options to the AddonOptionConstructor
-                    '----------------------------------------------------------------------------------------------------
-                    '
-                    If AddonOptionConstructor <> "" Then
-                        AddonOptionConstructor = AddonOptionConstructor & vbCrLf
-                    End If
-                    '
-                    ' temporary fix for Content Box not handling ajax or inframe
-                    '
-                    If vbLCase(AddonGuid) = vbLCase(ContentBoxGuid) Then
-                        AsAjax = False
-                        InFrame = False
-                        AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_BlockNoAjax
-                    ElseIf IsInline Then
-                        AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Inline
-                    Else
-                        AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Block
-                    End If
-                    '
-                    If Not FoundAddon Then
-                        '
-                        '-----------------------------------------------------------------------------------------------------
-                        ' Build-in Add-ons
-                        '-----------------------------------------------------------------------------------------------------
-                        '
-                        If vbLCase(AddonName) = "block text" Then
-                            AddonNameOrGuid_Local = AddonName
-                            FoundAddon = True
-                            'IsProcess = False
-                            addonId = 0
-                            Link = ""
-                            ProgramID = ""
-                            AddonOptionConstructor = AddonOptionConstructor_ForBlockText
-                            TextContent = ""
-                            DefaultStylesFilename = ""
-                            CustomStylesFilename = ""
-                            helpCopy = ""
-                            helpLink = ""
-                            JSOnLoad = ""
-                            'JSInHead = ""
-                            JSFilename = ""
-                            JSBodyEnd = ""
-                            PageTitle = ""
-                            MetaDescription = ""
-                            MetaKeywordList = ""
-                            OtherHeadTags = ""
-                            AddonEditIcon = ""
-                            IsInline = True
-                            GroupIDList = csv_GetAddonOption("AllowGroups", WorkingOptionString)
-                            GroupIDList = Trim(GroupIDList)
-                            ' not webonly anymore
-                            If Not user.isMemberOfGroupIdList(personalizationPeopleId, personalizationIsAuthenticated, GroupIDList) Then
-                                HTMLContent = BlockTextStartMarker
-                            End If
-                            'If isMainOk Then
-                            '    '
-                            '    ' web-only
-                            '    '
-                            '    If Not main_IsAdmin() Then
-                            '        If Not csv_IsGroupIDListMember(personalizationPeopleid, personalizationIsAuthenticated, GroupIDList) Then
-                            '            HTMLContent = BlockTextStartMarker
-                            '        End If
-                            '    End If
-                            ' End If
-                            '
-                        ElseIf vbLCase(AddonName) = "block text end" Then
-                            AddonNameOrGuid_Local = AddonName
-                            FoundAddon = True
-                            'IsProcess = False
-                            addonId = 0
-                            HTMLContent = BlockTextEndMarker
-                            Link = ""
-                            ProgramID = ""
-                            AddonOptionConstructor = AddonOptionConstructor_ForBlockTextEnd
-                            TextContent = ""
-                            DefaultStylesFilename = ""
-                            CustomStylesFilename = ""
-                            helpCopy = ""
-                            helpLink = ""
-                            JSOnLoad = ""
-                            'JSInHead = ""
-                            JSFilename = ""
-                            JSBodyEnd = ""
-                            PageTitle = ""
-                            MetaDescription = ""
-                            MetaKeywordList = ""
-                            OtherHeadTags = ""
-                            AddonEditIcon = ""
-                            IsInline = True
-                        End If
-                    End If
-                    If Not FoundAddon Then
-                        '
-                        '-----------------------------------------------------------------------------------------------------
-                        ' The add-on was not found for real
-                        '-----------------------------------------------------------------------------------------------------
-                        '
-                        return_StatusOK = False
-                        '
-                        ' web-only
-                        '
-                        If (Context = CPUtilsBaseClass.addonContext.ContextEmail) Or (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) Or (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) Or (Context = CPUtilsBaseClass.addonContext.ContextSimple) Then
-                            '
-                            ' Block all output even on error
-                            '
-                        ElseIf user.isAuthenticatedAdmin() Or user.isAuthenticatedContentManager("Page Content") Then
-                            '
-                            ' Provide hint to administrators
-                            '
-                            If AddonName = "" And addonId <> 0 Then
-                                AddonName = "Addon #" & addonId
-                            End If
-                            If Context = CPUtilsBaseClass.addonContext.ContextAdmin Then
-                                returnVal = "The Add-on '" & AddonName & "' could not be found. It may have been deleted or marked inactive. If you are receiving this message after clicking an Add-on from the Navigator, their may be a problem with this Add-on. If you are receiving this message from the main admin page, your Dashboard Add-on may be set incorrectly. Use the Admin tab under Preferences to select the Dashboard, or <a href=""?" & RequestNameDashboardReset & "=" & visit_Id & """>click here</a> to automatically reset the dashboard."
-                            Else
-                                returnVal = "The Add-on '" & AddonName & "' could not be found. It may have been deleted or marked inactive. Please use the Add-on Manager to replace it, or edit this page and remove it."
-                            End If
-                            returnVal = main_GetAdminHintWrapper(returnVal)
-                        End If
-                        If (addonId > 0) Then
-                            Call handleLegacyError7("executeAddon", "The Add-on could not be found by id [" & addonId & "] or name/guid [" & AddonNameOrGuid & "]")
-                        Else
-                            Call handleLegacyError7("executeAddon", "The Add-on could not be found by name/guid [" & AddonNameOrGuid & "]")
-                        End If
-                    End If
-                    '
-                    '-----------------------------------------------------------------
-                    ' Process the Add-on
-                    '-----------------------------------------------------------------
-                    '
-                    If FoundAddon Then
-                        '
-                        'determine if it has already run once (if so, block javascript and styles)
-                        '
-                        If addonsRunOnThisPageIdList.Contains(addonId) Then
-                            blockJavascriptAndCss = True
-                        Else
-                            addonsRunOnThisPageIdList.Add(addonId)
-                        End If
-                        'blockJavascriptAndCss = (InStr(1, "," & csv_addon_execute_AddonsRunOnThisPageIdList & ",", "," & addonId & ",") <> 0)
-                        'csv_addon_execute_AddonsRunOnThisPageIdList = csv_addon_execute_AddonsRunOnThisPageIdList & "," & addonId
-                        '
-                        '-----------------------------------------------------------------
-                        ' Enable Edit Wrapper for Page Content and Dynamic Menu for edit mode
-                        '-----------------------------------------------------------------
-                        '
-                        If isMainOk Then
-                            IncludeEditWrapper =
-                                (Not AddonBlockEditTools) _
-                                And (Context <> CPUtilsBaseClass.addonContext.ContextEditor) _
-                                And (Context <> CPUtilsBaseClass.addonContext.ContextEmail) _
-                                And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) _
-                                And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) _
-                                And (Context <> CPUtilsBaseClass.addonContext.ContextSimple) _
-                                And (Not IsIncludeAddon)
-                            If IncludeEditWrapper Then
-                                IncludeEditWrapper = IncludeEditWrapper _
-                                    And (visitProperty.getBoolean("AllowAdvancedEditor") _
-                                    And ((Context = CPUtilsBaseClass.addonContext.ContextAdmin) Or user.isEditing(HostContentName)))
-                                'IncludeEditWrapper = IncludeEditWrapper _
-                                '    And ( _
-                                '        ( _
-                                '            (csv_VisitProperty_AllowAdvancedEditor And ((Context = ContextAdmin) Or IsEditing(HostContentName))) _
-                                '        ) Or ( _
-                                '            (csv_VisitProperty_AllowEditing And ((AddonGuid = ContentBoxGuid) Or (AddonGuid = DynamicMenuGuid) Or (AddonGuid = TextBoxGuid))) _
-                                '        ) _
-                                '    )
-                            End If
-                        End If
-                        '
-                        ' ----- Test if this Addon is already in use
-                        '
-                        If addonsCurrentlyRunningIdList.Contains(addonId) Then
-                            '
-                            ' This addon is running, can not reenter
-                            '
-                            Call log_appendLog("addon_execute, Addon [" & AddonName & "] was called by itself. This is not allowed. AddonID [" & addonId & "], AddonNameOrGuid [" & AddonNameOrGuid_Local & "]")
-                        Else
-                            addonsCurrentlyRunningIdList.Add(addonId)
-                            'csv_addon_execute_AddonsCurrentlyRunningIdList = csv_addon_execute_AddonsCurrentlyRunningIdList & "," & addonId
-                            '
-                            '-----------------------------------------------------------------------------------------------------
-                            ' Preprocess arguments into OptionsForCPVars, and set generic instance values wrapperid and asajax
-                            '-----------------------------------------------------------------------------------------------------
-                            '
-                            ' Setup InstanceOptions - if InstanceOptionString is empty, use the defaults from the Addon Arguments
-                            '
-                            OptionCnt = 0
-                            If WorkingOptionString <> "" Then
-                                If vbInstr(1, WorkingOptionString, vbCrLf) <> 0 Then
-                                    '
-                                    ' this should never be the case
-                                    '
-                                    Options = SplitCRLF(WorkingOptionString)
-                                    OptionCnt = UBound(Options) + 1
-                                Else
-                                    '
-                                    '
-                                    '
-                                    Options = Split(WorkingOptionString, "&")
-                                    OptionCnt = UBound(Options) + 1
-                                End If
-                                OptionsForCPVars_Cnt = OptionCnt
-                                ReDim OptionsForCPVars(OptionCnt - 1)
-                                ReDim OptionNames(OptionCnt - 1)
-                                ReDim OptionValues(OptionCnt - 1)
-                                For OptionPtr = 0 To OptionCnt - 1
-                                    With OptionsForCPVars(OptionPtr)
-                                        .Name = Trim(Options(OptionPtr))
-                                        If vbInstr(1, .Name, "=") <> 0 Then
-                                            OptionPair = Split(.Name, "=")
-                                            .Name = Trim(EncodeText(OptionPair(0)))
-                                            .Value = EncodeText(OptionPair(1))
-                                            '
-                                            ' added this because when a row of apostrophes were added to an instance argument, they showed up here
-                                            ' so it appears (though not documented very well) that the WorkingOptionString argument is really
-                                            ' the Addon Encoded Instance OptionString
-                                            ' So, as I parse it for use in the add-on, I need to unencode it
-                                            '
-                                            .Name = Trim(decodeNvaArgument(.Name))
-                                            .Value = decodeNvaArgument(.Value)
-                                            '
-                                            '
-                                            If vbLCase(.Name) = "wrapper" Then
-                                                WrapperID = EncodeInteger(.Value)
-                                                If WrapperID = 0 Then
-                                                    WrapperID = DefaultWrapperID
-                                                End If
-                                            ElseIf vbLCase(.Name) = "as ajax" Then
-                                                If EncodeBoolean(.Value) Then
-                                                    AsAjax = True
-                                                End If
-                                            ElseIf vbLCase(.Name) = "css container id" Then
-                                                ContainerCssID = .Value
-                                            ElseIf vbLCase(.Name) = "css container class" Then
-                                                ContainerCssClass = .Value
-                                            End If
-                                            OptionNames(OptionPtr) = OptionsForCPVars(OptionPtr).Name
-                                            OptionValues(OptionPtr) = OptionsForCPVars(OptionPtr).Value
-                                        End If
-                                    End With
-                                Next
-                            End If
-                            If AddonOptionConstructor <> "" Then
-                                '        If WorkingOptionString = "" Then
-                                'WorkingOptionString = AddonOptionConstructor
-                                '
-                                ' convert from AddonConstructor format (crlf delimited, constructorincoded) to AddonOption format without selector (& delimited, addonencoded)
-                                '
-                                AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
-                                AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbLf, vbCr)
-                                AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
-                                Options = SplitCRLF(AddonOptionConstructor)
-                                OptionCnt = UBound(Options) + 1
-                                For OptionPtr = 0 To OptionCnt - 1
-                                    OptionName = Options(OptionPtr)
-                                    OptionValue = ""
-                                    '
-                                    OptionName = vbReplace(OptionName, "\=", vbCrLf)
-                                    If vbInstr(1, OptionName, "=") <> 0 Then
-                                        OptionPair = Split(OptionName, "=")
-                                        OptionName = OptionPair(0)
-                                        OptionPair(0) = ""
-                                        OptionValue = Mid(Join(OptionPair, "="), 2)
-                                    End If
-                                    OptionName = vbReplace(OptionName, vbCrLf, "\=")
-                                    OptionValue = vbReplace(OptionValue, vbCrLf, "\=")
-                                    '
-                                    Do While (Mid(OptionName, 1, 1) = vbTab) And Len(OptionName) > 1
-                                        OptionName = Mid(OptionName, 2)
-                                    Loop
-                                    OptionName = Trim(OptionName)
-                                    '
-                                    ' split on [, throw out the right side
-                                    OptionValue = vbReplace(OptionValue, "\[", vbCrLf)
-                                    If vbInstr(1, OptionValue, "[") <> 0 Then
-                                        OptionValue = Left(OptionValue, vbInstr(1, OptionValue, "[") - 1)
-                                    End If
-                                    OptionValue = vbReplace(OptionValue, vbCrLf, "\[")
-                                    '
-                                    ' Decode Constructor format
-                                    '
-                                    OptionName = DecodeAddonConstructorArgument(OptionName)
-                                    OptionValue = DecodeAddonConstructorArgument(OptionValue)
-                                    '
-                                    ' check for duplicates
-                                    '
-                                    For Ptr = 0 To OptionsForCPVars_Cnt - 1
-                                        If vbLCase(OptionName) = vbLCase(OptionsForCPVars(Ptr).Name) Then
-                                            Exit For
-                                        End If
-                                    Next
-                                    If Ptr = OptionsForCPVars_Cnt Then
-                                        '
-                                        ' not found, add it to option pairs
-                                        '
-                                        ReDim Preserve OptionsForCPVars(Ptr)
-                                        OptionsForCPVars(Ptr).Name = Trim(OptionName)
-                                        OptionsForCPVars(Ptr).Value = OptionValue
-                                        OptionsForCPVars_Cnt = OptionsForCPVars_Cnt + 1
-                                    End If
-                                Next
-                            End If
-                            '
-                            ' this is a hack -- add instanceID to the OptionsForCPVars. do the same in addon_executeAsProcess
-                            '   it is also added in csv_BuildAddonOptionLists() which is called by both, but does not effect OptionsForCPVars.
-                            '   the cpCoreClass execute should call executeAsProcess and share all this code.
-                            '
-                            If ACInstanceID <> "" Then
-                                ReDim Preserve OptionsForCPVars(OptionsForCPVars_Cnt)
-                                OptionsForCPVars(OptionsForCPVars_Cnt).Name = "instanceid"
-                                OptionsForCPVars(OptionsForCPVars_Cnt).Value = ACInstanceID
-                                OptionsForCPVars_Cnt = OptionsForCPVars_Cnt + 1
-                            End If
-                            '
-                            '-----------------------------------------------------------------------------------------------------
-                            ' Build ReplaceName, ReplaceValue pairs for call to cmc.csv_ExecuteScript
-                            '-----------------------------------------------------------------------------------------------------
-                            '
-                            ReplaceCnt = OptionsForCPVars_Cnt
-                            If ReplaceCnt > 0 Then
-                                ReDim ReplaceNames(ReplaceCnt - 1)
-                                ReDim ReplaceValues(ReplaceCnt - 1)
-                                For Ptr = 0 To ReplaceCnt - 1
-                                    With OptionsForCPVars(Ptr)
-                                        If .Name <> "" Then
-                                            ReplaceNames(Ptr) = .Name
-                                            'ReplaceNames(Ptr) = "$" & .Name & "$"
-                                            ReplaceValues(Ptr) = .Value
-                                        End If
-                                    End With
-                                Next
-                            End If
-                            '
-                            '-----------------------------------------------------------------------------------------------------
-                            '   Common to Add-ons and built-in Add-ons
-                            '-----------------------------------------------------------------------------------------------------
-                            '
-                            ' Update the option selector from the addon record
-                            '
-                            '!!!!!
-                            ' instanceId option pair is added here, but OptionsForCPVars() is already constructed and does not have it -- so scripts will not get it
-                            ' instanceId needs to be added early in preprocess so it gets picked up in OptionsForCPVars()
-                            '!!!!!
-                            Call csv_BuildAddonOptionLists(OptionString_ForObjectCall, AddonOptionExpandedConstructor, AddonOptionConstructor, WorkingOptionString, ACInstanceID, IncludeEditWrapper)
-                            '
-                            ' set global public value that can be accessed by scripts
-                            '
-                            OptionString = OptionString_ForObjectCall
-                            '
-                            '
-                            '-----------------------------------------------------------------------------------------------------
-                            ' Process the content for each context as needed
-                            '-----------------------------------------------------------------------------------------------------
-                            '
-                            If (InFrame And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) Then
-                                '
-                                '-----------------------------------------------------------------
-                                ' inFrame and this is NOT the callback - setup the iframe for a callback
-                                ' js,styles and other features are NOT added to the host page, they go to the remotemethod page
-                                '-----------------------------------------------------------------
-                                '
-                                If isMainOk Then
-                                    '
-                                    ' web-only
-                                    '
-                                    Link = web_requestProtocol & webServer.requestDomain & www_requestRootPath & siteProperties.serverPageDefault
-                                    If vbInstr(1, Link, "?") = 0 Then
-                                        Link = Link & "?"
-                                    Else
-                                        Link = Link & "&"
-                                    End If
-                                    Link = Link _
-                                        & "nocache=" & Rnd() _
-                                        & "&HostContentName=" & EncodeRequestVariable(HostContentName) _
-                                        & "&HostRecordID=" & HostRecordID _
-                                        & "&remotemethodaddon=" & EncodeURL(AddonNameOrGuid_Local) _
-                                        & "&optionstring=" & EncodeRequestVariable(WorkingOptionString) _
-                                        & ""
-                                    FrameID = "frame" & getRandomLong()
-                                    returnVal = "<iframe src=""" & Link & """ id=""" & FrameID & """ onload=""cj.setFrameHeight('" & FrameID & "');"" class=""ccAddonFrameCon"" frameborder=""0"" scrolling=""no"">This content is not visible because your browser does not support iframes</iframe>" _
-                                        & cr & "<script language=javascript type=""text/javascript"">" _
-                                        & cr & "// Safari and Opera need a kick-start." _
-                                        & cr & "var e=document.getElementById('" & FrameID & "');if(e){var iSource=e.src;e.src='';e.src = iSource;}" _
-                                        & cr & "</script>"
-                                End If
-                            ElseIf (AsAjax And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) Then
-                                '
-                                '-----------------------------------------------------------------
-                                ' AsAjax and this is NOT the callback - setup the ajax callback
-                                ' js,styles and other features from the addon record are added to the host page
-                                ' during the remote method, these are blocked, but if any are added during
-                                '   DLL processing, they have to be handled
-                                '-----------------------------------------------------------------
-                                '
-                                If isMainOk Then
-                                    AsAjaxID = "asajax" & getRandomLong()
-                                    QS = "" _
-                                        & RequestNameRemoteMethodAddon & "=" & EncodeRequestVariable(AddonNameOrGuid_Local) _
-                                        & "&HostContentName=" & EncodeRequestVariable(HostContentName) _
-                                        & "&HostRecordID=" & HostRecordID _
-                                        & "&HostRQS=" & EncodeRequestVariable(web_RefreshQueryString) _
-                                        & "&HostQS=" & EncodeRequestVariable(webServer.requestQueryString) _
-                                        & "&HostForm=" & EncodeRequestVariable(webServer.requestFormString) _
-                                        & "&optionstring=" & EncodeRequestVariable(WorkingOptionString) _
-                                        & ""
-                                    If IsInline Then
-                                        returnVal = cr & "<div ID=" & AsAjaxID & " Class=""ccAddonAjaxCon"" style=""display:inline;""><img src=""/ccLib/images/ajax-loader-small.gif"" width=""16"" height=""16""></div>"
-                                    Else
-                                        returnVal = cr & "<div ID=" & AsAjaxID & " Class=""ccAddonAjaxCon""><img src=""/ccLib/images/ajax-loader-small.gif"" width=""16"" height=""16""></div>"
-                                    End If
-                                    returnVal = returnVal _
-                                        & cr & "<script Language=""javaScript"" type=""text/javascript"">" _
-                                        & cr & "cj.ajax.qs('" & QS & "','','" & AsAjaxID & "');AdminNavPop=true;" _
-                                        & cr & "</script>"
-                                    '
-                                    ' Problem - AsAjax addons must add styles, js and meta to the head
-                                    '   Adding them to the host page covers most cases, but sometimes the DLL itself
-                                    '   adds styles, etc during processing. These have to be added during the remote method processing.
-                                    '   appending the .innerHTML of the head works for FF, but ie blocks it.
-                                    '   using .createElement works in ie, but the tag system right now not written
-                                    '   to save links, etc, it is written to store the entire tag.
-                                    '   Also, OtherHeadTags can not be added this was.
-                                    '
-                                    ' Short Term Fix
-                                    '   For Ajax, Add javascript and style features to head of host page
-                                    '   Then during remotemethod, clear these strings before dll processing. Anything
-                                    '   that is added must have come from the dll. So far, the only addons we have that
-                                    '   do this load styles, so instead of putting in the the head (so ie fails), add styles inline.
-                                    '
-                                    '   This is because ie does not allow innerHTML updates to head tag
-                                    '   scripts and js could be handled with .createElement if only the links were saved, but
-                                    '   otherhead could not.
-                                    '   The case this does not cover is if the addon itself manually adds one of these entries.
-                                    '   In no case can ie handle the OtherHead, however, all the others can be done with .createElement.
-                                    ' Long Term Fix
-                                    '   Convert js, style, and meta tag system to use .createElement during remote method processing
-                                    '
-                                    Call main_AddPagetitle2(PageTitle, AddedByName)
-                                    Call main_addMetaDescription2(MetaDescription, AddedByName)
-                                    Call main_addMetaKeywordList2(MetaKeywordList, AddedByName)
-                                    Call main_AddHeadTag2(OtherHeadTags, AddedByName)
-                                    If Not blockJavascriptAndCss Then
-                                        '
-                                        ' add javascript and styles if it has not run already
-                                        '
-                                        Call main_AddOnLoadJavascript2(JSOnLoad, AddedByName)
-                                        Call main_AddEndOfBodyJavascript2(JSBodyEnd, AddedByName)
-                                        Call main_AddHeadScriptLink(JSFilename, AddedByName)
-                                        If DefaultStylesFilename <> "" Then
-                                            Call main_AddStylesheetLink2(web_requestProtocol & webServer.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
-                                        End If
-                                        If CustomStylesFilename <> "" Then
-                                            Call main_AddStylesheetLink2(web_requestProtocol & webServer.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
-                                        End If
-                                    End If
-                                End If
-                            Else
-                                '
-                                '-----------------------------------------------------------------
-                                ' otherwise - produce the content from the addon
-                                '   setup RQS as needed - RQS provides the querystring for add-ons to create links that return to the same page
-                                '-----------------------------------------------------------------------------------------------------
-                                '
-                                If (InFrame And (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) Then
-                                    '
-                                    ' Add-on setup for InFrame, running the call-back - this page must think it is just the remotemethod
-                                    '
-                                    If isMainOk Then
-                                        Call web_addRefreshQueryString(RequestNameRemoteMethodAddon, AddonNameOrGuid_Local)
-                                        Call web_addRefreshQueryString("optionstring", WorkingOptionString)
-                                    End If
-                                ElseIf (AsAjax And (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) Then
-                                    '
-                                    ' Add-on setup for AsAjax, running the call-back - put the referring page's QS as the RQS
-                                    ' restore form values
-                                    '
-                                    If isMainOk Then
-                                        QS = docProperties.getText("Hostform")
-                                        If QS <> "" Then
-                                            Call docProperties.addQueryString(QS)
-                                        End If
-                                        '
-                                        ' restore refresh querystring values
-                                        '
-                                        QS = docProperties.getText("HostRQS")
-                                        QSSplit = Split(QS, "&")
-                                        For Ptr = 0 To UBound(QSSplit)
-                                            NVPair = QSSplit(Ptr)
-                                            If NVPair <> "" Then
-                                                NVSplit = Split(NVPair, "=")
-                                                If UBound(NVSplit) > 0 Then
-                                                    Call web_addRefreshQueryString(NVSplit(0), NVSplit(1))
-                                                End If
-                                            End If
-                                        Next
-                                        '
-                                        ' restore query string
-                                        '
-                                        QS = docProperties.getText("HostQS")
-                                        Call docProperties.addQueryString(QS)
-                                        '
-                                        ' Clear the style,js and meta features that were delivered to the host page
-                                        ' After processing, if these strings are not empty, they must have been added by the DLL
-                                        '
-                                        '
-                                        JSOnLoad = ""
-                                        JSBodyEnd = ""
-                                        PageTitle = ""
-                                        MetaDescription = ""
-                                        MetaKeywordList = ""
-                                        OtherHeadTags = ""
-                                        DefaultStylesFilename = ""
-                                        CustomStylesFilename = ""
-                                    End If
-                                End If
-                                '
-                                '-----------------------------------------------------------------
-                                ' gather list of included add-ons
-                                ' do not run yet because CP has not been created
-                                ' moved here from below to catch scripting entry
-                                ' moved to within the CP check bc this call includes CP which has not been created
-                                '-----------------------------------------------------------------
-                                '
-                                Ptr = cache_addonIncludeRules_getFirstPtr(addonId)
-                                Do While Ptr >= 0
-                                    addon_IncludedAddonIDList = addon_IncludedAddonIDList & "," & cache_addonIncludeRules.item(addonIncludeRulesCache_includedAddonId, Ptr)
-                                    Ptr = cache_addonIncludeRules.addonIdIndex.getNextPtrMatch(CStr(addonId))
-                                Loop
-                                '
-                                '-----------------------------------------------------------------
-                                ' Do replacements from Option String and Pick out WrapperID, and AsAjax
-                                '-----------------------------------------------------------------
-                                '
-                                TestString = HTMLContent & TextContent & PageTitle & MetaDescription & MetaKeywordList & OtherHeadTags & FormXML
-                                If (TestString <> "") And (ReplaceCnt > 0) Then
-                                    For Ptr = 0 To ReplaceCnt - 1
-                                        ReplaceSource = "$" & ReplaceNames(Ptr) & "$"
-                                        ' this section takes 15msec every addon, 32 addons is 480msec.
-                                        ' 20131221 - 4.2.317 - try test first to save time
-                                        If isInStr(1, TestString, ReplaceSource) Then
-                                            ReplaceValue = ReplaceValues(Ptr)
-                                            HTMLContent = vbReplace(HTMLContent, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
-                                            TextContent = vbReplace(TextContent, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
-                                            PageTitle = vbReplace(PageTitle, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
-                                            MetaDescription = vbReplace(MetaDescription, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
-                                            MetaKeywordList = vbReplace(MetaKeywordList, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
-                                            OtherHeadTags = vbReplace(OtherHeadTags, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
-                                            FormXML = vbReplace(FormXML, ReplaceSource, ReplaceValue, 1, 99, vbTextCompare)
-                                        End If
-                                    Next
-                                End If
-                                '
-                                '-----------------------------------------------------------------
-                                ' CP compatible section
-                                '-----------------------------------------------------------------
-                                '
-                                If (addon_IncludedAddonIDList <> "") Or (ScriptingCode <> "") Or (DotNetClassFullName <> "") Then
-                                    'hint = "Processing Addon [" & AddonName & "], adding Options to Environment"
-                                    For Ptr = 0 To UBound(OptionsForCPVars)
-                                        'hint = hint & ",1"
-                                        Call cp.AddVar(OptionsForCPVars(Ptr).Name, OptionsForCPVars(Ptr).Value)
-                                        'hint = hint & ",2"
-                                    Next
-                                    '
-                                    ' ----- run included add-ons before their parent
-                                    ' should be the first executable to run so includes run first
-                                    ' moved here from above because CP is needed
-                                    '
-                                    'hint = hint & ",3"
-                                    If addon_IncludedAddonIDList <> "" Then
-                                        'hint = hint & ",4"
-                                        includedAddonIds = Split(addon_IncludedAddonIDList, ",")
-                                        'hint = hint & ",5"
-                                        For Ptr = 0 To UBound(includedAddonIds)
-                                            'hint = hint & ",6"
-                                            includedAddonId = EncodeInteger(includedAddonIds(Ptr))
-                                            'hint = hint & ",7"
-                                            If includedAddonId <> 0 Then
-                                                'IsAuthenticated = 0
-                                                'If isMainOk Then
-                                                '    IsAuthenticated = main_IsAuthenticated
-                                                'End If
-                                                'hint = hint & ",8"
-                                                IncludeContent = IncludeContent & addon_execute(includedAddonId, "", "", CPUtilsBaseClass.addonContext.ContextAdmin, HostContentName, HostRecordID, HostFieldName, ACInstanceID, True, DefaultWrapperID, ignore_TemplateCaseOnly_PageContent, AddonStatusOK, Nothing, ignore_addonCallingItselfIdList & "," & addonId, Nothing, ignore_AddonsRunOnThisPageIdList, personalizationPeopleId, personalizationIsAuthenticated)
-                                            End If
-                                        Next
-                                    End If
-                                    '
-                                    ' ----- Scripting
-                                    '
-                                    'hint = hint & ",9"
-                                    If (ScriptingCode <> "") Then
-                                        'hint = "Processing Addon [" & AddonName & "], calling script component."
-                                        Try
-                                            ScriptContent = addon_execute_executeScript4(ScriptingLanguage, ScriptingCode, ScriptingEntryPoint, errorMessageForAdmin, ScriptingTimeout, "Addon [" & AddonName & "]", ReplaceCnt, ReplaceNames, ReplaceValues)
-                                        Catch ex As Exception
-                                            handleExceptionAndRethrow(ex, "There was an error executing the script component of Add-on [" & AddonName & "], AddonOptionString [" & WorkingOptionString & "]. The details of this error follow.</p><p>" & errorMessageForAdmin & "")
-                                        End Try
-                                    End If
-                                    '
-                                    ' ----- Dot Net Addons
-                                    '   Get path to the addon from the collection guid
-                                    '   If no collection, just look in the /addon path
-                                    '
-                                    'hint = hint & ",10"
-                                    If DotNetClassFullName <> "" Then
-                                        '
-                                        Dim csTmp As Integer
-                                        csTmp = db.db_openCsSql_rev("default", "select ccGuid from ccAddonCollections where id=" & addonCollectionId)
-                                        If db.cs_Ok(csTmp) Then
-                                            CollectionGuid = db.cs_getText(csTmp, "ccGuid")
-                                        End If
-                                        Call db.cs_Close(csTmp)
-                                        '
-                                        AssemblyContent = addon_execute_executeAssembly(addonId, AddonName, DotNetClassFullName, CollectionGuid, Nothing, errorMessageForAdmin)
-                                        If (errorMessageForAdmin <> "") Then
-                                            '
-                                            ' log the error
-                                            '
-                                            Call handleLegacyError8("Error during cmc.csv_ExecuteAssembly [" & errorMessageForAdmin & "]", "cpCoreClass.addon_execute_internal", True)
-                                            '
-                                            ' Put up an admin hint
-                                            '
-                                            If (Not isMainOk) Or (Context = CPUtilsBaseClass.addonContext.ContextEmail) Or (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) Or (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) Or (Context = CPUtilsBaseClass.addonContext.ContextSimple) Then
-                                                '
-                                                ' Block all output even on error
-                                                '
-                                            ElseIf user.isAuthenticatedAdmin() Then
-                                                '
-                                                ' Provide hint to administrators
-                                                '
-                                                If AddonName = "" And addonId <> 0 Then
-                                                    AddonName = "Addon #" & addonId
-                                                End If
-                                                AssemblyContent = main_GetAdminHintWrapper("<p>There was an error executing the assembly component of Add-on [" & AddonName & "], AddonOptionString [" & WorkingOptionString & "] with class name [" & DotNetClassFullName & "]. The details of this error follow.</p><p>" & errorMessageForAdmin & "</p>")
-                                            End If
-                                        End If
-                                    End If
-                                End If
-                                ''
-                                ''-----------------------------------------------------------------
-                                '' ActiveX Addons
-                                ''-----------------------------------------------------------------
-                                ''
-                                ''hint = "Processing Addon [" & AddonName & "], ActiveX Addons section"
-                                'If ProgramID <> "" Then
-                                '    '
-                                '    ' Go ahead
-                                '    '
-                                '    Try
-                                '        ObjectContent = csv_ExecuteActiveX(ProgramID, AddonName, OptionString_ForObjectCall, WorkingOptionString, errorMessageForAdmin)
-                                '    Catch ex As Exception
-                                '        handleException(ex, "There was an error executing the activex component of Add-on [" & AddonName & "], AddonOptionString [" & WorkingOptionString & "], with Program ID [" & ProgramID & "]. The details of this error follow.</p><p>" & errorMessageForAdmin & "")
-                                '    End Try
-                                '    AggrObject = Nothing
-                                'End If
-                                ''hint = ""
-                                '
-                                '-----------------------------------------------------------------------------------------------------
-                                '   Script Include
-                                '       Adds a comment with a script include file
-                                '-----------------------------------------------------------------------------------------------------
-                                '
-                                If (True) And (inlineScript <> "") Then
-                                    inlineScriptContent = "<!-- inlineScript(" & csv_ConnectionID & ")[" & html_EncodeHTML(inlineScript) & "] -->"
-                                End If
-                                '
-                                '-----------------------------------------------------------------------------------------------------
-                                '   RemoteAssetLink
-                                '-----------------------------------------------------------------------------------------------------
-                                '
-                                If (True) Then
-                                    If RemoteAssetLink <> "" Then
-                                        WorkingLink = RemoteAssetLink
-                                        If vbInstr(1, WorkingLink, "://") = 0 Then
-                                            If isMainOk Then
-                                                '
-                                                ' use request object to build link
-                                                '
-                                                If Mid(WorkingLink, 1, 1) = "/" Then
-                                                    WorkingLink = web_requestProtocol & webServer.requestDomain & WorkingLink
-                                                Else
-                                                    WorkingLink = web_requestProtocol & webServer.requestDomain & web_requestVirtualFilePath & WorkingLink
-                                                End If
-                                            Else
-                                                '
-                                                ' use assumptions
-                                                '
-                                                If Mid(WorkingLink, 1, 1) = "/" Then
-                                                    WorkingLink = "http://" & appConfig.domainList(0) & WorkingLink
-                                                Else
-                                                    WorkingLink = "http://" & appConfig.domainList(0) & "/" & WorkingLink
-                                                End If
-                                            End If
-                                        End If
-                                        Dim PosStart As Integer
-                                        kmaHTTP = New coreHttpRequestClass()
-                                        RemoteAssetContent = kmaHTTP.getURL(WorkingLink)
-                                        Pos = vbInstr(1, RemoteAssetContent, "<body", vbTextCompare)
-                                        If Pos > 0 Then
-                                            Pos = vbInstr(Pos, RemoteAssetContent, ">")
-                                            If Pos > 0 Then
-                                                PosStart = Pos + 1
-                                                Pos = vbInstr(Pos, RemoteAssetContent, "</body", vbTextCompare)
-                                                If Pos > 0 Then
-                                                    RemoteAssetContent = Mid(RemoteAssetContent, PosStart, Pos - PosStart)
-                                                End If
-                                            End If
-                                        End If
-
-                                    End If
-                                End If
-                                '
-                                '-----------------------------------------------------------------------------------------------------
-                                '   FormXML
-                                '-----------------------------------------------------------------------------------------------------
-                                '
-                                If isMainOk And (FormXML <> "") Then
-                                    FormContent = addon_execute_getFormContent(Nothing, FormXML, ExitAddonWithBlankResponse)
-                                    If ExitAddonWithBlankResponse Then
-                                        Exit Function
-                                    End If
-                                End If
-                                '
-                                '-----------------------------------------------------------------
-                                ' Script Callback
-                                '-----------------------------------------------------------------
-                                '
-                                '#If traceExecuteAddon Then
-                                'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") z"
-                                '#End If
-                                If isMainOk And (Link <> "") Then
-                                    If WorkingOptionString <> "" Then
-                                        If vbInstr(1, Link, "?") = 0 Then
-                                            Link = Link & "?" & WorkingOptionString
-                                        Else
-                                            Link = Link & "&" & WorkingOptionString
-                                        End If
-                                    End If
-                                    Link = modifyLinkQuery(Link, RequestNameJSForm, "1", True)
-                                    Link = EncodeAppRootPath(Link, web_requestVirtualFilePath, www_requestRootPath, webServer.requestDomain)
-                                    ScriptCallbackContent = "<SCRIPT LANGUAGE=""JAVASCRIPT"" SRC=""" & Link & """></SCRIPT>"
-                                End If
-                                '
-                                '-----------------------------------------------------------------
-                                ' Add javascripts and other features to page
-                                '-----------------------------------------------------------------
-                                '
-                                AddedByName = AddonName & " addon"
-                                '
-                                '#If traceExecuteAddon Then
-                                'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") aa"
-                                '#End If
-                                If isMainOk Then
-                                    Call main_AddPagetitle2(PageTitle, AddedByName)
-                                    Call main_addMetaDescription2(MetaDescription, AddedByName)
-                                    Call main_addMetaKeywordList2(MetaKeywordList, AddedByName)
-                                    Call main_AddHeadTag2(OtherHeadTags, AddedByName)
-                                    If Not blockJavascriptAndCss Then
-                                        Call main_AddOnLoadJavascript2(JSOnLoad, AddedByName)
-                                        Call main_AddEndOfBodyJavascript2(JSBodyEnd, AddedByName)
-                                        Call main_AddHeadScriptLink(JSFilename, AddedByName)
-                                        If DefaultStylesFilename <> "" Then
-                                            Call main_AddStylesheetLink2(web_requestProtocol & webServer.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
-                                        End If
-                                        If CustomStylesFilename <> "" Then
-                                            Call main_AddStylesheetLink2(web_requestProtocol & webServer.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
-                                        End If
-                                    End If
-                                End If
-                                '
-                                '-----------------------------------------------------------------
-                                ' 2012-6-8 Merge together all the pieces
-                                '   - moved the encode content call here from below so the content parts can be encoded and not the rest
-                                '   - below, the csv_EncodeContent addonContext was being hard-coded to contextAdmin, which makes no sense.
-                                '   - now I let the original context get through, but only call executeContentCommand on the content part (that the admin controls)
-                                '   - csv_executeContentCommands on only the content parts
-                                '   - csv_EncodeContent on everything
-                                '-----------------------------------------------------------------
-                                '
-                                '#If traceExecuteAddon Then
-                                'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") ab"
-                                '#End If
-                                Dim layoutErrors As String
-                                If (Context = CPUtilsBaseClass.addonContext.ContextEditor) Then
-                                    '
-                                    ' editor -- no encoding and no contentcommands
-                                    '
-                                    returnVal = TextContent & HTMLContent
-                                    returnVal = returnVal & IncludeContent & ScriptCallbackContent & FormContent & RemoteAssetContent & ScriptContent & ObjectContent & AssemblyContent & inlineScriptContent
-                                    '
-                                    ' csv_EncodeContent everything
-                                    '
-                                    's = csv_EncodeContent9(s, personalizationPeopleId, HostContentName, HostRecordID, 0, False, False, True, True, False, True, "", "", (Context = ContextEmail),  WrapperID, ignore_TemplateCaseOnly_PageContent, Context, personalizationIsAuthenticated, nothing, False)
-                                Else
-                                    '
-                                    ' encode the content parts of the addon
-                                    '
-                                    returnVal = TextContent & HTMLContent
-                                    If returnVal <> "" Then
-                                        returnVal = html_executeContentCommands(Nothing, returnVal, CPUtilsBaseClass.addonContext.ContextAdmin, personalizationPeopleId, personalizationIsAuthenticated, layoutErrors)
-                                        's = csv_EncodeContent9(s, personalizationPeopleId, HostContentName, HostRecordID, 0, False, False, True, True, False, True, "", "", (Context = ContextEmail), WrapperID, ignore_TemplateCaseOnly_PageContent, Context, personalizationIsAuthenticated, nothing, False)
-                                    End If
-                                    '
-                                    ' add in the rest
-                                    '
-                                    returnVal = returnVal & IncludeContent & ScriptCallbackContent & FormContent & RemoteAssetContent & ScriptContent & ObjectContent & AssemblyContent & inlineScriptContent
-                                    '
-                                    ' csv_EncodeContent everything
-                                    '
-                                    returnVal = html_encodeContent10(returnVal, personalizationPeopleId, HostContentName, HostRecordID, 0, False, False, True, True, False, True, "", "", (Context = CPUtilsBaseClass.addonContext.ContextEmail), WrapperID, ignore_TemplateCaseOnly_PageContent, Context, personalizationIsAuthenticated, Nothing, False)
-                                End If
-                                ''
-                                '' +++++ 9/8/2011, 4.1.482
-                                ''
-                                's = TextContent & HTMLContent & IncludeContent & ScriptCallbackContent & FormContent & RemoteAssetContent & ScriptContent & ObjectContent & AssemblyContent & inlineScriptContent
-                                's = vbReplace(s, "{%", "{<!---->%")
-                                '
-                                '-----------------------------------------------------------------
-                                ' check for xml contensive process instruction
-                                '   This is also handled in Encode Content, but here we can return the admin error message
-                                '   Once processed, it will skip the csv_EncodeContent processesing anyway
-                                '-----------------------------------------------------------------
-                                '
-                                '#If traceExecuteAddon Then
-                                'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") ac"
-                                '#End If
-                                Pos = vbInstr(1, returnVal, "<?contensive", vbTextCompare)
-                                If Pos > 0 Then
-                                    Throw New ApplicationException("xml structured commands are no longer supported")
-                                    ''
-                                    ''output is xml structured data
-                                    '' pass the data in as an argument to the structured data processor
-                                    '' and return its result
-                                    ''
-                                    's = Mid(s, Pos)
-                                    'LayoutEngineOptionString = "data=" & encodeNvaArgument(s)
-                                    'Dim structuredData As New core_primitivesStructuredDataClass(Me)
-                                    's = structuredData.execute()
-                                    's = csv_ExecuteActiveX("aoPrimitives.StructuredDataClass", "Structured Data Engine", LayoutEngineOptionString, "data=(structured data)", errorMessageForAdmin)
-                                    'If (errorMessageForAdmin <> "") Then
-                                    '    '
-                                    '    ' Put up an admin hint
-                                    '    '
-                                    '    If (Not isMainOk) Or (Context = CPUtilsBaseClass.addonContext.contextEmail) Or (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethod) Or (Context = CPUtilsBaseClass.addonContext.ContextSimple) Then
-                                    '        '
-                                    '        ' Block all output even on error
-                                    '        '
-                                    '    ElseIf user.user_isAdmin() Then
-                                    '        '
-                                    '        ' Provide hint to administrators
-                                    '        '
-                                    '        If AddonName = "" And addonId <> 0 Then
-                                    '            AddonName = "Addon #" & addonId
-                                    '        End If
-                                    '        s = s & main_GetAdminHintWrapper("<p>There was an error executing the Layout Engine for addon [" & AddonName & "], AddonOptionString [" & WorkingOptionString & "], with Program ID [" & ProgramID & "]. The details of this error follow.</p><p>" & errorMessageForAdmin & "</p>")
-                                    '    End If
-                                    'End If
-                                End If
-                                '
-                                '-----------------------------------------------------------------
-                                ' Add Css containers
-                                '-----------------------------------------------------------------
-                                '
-                                '#If traceExecuteAddon Then
-                                'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") ad"
-                                '#End If
-                                If ContainerCssID <> "" Or ContainerCssClass <> "" Then
-                                    If IsInline Then
-                                        returnVal = cr & "<div id=""" & ContainerCssID & """ class=""" & ContainerCssClass & """ style=""display:inline;"">" & returnVal & "</div>"
-                                    Else
-                                        returnVal = cr & "<div id=""" & ContainerCssID & """ class=""" & ContainerCssClass & """>" & kmaIndent(returnVal) & cr & "</div>"
-                                    End If
-                                End If
-                            End If
-                            '
-                            '-----------------------------------------------------------------
-                            '   Add Wrappers to content
-                            '-----------------------------------------------------------------
-                            '
-                            '#If traceExecuteAddon Then
-                            'ticksNow = GetTickCount : Ticks = (ticksNow - ticksLast) : ticksLast = ticksNow : Trace = Trace & vbCrLf & traceSN & "(" & Ticks & ") ae"
-                            '#End If
-                            If isMainOk Then
-                                If (InFrame And (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) Then
-                                    '
-                                    ' Return IFrame content
-                                    '   Framed in content, during the remote method call
-                                    '   add in the rest of the html page
-                                    '
-                                    Call main_SetMetaContent(0, 0)
-                                    returnVal = "" _
-                                        & main_docType _
-                                        & vbCrLf & "<html>" _
-                                        & cr & "<head>" _
-                                        & vbCrLf & kmaIndent(main_GetHTMLHead()) _
-                                        & cr & "</head>" _
-                                        & cr & TemplateDefaultBodyTag _
-                                        & cr & "</body>" _
-                                        & vbCrLf & "</html>"
-                                ElseIf (AsAjax And (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) Then
-                                    '
-                                    ' Return Ajax content
-                                    '   AsAjax addon, during the Ajax callback
-                                    '   need to create an onload event that runs everything appended to onload within this content
-                                    '
-                                    returnVal = returnVal
-                                ElseIf ((Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) Or (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) Then
-                                    '
-                                    ' Return non-ajax/non-Iframe remote method content (no wrapper)
-                                    '
-                                ElseIf (Context = CPUtilsBaseClass.addonContext.ContextEmail) Then
-                                    '
-                                    ' Return Email context (no wrappers)
-                                    '
-                                ElseIf (Context = CPUtilsBaseClass.addonContext.ContextSimple) Then
-                                    '
-                                    ' Add-on called by another add-on, subroutine style (no wrappers)
-                                    '
-                                Else
-                                    '
-                                    ' Return all other types
-                                    '
-                                    If IncludeEditWrapper Then
-                                        '
-                                        ' Add Edit Wrapper
-                                        '
-                                        EditWrapperHTMLID = "eWrapper" & pageManager_PageAddonCnt
-                                        'HelpIcon = main_GetHelpLink("", "Add-on " & AddonName, helpCopy, helpLink)
-                                        '
-                                        ' Edit Icon
-                                        '
-                                        If (addonId <> 0) Then
-                                            If visitProperty.getBoolean("AllowAdvancedEditor") Then
-                                                AddonEditIcon = GetIconSprite("", 0, "/ccLib/images/tooledit.png", 22, 22, "Edit the " & AddonName & " Add-on", "Edit the " & AddonName & " Add-on", "", True, "")
-                                                AddonEditIcon = "<a href=""" & siteProperties.adminURL & "?cid=" & metaData.getContentId("add-ons") & "&id=" & addonId & "&af=4&aa=2&ad=1"" tabindex=""-1"">" & AddonEditIcon & "</a>"
-                                                InstanceSettingsEditIcon = addon_execute_getInstanceBubble(AddonName, AddonOptionExpandedConstructor, HostContentName, HostRecordID, HostFieldName, ACInstanceID, Context, DialogList)
-                                                AddonStylesEditIcon = addon_execute_getAddonStylesBubble(addonId, DialogList)
-                                                HTMLViewerEditIcon = addon_execute_getHTMLViewerBubble(addonId, "editWrapper" & pageManager_EditWrapperCnt, DialogList)
-                                                HelpIcon = addon_execute_getHelpBubble(addonId, helpCopy, addonCollectionId, DialogList)
-                                                ToolBar = InstanceSettingsEditIcon & AddonEditIcon & AddonStylesEditIcon & SiteStylesEditIcon & HTMLViewerEditIcon & HelpIcon
-                                                ToolBar = vbReplace(ToolBar, "&nbsp;", "", 1, 99, vbTextCompare)
-                                                returnVal = main_GetEditWrapper("<div class=""ccAddonEditTools"">" & ToolBar & "&nbsp;" & AddonName & DialogList & "</div>", returnVal)
-                                                's = GetEditWrapper("<div class=""ccAddonEditCaption"">" & AddonName & "</div><div class=""ccAddonEditTools"">" & ToolBar & "</div>", s)
-                                            ElseIf visitProperty.getBoolean("AllowEditing") Then
-                                                returnVal = main_GetEditWrapper("<div class=""ccAddonEditCaption"">" & AddonName & "&nbsp;" & HelpIcon & "</div>", returnVal)
-                                            End If
-                                        End If
-                                    End If
-                                    ' moved to calling routines - so if this is called from an add-on without context, the data may not be html
-                                    '
-                                    ' Add Comment wrapper - to help debugging except email, remote methods and admin (empty is used to detect no result)
-                                    '
-                                    If isMainOk And (Context <> CPUtilsBaseClass.addonContext.ContextAdmin) And (Context <> CPUtilsBaseClass.addonContext.ContextEmail) And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) And (Context <> CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) And (Context <> CPUtilsBaseClass.addonContext.ContextSimple) Then
-                                        If visitProperty.getBoolean("AllowDebugging") Then
-                                            AddonCommentName = vbReplace(AddonName, "-->", "..>")
-                                            If IsInline Then
-                                                returnVal = "<!-- Add-on " & AddonCommentName & " -->" & returnVal & "<!-- /Add-on " & AddonCommentName & " -->"
-                                            Else
-                                                returnVal = "" _
-                                                    & cr & "<!-- Add-on " & AddonCommentName & " -->" _
-                                                    & kmaIndent(returnVal) _
-                                                    & cr & "<!-- /Add-on " & AddonCommentName & " -->"
-                                            End If
-                                        End If
-                                    End If
-                                    '
-                                    ' Add Design Wrapper
-                                    '
-                                    If (returnVal <> "") And (Not IsInline) And (WrapperID > 0) And (True) Then
-                                        returnVal = addon_execute_WrapContent(returnVal, WrapperID, "for Add-on " & AddonName)
-                                    End If
-                                End If
-                            End If
-                            '
-                            ' this completes the execute of this addon. remove it from the 'running' list
-                            '
-                            addonsCurrentlyRunningIdList.Remove(addonId)
-                            'csv_addon_execute_AddonsCurrentlyRunningIdList = vbReplace(csv_addon_execute_AddonsCurrentlyRunningIdList & ",", "," & addonId & ",", ",")
-                        End If
-                    End If
-                End If
-                OptionString = PushOptionString
-                '
-                pageManager_PageAddonCnt = pageManager_PageAddonCnt + 1
-            Catch ex As Exception
-                '
-                ' protect environment from addon error
-                '
-                handleExceptionAndNoThrow(ex)
-            End Try
-            Return returnVal
-        End Function
-        '
-        '
-        '
-        Private Function addon_execute_getFormContent(ByVal nothingObject As Object, ByVal FormXML As String, ByRef return_ExitAddonBlankWithResponse As Boolean) As String
-            'Const Tn = "addon_execute_internal_getFormContent" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Const LoginMode_None = 1
-            Const LoginMode_AutoRecognize = 2
-            Const LoginMode_AutoLogin = 3
-            '
-            Dim PageSize As Integer
-            Dim FieldCount As Integer
-            Dim RowMax As Integer
-            Dim ColumnMax As Integer
-            'Dim RecordField As Field
-            Dim SQLPageSize As Integer
-            'dim dt as datatable
-            Dim ErrorNumber As Integer
-            Dim ErrorDescription As String
-            Dim something As Object(,)
-            Dim RecordID As Integer
-            'Dim XMLTools As New xmlToolsclass(me)
-            Dim fieldfilename As String
-            'Dim fs As New fileSystemClass
-            Dim FieldDataSource As String
-            Dim FieldSQL As String
-            Dim LoginMode As Integer
-            Dim Help As String
-            Dim Content As New coreFastStringClass
-            Dim Copy As String
-            Dim Button As String
-            Dim PageNotFoundPageID As String
-            Dim Adminui As New coreAdminUIClass(Me)
-            Dim ButtonList As String
-            Dim AllowLinkAlias As Boolean
-            Dim LinkForwardAutoInsert As Boolean
-            Dim SectionLandingLink As String
-            Dim LandingPageID As String
-            Dim AllowAutoRecognize As Boolean
-            Dim AllowMobileTemplates As Boolean
-            Dim Filename As String
-            Dim NonEncodedLink As String
-            Dim EncodedLink As String
-            Dim VirtualFilePath As String
-            Dim OptionString As String
-            Dim TabName As String
-            Dim TabDescription As String
-            Dim TabHeading As String
-            Dim TabCnt As Integer
-            Dim TabCell As coreFastStringClass
-            Dim loadOK As Boolean = True
-            Dim FieldValue As String
-            Dim FieldDescription As String
-            Dim FieldDefaultValue As String
-            Dim IsFound As Boolean
-            Dim Name As String
-            Dim Description As String
-            Dim LoopPtr As Integer
-            Dim XMLFile As String
-            Dim Doc As New XmlDocument
-            Dim TabNode As XmlNode
-            Dim SettingNode As XmlNode
-            Dim CS As Integer
-            Dim FieldName As String
-            Dim FieldCaption As String
-            Dim FieldAddon As String
-            Dim FieldReadOnly As Boolean
-            Dim FieldHTML As Boolean
-            Dim fieldType As String
-            Dim FieldSelector As String
-            Dim DefaultFilename As String
-            '
-            Button = docProperties.getText(RequestNameButton)
-            If Button = ButtonCancel Then
-                '
-                ' Cancel just exits with no content
-                '
-                return_ExitAddonBlankWithResponse = True
-                Exit Function
-            ElseIf Not user.isAuthenticatedAdmin() Then
-                '
-                ' Not Admin Error
-                '
-                ButtonList = ButtonCancel
-                Content.Add(Adminui.GetFormBodyAdminOnly())
-            Else
-                If True Then
-                    loadOK = True
-                    Try
-                        Doc.LoadXml(FormXML)
-                    Catch ex As Exception
-                        ButtonList = ButtonCancel
-                        Content.Add("<div class=""ccError"" style=""margin:10px;padding:10px;background-color:white;"">There was a problem with the Setting Page you requested.</div>")
-                        loadOK = False
-                    End Try
-                    If loadOK Then
-                        '
-                        ' data is OK
-                        '
-                        If vbLCase(Doc.DocumentElement.Name) <> "form" Then
-                            '
-                            ' error - Need a way to reach the user that submitted the file
-                            '
-                            ButtonList = ButtonCancel
-                            Content.Add("<div class=""ccError"" style=""margin:10px;padding:10px;background-color:white;"">There was a problem with the Setting Page you requested.</div>")
-                        Else
-                            '
-                            ' ----- Process Requests
-                            '
-                            If (Button = ButtonSave) Or (Button = ButtonOK) Then
-                                With Doc.DocumentElement
-                                    For Each SettingNode In .ChildNodes
-                                        Select Case vbLCase(SettingNode.Name)
-                                            Case "tab"
-                                                For Each TabNode In SettingNode.ChildNodes
-                                                    Select Case vbLCase(TabNode.Name)
-                                                        Case "siteproperty"
-                                                            '
-                                                            FieldName = csv_GetXMLAttribute(IsFound, TabNode, "name", "")
-                                                            FieldValue = docProperties.getText(FieldName)
-                                                            fieldType = csv_GetXMLAttribute(IsFound, TabNode, "type", "")
-                                                            Select Case vbLCase(fieldType)
-                                                                Case "integer"
-                                                                    '
-                                                                    If FieldValue <> "" Then
-                                                                        FieldValue = EncodeInteger(FieldValue).ToString
-                                                                    End If
-                                                                    Call siteProperties.setProperty(FieldName, FieldValue)
-                                                                Case "boolean"
-                                                                    '
-                                                                    If FieldValue <> "" Then
-                                                                        FieldValue = EncodeBoolean(FieldValue).ToString
-                                                                    End If
-                                                                    Call siteProperties.setProperty(FieldName, FieldValue)
-                                                                Case "float"
-                                                                    '
-                                                                    If FieldValue <> "" Then
-                                                                        FieldValue = EncodeNumber(FieldValue).ToString
-                                                                    End If
-                                                                    Call siteProperties.setProperty(FieldName, FieldValue)
-                                                                Case "date"
-                                                                    '
-                                                                    If FieldValue <> "" Then
-                                                                        FieldValue = EncodeDate(FieldValue).ToString
-                                                                    End If
-                                                                    Call siteProperties.setProperty(FieldName, FieldValue)
-                                                                Case "file", "imagefile"
-                                                                    '
-                                                                    If doc_getBoolean(FieldName & ".DeleteFlag") Then
-                                                                        Call siteProperties.setProperty(FieldName, "")
-                                                                    End If
-                                                                    If FieldValue <> "" Then
-                                                                        VirtualFilePath = "Settings/" & FieldName
-                                                                        Call web_processFormInputFile(FieldName, VirtualFilePath)
-                                                                        FieldValue = VirtualFilePath & "/" & FieldValue
-                                                                        Call siteProperties.setProperty(FieldName, FieldValue)
-                                                                    End If
-                                                                Case "textfile"
-                                                                    '
-                                                                    DefaultFilename = "Settings/" & FieldName & ".txt"
-                                                                    Filename = siteProperties.getText(FieldName, DefaultFilename)
-                                                                    If Filename = "" Then
-                                                                        Filename = DefaultFilename
-                                                                        Call siteProperties.setProperty(FieldName, DefaultFilename)
-                                                                    End If
-                                                                    Call appRootFiles.saveFile(Filename, FieldValue)
-                                                                Case "cssfile"
-                                                                    '
-                                                                    DefaultFilename = "Settings/" & FieldName & ".css"
-                                                                    Filename = siteProperties.getText(FieldName, DefaultFilename)
-                                                                    If Filename = "" Then
-                                                                        Filename = DefaultFilename
-                                                                        Call siteProperties.setProperty(FieldName, DefaultFilename)
-                                                                    End If
-                                                                    Call appRootFiles.saveFile(Filename, FieldValue)
-                                                                Case "xmlfile"
-                                                                    '
-                                                                    DefaultFilename = "Settings/" & FieldName & ".xml"
-                                                                    Filename = siteProperties.getText(FieldName, DefaultFilename)
-                                                                    If Filename = "" Then
-                                                                        Filename = DefaultFilename
-                                                                        Call siteProperties.setProperty(FieldName, DefaultFilename)
-                                                                    End If
-                                                                    Call appRootFiles.saveFile(Filename, FieldValue)
-                                                                Case "currency"
-                                                                    '
-                                                                    If FieldValue <> "" Then
-                                                                        FieldValue = EncodeNumber(FieldValue).ToString
-                                                                        FieldValue = FormatCurrency(FieldValue)
-                                                                    End If
-                                                                    Call siteProperties.setProperty(FieldName, FieldValue)
-                                                                Case "link"
-                                                                    Call siteProperties.setProperty(FieldName, FieldValue)
-                                                                Case Else
-                                                                    Call siteProperties.setProperty(FieldName, FieldValue)
-                                                            End Select
-                                                        Case "copycontent"
-                                                            '
-                                                            ' A Copy Content block
-                                                            '
-                                                            FieldReadOnly = EncodeBoolean(csv_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
-                                                            If Not FieldReadOnly Then
-                                                                FieldName = csv_GetXMLAttribute(IsFound, TabNode, "name", "")
-                                                                FieldHTML = EncodeBoolean(csv_GetXMLAttribute(IsFound, TabNode, "html", "false"))
-                                                                If FieldHTML Then
-                                                                    '
-                                                                    ' treat html as active content for now.
-                                                                    '
-                                                                    FieldValue = doc_getActiveContent(FieldName)
-                                                                Else
-                                                                    FieldValue = docProperties.getText(FieldName)
-                                                                End If
-
-                                                                CS = db.csOpen("Copy Content", "name=" & db.encodeSQLText(FieldName), "ID")
-                                                                If Not db.cs_Ok(CS) Then
-                                                                    Call db.cs_Close(CS)
-                                                                    CS = db.cs_insertRecord("Copy Content", user.id)
-                                                                End If
-                                                                If db.cs_Ok(CS) Then
-                                                                    Call db.cs_set(CS, "name", FieldName)
-                                                                    '
-                                                                    ' Set copy
-                                                                    '
-                                                                    Call db.cs_set(CS, "copy", FieldValue)
-                                                                    '
-                                                                    ' delete duplicates
-                                                                    '
-                                                                    Call db.db_csGoNext(CS)
-                                                                    Do While db.cs_Ok(CS)
-                                                                        Call db.db_DeleteCSRecord(CS)
-                                                                        Call db.db_csGoNext(CS)
-                                                                    Loop
-                                                                End If
-                                                                Call db.cs_Close(CS)
-                                                            End If
-
-                                                        Case "filecontent"
-                                                            '
-                                                            ' A File Content block
-                                                            '
-                                                            FieldReadOnly = EncodeBoolean(csv_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
-                                                            If Not FieldReadOnly Then
-                                                                FieldName = csv_GetXMLAttribute(IsFound, TabNode, "name", "")
-                                                                fieldfilename = csv_GetXMLAttribute(IsFound, TabNode, "filename", "")
-                                                                FieldValue = docProperties.getText(FieldName)
-                                                                Call appRootFiles.saveFile(fieldfilename, FieldValue)
-                                                            End If
-                                                        Case "dbquery"
-                                                            '
-                                                            ' dbquery has no results to process
-                                                            '
-                                                    End Select
-                                                Next
-                                            Case Else
-                                        End Select
-                                    Next
-                                End With
-                            End If
-                            If (Button = ButtonOK) Then
-                                '
-                                ' Exit on OK or cancel
-                                '
-                                return_ExitAddonBlankWithResponse = True
-                                Exit Function
-                            End If
-                            '
-                            ' ----- Display Form
-                            '
-                            Content.Add(Adminui.EditTableOpen)
-                            Name = csv_GetXMLAttribute(IsFound, Doc.DocumentElement, "name", "")
-                            With Doc.DocumentElement
-                                For Each SettingNode In .ChildNodes
-                                    Select Case vbLCase(SettingNode.Name)
-                                        Case "description"
-                                            Description = SettingNode.InnerText
-                                        Case "tab"
-                                            TabCnt = TabCnt + 1
-                                            TabName = csv_GetXMLAttribute(IsFound, SettingNode, "name", "")
-                                            TabDescription = csv_GetXMLAttribute(IsFound, SettingNode, "description", "")
-                                            TabHeading = csv_GetXMLAttribute(IsFound, SettingNode, "heading", "")
-                                            If TabHeading = "Debug and Trace Settings" Then
-                                                TabHeading = TabHeading
-                                            End If
-                                            TabCell = New coreFastStringClass
-                                            For Each TabNode In SettingNode.ChildNodes
-                                                Select Case vbLCase(TabNode.Name)
-                                                    Case "heading"
-                                                        '
-                                                        ' Heading
-                                                        '
-                                                        FieldCaption = csv_GetXMLAttribute(IsFound, TabNode, "caption", "")
-                                                        Call TabCell.Add(Adminui.GetEditSubheadRow(FieldCaption))
-                                                    Case "siteproperty"
-                                                        '
-                                                        ' Site property
-                                                        '
-                                                        FieldName = csv_GetXMLAttribute(IsFound, TabNode, "name", "")
-                                                        If FieldName <> "" Then
-                                                            FieldCaption = csv_GetXMLAttribute(IsFound, TabNode, "caption", "")
-                                                            If FieldCaption = "" Then
-                                                                FieldCaption = FieldName
-                                                            End If
-                                                            FieldReadOnly = EncodeBoolean(csv_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
-                                                            FieldHTML = EncodeBoolean(csv_GetXMLAttribute(IsFound, TabNode, "html", ""))
-                                                            fieldType = csv_GetXMLAttribute(IsFound, TabNode, "type", "")
-                                                            FieldSelector = csv_GetXMLAttribute(IsFound, TabNode, "selector", "")
-                                                            FieldDescription = csv_GetXMLAttribute(IsFound, TabNode, "description", "")
-                                                            FieldAddon = csv_GetXMLAttribute(IsFound, TabNode, "EditorAddon", "")
-                                                            FieldDefaultValue = TabNode.InnerText
-                                                            FieldValue = siteProperties.getText(FieldName, FieldDefaultValue)
-                                                            If FieldAddon <> "" Then
-                                                                '
-                                                                ' Use Editor Addon
-                                                                '
-                                                                OptionString = "FieldName=" & FieldName & "&FieldValue=" & encodeNvaArgument(siteProperties.getText(FieldName, FieldDefaultValue))
-                                                                Copy = addon_execute_legacy5(0, FieldAddon, OptionString, CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", 0)
-                                                            ElseIf FieldSelector <> "" Then
-                                                                '
-                                                                ' Use Selector
-                                                                '
-                                                                Copy = addon_execute_getFormContent_decodeSelector(nothingObject, FieldName, FieldValue, FieldSelector)
-                                                            Else
-                                                                '
-                                                                ' Use default editor for each field type
-                                                                '
-                                                                Select Case vbLCase(fieldType)
-                                                                    Case "integer"
-                                                                        '
-                                                                        If FieldReadOnly Then
-                                                                            Copy = FieldValue & html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            Copy = html_GetFormInputText2(FieldName, FieldValue)
-                                                                        End If
-                                                                    Case "boolean"
-                                                                        If FieldReadOnly Then
-                                                                            Copy = html_GetFormInputCheckBox2(FieldName, EncodeBoolean(FieldValue))
-                                                                            Copy = vbReplace(Copy, ">", " disabled>")
-                                                                            Copy = Copy & html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            Copy = html_GetFormInputCheckBox2(FieldName, EncodeBoolean(FieldValue))
-                                                                        End If
-                                                                    Case "float"
-                                                                        If FieldReadOnly Then
-                                                                            Copy = FieldValue & html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            Copy = html_GetFormInputText2(FieldName, FieldValue)
-                                                                        End If
-                                                                    Case "date"
-                                                                        If FieldReadOnly Then
-                                                                            Copy = FieldValue & html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            Copy = html_GetFormInputDate(FieldName, FieldValue)
-                                                                        End If
-                                                                    Case "file", "imagefile"
-                                                                        '
-                                                                        If FieldReadOnly Then
-                                                                            Copy = FieldValue & html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            If FieldValue = "" Then
-                                                                                Copy = html_GetFormInputFile(FieldName)
-                                                                            Else
-                                                                                NonEncodedLink = webServer.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, FieldValue)
-                                                                                EncodedLink = EncodeURL(NonEncodedLink)
-                                                                                Copy = "" _
-                                                                                    & "<a href=""http://" & EncodedLink & """ target=""_blank"">[" & GetFilename(FieldValue) & "]</A>" _
-                                                                                    & "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & html_GetFormInputCheckBox2(FieldName & ".DeleteFlag", False) _
-                                                                                    & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & html_GetFormInputFile(FieldName)
-                                                                            End If
-                                                                        End If
-                                                                        'Call s.Add("&nbsp;</span></nobr></td>")
-                                                                    Case "currency"
-                                                                        '
-                                                                        If FieldReadOnly Then
-                                                                            Copy = FieldValue & html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            If FieldValue <> "" Then
-                                                                                FieldValue = FormatCurrency(FieldValue)
-                                                                            End If
-                                                                            Copy = html_GetFormInputText2(FieldName, FieldValue)
-                                                                        End If
-                                                                    Case "textfile"
-                                                                        '
-                                                                        If FieldReadOnly Then
-                                                                            Copy = FieldValue & html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            FieldValue = cdnFiles.readFile(FieldValue)
-                                                                            If FieldHTML Then
-                                                                                Copy = html_GetFormInputHTML(FieldName, FieldValue)
-                                                                            Else
-                                                                                Copy = html_GetFormInputTextExpandable(FieldName, FieldValue, 5)
-                                                                            End If
-                                                                        End If
-                                                                    Case "cssfile"
-                                                                        '
-                                                                        If FieldReadOnly Then
-                                                                            Copy = FieldValue & html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            Copy = html_GetFormInputTextExpandable(FieldName, FieldValue, 5)
-                                                                        End If
-                                                                    Case "xmlfile"
-                                                                        '
-                                                                        If FieldReadOnly Then
-                                                                            Copy = FieldValue & html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            Copy = html_GetFormInputTextExpandable(FieldName, FieldValue, 5)
-                                                                        End If
-                                                                    Case "link"
-                                                                        '
-                                                                        If FieldReadOnly Then
-                                                                            Copy = FieldValue & html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            Copy = html_GetFormInputText2(FieldName, FieldValue)
-                                                                        End If
-                                                                    Case Else
-                                                                        '
-                                                                        ' text
-                                                                        '
-                                                                        If FieldReadOnly Then
-                                                                            Dim tmp As String
-                                                                            tmp = html_GetFormInputHidden(FieldName, FieldValue)
-                                                                            Copy = FieldValue & tmp
-                                                                        Else
-                                                                            If FieldHTML Then
-                                                                                Copy = html_GetFormInputHTML(FieldName, FieldValue)
-                                                                            Else
-                                                                                Copy = html_GetFormInputText2(FieldName, FieldValue)
-                                                                            End If
-                                                                        End If
-                                                                End Select
-                                                            End If
-                                                            Call TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, False, False, ""))
-                                                        End If
-                                                    Case "copycontent"
-                                                        '
-                                                        ' Content Copy field
-                                                        '
-                                                        FieldName = csv_GetXMLAttribute(IsFound, TabNode, "name", "")
-                                                        If FieldName <> "" Then
-                                                            FieldCaption = csv_GetXMLAttribute(IsFound, TabNode, "caption", "")
-                                                            If FieldCaption = "" Then
-                                                                FieldCaption = FieldName
-                                                            End If
-                                                            FieldReadOnly = EncodeBoolean(csv_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
-                                                            FieldDescription = csv_GetXMLAttribute(IsFound, TabNode, "description", "")
-                                                            FieldHTML = EncodeBoolean(csv_GetXMLAttribute(IsFound, TabNode, "html", ""))
-                                                            '
-                                                            CS = db.csOpen("Copy Content", "Name=" & db.encodeSQLText(FieldName), "ID", , , , , "id,name,Copy")
-                                                            If Not db.cs_Ok(CS) Then
-                                                                Call db.cs_Close(CS)
-                                                                CS = db.cs_insertRecord("Copy Content", user.id)
-                                                                If db.cs_Ok(CS) Then
-                                                                    RecordID = db.cs_getInteger(CS, "ID")
-                                                                    Call db.cs_set(CS, "name", FieldName)
-                                                                    Call db.cs_set(CS, "copy", EncodeText(TabNode.InnerText))
-                                                                    Call db.db_SaveCSRecord(CS)
-                                                                    Call workflow.publishEdit("Copy Content", RecordID)
-                                                                End If
-                                                            End If
-                                                            If db.cs_Ok(CS) Then
-                                                                FieldValue = db.cs_getText(CS, "copy")
-                                                            End If
-                                                            If FieldReadOnly Then
-                                                                '
-                                                                ' Read only
-                                                                '
-                                                                Copy = FieldValue
-                                                            ElseIf FieldHTML Then
-                                                                '
-                                                                ' HTML
-                                                                '
-                                                                Copy = html_GetFormInputHTML3(FieldName, FieldValue)
-                                                                'Copy = main_GetFormInputActiveContent( FieldName, FieldValue)
-                                                            Else
-                                                                '
-                                                                ' Text edit
-                                                                '
-                                                                Copy = html_GetFormInputTextExpandable(FieldName, FieldValue)
-                                                            End If
-                                                            Call TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, False, False, ""))
-                                                        End If
-                                                    Case "filecontent"
-                                                        '
-                                                        ' Content from a flat file
-                                                        '
-                                                        FieldName = csv_GetXMLAttribute(IsFound, TabNode, "name", "")
-                                                        FieldCaption = csv_GetXMLAttribute(IsFound, TabNode, "caption", "")
-                                                        fieldfilename = csv_GetXMLAttribute(IsFound, TabNode, "filename", "")
-                                                        FieldReadOnly = EncodeBoolean(csv_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
-                                                        FieldDescription = csv_GetXMLAttribute(IsFound, TabNode, "description", "")
-                                                        FieldDefaultValue = TabNode.InnerText
-                                                        Copy = ""
-                                                        If fieldfilename <> "" Then
-                                                            If appRootFiles.fileExists(fieldfilename) Then
-                                                                Copy = FieldDefaultValue
-                                                            Else
-                                                                Copy = cdnFiles.readFile(fieldfilename)
-                                                            End If
-                                                            If Not FieldReadOnly Then
-                                                                Copy = html_GetFormInputTextExpandable(FieldName, Copy, 10)
-                                                            End If
-                                                        End If
-                                                        Call TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, False, False, ""))
-                                                    Case "dbquery", "querydb", "query", "db"
-                                                        '
-                                                        ' Display the output of a query
-                                                        '
-                                                        Copy = ""
-                                                        FieldDataSource = csv_GetXMLAttribute(IsFound, TabNode, "DataSourceName", "")
-                                                        FieldSQL = TabNode.InnerText
-                                                        FieldCaption = csv_GetXMLAttribute(IsFound, TabNode, "caption", "")
-                                                        FieldDescription = csv_GetXMLAttribute(IsFound, TabNode, "description", "")
-                                                        SQLPageSize = EncodeInteger(csv_GetXMLAttribute(IsFound, TabNode, "rowmax", ""))
-                                                        If SQLPageSize = 0 Then
-                                                            SQLPageSize = 100
-                                                        End If
-                                                        '
-                                                        ' Run the SQL
-                                                        '
-                                                        Dim rs As DataTable
-                                                        If FieldSQL <> "" Then
-                                                            Try
-                                                                rs = db.executeSql_getDataTable(FieldSQL, FieldDataSource, , SQLPageSize)
-                                                                'RS = app.csv_ExecuteSQLCommand(FieldDataSource, FieldSQL, 30, SQLPageSize, 1)
-
-                                                            Catch ex As Exception
-
-                                                                ErrorNumber = Err.Number
-                                                                ErrorDescription = Err.Description
-                                                                loadOK = False
-                                                            End Try
-                                                        End If
-                                                        If FieldSQL = "" Then
-                                                            '
-                                                            ' ----- Error
-                                                            '
-                                                            Copy = "No Result"
-                                                        ElseIf ErrorNumber <> 0 Then
-                                                            '
-                                                            ' ----- Error
-                                                            '
-                                                            Copy = "Error: " & Err.Description
-                                                        ElseIf (Not isDataTableOk(rs)) Then
-                                                            '
-                                                            ' ----- no result
-                                                            '
-                                                            Copy = "No Results"
-                                                        ElseIf (rs.Rows.Count = 0) Then
-                                                            '
-                                                            ' ----- no result
-                                                            '
-                                                            Copy = "No Results"
-                                                        Else
-                                                            '
-                                                            ' ----- print results
-                                                            '
-                                                            If rs.Rows.Count > 0 Then
-                                                                If rs.Rows.Count = 1 And rs.Columns.Count = 1 Then
-                                                                    Copy = html_GetFormInputText2("result", EncodeText(something(0, 0)), , , , , True)
-                                                                Else
-                                                                    For Each dr As DataRow In rs.Rows
-                                                                        '
-                                                                        ' Build headers
-                                                                        '
-                                                                        FieldCount = dr.ItemArray.Count
-                                                                        Copy = Copy & (cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"" style=""border-bottom:1px solid #444;border-right:1px solid #444;background-color:white;color:#444;"">")
-                                                                        Copy = Copy & (cr & vbTab & "<tr>")
-                                                                        For Each dc As DataColumn In dr.ItemArray
-                                                                            Copy = Copy & (cr & vbTab & vbTab & "<td class=""ccadminsmall"" style=""border-top:1px solid #444;border-left:1px solid #444;color:black;padding:2px;padding-top:4px;padding-bottom:4px;"">" & dr(dc).ToString & "</td>")
-                                                                        Next
-                                                                        Copy = Copy & (cr & vbTab & "</tr>")
-                                                                        '
-                                                                        ' Build output table
-                                                                        '
-                                                                        Dim RowStart As String
-                                                                        Dim RowEnd As String
-                                                                        Dim ColumnStart As String
-                                                                        Dim ColumnEnd As String
-                                                                        RowStart = cr & vbTab & "<tr>"
-                                                                        RowEnd = cr & vbTab & "</tr>"
-                                                                        ColumnStart = cr & vbTab & vbTab & "<td class=""ccadminnormal"" style=""border-top:1px solid #444;border-left:1px solid #444;background-color:white;color:#444;padding:2px"">"
-                                                                        ColumnEnd = "</td>"
-                                                                        Dim RowPointer As Integer
-                                                                        For RowPointer = 0 To RowMax
-                                                                            Copy = Copy & (RowStart)
-                                                                            Dim ColumnPointer As Integer
-                                                                            For ColumnPointer = 0 To ColumnMax
-                                                                                Dim CellData As Object
-                                                                                CellData = something(ColumnPointer, RowPointer)
-                                                                                If IsNull(CellData) Then
-                                                                                    Copy = Copy & (ColumnStart & "[null]" & ColumnEnd)
-                                                                                ElseIf IsNothing(CellData) Then
-                                                                                    Copy = Copy & (ColumnStart & "[empty]" & ColumnEnd)
-                                                                                ElseIf IsArray(CellData) Then
-                                                                                    Copy = Copy & ColumnStart & "[array]"
-                                                                                    'Dim Cnt As Integer
-                                                                                    'Cnt = UBound(CellData)
-                                                                                    'Dim Ptr As Integer
-                                                                                    'For Ptr = 0 To Cnt - 1
-                                                                                    '    Copy = Copy & ("<br>(" & Ptr & ")&nbsp;[" & CellData(Ptr) & "]")
-                                                                                    'Next
-                                                                                    'Copy = Copy & (ColumnEnd)
-                                                                                ElseIf EncodeText(CellData) = "" Then
-                                                                                    Copy = Copy & (ColumnStart & "[empty]" & ColumnEnd)
-                                                                                Else
-                                                                                    Copy = Copy & (ColumnStart & html_EncodeHTML(EncodeText(CellData)) & ColumnEnd)
-                                                                                End If
-                                                                            Next
-                                                                            Copy = Copy & (RowEnd)
-                                                                        Next
-                                                                        Copy = Copy & (cr & "</table>")
-
-                                                                    Next
-                                                                End If
-                                                            End If
-                                                        End If
-                                                        Call TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, False, False, ""))
-                                                End Select
-                                            Next
-                                            Copy = Adminui.GetEditPanel(True, TabHeading, TabDescription, Adminui.EditTableOpen & TabCell.Text & Adminui.EditTableClose)
-                                            If Copy <> "" Then
-                                                Call main_AddLiveTabEntry(Replace(TabName, " ", "&nbsp;"), Copy, "ccAdminTab")
-                                            End If
-                                            'Content.Add( GetForm_Edit_AddTab(TabName, Copy, True))
-                                            TabCell = Nothing
-                                        Case Else
-                                    End Select
-                                Next
-                            End With
-                            '
-                            ' Buttons
-                            '
-                            ButtonList = ButtonCancel & "," & ButtonSave & "," & ButtonOK
-                            '
-                            ' Close Tables
-                            '
-                            'Content.Add( main_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormMobileBrowserControl))
-                            '
-                            '
-                            '
-                            If TabCnt > 0 Then
-                                Content.Add(main_GetLiveTabs())
-                            End If
-                        End If
-                    End If
-                End If
-            End If
-            '
-            addon_execute_getFormContent = Adminui.GetBody(Name, ButtonList, "", True, True, Description, "", 0, Content.Text)
-            Content = Nothing
-            '
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError5("addon_execute_getFormContent", "trap", Err.Number, Err.Source, Err.Description, False)
-        End Function
-        '
-        '========================================================================
-        '   Display field in the admin/edit
-        '========================================================================
-        '
-        Private Function addon_execute_getFormContent_decodeSelector(ByVal nothingObject As Object, ByVal SitePropertyName As String, ByVal SitePropertyValue As String, ByVal selector As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("AdminClass.addon_execute_internal_getFormContent_decodeSelector")
-            '
-            Dim ExpandedSelector As String = ""
-            Dim ignore As String = ""
-            Dim OptionCaption As String
-            Dim OptionValue As String
-            Dim OptionValue_AddonEncoded As String
-            Dim OptionPtr As Integer
-            Dim OptionCnt As Integer
-            Dim OptionValues() As String
-            Dim OptionSuffix As String
-            Dim LCaseOptionDefault As String
-            Dim Pos As Integer
-            Dim Checked As Boolean
-            Dim ParentID As Integer
-            Dim ParentCID As Integer
-            Dim Criteria As String
-            Dim RootCID As Integer
-            Dim SQL As String
-            Dim TableID As Integer
-            Dim TableName As Integer
-            Dim ChildCID As Integer
-            Dim CIDList As String
-            Dim TableName2 As String
-            Dim RecordContentName As String
-            Dim HasParentID As Boolean
-            Dim CS As Integer
-            ' converted array to dictionary - Dim FieldPointer As Integer
-            Dim CSPointer As Integer
-            Dim RecordID As Integer
-            Dim FastString As coreFastStringClass
-            Dim FieldValueInteger As Integer
-            Dim FieldRequired As Boolean
-            Dim FieldHelp As String
-            Dim AuthoringStatusMessage As String
-            Dim Delimiter As String
-            Dim Copy As String
-            '
-            Dim FieldName As String
-            '
-            FastString = New coreFastStringClass
-            '
-            Call csv_BuildAddonOptionLists(ignore, ExpandedSelector, SitePropertyName & "=" & selector, SitePropertyName & "=" & SitePropertyValue, "0", True)
-            Pos = vbInstr(1, ExpandedSelector, "[")
-            If Pos <> 0 Then
-                '
-                ' List of Options, might be select, radio or checkbox
-                '
-                LCaseOptionDefault = vbLCase(Mid(ExpandedSelector, 1, Pos - 1))
-                Dim PosEqual As Integer
-
-                PosEqual = vbInstr(1, LCaseOptionDefault, "=")
-                If PosEqual > 0 Then
-                    LCaseOptionDefault = Mid(LCaseOptionDefault, PosEqual + 1)
-                End If
-
-                LCaseOptionDefault = decodeNvaArgument(LCaseOptionDefault)
-                ExpandedSelector = Mid(ExpandedSelector, Pos + 1)
-                Pos = vbInstr(1, ExpandedSelector, "]")
-                If Pos > 0 Then
-                    If Pos < Len(ExpandedSelector) Then
-                        OptionSuffix = vbLCase(Trim(Mid(ExpandedSelector, Pos + 1)))
-                    End If
-                    ExpandedSelector = Mid(ExpandedSelector, 1, Pos - 1)
-                End If
-                OptionValues = Split(ExpandedSelector, "|")
-                addon_execute_getFormContent_decodeSelector = ""
-                OptionCnt = UBound(OptionValues) + 1
-                For OptionPtr = 0 To OptionCnt - 1
-                    OptionValue_AddonEncoded = Trim(OptionValues(OptionPtr))
-                    If OptionValue_AddonEncoded <> "" Then
-                        Pos = vbInstr(1, OptionValue_AddonEncoded, ":")
-                        If Pos = 0 Then
-                            OptionValue = decodeNvaArgument(OptionValue_AddonEncoded)
-                            OptionCaption = OptionValue
-                        Else
-                            OptionCaption = decodeNvaArgument(Mid(OptionValue_AddonEncoded, 1, Pos - 1))
-                            OptionValue = decodeNvaArgument(Mid(OptionValue_AddonEncoded, Pos + 1))
-                        End If
-                        Select Case OptionSuffix
-                            Case "checkbox"
-                                '
-                                ' Create checkbox addon_execute_getFormContent_decodeSelector
-                                '
-                                If vbInstr(1, "," & LCaseOptionDefault & ",", "," & vbLCase(OptionValue) & ",") <> 0 Then
-                                    addon_execute_getFormContent_decodeSelector = addon_execute_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & SitePropertyName & OptionPtr & """ value=""" & OptionValue & """ checked=""checked"">" & OptionCaption & "</div>"
-                                Else
-                                    addon_execute_getFormContent_decodeSelector = addon_execute_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & SitePropertyName & OptionPtr & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
-                                End If
-                            Case "radio"
-                                '
-                                ' Create Radio addon_execute_getFormContent_decodeSelector
-                                '
-                                If vbLCase(OptionValue) = LCaseOptionDefault Then
-                                    addon_execute_getFormContent_decodeSelector = addon_execute_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & SitePropertyName & """ value=""" & OptionValue & """ checked=""checked"" >" & OptionCaption & "</div>"
-                                Else
-                                    addon_execute_getFormContent_decodeSelector = addon_execute_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & SitePropertyName & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
-                                End If
-                            Case Else
-                                '
-                                ' Create select addon_execute_getFormContent_decodeSelector
-                                '
-                                If vbLCase(OptionValue) = LCaseOptionDefault Then
-                                    addon_execute_getFormContent_decodeSelector = addon_execute_getFormContent_decodeSelector & "<option value=""" & OptionValue & """ selected>" & OptionCaption & "</option>"
-                                Else
-                                    addon_execute_getFormContent_decodeSelector = addon_execute_getFormContent_decodeSelector & "<option value=""" & OptionValue & """>" & OptionCaption & "</option>"
-                                End If
-                        End Select
-                    End If
-                Next
-                Select Case OptionSuffix
-                    Case "checkbox"
-                        '
-                        '
-                        Copy = Copy & "<input type=""hidden"" name=""" & SitePropertyName & "CheckBoxCnt"" value=""" & OptionCnt & """ >"
-                    Case "radio"
-                        '
-                        ' Create Radio addon_execute_getFormContent_decodeSelector
-                        '
-                        'addon_execute_getFormContent_decodeSelector = "<div>" & vbReplace(addon_execute_getFormContent_decodeSelector, "><", "></div><div><") & "</div>"
-                    Case Else
-                        '
-                        ' Create select addon_execute_getFormContent_decodeSelector
-                        '
-                        addon_execute_getFormContent_decodeSelector = "<select name=""" & SitePropertyName & """>" & addon_execute_getFormContent_decodeSelector & "</select>"
-                End Select
-            Else
-                '
-                ' Create Text addon_execute_getFormContent_decodeSelector
-                '
-
-                selector = decodeNvaArgument(selector)
-                addon_execute_getFormContent_decodeSelector = html_GetFormInputText2(SitePropertyName, selector, 1, 20)
-            End If
-
-            FastString = Nothing
-            Exit Function
-            '
-ErrorTrap:
-            FastString = Nothing
-            Call handleLegacyError7("addon_execute_getFormContent_decodeSelector", "trap")
-        End Function
-        '
-        ' ================================================================================================================
-        '   Execute a script
-        '   returns the results
-        '
-        '       - cp argument should be set during csv_OpenConnection3, not passed in here as nothingObject
-        ' ================================================================================================================
-        '
-        Public Function addon_execute_executeScript(ByVal Language As String, ByVal Code As String, ByVal EntryPoint As String, ByVal cmcObj As coreClass, ByVal nothingObject As Object, ByRef return_AddonErrorMessage As String) As String
-            Dim ScriptName As String
-            Dim FirstLine As String
-            Dim Pos As Integer
-            Dim EmptyArray(0) As String
-            '
-            If EntryPoint <> "" Then
-                ScriptName = "unnamed script with method [" & EntryPoint & "] and length [" & Len(Code) & "]"
-            Else
-                FirstLine = Code
-                FirstLine = vbReplace(FirstLine, vbTab, "")
-                Pos = vbInstr(1, FirstLine, vbCrLf)
-                If (Pos <= 0) Or (Pos > 50) Then
-                    FirstLine = Left(FirstLine, 50)
-                Else
-                    FirstLine = Left(FirstLine, Pos - 1)
-                End If
-                ScriptName = "unnamed script with length [" & Len(Code) & "] starting with [" & FirstLine & "]"
-            End If
-            '
-            addon_execute_executeScript = addon_execute_executeScript3(Language, Code, EntryPoint, cmcObj, nothingObject, return_AddonErrorMessage, 60000, ScriptName, 0, EmptyArray, EmptyArray)
-        End Function
-        '
-        ' ================================================================================================================
-        '   Execute a script
-        '   returns the results
-        ' ================================================================================================================
-        '
-        Public Function addon_execute_executeScript2(ByVal Language As String, ByVal Code As String, ByVal EntryPoint As String, ByVal cmcObj As coreClass, ByVal nothingObject As Object, ByRef return_AddonErrorMessage As String, ByVal ScriptingTimeout As Integer, ByVal ScriptName As String) As String
-            Dim EmptyArray(0) As String
-            addon_execute_executeScript2 = addon_execute_executeScript3(Language, Code, EntryPoint, cmcObj, nothingObject, return_AddonErrorMessage, ScriptingTimeout, ScriptName, 0, EmptyArray, EmptyArray)
-        End Function
-        '
-        ' ================================================================================================================
-        '   conversion to 2005 - pass 2
-        ' ================================================================================================================
-        '
-        Public Function addon_execute_executeScript3(ByVal Language As String, ByVal Code As String, ByVal EntryPoint As String, ByVal nothingObject As Object, ByVal nothingObject2 As Object, ByRef return_AddonErrorMessage As String, ByVal ScriptingTimeout As Integer, ByVal ScriptName As String, ByVal ReplaceCnt As Integer, ByVal ReplaceNames() As String, ByVal ReplaceValues() As String) As String
-            'Dim legacyMain As Object
-            'Dim legacyCsv As Object
-            '
-            addon_execute_executeScript3 = addon_execute_executeScript4(Language, Code, EntryPoint, return_AddonErrorMessage, ScriptingTimeout, ScriptName, ReplaceCnt, ReplaceNames, ReplaceValues)
-        End Function
-        '
-        ' ================================================================================================================
-        ''' <summary>
-        ''' execute the script section of addons. Must be 32-bit. 
-        ''' </summary>
-        ''' <param name="Language"></param>
-        ''' <param name="Code"></param>
-        ''' <param name="EntryPoint"></param>
-        ''' <param name="return_errorMessage"></param>
-        ''' <param name="ScriptingTimeout"></param>
-        ''' <param name="ScriptName"></param>
-        ''' <param name="ReplaceCnt"></param>
-        ''' <param name="ReplaceNames"></param>
-        ''' <param name="ReplaceValues"></param>
-        ''' <returns></returns>
-        ''' <remarks>long run, use either csscript.net, or use .net tools to build compile/run funtion</remarks>
-        Public Function addon_execute_executeScript4(ByVal Language As String, ByVal Code As String, ByVal EntryPoint As String, ByRef return_errorMessage As String, ByVal ScriptingTimeout As Integer, ByVal ScriptName As String, ByVal ReplaceCnt As Integer, ByVal ReplaceNames() As String, ByVal ReplaceValues() As String) As String
-            Dim returnText As String
-            Try
-                '
-                Dim Lines() As String
-                'Dim ErrorMsg As String
-                Dim sc As New MSScriptControl.ScriptControl
-                Dim emptyObj As Object
-                Dim Args() As String
-                Dim Pos As Integer
-                Dim EntryPointArgs As String
-                Dim EntryPointName As String
-                Dim arg2 As Object
-                Dim Ptr As Integer
-                Dim ReplaceName As String
-                Dim ReplaceValue As String
-                Dim WorkingCode As String
-                Dim WorkingEntryPoint As String
-                '
-                'Add a COM reference of "Microsoft Script Control 1.0" to your project.
-                'Use this code
-                'MSScriptControl.ScriptControl script = new MSScriptControl.ScriptControl();
-                'script.Language = "VBScript";
-                'script.AddObject("Repository", connectToDB.GetRepository);
-                'addobject -AddS
-                ' adds activex
-                '
-                WorkingEntryPoint = EntryPoint
-                WorkingCode = Code
-                If ReplaceCnt > 0 Then
-                    For Ptr = 0 To ReplaceCnt - 1
-                        ReplaceName = "$" & ReplaceNames(Ptr) & "$"
-                        ReplaceValue = ReplaceValues(Ptr)
-                        WorkingEntryPoint = vbReplace(WorkingEntryPoint, ReplaceName, ReplaceValue, 1, 99, vbTextCompare)
-                        WorkingCode = vbReplace(WorkingCode, ReplaceName, ReplaceValue, 1, 99, vbTextCompare)
-                    Next
-                End If
-                EntryPointName = WorkingEntryPoint
-                Pos = vbInstr(1, EntryPointName, "(")
-                If Pos = 0 Then
-                    Pos = vbInstr(1, EntryPointName, " ")
-                End If
-                If Pos > 1 Then
-                    EntryPointArgs = Trim(Mid(EntryPointName, Pos))
-                    EntryPointName = Trim(Left(EntryPointName, Pos - 1))
-                    If (Mid(EntryPointArgs, 1, 1) = "(") And (Mid(EntryPointArgs, Len(EntryPointArgs), 1) = ")") Then
-                        EntryPointArgs = Mid(EntryPointArgs, 2, Len(EntryPointArgs) - 2)
-                    End If
-                    Args = SplitDelimited(EntryPointArgs, ",")
-                End If
-                '
-                ' the only createObject allowed -- because there is no modern versin of 
-                '
-                'sc = CreateObject("ScriptControl")
-                Try
-                    sc.AllowUI = False
-                    sc.Timeout = ScriptingTimeout
-                    If Language <> "" Then
-                        sc.Language = Language
-                    Else
-                        sc.Language = "VBScript"
-                    End If
-                    Call sc.AddCode(WorkingCode)
-                Catch ex As Exception
-                    return_errorMessage = "Error configuring scripting system"
-                    If sc.Error.Number <> 0 Then
-                        With sc.Error
-                            return_errorMessage &= ", #" & .Number & ", " & .Description & ", line " & .Line & ", character " & .Column
-                            If .Line <> 0 Then
-                                Lines = Split(WorkingCode, vbCrLf)
-                                If UBound(Lines) >= .Line Then
-                                    return_errorMessage = return_errorMessage & ", code [" & Lines(.Line - 1) & "]"
-                                End If
-                            End If
-                        End With
-                    Else
-                        return_errorMessage &= ", no scripting error"
-                    End If
-                    handleExceptionAndRethrow(ex, return_errorMessage)
-                End Try
-                If String.IsNullOrEmpty(return_errorMessage) Then
-                    If True Then
-                        If True Then
-                            If True Then
-                                If True Then
-                                    Try
-                                        Call sc.AddObject("cp", cp)
-                                    Catch ex As Exception
-                                        '
-                                        ' Error adding cp object
-                                        '
-                                        return_errorMessage = "Error adding cp object to script environment"
-                                        If sc.Error.Number <> 0 Then
-                                            With sc.Error
-                                                return_errorMessage = return_errorMessage & ", #" & .Number & ", " & .Description & ", line " & .Line & ", character " & .Column
-                                                If .Line <> 0 Then
-                                                    Lines = Split(WorkingCode, vbCrLf)
-                                                    If UBound(Lines) >= .Line Then
-                                                        return_errorMessage = return_errorMessage & ", code [" & Lines(.Line - 1) & "]"
-                                                    End If
-                                                End If
-                                            End With
-                                        Else
-                                            return_errorMessage &= ", no scripting error"
-                                        End If
-                                        handleExceptionAndRethrow(ex, return_errorMessage)
-                                    End Try
-                                    If String.IsNullOrEmpty(return_errorMessage) Then
-                                        '
-                                        If EntryPointName = "" Then
-                                            If sc.Procedures.Count > 0 Then
-                                                EntryPointName = sc.Procedures(1).Name
-                                            End If
-                                        End If
-                                        Try
-                                            If EntryPointArgs = "" Then
-                                                addon_execute_executeScript4 = EncodeText(sc.Run(EntryPointName))
-
-                                            Else
-                                                Select Case UBound(Args)
-                                                    Case 0
-                                                        addon_execute_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0)))
-                                                    Case 1
-                                                        addon_execute_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0), Args(1)))
-                                                    Case 2
-                                                        addon_execute_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2)))
-                                                    Case 3
-                                                        addon_execute_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3)))
-                                                    Case 4
-                                                        addon_execute_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4)))
-                                                    Case 5
-                                                        addon_execute_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5)))
-                                                    Case 6
-                                                        addon_execute_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5), Args(6)))
-                                                    Case 7
-                                                        addon_execute_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5), Args(6), Args(7)))
-                                                    Case 8
-                                                        addon_execute_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5), Args(6), Args(7), Args(8)))
-                                                    Case 9
-                                                        addon_execute_executeScript4 = EncodeText(sc.Run(EntryPointName, Args(0), Args(1), Args(2), Args(3), Args(4), Args(5), Args(6), Args(7), Args(8), Args(9)))
-                                                    Case Else
-                                                        Call handleLegacyError6("csv_ExecuteScript4", "Scripting only supports 10 arguments.")
-                                                End Select
-                                            End If
-                                        Catch ex As Exception
-                                            return_errorMessage = "Error executing script"
-                                            If sc.Error.Number <> 0 Then
-                                                With sc.Error
-                                                    return_errorMessage = return_errorMessage & ", #" & .Number & ", " & .Description & ", line " & .Line & ", character " & .Column
-                                                    If .Line <> 0 Then
-                                                        Lines = Split(WorkingCode, vbCrLf)
-                                                        If UBound(Lines) >= .Line Then
-                                                            return_errorMessage = return_errorMessage & ", code [" & Lines(.Line - 1) & "]"
-                                                        End If
-                                                    End If
-                                                End With
-                                            Else
-                                                return_errorMessage = return_errorMessage & ", " & GetErrString()
-                                            End If
-                                            handleExceptionAndRethrow(ex, return_errorMessage)
-                                        End Try
-                                    End If
-                                End If
-                            End If
-                        End If
-                    End If
-                End If
-            Catch ex As Exception
-                handleExceptionAndRethrow(ex)
-            End Try
-        End Function
-        '
-        '
-        '
-        Public Function addon_execute_executeAssembly(ByVal addonId As Integer, ByVal AddonCaption As String, ByVal AssemblyClassFullName As String, ByVal CollectionGuid As String, ByVal nothingObject As Object, ByRef return_ErrorMessageForAdmin As String) As String
-            Dim result As String = ""
-            Try
-                Dim AddonFound As Boolean = False
-                Dim addonAppRootPath As String
-                Dim AddonPath As String
-                Dim addonInstall As coreAddonInstallClass
-                Dim AddonVersionPath As String
-                Dim commonAssemblyPath As String
-                Dim appAddonPath As String
-                '
-                ' first try debug folder -- cclibCommonAssemblies
-                '
-                commonAssemblyPath = cluster.localClusterFiles.joinPath(cluster.localClusterFiles.rootLocalPath, "clibCommonAssemblies\")
-                result = addon_execute_executeAssembly_byFilePath(addonId, AddonCaption, commonAssemblyPath, AssemblyClassFullName, True, AddonFound, return_ErrorMessageForAdmin)
-                If Not AddonFound Then
-                    '
-                    ' try app /bin folder
-                    '
-                    addonAppRootPath = privateFiles.joinPath(appRootFiles.rootLocalPath, "bin\")
-                    result = addon_execute_executeAssembly_byFilePath(addonId, AddonCaption, addonAppRootPath, AssemblyClassFullName, True, AddonFound, return_ErrorMessageForAdmin)
-                    If Not AddonFound Then
-                        '
-                        ' legacy mode, consider eliminating this and storing addon binaries in apps /bin folder
-                        '
-                        AddonVersionPath = ""
-                        If String.IsNullOrEmpty(CollectionGuid) Then
-                            Throw New ApplicationException("The assembly for addon [" & AddonCaption & "] could not be executed because it's collection has an invalid guid.")
-                        Else
-                            addonInstall = New coreAddonInstallClass(Me)
-                            Call addonInstall.GetCollectionConfig(CollectionGuid, AddonVersionPath, New Date(), "")
-                            If (String.IsNullOrEmpty(AddonVersionPath)) Then
-                                Throw New ApplicationException("The assembly for addon [" & AddonCaption & "] could not be executed because it's assembly could not be found in cclibCommonAssemblies, and no collection folder was found.")
-                            Else
-                                AddonPath = privateFiles.joinPath(Me.addon_getPrivateFilesAddonPath(), AddonVersionPath)
-                                appAddonPath = privateFiles.joinPath(privateFiles.rootLocalPath, AddonPath)
-                                result = addon_execute_executeAssembly_byFilePath(addonId, AddonCaption, appAddonPath, AssemblyClassFullName, False, AddonFound, return_ErrorMessageForAdmin)
-                                If (Not AddonFound) Then
-                                    '
-                                    ' assembly not found in addon path and in development path, if core collection, try in local /bin nm 
-                                    '
-                                    If (CollectionGuid <> CoreCollectionGuid) Then
-                                        '
-                                        ' assembly not found
-                                        '
-                                        Throw New ApplicationException("The addon [" & AddonCaption & "] could not be executed because it's assembly could not be found in the cluster's common assembly path [" & commonAssemblyPath & "], the apps binary folder [" & addonAppRootPath & "], or in the legacy collection folder [" & appAddonPath & "].")
-                                    Else
-                                    End If
-                                End If
-                            End If
-                        End If
-                    End If
-                End If
-            Catch ex As Exception
-                handleExceptionAndRethrow(ex)
-                Throw ex
-            End Try
-            Return result
-        End Function
-        '
-        '==================================================================================================
-        '   This is the call from the COM csv code that executes a dot net addon from com.
-        '   This is not in the CP BaseClass, because it is used by addons to call back into CP for
-        '   services, and they should never call this.
-        '==================================================================================================
-        '
-        Private Function addon_execute_executeAssembly_byFilePath(ByVal AddonID As Integer, ByVal AddonDisplayName As String, ByVal fullPath As String, ByVal typeFullName As String, ByVal IsDevAssembliesFolder As Boolean, ByRef AddonFound As Boolean, ByRef return_userErrorMessage As String) As String
-            Dim returnValue As String = ""
-            Try
-                Dim objTypes() As Type = Nothing
-                Dim filePtr As Integer
-                Dim dllFilenames() As String
-                Dim testAssembly As [Assembly] = Nothing
-                Dim testAssemblyType As Type = Nothing
-                Dim objInterface As Type = Nothing
-                Dim AddonObj As AddonBaseClass
-                'Dim addonObj As Object
-                Dim IsClassFound As Boolean = False
-                Dim TestFilePathname As String = ""
-                Dim AddonReturnObj As Object
-                Dim detailedErrorMessage As String = ""
-                Dim testFileIsValidAssembly As Boolean
-                Dim testAssemblyName As String
-                '
-                ' If not found in debug location (addon root folder), look in addon version folder provided
-                '
-                AddonFound = False
-                dllFilenames = IO.Directory.GetFileSystemEntries(fullPath, "*.dll")
-                If dllFilenames.Length > 0 Then
-                    '
-                    ' search the list for the correct assembly
-                    '
-                    filePtr = 0
-                    Do
-                        TestFilePathname = dllFilenames(filePtr)
-                        If TestFilePathname.IndexOf("\xunit.runner") >= 0 Then
-                            '
-                            ' unknown issue with xunit DLL, skip for now
-                            '
-                        Else
-                            testFileIsValidAssembly = True
-                            Try
-                                '
-                                ' ##### consider using refectiononlyload first, then if it is right, do the loadfrom - so dependancies are not loaded.
-                                '
-                                testAssembly = System.Reflection.Assembly.LoadFrom(TestFilePathname)
-                                testAssemblyName = testAssembly.FullName
-                            Catch ex As Exception
-                                testFileIsValidAssembly = False
-                            End Try
-                            Try
-                                If testFileIsValidAssembly Then
-                                    '
-                                    ' problem loading types, use try to debug
-                                    '
-                                    Try
-                                        For Each testAssemblyType In testAssembly.GetTypes
-                                            '
-                                            ' Loop through each type in the Assembly looking for our typename, public, and non-abstract
-                                            '
-                                            If (testAssemblyType.FullName.Trim.ToLower = typeFullName.Trim.ToLower) _
-                                                And (testAssemblyType.IsPublic = True) _
-                                                And (Not ((testAssemblyType.Attributes And TypeAttributes.Abstract) = TypeAttributes.Abstract)) _
-                                                And Not (testAssemblyType.BaseType Is Nothing) _
-                                                Then
-                                                If (testAssemblyType.BaseType.FullName.ToLower = "addonbaseclass") Or (testAssemblyType.BaseType.FullName.ToLower = "contensive.baseclasses.addonbaseclass") Then
-                                                    '
-                                                    ' This assembly matches the TypeFullName, use it
-                                                    '
-                                                    AddonFound = True
-                                                    Try
-                                                        '
-                                                        ' Create the object from the Assembly
-                                                        '
-                                                        AddonObj = DirectCast(testAssembly.CreateInstance(testAssemblyType.FullName), AddonBaseClass)
-                                                        Try
-                                                            '
-                                                            ' Call Execute
-                                                            '
-                                                            AddonReturnObj = AddonObj.Execute(cp)
-                                                            If Not (AddonReturnObj Is Nothing) Then
-                                                                Select Case AddonReturnObj.GetType().ToString
-                                                                    Case "System.Object[,]"
-                                                                '
-                                                                '   a 2-D Array of objects
-                                                                '   each cell can contain 
-                                                                '   return array for internal use constructing data/layout merge
-                                                                '   return xml as dataset to another computer
-                                                                '   return json as dataset for browser
-                                                                '
-                                                                    Case "System.String[,]"
-                                                                        '
-                                                                        '   return array for internal use constructing data/layout merge
-                                                                        '   return xml as dataset to another computer
-                                                                        '   return json as dataset for browser
-                                                                        '
-                                                                    Case Else
-                                                                        returnValue = AddonReturnObj.ToString
-                                                                End Select
-                                                            End If
-                                                        Catch Ex As Exception
-                                                            '
-                                                            ' Error in the addon
-                                                            '
-                                                            return_userErrorMessage = "There was an error executing the addon Dot Net assembly."
-                                                            detailedErrorMessage = "There was an error in the addon [" & AddonDisplayName & "]. It could not be executed because there was an error in the addon assembly [" & TestFilePathname & "], in class [" & testAssemblyType.FullName.Trim.ToLower & "]. The error was [" & Ex.ToString() & "]"
-                                                            handleExceptionAndNoThrow(Ex, detailedErrorMessage)
-                                                            'Throw New ApplicationException(detailedErrorMessage)
-                                                        End Try
-                                                    Catch Ex As Exception
-                                                        return_userErrorMessage = "There was an error initializing the addon's Dot Net DLL."
-                                                        detailedErrorMessage = AddonDisplayName & " could not be executed because there was an error creating an object from the assembly, DLL [" & testAssemblyType.FullName & "]. The error was [" & Ex.ToString() & "]"
-                                                        Throw New ApplicationException(detailedErrorMessage)
-                                                    End Try
-                                                    '
-                                                    ' addon was found, no need to look for more
-                                                    '
-                                                    Exit For
-                                                End If
-                                            End If
-                                        Next
-                                    Catch ex As ReflectionTypeLoadException
-                                        '
-                                        ' exceptin thrown out of application bin folder when xunit library included -- ignore
-                                        '
-                                    Catch ex As Exception
-                                        '
-                                        ' problem loading types
-                                        '
-                                        detailedErrorMessage = "While locating assembly for addon [" & AddonDisplayName & "], there was an error loading types for assembly [" & testAssemblyType.FullName & "]. This assembly was skipped and should be removed from the folder [" & fullPath & "]"
-                                        handleExceptionAndRethrow(ex, detailedErrorMessage)
-                                    End Try
-                                End If
-                            Catch ex As Reflection.ReflectionTypeLoadException
-                                return_userErrorMessage = "The addon's Dot Net DLL does not appear to be valid [" & TestFilePathname & "]."
-                                detailedErrorMessage = "A load exception occured for addon [" & AddonDisplayName & "], DLL [" & testAssemblyType.FullName & "]. The error was [" & ex.ToString() & "] Any internal exception follow:"
-                                objTypes = ex.Types
-                                For Each exLoader As Exception In ex.LoaderExceptions
-                                    detailedErrorMessage &= vbCrLf & "--LoaderExceptions: " & exLoader.Message
-                                Next
-                                Throw New ApplicationException(detailedErrorMessage)
-                            Catch ex As Exception
-                                '
-                                ' ignore these errors
-                                '
-                                return_userErrorMessage = "There was an unknown error in the addon's Dot Net DLL [" & AddonDisplayName & "]."
-                                detailedErrorMessage = "A non-load exception occured while loading the addon [" & AddonDisplayName & "], DLL [" & testAssemblyType.FullName & "]. The error was [" & ex.ToString() & "]."
-                            End Try
-                        End If
-                        filePtr += 1
-                    Loop While (Not AddonFound) And (filePtr < dllFilenames.Length)
-                End If
-                'If IsDevAssembliesFolder Then
-                '    If AddonFound Then
-                '        '
-                '        ' if debug folder version is run, log a warning
-                '        '
-                '        'Call Utils.AppendLog("Warning: Addon [" & AddonDisplayName & "] was bypassed by a file in the addon root folder [" & TestFilePathname & "]. This file should be deleted when debugging is complete.")
-                '    End If
-                'Else
-                '    If Not AddonFound Then
-                '        '
-                '        ' not found
-                '        '
-                '        return_userErrorMessage = "A valid Dot Net DLL could not be found for this addon [" & AddonDisplayName & "]."
-                '        detailedErrorMessage = "A valid Dot Net DLL could not be found for this addon [" & AddonDisplayName & "] in filePath [" & TestFilePathname & "]"
-                '        Throw New ApplicationException(detailedErrorMessage)
-                '    End If
-                'End If
-            Catch ex As Exception
-                handleExceptionAndRethrow(ex)
-            End Try
-            Return returnValue
-        End Function
-        ''
-        '' 
-        ''
-        'Public Function csv_ExecuteActiveX(ByVal ProgramID As String, ByVal AddonCaption As String, ByVal OptionString_ForObjectCall As String, ByVal OptionStringForDisplay As String, ByRef return_AddonErrorMessage As String) As String
-        '    Dim exMsg As String = "activex addons [" & ProgramID & "] are no longer supported"
-        '    handleException(New ApplicationException(exMsg))
-        '    Return exMsg
-        'End Function
-        '
-        '====================================================================================================================
-        '   Execte an Addon as a process
-        '
-        '   OptionString
-        '       can be & delimited or crlf delimited
-        '       must be addonencoded with call encodeNvaArgument
-        '
-        '   nothingObject
-        '       cp should be set during csv_OpenConnection3 -- do not pass it around in the arguments
-        '
-        '   WaitForReturn
-        '       if true, this routine calls the addon
-        '       if false, the server is called remotely, which starts a cccmd process, gets the command and calls this routine with true
-        '====================================================================================================================
-        '
-        Public Function executeAddonAsProcess(ByVal AddonIDGuidOrName As String, Optional ByVal OptionString As String = "") As String
-            On Error GoTo ErrorTrap 'Const Tn = "ExecuteAddonAsProcess" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Dim StatusOK As Boolean
-            Dim ErrNumber As Integer
-            Dim ErrSource As String
-            Dim ErrDescription As String
-            Dim TestName As String
-            Dim TestValue As String
-            Dim PairPtr As Integer
-            Dim LCaseTestName As String
-            Dim ScriptingTimeout As Integer
-            Dim ACInstanceID As String
-            Dim AddonOptionConstructor As String
-            Dim AddonOptionExpandedConstructor As String
-            Dim OptionString_ForObjectCall As String
-            Dim CollectionGuid As String
-            Dim IgnoreErrorMessage As String
-            Dim DefaultWrapperID As Integer
-            Dim WrapperID As Integer
-            Dim OptionPair() As String
-            Dim OptionsForCPVars() As NameValuePrivateType
-            Dim OptionPtr As Integer
-            Dim Options() As String
-            Dim CodeFilename As String
-            Dim CSRules As Integer
-            Dim SQL As String
-            Dim ScriptingLanguage As String
-            Dim scriptinglanguageid As Integer
-            Dim ScriptingEntryPoint As String
-            Dim HTMLContent As String
-            Dim AddonGuid As String
-            Dim OptionCnt As Integer
-            Dim OptionsForCPVars_Cnt As Integer
-
-            Dim Ptr As Integer
-            Dim hint As String
-            Dim Criteria As String
-            Dim CS As Integer
-            Dim AddonName As String
-            Dim ProgramID As String
-            Dim ArgumentList As String
-            Dim ScriptingCode As String
-            Dim DotNetClassFullName As String
-            Dim WorkingAddonOptionString As String
-            Dim cmdQueryString As String
-            'Dim runAtServer As runAtServerClass
-            Dim addonId As Integer
-            'Dim AddonGuidOrName As String
-            Dim ProcessStartTick As Integer
-            Dim ReplaceCnt As Integer
-            Dim ReplaceNames() As String
-            Dim ReplaceValues() As String
-            Dim SQLName As String
-            Dim addonPtr As Integer
-            ' Dim taskScheduler As New taskSchedulerServiceClass()
-            '
-            'hint = "csv_executeAddonAsProcess, enter"
-            '
-            ProcessStartTick = GetTickCount
-            addonPtr = addonCache.getPtr(AddonIDGuidOrName)
-            If addonPtr >= 0 Then
-                addonId = EncodeInteger(addonCache.localCache.addonList(addonPtr).addonCache_Id)
-                AddonName = EncodeText(addonCache.localCache.addonList(addonPtr).addonCache_name)
-                'hint = hint & ",020 addonname=[" & AddonName & "] addonid=[" & addonId & "]"
-            End If
-            '
-            '-----------------------------------------------------------------
-            '   Add to background process queue
-            '-----------------------------------------------------------------
-            '
-            'hint = hint & ",030"
-            appendLogWithLegacyRow(appConfig.name, "start: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
-            '
-            ' runAtServer = New runAtServerClass(Me)
-            ' must nva encode because that is what the server-execute command expects
-            cmdQueryString = "" _
-                    & "appname=" & encodeNvaArgument(EncodeRequestVariable(appConfig.name)) _
-                    & "&AddonID=" & CStr(addonId) _
-                    & "&OptionString=" & encodeNvaArgument(EncodeRequestVariable(OptionString))
-            'hint = hint & ",035"
-            Dim taskScheduler As New coreTaskSchedulerServiceClass()
-            Dim cmdDetail As New cmdDetailClass
-            cmdDetail.addonId = addonId
-            cmdDetail.addonName = AddonName
-            cmdDetail.docProperties = taskScheduler.convertAddonArgumentstoDocPropertiesList(Me, cmdQueryString)
-            Call taskScheduler.addTaskToQueue(Me, taskQueueCommandEnumModule.runAddon, cmdDetail, False)
-            'Call runAtServer.executeCmd("RunProcess", cmdQueryString)
-            '
-            appendLogWithLegacyRow(appConfig.name, "end: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
-            '
-            Exit Function
-ErrorTrap:
-            ErrNumber = Err.Number
-            ErrSource = Err.Source
-            ErrDescription = Err.Description
-            Call Err.Clear()
-            appendLogWithLegacyRow(appConfig.name, "errortrap exit(" & (GetTickCount - ProcessStartTick) & " msec): execute now, addon [" & AddonIDGuidOrName & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
-            Call handleLegacyError4(ErrNumber, ErrSource, ErrDescription, "unknownMethodNameLegacyCall" & ", hint=" & hint, True)
-        End Function
-        '
-        '=============================================================================================================
-        '   main_Get Addon Content
-        ' REFACTOR - unify interface, remove main_ and csv_ class references
-        '=============================================================================================================
-        '
-        Public Function addon_execute_legacy5(ByVal addonId As Integer, ByVal AddonName As String, ByVal Option_String As String, ByVal Context As CPUtilsBaseClass.addonContext, ByVal ContentName As String, ByVal RecordID As Integer, ByVal FieldName As String, ByVal ACInstanceID As Integer) As String
-            Dim AddonStatusOK As Boolean
-            addon_execute_legacy5 = addon_execute_legacy2(addonId, AddonName, Option_String, Context, ContentName, RecordID, FieldName, CStr(ACInstanceID), False, 0, "", AddonStatusOK, Nothing)
-        End Function
-        '
-        '====================================================================================================
-        ' Public Interface
-        ' REFACTOR - unify interface, remove main_ and csv_ class references
-        '====================================================================================================
-        '
-        Public Function addon_execute_legacy1(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal Option_String As String, ByVal Context As CPUtilsBaseClass.addonContext, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal DefaultWrapperID As Integer) As String
-            Dim AddonStatusOK As Boolean
-            Dim workingContext As CPUtilsBaseClass.addonContext
-            '
-            workingContext = Context
-            If workingContext = 0 Then
-                workingContext = CPUtilsBaseClass.addonContext.ContextPage
-            End If
-            addon_execute_legacy1 = addon_execute_legacy2(addonId, AddonNameOrGuid, Option_String, workingContext, HostContentName, HostRecordID, HostFieldName, ACInstanceID, False, DefaultWrapperID, "", AddonStatusOK, Nothing)
-        End Function
-        '
-        '====================================================================================================
-        ' Public Interface to support AsProcess
-        '   Programmatic calls to executeAddon would not require Context, HostContent, etc because the host would be an add-on, and the
-        '   addon has control or settings, not the administrator
-        ' REFACTOR - unify interface, remove main_ and csv_ class references
-        '====================================================================================================
-        '
-        Public Function addon_execute_legacy3(ByVal AddonIDGuidOrName As String, Optional ByVal Option_String As String = "", Optional ByVal WrapperID As Integer = 0, Optional ByVal nothingObject As Object = Nothing) As String
-            Dim AddonStatusOK As Boolean
-            If vbIsNumeric(AddonIDGuidOrName) Then
-                addon_execute_legacy3 = addon_execute_legacy2(EncodeInteger(AddonIDGuidOrName), "", Option_String, CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, WrapperID, "", AddonStatusOK, nothingObject)
-            Else
-                addon_execute_legacy3 = addon_execute_legacy2(0, AddonIDGuidOrName, Option_String, CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, WrapperID, "", AddonStatusOK, nothingObject)
-            End If
-        End Function
-        '
-        ' Public Interface to support AsProcess
-        '
-        Public Function addon_execute_legacy4(ByVal AddonIDGuidOrName As String, Optional ByVal Option_String As String = "", Optional ByVal Context As CPUtilsBaseClass.addonContext = CPUtilsBaseClass.addonContext.ContextPage, Optional ByVal nothingObject As Object = Nothing) As String
-            Dim AddonStatusOK As Boolean
-            Dim workingContext As CPUtilsBaseClass.addonContext
-            '
-            workingContext = Context
-            If workingContext = 0 Then
-                workingContext = CPUtilsBaseClass.addonContext.ContextPage
-            End If
-            If vbIsNumeric(AddonIDGuidOrName) Then
-                addon_execute_legacy4 = addon_execute_legacy2(EncodeInteger(AddonIDGuidOrName), "", Option_String, workingContext, "", 0, "", "", False, 0, "", AddonStatusOK, nothingObject)
-            Else
-                addon_execute_legacy4 = addon_execute_legacy2(0, AddonIDGuidOrName, Option_String, workingContext, "", 0, "", "", False, 0, "", AddonStatusOK, nothingObject)
-            End If
-        End Function
-        ''
-        ''=============================================================================================================
-        ''   Run Add-on as process
-        '' REFACTOR - unify interface, remove main_ and csv_ class references
-        ''=============================================================================================================
-        ''
-        'Public Function executeAddonAsProcess_legacy1(ByVal AddonIDGuidOrName As String, Optional ByVal Option_String As String = "", Optional ByVal nothingObject As Object = Nothing, Optional ByVal WaitForResults As Boolean = False) As String
-        '    '
-        '    executeAddonAsProcess_legacy1 = executeAddonAsProcess(AddonIDGuidOrName, Option_String, nothingObject, WaitForResults)
-        '    '
-        'End Function
-        '
-        '=============================================================================================================
-        '   main_Get Addon Content - internal (to support include add-ons)
-        ' REFACTOR - unify interface, remove main_ and csv_ class references
-        '=============================================================================================================
-        '
-        Public Function addon_execute_legacy2(ByVal addonId As Integer, ByVal AddonNameOrGuid As String, ByVal Option_String As String, ByVal Context As CPUtilsBaseClass.addonContext, ByVal HostContentName As String, ByVal HostRecordID As Integer, ByVal HostFieldName As String, ByVal ACInstanceID As String, ByVal IsIncludeAddon As Boolean, ByVal DefaultWrapperID As Integer, ByVal ignore_TemplateCaseOnly_PageContent As String, ByRef return_StatusOK As Boolean, ByVal nothingObject As Object, Optional ByVal AddonInUseIdList As String = "") As String
-            addon_execute_legacy2 = addon_execute(addonId, AddonNameOrGuid, Option_String, Context, HostContentName, HostRecordID, HostFieldName, ACInstanceID, IsIncludeAddon, DefaultWrapperID, ignore_TemplateCaseOnly_PageContent, return_StatusOK, nothingObject, AddonInUseIdList, Nothing, main_page_IncludedAddonIDList, user.id, user.isAuthenticated)
-        End Function
-        '
-        '===============================================================================================================================================
-        '   main_Get the editable options bubble
-        '       ACInstanceID required
-        '       ACInstanceID = -1 means this Add-on does not support instance options (like end-of-page scope, etc)
-        ' REFACTOR - unify interface, remove main_ and csv_ class references
-        '===============================================================================================================================================
-        '
-        Public Function addon_execute_getInstanceBubble(ByVal AddonName As String, ByVal Option_String As String, ByVal ContentName As String, ByVal RecordID As Integer, ByVal FieldName As String, ByVal ACInstanceID As String, ByVal Context As CPUtilsBaseClass.addonContext, ByRef return_DialogList As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("addon_execute_GetInstanceBubble")
-            '
-            Dim Dialog As String
-            Dim OptionDefault As String
-            Dim OptionSuffix As String
-            Dim OptionCnt As Integer
-            Dim OptionValue_AddonEncoded As String
-            Dim OptionValue As String
-            Dim OptionCaption As String
-            Dim LCaseOptionDefault As String
-            Dim OptionValues() As String
-            Dim FormInput As String
-            Dim OptionPtr As Integer
-            Dim QueryString As String
-            Dim LocalCode As String
-            Dim CopyHeader As String
-            Dim CopyContent As String
-            Dim BubbleJS As String
-            Dim OptionSplit() As String
-            Dim OptionName As String
-            Dim OptionSelector As String
-            Dim Ptr As Integer
-            Dim Pos As Integer
-            '
-            If user.isAuthenticated() And ((ACInstanceID = "-2") Or (ACInstanceID = "-1") Or (ACInstanceID = "0") Or (RecordID <> 0)) Then
-                If user.isEditingAnything() Then
-                    CopyHeader = CopyHeader _
-                        & "<div class=""ccHeaderCon"">" _
-                        & "<table border=0 cellpadding=0 cellspacing=0 width=""100%"">" _
-                        & "<tr>" _
-                        & "<td align=left class=""bbLeft"">Options for this instance of " & AddonName & "</td>" _
-                        & "<td align=right class=""bbRight""><a href=""#"" onClick=""HelpBubbleOff('HelpBubble" & pageManager_HelpCodeCount & "');return false;""><img alt=""close"" src=""/ccLib/images/ClosexRev1313.gif"" width=13 height=13 border=0></a></td>" _
-                        & "</tr>" _
-                        & "</table>" _
-                        & "</div>"
-                    If (Option_String = "") Then
-                        '
-                        ' no option string - no settings to display
-                        '
-                        CopyContent = "This Add-on has no instance options."
-                        CopyContent = "<div style=""width:400px;background-color:transparent"" class=""ccAdminSmall"">" & CopyContent & "</div>"
-                    ElseIf (ACInstanceID = "0") Or (ACInstanceID = "-1") Then
-                        '
-                        ' This addon does not support bubble option setting
-                        '
-                        CopyContent = "This addon does not support instance options."
-                        CopyContent = "<div style=""width:400px;background-color:transparent;"" class=""ccAdminSmall"">" & CopyContent & "</div>"
-                    ElseIf (Context <> CPUtilsBaseClass.addonContext.ContextAdmin) And (siteProperties.allowWorkflowAuthoring And Not visitProperty.getBoolean("AllowWorkflowRendering")) Then
-                        '
-                        ' workflow with no rendering (or within admin site)
-                        '
-                        CopyContent = "With Workflow editing enabled, you can not edit Add-on settings for live records. To make changes to the editable version of this page, turn on Render Workflow Authoring Changes and Advanced Edit together."
-                        CopyContent = "<div style=""width:400px;background-color:transparent;"" class=""ccAdminSmall"">" & CopyContent & "</div>"
-                    ElseIf ACInstanceID = "" Then
-                        '
-                        ' No instance ID - must be edited and saved
-                        '
-                        CopyContent = "You can not edit instance options for Add-ons on this page until the page is upgraded. To upgrade, edit and save the page."
-                        CopyContent = "<div style=""width:400px;background-color:transparent;"" class=""ccAdminSmall"">" & CopyContent & "</div>"
-                    Else
-                        '
-                        ' ACInstanceID is -2 (Admin Root), or Rnd (from an instance on a page) Editable Form
-                        '
-                        CopyContent = CopyContent _
-                            & "<table border=0 cellpadding=5 cellspacing=0 width=""100%"">" _
-                            & ""
-                        OptionSplit = Split(Option_String, vbCrLf)
-                        For Ptr = 0 To UBound(OptionSplit)
-                            '
-                            ' Process each option row
-                            '
-                            OptionName = OptionSplit(Ptr)
-                            OptionSuffix = ""
-                            OptionDefault = ""
-                            LCaseOptionDefault = ""
-                            OptionSelector = ""
-                            Pos = vbInstr(1, OptionName, "=")
-                            If Pos <> 0 Then
-                                If (Pos < Len(OptionName)) Then
-                                    OptionSelector = Trim(Mid(OptionName, Pos + 1))
-                                End If
-                                OptionName = Trim(Left(OptionName, Pos - 1))
-                            End If
-                            OptionName = decodeNvaArgument(OptionName)
-                            Pos = vbInstr(1, OptionSelector, "[")
-                            If Pos <> 0 Then
-                                '
-                                ' List of Options, might be select, radio, checkbox, resourcelink
-                                '
-                                OptionDefault = Mid(OptionSelector, 1, Pos - 1)
-                                OptionDefault = decodeNvaArgument(OptionDefault)
-                                LCaseOptionDefault = vbLCase(OptionDefault)
-                                'LCaseOptionDefault = decodeNvaArgument(LCaseOptionDefault)
-
-                                OptionSelector = Mid(OptionSelector, Pos + 1)
-                                Pos = vbInstr(1, OptionSelector, "]")
-                                If Pos > 0 Then
-                                    If Pos < Len(OptionSelector) Then
-                                        OptionSuffix = vbLCase(Trim(Mid(OptionSelector, Pos + 1)))
-                                    End If
-                                    OptionSelector = Mid(OptionSelector, 1, Pos - 1)
-                                End If
-                                OptionValues = Split(OptionSelector, "|")
-                                FormInput = ""
-                                OptionCnt = UBound(OptionValues) + 1
-                                For OptionPtr = 0 To OptionCnt - 1
-                                    OptionValue_AddonEncoded = Trim(OptionValues(OptionPtr))
-                                    If OptionValue_AddonEncoded <> "" Then
-                                        Pos = vbInstr(1, OptionValue_AddonEncoded, ":")
-                                        If Pos = 0 Then
-                                            OptionValue = decodeNvaArgument(OptionValue_AddonEncoded)
-                                            OptionCaption = OptionValue
-                                        Else
-                                            OptionCaption = decodeNvaArgument(Mid(OptionValue_AddonEncoded, 1, Pos - 1))
-                                            OptionValue = decodeNvaArgument(Mid(OptionValue_AddonEncoded, Pos + 1))
-                                        End If
-                                        Select Case OptionSuffix
-                                            Case "checkbox"
-                                                '
-                                                ' Create checkbox FormInput
-                                                '
-                                                If vbInstr(1, "," & LCaseOptionDefault & ",", "," & vbLCase(OptionValue) & ",") <> 0 Then
-                                                    FormInput = FormInput & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & OptionName & OptionPtr & """ value=""" & OptionValue & """ checked=""checked"">" & OptionCaption & "</div>"
-                                                Else
-                                                    FormInput = FormInput & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & OptionName & OptionPtr & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
-                                                End If
-                                            Case "radio"
-                                                '
-                                                ' Create Radio FormInput
-                                                '
-                                                If vbLCase(OptionValue) = LCaseOptionDefault Then
-                                                    FormInput = FormInput & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & OptionName & """ value=""" & OptionValue & """ checked=""checked"" >" & OptionCaption & "</div>"
-                                                Else
-                                                    FormInput = FormInput & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & OptionName & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
-                                                End If
-                                            Case Else
-                                                '
-                                                ' Create select FormInput
-                                                '
-                                                If vbLCase(OptionValue) = LCaseOptionDefault Then
-                                                    FormInput = FormInput & "<option value=""" & OptionValue & """ selected>" & OptionCaption & "</option>"
-                                                Else
-                                                    OptionCaption = vbReplace(OptionCaption, vbCrLf, " ")
-                                                    FormInput = FormInput & "<option value=""" & OptionValue & """>" & OptionCaption & "</option>"
-                                                End If
-                                        End Select
-                                    End If
-                                Next
-                                Select Case OptionSuffix
-                                    '                            Case FieldTypeLink
-                                    '                                '
-                                    '                                ' ----- Link (href value
-                                    '                                '
-                                    '                                Return_NewFieldList = Return_NewFieldList & "," & FieldName
-                                    '                                FieldValueText = encodeText(FieldValueVariant)
-                                    '                                EditorString = "" _
-                                    '                                    & main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80, FormFieldLCaseName) _
-                                    '                                    & "&nbsp;<a href=""#"" onClick=""OpenResourceLinkWindow( '" & FormFieldLCaseName & "' ) ;return false;""><img src=""/ccLib/images/ResourceLink1616.gif"" width=16 height=16 border=0 alt=""Link to a resource"" title=""Link to a resource""></a>" _
-                                    '                                    & "&nbsp;<a href=""#"" onClick=""OpenSiteExplorerWindow( '" & FormFieldLCaseName & "' ) ;return false;""><img src=""/ccLib/images/PageLink1616.gif"" width=16 height=16 border=0 alt=""Link to a page"" title=""Link to a page""></a>"
-                                    '                                s.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal & EditorString & "</span></nobr></td>")
-                                    '                            Case FieldTypeResourceLink
-                                    '                                '
-                                    '                                ' ----- Resource Link (src value)
-                                    '                                '
-                                    '                                Return_NewFieldList = Return_NewFieldList & "," & FieldName
-                                    '                                FieldValueText = encodeText(FieldValueVariant)
-                                    '                                EditorString = "" _
-                                    '                                    & main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80, FormFieldLCaseName) _
-                                    '                                    & "&nbsp;<a href=""#"" onClick=""OpenResourceLinkWindow( '" & FormFieldLCaseName & "' ) ;return false;""><img src=""/ccLib/images/ResourceLink1616.gif"" width=16 height=16 border=0 alt=""Link to a resource"" title=""Link to a resource""></a>"
-                                    '                                'EditorString = main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80)
-                                    '                                s.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal & EditorString & "</span></nobr></td>")
-                                    Case "resourcelink"
-                                        '
-                                        ' Create text box linked to resource library
-                                        '
-                                        OptionDefault = decodeNvaArgument(OptionDefault)
-                                        FormInput = "" _
-                                            & html_GetFormInputText2(OptionName, OptionDefault, 1, 20) _
-                                            & "&nbsp;<a href=""#"" onClick=""OpenResourceLinkWindow( '" & OptionName & "' ) ;return false;""><img src=""/ccLib/images/ResourceLink1616.gif"" width=16 height=16 border=0 alt=""Link to a resource"" title=""Link to a resource""></a>"
-                                        'EditorString = main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80)
-                                    Case "checkbox"
-                                        '
-                                        '
-                                        CopyContent = CopyContent & "<input type=""hidden"" name=""" & OptionName & "CheckBoxCnt"" value=""" & OptionCnt & """ >"
-                                    Case "radio"
-                                        '
-                                        ' Create Radio FormInput
-                                        '
-                                    Case Else
-                                        '
-                                        ' Create select FormInput
-                                        '
-                                        FormInput = "<select name=""" & OptionName & """>" & FormInput & "</select>"
-                                End Select
-                            Else
-                                '
-                                ' Create Text FormInput
-                                '
-
-                                OptionSelector = decodeNvaArgument(OptionSelector)
-                                FormInput = html_GetFormInputText2(OptionName, OptionSelector, 1, 20)
-                            End If
-                            CopyContent = CopyContent _
-                                & "<tr>" _
-                                & "<td class=""bbLeft"">" & OptionName & "</td>" _
-                                & "<td class=""bbRight"">" & FormInput & "</td>" _
-                                & "</tr>"
-                        Next
-                        CopyContent = "" _
-                            & CopyContent _
-                            & "</table>" _
-                            & html_GetFormInputHidden("Type", FormTypeAddonSettingsEditor) _
-                            & html_GetFormInputHidden("ContentName", ContentName) _
-                            & html_GetFormInputHidden("RecordID", RecordID) _
-                            & html_GetFormInputHidden("FieldName", FieldName) _
-                            & html_GetFormInputHidden("ACInstanceID", ACInstanceID)
-                    End If
-                    '
-                    BubbleJS = " onClick=""HelpBubbleOn( 'HelpBubble" & pageManager_HelpCodeCount & "',this);return false;"""
-                    QueryString = web_RefreshQueryString
-                    QueryString = ModifyQueryString(QueryString, RequestNameHardCodedPage, "", False)
-                    'QueryString = ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
-                    return_DialogList = return_DialogList _
-                        & "<div class=""ccCon helpDialogCon"">" _
-                        & html_GetUploadFormStart() _
-                        & "<table border=0 cellpadding=0 cellspacing=0 class=""ccBubbleCon"" id=""HelpBubble" & pageManager_HelpCodeCount & """ style=""display:none;visibility:hidden;"">" _
-                        & "<tr><td class=""ccHeaderCon"">" & CopyHeader & "</td></tr>" _
-                        & "<tr><td class=""ccButtonCon"">" & html_GetFormButton("Update", "HelpBubbleButton") & "</td></tr>" _
-                        & "<tr><td class=""ccContentCon"">" & CopyContent & "</td></tr>" _
-                        & "</table>" _
-                        & "</form>" _
-                        & "</div>"
-                    addon_execute_getInstanceBubble = "" _
-                        & "&nbsp;<a href=""#"" tabindex=-1 target=""_blank""" & BubbleJS & ">" _
-                        & GetIconSprite("", 0, "/ccLib/images/toolsettings.png", 22, 22, "Edit options used just for this instance of the " & AddonName & " Add-on", "Edit options used just for this instance of the " & AddonName & " Add-on", "", True, "") _
-                        & "</a>" _
-                        & "" _
-                        & ""
-                    If pageManager_HelpCodeCount >= pageManager_HelpCodeSize Then
-                        pageManager_HelpCodeSize = pageManager_HelpCodeSize + 10
-                        ReDim Preserve pageManager_HelpCodes(pageManager_HelpCodeSize)
-                        ReDim Preserve pageManager_HelpCaptions(pageManager_HelpCodeSize)
-                    End If
-                    pageManager_HelpCodes(pageManager_HelpCodeCount) = LocalCode
-                    pageManager_HelpCaptions(pageManager_HelpCodeCount) = AddonName
-                    pageManager_HelpCodeCount = pageManager_HelpCodeCount + 1
-                    '
-                    If pageManager_HelpDialogCnt = 0 Then
-                        Call main_AddOnLoadJavascript2("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
-                    End If
-                    pageManager_HelpDialogCnt = pageManager_HelpDialogCnt + 1
-                End If
-            End If
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("addon_execute_GetInstanceBubble")
-        End Function
-        '
-        '===============================================================================================================================================
-        '   main_Get Addon Styles Bubble Editor
-        '===============================================================================================================================================
-        '
-        Public Function addon_execute_getAddonStylesBubble(ByVal addonId As Integer, ByRef return_DialogList As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("addon_execute_GetAddonStylesBubble")
-            '
-            Dim DefaultStylesheet As String
-            Dim StyleSheet As String
-            Dim OptionDefault As String
-            Dim OptionSuffix As String
-            Dim OptionCnt As Integer
-            Dim OptionValue_AddonEncoded As String
-            Dim OptionValue As String
-            Dim OptionCaption As String
-            Dim LCaseOptionDefault As String
-            Dim OptionValues() As String
-            Dim FormInput As String
-            Dim OptionPtr As Integer
-            Dim QueryString As String
-            Dim LocalCode As String
-            Dim CopyHeader As String
-            Dim CopyContent As String
-            Dim BubbleJS As String
-            Dim OptionSplit() As String
-            Dim OptionName As String
-            Dim OptionSelector As String
-            Dim Ptr As Integer
-            Dim Pos As Integer
-            Dim CS As Integer
-            Dim AddonName As String
-            '
-            If user.isAuthenticated() And True Then
-                If user.isEditingAnything() Then
-                    CS = db_csOpen("Add-ons", addonId)
-                    If db.cs_Ok(CS) Then
-                        AddonName = db.cs_getText(CS, "name")
-                        StyleSheet = db.db_GetCS(CS, "CustomStylesFilename")
-                        DefaultStylesheet = db.db_GetCS(CS, "StylesFilename")
-                    End If
-                    Call db.cs_Close(CS)
-                    '
-                    CopyHeader = CopyHeader _
-                        & "<div class=""ccHeaderCon"">" _
-                        & "<table border=0 cellpadding=0 cellspacing=0 width=""100%"">" _
-                        & "<tr>" _
-                        & "<td align=left class=""bbLeft"">Stylesheet for " & AddonName & "</td>" _
-                        & "<td align=right class=""bbRight""><a href=""#"" onClick=""HelpBubbleOff('HelpBubble" & pageManager_HelpCodeCount & "');return false;""><img alt=""close"" src=""/ccLib/images/ClosexRev1313.gif"" width=13 height=13 border=0></a></td>" _
-                        & "</tr>" _
-                        & "</table>" _
-                        & "</div>"
-                    CopyContent = "" _
-                        & "" _
-                        & "<table border=0 cellpadding=5 cellspacing=0 width=""100%"">" _
-                        & "<tr><td style=""width:400px;background-color:transparent;"" class=""ccContentCon ccAdminSmall"">These stylesheets will be added to all pages that include this add-on. The default stylesheet comes with the add-on, and can not be edited.</td></tr>" _
-                        & "<tr><td style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Custom Stylesheet</b>" & html_GetFormInputTextExpandable2("CustomStyles", StyleSheet, 10, "400px") & "</td></tr>"
-                    'CopyContent = "" _
-                    '    & main_GetUploadFormStart() _
-                    '    & "<table border=0 cellpadding=5 cellspacing=0 width=""100%"">" _
-                    '    & "<tr><td><div style=""width:400px;background-color:transparent;"" class=""ccContentCon ccAdminSmall"">These stylesheets will be added to all pages that include this add-on. The default stylesheet comes with the add-on, and can not be edited.</div></td></tr>" _
-                    '    & "<tr><td><div style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Custom Stylesheet</b></div>" & main_GetFormInputTextExpandable2( "CustomStyles", StyleSheet, 10, "400px") & "</td></tr>"
-                    If DefaultStylesheet = "" Then
-                        CopyContent = CopyContent & "<tr><td style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Default Stylesheet</b><br>There are no default styles for this add-on.</td></tr>"
-                    Else
-                        CopyContent = CopyContent & "<tr><td style=""padding-bottom:5px;"" class=""ccContentCon ccAdminSmall""><b>Default Stylesheet</b><br>" & html_GetFormInputTextExpandable2("DefaultStyles", DefaultStylesheet, 10, "400px", , , True) & "</td></tr>"
-                    End If
-                    CopyContent = "" _
-                        & CopyContent _
-                        & "</tr>" _
-                        & "</table>" _
-                        & html_GetFormInputHidden("Type", FormTypeAddonStyleEditor) _
-                        & html_GetFormInputHidden("AddonID", addonId) _
-                        & ""
-                    '
-                    BubbleJS = " onClick=""HelpBubbleOn( 'HelpBubble" & pageManager_HelpCodeCount & "',this);return false;"""
-                    QueryString = web_RefreshQueryString
-                    QueryString = ModifyQueryString(QueryString, RequestNameHardCodedPage, "", False)
-                    'QueryString = ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
-                    Dim Dialog As String
-
-                    Dialog = Dialog _
-                        & "<div class=""ccCon helpDialogCon"">" _
-                        & html_GetUploadFormStart() _
-                        & "<table border=0 cellpadding=0 cellspacing=0 class=""ccBubbleCon"" id=""HelpBubble" & pageManager_HelpCodeCount & """ style=""display:none;visibility:hidden;"">" _
-                        & "<tr><td class=""ccHeaderCon"">" & CopyHeader & "</td></tr>" _
-                        & "<tr><td class=""ccButtonCon"">" & html_GetFormButton("Update", "HelpBubbleButton") & "</td></tr>" _
-                        & "<tr><td class=""ccContentCon"">" & CopyContent & "</td></tr>" _
-                        & "</table>" _
-                        & "</form>" _
-                        & "</div>"
-                    return_DialogList = return_DialogList & Dialog
-                    addon_execute_getAddonStylesBubble = "" _
-                        & "&nbsp;<a href=""#"" tabindex=-1 target=""_blank""" & BubbleJS & ">" _
-                        & GetIconSprite("", 0, "/ccLib/images/toolstyles.png", 22, 22, "Edit " & AddonName & " Stylesheets", "Edit " & AddonName & " Stylesheets", "", True, "") _
-                        & "</a>"
-                    If pageManager_HelpCodeCount >= pageManager_HelpCodeSize Then
-                        pageManager_HelpCodeSize = pageManager_HelpCodeSize + 10
-                        ReDim Preserve pageManager_HelpCodes(pageManager_HelpCodeSize)
-                        ReDim Preserve pageManager_HelpCaptions(pageManager_HelpCodeSize)
-                    End If
-                    pageManager_HelpCodes(pageManager_HelpCodeCount) = LocalCode
-                    pageManager_HelpCaptions(pageManager_HelpCodeCount) = AddonName
-                    pageManager_HelpCodeCount = pageManager_HelpCodeCount + 1
-                End If
-            End If
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("addon_execute_GetAddonStylesBubble")
-        End Function
-        '
-        '===============================================================================================================================================
-        '   main_Get inner HTML viewer Bubble
-        '===============================================================================================================================================
-        '
-
-        Public Function addon_execute_getHelpBubble(ByVal addonId As Integer, ByVal helpCopy As String, ByVal CollectionID As Integer, ByRef return_DialogList As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("addon_execute_GetHelpBubble")
-            '
-            Dim DefaultStylesheet As String
-            Dim StyleSheet As String
-            Dim OptionDefault As String
-            Dim OptionSuffix As String
-            Dim OptionCnt As Integer
-            Dim OptionValue_AddonEncoded As String
-            Dim OptionValue As String
-            Dim OptionCaption As String
-            Dim LCaseOptionDefault As String
-            Dim OptionValues() As String
-            Dim FormInput As String
-            Dim OptionPtr As Integer
-            Dim QueryString As String
-            Dim LocalCode As String
-            Dim CopyHeader As String
-            Dim CopyContent As String
-            Dim BubbleJS As String
-            Dim OptionSplit() As String
-            Dim OptionName As String
-            Dim OptionSelector As String
-            Dim Ptr As Integer
-            Dim Pos As Integer
-            Dim CS As Integer
-            Dim AddonName As String
-            Dim StyleSN As Integer
-            Dim InnerCopy As String
-            Dim CollectionCopy As String
-            '
-            If user.isAuthenticated() Then
-                If user.isEditingAnything() Then
-                    StyleSN = EncodeInteger(siteProperties.getText("StylesheetSerialNumber", "0"))
-                    pageManager_HelpViewerButtonID = "HelpBubble" & pageManager_HelpCodeCount
-                    InnerCopy = helpCopy
-                    If InnerCopy = "" Then
-                        InnerCopy = "<p style=""text-align:center"">No help is available for this add-on.</p>"
-                    End If
-                    '
-                    If CollectionID <> 0 Then
-                        CollectionCopy = main_GetRecordName("Add-on Collections", CollectionID)
-                        If CollectionCopy <> "" Then
-                            CollectionCopy = "This add-on is a member of the " & CollectionCopy & " collection."
-                        Else
-                            CollectionID = 0
-                        End If
-                    End If
-                    If CollectionID = 0 Then
-                        CollectionCopy = "This add-on is not a member of any collection."
-                    End If
-                    CopyHeader = CopyHeader _
-                        & "<div class=""ccHeaderCon"">" _
-                        & "<table border=0 cellpadding=0 cellspacing=0 width=""100%"">" _
-                        & "<tr>" _
-                        & "<td align=left class=""bbLeft"">Help Viewer</td>" _
-                        & "<td align=right class=""bbRight""><a href=""#"" onClick=""HelpBubbleOff('HelpBubble" & pageManager_HelpCodeCount & "');return false;""><img alt=""close"" src=""/ccLib/images/ClosexRev1313.gif"" width=13 height=13 border=0></a></td>" _
-                        & "</tr>" _
-                        & "</table>" _
-                        & "</div>"
-                    CopyContent = "" _
-                        & "<table border=0 cellpadding=5 cellspacing=0 width=""100%"">" _
-                        & "<tr><td style=""width:400px;background-color:transparent;"" class=""ccAdminSmall""><p>" & CollectionCopy & "</p></td></tr>" _
-                        & "<tr><td style=""width:400px;background-color:transparent;border:1px solid #fff;padding:10px;margin:5px;"">" & InnerCopy & "</td></tr>" _
-                        & "</tr>" _
-                        & "</table>" _
-                        & ""
-                    '
-                    QueryString = web_RefreshQueryString
-                    QueryString = ModifyQueryString(QueryString, RequestNameHardCodedPage, "", False)
-                    'QueryString = ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
-                    return_DialogList = return_DialogList _
-                        & "<div class=""ccCon helpDialogCon"">" _
-                        & "<table border=0 cellpadding=0 cellspacing=0 class=""ccBubbleCon"" id=""HelpBubble" & pageManager_HelpCodeCount & """ style=""display:none;visibility:hidden;"">" _
-                        & "<tr><td class=""ccHeaderCon"">" & CopyHeader & "</td></tr>" _
-                        & "<tr><td class=""ccContentCon"">" & CopyContent & "</td></tr>" _
-                        & "</table>" _
-                        & "</div>"
-                    BubbleJS = " onClick=""HelpBubbleOn( 'HelpBubble" & pageManager_HelpCodeCount & "',this);return false;"""
-                    If pageManager_HelpCodeCount >= pageManager_HelpCodeSize Then
-                        pageManager_HelpCodeSize = pageManager_HelpCodeSize + 10
-                        ReDim Preserve pageManager_HelpCodes(pageManager_HelpCodeSize)
-                        ReDim Preserve pageManager_HelpCaptions(pageManager_HelpCodeSize)
-                    End If
-                    pageManager_HelpCodes(pageManager_HelpCodeCount) = LocalCode
-                    pageManager_HelpCaptions(pageManager_HelpCodeCount) = AddonName
-                    pageManager_HelpCodeCount = pageManager_HelpCodeCount + 1
-                    '
-                    If pageManager_HelpDialogCnt = 0 Then
-                        Call main_AddOnLoadJavascript2("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
-                    End If
-                    pageManager_HelpDialogCnt = pageManager_HelpDialogCnt + 1
-                    'SiteStylesBubbleCache = "x"
-                    'End If
-                    addon_execute_getHelpBubble = "" _
-                        & "&nbsp;<a href=""#"" tabindex=-1 tarGet=""_blank""" & BubbleJS & " >" _
-                        & GetIconSprite("", 0, "/ccLib/images/toolhelp.png", 22, 22, "View help resources for this Add-on", "View help resources for this Add-on", "", True, "") _
-                        & "</a>"
-                End If
-            End If
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("addon_execute_GetHelpBubble")
-        End Function
-        '
-        '===============================================================================================================================================
-        '   main_Get inner HTML viewer Bubble
-        '===============================================================================================================================================
-        '
-        Public Function addon_execute_getHTMLViewerBubble(ByVal addonId As Integer, ByVal HTMLSourceID As String, ByRef return_DialogList As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("addon_execute_GetHTMLViewerBubble")
-            '
-            Dim DefaultStylesheet As String
-            Dim StyleSheet As String
-            Dim OptionDefault As String
-            Dim OptionSuffix As String
-            Dim OptionCnt As Integer
-            Dim OptionValue_AddonEncoded As String
-            Dim OptionValue As String
-            Dim OptionCaption As String
-            Dim LCaseOptionDefault As String
-            Dim OptionValues() As String
-            Dim FormInput As String
-            Dim OptionPtr As Integer
-            Dim QueryString As String
-            Dim LocalCode As String
-            Dim CopyHeader As String
-            Dim CopyContent As String
-            Dim BubbleJS As String
-            Dim OptionSplit() As String
-            Dim OptionName As String
-            Dim OptionSelector As String
-            Dim Ptr As Integer
-            Dim Pos As Integer
-            Dim CS As Integer
-            Dim AddonName As String
-            Dim StyleSN As Integer
-            Dim HTMLViewerBubbleID As String
-            '
-            If user.isAuthenticated() Then
-                If user.isEditingAnything() Then
-                    StyleSN = EncodeInteger(siteProperties.getText("StylesheetSerialNumber", "0"))
-                    HTMLViewerBubbleID = "HelpBubble" & pageManager_HelpCodeCount
-                    '
-                    CopyHeader = CopyHeader _
-                        & "<div class=""ccHeaderCon"">" _
-                        & "<table border=0 cellpadding=0 cellspacing=0 width=""100%"">" _
-                        & "<tr>" _
-                        & "<td align=left class=""bbLeft"">HTML viewer</td>" _
-                        & "<td align=right class=""bbRight""><a href=""#"" onClick=""HelpBubbleOff('" & HTMLViewerBubbleID & "');return false;""><img alt=""close"" src=""/ccLib/images/ClosexRev1313.gif"" width=13 height=13 border=0></A></td>" _
-                        & "</tr>" _
-                        & "</table>" _
-                        & "</div>"
-                    CopyContent = "" _
-                        & "<table border=0 cellpadding=5 cellspacing=0 width=""100%"">" _
-                        & "<tr><td style=""width:400px;background-color:transparent;"" class=""ccAdminSmall"">This is the HTML produced by this add-on. Carrage returns and tabs have been added or modified to enhance readability.</td></tr>" _
-                        & "<tr><td style=""width:400px;background-color:transparent;"" class=""ccAdminSmall"">" & html_GetFormInputTextExpandable2("DefaultStyles", "", 10, "400px", HTMLViewerBubbleID & "_dst", , False) & "</td></tr>" _
-                        & "</tr>" _
-                        & "</table>" _
-                        & ""
-                    '
-                    QueryString = web_RefreshQueryString
-                    QueryString = ModifyQueryString(QueryString, RequestNameHardCodedPage, "", False)
-                    'QueryString = ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
-                    return_DialogList = return_DialogList _
-                        & "<div class=""ccCon helpDialogCon"">" _
-                        & "<table border=0 cellpadding=0 cellspacing=0 class=""ccBubbleCon"" id=""" & HTMLViewerBubbleID & """ style=""display:none;visibility:hidden;"">" _
-                        & "<tr><td class=""ccHeaderCon"">" & CopyHeader & "</td></tr>" _
-                        & "<tr><td class=""ccContentCon"">" & CopyContent & "</td></tr>" _
-                        & "</table>" _
-                        & "</div>"
-                    BubbleJS = " onClick=""var d=document.getElementById('" & HTMLViewerBubbleID & "_dst');if(d){var s=document.getElementById('" & HTMLSourceID & "');if(s){d.value=s.innerHTML;HelpBubbleOn( '" & HTMLViewerBubbleID & "',this)}};return false;"" "
-                    If pageManager_HelpCodeCount >= pageManager_HelpCodeSize Then
-                        pageManager_HelpCodeSize = pageManager_HelpCodeSize + 10
-                        ReDim Preserve pageManager_HelpCodes(pageManager_HelpCodeSize)
-                        ReDim Preserve pageManager_HelpCaptions(pageManager_HelpCodeSize)
-                    End If
-                    pageManager_HelpCodes(pageManager_HelpCodeCount) = LocalCode
-                    pageManager_HelpCaptions(pageManager_HelpCodeCount) = AddonName
-                    pageManager_HelpCodeCount = pageManager_HelpCodeCount + 1
-                    'SiteStylesBubbleCache = "x"
-                    '
-                    If pageManager_HelpDialogCnt = 0 Then
-                        Call main_AddOnLoadJavascript2("jQuery(function(){jQuery('.helpDialogCon').draggable()})", "draggable dialogs")
-                    End If
-                    pageManager_HelpDialogCnt = pageManager_HelpDialogCnt + 1
-                    addon_execute_getHTMLViewerBubble = "" _
-                        & "&nbsp;<a href=""#"" tabindex=-1 target=""_blank""" & BubbleJS & " >" _
-                        & GetIconSprite("", 0, "/ccLib/images/toolhtml.png", 22, 22, "View the source HTML produced by this Add-on", "View the source HTML produced by this Add-on", "", True, "") _
-                        & "</A>"
-                End If
-            End If
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("addon_execute_GetHTMLViewerBubble")
-        End Function
-        '
-        '
-        '
-        Private Function addon_execute_getFormContent(ByVal FormXML As String, ByRef return_ExitRequest As Boolean) As String
-            ''Dim th as integer : th = profileLogMethodEnter("addon_execute_GetFormContent")
-            '
-            Const LoginMode_None = 1
-            Const LoginMode_AutoRecognize = 2
-            Const LoginMode_AutoLogin = 3
-            '
-            Dim PageSize As Integer
-            Dim FieldCount As Integer
-            Dim RowMax As Integer
-            Dim ColumnMax As Integer
-            'Dim RecordField As Field
-            Dim SQLPageSize As Integer
-            'dim dt as datatable
-            Dim ErrorNumber As Integer
-            Dim ErrorDescription As String
-            Dim dataArray As String(,)
-            Dim RecordID As Integer
-            'Dim XMLTools As New xmlToolsclass(me)
-            Dim fieldfilename As String
-            'Dim fs As New fileSystemClass
-            Dim FieldDataSource As String
-            Dim FieldSQL As String
-            Dim LoginMode As Integer
-            Dim Help As String
-            Dim Content As New coreFastStringClass
-            Dim Copy As String
-            Dim Button As String
-            Dim PageNotFoundPageID As String
-            Dim Adminui As New coreAdminUIClass(Me)
-            Dim ButtonList As String
-            Dim AllowLinkAlias As Boolean
-            'Dim AllowExternalLinksInChildList As Boolean
-            Dim LinkForwardAutoInsert As Boolean
-            Dim SectionLandingLink As String
-            'Dim app.siteProperty_ServerPageDefault As String
-            Dim LandingPageID As String
-            Dim AllowAutoRecognize As Boolean
-            Dim AllowMobileTemplates As Boolean
-            '
-            '
-            '
-            Dim Filename As String
-            Dim NonEncodedLink As String
-            Dim EncodedLink As String
-            Dim VirtualFilePath As String
-            Dim Option_String As String
-            Dim TabName As String
-            Dim TabDescription As String
-            Dim TabHeading As String
-            Dim TabCnt As Integer
-            Dim TabCell As coreFastStringClass
-            Dim FieldValue As String
-            Dim FieldDescription As String
-            Dim FieldDefaultValue As String
-            Dim IsFound As Boolean
-            Dim Name As String
-            Dim Description As String
-            Dim LoopPtr As Integer
-            Dim XMLFile As String
-            Dim Doc As New XmlDocument
-            Dim TabNode As XmlNode
-            Dim SettingNode As XmlNode
-            Dim CS As Integer
-            Dim FieldName As String
-            Dim FieldCaption As String
-            Dim FieldAddon As String
-            Dim FieldReadOnly As Boolean
-            Dim FieldHTML As Boolean
-            Dim fieldType As String
-            Dim FieldSelector As String
-            Dim DefaultFilename As String
-            '
-            Button = docProperties.getText(RequestNameButton)
-            If Button = ButtonCancel Then
-                '
-                ' Cancel just exits with no content
-                '
-                return_ExitRequest = True
-                Exit Function
-            ElseIf Not user.isAuthenticatedAdmin() Then
-                '
-                ' Not Admin Error
-                '
-                ButtonList = ButtonCancel
-                Content.Add(Adminui.GetFormBodyAdminOnly())
-            Else
-                If True Then
-                    Dim loadOK As Boolean
-                    loadOK = True
-                    Try
-
-                        Doc.LoadXml(FormXML)
-                    Catch ex As Exception
-                        ' error
-                        '
-                        ButtonList = ButtonCancel
-                        Content.Add("<div class=""ccError"" style=""margin:10px;padding:10px;background-color:white;"">There was a problem with the Setting Page you requested.</div>")
-                        loadOK = False
-                    End Try
-                    '        CS = main_OpenCSContentRecord("Setting Pages", SettingPageID)
-                    '        If Not app.csv_IsCSOK(CS) Then
-                    '            '
-                    '            ' Setting Page was not found
-                    '            '
-                    '            ButtonList = ButtonCancel
-                    '            Content.Add( "<div class=""ccError"" style=""margin:10px;padding:10px;background-color:white;"">The Setting Page you requested could not be found.</div>"
-                    '        Else
-                    '            XMLFile = app.db_GetCS(CS, "xmlfile")
-                    '            Doc = New XmlDocument
-                    'Doc.loadXML (XMLFile)
-                    If loadOK Then
-                    Else
-                        '
-                        ' data is OK
-                        '
-                        If vbLCase(Doc.DocumentElement.Name) <> "form" Then
-                            '
-                            ' error - Need a way to reach the user that submitted the file
-                            '
-                            ButtonList = ButtonCancel
-                            Content.Add("<div class=""ccError"" style=""margin:10px;padding:10px;background-color:white;"">There was a problem with the Setting Page you requested.</div>")
-                        Else
-                            '
-                            ' ----- Process Requests
-                            '
-                            If (Button = ButtonSave) Or (Button = ButtonOK) Then
-                                With Doc.DocumentElement
-                                    For Each SettingNode In .ChildNodes
-                                        Select Case vbLCase(SettingNode.Name)
-                                            Case "tab"
-                                                For Each TabNode In SettingNode.ChildNodes
-                                                    Select Case vbLCase(TabNode.Name)
-                                                        Case "siteproperty"
-                                                            '
-                                                            FieldName = main_GetXMLAttribute(IsFound, TabNode, "name", "")
-                                                            FieldValue = docProperties.getText(FieldName)
-                                                            fieldType = main_GetXMLAttribute(IsFound, TabNode, "type", "")
-                                                            Select Case vbLCase(fieldType)
-                                                                Case "integer"
-                                                                    '
-                                                                    If FieldValue <> "" Then
-                                                                        FieldValue = EncodeInteger(FieldValue).ToString
-                                                                    End If
-                                                                    Call siteProperties.setProperty(FieldName, FieldValue)
-                                                                Case "boolean"
-                                                                    '
-                                                                    If FieldValue <> "" Then
-                                                                        FieldValue = EncodeBoolean(FieldValue).ToString
-                                                                    End If
-                                                                    Call siteProperties.setProperty(FieldName, FieldValue)
-                                                                Case "float"
-                                                                    '
-                                                                    If FieldValue <> "" Then
-                                                                        FieldValue = EncodeNumber(FieldValue).ToString
-                                                                    End If
-                                                                    Call siteProperties.setProperty(FieldName, FieldValue)
-                                                                Case "date"
-                                                                    '
-                                                                    If FieldValue <> "" Then
-                                                                        FieldValue = EncodeDate(FieldValue).ToString
-                                                                    End If
-                                                                    Call siteProperties.setProperty(FieldName, FieldValue)
-                                                                Case "file", "imagefile"
-                                                                    '
-                                                                    If doc_getBoolean2(FieldName & ".DeleteFlag") Then
-                                                                        Call siteProperties.setProperty(FieldName, "")
-                                                                    End If
-                                                                    If FieldValue <> "" Then
-                                                                        VirtualFilePath = "Settings/" & FieldName
-                                                                        Call web_processFormInputFile(FieldName, VirtualFilePath)
-                                                                        FieldValue = VirtualFilePath & "/" & FieldValue
-                                                                        Call siteProperties.setProperty(FieldName, FieldValue)
-                                                                    End If
-                                                                Case "textfile"
-                                                                    '
-                                                                    DefaultFilename = "Settings/" & FieldName & ".txt"
-                                                                    Filename = siteProperties.getText(FieldName, DefaultFilename)
-                                                                    If Filename = "" Then
-                                                                        Filename = DefaultFilename
-                                                                        Call siteProperties.setProperty(FieldName, DefaultFilename)
-                                                                    End If
-                                                                    Call appRootFiles.saveFile(Filename, FieldValue)
-                                                                Case "cssfile"
-                                                                    '
-                                                                    DefaultFilename = "Settings/" & FieldName & ".css"
-                                                                    Filename = siteProperties.getText(FieldName, DefaultFilename)
-                                                                    If Filename = "" Then
-                                                                        Filename = DefaultFilename
-                                                                        Call siteProperties.setProperty(FieldName, DefaultFilename)
-                                                                    End If
-                                                                    Call appRootFiles.saveFile(Filename, FieldValue)
-                                                                Case "xmlfile"
-                                                                    '
-                                                                    DefaultFilename = "Settings/" & FieldName & ".xml"
-                                                                    Filename = siteProperties.getText(FieldName, DefaultFilename)
-                                                                    If Filename = "" Then
-                                                                        Filename = DefaultFilename
-                                                                        Call siteProperties.setProperty(FieldName, DefaultFilename)
-                                                                    End If
-                                                                    Call appRootFiles.saveFile(Filename, FieldValue)
-                                                                Case "currency"
-                                                                    '
-                                                                    If FieldValue <> "" Then
-                                                                        FieldValue = EncodeNumber(FieldValue).ToString
-                                                                        FieldValue = FormatCurrency(FieldValue)
-                                                                    End If
-                                                                    Call siteProperties.setProperty(FieldName, FieldValue)
-                                                                Case "link"
-                                                                    Call siteProperties.setProperty(FieldName, FieldValue)
-                                                                Case Else
-                                                                    Call siteProperties.setProperty(FieldName, FieldValue)
-                                                            End Select
-                                                        Case "copycontent"
-                                                            '
-                                                            ' A Copy Content block
-                                                            '
-                                                            FieldReadOnly = EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
-                                                            If Not FieldReadOnly Then
-                                                                FieldName = main_GetXMLAttribute(IsFound, TabNode, "name", "")
-                                                                FieldHTML = EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "html", "false"))
-                                                                If FieldHTML Then
-                                                                    '
-                                                                    ' treat html as active content for now.
-                                                                    '
-                                                                    FieldValue = doc_getActiveContent(FieldName)
-                                                                Else
-                                                                    FieldValue = docProperties.getText(FieldName)
-                                                                End If
-
-                                                                CS = db.csOpen("Copy Content", "name=" & db.encodeSQLText(FieldName), "ID")
-                                                                If Not db.cs_Ok(CS) Then
-                                                                    Call db.cs_Close(CS)
-                                                                    CS = db.cs_insertRecord("Copy Content")
-                                                                End If
-                                                                If db.cs_Ok(CS) Then
-                                                                    Call db.cs_set(CS, "name", FieldName)
-                                                                    '
-                                                                    ' Set copy
-                                                                    '
-                                                                    Call db.cs_set(CS, "copy", FieldValue)
-                                                                    '
-                                                                    ' delete duplicates
-                                                                    '
-                                                                    Call db.db_csGoNext(CS)
-                                                                    Do While db.cs_Ok(CS)
-                                                                        Call db_DeleteCSRecord(CS)
-                                                                        Call db.db_csGoNext(CS)
-                                                                    Loop
-                                                                End If
-                                                                Call db.cs_Close(CS)
-                                                            End If
-
-                                                        Case "filecontent"
-                                                            '
-                                                            ' A File Content block
-                                                            '
-                                                            FieldReadOnly = EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
-                                                            If Not FieldReadOnly Then
-                                                                FieldName = main_GetXMLAttribute(IsFound, TabNode, "name", "")
-                                                                fieldfilename = main_GetXMLAttribute(IsFound, TabNode, "filename", "")
-                                                                FieldValue = docProperties.getText(FieldName)
-                                                                Call appRootFiles.saveFile(fieldfilename, FieldValue)
-                                                            End If
-                                                        Case "dbquery"
-                                                            '
-                                                            ' dbquery has no results to process
-                                                            '
-                                                    End Select
-                                                Next
-                                            Case Else
-                                        End Select
-                                    Next
-                                End With
-                            End If
-                            If (Button = ButtonOK) Then
-                                '
-                                ' Exit on OK or cancel
-                                '
-                                return_ExitRequest = True
-                                Exit Function
-                            End If
-                            '
-                            ' ----- Display Form
-                            '
-                            Content.Add(Adminui.EditTableOpen)
-                            Name = main_GetXMLAttribute(IsFound, Doc.DocumentElement, "name", "")
-                            With Doc.DocumentElement
-                                For Each SettingNode In .ChildNodes
-                                    Select Case vbLCase(SettingNode.Name)
-                                        Case "description"
-                                            Description = SettingNode.InnerText
-                                        Case "tab"
-                                            TabCnt = TabCnt + 1
-                                            TabName = main_GetXMLAttribute(IsFound, SettingNode, "name", "")
-                                            TabDescription = main_GetXMLAttribute(IsFound, SettingNode, "description", "")
-                                            TabHeading = main_GetXMLAttribute(IsFound, SettingNode, "heading", "")
-                                            TabCell = New coreFastStringClass
-                                            For Each TabNode In SettingNode.ChildNodes
-                                                Select Case vbLCase(TabNode.Name)
-                                                    Case "heading"
-                                                        '
-                                                        ' Heading
-                                                        '
-                                                        FieldCaption = main_GetXMLAttribute(IsFound, TabNode, "caption", "")
-                                                        Call TabCell.Add(Adminui.GetEditSubheadRow(FieldCaption))
-                                                    Case "siteproperty"
-                                                        '
-                                                        ' Site property
-                                                        '
-                                                        FieldName = main_GetXMLAttribute(IsFound, TabNode, "name", "")
-                                                        If FieldName <> "" Then
-                                                            FieldCaption = main_GetXMLAttribute(IsFound, TabNode, "caption", "")
-                                                            If FieldCaption = "" Then
-                                                                FieldCaption = FieldName
-                                                            End If
-                                                            FieldReadOnly = EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
-                                                            FieldHTML = EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "html", ""))
-                                                            fieldType = main_GetXMLAttribute(IsFound, TabNode, "type", "")
-                                                            FieldSelector = main_GetXMLAttribute(IsFound, TabNode, "selector", "")
-                                                            FieldDescription = main_GetXMLAttribute(IsFound, TabNode, "description", "")
-                                                            FieldAddon = main_GetXMLAttribute(IsFound, TabNode, "EditorAddon", "")
-                                                            FieldDefaultValue = TabNode.InnerText
-                                                            FieldValue = siteProperties.getText(FieldName, FieldDefaultValue)
-                                                            '                                                    If FieldReadOnly Then
-                                                            '                                                        '
-                                                            '                                                        ' Read only = no editor
-                                                            '                                                        '
-                                                            '                                                        Copy = FieldValue & main_GetFormInputHidden( FieldName, FieldValue)
-                                                            '
-                                                            '                                                    ElseIf FieldAddon <> "" Then
-                                                            If FieldAddon <> "" Then
-                                                                '
-                                                                ' Use Editor Addon
-                                                                '
-                                                                Option_String = "FieldName=" & FieldName & "&FieldValue=" & encodeNvaArgument(siteProperties.getText(FieldName, FieldDefaultValue))
-                                                                Copy = addon_execute_legacy5(0, FieldAddon, Option_String, CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", 0)
-                                                            ElseIf FieldSelector <> "" Then
-                                                                '
-                                                                ' Use Selector
-                                                                '
-                                                                Copy = addon_execute_getFormContent_decodeSelector(FieldName, FieldValue, FieldSelector)
-                                                            Else
-                                                                '
-                                                                ' Use default editor for each field type
-                                                                '
-                                                                Select Case vbLCase(fieldType)
-                                                                    Case "integer"
-                                                                        '
-                                                                        If FieldReadOnly Then
-                                                                            Copy = FieldValue & html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            Copy = html_GetFormInputText2(FieldName, FieldValue)
-                                                                        End If
-                                                                    Case "boolean"
-                                                                        If FieldReadOnly Then
-                                                                            Copy = html_GetFormInputCheckBox2(FieldName, EncodeBoolean(FieldValue))
-                                                                            Copy = vbReplace(Copy, ">", " disabled>")
-                                                                            Copy = Copy & html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            Copy = html_GetFormInputCheckBox2(FieldName, EncodeBoolean(FieldValue))
-                                                                        End If
-                                                                    Case "float"
-                                                                        If FieldReadOnly Then
-                                                                            Copy = FieldValue & html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            Copy = html_GetFormInputText2(FieldName, FieldValue)
-                                                                        End If
-                                                                    Case "date"
-                                                                        If FieldReadOnly Then
-                                                                            Copy = FieldValue & html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            Copy = html_GetFormInputDate(FieldName, FieldValue)
-                                                                        End If
-                                                                    Case "file", "imagefile"
-                                                                        '
-                                                                        If FieldReadOnly Then
-                                                                            Copy = FieldValue & html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            If FieldValue = "" Then
-                                                                                Copy = html_GetFormInputFile(FieldName)
-                                                                            Else
-                                                                                NonEncodedLink = webServer.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, FieldValue)
-                                                                                EncodedLink = EncodeURL(NonEncodedLink)
-                                                                                Copy = "" _
-                                                                                    & "<a href=""http://" & EncodedLink & """ target=""_blank"">[" & GetFilename(FieldValue) & "]</A>" _
-                                                                                    & "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & html_GetFormInputCheckBox2(FieldName & ".DeleteFlag", False) _
-                                                                                    & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & html_GetFormInputFile(FieldName)
-                                                                            End If
-                                                                        End If
-                                                                        'Call s.Add("&nbsp;</span></nobr></td>")
-                                                                    Case "currency"
-                                                                        '
-                                                                        If FieldReadOnly Then
-                                                                            Copy = FieldValue & html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            If FieldValue <> "" Then
-                                                                                FieldValue = FormatCurrency(FieldValue)
-                                                                            End If
-                                                                            Copy = html_GetFormInputText2(FieldName, FieldValue)
-                                                                        End If
-                                                                    Case "textfile"
-                                                                        '
-                                                                        If FieldReadOnly Then
-                                                                            Copy = FieldValue & html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            FieldValue = cdnFiles.readFile(FieldValue)
-                                                                            If FieldHTML Then
-                                                                                Copy = html_GetFormInputHTML(FieldName, FieldValue)
-                                                                            Else
-                                                                                Copy = html_GetFormInputTextExpandable(FieldName, FieldValue, 5)
-                                                                            End If
-                                                                        End If
-                                                                    Case "cssfile"
-                                                                        '
-                                                                        If FieldReadOnly Then
-                                                                            Copy = FieldValue & html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            Copy = html_GetFormInputTextExpandable(FieldName, FieldValue, 5)
-                                                                        End If
-                                                                    Case "xmlfile"
-                                                                        '
-                                                                        If FieldReadOnly Then
-                                                                            Copy = FieldValue & html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            Copy = html_GetFormInputTextExpandable(FieldName, FieldValue, 5)
-                                                                        End If
-                                                                    Case "link"
-                                                                        '
-                                                                        If FieldReadOnly Then
-                                                                            Copy = FieldValue & html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            Copy = html_GetFormInputText2(FieldName, FieldValue)
-                                                                        End If
-                                                                    Case Else
-                                                                        '
-                                                                        ' text
-                                                                        '
-                                                                        If FieldReadOnly Then
-                                                                            Copy = FieldValue & html_GetFormInputHidden(FieldName, FieldValue)
-                                                                        Else
-                                                                            If FieldHTML Then
-                                                                                Copy = html_GetFormInputHTML(FieldName, FieldValue)
-                                                                            Else
-                                                                                Copy = html_GetFormInputText2(FieldName, FieldValue)
-                                                                            End If
-                                                                        End If
-                                                                End Select
-                                                            End If
-                                                            Call TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, False, False, ""))
-                                                        End If
-                                                    Case "copycontent"
-                                                        '
-                                                        ' Content Copy field
-                                                        '
-                                                        FieldName = main_GetXMLAttribute(IsFound, TabNode, "name", "")
-                                                        If FieldName <> "" Then
-                                                            FieldCaption = main_GetXMLAttribute(IsFound, TabNode, "caption", "")
-                                                            If FieldCaption = "" Then
-                                                                FieldCaption = FieldName
-                                                            End If
-                                                            FieldReadOnly = EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
-                                                            FieldDescription = main_GetXMLAttribute(IsFound, TabNode, "description", "")
-                                                            FieldHTML = EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "html", ""))
-                                                            '
-                                                            CS = db.csOpen("Copy Content", "Name=" & db_EncodeSQLText(FieldName), "ID", , , , , "Copy")
-                                                            If Not db.cs_Ok(CS) Then
-                                                                Call db.cs_Close(CS)
-                                                                CS = db.cs_insertRecord("Copy Content")
-                                                                If db.cs_Ok(CS) Then
-                                                                    RecordID = db.cs_getInteger(CS, "ID")
-                                                                    Call db.cs_set(CS, "name", FieldName)
-                                                                    Call db.cs_set(CS, "copy", EncodeText(TabNode.InnerText))
-                                                                    Call db.db_SaveCSRecord(CS)
-                                                                    Call workflow.publishEdit("Copy Content", RecordID)
-                                                                End If
-                                                            End If
-                                                            If db.cs_Ok(CS) Then
-                                                                FieldValue = db.cs_getText(CS, "copy")
-                                                            End If
-                                                            If FieldReadOnly Then
-                                                                '
-                                                                ' Read only
-                                                                '
-                                                                Copy = FieldValue
-                                                            ElseIf FieldHTML Then
-                                                                '
-                                                                ' HTML
-                                                                '
-                                                                Copy = html_GetFormInputHTML3(FieldName, FieldValue)
-                                                                'Copy = main_GetFormInputActiveContent( FieldName, FieldValue)
-                                                            Else
-                                                                '
-                                                                ' Text edit
-                                                                '
-                                                                Copy = html_GetFormInputTextExpandable(FieldName, FieldValue)
-                                                            End If
-                                                            Call TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, False, False, ""))
-                                                        End If
-                                                    Case "filecontent"
-                                                        '
-                                                        ' Content from a flat file
-                                                        '
-                                                        FieldName = main_GetXMLAttribute(IsFound, TabNode, "name", "")
-                                                        FieldCaption = main_GetXMLAttribute(IsFound, TabNode, "caption", "")
-                                                        fieldfilename = main_GetXMLAttribute(IsFound, TabNode, "filename", "")
-                                                        FieldReadOnly = EncodeBoolean(main_GetXMLAttribute(IsFound, TabNode, "readonly", ""))
-                                                        FieldDescription = main_GetXMLAttribute(IsFound, TabNode, "description", "")
-                                                        FieldDefaultValue = TabNode.InnerText
-                                                        Copy = ""
-                                                        If fieldfilename <> "" Then
-                                                            If appRootFiles.fileExists(fieldfilename) Then
-                                                                Copy = FieldDefaultValue
-                                                            Else
-                                                                Copy = cdnFiles.readFile(fieldfilename)
-                                                            End If
-                                                            If Not FieldReadOnly Then
-                                                                Copy = html_GetFormInputTextExpandable(FieldName, Copy, 10)
-                                                            End If
-                                                        End If
-                                                        Call TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, False, False, ""))
-                                                    Case "dbquery", "querydb", "query", "db"
-                                                        '
-                                                        ' Display the output of a query
-                                                        '
-                                                        Copy = ""
-                                                        FieldDataSource = main_GetXMLAttribute(IsFound, TabNode, "DataSourceName", "")
-                                                        FieldSQL = TabNode.InnerText
-                                                        FieldCaption = main_GetXMLAttribute(IsFound, TabNode, "caption", "")
-                                                        FieldDescription = main_GetXMLAttribute(IsFound, TabNode, "description", "")
-                                                        SQLPageSize = EncodeInteger(main_GetXMLAttribute(IsFound, TabNode, "rowmax", ""))
-                                                        If SQLPageSize = 0 Then
-                                                            SQLPageSize = 100
-                                                        End If
-                                                        '
-                                                        ' Run the SQL
-                                                        '
-                                                        Dim dt As DataTable
-
-                                                        If FieldSQL <> "" Then
-                                                            Try
-                                                                dt = db.executeSql_getDataTable(FieldSQL, FieldDataSource, , SQLPageSize)
-                                                            Catch ex As Exception
-                                                                ErrorDescription = ex.ToString
-                                                                loadOK = False
-                                                            End Try
-                                                        End If
-                                                        If FieldSQL = "" Then
-                                                            '
-                                                            ' ----- Error
-                                                            '
-                                                            Copy = "No Result"
-                                                        ElseIf ErrorNumber <> 0 Then
-                                                            '
-                                                            ' ----- Error
-                                                            '
-                                                            Copy = "Error: " & Err.Description
-                                                        ElseIf (dt.Rows.Count <= 0) Then
-                                                            '
-                                                            ' ----- no result
-                                                            '
-                                                            Copy = "No Results"
-                                                        Else
-                                                            '
-                                                            ' ----- print results
-                                                            '
-                                                            'PageSize = RS.PageSize
-                                                            '
-                                                            ' --- Create the Fields for the new table
-                                                            '
-                                                            '
-                                                            'Dim dtOk As Boolean = True
-                                                            dataArray = convertDataTabletoArray(dt)
-                                                            '
-                                                            RowMax = UBound(dataArray, 2)
-                                                            ColumnMax = UBound(dataArray, 1)
-                                                            If RowMax = 0 And ColumnMax = 0 Then
-                                                                '
-                                                                ' Single result, display with no table
-                                                                '
-                                                                Copy = html_GetFormInputText2("result", EncodeText(dataArray(0, 0)), , , , , True)
-                                                            Else
-                                                                '
-                                                                ' Build headers
-                                                                '
-                                                                FieldCount = dt.Columns.Count
-                                                                Copy = Copy & (cr & "<table border=""0"" cellpadding=""0"" cellspacing=""0"" width=""100%"" style=""border-bottom:1px solid #444;border-right:1px solid #444;background-color:white;color:#444;"">")
-                                                                Copy = Copy & (cr2 & "<tr>")
-                                                                For Each dc As DataColumn In dt.Columns
-                                                                    Copy = Copy & (cr2 & vbTab & "<td class=""ccadminsmall"" style=""border-top:1px solid #444;border-left:1px solid #444;color:black;padding:2px;padding-top:4px;padding-bottom:4px;"">" & dc.ColumnName & "</td>")
-                                                                    'Copy = Copy & ("<td class=""ccHeaderCon ccAdminSmall"" style=""color:white"">" & RecordField.Name & "</td>")
-                                                                Next
-                                                                Copy = Copy & (cr2 & "</tr>")
-                                                                '
-                                                                ' Build output table
-                                                                '
-                                                                Dim RowStart As String
-                                                                Dim RowEnd As String
-                                                                Dim ColumnStart As String
-                                                                Dim ColumnEnd As String
-                                                                RowStart = cr2 & "<tr>"
-                                                                RowEnd = cr2 & "</tr>"
-                                                                ColumnStart = cr2 & vbTab & "<td class=""ccadminnormal"" style=""border-top:1px solid #444;border-left:1px solid #444;background-color:white;color:#444;padding:2px"">"
-                                                                ColumnEnd = "</td>"
-                                                                Dim RowPointer As Integer
-                                                                For RowPointer = 0 To RowMax
-                                                                    Copy = Copy & (RowStart)
-                                                                    Dim ColumnPointer As Integer
-                                                                    For ColumnPointer = 0 To ColumnMax
-                                                                        Dim CellData As Object
-                                                                        CellData = dataArray(ColumnPointer, RowPointer)
-                                                                        If IsNull(CellData) Then
-                                                                            Copy = Copy & (ColumnStart & "[null]" & ColumnEnd)
-                                                                        ElseIf IsNothing(CellData) Then
-                                                                            Copy = Copy & (ColumnStart & "[empty]" & ColumnEnd)
-                                                                        ElseIf IsArray(CellData) Then
-                                                                            Copy = Copy & ColumnStart & "[array]"
-                                                                            'Dim Cnt As Integer
-                                                                            'Cnt = UBound(CellData)
-                                                                            'Dim Ptr As Integer
-                                                                            'For Ptr = 0 To Cnt - 1
-                                                                            '    Copy = Copy & ("<br>(" & Ptr & ")&nbsp;[" & CellData(Ptr) & "]")
-                                                                            'Next
-                                                                            'Copy = Copy & (ColumnEnd)
-                                                                        ElseIf EncodeText(CellData) = "" Then
-                                                                            Copy = Copy & (ColumnStart & "[empty]" & ColumnEnd)
-                                                                        Else
-                                                                            Copy = Copy & (ColumnStart & html_EncodeHTML(EncodeText(CellData)) & ColumnEnd)
-                                                                        End If
-                                                                    Next
-                                                                    Copy = Copy & (RowEnd)
-                                                                Next
-                                                                Copy = Copy & (cr & "</table>")
-                                                            End If
-                                                        End If
-                                                        Call TabCell.Add(Adminui.GetEditRow(Copy, FieldCaption, FieldDescription, False, False, ""))
-                                                End Select
-                                            Next
-                                            Copy = Adminui.GetEditPanel(True, TabHeading, TabDescription, Adminui.EditTableOpen & TabCell.Text & Adminui.EditTableClose)
-                                            If Copy <> "" Then
-                                                Call main_AddLiveTabEntry(Replace(TabName, " ", "&nbsp;"), Copy, "ccAdminTab")
-                                            End If
-                                            'Content.Add( main_GetForm_Edit_AddTab(TabName, Copy, True))
-                                            TabCell = Nothing
-                                        Case Else
-                                    End Select
-                                Next
-                            End With
-                            '
-                            ' Buttons
-                            '
-                            ButtonList = ButtonCancel & "," & ButtonSave & "," & ButtonOK
-                            '
-                            ' Close Tables
-                            '
-                            'Content.Add( main_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormMobileBrowserControl))
-                            '
-                            '
-                            '
-                            If TabCnt > 0 Then
-                                Content.Add(main_GetLiveTabs())
-                            End If
-                        End If
-                    End If
-                End If
-            End If
-            '
-            addon_execute_getFormContent = Adminui.GetBody(Name, ButtonList, "", True, True, Description, "", 0, Content.Text)
-            Content = Nothing
-            '
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError10(Err.Number, Err.Source, Err.Description, "addon_execute_GetFormContent", True, False)
-        End Function
-        '
-        '========================================================================
-        '   Display field in the admin/edit
-        '========================================================================
-        '
-        Private Function addon_execute_getFormContent_decodeSelector(SitePropertyName As String, SitePropertyValue As String, selector As String) As String
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("AdminClass.addon_execute_GetFormContent_decodeSelector")
-            '
-            Dim ExpandedSelector As String
-            Dim ignore As String
-            Dim OptionCaption As String
-            Dim OptionValue As String
-            Dim OptionValue_AddonEncoded As String
-            Dim OptionPtr As Integer
-            Dim OptionCnt As Integer
-            Dim OptionValues() As String
-            Dim OptionSuffix As String
-            Dim LCaseOptionDefault As String
-            Dim Pos As Integer
-            Dim Checked As Boolean
-            Dim ParentID As Integer
-            Dim ParentCID As Integer
-            Dim Criteria As String
-            Dim RootCID As Integer
-            Dim SQL As String
-            Dim TableID As Integer
-            Dim TableName As Integer
-            Dim ChildCID As Integer
-            Dim CIDList As String
-            Dim TableName2 As String
-            Dim RecordContentName As String
-            Dim HasParentID As Boolean
-            Dim CS As Integer
-            ' converted array to dictionary - Dim FieldPointer As Integer
-            Dim CSPointer As Integer
-            Dim RecordID As Integer
-            Dim FastString As coreFastStringClass
-            Dim FieldValueInteger As Integer
-            Dim FieldRequired As Boolean
-            Dim FieldHelp As String
-            Dim AuthoringStatusMessage As String
-            Dim Delimiter As String
-            Dim Copy As String
-            Dim Adminui As New coreAdminUIClass(Me)
-            '
-            Dim FieldName As String
-            '
-            FastString = New coreFastStringClass
-            '
-            Call addon_execute_buildAddonOptionLists(ignore, ExpandedSelector, SitePropertyName & "=" & selector, SitePropertyName & "=" & SitePropertyValue, "0", True)
-            Pos = vbInstr(1, ExpandedSelector, "[")
-            If Pos <> 0 Then
-                '
-                ' List of Options, might be select, radio or checkbox
-                '
-                LCaseOptionDefault = vbLCase(Mid(ExpandedSelector, 1, Pos - 1))
-                Dim PosEqual As Integer
-
-                PosEqual = vbInstr(1, LCaseOptionDefault, "=")
-                If PosEqual > 0 Then
-                    LCaseOptionDefault = Mid(LCaseOptionDefault, PosEqual + 1)
-                End If
-
-                LCaseOptionDefault = decodeNvaArgument(LCaseOptionDefault)
-                ExpandedSelector = Mid(ExpandedSelector, Pos + 1)
-                Pos = vbInstr(1, ExpandedSelector, "]")
-                If Pos > 0 Then
-                    If Pos < Len(ExpandedSelector) Then
-                        OptionSuffix = vbLCase(Trim(Mid(ExpandedSelector, Pos + 1)))
-                    End If
-                    ExpandedSelector = Mid(ExpandedSelector, 1, Pos - 1)
-                End If
-                OptionValues = Split(ExpandedSelector, "|")
-                addon_execute_getFormContent_decodeSelector = ""
-                OptionCnt = UBound(OptionValues) + 1
-                For OptionPtr = 0 To OptionCnt - 1
-                    OptionValue_AddonEncoded = Trim(OptionValues(OptionPtr))
-                    If OptionValue_AddonEncoded <> "" Then
-                        Pos = vbInstr(1, OptionValue_AddonEncoded, ":")
-                        If Pos = 0 Then
-                            OptionValue = decodeNvaArgument(OptionValue_AddonEncoded)
-                            OptionCaption = OptionValue
-                        Else
-                            OptionCaption = decodeNvaArgument(Mid(OptionValue_AddonEncoded, 1, Pos - 1))
-                            OptionValue = decodeNvaArgument(Mid(OptionValue_AddonEncoded, Pos + 1))
-                        End If
-                        Select Case OptionSuffix
-                            Case "checkbox"
-                                '
-                                ' Create checkbox
-                                '
-                                If vbInstr(1, "," & LCaseOptionDefault & ",", "," & vbLCase(OptionValue) & ",") <> 0 Then
-                                    addon_execute_getFormContent_decodeSelector = addon_execute_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & SitePropertyName & OptionPtr & """ value=""" & OptionValue & """ checked=""checked"">" & OptionCaption & "</div>"
-                                Else
-                                    addon_execute_getFormContent_decodeSelector = addon_execute_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""checkbox"" name=""" & SitePropertyName & OptionPtr & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
-                                End If
-                            Case "radio"
-                                '
-                                ' Create Radio
-                                '
-                                If vbLCase(OptionValue) = LCaseOptionDefault Then
-                                    addon_execute_getFormContent_decodeSelector = addon_execute_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & SitePropertyName & """ value=""" & OptionValue & """ checked=""checked"" >" & OptionCaption & "</div>"
-                                Else
-                                    addon_execute_getFormContent_decodeSelector = addon_execute_getFormContent_decodeSelector & "<div style=""white-space:nowrap""><input type=""radio"" name=""" & SitePropertyName & """ value=""" & OptionValue & """ >" & OptionCaption & "</div>"
-                                End If
-                            Case Else
-                                '
-                                ' Create select 
-                                '
-                                If vbLCase(OptionValue) = LCaseOptionDefault Then
-                                    addon_execute_getFormContent_decodeSelector = addon_execute_getFormContent_decodeSelector & "<option value=""" & OptionValue & """ selected>" & OptionCaption & "</option>"
-                                Else
-                                    addon_execute_getFormContent_decodeSelector = addon_execute_getFormContent_decodeSelector & "<option value=""" & OptionValue & """>" & OptionCaption & "</option>"
-                                End If
-                        End Select
-                    End If
-                Next
-                Select Case OptionSuffix
-                    Case "checkbox"
-                        '
-                        '
-                        Copy = Copy & "<input type=""hidden"" name=""" & SitePropertyName & "CheckBoxCnt"" value=""" & OptionCnt & """ >"
-                    Case "radio"
-                        '
-                        ' Create Radio 
-                        '
-                        'main_addon_execute_GetFormContent_decodeSelector = "<div>" & vbReplace(main_addon_execute_GetFormContent_decodeSelector, "><", "></div><div><") & "</div>"
-                    Case Else
-                        '
-                        ' Create select 
-                        '
-                        addon_execute_getFormContent_decodeSelector = "<select name=""" & SitePropertyName & """>" & addon_execute_getFormContent_decodeSelector & "</select>"
-                End Select
-            Else
-                '
-                ' Create Text addon_execute_GetFormContent_decodeSelector
-                '
-
-                selector = decodeNvaArgument(selector)
-                addon_execute_getFormContent_decodeSelector = html_GetFormInputText2(SitePropertyName, selector, 1, 20)
-            End If
-
-            FastString = Nothing
-            Exit Function
-            '
-ErrorTrap:
-            FastString = Nothing
-            Call handleLegacyError18("addon_execute_GetFormContent_decodeSelector")
         End Function
         '
         Public Function main_GetPCCPtr(PageID As Integer, main_IsWorkflowRendering As Boolean, main_IsQuickEditing As Boolean) As Integer
@@ -36082,7 +31498,7 @@ ErrorTrap:
                         If addonId > 0 Then
                             AddonName = addonCache.localCache.addonList(addonCachePtr).addonCache_name
                             'hint = hint & ",AddonName=" & AddonName
-                            returnHtmlBody = returnHtmlBody & addon_execute_legacy2(addonId, "", "", CPUtilsBaseClass.addonContext.ContextOnBodyStart, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
+                            returnHtmlBody = returnHtmlBody & addon.execute_legacy2(addonId, "", "", CPUtilsBaseClass.addonContext.ContextOnBodyStart, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
                             If Not FilterStatusOK Then
                                 Call handleLegacyError12("main_GetHtmlBody", "There was an error processing OnAfterBody [" & addonCache.localCache.addonList(addonCachePtr).addonCache_name & "]. Filtering was aborted.")
                                 Exit For
@@ -36176,7 +31592,7 @@ ErrorTrap:
                                 AddonName = addonCache.localCache.addonList(addonCachePtr).addonCache_name
                                 'hint = hint & ",AddonName=" & AddonName
                                 main_FilterInput = main_GetHtmlBody
-                                AddonReturn = addon_execute_legacy2(addonId, "", "", CPUtilsBaseClass.addonContext.ContextFilter, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
+                                AddonReturn = addon.execute_legacy2(addonId, "", "", CPUtilsBaseClass.addonContext.ContextFilter, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
                                 returnHtmlBody = main_FilterInput & AddonReturn
                                 If Not FilterStatusOK Then
                                     Call handleLegacyError12("main_GetHtmlBody", "There was an error processing OnBodyEnd for [" & AddonName & "]. Filtering was aborted.")
@@ -37714,7 +33130,7 @@ ErrorTrap:
                             addonId = addonCache.localCache.addonList(addonCachePtr).addonCache_Id
                             If addonId > 0 Then
                                 AddonName = addonCache.localCache.addonList(addonCachePtr).addonCache_name
-                                AddonContent = addon_execute_legacy5(addonId, AddonName, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
+                                AddonContent = addon.execute_legacy5(addonId, AddonName, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
                                 main_PageContent = AddonContent & main_PageContent
                             End If
                         End If
@@ -37733,7 +33149,7 @@ ErrorTrap:
                             addonId = addonCache.localCache.addonList(addonCachePtr).addonCache_Id
                             If addonId > 0 Then
                                 AddonName = addonCache.localCache.addonList(addonCachePtr).addonCache_name
-                                AddonContent = addon_execute_legacy5(addonId, AddonName, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
+                                AddonContent = addon.execute_legacy5(addonId, AddonName, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
                                 main_PageContent = main_PageContent & AddonContent
                             End If
                         End If
@@ -38327,7 +33743,7 @@ ErrorTrap:
                             '                    QueryString = ModifyQueryString(QueryString, RequestNameHardCodedPage, HardCodedPagePrinterVersion, True)
                             Caption = siteProperties.getText("PagePrinterVersionCaption", "Printer Version")
                             Caption = vbReplace(Caption, " ", "&nbsp;")
-                            IconRow = IconRow & cr & "&nbsp;&nbsp;<a href=""" & html_EncodeHTML(web_requestPage & "?" & QueryString) & """ target=""_blank""><img alt=""image"" src=""/ccLib/images/IconSmallPrinter.gif"" width=""13"" height=""13"" border=""0"" align=""absmiddle""></a>&nbsp<a href=""" & html_EncodeHTML(web_requestPage & "?" & QueryString) & """ target=""_blank"" style=""text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;"">" & Caption & "</a>"
+                            IconRow = IconRow & cr & "&nbsp;&nbsp;<a href=""" & html.html_EncodeHTML(web_requestPage & "?" & QueryString) & """ target=""_blank""><img alt=""image"" src=""/ccLib/images/IconSmallPrinter.gif"" width=""13"" height=""13"" border=""0"" align=""absmiddle""></a>&nbsp<a href=""" & html.html_EncodeHTML(web_requestPage & "?" & QueryString) & """ target=""_blank"" style=""text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;"">" & Caption & "</a>"
                         End If
                         If AllowEmailPage Then
                             QueryString = web_RefreshQueryString
@@ -38413,7 +33829,7 @@ ErrorTrap:
                         'hint = hint & ",048"
                         ChildListInstanceOptions = EncodeText(cache_pageContent(PCC_ChildListInstanceOptions, main_RenderCache_CurrentPage_PCCPtr))
                         'hint = hint & ",049"
-                        Cell = Cell & addon_execute_legacy2(siteProperties.childListAddonID, "", ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, ContentName, PageID, "", PageChildListInstanceID, False, siteProperties.defaultWrapperID, "", AddonStatusOK, Nothing)
+                        Cell = Cell & addon.execute_legacy2(siteProperties.childListAddonID, "", ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, ContentName, PageID, "", PageChildListInstanceID, False, siteProperties.defaultWrapperID, "", AddonStatusOK, Nothing)
                     End If
                 End If
                 '
@@ -38702,7 +34118,7 @@ ErrorTrap:
             ' ----- Child pages
             '
             ChildListInstanceOptions = EncodeText(cache_pageContent(PCC_ChildListInstanceOptions, main_RenderCache_CurrentPage_PCCPtr))
-            PageList = addon_execute_legacy2(siteProperties.childListAddonID, "", ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, ContentName, RecordID, "", PageChildListInstanceID, False, -1, "", AddonStatusOK, Nothing)
+            PageList = addon.execute_legacy2(siteProperties.childListAddonID, "", ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, ContentName, RecordID, "", PageChildListInstanceID, False, -1, "", AddonStatusOK, Nothing)
             If vbInstr(1, PageList, "<ul", vbTextCompare) = 0 Then
                 PageList = "(there are no child pages)"
             End If
@@ -38822,7 +34238,7 @@ ErrorTrap:
                 If returnHtml <> "" Then
                     returnHtml = BreadCrumbDelimiter & returnHtml
                 End If
-                returnHtml = "<a href=""" & html_EncodeHTML(Link) & """>" & pageCaption & "</a>" & returnHtml
+                returnHtml = "<a href=""" & html.html_EncodeHTML(Link) & """>" & pageCaption & "</a>" & returnHtml
                 parentBranchPtr = parentBranchPtr + 1
             Loop
             '
@@ -38927,64 +34343,60 @@ ErrorTrap:
                     If addonRoute <> "" Then
                         '
                         ' -- this section was added here. it came from an earlier processing section of initApp() but appears to apply only to remote method processing
+                        '--------------------------------------------------------------------------
+                        '   Verify Add-ons are run from Referrers on the Aggregate Access List
+                        '--------------------------------------------------------------------------
                         '
-                        If True Then
-                            '
-                            '--------------------------------------------------------------------------
-                            '   Verify Add-ons are run from Referrers on the Aggregate Access List
-                            '--------------------------------------------------------------------------
-                            '
-                            If web_ReadStreamJSForm Then
-                                If webServer.requestReferrer = "" Then
+                        If web_ReadStreamJSForm Then
+                            If webServer.requestReferrer = "" Then
+                                '
+                                ' Allow it to be hand typed
+                                '
+                            Else
+                                '
+                                ' Test source site
+                                '
+                                Dim refProtocol As String = ""
+                                Dim refHost As String = ""
+                                Dim refPath As String = ""
+                                Dim refPage As String = ""
+                                Dim refQueryString As String = ""
+                                Dim cs As Integer
+                                Call SeparateURL(webServer.requestReferrer, refProtocol, refHost, refPath, refPage, refQueryString)
+                                If vbUCase(refHost) <> vbUCase(webServer.requestDomain) Then
                                     '
-                                    ' Allow it to be hand typed
+                                    ' Not from this site
                                     '
-                                Else
-                                    '
-                                    ' Test source site
-                                    '
-                                    Dim refProtocol As String = ""
-                                    Dim refHost As String = ""
-                                    Dim refPath As String = ""
-                                    Dim refPage As String = ""
-                                    Dim refQueryString As String = ""
-                                    Dim cs As Integer
-                                    Call SeparateURL(webServer.requestReferrer, refProtocol, refHost, refPath, refPage, refQueryString)
-                                    If vbUCase(refHost) <> vbUCase(webServer.requestDomain) Then
-                                        '
-                                        ' Not from this site
-                                        '
-                                        If siteProperties.getBoolean("AllowAggregateAccessBlocking") Then
-                                            cs = db.csOpen("Aggregate Access", "Link=" & db_EncodeSQLText(refHost), , False, , , , "active")
-                                            If Not db.cs_Ok(cs) Then
-                                                '
-                                                ' no record, add an inactive record and throw error
-                                                '
-                                                Call db.cs_Close(cs)
-                                                cs = db.cs_insertRecord("Aggregate Access")
-                                                If db.cs_Ok(cs) Then
-                                                    Call db.cs_set(cs, "Name", refHost)
-                                                    Call db.cs_set(cs, "Link", refHost)
-                                                    Call db.cs_set(cs, "active", False)
-                                                End If
-                                                Call db.cs_Close(cs)
-                                                Call handleLegacyError12("Init", "Add-on call from [" & refHost & "] was blocked because this domain is not in the Aggregate Access Content. An inactive record was added. To allow this domain access, mark the record active.")
-                                                docOpen = False '--- should be disposed by caller --- Call dispose
-                                                Return _docBuffer
-                                            ElseIf Not db.cs_getBoolean(cs, "active") Then
-                                                '
-                                                ' inactive record, throw error
-                                                '
-                                                Call db.cs_Close(cs)
-                                                Call handleLegacyError12("Init", "Add-on call from [" & refHost & "] was blocked because this domain is not active in the Aggregate Access Content. To allow this domain access, mark the record active.")
-                                                docOpen = False '--- should be disposed by caller --- Call dispose
-                                                Return _docBuffer
-                                            Else
-                                                '
-                                                ' Active record, allow hit
-                                                '
-                                                Call db.cs_Close(cs)
+                                    If siteProperties.getBoolean("AllowAggregateAccessBlocking") Then
+                                        cs = db.csOpen("Aggregate Access", "Link=" & db_EncodeSQLText(refHost), , False, , , , "active")
+                                        If Not db.cs_Ok(cs) Then
+                                            '
+                                            ' no record, add an inactive record and throw error
+                                            '
+                                            Call db.cs_Close(cs)
+                                            cs = db.cs_insertRecord("Aggregate Access")
+                                            If db.cs_Ok(cs) Then
+                                                Call db.cs_set(cs, "Name", refHost)
+                                                Call db.cs_set(cs, "Link", refHost)
+                                                Call db.cs_set(cs, "active", False)
                                             End If
+                                            Call db.cs_Close(cs)
+                                            Call handleLegacyError12("Init", "Add-on call from [" & refHost & "] was blocked because this domain is not in the Aggregate Access Content. An inactive record was added. To allow this domain access, mark the record active.")
+                                            docOpen = False '--- should be disposed by caller --- Call dispose
+                                            Return _docBuffer
+                                        ElseIf Not db.cs_getBoolean(cs, "active") Then
+                                            '
+                                            ' inactive record, throw error
+                                            '
+                                            Call db.cs_Close(cs)
+                                            Call handleLegacyError12("Init", "Add-on call from [" & refHost & "] was blocked because this domain is not active in the Aggregate Access Content. To allow this domain access, mark the record active.")
+                                            docOpen = False '--- should be disposed by caller --- Call dispose
+                                            Return _docBuffer
+                                        Else
+                                            '
+                                            ' Active record, allow hit
+                                            '
+                                            Call db.cs_Close(cs)
                                         End If
                                     End If
                                 End If
@@ -39028,7 +34440,7 @@ ErrorTrap:
                             '
                             ' REFACTOR -- must know if this is json or html remote before call because it is an argument -- assume this is a json for now -- must deal with it somehow
                             '
-                            returnResult = addon_execute(0, addonRoute, Option_String, CPUtilsBaseClass.addonContext.ContextRemoteMethodJson, HostContentName, hostRecordId, "", "0", False, 0, "", AddonStatusOK, Nothing, "", Nothing, "", user.id, user.isAuthenticated)
+                            returnResult = addon.execute(0, addonRoute, Option_String, CPUtilsBaseClass.addonContext.ContextRemoteMethodJson, HostContentName, hostRecordId, "", "0", False, 0, "", AddonStatusOK, Nothing, "", Nothing, "", user.id, user.isAuthenticated)
                         End If
                         '
                         ' deliver styles, javascript and other head tags as javascript appends
@@ -39537,7 +34949,7 @@ ErrorTrap:
                         Dim defaultAddonId As Integer = cp.Site.GetInteger("Default Route AddonId")
                         If defaultAddonId <> 0 Then
                             Dim addonStatusOk As Boolean = False
-                            returnResult = addon_execute(defaultAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", addonStatusOk, Nothing, "", Nothing, "", user.id, visit_isAuthenticated)
+                            returnResult = addon.execute(defaultAddonId, "", "", CPUtilsBaseClass.addonContext.ContextPage, "", 0, "", "", False, 0, "", addonStatusOk, Nothing, "", Nothing, "", user.id, visit_isAuthenticated)
                         End If
                         'returnResult = addonToBe_pageManager()
                     End If
@@ -39842,38 +35254,41 @@ ErrorTrap:
                     ' ----- multipart form (and file uploads)
                     '
                     Try
-                        parser = New MultipartFormDataParser(iisContext.Request.InputStream)
-                        For Each parameter As ParameterPart In parser.Parameters
-                            key = parameter.Name
-                            keyValue = parameter.Data
-                            docProperties.setProperty(key, keyValue, True)
-                            webServer.requestFormString = ModifyQueryString(webServer.requestFormString, key, keyValue)
-                        Next
-                        '
-                        ' file uploads, add to doc properties
-                        '
-                        If parser.Files.Count > 0 Then
-                            Dim ptr As Integer = 0
-                            Dim ptrText As String
-                            Dim instanceId As String = cp.Utils.CreateGuid()
-                            For Each file As FilePart In parser.Files
-                                If file.FileName.Length > 0 Then
-                                    Dim prop As New docPropertiesClass
-                                    ptrText = ptr.ToString
-                                    prop.Name = file.Name
-                                    prop.Value = file.FileName
-                                    prop.NameValue = EncodeRequestVariable(prop.Name) & "=" & EncodeRequestVariable(prop.Value)
-                                    prop.IsFile = True
-                                    prop.IsForm = True
-                                    prop.tmpPrivatePathfilename = instanceId & "-" & ptrText & ".bin"
-                                    deleteOnDisposeFileList.Add(prop.tmpPrivatePathfilename)
-                                    Using fileStream As System.IO.FileStream = System.IO.File.OpenWrite(privateFiles.rootLocalPath & prop.tmpPrivatePathfilename)
-                                        file.Data.CopyTo(fileStream)
-                                    End Using
-                                    prop.FileSize = CInt(file.Data.Length)
-                                    docProperties.setProperty(file.Name, prop)
-                                    '
-                                    webServer.requesFilesString = "" _
+                        If (iisContext.Request.InputStream.Length <= 0) Then
+                            key = key
+                        Else
+                            parser = New MultipartFormDataParser(iisContext.Request.InputStream)
+                            For Each parameter As ParameterPart In parser.Parameters
+                                key = parameter.Name
+                                keyValue = parameter.Data
+                                docProperties.setProperty(key, keyValue, True)
+                                webServer.requestFormString = ModifyQueryString(webServer.requestFormString, key, keyValue)
+                            Next
+                            '
+                            ' file uploads, add to doc properties
+                            '
+                            If parser.Files.Count > 0 Then
+                                Dim ptr As Integer = 0
+                                Dim ptrText As String
+                                Dim instanceId As String = cp.Utils.CreateGuid()
+                                For Each file As FilePart In parser.Files
+                                    If file.FileName.Length > 0 Then
+                                        Dim prop As New docPropertiesClass
+                                        ptrText = ptr.ToString
+                                        prop.Name = file.Name
+                                        prop.Value = file.FileName
+                                        prop.NameValue = EncodeRequestVariable(prop.Name) & "=" & EncodeRequestVariable(prop.Value)
+                                        prop.IsFile = True
+                                        prop.IsForm = True
+                                        prop.tmpPrivatePathfilename = instanceId & "-" & ptrText & ".bin"
+                                        deleteOnDisposeFileList.Add(prop.tmpPrivatePathfilename)
+                                        Using fileStream As System.IO.FileStream = System.IO.File.OpenWrite(privateFiles.rootLocalPath & prop.tmpPrivatePathfilename)
+                                            file.Data.CopyTo(fileStream)
+                                        End Using
+                                        prop.FileSize = CInt(file.Data.Length)
+                                        docProperties.setProperty(file.Name, prop)
+                                        '
+                                        webServer.requesFilesString = "" _
                                         & "&" & ptrText & "formname=" & EncodeRequestVariable(prop.Name) _
                                         & "&" & ptrText & "filename=" & EncodeRequestVariable(prop.Value) _
                                         & "&" & ptrText & "type=" _
@@ -39881,14 +35296,14 @@ ErrorTrap:
                                         & "&" & ptrText & "error=" _
                                         & "&" & ptrText & "size=" & prop.FileSize _
                                         & ""
-                                    ptr += 1
-                                End If
-                            Next
+                                        ptr += 1
+                                    End If
+                                Next
+                            End If
+                            'https://github.com/Vodurden/Http-Multipart-Data-Parser
                         End If
-
-                        'https://github.com/Vodurden/Http-Multipart-Data-Parser
                     Catch ex As Exception
-                        handleExceptionAndRethrow(ex, "Exception processing multipart form input")
+                        handleExceptionAndContinue(ex, "Exception processing multipart form input")
                     End Try
                 End If
             End If
@@ -40227,11 +35642,11 @@ ErrorTrap:
             Throw ex
         End Sub
         '
-        Public Sub handleExceptionAndNoThrow(ByVal ex As Exception, ByVal cause As String)
+        Public Sub handleExceptionAndContinue(ByVal ex As Exception, ByVal cause As String)
             Call handleException(ex, cause, 2)
         End Sub
         '
-        Public Sub handleExceptionAndNoThrow(ByVal ex As Exception)
+        Public Sub handleExceptionAndContinue(ByVal ex As Exception)
             Call handleException(ex, "n/a", 2)
         End Sub
         '
@@ -40326,7 +35741,7 @@ ErrorTrap:
         ''' <param name="ResumeNext"></param>
         ''' <param name="Context"></param>
         ''' <remarks></remarks>
-        Private Sub handleLegacyError4(ByVal ErrNumber As Integer, ByVal ErrSource As String, ByVal ErrDescription As String, ByVal MethodName As String, ByVal ErrorTrap As Boolean, Optional ByVal ignore As Boolean = False, Optional ByVal Context As String = "")
+        Friend Sub handleLegacyError4(ByVal ErrNumber As Integer, ByVal ErrSource As String, ByVal ErrDescription As String, ByVal MethodName As String, ByVal ErrorTrap As Boolean, Optional ByVal ignore As Boolean = False, Optional ByVal Context As String = "")
             handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], Context=[" & Context & "] raised, [legacy error #" & ErrNumber & "," & ErrSource & "," & ErrDescription & "]"), Context, 2)
             Throw New ApplicationException("handleLegacyError")
         End Sub
@@ -40342,7 +35757,7 @@ ErrorTrap:
         ''' <param name="Err_Description"></param>
         ''' <param name="ResumeNext"></param>
         ''' <remarks></remarks>
-        Private Sub handleLegacyError5(MethodName As String, Cause As String, Err_Number As Integer, Err_Source As String, Err_Description As String, ignore As Boolean)
+        Friend Sub handleLegacyError5(MethodName As String, Cause As String, Err_Number As Integer, Err_Source As String, Err_Description As String, ignore As Boolean)
             handleException(New Exception("Legacy error raised, [legacy error #" & Err_Number & "," & Err_Source & "," & Err_Description & "]"), Cause, 2)
             Throw New ApplicationException("handleLegacyError")
         End Sub
@@ -40354,7 +35769,7 @@ ErrorTrap:
         ''' <param name="MethodName"></param>
         ''' <param name="Cause"></param>
         ''' <remarks></remarks>
-        Private Sub handleLegacyError6(MethodName As String, Cause As String)
+        Friend Sub handleLegacyError6(MethodName As String, Cause As String)
             handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
             Throw New ApplicationException("handleLegacyError")
         End Sub
@@ -40366,7 +35781,7 @@ ErrorTrap:
         ''' <param name="MethodName"></param>
         ''' <param name="Cause"></param>
         ''' <remarks></remarks>
-        Private Sub handleLegacyError7(MethodName As String, Cause As String)
+        Friend Sub handleLegacyError7(MethodName As String, Cause As String)
             handleException(New Exception("Legacy error, MethodName=[" & MethodName & "], cause=[" & Cause & "] #" & Err.Number & "," & Err.Source & "," & Err.Description & ""), Cause, 2)
             Throw New ApplicationException("handleLegacyError")
         End Sub
@@ -40396,7 +35811,7 @@ ErrorTrap:
         ''' <param name="ErrorTrap"></param>
         ''' <param name="ResumeNext"></param>
         ''' <remarks></remarks>
-        Private Sub handleLegacyError10(ByVal Err_Number As Integer, ByVal Err_Source As String, ByVal Err_Description As String, ByVal MethodName As String, ByVal ErrorTrap As Boolean, ByVal ResumeNext As Boolean)
+        Friend Sub handleLegacyError10(ByVal Err_Number As Integer, ByVal Err_Source As String, ByVal Err_Description As String, ByVal MethodName As String, ByVal ErrorTrap As Boolean, ByVal ResumeNext As Boolean)
             handleException(New Exception("Legacy error, MethodName=[" & MethodName & "] [legacy error #" & Err_Number & "," & Err_Source & "," & Err_Description & "]"), "n/a", 2)
             Throw New ApplicationException("handleLegacyError")
         End Sub
@@ -40895,12 +36310,6 @@ ErrorTrap:
             Return returnName
         End Function
         '
-        '
-        '
-        Public Function addon_getPrivateFilesAddonPath() As String
-            Return "addons\"
-        End Function
-        '
         '====================================================================================================
         ''' <summary>
         ''' return the docProperties collection as the legacy optionString
@@ -41054,6 +36463,11 @@ ErrorTrap:
                         ' no dispose
                         'Call _addonCache.Dispose()
                         _addonCache = Nothing
+                    End If
+                    '
+                    If Not (_addon Is Nothing) Then
+                        Call _addon.Dispose()
+                        _addon = Nothing
                     End If
                     '
                     If Not (_db Is Nothing) Then

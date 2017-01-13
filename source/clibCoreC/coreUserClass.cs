@@ -453,7 +453,7 @@
 //                    //
 //                    // Custom Login
 //                    //
-//                    returnHtml = cpCore.addon_execute_legacy2(loginAddonID, "", "", cpCoreClass.addonContextEnum.ContextPage, "", 0, "", "", false, 0,
+//                    returnHtml = cpCore.addon.addon_execute_legacy2(loginAddonID, "", "", cpCoreClass.addonContextEnum.ContextPage, "", 0, "", "", false, 0,
 //                    "", ref isAddonOk, null);
 //                    if (!isAddonOk)
 //                    {
@@ -500,7 +500,7 @@
 //                //
 //                if (cpCore.siteProperties.getBoolean("allowPasswordEmail", true))
 //                {
-//                    returnResult = "" + cr + "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">" + cr2 + "<tr>" + cr3 + "<td style=\"text-align:right;vertical-align:middle;width:30%;padding:4px\" align=\"right\" width=\"30%\">" + SpanClassAdminNormal + "Email</span></td>" + cr3 + "<td style=\"text-align:left;vertical-align:middle;width:70%;padding:4px\" align=\"left\"  width=\"70%\"><input NAME=\"" + "email\" VALUE=\"" + html_EncodeHTML(loginForm_Email) + "\" SIZE=\"20\" MAXLENGTH=\"50\"></td>" + cr2 + "</tr>" + cr2 + "<tr>" + cr3 + "<td colspan=\"2\">&nbsp;</td>" + cr2 + "</tr>" + cr2 + "<tr>" + cr3 + "<td colspan=\"2\">" + kmaIndent(kmaIndent(cpCore.main_GetPanelButtons(ButtonSendPassword, "Button"))) + cr3 + "</td>" + cr2 + "</tr>" + cr + "</table>" + "";
+//                    returnResult = "" + cr + "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">" + cr2 + "<tr>" + cr3 + "<td style=\"text-align:right;vertical-align:middle;width:30%;padding:4px\" align=\"right\" width=\"30%\">" + SpanClassAdminNormal + "Email</span></td>" + cr3 + "<td style=\"text-align:left;vertical-align:middle;width:70%;padding:4px\" align=\"left\"  width=\"70%\"><input NAME=\"" + "email\" VALUE=\"" + cpcore.html.html_EncodeHTML(loginForm_Email) + "\" SIZE=\"20\" MAXLENGTH=\"50\"></td>" + cr2 + "</tr>" + cr2 + "<tr>" + cr3 + "<td colspan=\"2\">&nbsp;</td>" + cr2 + "</tr>" + cr2 + "<tr>" + cr3 + "<td colspan=\"2\">" + kmaIndent(kmaIndent(cpCore.main_GetPanelButtons(ButtonSendPassword, "Button"))) + cr3 + "</td>" + cr2 + "</tr>" + cr + "</table>" + "";
 //                    //
 //                    // write out all of the form input (except state) to hidden fields so they can be read after login
 //                    //
@@ -1733,7 +1733,7 @@
 //                        Caption = "Username";
 //                    }
 //                    //
-//                    loginForm = loginForm + cr + "<tr>" + cr2 + "<td style=\"text-align:right;vertical-align:middle;width:30%;padding:4px\" align=\"right\" width=\"30%\">" + SpanClassAdminNormal + Caption + "&nbsp;</span></td>" + cr2 + "<td style=\"text-align:left;vertical-align:middle;width:70%;padding:4px\" align=\"left\"  width=\"70%\"><input ID=\"LoginUsernameInput\" NAME=\"" + "username\" VALUE=\"" + html_EncodeHTML(loginForm_Username) + "\" SIZE=\"20\" MAXLENGTH=\"50\" ></td>" + cr + "</tr>";
+//                    loginForm = loginForm + cr + "<tr>" + cr2 + "<td style=\"text-align:right;vertical-align:middle;width:30%;padding:4px\" align=\"right\" width=\"30%\">" + SpanClassAdminNormal + Caption + "&nbsp;</span></td>" + cr2 + "<td style=\"text-align:left;vertical-align:middle;width:70%;padding:4px\" align=\"left\"  width=\"70%\"><input ID=\"LoginUsernameInput\" NAME=\"" + "username\" VALUE=\"" + cpcore.html.html_EncodeHTML(loginForm_Username) + "\" SIZE=\"20\" MAXLENGTH=\"50\" ></td>" + cr + "</tr>";
 //                    //
 //                    // ----- Password
 //                    //

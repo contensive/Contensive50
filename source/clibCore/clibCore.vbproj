@@ -205,6 +205,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="coreAddonCacheClass.vb" />
+    <Compile Include="coreAddonClass.vb" />
     <Compile Include="coreCacheClass.vb" />
     <Compile Include="coreDocPropertiesClass.vb" />
     <Compile Include="coreDomainsClass.vb" />

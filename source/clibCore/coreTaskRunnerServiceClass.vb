@@ -220,7 +220,7 @@ Namespace Contensive
                                         '
                                         Select Case command.ToLower()
                                             Case taskQueueCommandEnumModule.runAddon
-                                                Call cpSite.core.addon_execute(cmdDetail.addonId, cmdDetail.docProperties, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple)
+                                                Call cpSite.core.addon.execute(cmdDetail.addonId, cmdDetail.docProperties, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple)
                                         End Select
                                     End If
                                     cpSite.core.db.cs_Close(CS)

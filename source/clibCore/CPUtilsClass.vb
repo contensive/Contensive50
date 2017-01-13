@@ -129,7 +129,7 @@ Namespace Contensive.Core
             Dim returnValue As String = ""
             '
             If (Source <> "") Then
-                returnValue = cl.html_EncodeHTML(Source)
+                returnValue = CP.core.html.html_EncodeHTML(Source)
             End If
             Return returnValue
         End Function
@@ -265,23 +265,23 @@ Namespace Contensive.Core
         '
         '
         Public Overrides Function ExecuteAddon(ByVal IdGuidOrName As String) As String
-            Return CP.core.addon_execute_legacy3(IdGuidOrName, CP.core.getLegacyOptionStringFromVar(), 0, Nothing)
+            Return CP.core.addon.execute_legacy3(IdGuidOrName, CP.core.getLegacyOptionStringFromVar(), 0, Nothing)
         End Function
         '
         '
         '
         Public Overrides Function ExecuteAddon(ByVal IdGuidOrName As String, ByVal WrapperId As Integer) As String
-            Return CP.core.addon_execute_legacy3(IdGuidOrName, CP.core.getLegacyOptionStringFromVar(), WrapperId, Nothing)
+            Return CP.core.addon.execute_legacy3(IdGuidOrName, CP.core.getLegacyOptionStringFromVar(), WrapperId, Nothing)
         End Function
         '
         '
         '
         Public Overrides Function ExecuteAddon(ByVal IdGuidOrName As String, ByVal context As addonContext) As String
-            Return CP.core.addon_execute_legacy4(IdGuidOrName, CP.core.getLegacyOptionStringFromVar(), context, Nothing)
+            Return CP.core.addon.execute_legacy4(IdGuidOrName, CP.core.getLegacyOptionStringFromVar(), context, Nothing)
         End Function
 
         Public Overrides Function ExecuteAddonAsProcess(ByVal IdGuidOrName As String) As String
-            Return CP.core.executeAddonAsProcess(IdGuidOrName, CP.core.getLegacyOptionStringFromVar())
+            Return CP.core.addon.executeAddonAsProcess(IdGuidOrName, CP.core.getLegacyOptionStringFromVar())
         End Function
 
 

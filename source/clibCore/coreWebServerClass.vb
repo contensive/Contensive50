@@ -903,7 +903,7 @@ Namespace Contensive.Core
                                         C = vbReplace(C, "/", "%2F")
                                         Link = Link & "&e=" & C
                                     End If
-                                    Link = html_EncodeHTML(Link)
+                                    Link = cpCore.html.html_EncodeHTML(Link)
                                     cpCore.main_ClosePageHTML = cpCore.main_ClosePageHTML & vbCrLf & vbTab & "<iframe style=""display:none;"" width=""0"" height=""0"" src=""" & Link & """></iframe>"
                                 End If
                             End If

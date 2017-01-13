@@ -894,7 +894,7 @@ Namespace Contensive.Core
                                 Next
                                 ArgOptionString &= "&cmdAccumulator=" & encodeNvaArgument(CmdAccumulator)
                                 ArgOptionString = Mid(ArgOptionString, 2)
-                                CmdAccumulator = cpCore.addon_execute(0, addonName, ArgOptionString, Context, "", 0, "", "", False, 0, "", addonStatusOK, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
+                                CmdAccumulator = cpCore.addon.execute(0, addonName, ArgOptionString, Context, "", 0, "", "", False, 0, "", addonStatusOK, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
                             Case Else
                                 '
                                 ' attempts to execute an add-on with the command name
@@ -914,7 +914,7 @@ Namespace Contensive.Core
                                 Next
                                 ArgOptionString = ArgOptionString & "&cmdAccumulator=" & encodeNvaArgument(CmdAccumulator)
                                 ArgOptionString = Mid(ArgOptionString, 2)
-                                CmdAccumulator = cpCore.addon_execute(0, addonName, ArgOptionString, Context, "", 0, "", "", False, 0, "", addonStatusOK, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
+                                CmdAccumulator = cpCore.addon.execute(0, addonName, ArgOptionString, Context, "", 0, "", "", False, 0, "", addonStatusOK, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
                                 'CmdAccumulator = mainOrNothing.ExecuteAddon3(addonName, ArgOptionString, Context)
                         End Select
                     Next

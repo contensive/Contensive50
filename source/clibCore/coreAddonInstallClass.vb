@@ -341,7 +341,7 @@ ErrorTrap:
                     '
                     ' Download all files for this collection and build the collection folder(s)
                     '
-                    WorkingFolder = cpCore.addon_getPrivateFilesAddonPath() & "temp_" & GetRandomInteger() & "\"
+                    WorkingFolder = cpCore.addon.getPrivateFilesAddonPath() & "temp_" & GetRandomInteger() & "\"
                     Call cpCore.privateFiles.createPath(WorkingFolder)
                     '
                     UpgradeOK = DownloadCollectionFiles(WorkingFolder, CollectionGuid, return_IISResetRequired, return_RegisterList, CollectionLastChangeDate, return_ErrorMessage)
@@ -603,7 +603,7 @@ ErrorTrap:
                                                                                                 '
                                                                                                 ' LibLastChangeDate <>0, and it is > local lastchangedate
                                                                                                 '
-                                                                                                WorkingFolder = cpCore.addon_getPrivateFilesAddonPath() & "\temp_" & GetRandomInteger() & "\"
+                                                                                                WorkingFolder = cpCore.addon.getPrivateFilesAddonPath() & "\temp_" & GetRandomInteger() & "\"
                                                                                                 If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), matching library collection is newer, start upgrade [" & WorkingFolder & "].")
                                                                                                 Call appendInstallLog("server", "UpgradeAllLocalCollectionsFromLib3", "Upgrading Collection [" & LibGUID & "], Library name [" & LibName & "], because LocalChangeDate [" & LocalLastChangeDate & "] < LibraryChangeDate [" & LibLastChangeDate & "]")
                                                                                                 '
@@ -844,7 +844,7 @@ ErrorTrap:
                                                 CollectionFolderName = vbReplace(CollectionFolderName, " ", "")
                                                 CollectionFolderName = Collectionname & "_" & CollectionFolderName
                                             End If
-                                            CollectionFolder = cpCore.addon_getPrivateFilesAddonPath() & CollectionFolderName & "\"
+                                            CollectionFolder = cpCore.addon.getPrivateFilesAddonPath() & CollectionFolderName & "\"
                                             If Not cpCore.privateFiles.pathExists(CollectionFolder) Then
                                                 '
                                                 ' Create collection folder
@@ -875,7 +875,7 @@ ErrorTrap:
                                             If (NowPart < 10) Then TimeStamp &= "0"
                                             TimeStamp &= NowPart.ToString()
                                             CollectionVersionFolderName = CollectionFolderName & "\" & TimeStamp
-                                            CollectionVersionFolder = cpCore.addon_getPrivateFilesAddonPath() & CollectionVersionFolderName & "\"
+                                            CollectionVersionFolder = cpCore.addon.getPrivateFilesAddonPath() & CollectionVersionFolderName & "\"
                                             Call cpCore.privateFiles.createPath(CollectionVersionFolder)
                                             '
                                             ' copy all files from source to CollectionVersionFolder
@@ -1322,7 +1322,7 @@ ErrorTrap:
                         '
                         ' Search Local Collection Folder for collection config file (xml file)
                         '
-                        CollectionVersionFolder = cpCore.addon_getPrivateFilesAddonPath() & CollectionVersionFolderName & "\"
+                        CollectionVersionFolder = cpCore.addon.getPrivateFilesAddonPath() & CollectionVersionFolderName & "\"
                         'CollectionVersionFolder = GetProgramPath & "\Addons\" & CollectionVersionFolderName & "\"
                         CollectionHelp = ""
                         CollectionHelpLink = ""
@@ -2328,10 +2328,10 @@ ErrorTrap:
                 Dim Pos As Integer
                 Dim FolderList As IO.DirectoryInfo()
                 '
-                collectionFilePathFilename = cpCore.addon_getPrivateFilesAddonPath & "Collections.xml"
+                collectionFilePathFilename = cpCore.addon.getPrivateFilesAddonPath & "Collections.xml"
                 returnXml = cpCore.privateFiles.readFile(collectionFilePathFilename)
                 If returnXml = "" Then
-                    FolderList = cpCore.privateFiles.getFolderList(cpCore.addon_getPrivateFilesAddonPath)
+                    FolderList = cpCore.privateFiles.getFolderList(cpCore.addon.getPrivateFilesAddonPath)
                     If FolderList.Count > 0 Then
                         For Each folder As IO.DirectoryInfo In FolderList
                             FolderName = folder.Name
@@ -2345,7 +2345,7 @@ ErrorTrap:
                                         Collectionname = Left(FolderName, Len(FolderName) - Len(CollectionGuid) - 1)
                                         CollectionGuid = Mid(CollectionGuid, 1, 8) & "-" & Mid(CollectionGuid, 9, 4) & "-" & Mid(CollectionGuid, 13, 4) & "-" & Mid(CollectionGuid, 17, 4) & "-" & Mid(CollectionGuid, 21)
                                         CollectionGuid = "{" & CollectionGuid & "}"
-                                        SubFolderList = cpCore.privateFiles.getFolderList(cpCore.addon_getPrivateFilesAddonPath() & "\" & FolderName)
+                                        SubFolderList = cpCore.privateFiles.getFolderList(cpCore.addon.getPrivateFilesAddonPath() & "\" & FolderName)
                                         If SubFolderList.Count > 0 Then
                                             SubFolder = SubFolderList(SubFolderList.Count - 1)
                                             FolderName = FolderName & "\" & SubFolder.Name
@@ -2456,7 +2456,7 @@ ErrorTrap:
                             '
                             ' Save the result
                             '
-                            LocalFilename = cpCore.addon_getPrivateFilesAddonPath() & "Collections.xml"
+                            LocalFilename = cpCore.addon.getPrivateFilesAddonPath() & "Collections.xml"
                             'LocalFilename = GetProgramPath & "\Addons\Collections.xml"
                             Call Doc.Save(cpCore.privateFiles.rootLocalPath & LocalFilename)
                         End If
@@ -2592,7 +2592,7 @@ ErrorTrap:
                     End If
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndNoThrow(ex)
+                cpCore.handleExceptionAndContinue(ex)
                 returnSuccess = False
                 If (String.IsNullOrEmpty(return_ErrorMessage)) Then
                     return_ErrorMessage = "There was an unexpected error installing the collection, details [" & ex.Message & "]"
@@ -5255,7 +5255,7 @@ ErrorTrap:
                                 '
                                 ' Can not update a base content with a non-base content
                                 '
-                                cpCore.handleExceptionAndNoThrow(New ApplicationException("Warning: An attempt was made to update Content Definition [" & .Name & "] from base to non-base. This should only happen when a base cdef is removed from the base collection. The update was ignored."))
+                                cpCore.handleExceptionAndContinue(New ApplicationException("Warning: An attempt was made to update Content Definition [" & .Name & "] from base to non-base. This should only happen when a base cdef is removed from the base collection. The update was ignored."))
                                 .IsBaseContent = ContentIsBaseContent
                                 'cpCore.handleLegacyError3(cpCore.appConfig.name, "", "dll", "builderClass", "UpgradeCDef_BuildDbFromCollection_AddCDefToDb", 0, "", "", False, True, "")
                             End If

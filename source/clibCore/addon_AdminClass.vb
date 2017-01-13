@@ -225,7 +225,7 @@ Namespace Contensive.Addons
             editRecord.Loaded = False
             UseContentWatchLink = cpCore.siteProperties.useContentWatchLink
             Call cpCore.main_AddOnLoadJavascript2("document.getElementsByTagName('BODY')[0].onclick = BodyOnClick;", "Contensive")
-            Call cpCore.addon_execute_legacy4(adminCommonAddonGuid)
+            Call cpCore.addon.execute_legacy4(adminCommonAddonGuid)
             '
             '-------------------------------------------------------------------------------
             ' check for member login, if logged in and no admin, lock out
@@ -436,13 +436,13 @@ leak200:
                         Case AdminFormMetaKeywordTool
                             ContentCell = GetForm_MetaKeywordTool()
                         Case AdminFormMobileBrowserControl, AdminFormPageControl, AdminFormEmailControl
-                            ContentCell = cpCore.addon_execute_legacy4(AddonGuidPreferences, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
+                            ContentCell = cpCore.addon.execute_legacy4(AddonGuidPreferences, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
                         Case AdminFormClearCache
                             ContentCell = GetForm_ClearCache()
                         Case AdminFormEDGControl
                             ContentCell = (GetForm_StaticPublishControl())
                         Case AdminFormSpiderControl
-                            ContentCell = cpCore.addon_execute_legacy4("Content Spider Control", "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
+                            ContentCell = cpCore.addon.execute_legacy4("Content Spider Control", "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
                         Case AdminFormResourceLibrary
                             ContentCell = cpCore.main_GetResourceLibrary2("", False, "", "", True)
                         Case AdminFormQuickStats
@@ -472,11 +472,11 @@ leak200:
                         Case AdminformRSSControl
                             Call cpCore.web_Redirect2("?cid=" & cpCore.main_GetContentID("RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.", False)
                         Case AdminFormImportWizard
-                            ContentCell = cpCore.addon_execute_legacy4(ImportWizardGuid, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
+                            ContentCell = cpCore.addon.execute_legacy4(ImportWizardGuid, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
                         Case AdminFormCustomReports
                             ContentCell = GetForm_CustomReports()
                         Case AdminFormFormWizard
-                            ContentCell = cpCore.addon_execute_legacy4(FormWizardGuid, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
+                            ContentCell = cpCore.addon.execute_legacy4(FormWizardGuid, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
                         Case AdminFormLegacyAddonManager
                             ContentCell = GetAddonManager()
                         Case AdminFormEditorConfig
@@ -530,7 +530,7 @@ leak200:
                         ' default wrapper does not apply to admin
                         DefaultWrapperID = -1
                         'DefaultWrapperID = cpCore.main_GetSiteProperty2("DefaultWrapperID", "0")
-                        ContentCell = cpCore.addon_execute_legacy1(addonId, "", InstanceOptionString, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, AddonName, "-2", DefaultWrapperID)
+                        ContentCell = cpCore.addon.execute_legacy1(addonId, "", InstanceOptionString, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, AddonName, "-2", DefaultWrapperID)
                         ' no must allow for an add-on to return blank to return to root
                         'If ContentCell = "" Then
                         '    ContentCell = "<div class=""ccAdminMsg"">The Add-on you requested did not return a valid response.</div>"
@@ -546,7 +546,7 @@ leak200:
                 ' include fancybox if it was needed
                 '
                 If includeFancyBox Then
-                    Call cpCore.addon_execute_legacy4(jQueryFancyBoxGuid)
+                    Call cpCore.addon.execute_legacy4(jQueryFancyBoxGuid)
                     Call cpCore.main_AddHeadJavascript("jQuery(document).ready(function() {" & fancyBoxHeadJS & "});")
                 End If
                 '
@@ -3675,7 +3675,8 @@ ErrorTrap:
                     End Select
                 End With
                 '
-                return_formIndexCell = html_EncodeHTML(Stream.Text)
+                Dim html As New coreHtmlClass(cpCore)
+                return_formIndexCell = cpCore.html.html_EncodeHTML(Stream.Text)
             Catch ex As Exception
                 Call cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -4788,7 +4789,7 @@ ErrorTrap:
                     Copy = EncodeText(cpCore.db.cs_getInteger(CSPointer, "PagesFound"))
                 End If
                 Call cpCore.db.cs_Close(CSPointer)
-                Call Content.Add(Adminui.GetEditRow("<a href=""" & html_EncodeHTML(cpCore.appConfig.adminRoute & "?" & QueryString) & """ target=""_blank"">" & SpanClassAdminNormal & Copy & "</a>", "Bad Links", "", False, False, ""))
+                Call Content.Add(Adminui.GetEditRow("<a href=""" & cpCore.html.html_EncodeHTML(cpCore.appConfig.adminRoute & "?" & QueryString) & """ target=""_blank"">" & SpanClassAdminNormal & Copy & "</a>", "Bad Links", "", False, False, ""))
                 '
                 ' ----- Options
                 '
@@ -5048,7 +5049,7 @@ ErrorTrap:
                                         If Link = "" Then
                                             Link = "unknown"
                                         Else
-                                            Link = "<a href=""" & html_EncodeHTML(Link) & """ target=""_blank"">" & Link & "</a>"
+                                            Link = "<a href=""" & cpCore.html.html_EncodeHTML(Link) & """ target=""_blank"">" & Link & "</a>"
                                         End If
                                         '
                                         ' get approved status of the submitted record
@@ -5482,7 +5483,7 @@ ErrorTrap:
                                         & ""
                                 End If
 
-                                EditorString = cpCore.addon_execute(editorAddonID, "", addonOptionString, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextEditor, "", 0, "", "", False, 0, "", useEditorAddon, Nothing, "", Nothing, "", 0, False)
+                                EditorString = cpCore.addon.execute(editorAddonID, "", addonOptionString, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextEditor, "", 0, "", "", False, 0, "", useEditorAddon, Nothing, "", Nothing, "", 0, False)
                                 If useEditorAddon Then
                                     return_NewFieldList = return_NewFieldList & "," & FieldName
                                 Else
@@ -6144,7 +6145,7 @@ ErrorTrap:
                                                 '
                                                 EditorStyleModifier = "textexpandable"
                                                 FieldRows = (cpCore.properties_user_getInteger(adminContent.Name & "." & FieldName & ".RowHeight", 10))
-                                                EditorString = cpCore.html_GetFormInputTextExpandable2(FormFieldLCaseName, html_EncodeHTML(FieldValueText), FieldRows, "600px", FormFieldLCaseName, False, , "text")
+                                                EditorString = cpCore.html_GetFormInputTextExpandable2(FormFieldLCaseName, cpCore.html.html_EncodeHTML(FieldValueText), FieldRows, "600px", FormFieldLCaseName, False, , "text")
                                             End If
                                             's.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal & EditorString & "</span></nobr></td>")
                                     End Select
@@ -6653,7 +6654,7 @@ ErrorTrap:
                     If Copy = "" Then
                         HTMLFieldString = "unknown"
                     Else
-                        HTMLFieldString = "<a href=""" & html_EncodeHTML(Copy) & """ target=""_blank"">" & Copy & "</a>"
+                        HTMLFieldString = "<a href=""" & cpCore.html.html_EncodeHTML(Copy) & """ target=""_blank"">" & Copy & "</a>"
                     End If
                     Call FastString.Add(Adminui.GetEditRow(HTMLFieldString, "Last Known Public URL", FieldHelp, False, False, ""))
                 End If
@@ -7013,7 +7014,7 @@ ErrorTrap:
                 HTMLFieldString = "This Site Property is not defined"
             Else
                 HTMLFieldString = cpCore.html_GetFormInputHidden("name", SitePropertyName)
-                Call cpCore.addon_execute_buildAddonOptionLists(ignore, ExpandedSelector, SitePropertyName & "=" & selector, SitePropertyName & "=" & SitePropertyValue, "0", True)
+                Call cpCore.addon.buildAddonOptionLists(ignore, ExpandedSelector, SitePropertyName & "=" & selector, SitePropertyName & "=" & SitePropertyValue, "0", True)
 
 
 
@@ -7200,7 +7201,7 @@ ErrorTrap:
                         & "<div style=""clear:both;margin-top:20px;"">&nbsp;</div>" _
                         & "<div style=""clear:both;margin-top:20px;"">" & cpCore.error_GetUserError() & "</div>"
                     End If
-                    returnHtml = returnHtml & cpCore.addon_execute_legacy4(CStr(addonId), "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
+                    returnHtml = returnHtml & cpCore.addon.execute_legacy4(CStr(addonId), "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin)
                 End If
                 If returnHtml = "" Then
                     '
@@ -7279,7 +7280,7 @@ ErrorTrap:
                 PageCount = cpCore.db.db_GetCSNumber(CS, "pageCount")
                 Stream.Add("<tr>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "All Visits</span></td>")
-                Stream.Add("<td style=""width:150px;border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & html_EncodeHTML(cpCore.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&DateFrom=" & cpCore.main_PageStartTime & "&DateTo=" & cpCore.main_PageStartTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
+                Stream.Add("<td style=""width:150px;border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.html.html_EncodeHTML(cpCore.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&DateFrom=" & cpCore.main_PageStartTime & "&DateTo=" & cpCore.main_PageStartTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "This includes all visitors to the website, including guests, bots and administrators. Pages/visit includes page hits and not ajax or remote method hits.</span></td>")
                 Stream.Add("</tr>")
             End If
@@ -7294,7 +7295,7 @@ ErrorTrap:
                 PageCount = cpCore.db.db_GetCSNumber(CS, "pageCount")
                 Stream.Add("<tr>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "Non-bot Visits</span></td>")
-                Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & html_EncodeHTML(cpCore.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&DateFrom=" & cpCore.main_PageStartTime.ToShortDateString & "&DateTo=" & cpCore.main_PageStartTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
+                Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.html.html_EncodeHTML(cpCore.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&DateFrom=" & cpCore.main_PageStartTime.ToShortDateString & "&DateTo=" & cpCore.main_PageStartTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "This excludes hits from visitors identified as bots. Pages/visit includes page hits and not ajax or remote method hits.</span></td>")
                 Stream.Add("</tr>")
             End If
@@ -7309,7 +7310,7 @@ ErrorTrap:
                 PageCount = cpCore.db.db_GetCSNumber(CS, "pageCount")
                 Stream.Add("<tr>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "Visits by New Visitors</span></td>")
-                Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & html_EncodeHTML(cpCore.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&ExcludeOldVisitors=1&DateFrom=" & cpCore.main_PageStartTime.ToShortDateString & "&DateTo=" & cpCore.main_PageStartTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
+                Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.html.html_EncodeHTML(cpCore.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&ExcludeOldVisitors=1&DateFrom=" & cpCore.main_PageStartTime.ToShortDateString & "&DateTo=" & cpCore.main_PageStartTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "This includes only new visitors not identified as bots. Pages/visit includes page hits and not ajax or remote method hits.</span></td>")
                 Stream.Add("</tr>")
             End If
@@ -7341,7 +7342,7 @@ ErrorTrap:
                     Do While cpCore.db.cs_Ok(CS)
                         VisitID = cpCore.db.cs_getInteger(CS, "VisitID")
                         Panel = Panel & "<tr class=""" & RowColor & """>"
-                        Panel = Panel & "<td align=""left"">" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & html_EncodeHTML(cpCore.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=16&MemberID=" & cpCore.db.cs_getInteger(CS, "MemberID")) & """>" & cpCore.db.db_GetCS(CS, "MemberName") & "</A></span></td>"
+                        Panel = Panel & "<td align=""left"">" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.html.html_EncodeHTML(cpCore.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=16&MemberID=" & cpCore.db.cs_getInteger(CS, "MemberID")) & """>" & cpCore.db.db_GetCS(CS, "MemberName") & "</A></span></td>"
                         Panel = Panel & "<td align=""left"">" & SpanClassAdminNormal & cpCore.db.db_GetCS(CS, "Remote_Addr") & "</span></td>"
                         Panel = Panel & "<td align=""left"">" & SpanClassAdminNormal & FormatDateTime(cpCore.db.db_GetCSDate(CS, "LastVisitTime"), vbLongTime) & "</span></td>"
                         Panel = Panel & "<td align=""right"">" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=10&VisitID=" & VisitID & """>" & cpCore.db.db_GetCS(CS, "PageVisits") & "</A></span></td>"
@@ -7563,7 +7564,7 @@ ErrorTrap:
                 Link = cpCore.main_GetPageDynamicLink(editRecord.id, False)
                 CS = cpCore.db.csOpen("Link Aliases", "pageid=" & editRecord.id, "ID Desc", , , , , "name")
                 Do While cpCore.db.cs_Ok(CS)
-                    LinkList = LinkList & "<div style=""margin-left:4px;margin-bottom:4px;"">" & html_EncodeHTML(cpCore.db.cs_getText(CS, "name")) & "</div>"
+                    LinkList = LinkList & "<div style=""margin-left:4px;margin-bottom:4px;"">" & cpCore.html.html_EncodeHTML(cpCore.db.cs_getText(CS, "name")) & "</div>"
                     LinkCnt = LinkCnt + 1
                     Call cpCore.db.db_csGoNext(CS)
                 Loop
@@ -9161,7 +9162,7 @@ ErrorTrap:
                     '
                     ' Admin Navigator
                     '
-                    AdminNavFull = cpCore.addon_execute_legacy4(AdminNavigatorGuid)
+                    AdminNavFull = cpCore.addon.execute_legacy4(AdminNavigatorGuid)
                     Stream.Add("" _
                         & cr & "<table border=0 cellpadding=0 cellspacing=0><tr>" _
                         & cr & "<td class=""ccToolsCon"" valign=top>" _
@@ -12714,7 +12715,7 @@ ErrorTrap:
                                 & "</div>"
                             TitleRows = 0
                             If SubTitle <> "" Then
-                                Title = Title & "<div style=""clear:both"">Filter: " & html_EncodeHTML(Mid(SubTitle, 3)) & "</div>"
+                                Title = Title & "<div style=""clear:both"">Filter: " & cpCore.html.html_EncodeHTML(Mid(SubTitle, 3)) & "</div>"
                                 TitleRows = TitleRows + 1
                             End If
                             If ContentAccessLimitMessage <> "" Then
@@ -12875,7 +12876,7 @@ ErrorTrap:
                                 ButtonObject = "Button" & ButtonObjectCount
                                 ButtonObjectCount = ButtonObjectCount + 1
                                 DataTable_HdrRow &= "<td width=""" & ColumnWidth & "%"" valign=bottom align=left class=""ccAdminListCaption"">"
-                                DataTable_HdrRow &= ("<a title=""" & SortTitle & """ href=""" & html_EncodeHTML(ButtonHref) & """ class=""ccAdminListCaption"">" & ButtonFace & "</A>")
+                                DataTable_HdrRow &= ("<a title=""" & SortTitle & """ href=""" & cpCore.html.html_EncodeHTML(ButtonHref) & """ class=""ccAdminListCaption"">" & ButtonFace & "</A>")
                                 DataTable_HdrRow &= ("</td>")
                             Next
                             DataTable_HdrRow &= ("</tr>")
@@ -12935,7 +12936,7 @@ ErrorTrap:
                                             URI = URI & "&wl" & WhereCount & "=" & cpCore.main_EncodeRequestVariable(WherePair(0, WhereCount)) & "&wr" & WhereCount & "=" & cpCore.main_EncodeRequestVariable(WherePair(1, WhereCount))
                                         Next
                                     End If
-                                    DataTable_DataRows &= ("<a href=""" & html_EncodeHTML(URI) & """><img src=""/ccLib/images/IconContentEdit.gif"" border=""0""></a>")
+                                    DataTable_DataRows &= ("<a href=""" & cpCore.html.html_EncodeHTML(URI) & """><img src=""/ccLib/images/IconContentEdit.gif"" border=""0""></a>")
                                     DataTable_DataRows &= ("</td>")
                                     '
                                     ' --- field columns
@@ -15651,7 +15652,7 @@ ErrorTrap:
                                     Caption = Caption & "*"
                                     InheritedFieldCount = InheritedFieldCount + 1
                                 End If
-                                AStart = "<a href=""?" & cpCore.web_RefreshQueryString & "&FieldName=" & html_EncodeHTML(.nameLc) & "&fi=" & fieldId & "&dtcn=" & ColumnPtr & "&" & RequestNameAdminSubForm & "=" & AdminFormIndex_SubFormSetColumns
+                                AStart = "<a href=""?" & cpCore.web_RefreshQueryString & "&FieldName=" & cpCore.html.html_EncodeHTML(.nameLc) & "&fi=" & fieldId & "&dtcn=" & ColumnPtr & "&" & RequestNameAdminSubForm & "=" & AdminFormIndex_SubFormSetColumns
                                 Call Stream.Add("<td width=""" & ColumnWidth & "%"" valign=""top"" align=""left"">" & SpanClassAdminNormal & Caption & "<br >")
                                 Call Stream.Add("<img src=""/ccLib/images/black.GIF"" width=""100%"" height=""1"" >")
                                 Call Stream.Add(AStart & "&dta=" & ToolsActionRemoveField & """><img src=""/ccLib/images/LibButtonDeleteUp.gif"" width=""50"" height=""15"" border=""0"" ></A><BR >")
@@ -16905,13 +16906,13 @@ ErrorTrap:
                 Dim AddonMan As addon_AddonMngrSafeClass
                 '
                 Try
-                    addonManager = cpCore.addon_execute_legacy2(0, AddonManagerGuid, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "0", False, -1, "", AddonStatusOK, Nothing)
+                    addonManager = cpCore.addon.execute_legacy2(0, AddonManagerGuid, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", "0", False, -1, "", AddonStatusOK, Nothing)
                 Catch ex As Exception
-                    Call cpCore.handleExceptionAndNoThrow(New Exception("Error calling ExecuteAddon with AddonManagerGuid, will attempt Safe Mode Addon Manager. Exception=[" & ex.ToString & "]"))
+                    Call cpCore.handleExceptionAndContinue(New Exception("Error calling ExecuteAddon with AddonManagerGuid, will attempt Safe Mode Addon Manager. Exception=[" & ex.ToString & "]"))
                     AddonStatusOK = False
                 End Try
                 If addonManager = "" Then
-                    Call cpCore.handleExceptionAndNoThrow(New Exception("AddonManager returned blank, calling Safe Mode Addon Manager."))
+                    Call cpCore.handleExceptionAndContinue(New Exception("AddonManager returned blank, calling Safe Mode Addon Manager."))
                     AddonStatusOK = False
                 End If
                 If Not AddonStatusOK Then

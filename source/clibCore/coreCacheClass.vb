@@ -581,7 +581,7 @@ Namespace Contensive.Core
             Try
                 'cpCore.appendLog(line)
             Catch ex As Exception
-                cpCore.handleExceptionAndNoThrow(New ApplicationException("appendCacheLog exception", ex))
+                cpCore.handleExceptionAndContinue(New ApplicationException("appendCacheLog exception", ex))
             End Try
         End Sub
         '
