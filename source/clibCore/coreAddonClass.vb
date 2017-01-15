@@ -393,7 +393,7 @@ Namespace Contensive.Core
                     '
                     ScriptingLanguage = ""
                     If scriptinglanguageid <> 0 Then
-                        ScriptingLanguage = cpCore.db_GetRecordName("Scripting Languages", scriptinglanguageid)
+                        ScriptingLanguage = cpCore.GetRecordName("Scripting Languages", scriptinglanguageid)
                     End If
                     If ScriptingLanguage = "" Then
                         ScriptingLanguage = "VBScript"
@@ -444,13 +444,13 @@ Namespace Contensive.Core
                         ' Get Modules
                         '
                         SQL = "select c.code from ccScriptingModules c left join ccAddonScriptingModuleRules r on r.ScriptingModuleID=c.id where r.Addonid=" & addonId & " order by c.sortorder"
-                        CSRules = cpCore.db.db_openCsSql_rev("default", SQL)
-                        Do While cpCore.db.cs_Ok(CSRules)
-                            CodeFilename = cpCore.db.db_GetCS(CSRules, "code")
+                        CSRules = cpCore.db.cs_openCsSql_rev("default", SQL)
+                        Do While cpCore.db.cs_ok(CSRules)
+                            CodeFilename = cpCore.db.cs_get(CSRules, "code")
                             If CodeFilename <> "" Then
                                 ScriptingCode = ScriptingCode & vbCrLf & cpCore.cdnFiles.readFile(CodeFilename)
                             End If
-                            Call cpCore.db.db_csGoNext(CSRules)
+                            Call cpCore.db.cs_goNext(CSRules)
                         Loop
                         Call cpCore.db.cs_Close(CSRules)
                     End If
@@ -1054,8 +1054,8 @@ Namespace Contensive.Core
                                     If DotNetClassFullName <> "" Then
                                         '
                                         Dim csTmp As Integer
-                                        csTmp = cpCore.db.db_openCsSql_rev("default", "select ccGuid from ccAddonCollections where id=" & addonCollectionId)
-                                        If cpCore.db.cs_Ok(csTmp) Then
+                                        csTmp = cpCore.db.cs_openCsSql_rev("default", "select ccGuid from ccAddonCollections where id=" & addonCollectionId)
+                                        If cpCore.db.cs_ok(csTmp) Then
                                             CollectionGuid = cpCore.db.cs_getText(csTmp, "ccGuid")
                                         End If
                                         Call cpCore.db.cs_Close(csTmp)
@@ -1652,12 +1652,12 @@ Namespace Contensive.Core
                                                                     FieldValue = cpCore.docProperties.getText(FieldName)
                                                                 End If
 
-                                                                CS = cpCore.db.csOpen("Copy Content", "name=" & cpCore.db.encodeSQLText(FieldName), "ID")
-                                                                If Not cpCore.db.cs_Ok(CS) Then
+                                                                CS = cpCore.db.cs_open("Copy Content", "name=" & cpCore.db.encodeSQLText(FieldName), "ID")
+                                                                If Not cpCore.db.cs_ok(CS) Then
                                                                     Call cpCore.db.cs_Close(CS)
                                                                     CS = cpCore.db.cs_insertRecord("Copy Content", cpCore.user.id)
                                                                 End If
-                                                                If cpCore.db.cs_Ok(CS) Then
+                                                                If cpCore.db.cs_ok(CS) Then
                                                                     Call cpCore.db.cs_set(CS, "name", FieldName)
                                                                     '
                                                                     ' Set copy
@@ -1666,10 +1666,10 @@ Namespace Contensive.Core
                                                                     '
                                                                     ' delete duplicates
                                                                     '
-                                                                    Call cpCore.db.db_csGoNext(CS)
-                                                                    Do While cpCore.db.cs_Ok(CS)
-                                                                        Call cpCore.db.db_DeleteCSRecord(CS)
-                                                                        Call cpCore.db.db_csGoNext(CS)
+                                                                    Call cpCore.db.cs_goNext(CS)
+                                                                    Do While cpCore.db.cs_ok(CS)
+                                                                        Call cpCore.db.cs_deleteRecord(CS)
+                                                                        Call cpCore.db.cs_goNext(CS)
                                                                     Loop
                                                                 End If
                                                                 Call cpCore.db.cs_Close(CS)
@@ -1885,19 +1885,19 @@ Namespace Contensive.Core
                                                             FieldDescription = cpCore.csv_GetXMLAttribute(IsFound, TabNode, "description", "")
                                                             FieldHTML = EncodeBoolean(cpCore.csv_GetXMLAttribute(IsFound, TabNode, "html", ""))
                                                             '
-                                                            CS = cpCore.db.csOpen("Copy Content", "Name=" & cpCore.db.encodeSQLText(FieldName), "ID", , , , , "id,name,Copy")
-                                                            If Not cpCore.db.cs_Ok(CS) Then
+                                                            CS = cpCore.db.cs_open("Copy Content", "Name=" & cpCore.db.encodeSQLText(FieldName), "ID", , , , , "id,name,Copy")
+                                                            If Not cpCore.db.cs_ok(CS) Then
                                                                 Call cpCore.db.cs_Close(CS)
                                                                 CS = cpCore.db.cs_insertRecord("Copy Content", cpCore.user.id)
-                                                                If cpCore.db.cs_Ok(CS) Then
+                                                                If cpCore.db.cs_ok(CS) Then
                                                                     RecordID = cpCore.db.cs_getInteger(CS, "ID")
                                                                     Call cpCore.db.cs_set(CS, "name", FieldName)
                                                                     Call cpCore.db.cs_set(CS, "copy", EncodeText(TabNode.InnerText))
-                                                                    Call cpCore.db.db_SaveCSRecord(CS)
+                                                                    Call cpCore.db.cs_save2(CS)
                                                                     Call cpCore.workflow.publishEdit("Copy Content", RecordID)
                                                                 End If
                                                             End If
-                                                            If cpCore.db.cs_Ok(CS) Then
+                                                            If cpCore.db.cs_ok(CS) Then
                                                                 FieldValue = cpCore.db.cs_getText(CS, "copy")
                                                             End If
                                                             If FieldReadOnly Then
@@ -1960,7 +1960,7 @@ Namespace Contensive.Core
                                                         Dim rs As DataTable
                                                         If FieldSQL <> "" Then
                                                             Try
-                                                                rs = cpCore.db.executeSql_getDataTable(FieldSQL, FieldDataSource, , SQLPageSize)
+                                                                rs = cpCore.db.executeSql(FieldSQL, FieldDataSource, , SQLPageSize)
                                                                 'RS = app.csv_ExecuteSQLCommand(FieldDataSource, FieldSQL, 30, SQLPageSize, 1)
 
                                                             Catch ex As Exception
@@ -3222,11 +3222,11 @@ ErrorTrap:
             '
             If cpCore.user.isAuthenticated() And True Then
                 If cpCore.user.isEditingAnything() Then
-                    CS = cpCore.db_csOpen("Add-ons", addonId)
-                    If cpCore.db.cs_Ok(CS) Then
+                    CS = cpCore.csOpen("Add-ons", addonId)
+                    If cpCore.db.cs_ok(CS) Then
                         AddonName = cpCore.db.cs_getText(CS, "name")
-                        StyleSheet = cpCore.db.db_GetCS(CS, "CustomStylesFilename")
-                        DefaultStylesheet = cpCore.db.db_GetCS(CS, "StylesFilename")
+                        StyleSheet = cpCore.db.cs_get(CS, "CustomStylesFilename")
+                        DefaultStylesheet = cpCore.db.cs_get(CS, "StylesFilename")
                     End If
                     Call cpCore.db.cs_Close(CS)
                     '
@@ -3613,7 +3613,7 @@ ErrorTrap:
                     '            ButtonList = ButtonCancel
                     '            Content.Add( "<div class=""ccError"" style=""margin:10px;padding:10px;background-color:white;"">The Setting Page you requested could not be found.</div>"
                     '        Else
-                    '            XMLFile = app.db_GetCS(CS, "xmlfile")
+                    '            XMLFile = app.cs_get(CS, "xmlfile")
                     '            Doc = New XmlDocument
                     'Doc.loadXML (XMLFile)
                     If loadOK Then
@@ -3735,12 +3735,12 @@ ErrorTrap:
                                                                     FieldValue = cpCore.docProperties.getText(FieldName)
                                                                 End If
 
-                                                                CS = cpCore.db.csOpen("Copy Content", "name=" & cpCore.db.encodeSQLText(FieldName), "ID")
-                                                                If Not cpCore.db.cs_Ok(CS) Then
+                                                                CS = cpCore.db.cs_open("Copy Content", "name=" & cpCore.db.encodeSQLText(FieldName), "ID")
+                                                                If Not cpCore.db.cs_ok(CS) Then
                                                                     Call cpCore.db.cs_Close(CS)
                                                                     CS = cpCore.db.cs_insertRecord("Copy Content")
                                                                 End If
-                                                                If cpCore.db.cs_Ok(CS) Then
+                                                                If cpCore.db.cs_ok(CS) Then
                                                                     Call cpCore.db.cs_set(CS, "name", FieldName)
                                                                     '
                                                                     ' Set copy
@@ -3749,10 +3749,10 @@ ErrorTrap:
                                                                     '
                                                                     ' delete duplicates
                                                                     '
-                                                                    Call cpCore.db.db_csGoNext(CS)
-                                                                    Do While cpCore.db.cs_Ok(CS)
-                                                                        Call cpCore.db_DeleteCSRecord(CS)
-                                                                        Call cpCore.db.db_csGoNext(CS)
+                                                                    Call cpCore.db.cs_goNext(CS)
+                                                                    Do While cpCore.db.cs_ok(CS)
+                                                                        Call cpCore.DeleteCSRecord(CS)
+                                                                        Call cpCore.db.cs_goNext(CS)
                                                                     Loop
                                                                 End If
                                                                 Call cpCore.db.cs_Close(CS)
@@ -3970,19 +3970,19 @@ ErrorTrap:
                                                             FieldDescription = cpCore.main_GetXMLAttribute(IsFound, TabNode, "description", "")
                                                             FieldHTML = EncodeBoolean(cpCore.main_GetXMLAttribute(IsFound, TabNode, "html", ""))
                                                             '
-                                                            CS = cpCore.db.csOpen("Copy Content", "Name=" & cpCore.db_EncodeSQLText(FieldName), "ID", , , , , "Copy")
-                                                            If Not cpCore.db.cs_Ok(CS) Then
+                                                            CS = cpCore.db.cs_open("Copy Content", "Name=" & cpCore.EncodeSQLText(FieldName), "ID", , , , , "Copy")
+                                                            If Not cpCore.db.cs_ok(CS) Then
                                                                 Call cpCore.db.cs_Close(CS)
                                                                 CS = cpCore.db.cs_insertRecord("Copy Content")
-                                                                If cpCore.db.cs_Ok(CS) Then
+                                                                If cpCore.db.cs_ok(CS) Then
                                                                     RecordID = cpCore.db.cs_getInteger(CS, "ID")
                                                                     Call cpCore.db.cs_set(CS, "name", FieldName)
                                                                     Call cpCore.db.cs_set(CS, "copy", EncodeText(TabNode.InnerText))
-                                                                    Call cpCore.db.db_SaveCSRecord(CS)
+                                                                    Call cpCore.db.cs_save2(CS)
                                                                     Call cpCore.workflow.publishEdit("Copy Content", RecordID)
                                                                 End If
                                                             End If
-                                                            If cpCore.db.cs_Ok(CS) Then
+                                                            If cpCore.db.cs_ok(CS) Then
                                                                 FieldValue = cpCore.db.cs_getText(CS, "copy")
                                                             End If
                                                             If FieldReadOnly Then
@@ -4046,7 +4046,7 @@ ErrorTrap:
 
                                                         If FieldSQL <> "" Then
                                                             Try
-                                                                dt = cpCore.db.executeSql_getDataTable(FieldSQL, FieldDataSource, , SQLPageSize)
+                                                                dt = cpCore.db.executeSql(FieldSQL, FieldDataSource, , SQLPageSize)
                                                             Catch ex As Exception
                                                                 ErrorDescription = ex.ToString
                                                                 loadOK = False
@@ -4077,7 +4077,7 @@ ErrorTrap:
                                                             '
                                                             '
                                                             'Dim dtOk As Boolean = True
-                                                            dataArray = convertDataTabletoArray(dt)
+                                                            dataArray = cpCore.db.convertDataTabletoArray(dt)
                                                             '
                                                             RowMax = UBound(dataArray, 2)
                                                             ColumnMax = UBound(dataArray, 1)
@@ -4565,8 +4565,8 @@ ErrorTrap:
             '
             s = Content
             SelectFieldList = "name,copytext,javascriptonload,javascriptbodyend,stylesfilename,otherheadtags,JSFilename,targetString"
-            CS = cpCore.db_csOpen("Wrappers", WrapperID, , , SelectFieldList)
-            If cpCore.db.cs_Ok(CS) Then
+            CS = cpCore.csOpen("Wrappers", WrapperID, , , SelectFieldList)
+            If cpCore.db.cs_ok(CS) Then
                 Wrapper = cpCore.db.cs_getText(CS, "copytext")
                 wrapperName = cpCore.db.cs_getText(CS, "name")
                 TargetString = cpCore.db.cs_getText(CS, "targetString")

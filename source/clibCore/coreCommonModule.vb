@@ -222,13 +222,14 @@ Namespace Contensive.Core
     ' ---------------------------------------------------------------------------------------------------
     '
     Public Class dataSourceClass
-        Public NameLower As String
-        Public Id As Integer
+        Public name As String
+        Public nameLower As String
+        Public id As Integer
         Public dataSourceType As dataSourceTypeEnum
         Public endPoint As String
         Public username As String
         Public password As String
-        Public odbcConnectionString As String
+        Public connectionStringOLEDB As String
     End Class
     '
     Public Enum dataSourceTypeEnum
@@ -4137,17 +4138,17 @@ Namespace Contensive.Core
         '    iFieldType = fieldType
         '    Select Case iFieldType
         '        Case FieldTypeIdBoolean
-        '            EncodeSQL = app.db_EncodeSQLBoolean(expression)
+        '            EncodeSQL = app.EncodeSQLBoolean(expression)
         '        Case FieldTypeIdCurrency, FieldTypeIdAutoIdIncrement, FieldTypeIdFloat, FieldTypeIdInteger, FieldTypeIdLookup, FieldTypeIdMemberSelect
-        '            EncodeSQL = app.db_EncodeSQLNumber(expression)
+        '            EncodeSQL = app.EncodeSQLNumber(expression)
         '        Case FieldTypeIdDate
-        '            EncodeSQL = app.db_EncodeSQLDate(expression)
+        '            EncodeSQL = app.EncodeSQLDate(expression)
         '        Case FieldTypeIdLongText, FieldTypeIdHTML
-        '            EncodeSQL = app.db_EncodeSQLText(expression)
+        '            EncodeSQL = app.EncodeSQLText(expression)
         '        Case FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdRedirect, FieldTypeIdManyToMany, FieldTypeIdText, FieldTypeIdFileTextPrivate, FieldTypeIdFileJavascript, FieldTypeIdFileXML, FieldTypeIdFileCSS, FieldTypeIdFileHTMLPrivate
-        '            EncodeSQL = app.db_EncodeSQLText(expression)
+        '            EncodeSQL = app.EncodeSQLText(expression)
         '        Case Else
-        '            EncodeSQL = app.db_EncodeSQLText(expression)
+        '            EncodeSQL = app.EncodeSQLText(expression)
         '            On Error GoTo 0
         '            Call Err.Raise(ignoreInteger, "dll", "Unknown Field Type [" & fieldType & "] used FieldTypeText.")
         '    End Select
@@ -6572,16 +6573,12 @@ ErrorTrap:
         '====================================================================================================
         '
         Public Function EncodeText(ByVal Expression As Object) As String
-            Try
-                EncodeText = ""
-                If Not (TypeOf Expression Is DBNull) Then
-                    If Not (Expression Is Nothing) Then
-                        EncodeText = CStr(Expression)
-                    End If
+            If Not (TypeOf Expression Is DBNull) Then
+                If (Expression IsNot Nothing) Then
+                    Return Expression.ToString()
                 End If
-            Catch
-                EncodeText = ""
-            End Try
+            End If
+            Return String.Empty
         End Function
         '
         '====================================================================================================
@@ -6775,7 +6772,7 @@ ErrorTrap:
         '        '   encodeSQLText
         '        '========================================================================
         '        '
-        '        Public Function app.db_EncodeSQLText(ByVal expression As Object) As String
+        '        Public Function app.EncodeSQLText(ByVal expression As Object) As String
         '            Dim returnString As String = ""
         '            If expression Is Nothing Then
         '                returnString = "null"
@@ -6794,7 +6791,7 @@ ErrorTrap:
         '        '   encodeSQLLongText
         '        '========================================================================
         '        '
-        '        Public Function app.db_EncodeSQLText(ByVal expression As Object) As String
+        '        Public Function app.EncodeSQLText(ByVal expression As Object) As String
         '            Dim returnString As String = ""
         '            If expression Is Nothing Then
         '                returnString = "null"
@@ -6814,7 +6811,7 @@ ErrorTrap:
         '        '       encode a date variable to go in an sql expression
         '        '========================================================================
         '        '
-        '        Public Function app.db_EncodeSQLDate(ByVal expression As Object) As String
+        '        Public Function app.EncodeSQLDate(ByVal expression As Object) As String
         '            Dim returnString As String = ""
         '            Dim expressionDate As Date = Date.MinValue
         '            If expression Is Nothing Then
@@ -6841,7 +6838,7 @@ ErrorTrap:
         '        '       encode a number variable to go in an sql expression
         '        '========================================================================
         '        '
-        '        Public Function app.db_EncodeSQLNumber(ByVal expression As Object) As String
+        '        Public Function app.EncodeSQLNumber(ByVal expression As Object) As String
         '            Dim returnString As String = ""
         '            Dim expressionNumber As Double = 0
         '            If expression Is Nothing Then
@@ -6870,13 +6867,13 @@ ErrorTrap:
         '        '       encode a boolean variable to go in an sql expression
         '        '========================================================================
         '        '
-        '        Public Function app.db_EncodeSQLBoolean(ByVal ExpressionVariant As Object) As String
+        '        Public Function app.EncodeSQLBoolean(ByVal ExpressionVariant As Object) As String
         '            '
         '            'Dim src As String
         '            '
-        '            app.db_EncodeSQLBoolean = SQLFalse
+        '            app.EncodeSQLBoolean = SQLFalse
         '            If EncodeBoolean(ExpressionVariant) Then
-        '                app.db_EncodeSQLBoolean = SQLTrue
+        '                app.EncodeSQLBoolean = SQLTrue
         '            End If
         '        End Function
         '
@@ -7377,37 +7374,6 @@ ErrorTrap:
                 returnString = returnString.Substring(1)
             End If
             Return returnString
-        End Function
-        '
-        '====================================================================================================
-        ' convert a dtaTable to a simple array - quick way to adapt old code
-        '====================================================================================================
-        '
-        Public Function convertDataTabletoArray(dt As DataTable) As String(,)
-            'Public Function convertDataTabletoArray(dt As DataTable, ByRef returnSuccess As Boolean) As String(,)
-            Dim columnCnt As Integer
-            Dim rowCnt As Integer
-            Dim rows As String(,) = {}
-            Dim cPtr As Integer
-            Dim rPtr As Integer
-            '
-            ' 20150717 check for no columns
-            If ((dt.Rows.Count > 0) And (dt.Columns.Count > 0)) Then
-                columnCnt = dt.Columns.Count
-                rowCnt = dt.Rows.Count
-                ' 20150717 change from rows(columnCnt,rowCnt) because other routines appear to use this count
-                ReDim rows(columnCnt - 1, rowCnt - 1)
-                rPtr = 0
-                For Each dr As DataRow In dt.Rows
-                    cPtr = 0
-                    For Each cell As DataColumn In dt.Columns
-                        rows(cPtr, rPtr) = EncodeText(dr(cell))
-                        cPtr += 1
-                    Next
-                    rPtr += 1
-                Next
-            End If
-            Return rows
         End Function
         '
         '====================================================================================================

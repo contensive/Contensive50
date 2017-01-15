@@ -136,17 +136,17 @@ Namespace Contensive.Core
                         If _childListAddonID_Local = 0 Then
                             BuildSupportsGuid = True
                             If BuildSupportsGuid Then
-                                CS = cpCore.db.csOpen("Add-ons", "ccguid='" & ChildListGuid & "'", , , ,,  , "ID")
+                                CS = cpCore.db.cs_open("Add-ons", "ccguid='" & ChildListGuid & "'", , , ,,  , "ID")
                             Else
-                                CS = cpCore.db.csOpen("Add-ons", "name='Child Page List'", , , , ,, "ID")
+                                CS = cpCore.db.cs_open("Add-ons", "name='Child Page List'", , , , ,, "ID")
                             End If
-                            If cpCore.db.cs_Ok(CS) Then
+                            If cpCore.db.cs_ok(CS) Then
                                 _childListAddonID_Local = cpCore.db.cs_getInteger(CS, "ID")
                             End If
                             Call cpCore.db.cs_Close(CS)
                             If _childListAddonID_Local = 0 Then
                                 CS = cpCore.db.cs_insertRecord("Add-ons")
-                                If cpCore.db.cs_Ok(CS) Then
+                                If cpCore.db.cs_ok(CS) Then
                                     _childListAddonID_Local = cpCore.db.cs_getInteger(CS, "ID")
                                     Call cpCore.db.cs_set(CS, "name", "Child Page List")
                                     Call cpCore.db.cs_set(CS, "ArgumentList", "Name")
@@ -438,24 +438,24 @@ Namespace Contensive.Core
 
                 RecordID = 0
                 SQL = "SELECT ID FROM CCSETUP WHERE NAME=" & cpCore.db.encodeSQLText(propertyName) & " order by id"
-                dt = cpCore.db.executeSql_getDataTable(SQL)
+                dt = cpCore.db.executeSql(SQL)
                 If dt.Rows.Count > 0 Then
                     RecordID = EncodeInteger(dt.Rows(0).Item("ID"))
                 End If
                 If RecordID <> 0 Then
                     SQL = "UPDATE ccSetup Set FieldValue=" & cpCore.db.encodeSQLText(Value) & ",ModifiedDate=" & SQLNow & " WHERE ID=" & RecordID
-                    Call cpCore.db.executeSql_getDataTable(SQL)
+                    Call cpCore.db.executeSql(SQL)
                 Else
                     ' get contentId manually, getContentId call checks cache, which gets site property, which may set
                     ContentID = 0
                     SQL = "SELECT ID FROM cccontent WHERE NAME='site properties' order by id"
-                    dt = cpCore.db.executeSql_getDataTable(SQL)
+                    dt = cpCore.db.executeSql(SQL)
                     If dt.Rows.Count > 0 Then
                         ContentID = EncodeInteger(dt.Rows(0).Item("ID"))
                     End If
                     'ContentID = csv_GetContentID("Site Properties")
                     SQL = "INSERT INTO ccSetup (ACTIVE,CONTENTCONTROLID,NAME,FIELDVALUE,ModifiedDate,DateAdded)VALUES(" & SQLTrue & "," & cpCore.db.encodeSQLNumber(ContentID) & "," & cpCore.db.encodeSQLText(UCase(propertyName)) & "," & cpCore.db.encodeSQLText(Value) & "," & SQLNow & "," & SQLNow & ");"
-                    Call cpCore.db.executeSql_getDataTable(SQL)
+                    Call cpCore.db.executeSql(SQL)
                 End If
                 Call cpCore.cache.setKey(cacheName, Value, "site properties")
 
@@ -504,7 +504,7 @@ Namespace Contensive.Core
                 Dim dt As DataTable
 
                 SQL = "select FieldValue from ccSetup where name=" & cpCore.db.encodeSQLText(PropertyName) & " order by id"
-                dt = cpCore.db.executeSql_getDataTable(SQL)
+                dt = cpCore.db.executeSql(SQL)
                 If dt.Rows.Count > 0 Then
                     returnString = EncodeText(dt.Rows(0).Item("FieldValue"))
                     return_propertyFound = True
@@ -607,5 +607,32 @@ Namespace Contensive.Core
         End Property
         Private siteProperty_AllowCache_LocalLoaded As Boolean = False
         Private siteProperty_AllowCache_Local As Boolean
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' The code version used to update the database last
+        ''' </summary>
+        ''' <returns></returns>
+        Public ReadOnly Property dataBuildVersion As String
+            Get
+                Dim returnString = ""
+                Try
+
+                    If Not _dataBuildVersion_Loaded Then
+                        _dataBuildVersion = getText("BuildVersion", "")
+                        If _dataBuildVersion = "" Then
+                            _dataBuildVersion = "0.0.000"
+                        End If
+                        _dataBuildVersion_Loaded = True
+                    End If
+                    returnString = _dataBuildVersion
+                Catch ex As Exception
+                    cpCore.handleExceptionAndRethrow(ex)
+                End Try
+                Return returnString
+            End Get
+        End Property
+        Private _dataBuildVersion As String
+        Friend _dataBuildVersion_Loaded As Boolean = False
     End Class
 End Namespace

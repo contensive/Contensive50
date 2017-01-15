@@ -1271,20 +1271,20 @@ Namespace Contensive
                                     & " or((ProcessInterval is not null)and(ProcessInterval<>0)and(ProcessNextRun is null))" _
                                     & " or(ProcessNextRun<" & SQLNow & ")" _
                                     & ")"
-                            CS = cpSite.core.db.csOpen("add-ons", SQL)
-                            Do While cpSite.core.db.cs_Ok(CS)
+                            CS = cpSite.core.db.cs_open("add-ons", SQL)
+                            Do While cpSite.core.db.cs_ok(CS)
                                 ProcessInterval = cpSite.core.db.cs_getInteger(CS, "ProcessInterval")
                                 ProcessID = cpSite.core.db.cs_getInteger(CS, "ID")
                                 processName = cpSite.core.db.cs_getText(CS, "name")
                                 ProcessRunOnce = cpSite.core.db.cs_getBoolean(CS, "ProcessRunOnce")
-                                ProcessNextRun = cpSite.core.db.db_GetCSDate(CS, "ProcessNextRun")
+                                ProcessNextRun = cpSite.core.db.cs_getDate(CS, "ProcessNextRun")
                                 NextRun = Date.MinValue
                                 hint &= ",run addon " & processName
                                 If ProcessInterval > 0 Then
                                     NextRun = RightNow.AddMinutes(ProcessInterval)
                                 End If
                                 If False Then ' some of the servers are reporting an invalid hostprocessid
-                                    'If cpSite.core.app.csv_GetCSInteger(CS, "ProcessServerKey") <> HostProcessID Then
+                                    'If cpSite.core.app.csv_cs_getInteger(CS, "ProcessServerKey") <> HostProcessID Then
                                     '
                                     ' Server has been restarted, reset next run
                                     '
@@ -1298,7 +1298,7 @@ Namespace Contensive
                                     Call cpSite.core.db.cs_set(CS, "ProcessNextRun", NextRun)
                                     Call addAsyncCmd(cpCore, "runprocess appname=""" & cpSite.core.appConfig.name & """ addonid=""" & ProcessID & """", True)
                                     'Call addAsyncCmd(cp,"runprocess appname=""" & cpSite.core.appEnvironment.name & """ addonname=""" & ProcessName & """", True)
-                                ElseIf cpSite.core.db.db_GetCSDate(CS, "ProcessNextRun") = Date.MinValue Then
+                                ElseIf cpSite.core.db.cs_getDate(CS, "ProcessNextRun") = Date.MinValue Then
                                     '
                                     ' Interval is OK but NextRun is 0, just set next run
                                     '
@@ -1310,7 +1310,7 @@ Namespace Contensive
                                     Call addAsyncCmd(cpCore, "runprocess appname=""" & cpSite.core.appConfig.name & """ addonid=""" & ProcessID & """", True)
                                     Call cpSite.core.db.cs_set(CS, "ProcessNextRun", NextRun)
                                 End If
-                                Call cpSite.core.db.db_csGoNext(CS)
+                                Call cpSite.core.db.cs_goNext(CS)
                                 cpSite.Dispose()
                             Loop
                             Call cpSite.core.db.cs_Close(CS)

@@ -121,7 +121,7 @@ Namespace Contensive.Core
                 Dim builder As New coreBuilderClass(cpCore)
                 '
                 ' BuildVersion = cpcore.app.dataBuildVersion
-                Dim dataBuildVersion As String = cpCore.db.siteproperty_dataBuildVersion
+                Dim dataBuildVersion As String = cpCore.siteProperties.dataBuildVersion
                 Dim coreVersion As String = cpCore.common_version()
 
                 DbUpToDate = (dataBuildVersion = coreVersion)
@@ -194,13 +194,13 @@ Namespace Contensive.Core
                                         '                            ' Load all collections into local collection storage
                                         '                            '
                                         '                            TargetCollectionID = cpcore.main_GetStreamInteger2("acID" & Ptr)
-                                        '                            CS = cpcore.app.db_csOpen("Add-on Collections")
+                                        '                            CS = cpcore.app.csOpen("Add-on Collections")
                                         '                            CollectionCnt = 0
                                         '                            TargetCollectionPtr = -1
                                         '                            Do While cpcore.asv.csv_IsCSOK(CS)
                                         '                                ReDim Preserve Collections(CollectionCnt)
-                                        '                                CollectionID = cpcore.app.db_GetCSInteger(CS, "ID")
-                                        '                                CollectionName = cpcore.db.db_GetCSText(CS, "Name")
+                                        '                                CollectionID = cpcore.app.cs_getInteger(CS, "ID")
+                                        '                                CollectionName = cpcore.db.cs_getText(CS, "Name")
                                         '                                If CollectionID = TargetCollectionID Then
                                         '                                    TargetCollectionPtr = CollectionCnt
                                         '                                    'TargetCollectionPtr = Ptr
@@ -219,22 +219,22 @@ Namespace Contensive.Core
                                         '                                        & " left join ccAddonCollectionRules R on R.AddonID=A.ID" _
                                         '                                        & " where R.CollectionID=" & CollectionID
                                         '                                End If
-                                        '                                CSAddons = cpcore.app.db_openCsSql_rev("default", SQL)
+                                        '                                CSAddons = cpcore.app.openCsSql_rev("default", SQL)
                                         '                                Do While cpcore.asv.csv_IsCSOK(CSAddons)
                                         '                                    AddonCnt = Collections(CollectionCnt).AddonCnt
                                         '                                    ReDim Preserve Collections(CollectionCnt).AddonName(AddonCnt)
                                         '                                    ReDim Preserve Collections(CollectionCnt).AddonGuid(AddonCnt)
-                                        '                                    addonid = cpcore.app.db_GetCSInteger(CSAddons, "ID")
-                                        '                                    Collections(CollectionCnt).AddonGuid(AddonCnt) = cpcore.db.db_GetCSText(CSAddons, GuidFieldName)
-                                        '                                    Collections(CollectionCnt).AddonName(AddonCnt) = cpcore.db.db_GetCSText(CSAddons, "Name")
+                                        '                                    addonid = cpcore.app.cs_getInteger(CSAddons, "ID")
+                                        '                                    Collections(CollectionCnt).AddonGuid(AddonCnt) = cpcore.db.cs_getText(CSAddons, GuidFieldName)
+                                        '                                    Collections(CollectionCnt).AddonName(AddonCnt) = cpcore.db.cs_getText(CSAddons, "Name")
                                         '                                    Collections(CollectionCnt).AddonCnt = AddonCnt + 1
-                                        '                                    Call cpcore.app.db_nextCSRecord(CSAddons)
+                                        '                                    Call cpcore.app.nextCSRecord(CSAddons)
                                         '                                Loop
-                                        '                                Call cpcore.app.db_closeCS(CSAddons)
+                                        '                                Call cpcore.app.closeCS(CSAddons)
                                         '                                '
                                         '                                ' GetCDefs from Collection File to remove cdefs and navigators
                                         '                                '
-                                        '                                CollectionFile = cpcore.app.db_GetCS(CS, "InstallFile")
+                                        '                                CollectionFile = cpcore.app.cs_get(CS, "InstallFile")
                                         '                                If CollectionFile <> "" Then
                                         '                                    Call Doc.loadXML(CollectionFile)
                                         '                                    If Doc.parseError.ErrorCode <> 0 Then
@@ -292,7 +292,7 @@ Namespace Contensive.Core
                                         '                                CollectionCnt = CollectionCnt + 1
                                         '                                cpcore.main_NextCSRecord (CS)
                                         '                            Loop
-                                        '                            Call cpcore.app.db_closeCS(CS)
+                                        '                            Call cpcore.app.closeCS(CS)
                                         '                            '
                                         '                            ' Search through the local collection storage for the addons in the one we want to delete
                                         '                            '   if not in any other collections, delete the addon from the system
@@ -301,7 +301,7 @@ Namespace Contensive.Core
                                         '                                '
                                         '                                ' delete all addons associated to this collection
                                         '                                '
-                                        '                                Call cpcore.app.db_DeleteContentRecords("Add-ons", "collectionid=" & TargetCollectionID)
+                                        '                                Call cpcore.app.DeleteContentRecords("Add-ons", "collectionid=" & TargetCollectionID)
                                         '                            Else
                                         '                                ' deprecated the addoncollectionrules for collectionid in addon
                                         '                                If (TargetCollectionPtr >= 0) And (CollectionCnt <> 0) Then
@@ -339,7 +339,7 @@ Namespace Contensive.Core
                                         '                                            Else
                                         '                                                Criteria = "(name=" & encodeSQLText(TargetAddonName) & ")"
                                         '                                            End If
-                                        '                                            Call cpcore.app.db_DeleteContentRecords("Add-ons", Criteria)
+                                        '                                            Call cpcore.app.DeleteContentRecords("Add-ons", Criteria)
                                         '                                        End If
                                         '                                    Next
                                         '                                End If
@@ -366,7 +366,7 @@ Namespace Contensive.Core
                                         '                                        '
                                         '                                        ' OK to delete the target addon
                                         '                                        '
-                                        '                                        Call cpcore.app.db_DeleteContentRecords("Menu Entries", "(name=" & encodeSQLText(TargetName) & ")")
+                                        '                                        Call cpcore.app.DeleteContentRecords("Menu Entries", "(name=" & encodeSQLText(TargetName) & ")")
                                         '                                    End If
                                         '                                Next
                                         '                                '
@@ -421,8 +421,8 @@ Namespace Contensive.Core
                                         '
                                         If TargetCollectionID > 0 Then
                                             AddonNavigatorID = 0
-                                            CS = cpCore.db.csOpen("Navigator Entries", "name='Manage Add-ons' and ((parentid=0)or(parentid is null))")
-                                            If cpCore.db.cs_Ok(CS) Then
+                                            CS = cpCore.db.cs_open("Navigator Entries", "name='Manage Add-ons' and ((parentid=0)or(parentid is null))")
+                                            If cpCore.db.cs_ok(CS) Then
                                                 AddonNavigatorID = cpCore.db.cs_getInteger(CS, "ID")
                                             End If
                                             Call cpCore.db.cs_Close(CS)
@@ -432,7 +432,7 @@ Namespace Contensive.Core
                                             '
                                             ' Now delete the Collection record
                                             '
-                                            Call cpCore.db_DeleteContentRecord("Add-on Collections", TargetCollectionID)
+                                            Call cpCore.DeleteContentRecord("Add-on Collections", TargetCollectionID)
                                             '
                                             ' Delete Navigator Entries set as installed by the collection (this may be all that is needed)
                                             '
@@ -450,7 +450,7 @@ Namespace Contensive.Core
                             If Cnt > 0 Then
                                 For Ptr = 0 To Cnt - 1
                                     If cpCore.doc_getBoolean2("ao" & Ptr) Then
-                                        Call cpCore.db_DeleteContentRecord("Add-ons", cpCore.docProperties.getInteger("aoID" & Ptr))
+                                        Call cpCore.DeleteContentRecord("Add-ons", cpCore.docProperties.getInteger("aoID" & Ptr))
                                     End If
                                 Next
                             End If
@@ -527,7 +527,7 @@ Namespace Contensive.Core
                         If AllowInstallFromFolder Then
                             'InstallFolder = cpcore.asv.config.physicalFilePath & InstallFolderName & "\"
                             If cpCore.privateFiles.pathExists(privateFilesInstallPath) Then
-                                UpgradeOK = addonInstall.InstallCollectionFromPrivateFolder(builder, cpCore.db.siteproperty_dataBuildVersion, privateFilesInstallPath, IISResetRequired, cpCore.appConfig.name, ErrorMessage, InstalledCollectionGuid, False)
+                                UpgradeOK = addonInstall.InstallCollectionFromPrivateFolder(builder, cpCore.siteProperties.dataBuildVersion, privateFilesInstallPath, IISResetRequired, cpCore.appConfig.name, ErrorMessage, InstalledCollectionGuid, False)
                                 If Not UpgradeOK Then
                                     If ErrorMessage = "" Then
                                         cpCore.error_AddUserError("The Add-on Collection did not install correctly, but no detailed error message was given.")
@@ -549,8 +549,8 @@ Namespace Contensive.Core
                         ' --------------------------------------------------------------------------------
                         '
                         If InstalledCollectionGuid <> "" Then
-                            CS = cpCore.db.csOpen("Add-on Collections", GuidFieldName & "=" & cpCore.db.encodeSQLText(InstalledCollectionGuid))
-                            If cpCore.db.cs_Ok(CS) Then
+                            CS = cpCore.db.cs_open("Add-on Collections", GuidFieldName & "=" & cpCore.db.encodeSQLText(InstalledCollectionGuid))
+                            If cpCore.db.cs_ok(CS) Then
                                 InstalledCollectionID = cpCore.db.cs_getInteger(CS, "ID")
                             End If
                             Call cpCore.db.cs_Close(CS)
@@ -728,8 +728,8 @@ Namespace Contensive.Core
                                                             Cells3(RowPtr, 3) = CollectionDescription & "&nbsp;"
                                                         Else
                                                             IsOnServer = EncodeBoolean(InStr(1, OnServerGuidList, CollectionGuid, vbTextCompare))
-                                                            CS = cpCore.db.csOpen("Add-on Collections", GuidFieldName & "=" & cpCore.db.encodeSQLText(CollectionGuid), , , , , , "ID")
-                                                            IsOnSite = cpCore.db.cs_Ok(CS)
+                                                            CS = cpCore.db.cs_open("Add-on Collections", GuidFieldName & "=" & cpCore.db.encodeSQLText(CollectionGuid), , , , , , "ID")
+                                                            IsOnSite = cpCore.db.cs_ok(CS)
                                                             Call cpCore.db.cs_Close(CS)
                                                             If IsOnSite Then
                                                                 '
@@ -826,31 +826,31 @@ Namespace Contensive.Core
                                     '
                                     ' before system attribute
                                     '
-                                    CS = cpCore.db.csOpen("Add-on Collections", , "Name")
+                                    CS = cpCore.db.cs_open("Add-on Collections", , "Name")
                                 ElseIf Not cpCore.user.isAuthenticatedDeveloper Then
                                     '
                                     ' non-developers
                                     '
-                                    CS = cpCore.db.csOpen("Add-on Collections", "((system is null)or(system=0))", "Name")
+                                    CS = cpCore.db.cs_open("Add-on Collections", "((system is null)or(system=0))", "Name")
                                 Else
                                     '
                                     ' developers
                                     '
                                     DisplaySystem = True
-                                    CS = cpCore.db.csOpen("Add-on Collections", , "Name")
+                                    CS = cpCore.db.cs_open("Add-on Collections", , "Name")
                                 End If
-                                ReDim Preserve Cells(cpCore.db.db_GetCSRowCount(CS), ColumnCnt)
+                                ReDim Preserve Cells(cpCore.db.cs_getRowCount(CS), ColumnCnt)
                                 RowPtr = 0
-                                Do While cpCore.db.cs_Ok(CS)
+                                Do While cpCore.db.cs_ok(CS)
                                     Cells(RowPtr, 0) = cpCore.html_GetFormInputCheckBox2("AC" & RowPtr) & cpCore.html_GetFormInputHidden("ACID" & RowPtr, cpCore.db.cs_getInteger(CS, "ID"))
-                                    'Cells(RowPtr, 1) = "<a href=""" & cpcore.app.SiteProperty_AdminURL & "?id=" & cpcore.app.db_GetCSInteger(CS, "ID") & "&cid=" & cpcore.app.db_GetCSInteger(CS, "ContentControlID") & "&af=4""><img src=""/ccLib/images/IconContentEdit.gif"" border=0></a>"
+                                    'Cells(RowPtr, 1) = "<a href=""" & cpcore.app.SiteProperty_AdminURL & "?id=" & cpcore.app.cs_getInteger(CS, "ID") & "&cid=" & cpcore.app.cs_getInteger(CS, "ContentControlID") & "&af=4""><img src=""/ccLib/images/IconContentEdit.gif"" border=0></a>"
                                     Cells(RowPtr, 1) = cpCore.db.cs_getText(CS, "name")
                                     If DisplaySystem Then
                                         If cpCore.db.cs_getBoolean(CS, "system") Then
                                             Cells(RowPtr, 1) = Cells(RowPtr, 1) & " (system)"
                                         End If
                                     End If
-                                    Call cpCore.db.db_csGoNext(CS)
+                                    Call cpCore.db.cs_goNext(CS)
                                     RowPtr = RowPtr + 1
                                 Loop
                                 Call cpCore.db.cs_Close(CS)
@@ -925,23 +925,23 @@ Namespace Contensive.Core
             Dim EntryID As Integer
             '
             If EntryParentID = 0 Then
-                CS = cpCore.db.csOpen("Navigator Entries", "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and((parentID is null)or(parentid=0))")
+                CS = cpCore.db.cs_open("Navigator Entries", "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and((parentID is null)or(parentid=0))")
             Else
-                CS = cpCore.db.csOpen("Navigator Entries", "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(parentID=" & cpCore.db.encodeSQLNumber(EntryParentID) & ")")
+                CS = cpCore.db.cs_open("Navigator Entries", "(name=" & cpCore.db.encodeSQLText(EntryName) & ")and(parentID=" & cpCore.db.encodeSQLNumber(EntryParentID) & ")")
             End If
-            If cpCore.db.cs_Ok(CS) Then
+            If cpCore.db.cs_ok(CS) Then
                 EntryID = cpCore.db.cs_getInteger(CS, "ID")
             End If
             Call cpCore.db.cs_Close(CS)
             '
             If EntryID <> 0 Then
-                CS = cpCore.db.csOpen("Navigator Entries", "(parentID=" & cpCore.db.encodeSQLNumber(EntryID) & ")")
-                Do While cpCore.db.cs_Ok(CS)
+                CS = cpCore.db.cs_open("Navigator Entries", "(parentID=" & cpCore.db.encodeSQLNumber(EntryID) & ")")
+                Do While cpCore.db.cs_ok(CS)
                     Call GetForm_SafeModeAddonManager_DeleteNavigatorBranch(cpCore.db.cs_getText(CS, "name"), EntryID)
-                    Call cpCore.db.db_csGoNext(CS)
+                    Call cpCore.db.cs_goNext(CS)
                 Loop
                 Call cpCore.db.cs_Close(CS)
-                Call cpCore.db_DeleteContentRecord("Navigator Entries", EntryID)
+                Call cpCore.DeleteContentRecord("Navigator Entries", EntryID)
             End If
             '
             Exit Sub
@@ -1005,7 +1005,7 @@ ErrorTrap:
         '
         '
         '
-        public Function GetParentIDFromNameSpace(ByVal ContentName As String, ByVal menuNameSpace As String) As Integer
+        Public Function GetParentIDFromNameSpace(ByVal ContentName As String, ByVal menuNameSpace As String) As Integer
             On Error GoTo ErrorTrap
             '
             Dim NameSplit() As String
@@ -1027,15 +1027,15 @@ ErrorTrap:
                     ParentNameSpace = Mid(menuNameSpace, 1, Pos - 1)
                 End If
                 If ParentNameSpace = "" Then
-                    CS = cpCore.db.csOpen(ContentName, "(name=" & cpCore.db.encodeSQLText(ParentName) & ")and((parentid is null)or(parentid=0))", "ID", , , , , "ID")
-                    If cpCore.db.cs_Ok(CS) Then
+                    CS = cpCore.db.cs_open(ContentName, "(name=" & cpCore.db.encodeSQLText(ParentName) & ")and((parentid is null)or(parentid=0))", "ID", , , , , "ID")
+                    If cpCore.db.cs_ok(CS) Then
                         GetParentIDFromNameSpace = cpCore.db.cs_getInteger(CS, "ID")
                     End If
                     Call cpCore.db.cs_Close(CS)
                 Else
                     ParentID = GetParentIDFromNameSpace(ContentName, ParentNameSpace)
-                    CS = cpCore.db.csOpen(ContentName, "(name=" & cpCore.db.encodeSQLText(ParentName) & ")and(parentid=" & ParentID & ")", "ID", , , , , "ID")
-                    If cpCore.db.cs_Ok(CS) Then
+                    CS = cpCore.db.cs_open(ContentName, "(name=" & cpCore.db.encodeSQLText(ParentName) & ")and(parentid=" & ParentID & ")", "ID", , , , , "ID")
+                    If cpCore.db.cs_ok(CS) Then
                         GetParentIDFromNameSpace = cpCore.db.cs_getInteger(CS, "ID")
                     End If
                     Call cpCore.db.cs_Close(CS)

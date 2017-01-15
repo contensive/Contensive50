@@ -142,7 +142,7 @@ Namespace Contensive.Core
                         addonCacheRowOK = False
                         SQL = "select " & cache_addon2_fieldList & " from ccaggregatefunctions where id=" & RecordID
                         addon = New addonClass
-                        dt = cpCore.db.executeSql_getDataTable(SQL)
+                        dt = cpCore.db.executeSql(SQL)
                         If dt.Rows.Count > 0 Then
                             With dt.Rows(0)
                                 addon.addonCache_Id = EncodeInteger(.Item(0))
@@ -191,7 +191,7 @@ Namespace Contensive.Core
                         End If
                         Call dt.Dispose()
                         'hint = hint & ", 4 RowPtr=[" & addonPtr & "], sql=[" & SQL & "]"
-                        addonCacheRow = convertDataTabletoArray(cpCore.db.executeSql_getDataTable(SQL))
+                        addonCacheRow = cpCore.db.convertDataTabletoArray(cpCore.db.executeSql(SQL))
 
                         'RS = app.csv_OpenRSSQL_Internal("Default", SQL, 120, 1, 1, False, CursorLocationEnum.adUseClient, LockTypeEnum.ADLOCKOptimistic, CursorTypeEnum.ADOPENForwardOnly)
                         'If (isDataTableOk(rs)) Then
@@ -282,9 +282,9 @@ Namespace Contensive.Core
                         '
                         ' This addonId is missing from cache - try to load it from Db
                         '
-                        sqlCriteria = "(id=" & cpCore.db.encodeSQLNumber(addonNameGuidOrId) & ")or(name=" & cpCore.db.encodeSQLText(addonNameGuidOrId) & ")or(ccguid=" & cpCore.db.encodeSQLText(addonNameGuidOrId) & ")"
-                        CS = cpCore.db.csOpen("add-ons", sqlCriteria)
-                        If cpCore.db.cs_Ok(CS) Then
+                        sqlCriteria = "(id=" & cpCore.db.encodeSQLNumber(EncodeInteger(addonNameGuidOrId)) & ")or(name=" & cpCore.db.encodeSQLText(addonNameGuidOrId) & ")or(ccguid=" & cpCore.db.encodeSQLText(addonNameGuidOrId) & ")"
+                        CS = cpCore.db.cs_open("add-ons", sqlCriteria)
+                        If cpCore.db.cs_ok(CS) Then
                             addonId = cpCore.db.cs_getInteger(CS, "id")
                         End If
                         Call cpCore.db.cs_Close(CS)
@@ -375,7 +375,7 @@ Namespace Contensive.Core
                         onBodyEndCnt = 0
                         SQL = "select " & cache_addon2_fieldList & " from ccAggregateFunctions where (active<>0) order by id"
                         'hint = hint & ", addonCache IsEmpty - Db select"
-                        Using dt As DataTable = cpCore.db.executeSql_getDataTable(SQL)
+                        Using dt As DataTable = cpCore.db.executeSql(SQL)
                             If dt.Rows.Count > 0 Then
                                 addonPtr = 0
                                 For Each dr As DataRow In dt.Rows

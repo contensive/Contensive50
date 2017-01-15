@@ -354,7 +354,7 @@ Namespace Contensive.Core
                         Call cpCore.security.decodeToken(CookieDetectKey, CookieDetectVisitId, cookieDetectDate)
                         'CookieDetectVisitId = cpCore.main_DecodeKeyNumber(CookieDetectKey)
                         If CookieDetectVisitId <> 0 Then
-                            Call cpCore.db.executeSql_getDataTable("update ccvisits set CookieSupport=1 where id=" & CookieDetectVisitId)
+                            Call cpCore.db.executeSql("update ccvisits set CookieSupport=1 where id=" & CookieDetectVisitId)
                             cpCore.docOpen = False '--- should be disposed by caller --- Call dispose
                             Return cpCore.docOpen
                         End If
@@ -400,7 +400,7 @@ Namespace Contensive.Core
                         domainDetailsListText = vbCrLf
                         SQL = "select name,rootpageid,nofollow,typeid,visited,id,ForwardURL,DefaultTemplateId,PageNotFoundPageID,allowCrossLogin,ForwardDomainId from ccdomains where (active<>0)and(name is not null) order by id"
                         Dim dt As DataTable
-                        dt = cpCore.db.executeSql_getDataTable(SQL)
+                        dt = cpCore.db.executeSql(SQL)
                         If dt.Rows.Count > 0 Then
                             If Not (dt.Columns Is Nothing) Then
                                 Dim colCnt As Integer = dt.Columns.Count
@@ -458,7 +458,7 @@ Namespace Contensive.Core
                             ' this is a default domain or a new domain -- add to the domain table
                             '
                             CS = cpCore.db.cs_insertRecord("domains")
-                            If cpCore.db.cs_Ok(CS) Then
+                            If cpCore.db.cs_ok(CS) Then
                                 cpCore.domains.domainDetails.id = cpCore.db.cs_getInteger(CS, "id")
                                 Call cpCore.db.cs_set(CS, "name", requestDomain)
                                 Call cpCore.db.cs_set(CS, "typeId", "1")
@@ -477,7 +477,7 @@ Namespace Contensive.Core
                             ' set visited true
                             '
                             SQL = "update ccdomains set visited=1 where name=" & cpCore.db.encodeSQLText(requestDomain)
-                            Call cpCore.db.executeSql_getDataTable(SQL)
+                            Call cpCore.db.executeSql(SQL)
                             Call cpCore.cache.setKey("domainContentList", "", "domains")
                         End If
                         If cpCore.domains.domainDetails.typeId = 1 Then
@@ -551,7 +551,7 @@ Namespace Contensive.Core
                         cpCore.domains.domainDetailsList.Add(requestDomain.ToLower(), domainDetailsNew)
                         '
                         CS = cpCore.db.cs_insertRecord("domains")
-                        If cpCore.db.cs_Ok(CS) Then
+                        If cpCore.db.cs_ok(CS) Then
                             cpCore.domains.domainDetails.id = cpCore.db.cs_getInteger(CS, "id")
                             Call cpCore.db.cs_set(CS, "name", requestDomain)
                             Call cpCore.db.cs_set(CS, "typeid", "1")

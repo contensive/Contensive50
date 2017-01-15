@@ -33,7 +33,7 @@ Namespace Contensive.Core
             'Dim appName As String
             ''
             'appName = ""
-            'SQLDateNow = app.db_EncodeSQLDate(Now)
+            'SQLDateNow = app.EncodeSQLDate(Now)
             Throw New NotImplementedException
             'For Each AppService In KernelService.AppServices
             '    appName = cpCore.app.Name
@@ -49,7 +49,7 @@ Namespace Contensive.Core
             '                '   Check this server for anything in the tasks queue
             '                '
             '                If cmc.csv_IsContentFieldSupported("Tasks", "ID") Then
-            '                    CS = cmc.cpCore.app.db_csOpen("Tasks", "DateCompleted is null")
+            '                    CS = cmc.cpCore.app.csOpen("Tasks", "DateCompleted is null")
             '                    Do While cmc.cpCore.app.csv_IsCSOK(CS)
             '                        PreviousProcessAborted = False
             '                        If (true) Then
@@ -57,14 +57,14 @@ Namespace Contensive.Core
             '                            ' Since only one ccTask can run at a time, if a task is found to be started, it must have aborted.
             '                            ' Mark it aborted so it will not lock up all task processes
             '                            '
-            '                            PreviousProcessAborted = (cmc.csv_GetCSDate(CS, "DateStarted") <> Date.MinValue)
+            '                            PreviousProcessAborted = (cmc.csv_cs_getDate(CS, "DateStarted") <> Date.MinValue)
             '                        End If
             '                        If PreviousProcessAborted Then
             '                            Call cmc.cpCore.app.csv_SetCS(CS, "DateCompleted", Now)
             '                            Call cmc.cpCore.app.csv_SetCS(CS, "ResultMessage", "This task failed to complete.")
             '                        Else
             '                            If cmc.csv_IsContentFieldSupported("Tasks", "NotifyEmail") Then
-            '                                NotifyEMail = cmc.csv_GetCS(CS, "NotifyEmail")
+            '                                NotifyEMail = cmc.csv_cs_get(CS, "NotifyEmail")
             '                            End If
             '                            NotifyBody = ""
             '                            If cmc.csv_GetSiteProperty("BuildVersion", "", SystemMemberID) >= "3.3.583" Then
@@ -72,14 +72,14 @@ Namespace Contensive.Core
             '                            Else
             '                                SQLFieldName = "SQL"
             '                            End If
-            '                            Select Case vbUCase(cmc.cpCore.app.csv_GetCSText(CS, "Command"))
+            '                            Select Case vbUCase(cmc.cpCore.app.csv_cs_getText(CS, "Command"))
             '                                Case "BUILDCSV"
             '                                    '
             '                                    ' Build CSV
             '                                    '
-            '                                    DataSource = cmc.cpCore.app.csv_GetCSText(CS, "DataSource")
-            '                                    SQL = cmc.cpCore.app.csv_GetCSText(CS, SQLFieldName)
-            '                                    Filename = vbReplace(cmc.cpCore.app.csv_GetCSText(CS, "Filename"), "/", "\")
+            '                                    DataSource = cmc.cpCore.app.csv_cs_getText(CS, "DataSource")
+            '                                    SQL = cmc.cpCore.app.csv_cs_getText(CS, SQLFieldName)
+            '                                    Filename = vbReplace(cmc.cpCore.app.csv_cs_getText(CS, "Filename"), "/", "\")
             '                                    ResultMessage = BuildCSV(cmc, DataSource, SQL, cmc.cpCore.app.config.physicalFilePath & Filename)
             '                                    If ResultMessage <> "" Then
             '                                        NotifyBody = "This email is to notify you that there was a problem with your export data [" & ResultMessage & "]  on [" & cmc.appEnvironment.name & "]"
@@ -92,9 +92,9 @@ Namespace Contensive.Core
             '                                    '
             '                                    ' Build XML
             '                                    '
-            '                                    DataSource = cmc.cpCore.app.csv_GetCSText(CS, "DataSource")
-            '                                    SQL = cmc.cpCore.app.csv_GetCSText(CS, SQLFieldName)
-            '                                    Filename = vbReplace(cmc.cpCore.app.csv_GetCSText(CS, "Filename"), "/", "\")
+            '                                    DataSource = cmc.cpCore.app.csv_cs_getText(CS, "DataSource")
+            '                                    SQL = cmc.cpCore.app.csv_cs_getText(CS, SQLFieldName)
+            '                                    Filename = vbReplace(cmc.cpCore.app.csv_cs_getText(CS, "Filename"), "/", "\")
             '                                    ResultMessage = BuildXML(cmc, DataSource, SQL, cmc.cpCore.app.config.physicalFilePath & Filename)
             '                                    NotifyBody = "This email is to notify you that your XML export is ready on [" & cmc.appEnvironment.name & "]"
             '                                    NotifySubject = "XML export is ready"
@@ -108,8 +108,8 @@ Namespace Contensive.Core
             '                                    ''
             '                                    'Set ImportProcessor = New ProcessImportClass
             '                                    ''
-            '                                    'CSVFilename = vbReplace(cmc.cpCore.app.csv_GetCSText(CS, "Filename"), "/", "\")
-            '                                    'ImportMapFilename = vbReplace(cmc.cpCore.app.csv_GetCSText(CS, "ImportMapFilename"), "/", "\")
+            '                                    'CSVFilename = vbReplace(cmc.cpCore.app.csv_cs_getText(CS, "Filename"), "/", "\")
+            '                                    'ImportMapFilename = vbReplace(cmc.cpCore.app.csv_cs_getText(CS, "ImportMapFilename"), "/", "\")
             '                                    ''
             '                                    'ResultMessage = ImportProcessor.ProcessCSV(cmc, CSVFilename, ImportMapFilename)
             '                                    'If ResultMessage <> "" Then
@@ -173,8 +173,8 @@ Namespace Contensive.Core
             Dim appName As String
             '
             appName = cpCore.appConfig.name
-            CS = cpCore.db.db_openCsSql_rev(DataSource, SQL)
-            If cpCore.db.cs_Ok(CS) Then
+            CS = cpCore.db.cs_openCsSql_rev(DataSource, SQL)
+            If cpCore.db.cs_ok(CS) Then
                 '
                 ' ----- print out the field names
                 '
@@ -182,7 +182,7 @@ Namespace Contensive.Core
                 FieldNameCnt = 0
                 FieldNameSize = 100
                 ReDim FieldNames(FieldNameSize)
-                FieldName = cpCore.db.db_GetCSFirstFieldName(CS)
+                FieldName = cpCore.db.cs_getFirstFieldName(CS)
                 Do While (FieldName <> "")
                     If FieldNameCnt > FieldNameSize Then
                         FieldNameSize = FieldNameSize + 10
@@ -190,7 +190,7 @@ Namespace Contensive.Core
                     End If
                     FieldNames(FieldNameCnt) = FieldName
                     RowBuffer = RowBuffer & ",""" & FieldName & """"
-                    FieldName = cpCore.db.db_GetCSNextFieldName(CS)
+                    FieldName = cpCore.db.cs_getNextFieldName(CS)
                     FieldNameCnt = FieldNameCnt + 1
                     'DoEvents()
                 Loop
@@ -200,11 +200,11 @@ Namespace Contensive.Core
                     '
                     ' ----- print out the values
                     '
-                    Do While cpCore.db.cs_Ok(CS)
+                    Do While cpCore.db.cs_ok(CS)
                         Delimiter = ""
                         RowBuffer = ""
                         For FieldNamePtr = 0 To FieldNameCnt - 1
-                            Copy = cpCore.db.db_GetCS(CS, FieldNames(FieldNamePtr))
+                            Copy = cpCore.db.cs_get(CS, FieldNames(FieldNamePtr))
                             Copy = vbReplace(Copy, """", """""")
                             ' if propertly quoted, line breaks can be preserved
                             'Copy = vbReplace(Copy, vbCrLf, " ")
@@ -214,7 +214,7 @@ Namespace Contensive.Core
                             'DoEvents()
                         Next
                         Call cpCore.cdnFiles.appendFile(Filename, Mid(RowBuffer, 2) & vbCrLf)
-                        Call cpCore.db.db_csGoNext(CS)
+                        Call cpCore.db.cs_goNext(CS)
                         'DoEvents()
                     Loop
                 End If
@@ -250,22 +250,22 @@ ErrorTrap:
             Dim appName As String
             '
             appName = cpCore.appConfig.name
-            CS = cpCore.db.db_openCsSql_rev(DataSource, SQL)
-            If cpCore.db.cs_Ok(CS) Then
+            CS = cpCore.db.cs_openCsSql_rev(DataSource, SQL)
+            If cpCore.db.cs_ok(CS) Then
                 '
                 ' ----- setup the field names
                 '
                 FieldNameCnt = 0
                 FieldNameSize = 100
                 ReDim FieldNames(FieldNameSize)
-                FieldName = cpCore.db.db_GetCSFirstFieldName(CS)
+                FieldName = cpCore.db.cs_getFirstFieldName(CS)
                 Do While (FieldName <> "")
                     If FieldNameCnt > FieldNameSize Then
                         FieldNameSize = FieldNameSize + 10
                         ReDim Preserve FieldNames(FieldNameSize)
                     End If
                     FieldNames(FieldNameCnt) = FieldName
-                    FieldName = cpCore.db.db_GetCSNextFieldName(CS)
+                    FieldName = cpCore.db.cs_getNextFieldName(CS)
                     FieldNameCnt = FieldNameCnt + 1
                     'DoEvents()
                 Loop
@@ -276,13 +276,13 @@ ErrorTrap:
                     '
                     ' ----- print out the values
                     '
-                    Do While cpCore.db.cs_Ok(CS)
+                    Do While cpCore.db.cs_ok(CS)
                         Delimiter = ""
                         RowBuffer = "<Record>"
                         For FieldNamePtr = 0 To FieldNameCnt - 1
                             FieldName = FieldNames(FieldNamePtr)
                             If FieldName <> "" Then
-                                Copy = cpCore.db.db_GetCS(CS, FieldNames(FieldNamePtr))
+                                Copy = cpCore.db.cs_get(CS, FieldNames(FieldNamePtr))
                                 Copy = cpcore.html.html_EncodeHTML(Copy)
                                 If Copy = "" Then
                                     RowBuffer = RowBuffer & "<" & FieldName & " />"
@@ -294,7 +294,7 @@ ErrorTrap:
                         Next
                         RowBuffer = RowBuffer & "</Record>"
                         Call cpCore.cdnFiles.appendFile(Filename, RowBuffer & vbCrLf)
-                        Call cpCore.db.db_csGoNext(CS)
+                        Call cpCore.db.cs_goNext(CS)
                         'DoEvents()
                     Loop
                     Call cpCore.cdnFiles.appendFile(Filename, "</Content>" & vbCrLf)

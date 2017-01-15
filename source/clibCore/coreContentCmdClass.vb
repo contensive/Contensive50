@@ -656,7 +656,7 @@ Namespace Contensive.Core
                                 Next
                                 If ArgName <> "" Then
                                     'CmdAccumulator = cpCore.main_GetContentCopy(ArgName, "copy content")
-                                    Dim dt As DataTable = cpCore.db.executeSql_getDataTable("select layout from ccLayouts where name=" & cpCore.db.encodeSQLText(ArgName))
+                                    Dim dt As DataTable = cpCore.db.executeSql("select layout from ccLayouts where name=" & cpCore.db.encodeSQLText(ArgName))
                                     If Not (dt Is Nothing) Then
                                         CmdAccumulator = EncodeText(dt.Rows(0).Item("layout"))
                                     End If

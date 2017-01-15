@@ -1219,7 +1219,7 @@ Namespace Contensive.Core
         'Public app.csv_ContentSetSize As Integer        ' The number of current elements in the array
         'Const app.csv_ContentSetChunk = 50              ' How many are added at a time
         ''
-        '' when true, all app.db_csOpen, etc, will be setup, but not return any data (app.csv_IsCSOK false)
+        '' when true, all app.csOpen, etc, will be setup, but not return any data (app.csv_IsCSOK false)
         '' this is used to generate the app.csv_ContentSet.Source so we can run a app.csv_GetContentRows without first opening a recordset
         ''
         'Private csv_OpenCSWithoutRecords As Boolean
@@ -1322,7 +1322,7 @@ Namespace Contensive.Core
             ' ##### new way 4/19/2004
             '   readCache stores only the current row
             '   RS holds all other rows
-            '   app.csv_GetCSRow returns the readCache
+            '   app.csv_cs_getRow returns the readCache
             '   app.csv_NextCSRecord saves the difference between the readCache and the writeCache, and movesnext, inc ResultachePointer
             '   csv_LoadreadCache stores the current RS row to the readCache
             '
@@ -1394,7 +1394,7 @@ Namespace Contensive.Core
         '    ' ##### new way 4/19/2004
         '    '   ResultCache stores only the current row
         '    '   RS holds all other rows
-        '    '   app.csv_GetCSRow returns the ResultCache
+        '    '   app.csv_cs_getRow returns the ResultCache
         '    '   app.csv_NextCSRecord saves the difference between the ResultCache and the RowCache, and movesnext, inc ResultachePointer
         '    '   csv_LoadResultCache stores the current RS row to the ResultCache
         '    '
@@ -1527,7 +1527,7 @@ Namespace Contensive.Core
         ' Get a tables first ContentID from Tablename
         '========================================================================
         '
-        Public Function db_GetContentIDByTablename(TableName As String) As Integer
+        Public Function GetContentIDByTablename(TableName As String) As Integer
             On Error GoTo ErrorTrap 'Const Tn = "MethodName-028" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
             Dim MethodName As String
@@ -1536,12 +1536,12 @@ Namespace Contensive.Core
             '
             MethodName = "csv_GetContentIDByTablename"
             '
-            db_GetContentIDByTablename = -1
+            GetContentIDByTablename = -1
             If TableName <> "" Then
                 SQL = "select ContentControlID from " & TableName & " where contentcontrolid is not null order by contentcontrolid;"
-                CS = db.db_openCsSql_rev("Default", SQL, 1, 1)
-                If db.cs_Ok(CS) Then
-                    db_GetContentIDByTablename = db.cs_getInteger(CS, "ContentControlID")
+                CS = db.cs_openCsSql_rev("Default", SQL, 1, 1)
+                If db.cs_ok(CS) Then
+                    GetContentIDByTablename = db.cs_getInteger(CS, "ContentControlID")
                 End If
                 Call db.cs_Close(CS)
             End If
@@ -1558,7 +1558,7 @@ ErrorTrap:
         ' app.csv_DeleteTableRecord
         '========================================================================
         '
-        Public Sub db_DeleteTableRecordChunks(ByVal DataSourceName As String, ByVal TableName As String, ByVal Criteria As String, Optional ByVal ChunkSize As Integer = 1000, Optional ByVal MaxChunkCount As Integer = 1000)
+        Public Sub DeleteTableRecordChunks(ByVal DataSourceName As String, ByVal TableName As String, ByVal Criteria As String, Optional ByVal ChunkSize As Integer = 1000, Optional ByVal MaxChunkCount As Integer = 1000)
             On Error GoTo ErrorTrap 'Const Tn = "MethodName-029" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
             Dim PreviousCount As Integer
@@ -1570,12 +1570,12 @@ ErrorTrap:
             'dim dt as datatable
             Dim DataSourceType As Integer
             '
-            DataSourceType = db.db_GetDataSourceType(DataSourceName)
+            DataSourceType = db.getDataSourceType(DataSourceName)
             If (DataSourceType <> DataSourceTypeODBCSQLServer) And (DataSourceType <> DataSourceTypeODBCAccess) Then
                 '
                 ' If not SQL server, just delete them
                 '
-                Call db.db_DeleteTableRecords(DataSourceName, TableName, Criteria)
+                Call db.DeleteTableRecords(TableName, Criteria, DataSourceName)
             Else
                 '
                 ' ----- Clear up to date for the properties
@@ -1596,20 +1596,20 @@ ErrorTrap:
                 CurrentCount = 0
                 SQL = "select count(*) as RecordCount from " & TableName & " where " & Criteria
                 Dim dt As DataTable
-                dt = db.executeSql_getDataTable(SQL)
+                dt = db.executeSql(SQL)
                 If dt.Rows.Count > 0 Then
                     CurrentCount = EncodeInteger(dt.Rows(0).Item(0))
                 End If
                 Do While (CurrentCount <> 0) And (PreviousCount <> CurrentCount) And (LoopCount < iChunkCount)
-                    If db.db_GetDataSourceType(DataSourceName) = DataSourceTypeODBCMySQL Then
+                    If db.getDataSourceType(DataSourceName) = DataSourceTypeODBCMySQL Then
                         SQL = "delete from " & TableName & " where id in (select ID from " & TableName & " where " & Criteria & " limit " & iChunkSize & ")"
                     Else
                         SQL = "delete from " & TableName & " where id in (select top " & iChunkSize & " ID from " & TableName & " where " & Criteria & ")"
                     End If
-                    Call db.executeSql_getDataTable(SQL, DataSourceName)
+                    Call db.executeSql(SQL, DataSourceName)
                     PreviousCount = CurrentCount
                     SQL = "select count(*) as RecordCount from " & TableName & " where " & Criteria
-                    dt = db.executeSql_getDataTable(SQL)
+                    dt = db.executeSql(SQL)
                     If dt.Rows.Count > 0 Then
                         CurrentCount = EncodeInteger(dt.Rows(0).Item(0))
                     End If
@@ -1642,7 +1642,7 @@ ErrorTrap:
         ' will include both the content, and its child contents.
         '========================================================================
         '
-        Public Function db_GetContentControlCriteria(ByVal ContentName As String) As String
+        Public Function GetContentControlCriteria(ByVal ContentName As String) As String
             On Error GoTo ErrorTrap 'Const Tn = "MethodName-032" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
             Dim MethodName As String
@@ -1651,7 +1651,7 @@ ErrorTrap:
             MethodName = "csv_GetContentControlCriteria"
             '
             CDef = metaData.getCdef(ContentName)
-            db_GetContentControlCriteria = CDef.ContentControlCriteria
+            GetContentControlCriteria = CDef.ContentControlCriteria
             '
             Exit Function
             '
@@ -1665,7 +1665,7 @@ ErrorTrap:
         '   Update the content fields for all definitions that match this table
         '=============================================================================
         '
-        Public Sub db_CreateContentFieldsFromSQLTable(ByVal DataSourceName As String, ByVal TableName As String)
+        Public Sub CreateContentFieldsFromSQLTable(ByVal DataSourceName As String, ByVal TableName As String)
             On Error GoTo ErrorTrap 'Const Tn = "MethodName-036" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
             'Dim RSTargetTable as datatable
@@ -1698,7 +1698,7 @@ ErrorTrap:
             Const dtColumnContentId As Integer = 2
             '
             Dim dt As DataTable
-            dt = db.executeSql_getDataTable(SQL)
+            dt = db.executeSql(SQL)
             If dt.Rows.Count = 0 Then
                 Call handleLegacyError25(MethodName, ("No Content Definition could be found for records in table [" & TableName & "]"))
             Else
@@ -1707,13 +1707,13 @@ ErrorTrap:
                 ' Read in a record from the table to get fields
                 '----------------------------------------------------------------
                 '
-                SQL = db.db_GetSQLSelect("default", TableName, , , , , 1)
+                SQL = db.GetSQLSelect("default", TableName, , , , , 1)
                 'If csv_GetDataSourceType(DataSourceName) = DataSourceTypeODBCMySQL Then
                 '    SQL = "select * from " & TableName & " limit 1"
                 'Else
                 '    SQL = "select top 1 * from " & TableName & ";"
                 'End If
-                Dim dtTargetTable As DataTable = db.executeSql_getDataTable(SQL, DataSourceName)
+                Dim dtTargetTable As DataTable = db.executeSql(SQL, DataSourceName)
                 If dtTargetTable.Rows.Count = 0 Then
                     '
                     ' --- no records were found, add a blank if we can
@@ -1725,16 +1725,16 @@ ErrorTrap:
                         & " " & db.encodeSQLNumber(CreateKey) _
                         & "," & db.encodeSQLDate(DateAdded) _
                         & ");"
-                    Call db.executeSql_getDataTable(SQL, DataSourceName)
-                    SQL = db.db_GetSQLSelect("default", TableName, "ID", "DateAdded=" & db.encodeSQLDate(DateAdded) & " AND CreateKey=" & db.encodeSQLNumber(CreateKey))
-                    dtTargetTable = db.executeSql_getDataTable(SQL, DataSourceName)
+                    Call db.executeSql(SQL, DataSourceName)
+                    SQL = db.GetSQLSelect("default", TableName, "ID", "DateAdded=" & db.encodeSQLDate(DateAdded) & " AND CreateKey=" & db.encodeSQLNumber(CreateKey))
+                    dtTargetTable = db.executeSql(SQL, DataSourceName)
                     If dtTargetTable.Rows.Count = 0 Then
                         Call handleLegacyError25(MethodName, ("Could not locate a new re   cord added to table [" & TableName & "]"))
                     Else
                         BlankRecordID = EncodeInteger(dtTargetTable.Rows(0).Item("id"))
                     End If
-                    SQL = db.db_GetSQLSelect("default", TableName, , , , , 1)
-                    dtTargetTable = db.executeSql_getDataTable(SQL, DataSourceName)
+                    SQL = db.GetSQLSelect("default", TableName, , , , , 1)
+                    dtTargetTable = db.executeSql(SQL, DataSourceName)
                     If dtTargetTable.Rows.Count = 0 Then
                         Call handleLegacyError25(MethodName, ("Could not open a record to table [" & TableName & "]."))
                     End If
@@ -1751,10 +1751,10 @@ ErrorTrap:
                         For Each dc As DataColumn In dtTargetTable.Rows
                             TableFieldName = dc.ColumnName
                             SQL = "SELECT * FROM ccFields where (ContentID=" & ContentID & ")and(name=" & db.encodeSQLText(TableFieldName) & ")"
-                            Dim dtField As DataTable = db.executeSql_getDataTable(SQL, "Default")
+                            Dim dtField As DataTable = db.executeSql(SQL, "Default")
                             If dtField.Rows.Count = 0 Then
-                                Call db.db_CreateContentFieldFromTableField(ContentName, dc.ColumnName, EncodeInteger(dc.DataType))
-                                'Call db_CreateContentFieldFromTableField(ContentName, dc.ColumnName, EncodeInteger(dc.DataType))
+                                Call db.createContentFieldFromTableField(ContentName, dc.ColumnName, EncodeInteger(dc.DataType))
+                                'Call CreateContentFieldFromTableField(ContentName, dc.ColumnName, EncodeInteger(dc.DataType))
                             End If
                         Next
                     Next
@@ -1763,11 +1763,10 @@ ErrorTrap:
             '
             ' ----- Load CDef
             '
-            If (Not db.UpgradeInProgress) Then
+            If (Not upgradeInProgress) Then
                 cache.invalidateAll()
                 metaData.clear()
             End If
-            'app.AllowContentAutoLoad = StateOfAllowContentAutoLoad
             Exit Sub
             '
             ' ----- Error Trap
@@ -1781,7 +1780,7 @@ ErrorTrap:
         '   Get Content Definitions in XML format
         '========================================================================
         '
-        Public Function db_GetXMLContentDefinition3(Optional ByVal ContentName As String = "", Optional ByVal IncludeBaseFields As Boolean = False) As String
+        Public Function GetXMLContentDefinition3(Optional ByVal ContentName As String = "", Optional ByVal IncludeBaseFields As Boolean = False) As String
             On Error GoTo ErrorTrap 'Const Tn = "MethodName-046" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
             Dim MethodName As String
@@ -1790,7 +1789,7 @@ ErrorTrap:
             MethodName = "csv_GetXMLContentDefinition3"
             '
             XML = New coreXmlToolsClass(Me)
-            db_GetXMLContentDefinition3 = XML.GetXMLContentDefinition3(ContentName, IncludeBaseFields)
+            GetXMLContentDefinition3 = XML.GetXMLContentDefinition3(ContentName, IncludeBaseFields)
             XML = Nothing
             '
             Exit Function
@@ -1808,16 +1807,16 @@ ErrorTrap:
         ' ----- Get FieldDescritor from FieldType
         '========================================================================
         '
-        Public Function db_GetSQLAlterColumnType(ByVal DataSourceName As String, ByVal fieldType As Integer) As String
-            Return db.db_GetSQLAlterColumnType(DataSourceName, fieldType)
+        Public Function GetSQLAlterColumnType(ByVal DataSourceName As String, ByVal fieldType As Integer) As String
+            Return db.getSQLAlterColumnType(DataSourceName, fieldType)
         End Function
         '        '
         '========================================================================
         ' ----- Get FieldType from ADO Field Type
         '========================================================================
         '
-        Private Function db_GetFieldTypeByADOType(ByVal ADOFieldType As Integer) As Integer
-            Return db.db_GetFieldTypeIdByADOType(ADOFieldType)
+        Private Function GetFieldTypeByADOType(ByVal ADOFieldType As Integer) As Integer
+            Return db.getFieldTypeIdByADOType(ADOFieldType)
         End Function
         '
         '========================================================================
@@ -1828,24 +1827,24 @@ ErrorTrap:
         '   if the table is present, check all core fields
         '========================================================================
         '
-        Public Sub db_CreateSQLTable(ByVal DataSourceName As String, ByVal TableName As String, Optional ByVal AllowAutoIncrement As Boolean = True)
-            Call db.db_CreateSQLTable(DataSourceName, TableName, AllowAutoIncrement)
+        Public Sub CreateSQLTable(ByVal DataSourceName As String, ByVal TableName As String, Optional ByVal AllowAutoIncrement As Boolean = True)
+            Call db.createSQLTable(DataSourceName, TableName, AllowAutoIncrement)
         End Sub
 
         '
         '========================================================================
         '   Delete a table field from a table
         '======================================================================
-        Public Sub db_DeleteTable(ByVal DataSourceName As String, ByVal TableName As String)
-            db.db_DeleteTable(DataSourceName, TableName)
+        Public Sub DeleteTable(ByVal DataSourceName As String, ByVal TableName As String)
+            db.deleteTable(DataSourceName, TableName)
         End Sub
         '
         '========================================================================
         '   Delete a table field from a table
         '========================================================================
         '
-        Public Sub db_DeleteTableField(ByVal DataSourceName As String, ByVal TableName As String, ByVal FieldName As String)
-            Call db.db_DeleteTableField(DataSourceName, TableName, FieldName)
+        Public Sub DeleteTableField(ByVal DataSourceName As String, ByVal TableName As String, ByVal FieldName As String)
+            Call db.deleteTableField(DataSourceName, TableName, FieldName)
         End Sub
         '
         '========================================================================
@@ -1854,30 +1853,23 @@ ErrorTrap:
         '   Fieldnames is  a comma delimited list of fields
         '========================================================================
         '
-        Public Sub db_CreateSQLIndex(ByVal DataSourceName As String, ByVal TableName As String, ByVal IndexName As String, ByVal FieldNames As String)
-            Call db.db_CreateSQLIndex(DataSourceName, TableName, IndexName, FieldNames)
+        Public Sub CreateSQLIndex(ByVal DataSourceName As String, ByVal TableName As String, ByVal IndexName As String, ByVal FieldNames As String)
+            Call db.createSQLIndex(DataSourceName, TableName, IndexName, FieldNames)
         End Sub
         '
         '======================================================================================
         '   Mimicks a local
         '======================================================================================
         '
-        Public Property csv_UpgradeInProgress() As Boolean
+        Public Property upgradeInProgress() As Boolean
             Get
-                csv_UpgradeInProgress = False
-                If Not (_db Is Nothing) Then
-                    csv_UpgradeInProgress = db.UpgradeInProgress
-                End If
+                Return _upgradeInProgress
             End Get
             Set(ByVal value As Boolean)
-                If Not (_db Is Nothing) Then
-                    db.UpgradeInProgress = value
-                End If
-                'csv_UpgradeInProgressLocal = InProgress
-
+                _upgradeInProgress = value
             End Set
-            'csv_UpgradeInProgress = csv_UpgradeInProgressLocal
         End Property
+        Private _upgradeInProgress As Boolean             ' Block content autoload when upgrading
         '
         '==================================================================================================
         ' ----- Remove this record from all watch lists
@@ -1892,7 +1884,7 @@ ErrorTrap:
             ' ----- remove all ContentWatchListRules (uncheck the watch lists in admin)
             '
             ContentID = metaData.getContentId(ContentName)
-            Call db.db_DeleteContentRules(ContentID, RecordID)
+            Call db.deleteContentRules(ContentID, RecordID)
             Exit Sub
             '
             ' ----- Error Trap
@@ -2013,7 +2005,7 @@ ErrorTrap:
                     '
                     If True Then
                         CSLog = db.cs_insertRecord("Email Log", 0)
-                        If db.cs_Ok(CSLog) Then
+                        If db.cs_ok(CSLog) Then
                             Call db.cs_set(CSLog, "Name", "System Email Send " & CStr(Now()))
                             Call db.cs_set(CSLog, "LogType", EmailLogTypeImmediateSend)
                             Call db.cs_set(CSLog, "SendStatus", returnStatus)
@@ -2168,16 +2160,16 @@ ErrorTrap:
         '   Returns true if the field exists in the table
         '========================================================================
         '
-        Public Function db_IsSQLTableField(ByVal DataSourceName As String, ByVal TableName As String, ByVal FieldName As String) As Boolean
-            Return db.db_IsSQLTableField(DataSourceName, TableName, FieldName)
+        Public Function IsSQLTableField(ByVal DataSourceName As String, ByVal TableName As String, ByVal FieldName As String) As Boolean
+            Return db.isSQLTableField(DataSourceName, TableName, FieldName)
         End Function
         '
         '========================================================================
         '   Returns true if the table exists
         '========================================================================
         '
-        Public Function db_IsSQLTable(ByVal DataSourceName As String, ByVal TableName As String) As Boolean
-            Return db.db_IsSQLTable(DataSourceName, TableName)
+        Public Function IsSQLTable(ByVal DataSourceName As String, ByVal TableName As String) As Boolean
+            Return db.isSQLTable(DataSourceName, TableName)
         End Function
         '
         '========================================================================
@@ -2200,29 +2192,29 @@ ErrorTrap:
         End Sub
 
 
-        '=================================================================================
-        ' Returns a pointer into the app.tableSchema() array for the table that matches
-        '=================================================================================
-        '
-        Public Function db_GetConnectionString(ByVal DataSourceName As String) As String
-            db_GetConnectionString = ""
-            Try
-                Dim Pointer As Integer
-                '
-                If Not (_db Is Nothing) Then
-                    If vbUCase(DataSourceName) = "DEFAULT" Then
-                        db_GetConnectionString = db.DefaultConnectionString
-                    Else
-                        Pointer = db.db_GetDataSourcePointer(DataSourceName)
-                        If Pointer >= 0 Then
-                            db_GetConnectionString = db.dataSources(Pointer).odbcConnectionString
-                        End If
-                    End If
-                End If
-            Catch ex As Exception
-                Call handleExceptionAndRethrow(ex)
-            End Try
-        End Function
+        ''=================================================================================
+        '' Returns a pointer into the app.tableSchema() array for the table that matches
+        ''=================================================================================
+        ''
+        'Public Function GetConnectionString(ByVal DataSourceName As String) As String
+        '    GetConnectionString = ""
+        '    Try
+        '        Dim Pointer As Integer
+        '        '
+        '        If Not (_db Is Nothing) Then
+        '            If vbUCase(DataSourceName) = "DEFAULT" Then
+        '                GetConnectionString = db.DefaultConnectionString
+        '            Else
+        '                Pointer = db.GetDataSourcePointer(DataSourceName)
+        '                If Pointer >= 0 Then
+        '                    GetConnectionString = db.dataSources(Pointer).odbcConnectionString
+        '                End If
+        '            End If
+        '        End If
+        '    Catch ex As Exception
+        '        Call handleExceptionAndRethrow(ex)
+        '    End Try
+        'End Function
         '
         '=============================================================================
         '   Verify an Admin Menu Entry
@@ -2825,11 +2817,11 @@ ErrorTrap:
                                                         Copy = security.encodeToken(personalizationPeopleId, Now())
                                                     Else
                                                         If Not CSPeopleSet Then
-                                                            CSPeople = db.db_OpenCSContentRecord("People", personalizationPeopleId)
+                                                            CSPeople = db.cs_openContentRecord("People", personalizationPeopleId)
                                                             CSPeopleSet = True
                                                         End If
-                                                        If db.cs_Ok(CSPeople) And db.db_IsCSFieldSupported(CSPeople, FieldName) Then
-                                                            Copy = db.db_GetCSLookup(CSPeople, FieldName)
+                                                        If db.cs_ok(CSPeople) And db.cs_isFieldSupported(CSPeople, FieldName) Then
+                                                            Copy = db.cs_getLookup(CSPeople, FieldName)
                                                         End If
                                                     End If
                                                 End If
@@ -2913,11 +2905,11 @@ ErrorTrap:
                                                 Else
                                                     If Not PeopleLanguageSet Then
                                                         If Not CSPeopleSet Then
-                                                            CSPeople = db.db_OpenCSContentRecord("people", personalizationPeopleId)
+                                                            CSPeople = db.cs_openContentRecord("people", personalizationPeopleId)
                                                             CSPeopleSet = True
                                                         End If
-                                                        CSlanguage = db.db_OpenCSContentRecord("Languages", db.cs_getInteger(CSPeople, "LanguageID"), , , , "Name")
-                                                        If db.cs_Ok(CSlanguage) Then
+                                                        CSlanguage = db.cs_openContentRecord("Languages", db.cs_getInteger(CSPeople, "LanguageID"), , , , "Name")
+                                                        If db.cs_ok(CSlanguage) Then
                                                             PeopleLanguage = db.cs_getText(CSlanguage, "name")
                                                         End If
                                                         Call db.cs_Close(CSlanguage)
@@ -3037,12 +3029,12 @@ ErrorTrap:
                                                     Else
                                                         Criteria = "name=" & db.encodeSQLText(UCaseACName)
                                                     End If
-                                                    CS = db.csOpen(AddonContentName, Criteria, "Name,ID", , , , , SelectList)
-                                                    If db.cs_Ok(CS) Then
+                                                    CS = db.cs_open(AddonContentName, Criteria, "Name,ID", , , , , SelectList)
+                                                    If db.cs_ok(CS) Then
                                                         AddonFound = True
                                                         ' ArgumentList comes in already encoded
-                                                        IconFilename = db.db_GetCS(CS, "IconFilename")
-                                                        SrcOptionList = db.db_GetCS(CS, "ArgumentList")
+                                                        IconFilename = db.cs_get(CS, "IconFilename")
+                                                        SrcOptionList = db.cs_get(CS, "ArgumentList")
                                                         IconWidth = db.cs_getInteger(CS, "IconWidth")
                                                         IconHeight = db.cs_getInteger(CS, "IconHeight")
                                                         IconSprites = db.cs_getInteger(CS, "IconSprites")
@@ -3183,9 +3175,9 @@ ErrorTrap:
                                                     lfFilename = EncodeText(cache_libraryFiles(LibraryFilesCache_filename, lfPtr))
                                                     lfWidth = EncodeInteger(cache_libraryFiles(LibraryFilesCache_width, lfPtr))
                                                     lfHeight = EncodeInteger(cache_libraryFiles(LibraryFilesCache_height, lfPtr))
-                                                    'CS = app.db_csOpen("Library Files", "ID=" & encodeSQLNumber(ACAttrRecordID), , , , , , "Filename,AltText,Width,Height")
+                                                    'CS = app.csOpen("Library Files", "ID=" & encodeSQLNumber(ACAttrRecordID), , , , , , "Filename,AltText,Width,Height")
                                                     'If app.csv_IsCSOK(CS) Then
-                                                    'Filename = app.csv_GetCSField(CS, "FileName")
+                                                    'Filename = app.csv_cs_getField(CS, "FileName")
                                                     If Filename <> "" Then
                                                         Filename = lfFilename
                                                         'Filename = vbReplace(Filename, " ", "%20")
@@ -3195,7 +3187,7 @@ ErrorTrap:
                                                         '
                                                         If ACAttrWidth = 0 Then
                                                             ACAttrWidth = lfWidth
-                                                            'ACAttrWidth = app.csv_GetCSInteger(CS, "Width")
+                                                            'ACAttrWidth = app.csv_cs_getInteger(CS, "Width")
                                                         End If
                                                         If ACAttrWidth <> 0 Then
                                                             Copy = Copy & " width=""" & ACAttrWidth & """"
@@ -3203,7 +3195,7 @@ ErrorTrap:
                                                         '
                                                         If ACAttrHeight = 0 Then
                                                             ACAttrHeight = lfHeight
-                                                            'ACAttrHeight = app.csv_GetCSInteger(CS, "Height")
+                                                            'ACAttrHeight = app.csv_cs_getInteger(CS, "Height")
                                                         End If
                                                         If ACAttrHeight <> 0 Then
                                                             Copy = Copy & " height=""" & ACAttrHeight & """"
@@ -3279,10 +3271,10 @@ ErrorTrap:
                                                         ACAttrAlt = EncodeText(cache_libraryFiles(LibraryFilesCache_alttext, libraryFilePtr))
                                                     End If
                                                 End If
-                                                '                                        CS = app.db_csOpenRecord("Library Files", ACAttrRecordID, , , , "Filename,AltText")
+                                                '                                        CS = app.csOpenRecord("Library Files", ACAttrRecordID, , , , "Filename,AltText")
                                                 '                                        If app.csv_IsCSOK(CS) Then
                                                 '                                            If ACAttrAlt = "" Then
-                                                '                                                ACAttrAlt = encodeText(app.csv_GetCSText(CS, "AltText"))
+                                                '                                                ACAttrAlt = encodeText(app.csv_cs_getText(CS, "AltText"))
                                                 '                                            End If
                                                 '                                        End If
                                                 '                                        Call app.csv_CloseCS(CS)
@@ -3475,8 +3467,8 @@ ErrorTrap:
             Dim Copy As String
             '
             Copy = ""
-            CS = db.db_OpenCSContentRecord("People", PeopleID, , , , "Name,Phone,Email")
-            If db.cs_Ok(CS) Then
+            CS = db.cs_openContentRecord("People", PeopleID, , , , "Name,Phone,Email")
+            If db.cs_ok(CS) Then
                 ContactName = (db.cs_getText(CS, "Name"))
                 ContactPhone = (db.cs_getText(CS, "Phone"))
                 ContactEmail = (db.cs_getText(CS, "Email"))
@@ -4025,7 +4017,7 @@ ErrorTrap:
                                                                             recordUpdateSql = ""
                                                                             Call cache_libraryFiles_loadIfNeeded()
                                                                             libraryFilePtr = cache_libraryFilesIdIndex.getPtr(CStr(RecordID))
-                                                                            'CS = app.db_csOpenRecord("Library Files", RecordID)
+                                                                            'CS = app.csOpenRecord("Library Files", RecordID)
                                                                             If libraryFilePtr < 0 Then
                                                                                 'If Not app.csv_IsCSOK(CS) Then
                                                                                 '
@@ -4034,13 +4026,13 @@ ErrorTrap:
                                                                                 ElementText = ""
                                                                             Else
                                                                                 RecordVirtualFilename = EncodeText(cache_libraryFiles(LibraryFilesCache_filename, libraryFilePtr))
-                                                                                'RecordVirtualFilename = app.csv_GetCS(CS, "filename")
+                                                                                'RecordVirtualFilename = app.csv_cs_get(CS, "filename")
                                                                                 RecordWidth = EncodeInteger(cache_libraryFiles(LibraryFilesCache_width, libraryFilePtr))
-                                                                                'RecordWidth = app.csv_GetCSInteger(CS, "width")
+                                                                                'RecordWidth = app.csv_cs_getInteger(CS, "width")
                                                                                 RecordHeight = EncodeInteger(cache_libraryFiles(LibraryFilesCache_height, libraryFilePtr))
-                                                                                'RecordHeight = app.csv_GetCSInteger(CS, "height")
+                                                                                'RecordHeight = app.csv_cs_getInteger(CS, "height")
                                                                                 RecordAltSizeList = EncodeText(cache_libraryFiles(LibraryFilesCache_altsizelist, libraryFilePtr))
-                                                                                'RecordAltSizeList = app.csv_GetCS(CS, "altsizelist")
+                                                                                'RecordAltSizeList = app.csv_cs_get(CS, "altsizelist")
                                                                                 RecordFilename = RecordVirtualFilename
                                                                                 Pos = InStrRev(RecordVirtualFilename, "/")
                                                                                 If Pos > 0 Then
@@ -4242,7 +4234,7 @@ ErrorTrap:
                                                                             End If
                                                                             If recordUpdateSql <> "" Then
                                                                                 recordUpdateSql = Mid(recordUpdateSql, 2)
-                                                                                Call db.executeSql_getDataTable("update cclibraryfiles set " & recordUpdateSql & " where id=" & RecordID)
+                                                                                Call db.executeSql("update cclibraryfiles set " & recordUpdateSql & " where id=" & RecordID)
                                                                             End If
                                                                             'Call app.csv_CloseCS(CS)
                                                                         End If
@@ -4296,7 +4288,7 @@ ErrorTrap:
         '
         '=============================================================
         '
-        Public Function db_GetRecordID(ByVal ContentName As String, ByVal RecordName As String) As Integer
+        Public Function GetRecordID(ByVal ContentName As String, ByVal RecordName As String) As Integer
             Return db.getRecordID(ContentName, RecordName)
         End Function
         '
@@ -4304,8 +4296,8 @@ ErrorTrap:
         '
         '=============================================================
         '
-        Public Function db_GetRecordName(ByVal ContentName As String, ByVal RecordID As Integer) As String
-            Return db.db_GetRecordName(ContentName, RecordID)
+        Public Function GetRecordName(ByVal ContentName As String, ByVal RecordID As Integer) As String
+            Return db.getRecordName(ContentName, RecordID)
         End Function
         '
         '=============================================================
@@ -4313,7 +4305,7 @@ ErrorTrap:
         '=============================================================
         '
         Public Function metaData_IsContentFieldSupported(ByVal ContentName As String, ByVal FieldName As String) As Boolean
-            Return db.metaData_IsContentFieldSupported(ContentName, FieldName)
+            Return metaData.isContentFieldSupported(ContentName, FieldName)
         End Function
         '
         '
@@ -4331,7 +4323,7 @@ ErrorTrap:
                 TaskName = CStr(Now()) & " snapshot of " & vbLCase(ExportName)
             End If
             CS = db.cs_insertRecord("Tasks", RequestedByMemberID)
-            If db.cs_Ok(CS) Then
+            If db.cs_ok(CS) Then
                 Call db.cs_getFilename(CS, "Filename", Filename)
                 Call db.cs_set(CS, "Name", TaskName)
                 Call db.cs_set(CS, "Command", Command)
@@ -4348,7 +4340,7 @@ ErrorTrap:
         '   Open a content set with the current whats new list
         '========================================================================
         '
-        Public Function db_csOpenWatchList(ByVal ListName As String, ByVal SortFieldList As String, ByVal ActiveOnly As Boolean, ByVal PageSize As Integer, ByVal PageNumber As Integer) As Integer
+        Public Function csOpenWatchList(ByVal ListName As String, ByVal SortFieldList As String, ByVal ActiveOnly As Boolean, ByVal PageSize As Integer, ByVal PageNumber As Integer) As Integer
             On Error GoTo ErrorTrap 'Const Tn = "OpenCSContentWatchList" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
             Dim SQL As String
@@ -4366,7 +4358,7 @@ ErrorTrap:
             'iActiveOnly = encodeMissingText(ActiveOnly, True)
             'ListName = Trim(EncodeText(ListName))
             '
-            MethodName = "db_csOpenWatchList( " & ListName & ", " & SortFieldList & ", " & ActiveOnly & " )"
+            MethodName = "csOpenWatchList( " & ListName & ", " & SortFieldList & ", " & ActiveOnly & " )"
             '
             ' ----- Add tablename to the front of SortFieldList fieldnames
             '
@@ -4391,16 +4383,16 @@ ErrorTrap:
                     & "AND ((ccContentWatch.WhatsNewDateExpires is null)or(ccContentWatch.WhatsNewDateExpires>" & db.encodeSQLDate(Now) & "))" _
                     & ")" _
                 & " ORDER BY " & SortFieldList & ";"
-            db_csOpenWatchList = db.db_openCsSql_rev("Default", SQL)
-            If Not db.cs_Ok(db_csOpenWatchList) Then
+            csOpenWatchList = db.cs_openCsSql_rev("Default", SQL)
+            If Not db.cs_ok(csOpenWatchList) Then
                 '
                 ' Check if listname exists
                 '
-                CS = db.csOpen("Content Watch Lists", "name=" & db.encodeSQLText(ListName), "ID", , , , , "ID")
-                If Not db.cs_Ok(CS) Then
+                CS = db.cs_open("Content Watch Lists", "name=" & db.encodeSQLText(ListName), "ID", , , , , "ID")
+                If Not db.cs_ok(CS) Then
                     Call db.cs_Close(CS)
                     CS = db.cs_insertRecord("Content Watch Lists", 0)
-                    If db.cs_Ok(CS) Then
+                    If db.cs_ok(CS) Then
                         Call db.cs_set(CS, "name", ListName)
                     End If
                 End If
@@ -4409,7 +4401,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            Call handleLegacyError4(Err.Number, Err.Source, Err.Description, "db_csOpenWatchList", True)
+            Call handleLegacyError4(Err.Number, Err.Source, Err.Description, "csOpenWatchList", True)
         End Function
         '        '
         '        '=============================================================================
@@ -4553,8 +4545,8 @@ ErrorTrap:
                     iMenuName = "Default"
                 End If
                 '
-                CS = db.db_openCsSql_rev("default", "select ID from ccDynamicMenus where name=" & db.encodeSQLText(iMenuName))
-                If db.cs_Ok(CS) Then
+                CS = db.cs_openCsSql_rev("default", "select ID from ccDynamicMenus where name=" & db.encodeSQLText(iMenuName))
+                If db.cs_ok(CS) Then
                     csv_VerifyDynamicMenu = db.cs_getInteger(CS, "ID")
                 End If
                 Call db.cs_Close(CS)
@@ -4564,7 +4556,7 @@ ErrorTrap:
                     ' Add the Menu
                     '
                     CS = db.cs_insertRecord("Dynamic Menus", SystemMemberID)
-                    If db.cs_Ok(CS) Then
+                    If db.cs_ok(CS) Then
                         csv_VerifyDynamicMenu = db.cs_getInteger(CS, "ID")
                         Call db.cs_set(CS, "name", iMenuName)
                         If True Then
@@ -4577,15 +4569,15 @@ ErrorTrap:
                         '
                         ' Adding the Default menu - put all sections into this when it is created
                         '
-                        CS = db.csOpen("Site Sections")
-                        Do While db.cs_Ok(CS)
+                        CS = db.cs_open("Site Sections")
+                        Do While db.cs_ok(CS)
                             CSRule = db.cs_insertRecord("Dynamic Menu Section Rules", SystemMemberID)
-                            If db.cs_Ok(CSRule) Then
+                            If db.cs_ok(CSRule) Then
                                 Call db.cs_set(CSRule, "DynamicMenuID", csv_VerifyDynamicMenu)
                                 Call db.cs_set(CSRule, "SectionID", db.cs_getInteger(CS, "ID"))
                             End If
                             Call db.cs_Close(CSRule)
-                            db.db_csGoNext(CS)
+                            db.cs_goNext(CS)
                         Loop
                         Call db.cs_Close(CS)
                     End If
@@ -4606,25 +4598,25 @@ ErrorTrap:
         '===========================================================================================
         '
         Public Function csv_GetDynamicMenuACSelect() As String
-            On Error GoTo ErrorTrap 'Const Tn = "GetCSv_DynamicMenuACSelect" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
+            On Error GoTo ErrorTrap 'Const Tn = "cs_getv_DynamicMenuACSelect" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
             Dim CS As Integer
             '
             If True Then
                 '
                 If csv_DynamicMenuACSelect = "" Then
-                    CS = db.csOpen("Dynamic Menus", , "Name", , , , , "Name")
-                    If Not db.cs_Ok(CS) Then
+                    CS = db.cs_open("Dynamic Menus", , "Name", , , , , "Name")
+                    If Not db.cs_ok(CS) Then
                         Call db.cs_Close(CS)
                         Call csv_VerifyDynamicMenu("Default")
-                        CS = db.csOpen("Dynamic Menus", , "Name", , , , , "Name")
+                        CS = db.cs_open("Dynamic Menus", , "Name", , , , , "Name")
                     End If
-                    Do While db.cs_Ok(CS)
+                    Do While db.cs_ok(CS)
                         If csv_DynamicMenuACSelect <> "" Then
                             csv_DynamicMenuACSelect = csv_DynamicMenuACSelect & "|"
                         End If
                         csv_DynamicMenuACSelect = csv_DynamicMenuACSelect & db.cs_getText(CS, "name")
-                        db.db_csGoNext(CS)
+                        db.cs_goNext(CS)
                     Loop
                     Call db.cs_Close(CS)
                 End If
@@ -4745,7 +4737,7 @@ ErrorTrap:
                 '
                 SQL = "select s.name,s.id,s.StyleFilename from ccSharedStyles s where (s.active<>0)and(s.AlwaysInclude<>0)"
                 Dim dt As DataTable
-                dt = db.executeSql_getDataTable(SQL)
+                dt = db.executeSql(SQL)
                 If dt.Rows.Count > 0 Then
                     For Each row As DataRow In dt.Rows
                         styleId = EncodeInteger(row("id"))
@@ -4771,7 +4763,7 @@ ErrorTrap:
                     '
                     SQL = "select name,stylesFilename from cctemplates where (id=" & templateId & ")and(stylesFilename is not null)"
                     'Dim dt As DataTable
-                    dt = db.executeSql_getDataTable(SQL)
+                    dt = db.executeSql(SQL)
                     If dt.Rows.Count > 0 Then
                         For Each dr As DataRow In dt.Rows
                             Filename = EncodeText(dr("stylesfilename"))
@@ -4793,7 +4785,7 @@ ErrorTrap:
                     Dim rs As DataTable
 
                     SQL = "select s.name,s.id,s.StyleFilename from ccSharedStyles s left join ccSharedStylesTemplateRules r on s.id=r.styleid where (s.active<>0)and(r.templateid=" & templateId & ")and((s.AlwaysInclude=0)or(s.AlwaysInclude is null))"
-                    rs = db.executeSql_getDataTable(SQL)
+                    rs = db.executeSql(SQL)
                     If rs.Rows.Count > 0 Then
                         styleId = EncodeInteger(rs.Rows(0).Item("id"))
                         StyleName = EncodeText(rs.Rows(0).Item("name"))
@@ -4819,7 +4811,7 @@ ErrorTrap:
                     SQL = "select name,blockSiteStyles,stylesFilename,emailTemplateID from ccemail where id=" & EmailID
                     'Dim dt As DataTable
 
-                    dt = db.executeSql_getDataTable(SQL)
+                    dt = db.executeSql(SQL)
                     If dt.Rows.Count > 0 Then
                         For Each rsDr As DataRow In dt.Rows
                             blockStyles = EncodeBoolean(rsDr("blockSiteStyles"))
@@ -4842,7 +4834,7 @@ ErrorTrap:
                     ' email shared styles
                     '
                     SQL = "select s.name,s.id,s.StyleFilename from ccSharedStyles s left join ccEmailStyleRules r on s.id=r.sharedstylesid where (s.active<>0)and(r.emailid=" & EmailID & ")and((s.AlwaysInclude=0)or(s.AlwaysInclude is null))"
-                    dt = db.executeSql_getDataTable(SQL)
+                    dt = db.executeSql(SQL)
                     For Each rsDr As DataRow In dt.Rows
                         styleId = EncodeInteger(rsDr("id"))
                         StyleName = EncodeText(rsDr("name"))
@@ -4921,33 +4913,6 @@ ErrorTrap:
             Exit Function
 ErrorTrap:
             Call handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_getStyleSheetDefault", True, False)
-        End Function
-
-
-        '
-        '
-        '
-        Public Function db_GetDataSourceList() As String
-            On Error GoTo ErrorTrap 'Const Tn = "csv_GetDataSourceList" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            'dim dt as datatable
-            'Dim Conn As Connection
-            Dim DPtr As Integer
-            Dim DataSourceName As String
-            '
-            If db.dataSources.Length > 0 Then
-                For DPtr = 0 To db.dataSources.Length - 1
-                    db_GetDataSourceList = db_GetDataSourceList _
-                        & vbCrLf & db.dataSources(DPtr).NameLower
-                Next
-                If db_GetDataSourceList <> "" Then
-                    db_GetDataSourceList = Mid(db_GetDataSourceList, 3)
-                End If
-            End If
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_GetDataSourceList", True, False)
         End Function
         ''
         '
@@ -5122,9 +5087,9 @@ ErrorTrap:
                             ' ContentList - Open the Content and build the options from the names
                             '
                             If ContentCriteria <> "" Then
-                                CS = db.csOpen(ContentName, ContentCriteria, "name", , , , , "ID,Name")
+                                CS = db.cs_open(ContentName, ContentCriteria, "name", , , , , "ID,Name")
                             Else
-                                CS = db.csOpen(ContentName, , "name", , , , , "ID,Name")
+                                CS = db.cs_open(ContentName, , "name", , , , , "ID,Name")
                             End If
                         ElseIf IsListField Then
                             '
@@ -5132,12 +5097,12 @@ ErrorTrap:
                             '
                             CID = metaData.getContentId(ContentName)
                             If CID > 0 Then
-                                CS = db.csOpen("Content Fields", "Contentid=" & CID, "name", , , , , "ID,Name")
+                                CS = db.cs_open("Content Fields", "Contentid=" & CID, "name", , , , , "ID,Name")
                             End If
                         End If
 
-                        If db.cs_Ok(CS) Then
-                            Cell = db.db_GetCSRows(CS)
+                        If db.cs_ok(CS) Then
+                            Cell = db.cs_getRows(CS)
                             RowCnt = UBound(Cell, 2) + 1
                             For RowPtr = 0 To RowCnt - 1
                                 '
@@ -5263,7 +5228,7 @@ ErrorTrap:
             Dim CS As Integer
             '
             CS = db.cs_insertRecord("Activity Log", ByMemberID)
-            If db.cs_Ok(CS) Then
+            If db.cs_ok(CS) Then
                 Call db.cs_set(CS, "MemberID", SubjectMemberID)
                 Call db.cs_set(CS, "OrganizationID", SubjectOrganizationID)
                 Call db.cs_set(CS, "Message", Message)
@@ -5727,7 +5692,7 @@ ErrorTrap:
                                         RecordVirtualFilename = EncodeText(cache_libraryFiles(LibraryFilesCache_filename, lfPtr))
                                         ''hint = hint & ",071"
                                         RecordAltSizeList = EncodeText(cache_libraryFiles(LibraryFilesCache_altsizelist, lfPtr))
-                                        'RecordVirtualFilename = app.csv_GetCS(CS, FieldName)
+                                        'RecordVirtualFilename = app.csv_cs_get(CS, FieldName)
                                         ''hint = hint & ",072"
                                         If RecordVirtualFilename = EncodeJavascript(RecordVirtualFilename) Then
                                             '
@@ -5781,7 +5746,7 @@ ErrorTrap:
                                             '        End If
                                             '    End If
                                             'End If
-                                            'RecordAltSizeList = app.csv_GetCS(CS, "altsizelist")
+                                            'RecordAltSizeList = app.csv_cs_get(CS, "altsizelist")
                                             FilePrefixSegment = LinkSplit(LinkPtr - 1)
                                             If Len(FilePrefixSegment) > 1 Then
                                                 '
@@ -6254,7 +6219,7 @@ ErrorTrap:
                 & " and(specificKey=" & db.encodeSQLText(specificKey) & ")" _
                 & ""
             Dim dt As DataTable
-            dt = db.executeSql_getDataTable(SQL)
+            dt = db.executeSql(SQL)
             If dt.Rows.Count > 0 Then
                 warningId = EncodeInteger(dt.Rows(0).Item("id"))
             End If
@@ -6264,13 +6229,13 @@ ErrorTrap:
                 ' increment count for matching warning
                 '
                 SQL = "update ccsitewarnings set count=count+1,DateLastReported=" & db.encodeSQLDate(Now()) & " where id=" & warningId
-                Call db.executeSql_getDataTable(SQL)
+                Call db.executeSql(SQL)
             Else
                 '
                 ' insert new record
                 '
                 CS = db.cs_insertRecord("Site Warnings", 0)
-                If db.cs_Ok(CS) Then
+                If db.cs_ok(CS) Then
                     Call db.cs_set(CS, "name", Name)
                     Call db.cs_set(CS, "description", Description)
                     Call db.cs_set(CS, "generalKey", generalKey)
@@ -6441,14 +6406,14 @@ ErrorTrap:
                                 '
                                 FieldList = "Name,PageID,'' as QueryStringSuffix"
                             End If
-                            CS = db.csOpen("Link Aliases", "name=" & db.encodeSQLText(WorkingLinkAlias), , , , , , FieldList)
-                            If Not db.cs_Ok(CS) Then
+                            CS = db.cs_open("Link Aliases", "name=" & db.encodeSQLText(WorkingLinkAlias), , , , , , FieldList)
+                            If Not db.cs_ok(CS) Then
                                 '
                                 ' Alias not found, create a Link Aliases
                                 '
                                 Call db.cs_Close(CS)
                                 CS = db.cs_insertRecord("Link Aliases", 0)
-                                If db.cs_Ok(CS) Then
+                                If db.cs_ok(CS) Then
                                     Call db.cs_set(CS, "Name", WorkingLinkAlias)
                                     'Call app.csv_SetCS(CS, "Link", Link)
                                     Call db.cs_set(CS, "Pageid", PageID)
@@ -6470,16 +6435,16 @@ ErrorTrap:
                                     '   remove it and add this one
                                     '
                                     CurrentLinkAliasID = db.cs_getInteger(CS, "id")
-                                    CS2 = db.db_openCsSql_rev("default", "select top 1 id from ccLinkAliases where pageid=" & LinkAliasPageID & " order by id desc")
-                                    If db.cs_Ok(CS2) Then
+                                    CS2 = db.cs_openCsSql_rev("default", "select top 1 id from ccLinkAliases where pageid=" & LinkAliasPageID & " order by id desc")
+                                    If db.cs_ok(CS2) Then
                                         resaveLinkAlias = (CurrentLinkAliasID <> db.cs_getInteger(CS2, "id"))
                                     End If
                                     Call db.cs_Close(CS2)
                                     If resaveLinkAlias Then
-                                        Call db.executeSql_getDataTable("delete from ccLinkAliases where id=" & CurrentLinkAliasID)
+                                        Call db.executeSql("delete from ccLinkAliases where id=" & CurrentLinkAliasID)
                                         Call db.cs_Close(CS)
                                         CS = db.cs_insertRecord("Link Aliases", 0)
-                                        If db.cs_Ok(CS) Then
+                                        If db.cs_ok(CS) Then
                                             Call db.cs_set(CS, "Name", WorkingLinkAlias)
                                             Call db.cs_set(CS, "Pageid", PageID)
                                             If True Then
@@ -6966,8 +6931,8 @@ ErrorTrap:
                 bodyEncoded = Body
                 templateEncoded = template
                 '
-                CS = db.db_OpenCSContentRecord("People", ToMemberID, , , , "email")
-                If db.cs_Ok(CS) Then
+                CS = db.cs_openContentRecord("People", ToMemberID, , , , "email")
+                If db.cs_ok(CS) Then
                     ToAddress = Trim(db.cs_getText(CS, "email"))
                     If ToAddress = "" Then
                         returnStatus = "The email was not sent because the to-address was blank."
@@ -7122,8 +7087,8 @@ ErrorTrap:
             Else
                 SelectList = "ID,TestMemberID,FromAddress,Subject,copyfilename,AddLinkEID,AllowSpamFooter,0 as EmailTemplateID"
             End If
-            CSEmail = db.csOpen("System Email", "name=" & db.encodeSQLText(EMailName), "ID", , , , , SelectList)
-            If Not db.cs_Ok(CSEmail) Then
+            CSEmail = db.cs_open("System Email", "name=" & db.encodeSQLText(EMailName), "ID", , , , , SelectList)
+            If Not db.cs_ok(CSEmail) Then
                 '
                 ' ----- Email was not found
                 '
@@ -7143,7 +7108,7 @@ ErrorTrap:
                 EmailToConfirmationMemberID = db.cs_getInteger(CSEmail, "testmemberid")
                 EmailFrom = db.cs_getText(CSEmail, "FromAddress")
                 EmailSubjectSource = db.cs_getText(CSEmail, "Subject")
-                EmailBodySource = db.db_GetCS(CSEmail, "copyfilename") & AdditionalCopy
+                EmailBodySource = db.cs_get(CSEmail, "copyfilename") & AdditionalCopy
                 EmailAllowLinkEID = db.cs_getBoolean(CSEmail, "AddLinkEID")
                 BounceAddress = siteProperties.getText("EmailBounceAddress", "")
                 If BounceAddress = "" Then
@@ -7154,9 +7119,9 @@ ErrorTrap:
                 ' Get the Email Template
                 '
                 If EMailTemplateID <> 0 Then
-                    CS = db.db_OpenCSContentRecord("Email Templates", EMailTemplateID)
-                    If db.cs_Ok(CS) Then
-                        EmailTemplateSource = db.db_GetCS(CS, "BodyHTML")
+                    CS = db.cs_openContentRecord("Email Templates", EMailTemplateID)
+                    If db.cs_ok(CS) Then
+                        EmailTemplateSource = db.cs_get(CS, "BodyHTML")
                     End If
                     Call db.cs_Close(CS)
                 End If
@@ -7183,8 +7148,8 @@ ErrorTrap:
                 '
                 If iAdditionalMemberID <> 0 Then
                     EmailStatusMessage = EmailStatusMessage & BR & "Primary Recipient:" & BR
-                    CSPeople = db.db_OpenCSContentRecord("People", iAdditionalMemberID, , , , "ID,Name,Email")
-                    If db.cs_Ok(CSPeople) Then
+                    CSPeople = db.cs_openContentRecord("People", iAdditionalMemberID, , , , "ID,Name,Email")
+                    If db.cs_ok(CSPeople) Then
                         EMailToMemberID = db.cs_getInteger(CSPeople, "ID")
                         EmailToName = db.cs_getText(CSPeople, "name")
                         EmailToAddress = db.cs_getText(CSPeople, "email")
@@ -7205,8 +7170,8 @@ ErrorTrap:
                 '
                 EmailStatusMessage = EmailStatusMessage & BR & "Recipients in selected System Email groups:" & BR
                 SQL = email_getGroupEmailSQL(False, EmailRecordID)
-                CSPeople = db.db_openCsSql_rev("default", SQL)
-                Do While db.cs_Ok(CSPeople)
+                CSPeople = db.cs_openCsSql_rev("default", SQL)
+                Do While db.cs_ok(CSPeople)
                     EMailToMemberID = db.cs_getInteger(CSPeople, "ID")
                     EmailToName = db.cs_getText(CSPeople, "name")
                     EmailToAddress = db.cs_getText(CSPeople, "email")
@@ -7218,7 +7183,7 @@ ErrorTrap:
                             EmailStatus = "ok"
                         End If
                         EmailStatusMessage = EmailStatusMessage & "&nbsp;&nbsp;Sent to " & EmailToName & " at " & EmailToAddress & ", Status = " & EmailStatus & BR
-                        Call db.db_csGoNext(CSPeople)
+                        Call db.cs_goNext(CSPeople)
                     End If
                 Loop
                 Call db.cs_Close(CSPeople)
@@ -7232,8 +7197,8 @@ ErrorTrap:
                     ' get the confirmation info
                     '
                     isValid = False
-                    CSPeople = db.db_OpenCSContentRecord("people", EmailToConfirmationMemberID)
-                    If db.cs_Ok(CSPeople) Then
+                    CSPeople = db.cs_openContentRecord("people", EmailToConfirmationMemberID)
+                    If db.cs_ok(CSPeople) Then
                         isValid = db.cs_getBoolean(CSPeople, "active")
                         EMailToMemberID = db.cs_getInteger(CSPeople, "ID")
                         EmailToName = db.cs_getText(CSPeople, "name")
@@ -7448,8 +7413,8 @@ ErrorTrap:
                     End If
                 End If
                 If AllowChange Then
-                    CSMember = db.csOpen("people", "id=" & db.encodeSQLNumber(user.id))
-                    If Not db.cs_Ok(CSMember) Then
+                    CSMember = db.cs_open("people", "id=" & db.encodeSQLNumber(user.id))
+                    If Not db.cs_ok(CSMember) Then
                         Call error_AddUserError("There was a problem locating your account record. No changes were saved.")
                         ' if user error, it goes back to the hardcodedpage
                         'LegacyInterceptPageSN = LegacyInterceptPageSNMyProfile
@@ -7468,8 +7433,8 @@ ErrorTrap:
                                     FieldName = field.nameLc
                                     FieldValue = docProperties.getText(FieldName)
                                     If FieldValue <> "" Then
-                                        CSTest = db.csOpen(ContentName, "(" & FieldName & "=" & db.encodeSQLText(FieldValue) & ")and(ID<>" & user.id & ")")
-                                        If db.cs_Ok(CSTest) Then
+                                        CSTest = db.cs_open(ContentName, "(" & FieldName & "=" & db.encodeSQLText(FieldValue) & ")and(ID<>" & user.id & ")")
+                                        If db.cs_ok(CSTest) Then
                                             Call error_AddUserError("The field '" & FieldName & "' must be unique, and another account has already used '" & FieldValue & "'")
                                         End If
                                         Call db.cs_Close(CSTest)
@@ -7706,7 +7671,7 @@ ErrorTrap:
                     '
                     Call log_appendLogPageNotFound(webServer.requestLinkSource)
                     If ShortLink <> "" Then
-                        Call db.executeSql_getDataTable("Update ccContentWatch set link=null where link=" & db.encodeSQLText(ShortLink))
+                        Call db.executeSql("Update ccContentWatch set link=null where link=" & db.encodeSQLText(ShortLink))
                     End If
                     '
                     If main_PageTestPointPrinting Then
@@ -8127,8 +8092,8 @@ ErrorTrap:
             '
             main_RedirectByRecord_ReturnStatus = False
             BlockRedirect = False
-            CSPointer = db.csOpen(iContentName, "ID=" & iRecordID)
-            If db.cs_Ok(CSPointer) Then
+            CSPointer = db.cs_open(iContentName, "ID=" & iRecordID)
+            If db.cs_ok(CSPointer) Then
                 ' 2/18/2008 - EncodeLink change
                 '
                 ' Assume all Link fields are already encoded -- as this is how they would appear if the admin cut and pasted
@@ -8166,8 +8131,8 @@ ErrorTrap:
                                     BlockRedirect = True
                                     Call db.cs_set(CSPointer, "active", 0)
                                 Else
-                                    CSHost = db.csOpen(HostContentName, "ID=" & HostRecordID)
-                                    If Not db.cs_Ok(CSHost) Then
+                                    CSHost = db.cs_open(HostContentName, "ID=" & HostRecordID)
+                                    If Not db.cs_ok(CSHost) Then
                                         '
                                         ' ----- Content Watch host record not found, mark inactive
                                         '
@@ -8190,8 +8155,8 @@ ErrorTrap:
                     ' If link incorrectly includes the LinkPrefix, take it off first, then add it back
                     '
                     NonEncodedLink = ConvertShortLinkToLink(NonEncodedLink, LinkPrefix)
-                    If db.db_IsCSFieldSupported(CSPointer, "Clicks") Then
-                        Call db.cs_set(CSPointer, "Clicks", (db.db_GetCSNumber(CSPointer, "Clicks")) + 1)
+                    If db.cs_isFieldSupported(CSPointer, "Clicks") Then
+                        Call db.cs_set(CSPointer, "Clicks", (db.cs_getNumber(CSPointer, "Clicks")) + 1)
                     End If
                     Call web_Redirect2(LinkPrefix & NonEncodedLink, "Call to " & MethodName & ", no reason given.", False)
                     main_RedirectByRecord_ReturnStatus = True
@@ -8314,7 +8279,7 @@ ErrorTrap:
                     SQL &= " and " & LcaseCriteria
                 End If
                 Dim dt As DataTable
-                dt = db.executeSql_getDataTable(SQL)
+                dt = db.executeSql(SQL)
                 If dt.Rows.Count > 0 Then
                     RowCnt = EncodeInteger(dt.Rows(0).Item("cnt"))
                 End If
@@ -8337,8 +8302,8 @@ ErrorTrap:
                     If CurrentValue = 0 Then
                         main_GetFormInputSelect2 = html_GetFormInputText2(MenuName, "0")
                     Else
-                        CSPointer = db_csOpen(ContentName, CurrentValue)
-                        If db.cs_Ok(CSPointer) Then
+                        CSPointer = csOpen(ContentName, CurrentValue)
+                        If db.cs_ok(CSPointer) Then
                             main_GetFormInputSelect2 = db.cs_getText(CSPointer, "name") & "&nbsp;"
                         End If
                         Call db.cs_Close(CSPointer)
@@ -8428,13 +8393,13 @@ ErrorTrap:
                         '
                         ' ----- select values
                         '
-                        CSPointer = db.csOpen(ContentName, Criteria, SortFieldList, , , , , SelectFields)
-                        If db.cs_Ok(CSPointer) Then
+                        CSPointer = db.cs_open(ContentName, Criteria, SortFieldList, , , , , SelectFields)
+                        If db.cs_ok(CSPointer) Then
                             Call testPoint("main_GetFormInputSelect2, 10 ContentName=[" & ContentName & "] Criteria=[" & Criteria & "] ")
-                            RowsArray = db.db_GetCSRows2(CSPointer)
+                            RowsArray = db.cs_getRows(CSPointer)
                             Call testPoint("main_GetFormInputSelect2, 20")
-                            'RowFieldArray = app.csv_GetCSRowFields(CSPointer)
-                            RowFieldArray = Split(db.db_GetCSSelectFieldList(CSPointer), ",")
+                            'RowFieldArray = app.csv_cs_getRowFields(CSPointer)
+                            RowFieldArray = Split(db.cs_getSelectFieldList(CSPointer), ",")
                             Call testPoint("main_GetFormInputSelect2, 30")
                             ColumnMax = UBound(RowsArray, 1)
                             Call testPoint("main_GetFormInputSelect2, 40")
@@ -8494,12 +8459,12 @@ ErrorTrap:
                                     Criteria = Criteria & "and"
                                 End If
                                 Criteria = Criteria & "(id=" & EncodeInteger(CurrentValue) & ")"
-                                CSPointer = db.csOpen(ContentName, Criteria, SortFieldList, False, , , , SelectFields)
-                                If db.cs_Ok(CSPointer) Then
+                                CSPointer = db.cs_open(ContentName, Criteria, SortFieldList, False, , , , SelectFields)
+                                If db.cs_ok(CSPointer) Then
                                     Call testPoint("main_GetFormInputSelect2, 110")
-                                    RowsArray = db.db_GetCSRows2(CSPointer)
+                                    RowsArray = db.cs_getRows(CSPointer)
                                     Call testPoint("main_GetFormInputSelect2, 120")
-                                    RowFieldArray = Split(db.db_GetCSSelectFieldList(CSPointer), ",")
+                                    RowFieldArray = Split(db.cs_getSelectFieldList(CSPointer), ",")
                                     Call testPoint("main_GetFormInputSelect2, 130")
                                     RowMax = UBound(RowsArray, 2)
                                     Call testPoint("main_GetFormInputSelect2, 140")
@@ -8650,9 +8615,9 @@ ErrorTrap:
                 ' Build the SelectRaw
                 ' Test selection size
                 '
-                PeopleTableName = db_GetContentTablename("people")
+                PeopleTableName = GetContentTablename("people")
                 PeopleDataSource = main_GetContentDataSource("People")
-                MemberRulesTableName = db_GetContentTablename("Member Rules")
+                MemberRulesTableName = GetContentTablename("Member Rules")
                 '
                 RowMax = 0
                 SQL = "select count(*) as cnt" _
@@ -8660,8 +8625,8 @@ ErrorTrap:
                     & " inner join ccMembers P on R.MemberID=P.ID" _
                     & " where (P.active<>0)" _
                     & " and (R.GroupID=" & GroupID & ")"
-                CSPointer = db.db_openCsSql_rev(PeopleDataSource, SQL)
-                If db.cs_Ok(CSPointer) Then
+                CSPointer = db.cs_openCsSql_rev(PeopleDataSource, SQL)
+                If db.cs_ok(CSPointer) Then
                     RowMax = RowMax + db.cs_getInteger(CSPointer, "cnt")
                 End If
                 Call db.cs_Close(CSPointer)
@@ -8672,9 +8637,9 @@ ErrorTrap:
                 '            & " and(( P.admin<>0 )or( P.developer<>0 ))"
                 '        CSPointer = app.csv_OpenCSSQL(PeopleDataSource, SQL, memberID)
                 '        If app.csv_IsCSOK(CSPointer) Then
-                '            RowMax = RowMax + app.csv_GetCSInteger(CSPointer, "cnt")
+                '            RowMax = RowMax + app.csv_cs_getInteger(CSPointer, "cnt")
                 '        End If
-                '        Call app.db_closeCS(CSPointer)
+                '        Call app.closeCS(CSPointer)
                 '
                 If RowMax > siteProperties.selectFieldLimit Then
                     '
@@ -8683,8 +8648,8 @@ ErrorTrap:
                     handleExceptionAndRethrow(New Exception("While building a group members list for group [" & group_GetGroupName(GroupID) & "], too many rows were selected. [" & RowMax & "] records exceeds [" & siteProperties.selectFieldLimit & "], the current Site Property app.SiteProperty_SelectFieldLimit."))
                     main_GetFormInputMemberSelect2 = main_GetFormInputMemberSelect2 & html_GetFormInputHidden(MenuNameFPO, iCurrentValue)
                     If iCurrentValue <> 0 Then
-                        CSPointer = db_csOpen("people", iCurrentValue)
-                        If db.cs_Ok(CSPointer) Then
+                        CSPointer = csOpen("people", iCurrentValue)
+                        If db.cs_ok(CSPointer) Then
                             main_GetFormInputMemberSelect2 = db.cs_getText(CSPointer, "name") & "&nbsp;"
                         End If
                         Call db.cs_Close(CSPointer)
@@ -8694,7 +8659,7 @@ ErrorTrap:
                     '
                     ' ----- Generate Drop Down Field Names
                     '
-                    DropDownFieldList = db_GetContentProperty("people", "DropDownFieldList")
+                    DropDownFieldList = GetContentProperty("people", "DropDownFieldList")
                     If DropDownFieldList = "" Then
                         DropDownFieldList = "NAME"
                     End If
@@ -8801,11 +8766,11 @@ ErrorTrap:
                         '                    & " where (active<>0)" _
                         '                    & " and(( P.admin<>0 )or( P.developer<>0 ))" _
                         '                    & " order by P." & SortFieldList
-                        CSPointer = db.db_openCsSql_rev(PeopleDataSource, SQL)
-                        If db.cs_Ok(CSPointer) Then
-                            RowsArray = db.db_GetCSRows(CSPointer)
-                            'RowFieldArray = app.csv_GetCSRowFields(CSPointer)
-                            RowFieldArray = Split(db.db_GetCSSelectFieldList(CSPointer), ",")
+                        CSPointer = db.cs_openCsSql_rev(PeopleDataSource, SQL)
+                        If db.cs_ok(CSPointer) Then
+                            RowsArray = db.cs_getRows(CSPointer)
+                            'RowFieldArray = app.csv_cs_getRowFields(CSPointer)
+                            RowFieldArray = Split(db.cs_getSelectFieldList(CSPointer), ",")
                             RowMax = UBound(RowsArray, 2)
                             ColumnMax = UBound(RowsArray, 1)
                             '
@@ -9316,7 +9281,7 @@ ErrorTrap:
         '========================================================================
         '
         Public Sub main_IncrementTableField(ByVal TableName As String, ByVal RecordID As Integer, ByVal FieldName As String, Optional ByVal DataSourceName As String = "")
-            Call db.executeSql_getDataTable("update " & TableName & " set " & FieldName & "=" & FieldName & "+1 where id=" & RecordID, DataSourceName)
+            Call db.executeSql("update " & TableName & " set " & FieldName & "=" & FieldName & "+1 where id=" & RecordID, DataSourceName)
 
             '            On Error GoTo ErrorTrap : ''Dim th as integer : th = profileLogMethodEnter("IncrementTableField")
             '            '
@@ -9922,8 +9887,8 @@ ErrorTrap:
                                 ' Path blocking allowed
                                 '
                                 'OptionsPanel = OptionsPanel & SpanClassAdminSmall & "<LABEL for=""" & TagID & """>"
-                                CS = db.csOpen("Paths", "name=" & db.encodeSQLText(web_requestPath), , , , , , "ID")
-                                If db.cs_Ok(CS) Then
+                                CS = db.cs_open("Paths", "name=" & db.encodeSQLText(web_requestPath), , , , , , "ID")
+                                If db.cs_ok(CS) Then
                                     PathID = (db.cs_getInteger(CS, "ID"))
                                 End If
                                 Call db.cs_Close(CS)
@@ -10206,7 +10171,7 @@ ErrorTrap:
         '                MethodName = "main_TrackContent"
         '                '
         '                CSPointer = main_OpenCSContentRecord2(iContentName, iRecordID)
-        '                If Not app.db_IsCSOK(CSPointer) Then
+        '                If Not app.IsCSOK(CSPointer) Then
         '                    Call handleLegacyError14(MethodName, "main_TrackContent, Error opening ContentSet from Content/Record [" & iContentName & "/" & EncodeText(iRecordID) & "].")
         '                Else
         '                    Call main_TrackContentSet(CSPointer)
@@ -10283,12 +10248,12 @@ ErrorTrap:
                     '
                     ' ----- if iContentName was bad, maybe they put table in, no authoring
                     '
-                    ContentID = db_GetContentIDByTablename(iContentName)
+                    ContentID = GetContentIDByTablename(iContentName)
                 End If
                 If (ContentID > 0) Then
                     '
-                    CS = db.csOpen("See Also", "((active<>0)AND(ContentID=" & ContentID & ")AND(RecordID=" & iRecordID & "))")
-                    Do While (db.cs_Ok(CS))
+                    CS = db.cs_open("See Also", "((active<>0)AND(ContentID=" & ContentID & ")AND(RecordID=" & iRecordID & "))")
+                    Do While (db.cs_ok(CS))
                         SeeAlsoLink = (db.cs_getText(CS, "Link"))
                         If SeeAlsoLink <> "" Then
                             main_GetSeeAlso = main_GetSeeAlso & cr & "<li class=""ccListItem"">"
@@ -10306,7 +10271,7 @@ ErrorTrap:
                             SeeAlsoCount = SeeAlsoCount + 1
                             main_GetSeeAlso = main_GetSeeAlso & "</li>"
                         End If
-                        db.db_csGoNext(CS)
+                        db.cs_goNext(CS)
                     Loop
                     db.cs_Close(CS)
                     '
@@ -10427,10 +10392,10 @@ ErrorTrap:
                     NoteCopy = NoteCopy & BR
                     NoteCopy = NoteCopy & "<b>Content on which the comments are based</b>" & BR
                     '
-                    CS = db.csOpen(iContentName, "ID=" & iRecordID)
+                    CS = db.cs_open(iContentName, "ID=" & iRecordID)
                     Copy = "[the content of this page is not available]" & BR
-                    If db.cs_Ok(CS) Then
-                        Copy = (db.db_GetCS(CS, "copyFilename"))
+                    If db.cs_ok(CS) Then
+                        Copy = (db.cs_get(CS, "copyFilename"))
                         'Copy = main_EncodeContent5(Copy, user.userid, iContentName, iRecordID, 0, False, False, True, True, False, True, "", "", False, 0)
                     End If
                     NoteCopy = NoteCopy & Copy & BR
@@ -10576,15 +10541,15 @@ ErrorTrap:
                     & ")" _
                 & " ORDER BY " & iSortFieldList & ";"
             main_OpenCSContentWatchList = db.cs_openSql(SQL, , PageSize, PageNumber)
-            If Not db.cs_Ok(main_OpenCSContentWatchList) Then
+            If Not db.cs_ok(main_OpenCSContentWatchList) Then
                 '
                 ' Check if listname exists
                 '
-                CS = db.csOpen("Content Watch Lists", "name=" & db.encodeSQLText(ListName), "ID", , , , , "ID")
-                If Not db.cs_Ok(CS) Then
+                CS = db.cs_open("Content Watch Lists", "name=" & db.encodeSQLText(ListName), "ID", , , , , "ID")
+                If Not db.cs_ok(CS) Then
                     Call db.cs_Close(CS)
                     CS = db.cs_insertRecord("Content Watch Lists")
-                    If db.cs_Ok(CS) Then
+                    If db.cs_ok(CS) Then
                         Call db.cs_set(CS, "name", ListName)
                     End If
                 End If
@@ -10621,9 +10586,9 @@ ErrorTrap:
             '
             CSPointer = main_OpenCSWhatsNew(SortFieldList)
             '
-            If db.cs_Ok(CSPointer) Then
+            If db.cs_ok(CSPointer) Then
                 ContentID = main_GetContentID("Content Watch")
-                Do While db.cs_Ok(CSPointer)
+                Do While db.cs_ok(CSPointer)
                     Link = db.cs_getText(CSPointer, "link")
                     LinkLabel = db.cs_getText(CSPointer, "LinkLabel")
                     RecordID = db.cs_getInteger(CSPointer, "ID")
@@ -10636,7 +10601,7 @@ ErrorTrap:
                         End If
                         main_GetWhatsNew = main_GetWhatsNew & "</li>"
                     End If
-                    Call db.db_csGoNext(CSPointer)
+                    Call db.cs_goNext(CSPointer)
                 Loop
                 main_GetWhatsNew = cr & "<ul class=""ccWatchList"">" & kmaIndent(main_GetWhatsNew) & cr & "</ul>"
             End If
@@ -10681,8 +10646,8 @@ ErrorTrap:
         '            '
         '            MethodName = "main_GetJoinForm"
         '            '
-        '            CSPeople = app.db_csOpen("people", "ID=" & user.userid)
-        '            If Not app.db_csOk(CSPeople) Then
+        '            CSPeople = app.csOpen("people", "ID=" & user.userid)
+        '            If Not app.csOk(CSPeople) Then
         '                '
         '                ' ----- could not open people, can not continue
         '                '
@@ -10699,7 +10664,7 @@ ErrorTrap:
         '                        ' ----- Not authenticated, Guest identity, ask for information.
         '                        '
         '                        Dim QS As String
-        '                        FirstName = db.db_GetCSText(CSPeople, "firstName")
+        '                        FirstName = db.cs_getText(CSPeople, "firstName")
         '                        If vbLCase(FirstName) = "guest" Then
         '                            FirstName = ""
         '                        End If
@@ -10715,15 +10680,15 @@ ErrorTrap:
         '                        returnHtml = returnHtml & "</tr>"
         '                        returnHtml = returnHtml & "<tr>"
         '                        returnHtml = returnHtml & "<td align=""right"" width=""30%"">" & SpanClassAdminNormal & "Last Name</span></td>"
-        '                        returnHtml = returnHtml & "<td align=""left""  width=""70%""><input NAME=""" & "lastname"" VALUE=""" & html.html_EncodeHTML(db.db_GetCSText(CSPeople, "lastname")) & """ SIZE=""20"" MAXLENGTH=""50""></td>"
+        '                        returnHtml = returnHtml & "<td align=""left""  width=""70%""><input NAME=""" & "lastname"" VALUE=""" & html.html_EncodeHTML(db.cs_getText(CSPeople, "lastname")) & """ SIZE=""20"" MAXLENGTH=""50""></td>"
         '                        returnHtml = returnHtml & "</tr>"
         '                        returnHtml = returnHtml & "<tr>"
         '                        returnHtml = returnHtml & "<td align=""right"" width=""30%"">" & SpanClassAdminNormal & "Email</span></td>"
-        '                        returnHtml = returnHtml & "<td align=""left""  width=""70%""><input NAME=""" & "email"" VALUE=""" & html.html_EncodeHTML(db.db_GetCSText(CSPeople, "email")) & """ SIZE=""20"" MAXLENGTH=""50""></td>"
+        '                        returnHtml = returnHtml & "<td align=""left""  width=""70%""><input NAME=""" & "email"" VALUE=""" & html.html_EncodeHTML(db.cs_getText(CSPeople, "email")) & """ SIZE=""20"" MAXLENGTH=""50""></td>"
         '                        returnHtml = returnHtml & "</tr>"
         '                        returnHtml = returnHtml & "<tr>"
         '                        returnHtml = returnHtml & "<td align=""right"" width=""30%"">" & SpanClassAdminNormal & "Username</span></td>"
-        '                        returnHtml = returnHtml & "<td align=""left""  width=""70%""><input NAME=""" & "username"" VALUE=""" & html.html_EncodeHTML(db.db_GetCSText(CSPeople, "username")) & """ SIZE=""20"" MAXLENGTH=""50""></td>"
+        '                        returnHtml = returnHtml & "<td align=""left""  width=""70%""><input NAME=""" & "username"" VALUE=""" & html.html_EncodeHTML(db.cs_getText(CSPeople, "username")) & """ SIZE=""20"" MAXLENGTH=""50""></td>"
         '                        returnHtml = returnHtml & "</tr>"
         '                        returnHtml = returnHtml & "<tr>"
         '                        returnHtml = returnHtml & "<td align=""right"" width=""30%"">" & SpanClassAdminNormal & "Password</span></td>"
@@ -10782,10 +10747,10 @@ ErrorTrap:
         '            If Not user.user_isAuthenticated() Then
         '                Call error_AddUserError("You can not edit your MyAccount page until you have logged in.")
         '            Else
-        '                CSMember = main_OpenContent("People", "ID=" & app.db_EncodeSQLNumber(iPeopleID))
-        '                If app.db_csOk(CSMember) Then
+        '                CSMember = main_OpenContent("People", "ID=" & app.EncodeSQLNumber(iPeopleID))
+        '                If app.csOk(CSMember) Then
         '                    '
-        '                    ContentID = app.db_GetCSInteger(CSMember, "ContentControlID")
+        '                    ContentID = app.cs_getInteger(CSMember, "ContentControlID")
         '                    ContentName = metaData.getContentNameByID(ContentID)
         '                    '
         '                    ' ----- member personal information
@@ -10888,15 +10853,15 @@ ErrorTrap:
         '                    s.Add(main_GetMyProfileForm_Row("Member Number", EncodeText(user.userid)) & vbCrLf)
         '                    s.Add(main_GetMyProfileForm_Row("Visitor Number", EncodeText(main_VisitorID)) & vbCrLf)
         '                    s.Add(main_GetMyProfileForm_Row("Visit Number", EncodeText(main_VisitId)) & vbCrLf)
-        '                    CSLastVisit = app.db_csOpen("Visits", "MemberID=" & iPeopleID, "ID DESC")
-        '                    If app.db_csOk(CSLastVisit) Then
+        '                    CSLastVisit = app.csOpen("Visits", "MemberID=" & iPeopleID, "ID DESC")
+        '                    If app.csOk(CSLastVisit) Then
         '                        s.Add(main_GetMyProfileForm_RowCS(CSLastVisit, "Visits", "StartTime", "", RowCount, "Start Time", True) & vbCrLf)
         '                        s.Add(main_GetMyProfileForm_RowCS(CSLastVisit, "Visits", "REMOTE_ADDR", "", RowCount, "IP Address", True) & vbCrLf)
         '                        s.Add(main_GetMyProfileForm_RowCS(CSLastVisit, "Visits", "Browser", "", RowCount, "", True) & vbCrLf)
         '                        s.Add(main_GetMyProfileForm_RowCS(CSLastVisit, "Visits", "HTTP_REFERER", "", RowCount, "Referer", True) & vbCrLf)
         '                        s.Add(main_GetMyProfileForm_RowCS(CSLastVisit, "Visits", "CookieSupport", "", RowCount, "Cookie Support", True) & vbCrLf)
         '                    End If
-        '                    Call app.db_csClose(CSLastVisit)
+        '                    Call app.csClose(CSLastVisit)
         '                    s.Add(TableClose)
         '                    Call main_AddLiveTabEntry("Statistics", s.Text)
         '                    '
@@ -10957,9 +10922,9 @@ ErrorTrap:
         '            If Not user.user_isAuthenticated() Then
         '                Call error_AddUserError("You can not edit your MyAccount page until you have logged in.")
         '            Else
-        '                CSMember = main_OpenContent("People", "ID=" & db.db_EncodeSQLNumber(iPeopleID))
-        '                If db.db_csOk(CSMember) Then
-        '                    ContentID = db.db_GetCSInteger(CSMember, "ContentControlID")
+        '                CSMember = main_OpenContent("People", "ID=" & db.EncodeSQLNumber(iPeopleID))
+        '                If db.csOk(CSMember) Then
+        '                    ContentID = db.cs_getInteger(CSMember, "ContentControlID")
         '                    ContentName = metaData.getContentNameByID(ContentID)
         '                    '
         '                    RowDivider = "<tr><td width=""100%"" align=""left""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""1"" ></td></tr>" & vbCrLf
@@ -11059,8 +11024,8 @@ ErrorTrap:
         '                    Stream.Add(main_GetMyProfileForm_Row("Member Number", EncodeText(user.userId)) & vbCrLf)
         '                    Stream.Add(main_GetMyProfileForm_Row("Visitor Number", EncodeText(main_VisitorID)) & vbCrLf)
         '                    Stream.Add(main_GetMyProfileForm_Row("Visit Number", EncodeText(main_VisitId)) & vbCrLf)
-        '                    CSLastVisit = db.db_csOpen("Visits", "MemberID=" & iPeopleID, "ID DESC")
-        '                    If db.db_csOk(CSLastVisit) Then
+        '                    CSLastVisit = db.csOpen("Visits", "MemberID=" & iPeopleID, "ID DESC")
+        '                    If db.csOk(CSLastVisit) Then
         '                        'Stream.Add( main_GetMyProfileForm_RowCS(CSLastVisit, "Visits", "main_VisitorID", "", RowCount) & vbcrlf )
         '                        'Stream.Add( main_GetMyProfileForm_RowCS(CSLastVisit, "Visits", "ID", "", RowCount) & vbcrlf )
         '                        Stream.Add(main_GetMyProfileForm_RowCS(CSLastVisit, "Visits", "StartTime", "", RowCount, "Start Time", True) & vbCrLf)
@@ -11071,7 +11036,7 @@ ErrorTrap:
         '                        Stream.Add(main_GetMyProfileForm_RowCS(CSLastVisit, "Visits", "CookieSupport", "", RowCount, "Cookie Support", True) & vbCrLf)
         '                        'Stream.Add( main_GetMyProfileForm_RowCS(CSLastVisit, "Visits", "main_VisitAuthenticated", "", RowCount) & vbcrlf )
         '                    End If
-        '                    Call db.db_csClose(CSLastVisit)
+        '                    Call db.csClose(CSLastVisit)
         '                    '
         '                    Stream.Add("</table>")
         '                    '
@@ -11106,14 +11071,14 @@ ErrorTrap:
         '            '
         '            iCaption = Caption
         '            If Caption = "" Then
-        '                iCaption = db.db_getCSFieldCaption(CSPointer, FieldName)
+        '                iCaption = db.cs_getFieldCaption(CSPointer, FieldName)
         '            End If
         '            '
-        '            If Not db.db_csOk(CSPointer) Then
+        '            If Not db.csOk(CSPointer) Then
         '                handleExceptionAndRethrow(New Exception("ContentSet argument is not valid"))
         '            Else
         '                If readOnlyField Then
-        '                    Stream = db.db_GetCSText(CSPointer, FieldName)
+        '                    Stream = db.cs_getText(CSPointer, FieldName)
         '                Else
         '                    Stream = html_GetFormInputCS(CSPointer, ContentName, FieldName, , 60)
         '                End If
@@ -11201,13 +11166,13 @@ ErrorTrap:
         '                & " WHERE (((ccTopics.Active)<>0) AND ((ccTopicHabits.MemberID)=" & user.userId & ")) OR (((ccTopics.Active)<>0) AND ((ccTopicHabits.MemberID) Is Null))" _
         '                & " Group By ccTopics.name" _
         '                & " Order by ccTopics.Name"
-        '            CS = db.db_csOpenSql(SQL)
-        '            Do While db.db_csOk(CS)
-        '                Stream = Stream & SpanClassAdminNormal & db.db_GetCSText(CS, "name") & " = " & EncodeText(db.db_GetCSInteger(CS, "score")) & "</span><BR >"
-        '                Call db.db_csGoNext(CS)
+        '            CS = db.csOpenSql(SQL)
+        '            Do While db.csOk(CS)
+        '                Stream = Stream & SpanClassAdminNormal & db.cs_getText(CS, "name") & " = " & EncodeText(db.cs_getInteger(CS, "score")) & "</span><BR >"
+        '                Call db.csGoNext(CS)
         '                TopicCount = TopicCount + 1
         '            Loop
-        '            Call db.db_csClose(CS)
+        '            Call db.csClose(CS)
         '            '
         '            '
         '            '
@@ -11290,7 +11255,7 @@ ErrorTrap:
                 '
                 ' ----- main_Get the Group ID
                 '
-                dt = db.executeSql_getDataTable("select top 1 id from ccGroups where name=" & db.encodeSQLText(iGroupName))
+                dt = db.executeSql("select top 1 id from ccGroups where name=" & db.encodeSQLText(iGroupName))
                 If dt.Rows.Count > 0 Then
                     group_GetGroupID = EncodeInteger(dt.Rows(0).Item(0))
                 End If
@@ -11324,9 +11289,9 @@ ErrorTrap:
                 '
                 ' ----- main_Get the Group name
                 '
-                CS = db_csOpenRecord("Groups", iGroupID)
-                If db.cs_Ok(CS) Then
-                    group_GetGroupName = EncodeText(db_cs_GetField(CS, "Name"))
+                CS = csOpenRecord("Groups", iGroupID)
+                If db.cs_ok(CS) Then
+                    group_GetGroupName = EncodeText(cs_GetField(CS, "Name"))
                 End If
                 Call db.cs_Close(CS)
             End If
@@ -11361,13 +11326,13 @@ ErrorTrap:
             '
             group_Add = -1
             Dim dt As DataTable
-            dt = db.executeSql_getDataTable("SELECT ID FROM ccgroups WHERE NAME=" & db.encodeSQLText(iGroupName))
+            dt = db.executeSql("SELECT ID FROM ccgroups WHERE NAME=" & db.encodeSQLText(iGroupName))
             If dt.Rows.Count > 0 Then
                 group_Add = EncodeInteger(dt.Rows(0).Item(0))
             Else
                 CS = db.cs_insertRecord("Groups", SystemMemberID)
-                If db.cs_Ok(CS) Then
-                    group_Add = EncodeInteger(db.db_GetCSField(CS, "ID"))
+                If db.cs_ok(CS) Then
+                    group_Add = EncodeInteger(db.cs_getField(CS, "ID"))
                     Call db.cs_set(CS, "name", iGroupName)
                     Call db.cs_set(CS, "caption", iGroupCaption)
                     Call db.cs_set(CS, "active", True)
@@ -11430,12 +11395,12 @@ ErrorTrap:
                 If (GroupID < 1) Then
                     Call handleLegacyError14(MethodName, "main_AddGroupMember could not find or add Group [" & GroupName & "]")
                 Else
-                    CS = db.csOpen("Member Rules", "(MemberID=" & db.encodeSQLNumber(NewMemberID) & ")and(GroupID=" & db.encodeSQLNumber(GroupID) & ")", , False)
-                    If Not db.cs_Ok(CS) Then
+                    CS = db.cs_open("Member Rules", "(MemberID=" & db.encodeSQLNumber(NewMemberID) & ")and(GroupID=" & db.encodeSQLNumber(GroupID) & ")", , False)
+                    If Not db.cs_ok(CS) Then
                         Call db.cs_Close(CS)
                         CS = db.cs_insertRecord("Member Rules")
                     End If
-                    If Not db.cs_Ok(CS) Then
+                    If Not db.cs_ok(CS) Then
                         Call handleLegacyError14(MethodName, "main_AddGroupMember could not add this member to the Group [" & GroupName & "]")
                     Else
                         Call db.cs_set(CS, "active", True)
@@ -11564,16 +11529,16 @@ ErrorTrap:
             '
             '  BuildVersion = app.dataBuildVersion
             If False Then '.3.210" Then
-                handleExceptionAndRethrow(New Exception("Contensive database was created with version " & db.siteproperty_dataBuildVersion & ". main_SetContentCopy requires an builder."))
+                handleExceptionAndRethrow(New Exception("Contensive database was created with version " & siteProperties.dataBuildVersion & ". main_SetContentCopy requires an builder."))
             Else
                 iCopyName = EncodeText(CopyName)
                 iContent = EncodeText(Content)
-                CS = db.csOpen(ContentName, "name=" & db_EncodeSQLText(iCopyName))
-                If Not db.cs_Ok(CS) Then
+                CS = db.cs_open(ContentName, "name=" & EncodeSQLText(iCopyName))
+                If Not db.cs_ok(CS) Then
                     Call db.cs_Close(CS)
                     CS = db.cs_insertRecord(ContentName)
                 End If
-                If db.cs_Ok(CS) Then
+                If db.cs_ok(CS) Then
                     Call db.cs_set(CS, "name", iCopyName)
                     Call db.cs_set(CS, "Copy", iContent)
                 End If
@@ -11746,7 +11711,7 @@ ErrorTrap:
         '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("OpenContent")
         '            '
         '            'If Not (true) Then Exit Function
-        '            main_OpenContent = db.db_csOpen(EncodeText(ContentName), Criteria, SortFieldList, ActiveOnly)
+        '            main_OpenContent = db.csOpen(EncodeText(ContentName), Criteria, SortFieldList, ActiveOnly)
         '            '
         '            Exit Function
         'ErrorTrap:
@@ -11757,8 +11722,8 @@ ErrorTrap:
         ' main_Gets the field in the current CSRow according to its definition
         '========================================================================
         '
-        Public Function cs_GetCSRecordEditLink(ByVal CSPointer As Integer, Optional ByVal AllowCut As Object = False) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetCSRecordEditLink")
+        Public Function cs_cs_getRecordEditLink(ByVal CSPointer As Integer, Optional ByVal AllowCut As Object = False) As String
+            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("cs_getRecordEditLink")
             '
             'If Not (true) Then Exit Function
             '
@@ -11771,13 +11736,13 @@ ErrorTrap:
             '
             iCSPointer = EncodeInteger(CSPointer)
             '
-            MethodName = "main_GetCSRecordEditLink"
+            MethodName = "main_cs_getRecordEditLink"
             '
             If iCSPointer = -1 Then
-                Call handleLegacyError14(MethodName, "main_GetCSRecordEditLink called with invalid iCSPointer")
+                Call handleLegacyError14(MethodName, "main_cs_getRecordEditLink called with invalid iCSPointer")
             Else
-                If Not db.cs_Ok(iCSPointer) Then
-                    Call handleLegacyError14(MethodName, "main_GetCSRecordEditLink called with Not main_CSOK")
+                If Not db.cs_ok(iCSPointer) Then
+                    Call handleLegacyError14(MethodName, "main_cs_getRecordEditLink called with Not main_CSOK")
                 Else
                     '
                     ' Print an edit link for the records Content (may not be iCSPointer content)
@@ -11787,7 +11752,7 @@ ErrorTrap:
                     ContentControlID = (db.cs_getInteger(iCSPointer, "contentcontrolid"))
                     ContentName = metaData.getContentNameByID(ContentControlID)
                     If ContentName <> "" Then
-                        cs_GetCSRecordEditLink = main_GetRecordEditLink2(ContentName, RecordID, EncodeBoolean(AllowCut), RecordName, user.isEditing(ContentName))
+                        cs_cs_getRecordEditLink = main_GetRecordEditLink2(ContentName, RecordID, EncodeBoolean(AllowCut), RecordName, user.isEditing(ContentName))
                     End If
                 End If
             End If
@@ -12281,11 +12246,11 @@ ErrorTrap:
                 & " GROUP BY " & SecondaryTablename & ".ID, ccContent.Name, " & SecondaryTablename & "." & iCaptionFieldName & ", " & SecondaryTablename & ".name, " & SecondaryTablename & ".SortOrder" _
                 & " ORDER BY ccContent.Name, " & SecondaryTablename & "." & iCaptionFieldName
             CS = db.cs_openSql(SQL)
-            If db.cs_Ok(CS) Then
+            If db.cs_ok(CS) Then
                 SectionName = ""
                 GroupCount = 0
                 CanSeeHiddenFields = user.isAuthenticatedDeveloper()
-                Do While db.cs_Ok(CS)
+                Do While db.cs_ok(CS)
                     GroupName = db.cs_getText(CS, "GroupName")
                     If (Mid(GroupName, 1, 1) <> "_") Or CanSeeHiddenFields Then
                         RecordID = db.cs_getInteger(CS, "ID")
@@ -12320,7 +12285,7 @@ ErrorTrap:
                         Result = Result & SpanClassAdminNormal & GroupCaption
                         GroupCount = GroupCount + 1
                     End If
-                    db.db_csGoNext(CS)
+                    db.cs_goNext(CS)
                 Loop
                 Result = Result & "<input type=""hidden"" name=""" & TagName & ".RowCount"" value=""" & GroupCount & """>" & vbCrLf
             End If
@@ -12388,8 +12353,8 @@ ErrorTrap:
                         '
                         ' main_Get the current value if the record was found
                         '
-                        If db.cs_Ok(CSPointer) Then
-                            FieldValueVariant = db_cs_GetField(CSPointer, FieldName)
+                        If db.cs_ok(CSPointer) Then
+                            FieldValueVariant = cs_GetField(CSPointer, FieldName)
                         End If
                         '
                         If FieldPassword Then
@@ -12510,9 +12475,9 @@ ErrorTrap:
                                         ' Lookup into Content
                                         '
                                         If FieldReadOnly Then
-                                            CSPointer = db_csOpenRecord(FieldLookupContentName, FieldValueInteger)
-                                            If db.cs_Ok(CSLookup) Then
-                                                returnResult = main_GetCSEncodedField(CSLookup, "name")
+                                            CSPointer = csOpenRecord(FieldLookupContentName, FieldValueInteger)
+                                            If db.cs_ok(CSLookup) Then
+                                                returnResult = main_cs_getEncodedField(CSLookup, "name")
                                             End If
                                             Call db.cs_Close(CSLookup)
                                         Else
@@ -12787,7 +12752,7 @@ ErrorTrap:
             '
             Call web_setResponseContentType("text/plain")
             Call web_SetStreamBuffer(False)
-            TableName = GetDbObjectTableName(db_GetContentTablename(iContentName))
+            TableName = GetDbObjectTableName(GetContentTablename(iContentName))
             Select Case vbUCase(TableName)
                 Case "CCMEMBERS"
                     '
@@ -12796,21 +12761,21 @@ ErrorTrap:
                     If Not user.isAuthenticatedAdmin() Then
                         Call sb.Append("Warning: You must be a site administrator to export this information.")
                     Else
-                        CSPointer = db.csOpen(iContentName, , "ID", False, , , ,, PageSize, PageNumber)
+                        CSPointer = db.cs_open(iContentName, , "ID", False, , , ,, PageSize, PageNumber)
                         '
                         ' ----- print out the field names
                         '
-                        If db.cs_Ok(CSPointer) Then
+                        If db.cs_ok(CSPointer) Then
                             Call sb.Append("""EID""")
                             Delimiter = ","
-                            FieldNameVariant = db.db_GetCSFirstFieldName(CSPointer)
+                            FieldNameVariant = db.cs_getFirstFieldName(CSPointer)
                             Do While (FieldNameVariant <> "")
                                 FieldName = EncodeText(FieldNameVariant)
                                 UcaseFieldName = vbUCase(FieldName)
                                 If (UcaseFieldName <> "USERNAME") And (UcaseFieldName <> "PASSWORD") Then
                                     Call sb.Append(Delimiter & """" & FieldName & """")
                                 End If
-                                FieldNameVariant = db.db_GetCSNextFieldName(CSPointer)
+                                FieldNameVariant = db.cs_getNextFieldName(CSPointer)
                                 '''DoEvents
                             Loop
                             Call sb.Append(vbCrLf)
@@ -12818,17 +12783,17 @@ ErrorTrap:
                         '
                         ' ----- print out the values
                         '
-                        Do While db.cs_Ok(CSPointer)
+                        Do While db.cs_ok(CSPointer)
                             If Not (db.cs_getBoolean(CSPointer, "Developer")) Then
                                 Copy = security.encodeToken((db.cs_getInteger(CSPointer, "ID")), main_PageStartTime)
                                 Call sb.Append("""" & Copy & """")
                                 Delimiter = ","
-                                FieldNameVariant = db.db_GetCSFirstFieldName(CSPointer)
+                                FieldNameVariant = db.cs_getFirstFieldName(CSPointer)
                                 Do While (FieldNameVariant <> "")
                                     FieldName = EncodeText(FieldNameVariant)
                                     UcaseFieldName = vbUCase(FieldName)
                                     If (UcaseFieldName <> "USERNAME") And (UcaseFieldName <> "PASSWORD") Then
-                                        Copy = db.db_GetCS(CSPointer, FieldName)
+                                        Copy = db.cs_get(CSPointer, FieldName)
                                         If Copy <> "" Then
                                             Copy = vbReplace(Copy, """", "'")
                                             Copy = vbReplace(Copy, vbCrLf, " ")
@@ -12837,12 +12802,12 @@ ErrorTrap:
                                         End If
                                         Call sb.Append(Delimiter & """" & Copy & """")
                                     End If
-                                    FieldNameVariant = db.db_GetCSNextFieldName(CSPointer)
+                                    FieldNameVariant = db.cs_getNextFieldName(CSPointer)
                                     '''DoEvents
                                 Loop
                                 Call sb.Append(vbCrLf)
                             End If
-                            Call db.db_csGoNext(CSPointer)
+                            Call db.cs_goNext(CSPointer)
                             '''DoEvents
                         Loop
                     End If
@@ -12854,17 +12819,17 @@ ErrorTrap:
                     If Not user.isAuthenticatedContentManager(iContentName) Then
                         Call sb.Append("Error: You must be a content manager to export this data.")
                     Else
-                        CSPointer = db.csOpen(iContentName, , "ID", False, , , ,, PageSize, PageNumber)
+                        CSPointer = db.cs_open(iContentName, , "ID", False, , , ,, PageSize, PageNumber)
                         '
                         ' ----- print out the field names
                         '
-                        If db.cs_Ok(CSPointer) Then
+                        If db.cs_ok(CSPointer) Then
                             Delimiter = ""
-                            FieldNameVariant = db.db_GetCSFirstFieldName(CSPointer)
+                            FieldNameVariant = db.cs_getFirstFieldName(CSPointer)
                             Do While (FieldNameVariant <> "")
                                 Call appRootFiles.appendFile(TestFilename, Delimiter & """" & FieldNameVariant & """")
                                 Delimiter = ","
-                                FieldNameVariant = db.db_GetCSNextFieldName(CSPointer)
+                                FieldNameVariant = db.cs_getNextFieldName(CSPointer)
                                 '''DoEvents
                             Loop
                             Call appRootFiles.appendFile(TestFilename, vbCrLf)
@@ -12872,15 +12837,15 @@ ErrorTrap:
                         '
                         ' ----- print out the values
                         '
-                        Do While db.cs_Ok(CSPointer)
+                        Do While db.cs_ok(CSPointer)
                             Delimiter = ""
-                            FieldNameVariant = db.db_GetCSFirstFieldName(CSPointer)
+                            FieldNameVariant = db.cs_getFirstFieldName(CSPointer)
                             Do While (FieldNameVariant <> "")
-                                Select Case db.db_GetCSFieldTypeId(CSPointer, EncodeText(FieldNameVariant))
+                                Select Case db.cs_getFieldTypeId(CSPointer, EncodeText(FieldNameVariant))
                                     Case FieldTypeIdFileTextPrivate, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdFileHTMLPrivate
-                                        Copy = main_GetCSEncodedField(CSPointer, EncodeText(FieldNameVariant))
+                                        Copy = main_cs_getEncodedField(CSPointer, EncodeText(FieldNameVariant))
                                     Case FieldTypeIdLookup
-                                        Copy = db.db_GetCSLookup(CSPointer, EncodeText(FieldNameVariant))
+                                        Copy = db.cs_getLookup(CSPointer, EncodeText(FieldNameVariant))
                                     Case FieldTypeIdRedirect, FieldTypeIdManyToMany
                                     Case Else
                                         Copy = db.cs_getText(CSPointer, EncodeText(FieldNameVariant))
@@ -12893,11 +12858,11 @@ ErrorTrap:
                                 End If
                                 Call appRootFiles.appendFile(TestFilename, Delimiter & """" & Copy & """")
                                 Delimiter = ","
-                                FieldNameVariant = db.db_GetCSNextFieldName(CSPointer)
+                                FieldNameVariant = db.cs_getNextFieldName(CSPointer)
                                 '''DoEvents
                             Loop
                             Call appRootFiles.appendFile(TestFilename, vbCrLf)
-                            Call db.db_csGoNext(CSPointer)
+                            Call db.cs_goNext(CSPointer)
                             '''DoEvents
                         Loop
                     End If
@@ -12928,13 +12893,13 @@ ErrorTrap:
         '            '
         '            MethodName = "main_SetMember"
         '            '
-        '            CSPointer = db.csOpen("people", "id=" & db.db_EncodeSQLNumber(iPeopleID))
-        '            If Not db.db_csOk(CSPointer) Then
+        '            CSPointer = db.csOpen("people", "id=" & db.EncodeSQLNumber(iPeopleID))
+        '            If Not db.csOk(CSPointer) Then
         '                Call handleLegacyError14(MethodName, "main_SetMember ErrorTrap, could not find RecordID [" & iPeopleID & "] in people content.")
         '            Else
-        '                Call db.db_setCS(CSPointer, "ContentControlID", main_GetContentID("Members"))
+        '                Call db.setCS(CSPointer, "ContentControlID", main_GetContentID("Members"))
         '            End If
-        '            Call db.db_csClose(CSPointer)
+        '            Call db.csClose(CSPointer)
         '            '
         '            Exit Sub
         '            '
@@ -13064,7 +13029,7 @@ ErrorTrap:
             '
             MethodName = "main_GetVirtualFilename"
             '
-            main_GetVirtualFilename = db.db_GetVirtualFilename(iContentName, iFieldName, iRecordID, OriginalFilename)
+            main_GetVirtualFilename = db.GetVirtualFilename(iContentName, iFieldName, iRecordID, OriginalFilename)
             Exit Function
             '
             ' ----- Error Trap
@@ -13143,7 +13108,7 @@ ErrorTrap:
                         & ""
                 End If
                 SQL &= " WHERE (ID=" & visit_Id & ");"
-                Call db.executeSql_getDataTable(SQL)
+                Call db.executeSql(SQL)
             End If
             Exit Sub
             '
@@ -13186,7 +13151,7 @@ ErrorTrap:
                         & ",OrderID = " & db.encodeSQLNumber(visitor_orderID) _
                         & " WHERE ID=" & visitor_id & ";"
                 End If
-                Call db.executeSql_getDataTable(SQL)
+                Call db.executeSql(SQL)
             End If
             Exit Sub
             '
@@ -13380,7 +13345,7 @@ ErrorTrap:
                             & " WHERE (((ccVisits.ID)=" & visit_Id & "))"
                         '
                         CS = db.cs_openSql(SQL)
-                        If Not db.cs_Ok(CS) Then
+                        If Not db.cs_ok(CS) Then
                             '
                             ' Bad visit cookie, kill main_VisitId
                             '
@@ -13404,7 +13369,7 @@ ErrorTrap:
                             '--------------------------------------------------------------------------
                             '
                             'hint = "250"
-                            visit_lastTime = db.db_GetCSDate(CS, "VisitLastVisitTime")
+                            visit_lastTime = db.cs_getDate(CS, "VisitLastVisitTime")
                             If visit_lastTime.ToOADate + 0.041666 < main_PageStartTime.ToOADate Then
                                 '--------------------------------------------------------------------------
                                 ' ----- kill visit (no activity for over 1 hour)
@@ -13427,7 +13392,7 @@ ErrorTrap:
                                 visit_cookieSupport = (db.cs_getBoolean(CS, "VisitCookieSupport"))
                                 visit_pages = (db.cs_getInteger(CS, "VisitPageVisits"))
                                 visit_isAuthenticated = (db.cs_getBoolean(CS, "VisitAuthenticated"))
-                                visit_startTime = (db.db_GetCSDate(CS, "VisitStartTime"))
+                                visit_startTime = (db.cs_getDate(CS, "VisitStartTime"))
                                 visit_startDateValue = (db.cs_getInteger(CS, "VisitStartDateValue"))
                                 visit_referer = (db.cs_getText(CS, "VisitHTTP_REFERER"))
                                 visit_loginAttempts = (db.cs_getInteger(CS, "VisitLoginAttempts"))
@@ -13483,7 +13448,7 @@ ErrorTrap:
                                     user.email = (db.cs_getText(CS, "MemberEmail"))
                                     user.company = (db.cs_getText(CS, "MemberCompany"))
                                     user.visits = (db.cs_getInteger(CS, "MemberVisits"))
-                                    user.lastVisit = (db.db_GetCSDate(CS, "MemberLastVisit"))
+                                    user.lastVisit = (db.cs_getDate(CS, "MemberLastVisit"))
                                 End If
                                 '
                                 '--------------------------------------------------------------------------
@@ -13577,7 +13542,7 @@ ErrorTrap:
                                     SQL = "SELECT ID,Name,MemberID,OrderID,0 as ForceBrowserMobile from ccVisitors WHERE ID=" & visitor_id & ";"
                                 End If
                                 CS = db.cs_openSql(SQL)
-                                If Not db.cs_Ok(CS) Then
+                                If Not db.cs_ok(CS) Then
                                     '
                                     ' ----- bad cookie, kill main_VisitorID
                                     '
@@ -13650,7 +13615,7 @@ ErrorTrap:
                                     'hint = "530"
                                     SQL = "select top 1 V.VisitAuthenticated from ccVisits V where (V.ID<>" & visit_Id & ")and(V.VisitorID=" & visitor_id & ") order by id desc"
                                     CS = db.cs_openSql(SQL)
-                                    If db.cs_Ok(CS) Then
+                                    If db.cs_ok(CS) Then
                                         If db.cs_getBoolean(CS, "VisitAuthenticated") Then
                                             '
                                             ' ----- yes, go ahead with autologin
@@ -13726,7 +13691,7 @@ ErrorTrap:
                         If (LCase(Left(visit_name, 5)) <> "visit") Then
                             DefaultMemberName = visit_name
                         Else
-                            DefaultMemberName = EncodeText(db_GetContentFieldProperty("people", "name", "default"))
+                            DefaultMemberName = EncodeText(GetContentFieldProperty("people", "name", "default"))
                         End If
                         If (False) Then
                             '
@@ -13800,8 +13765,8 @@ ErrorTrap:
                                     '
                                     ' Handle the non-English case first, so if there is a problem, fall back is English
                                     '
-                                    CS = db.csOpen("Languages", "name=" & db.encodeSQLText(user.language))
-                                    If db.cs_Ok(CS) Then
+                                    CS = db.cs_open("Languages", "name=" & db.encodeSQLText(user.language))
+                                    If db.cs_ok(CS) Then
                                         user.languageId = db.cs_getInteger(CS, "ID")
                                         user_changes = True
                                     End If
@@ -13815,8 +13780,8 @@ ErrorTrap:
                                     End If
                                 End If
                                 If user.language = "English" Then
-                                    CS = db.csOpen("Languages", "name=" & db.encodeSQLText(user.language))
-                                    If db.cs_Ok(CS) Then
+                                    CS = db.cs_open("Languages", "name=" & db.encodeSQLText(user.language))
+                                    If db.cs_ok(CS) Then
                                         user.languageId = db.cs_getInteger(CS, "ID")
                                         user_changes = True
                                     End If
@@ -13826,7 +13791,7 @@ ErrorTrap:
                                         ' English is not in Language table, add it, and set it in Member
                                         '
                                         CS = db.cs_insertRecord("Languages")
-                                        If db.cs_Ok(CS) Then
+                                        If db.cs_ok(CS) Then
                                             user.languageId = db.cs_getInteger(CS, "ID")
                                             user.language = "English"
                                             Call db.cs_set(CS, "Name", user.language)
@@ -13899,10 +13864,10 @@ ErrorTrap:
                     'hint = "980"
                     '$$$$$ cache this
                     ' $$$$$ make ptr list on load
-                    CS = db.csOpen("Add-ons", "(OnNewVisitEvent<>0)", "Name", , , , , "id")
-                    Do While db.cs_Ok(CS)
+                    CS = db.cs_open("Add-ons", "(OnNewVisitEvent<>0)", "Name", , , , , "id")
+                    Do While db.cs_ok(CS)
                         Call addon.execute_legacy5(db.cs_getInteger(CS, "ID"), "", "", CPUtilsBaseClass.addonContext.ContextOnNewVisit, "", 0, "", 0)
-                        db.db_csGoNext(CS)
+                        db.cs_goNext(CS)
                     Loop
                     Call db.cs_Close(CS)
                 End If
@@ -14309,7 +14274,7 @@ ErrorTrap:
         '   call main_DeleteContentRecords.
         '========================================================================
         '
-        Public Sub db_DeleteContentRecord(ByVal ContentName As String, ByVal RecordID As Integer)
+        Public Sub DeleteContentRecord(ByVal ContentName As String, ByVal RecordID As Integer)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("DeleteContentRecord")
             '
             'If Not (true) Then Exit Sub
@@ -14325,12 +14290,12 @@ ErrorTrap:
             '
             If (iContentName = "") Or (iRecordID = 0) Then
                 If (EncodeText(RecordID) <> "") And (EncodeText(RecordID) <> "0") Then
-                    Call db.db_DeleteContentRecord(ContentName, RecordID)
+                    Call db.deleteContentRecord(ContentName, RecordID)
                 Else
                     handleExceptionAndRethrow(New Exception("Invalid ContentName [" & iContentName & "] or RecordID [" & EncodeText(RecordID) & "]"))
                 End If
             Else
-                Call db.db_DeleteContentRecord(iContentName, iRecordID, user.id)
+                Call db.deleteContentRecord(iContentName, iRecordID, user.id)
             End If
             Call main_ProcessSpecialCaseAfterSave(True, iContentName, iRecordID, "", 0, False)
             Exit Sub
@@ -14346,7 +14311,7 @@ ErrorTrap:
         ' main_DeleteCSRecord
         '========================================================================
         '
-        Public Sub db_DeleteCSRecord(ByVal CSPointer As Integer)
+        Public Sub DeleteCSRecord(ByVal CSPointer As Integer)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("DeleteCSRecord")
             '
             'If Not (true) Then Exit Sub
@@ -14355,7 +14320,7 @@ ErrorTrap:
             '
             MethodName = "main_DeleteCSRecord"
             '
-            Call db.db_DeleteCSRecord(EncodeInteger(CSPointer))
+            Call db.cs_deleteRecord(EncodeInteger(CSPointer))
             Exit Sub
             '
             ' ----- Error Trap
@@ -14388,8 +14353,8 @@ ErrorTrap:
         '
         ' ----- alternate name
         '
-        Public Function db_InsertCSContent(ByVal ContentName As String) As Integer
-            db_InsertCSContent = db.cs_insertRecord(EncodeText(ContentName))
+        Public Function InsertCSContent(ByVal ContentName As String) As Integer
+            InsertCSContent = db.cs_insertRecord(EncodeText(ContentName))
         End Function
         '
         '========================================================================
@@ -14444,8 +14409,8 @@ ErrorTrap:
                         AcceptLanguage = Mid(AcceptLanguage, 1, DashPosition - 1)
                     End If
                     If Len(AcceptLanguage) > 0 Then
-                        CS = db.csOpen("languages", "HTTP_Accept_LANGUAGE=" & db.encodeSQLText(AcceptLanguage), , , , , , "ID", 1)
-                        If db.cs_Ok(CS) Then
+                        CS = db.cs_open("languages", "HTTP_Accept_LANGUAGE=" & db.encodeSQLText(AcceptLanguage), , , , , , "ID", 1)
+                        If db.cs_ok(CS) Then
                             LanguageID = db.cs_getInteger(CS, "ID")
                             LanguageName = db.cs_getText(CS, "Name")
                         End If
@@ -14459,8 +14424,8 @@ ErrorTrap:
                 '
                 ' ----- no matching browser language, use site default
                 '
-                CS = db.csOpen("languages", "name=" & db.encodeSQLText(siteProperties.language), , , , , , "ID", 1)
-                If db.cs_Ok(CS) Then
+                CS = db.cs_open("languages", "name=" & db.encodeSQLText(siteProperties.language), , , , , , "ID", 1)
+                If db.cs_ok(CS) Then
                     LanguageID = db.cs_getInteger(CS, "ID")
                     LanguageName = db.cs_getText(CS, "Name")
                 End If
@@ -14611,8 +14576,8 @@ ErrorTrap:
         '   PresetNameValueList is a name=value pair to force in the added record
         '========================================================================
         '
-        Public Function main_GetCSRecordAddLink(ByVal CSPointer As Integer, Optional ByVal PresetNameValueList As String = "", Optional ByVal AllowPaste As Boolean = False) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetCSRecordAddLink")
+        Public Function main_cs_getRecordAddLink(ByVal CSPointer As Integer, Optional ByVal PresetNameValueList As String = "", Optional ByVal AllowPaste As Boolean = False) As String
+            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("cs_getRecordAddLink")
             '
             'If Not (true) Then Exit Function
             '
@@ -14624,19 +14589,19 @@ ErrorTrap:
             iCSPointer = EncodeInteger(CSPointer)
             iPresetNameValueList = encodeEmptyText(PresetNameValueList, "")
             '
-            MethodName = "main_GetCSRecordAddLink"
+            MethodName = "main_cs_getRecordAddLink"
             '
             If iCSPointer < 0 Then
-                Call handleLegacyError14(MethodName, "main_GetCSRecordAddLink was called with invalid ContentSet pointer [" & iCSPointer & "]")
+                Call handleLegacyError14(MethodName, "main_cs_getRecordAddLink was called with invalid ContentSet pointer [" & iCSPointer & "]")
             Else
                 '
                 ' Print an add tag to the iCSPointers Content
                 '
-                ContentName = db.db_GetCSContentName(iCSPointer)
+                ContentName = db.cs_getContentName(iCSPointer)
                 If ContentName = "" Then
-                    Call handleLegacyError14(MethodName, "main_GetCSRecordAddLink was called with a ContentSet that was created with an SQL statement. The function requires a ContentSet opened with an OpenCSContent.")
+                    Call handleLegacyError14(MethodName, "main_cs_getRecordAddLink was called with a ContentSet that was created with an SQL statement. The function requires a ContentSet opened with an OpenCSContent.")
                 Else
-                    main_GetCSRecordAddLink = main_GetRecordAddLink(ContentName, iPresetNameValueList, AllowPaste)
+                    main_cs_getRecordAddLink = main_GetRecordAddLink(ContentName, iPresetNameValueList, AllowPaste)
                 End If
             End If
             Exit Function
@@ -14730,8 +14695,8 @@ ErrorTrap:
                     Call handleLegacyError14(MethodName, "Method called with blank ContentName")
                 Else
                     iContentID = main_GetContentID(iContentName)
-                    csChildContent = db.csOpen("Content", "ParentID=" & iContentID, , , , , , "id")
-                    useFlyout = db.cs_Ok(csChildContent)
+                    csChildContent = db.cs_open("Content", "ParentID=" & iContentID, , , , , , "id")
+                    useFlyout = db.cs_ok(csChildContent)
                     Call db.cs_Close(csChildContent)
                     '
                     If Not useFlyout Then
@@ -14773,7 +14738,7 @@ ErrorTrap:
                                     ClipboardContentID = EncodeInteger(ClipBoardArray(0))
                                     ClipChildRecordID = EncodeInteger(ClipBoardArray(1))
                                     'iContentID = main_GetContentID(iContentName)
-                                    If db_IsWithinContent(ClipboardContentID, iContentID) Then
+                                    If IsWithinContent(ClipboardContentID, iContentID) Then
                                         If vbInstr(1, iPresetNameValueList, "PARENTID=", vbTextCompare) <> 0 Then
                                             '
                                             ' must test for main_IsChildRecord
@@ -14893,7 +14858,7 @@ ErrorTrap:
             '
             SQL = "select ParentID from " & TableName & " where id=" & ChildRecordID
             CS = db.cs_openSql(SQL)
-            If db.cs_Ok(CS) Then
+            If db.cs_ok(CS) Then
                 ChildRecordParentID = db.cs_getInteger(CS, "ParentID")
             End If
             Call db.cs_Close(CS)
@@ -14974,7 +14939,7 @@ ErrorTrap:
                             & " AND(ccContent.active<>0)" _
                             & " );"
                         CS = db.cs_openSql(SQL)
-                        If db.cs_Ok(CS) Then
+                        If db.cs_ok(CS) Then
                             '
                             ' Entry was found
                             '
@@ -15007,7 +14972,7 @@ ErrorTrap:
                             & " AND(ccMembers.ID=" & user.id & ")" _
                             & " );"
                         CS = db.cs_openSql(SQL)
-                        If db.cs_Ok(CS) Then
+                        If db.cs_ok(CS) Then
                             '
                             ' ----- Entry was found, member has some kind of access
                             '
@@ -15015,7 +14980,7 @@ ErrorTrap:
                             ContentID = db.cs_getInteger(CS, "ContentID")
                             ContentAllowAdd = db.cs_getBoolean(CS, "ContentAllowAdd")
                             GroupRulesAllowAdd = db.cs_getBoolean(CS, "GroupRulesAllowAdd")
-                            MemberRulesDateExpires = db.db_GetCSDate(CS, "MemberRulesDateExpires")
+                            MemberRulesDateExpires = db.cs_getDate(CS, "MemberRulesDateExpires")
                             MemberRulesAllow = False
                             If MemberRulesDateExpires = Date.MinValue Then
                                 MemberRulesAllow = True
@@ -15053,8 +15018,8 @@ ErrorTrap:
                         '
                         ' Create child submenu if Child Entries found
                         '
-                        csChildContent = db.csOpen("Content", "ParentID=" & ContentID, , , , , , "name")
-                        If Not db.cs_Ok(csChildContent) Then
+                        csChildContent = db.cs_open("Content", "ParentID=" & ContentID, , , , , , "name")
+                        If Not db.cs_ok(csChildContent) Then
                             '
                             ' No child menu
                             '
@@ -15067,7 +15032,7 @@ ErrorTrap:
                             '
                             ' ----- Create the ChildPanel with all Children found
                             '
-                            Do While db.cs_Ok(csChildContent)
+                            Do While db.cs_ok(csChildContent)
                                 ChildContentName = db.cs_getText(csChildContent, "name")
                                 Copy = main_GetRecordAddLink_AddMenuEntry(ChildContentName, PresetNameValueList, MyContentNameList, MenuName, ParentMenuName)
                                 'Copy = main_GetRecordAddLink_AddMenuEntry(ChildContentName, PresetNameValueList, MyContentNameList, MenuName, ChildMenuName)
@@ -15077,7 +15042,7 @@ ErrorTrap:
                                 If (main_GetRecordAddLink_AddMenuEntry = "") And (Copy <> "") Then
                                     main_GetRecordAddLink_AddMenuEntry = Copy
                                 End If
-                                db.db_csGoNext(csChildContent)
+                                db.cs_goNext(csChildContent)
                             Loop
                         End If
                     End If
@@ -15135,11 +15100,11 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Function
             '
-            If db.cs_Ok(EncodeInteger(CSPointer)) Then
+            If db.cs_ok(EncodeInteger(CSPointer)) Then
                 '
                 ' Just do a text box with the value
                 '
-                main_GetFormCSInput = html_GetFormInputText2(FieldName, EncodeText(db.db_GetCSField(CSPointer, FieldName)))
+                main_GetFormCSInput = html_GetFormInputText2(FieldName, EncodeText(db.cs_getField(CSPointer, FieldName)))
             Else
                 '
                 ' Just do a text box with a blank
@@ -15368,9 +15333,9 @@ ErrorTrap:
                                 ' ----- Create Path Block record, if requested
                                 '
                                 CreatePathBlock = doc_getBoolean2("CreatePathBlock")
-                                CS = db.csOpen("Paths", "name=" & db.encodeSQLText(web_requestPath))
+                                CS = db.cs_open("Paths", "name=" & db.encodeSQLText(web_requestPath))
                                 PathID = 0
-                                If db.cs_Ok(CS) Then
+                                If db.cs_ok(CS) Then
                                     PathID = db.cs_getInteger(CS, "id")
                                 End If
                                 Call db.cs_Close(CS)
@@ -15379,7 +15344,7 @@ ErrorTrap:
                                     ' path is not blocked, but we want it blocked
                                     '
                                     CS = db.cs_insertRecord("Paths")
-                                    If db.cs_Ok(CS) Then
+                                    If db.cs_ok(CS) Then
                                         Call db.cs_set(CS, "name", web_requestPath)
                                         Call db.cs_set(CS, "active", 1)
                                     End If
@@ -15388,7 +15353,7 @@ ErrorTrap:
                                     '
                                     ' path is blocked, but we do not want it blocked
                                     '
-                                    Call db_DeleteContentRecord("Paths", PathID)
+                                    Call DeleteContentRecord("Paths", PathID)
                                 End If
                             End If
                     End Select
@@ -15461,9 +15426,9 @@ ErrorTrap:
                 ' ----- Page Content Child List Add-on
                 '
                 If (RecordID <> 0) And (True) Then
-                    CSAddon = db_csOpen("Add-ons", siteProperties.childListAddonID)
+                    CSAddon = csOpen("Add-ons", siteProperties.childListAddonID)
                     FoundAddon = False
-                    If db.cs_Ok(CSAddon) Then
+                    If db.cs_ok(CSAddon) Then
                         FoundAddon = True
                         AddonOptionConstructor = db.cs_getText(CSAddon, "ArgumentList")
                         AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
@@ -15512,14 +15477,14 @@ ErrorTrap:
                     End If
                     Call db.cs_Close(CSAddon)
                     ' ????? need to test
-                    Call db.executeSql_getDataTable("update ccpagecontent set ChildListInstanceOptions=" & db.encodeSQLText(addonOption_String) & " where id=" & RecordID)
+                    Call db.executeSql("update ccpagecontent set ChildListInstanceOptions=" & db.encodeSQLText(addonOption_String) & " where id=" & RecordID)
                     needToClearCache = True
                     'CS = main_OpenCSContentRecord("page content", RecordID)
                     'If app.csv_IsCSOK(CS) Then
-                    '    Call app.db_SetCS(CS, "ChildListInstanceOptions", addonOption_String)
+                    '    Call app.SetCS(CS, "ChildListInstanceOptions", addonOption_String)
                     '    needToClearCache = True
                     'End If
-                    'Call app.db_closeCS(CS)
+                    'Call app.closeCS(CS)
                 End If
             ElseIf (ACInstanceID = "-2") And (FieldName <> "") Then
                 '
@@ -15544,24 +15509,24 @@ ErrorTrap:
                         AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Block
                     End If
                 End If
-                '        CSAddon = app.db_csOpen("Add-ons", "name=" & encodeSQLText(AddonName))
+                '        CSAddon = app.csOpen("Add-ons", "name=" & encodeSQLText(AddonName))
                 '        FoundAddon = False
                 '        If app.csv_IsCSOK(CSAddon) Then
                 '            FoundAddon = True
-                '            AddonOptionConstructor = db.db_GetCSText(CSAddon, "ArgumentList")
+                '            AddonOptionConstructor = db.cs_getText(CSAddon, "ArgumentList")
                 '            AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
                 '            AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbLf, vbCr)
                 '            AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
                 '            If AddonOptionConstructor <> "" Then
                 '                AddonOptionConstructor = AddonOptionConstructor & vbCrLf
                 '            End If
-                '            If db.db_GetCSBoolean(CSAddon, "IsInline") Then
+                '            If db.cs_getBoolean(CSAddon, "IsInline") Then
                 '                AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Inline
                 '            Else
                 '                AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Block
                 '            End If
                 '        End If
-                '        Call app.db_closeCS(CSAddon)
+                '        Call app.closeCS(CSAddon)
                 If Not FoundAddon Then
                     '
                     ' Hardcoded Addons
@@ -15619,26 +15584,26 @@ ErrorTrap:
                 '
                 ' ----- Normal Content Edit - find instance in the content
                 '
-                CS = db_csOpen(ContentName, RecordID)
-                If Not db.cs_Ok(CS) Then
+                CS = csOpen(ContentName, RecordID)
+                If Not db.cs_ok(CS) Then
                     handleExceptionAndRethrow(New Exception("No record found with content [" & ContentName & "] and RecordID [" & RecordID & "]"))
                 Else
                     If FieldName <> "" Then
                         '
                         ' Field is given, find the position
                         '
-                        Copy = db.db_GetCS(CS, FieldName)
+                        Copy = db.cs_get(CS, FieldName)
                         PosACInstanceID = vbInstr(1, Copy, "=""" & ACInstanceID & """ ", vbTextCompare)
                     Else
                         '
                         ' Find the field, then find the position
                         '
-                        FieldName = db.db_GetCSFirstFieldName(CS)
+                        FieldName = db.cs_getFirstFieldName(CS)
                         Do While FieldName <> ""
-                            fieldType = db.db_GetCSFieldTypeId(CS, FieldName)
+                            fieldType = db.cs_getFieldTypeId(CS, FieldName)
                             Select Case fieldType
                                 Case FieldTypeIdLongText, FieldTypeIdText, FieldTypeIdFileTextPrivate, FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript, FieldTypeIdHTML, FieldTypeIdFileHTMLPrivate
-                                    Copy = db.db_GetCS(CS, FieldName)
+                                    Copy = db.cs_get(CS, FieldName)
                                     PosACInstanceID = vbInstr(1, Copy, "ACInstanceID=""" & ACInstanceID & """", vbTextCompare)
                                     If PosACInstanceID <> 0 Then
                                         '
@@ -15648,7 +15613,7 @@ ErrorTrap:
                                         Exit Do
                                     End If
                             End Select
-                            FieldName = db.db_GetCSNextFieldName(CS)
+                            FieldName = db.cs_getNextFieldName(CS)
                         Loop
                     End If
                     '
@@ -15770,7 +15735,7 @@ ErrorTrap:
                 Call cache.invalidateTagCommaList("")
                 If ContentName <> "" Then
                     Call cache.invalidateTagCommaList(ContentName)
-                    TableName = db_GetContentTablename(ContentName)
+                    TableName = GetContentTablename(ContentName)
                     If vbLCase(TableName) = "cctemplates" Then
                         Call cache.setKey(pageManager_cache_pageTemplate_cacheName, EmptyVariant)
                         Call pageManager_cache_pageTemplate_load()
@@ -15824,7 +15789,7 @@ ErrorTrap:
                             HelpCaption = docProperties.getText("helpcaption")
                             HelpMessage = docProperties.getText("helptext")
                             SQL = "update ccfields set caption=" & db.encodeSQLText(HelpCaption) & ",HelpMessage=" & db.encodeSQLText(HelpMessage) & " where id=" & RecordID
-                            Call db.executeSql_getDataTable(SQL)
+                            Call db.executeSql(SQL)
                             cache.invalidateAll()
                             metaData.clear()
                         End If
@@ -16139,7 +16104,7 @@ ErrorTrap:
         '   Copy the records from one CS to another
         '==========================================================================
         '
-        Public Sub db_cs_CopyRecord(ByVal CSSource As Object, ByVal CSDestination As Object)
+        Public Sub cs_CopyRecord(ByVal CSSource As Object, ByVal CSDestination As Object)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00229")
             '
             'If Not (true) Then Exit Sub
@@ -16148,7 +16113,7 @@ ErrorTrap:
             '
             MethodName = "main_CopyCSRecord"
             '
-            Call db.db_CopyCSRecord(EncodeInteger(CSSource), EncodeInteger(CSDestination))
+            Call db.cs_copyRecord(EncodeInteger(CSSource), EncodeInteger(CSDestination))
             Exit Sub
             '
             ' ----- Error Trap
@@ -16162,7 +16127,7 @@ ErrorTrap:
         '
         '========================================================================
         '
-        Public Function db_GetContentProperty(ByVal ContentName As String, ByVal PropertyName As String) As String
+        Public Function GetContentProperty(ByVal ContentName As String, ByVal PropertyName As String) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetContentProperty")
             '
             'If Not (true) Then Exit Function
@@ -16175,57 +16140,57 @@ ErrorTrap:
             Contentdefinition = metaData.getCdef(EncodeText(ContentName))
             Select Case vbUCase(EncodeText(PropertyName))
                 Case "CONTENTCONTROLCRITERIA"
-                    db_GetContentProperty = Contentdefinition.ContentControlCriteria
+                    GetContentProperty = Contentdefinition.ContentControlCriteria
                 Case "ACTIVEONLY"
-                    db_GetContentProperty = Contentdefinition.ActiveOnly.ToString
+                    GetContentProperty = Contentdefinition.ActiveOnly.ToString
                 Case "ADMINONLY"
-                    db_GetContentProperty = Contentdefinition.AdminOnly.ToString
+                    GetContentProperty = Contentdefinition.AdminOnly.ToString
                 Case "ALIASID"
-                    db_GetContentProperty = Contentdefinition.AliasID
+                    GetContentProperty = Contentdefinition.AliasID
                 Case "ALIASNAME"
-                    db_GetContentProperty = Contentdefinition.AliasName
+                    GetContentProperty = Contentdefinition.AliasName
                 Case "ALLOWADD"
-                    db_GetContentProperty = Contentdefinition.AllowAdd.ToString
+                    GetContentProperty = Contentdefinition.AllowAdd.ToString
                 Case "ALLOWDELETE"
-                    db_GetContentProperty = Contentdefinition.AllowDelete.ToString
+                    GetContentProperty = Contentdefinition.AllowDelete.ToString
                 'Case "CHILDIDLIST"
                 '    main_GetContentProperty = Contentdefinition.ChildIDList
                 Case "DATASOURCEID"
-                    db_GetContentProperty = Contentdefinition.dataSourceId.ToString
+                    GetContentProperty = Contentdefinition.dataSourceId.ToString
                 Case "DEFAULTSORTMETHOD"
-                    db_GetContentProperty = Contentdefinition.DefaultSortMethod
+                    GetContentProperty = Contentdefinition.DefaultSortMethod
                 Case "DEVELOPERONLY"
-                    db_GetContentProperty = Contentdefinition.DeveloperOnly.ToString
+                    GetContentProperty = Contentdefinition.DeveloperOnly.ToString
                 Case "FIELDCOUNT"
-                    db_GetContentProperty = Contentdefinition.fields.Count.ToString
+                    GetContentProperty = Contentdefinition.fields.Count.ToString
                 'Case "FIELDPOINTER"
                 '    main_GetContentProperty = Contentdefinition.FieldPointer
                 Case "ID"
-                    db_GetContentProperty = Contentdefinition.Id.ToString
+                    GetContentProperty = Contentdefinition.Id.ToString
                 Case "IGNORECONTENTCONTROL"
-                    db_GetContentProperty = Contentdefinition.IgnoreContentControl.ToString
+                    GetContentProperty = Contentdefinition.IgnoreContentControl.ToString
                 Case "NAME"
-                    db_GetContentProperty = Contentdefinition.Name
+                    GetContentProperty = Contentdefinition.Name
                 Case "PARENTID"
-                    db_GetContentProperty = Contentdefinition.parentID.ToString
+                    GetContentProperty = Contentdefinition.parentID.ToString
                 'Case "SINGLERECORD"
                 '    main_GetContentProperty = Contentdefinition.SingleRecord
                 Case "CONTENTTABLENAME"
-                    db_GetContentProperty = Contentdefinition.ContentTableName
+                    GetContentProperty = Contentdefinition.ContentTableName
                 Case "CONTENTDATASOURCENAME"
-                    db_GetContentProperty = Contentdefinition.ContentDataSourceName
+                    GetContentProperty = Contentdefinition.ContentDataSourceName
                 Case "AUTHORINGTABLENAME"
-                    db_GetContentProperty = Contentdefinition.AuthoringTableName
+                    GetContentProperty = Contentdefinition.AuthoringTableName
                 Case "AUTHORINGDATASOURCENAME"
-                    db_GetContentProperty = Contentdefinition.AuthoringDataSourceName
+                    GetContentProperty = Contentdefinition.AuthoringDataSourceName
                 Case "WHERECLAUSE"
-                    db_GetContentProperty = Contentdefinition.WhereClause
+                    GetContentProperty = Contentdefinition.WhereClause
                 Case "ALLOWWORKFLOWAUTHORING"
-                    db_GetContentProperty = Contentdefinition.AllowWorkflowAuthoring.ToString
+                    GetContentProperty = Contentdefinition.AllowWorkflowAuthoring.ToString
                 Case "DROPDOWNFIELDLIST"
-                    db_GetContentProperty = Contentdefinition.DropDownFieldList
+                    GetContentProperty = Contentdefinition.DropDownFieldList
                 Case "SELECTFIELDLIST"
-                    db_GetContentProperty = Contentdefinition.SelectCommaList
+                    GetContentProperty = Contentdefinition.SelectCommaList
                 Case Else
                     Call handleLegacyError14(MethodName, "Content Property [" & EncodeText(PropertyName) & "] was not found in content [" & EncodeText(ContentName) & "]")
             End Select
@@ -16243,7 +16208,7 @@ ErrorTrap:
         '
         '========================================================================
         '
-        Public Function db_GetContentFieldProperty(ByVal ContentName As String, ByVal FieldName As String, ByVal PropertyName As String) As Object
+        Public Function GetContentFieldProperty(ByVal ContentName As String, ByVal FieldName As String, ByVal PropertyName As String) As Object
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00230")
             '
             'If Not (true) Then Exit Function
@@ -16255,7 +16220,7 @@ ErrorTrap:
             '
             MethodName = "main_GetContentFieldProperty"
             '
-            db_GetContentFieldProperty = ""
+            GetContentFieldProperty = ""
             If True Then
                 UcaseFieldName = vbUCase(EncodeText(FieldName))
                 Contentdefinition = metaData.getCdef(EncodeText(ContentName))
@@ -16268,28 +16233,28 @@ ErrorTrap:
                             If UcaseFieldName = vbUCase(.nameLc) Then
                                 Select Case vbUCase(EncodeText(PropertyName))
                                     Case "FIELDTYPE", "TYPE"
-                                        db_GetContentFieldProperty = .fieldTypeId
+                                        GetContentFieldProperty = .fieldTypeId
                                     Case "HTMLCONTENT"
-                                        db_GetContentFieldProperty = .htmlContent
+                                        GetContentFieldProperty = .htmlContent
                                     Case "ADMINONLY"
-                                        db_GetContentFieldProperty = .adminOnly
+                                        GetContentFieldProperty = .adminOnly
                                     Case "AUTHORABLE"
-                                        db_GetContentFieldProperty = .authorable
+                                        GetContentFieldProperty = .authorable
                                     Case "CAPTION"
-                                        db_GetContentFieldProperty = .caption
+                                        GetContentFieldProperty = .caption
                                     Case "REQUIRED"
-                                        db_GetContentFieldProperty = .Required
+                                        GetContentFieldProperty = .Required
                                     Case "UNIQUENAME"
-                                        db_GetContentFieldProperty = .UniqueName
+                                        GetContentFieldProperty = .UniqueName
                                     Case "UNIQUE"
                                         '
                                         ' fix for the uniquename screwup - it is not unique name, it is unique value
                                         '
-                                        db_GetContentFieldProperty = .UniqueName
+                                        GetContentFieldProperty = .UniqueName
                                     Case "DEFAULT"
-                                        db_GetContentFieldProperty = EncodeText(.defaultValue)
+                                        GetContentFieldProperty = EncodeText(.defaultValue)
                                     Case "MEMBERSELECTGROUPID"
-                                        db_GetContentFieldProperty = EncodeText(.MemberSelectGroupID)
+                                        GetContentFieldProperty = EncodeText(.MemberSelectGroupID)
                                     Case Else
                                         Call handleLegacyError14(MethodName, "Content Property [" & EncodeText(PropertyName) & "] was not found in content [" & EncodeText(ContentName) & "]")
                                 End Select
@@ -16441,12 +16406,12 @@ ErrorTrap:
         '
         ' ----- 2.1 compatibility
         '
-        Public Function db_GetContentTablename(ByVal ContentName As String) As String
+        Public Function GetContentTablename(ByVal ContentName As String) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetContentTablename")
             '
             'If Not (true) Then Exit Function
             '
-            db_GetContentTablename = EncodeText(db_GetContentProperty(EncodeText(ContentName), "ContentTableName"))
+            GetContentTablename = EncodeText(GetContentProperty(EncodeText(ContentName), "ContentTableName"))
             '
             Exit Function
 ErrorTrap:
@@ -16464,12 +16429,12 @@ ErrorTrap:
         '       The rest are the archive records.
         '========================================================================
         '
-        Public Function db_csOpenRecord(ByVal ContentName As String, ByVal RecordID As Integer, Optional ByVal WorkflowAuthoringMode As Boolean = False, Optional ByVal WorkflowEditingMode As Boolean = False, Optional ByVal SelectFieldList As String = "") As Integer
+        Public Function csOpenRecord(ByVal ContentName As String, ByVal RecordID As Integer, Optional ByVal WorkflowAuthoringMode As Boolean = False, Optional ByVal WorkflowEditingMode As Boolean = False, Optional ByVal SelectFieldList As String = "") As Integer
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("OpenCSContentRecord_Internal")
             '
             'If Not (true) Then Exit Function
             '
-            db_csOpenRecord = db.csOpen(ContentName, "(ID=" & db.encodeSQLNumber(RecordID) & ")", , False, user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
+            csOpenRecord = db.cs_open(ContentName, "(ID=" & db.encodeSQLNumber(RecordID) & ")", , False, user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
             '
             Exit Function
             '
@@ -16489,12 +16454,12 @@ ErrorTrap:
         '       The rest are the archive records.
         '========================================================================
         '
-        Public Function db_csOpen(ByVal ContentName As String, ByVal RecordID As Integer, Optional ByVal WorkflowAuthoringMode As Boolean = False, Optional ByVal WorkflowEditingMode As Boolean = False, Optional ByVal SelectFieldList As String = "") As Integer
+        Public Function csOpen(ByVal ContentName As String, ByVal RecordID As Integer, Optional ByVal WorkflowAuthoringMode As Boolean = False, Optional ByVal WorkflowEditingMode As Boolean = False, Optional ByVal SelectFieldList As String = "") As Integer
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("OpenCSContentRecord")
             '
             'If Not (true) Then Exit Function
             '
-            db_csOpen = db.csOpen(EncodeText(ContentName), "(ID=" & db.encodeSQLNumber(RecordID) & ")", , False, user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
+            csOpen = db.cs_open(EncodeText(ContentName), "(ID=" & db.encodeSQLNumber(RecordID) & ")", , False, user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
             '
             Exit Function
             '
@@ -16527,7 +16492,7 @@ ErrorTrap:
         '       Returns true if ChildContentID is in ParentContentID
         '========================================================================
         '
-        Public Function db_IsWithinContent(ByVal ChildContentID As Integer, ByVal ParentContentID As Integer) As Boolean
+        Public Function IsWithinContent(ByVal ChildContentID As Integer, ByVal ParentContentID As Integer) As Boolean
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("IsWithinContent")
             '
             'If Not (true) Then Exit Function
@@ -16536,7 +16501,7 @@ ErrorTrap:
             '
             MethodName = "IsWithinContent"
             '
-            db_IsWithinContent = metaData.isWithinContent(EncodeInteger(ChildContentID), EncodeInteger(ParentContentID))
+            IsWithinContent = metaData.isWithinContent(EncodeInteger(ChildContentID), EncodeInteger(ParentContentID))
             Exit Function
             '
             ' ----- Error Trap
@@ -16548,7 +16513,7 @@ ErrorTrap:
         '
         '
         '
-        Public Sub db_IncrementContentField(ByVal ContentName As String, ByVal RecordID As Integer, ByVal FieldName As String)
+        Public Sub IncrementContentField(ByVal ContentName As String, ByVal RecordID As Integer, ByVal FieldName As String)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00252")
             '
             'If Not (true) Then Exit Sub
@@ -16564,7 +16529,7 @@ ErrorTrap:
             '
             MethodName = "main_IncrementContentField( " & iContentName & "," & EncodeText(iRecordID) & "," & iFieldName & " )"
             '
-            Call db_IncrementContentField_Internal(iContentName, iRecordID, iFieldName)
+            Call IncrementContentField_Internal(iContentName, iRecordID, iFieldName)
             '
             Exit Sub
             '
@@ -16577,7 +16542,7 @@ ErrorTrap:
         '
         '
         '
-        Public Sub db_IncrementContentField_Internal(ByVal ContentName As String, ByVal RecordID As Integer, ByVal FieldName As String)
+        Public Sub IncrementContentField_Internal(ByVal ContentName As String, ByVal RecordID As Integer, ByVal FieldName As String)
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00253")
             '
             'If Not (true) Then Exit Sub
@@ -16598,7 +16563,7 @@ ErrorTrap:
         '
         '
         '
-        Public Function db_EncodeSQLText(ByVal SourceText As String) As String
+        Public Function EncodeSQLText(ByVal SourceText As String) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00254")
             '
             'If Not (true) Then Exit Function
@@ -16610,7 +16575,7 @@ ErrorTrap:
             '
             MethodName = "main_EncodeSQLText( " & iSourceText & " )"
             '
-            db_EncodeSQLText = db.encodeSQLText(iSourceText)
+            EncodeSQLText = db.encodeSQLText(iSourceText)
             '
             Exit Function
             '
@@ -16633,24 +16598,24 @@ ErrorTrap:
         End Property
         '
         '========================================================================
-        '   main_GetCSField - Fast
+        '   main_cs_getField - Fast
         '       CSv is not checked
         '       All arguments typed
         '========================================================================
         '
-        Public Function db_cs_GetField(ByVal CSPointer As Integer, ByVal FieldName As String) As Object
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetCSField_Internal")
+        Public Function cs_GetField(ByVal CSPointer As Integer, ByVal FieldName As String) As Object
+            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("cs_getField_Internal")
             '
             'If Not (true) Then Exit Function
             '
-            db_cs_GetField = db.db_GetCSField(CSPointer, FieldName)
+            cs_GetField = db.cs_getField(CSPointer, FieldName)
             '
             Exit Function
             '
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError13("main_GetCSField_Internal")
+            Call handleLegacyError13("main_cs_getField_Internal")
             '
         End Function
         '
@@ -16925,7 +16890,7 @@ ErrorTrap:
         '
         '
         '
-        Public Function db_GetTableID(ByVal TableName As String) As Integer
+        Public Function GetTableID(ByVal TableName As String) As Integer
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00273")
             '
             'If Not (true) Then Exit Function
@@ -16935,10 +16900,10 @@ ErrorTrap:
             '
             MethodName = "main_GetTableID"
             '
-            db_GetTableID = -1
+            GetTableID = -1
             CS = db.cs_openSql("Select ID from ccTables where name=" & db.encodeSQLText(TableName), , 1)
-            If db.cs_Ok(CS) Then
-                db_GetTableID = db.cs_getInteger(CS, "ID")
+            If db.cs_ok(CS) Then
+                GetTableID = db.cs_getInteger(CS, "ID")
             End If
             Call db.cs_Close(CS)
             '
@@ -17225,10 +17190,10 @@ ErrorTrap:
                 '
                 currentRulesCnt = 0
                 dupRuleIdList = ""
-                rulesTablename = db_GetContentTablename(RulesContentName)
+                rulesTablename = GetContentTablename(RulesContentName)
                 SQL = "select " & RulesSecondaryFieldName & ",id from " & rulesTablename & " where (" & RulesPrimaryFieldname & "=" & PrimaryRecordID & ")and(active<>0) order by " & RulesSecondaryFieldName
                 currentRulesCnt = 0
-                currentRules = db.executeSql_getDataTable(SQL)
+                currentRules = db.executeSql(SQL)
                 currentRulesCnt = currentRules.Rows.Count
                 For GroupPtr = 0 To GroupCnt - 1
                     '
@@ -17270,13 +17235,13 @@ ErrorTrap:
                         ' Record exists and is needed, update the rule copy
                         '
                         SQL = "update " & rulesTablename & " set rulecopy=" & db.encodeSQLText(RuleCopy) & " where id=" & RuleId
-                        Call db.executeSql_getDataTable(SQL)
+                        Call db.executeSql(SQL)
                     ElseIf RuleNeeded And (Not RuleFound) Then
                         '
                         ' No record exists, and one is needed
                         '
                         CSRule = db.cs_insertRecord(RulesContentName)
-                        If db.cs_Ok(CSRule) Then
+                        If db.cs_ok(CSRule) Then
                             Call db.cs_set(CSRule, "Active", RuleNeeded)
                             Call db.cs_set(CSRule, RulesPrimaryFieldname, PrimaryRecordID)
                             Call db.cs_set(CSRule, RulesSecondaryFieldName, SecondaryRecordID)
@@ -17291,7 +17256,7 @@ ErrorTrap:
                         ' Record exists and it is not needed
                         '
                         SQL = "delete from " & rulesTablename & " where id=" & RuleId
-                        Call db.executeSql_getDataTable(SQL)
+                        Call db.executeSql(SQL)
                         RuleContentChanged = True
                     End If
                 Next
@@ -17300,7 +17265,7 @@ ErrorTrap:
                 '
                 If dupRuleIdList <> "" Then
                     SQL = "delete from " & rulesTablename & " where id in (" & Mid(dupRuleIdList, 2) & ")"
-                    Call db.executeSql_getDataTable(SQL)
+                    Call db.executeSql(SQL)
                     RuleContentChanged = True
                 End If
                 '        For GroupPtr = 0 To GroupCnt - 1
@@ -17313,7 +17278,7 @@ ErrorTrap:
                 '            '
                 '            ' ----- Update Record
                 '            '
-                '            CSRule = app.db_csOpen(RulesContentName, "(" & RulesPrimaryFieldname & "=" & PrimaryRecordID & ")and(" & RulesSecondaryFieldName & "=" & SecondaryRecordID & ")", , False)
+                '            CSRule = app.csOpen(RulesContentName, "(" & RulesPrimaryFieldname & "=" & PrimaryRecordID & ")and(" & RulesSecondaryFieldName & "=" & SecondaryRecordID & ")", , False)
                 '            If SupportRuleCopy And RuleNeeded And (app.csv_IsCSOK(CSRule)) Then
                 '                '
                 '                ' Record exists and is needed, update the rule copy
@@ -17323,8 +17288,8 @@ ErrorTrap:
                 '                '
                 '                ' No record exists, and one is needed
                 '                '
-                '                Call app.db_closeCS(CSRule)
-                '                CSRule = app.db_InsertCSRecord(RulesContentName)
+                '                Call app.closeCS(CSRule)
+                '                CSRule = app.InsertCSRecord(RulesContentName)
                 '                If app.csv_IsCSOK(CSRule) Then
                 '                    Call app.csv_SetCS(CSRule, "Active", RuleNeeded)
                 '                    Call app.csv_SetCS(CSRule, RulesPrimaryFieldname, PrimaryRecordID)
@@ -17341,7 +17306,7 @@ ErrorTrap:
                 '                Call main_DeleteCSRecord(CSRule)
                 '                RuleContentChanged = True
                 '            End If
-                '            Call app.db_closeCS(CSRule)
+                '            Call app.closeCS(CSRule)
                 '        Next
             End If
             If RuleContentChanged Then
@@ -17357,95 +17322,95 @@ ErrorTrap:
         End Sub
         '
         '========================================================================
-        '   main_GetCS Field, translate all fields to their best text equivalent, and encode for display
+        '   main_cs_get Field, translate all fields to their best text equivalent, and encode for display
         '========================================================================
         '
-        Public Function main_GetCSEncodedField(ByVal CSPointer As Integer, ByVal FieldName As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetCSEncodedField")
+        Public Function main_cs_getEncodedField(ByVal CSPointer As Integer, ByVal FieldName As String) As String
+            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("cs_getEncodedField")
             '
             Dim ContentName As String
             Dim RecordID As Integer
             '
             'If Not (true) Then Exit Function
             '
-            If db.db_IsCSFieldSupported(CSPointer, "id") And db.db_IsCSFieldSupported(CSPointer, "contentcontrolId") Then
+            If db.cs_isFieldSupported(CSPointer, "id") And db.cs_isFieldSupported(CSPointer, "contentcontrolId") Then
                 RecordID = db.cs_getInteger(CSPointer, "id")
                 ContentName = metaData.getContentNameByID(db.cs_getInteger(CSPointer, "contentcontrolId"))
             End If
-            main_GetCSEncodedField = html_encodeContent10(db.db_GetCS(EncodeInteger(CSPointer), EncodeText(FieldName)), user.id, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, user.isAuthenticated, Nothing, user.isEditingAnything)
+            main_cs_getEncodedField = html_encodeContent10(db.cs_get(EncodeInteger(CSPointer), EncodeText(FieldName)), user.id, ContentName, RecordID, 0, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, user.isAuthenticated, Nothing, user.isEditingAnything)
             Exit Function
             '
             ' ----- Error Trap
             '
 ErrorTrap:
-            Call handleLegacyError18("main_GetCSEncodedField")
+            Call handleLegacyError18("main_cs_getEncodedField")
         End Function
         '
         '=============================================================================================
-        '   main_GetCS calls
+        '   main_cs_get calls
         '=============================================================================================
         '
-        '        Public Function db.db_GetCSText(ByVal CSPointer As Integer, ByVal FieldName As String) As String
-        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetCSText")
+        '        Public Function db.cs_getText(ByVal CSPointer As Integer, ByVal FieldName As String) As String
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("cs_getText")
         '            '
         '            'If Not (true) Then Exit Function
         '            '
-        '            main_GetCSText = db.db_GetCSText(EncodeInteger(CSPointer), EncodeText(FieldName))
-        '            'main_GetCSText = encodeText(main_GetCSField_Internal(encodeInteger(CSPointer), encodeText(FieldName)))
+        '            main_cs_getText = db.cs_getText(EncodeInteger(CSPointer), EncodeText(FieldName))
+        '            'main_cs_getText = encodeText(main_cs_getField_Internal(encodeInteger(CSPointer), encodeText(FieldName)))
         '            '
         '            Exit Function
         'ErrorTrap:
-        '            Call handleLegacyError18("main_GetCSText")
+        '            Call handleLegacyError18("main_cs_getText")
         '        End Function
         '
         '=============================================================================================
-        '   main_GetCS calls
+        '   main_cs_get calls
         '=============================================================================================
         '
-        '        Public Function db.db_GetCSFilename(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal OriginalFilename As String, Optional ByVal ContentName As String = "") As String
-        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetCSFilename")
+        '        Public Function db.cs_getFilename(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal OriginalFilename As String, Optional ByVal ContentName As String = "") As String
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("cs_getFilename")
         '            '
         '            'If Not (true) Then Exit Function
         '            '
-        '            db.db_GetCSFilename = db.db_GetCSFilename(EncodeInteger(CSPointer), EncodeText(FieldName), EncodeText(OriginalFilename), encodeEmptyText(ContentName, ""))
+        '            db.cs_getFilename = db.cs_getFilename(EncodeInteger(CSPointer), EncodeText(FieldName), EncodeText(OriginalFilename), encodeEmptyText(ContentName, ""))
         '            '
         '            Exit Function
         'ErrorTrap:
-        '            Call handleLegacyError18("db.db_GetCSFilename")
+        '            Call handleLegacyError18("db.cs_getFilename")
         '        End Function
         '        '
-        '        Public Function db.db_GetCSBoolean(ByVal CSPointer As Integer, ByVal FieldName As String) As Boolean
-        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetCSBoolean")
+        '        Public Function db.cs_getBoolean(ByVal CSPointer As Integer, ByVal FieldName As String) As Boolean
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("cs_getBoolean")
         '            '
-        '            main_GetCSBoolean = db.db_GetCSBoolean((CSPointer), EncodeText(FieldName))
+        '            main_cs_getBoolean = db.cs_getBoolean((CSPointer), EncodeText(FieldName))
         '            '
         '            Exit Function
         'ErrorTrap:
-        '            Call handleLegacyError18("main_GetCSBoolean")
+        '            Call handleLegacyError18("main_cs_getBoolean")
         '        End Function
         '
 
         ''
-        'Public Function db.db_GetCSNumber(ByVal CSPointer As Integer, ByVal FieldName As String) As Double
-        '    db_xxGetCSNumber = db.db_GetCSNumber(EncodeInteger(CSPointer), EncodeText(FieldName))
+        'Public Function db.cs_getNumber(ByVal CSPointer As Integer, ByVal FieldName As String) As Double
+        '    xxcs_getNumber = db.cs_getNumber(EncodeInteger(CSPointer), EncodeText(FieldName))
         'End Function
         ''
         ''
         ''
-        'Public Function db.db_GetCSLookup(ByVal CSPointer As Integer, ByVal FieldName As String) As String
-        '    db_xxGetCSLookup = db.db_GetCSLookup(EncodeInteger(CSPointer), EncodeText(FieldName))
+        'Public Function db.cs_getLookup(ByVal CSPointer As Integer, ByVal FieldName As String) As String
+        '    xxcs_getLookup = db.cs_getLookup(EncodeInteger(CSPointer), EncodeText(FieldName))
         'End Function
         '
         '
         '
-        Public Function db_GetCSSource(ByVal CSPointer As Integer) As String
+        Public Function cs_getSource(ByVal CSPointer As Integer) As String
             Dim iCS As Integer
             '
             iCS = EncodeInteger(CSPointer)
-            If Not db.cs_Ok(iCS) Then
+            If Not db.cs_ok(iCS) Then
                 Call Err.Raise(ignoreInteger, "dll", "ContentSet is not main_CSOK")
             Else
-                db_GetCSSource = db.db_GetCSSource(iCS)
+                cs_getSource = db.cs_getSource(iCS)
             End If
         End Function
         '        '
@@ -17471,32 +17436,32 @@ ErrorTrap:
         '        '
         '        '
         '        '
-        '        Public Function db.db_GetCSRow(ByVal CSPointer As Integer) As Object
-        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetCSRow")
+        '        Public Function db.cs_getRow(ByVal CSPointer As Integer) As Object
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("cs_getRow")
         '            '
         '            'If Not (true) Then Exit Function
         '            '
-        '            main_GetCSRow = db.db_GetCSRow(EncodeInteger(CSPointer))
+        '            main_cs_getRow = db.cs_getRow(EncodeInteger(CSPointer))
         '            '
         '            Exit Function
         '            '
         '            ' ----- Error Trap
         '            '
         'ErrorTrap:
-        '            Call handleLegacyError18("main_GetCSRow")
+        '            Call handleLegacyError18("main_cs_getRow")
         '            '
         '        End Function
         ''
         ''
         ''
-        'Public Function db.db_GetCSRows(ByVal CSPointer As Integer) As Object
-        '    main_GetCSRows = db.db_GetCSRows(EncodeInteger(CSPointer))
+        'Public Function db.cs_getRows(ByVal CSPointer As Integer) As Object
+        '    main_cs_getRows = db.cs_getRows(EncodeInteger(CSPointer))
         'End Function
         ''
         ''
         ''
-        'Public Function main_GetCSRowCount(ByVal CSPointer As Integer) As Integer
-        '    main_GetCSRowCount = db.db_GetCSRowCount(EncodeInteger(CSPointer))
+        'Public Function main_cs_getRowCount(ByVal CSPointer As Integer) As Integer
+        '    main_cs_getRowCount = db.cs_getRowCount(EncodeInteger(CSPointer))
         'End Function
         ''
         ''   Leave interface
@@ -17701,25 +17666,25 @@ ErrorTrap:
             Call handleLegacyError18(MethodName)
             '
         End Function
-        '
-        '=============================================================================
-        ' Returns the connection string for a datasource
-        '=============================================================================
-        '
-        Public Function main_GetConnectionString(ByVal DataSourceName As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00342")
-            '
-            'If Not (true) Then Exit Function
-            '
-            main_GetConnectionString = db_GetConnectionString(EncodeText(DataSourceName))
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18("main_GetConnectionString")
-        End Function
+        '        '
+        '        '=============================================================================
+        '        ' Returns the connection string for a datasource
+        '        '=============================================================================
+        '        '
+        '        Public Function main_GetConnectionString(ByVal DataSourceName As String) As String
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00342")
+        '            '
+        '            'If Not (true) Then Exit Function
+        '            '
+        '            main_GetConnectionString = GetConnectionString(EncodeText(DataSourceName))
+        '            '
+        '            Exit Function
+        '            '
+        '            ' ----- Error Trap
+        '            '
+        'ErrorTrap:
+        '            Call handleLegacyError18("main_GetConnectionString")
+        'End Function
         '
         '=============================================================================
         ' Returns the connection string for a datasource
@@ -18098,7 +18063,7 @@ ErrorTrap:
         '
         '
         '
-        Public Function db_GetSortMethodByID(ByVal SortMethodID As Integer) As String
+        Public Function GetSortMethodByID(ByVal SortMethodID As Integer) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00352")
             '
             Dim CS As Integer
@@ -18106,9 +18071,9 @@ ErrorTrap:
             'If Not (true) Then Exit Function
             '
             If SortMethodID > 0 Then
-                CS = db_csOpenRecord("Sort Methods", SortMethodID)
-                If db.cs_Ok(CS) Then
-                    db_GetSortMethodByID = db.cs_getText(CS, "OrderByClause")
+                CS = csOpenRecord("Sort Methods", SortMethodID)
+                If db.cs_ok(CS) Then
+                    GetSortMethodByID = db.cs_getText(CS, "OrderByClause")
                 End If
                 Call db.cs_Close(CS)
             End If
@@ -18182,8 +18147,8 @@ ErrorTrap:
             '
             ' Lookup link in main_ContentWatch
             '
-            CSPointer = db.csOpen("Content Watch", "ContentRecordKey=" & db.encodeSQLText(ContentRecordKey), , , , , , "Link,Clicks")
-            If db.cs_Ok(CSPointer) Then
+            CSPointer = db.cs_open("Content Watch", "ContentRecordKey=" & db.encodeSQLText(ContentRecordKey), , , , , , "Link,Clicks")
+            If db.cs_ok(CSPointer) Then
                 main_GetContentWatchLinkByKey = db.cs_getText(CSPointer, "Link")
                 If EncodeBoolean(IncrementClicks) Then
                     Call db.cs_set(CSPointer, "Clicks", db.cs_getInteger(CSPointer, "clicks") + 1)
@@ -18407,22 +18372,22 @@ ErrorTrap:
                     If Trim(RequestName) = "" Then
                         Call error_AddUserError("A name is required to save this page")
                     Else
-                        CSBlock = db_csOpenRecord(ContentName, RecordID, True, True)
-                        If db.cs_Ok(CSBlock) Then
+                        CSBlock = csOpenRecord(ContentName, RecordID, True, True)
+                        If db.cs_ok(CSBlock) Then
                             FieldName = "copyFilename"
                             Copy = docProperties.getText(FieldName)
                             Copy = html_DecodeContent(Copy)
-                            If Copy <> db.db_GetCS(CSBlock, "copyFilename") Then
+                            If Copy <> db.cs_get(CSBlock, "copyFilename") Then
                                 Call db.cs_set(CSBlock, "copyFilename", Copy)
                                 SaveButNoChanges = False
                             End If
                             RecordName = docProperties.getText("name")
-                            If RecordName <> db.db_GetCS(CSBlock, "name") Then
+                            If RecordName <> db.cs_get(CSBlock, "name") Then
                                 Call db.cs_set(CSBlock, "name", RecordName)
                                 SaveButNoChanges = False
                             End If
                             Call main_AddLinkAlias(RecordName, RecordID, "")
-                            If (docProperties.getText("headline") <> db.db_GetCS(CSBlock, "headline")) Then
+                            If (docProperties.getText("headline") <> db.cs_get(CSBlock, "headline")) Then
                                 Call db.cs_set(CSBlock, "headline", docProperties.getText("headline"))
                                 SaveButNoChanges = False
                             End If
@@ -18444,14 +18409,14 @@ ErrorTrap:
                     '
                     '
                     CSBlock = db.cs_insertRecord(ContentName)
-                    If db.cs_Ok(CSBlock) Then
+                    If db.cs_ok(CSBlock) Then
                         Call db.cs_set(CSBlock, "active", True)
                         Call db.cs_set(CSBlock, "ParentID", RecordID)
                         Call db.cs_set(CSBlock, "contactmemberid", user.id)
                         Call db.cs_set(CSBlock, "name", "New Page added " & main_PageStartTime & " by " & user.name)
                         Call db.cs_set(CSBlock, "copyFilename", "")
                         RecordID = db.cs_getInteger(CSBlock, "ID")
-                        Call db.db_SaveCSRecord(CSBlock)
+                        Call db.cs_save2(CSBlock)
                         '
                         Link = pageManager_GetPageLink4(RecordID, "", True, False)
                         'Link = main_GetPageLink(RecordID)
@@ -18473,21 +18438,21 @@ ErrorTrap:
                     '
                     '
                     '
-                    CSBlock = db_csOpen(ContentName, RecordID, , , "ParentID")
-                    If db.cs_Ok(CSBlock) Then
+                    CSBlock = csOpen(ContentName, RecordID, , , "ParentID")
+                    If db.cs_ok(CSBlock) Then
                         ParentID = db.cs_getInteger(CSBlock, "ParentID")
                     End If
                     Call db.cs_Close(CSBlock)
                     If ParentID <> 0 Then
                         CSBlock = db.cs_insertRecord(ContentName)
-                        If db.cs_Ok(CSBlock) Then
+                        If db.cs_ok(CSBlock) Then
                             Call db.cs_set(CSBlock, "active", True)
                             Call db.cs_set(CSBlock, "ParentID", ParentID)
                             Call db.cs_set(CSBlock, "contactmemberid", user.id)
                             Call db.cs_set(CSBlock, "name", "New Page added " & main_PageStartTime & " by " & user.name)
                             Call db.cs_set(CSBlock, "copyFilename", "")
                             RecordID = db.cs_getInteger(CSBlock, "ID")
-                            Call db.db_SaveCSRecord(CSBlock)
+                            Call db.cs_save2(CSBlock)
                             '
                             Link = pageManager_GetPageLink4(RecordID, "", True, False)
                             'Link = main_GetPageLink(RecordID)
@@ -18507,14 +18472,14 @@ ErrorTrap:
                     Call cache.invalidateTagCommaList(ContentName)
                 End If
                 If (Button = ButtonDelete) Then
-                    CSBlock = db_csOpen(ContentName, RecordID)
-                    If db.cs_Ok(CSBlock) Then
+                    CSBlock = csOpen(ContentName, RecordID)
+                    If db.cs_ok(CSBlock) Then
                         ParentID = db.cs_getInteger(CSBlock, "parentid")
                     End If
                     Call db.cs_Close(CSBlock)
                     '
                     Call pageManager_DeleteChildRecords(ContentName, RecordID, False)
-                    Call db_DeleteContentRecord(ContentName, RecordID)
+                    Call DeleteContentRecord(ContentName, RecordID)
                     '
                     If Not main_WorkflowSupport Then
                         'Call AppendLog("pageManager_ProcessFormQuickEditor, 9-call pageManager_cache_pageContent_clear")
@@ -18763,7 +18728,7 @@ ErrorTrap:
                         If ChildPagesFound Then
                             ChildPageCount = main_GetSectionMenu_AddChildMenu_ReturnChildCount(MenuID, ContentName, LinkWorking, Tier1MenuCaption, "," & EncodeText(MenuID), MenuNamePrefix, 1, DepthLimit, childListSortMethodId, SectionID, AddRootButton, UseContentWatchLink)
                             If (ChildPageCount = 0) And (True) Then
-                                Call db.executeSql_getDataTable("update ccpagecontent set ChildPagesFound=0 where id=" & MenuID)
+                                Call db.executeSql("update ccpagecontent set ChildPagesFound=0 where id=" & MenuID)
                             End If
                         End If
                         pageManager_GetSectionMenu_NameMenu = pageManager_GetSectionMenu_NameMenu & vbReplace(menuFlyout.getMenu(MenuNamePrefix & EncodeText(MenuID), MenuStyle, StyleSheetPrefix), vbCrLf, "")
@@ -19017,14 +18982,14 @@ ErrorTrap:
                                         '
                                         ' ChildPagesFound flag is true, but no pages were found - clear flag
                                         '
-                                        Call db.executeSql_getDataTable("update ccpagecontent set ChildPagesFound=0 where id=" & PageID)
+                                        Call db.executeSql("update ccpagecontent set ChildPagesFound=0 where id=" & PageID)
                                         'Call AppendLog("main_GetSectionMenu_IdMenu, 4-call pageManager_cache_pageContent_updateRow")
                                         Call pageManager_cache_pageContent_updateRow(PageID, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
                                     ElseIf (ChildPageCount > 0) And (Not ChildPagesFound) Then
                                         '
                                         ' ChildPagesFlag is cleared, but pages were found -- set the flag
                                         '
-                                        Call db.executeSql_getDataTable("update ccpagecontent set ChildPagesFound=1 where id=" & PageID)
+                                        Call db.executeSql("update ccpagecontent set ChildPagesFound=1 where id=" & PageID)
                                         'Call AppendLog("main_GetSectionMenu_IdMenu, 5-call pageManager_cache_pageContent_updateRow")
                                         Call pageManager_cache_pageContent_updateRow(PageID, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
                                     End If
@@ -19117,9 +19082,9 @@ ErrorTrap:
             If (ParentMenuID > 0) And (MenuDepth <= MenuDepthMax) Then
                 MenuDepthLocal = MenuDepth + 1
                 UsedPageIDStringLocal = UsedPageIDString
-                OrderByCriteria = db_GetSortMethodByID(childListSortMethodId)
+                OrderByCriteria = GetSortMethodByID(childListSortMethodId)
                 If OrderByCriteria = "" Then
-                    OrderByCriteria = db_GetContentProperty(ContentName, "defaultsortmethod")
+                    OrderByCriteria = GetContentProperty(ContentName, "defaultsortmethod")
                 End If
                 If OrderByCriteria = "" Then
                     OrderByCriteria = "ID"
@@ -19259,7 +19224,7 @@ ErrorTrap:
                                                 ' no pages were found, clear the child pages found property
                                                 ' child pages found property is set at admin site when a page is saved with this as the parent id
                                                 '
-                                                Call db.executeSql_getDataTable("update ccpagecontent set ChildPagesFound=0 where id=" & MenuID)
+                                                Call db.executeSql("update ccpagecontent set ChildPagesFound=0 where id=" & MenuID)
                                                 'Call AppendLog("main_GetHtmlBody_GetSection_GetContentMenu_AddChildMenu, 6-call pageManager_cache_pageContent_updateRow -- fix here to NOT call pageManager_cache_pageContent_updateRow()")
                                                 cache_pageContent(PCC_ChildPagesFound, ChildPointer) = "0"
                                                 'Call pageManager_cache_pageContent_updateRow(MenuID, main_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
@@ -19267,7 +19232,7 @@ ErrorTrap:
                                                 '
                                                 ' pages were found, set the child pages found property
                                                 '
-                                                Call db.executeSql_getDataTable("update ccpagecontent set ChildPagesFound=1 where id=" & MenuID)
+                                                Call db.executeSql("update ccpagecontent set ChildPagesFound=1 where id=" & MenuID)
                                                 'Call AppendLog("main_GetHtmlBody_GetSection_GetContentMenu_AddChildMenu, 7-call pageManager_cache_pageContent_updateRow -- fix here to NOT call pageManager_cache_pageContent_updateRow()")
                                                 cache_pageContent(PCC_ChildPagesFound, ChildPointer) = "1"
                                                 'Call pageManager_cache_pageContent_updateRow(MenuID, main_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
@@ -19581,7 +19546,7 @@ ErrorTrap:
                     '
                     ' Section/Page connection at RootPageID, show all sections
                     '
-                    CSSections = db.csOpen("Site Sections", , , , , ,, SelectFieldList)
+                    CSSections = db.cs_open("Site Sections", , , , , ,, SelectFieldList)
                 Else
                     '
                     ' Section/Page connection at RootPageID, only show sections connected to the menu
@@ -19592,7 +19557,7 @@ ErrorTrap:
                         & " left join ccDynamicMenus M on M.ID=R.DynamicMenuID)" _
                         & " where M.ID=" & MenuID
                     Criteria = "ID in (" & SQL & ")"
-                    CSSections = db.csOpen("Site Sections", Criteria, , , , , , SelectFieldList)
+                    CSSections = db.cs_open("Site Sections", Criteria, , , , , , SelectFieldList)
                 End If
                 '        '
                 '        ' Section/Page connection at RootPageID
@@ -19605,7 +19570,7 @@ ErrorTrap:
                 '            & " where M.ID=" & MenuID
                 '        Criteria = "ID in (" & SQL & ")"
                 '        ShowHiddenMenu = main_IsEditing("Site Sections")
-                '        CSSections = app.db_csOpen("Site Sections", Criteria, , , , , SelectFieldList)
+                '        CSSections = app.csOpen("Site Sections", Criteria, , , , , SelectFieldList)
             ElseIf (True) Then
                 '
                 ' Multiple Menus with ccDynamicMenuSectionRules
@@ -19617,7 +19582,7 @@ ErrorTrap:
                     '
                     ' Section/Page connection at RootPageID, show all sections
                     '
-                    CSSections = db.csOpen("Site Sections", , , , , , , SelectFieldList)
+                    CSSections = db.cs_open("Site Sections", , , , , , , SelectFieldList)
                 Else
                     '
                     ' Section/Page connection at RootPageID, only show sections connected to the menu
@@ -19628,7 +19593,7 @@ ErrorTrap:
                         & " left join ccDynamicMenus M on M.ID=R.DynamicMenuID)" _
                         & " where M.ID=" & MenuID
                     Criteria = "ID in (" & SQL & ")"
-                    CSSections = db.csOpen("Site Sections", Criteria, , , , ,, SelectFieldList)
+                    CSSections = db.cs_open("Site Sections", Criteria, , , , ,, SelectFieldList)
                 End If
                 '        SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,BlockSection"
                 '        SQL = "Select Distinct S.ID" _
@@ -19638,8 +19603,8 @@ ErrorTrap:
                 '            & " where M.ID=" & MenuID
                 '        Criteria = "ID in (" & SQL & ")"
                 '        ShowHiddenMenu = main_IsEditing("Site Sections")
-                '        CSSections = app.db_csOpen("Site Sections", Criteria, , , , , SelectFieldList)
-            ElseIf db_IsSQLTableField("Default", "ccSections", "BlockSection") Then
+                '        CSSections = app.csOpen("Site Sections", Criteria, , , , , SelectFieldList)
+            ElseIf IsSQLTableField("Default", "ccSections", "BlockSection") Then
                 '
                 ' All sections menu mode with block sections
                 '
@@ -19647,8 +19612,8 @@ ErrorTrap:
                 Criteria = ""
                 ShowHiddenMenu = user.isEditingAnything()
                 'ShowHiddenMenu = main_IsEditing("Site Sections")
-                CSSections = db.csOpen("Site Sections", Criteria, , , , ,, SelectFieldList)
-            ElseIf db_IsSQLTableField("Default", "ccSections", "MenuImageOverFilename") Then
+                CSSections = db.cs_open("Site Sections", Criteria, , , , ,, SelectFieldList)
+            ElseIf IsSQLTableField("Default", "ccSections", "MenuImageOverFilename") Then
                 '
                 ' All sections menu mode with Image Over
                 '
@@ -19656,8 +19621,8 @@ ErrorTrap:
                 Criteria = ""
                 ShowHiddenMenu = user.isEditingAnything()
                 'ShowHiddenMenu = main_IsEditing("Site Sections")
-                CSSections = db.csOpen("Site Sections", Criteria, , , , ,, SelectFieldList)
-            ElseIf db_IsSQLTableField("Default", "ccSections", "HideMenu") Then
+                CSSections = db.cs_open("Site Sections", Criteria, , , , ,, SelectFieldList)
+            ElseIf IsSQLTableField("Default", "ccSections", "HideMenu") Then
                 '
                 ' All sections menu mode with HideMenu
                 '
@@ -19665,14 +19630,14 @@ ErrorTrap:
                 Criteria = ""
                 ShowHiddenMenu = user.isEditingAnything()
                 'ShowHiddenMenu = main_IsEditing("Site Sections")
-                CSSections = db.csOpen("Site Sections", Criteria, , , , ,, SelectFieldList)
+                CSSections = db.cs_open("Site Sections", Criteria, , , , ,, SelectFieldList)
             Else
                 SelectFieldList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,'' as MenuImageOverFilename,0 as HideMenu,0 as BlockSection,0 as RootPageID"
                 Criteria = ""
                 ShowHiddenMenu = True
-                CSSections = db.csOpen("Site Sections", Criteria, , , , ,, SelectFieldList)
+                CSSections = db.cs_open("Site Sections", Criteria, , , , ,, SelectFieldList)
             End If
-            Do While db.cs_Ok(CSSections)
+            Do While db.cs_ok(CSSections)
                 HideMenu = db.cs_getBoolean(CSSections, "HideMenu")
                 BlockSection = db.cs_getBoolean(CSSections, "BlockSection")
                 SectionID = db.cs_getInteger(CSSections, "ID")
@@ -19680,19 +19645,19 @@ ErrorTrap:
                     SectionName = Trim(db.cs_getText(CSSections, "Name"))
                     If SectionName = "" Then
                         SectionName = "Section " & SectionID
-                        Call db.executeSql_getDataTable("update ccSections set Name=" & db.encodeSQLText(SectionName) & " where ID=" & SectionID)
+                        Call db.executeSql("update ccSections set Name=" & db.encodeSQLText(SectionName) & " where ID=" & SectionID)
                     End If
                     SectionCaption = db.cs_getText(CSSections, "Caption")
                     If SectionCaption = "" Then
                         SectionCaption = SectionName
-                        Call db.executeSql_getDataTable("update ccSections set Caption=" & db.encodeSQLText(SectionCaption) & " where ID=" & SectionID)
+                        Call db.executeSql("update ccSections set Caption=" & db.encodeSQLText(SectionCaption) & " where ID=" & SectionID)
                     End If
                     If HideMenu Then
                         SectionCaption = "[Hidden: " & SectionCaption & "]"
                     End If
                     SectionTemplateID = db.cs_getInteger(CSSections, "TemplateID")
                     ContentID = db.cs_getInteger(CSSections, "ContentID")
-                    If (ContentID <> PageContentCID) And (Not db_IsWithinContent(ContentID, PageContentCID)) Then
+                    If (ContentID <> PageContentCID) And (Not IsWithinContent(ContentID, PageContentCID)) Then
                         ContentID = PageContentCID
                         Call db.cs_set(CSSections, "ContentID", ContentID)
                     End If
@@ -19703,7 +19668,7 @@ ErrorTrap:
                         If ContentName = "" Then
                             ContentName = "Page Content"
                             ContentID = main_GetContentID(ContentName)
-                            Call db.executeSql_getDataTable("update ccSections set ContentID=" & ContentID & " where ID=" & SectionID)
+                            Call db.executeSql("update ccSections set ContentID=" & ContentID & " where ID=" & SectionID)
                         End If
                     End If
                     MenuImage = db.cs_getText(CSSections, "MenuImageFilename")
@@ -19726,14 +19691,14 @@ ErrorTrap:
                         '
                         PCCPtr = pageManager_cache_pageContent_getFirstNamePtr(SectionName, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
                         'SelectFieldList = "ID,TemplateID,0 as BlockPage"
-                        'CSPage = app.db_csOpen(ContentName, "name=" & encodeSQLText(SectionName), "ID", , , , SelectFieldList)
+                        'CSPage = app.csOpen(ContentName, "name=" & encodeSQLText(SectionName), "ID", , , , SelectFieldList)
                     ElseIf False Then '.3.613" Then
                         '
                         ' blockpage,section-page connection by name
                         '
                         PCCPtr = pageManager_cache_pageContent_getFirstNamePtr(SectionName, pagemanager_IsWorkflowRendering, main_RenderCache_CurrentPage_IsQuickEditing)
                         'SelectFieldList = "ID,TemplateID,BlockPage"
-                        'CSPage = app.db_csOpen(ContentName, "name=" & encodeSQLText(SectionName), "ID", , , , SelectFieldList)
+                        'CSPage = app.csOpen(ContentName, "name=" & encodeSQLText(SectionName), "ID", , , , SelectFieldList)
                     Else
                         '
                         ' section-page connection by name
@@ -19794,7 +19759,7 @@ ErrorTrap:
                     End If
                     '
                 End If
-                Call db.db_csGoNext(CSSections)
+                Call db.cs_goNext(CSSections)
             Loop
             AuthoringTag = main_GetRecordAddLink("Site Sections", "MenuID=" & MenuID)
             If AuthoringTag <> "" Then
@@ -19836,7 +19801,7 @@ ErrorTrap:
                     & " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" & db.encodeSQLDate(main_PageStartTime) & ")" _
                     & " AND ((ccMemberRules.MemberID)=" & user.id & "));"
                 CS = db.cs_openSql(SQL)
-                pageManager_BypassContentBlock = db.cs_Ok(CS)
+                pageManager_BypassContentBlock = db.cs_ok(CS)
                 Call db.cs_Close(CS)
             End If
             '
@@ -19993,10 +19958,10 @@ ErrorTrap:
             '
             '    CS = main_OpenCSContentRecord("Page Content", PageID, , , "Name,ParentID")
             '    If app.csv_IsCSOK(CS) Then
-            '        PageName2 = db.db_GetCSText(CS, "Name")
-            '        ParentID = app.db_GetCSInteger(CS, "ParentID")
+            '        PageName2 = db.cs_getText(CS, "Name")
+            '        ParentID = app.cs_getInteger(CS, "ParentID")
             '    End If
-            '    Call app.db_closeCS(CS)
+            '    Call app.closeCS(CS)
             '
             ' Chase page tree to main_Get templateid
             '
@@ -20012,11 +19977,11 @@ ErrorTrap:
                     main_GetPageDynamicLink_GetSectionID = EncodeInteger(cache_siteSection(SSC_ID, Ptr))
                 End If
                 '        '
-                '        CS = app.db_csOpen("Site Sections", "rootpageid=" & PageID, "ID", , , , "ID")
+                '        CS = app.csOpen("Site Sections", "rootpageid=" & PageID, "ID", , , , "ID")
                 '        If app.csv_IsCSOK(CS) Then
-                '            main_GetPageDynamicLink_GetSectionID = app.db_GetCSInteger(CS, "ID")
+                '            main_GetPageDynamicLink_GetSectionID = app.cs_getInteger(CS, "ID")
                 '        End If
-                '        Call app.db_closeCS(CS)
+                '        Call app.closeCS(CS)
                 '        'main_GetPageDynamicLink_GetSectionID = main_GetRecordID("Site Sections", PageName2)
             Else
                 '
@@ -20047,8 +20012,8 @@ ErrorTrap:
             Dim templateId As Integer
             '
             '
-            CS = db_csOpen("Page Content", PageID, , , "TemplateID,ParentID")
-            If db.cs_Ok(CS) Then
+            CS = csOpen("Page Content", PageID, , , "TemplateID,ParentID")
+            If db.cs_ok(CS) Then
                 templateId = db.cs_getInteger(CS, "TemplateID")
                 ParentID = db.cs_getInteger(CS, "ParentID")
             End If
@@ -20543,9 +20508,9 @@ ErrorTrap:
                 End If
                 CS = -1
                 If templateId <> 0 Then
-                    CS = db_csOpenRecord(ContentName, templateId, , , FieldList)
+                    CS = csOpenRecord(ContentName, templateId, , , FieldList)
                 End If
-                If (templateId = 0) Or (Not db.cs_Ok(CS)) Then
+                If (templateId = 0) Or (Not db.cs_ok(CS)) Then
                     '
                     ' ----- if template not found, return default template
                     '       if this operation fails, exit now -- do not continue and create new template
@@ -20556,30 +20521,30 @@ ErrorTrap:
                         ' ----- attempt to use the domain's default template
                         '
                         Call db.cs_Close(CS)
-                        CS = db_csOpenRecord(ContentName, domains.domainDetails.defaultTemplateId, , , FieldList)
-                        If Not db.cs_Ok(CS) Then
+                        CS = csOpenRecord(ContentName, domains.domainDetails.defaultTemplateId, , , FieldList)
+                        If Not db.cs_ok(CS) Then
                             '
                             ' the defaultemplateid in the domain is not valid
                             '
-                            Call db.executeSql_getDataTable("update ccdomains set defaulttemplateid=0 where defaulttemplateid=" & domains.domainDetails.defaultTemplateId)
+                            Call db.executeSql("update ccdomains set defaulttemplateid=0 where defaulttemplateid=" & domains.domainDetails.defaultTemplateId)
                             Call cache.invalidateTagCommaList("domains")
                         End If
                     End If
-                    If Not db.cs_Ok(CS) Then
+                    If Not db.cs_ok(CS) Then
                         '
                         ' ----- attempt to use the site's default template
                         '
                         Call db.cs_Close(CS)
-                        CS = db.csOpen(ContentName, "name=" & db.encodeSQLText(TemplateDefaultName), "ID", , , , , FieldList)
+                        CS = db.cs_open(ContentName, "name=" & db.encodeSQLText(TemplateDefaultName), "ID", , , , , FieldList)
                     End If
-                    If db.cs_Ok(CS) Then
+                    If db.cs_ok(CS) Then
                         main_RenderedTemplateID = db.cs_getInteger(CS, "ID")
                         main_RenderedTemplateName = db.cs_getText(CS, "name")
                         pageManager_TemplateName = main_RenderedTemplateName
-                        pageManager_TemplateLink = main_verifyTemplateLink(db.db_GetCS(CS, "Link"))
-                        'pageManager_TemplateLink = app.csv_GetCS(CS, "Link")
+                        pageManager_TemplateLink = main_verifyTemplateLink(db.cs_get(CS, "Link"))
+                        'pageManager_TemplateLink = app.csv_cs_get(CS, "Link")
                         If True Then
-                            pageManager_TemplateBody = db.db_GetCS(CS, "BodyHTML")
+                            pageManager_TemplateBody = db.cs_get(CS, "BodyHTML")
                         End If
                     End If
                     Call db.cs_Close(CS)
@@ -20590,7 +20555,7 @@ ErrorTrap:
                         pageManager_TemplateName = TemplateDefaultName
                         pageManager_TemplateBody = TemplateDefaultBody
                         CS = db.cs_insertRecord("Page Templates")
-                        If db.cs_Ok(CS) Then
+                        If db.cs_ok(CS) Then
                             main_RenderedTemplateID = db.cs_getInteger(CS, "ID")
                             main_RenderedTemplateName = TemplateDefaultName
                             Call db.cs_set(CS, "name", TemplateDefaultName)
@@ -20611,12 +20576,12 @@ ErrorTrap:
                     ' ----- load template
                     '
                     If True Then
-                        pageManager_TemplateBody = db.db_GetCS(CS, "BodyHTML")
+                        pageManager_TemplateBody = db.cs_get(CS, "BodyHTML")
                     Else
                         pageManager_TemplateBody = "<!-- Template Body support requires a Contensive database upgrade through the Application Manager. -->" & TemplateDefaultBody
                     End If
-                    pageManager_TemplateName = db.db_GetCS(CS, "name")
-                    pageManager_TemplateLink = main_verifyTemplateLink(db.db_GetCS(CS, "Link"))
+                    pageManager_TemplateName = db.cs_get(CS, "name")
+                    pageManager_TemplateLink = main_verifyTemplateLink(db.cs_get(CS, "Link"))
                 End If
                 Call db.cs_Close(CS)
                 pageManager_TemplateLink = main_verifyTemplateLink(pageManager_TemplateLink)
@@ -20649,8 +20614,8 @@ ErrorTrap:
         '
         '
         '
-        Public Function main_GetCS2Text(ByVal CSPointer As Integer, ByVal FieldName As String) As String
-            main_GetCS2Text = db.db_GetCS(EncodeInteger(CSPointer), EncodeText(FieldName))
+        Public Function main_cs_get2Text(ByVal CSPointer As Integer, ByVal FieldName As String) As String
+            main_cs_get2Text = db.cs_get(EncodeInteger(CSPointer), EncodeText(FieldName))
         End Function
         '        '
         '        '=============================================================================================
@@ -20658,12 +20623,12 @@ ErrorTrap:
         '        '       Saves the value, encoded correctly for the field type
         '        '=============================================================================================
         '        '
-        '        Public Sub app.db_SetCS(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal FieldValue As String)
+        '        Public Sub app.SetCS(ByVal CSPointer As Integer, ByVal FieldName As String, ByVal FieldValue As String)
         '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("SetCS")
         '            '
         '            'If Not (true) Then Exit Sub
         '            '
-        '            Call app.db_SetCS(EncodeInteger(CSPointer), EncodeText(FieldName), FieldValue)
+        '            Call app.SetCS(EncodeInteger(CSPointer), EncodeText(FieldName), FieldValue)
         '            '
         '            Exit Sub
         'ErrorTrap:
@@ -20731,19 +20696,19 @@ ErrorTrap:
                     '
                     ' Template Specified
                     '
-                    CS = db_csOpen("AutoSite Templates", templateId, , , "Copy,StyleSheetID")
-                    If db.cs_Ok(CS) Then
-                        main_GetAutoSite_Template = db.db_GetCS(CS, "Copy")
-                        StyleSheetID = EncodeInteger(db.db_GetCS(CS, "StyleSheetID"))
+                    CS = csOpen("AutoSite Templates", templateId, , , "Copy,StyleSheetID")
+                    If db.cs_ok(CS) Then
+                        main_GetAutoSite_Template = db.cs_get(CS, "Copy")
+                        StyleSheetID = EncodeInteger(db.cs_get(CS, "StyleSheetID"))
                     End If
                     Call db.cs_Close(CS)
                     '
                     ' StyleSheet Specified
                     '
                     If StyleSheetID <> 0 Then
-                        CS = db_csOpen("AutoSite Styles", StyleSheetID, , , "Copy")
-                        If db.cs_Ok(CS) Then
-                            StyleSheetCopy = db.db_GetCS(CS, "Copy")
+                        CS = csOpen("AutoSite Styles", StyleSheetID, , , "Copy")
+                        If db.cs_ok(CS) Then
+                            StyleSheetCopy = db.cs_get(CS, "Copy")
                         End If
                         Call db.cs_Close(CS)
                     End If
@@ -20791,8 +20756,8 @@ ErrorTrap:
                 Else
                     FieldList = "ID,Name,MetaDescription,OtherHeadTags,MetaKeywordList"
                 End If
-                CS = db.csOpen("Meta Content", Criteria, , , , ,, FieldList)
-                If db.cs_Ok(CS) Then
+                CS = db.cs_open("Meta Content", Criteria, , , , ,, FieldList)
+                If db.cs_ok(CS) Then
                     MetaContentID = db.cs_getInteger(CS, "ID")
                     Call main_AddPagetitle2(html.html_EncodeHTML(db.cs_getText(CS, "Name")), "page content")
                     Call main_addMetaDescription2(html.html_EncodeHTML(db.cs_getText(CS, "MetaDescription")), "page content")
@@ -20800,9 +20765,9 @@ ErrorTrap:
                     If True Then
                         KeywordList = vbReplace(db.cs_getText(CS, "MetaKeywordList"), vbCrLf, ",")
                     End If
-                    'main_MetaContent_Title = encodeHTML(app.csv_GetCSText(CS, "Name"))
-                    'main_MetaContent_Description = encodeHTML(app.csv_GetCSText(CS, "MetaDescription"))
-                    'main_MetaContent_OtherHeadTags = app.csv_GetCSText(CS, "OtherHeadTags")
+                    'main_MetaContent_Title = encodeHTML(app.csv_cs_getText(CS, "Name"))
+                    'main_MetaContent_Description = encodeHTML(app.csv_cs_getText(CS, "MetaDescription"))
+                    'main_MetaContent_OtherHeadTags = app.csv_cs_getText(CS, "OtherHeadTags")
                 End If
                 Call db.cs_Close(CS)
                 '
@@ -20813,9 +20778,9 @@ ErrorTrap:
                     & " LEFT JOIN ccMetaKeywordRules on ccMetaKeywordRules.MetaKeywordID=ccMetaKeywords.ID" _
                     & " Where ccMetaKeywordRules.MetaContentID=" & MetaContentID
                 CS = db.cs_openSql(SQL)
-                Do While db.cs_Ok(CS)
+                Do While db.cs_ok(CS)
                     KeywordList = KeywordList & "," & db.cs_getText(CS, "Name")
-                    Call db.db_csGoNext(CS)
+                    Call db.cs_goNext(CS)
                 Loop
                 If KeywordList <> "" Then
                     If Left(KeywordList, 1) = "," Then
@@ -21083,7 +21048,7 @@ ErrorTrap:
                         Dim FromAddress As String = siteProperties.getText("EmailFromAddress", "info@" & main_ServerDomain)
                         Call main_SendFormEmail(siteProperties.emailAdmin, FromAddress, "Form Submitted on " & web_requestReferer)
                         Dim cs As Integer = db.cs_insertRecord("User Form Response")
-                        If db.cs_Ok(cs) Then
+                        If db.cs_ok(cs) Then
                             Call db.cs_set(cs, "name", "Form " & webServer.requestReferrer)
                             Dim Copy As String = ""
                             For Each kvp As KeyValuePair(Of String, docPropertiesClass) In docProperties.docPropertiesDict
@@ -21169,14 +21134,14 @@ ErrorTrap:
                             If libraryFilePtr >= 0 Then
                                 libraryFileClicks = EncodeInteger(cache_libraryFiles(LibraryFilesCache_clicks, libraryFilePtr))
                                 link = EncodeText(cache_libraryFiles(LibraryFilesCache_filename, libraryFilePtr))
-                                Call db.executeSql_getDataTable("update cclibraryfiles set clicks=" & (libraryFileClicks + 1) & " where id=" & downloadId)
+                                Call db.executeSql("update cclibraryfiles set clicks=" & (libraryFileClicks + 1) & " where id=" & downloadId)
                             End If
                             If link <> "" Then
                                 '
                                 ' ----- create log entry
                                 '
                                 Dim CSPointer As Integer = db.cs_insertRecord("Library File Log")
-                                If db.cs_Ok(CSPointer) Then
+                                If db.cs_ok(CSPointer) Then
                                     Call db.cs_set(CSPointer, "FileID", downloadId)
                                     Call db.cs_set(CSPointer, "VisitId", visit_Id)
                                     Call db.cs_set(CSPointer, "MemberID", user.id)
@@ -21235,7 +21200,7 @@ ErrorTrap:
                                     Else
                                         ClipChildContentID = EncodeInteger(ClipBoardArray(0))
                                         ClipChildRecordID = EncodeInteger(ClipBoardArray(1))
-                                        If Not db_IsWithinContent(ClipChildContentID, ClipParentContentID) Then
+                                        If Not IsWithinContent(ClipChildContentID, ClipParentContentID) Then
                                             Call error_AddUserError("The paste operation failed because the destination location is not compatible with the clipboard data.")
                                         Else
                                             '
@@ -21254,8 +21219,8 @@ ErrorTrap:
                                                     ' the parent record is not a child of the child record (circular check)
                                                     '
                                                     ClipChildRecordName = "record " & ClipChildRecordID
-                                                    CSClip = db_csOpenRecord(ClipChildContentName, ClipChildRecordID, True, True)
-                                                    If Not db.cs_Ok(CSClip) Then
+                                                    CSClip = csOpenRecord(ClipChildContentName, ClipChildRecordID, True, True)
+                                                    If Not db.cs_ok(CSClip) Then
                                                         Call error_AddUserError("The paste operation failed because the data record referenced by the clipboard could not found.")
                                                     Else
                                                         '
@@ -21266,7 +21231,7 @@ ErrorTrap:
                                                             '
                                                             ' Legacy paste - go right to the parent id
                                                             '
-                                                            If Not db.db_IsCSFieldSupported(CSClip, "ParentID") Then
+                                                            If Not db.cs_isFieldSupported(CSClip, "ParentID") Then
                                                                 Call error_AddUserError("The paste operation failed because the record you are pasting does not   support the necessary parenting feature.")
                                                             Else
                                                                 Call db.cs_set(CSClip, "ParentID", ClipParentRecordID)
@@ -21287,7 +21252,7 @@ ErrorTrap:
                                                                 If UBound(NameValues) = 0 Then
                                                                     Call error_AddUserError("The paste operation failed because the clipboard data Field List is not configured correctly.")
                                                                 Else
-                                                                    If Not db.db_IsCSFieldSupported(CSClip, CStr(NameValues(0))) Then
+                                                                    If Not db.cs_isFieldSupported(CSClip, CStr(NameValues(0))) Then
                                                                         Call error_AddUserError("The paste operation failed because the clipboard data Field [" & CStr(NameValues(0)) & "] is not supported by the location data.")
                                                                     Else
                                                                         Call db.cs_set(CSClip, CStr(NameValues(0)), CStr(NameValues(1)))
@@ -21307,8 +21272,8 @@ ErrorTrap:
                                                     '
                                                     ' Set Child Pages Found and clear caches
                                                     '
-                                                    CSClip = db_csOpen(ClipParentContentName, ClipParentRecordID, , , "ChildPagesFound")
-                                                    If db.cs_Ok(CSClip) Then
+                                                    CSClip = csOpen(ClipParentContentName, ClipParentRecordID, , , "ChildPagesFound")
+                                                    If db.cs_ok(CSClip) Then
                                                         Call db.cs_set(CSClip, "ChildPagesFound", True.ToString)
                                                     End If
                                                     Call db.cs_Close(CSClip)
@@ -21438,9 +21403,9 @@ ErrorTrap:
                                         ' if match, go look it up and verify all OK
                                         '
                                         isLinkForward = False
-                                        Sql = db_GetSQLSelect("", "ccLinkForwards", "ID,DestinationLink,Viewings,GroupID", LinkForwardCriteria, "ID", , 1)
+                                        Sql = GetSQLSelect("", "ccLinkForwards", "ID,DestinationLink,Viewings,GroupID", LinkForwardCriteria, "ID", , 1)
                                         CSPointer = db.cs_openSql(Sql)
-                                        If db.cs_Ok(CSPointer) Then
+                                        If db.cs_ok(CSPointer) Then
                                             '
                                             ' Link Forward found - update count
                                             '
@@ -21451,7 +21416,7 @@ ErrorTrap:
                                             IsInLinkForwardTable = True
                                             Viewings = db.cs_getInteger(CSPointer, "Viewings") + 1
                                             Sql = "update ccLinkForwards set Viewings=" & Viewings & " where ID=" & db.cs_getInteger(CSPointer, "ID")
-                                            Call db.executeSql_getDataTable(Sql)
+                                            Call db.executeSql(Sql)
                                             Link = db.cs_getText(CSPointer, "DestinationLink")
                                             If Link <> "" Then
                                                 '
@@ -21561,8 +21526,8 @@ ErrorTrap:
                                             '
                                             ' Add a new Link Forward entry
                                             '
-                                            CSPointer = db_InsertCSContent("Link Forwards")
-                                            If db.cs_Ok(CSPointer) Then
+                                            CSPointer = InsertCSContent("Link Forwards")
+                                            If db.cs_ok(CSPointer) Then
                                                 Call db.cs_set(CSPointer, "Name", webServer.requestPathPage)
                                                 Call db.cs_set(CSPointer, "sourcelink", webServer.requestPathPage)
                                                 Call db.cs_set(CSPointer, "Viewings", 1)
@@ -22016,7 +21981,7 @@ ErrorTrap:
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetRecordID_Internal")
             '
             If True Then
-                main_GetRecordID_Internal = db_GetRecordID(EncodeText(ContentName), EncodeText(RecordName))
+                main_GetRecordID_Internal = GetRecordID(EncodeText(ContentName), EncodeText(RecordName))
             End If
 
             Exit Function
@@ -22045,7 +22010,7 @@ ErrorTrap:
         Public Function main_GetRecordName(ByVal ContentName As String, ByVal RecordID As Integer) As String
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("Proc00414")
             '
-            main_GetRecordName = db_GetRecordName(EncodeText(ContentName), EncodeInteger(RecordID))
+            main_GetRecordName = GetRecordName(EncodeText(ContentName), EncodeInteger(RecordID))
 
             Exit Function
 ErrorTrap:
@@ -22102,14 +22067,14 @@ ErrorTrap:
             Dim Id As Integer
             '
             CS = db.cs_insertRecord(ContentName, CreatedBy)
-            If db.cs_Ok(CS) Then
+            If db.cs_ok(CS) Then
                 Id = db.cs_getInteger(CS, "ID")
                 Call db.cs_set(CS, "name", PageName)
                 Call db.cs_set(CS, "active", "1")
                 If True Then
                     Call db.cs_set(CS, "ccGuid", pageGuid)
                 End If
-                Call db.db_SaveCSRecord(CS)
+                Call db.cs_save2(CS)
                 Call workflow.publishEdit("Page Content", Id)
             End If
             Call db.cs_Close(CS)
@@ -22152,14 +22117,14 @@ ErrorTrap:
                     If LoopPtr <> 0 Then
                         SectionNameTry = SectionName & " " & (LoopPtr + 1)
                     End If
-                    CS = db.csOpen("Site Sections", "name=" & db.encodeSQLText(SectionNameTry), , ,, , , "ID")
-                    NameOK = Not db.cs_Ok(CS)
+                    CS = db.cs_open("Site Sections", "name=" & db.encodeSQLText(SectionNameTry), , ,, , , "ID")
+                    NameOK = Not db.cs_ok(CS)
                     Call db.cs_Close(CS)
                     LoopPtr = LoopPtr + 1
                 Loop
                 '
                 CS = db.cs_insertRecord("Site Sections")
-                If db.cs_Ok(CS) Then
+                If db.cs_ok(CS) Then
                     SectionID = db.cs_getInteger(CS, "ID")
                     Call db.cs_set(CS, "Name", SectionNameTry)
                     Call db.cs_set(CS, "Caption", DefaultLandingSectionName)
@@ -22179,8 +22144,8 @@ ErrorTrap:
                 '
                 ' main_Get the Default Menu ID
                 '
-                CS = db.csOpen("Dynamic Menus", "(name='Default')", "ID", , ,, , "ID")
-                If db.cs_Ok(CS) Then
+                CS = db.cs_open("Dynamic Menus", "(name='Default')", "ID", , ,, , "ID")
+                If db.cs_ok(CS) Then
                     DefaultMenuID = db.cs_getInteger(CS, "ID")
                 End If
                 Call db.cs_Close(CS)
@@ -22188,7 +22153,7 @@ ErrorTrap:
                 ' Add the new landing section to the default menu
                 '
                 CS = db.cs_insertRecord("Dynamic Menu Section Rules")
-                If db.cs_Ok(CS) Then
+                If db.cs_ok(CS) Then
                     Call db.cs_set(CS, "DynamicMenuID", DefaultMenuID)
                     Call db.cs_set(CS, "SectionID", SectionID)
                 End If
@@ -22220,7 +22185,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Sub
             '
-            Call db.db_RollBackCS(EncodeInteger(CSPointer))
+            Call db.cs_rollBack(EncodeInteger(CSPointer))
             '
             Exit Sub
 ErrorTrap:
@@ -22260,7 +22225,7 @@ ErrorTrap:
                         & " and R.Active<>0" _
                         & " and M.Active<>0" _
                         & " and ((M.DateExpires is null)or(M.DateExpires>" & db.encodeSQLDate(main_PageStartTime) & "))"
-                    SQL = db_GetSQLSelect("", "ccmemberRules M,ccSectionBlockRules R", "M.ID", SQLWhere, , , 1)
+                    SQL = GetSQLSelect("", "ccmemberRules M,ccSectionBlockRules R", "M.ID", SQLWhere, , , 1)
                     CS = db.cs_openSql(SQL)
                     'SQL = "select ID" _
                     '    & " from ccMemberRules M,ccSectionBlockRules R" _
@@ -22270,7 +22235,7 @@ ErrorTrap:
                     '    & " and R.Active<>0" _
                     '    & " and M.Active<>0" _
                     '    & " and ((M.DateExpires is null)or(M.DateExpires>" & main_SQlPageStartTime & "))"
-                    'CS = app.db_openCsSql_rev("default", SQL, 1, 1)
+                    'CS = app.openCsSql_rev("default", SQL, 1, 1)
                     'SQL = "select top 1 *" _
                     '    & " from ccMemberRules M,ccSectionBlockRules R" _
                     '    & " where M.MemberID=" & memberID _
@@ -22279,8 +22244,8 @@ ErrorTrap:
                     '    & " and R.Active<>0" _
                     '    & " and M.Active<>0" _
                     '    & " and ((M.DateExpires is null)or(M.DateExpires>" & main_SQlPageStartTime & "))"
-                    'CS = app.db_openCsSql(SQL)
-                    main_isSectionBlocked = Not (db.cs_Ok(CS))
+                    'CS = app.openCsSql(SQL)
+                    main_isSectionBlocked = Not (db.cs_ok(CS))
                     Call db.cs_Close(CS)
                 End If
             End If
@@ -22330,8 +22295,8 @@ ErrorTrap:
                 '
                 ' First try main_ContentWatch table for a link
                 '
-                CSPointer = db.csOpen("Content Watch", "ContentRecordKey=" & db.encodeSQLText(ContentRecordKey), , , ,, , "Link,Clicks")
-                If db.cs_Ok(CSPointer) Then
+                CSPointer = db.cs_open("Content Watch", "ContentRecordKey=" & db.encodeSQLText(ContentRecordKey), , , ,, , "Link,Clicks")
+                If db.cs_ok(CSPointer) Then
                     main_GetLinkByContentRecordKey = db.cs_getText(CSPointer, "Link")
                 End If
                 Call db.cs_Close(CSPointer)
@@ -22347,9 +22312,9 @@ ErrorTrap:
                             ContentName = metaData.getContentNameByID(ContentID)
                             RecordID = EncodeInteger(KeySplit(1))
                             If ContentName <> "" And RecordID <> 0 Then
-                                If db_GetContentTablename(ContentName) = "ccPageContent" Then
-                                    CSPointer = db_csOpen(ContentName, RecordID, , , "TemplateID,ParentID")
-                                    If db.cs_Ok(CSPointer) Then
+                                If GetContentTablename(ContentName) = "ccPageContent" Then
+                                    CSPointer = csOpen(ContentName, RecordID, , , "TemplateID,ParentID")
+                                    If db.cs_ok(CSPointer) Then
                                         recordfound = True
                                         templateId = db.cs_getInteger(CSPointer, "TemplateID")
                                         ParentID = db.cs_getInteger(CSPointer, "ParentID")
@@ -22359,24 +22324,24 @@ ErrorTrap:
                                         '
                                         ' This content record does not exist - remove any records with this ContentRecordKey pointer
                                         '
-                                        'Call app.db_DeleteContentRecords("Topic Rules", "ContentRecordKey=" & encodeSQLText(ContentRecordKey))
-                                        'Call app.db_DeleteContentRecords("Topic Habits", "ContentRecordKey=" & encodeSQLText(ContentRecordKey))
+                                        'Call app.DeleteContentRecords("Topic Rules", "ContentRecordKey=" & encodeSQLText(ContentRecordKey))
+                                        'Call app.DeleteContentRecords("Topic Habits", "ContentRecordKey=" & encodeSQLText(ContentRecordKey))
                                         Call db.deleteContentRecords("Content Watch", "ContentRecordKey=" & db.encodeSQLText(ContentRecordKey))
                                         Call metaData_DeleteContentTracking(ContentName, RecordID, True)
                                     Else
 
                                         If templateId <> 0 Then
-                                            CSPointer = db_csOpen("Page Templates", templateId, , , "Link")
-                                            If db.cs_Ok(CSPointer) Then
+                                            CSPointer = csOpen("Page Templates", templateId, , , "Link")
+                                            If db.cs_ok(CSPointer) Then
                                                 main_GetLinkByContentRecordKey = db.cs_getText(CSPointer, "Link")
                                             End If
                                             Call db.cs_Close(CSPointer)
                                         End If
                                         If main_GetLinkByContentRecordKey = "" And ParentID <> 0 Then
-                                            TableName = db_GetContentTablename(ContentName)
+                                            TableName = GetContentTablename(ContentName)
                                             DataSource = main_GetContentDataSource(ContentName)
-                                            CSPointer = db.db_openCsSql_rev(DataSource, "Select ContentControlID from " & TableName & " where ID=" & RecordID)
-                                            If db.cs_Ok(CSPointer) Then
+                                            CSPointer = db.cs_openCsSql_rev(DataSource, "Select ContentControlID from " & TableName & " where ID=" & RecordID)
+                                            If db.cs_ok(CSPointer) Then
                                                 ParentContentID = EncodeInteger(db.cs_getText(CSPointer, "ContentControlID"))
                                             End If
                                             Call db.cs_Close(CSPointer)
@@ -22429,9 +22394,9 @@ ErrorTrap:
                 CS = main_OpenCSContentWatchList(ListName, SortField, True)
             End If
             '
-            If db.cs_Ok(CS) Then
+            If db.cs_ok(CS) Then
                 ContentID = main_GetContentID("Content Watch")
-                Do While db.cs_Ok(CS)
+                Do While db.cs_ok(CS)
                     Link = db.cs_getText(CS, "link")
                     LinkLabel = db.cs_getText(CS, "LinkLabel")
                     RecordID = db.cs_getInteger(CS, "ID")
@@ -22444,7 +22409,7 @@ ErrorTrap:
                         End If
                         main_GetWatchList = main_GetWatchList & "</li>"
                     End If
-                    Call db.db_csGoNext(CS)
+                    Call db.cs_goNext(CS)
                 Loop
                 If main_GetWatchList <> "" Then
                     main_GetWatchList = html_GetContentCopy("Watch List Caption: " & ListName, ListName, user.id, True, user.isAuthenticated) & cr & "<ul class=""ccWatchList"">" & kmaIndent(main_GetWatchList) & cr & "</ul>"
@@ -22583,9 +22548,9 @@ ErrorTrap:
             '
             If Not IsInDelimitedString(UsedIDString, CStr(RecordID), ",") Then
                 ContentName = metaData.getContentNameByID(ContentID)
-                CS = db_csOpen(ContentName, RecordID, False, False)
-                If db.cs_Ok(CS) Then
-                    HasParentID = db.db_IsCSFieldSupported(CS, "ParentID")
+                CS = csOpen(ContentName, RecordID, False, False)
+                If db.cs_ok(CS) Then
+                    HasParentID = db.cs_isFieldSupported(CS, "ParentID")
                     RecordContentID = db.cs_getInteger(CS, "ContentControlID")
                     RecordContentName = metaData.getContentNameByID(RecordContentID)
                 End If
@@ -22595,18 +22560,18 @@ ErrorTrap:
                     '
                     '
                     DataSourceName = main_GetContentDataSource(RecordContentName)
-                    RecordTableName = db_GetContentTablename(RecordContentName)
+                    RecordTableName = GetContentTablename(RecordContentName)
                     '
                     ' either Workflow on non-workflow - it changes everything
                     '
                     SQL = "update " & RecordTableName & " set ContentControlID=" & NewContentControlID & " where ID=" & RecordID & " or EditSourceID=" & RecordID
-                    Call db.executeSql_getDataTable(SQL, DataSourceName)
+                    Call db.executeSql(SQL, DataSourceName)
                     If HasParentID Then
                         SQL = "select contentcontrolid,ID from " & RecordTableName & " where ParentID=" & RecordID
-                        CS = db.db_openCsSql_rev(DataSourceName, SQL)
-                        Do While db.cs_Ok(CS)
+                        CS = db.cs_openCsSql_rev(DataSourceName, SQL)
+                        Do While db.cs_ok(CS)
                             Call content_SetContentControl(db.cs_getInteger(CS, "contentcontrolid"), db.cs_getInteger(CS, "ID"), NewContentControlID, UsedIDString & "," & RecordID)
-                            db.db_csGoNext(CS)
+                            db.cs_goNext(CS)
                         Loop
                         Call db.cs_Close(CS)
                     End If
@@ -22614,7 +22579,7 @@ ErrorTrap:
                     ' fix content watch
                     '
                     SQL = "update ccContentWatch set ContentID=" & NewContentControlID & ", ContentRecordKey='" & NewContentControlID & "." & RecordID & "' where ContentID=" & ContentID & " and RecordID=" & RecordID
-                    Call db.executeSql_getDataTable(SQL)
+                    Call db.executeSql(SQL)
                     '            '
                     '            ' fix Topic Rules
                     '            '
@@ -22715,9 +22680,9 @@ ErrorTrap:
             Dim CS As Integer
             Dim PageID As Integer
             '
-            CS = db.csOpen("Copy Content", "name=" & db.encodeSQLText(ContentBlockCopyName), "ID", , , , , "Copy,ID")
-            If db.cs_Ok(CS) Then
-                pageManager_GetDefaultBlockMessage = db.db_GetCS(CS, "Copy")
+            CS = db.cs_open("Copy Content", "name=" & db.encodeSQLText(ContentBlockCopyName), "ID", , , , , "Copy,ID")
+            If db.cs_ok(CS) Then
+                pageManager_GetDefaultBlockMessage = db.cs_get(CS, "Copy")
             End If
             Call db.cs_Close(CS)
             '
@@ -22730,11 +22695,11 @@ ErrorTrap:
             ' ----- Create Copy Content Record for future
             '
             CS = db.cs_insertRecord("Copy Content")
-            If db.cs_Ok(CS) Then
+            If db.cs_ok(CS) Then
                 Call db.cs_set(CS, "Name", ContentBlockCopyName)
                 Call db.cs_set(CS, "Copy", pageManager_GetDefaultBlockMessage)
-                Call db.db_SaveCSRecord(CS)
-                Call workflow.publishEdit("Copy Content", EncodeInteger(db.db_GetCS(CS, "ID")))
+                Call db.cs_save2(CS)
+                Call workflow.publishEdit("Copy Content", EncodeInteger(db.cs_get(CS, "ID")))
             End If
             '
             Exit Function
@@ -22898,8 +22863,8 @@ ErrorTrap:
             '
             IsRetry = (docProperties.getInteger("ContensiveFormPageID") <> 0)
             '
-            CS = db.csOpen("Form Pages", "name=" & db.encodeSQLText(FormPageName))
-            If db.cs_Ok(CS) Then
+            CS = db.cs_open("Form Pages", "name=" & db.encodeSQLText(FormPageName))
+            If db.cs_ok(CS) Then
                 FormPageID = db.cs_getInteger(CS, "ID")
                 Formhtml = db.cs_getText(CS, "Body")
                 FormInstructions = db.cs_getText(CS, "Instructions")
@@ -22923,14 +22888,14 @@ ErrorTrap:
                             Else
                                 CaptionSpan = "<span>"
                             End If
-                            If Not db.cs_Ok(CSPeople) Then
-                                CSPeople = db_csOpen("people", user.id)
+                            If Not db.cs_ok(CSPeople) Then
+                                CSPeople = csOpen("people", user.id)
                             End If
                             Caption = .Caption
-                            If .REquired Or EncodeBoolean(db_GetContentFieldProperty("People", .PeopleField, "Required")) Then
+                            If .REquired Or EncodeBoolean(GetContentFieldProperty("People", .PeopleField, "Required")) Then
                                 Caption = "*" & Caption
                             End If
-                            If db.cs_Ok(CSPeople) Then
+                            If db.cs_ok(CSPeople) Then
                                 Body = f.RepeatCell
                                 Body = vbReplace(Body, "{{CAPTION}}", CaptionSpan & Caption & "</span>", 1, 99, vbTextCompare)
                                 Body = vbReplace(Body, "{{FIELD}}", html_GetFormInputCS(CSPeople, "People", .PeopleField), 1, 99, vbTextCompare)
@@ -23005,8 +22970,8 @@ ErrorTrap:
             '
             ' main_Get the instructions from the record
             '
-            CS = db_csOpen("Form Pages", FormPageID)
-            If db.cs_Ok(CS) Then
+            CS = csOpen("Form Pages", FormPageID)
+            If db.cs_ok(CS) Then
                 Formhtml = db.cs_getText(CS, "Body")
                 FormInstructions = db.cs_getText(CS, "Instructions")
             End If
@@ -23032,10 +22997,10 @@ ErrorTrap:
                                 ' People Record
                                 '
                                 FormValue = docProperties.getText(.PeopleField)
-                                If (FormValue <> "") And EncodeBoolean(db_GetContentFieldProperty("people", .PeopleField, "uniquename")) Then
+                                If (FormValue <> "") And EncodeBoolean(GetContentFieldProperty("people", .PeopleField, "uniquename")) Then
                                     SQL = "select count(*) from ccMembers where " & .PeopleField & "=" & db.encodeSQLText(FormValue)
                                     CS = db.cs_openSql(SQL)
-                                    If db.cs_Ok(CS) Then
+                                    If db.cs_ok(CS) Then
                                         Success = db.cs_getInteger(CS, "cnt") = 0
                                     End If
                                     Call db.cs_Close(CS)
@@ -23043,14 +23008,14 @@ ErrorTrap:
                                         error_AddUserError("The field [" & .Caption & "] must be unique, and the value [" & html.html_EncodeHTML(FormValue) & "] has already been used.")
                                     End If
                                 End If
-                                If (.REquired Or EncodeBoolean(db_GetContentFieldProperty("people", .PeopleField, "required"))) And FormValue = "" Then
+                                If (.REquired Or EncodeBoolean(GetContentFieldProperty("people", .PeopleField, "required"))) And FormValue = "" Then
                                     Success = False
                                     error_AddUserError("The field [" & html.html_EncodeHTML(.Caption) & "] is required.")
                                 Else
-                                    If Not db.cs_Ok(CSPeople) Then
-                                        CSPeople = db_csOpen("people", user.id)
+                                    If Not db.cs_ok(CSPeople) Then
+                                        CSPeople = csOpen("people", user.id)
                                     End If
-                                    If db.cs_Ok(CSPeople) Then
+                                    If db.cs_ok(CSPeople) Then
                                         Select Case vbUCase(.PeopleField)
                                             Case "NAME"
                                                 PeopleName = FormValue
@@ -23093,7 +23058,7 @@ ErrorTrap:
                 ' Create People Name
                 '
                 If PeopleName = "" And PeopleFirstName <> "" And PeopleLastName <> "" Then
-                    If db.cs_Ok(CSPeople) Then
+                    If db.cs_ok(CSPeople) Then
                         Call db.cs_set(CSPeople, "name", PeopleFirstName & " " & PeopleLastName)
                     End If
                 End If
@@ -23150,15 +23115,15 @@ ErrorTrap:
             Dim Copy As String
             '
             Call db.deleteContentRecords("Form Pages", "name=" & db.encodeSQLText("Registration Form"))
-            CS = db.csOpen("Form Pages", "name=" & db.encodeSQLText("Registration Form"))
-            If Not db.cs_Ok(CS) Then
+            CS = db.cs_open("Form Pages", "name=" & db.encodeSQLText("Registration Form"))
+            If Not db.cs_ok(CS) Then
                 '
                 ' create Version 1 template - just to main_Get it started
                 '
                 Call db.cs_Close(CS)
                 GroupNameList = "Registered"
                 CS = db.cs_insertRecord("Form Pages")
-                If db.cs_Ok(CS) Then
+                If db.cs_ok(CS) Then
                     Call db.cs_set(CS, "name", "Registration Form")
                     Copy = "" _
                         & vbCrLf & "<table border=""0"" cellpadding=""2"" cellspacing=""0"" width=""100%"">" _
@@ -23269,27 +23234,27 @@ ErrorTrap:
                 '
                 ' Open the Menu
                 '
-                CS = db_csOpen("Dynamic Menus", MenuID)
-                If Not db.cs_Ok(CS) Then
+                CS = csOpen("Dynamic Menus", MenuID)
+                If Not db.cs_ok(CS) Then
                     '
                     ' ID was given, but no found in Db
                     '
                     Call db.cs_Close(CS)
-                    CS = db_csOpen("Dynamic Menus", menu_VerifyDynamicMenu("Default"))
+                    CS = csOpen("Dynamic Menus", menu_VerifyDynamicMenu("Default"))
                 End If
-                If db.cs_Ok(CS) Then
+                If db.cs_ok(CS) Then
                     '
                     ' setup arguments from Content
                     '
-                    EditLink = cs_GetCSRecordEditLink(CS)
+                    EditLink = cs_cs_getRecordEditLink(CS)
                     MenuName = db.cs_getText(CS, "Name")
                     MenuDepth = db.cs_getInteger(CS, "Depth")
                     MenuStylePrefix = db.cs_getText(CS, "StylePrefix")
                     MenuDelimiter = db.cs_getText(CS, "Delimiter")
                     FlyoutOnHover = db.cs_getBoolean(CS, "FlyoutOnHover").ToString
                     ' LookupList should return the text for the value saved - to be compatible with the old hardcoded text
-                    FlyoutDirection = db.db_GetCS(CS, "FlyoutDirection")
-                    Layout = db.db_GetCS(CS, "Layout")
+                    FlyoutDirection = db.cs_get(CS, "FlyoutDirection")
+                    Layout = db.cs_get(CS, "Layout")
                     MenuStyle = 0
                     '
                     ' Add exclusive styles
@@ -23392,14 +23357,14 @@ ErrorTrap:
         '
         ' This is a copy of the routine in CSrv -- duplicated so I do not have to make a public until the interface is worked-out
         '
-        Public Function db_GetSQLSelect(ByVal DataSourceName As String, ByVal From As String, Optional ByVal FieldList As String = "", Optional ByVal Where As String = "", Optional ByVal OrderBy As String = "", Optional ByVal GroupBy As String = "", Optional ByVal RecordLimit As Integer = 0) As String
+        Public Function GetSQLSelect(ByVal DataSourceName As String, ByVal From As String, Optional ByVal FieldList As String = "", Optional ByVal Where As String = "", Optional ByVal OrderBy As String = "", Optional ByVal GroupBy As String = "", Optional ByVal RecordLimit As Integer = 0) As String
             On Error GoTo ErrorTrap
             '
             'If Not (true) Then Exit Function
             '
             Dim SQL As String
             '
-            Select Case db.db_GetDataSourceType(DataSourceName)
+            Select Case db.getDataSourceType(DataSourceName)
                 Case DataSourceTypeODBCMySQL
                     SQL = "SELECT"
                     SQL &= " " & FieldList
@@ -23437,7 +23402,7 @@ ErrorTrap:
                         SQL &= " GROUP BY " & GroupBy
                     End If
             End Select
-            db_GetSQLSelect = SQL
+            GetSQLSelect = SQL
             '
             Exit Function
 ErrorTrap:
@@ -23446,7 +23411,7 @@ ErrorTrap:
         '
         '
         '
-        Public Sub db_cs_setFormInput(ByVal CSPointer As Integer, ByVal FieldName As String, Optional ByVal RequestName As String = "")
+        Public Sub cs_setFormInput(ByVal CSPointer As Integer, ByVal FieldName As String, Optional ByVal RequestName As String = "")
             On Error GoTo ErrorTrap
             '
             Dim LocalRequestName As String
@@ -23455,7 +23420,7 @@ ErrorTrap:
             '
             'If Not (true) Then Exit Sub
             '
-            If Not db.cs_Ok(CSPointer) Then
+            If Not db.cs_ok(CSPointer) Then
                 Throw New ApplicationException("ContentSetPointer is invalid, empty, or end-of-file")
             ElseIf Trim(FieldName) = "" Then
                 Throw New ApplicationException("FieldName is invalid or blank")
@@ -23464,7 +23429,7 @@ ErrorTrap:
                 If LocalRequestName = "" Then
                     LocalRequestName = FieldName
                 End If
-                Select Case db.db_GetCSFieldTypeId(CSPointer, FieldName)
+                Select Case db.cs_getFieldTypeId(CSPointer, FieldName)
                     Case FieldTypeIdBoolean
                         '
                         ' Boolean
@@ -23561,7 +23526,7 @@ ErrorTrap:
                 ' Put styles inline if requested, and if there has been an upgrade
                 '
                 pageManager_GetStyleTagPublic = pageManager_GetStyleTagPublic & cr & StyleSheetStart & pageManager_GetStyleSheet() & cr & StyleSheetEnd
-            ElseIf (db.siteproperty_dataBuildVersion <> cp.Version()) Then
+            ElseIf (siteProperties.dataBuildVersion <> cp.Version()) Then
                 '
                 ' Put styles inline if requested, and if there has been an upgrade
                 '
@@ -23582,7 +23547,7 @@ ErrorTrap:
             StyleSN = EncodeInteger(siteProperties.getText("StylesheetSerialNumber", "0"))
             If StyleSN = 0 Then
                 admin_GetStyleTagAdmin = cr & StyleSheetStart & pageManager_GetStyleSheetDefault() & cr & StyleSheetEnd
-            ElseIf (db.siteproperty_dataBuildVersion <> cp.Version()) Then
+            ElseIf (siteProperties.dataBuildVersion <> cp.Version()) Then
                 admin_GetStyleTagAdmin = cr & "<!-- styles forced inline because database upgrade needed -->" & StyleSheetStart & pageManager_GetStyleSheetDefault() & cr & StyleSheetEnd
             Else
                 If StyleSN < 0 Then
@@ -23685,12 +23650,12 @@ ErrorTrap:
         '            ProcessACTags = ((EncodeActiveFormatting Or EncodeActivePersonalization Or EncodeActiveImages Or EncodeActiveEditIcons)) And (InStr(1, Source, "<ac ", vbTextCompare) <> 0)
         '            If ProcessACTags Then
         '                'CSFormattingContext = encodeEmptyInteger(CSFormattingContext, -1)
-        '                If app.db_csOk(CSFormattingContext) Then
-        '                    FormattingContentID = app.db_GetCSInteger(CSFormattingContext, "ContentControlID")
+        '                If app.csOk(CSFormattingContext) Then
+        '                    FormattingContentID = app.cs_getInteger(CSFormattingContext, "ContentControlID")
         '                    ContextContentName = metaData.getContentNameByID(FormattingContentID)
-        '                    ContextRecordID = app.db_GetCSInteger(CSFormattingContext, "ID")
-        '                    If app.db_IsCSFieldSupported(CSFormattingContext, "ContactMemberID") Then
-        '                        ContextContactPeopleID = app.db_GetCSInteger(CSFormattingContext, "ContactMemberID")
+        '                    ContextRecordID = app.cs_getInteger(CSFormattingContext, "ID")
+        '                    If app.IsCSFieldSupported(CSFormattingContext, "ContactMemberID") Then
+        '                        ContextContactPeopleID = app.cs_getInteger(CSFormattingContext, "ContactMemberID")
         '                    End If
         '                End If
         '            End If
@@ -23857,7 +23822,7 @@ ErrorTrap:
                     '
                     '
                     '
-                    rulesTablename = db_GetContentTablename(RulesContentName)
+                    rulesTablename = GetContentTablename(RulesContentName)
                     SingularPrefixHtmlEncoded = html.html_EncodeHTML(GetSingular(SecondaryContentName)) & "&nbsp;"
                     '
                     main_MemberShipCount = 0
@@ -23912,12 +23877,12 @@ ErrorTrap:
                                 SQL &= "and(" & SecondaryTablename & ".editsourceid is null)"
                             End If
                             CS = db.cs_openSql(SQL)
-                            If db.cs_Ok(CS) Then
+                            If db.cs_ok(CS) Then
                                 If True Then
                                     main_MemberShipSize = 10
                                     ReDim main_MemberShip(main_MemberShipSize)
                                     ReDim main_MemberShipRuleCopy(main_MemberShipSize)
-                                    Do While db.cs_Ok(CS)
+                                    Do While db.cs_ok(CS)
                                         If main_MemberShipCount >= main_MemberShipSize Then
                                             main_MemberShipSize = main_MemberShipSize + 10
                                             ReDim Preserve main_MemberShip(main_MemberShipSize)
@@ -23926,7 +23891,7 @@ ErrorTrap:
                                         main_MemberShip(main_MemberShipCount) = db.cs_getInteger(CS, "ID")
                                         main_MemberShipRuleCopy(main_MemberShipCount) = db.cs_getText(CS, "RuleCopy")
                                         main_MemberShipCount = main_MemberShipCount + 1
-                                        db.db_csGoNext(CS)
+                                        db.cs_goNext(CS)
                                     Loop
                                 End If
                             End If
@@ -23978,7 +23943,7 @@ ErrorTrap:
                         End If
                         SQL &= SecondaryTablename & "." & CaptionFieldName
                         CS = db.cs_openSql(SQL)
-                        If Not db.cs_Ok(CS) Then
+                        If Not db.cs_ok(CS) Then
                             returnHtml = "(No choices are available.)"
                         Else
                             If True Then
@@ -23990,7 +23955,7 @@ ErrorTrap:
                                 DivCnt = 0
                                 CanSeeHiddenFields = user.isAuthenticatedDeveloper()
                                 DivName = TagName & ".All"
-                                Do While db.cs_Ok(CS)
+                                Do While db.cs_ok(CS)
                                     OptionName = db.cs_getText(CS, "OptionName")
                                     If (Mid(OptionName, 1, 1) <> "_") Or CanSeeHiddenFields Then
                                         '
@@ -24099,7 +24064,7 @@ ErrorTrap:
                                         CheckBoxCnt = CheckBoxCnt + 1
                                         DivCheckBoxCnt = DivCheckBoxCnt + 1
                                     End If
-                                    db.db_csGoNext(CS)
+                                    db.cs_goNext(CS)
                                 Loop
                                 returnHtml &= EndDiv
                                 returnHtml &= "<input type=""hidden"" name=""" & TagName & ".RowCount"" value=""" & CheckBoxCnt & """>" & vbCrLf
@@ -24164,9 +24129,9 @@ ErrorTrap:
 
                 If main_GetFormInputCheckListCategories = "" Then
                     EmptyDivID = TagName & ".empty"
-                    SQL = db_GetSQLSelect("", "ccContentCategories", "ID,ContentCategoryID,Name", , "Name")
+                    SQL = GetSQLSelect("", "ccContentCategories", "ID,ContentCategoryID,Name", , "Name")
                     CS = db.cs_openSql(SQL)
-                    Do While db.cs_Ok(CS)
+                    Do While db.cs_ok(CS)
                         Caption = db.cs_getText(CS, "name")
                         Id = db.cs_getInteger(CS, "ID")
                         CurrentFolderID = db.cs_getInteger(CS, "ContentCategoryID")
@@ -24183,7 +24148,7 @@ ErrorTrap:
                         s = s & cr & "<li class=""ccAdminSmall ccPanel""><a href=""#"" onclick=""" & JSSwitch & """>" & Caption & "</a></li>"
                         'Call Tree.AddEntry(CStr(Id), CStr(CurrentFolderID), , , Link, Caption, JSSwitch)
                         'Call Tree.AddEntry(CStr(ID), CStr(CurrentFolderID), , , Link, Caption, "switchContentFolderDiv( '" & TagName & ".ContentCategoryID" & ID & "', OldFolder" & main_CheckListCnt & ",'" & TagName & ".ContentCaption'," & JSCaption & "); OldFolder" & main_CheckListCnt & "='" & TagName & ".ContentCategoryID" & ID & "';")
-                        Call db.db_csGoNext(CS)
+                        Call db.cs_goNext(CS)
                     Loop
                     Call db.cs_Close(CS)
                     LeftPane = cr & "<ul>" & kmaIndent(s) & cr & "</ul>"
@@ -24709,7 +24674,7 @@ ErrorTrap:
             On Error GoTo ErrorTrap
             If cache_linkAliasCnt = 0 Then
                 Dim rs As DataTable
-                rs = db.executeSql_getDataTable("select " & cache_linkAlias_fieldList & " from ccLinkAliases where (active<>0) order by id desc")
+                rs = db.executeSql("select " & cache_linkAlias_fieldList & " from ccLinkAliases where (active<>0) order by id desc")
                 If rs.Rows.Count > 0 Then
                     cache_linkAlias_NameIndex = New coreKeyPtrIndexClass
                     cache_linkAlias_PageIdQSSIndex = New coreKeyPtrIndexClass
@@ -24902,14 +24867,14 @@ ErrorTrap:
         ''
         ''
         ''
-        'public Function main_GetCsv() As ContentServerClass
-        '    On Error GoTo ErrorTrap: 'Dim th as integer: th = profileLogMethodEnter("GetCsv")
+        'public Function main_cs_getv() As ContentServerClass
+        '    On Error GoTo ErrorTrap: 'Dim th as integer: th = profileLogMethodEnter("cs_getv")
         '    '
-        '    main_GetCsv = main_cmc
+        '    main_cs_getv = main_cmc
         '    '
         '    Exit Function
         'ErrorTrap:
-        '    Call main_HandleClassErrorAndResume_TrapPatch1("main_GetCsv")
+        '    Call main_HandleClassErrorAndResume_TrapPatch1("main_cs_getv")
         'End Function
         '
         '
@@ -25041,8 +25006,8 @@ ErrorTrap:
                     '
                     ' try the domain landing page first
                     '
-                    CS = db.csOpen("Domains", "(name=" & db.encodeSQLText(webServer.requestDomain) & ")", , , , , , "RootPageID")
-                    If db.cs_Ok(CS) Then
+                    CS = db.cs_open("Domains", "(name=" & db.encodeSQLText(webServer.requestDomain) & ")", , , , , , "RootPageID")
+                    If db.cs_ok(CS) Then
                         pageManager_LandingPageID = EncodeInteger(db.cs_getText(CS, "RootPageID"))
                     End If
                     Call db.cs_Close(CS)
@@ -25161,7 +25126,7 @@ ErrorTrap:
         Public Function main_IsSQLTable(DataSourceName As String, TableName As String) As Boolean
             '
             If (True) Then
-                main_IsSQLTable = db_IsSQLTable(DataSourceName, TableName)
+                main_IsSQLTable = IsSQLTable(DataSourceName, TableName)
             End If
             '
         End Function
@@ -25173,7 +25138,7 @@ ErrorTrap:
         Public Function main_IsSQLTableField(DataSourceName As String, TableName As String, FieldName As String) As Boolean
             '
             If (True) Then
-                main_IsSQLTableField = db_IsSQLTableField(DataSourceName, TableName, FieldName)
+                main_IsSQLTableField = IsSQLTableField(DataSourceName, TableName, FieldName)
             End If
             '
         End Function
@@ -25381,7 +25346,7 @@ ErrorTrap:
                 '
                 SelectList = pageManager_cache_pageContent_fieldList
                 Criteria = ""
-                cache_pageContent = db.db_GetContentRows("Page Content", Criteria, , False, SystemMemberID, (main_IsWorkflowRendering Or main_IsQuickEditing), , SelectList)
+                cache_pageContent = db.GetContentRows("Page Content", Criteria, , False, SystemMemberID, (main_IsWorkflowRendering Or main_IsQuickEditing), , SelectList)
                 If (cache_pageContent.Length > 0) Then
                     pageManager_cache_pageContent_rows = UBound(cache_pageContent, 2) + 1
                     If pageManager_cache_pageContent_rows > 0 Then
@@ -25494,14 +25459,14 @@ ErrorTrap:
                             'Call Err.Raise(ignoreInteger, "cpCoreClass", "pageManager_cache_pageContent_getPtr, pageID [" & PageID & "] reload failed. ERROR")
                             'Call AppendLog("pageManager_cache_pageContent_getPtr, pageID[" & PageID & "] reload failed. ERROR")
                         End If
-                        'CS = app.db_csOpen("page content", "id=" & PageID, "id", , , , "ID")
+                        'CS = app.csOpen("page content", "id=" & PageID, "id", , , , "ID")
                         'If app.csv_IsCSOK(CS) Then
                         '    Call pageManager_cache_pageContent_updateRow(PageID, main_IsWorkflowRendering, main_IsQuickEditing)
                         '    If (main_PCCCnt > 0) And Not (main_PCCIDIndex Is Nothing) Then
                         '        pageManager_cache_pageContent_getPtr = main_PCCIDIndex.GetPointer(CStr(PageID))
                         '    End If
                         'End If
-                        'Call app.db_closeCS(CS)
+                        'Call app.closeCS(CS)
                     End If
                 End If
             End If
@@ -25619,14 +25584,14 @@ ErrorTrap:
                     End If
                 Next
                 Criteria = "ID=" & PageID
-                CS = db.csOpen("Page Content", Criteria, , False, ,,, SelectList)
-                If Not db.cs_Ok(CS) Then
+                CS = db.cs_open("Page Content", Criteria, , False, ,,, SelectList)
+                If Not db.cs_ok(CS) Then
                     '
                     ' Page Not Found
                     '
                     Call pageManager_cache_pageContent_removeRow(PageID, main_IsWorkflowRendering, main_IsQuickEditing)
                 Else
-                    PCCRow = db.db_GetCSRows(CS)
+                    PCCRow = db.cs_getRows(CS)
                     '
                     ' page was found in the Db - find the entry in PCC
                     '
@@ -26067,7 +26032,7 @@ ErrorTrap:
             On Error GoTo ErrorTrap
             If pageManager_cache_siteSection_rows = 0 Then
                 SelectList = "ID, Name,TemplateID,ContentID,MenuImageFilename,Caption,MenuImageOverFilename,HideMenu,BlockSection,RootPageID,JSOnLoad,JSHead,JSEndBody,JSFilename"
-                cache_siteSection = db.db_GetContentRows("Site Sections", "(active<>0)", , False, SystemMemberID, (pagemanager_IsWorkflowRendering()), , SelectList)
+                cache_siteSection = db.GetContentRows("Site Sections", "(active<>0)", , False, SystemMemberID, (pagemanager_IsWorkflowRendering()), , SelectList)
                 pageManager_cache_siteSection_rows = UBound(cache_siteSection, 2) + 1
                 For Ptr = 0 To pageManager_cache_siteSection_rows - 1
                     '
@@ -26261,7 +26226,7 @@ ErrorTrap:
                     & " Left Join ccSharedStylesTemplateRules r on r.templateid=t.id" _
                     & " where (t.active<>0)" _
                     & " order by t.id"
-                Dim dt As DataTable = db.executeSql_getDataTable(SQL)
+                Dim dt As DataTable = db.executeSql(SQL)
                 If dt.Rows.Count > 0 Then
                     For Each rsDr As DataRow In dt.Rows
                         templateId = EncodeInteger(rsDr("ID"))
@@ -26310,7 +26275,7 @@ ErrorTrap:
                             ' gather domains for this templates
                             '
                             SQL = "select domainid from ccDomainTemplateRules where templateid=" & templateId
-                            Dim dtdomains As DataTable = db.executeSql_getDataTable(SQL)
+                            Dim dtdomains As DataTable = db.executeSql(SQL)
                             If dtdomains.Rows.Count > 0 Then
                                 cacheArray(TC_DomainIdList, Ptr) = EncodeText(dtdomains.Rows.Item(0))
                                 'cacheArray(TC_DomainIdList, Ptr) = rsdomains.GetString(StringFormatEnum.adClipString, , "", ",")
@@ -26654,10 +26619,10 @@ ErrorTrap:
             '
             ' For now, the child delete only works in non-workflow
             '
-            CS = db.csOpen(ContentName, "parentid=" & RecordID, , , , ,, "ID")
-            Do While db.cs_Ok(CS)
+            CS = db.cs_open(ContentName, "parentid=" & RecordID, , , , ,, "ID")
+            Do While db.cs_ok(CS)
                 pageManager_DeleteChildRecords = pageManager_DeleteChildRecords & "," & db.cs_getInteger(CS, "ID")
-                db.db_csGoNext(CS)
+                db.cs_goNext(CS)
             Loop
             Call db.cs_Close(CS)
             If pageManager_DeleteChildRecords <> "" Then
@@ -26684,7 +26649,7 @@ ErrorTrap:
                     SingleEntry = (IDCnt = 1)
                     QuickEditing = user.isQuickEditing("page content")
                     For Ptr = 0 To IDCnt - 1
-                        Call db_DeleteContentRecord("page content", EncodeInteger(IDs(Ptr)))
+                        Call DeleteContentRecord("page content", EncodeInteger(IDs(Ptr)))
                         Call pageManager_cache_pageContent_removeRow(EncodeInteger(IDs(Ptr)), pagemanager_IsWorkflowRendering, QuickEditing)
                     Next
                 End If
@@ -26730,7 +26695,7 @@ ErrorTrap:
             '
             'hint = hint & ",000"
             ContentID = main_GetContentID(ContentName)
-            TableName = db_GetContentTablename(ContentName)
+            TableName = GetContentTablename(ContentName)
             Call pageManager_MarkRecordReviewed(ContentName, RecordID)
             '
             ' Test for parentid=id loop
@@ -26749,8 +26714,8 @@ ErrorTrap:
                     ' Log Activity for changes to people and organizattions
                     '
                     'hint = hint & ",110"
-                    CS = db_csOpenRecord("people", RecordID, , , "Name,OrganizationID")
-                    If db.cs_Ok(CS) Then
+                    CS = csOpenRecord("people", RecordID, , , "Name,OrganizationID")
+                    If db.cs_ok(CS) Then
                         ActivityLogOrganizationID = db.cs_getInteger(CS, "OrganizationID")
                     End If
                     Call db.cs_Close(CS)
@@ -26790,7 +26755,7 @@ ErrorTrap:
                     If RecordParentID > 0 Then
                         Call pageManager_cache_pageContent_updateRow(RecordParentID, False, False)
                         If Not IsDelete Then
-                            Call db.executeSql_getDataTable("update ccpagecontent set ChildPagesfound=1 where ID=" & RecordParentID)
+                            Call db.executeSql("update ccpagecontent set ChildPagesfound=1 where ID=" & RecordParentID)
                         End If
                     End If
                     '
@@ -26800,7 +26765,7 @@ ErrorTrap:
                         '
                         ' If this was a section's root page, clear the rootpageid so a new page will be created
                         '
-                        Call db.executeSql_getDataTable("update ccsections set RootPageID=0 where RootPageID=" & RecordID)
+                        Call db.executeSql("update ccsections set RootPageID=0 where RootPageID=" & RecordID)
                         Call pageManager_cache_siteSection_clear()
                         '
                         ' Clear the Landing page and page not found site properties
@@ -26818,7 +26783,7 @@ ErrorTrap:
                         '
                         ' Delete Link Alias entries with this PageID
                         '
-                        Call db.executeSql_getDataTable("delete from cclinkAliases where PageID=" & RecordID)
+                        Call db.executeSql("delete from cclinkAliases where PageID=" & RecordID)
                         Call cache_linkAlias_clear()
                     Else
                         '
@@ -26841,8 +26806,8 @@ ErrorTrap:
                     ' Attempt to update
                     '
                     'hint = hint & ",160"
-                    CS = db_csOpen("Site Sections", RecordID)
-                    If db.cs_Ok(CS) Then
+                    CS = csOpen("Site Sections", RecordID)
+                    If db.cs_ok(CS) Then
                         PageContentID = db.cs_getInteger(CS, "ContentID")
                         If PageContentID = 0 Then
                             PageContentID = main_GetContentID("Page Content")
@@ -26892,9 +26857,9 @@ ErrorTrap:
                     'hint = hint & ",180"
                     If (siteProperties.getBoolean("ImageAllowSFResize", True)) Then
                         If Not IsDelete Then
-                            CS = db_csOpen("library files", RecordID)
-                            If db.cs_Ok(CS) Then
-                                Filename = db.db_GetCS(CS, "filename")
+                            CS = csOpen("library files", RecordID)
+                            If db.cs_ok(CS) Then
+                                Filename = db.cs_get(CS, "filename")
                                 Pos = InStrRev(Filename, "/")
                                 If Pos > 0 Then
                                     FilePath = Mid(Filename, 1, Pos)
@@ -26963,12 +26928,12 @@ ErrorTrap:
                                         '                                On Error Resume Next
                                         '                                sf.LoadFromFile (app.publicFiles.rootFullPath & FilePath & Filename)
                                         '                                If Err.Number = 0 Then
-                                        '                                    Call app.db_SetCS(CS, "height", sf.Height)
-                                        '                                    Call app.db_SetCS(CS, "width", sf.Width)
+                                        '                                    Call app.SetCS(CS, "height", sf.Height)
+                                        '                                    Call app.SetCS(CS, "width", sf.Width)
                                         '                                Else
                                         '                                    Err.Clear
                                         '                                End If
-                                        '                                AltSizeList = db.db_GetCSText(CS, "AltSizeList")
+                                        '                                AltSizeList = db.cs_getText(CS, "AltSizeList")
                                         '                                RebuildSizes = (AltSizeList = "")
                                         '                                If RebuildSizes Then
                                         '                                    AltSizeList = ""
@@ -27008,7 +26973,7 @@ ErrorTrap:
                                         '                                        Call sf.SaveToFile(app.publicFiles.rootFullPath & FilePath & FilenameNoExt & "-80x" & sf.Height & "." & FilenameExt)
                                         '                                        AltSizeList = AltSizeList & vbCrLf & "80x" & sf.Height
                                         '                                    End If
-                                        '                                    Call app.db_SetCS(CS, "AltSizeList", AltSizeList)
+                                        '                                    Call app.SetCS(CS, "AltSizeList", AltSizeList)
                                         '                                End If
                                         '                                sf = Nothing
                                     End If
@@ -27029,17 +26994,17 @@ ErrorTrap:
             'hint = hint & ",190"
             If True Then
                 'hint = hint & ",200 content=[" & ContentID & "]"
-                CS = db.csOpen("Add-on Content Trigger Rules", "ContentID=" & ContentID, , , , , , "addonid")
+                CS = db.cs_open("Add-on Content Trigger Rules", "ContentID=" & ContentID, , , , , , "addonid")
                 Option_String = "" _
                     & vbCrLf & "action=contentchange" _
                     & vbCrLf & "contentid=" & ContentID _
                     & vbCrLf & "recordid=" & RecordID _
                     & ""
-                Do While db.cs_Ok(CS)
+                Do While db.cs_ok(CS)
                     addonId = db.cs_getInteger(CS, "Addonid")
                     'hint = hint & ",210 addonid=[" & addonId & "]"
                     Call addon.executeAddonAsProcess(CStr(addonId), Option_String)
-                    Call db.db_csGoNext(CS)
+                    Call db.cs_goNext(CS)
                 Loop
                 Call db.cs_Close(CS)
             End If
@@ -27122,12 +27087,12 @@ ErrorTrap:
                 End If
                 CS = db.cs_openSql(SQL)
                 LastStyleID = 0
-                Do While db.cs_Ok(CS)
+                Do While db.cs_ok(CS)
                     styleId = db.cs_getInteger(CS, "ID")
                     If styleId <> LastStyleID Then
-                        Filename = db.db_GetCS(CS, "StyleFilename")
-                        Prefix = vbReplace(main_encodeHTML(db.db_GetCS(CS, "Prefix")), ",", "&#44;")
-                        Suffix = vbReplace(main_encodeHTML(db.db_GetCS(CS, "Suffix")), ",", "&#44;")
+                        Filename = db.cs_get(CS, "StyleFilename")
+                        Prefix = vbReplace(main_encodeHTML(db.cs_get(CS, "Prefix")), ",", "&#44;")
+                        Suffix = vbReplace(main_encodeHTML(db.cs_get(CS, "Suffix")), ",", "&#44;")
                         If (Not main_IsAdminSite) And db.cs_getBoolean(CS, "alwaysinclude") Then
                             MapList = MapList & vbCrLf & "0" & vbTab & Filename & "<" & Prefix & "<" & Suffix
                         Else
@@ -27135,12 +27100,12 @@ ErrorTrap:
                         End If
                     End If
                     IncludedStyleFilename = db.cs_getText(CS, "iStylefilename")
-                    Prefix = main_encodeHTML(db.db_GetCS(CS, "iPrefix"))
-                    Suffix = main_encodeHTML(db.db_GetCS(CS, "iSuffix"))
+                    Prefix = main_encodeHTML(db.cs_get(CS, "iPrefix"))
+                    Suffix = main_encodeHTML(db.cs_get(CS, "iSuffix"))
                     If IncludedStyleFilename <> "" Then
                         MapList = MapList & "," & IncludedStyleFilename & "<" & Prefix & "<" & Suffix
                     End If
-                    Call db.db_csGoNext(CS)
+                    Call db.cs_goNext(CS)
                 Loop
                 If MapList = "" Then
                     MapList = ","
@@ -27444,7 +27409,7 @@ ErrorTrap:
             If main_IsContentFieldSupported(ContentName, "DateReviewed") Then
                 'SQLNow = encodeSQLDate(Now)
                 DataSourceName = main_GetContentDataSource(ContentName)
-                TableName = db_GetContentTablename(ContentName)
+                TableName = GetContentTablename(ContentName)
                 '
                 SQL = "update " & TableName & " set DateReviewed=" & db.encodeSQLDate(main_PageStartTime)
                 If main_IsContentFieldSupported(ContentName, "ReviewedBy") Then
@@ -27453,12 +27418,12 @@ ErrorTrap:
                 '
                 ' Mark the live record
                 '
-                Call db.executeSql_getDataTable(SQL, DataSourceName & " where id=" & RecordID)
+                Call db.executeSql(SQL, DataSourceName & " where id=" & RecordID)
                 '
                 ' Mark the edit record if in workflow
                 '
                 If main_IsContentFieldSupported(ContentName, "editsourceid") Then
-                    Call db.executeSql_getDataTable(SQL, DataSourceName & " where (editsourceid=" & RecordID & ")and(editarchive=0)")
+                    Call db.executeSql(SQL, DataSourceName & " where (editsourceid=" & RecordID & ")and(editarchive=0)")
                 End If
             End If
         End Sub
@@ -27640,8 +27605,8 @@ ErrorTrap:
                 ' main_Get values out of the remote query record
                 '
                 If gv.status = GoogleVisualizationStatusEnum.OK Then
-                    CS = db.csOpen("Remote Queries", "((VisitId=" & visit_Id & ")and(remotekey=" & db.encodeSQLText(RemoteKey) & "))")
-                    If db.cs_Ok(CS) Then
+                    CS = db.cs_open("Remote Queries", "((VisitId=" & visit_Id & ")and(remotekey=" & db.encodeSQLText(RemoteKey) & "))")
+                    If db.cs_ok(CS) Then
                         '
                         ' Use user definied query
                         '
@@ -27649,7 +27614,7 @@ ErrorTrap:
                         DataSource = db.getDataSourceNameByID(db.cs_getInteger(CS, "datasourceid"))
                         maxRows = db.cs_getInteger(CS, "maxrows")
                         QueryType = db.cs_getInteger(CS, "QueryTypeID")
-                        ContentName = db.db_GetCS(CS, "ContentID")
+                        ContentName = db.cs_get(CS, "ContentID")
                         Criteria = db.cs_getText(CS, "Criteria")
                         SortFieldList = db.cs_getText(CS, "SortFieldList")
                         AllowInactiveRecords2 = db.cs_getBoolean(CS, "AllowInactiveRecords")
@@ -27777,9 +27742,9 @@ ErrorTrap:
                         '    '
 
                         '    CDef = app.getCdef(ContentName)
-                        '    CS = app.db_csOpen(ContentName, Criteria, SortFieldList, AllowInactiveRecords, , , SelectFieldList)
-                        '    Cells = app.csv_GetCSRows(CS)
-                        '    FieldList = app.db_GetCSSelectFieldList(CS)
+                        '    CS = app.csOpen(ContentName, Criteria, SortFieldList, AllowInactiveRecords, , , SelectFieldList)
+                        '    Cells = app.csv_cs_getRows(CS)
+                        '    FieldList = app.cs_getSelectFieldList(CS)
                         '    '
                         '    RowMax = UBound(Cells, 2)
                         '    ColMax = UBound(Cells, 1)
@@ -27838,8 +27803,8 @@ ErrorTrap:
                                 '
                                 ' Open the content and cycle through each setPair
                                 '
-                                CS = db.csOpen(ContentName, Criteria, SortFieldList, AllowInactiveRecords2, , ,, SelectFieldList)
-                                If db.cs_Ok(CS) Then
+                                CS = db.cs_open(ContentName, Criteria, SortFieldList, AllowInactiveRecords2, , ,, SelectFieldList)
+                                If db.cs_ok(CS) Then
                                     '
                                     ' update by looping through the args and setting name=values
                                     '
@@ -27898,8 +27863,8 @@ ErrorTrap:
             If maxRows = 0 Then
                 maxRows = 1000
             End If
-            CS = db_InsertCSContent("Remote Queries")
-            If db.cs_Ok(CS) Then
+            CS = InsertCSContent("Remote Queries")
+            If db.cs_ok(CS) Then
                 RemoteKey = Guid.NewGuid.ToString()
                 DataSourceID = main_GetRecordID("Data Sources", DataSourceName)
                 Call db.cs_set(CS, "remotekey", RemoteKey)
@@ -28227,31 +28192,31 @@ ErrorTrap:
         '        '   Legacy
         '        '=============================================================================================
         '        '
-        '        Public Function app.db_GetCS(ByVal CSPointer As Integer, ByVal FieldName As String) As String
+        '        Public Function app.cs_get(ByVal CSPointer As Integer, ByVal FieldName As String) As String
         '            On Error GoTo ErrorTrap
         '            '
-        '            main_GetCS = app.db_GetCS(EncodeInteger(CSPointer), EncodeText(FieldName))
+        '            main_cs_get = app.cs_get(EncodeInteger(CSPointer), EncodeText(FieldName))
         '            '
         '            Exit Function
         'ErrorTrap:
-        '            Call handleLegacyError18("main_GetCS")
+        '            Call handleLegacyError18("main_cs_get")
         '        End Function
         '        '
         '        '=============================================================================================
-        '        '   main_GetCS
+        '        '   main_cs_get
         '        '       Returns the field value in text format, encoded from file if needed
         '        '=============================================================================================
         '        '
-        '        Public Function app.db_GetCS(ByVal CSPointer As Integer, ByVal FieldName As String) As String
-        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetCS2")
+        '        Public Function app.cs_get(ByVal CSPointer As Integer, ByVal FieldName As String) As String
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("cs_get2")
         '            '
         '            If True Then
-        '                main_GetCS2 = app.db_GetCS(CSPointer, FieldName)
+        '                main_cs_get2 = app.cs_get(CSPointer, FieldName)
         '            End If
         '            '
         '            Exit Function
         'ErrorTrap:
-        '            Call handleLegacyError18("main_GetCS2")
+        '            Call handleLegacyError18("main_cs_get2")
         '        End Function
         '
         '
@@ -28582,7 +28547,7 @@ ErrorTrap:
                     Err.Clear()
                     InsertTestOK = False
                     CS = db.cs_insertRecord("Trap Log")
-                    If Not db.cs_Ok(CS) Then
+                    If Not db.cs_ok(CS) Then
                         Call handleLegacyError10(ignoreInteger, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was not OK.", "Init", False, True)
                     Else
                         InsertTestOK = True
@@ -28593,7 +28558,7 @@ ErrorTrap:
                         If TrapID = 0 Then
                             Call handleLegacyError10(ignoreInteger, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was OK, but ID=0.", "Init", False, True)
                         Else
-                            Call db_DeleteContentRecord("Trap Log", TrapID)
+                            Call DeleteContentRecord("Trap Log", TrapID)
                         End If
                     End If
                     If Err.Number <> 0 Then
@@ -28747,8 +28712,8 @@ ErrorTrap:
                         '
                         ' Confirm the order
                         '
-                        CS = db.csOpen("Orders", "(ID=" & ConfirmOrderID & ") and ((OrderCompleted=0)or(OrderCompleted is Null))")
-                        If db.cs_Ok(CS) Then
+                        CS = db.cs_open("Orders", "(ID=" & ConfirmOrderID & ") and ((OrderCompleted=0)or(OrderCompleted is Null))")
+                        If db.cs_ok(CS) Then
                             Call db.cs_set(CS, "OrderCompleted", True)
                             Call db.cs_set(CS, "DateCompleted", main_PageStartTime)
                             Call db.cs_set(CS, "ccAuthCode", docProperties.getText("txn_id"))
@@ -28762,16 +28727,16 @@ ErrorTrap:
                             Call db.cs_set(CS, "ShipZip", docProperties.getText("address_zip"))
                             Call db.cs_set(CS, "BilleMail", docProperties.getText("payer_email"))
                             Call db.cs_set(CS, "ContentControlID", main_GetContentID("Orders Completed"))
-                            Call db.db_SaveCSRecord(CS)
+                            Call db.cs_save2(CS)
                         End If
                         Call db.cs_Close(CS)
                         '
                         ' Empty the cart
                         '
-                        CS = db.csOpen("Visitors", "OrderID=" & ConfirmOrderID)
-                        If db.cs_Ok(CS) Then
+                        CS = db.cs_open("Visitors", "OrderID=" & ConfirmOrderID)
+                        If db.cs_ok(CS) Then
                             Call db.cs_set(CS, "OrderID", 0)
-                            Call db.db_SaveCSRecord(CS)
+                            Call db.cs_save2(CS)
                         End If
                         Call db.cs_Close(CS)
                         '
@@ -28838,12 +28803,12 @@ ErrorTrap:
             Else
                 intContentName = metaData.getContentNameByID(ContentID)
                 If intContentName <> "" Then
-                    CSPointer = db.csOpen(intContentName, "ID=" & intRecordId)
-                    If Not db.cs_Ok(CSPointer) Then
+                    CSPointer = db.cs_open(intContentName, "ID=" & intRecordId)
+                    If Not db.cs_ok(CSPointer) Then
                         PanelCopy = SpanClassAdminNormal & "The information you have selected can not be accessed.</span>"
                         EditorPanel = EditorPanel & main_GetPanel(PanelCopy)
                     Else
-                        Copy = db.db_GetCS(CSPointer, strFieldName)
+                        Copy = db.cs_get(CSPointer, strFieldName)
                         EditorPanel = EditorPanel & html_GetFormInputHidden("Type", FormTypeActiveEditor)
                         EditorPanel = EditorPanel & html_GetFormInputHidden("cid", ContentID)
                         EditorPanel = EditorPanel & html_GetFormInputHidden("ID", intRecordId)
@@ -28913,8 +28878,8 @@ ErrorTrap:
                     '
                     ContentName = metaData.getContentNameByID(ContentID)
                     If ContentName <> "" Then
-                        CS = db.csOpen(ContentName, "ID=" & db.encodeSQLNumber(RecordID), , False)
-                        If db.cs_Ok(CS) Then
+                        CS = db.cs_open(ContentName, "ID=" & db.encodeSQLNumber(RecordID), , False)
+                        If db.cs_ok(CS) Then
                             Call db.cs_set(CS, FieldName, ContentCopy)
                         End If
                         Call db.cs_Close(CS)
@@ -29000,7 +28965,7 @@ ErrorTrap:
                 InputName = FieldName
             End If
             '
-            fieldType = EncodeInteger(db_GetContentFieldProperty(ContentName, FieldName, "type"))
+            fieldType = EncodeInteger(GetContentFieldProperty(ContentName, FieldName, "type"))
             Select Case fieldType
                 Case FieldTypeIdBoolean
                     '
@@ -29141,7 +29106,7 @@ ErrorTrap:
                     '
                     '
                     '
-                    GroupID = EncodeInteger(db_GetContentFieldProperty(ContentName, FieldName, "memberselectgroupid"))
+                    GroupID = EncodeInteger(GetContentFieldProperty(ContentName, FieldName, "memberselectgroupid"))
                     html_GetFormInputField = main_GetFormInputMemberSelect(InputName, EncodeInteger(HtmlValue), GroupID, , , HtmlId)
                     If HtmlClass <> "" Then
                         html_GetFormInputField = vbReplace(html_GetFormInputField, ">", " class=""" & HtmlClass & """>")
@@ -29319,7 +29284,7 @@ ErrorTrap:
                 ReDim Items(100)
                 ItemsCnt = 0
                 Index = New coreKeyPtrIndexClass
-                'Set main_cmc = main_GetCsv()
+                'Set main_cmc = main_cs_getv()
                 '
                 ' AC StartBlockText
                 '
@@ -29347,7 +29312,7 @@ ErrorTrap:
                     '
                     ' Personalization Tag
                     '
-                    FieldList = db_GetContentProperty("people", "SelectFieldList")
+                    FieldList = GetContentProperty("people", "SelectFieldList")
                     FieldList = vbReplace(FieldList, ",", "|")
                     IconIDControlString = "AC,PERSONALIZATION,0,Personalization,field=[" & FieldList & "]"
                     IconImg = GetAddonIconImg(siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", appConfig.cdnFilesNetprefix, "Any Personalization Field", "Renders as any Personalization Field", "", 0)
@@ -29386,9 +29351,9 @@ ErrorTrap:
                     '
                     ' Watch Lists
                     '
-                    CSLists = db.csOpen("Content Watch Lists", , "Name,ID", , , , , "Name,ID", 20, 1)
-                    If db.cs_Ok(CSLists) Then
-                        Do While db.cs_Ok(CSLists)
+                    CSLists = db.cs_open("Content Watch Lists", , "Name,ID", , , , , "Name,ID", 20, 1)
+                    If db.cs_ok(CSLists) Then
+                        Do While db.cs_ok(CSLists)
                             FieldName = Trim(db.cs_getText(CSLists, "name"))
                             If FieldName <> "" Then
                                 FieldCaption = "Watch List [" & FieldName & "]"
@@ -29405,7 +29370,7 @@ ErrorTrap:
                                     ReDim Preserve Items(ItemsSize)
                                 End If
                             End If
-                            db.db_csGoNext(CSLists)
+                            db.cs_goNext(CSLists)
                         Loop
                     End If
                     Call db.cs_Close(CSLists)
@@ -29444,9 +29409,9 @@ ErrorTrap:
                     End If
                     AddonContentName = "Add-ons"
                     SelectList = "Name,Link,ID,ArgumentList,ObjectProgramID,IconFilename,IconWidth,IconHeight,IconSprites,IsInline,ccguid"
-                    CSAddons = db.csOpen(AddonContentName, Criteria, "Name,ID", , , , , SelectList)
-                    If db.cs_Ok(CSAddons) Then
-                        Do While db.cs_Ok(CSAddons)
+                    CSAddons = db.cs_open(AddonContentName, Criteria, "Name,ID", , , , , SelectList)
+                    If db.cs_ok(CSAddons) Then
+                        Do While db.cs_ok(CSAddons)
                             AddonGuid = db.cs_getText(CSAddons, "ccguid")
                             ObjectProgramID2 = db.cs_getText(CSAddons, "ObjectProgramID")
                             If (ContentType = csv_contentTypeEnum.contentTypeEmail) And (ObjectProgramID2 <> "") Then
@@ -29455,13 +29420,13 @@ ErrorTrap:
                                 '
                                 ObjectProgramID2 = ObjectProgramID2
                             Else
-                                AddonName = Trim(db.db_GetCS(CSAddons, "name"))
+                                AddonName = Trim(db.cs_get(CSAddons, "name"))
                                 If AddonName <> "" And (AddonName <> LastAddonName) Then
                                     '
                                     ' Icon (fieldtyperesourcelink)
                                     '
                                     IsInline = db.cs_getBoolean(CSAddons, "IsInline")
-                                    IconFilename = db.db_GetCS(CSAddons, "Iconfilename")
+                                    IconFilename = db.cs_get(CSAddons, "Iconfilename")
                                     If IconFilename = "" Then
                                         IconWidth = 0
                                         IconHeight = 0
@@ -29478,7 +29443,7 @@ ErrorTrap:
                                     If UseAjaxDefaultAddonOptions Then
                                         DefaultAddonOption_String = ""
                                     Else
-                                        ArgumentList = Trim(db.db_GetCS(CSAddons, "ArgumentList"))
+                                        ArgumentList = Trim(db.cs_get(CSAddons, "ArgumentList"))
                                         DefaultAddonOption_String = main_GetDefaultAddonOption_String(ArgumentList, AddonGuid, IsInline)
                                         DefaultAddonOption_String = main_encodeHTML(DefaultAddonOption_String)
                                     End If
@@ -29499,7 +29464,7 @@ ErrorTrap:
                                     End If
                                 End If
                             End If
-                            db.db_csGoNext(CSAddons)
+                            db.cs_goNext(CSAddons)
                         Loop
                     End If
                     Call db.cs_Close(CSAddons)
@@ -29679,7 +29644,7 @@ ErrorTrap:
                     & " from ccFieldTypes t" _
                     & " left join ccaggregatefunctions a on a.id=t.editorAddonId" _
                     & " where (t.active<>0)and(a.active<>0) order by t.id"
-                RS = db.executeSql_getDataTable(SQL)
+                RS = db.executeSql(SQL)
                 For Each dr As DataRow In RS.Rows
                     fieldTypeID = EncodeInteger(dr("id"))
                     If (fieldTypeID <= FieldTypeIdMax) Then
@@ -29821,7 +29786,7 @@ ErrorTrap:
                     If True And (pageManager_Private_ServerDomainCrossList = "") Then
                         pageManager_Private_ServerDomainCrossList = ","
                         SQL = "select name from ccDomains where (typeId=1)and(allowCrossLogin<>0)"
-                        Dim dt As DataTable = db.executeSql_getDataTable(SQL)
+                        Dim dt As DataTable = db.executeSql(SQL)
                         For Each dr As DataRow In dt.Rows
                             pageManager_Private_ServerDomainCrossList &= dr(0).ToString
                         Next
@@ -29841,8 +29806,8 @@ ErrorTrap:
             '
             Dim CS As Integer
             '
-            CS = db.csOpen("page templates", "name=" & db.encodeSQLText(TemplateDefaultName), "ID", , , , , "id")
-            If db.cs_Ok(CS) Then
+            CS = db.cs_open("page templates", "name=" & db.encodeSQLText(TemplateDefaultName), "ID", , , , , "id")
+            If db.cs_ok(CS) Then
                 main_GetDefaultTemplateId = db.cs_getInteger(CS, "ID")
             End If
             Call db.cs_Close(CS)
@@ -29851,7 +29816,7 @@ ErrorTrap:
             '
             If main_GetDefaultTemplateId = 0 Then
                 CS = db.cs_insertRecord("Page Templates")
-                If db.cs_Ok(CS) Then
+                If db.cs_ok(CS) Then
                     main_GetDefaultTemplateId = db.cs_getInteger(CS, "ID")
                     Call db.cs_set(CS, "name", TemplateDefaultName)
                     Call db.cs_set(CS, "Link", "")
@@ -30069,21 +30034,21 @@ ErrorTrap:
                 Dim emailstyles As String
                 Dim layoutError As String
                 '
-                CS = db_csOpen("email", EmailID)
-                If Not db.cs_Ok(CS) Then
+                CS = csOpen("email", EmailID)
+                If Not db.cs_ok(CS) Then
                     Call error_AddUserError("There was a problem sending the email confirmation. The email record could not be found.")
                 Else
-                    EmailSubject = db.db_GetCS(CS, "Subject")
-                    EmailBody = db.db_GetCS(CS, "copyFilename")
+                    EmailSubject = db.cs_get(CS, "Subject")
+                    EmailBody = db.cs_get(CS, "copyFilename")
                     '
                     ' merge in template
                     '
                     EmailTemplate = ""
                     EMailTemplateID = db.cs_getInteger(CS, "EmailTemplateID")
                     If EMailTemplateID <> 0 Then
-                        CSTemplate = db_csOpen("Email Templates", EMailTemplateID, , , "BodyHTML")
-                        If db.cs_Ok(CSTemplate) Then
-                            EmailTemplate = db.db_GetCS(CSTemplate, "BodyHTML")
+                        CSTemplate = csOpen("Email Templates", EMailTemplateID, , , "BodyHTML")
+                        If db.cs_ok(CSTemplate) Then
+                            EmailTemplate = db.cs_get(CSTemplate, "BodyHTML")
                         End If
                         Call db.cs_Close(CSTemplate)
                     End If
@@ -30107,16 +30072,16 @@ ErrorTrap:
                     ' Confirm footer
                     '
                     SQL = main_GetGroupEmailSQL(False, EmailID)
-                    'SQL = main_GetGroupEmailSQL(db.db_GetCSBoolean(CS, "ToAll"), EmailID)
+                    'SQL = main_GetGroupEmailSQL(db.cs_getBoolean(CS, "ToAll"), EmailID)
                     CSPeople = db.cs_openSql(SQL)
-                    If Not db.cs_Ok(CSPeople) Then
+                    If Not db.cs_ok(CSPeople) Then
                         error_AddUserError("There are no valid recipients of this email, other than the confirmation address. Either no groups or topics were selected, or those selections contain no people with both a valid email addresses and 'Allow Group Email' enabled.")
                     Else
                         'TotalList = TotalList & "--- all recipients ---" & BR
                         LastEmail = "empty"
-                        Do While db.cs_Ok(CSPeople)
-                            Email = db.db_GetCS(CSPeople, "email")
-                            EMailName = db.db_GetCS(CSPeople, "name")
+                        Do While db.cs_ok(CSPeople)
+                            Email = db.cs_get(CSPeople, "email")
+                            EMailName = db.cs_get(CSPeople, "name")
                             EmailMemberID = db.cs_getInteger(CSPeople, "ID")
                             If EMailName = "" Then
                                 EMailName = "no name (member id " & EmailMemberID & ")"
@@ -30149,7 +30114,7 @@ ErrorTrap:
                             TotalList = TotalList & EmailLine & BR
                             LastEmail = Email
                             TotalCnt = TotalCnt + 1
-                            Call db.db_csGoNext(CSPeople)
+                            Call db.cs_goNext(CSPeople)
                         Loop
                         'TotalList = TotalList & "--- end all recipients ---" & BR
                     End If
@@ -30337,7 +30302,7 @@ ErrorTrap:
                 Next
                 SQL &= "));"
                 CSPointer = db.cs_openSql(SQL)
-                Do While db.cs_Ok(CSPointer)
+                Do While db.cs_ok(CSPointer)
                     ToMemberID = EncodeInteger(db.cs_getInteger(CSPointer, "ID"))
                     iSubject = iSubjectSource
                     iBody = iBodySource
@@ -30347,7 +30312,7 @@ ErrorTrap:
                     ' send
                     '
                     Call email_sendMemberEmail3(ToMemberID, iFromAddress, iSubject, iBody, iImmediate, iHTML, 0, "", False)
-                    Call db.db_csGoNext(CSPointer)
+                    Call db.cs_goNext(CSPointer)
                 Loop
             End If
             '
@@ -30553,7 +30518,7 @@ ErrorTrap:
                 '
                 'hint = hint & ",20 cnt=0 rebuild"
                 SQL = "select " & cache_addonIncludeRules_fieldList & " from ccaddonIncludeRules where (active<>0) order by id"
-                cache_addonIncludeRules.item = convertDataTabletoArray(db.executeSql_getDataTable(SQL))
+                cache_addonIncludeRules.item = db.convertDataTabletoArray(db.executeSql(SQL))
                 'hint = hint & ",21"
                 If True Then
                     'hint = hint & ",22"
@@ -30634,7 +30599,7 @@ ErrorTrap:
             '
             cacheValue = DirectCast(cache.getObject(Of String)(cache_linkForward_cacheName), String)
             If cacheValue = "" Then
-                RS = db.executeSql_getDataTable("select sourceLink from ccLinkForwards where (sourceLink<>'')and(DestinationLink<>'')and(active<>0) order by id desc")
+                RS = db.executeSql("select sourceLink from ccLinkForwards where (sourceLink<>'')and(DestinationLink<>'')and(active<>0) order by id desc")
                 For Each dr As DataRow In RS.Rows
                     cacheValue &= "," & dr.Item("sourceLink").ToString
                 Next
@@ -30748,7 +30713,7 @@ ErrorTrap:
                     '
                     'hint = hint & ",cnt=0 rebuild"
                     SQL = "select " & cache_LibraryFiles_fieldList & " from cclibraryFiles where (active<>0) order by id"
-                    cache_libraryFiles = convertDataTabletoArray(db.executeSql_getDataTable(SQL))
+                    cache_libraryFiles = db.convertDataTabletoArray(db.executeSql(SQL))
                     '    RS = app.csv_OpenRSSQL_Internal("Default", SQL, 120, 1000, 1, False, CursorLocationEnum.adUseClient, LockTypeEnum.adLockOptimistic, CursorTypeEnum.adOpenForwardOnly)
                     'cacheLoaded = False
                     'If (isDataTableOk(rs)) Then
@@ -31153,7 +31118,7 @@ ErrorTrap:
                     '    main_oldCacheArray_ParentBranchCount = main_oldCacheArray_ParentBranchCount + 1
                     'End With
                     '
-                    'Call app.db_closeCS(CS)
+                    'Call app.closeCS(CS)
                     '
                     IsRootPage = (EncodeInteger(cache_pageContent(PCC_ID, PCCPtr)) = rootPageId)
                     If IsRootPage Then
@@ -31235,7 +31200,7 @@ ErrorTrap:
                     childListSortMethodId = EncodeInteger(cache_pageContent(PCC_ChildListSortMethodID, main_RenderCache_CurrentPage_PCCPtr))
                     'childListSortMethodId = main_oldCacheArray_CurrentPage(main_oldCacheArray_CurrentPagePtr).childListSortMethodId
                     If childListSortMethodId <> 0 Then
-                        SQLOrderBy = db_GetSortMethodByID(childListSortMethodId)
+                        SQLOrderBy = GetSortMethodByID(childListSortMethodId)
                     End If
                 End If
                 '
@@ -31407,7 +31372,7 @@ ErrorTrap:
                     ' ----- load the child branch
                     '
                     childListSortMethodId = EncodeInteger(cache_pageContent(PCC_ChildListSortMethodID, main_RenderCache_CurrentPage_PCCPtr))
-                    SortOrder = db_GetSortMethodByID(childListSortMethodId)
+                    SortOrder = GetSortMethodByID(childListSortMethodId)
                     If SortOrder = "" Then
                         SortOrder = EncodeText(OrderByClause)
                     End If
@@ -31912,7 +31877,7 @@ ErrorTrap:
                         ' OK to create page here because section has a good record with a 0 RootPageID (this is not AutoHomeCreate)
                         '
                         rootPageId = main_CreatePageGetID(SectionName, "Page Content", SystemMemberID, "")
-                        Call db.executeSql_getDataTable("update ccsections set RootPageID=" & rootPageId & " where id=" & SectionID)
+                        Call db.executeSql("update ccsections set RootPageID=" & rootPageId & " where id=" & SectionID)
                         Call pageManager_cache_siteSection_clear()
                         main_AdminWarning = "<p>This page was created automatically because the section [" & SectionName & "] was requested, and it did not reference a page. Use the links below to edit the new page.</p>"
                         main_AdminWarningPageID = rootPageId
@@ -31997,11 +31962,11 @@ ErrorTrap:
                     '
                     ' main_Get Landing Section
                     '
-                    CSSection = db.csOpen("Site Sections", SectionCriteria, "ID", , ,, , SectionFieldList)
+                    CSSection = db.cs_open("Site Sections", SectionCriteria, "ID", , ,, , SectionFieldList)
                     '
                     ' try something new - if no landing section, use a "dummy" section with no blocking, etc.
                     '
-                    If Not db.cs_Ok(CSSection) Then
+                    If Not db.cs_ok(CSSection) Then
                         SectionID = 0
                         SectionName = ""
                         SectionTemplateID = 0
@@ -32679,7 +32644,7 @@ ErrorTrap:
                 If (pageManager_RedirectLink = "") Then
                     Link = EncodeText(cache_pageContent(PCC_Link, main_RenderCache_CurrentPage_PCCPtr))
                     If (Link <> "") Then
-                        Call db.executeSql_getDataTable("update ccpagecontent set clicks=clicks+1 where id=" & main_RenderedPageID)
+                        Call db.executeSql("update ccpagecontent set clicks=clicks+1 where id=" & main_RenderedPageID)
                         pageManager_RedirectLink = Link
                         pageManager_RedirectReason = "Redirect required because this page (PageRecordID=" & main_RenderedPageID & ") has a Link Override [" & pageManager_RedirectLink & "]."
                     End If
@@ -32723,9 +32688,9 @@ ErrorTrap:
                             & " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" & db.encodeSQLDate(main_PageStartTime) & "));"
                         CS = db.cs_openSql(SQL)
                         BlockedRecordIDList = "," & BlockedRecordIDList
-                        Do While db.cs_Ok(CS)
+                        Do While db.cs_ok(CS)
                             BlockedRecordIDList = vbReplace(BlockedRecordIDList, "," & db.cs_getText(CS, "RecordID"), "")
-                            db.db_csGoNext(CS)
+                            db.cs_goNext(CS)
                         Loop
                         Call db.cs_Close(CS)
                         If BlockedRecordIDList <> "" Then
@@ -32746,9 +32711,9 @@ ErrorTrap:
                                 & " AND ((ManagementMemberRules.DateExpires) Is Null Or (ManagementMemberRules.DateExpires)>" & db.encodeSQLDate(main_PageStartTime) & ")" _
                                 & " AND ((ManagementMemberRules.MemberID)=" & user.id & " ));"
                             CS = db.cs_openSql(SQL)
-                            Do While db.cs_Ok(CS)
+                            Do While db.cs_ok(CS)
                                 BlockedRecordIDList = vbReplace(BlockedRecordIDList, "," & db.cs_getText(CS, "RecordID"), "")
-                                db.db_csGoNext(CS)
+                                db.cs_goNext(CS)
                             Loop
                             Call db.cs_Close(CS)
                         End If
@@ -32769,8 +32734,8 @@ ErrorTrap:
                     If True Then
                         If BlockedPageRecordID <> 0 Then
                             '$$$$$ cache this
-                            CS = db_csOpen("Page Content", BlockedPageRecordID, , , "CustomBlockMessage,BlockSourceID,RegistrationGroupID,ContentPadding")
-                            If db.cs_Ok(CS) Then
+                            CS = csOpen("Page Content", BlockedPageRecordID, , , "CustomBlockMessage,BlockSourceID,RegistrationGroupID,ContentPadding")
+                            If db.cs_ok(CS) Then
                                 BlockSourceID = db.cs_getInteger(CS, "BlockSourceID")
                                 ContentPadding = db.cs_getInteger(CS, "ContentPadding")
                                 CustomBlockMessageFilename = db.cs_getText(CS, "CustomBlockMessage")
@@ -32941,7 +32906,7 @@ ErrorTrap:
                         'If app.csv_IsCSOK(CS) Then
                         contactMemberID = EncodeInteger(cache_pageContent(PCC_ContactMemberID, main_RenderCache_CurrentPage_PCCPtr))
                         pageViewings = EncodeInteger(cache_pageContent(PCC_Viewings, main_RenderCache_CurrentPage_PCCPtr))
-                        'contactMemberID = app.csv_GetCSInteger(CS, "ContactMemberID")
+                        'contactMemberID = app.csv_cs_getInteger(CS, "ContactMemberID")
                         If user.isEditing(main_RenderCache_CurrentPage_ContentName) Or visitProperty.getBoolean("AllowWorkflowRendering") Then
                             '
                             ' Link authoring, workflow rendering -> do encoding, but no tracking
@@ -32955,8 +32920,8 @@ ErrorTrap:
                             returnHtml = html_executeContentCommands(Nothing, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, user.id, user.isAuthenticated, layoutError)
                             returnHtml = html_encodeContent9(returnHtml, user.id, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "http://" & webServer.requestDomain, False, siteProperties.defaultWrapperID, "", CPUtilsBaseClass.addonContext.ContextPage)
                             'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
-                            Call db.executeSql_getDataTable("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & main_RenderedPageID)
-                            'Call app.csv_SetCS(CS, "Viewings", app.csv_GetCSInteger(CS, "Viewings") + 1)
+                            Call db.executeSql("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & main_RenderedPageID)
+                            'Call app.csv_SetCS(CS, "Viewings", app.csv_cs_getInteger(CS, "Viewings") + 1)
                         Else
                             '
                             ' Live content
@@ -32970,15 +32935,15 @@ ErrorTrap:
                             'returnHtml = main_EncodeContent5(returnHtml, memberID, main_RenderCache_CurrentPage_ContentName, PageRecordID, contactMemberID, False, False, True, True, False, True, "", "", False, app.SiteProperty_DefaultWrapperID)
                             'Call main_TrackContent(main_RenderCache_CurrentPage_ContentName, main_RenderedPageID)
                             'Call main_TrackContentSet(CS)
-                            Call db.executeSql_getDataTable("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & main_RenderedPageID)
-                            'Call app.csv_SetCS(CS, "Viewings", app.csv_GetCSInteger(CS, "Viewings") + 1)
+                            Call db.executeSql("update ccpagecontent set viewings=" & (pageViewings + 1) & " where id=" & main_RenderedPageID)
+                            'Call app.csv_SetCS(CS, "Viewings", app.csv_cs_getInteger(CS, "Viewings") + 1)
                         End If
                         '
                         ' Page Hit Notification
                         '
                         If (Not visit_excludeFromAnalytics) And (contactMemberID <> 0) And (InStr(1, webServer.requestBrowser, "kmahttp", vbTextCompare) = 0) Then
                             AllowHitNotification = EncodeBoolean(cache_pageContent(PCC_AllowHitNotification, main_RenderCache_CurrentPage_PCCPtr))
-                            'AllowHitNotification = app.csv_GetCSBoolean(CS, "AllowHitNotification")
+                            'AllowHitNotification = app.csv_cs_getBoolean(CS, "AllowHitNotification")
                             If AllowHitNotification Then
                                 PageName = EncodeText(cache_pageContent(PCC_Name, main_RenderCache_CurrentPage_PCCPtr))
                                 If PageName = "" Then
@@ -33019,15 +32984,15 @@ ErrorTrap:
                         '   4) Then Remove From Group
                         '
                         ConditionID = EncodeInteger(cache_pageContent(PCC_TriggerConditionID, main_RenderCache_CurrentPage_PCCPtr))
-                        'ConditionID = app.csv_GetCSInteger(CS, "TriggerConditionID")
+                        'ConditionID = app.csv_cs_getInteger(CS, "TriggerConditionID")
                         ConditionGroupID = EncodeInteger(cache_pageContent(PCC_TriggerConditionGroupID, main_RenderCache_CurrentPage_PCCPtr))
-                        'ConditionGroupID = app.csv_GetCSInteger(CS, "TriggerConditionGroupID")
+                        'ConditionGroupID = app.csv_cs_getInteger(CS, "TriggerConditionGroupID")
                         main_AddGroupID = EncodeInteger(cache_pageContent(PCC_TriggerAddGroupID, main_RenderCache_CurrentPage_PCCPtr))
-                        'main_AddGroupID = app.csv_GetCSInteger(CS, "TriggerAddGroupID")
+                        'main_AddGroupID = app.csv_cs_getInteger(CS, "TriggerAddGroupID")
                         RemoveGroupID = EncodeInteger(cache_pageContent(PCC_TriggerRemoveGroupID, main_RenderCache_CurrentPage_PCCPtr))
-                        'RemoveGroupID = app.csv_GetCSInteger(CS, "TriggerRemoveGroupID")
+                        'RemoveGroupID = app.csv_cs_getInteger(CS, "TriggerRemoveGroupID")
                         SystemEMailID = EncodeInteger(cache_pageContent(PCC_TriggerSendSystemEmailID, main_RenderCache_CurrentPage_PCCPtr))
-                        'SystemEMailID = app.csv_GetCSInteger(CS, "TriggerSendSystemEmailID")
+                        'SystemEMailID = app.csv_cs_getInteger(CS, "TriggerSendSystemEmailID")
                         Select Case ConditionID
                             Case 1
                                 '
@@ -33078,7 +33043,7 @@ ErrorTrap:
                                 End If
                         End Select
                         'End If
-                        'Call app.db_closeCS(CS)
+                        'Call app.closeCS(CS)
                     End If
                     '
                     '---------------------------------------------------------------------------------
@@ -33348,7 +33313,7 @@ ErrorTrap:
                     '                '
                     '                ' if this is not the first pagecontent to be opened on this page, close the previous first
                     '                '
-                    '                Call app.db_closeCS(main_oldCacheRS_cs)
+                    '                Call app.closeCS(main_oldCacheRS_cs)
                     '            End If
                     '            'hint = hint & ",160"
                     '            main_oldCacheRS_cs = main_OpenCSContentRecord_Internal(main_RenderCache_CurrentPage_ContentName, PageID, main_RenderCache_CurrentPage_IsRenderingMode Or main_RenderCache_CurrentPage_IsQuickEditing, main_RenderCache_CurrentPage_IsQuickEditing)
@@ -33359,7 +33324,7 @@ ErrorTrap:
                     '                ' freak bug - page was not found - maybe deleted in a concurrent process
                     '                '
                     '                'hint = hint & ",180"
-                    '                Call app.db_closeCS(main_oldCacheRS_cs)
+                    '                Call app.closeCS(main_oldCacheRS_cs)
                     '                pageManager_RedirectBecausePageNotFound = True
                     ''????? test
                     '                pageManager_RedirectReason = "The page [" & PageID & "] could not be found."
@@ -33368,12 +33333,12 @@ ErrorTrap:
                     '            Else
                     '' $$$$$ remove main_oldCacheRS_cs, use pccPtr
                     '                'hint = hint & ",190"
-                    '                'main_RenderedPageName = db.db_GetCSText(main_oldCacheRS_cs, "name")
+                    '                'main_RenderedPageName = db.cs_getText(main_oldCacheRS_cs, "name")
                     '' $$$$$ this should just be the pcc field list
-                    '                'SelectFieldList = app.db_GetCSSelectFieldList(main_oldCacheRS_cs)
+                    '                'SelectFieldList = app.cs_getSelectFieldList(main_oldCacheRS_cs)
                     '' $$$$$ remove all uses of main_oldCacheRS_FieldNames/main_oldCacheRS_FieldValues
                     '                'main_oldCacheRS_FieldNames = Split(SelectFieldList, ",")
-                    '                'main_oldCacheRS_FieldValues = db.db_GetCSRow(main_oldCacheRS_cs)
+                    '                'main_oldCacheRS_FieldValues = db.cs_getRow(main_oldCacheRS_cs)
                     '                'For Pointer = 0 To UBound(main_oldCacheRS_FieldValues)
                     '                '    main_oldCacheRS_FieldValues(Pointer) = vbReplace(Replace(main_oldCacheRS_FieldValues(Pointer), vbTab, ""), vbCrLf, "")
                     '                'Next
@@ -33644,7 +33609,7 @@ ErrorTrap:
                 ' ----- A page was found
                 '
                 PageID = EncodeInteger(cache_pageContent(PCC_ID, main_RenderCache_CurrentPage_PCCPtr))
-                'pageID = (app.csv_GetCSInteger(CSPointer, "ID"))
+                'pageID = (app.csv_cs_getInteger(CSPointer, "ID"))
                 '        s = "" _
                 '            & "<div>main_RenderedPageID=" & main_RenderedPageID & "</div>" _
                 '            & "<div>CSPointer id=" & PageID & "</div>" _
@@ -33652,51 +33617,51 @@ ErrorTrap:
                 '            & "<div>main_pcc(PCC_ID, main_RenderCache_CurrentPage_PCCPtr )=" & main_pcc(PCC_ID, main_RenderCache_CurrentPage_PCCPtr) & "</div>" _
                 '            & ""
                 parentPageID = EncodeInteger(cache_pageContent(PCC_ParentID, main_RenderCache_CurrentPage_PCCPtr))
-                'ParentPageID = (app.csv_GetCSInteger(CSPointer, "parentid"))
+                'ParentPageID = (app.csv_cs_getInteger(CSPointer, "parentid"))
                 contactMemberID = EncodeInteger(cache_pageContent(PCC_ContactMemberID, main_RenderCache_CurrentPage_PCCPtr))
-                'contactMemberID = (app.csv_GetCSInteger(CSPointer, "ContactMemberID"))
+                'contactMemberID = (app.csv_cs_getInteger(CSPointer, "ContactMemberID"))
                 allowChildListDisplay = EncodeBoolean(cache_pageContent(PCC_AllowChildListDisplay, main_RenderCache_CurrentPage_PCCPtr))
                 allowChildListComposite = AllowChildList And allowChildListDisplay
-                'allowChildListComposite = AllowChildList And (app.csv_GetCSBoolean(CSPointer, "AllowChildListDisplay"))
+                'allowChildListComposite = AllowChildList And (app.csv_cs_getBoolean(CSPointer, "AllowChildListDisplay"))
                 dateArchive = EncodeDate(cache_pageContent(PCC_DateArchive, main_RenderCache_CurrentPage_PCCPtr))
-                'DateArchive = app.csv_GetCSDate(CSPointer, "DateArchive")
+                'DateArchive = app.csv_cs_getDate(CSPointer, "DateArchive")
                 'Compatibility21 = encodeBoolean(csv_GetSiteProperty("ContentPageCompatibility21", False))
                 childListSortMethodId = EncodeInteger(cache_pageContent(PCC_ChildListSortMethodID, main_RenderCache_CurrentPage_PCCPtr))
-                'ChildListSortMethodID = app.csv_GetCSInteger(CSPointer, "ChildListSortMethodID")
+                'ChildListSortMethodID = app.csv_cs_getInteger(CSPointer, "ChildListSortMethodID")
                 allowReturnLinkDisplay = EncodeBoolean(cache_pageContent(PCC_allowReturnLinkDisplay, main_RenderCache_CurrentPage_PCCPtr))
                 allowReturnLinkComposite = AllowReturnLink And allowReturnLinkDisplay
                 '
                 AllowPrinterVersion = EncodeBoolean(cache_pageContent(pcc_allowPrinterVersion, main_RenderCache_CurrentPage_PCCPtr))
-                'AllowPrinterVersion = app.csv_GetCSBoolean(CSPointer, "AllowPrinterVersion")
+                'AllowPrinterVersion = app.csv_cs_getBoolean(CSPointer, "AllowPrinterVersion")
                 AllowEmailPage = EncodeBoolean(cache_pageContent(pcc_allowEmailPage, main_RenderCache_CurrentPage_PCCPtr))
-                'AllowEmailPage = app.csv_GetCSBoolean(CSPointer, "AllowEmailPage")
+                'AllowEmailPage = app.csv_cs_getBoolean(CSPointer, "AllowEmailPage")
                 headline = EncodeText(cache_pageContent(PCC_Headline, main_RenderCache_CurrentPage_PCCPtr))
-                'headline = app.csv_GetCS(CSPointer, "Headline")
+                'headline = app.csv_cs_get(CSPointer, "Headline")
                 copyFilename = EncodeText(cache_pageContent(PCC_CopyFilename, main_RenderCache_CurrentPage_PCCPtr))
                 If copyFilename <> "" Then
                     Copy = cdnFiles.readFile(copyFilename)
                 End If
-                'copy = app.csv_GetCS(CSPointer, "copyFilename")
+                'copy = app.csv_cs_get(CSPointer, "copyFilename")
                 allowSeeAlso = EncodeBoolean(cache_pageContent(pcc_allowSeeAlso, main_RenderCache_CurrentPage_PCCPtr))
-                'allowSeeAlso = encodeBoolean(app.csv_GetCSBoolean(CSPointer, "AllowSeeAlso"))        '
+                'allowSeeAlso = encodeBoolean(app.csv_cs_getBoolean(CSPointer, "AllowSeeAlso"))        '
                 allowMoreInfo = EncodeBoolean(cache_pageContent(pcc_allowMoreInfo, main_RenderCache_CurrentPage_PCCPtr))
-                'allowMoreInfo = encodeBoolean(app.csv_GetCSBoolean(CSPointer, "AllowMoreInfo"))
+                'allowMoreInfo = encodeBoolean(app.csv_cs_getBoolean(CSPointer, "AllowMoreInfo"))
                 allowFeedback = EncodeBoolean(cache_pageContent(pcc_allowFeedback, main_RenderCache_CurrentPage_PCCPtr))
-                'AllowFeedBack = encodeBoolean(app.csv_GetCSBoolean(CSPointer, "AllowFeedBack"))
+                'AllowFeedBack = encodeBoolean(app.csv_cs_getBoolean(CSPointer, "AllowFeedBack"))
                 LastModified = EncodeDate(cache_pageContent(PCC_ModifiedDate, main_RenderCache_CurrentPage_PCCPtr))
-                'LastModified = app.csv_GetCSDate(CSPointer, "ModifiedDate")
+                'LastModified = app.csv_cs_getDate(CSPointer, "ModifiedDate")
                 allowLastModifiedFooter = EncodeBoolean(cache_pageContent(pcc_allowLastModifiedFooter, main_RenderCache_CurrentPage_PCCPtr))
-                'AllowLastModifiedFooter = app.csv_GetCSBoolean(CSPointer, "AllowLastModifiedFooter")
+                'AllowLastModifiedFooter = app.csv_cs_getBoolean(CSPointer, "AllowLastModifiedFooter")
                 ModifiedBy = EncodeInteger(cache_pageContent(PCC_ModifiedBy, main_RenderCache_CurrentPage_PCCPtr))
-                'ModifiedBy = app.db_GetCSInteger(CSPointer, "ModifiedBy")
+                'ModifiedBy = app.cs_getInteger(CSPointer, "ModifiedBy")
                 DateReviewed = EncodeDate(cache_pageContent(PCC_DateReviewed, main_RenderCache_CurrentPage_PCCPtr))
-                'DateReviewed = app.csv_GetCSDate(CSPointer, "DateReviewed")
+                'DateReviewed = app.csv_cs_getDate(CSPointer, "DateReviewed")
                 ReviewedBy = EncodeInteger(cache_pageContent(PCC_ReviewedBy, main_RenderCache_CurrentPage_PCCPtr))
-                'ReviewedBy = app.db_GetCSInteger(CSPointer, "ReviewedBy")
+                'ReviewedBy = app.cs_getInteger(CSPointer, "ReviewedBy")
                 allowReviewedFooter = EncodeBoolean(cache_pageContent(PCC_allowReviewedFooter, main_RenderCache_CurrentPage_PCCPtr))
-                'allowReviewedFooter = (app.csv_GetCSBoolean(CSPointer, "AllowReviewedFooter"))
+                'allowReviewedFooter = (app.csv_cs_getBoolean(CSPointer, "AllowReviewedFooter"))
                 allowMessageFooter = EncodeBoolean(cache_pageContent(PCC_allowMessageFooter, main_RenderCache_CurrentPage_PCCPtr))
-                'allowMessageFooter = (app.csv_GetCSBoolean(CSPointer, "AllowMessageFooter"))
+                'allowMessageFooter = (app.csv_cs_getBoolean(CSPointer, "AllowMessageFooter"))
                 '
                 ' ----- Print Breadcrumb if not at root Page
                 '
@@ -34010,9 +33975,9 @@ ErrorTrap:
             IsRootPage = (ParentID = 0)
             If Not IsRootPage Then
                 IsRootPage = EncodeInteger(pageManager_cache_siteSection_RootPageIDIndex.getPtr(CStr(RecordID))) <> -1
-                'CSParent = app.db_csOpen("Site Sections", "RootPageID=" & RecordID, , , , , "ID")
+                'CSParent = app.csOpen("Site Sections", "RootPageID=" & RecordID, , , , , "ID")
                 'IsRootPage = app.csv_IsCSOK(CSParent)
-                'Call app.db_closeCS(CSParent)
+                'Call app.closeCS(CSParent)
                 'Call main_testPoint("checking site section -- IsRootPage=" & IsRootPage)
             End If
             '
@@ -34368,14 +34333,14 @@ ErrorTrap:
                                     ' Not from this site
                                     '
                                     If siteProperties.getBoolean("AllowAggregateAccessBlocking") Then
-                                        cs = db.csOpen("Aggregate Access", "Link=" & db_EncodeSQLText(refHost), , False, , , , "active")
-                                        If Not db.cs_Ok(cs) Then
+                                        cs = db.cs_open("Aggregate Access", "Link=" & EncodeSQLText(refHost), , False, , , , "active")
+                                        If Not db.cs_ok(cs) Then
                                             '
                                             ' no record, add an inactive record and throw error
                                             '
                                             Call db.cs_Close(cs)
                                             cs = db.cs_insertRecord("Aggregate Access")
-                                            If db.cs_Ok(cs) Then
+                                            If db.cs_ok(cs) Then
                                                 Call db.cs_set(cs, "Name", refHost)
                                                 Call db.cs_set(cs, "Link", refHost)
                                                 Call db.cs_set(cs, "active", False)
@@ -34505,7 +34470,7 @@ ErrorTrap:
                                         & " f.ID = " & fieldId _
                                         & ""
                                     Dim dt As DataTable
-                                    dt = db.executeSql_getDataTable(Sql)
+                                    dt = db.executeSql(Sql)
                                     If dt.Rows.Count > 0 Then
                                         For Each rsDr As DataRow In dt.Rows
                                             addonDefaultEditorName = "&nbsp;(" & EncodeText(rsDr("name")) & ")"
@@ -34523,7 +34488,7 @@ ErrorTrap:
                                         & " left join ccAggregateFunctions a on a.id=r.AddonId)" _
                                         & " where f.id=" & fieldId
 
-                                    dt = db.executeSql_getDataTable(Sql)
+                                    dt = db.executeSql(Sql)
                                     If dt.Rows.Count > 0 Then
                                         For Each rsDr As DataRow In dt.Rows
                                             Dim addonId As Integer = EncodeInteger(rsDr("addonid"))
@@ -34564,10 +34529,10 @@ ErrorTrap:
                                     '
                                     Dim AddonGuid As String = docProperties.getText("guid")
                                     '$$$$$ cache this
-                                    Dim CS As Integer = db.csOpen("add-ons", "ccguid=" & db.encodeSQLText(AddonGuid))
+                                    Dim CS As Integer = db.cs_open("add-ons", "ccguid=" & db.encodeSQLText(AddonGuid))
                                     Dim addonArgumentList As String = ""
                                     Dim addonIsInline As Boolean = False
-                                    If db.cs_Ok(CS) Then
+                                    If db.cs_ok(CS) Then
                                         addonArgumentList = db.cs_getText(CS, "argumentlist")
                                         addonIsInline = db.cs_getBoolean(CS, "IsInline")
                                         returnResult = main_GetDefaultAddonOption_String(addonArgumentList, AddonGuid, addonIsInline)
@@ -34689,7 +34654,7 @@ ErrorTrap:
                             '
                             EmailMemberID = docProperties.getInteger(RequestNameEmailMemberID)
                             CSLog = db.cs_insertRecord("Email Log")
-                            If db.cs_Ok(CSLog) Then
+                            If db.cs_ok(CSLog) Then
                                 Call db.cs_set(CSLog, "Name", "Opened " & CStr(main_PageStartTime))
                                 Call db.cs_set(CSLog, "EmailDropID", recordid)
                                 Call db.cs_set(CSLog, "MemberID", EmailMemberID)
@@ -34708,7 +34673,7 @@ ErrorTrap:
                             '
                             EmailMemberID = docProperties.getInteger(RequestNameEmailMemberID)
                             CSLog = db.cs_insertRecord("Email Log")
-                            If db.cs_Ok(CSLog) Then
+                            If db.cs_ok(CSLog) Then
                                 Call db.cs_set(CSLog, "Name", "Clicked " & CStr(main_PageStartTime))
                                 Call db.cs_set(CSLog, "EmailDropID", emailDropId)
                                 Call db.cs_set(CSLog, "MemberID", EmailMemberID)
@@ -34723,10 +34688,10 @@ ErrorTrap:
                             '
                             Call email_addToEmailBlockList_InternalOnly(EmailSpamBlock)
                             '
-                            CSLog = db.csOpen("people", "email=" & db.encodeSQLText(EmailSpamBlock), , , , , , "AllowBulkEmail")
-                            Do While db.cs_Ok(CSLog)
+                            CSLog = db.cs_open("people", "email=" & db.encodeSQLText(EmailSpamBlock), , , , , , "AllowBulkEmail")
+                            Do While db.cs_ok(CSLog)
                                 Call db.cs_set(CSLog, "AllowBulkEmail", False)
-                                Call db.db_csGoNext(CSLog)
+                                Call db.cs_goNext(CSLog)
                             Loop
                             Call db.cs_Close(CSLog)
                             '
@@ -34739,7 +34704,7 @@ ErrorTrap:
                                 '
                                 EmailMemberID = docProperties.getInteger(RequestNameEmailMemberID)
                                 CSLog = db.cs_insertRecord("Email Log")
-                                If db.cs_Ok(CSLog) Then
+                                If db.cs_ok(CSLog) Then
                                     Call db.cs_set(CSLog, "Name", "Email Block Request " & CStr(main_PageStartTime))
                                     Call db.cs_set(CSLog, "EmailDropID", emailDropId)
                                     Call db.cs_set(CSLog, "MemberID", EmailMemberID)
@@ -34806,8 +34771,8 @@ ErrorTrap:
                                         Dim nothingObject As Object = Nothing
                                         Dim cs As Integer
                                         addonId = docProperties.getInteger("AddonID")
-                                        cs = db_csOpen("Add-ons", addonId)
-                                        If db.cs_Ok(cs) Then
+                                        cs = csOpen("Add-ons", addonId)
+                                        If db.cs_ok(cs) Then
                                             Call db.cs_set(cs, "CustomStylesFilename", docProperties.getText("CustomStyles"))
                                         End If
                                         Call db.cs_Close(cs)
@@ -34820,7 +34785,7 @@ ErrorTrap:
                                         Call cache.invalidateTagCommaList("")
                                         If contentName <> "" Then
                                             Call cache.invalidateTagCommaList(contentName)
-                                            tableName = db_GetContentTablename(contentName)
+                                            tableName = GetContentTablename(contentName)
                                             If vbLCase(tableName) = "cctemplates" Then
                                                 Call cache.setKey(pageManager_cache_pageTemplate_cacheName, nothingObject)
                                                 Call pageManager_cache_pageTemplate_load()
@@ -35353,7 +35318,7 @@ ErrorTrap:
                 '
                 If returnUserError = "" Then
                     If privateFiles.pathExists(privateFolder) Then
-                        returnOk = addonInstall.InstallCollectionFromPrivateFolder(builder, db.siteproperty_dataBuildVersion, privateFolder, iisResetRequired, appConfig.name, returnUserError, installedCollectionGuid, False)
+                        returnOk = addonInstall.InstallCollectionFromPrivateFolder(builder, siteProperties.dataBuildVersion, privateFolder, iisResetRequired, appConfig.name, returnUserError, installedCollectionGuid, False)
                         'If iisResetRequired Then
                         '    Dim sitebuilder As New builderClass(Me)
                         '    sitebuilder.web.reset()
@@ -36005,17 +35970,17 @@ ErrorTrap:
                 Dim cid As Integer
                 Dim sqlGroupName As String = db.encodeSQLText(groupName)
                 '
-                dt = db.executeSql_getDataTable("SELECT ID FROM CCGROUPS WHERE NAME=" & sqlGroupName & "")
+                dt = db.executeSql("SELECT ID FROM CCGROUPS WHERE NAME=" & sqlGroupName & "")
                 If dt.Rows.Count > 0 Then
                     returnGroupId = EncodeInteger(dt.Rows(0).Item("ID"))
                 Else
                     cid = metaData.getContentId("groups")
                     createkey = GetRandomInteger()
                     sql = "insert into ccgroups (contentcontrolid,active,createkey,name,caption) values (" & cid & ",1," & createkey & "," & sqlGroupName & "," & sqlGroupName & ")"
-                    Call db.executeSql_getDataTable(sql)
+                    Call db.executeSql(sql)
                     '
                     sql = "select top 1 id from ccgroups where createkey=" & createkey & " order by id desc"
-                    dt = db.executeSql_getDataTable(sql)
+                    dt = db.executeSql(sql)
                     If dt.Rows.Count > 0 Then
                         returnGroupId = EncodeInteger(dt.Rows(0).Item(0))
                     End If
@@ -36104,7 +36069,7 @@ ErrorTrap:
                             Call CS.Insert("Member Rules")
                         End If
                         If Not CS.OK Then
-                            groupName = db_GetRecordName("groups", groupId)
+                            groupName = GetRecordName("groups", groupId)
                             handleExceptionAndRethrow(New ApplicationException("Could not find or create the Member Rule to add this member [" & userid & "] to the Group [" & groupId & ", " & groupName & "]"))
                         Else
                             Call CS.SetField("active", "1")
@@ -36236,28 +36201,28 @@ ErrorTrap:
                 '
                 ' honestly, not sure what to do with 'return_ErrorMessage'
                 '
-                CS = db.csOpen("copy content", "Name=" & db.encodeSQLText(CopyName), "ID", , 0, , , "Name,ID,Copy,modifiedBy")
-                If Not db.cs_Ok(CS) Then
+                CS = db.cs_open("copy content", "Name=" & db.encodeSQLText(CopyName), "ID", , 0, , , "Name,ID,Copy,modifiedBy")
+                If Not db.cs_ok(CS) Then
                     Call db.cs_Close(CS)
                     CS = db.cs_insertRecord("copy content", 0)
-                    If db.cs_Ok(CS) Then
+                    If db.cs_ok(CS) Then
                         RecordID = db.cs_getInteger(CS, "ID")
                         Call db.cs_set(CS, "name", CopyName)
                         Call db.cs_set(CS, "copy", EncodeText(DefaultContent))
-                        Call db.db_SaveCSRecord(CS)
+                        Call db.cs_save2(CS)
                         Call workflow.publishEdit("copy content", RecordID)
                     End If
                 End If
-                If db.cs_Ok(CS) Then
+                If db.cs_ok(CS) Then
                     RecordID = db.cs_getInteger(CS, "ID")
                     contactPeopleId = db.cs_getInteger(CS, "modifiedBy")
-                    returnCopy = db.db_GetCS(CS, "Copy")
+                    returnCopy = db.cs_get(CS, "Copy")
                     returnCopy = html_executeContentCommands(Nothing, returnCopy, CPUtilsBaseClass.addonContext.ContextPage, personalizationPeopleId, personalizationIsAuthenticated, Return_ErrorMessage)
                     returnCopy = html_encodeContent10(returnCopy, personalizationPeopleId, "copy content", RecordID, contactPeopleId, False, False, True, True, False, True, "", "", False, 0, "", CPUtilsBaseClass.addonContext.ContextPage, False, Nothing, False)
                     '
                     If True Then
                         If user.isEditingAnything() Then
-                            returnCopy = cs_GetCSRecordEditLink(CS, False) & returnCopy
+                            returnCopy = cs_cs_getRecordEditLink(CS, False) & returnCopy
                             If AllowEditWrapper Then
                                 returnCopy = main_GetEditWrapper("copy content", returnCopy)
                             End If
@@ -36273,7 +36238,7 @@ ErrorTrap:
         '
         '============================================================================
         '
-        Public Shared Function db_encodeSqlTableName(sourceName As String) As String
+        Public Shared Function encodeSqlTableName(sourceName As String) As String
             Dim returnName As String = ""
             Const FirstCharSafeString As String = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
             Const SafeString As String = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_@#"
@@ -36305,7 +36270,7 @@ ErrorTrap:
                 Loop
             Catch ex As Exception
                 ' shared method, rethrow error
-                Throw New ApplicationException("Exception in db_encodeSqlTableName(" & sourceName & ")", ex)
+                Throw New ApplicationException("Exception in encodeSqlTableName(" & sourceName & ")", ex)
             End Try
             Return returnName
         End Function
@@ -36587,20 +36552,20 @@ ErrorTrap:
     '====================================================================================================
     '
     Public Class cpCoreTests
-        <Fact> Public Sub db_encodeSqlTableNameTest()
+        <Fact> Public Sub encodeSqlTableNameTest()
             ' arrange
             ' act
             ' assert
-            Assert.Equal("", coreClass.db_encodeSqlTableName(""))
-            Assert.Equal("", coreClass.db_encodeSqlTableName("-----"))
-            Assert.Equal("", coreClass.db_encodeSqlTableName("01234567879"))
-            Assert.Equal("a", coreClass.db_encodeSqlTableName("a"))
-            Assert.Equal("aa", coreClass.db_encodeSqlTableName("a a"))
-            Assert.Equal("aA", coreClass.db_encodeSqlTableName(" aA"))
-            Assert.Equal("aA", coreClass.db_encodeSqlTableName(" aA "))
-            Assert.Equal("aA", coreClass.db_encodeSqlTableName("aA "))
-            Assert.Equal("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", coreClass.db_encodeSqlTableName("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"))
-            Assert.Equal("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_@#", coreClass.db_encodeSqlTableName("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_@#"))
+            Assert.Equal("", coreClass.encodeSqlTableName(""))
+            Assert.Equal("", coreClass.encodeSqlTableName("-----"))
+            Assert.Equal("", coreClass.encodeSqlTableName("01234567879"))
+            Assert.Equal("a", coreClass.encodeSqlTableName("a"))
+            Assert.Equal("aa", coreClass.encodeSqlTableName("a a"))
+            Assert.Equal("aA", coreClass.encodeSqlTableName(" aA"))
+            Assert.Equal("aA", coreClass.encodeSqlTableName(" aA "))
+            Assert.Equal("aA", coreClass.encodeSqlTableName("aA "))
+            Assert.Equal("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", coreClass.encodeSqlTableName("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"))
+            Assert.Equal("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_@#", coreClass.encodeSqlTableName("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_@#"))
             '
         End Sub
     End Class

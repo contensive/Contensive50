@@ -78,13 +78,13 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetContentControlCriteria(ByVal ContentName As String) As String
-            Return cpCore.db_GetContentControlCriteria(ContentName)
+            Return cpCore.GetContentControlCriteria(ContentName)
         End Function
         '
         '====================================================================================================
         '
         Public Overrides Function GetFieldProperty(ByVal ContentName As String, ByVal FieldName As String, ByVal PropertyName As String) As String
-            Return cpCore.db_GetContentFieldProperty(ContentName, FieldName, PropertyName)
+            Return cpCore.GetContentFieldProperty(ContentName, FieldName, PropertyName)
         End Function
         '
         '====================================================================================================
@@ -96,7 +96,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetProperty(ByVal ContentName As String, ByVal PropertyName As String) As String
-            Return cpCore.db_GetContentProperty(ContentName, PropertyName)
+            Return cpCore.GetContentProperty(ContentName, PropertyName)
         End Function
         '
         '====================================================================================================
@@ -138,13 +138,13 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetRecordID(ByVal ContentName As String, ByVal RecordName As String) As Integer
-            Return cpCore.db_GetRecordID(ContentName, RecordName)
+            Return cpCore.GetRecordID(ContentName, RecordName)
         End Function
         '
         '====================================================================================================
         '
         Public Overrides Function GetRecordName(ByVal ContentName As String, ByVal RecordID As Integer) As String
-            Return cpCore.db_GetRecordName(ContentName, RecordID)
+            Return cpCore.GetRecordName(ContentName, RecordID)
         End Function
         '
         '====================================================================================================

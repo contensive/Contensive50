@@ -4374,17 +4374,17 @@
 //        //    iFieldType = fieldType
 //        //    Select Case iFieldType
 //        //        Case FieldTypeIdBoolean
-//        //            EncodeSQL = app.db_EncodeSQLBoolean(expression)
+//        //            EncodeSQL = app.EncodeSQLBoolean(expression)
 //        //        Case FieldTypeIdCurrency, FieldTypeIdAutoIdIncrement, FieldTypeIdFloat, FieldTypeIdInteger, FieldTypeIdLookup, FieldTypeIdMemberSelect
-//        //            EncodeSQL = app.db_EncodeSQLNumber(expression)
+//        //            EncodeSQL = app.EncodeSQLNumber(expression)
 //        //        Case FieldTypeIdDate
-//        //            EncodeSQL = app.db_EncodeSQLDate(expression)
+//        //            EncodeSQL = app.EncodeSQLDate(expression)
 //        //        Case FieldTypeIdLongText, FieldTypeIdHTML
-//        //            EncodeSQL = app.db_EncodeSQLText(expression)
+//        //            EncodeSQL = app.EncodeSQLText(expression)
 //        //        Case FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdRedirect, FieldTypeIdManyToMany, FieldTypeIdText, FieldTypeIdFileTextPrivate, FieldTypeIdFileJavascript, FieldTypeIdFileXML, FieldTypeIdFileCSS, FieldTypeIdFileHTMLPrivate
-//        //            EncodeSQL = app.db_EncodeSQLText(expression)
+//        //            EncodeSQL = app.EncodeSQLText(expression)
 //        //        Case Else
-//        //            EncodeSQL = app.db_EncodeSQLText(expression)
+//        //            EncodeSQL = app.EncodeSQLText(expression)
 //        //            On Error GoTo 0
 //        //            Call Err.Raise(ignoreInteger, "dll", "Unknown Field Type [" & fieldType & "] used FieldTypeText.")
 //        //    End Select
@@ -7474,7 +7474,7 @@
 //        //        '   encodeSQLText
 //        //        '========================================================================
 //        //        '
-//        //        Public Function app.db_EncodeSQLText(ByVal expression As Object) As String
+//        //        Public Function app.EncodeSQLText(ByVal expression As Object) As String
 //        //            Dim returnString As String = ""
 //        //            If expression Is Nothing Then
 //        //                returnString = "null"
@@ -7493,7 +7493,7 @@
 //        //        '   encodeSQLLongText
 //        //        '========================================================================
 //        //        '
-//        //        Public Function app.db_EncodeSQLText(ByVal expression As Object) As String
+//        //        Public Function app.EncodeSQLText(ByVal expression As Object) As String
 //        //            Dim returnString As String = ""
 //        //            If expression Is Nothing Then
 //        //                returnString = "null"
@@ -7513,7 +7513,7 @@
 //        //        '       encode a date variable to go in an sql expression
 //        //        '========================================================================
 //        //        '
-//        //        Public Function app.db_EncodeSQLDate(ByVal expression As Object) As String
+//        //        Public Function app.EncodeSQLDate(ByVal expression As Object) As String
 //        //            Dim returnString As String = ""
 //        //            Dim expressionDate As Date = Date.MinValue
 //        //            If expression Is Nothing Then
@@ -7540,7 +7540,7 @@
 //        //        '       encode a number variable to go in an sql expression
 //        //        '========================================================================
 //        //        '
-//        //        Public Function app.db_EncodeSQLNumber(ByVal expression As Object) As String
+//        //        Public Function app.EncodeSQLNumber(ByVal expression As Object) As String
 //        //            Dim returnString As String = ""
 //        //            Dim expressionNumber As Double = 0
 //        //            If expression Is Nothing Then
@@ -7569,13 +7569,13 @@
 //        //        '       encode a boolean variable to go in an sql expression
 //        //        '========================================================================
 //        //        '
-//        //        Public Function app.db_EncodeSQLBoolean(ByVal ExpressionVariant As Object) As String
+//        //        Public Function app.EncodeSQLBoolean(ByVal ExpressionVariant As Object) As String
 //        //            '
 //        //            'Dim src As String
 //        //            '
-//        //            app.db_EncodeSQLBoolean = SQLFalse
+//        //            app.EncodeSQLBoolean = SQLFalse
 //        //            If EncodeBoolean(ExpressionVariant) Then
-//        //                app.db_EncodeSQLBoolean = SQLTrue
+//        //                app.EncodeSQLBoolean = SQLTrue
 //        //            End If
 //        //        End Function
 //        //

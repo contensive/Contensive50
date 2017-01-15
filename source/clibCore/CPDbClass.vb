@@ -49,14 +49,14 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         '
-        Public Overrides Sub Delete(ByVal DataSourcename As String, ByVal TableName As String, ByVal RecordId As Integer) 'Inherits BaseClasses.CPDbBaseClass.Delete
-            Call cp.core.db.db_DeleteTableRecord(DataSourcename, TableName, RecordId)
+        Public Overrides Sub Delete(ByVal DataSourcename As String, ByVal TableName As String, ByVal RecordId As Integer)
+            Call cp.core.db.deleteTableRecord(TableName, RecordId, DataSourcename)
         End Sub
         '
         '====================================================================================================
         '
         Public Overrides Function GetConnectionString(ByVal DataSourcename As String) As String
-            Return cp.core.db_GetConnectionString(DataSourcename)
+            Return cp.core.db.getConnectionStringADONET(cp.core.appConfig.name, DataSourcename)
         End Function
         '
         '====================================================================================================
@@ -70,7 +70,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetDataSourceType(ByVal DataSourcename As String) As Integer
-            Return cp.core.db.db_GetDataSourceType(DataSourcename)
+            Return cp.core.db.getDataSourceType(DataSourcename)
         End Function
         '
         '====================================================================================================
@@ -84,7 +84,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetTableID(ByVal TableName As String) As Integer
-            Return cp.core.db_GetTableID(TableName)
+            Return cp.core.GetTableID(TableName)
         End Function
         '
         '====================================================================================================
@@ -98,7 +98,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function IsTable(ByVal DataSourcename As String, ByVal TableName As String) As Boolean
-            Return cp.core.db_IsSQLTable(DataSourcename, TableName)
+            Return cp.core.IsSQLTable(DataSourcename, TableName)
         End Function
         '
         '====================================================================================================
@@ -111,7 +111,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function IsTableField(ByVal DataSourcename As String, ByVal TableName As String, ByVal FieldName As String) As Boolean
-            Return cp.core.db_IsSQLTableField(DataSourcename, TableName, FieldName)
+            Return cp.core.IsSQLTableField(DataSourcename, TableName, FieldName)
         End Function
         '
         '====================================================================================================
@@ -203,7 +203,7 @@ Namespace Contensive.Core
         ''' <param name="SQL"></param>
         ''' <returns></returns>
         Public Overrides Function ExecuteSQL_GetDataTable(SQL As String) As DataTable
-            Return cp.core.db.executeSql_getDataTable(SQL)
+            Return cp.core.db.executeSql(SQL)
         End Function
         '
         '====================================================================================================
@@ -214,7 +214,7 @@ Namespace Contensive.Core
         ''' <param name="MaxRows"></param>
         ''' <returns></returns>
         Public Overrides Function ExecuteSQL_GetDataTable(SQL As String, MaxRows As Integer) As DataTable
-            Return cp.core.db.executeSql_getDataTable(SQL, "", 0, MaxRows)
+            Return cp.core.db.executeSql(SQL, "", 0, MaxRows)
         End Function
         '
         '====================================================================================================
@@ -225,7 +225,7 @@ Namespace Contensive.Core
         ''' <param name="DataSourcename"></param>
         ''' <returns></returns>
         Public Overrides Function ExecuteSQL_GetDataTable(SQL As String, DataSourcename As String) As DataTable
-            Return cp.core.db.executeSql_getDataTable(SQL, DataSourcename)
+            Return cp.core.db.executeSql(SQL, DataSourcename)
         End Function
         '
         '====================================================================================================
@@ -238,7 +238,7 @@ Namespace Contensive.Core
         ''' <param name="PageNumber"></param>
         ''' <returns></returns>
         Public Overrides Function ExecuteSQL_GetDataTable(SQL As String, DataSourcename As String, MaxRows As Integer, PageSize As Integer, PageNumber As Integer) As DataTable
-            Return cp.core.db.executeSql_getDataTable(SQL, "", (PageSize * PageNumber), MaxRows)
+            Return cp.core.db.executeSql(SQL, "", (PageSize * PageNumber), MaxRows)
         End Function
         '
         '====================================================================================================

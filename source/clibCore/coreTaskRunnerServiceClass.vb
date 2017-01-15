@@ -204,13 +204,13 @@ Namespace Contensive
                                     & vbCrLf & " BEGIN TRANSACTION" _
                                     & vbCrLf & " update cctasks set cmdRunner=" & cpSite.core.db.encodeSQLText(runnerGuid) & " where id in (select top 1 id from cctasks where (cmdRunner is null)and(datestarted is null))" _
                                     & vbCrLf & " COMMIT TRANSACTION"
-                                    cpSite.core.db.executeSql_getDataTable(sql)
-                                    CS = cpSite.core.db.csOpen("tasks", "(cmdRunner=" & cpSite.core.db.encodeSQLText(runnerGuid) & ")and(datestarted is null)", "id")
-                                    If cpSite.core.db.cs_Ok(CS) Then
+                                    cpSite.core.db.executeSql(sql)
+                                    CS = cpSite.core.db.cs_open("tasks", "(cmdRunner=" & cpSite.core.db.encodeSQLText(runnerGuid) & ")and(datestarted is null)", "id")
+                                    If cpSite.core.db.cs_ok(CS) Then
                                         'Dim json As New System.Web.Script.Serialization.JavaScriptSerializer
                                         recordsRemaining = True
                                         Call cpSite.core.db.cs_set(CS, "datestarted", Now())
-                                        Call cpSite.core.db.db_SaveCS(CS)
+                                        Call cpSite.core.db.cs_save2(CS)
                                         '
                                         command = cpSite.core.db.cs_getText(CS, "command")
                                         cmdDetailText = cpSite.core.db.cs_getText(CS, "cmdDetail")

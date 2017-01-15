@@ -48,11 +48,18 @@ Namespace Contensive.Core
         Public Function sampleFunction(sampleArg As String) As String
             Dim returnValue As String = ""
             Try
-                '
-                ' code
-                '
+                If String.IsNullOrEmpty(sampleArg) Then
+                    Throw New ArgumentException("sampleArg cannot be blank")
+                Else
+                    '
+                    ' code
+                    '
+                End If
             Catch ex As Exception
+                ' if an exception in this routine might need to interrupt program flow
                 cpCore.handleExceptionAndRethrow(ex)
+                ' if an exception in this routine will never
+                cpCore.handleExceptionAndContinue(ex)
             End Try
             Return returnValue
         End Function

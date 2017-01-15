@@ -285,7 +285,7 @@ Namespace Contensive.Core
             ''' Plain text to be verified against the specified hash. The function
             ''' does not check whether this parameter is null.
             ''' </param>
-            ''' < name="hashAlgorithm">
+            ''' <param name="hashAlgorithm">
             ''' Name of the hash algorithm. Allowed values are: "MD5", "SHA1",
             ''' "SHA256", "SHA384", and "SHA512" (if any other value is specified
             ''' MD5 hashing algorithm will be used). This value is case-insensitive.

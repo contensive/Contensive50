@@ -608,7 +608,7 @@
 //                            // check if memberid is admin
 //                            //
 //                            SQL = "select top 1 m.id" + " from ccmembers m" + " where" + " (m.id=" + MemberID + ")" + " and(m.active<>0)" + " and(" + " (m.admin<>0)" + " or(m.developer<>0)" + " )" + " ";
-//                            CS = cpCore.db.db_openCsSql_rev("default", SQL);
+//                            CS = cpCore.db.openCsSql_rev("default", SQL);
 //                            returnREsult = cpCore.db.cs_Ok(CS);
 //                            cpCore.db.cs_Close(ref CS);
 //                        }
@@ -632,7 +632,7 @@
 //                        Criteria = "" + "(" + Criteria + ")" + " and(m.active<>0)" + " and(m.id=" + MemberID + ")";
 //                        //
 //                        SQL = "select top 1 m.id" + " from ccmembers m" + " left join ccMemberRules r on r.Memberid=m.id" + " where" + Criteria;
-//                        CS = cpCore.db.db_openCsSql_rev("default", SQL);
+//                        CS = cpCore.db.openCsSql_rev("default", SQL);
 //                        returnREsult = cpCore.db.cs_Ok(CS);
 //                        cpCore.db.cs_Close(ref CS);
 //                    }
@@ -665,7 +665,7 @@
 //                    // attempt to read in Member record if logged on
 //                    // dont just do main_CheckMember() -- in case a pretty login is needed
 //                    //
-//                    CS = cpCore.db_csOpenRecord("People", recordId);
+//                    CS = cpCore.csOpenRecord("People", recordId);
 //                    if (cpCore.db.cs_Ok(CS))
 //                    {
 //                        name = cpCore.db.cs_getText(CS, "Name");
@@ -674,7 +674,7 @@
 //                        contentControlID = cpCore.db.cs_getInteger(CS, "ContentControlID");
 //                        organizationId = cpCore.db.cs_getInteger(CS, "OrganizationID");
 //                        languageId = cpCore.db.cs_getInteger(CS, "LanguageID");
-//                        language = cpCore.main_GetCSEncodedField(CS, "LanguageID");
+//                        language = cpCore.main_cs_getEncodedField(CS, "LanguageID");
 //                        //
 //                        shipName = cpCore.db.cs_getText(CS, "ShipName");
 //                        shipCompany = cpCore.db.cs_getText(CS, "ShipCompany");
@@ -801,7 +801,7 @@
 //            {
 //                if ((!property_user_isMember_isLoaded) & (cpCore.visit_initialized))
 //                {
-//                    property_user_isMember = isAuthenticated() & cpCore.db_IsWithinContent(contentControlID, cpCore.main_GetContentID("members"));
+//                    property_user_isMember = isAuthenticated() & cpCore.IsWithinContent(contentControlID, cpCore.main_GetContentID("members"));
 //                    property_user_isMember_isLoaded = true;
 //                }
 //                returnREsult = property_user_isMember;
@@ -969,9 +969,9 @@
 //                                    // renew this old record
 //                                    //
 //                                    //hint = "150"
-//                                    cpCore.db.db_SetCSField(CS, "developer", "1");
-//                                    cpCore.db.db_SetCSField(CS, "admin", "1");
-//                                    cpCore.db.db_SetCSField(CS, "dateExpires", DateTime.Now.AddDays(7).Date.ToString());
+//                                    cpCore.db.SetCSField(CS, "developer", "1");
+//                                    cpCore.db.SetCSField(CS, "admin", "1");
+//                                    cpCore.db.SetCSField(CS, "dateExpires", DateTime.Now.AddDays(7).Date.ToString());
 //                                }
 //                                else {
 //                                    //
@@ -980,13 +980,13 @@
 //                                    //hint = "150"
 //                                    cpCore.db.cs_Close( ref CS);
 //                                    CS = cpCore.db.cs_insertRecord("people");
-//                                    cpCore.db.db_SetCSField(CS, "name", "Contensive Support");
-//                                    cpCore.db.db_SetCSField(CS, "email", workingEmail);
-//                                    cpCore.db.db_SetCSField(CS, "developer", "1");
-//                                    cpCore.db.db_SetCSField(CS, "admin", "1");
-//                                    cpCore.db.db_SetCSField(CS, "dateExpires", DateTime.Now.AddDays(7).Date.ToString());
+//                                    cpCore.db.SetCSField(CS, "name", "Contensive Support");
+//                                    cpCore.db.SetCSField(CS, "email", workingEmail);
+//                                    cpCore.db.SetCSField(CS, "developer", "1");
+//                                    cpCore.db.SetCSField(CS, "admin", "1");
+//                                    cpCore.db.SetCSField(CS, "dateExpires", DateTime.Now.AddDays(7).Date.ToString());
 //                                }
-//                                cpCore.db.db_SaveCSRecord(CS);
+//                                cpCore.db.SaveCSRecord(CS);
 //                            }
 //                            else {
 //                                //hint = "155"
@@ -1090,7 +1090,7 @@
 //                                    }
 //                                    recordCnt = recordCnt + 1;
 //                                }
-//                                cpCore.db.db_csGoNext(CS);
+//                                cpCore.db.csGoNext(CS);
 //                            }
 //                        }
 //                    }
@@ -1254,7 +1254,7 @@
 //                    {
 //                        if (cpCore.siteProperties.getBoolean("AllowAutoLogin"))
 //                        {
-//                            CS = cpCore.db_csOpenRecord("people", irecordID);
+//                            CS = cpCore.csOpenRecord("people", irecordID);
 //                            if (cpCore.db.cs_Ok(CS))
 //                            {
 //                                cpCore.db.cs_set(CS, "AutoLogin", AllowAutoLogin);
@@ -1311,7 +1311,7 @@
 //                    active = (cpCore.db.cs_getBoolean(CS, "Active"));
 //                    company = (cpCore.db.cs_getText(CS, "Company"));
 //                    visits = (cpCore.db.cs_getInteger(CS, "Visits"));
-//                    lastVisit = (cpCore.db.db_GetCSDate(CS, "LastVisit"));
+//                    lastVisit = (cpCore.db.cs_getDate(CS, "LastVisit"));
 //                    allowBulkEmail = (cpCore.db.cs_getBoolean(CS, "AllowBulkEmail"));
 //                    allowToolsPanel = (cpCore.db.cs_getBoolean(CS, "AllowToolsPanel"));
 //                    adminMenuModeID = (cpCore.db.cs_getInteger(CS, "AdminMenuModeID"));
@@ -1390,7 +1390,7 @@
 //                    cpCore.db.cs_set(CSMember, "LastVisit", lastVisit);
 //                    //
 //                    //
-//                    CSlanguage = cpCore.db_csOpenRecord("Languages", cpCore.web_GetBrowserLanguageID(), SelectFieldList: "Name");
+//                    CSlanguage = cpCore.csOpenRecord("Languages", cpCore.web_GetBrowserLanguageID(), SelectFieldList: "Name");
 //                    if (cpCore.db.cs_Ok(CSlanguage))
 //                    {
 //                        languageId = cpCore.db.cs_getInteger(CSlanguage, "ID");
@@ -1475,7 +1475,7 @@
 //                lastVisit = cpCore.main_PageStartTime;
 //                //
 //                //
-//                CSlanguage = cpCore.db_csOpenRecord("Languages", cpCore.web_GetBrowserLanguageID(), SelectFieldList: "Name");
+//                CSlanguage = cpCore.csOpenRecord("Languages", cpCore.web_GetBrowserLanguageID(), SelectFieldList: "Name");
 //                if (cpCore.db.cs_Ok(CSlanguage))
 //                {
 //                    languageId = cpCore.db.cs_getInteger(CSlanguage, "ID");
@@ -1887,7 +1887,7 @@
 //                        //
 //                        cpCore.error_AddUserError(badLoginUserError);
 //                    }
-//                    else if ((!EncodeBoolean(cpCore.siteProperties.getBoolean("AllowDuplicateUsernames", false))) & (cpCore.db.db_GetCSRowCount(CS) > 1))
+//                    else if ((!EncodeBoolean(cpCore.siteProperties.getBoolean("AllowDuplicateUsernames", false))) & (cpCore.db.cs_getRowCount(CS) > 1))
 //                    {
 //                        //
 //                        // ----- AllowDuplicates is false, and there are more then one record
@@ -1939,7 +1939,7 @@
 //                            {
 //                                break; // TODO: might not be correct. Was : Exit Do
 //                            }
-//                            cpCore.db.db_csGoNext(CS);
+//                            cpCore.db.csGoNext(CS);
 //                        }
 //                        if (returnUserId == 0)
 //                        {

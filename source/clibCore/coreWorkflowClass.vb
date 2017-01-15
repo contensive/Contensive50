@@ -118,8 +118,8 @@ Namespace Contensive.Core
                 If main_EditLockStatus_Local Then
                     If main_EditLockMemberName_Local = "" Then
                         If main_EditLockMemberID_Local <> 0 Then
-                            CS = cpCore.db_csOpenRecord("people", main_EditLockMemberID_Local)
-                            If cpCore.db.cs_Ok(CS) Then
+                            CS = cpCore.csOpenRecord("people", main_EditLockMemberID_Local)
+                            If cpCore.db.cs_ok(CS) Then
                                 main_EditLockMemberName_Local = cpCore.db.cs_getText(CS, "name")
                             End If
                             Call cpCore.db.cs_Close(CS)
@@ -202,7 +202,7 @@ Namespace Contensive.Core
         '=========================================================================================
         '
         Public Function isWorkflowAuthoringCompatible(ByVal ContentName As String) As Boolean
-            isWorkflowAuthoringCompatible = EncodeBoolean(cpCore.db_GetContentProperty(EncodeText(ContentName), "ALLOWWORKFLOWAUTHORING"))
+            isWorkflowAuthoringCompatible = EncodeBoolean(cpCore.GetContentProperty(EncodeText(ContentName), "ALLOWWORKFLOWAUTHORING"))
         End Function
         '
         '==========================================================================================
@@ -286,35 +286,35 @@ Namespace Contensive.Core
                         '
                         ' ----- Open the live record
                         '
-                        RSLive = cpCore.db.executeSql_getDataTable("SELECT " & FieldList & " FROM " & LiveTableName & " WHERE ID=" & cpCore.db.encodeSQLNumber(LiveRecordID) & ";", LiveDataSourceName)
+                        RSLive = cpCore.db.executeSql("SELECT " & FieldList & " FROM " & LiveTableName & " WHERE ID=" & cpCore.db.encodeSQLNumber(LiveRecordID) & ";", LiveDataSourceName)
                         'RSLive = appservices.cpcore.db.executeSql(LiveDataSourceName, "SELECT " & FieldList & " FROM " & LiveTableName & " WHERE ID=" & encodeSQLNumber(LiveRecordID) & ";")
                         If RSLive.Rows.Count <= 0 Then
                             '
                             Call cpCore.handleExceptionAndRethrow(New ApplicationException("During record publishing, there was an error opening the live record, [ID=" & LiveRecordID & "] in table [" & LiveTableName & "] on datasource [" & LiveDataSourceName & " ]"))
                         Else
                             If True Then
-                                LiveRecordID = EncodeInteger(cpCore.db.db_getDataRowColumnName(RSLive.Rows(0), "ID"))
-                                LiveRecordBlank = EncodeBoolean(cpCore.db.db_getDataRowColumnName(RSLive.Rows(0), "EditBlank"))
+                                LiveRecordID = EncodeInteger(cpCore.db.getDataRowColumnName(RSLive.Rows(0), "ID"))
+                                LiveRecordBlank = EncodeBoolean(cpCore.db.getDataRowColumnName(RSLive.Rows(0), "EditBlank"))
                                 '
                                 ' ----- Open the edit record
                                 '
-                                RSEdit = cpCore.db.executeSql_getDataTable("SELECT " & FieldList & " FROM " & EditTableName & " WHERE (EditSourceID=" & cpCore.db.encodeSQLNumber(LiveRecordID) & ")and(EditArchive=0) Order By ID DESC;", EditDataSourceName)
+                                RSEdit = cpCore.db.executeSql("SELECT " & FieldList & " FROM " & EditTableName & " WHERE (EditSourceID=" & cpCore.db.encodeSQLNumber(LiveRecordID) & ")and(EditArchive=0) Order By ID DESC;", EditDataSourceName)
                                 'RSEdit = appservices.cpcore.db.executeSql(EditDataSourceName, "SELECT " & FieldList & " FROM " & EditTableName & " WHERE (EditSourceID=" & encodeSQLNumber(LiveRecordID) & ")and(EditArchive=0) Order By ID DESC;")
                                 If RSEdit.Rows.Count <= 0 Then
                                     '
                                     Call cpCore.handleExceptionAndRethrow(New ApplicationException("During record publishing, there was an error opening the edit record [EditSourceID=" & LiveRecordID & "] in table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
                                 Else
                                     If True Then
-                                        EditRecordID = EncodeInteger(cpCore.db.db_getDataRowColumnName(RSEdit.Rows(0), "ID"))
-                                        EditRecordCID = EncodeInteger(cpCore.db.db_getDataRowColumnName(RSEdit.Rows(0), "ContentControlID"))
-                                        EditRecordBlank = EncodeBoolean(cpCore.db.db_getDataRowColumnName(RSEdit.Rows(0), "EditBlank"))
+                                        EditRecordID = EncodeInteger(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), "ID"))
+                                        EditRecordCID = EncodeInteger(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), "ContentControlID"))
+                                        EditRecordBlank = EncodeBoolean(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), "EditBlank"))
                                         PublishingDelete = EditRecordBlank
-                                        PublishingInactive = Not EncodeBoolean(cpCore.db.db_getDataRowColumnName(RSEdit.Rows(0), "active"))
+                                        PublishingInactive = Not EncodeBoolean(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), "active"))
                                         '
                                         ' ----- Create new Edit record
                                         '
                                         If Not PublishingDelete Then
-                                            NewEditRecordID = cpCore.db.db_InsertTableRecordGetID(EditDataSourceName, EditTableName, SystemMemberID)
+                                            NewEditRecordID = cpCore.db.insertTableRecordGetId(EditDataSourceName, EditTableName, SystemMemberID)
                                             If NewEditRecordID < 1 Then
                                                 '
                                                 Call cpCore.handleExceptionAndRethrow(New ApplicationException("During record publishing, a new edit record could not be create, table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
@@ -353,9 +353,9 @@ Namespace Contensive.Core
                                                                     '
                                                                     ' ----- Content related field
                                                                     '
-                                                                    LiveSQLValue = cpCore.db.db_EncodeSQL(cpCore.db.db_getDataRowColumnName(RSLive.Rows(0), FieldName), fieldTypeId)
-                                                                    EditSQLValue = cpCore.db.db_EncodeSQL(cpCore.db.db_getDataRowColumnName(RSEdit.Rows(0), FieldName), fieldTypeId)
-                                                                    BlankSQLValue = cpCore.db.db_EncodeSQL(Nothing, fieldTypeId)
+                                                                    LiveSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSLive.Rows(0), FieldName), fieldTypeId)
+                                                                    EditSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), FieldName), fieldTypeId)
+                                                                    BlankSQLValue = cpCore.db.EncodeSQL(Nothing, fieldTypeId)
                                                                     FieldNameArray(FieldPointer) = FieldName
                                                                     '
                                                                     ' ----- New Edit Record value
@@ -366,7 +366,7 @@ Namespace Contensive.Core
                                                                                 '
                                                                                 ' ----- cdn files - create copy of File for neweditrecord
                                                                                 '
-                                                                                EditFilename = EncodeText(cpCore.db.db_getDataRowColumnName(RSEdit.Rows(0), FieldName))
+                                                                                EditFilename = EncodeText(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), FieldName))
                                                                                 If EditFilename = "" Then
                                                                                     NewEditSqlFieldList.add(FieldName, cpCore.db.encodeSQLText(""))
                                                                                 Else
@@ -379,7 +379,7 @@ Namespace Contensive.Core
                                                                                 '
                                                                                 ' ----- private files - create copy of File for neweditrecord
                                                                                 '
-                                                                                EditFilename = EncodeText(cpCore.db.db_getDataRowColumnName(RSEdit.Rows(0), FieldName))
+                                                                                EditFilename = EncodeText(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), FieldName))
                                                                                 If EditFilename = "" Then
                                                                                     NewEditSqlFieldList.add(FieldName, cpCore.db.encodeSQLText(""))
                                                                                 Else
@@ -423,8 +423,8 @@ Namespace Contensive.Core
                                             FieldName = "MODIFIEDDATE"
                                             fieldTypeId = FieldTypeIdDate
                                             FieldNameArray(FieldPointer) = FieldName
-                                            LiveSQLValue = cpCore.db.db_EncodeSQL(cpCore.db.db_getDataRowColumnName(RSLive.Rows(0), FieldName), fieldTypeId)
-                                            EditSQLValue = cpCore.db.db_EncodeSQL(cpCore.db.db_getDataRowColumnName(RSEdit.Rows(0), FieldName), fieldTypeId)
+                                            LiveSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSLive.Rows(0), FieldName), fieldTypeId)
+                                            EditSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), FieldName), fieldTypeId)
                                             ArchiveSqlFieldList.add(FieldName, LiveSQLValue)
                                             NewEditSqlFieldList.add(FieldName, EditSQLValue)
                                             PublishFieldNameArray(FieldPointer) = FieldName
@@ -434,8 +434,8 @@ Namespace Contensive.Core
                                             FieldName = "MODIFIEDBY"
                                             fieldTypeId = FieldTypeIdLookup
                                             FieldNameArray(FieldPointer) = FieldName
-                                            LiveSQLValue = cpCore.db.db_EncodeSQL(cpCore.db.db_getDataRowColumnName(RSLive.Rows(0), FieldName), fieldTypeId)
-                                            EditSQLValue = cpCore.db.db_EncodeSQL(cpCore.db.db_getDataRowColumnName(RSEdit.Rows(0), FieldName), fieldTypeId)
+                                            LiveSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSLive.Rows(0), FieldName), fieldTypeId)
+                                            EditSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), FieldName), fieldTypeId)
                                             ArchiveSqlFieldList.add(FieldName, LiveSQLValue)
                                             NewEditSqlFieldList.add(FieldName, EditSQLValue)
                                             PublishFieldNameArray(FieldPointer) = FieldName
@@ -445,8 +445,8 @@ Namespace Contensive.Core
                                             FieldName = "CONTENTCONTROLID"
                                             fieldTypeId = FieldTypeIdLookup
                                             FieldNameArray(FieldPointer) = FieldName
-                                            LiveSQLValue = cpCore.db.db_EncodeSQL(cpCore.db.db_getDataRowColumnName(RSLive.Rows(0), FieldName), fieldTypeId)
-                                            EditSQLValue = cpCore.db.db_EncodeSQL(cpCore.db.db_getDataRowColumnName(RSEdit.Rows(0), FieldName), fieldTypeId)
+                                            LiveSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSLive.Rows(0), FieldName), fieldTypeId)
+                                            EditSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), FieldName), fieldTypeId)
                                             ArchiveSqlFieldList.add(FieldName, LiveSQLValue)
                                             NewEditSqlFieldList.add(FieldName, EditSQLValue)
                                             PublishFieldNameArray(FieldPointer) = FieldName
@@ -460,8 +460,8 @@ Namespace Contensive.Core
                                             FieldName = "EDITBLANK"
                                             fieldTypeId = FieldTypeIdBoolean
                                             FieldNameArray(FieldPointer) = FieldName
-                                            LiveSQLValue = cpCore.db.db_EncodeSQL(cpCore.db.db_getDataRowColumnName(RSLive.Rows(0), FieldName), fieldTypeId)
-                                            EditSQLValue = cpCore.db.db_EncodeSQL(cpCore.db.db_getDataRowColumnName(RSEdit.Rows(0), FieldName), fieldTypeId)
+                                            LiveSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSLive.Rows(0), FieldName), fieldTypeId)
+                                            EditSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), FieldName), fieldTypeId)
                                             ArchiveSqlFieldList.add(FieldName, LiveSQLValue)
                                             NewEditSqlFieldList.add(FieldName, EditSQLValue)
                                             PublishFieldNameArray(FieldPointer) = FieldName
@@ -483,13 +483,13 @@ Namespace Contensive.Core
                                             '
                                             ' ----- copy edit record to live record
                                             '
-                                            Call cpCore.db.db_UpdateTableRecord(LiveDataSourceName, LiveTableName, "ID=" & LiveRecordID, PublishSqlFieldList)
+                                            Call cpCore.db.updateTableRecord(LiveDataSourceName, LiveTableName, "ID=" & LiveRecordID, PublishSqlFieldList)
                                             '
                                             ' ----- copy live record to archive record and the edit to the new edit
                                             '
-                                            Call cpCore.db.db_UpdateTableRecord(EditDataSourceName, EditTableName, "ID=" & EditRecordID, ArchiveSqlFieldList)
+                                            Call cpCore.db.updateTableRecord(EditDataSourceName, EditTableName, "ID=" & EditRecordID, ArchiveSqlFieldList)
                                             If Not PublishingDelete Then
-                                                Call cpCore.db.db_UpdateTableRecord(EditDataSourceName, EditTableName, "ID=" & NewEditRecordID, NewEditSqlFieldList)
+                                                Call cpCore.db.updateTableRecord(EditDataSourceName, EditTableName, "ID=" & NewEditRecordID, NewEditSqlFieldList)
                                             End If
                                             '
                                             ' ----- Content Watch effects
@@ -498,15 +498,15 @@ Namespace Contensive.Core
                                                 '
                                                 ' Record was deleted, delete contentwatch records also
                                                 '
-                                                Call cpCore.db.db_DeleteContentRules(ContentID, RecordID)
+                                                Call cpCore.db.deleteContentRules(ContentID, RecordID)
                                             End If
                                             '
                                             ' ----- mark the SpiderDocs record not up-to-date
                                             '
                                             If (LCase(EditTableName) = "ccpagecontent") And (LiveRecordID <> 0) Then
-                                                If cpCore.db.db_IsSQLTableField("default", "ccSpiderDocs", "PageID") Then
+                                                If cpCore.db.isSQLTableField("default", "ccSpiderDocs", "PageID") Then
                                                     SQL = "UPDATE ccspiderdocs SET UpToDate = 0 WHERE PageID=" & LiveRecordID
-                                                    Call cpCore.db.executeSql_getDataTable(SQL)
+                                                    Call cpCore.db.executeSql(SQL)
                                                 End If
                                             End If
                                             '
@@ -535,7 +535,7 @@ Namespace Contensive.Core
                         '
                         '
                         If PublishingDelete Or PublishingInactive Then
-                            Call cpCore.db.db_DeleteContentRules(ContentID, LiveRecordID)
+                            Call cpCore.db.deleteContentRules(ContentID, LiveRecordID)
                         End If
                     End If
                 End If
@@ -596,11 +596,11 @@ Namespace Contensive.Core
                         'ReDim sqlFieldList(FieldCount + 2)
                         'ReDim PublishFieldNameArray(FieldCount + 2)
                         LiveRecordID = RecordID
-                        ' LiveRecordID = appservices.csv_GetCSField(CSPointer, "ID")
+                        ' LiveRecordID = appservices.csv_cs_getField(CSPointer, "ID")
                         '
                         ' Open the live record
                         '
-                        RSLive = cpCore.db.executeSql_getDataTable("SELECT * FROM " & LiveTableName & " WHERE ID=" & cpCore.db.encodeSQLNumber(LiveRecordID) & ";", LiveDataSourceName)
+                        RSLive = cpCore.db.executeSql("SELECT * FROM " & LiveTableName & " WHERE ID=" & cpCore.db.encodeSQLNumber(LiveRecordID) & ";", LiveDataSourceName)
                         If (RSLive Is Nothing) Then
                             '
                             Call cpCore.handleExceptionAndRethrow(New ApplicationException("During record publishing, there was an error opening the live record, [ID=" & LiveRecordID & "] in table [" & LiveTableName & "] on datasource [" & LiveDataSourceName & " ]"))
@@ -609,11 +609,11 @@ Namespace Contensive.Core
                                 '
                                 Call cpCore.handleExceptionAndRethrow(New ApplicationException("During record publishing, the live record could not be found, [ID=" & LiveRecordID & "] in table [" & LiveTableName & "] on datasource [" & LiveDataSourceName & " ]"))
                             Else
-                                LiveRecordID = EncodeInteger(cpCore.db.db_getDataRowColumnName(RSLive.Rows(0), "ID"))
+                                LiveRecordID = EncodeInteger(cpCore.db.getDataRowColumnName(RSLive.Rows(0), "ID"))
                                 '
                                 ' Open the edit record
                                 '
-                                RSEdit = cpCore.db.executeSql_getDataTable("SELECT * FROM " & EditTableName & " WHERE (EditSourceID=" & cpCore.db.encodeSQLNumber(LiveRecordID) & ")and(EditArchive=0) Order By ID DESC;", EditDataSourceName)
+                                RSEdit = cpCore.db.executeSql("SELECT * FROM " & EditTableName & " WHERE (EditSourceID=" & cpCore.db.encodeSQLNumber(LiveRecordID) & ")and(EditArchive=0) Order By ID DESC;", EditDataSourceName)
                                 If (RSEdit Is Nothing) Then
                                     '
                                     Call cpCore.handleExceptionAndRethrow(New ApplicationException("During record publishing, there was an error opening the edit record [EditSourceID=" & LiveRecordID & "] in table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
@@ -622,7 +622,7 @@ Namespace Contensive.Core
                                         '
                                         Call cpCore.handleExceptionAndRethrow(New ApplicationException("During record publishing, the edit record could not be found, [EditSourceID=" & LiveRecordID & "] in table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
                                     Else
-                                        EditRecordID = EncodeInteger(cpCore.db.db_getDataRowColumnName(RSEdit.Rows(0), "ID"))
+                                        EditRecordID = EncodeInteger(cpCore.db.getDataRowColumnName(RSEdit.Rows(0), "ID"))
                                         '
                                         ' create update arrays
                                         '
@@ -631,9 +631,9 @@ Namespace Contensive.Core
                                             Dim field As coreMetaDataClass.CDefFieldClass = keyValuePair.Value
                                             With field
                                                 FieldName = .nameLc
-                                                If cpCore.db.db_IsSQLTableField(EditDataSourceName, EditTableName, FieldName) Then
+                                                If cpCore.db.isSQLTableField(EditDataSourceName, EditTableName, FieldName) Then
                                                     fieldTypeId = .fieldTypeId
-                                                    LiveSQLValue = cpCore.db.db_EncodeSQL(cpCore.db.db_getDataRowColumnName(RSLive.Rows(0), FieldName), fieldTypeId)
+                                                    LiveSQLValue = cpCore.db.EncodeSQL(cpCore.db.getDataRowColumnName(RSLive.Rows(0), FieldName), fieldTypeId)
                                                     Select Case vbUCase(FieldName)
                                                         Case "EDITARCHIVE", "ID", "EDITSOURCEID"
                                                             '
@@ -647,7 +647,7 @@ Namespace Contensive.Core
                                                                 '
                                                                 '   cdnfiles - create copy of Live TextFile for Edit record
                                                                 '
-                                                                LiveFilename = EncodeText(cpCore.db.db_getDataRowColumnName(RSLive.Rows(0), FieldName))
+                                                                LiveFilename = EncodeText(cpCore.db.getDataRowColumnName(RSLive.Rows(0), FieldName))
                                                                 If LiveFilename <> "" Then
                                                                     EditFilename = csv_GetVirtualFilenameByTable(EditTableName, FieldName, EditRecordID, "", fieldTypeId)
                                                                     Call cpCore.cdnFiles.copyFile(LiveFilename, EditFilename)
@@ -658,7 +658,7 @@ Namespace Contensive.Core
                                                                 '
                                                                 '   pivatefiles - create copy of Live TextFile for Edit record
                                                                 '
-                                                                LiveFilename = EncodeText(cpCore.db.db_getDataRowColumnName(RSLive.Rows(0), FieldName))
+                                                                LiveFilename = EncodeText(cpCore.db.getDataRowColumnName(RSLive.Rows(0), FieldName))
                                                                 If LiveFilename <> "" Then
                                                                     EditFilename = csv_GetVirtualFilenameByTable(EditTableName, FieldName, EditRecordID, "", fieldTypeId)
                                                                     Call cpCore.privateFiles.copyFile(LiveFilename, EditFilename)
@@ -683,7 +683,7 @@ Namespace Contensive.Core
                         '
                         ' ----- copy live record to editrecord
                         '
-                        Call cpCore.db.db_UpdateTableRecord(EditDataSourceName, EditTableName, "ID=" & EditRecordID, sqlFieldList)
+                        Call cpCore.db.updateTableRecord(EditDataSourceName, EditTableName, "ID=" & EditRecordID, sqlFieldList)
                         '
                         ' ----- Clear all authoring controls
                         '
@@ -748,8 +748,8 @@ Namespace Contensive.Core
                 Dim CS As Integer
                 '
                 Criteria = getAuthoringControlCriteria(ContentName, RecordID) & "and(CreatedBy<>" & cpCore.db.encodeSQLNumber(MemberID) & ")"
-                CS = cpCore.db.csOpen("Authoring Controls", Criteria, , , MemberID)
-                isRecordLocked = cpCore.db.cs_Ok(CS)
+                CS = cpCore.db.cs_open("Authoring Controls", Criteria, , , MemberID)
+                isRecordLocked = cpCore.db.cs_ok(CS)
                 Call cpCore.db.cs_Close(CS)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -772,16 +772,16 @@ Namespace Contensive.Core
                 '
                 MethodName = "csv_GetAuthoringControlCriteria"
                 '
-                TableID = cpCore.db.db_GetContentTableID(ContentName)
+                TableID = cpCore.db.GetContentTableID(ContentName)
                 '
                 ' Authoring Control records are referenced by ContentID
                 '
                 ContentCnt = 0
-                CS = cpCore.db.csOpen("Content", "(contenttableid=" & TableID & ")")
-                Do While cpCore.db.cs_Ok(CS)
+                CS = cpCore.db.cs_open("Content", "(contenttableid=" & TableID & ")")
+                Do While cpCore.db.cs_ok(CS)
                     Criteria = Criteria & "," & cpCore.db.cs_getInteger(CS, "ID")
                     ContentCnt = ContentCnt + 1
-                    Call cpCore.db.db_csGoNext(CS)
+                    Call cpCore.db.cs_goNext(CS)
                 Loop
                 Call cpCore.db.cs_Close(CS)
                 If ContentCnt < 1 Then
@@ -794,7 +794,7 @@ Namespace Contensive.Core
                     '
                     ' One content record
                     '
-                    getAuthoringControlCriteria = "(ContentID=" & cpCore.db.encodeSQLNumber(Mid(Criteria, 2)) & ")And(RecordID=" & cpCore.db.encodeSQLNumber(RecordID) & ")And((DateExpires>" & cpCore.db.encodeSQLDate(Now) & ")Or(DateExpires Is null))"
+                    getAuthoringControlCriteria = "(ContentID=" & cpCore.db.encodeSQLNumber(EncodeInteger(Mid(Criteria, 2))) & ")And(RecordID=" & cpCore.db.encodeSQLNumber(RecordID) & ")And((DateExpires>" & cpCore.db.encodeSQLDate(Now) & ")Or(DateExpires Is null))"
                 Else
                     '
                     ' Multiple content records
@@ -874,13 +874,13 @@ Namespace Contensive.Core
                                 '
                                 ' Select any lock left, only the newest counts
                                 '
-                                CSCurrentLock = cpCore.db.csOpen("Authoring Controls", sqlCriteria, "ID DESC", , MemberID, False, False)
-                                If Not cpCore.db.cs_Ok(CSCurrentLock) Then
+                                CSCurrentLock = cpCore.db.cs_open("Authoring Controls", sqlCriteria, "ID DESC", , MemberID, False, False)
+                                If Not cpCore.db.cs_ok(CSCurrentLock) Then
                                     '
                                     ' No lock, create one
                                     '
                                     CSNewLock = cpCore.db.cs_insertRecord("Authoring Controls", MemberID)
-                                    If cpCore.db.cs_Ok(CSNewLock) Then
+                                    If cpCore.db.cs_ok(CSNewLock) Then
                                         Call cpCore.db.cs_setField(CSNewLock, "RecordID", RecordID)
                                         Call cpCore.db.cs_setField(CSNewLock, "DateExpires", (Now.AddDays(EditLockTimeoutDays)))
                                         Call cpCore.db.cs_setField(CSNewLock, "ControlType", AuthoringControlsEditing)
@@ -901,13 +901,13 @@ Namespace Contensive.Core
                         Case AuthoringControlsSubmitted, AuthoringControlsApproved, AuthoringControlsModified
                             If CDef.AllowWorkflowAuthoring And cpCore.siteProperties.allowWorkflowAuthoring Then
                                 sqlCriteria = AuthoringCriteria & "And(ControlType=" & AuthoringControl & ")"
-                                CSCurrentLock = cpCore.db.csOpen("Authoring Controls", sqlCriteria, "ID DESC", , MemberID, False, False)
-                                If Not cpCore.db.cs_Ok(CSCurrentLock) Then
+                                CSCurrentLock = cpCore.db.cs_open("Authoring Controls", sqlCriteria, "ID DESC", , MemberID, False, False)
+                                If Not cpCore.db.cs_ok(CSCurrentLock) Then
                                     '
                                     ' Create new lock
                                     '
                                     CSNewLock = cpCore.db.cs_insertRecord("Authoring Controls", MemberID)
-                                    If cpCore.db.cs_Ok(CSNewLock) Then
+                                    If cpCore.db.cs_ok(CSNewLock) Then
                                         Call cpCore.db.cs_setField(CSNewLock, "RecordID", RecordID)
                                         Call cpCore.db.cs_setField(CSNewLock, "ControlType", AuthoringControl)
                                         Call cpCore.db.cs_setField(CSNewLock, "ContentRecordKey", EncodeText(ContentID & "." & RecordID))
@@ -977,30 +977,30 @@ Namespace Contensive.Core
                             '
                             'TableID = csv_GetContentTableID(ContentName)
                             Criteria = getAuthoringControlCriteria(ContentName, RecordID)
-                            CSLocks = cpCore.db.csOpen("Authoring Controls", Criteria, "DateAdded Desc", , , , , "DateAdded,ControlType,CreatedBy,ID,DateExpires")
-                            Do While cpCore.db.cs_Ok(CSLocks)
+                            CSLocks = cpCore.db.cs_open("Authoring Controls", Criteria, "DateAdded Desc", , , , , "DateAdded,ControlType,CreatedBy,ID,DateExpires")
+                            Do While cpCore.db.cs_ok(CSLocks)
                                 ControlType = cpCore.db.cs_getInteger(CSLocks, "ControlType")
                                 Select Case ControlType
                                     Case AuthoringControlsModified
                                         If Not IsModified Then
-                                            ModifiedDate = cpCore.db.db_GetCSDate(CSLocks, "DateAdded")
-                                            ModifiedName = cpCore.db.db_GetCS(CSLocks, "CreatedBy")
+                                            ModifiedDate = cpCore.db.cs_getDate(CSLocks, "DateAdded")
+                                            ModifiedName = cpCore.db.cs_get(CSLocks, "CreatedBy")
                                             IsModified = True
                                         End If
                                     Case AuthoringControlsSubmitted
                                         If Not IsSubmitted Then
-                                            SubmittedDate = cpCore.db.db_GetCSDate(CSLocks, "DateAdded")
-                                            SubmittedName = cpCore.db.db_GetCS(CSLocks, "CreatedBy")
+                                            SubmittedDate = cpCore.db.cs_getDate(CSLocks, "DateAdded")
+                                            SubmittedName = cpCore.db.cs_get(CSLocks, "CreatedBy")
                                             IsSubmitted = True
                                         End If
                                     Case AuthoringControlsApproved
                                         If Not IsApproved Then
-                                            ApprovedDate = cpCore.db.db_GetCSDate(CSLocks, "DateAdded")
-                                            ApprovedName = cpCore.db.db_GetCS(CSLocks, "CreatedBy")
+                                            ApprovedDate = cpCore.db.cs_getDate(CSLocks, "DateAdded")
+                                            ApprovedName = cpCore.db.cs_get(CSLocks, "CreatedBy")
                                             IsApproved = True
                                         End If
                                 End Select
-                                cpCore.db.db_csGoNext(CSLocks)
+                                cpCore.db.cs_goNext(CSLocks)
                             Loop
                             Call cpCore.db.cs_Close(CSLocks)
                             '
@@ -1011,10 +1011,10 @@ Namespace Contensive.Core
                             & " FROM " & AuthoringTableName & " As AuthoringTableName RIGHT JOIN " & ContentTableName & " As ContentTableName On AuthoringTableName.EditSourceID = ContentTableName.ID" _
                             & " Where (((ContentTableName.ID) = " & RecordID & "))" _
                             & " ORDER BY AuthoringTableName.ID DESC;"
-                            rs = cpCore.db.executeSql_getDataTable(SQL, DataSourceName)
+                            rs = cpCore.db.executeSql(SQL, DataSourceName)
                             If isDataTableOk(rs) Then
-                                IsInserted = EncodeBoolean(cpCore.db.db_getDataRowColumnName(rs.Rows(0), "IsInserted"))
-                                IsDeleted = EncodeBoolean(cpCore.db.db_getDataRowColumnName(rs.Rows(0), "IsDeleted"))
+                                IsInserted = EncodeBoolean(cpCore.db.getDataRowColumnName(rs.Rows(0), "IsInserted"))
+                                IsDeleted = EncodeBoolean(cpCore.db.getDataRowColumnName(rs.Rows(0), "IsDeleted"))
                                 'IsModified = (getDataRowColumnName(RS.rows(0), "LiveRecordModifiedDate") <> getDataRowColumnName(RS.rows(0), "EditRecordModifiedDate"))
                             End If
                             Call closeDataTable(rs)

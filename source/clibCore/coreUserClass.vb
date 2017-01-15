@@ -347,7 +347,7 @@ Namespace Contensive.Core
                             SQL &= ",ExcludeFromAnalytics=" & cpCore.db.encodeSQLBoolean(excludeFromAnalytics)
                         End If
                         SQL &= " WHERE ID=" & id & ";"
-                        Call cpCore.db.executeSql_getDataTable(SQL)
+                        Call cpCore.db.executeSql(SQL)
                     End If
                 End If
             Catch ex As Exception
@@ -523,8 +523,8 @@ Namespace Contensive.Core
                                 & " or(m.developer<>0)" _
                             & " )" _
                             & " "
-                            CS = cpCore.db.db_openCsSql_rev("default", SQL)
-                            returnREsult = cpCore.db.cs_Ok(CS)
+                            CS = cpCore.db.cs_openCsSql_rev("default", SQL)
+                            returnREsult = cpCore.db.cs_ok(CS)
                             Call cpCore.db.cs_Close(CS)
                         End If
                     Else
@@ -553,8 +553,8 @@ Namespace Contensive.Core
                         & " from ccmembers m" _
                         & " left join ccMemberRules r on r.Memberid=m.id" _
                         & " where" & Criteria
-                        CS = cpCore.db.db_openCsSql_rev("default", SQL)
-                        returnREsult = cpCore.db.cs_Ok(CS)
+                        CS = cpCore.db.cs_openCsSql_rev("default", SQL)
+                        returnREsult = cpCore.db.cs_ok(CS)
                         Call cpCore.db.cs_Close(CS)
                     End If
                 End If
@@ -581,15 +581,15 @@ Namespace Contensive.Core
                     ' attempt to read in Member record if logged on
                     ' dont just do main_CheckMember() -- in case a pretty login is needed
                     '
-                    CS = cpCore.db_csOpenRecord("People", recordId)
-                    If cpCore.db.cs_Ok(CS) Then
+                    CS = cpCore.csOpenRecord("People", recordId)
+                    If cpCore.db.cs_ok(CS) Then
                         name = cpCore.db.cs_getText(CS, "Name")
                         isDeveloper = cpCore.db.cs_getBoolean(CS, "Developer")
                         isAdmin = cpCore.db.cs_getBoolean(CS, "Admin")
                         contentControlID = cpCore.db.cs_getInteger(CS, "ContentControlID")
                         organizationId = cpCore.db.cs_getInteger(CS, "OrganizationID")
                         languageId = cpCore.db.cs_getInteger(CS, "LanguageID")
-                        language = cpCore.main_GetCSEncodedField(CS, "LanguageID")
+                        language = cpCore.main_cs_getEncodedField(CS, "LanguageID")
                         '
                         shipName = cpCore.db.cs_getText(CS, "ShipName")
                         shipCompany = cpCore.db.cs_getText(CS, "ShipCompany")
@@ -695,7 +695,7 @@ Namespace Contensive.Core
             Dim returnREsult As Boolean = False
             Try
                 If (Not property_user_isMember_isLoaded) And (cpCore.visit_initialized) Then
-                    property_user_isMember = isAuthenticated() And cpCore.db_IsWithinContent(contentControlID, cpCore.main_GetContentID("members"))
+                    property_user_isMember = isAuthenticated() And cpCore.IsWithinContent(contentControlID, cpCore.main_GetContentID("members"))
                     property_user_isMember_isLoaded = True
                 End If
                 returnREsult = property_user_isMember
@@ -821,8 +821,8 @@ Namespace Contensive.Core
                         If True Then
                             sqlCriteria = sqlCriteria & "and((dateExpires is null)or(dateExpires>" & cpCore.db.encodeSQLDate(DateTime.Now) & "))"
                         End If
-                        CS = cpCore.db.csOpen("People", sqlCriteria, "ID", SelectFieldList:="username,password", PageSize:=1)
-                        If Not cpCore.db.cs_Ok(CS) Then
+                        CS = cpCore.db.cs_open("People", sqlCriteria, "ID", SelectFieldList:="username,password", PageSize:=1)
+                        If Not cpCore.db.cs_ok(CS) Then
                             '
                             ' valid login account for this email not found
                             '
@@ -831,8 +831,8 @@ Namespace Contensive.Core
                                 ' look for expired account to renew
                                 '
                                 Call cpCore.db.cs_Close(CS)
-                                CS = cpCore.db.csOpen("People", "((email=" & cpCore.db.encodeSQLText(workingEmail) & "))", "ID", PageSize:=1)
-                                If cpCore.db.cs_Ok(CS) Then
+                                CS = cpCore.db.cs_open("People", "((email=" & cpCore.db.encodeSQLText(workingEmail) & "))", "ID", PageSize:=1)
+                                If cpCore.db.cs_ok(CS) Then
                                     '
                                     ' renew this old record
                                     '
@@ -853,18 +853,18 @@ Namespace Contensive.Core
                                     Call cpCore.db.cs_setField(CS, "admin", "1")
                                     Call cpCore.db.cs_setField(CS, "dateExpires", DateTime.Now.AddDays(7).Date.ToString())
                                 End If
-                                Call cpCore.db.db_SaveCSRecord(CS)
+                                Call cpCore.db.cs_save2(CS)
                             Else
                                 'hint = "155"
                                 cpCore.error_AddUserError("No current user was found matching this email address. Please try again. ")
                             End If
                         End If
-                        If cpCore.db.cs_Ok(CS) Then
+                        If cpCore.db.cs_ok(CS) Then
                             'hint = "160"
                             FromAddress = cpCore.siteProperties.getText("EmailFromAddress", "info@" & cpCore.main_ServerDomain)
                             subject = "Password Request at " & cpCore.main_ServerDomain
                             Message = ""
-                            Do While cpCore.db.cs_Ok(CS)
+                            Do While cpCore.db.cs_ok(CS)
                                 'hint = "170"
                                 updateUser = False
                                 If Message = "" Then
@@ -942,7 +942,7 @@ Namespace Contensive.Core
                                     End If
                                     recordCnt = recordCnt + 1
                                 End If
-                                cpCore.db.db_csGoNext(CS)
+                                cpCore.db.cs_goNext(CS)
                             Loop
                         End If
                     End If
@@ -1000,7 +1000,7 @@ Namespace Contensive.Core
                                         & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & cpCore.db.encodeSQLDate(cpCore.main_PageStartTime) & "))" _
                                         & ")"
                                 CS = cpCore.db.cs_openSql(SQL)
-                                _isAuthenticatedContentManagerAnything = cpCore.db.cs_Ok(CS)
+                                _isAuthenticatedContentManagerAnything = cpCore.db.cs_ok(CS)
                                 cpCore.db.cs_Close(CS)
                                 '
                                 _isAuthenticatedContentManagerAnything_userId = id
@@ -1087,8 +1087,8 @@ Namespace Contensive.Core
                     '
                     If AllowAutoLogin Xor autoLogin Then
                         If cpCore.siteProperties.getBoolean("AllowAutoLogin") Then
-                            CS = cpCore.db_csOpenRecord("people", irecordID)
-                            If cpCore.db.cs_Ok(CS) Then
+                            CS = cpCore.csOpenRecord("people", irecordID)
+                            If cpCore.db.cs_ok(CS) Then
                                 Call cpCore.db.cs_set(CS, "AutoLogin", AllowAutoLogin)
                             End If
                             Call cpCore.db.cs_Close(CS)
@@ -1126,7 +1126,7 @@ Namespace Contensive.Core
                     & " and((ccMembers.dateExpires is null)or(ccMembers.dateExpires>" & cpCore.db.encodeSQLDate(DateTime.Now) & "))" _
                     & ""
                 CS = cpCore.db.cs_openSql(SQL)
-                If cpCore.db.cs_Ok(CS) Then
+                If cpCore.db.cs_ok(CS) Then
                     If cpCore.visit_Id = 0 Then
                         '
                         ' Visit was blocked during init, init the visit DateTime.Now
@@ -1147,7 +1147,7 @@ Namespace Contensive.Core
                     active = (cpCore.db.cs_getBoolean(CS, "Active"))
                     company = (cpCore.db.cs_getText(CS, "Company"))
                     visits = (cpCore.db.cs_getInteger(CS, "Visits"))
-                    lastVisit = (cpCore.db.db_GetCSDate(CS, "LastVisit"))
+                    lastVisit = (cpCore.db.cs_getDate(CS, "LastVisit"))
                     allowBulkEmail = (cpCore.db.cs_getBoolean(CS, "AllowBulkEmail"))
                     allowToolsPanel = (cpCore.db.cs_getBoolean(CS, "AllowToolsPanel"))
                     adminMenuModeID = (cpCore.db.cs_getInteger(CS, "AdminMenuModeID"))
@@ -1201,7 +1201,7 @@ Namespace Contensive.Core
                 '
                 id = 0
                 CSMember = cpCore.db.cs_insertRecord("people")
-                If Not cpCore.db.cs_Ok(CSMember) Then
+                If Not cpCore.db.cs_ok(CSMember) Then
                     Call cpCore.handleExceptionAndRethrow(New ApplicationException("main_CreateUser, Error inserting new people record, could not main_CreateUser"))
                 Else
                     id = cpCore.db.cs_getInteger(CSMember, "id")
@@ -1217,8 +1217,8 @@ Namespace Contensive.Core
                     Call cpCore.db.cs_set(CSMember, "LastVisit", lastVisit)
                     '
                     '
-                    CSlanguage = cpCore.db_csOpenRecord("Languages", cpCore.web_GetBrowserLanguageID(), SelectFieldList:="Name")
-                    If cpCore.db.cs_Ok(CSlanguage) Then
+                    CSlanguage = cpCore.csOpenRecord("Languages", cpCore.web_GetBrowserLanguageID(), SelectFieldList:="Name")
+                    If cpCore.db.cs_ok(CSlanguage) Then
                         languageId = cpCore.db.cs_getInteger(CSlanguage, "ID")
                         language = cpCore.db.cs_getText(CSlanguage, "Name")
                         Call cpCore.db.cs_set(CSMember, "LanguageID", languageId)
@@ -1297,8 +1297,8 @@ Namespace Contensive.Core
                 lastVisit = cpCore.main_PageStartTime
                 '
                 '
-                CSlanguage = cpCore.db_csOpenRecord("Languages", cpCore.web_GetBrowserLanguageID(), SelectFieldList:="Name")
-                If cpCore.db.cs_Ok(CSlanguage) Then
+                CSlanguage = cpCore.csOpenRecord("Languages", cpCore.web_GetBrowserLanguageID(), SelectFieldList:="Name")
+                If cpCore.db.cs_ok(CSlanguage) Then
                     languageId = cpCore.db.cs_getInteger(CSlanguage, "ID")
                     language = cpCore.db.cs_getText(CSlanguage, "Name")
                 End If
@@ -1345,7 +1345,7 @@ Namespace Contensive.Core
                         & ",AutoLogin=" & cpCore.db.encodeSQLBoolean(autoLogin)
                         SQL &= ",ExcludeFromAnalytics=" & cpCore.db.encodeSQLBoolean(excludeFromAnalytics)
                         SQL &= " WHERE ID=" & id & ";"
-                        Call cpCore.db.executeSql_getDataTable(SQL)
+                        Call cpCore.db.executeSql(SQL)
                     End If
                 End If
             Catch ex As Exception
@@ -1400,8 +1400,8 @@ Namespace Contensive.Core
                         Call cpCore.error_AddUserError(ErrorMessage)
                     Else
                         If Not cpCore.error_IsUserError() Then
-                            CS = cpCore.db.csOpen("people", "ID=" & cpCore.db.encodeSQLNumber(cpCore.user.id))
-                            If Not cpCore.db.cs_Ok(CS) Then
+                            CS = cpCore.db.cs_open("people", "ID=" & cpCore.db.encodeSQLNumber(cpCore.user.id))
+                            If Not cpCore.db.cs_ok(CS) Then
                                 cpCore.handleExceptionAndRethrow(New Exception("Could not open the current members account to set the username and password."))
                             Else
                                 If (cpCore.db.cs_getText(CS, "username") <> "") Or (cpCore.db.cs_getText(CS, "password") <> "") Or (cpCore.db.cs_getBoolean(CS, "admin")) Or (cpCore.db.cs_getBoolean(CS, "developer")) Then
@@ -1542,7 +1542,7 @@ Namespace Contensive.Core
                     loginForm = loginForm _
                     & cr & "<tr>" _
                     & cr2 & "<td style=""text-align:right;vertical-align:middle;width:30%;padding:4px"" align=""right"" width=""30%"">" & SpanClassAdminNormal & Caption & "&nbsp;</span></td>" _
-                    & cr2 & "<td style=""text-align:left;vertical-align:middle;width:70%;padding:4px"" align=""left""  width=""70%""><input ID=""LoginUsernameInput"" NAME=""" & "username"" VALUE=""" & cpcore.html.html_EncodeHTML(loginForm_Username) & """ SIZE=""20"" MAXLENGTH=""50"" ></td>" _
+                    & cr2 & "<td style=""text-align:left;vertical-align:middle;width:70%;padding:4px"" align=""left""  width=""70%""><input ID=""LoginUsernameInput"" NAME=""" & "username"" VALUE=""" & cpCore.html.html_EncodeHTML(loginForm_Username) & """ SIZE=""20"" MAXLENGTH=""50"" ></td>" _
                     & cr & "</tr>"
                     '
                     ' ----- Password
@@ -1714,13 +1714,13 @@ Namespace Contensive.Core
                     If True Then
                         Criteria = Criteria & "and((dateExpires is null)or(dateExpires>" & cpCore.db.encodeSQLDate(DateTime.Now) & "))"
                     End If
-                    CS = cpCore.db.csOpen("People", Criteria, "id", SelectFieldList:="ID ,password,admin,developer", PageSize:=2)
-                    If Not cpCore.db.cs_Ok(CS) Then
+                    CS = cpCore.db.cs_open("People", Criteria, "id", SelectFieldList:="ID ,password,admin,developer", PageSize:=2)
+                    If Not cpCore.db.cs_ok(CS) Then
                         '
                         ' ----- loginFieldValue not found, stop here
                         '
                         Call cpCore.error_AddUserError(badLoginUserError)
-                    ElseIf (Not EncodeBoolean(cpCore.siteProperties.getBoolean("AllowDuplicateUsernames", False))) And (cpCore.db.db_GetCSRowCount(CS) > 1) Then
+                    ElseIf (Not EncodeBoolean(cpCore.siteProperties.getBoolean("AllowDuplicateUsernames", False))) And (cpCore.db.cs_getRowCount(CS) > 1) Then
                         '
                         ' ----- AllowDuplicates is false, and there are more then one record
                         '
@@ -1729,7 +1729,7 @@ Namespace Contensive.Core
                         '
                         ' ----- search all found records for the correct password
                         '
-                        Do While cpCore.db.cs_Ok(CS)
+                        Do While cpCore.db.cs_ok(CS)
                             returnUserId = 0
                             '
                             ' main_Get Id if password good
@@ -1755,7 +1755,7 @@ Namespace Contensive.Core
                                         & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & cpCore.db.encodeSQLDate(cpCore.main_PageStartTime) & "))" _
                                         & ");"
                                     CS = cpCore.db.cs_openSql(SQL)
-                                    If cpCore.db.cs_Ok(CS) Then
+                                    If cpCore.db.cs_ok(CS) Then
                                         returnUserId = 0
                                     End If
                                     Call cpCore.db.cs_Close(CS)
@@ -1771,7 +1771,7 @@ Namespace Contensive.Core
                             If returnUserId <> 0 Then
                                 Exit Do
                             End If
-                            Call cpCore.db.db_csGoNext(CS)
+                            Call cpCore.db.cs_goNext(CS)
                         Loop
                         If returnUserId = 0 Then
                             Call cpCore.error_AddUserError(badLoginUserError)
@@ -1816,8 +1816,8 @@ Namespace Contensive.Core
                     '        errorMessage = "You currently have cookie support disabled in your browser. Without cookies, your browser can not support the level of security required to login."
                 Else
 
-                    CSPointer = cpCore.db.csOpen("People", "username=" & cpCore.db.encodeSQLText(Username), "", False, SelectFieldList:="ID", PageSize:=2)
-                    If cpCore.db.cs_Ok(CSPointer) Then
+                    CSPointer = cpCore.db.cs_open("People", "username=" & cpCore.db.encodeSQLText(Username), "", False, SelectFieldList:="ID", PageSize:=2)
+                    If cpCore.db.cs_ok(CSPointer) Then
                         '
                         ' ----- username was found, stop here
                         '
@@ -1938,7 +1938,7 @@ Namespace Contensive.Core
                         & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & cpCore.db.encodeSQLDate(cpCore.main_PageStartTime) & "))" _
                         & ");"
                     CSPointer = cpCore.db.cs_openSql(SQL)
-                    If cpCore.db.cs_Ok(CSPointer) Then
+                    If cpCore.db.cs_ok(CSPointer) Then
                         returnAllowEdit = True
                         returnAllowAdd = cpCore.db.cs_getBoolean(CSPointer, "allowAdd")
                         returnAllowDelete = cpCore.db.cs_getBoolean(CSPointer, "allowDelete")

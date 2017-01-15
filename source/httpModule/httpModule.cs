@@ -75,6 +75,7 @@ namespace Contensive.Core
             }
             catch (Exception ex)
             {
+                throw new ApplicationException("Exception in beginRequest", ex);
             }
         }
         //

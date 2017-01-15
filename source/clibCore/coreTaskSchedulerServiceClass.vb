@@ -199,14 +199,14 @@ Namespace Contensive
                                     & "  or((ProcessInterval is not null)and(ProcessInterval<>0)and(ProcessNextRun is null))" _
                                     & "  or(ProcessNextRun<" & SQLNow & ")" _
                                     & " )"
-                                CS = cpSite.core.db.csOpen("add-ons", sqlAddonsCriteria)
-                                Do While cpSite.core.db.cs_Ok(CS)
+                                CS = cpSite.core.db.cs_open("add-ons", sqlAddonsCriteria)
+                                Do While cpSite.core.db.cs_ok(CS)
                                     addonProcessInterval = cpSite.core.db.cs_getInteger(CS, "ProcessInterval")
                                     addonId = cpSite.core.db.cs_getInteger(CS, "ID")
                                     addonName = cpSite.core.db.cs_getText(CS, "name")
                                     addonArguments = cpSite.core.db.cs_getText(CS, "argumentlist")
                                     addonProcessRunOnce = cpSite.core.db.cs_getBoolean(CS, "ProcessRunOnce")
-                                    addonProcessNextRun = cpSite.core.db.db_GetCSDate(CS, "ProcessNextRun")
+                                    addonProcessNextRun = cpSite.core.db.cs_getDate(CS, "ProcessNextRun")
                                     NextRun = Date.MinValue
                                     hint &= ",run addon " & addonName
                                     If addonProcessInterval > 0 Then
@@ -218,25 +218,25 @@ Namespace Contensive
                                         '
                                         Call cpSite.core.db.cs_set(CS, "ProcessRunOnce", False)
                                         Call cpSite.core.db.cs_set(CS, "ProcessNextRun", "")
-                                        Call cpSite.core.db.db_SaveCS(CS)
+                                        Call cpSite.core.db.cs_save2(CS)
                                         '
                                         cmdDetail = New cmdDetailClass
                                         cmdDetail.addonId = addonId
                                         cmdDetail.addonName = addonName
                                         cmdDetail.docProperties = convertAddonArgumentstoDocPropertiesList(cpSite.core, addonArguments)
                                         Call addTaskToQueue(cpSite.core, taskQueueCommandEnumModule.runAddon, cmdDetail, False)
-                                    ElseIf cpSite.core.db.db_GetCSDate(CS, "ProcessNextRun") = Date.MinValue Then
+                                    ElseIf cpSite.core.db.cs_getDate(CS, "ProcessNextRun") = Date.MinValue Then
                                         '
                                         ' Interval is OK but NextRun is 0, just set next run
                                         '
                                         Call cpSite.core.db.cs_set(CS, "ProcessNextRun", NextRun)
-                                        Call cpSite.core.db.db_SaveCS(CS)
+                                        Call cpSite.core.db.cs_save2(CS)
                                     ElseIf addonProcessNextRun < RightNow Then
                                         '
                                         ' All is OK, triggered on NextRun, Cycle RightNow
                                         '
                                         Call cpSite.core.db.cs_set(CS, "ProcessNextRun", NextRun)
-                                        Call cpSite.core.db.db_SaveCS(CS)
+                                        Call cpSite.core.db.cs_save2(CS)
                                         '
                                         cmdDetail = New cmdDetailClass
                                         cmdDetail.addonId = addonId
@@ -244,7 +244,7 @@ Namespace Contensive
                                         cmdDetail.docProperties = convertAddonArgumentstoDocPropertiesList(cpSite.core, addonArguments)
                                         Call addTaskToQueue(cpSite.core, taskQueueCommandEnumModule.runAddon, cmdDetail, False)
                                     End If
-                                    Call cpSite.core.db.db_csGoNext(CS)
+                                    Call cpSite.core.db.cs_goNext(CS)
                                 Loop
                                 Call cpSite.core.db.cs_Close(CS)
                             Catch ex As Exception
@@ -286,7 +286,7 @@ Namespace Contensive
                     '
                     sql = "select top 1 id from cctasks where ((command=" & cpSiteCore.db.encodeSQLText(Command) & ")and(cmdDetail=" & cmdDetailJson & "))"
                     cs = cpSiteCore.db.cs_openSql(sql)
-                    If cpSiteCore.db.cs_Ok(cs) Then
+                    If cpSiteCore.db.cs_ok(cs) Then
                         returnTaskAdded = False
                     End If
                     Call cpSiteCore.db.cs_Close(cs)
@@ -296,7 +296,7 @@ Namespace Contensive
                 '
                 If returnTaskAdded Then
                     cs = cpSiteCore.db.cs_insertRecord("tasks")
-                    If cpSiteCore.db.cs_Ok(cs) Then
+                    If cpSiteCore.db.cs_ok(cs) Then
                         cpSiteCore.db.cs_setField(cs, "name", "")
                         cpSiteCore.db.cs_setField(cs, "command", Command)
                         cpSiteCore.db.cs_setField(cs, "cmdDetail", cmdDetailJson)

@@ -115,12 +115,12 @@ ErrorTrap:
                         ' Send Submitted Group Email (submitted, not sent, no conditions)
                         '
                         'hint = "5"
-                        Call ProcessEmail_GroupEmail(cpCore.db.siteproperty_dataBuildVersion)
+                        Call ProcessEmail_GroupEmail(cpCore.siteproperties.dataBuildVersion)
                         '
                         ' Send Conditional Email - Offset days after Joining
                         '
                         'hint = "6"
-                        Call ProcessEmail_ConditionalEmail(cpCore.db.siteproperty_dataBuildVersion, IsNewHour, IsNewDay)
+                        Call ProcessEmail_ConditionalEmail(cpCore.siteproperties.dataBuildVersion, IsNewHour, IsNewDay)
                         '
                     End If
                 End Using
@@ -191,8 +191,8 @@ ErrorTrap:
                 & " and ((ccemail.scheduledate is null)or(ccemail.scheduledate<" & SQLDateNow & "))" _
                 & " and ((ccemail.ConditionID is null)OR(ccemail.ConditionID=0))" _
                 & ""
-            CSEmail = cpCore.db.csOpen("Email", Criteria, , , , , , FieldList)
-            If cpCore.db.cs_Ok(CSEmail) Then
+            CSEmail = cpCore.db.cs_open("Email", Criteria, , , , , , FieldList)
+            If cpCore.db.cs_ok(CSEmail) Then
                 '
                 SQLTablePeople = cpCore.metaData.getContentTablename("People")
                 SQLTableMemberRules = cpCore.metaData.getContentTablename("Member Rules")
@@ -200,13 +200,13 @@ ErrorTrap:
                 BounceAddress = cpCore.siteProperties.getText("EmailBounceAddress", "")
                 siteStyles = cpCore.csv_getStyleSheetProcessed()
                 '
-                Do While cpCore.db.cs_Ok(CSEmail)
+                Do While cpCore.db.cs_ok(CSEmail)
                     emailID = cpCore.db.cs_getInteger(CSEmail, "ID")
                     EmailMemberID = cpCore.db.cs_getInteger(CSEmail, "ModifiedBy")
                     EmailTemplateID = cpCore.db.cs_getInteger(CSEmail, "EmailTemplateID")
                     EmailTemplate = GetEmailTemplate(EmailTemplateID)
                     EmailAddLinkEID = cpCore.db.cs_getBoolean(CSEmail, "AddLinkEID")
-                    'exclusiveStyles = cpCore.asv.csv_GetCSText(CSEmail, "exclusiveStyles")
+                    'exclusiveStyles = cpCore.asv.csv_cs_getText(CSEmail, "exclusiveStyles")
                     EmailFrom = cpCore.db.cs_getText(CSEmail, "FromAddress")
                     EmailSubject = cpCore.db.cs_getText(CSEmail, "Subject")
                     emailStyles = cpCore.email_getEmailStyles(emailID)
@@ -214,14 +214,14 @@ ErrorTrap:
                     ' Mark this email sent and go to the next
                     '
                     Call cpCore.db.cs_setField(CSEmail, "sent", True)
-                    Call cpCore.db.db_SaveCSRecord(CSEmail)
+                    Call cpCore.db.cs_save2(CSEmail)
                     '
                     ' Create Drop Record
                     '
                     CSDrop = cpCore.db.cs_insertRecord("Email Drops", EmailMemberID)
-                    If cpCore.db.cs_Ok(CSDrop) Then
+                    If cpCore.db.cs_ok(CSDrop) Then
                         EmailDropID = cpCore.db.cs_getInteger(CSDrop, "ID")
-                        ScheduleDate = cpCore.db.db_GetCSDate(CSEmail, "ScheduleDate")
+                        ScheduleDate = cpCore.db.cs_getDate(CSEmail, "ScheduleDate")
                         If ScheduleDate < CDate("1/1/2000") Then
                             ScheduleDate = CDate("1/1/2000")
                         End If
@@ -262,7 +262,7 @@ ErrorTrap:
                             & " and ((" & SQLTableMemberRules & ".DateExpires is null)or(" & SQLTableMemberRules & ".DateExpires>" & SQLDateNow & "))" _
                             & " order by " & SQLTablePeople & ".email," & SQLTablePeople & ".id"
                     End If
-                    CSPeople = cpCore.db.db_openCsSql_rev("default", SQL)
+                    CSPeople = cpCore.db.cs_openCsSql_rev("default", SQL)
                     '
                     ' Send the email to all selected people
                     '
@@ -271,36 +271,36 @@ ErrorTrap:
                     Dim PeopleName As String
                     EmailStatusList = ""
                     LastEmail = "empty"
-                    Do While cpCore.db.cs_Ok(CSPeople)
+                    Do While cpCore.db.cs_ok(CSPeople)
                         PeopleID = cpCore.db.cs_getInteger(CSPeople, "MemberID")
                         Email = cpCore.db.cs_getText(CSPeople, "Email")
                         If (Email = LastEmail) Then
-                            PeopleName = cpCore.db_GetRecordName("people", PeopleID)
+                            PeopleName = cpCore.GetRecordName("people", PeopleID)
                             If PeopleName = "" Then
                                 PeopleName = "user #" & PeopleID
                             End If
                             EmailStatusList = EmailStatusList & "Not Sent to " & PeopleName & ", duplicate email address (" & Email & ")" & BR
                         Else
-                            EmailStatusList = EmailStatusList & SendEmailRecord(PeopleID, emailID, Date.MinValue, EmailDropID, BounceAddress, EmailFrom, EmailTemplate, EmailFrom, EmailSubject, cpCore.db.db_GetCS(CSEmail, "CopyFilename"), cpCore.db.cs_getBoolean(CSEmail, "AllowSpamFooter"), cpCore.db.cs_getBoolean(CSEmail, "AddLinkEID"), emailStyles) & BR
-                            'EmailStatusList = EmailStatusList & SendEmailRecord( PeopleID, EmailID, 0, EmailDropID, BounceAddress, EmailFrom, EmailTemplate, EmailFrom, cpCore.csv_GetCS(CSEmail, "Subject"), cpCore.csv_GetCS(CSEmail, "CopyFilename"), cpCore.csv_GetCSBoolean(CSEmail, "AllowSpamFooter"), cpCore.csv_GetCSBoolean(CSEmail, "AddLinkEID"), emailStyles) & BR
+                            EmailStatusList = EmailStatusList & SendEmailRecord(PeopleID, emailID, Date.MinValue, EmailDropID, BounceAddress, EmailFrom, EmailTemplate, EmailFrom, EmailSubject, cpCore.db.cs_get(CSEmail, "CopyFilename"), cpCore.db.cs_getBoolean(CSEmail, "AllowSpamFooter"), cpCore.db.cs_getBoolean(CSEmail, "AddLinkEID"), emailStyles) & BR
+                            'EmailStatusList = EmailStatusList & SendEmailRecord( PeopleID, EmailID, 0, EmailDropID, BounceAddress, EmailFrom, EmailTemplate, EmailFrom, cpCore.csv_cs_get(CSEmail, "Subject"), cpCore.csv_cs_get(CSEmail, "CopyFilename"), cpCore.csv_cs_getBoolean(CSEmail, "AllowSpamFooter"), cpCore.csv_cs_getBoolean(CSEmail, "AddLinkEID"), emailStyles) & BR
                         End If
                         LastEmail = Email
-                        Call cpCore.db.db_csGoNext(CSPeople)
+                        Call cpCore.db.cs_goNext(CSPeople)
                     Loop
                     Call cpCore.db.cs_Close(CSPeople)
                     '
                     ' Send the confirmation
                     '
-                    EmailCopy = cpCore.db.db_GetCS(CSEmail, "copyfilename")
+                    EmailCopy = cpCore.db.cs_get(CSEmail, "copyfilename")
                     ConfirmationMemberID = cpCore.db.cs_getInteger(CSEmail, "testmemberid")
                     Call SendConfirmationEmail(ConfirmationMemberID, EmailDropID, EmailTemplate, EmailAddLinkEID, PrimaryLink, EmailSubject, EmailCopy, emailStyles, EmailFrom, EmailStatusList)
-                    '            CSPeople = cpCore.asv.db_csOpenRecord("people", ConfirmationMemberID)
+                    '            CSPeople = cpCore.asv.csOpenRecord("people", ConfirmationMemberID)
                     '            If cpCore.asv.csv_IsCSOK(CSPeople) Then
                     '                ClickFlagQuery = RequestNameEmailClickFlag & "=" & EmailDropID & "&" & RequestNameEmailMemberID & "=" & ConfirmationMemberID
                     '                EmailTemplate = cpCore.csv_EncodeContent(EmailTemplate, ConfirmationMemberID, -1, False, EmailAddLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink)
-                    '                EmailSubject = cpCore.csv_EncodeContent(cpCore.csv_GetCS(CSEmail, "Subject"), ConfirmationMemberID, , True, False, False, False, False, True, , "http://" & GetPrimaryDomainName())
-                    '                EmailBody = cpCore.csv_EncodeContent(cpCore.csv_GetCS(CSEmail, "CopyFilename"), ConfirmationMemberID, , False, EmailAddLinkEID, True, True, False, True, , "http://" & GetPrimaryDomainName())
-                    '                'EmailFrom = cpCore.csv_GetCS(CSEmail, "FromAddress")
+                    '                EmailSubject = cpCore.csv_EncodeContent(cpCore.csv_cs_get(CSEmail, "Subject"), ConfirmationMemberID, , True, False, False, False, False, True, , "http://" & GetPrimaryDomainName())
+                    '                EmailBody = cpCore.csv_EncodeContent(cpCore.csv_cs_get(CSEmail, "CopyFilename"), ConfirmationMemberID, , False, EmailAddLinkEID, True, True, False, True, , "http://" & GetPrimaryDomainName())
+                    '                'EmailFrom = cpCore.csv_cs_get(CSEmail, "FromAddress")
                     '                Confirmation = "<HTML><Head>" _
                     '                    & "<Title>Email Confirmation</Title>" _
                     '                    & "<Base href=""http://" & GetPrimaryDomainName() & cpCore.csv_RootPath & """>" _
@@ -318,11 +318,11 @@ ErrorTrap:
                     '                    & "--- end email list ---" & BR _
                     '                    & "</BODY></HTML>"
                     '                Confirmation = ConvertLinksToAbsolute(Confirmation, PrimaryLink & "/")
-                    '                Call cpCore.csv_SendEmail2(cpCore.asv.csv_GetCSText(CSPeople, "Email"), EmailFrom, "Email Confirmation from " & GetPrimaryDomainName(), Confirmation, "", "", , True, True)
+                    '                Call cpCore.csv_SendEmail2(cpCore.asv.csv_cs_getText(CSPeople, "Email"), EmailFrom, "Email Confirmation from " & GetPrimaryDomainName(), Confirmation, "", "", , True, True)
                     '                End If
                     '            Call cpCore.asv.csv_CloseCS(CSPeople)
                     '
-                    Call cpCore.db.db_csGoNext(CSEmail)
+                    Call cpCore.db.cs_goNext(CSEmail)
                 Loop
             End If
             Call cpCore.db.cs_Close(CSEmail)
@@ -383,7 +383,7 @@ ErrorTrap:
             Dim dataSourceType As Integer
             Dim sqlDateTest As String
             '
-            dataSourceType = cpCore.db.db_GetDataSourceType("default")
+            dataSourceType = cpCore.db.getDataSourceType("default")
             SQLTablePeople = cpCore.metaData.getContentTablename("People")
             SQLTableMemberRules = cpCore.metaData.getContentTablename("Member Rules")
             SQLTableGroups = cpCore.metaData.getContentTablename("Groups")
@@ -439,27 +439,27 @@ ErrorTrap:
                     & " AND (" & SQLTablePeople & ".Active <> 0)" _
                     & " AND (" & SQLTablePeople & ".AllowBulkEmail <> 0)" _
                     & " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.MemberID=" & SQLTablePeople & ".ID))"
-                CSEmailBig = cpCore.db.db_openCsSql_rev("Default", SQL)
-                Do While cpCore.db.cs_Ok(CSEmailBig)
+                CSEmailBig = cpCore.db.cs_openCsSql_rev("Default", SQL)
+                Do While cpCore.db.cs_ok(CSEmailBig)
                     emailID = cpCore.db.cs_getInteger(CSEmailBig, "EmailID")
                     EmailMemberID = cpCore.db.cs_getInteger(CSEmailBig, "MemberID")
-                    EmailDateExpires = cpCore.db.db_GetCSDate(CSEmailBig, "DateExpires")
-                    CSEmail = cpCore.db.db_OpenCSContentRecord("Conditional Email", emailID)
-                    If cpCore.db.cs_Ok(CSEmail) Then
+                    EmailDateExpires = cpCore.db.cs_getDate(CSEmailBig, "DateExpires")
+                    CSEmail = cpCore.db.cs_openContentRecord("Conditional Email", emailID)
+                    If cpCore.db.cs_ok(CSEmail) Then
                         EmailTemplateID = cpCore.db.cs_getInteger(CSEmail, "EmailTemplateID")
                         EmailTemplate = GetEmailTemplate(EmailTemplateID)
                         FromAddress = cpCore.db.cs_getText(CSEmail, "FromAddress")
                         ConfirmationMemberID = cpCore.db.cs_getInteger(CSEmail, "testmemberid")
                         EmailAddLinkEID = cpCore.db.cs_getBoolean(CSEmail, "AddLinkEID")
-                        EmailSubject = cpCore.db.db_GetCS(CSEmail, "Subject")
-                        EmailCopy = cpCore.db.db_GetCS(CSEmail, "CopyFilename")
+                        EmailSubject = cpCore.db.cs_get(CSEmail, "Subject")
+                        EmailCopy = cpCore.db.cs_get(CSEmail, "CopyFilename")
                         emailStyles = cpCore.email_getEmailStyles(emailID)
                         EmailStatus = SendEmailRecord(EmailMemberID, emailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, EmailSubject, EmailCopy, cpCore.db.cs_getBoolean(CSEmail, "AllowSpamFooter"), EmailAddLinkEID, emailStyles)
-                        'EmailStatus = SendEmailRecord( EmailMemberID, EmailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, EmailSubject, EmailCopy, cpCore.csv_GetCSBoolean(CSEmail, "AllowSpamFooter"), EmailAddLinkEID, EmailInlineStyles)
+                        'EmailStatus = SendEmailRecord( EmailMemberID, EmailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, EmailSubject, EmailCopy, cpCore.csv_cs_getBoolean(CSEmail, "AllowSpamFooter"), EmailAddLinkEID, EmailInlineStyles)
                         Call SendConfirmationEmail(ConfirmationMemberID, EmailDropID, EmailTemplate, EmailAddLinkEID, "", EmailSubject, EmailCopy, emailStyles, FromAddress, EmailStatus & "<BR>")
                     End If
                     Call cpCore.db.cs_Close(CSEmail)
-                    Call cpCore.db.db_csGoNext(CSEmailBig)
+                    Call cpCore.db.cs_goNext(CSEmailBig)
                 Loop
                 Call cpCore.db.cs_Close(CSEmailBig)
             End If
@@ -503,27 +503,27 @@ ErrorTrap:
                     & " AND (" & SQLTablePeople & ".Active <> 0)" _
                     & " AND (" & SQLTablePeople & ".AllowBulkEmail <> 0)" _
                     & " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.MemberID=" & SQLTablePeople & ".ID))"
-                CSEmailBig = cpCore.db.db_openCsSql_rev("Default", SQL)
-                Do While cpCore.db.cs_Ok(CSEmailBig)
+                CSEmailBig = cpCore.db.cs_openCsSql_rev("Default", SQL)
+                Do While cpCore.db.cs_ok(CSEmailBig)
                     emailID = cpCore.db.cs_getInteger(CSEmailBig, "EmailID")
                     EmailMemberID = cpCore.db.cs_getInteger(CSEmailBig, "MemberID")
-                    EmailDateExpires = cpCore.db.db_GetCSDate(CSEmailBig, "DateExpires")
-                    CSEmail = cpCore.db.db_OpenCSContentRecord("Conditional Email", emailID)
-                    If cpCore.db.cs_Ok(CSEmail) Then
+                    EmailDateExpires = cpCore.db.cs_getDate(CSEmailBig, "DateExpires")
+                    CSEmail = cpCore.db.cs_openContentRecord("Conditional Email", emailID)
+                    If cpCore.db.cs_ok(CSEmail) Then
                         EmailTemplateID = cpCore.db.cs_getInteger(CSEmail, "EmailTemplateID")
                         EmailTemplate = GetEmailTemplate(EmailTemplateID)
                         FromAddress = cpCore.db.cs_getText(CSEmail, "FromAddress")
                         ConfirmationMemberID = cpCore.db.cs_getInteger(CSEmail, "testmemberid")
                         EmailAddLinkEID = cpCore.db.cs_getBoolean(CSEmail, "AddLinkEID")
-                        EmailSubject = cpCore.db.db_GetCS(CSEmail, "Subject")
-                        EmailCopy = cpCore.db.db_GetCS(CSEmail, "CopyFilename")
+                        EmailSubject = cpCore.db.cs_get(CSEmail, "Subject")
+                        EmailCopy = cpCore.db.cs_get(CSEmail, "CopyFilename")
                         emailStyles = cpCore.email_getEmailStyles(emailID)
-                        EmailStatus = SendEmailRecord(EmailMemberID, emailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, cpCore.db.db_GetCS(CSEmail, "Subject"), cpCore.db.db_GetCS(CSEmail, "CopyFilename"), cpCore.db.cs_getBoolean(CSEmail, "AllowSpamFooter"), cpCore.db.cs_getBoolean(CSEmail, "AddLinkEID"), emailStyles)
-                        'EmailStatus = SendEmailRecord( EmailMemberID, EmailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, cpCore.csv_GetCS(CSEmail, "Subject"), cpCore.csv_GetCS(CSEmail, "CopyFilename"), cpCore.csv_GetCSBoolean(CSEmail, "AllowSpamFooter"), cpCore.csv_GetCSBoolean(CSEmail, "AddLinkEID"), EmailInlineStyles)
+                        EmailStatus = SendEmailRecord(EmailMemberID, emailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, cpCore.db.cs_get(CSEmail, "Subject"), cpCore.db.cs_get(CSEmail, "CopyFilename"), cpCore.db.cs_getBoolean(CSEmail, "AllowSpamFooter"), cpCore.db.cs_getBoolean(CSEmail, "AddLinkEID"), emailStyles)
+                        'EmailStatus = SendEmailRecord( EmailMemberID, EmailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, cpCore.csv_cs_get(CSEmail, "Subject"), cpCore.csv_cs_get(CSEmail, "CopyFilename"), cpCore.csv_cs_getBoolean(CSEmail, "AllowSpamFooter"), cpCore.csv_cs_getBoolean(CSEmail, "AddLinkEID"), EmailInlineStyles)
                         Call SendConfirmationEmail(ConfirmationMemberID, EmailDropID, EmailTemplate, EmailAddLinkEID, "", EmailSubject, EmailCopy, emailStyles, FromAddress, EmailStatus & "<BR>")
                     End If
                     Call cpCore.db.cs_Close(CSEmail)
-                    Call cpCore.db.db_csGoNext(CSEmailBig)
+                    Call cpCore.db.cs_goNext(CSEmailBig)
                 Loop
                 Call cpCore.db.cs_Close(CSEmailBig)
             End If
@@ -557,27 +557,27 @@ ErrorTrap:
                         & " AND (" & SQLTablePeople & ".BirthdayMonth=" & Month(Now) & ")" _
                         & " AND (" & SQLTablePeople & ".BirthdayDay=" & Day(Now) & ")" _
                         & " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.MemberID=" & SQLTablePeople & ".ID and ccEmailLog.DateAdded>=" & cpCore.db.encodeSQLDate(Int(Now())) & "))"
-                    CSEmailBig = cpCore.db.db_openCsSql_rev("Default", SQL)
-                    Do While cpCore.db.cs_Ok(CSEmailBig)
+                    CSEmailBig = cpCore.db.cs_openCsSql_rev("Default", SQL)
+                    Do While cpCore.db.cs_ok(CSEmailBig)
                         emailID = cpCore.db.cs_getInteger(CSEmailBig, "EmailID")
                         EmailMemberID = cpCore.db.cs_getInteger(CSEmailBig, "MemberID")
-                        EmailDateExpires = cpCore.db.db_GetCSDate(CSEmailBig, "DateExpires")
-                        CSEmail = cpCore.db.db_OpenCSContentRecord("Conditional Email", emailID)
-                        If cpCore.db.cs_Ok(CSEmail) Then
+                        EmailDateExpires = cpCore.db.cs_getDate(CSEmailBig, "DateExpires")
+                        CSEmail = cpCore.db.cs_openContentRecord("Conditional Email", emailID)
+                        If cpCore.db.cs_ok(CSEmail) Then
                             EmailTemplateID = cpCore.db.cs_getInteger(CSEmail, "EmailTemplateID")
                             EmailTemplate = GetEmailTemplate(EmailTemplateID)
                             FromAddress = cpCore.db.cs_getText(CSEmail, "FromAddress")
                             ConfirmationMemberID = cpCore.db.cs_getInteger(CSEmail, "testmemberid")
                             EmailAddLinkEID = cpCore.db.cs_getBoolean(CSEmail, "AddLinkEID")
-                            EmailSubject = cpCore.db.db_GetCS(CSEmail, "Subject")
-                            EmailCopy = cpCore.db.db_GetCS(CSEmail, "CopyFilename")
+                            EmailSubject = cpCore.db.cs_get(CSEmail, "Subject")
+                            EmailCopy = cpCore.db.cs_get(CSEmail, "CopyFilename")
                             emailStyles = cpCore.email_getEmailStyles(emailID)
-                            EmailStatus = SendEmailRecord(EmailMemberID, emailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, cpCore.db.db_GetCS(CSEmail, "Subject"), cpCore.db.db_GetCS(CSEmail, "CopyFilename"), cpCore.db.cs_getBoolean(CSEmail, "AllowSpamFooter"), cpCore.db.cs_getBoolean(CSEmail, "AddLinkEID"), emailStyles)
-                            'EmailStatus = SendEmailRecord( EmailMemberID, EmailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, cpCore.csv_GetCS(CSEmail, "Subject"), cpCore.csv_GetCS(CSEmail, "CopyFilename"), cpCore.csv_GetCSBoolean(CSEmail, "AllowSpamFooter"), cpCore.csv_GetCSBoolean(CSEmail, "AddLinkEID"), EmailInlineStyles)
+                            EmailStatus = SendEmailRecord(EmailMemberID, emailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, cpCore.db.cs_get(CSEmail, "Subject"), cpCore.db.cs_get(CSEmail, "CopyFilename"), cpCore.db.cs_getBoolean(CSEmail, "AllowSpamFooter"), cpCore.db.cs_getBoolean(CSEmail, "AddLinkEID"), emailStyles)
+                            'EmailStatus = SendEmailRecord( EmailMemberID, EmailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, cpCore.csv_cs_get(CSEmail, "Subject"), cpCore.csv_cs_get(CSEmail, "CopyFilename"), cpCore.csv_cs_getBoolean(CSEmail, "AllowSpamFooter"), cpCore.csv_cs_getBoolean(CSEmail, "AddLinkEID"), EmailInlineStyles)
                             Call SendConfirmationEmail(ConfirmationMemberID, EmailDropID, EmailTemplate, EmailAddLinkEID, "", EmailSubject, EmailCopy, emailStyles, FromAddress, EmailStatus & "<BR>")
                         End If
                         Call cpCore.db.cs_Close(CSEmail)
-                        Call cpCore.db.db_csGoNext(CSEmailBig)
+                        Call cpCore.db.cs_goNext(CSEmailBig)
                     Loop
                     Call cpCore.db.cs_Close(CSEmailBig)
                 End If
@@ -638,7 +638,7 @@ ErrorTrap:
                 EmailSubjectEncoded = EmailSubject
                 'buildversion = cpCore.app.dataBuildVersion
                 CSLog = cpCore.db.cs_insertRecord("Email Log", 0)
-                If cpCore.db.cs_Ok(CSLog) Then
+                If cpCore.db.cs_ok(CSLog) Then
                     Call cpCore.db.cs_setField(CSLog, "Name", "Sent " & CStr(Now()))
                     Call cpCore.db.cs_setField(CSLog, "EmailDropID", EmailDropID)
                     Call cpCore.db.cs_setField(CSLog, "EmailID", emailID)
@@ -650,7 +650,7 @@ ErrorTrap:
                         Call cpCore.db.cs_set(CSLog, "fromaddress", FromAddress)
                         Call cpCore.db.cs_set(CSLog, "Subject", EmailSubject)
                     End If
-                    Call cpCore.db.db_SaveCS(CSLog)
+                    Call cpCore.db.cs_save2(CSLog)
                     '
                     ' Get the Template
                     '
@@ -658,10 +658,10 @@ ErrorTrap:
                     '
                     ' Get the Member
                     '
-                    CSPeople = cpCore.db.db_OpenCSContentRecord("People", MemberID, , , , "Email,Name")
-                    If cpCore.db.cs_Ok(CSPeople) Then
-                        ToAddress = cpCore.db.db_GetCS(CSPeople, "Email")
-                        EmailToName = cpCore.db.db_GetCS(CSPeople, "Name")
+                    CSPeople = cpCore.db.cs_openContentRecord("People", MemberID, , , , "Email,Name")
+                    If cpCore.db.cs_ok(CSPeople) Then
+                        ToAddress = cpCore.db.cs_get(CSPeople, "Email")
+                        EmailToName = cpCore.db.cs_get(CSPeople, "Name")
                         ServerPageDefault = cpCore.siteProperties.getText(siteproperty_serverPageDefault_name, siteproperty_serverPageDefault_defaultValue)
                         RootURL = PrimaryLink & cpCore.app_rootWebPath
                         If EmailDropID <> 0 Then
@@ -766,11 +766,11 @@ ErrorTrap:
                         If True Then
                             Call cpCore.db.cs_set(CSLog, "toaddress", ToAddress)
                         End If
-                        Call cpCore.db.db_SaveCS(CSLog)
+                        Call cpCore.db.cs_save2(CSLog)
                     End If
-                    'Call cpCore.app.db_closeCS(CSPeople)
+                    'Call cpCore.app.closeCS(CSPeople)
                 End If
-                'Call cpCore.app.db_closeCS(CSLog)
+                'Call cpCore.app.closeCS(CSLog)
             Catch ex As Exception
                 cpCore.handleLegacyError3(cpCore.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "SendEmailRecord", Err.Number, Err.Source, Err.Description, True, True, "")
                 Err.Clear()
@@ -815,9 +815,9 @@ ErrorTrap:
             ' Get the Template
             '
             If EmailTemplateID <> 0 Then
-                CS = cpCore.db.db_OpenCSContentRecord("Email Templates", EmailTemplateID, , , , "BodyHTML")
-                If cpCore.db.cs_Ok(CS) Then
-                    GetEmailTemplate = cpCore.db.db_GetCS(CS, "BodyHTML")
+                CS = cpCore.db.cs_openContentRecord("Email Templates", EmailTemplateID, , , , "BodyHTML")
+                If cpCore.db.cs_ok(CS) Then
+                    GetEmailTemplate = cpCore.db.cs_get(CS, "BodyHTML")
                 End If
                 Call cpCore.db.cs_Close(CS)
             End If
@@ -853,8 +853,8 @@ ErrorTrap:
                 Dim errorMessage As String = ""
                 Dim EmailBody As String = ""
                 '
-                CSPeople = cpCore.db.db_OpenCSContentRecord("people", ConfirmationMemberID)
-                If cpCore.db.cs_Ok(CSPeople) Then
+                CSPeople = cpCore.db.cs_openContentRecord("people", ConfirmationMemberID)
+                If cpCore.db.cs_ok(CSPeople) Then
                     ClickFlagQuery = RequestNameEmailClickFlag & "=" & EmailDropID & "&" & RequestNameEmailMemberID & "=" & ConfirmationMemberID
                     '
                     EmailSubject = cpCore.html_executeContentCommands(Nothing, EmailSubject, AddonContextEnum.contextEmail, ConfirmationMemberID, True, errorMessage)

@@ -433,7 +433,7 @@ End Namespace
 '                                '        If true Then
 '                                '            'CSConnection = cmc.csv_OpenConnection(AppName)
 '                                '            If cmc.app.status = applicationStatusEnum.ApplicationStatusRunning Then
-'                                '                cs = cmc.app.db_csOpen("people", "username='root'", , False)
+'                                '                cs = cmc.app.csOpen("people", "username='root'", , False)
 '                                '                If Not cmc.app.csv_IsCSOK(cs) Then
 '                                '                    Call cmc.app.csv_CloseCS(cs)
 '                                '                    cs = cmc.app.csv_InsertCSRecord("people", 0)
