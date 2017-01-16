@@ -109,7 +109,7 @@ Namespace Contensive.Core
                 Dim UploadsCnt As Integer
                 Dim UploadPathPage As String
                 Dim CDef_Node As XmlNode
-                Dim Doc As New XmlDocument
+                'Dim Doc As New XmlDocument
                 Dim CollectionNode As XmlNode
                 Dim status As String = ""
                 Dim AllowInstallFromFolder As Boolean

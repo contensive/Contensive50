@@ -239,13 +239,40 @@ Namespace Contensive.Core
             End If
         End Sub
         '
-        '
-        '
+        '====================================================================================================
+        ''' <summary>
+        ''' process an html file element to cdnFiles to the optional path. If the path is ommitted, the path "upload"
+        ''' </summary>
+        ''' <param name="HtmlName"></param>
+        ''' <param name="VirtualFilePath"></param>
         Public Overrides Sub ProcessInputFile(ByVal HtmlName As String, Optional ByVal VirtualFilePath As String = "") 'Inherits BaseClasses.CPHtmlBaseClass.ProcessInputFile
-            If True Then
-                Call cpCore.web_processFormInputFile(HtmlName, VirtualFilePath)
-            End If
+            Call cpCore.web_processFormInputFile(HtmlName, VirtualFilePath)
         End Sub
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' process an html file element to a specified file system (cp.files.cdnFiles for example). The return path is returned.
+        ''' </summary>
+        ''' <param name="HtmlName"></param>
+        ''' <param name="fileSystem"></param>
+        ''' <param name="returnPathFilename"></param>
+        ''' <returns></returns>
+        Public Overrides Function ProcessInputFile(HtmlName As String, fileSystem As CPFileSystemBaseClass, ByRef returnPathFilename As String) As Boolean
+            Throw New NotImplementedException()
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' process an html file element to a specified file system and a specified path. The filename uploaded to that path is returned
+        ''' </summary>
+        ''' <param name="HtmlName"></param>
+        ''' <param name="fileSystem"></param>
+        ''' <param name="uploadFilePath"></param>
+        ''' <param name="returnFilename"></param>
+        ''' <returns></returns>
+        Public Overrides Function ProcessInputFile(HtmlName As String, fileSystem As CPFileSystemBaseClass, uploadFilePath As String, ByRef returnFilename As String) As Boolean
+            Throw New NotImplementedException()
+        End Function
         '
         '
         '

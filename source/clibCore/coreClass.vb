@@ -22441,22 +22441,22 @@ ErrorTrap:
 ErrorTrap:
             Call handleLegacyError18("main_AddTabEntry")
         End Sub
-        '
-        '
-        '
-        Public Function main_GetTabs() As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetTabs")
-            '
-            ' should use the ccNav object, no the ccCommon module for this code
-            '
-            '
-            main_GetTabs = menuTab.GetTabs()
-            '    main_GetTabs = ccGetTabs()
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("main_GetTabs")
-        End Function
+        '        '
+        '        '
+        '        '
+        '        Public Function main_GetTabs() As String
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetTabs")
+        '            '
+        '            ' should use the ccNav object, no the ccCommon module for this code
+        '            '
+        '            '
+        '            main_GetTabs = menuTab.GetTabs()
+        '            '    main_GetTabs = ccGetTabs()
+        '            '
+        '            Exit Function
+        'ErrorTrap:
+        '            Call handleLegacyError18("main_GetTabs")
+        '        End Function
         '
         '
         '

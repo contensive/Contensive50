@@ -786,7 +786,7 @@ Namespace Contensive.Core
             ElseIf (rootLocalPath.ToLower().IndexOf(normalizedPath.ToLower()) = 0) Then
                 Return normalizedPath
             ElseIf (normalizedPath.IndexOf(":\") >= 0) Then
-                Throw New ApplicationException("Attempt to access an invalid relative path [" & normalizedPath & "] within the physical path [" & rootLocalPath & "].")
+                Throw New ApplicationException("Attempt to access an invalid path [" & normalizedPath & "] that is not within the allowed path [" & rootLocalPath & "].")
             Else
                 Return joinPath(rootLocalPath, normalizedPath)
             End If

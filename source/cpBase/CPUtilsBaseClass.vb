@@ -74,9 +74,9 @@ Namespace Contensive.BaseClasses
         Public MustOverride Function hashMd5(ByVal source As String) As String
         Public MustOverride Function isGuid(ByVal guid As String) As Boolean
         Public MustOverride Sub Upgrade(ByVal isNewApp As Boolean)
-        Public MustOverride Function installCollectionFromFile(privateFile As String) As Integer ' returns taskId
-        Public MustOverride Function installCollectionFromLibrary(collectionGuid As String) As Integer ' returns taskId
-        Public MustOverride Function installCollectionFromLink(link As String) As Integer ' returns taskId
+        Public MustOverride Function installCollectionAsyncFromFile(privateFile As String) As Integer ' returns taskId
+        Public MustOverride Function installCollectionAsyncFromLibrary(collectionGuid As String) As Integer ' returns taskId
+        Public MustOverride Function installCollectionAsyncFromLink(link As String) As Integer ' returns taskId
         'Public MustOverride Function getTaskStatus(taskId As Integer) As Integer ' returns status codes
     End Class
 End Namespace

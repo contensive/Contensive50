@@ -394,15 +394,15 @@ Namespace Contensive.Core
             Return CP.core.common_isGuid(guid)
         End Function
         '
-        Public Overrides Function installCollectionFromFile(privateFile As String) As Integer
+        Public Overrides Function installCollectionAsyncFromFile(privateFile As String) As Integer
             Throw New NotImplementedException()
         End Function
         '
-        Public Overrides Function installCollectionFromLibrary(collectionGuid As String) As Integer
+        Public Overrides Function installCollectionAsyncFromLibrary(collectionGuid As String) As Integer
             Throw New NotImplementedException()
         End Function
         '
-        Public Overrides Function installCollectionFromLink(link As String) As Integer
+        Public Overrides Function installCollectionAsyncFromLink(link As String) As Integer
             Throw New NotImplementedException()
         End Function
         '
