@@ -94,60 +94,92 @@ Namespace Contensive.Core
         ''' <param name="folderPath"></param>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
         Public Overrides Sub createFolder(ByVal folderPath As String)
-            Call cpCore.appRootFiles.createPath(folderPath)
+            If cpCore.appRootFiles.isinPhysicalPath(folderPath) Then
+                Call cpCore.appRootFiles.createPath(folderPath)
+            ElseIf cpCore.privateFiles.isinPhysicalPath(folderPath) Then
+                Call cpCore.privateFiles.createPath(folderPath)
+            ElseIf cpCore.cdnFiles.isinPhysicalPath(folderPath) Then
+                Call cpCore.cdnFiles.createPath(folderPath)
+            Else
+                cpCore.handleExceptionAndRethrow(New ApplicationException("Application cannot access this path [" & folderPath & "]"))
+            End If
         End Sub
         '
         '==========================================================================================
         ''' <summary>
         ''' Delete a file anywhere on the physical file space of the hosting server.
         ''' </summary>
-        ''' <param name="filename"></param>
+        ''' <param name="pathFilename"></param>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
-        Public Overrides Sub delete(ByVal filename As String)
-            Call cpCore.appRootFiles.deleteFile(filename)
+        Public Overrides Sub delete(ByVal pathFilename As String)
+            If cpCore.appRootFiles.isinPhysicalPath(pathFilename) Then
+                Call cpCore.appRootFiles.deleteFile(pathFilename)
+            ElseIf cpCore.privateFiles.isinPhysicalPath(pathFilename) Then
+                Call cpCore.privateFiles.deleteFile(pathFilename)
+            ElseIf cpCore.cdnFiles.isinPhysicalPath(pathFilename) Then
+                Call cpCore.cdnFiles.deleteFile(pathFilename)
+            Else
+                cpCore.handleExceptionAndRethrow(New ApplicationException("Application cannot access this path [" & pathFilename & "]"))
+            End If
         End Sub
         '
         '==========================================================================================
         ''' <summary>
         ''' Delete a file in the cdnFiles store.
         ''' </summary>
-        ''' <param name="filename"></param>
+        ''' <param name="pathFilename"></param>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
-        Public Overrides Sub deleteVirtual(ByVal filename As String)
-            Call cpCore.cdnFiles.deleteFile(filename)
+        Public Overrides Sub deleteVirtual(ByVal pathFilename As String)
+            Call cpCore.cdnFiles.deleteFile(pathFilename)
         End Sub
         '
         '==========================================================================================
         ''' <summary>
         ''' Save a file anywhere on the physical file space of the hosting server.
         ''' </summary>
-        ''' <param name="filename"></param>
+        ''' <param name="pathFilename"></param>
         ''' <returns></returns>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
-        Public Overrides Function read(ByVal filename As String) As String
-            Return cpCore.appRootFiles.readFile(filename)
+        Public Overrides Function read(ByVal pathFilename As String) As String
+            If cpCore.appRootFiles.isinPhysicalPath(pathFilename) Then
+                Return cpCore.appRootFiles.readFile(pathFilename)
+            ElseIf cpCore.privateFiles.isinPhysicalPath(pathFilename) Then
+                Return cpCore.privateFiles.readFile(pathFilename)
+            ElseIf cpCore.cdnFiles.isinPhysicalPath(pathFilename) Then
+                Return cpCore.cdnFiles.readFile(pathFilename)
+            Else
+                cpCore.handleExceptionAndRethrow(New ApplicationException("Application cannot access this path [" & pathFilename & "]"))
+            End If
         End Function
         '
         '==========================================================================================
         ''' <summary>
         ''' Read a file from the cdnFiles store.
         ''' </summary>
-        ''' <param name="filename"></param>
+        ''' <param name="pathFilename"></param>
         ''' <returns></returns>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
-        Public Overrides Function readVirtual(ByVal filename As String) As String
-            Return cpCore.cdnFiles.readFile(filename)
+        Public Overrides Function readVirtual(ByVal pathFilename As String) As String
+            Return cpCore.cdnFiles.readFile(pathFilename)
         End Function
         '
         '==========================================================================================
         ''' <summary>
         ''' Save a file anywhere on the physical file space of the hosting server.
         ''' </summary>
-        ''' <param name="filename"></param>
+        ''' <param name="pathFilename"></param>
         ''' <param name="fileContent"></param>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
-        Public Overrides Sub save(ByVal filename As String, ByVal fileContent As String)
-            Call cpCore.appRootFiles.saveFile(filename, fileContent)
+        Public Overrides Sub save(ByVal pathFilename As String, ByVal fileContent As String)
+            If cpCore.appRootFiles.isinPhysicalPath(pathFilename) Then
+                cpCore.appRootFiles.saveFile(pathFilename, fileContent)
+            ElseIf cpCore.privateFiles.isinPhysicalPath(pathFilename) Then
+                cpCore.privateFiles.saveFile(pathFilename, fileContent)
+            ElseIf cpCore.cdnFiles.isinPhysicalPath(pathFilename) Then
+                cpCore.cdnFiles.saveFile(pathFilename, fileContent)
+            Else
+                cpCore.handleExceptionAndRethrow(New ApplicationException("Application cannot access this path [" & pathFilename & "]"))
+            End If
         End Sub
         '
         '==========================================================================================
@@ -169,54 +201,106 @@ Namespace Contensive.Core
         ''' <returns></returns>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
         Public Overrides Function fileExists(ByVal pathFileName As String) As Boolean
-            fileExists = cpCore.appRootFiles.fileExists(pathFileName)
+            Dim result As Boolean = False
+            If cpCore.appRootFiles.isinPhysicalPath(pathFileName) Then
+                result = cpCore.appRootFiles.fileExists(pathFileName)
+            ElseIf cpCore.privateFiles.isinPhysicalPath(pathFileName) Then
+                result = cpCore.privateFiles.fileExists(pathFileName)
+            ElseIf cpCore.cdnFiles.isinPhysicalPath(pathFileName) Then
+                result = cpCore.cdnFiles.fileExists(pathFileName)
+            Else
+                cpCore.handleExceptionAndRethrow(New ApplicationException("Application cannot access this path [" & pathFileName & "]"))
+            End If
+            Return result
         End Function
         '
         '==========================================================================================
         ''' <summary>
         ''' Test if a folder exists anywhere on the physical file space of the hosting server.
         ''' </summary>
-        ''' <param name="folderName"></param>
+        ''' <param name="pathFolderName"></param>
         ''' <returns></returns>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
-        Public Overrides Function folderExists(ByVal folderName As String) As Boolean
-            folderExists = cpCore.appRootFiles.pathExists(folderName)
+        Public Overrides Function folderExists(ByVal pathFolderName As String) As Boolean
+            Dim result As Boolean = False
+            If cpCore.appRootFiles.isinPhysicalPath(pathFolderName) Then
+                result = cpCore.appRootFiles.pathExists(pathFolderName)
+            ElseIf cpCore.privateFiles.isinPhysicalPath(pathFolderName) Then
+                result = cpCore.privateFiles.pathExists(pathFolderName)
+            ElseIf cpCore.cdnFiles.isinPhysicalPath(pathFolderName) Then
+                result = cpCore.cdnFiles.pathExists(pathFolderName)
+            Else
+                cpCore.handleExceptionAndRethrow(New ApplicationException("Application cannot access this path [" & pathFolderName & "]"))
+            End If
+            Return result
         End Function
         '
         '==========================================================================================
         ''' <summary>
         ''' Return a parsable comma,crlf delimited string of the files available anywhere on the physical file space of the hosting server.
         ''' </summary>
-        ''' <param name="folderName"></param>
+        ''' <param name="pathFolderName"></param>
         ''' <param name="pageSize"></param>
         ''' <param name="pageNumber"></param>
         ''' <returns></returns>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
-        Public Overrides Function fileList(ByVal folderName As String, Optional ByVal pageSize As Integer = 0, Optional ByVal pageNumber As Integer = 1) As String
-            Dim fi As IO.FileInfo() = cpCore.appRootFiles.getFileList(folderName)
-            Return cpCore.cluster.localClusterFiles.convertFileINfoArrayToParseString(fi)
+        Public Overrides Function fileList(ByVal pathFolderName As String, Optional ByVal pageSize As Integer = 0, Optional ByVal pageNumber As Integer = 1) As String
+            Dim result As String = ""
+            If cpCore.appRootFiles.isinPhysicalPath(pathFolderName) Then
+                Dim fi As IO.FileInfo() = cpCore.appRootFiles.getFileList(pathFolderName)
+                result = cpCore.appRootFiles.convertFileINfoArrayToParseString(fi)
+            ElseIf cpCore.privateFiles.isinPhysicalPath(pathFolderName) Then
+                Dim fi As IO.FileInfo() = cpCore.privateFiles.getFileList(pathFolderName)
+                result = cpCore.privateFiles.convertFileINfoArrayToParseString(fi)
+            ElseIf cpCore.cdnFiles.isinPhysicalPath(pathFolderName) Then
+                Dim fi As IO.FileInfo() = cpCore.cdnFiles.getFileList(pathFolderName)
+                result = cpCore.cdnFiles.convertFileINfoArrayToParseString(fi)
+            Else
+                cpCore.handleExceptionAndRethrow(New ApplicationException("Application cannot access this path [" & pathFolderName & "]"))
+            End If
+            Return result
         End Function
         '
         '==========================================================================================
         ''' <summary>
         ''' Return a parsable comma,crlf delimited string of the folders available anywhere on the physical file space of the hosting server.
         ''' </summary>
-        ''' <param name="folderName"></param>
+        ''' <param name="pathFolderName"></param>
         ''' <returns></returns>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
-        Public Overrides Function folderList(ByVal folderName As String) As String
-            Dim di As IO.DirectoryInfo() = cpCore.appRootFiles.getFolderList(folderName)
-            Return cpCore.cluster.localClusterFiles.convertDirectoryInfoArrayToParseString(di)
+        Public Overrides Function folderList(ByVal pathFolderName As String) As String
+            Dim result As String = ""
+            If cpCore.appRootFiles.isinPhysicalPath(pathFolderName) Then
+                Dim fi As IO.DirectoryInfo() = cpCore.appRootFiles.getFolderList(pathFolderName)
+                result = cpCore.appRootFiles.convertDirectoryInfoArrayToParseString(fi)
+            ElseIf cpCore.privateFiles.isinPhysicalPath(pathFolderName) Then
+                Dim fi As IO.DirectoryInfo() = cpCore.privateFiles.getFolderList(pathFolderName)
+                result = cpCore.privateFiles.convertDirectoryInfoArrayToParseString(fi)
+            ElseIf cpCore.cdnFiles.isinPhysicalPath(pathFolderName) Then
+                Dim fi As IO.DirectoryInfo() = cpCore.cdnFiles.getFolderList(pathFolderName)
+                result = cpCore.cdnFiles.convertDirectoryInfoArrayToParseString(fi)
+            Else
+                cpCore.handleExceptionAndRethrow(New ApplicationException("Application cannot access this path [" & pathFolderName & "]"))
+            End If
+            Return result
         End Function
         '
         '==========================================================================================
         ''' <summary>
         ''' Delete a folder anywhere on the physical file space of the hosting server.
         ''' </summary>
-        ''' <param name="folderPath"></param>
+        ''' <param name="pathFolderName"></param>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
-        Public Overrides Sub DeleteFolder(folderPath As String)
-            Throw New NotImplementedException()
+        Public Overrides Sub DeleteFolder(pathFolderName As String)
+            If cpCore.appRootFiles.isinPhysicalPath(pathFolderName) Then
+                cpCore.appRootFiles.DeleteFileFolder(pathFolderName)
+            ElseIf cpCore.privateFiles.isinPhysicalPath(pathFolderName) Then
+                cpCore.appRootFiles.DeleteFileFolder(pathFolderName)
+            ElseIf cpCore.cdnFiles.isinPhysicalPath(pathFolderName) Then
+                cpCore.appRootFiles.DeleteFileFolder(pathFolderName)
+            Else
+                cpCore.handleExceptionAndRethrow(New ApplicationException("Application cannot access this path [" & pathFolderName & "]"))
+            End If
         End Sub
 #Region " IDisposable Support "
         ' Do not change or add Overridable to these methods.

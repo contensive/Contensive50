@@ -172,7 +172,7 @@ Namespace Contensive.Core
                 If False Then
                     Return "/"
                 Else
-                    Return cpCore.www_requestRootPath
+                    Return cpCore.webServerIO_requestRootPath
                 End If
             End Get
         End Property
@@ -195,7 +195,7 @@ Namespace Contensive.Core
                     End If
                 Else
                     'CP.File.AppendVirtual("cpDebug.log", "test 3")
-                    DomainPrimary = cpCore.main_ServerDomainPrimary
+                    DomainPrimary = cpCore.domains_ServerDomainPrimary
                 End If
                 Return DomainPrimary
             End Get
@@ -208,7 +208,7 @@ Namespace Contensive.Core
                 If False Then
                     Return DomainPrimary
                 Else
-                    Return cpCore.main_ServerDomain
+                    Return cpCore.webServerIO_requestDomain
                 End If
             End Get
         End Property
@@ -255,7 +255,7 @@ Namespace Contensive.Core
             If False Then
                 Return Link
             Else
-                Return cpCore.main_EncodeAppRootPath(Link)
+                Return cpCore.encodeAppRootPath(Link)
             End If
         End Function
 
@@ -319,7 +319,7 @@ Namespace Contensive.Core
                 '
                 '
             Else
-                Call cpCore.testPoint(Message)
+                Call cpCore.debug_testPoint(Message)
             End If
         End Sub
 

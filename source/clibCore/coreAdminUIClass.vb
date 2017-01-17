@@ -207,7 +207,7 @@ ErrorTrap:
             Dim s As String
             '
             If RightSideMessage = "" Then
-                RightSideMessage = FormatDateTime(cpCore.main_PageStartTime)
+                RightSideMessage = FormatDateTime(cpCore.app_startTime)
             End If
             '
             If isInStr(1, HeaderMessage & RightSideMessage, vbCrLf) Then
@@ -933,7 +933,7 @@ ErrorTrap:
                     If PagePointer <> 1 Then
                         WorkingQS = cpCore.web_RefreshQueryString
                         WorkingQS = ModifyQueryString(WorkingQS, "GotoPage", "1", True)
-                        GetReport2 = GetReport2 & "<a href=""" & cpCore.web_requestPage & "?" & WorkingQS & """>1</A>...&nbsp;"
+                        GetReport2 = GetReport2 & "<a href=""" & cpCore.webServerIO_requestPage & "?" & WorkingQS & """>1</A>...&nbsp;"
                     End If
                     WorkingQS = cpCore.web_RefreshQueryString
                     WorkingQS = ModifyQueryString(WorkingQS, RequestNamePageSize, CStr(ReportPageSize), True)
@@ -942,18 +942,18 @@ ErrorTrap:
                             GetReport2 = GetReport2 & PagePointer & "&nbsp;"
                         Else
                             WorkingQS = ModifyQueryString(WorkingQS, RequestNamePageNumber, CStr(PagePointer), True)
-                            GetReport2 = GetReport2 & "<a href=""" & cpCore.web_requestPage & "?" & WorkingQS & """>" & PagePointer & "</A>&nbsp;"
+                            GetReport2 = GetReport2 & "<a href=""" & cpCore.webServerIO_requestPage & "?" & WorkingQS & """>" & PagePointer & "</A>&nbsp;"
                         End If
                         PagePointer = PagePointer + 1
                         LinkCount = LinkCount + 1
                     Loop
                     If PagePointer < PageCount Then
                         WorkingQS = ModifyQueryString(WorkingQS, RequestNamePageNumber, CStr(PageCount), True)
-                        GetReport2 = GetReport2 & "...<a href=""" & cpCore.web_requestPage & "?" & WorkingQS & """>" & PageCount & "</A>&nbsp;"
+                        GetReport2 = GetReport2 & "...<a href=""" & cpCore.webServerIO_requestPage & "?" & WorkingQS & """>" & PageCount & "</A>&nbsp;"
                     End If
                     If ReportPageNumber < PageCount Then
                         WorkingQS = ModifyQueryString(WorkingQS, RequestNamePageNumber, CStr(ReportPageNumber + 1), True)
-                        GetReport2 = GetReport2 & "...<a href=""" & cpCore.web_requestPage & "?" & WorkingQS & """>next</A>&nbsp;"
+                        GetReport2 = GetReport2 & "...<a href=""" & cpCore.webServerIO_requestPage & "?" & WorkingQS & """>next</A>&nbsp;"
                     End If
                     GetReport2 = GetReport2 & "<br>&nbsp;"
                 End If

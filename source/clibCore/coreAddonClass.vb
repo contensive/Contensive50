@@ -412,7 +412,7 @@ Namespace Contensive.Core
                     OtherHeadTags = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_OtherHeadTags)
                     JSFilename = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_JSFilename)
                     If JSFilename <> "" Then
-                        JSFilename = cpCore.web_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, JSFilename)
+                        JSFilename = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, JSFilename)
                     End If
                 End If
                 If Not String.IsNullOrEmpty(ProgramID) Then
@@ -573,7 +573,7 @@ Namespace Contensive.Core
                             Else
                                 returnVal = "The Add-on '" & AddonName & "' could not be found. It may have been deleted or marked inactive. Please use the Add-on Manager to replace it, or edit this page and remove it."
                             End If
-                            returnVal = cpCore.main_GetAdminHintWrapper(returnVal)
+                            returnVal = cpCore.html_GetAdminHintWrapper(returnVal)
                         End If
                         If (addonId > 0) Then
                             Throw New ApplicationException("The Add-on could not be found by id [" & addonId & "] or name/guid [" & AddonNameOrGuid & "]")
@@ -824,7 +824,7 @@ Namespace Contensive.Core
                                     '
                                     ' web-only
                                     '
-                                    Link = cpCore.web_requestProtocol & cpCore.webServer.requestDomain & coreClass.www_requestRootPath & cpCore.siteProperties.serverPageDefault
+                                    Link = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & coreClass.webServerIO_requestRootPath & cpCore.siteProperties.serverPageDefault
                                     If vbInstr(1, Link, "?") = 0 Then
                                         Link = Link & "?"
                                     Else
@@ -860,8 +860,8 @@ Namespace Contensive.Core
                                         & "&HostContentName=" & EncodeRequestVariable(HostContentName) _
                                         & "&HostRecordID=" & HostRecordID _
                                         & "&HostRQS=" & EncodeRequestVariable(cpCore.web_RefreshQueryString) _
-                                        & "&HostQS=" & EncodeRequestVariable(cpCore.webServer.requestQueryString) _
-                                        & "&HostForm=" & EncodeRequestVariable(cpCore.webServer.requestFormString) _
+                                        & "&HostQS=" & EncodeRequestVariable(cpCore.webServerIO.requestQueryString) _
+                                        & "&HostForm=" & EncodeRequestVariable(cpCore.webServerIO.requestFormString) _
                                         & "&optionstring=" & EncodeRequestVariable(WorkingOptionString) _
                                         & ""
                                     If IsInline Then
@@ -908,10 +908,10 @@ Namespace Contensive.Core
                                         Call cpCore.main_AddEndOfBodyJavascript2(JSBodyEnd, AddedByName)
                                         Call cpCore.main_AddHeadScriptLink(JSFilename, AddedByName)
                                         If DefaultStylesFilename <> "" Then
-                                            Call cpCore.main_AddStylesheetLink2(cpCore.web_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
+                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
                                         End If
                                         If CustomStylesFilename <> "" Then
-                                            Call cpCore.main_AddStylesheetLink2(cpCore.web_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
+                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
                                         End If
                                     End If
                                 End If
@@ -927,8 +927,8 @@ Namespace Contensive.Core
                                     ' Add-on setup for InFrame, running the call-back - this page must think it is just the remotemethod
                                     '
                                     If isMainOk Then
-                                        Call cpCore.web_addRefreshQueryString(RequestNameRemoteMethodAddon, AddonNameOrGuid_Local)
-                                        Call cpCore.web_addRefreshQueryString("optionstring", WorkingOptionString)
+                                        Call cpCore.webServerIO_addRefreshQueryString(RequestNameRemoteMethodAddon, AddonNameOrGuid_Local)
+                                        Call cpCore.webServerIO_addRefreshQueryString("optionstring", WorkingOptionString)
                                     End If
                                 ElseIf (AsAjax And (Context = CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) Then
                                     '
@@ -950,7 +950,7 @@ Namespace Contensive.Core
                                             If NVPair <> "" Then
                                                 NVSplit = Split(NVPair, "=")
                                                 If UBound(NVSplit) > 0 Then
-                                                    Call cpCore.web_addRefreshQueryString(NVSplit(0), NVSplit(1))
+                                                    Call cpCore.webServerIO_addRefreshQueryString(NVSplit(0), NVSplit(1))
                                                 End If
                                             End If
                                         Next
@@ -1080,7 +1080,7 @@ Namespace Contensive.Core
                                                 If AddonName = "" And addonId <> 0 Then
                                                     AddonName = "Addon #" & addonId
                                                 End If
-                                                AssemblyContent = cpCore.main_GetAdminHintWrapper("<p>There was an error executing the assembly component of Add-on [" & AddonName & "], AddonOptionString [" & WorkingOptionString & "] with class name [" & DotNetClassFullName & "]. The details of this error follow.</p><p>" & errorMessageForAdmin & "</p>")
+                                                AssemblyContent = cpCore.html_GetAdminHintWrapper("<p>There was an error executing the assembly component of Add-on [" & AddonName & "], AddonOptionString [" & WorkingOptionString & "] with class name [" & DotNetClassFullName & "]. The details of this error follow.</p><p>" & errorMessageForAdmin & "</p>")
                                             End If
                                         End If
                                     End If
@@ -1126,9 +1126,9 @@ Namespace Contensive.Core
                                                 ' use request object to build link
                                                 '
                                                 If Mid(WorkingLink, 1, 1) = "/" Then
-                                                    WorkingLink = cpCore.web_requestProtocol & cpCore.webServer.requestDomain & WorkingLink
+                                                    WorkingLink = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & WorkingLink
                                                 Else
-                                                    WorkingLink = cpCore.web_requestProtocol & cpCore.webServer.requestDomain & cpCore.web_requestVirtualFilePath & WorkingLink
+                                                    WorkingLink = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.webServerIO_requestVirtualFilePath & WorkingLink
                                                 End If
                                             Else
                                                 '
@@ -1186,7 +1186,7 @@ Namespace Contensive.Core
                                         End If
                                     End If
                                     Link = modifyLinkQuery(Link, RequestNameJSForm, "1", True)
-                                    Link = EncodeAppRootPath(Link, cpCore.web_requestVirtualFilePath, coreClass.www_requestRootPath, cpCore.webServer.requestDomain)
+                                    Link = EncodeAppRootPath(Link, cpCore.webServerIO_requestVirtualFilePath, coreClass.webServerIO_requestRootPath, cpCore.webServerIO.requestDomain)
                                     ScriptCallbackContent = "<SCRIPT LANGUAGE=""JAVASCRIPT"" SRC=""" & Link & """></SCRIPT>"
                                 End If
                                 '
@@ -1209,10 +1209,10 @@ Namespace Contensive.Core
                                         Call cpCore.main_AddEndOfBodyJavascript2(JSBodyEnd, AddedByName)
                                         Call cpCore.main_AddHeadScriptLink(JSFilename, AddedByName)
                                         If DefaultStylesFilename <> "" Then
-                                            Call cpCore.main_AddStylesheetLink2(cpCore.web_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
+                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
                                         End If
                                         If CustomStylesFilename <> "" Then
-                                            Call cpCore.main_AddStylesheetLink2(cpCore.web_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
+                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
                                         End If
                                     End If
                                 End If
@@ -1800,7 +1800,7 @@ Namespace Contensive.Core
                                                                             If FieldValue = "" Then
                                                                                 Copy = cpCore.html_GetFormInputFile(FieldName)
                                                                             Else
-                                                                                NonEncodedLink = cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, FieldValue)
+                                                                                NonEncodedLink = cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, FieldValue)
                                                                                 EncodedLink = EncodeURL(NonEncodedLink)
                                                                                 Copy = "" _
                                                                                     & "<a href=""http://" & EncodedLink & """ target=""_blank"">[" & GetFilename(FieldValue) & "]</A>" _
@@ -2566,6 +2566,9 @@ ErrorTrap:
                 ' If not found in debug location (addon root folder), look in addon version folder provided
                 '
                 AddonFound = False
+                '
+                ' refactor -- add an argument byref dictionary cache, loaded as you go through the types in each dll. Next load, use the dictionary to locate the class faster. 
+                '
                 dllFilenames = IO.Directory.GetFileSystemEntries(fullPath, "*.dll")
                 If dllFilenames.Length > 0 Then
                     '
@@ -3345,7 +3348,7 @@ ErrorTrap:
                     End If
                     '
                     If CollectionID <> 0 Then
-                        CollectionCopy = cpCore.main_GetRecordName("Add-on Collections", CollectionID)
+                        CollectionCopy = cpCore.content_GetRecordName("Add-on Collections", CollectionID)
                         If CollectionCopy <> "" Then
                             CollectionCopy = "This add-on is a member of the " & CollectionCopy & " collection."
                         Else
@@ -3887,7 +3890,7 @@ ErrorTrap:
                                                                             If FieldValue = "" Then
                                                                                 Copy = cpCore.html_GetFormInputFile(FieldName)
                                                                             Else
-                                                                                NonEncodedLink = cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, FieldValue)
+                                                                                NonEncodedLink = cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, FieldValue)
                                                                                 EncodedLink = EncodeURL(NonEncodedLink)
                                                                                 Copy = "" _
                                                                                     & "<a href=""http://" & EncodedLink & """ target=""_blank"">[" & GetFilename(FieldValue) & "]</A>" _
@@ -4581,7 +4584,7 @@ ErrorTrap:
                 '
                 JSFilename = cpCore.db.cs_getText(CS, "jsfilename")
                 If JSFilename <> "" Then
-                    JSFilename = cpCore.web_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, JSFilename)
+                    JSFilename = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, JSFilename)
                     Call cpCore.main_AddHeadScriptLink(JSFilename, SourceComment)
                 End If
                 Copy = cpCore.db.cs_getText(CS, "stylesfilename")
@@ -4589,7 +4592,7 @@ ErrorTrap:
                     If vbInstr(1, Copy, "://") <> 0 Then
                     ElseIf Left(Copy, 1) = "/" Then
                     Else
-                        Copy = cpCore.web_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, Copy)
+                        Copy = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, Copy)
                     End If
                     Call cpCore.main_AddStylesheetLink2(Copy, SourceComment)
                 End If

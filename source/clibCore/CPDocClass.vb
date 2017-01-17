@@ -64,14 +64,14 @@ Namespace Contensive.Core
         <Obsolete("Page Content comes from the pageManager addon.", True)> Public Overrides Property content() As String
             Get
                 If True Then
-                    Return cpCore.main_PageContent
+                    Return cpCore.pageManager_PageContent
                 Else
                     Return ""
                 End If
             End Get
             Set(ByVal value As String)
                 If True Then
-                    cpCore.main_PageContent = value
+                    cpCore.pageManager_PageContent = value
                 End If
             End Set
         End Property
@@ -189,7 +189,7 @@ Namespace Contensive.Core
         Public Overrides ReadOnly Property startTime() As Date
             Get
                 If True Then
-                    Return cpCore.main_PageStartTime
+                    Return cpCore.app_startTime
                 Else
                     Return New Date()
                 End If
@@ -284,7 +284,7 @@ Namespace Contensive.Core
         '
         Public Overrides Sub addRefreshQueryString(ByVal Name As String, ByVal Value As String)
             If True Then
-                Call cpCore.web_addRefreshQueryString(Name, Value)
+                Call cpCore.webServerIO_addRefreshQueryString(Name, Value)
             End If
         End Sub
         '
@@ -317,14 +317,14 @@ Namespace Contensive.Core
         Public Overrides Property body() As String
             Get
                 If True Then
-                    body = cpCore.main_FilterInput
+                    body = cpCore.pageManager_FilterInput
                 Else
                     Return ""
                 End If
             End Get
             Set(ByVal value As String)
                 If True Then
-                    cpCore.main_FilterInput = value
+                    cpCore.pageManager_FilterInput = value
                 End If
             End Set
         End Property

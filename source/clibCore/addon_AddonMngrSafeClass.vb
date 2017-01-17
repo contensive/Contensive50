@@ -137,7 +137,7 @@ Namespace Contensive.Core
                     '
                     ' ----- redirect back to the root
                     '
-                    Call cpCore.web_Redirect2(cpCore.siteProperties.adminURL, "Addon Manager, Cancel Button Pressed", False)
+                    Call cpCore.webServerIO_Redirect2(cpCore.siteProperties.adminURL, "Addon Manager, Cancel Button Pressed", False)
                 Else
                     If Not cpCore.user.isAuthenticatedAdmin Then
                         '
@@ -184,7 +184,7 @@ Namespace Contensive.Core
                                 For Ptr = 0 To Cnt - 1
                                     If cpCore.doc_getBoolean2("ac" & Ptr) Then
                                         TargetCollectionID = cpCore.doc_getInteger("acID" & Ptr)
-                                        TargetCollectionName = cpCore.main_GetRecordName("Add-on Collections", TargetCollectionID)
+                                        TargetCollectionName = cpCore.content_GetRecordName("Add-on Collections", TargetCollectionID)
                                         '
                                         ' Delete any addons from this collection
                                         '
@@ -584,7 +584,7 @@ Namespace Contensive.Core
                         ' --------------------------------------------------------------------------------
                         '
                         If (InstalledCollectionID <> 0) And (Not cpCore.error_IsUserError) Then
-                            Call cpCore.web_Redirect2(cpCore.siteProperties.adminURL & "?helpcollectionid=" & InstalledCollectionID, "Redirecting to help page after collection installation", False)
+                            Call cpCore.webServerIO_Redirect2(cpCore.siteProperties.adminURL & "?helpcollectionid=" & InstalledCollectionID, "Redirecting to help page after collection installation", False)
                         End If
                         '
                         ' --------------------------------------------------------------------------------
@@ -989,7 +989,7 @@ ErrorTrap:
         '
         '
         Private Sub HandleClassAppendLog(ByVal MethodName As String, ByVal Context As String)
-            cpCore.appendLogWithLegacyRow(cpCore.appConfig.name, Context, "dll", "AddonManClass", MethodName, 0, "", "", False, True, cpCore.main_ServerLink, "", "")
+            cpCore.appendLogWithLegacyRow(cpCore.appConfig.name, Context, "dll", "AddonManClass", MethodName, 0, "", "", False, True, cpCore.webServerIO_ServerLink, "", "")
 
         End Sub
         '
@@ -999,7 +999,7 @@ ErrorTrap:
         '
         Private Sub HandleClassTrapError(ByVal MethodName As String, Optional ByVal Context As String = "context unknown")
             '
-            cpCore.handleLegacyError3(cpCore.appConfig.name, Context, "dll", "AddonManClass", MethodName, Err.Number, Err.Source, Err.Description, True, False, cpCore.main_ServerLink)
+            cpCore.handleLegacyError3(cpCore.appConfig.name, Context, "dll", "AddonManClass", MethodName, Err.Number, Err.Source, Err.Description, True, False, cpCore.webServerIO_ServerLink)
             '
         End Sub
         '

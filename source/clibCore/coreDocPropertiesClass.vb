@@ -116,10 +116,10 @@ Namespace Contensive.Core
             Try
                 If Not String.IsNullOrEmpty(sourceKey) Then
                     returnResult = sourceKey.ToLower()
-                    If cpCore.webServer.requestSpaceAsUnderscore Then
+                    If cpCore.webServerIO.requestSpaceAsUnderscore Then
                         returnResult = vbReplace(returnResult, " ", "_")
                     End If
-                    If cpCore.webServer.requestDotAsUnderscore Then
+                    If cpCore.webServerIO.requestDotAsUnderscore Then
                         returnResult = vbReplace(returnResult, ".", "_")
                     End If
                 End If
@@ -162,11 +162,8 @@ Namespace Contensive.Core
                                     End If
                                     .IsForm = False
                                     .IsFile = False
-                                    cpCore.web_ReadStreamJSForm = cpCore.web_ReadStreamJSForm Or (UCase(.Name) = vbUCase(RequestNameJSForm))
+                                    cpCore.webServerIO_ReadStreamJSForm = cpCore.webServerIO_ReadStreamJSForm Or (UCase(.Name) = vbUCase(RequestNameJSForm))
                                     cpCore.main_ReadStreamJSProcess = cpCore.main_ReadStreamJSProcess Or (UCase(.Name) = vbUCase(RequestNameJSProcess))
-                                    If .Name = RequestNameStateString Then
-                                        cpCore.main_Private_StateString_In = .Value
-                                    End If
                                     cpCore.docProperties.setProperty(key, docProperty)
                                 End If
                             End If

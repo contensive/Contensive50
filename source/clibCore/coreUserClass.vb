@@ -168,7 +168,7 @@ Namespace Contensive.Core
                     Dim cacheTestName As String
                     '
                     If Not cpCore.visit_initialized Then
-                        Call cpCore.testPoint("...visit not initialized")
+                        Call cpCore.debug_testPoint("...visit not initialized")
                     Else
                         '
                         ' always false until visit loaded
@@ -180,10 +180,10 @@ Namespace Contensive.Core
                         End If
                         cacheTestName = vbLCase(cacheTestName)
                         If coreCommonModule.IsInDelimitedString(main_IsEditingContentList, cacheTestName, ",") Then
-                            Call cpCore.testPoint("...is in main_IsEditingContentList")
+                            Call cpCore.debug_testPoint("...is in main_IsEditingContentList")
                             returnResult = True
                         ElseIf coreCommonModule.IsInDelimitedString(main_IsNotEditingContentList, cacheTestName, ",") Then
-                            Call cpCore.testPoint("...is in main_IsNotEditingContentList")
+                            Call cpCore.debug_testPoint("...is in main_IsNotEditingContentList")
                         Else
                             If isAuthenticated() Then
                                 If Not cpCore.pageManager_printVersion Then
@@ -384,7 +384,7 @@ Namespace Contensive.Core
                         QS = ModifyQueryString(QS, "method", "")
                         QS = ModifyQueryString(QS, "RequestBinary", "")
                         '
-                        Call cpCore.web_Redirect2("?" & QS, "Login form success", False)
+                        Call cpCore.webServerIO_Redirect2("?" & QS, "Login form success", False)
                     End If
                 End If
                 If loginAddonID = 0 Then
@@ -617,7 +617,7 @@ Namespace Contensive.Core
                         '
                         styleFilename = cpCore.db.cs_getText(CS, "StyleFilename")
                         If styleFilename <> "" Then
-                            Call cpCore.main_AddStylesheetLink(cpCore.web_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, styleFilename))
+                            Call cpCore.main_AddStylesheetLink(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, styleFilename))
                         End If
                         excludeFromAnalytics = cpCore.db.cs_getBoolean(CS, "ExcludeFromAnalytics")
                         returnRecordId = recordId
@@ -861,15 +861,15 @@ Namespace Contensive.Core
                         End If
                         If cpCore.db.cs_ok(CS) Then
                             'hint = "160"
-                            FromAddress = cpCore.siteProperties.getText("EmailFromAddress", "info@" & cpCore.main_ServerDomain)
-                            subject = "Password Request at " & cpCore.main_ServerDomain
+                            FromAddress = cpCore.siteProperties.getText("EmailFromAddress", "info@" & cpCore.webServerIO_requestDomain)
+                            subject = "Password Request at " & cpCore.webServerIO_requestDomain
                             Message = ""
                             Do While cpCore.db.cs_ok(CS)
                                 'hint = "170"
                                 updateUser = False
                                 If Message = "" Then
                                     'hint = "180"
-                                    Message = "This email was sent in reply to a request at " & cpCore.main_ServerDomain & " for the username and password associated with this email address. "
+                                    Message = "This email was sent in reply to a request at " & cpCore.webServerIO_requestDomain & " for the username and password associated with this email address. "
                                     Message = Message & "If this request was made by you, please return to the login screen and use the following:" & vbCrLf
                                     Message = Message & vbCrLf
                                 Else
@@ -997,7 +997,7 @@ Namespace Contensive.Core
                                         & " AND(ccMemberRules.active<>0)" _
                                         & " AND(ccGroupRules.active<>0)" _
                                         & " AND(ccGroupRules.ContentID Is not Null)" _
-                                        & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & cpCore.db.encodeSQLDate(cpCore.main_PageStartTime) & "))" _
+                                        & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & cpCore.db.encodeSQLDate(cpCore.app_startTime) & "))" _
                                         & ")"
                                 CS = cpCore.db.cs_openSql(SQL)
                                 _isAuthenticatedContentManagerAnything = cpCore.db.cs_ok(CS)
@@ -1077,7 +1077,7 @@ Namespace Contensive.Core
                     ' Write Cookies in case Visit Tracking is off
                     '
                     If cpCore.visit_startTime = Date.MinValue Then
-                        cpCore.visit_startTime = cpCore.main_PageStartTime
+                        cpCore.visit_startTime = cpCore.app_startTime
                     End If
                     If Not cpCore.siteProperties.allowVisitTracking Then
                         Call cpCore.visit_init(True)
@@ -1159,7 +1159,7 @@ Namespace Contensive.Core
                     language = (cpCore.db.cs_getText(CS, "LanguageName"))
                     styleFilename = cpCore.db.cs_getText(CS, "StyleFilename")
                     If styleFilename <> "" Then
-                        Call cpCore.main_AddStylesheetLink(cpCore.web_requestProtocol & cpCore.webServer.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, styleFilename))
+                        Call cpCore.main_AddStylesheetLink(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, styleFilename))
                     End If
                     excludeFromAnalytics = cpCore.db.cs_getBoolean(CS, "ExcludeFromAnalytics")
                     '
@@ -1169,7 +1169,7 @@ Namespace Contensive.Core
                     Else
                         isNew = False
                     End If
-                    lastVisit = cpCore.main_PageStartTime
+                    lastVisit = cpCore.app_startTime
                     'cpCore.main_VisitMemberID = id
                     cpCore.visit_loginAttempts = 0
                     cpCore.visitor_memberID = id
@@ -1213,7 +1213,7 @@ Namespace Contensive.Core
                     visits = 1
                     Call cpCore.db.cs_set(CSMember, "Visits", visits)
                     '
-                    lastVisit = cpCore.main_PageStartTime
+                    lastVisit = cpCore.app_startTime
                     Call cpCore.db.cs_set(CSMember, "LastVisit", lastVisit)
                     '
                     '
@@ -1294,7 +1294,7 @@ Namespace Contensive.Core
                 '
                 visits = 1
                 '
-                lastVisit = cpCore.main_PageStartTime
+                lastVisit = cpCore.app_startTime
                 '
                 '
                 CSlanguage = cpCore.csOpenRecord("Languages", cpCore.web_GetBrowserLanguageID(), SelectFieldList:="Name")
@@ -1472,14 +1472,14 @@ Namespace Contensive.Core
                 '
                 Call cpCore.main_SetMetaContent(0, 0)
                 Call cpCore.main_AddPagetitle2("Login", "loginPage")
-                head = cpCore.main_GetHTMLInternalHead(False)
+                head = cpCore.webServerIO_GetHTMLInternalHead(False)
                 If cpCore.pageManager_TemplateBodyTag <> "" Then
                     bodyTag = cpCore.pageManager_TemplateBodyTag
                 Else
                     bodyTag = TemplateDefaultBodyTag
                 End If
                 'Call AppendLog("call main_getEndOfBody, from main_getLoginPage2 ")
-                returnREsult = cpCore.main_assembleHtmlDoc(cpCore.main_docType, head, bodyTag, Body & cpCore.main_GetEndOfBody(False, False, False, False))
+                returnREsult = cpCore.main_assembleHtmlDoc(cpCore.main_docType, head, bodyTag, Body & cpCore.html_GetEndOfBody(False, False, False, False))
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -1515,7 +1515,7 @@ Namespace Contensive.Core
                     '
                     ' ----- When page loads, set focus on login username
                     '
-                    Call cpCore.web_addRefreshQueryString("method", "")
+                    Call cpCore.webServerIO_addRefreshQueryString("method", "")
                     loginForm = ""
                     Call cpCore.main_AddOnLoadJavascript2("document.getElementById('LoginUsernameInput').focus()", "login")
                     '
@@ -1527,7 +1527,7 @@ Namespace Contensive.Core
                         usernameMsg = "<b>To login, enter your username and password.</b></p>"
                     End If
                     '
-                    QueryString = cpCore.webServer.requestQueryString
+                    QueryString = cpCore.webServerIO.requestQueryString
                     QueryString = ModifyQueryString(QueryString, RequestNameHardCodedPage, "", False)
                     QueryString = ModifyQueryString(QueryString, "requestbinary", "", False)
                     '
@@ -1752,7 +1752,7 @@ Namespace Contensive.Core
                                         & " AND(ccMemberRules.active<>0)" _
                                         & " AND(ccGroupRules.active<>0)" _
                                         & " AND(ccGroupRules.ContentID Is not Null)" _
-                                        & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & cpCore.db.encodeSQLDate(cpCore.main_PageStartTime) & "))" _
+                                        & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & cpCore.db.encodeSQLDate(cpCore.app_startTime) & "))" _
                                         & ");"
                                     CS = cpCore.db.cs_openSql(SQL)
                                     If cpCore.db.cs_ok(CS) Then
@@ -1935,7 +1935,7 @@ Namespace Contensive.Core
                         & " AND(ccMemberRules.active<>0)" _
                         & " AND(ccGroupRules.active<>0)" _
                         & " AND(ccGroupRules.ContentID=" & ContentID & ")" _
-                        & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & cpCore.db.encodeSQLDate(cpCore.main_PageStartTime) & "))" _
+                        & " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" & cpCore.db.encodeSQLDate(cpCore.app_startTime) & "))" _
                         & ");"
                     CSPointer = cpCore.db.cs_openSql(SQL)
                     If cpCore.db.cs_ok(CSPointer) Then

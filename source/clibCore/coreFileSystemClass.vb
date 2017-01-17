@@ -780,16 +780,22 @@ Namespace Contensive.Core
         ''' <param name="path"></param>
         ''' <returns></returns>
         Private Function convertToAbsPath(path As String) As String
-            Dim normalizedPath As String = normalizePath(path)
-            If (String.IsNullOrEmpty(normalizedPath)) Then
-                Return rootLocalPath
-            ElseIf (rootLocalPath.ToLower().IndexOf(normalizedPath.ToLower()) = 0) Then
-                Return normalizedPath
-            ElseIf (normalizedPath.IndexOf(":\") >= 0) Then
-                Throw New ApplicationException("Attempt to access an invalid path [" & normalizedPath & "] that is not within the allowed path [" & rootLocalPath & "].")
-            Else
-                Return joinPath(rootLocalPath, normalizedPath)
-            End If
+            Dim result As String = path
+            Try
+                Dim normalizedPath As String = normalizePath(path)
+                If (String.IsNullOrEmpty(normalizedPath)) Then
+                    result = rootLocalPath
+                ElseIf isinPhysicalPath(normalizedPath) Then
+                    result = normalizedPath
+                ElseIf (normalizedPath.IndexOf(":\") >= 0) Then
+                    Throw New ApplicationException("Attempt to access an invalid path [" & normalizedPath & "] that is not within the allowed path [" & rootLocalPath & "].")
+                Else
+                    result = joinPath(rootLocalPath, normalizedPath)
+                End If
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+            Return result
         End Function
         '
         '====================================================================================================
@@ -803,6 +809,11 @@ Namespace Contensive.Core
             returnPath = returnPath.Replace("/", "\")
             returnPath = returnPath.Replace("\\", "\")
             Return returnPath
+        End Function
+        '
+        '====================================================================================================
+        Friend Function isinPhysicalPath(path As String) As Boolean
+            Return (normalizePath(path).ToLower().IndexOf(rootLocalPath.ToLower()) = 0)
         End Function
         '
         '====================================================================================================

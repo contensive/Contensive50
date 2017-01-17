@@ -87,15 +87,7 @@ Namespace Contensive.Core
         End Function
 
         Public Overrides Function CreateGuid() As String
-            'Dim guid As Guid = guid.NewGuid()
-            Return "{" & Guid.NewGuid().ToString & "}"
-            'Dim guid As CSGUID.GUIDGenerator = New CSGUID.GUIDGenerator
-            'Return guid.CreateGUID("")
-            'If true Then
-            '    CreateGuid = cmc.main_CreateGuid()
-            'Else
-            '    CreateGuid = ""
-            'End If
+            Return CP.core.createGuid()
         End Function
 
         Public Overrides Function DecodeUrl(ByVal Url As String) As String

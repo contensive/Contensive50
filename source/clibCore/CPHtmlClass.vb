@@ -342,7 +342,7 @@ Namespace Contensive.Core
         '
         Public Overrides Function SelectUser(ByVal HtmlName As String, ByVal HtmlValue As Integer, ByVal GroupId As Integer, Optional ByVal NoneCaption As String = "", Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Inherits BaseClasses.CPHtmlBaseClass.SelectUser
             If True Then
-                Return cpCore.main_GetFormInputMemberSelect(HtmlName, HtmlValue, GroupId, NoneCaption, HtmlId)
+                Return cpCore.html_GetFormInputMemberSelect(HtmlName, HtmlValue, GroupId, NoneCaption, HtmlId)
             Else
                 Return ""
             End If

@@ -212,7 +212,7 @@
     <Compile Include="coreEncodeBase64Class.vb" />
     <Compile Include="coreSitePropertiesClass.vb" />
     <Compile Include="coreUserClass.vb" />
-    <Compile Include="coreWebServerClass.vb" />
+    <Compile Include="coreWebServerIOClass.vb" />
     <Compile Include="coreMetaDataClass.vb" />
     <Compile Include="coreCacheKeyPtrClass.vb" />
     <Compile Include="coreSecurityClass.vb" />

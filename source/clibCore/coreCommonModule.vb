@@ -2653,7 +2653,7 @@ Namespace Contensive.Core
         '------------------------------------------------------------------------
         '
         Public Const TestPointTab = 2
-        Public Const TestPointTabChr As Char = "-"c
+        Public Const debug_TestPointTabChr As Char = "-"c
         Public CPTickCountBase As Double
         '
         '------------------------------------------------------------------------

@@ -78,7 +78,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetContentControlCriteria(ByVal ContentName As String) As String
-            Return cpCore.GetContentControlCriteria(ContentName)
+            Return cpCore.content_getContentControlCriteria(ContentName)
         End Function
         '
         '====================================================================================================

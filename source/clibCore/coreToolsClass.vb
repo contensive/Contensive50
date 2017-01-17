@@ -238,14 +238,14 @@ Namespace Contensive.Core
                 defaultAddMenu = cpCore.doc_getBoolean("dtdam")
                 DefaultCreateBlankRecord = cpCore.doc_getBoolean("dtblank")
                 '
-                Call cpCore.web_addRefreshQueryString("dta", ToolsAction.ToString())
+                Call cpCore.webServerIO_addRefreshQueryString("dta", ToolsAction.ToString())
                 'Call cpCore.main_AddRefreshQueryString("Button=" & Button)
                 'Call cpCore.main_AddRefreshQueryString("af=" & AdminFormTool)
                 '
-                cpCore.testPoint("Button = " & Button)
-                cpCore.testPoint("ToolsQuery = " & ToolsQuery)
-                cpCore.testPoint("ToolsDataSource = " & ToolsDataSource)
-                cpCore.testPoint("AdminFormTool = " & AdminFormTool)
+                cpCore.debug_testPoint("Button = " & Button)
+                cpCore.debug_testPoint("ToolsQuery = " & ToolsQuery)
+                cpCore.debug_testPoint("ToolsDataSource = " & ToolsDataSource)
+                cpCore.debug_testPoint("AdminFormTool = " & AdminFormTool)
                 '
                 '
                 '
@@ -340,7 +340,7 @@ Namespace Contensive.Core
                             Call Stream.Add(GetForm_CreateGUID())
                         Case Else
                             '
-                            cpCore.testPoint("Taking AdminFormToolRoot case")
+                            cpCore.debug_testPoint("Taking AdminFormToolRoot case")
                             Call Stream.Add(GetForm_Root)
                     End Select
                 End If
@@ -374,7 +374,7 @@ ErrorTrap:
             Dim Stream As New coreFastStringClass
             Dim ButtonList As String
             '
-            Stream.Add(SpanClassAdminNormal & "<strong><A href=""" & cpCore.web_requestPage & "?af=" & AdminFormToolRoot & """>Tools</A></strong></SPAN>")
+            Stream.Add(SpanClassAdminNormal & "<strong><A href=""" & cpCore.webServerIO_requestPage & "?af=" & AdminFormToolRoot & """>Tools</A></strong></SPAN>")
             Stream.Add(SpanClassAdminNormal & ":Create Content Fields from Table</SPAN>")
             '
             '   print out the submit form
@@ -507,7 +507,7 @@ ErrorTrap:
             '
             If (ToolButton <> "") Then
                 If (ToolButton <> ButtonCancel) Then
-                    cpCore.testPoint("ConfigureEdit, Process Save")
+                    cpCore.debug_testPoint("ConfigureEdit, Process Save")
                     '
                     ' Save the form changes
                     '
@@ -591,7 +591,7 @@ ErrorTrap:
                                                     '
                                                     ' Field Type changed, must be done manually
                                                     '
-                                                    ErrorMessage &= "<LI>Field [" & formFieldName & "] changed type from [" & cpCore.main_GetRecordName("content Field Types", .fieldTypeId) & "] to [" & cpCore.main_GetRecordName("content Field Types", formFieldTypeId) & "]. This may have caused a problem converting content.</LI>"
+                                                    ErrorMessage &= "<LI>Field [" & formFieldName & "] changed type from [" & cpCore.content_GetRecordName("content Field Types", .fieldTypeId) & "] to [" & cpCore.content_GetRecordName("content Field Types", formFieldTypeId) & "]. This may have caused a problem converting content.</LI>"
                                                     Dim DataSourceTypeID As Integer
                                                     DataSourceTypeID = cpCore.db.getDataSourceType(DataSourceName)
                                                     Select Case DataSourceTypeID
@@ -663,7 +663,7 @@ ErrorTrap:
                     cpCore.metaData.clear()
                 End If
                 If (ToolButton = ButtonAdd) Then
-                    cpCore.testPoint("ConfigureEdit, Process Add Button")
+                    cpCore.debug_testPoint("ConfigureEdit, Process Add Button")
                     '
                     ' ----- Insert a blank Field
                     '
@@ -696,7 +696,7 @@ ErrorTrap:
                     '
                     ' ----- Exit back to menu
                     '
-                    Call cpCore.main_Redirect(cpCore.web_requestProtocol & cpCore.main_ServerDomain & cpCore.web_requestPath & cpCore.web_requestPage & "?af=" & AdminFormTools)
+                    Call cpCore.main_Redirect(cpCore.webServerIO_requestProtocol & cpCore.webServerIO_requestDomain & cpCore.webServerIO_requestPath & cpCore.webServerIO_requestPage & "?af=" & AdminFormTools)
                 End If
             End If
             '
@@ -704,8 +704,8 @@ ErrorTrap:
             '   Print Output
             '--------------------------------------------------------------------------------
             '
-            cpCore.testPoint("ConfigureEdit, Start Form")
-            Stream.Add(SpanClassAdminNormal & "<strong><a href=""" & cpCore.web_requestPage & "?af=" & AdminFormToolRoot & """>Tools</a></strong>&nbsp;»&nbsp;Manage Admin Edit Fields</span>")
+            cpCore.debug_testPoint("ConfigureEdit, Start Form")
+            Stream.Add(SpanClassAdminNormal & "<strong><a href=""" & cpCore.webServerIO_requestPage & "?af=" & AdminFormToolRoot & """>Tools</a></strong>&nbsp;»&nbsp;Manage Admin Edit Fields</span>")
             Stream.Add("<div>")
             Stream.Add("<div style=""width:45%;float:left;padding:10px;"">" _
                 & "Use this tool to add or modify content definition fields. Contensive uses a caching system for content definitions that is not automatically reloaded. Change you make will not take effect until the next time the system is reloaded. When you create a new field, the database field is created automatically when you have saved both a name and a field type. If you change the field type, you may have to manually change the database field." _
@@ -937,7 +937,7 @@ ErrorTrap:
                                 End If
                                 Call cpCore.db.cs_Close(CSPointer)
                             ElseIf FieldLocked Then
-                                Call streamRow.Add(cpCore.main_GetRecordName("content field types", .fieldTypeId) & cpCore.html_GetFormInputHidden("dtfaType." & RecordCount, .fieldTypeId))
+                                Call streamRow.Add(cpCore.content_GetRecordName("content field types", .fieldTypeId) & cpCore.html_GetFormInputHidden("dtfaType." & RecordCount, .fieldTypeId))
                             Else
                                 TypeSelect = TypeSelectTemplate
                                 TypeSelect = vbReplace(TypeSelect, "menuname", "dtfaType." & RecordCount, 1, 99, vbTextCompare)
@@ -1031,7 +1031,7 @@ ErrorTrap:
                     Call Stream.Add("<br>**This field can not be inherited because the Parent Content Definition does not have a field with the same name.")
                 End If
             End If
-            cpCore.testPoint("ConfigureEdit, Form Done")
+            cpCore.debug_testPoint("ConfigureEdit, Form Done")
             If ContentID <> 0 Then
                 '
                 ' Save the content selection
@@ -1112,7 +1112,7 @@ ErrorTrap:
             '
             GetForm_RootRow = ""
             GetForm_RootRow = GetForm_RootRow & "<tr><td colspan=""2"">"
-            GetForm_RootRow = GetForm_RootRow & SpanClassAdminNormal & "<P class=""ccAdminNormal""><A href=""" & cpCore.web_requestPage & "?af=" & AdminFormToolId.ToString() & """><B>" & Caption & "</b></SPAN></A></p>"
+            GetForm_RootRow = GetForm_RootRow & SpanClassAdminNormal & "<P class=""ccAdminNormal""><A href=""" & cpCore.webServerIO_requestPage & "?af=" & AdminFormToolId.ToString() & """><B>" & Caption & "</b></SPAN></A></p>"
             GetForm_RootRow = GetForm_RootRow & "</td></tr>"
             If Description <> "" Then
                 GetForm_RootRow = GetForm_RootRow & "<tr><td width=""30""><img src=""/ccLib/images/spacer.gif"" height=""1"" width=""30""></td>"
@@ -1136,7 +1136,7 @@ ErrorTrap:
             Dim SQL As String
             '
             GetTitle = GetTitle & "<P>" & SpanClassAdminNormal _
-                    & "<A href=""" & cpCore.web_requestPage & "?af=" & AdminFormToolRoot & """><B>Tools</b></A>" _
+                    & "<A href=""" & cpCore.webServerIO_requestPage & "?af=" & AdminFormToolRoot & """><B>Tools</b></A>" _
                     & "&nbsp;&gt;&nbsp;" _
                     & Title _
                     & "</P><P>" & SpanClassAdminNormal & Description & "</P>"
@@ -1994,7 +1994,7 @@ ErrorTrap:
                                     Caption = Caption & "*"
                                     InheritedFieldCount = InheritedFieldCount + 1
                                 End If
-                                AStart = "<A href=""" & cpCore.web_requestPage & "?" & RequestNameToolContentID & "=" & ContentID & "&af=" & AdminFormToolConfigureListing & "&fi=" & fieldId & "&dtcn=" & ColumnCount
+                                AStart = "<A href=""" & cpCore.webServerIO_requestPage & "?" & RequestNameToolContentID & "=" & ContentID & "&af=" & AdminFormToolConfigureListing & "&fi=" & fieldId & "&dtcn=" & ColumnCount
                                 Call Stream.Add("<td width=""" & ColumnWidth & "%"" valign=""top"" align=""left"">" & SpanClassAdminNormal & Caption & "<br>")
                                 Call Stream.Add("<IMG src=""/ccLib/images/black.GIF"" width=""100%"" height=""1"">")
                                 Call Stream.Add(AStart & "&dta=" & ToolsActionRemoveField & """><IMG src=""/ccLib/images/LibButtonDeleteUp.gif"" width=""50"" height=""15"" border=""0""></A><br>")
@@ -2091,7 +2091,7 @@ ErrorTrap:
                                     '
                                     ' can be used as column header
                                     '
-                                    Stream.Add("<A href=""" & cpCore.web_requestPage & "?" & RequestNameToolContentID & "=" & ContentID & "&af=" & AdminFormToolConfigureListing & "&fi=" & .id & "&dta=" & ToolsActionAddField & "&" & RequestNameAddFieldID & "=" & .id & """><IMG src=""/ccLib/images/LibButtonAddUp.gif"" width=""50"" height=""15"" border=""0""></A> " & .caption & "<br>")
+                                    Stream.Add("<A href=""" & cpCore.webServerIO_requestPage & "?" & RequestNameToolContentID & "=" & ContentID & "&af=" & AdminFormToolConfigureListing & "&fi=" & .id & "&dta=" & ToolsActionAddField & "&" & RequestNameAddFieldID & "=" & .id & """><IMG src=""/ccLib/images/LibButtonAddUp.gif"" width=""50"" height=""15"" border=""0""></A> " & .caption & "<br>")
                                 End If
                             End If
                         End With
@@ -2280,7 +2280,7 @@ ErrorTrap:
                     '
                     Call Stream.Add("Site Property 'TrapErrors' is currently set false. This property must be true to run Content Diagnostics successfully.<br>")
                 Else
-                    Call cpCore.web_SetStreamBuffer(False)
+                    Call cpCore.webServerIO_SetStreamBuffer(False)
                     '
                     ' ----- check Content Sources for duplicates
                     '
@@ -2417,9 +2417,9 @@ ErrorTrap:
                                                     ' ----- redirect type, check redirect contentid
                                                     '
                                                     RedirectContentID = cpCore.db.cs_getInteger(CSFields, "RedirectContentID")
-                                                    ErrorCount = cpCore.main_PageErrorCount
+                                                    ErrorCount = cpCore.app_errorCount
                                                     bitBucket = Local_GetContentNameByID(RedirectContentID)
-                                                    If IsNull(bitBucket) Or (ErrorCount <> cpCore.main_PageErrorCount) Then
+                                                    If IsNull(bitBucket) Or (ErrorCount <> cpCore.app_errorCount) Then
                                                         DiagProblem = "PROBLEM: Content Field [" & ContentName & "].[" & FieldName & "] is a Redirection type, but the ContentID [" & RedirectContentID & "] is not valid."
                                                         If FieldName = "" Then
                                                             DiagProblem = DiagProblem & " Also, the field has no name attribute so these diagnostics can not automatically mark the field inactive."
@@ -2440,9 +2440,9 @@ ErrorTrap:
                                                     '
                                                     ' ----- lookup type, read value and check lookup contentid
                                                     '
-                                                    ErrorCount = cpCore.main_PageErrorCount
+                                                    ErrorCount = cpCore.app_errorCount
                                                     bitBucket = cpCore.db.cs_getField(CSTestRecord, FieldName)
-                                                    If ErrorCount <> cpCore.main_PageErrorCount Then
+                                                    If ErrorCount <> cpCore.app_errorCount Then
                                                         DiagProblem = "PROBLEM: An error occurred reading the value of Content Field [" & ContentName & "].[" & FieldName & "]"
                                                         ReDim DiagActions(1)
                                                         DiagActions(0).Name = "Ignore, or handle this issue manually"
@@ -2453,10 +2453,10 @@ ErrorTrap:
                                                         LookupList = cpCore.db.cs_getText(CSFields, "Lookuplist")
                                                         LookupContentID = cpCore.db.cs_getInteger(CSFields, "LookupContentID")
                                                         If LookupContentID <> 0 Then
-                                                            ErrorCount = cpCore.main_PageErrorCount
+                                                            ErrorCount = cpCore.app_errorCount
                                                             bitBucket = Local_GetContentNameByID(LookupContentID)
                                                         End If
-                                                        If (LookupList = "") And ((LookupContentID = 0) Or (bitBucket = "") Or (ErrorCount <> cpCore.main_PageErrorCount)) Then
+                                                        If (LookupList = "") And ((LookupContentID = 0) Or (bitBucket = "") Or (ErrorCount <> cpCore.app_errorCount)) Then
                                                             DiagProblem = "Content Field [" & ContentName & "].[" & FieldName & "] is a Lookup type, but LookupList is blank and LookupContentID [" & LookupContentID & "] is not valid."
                                                             ReDim DiagActions(2)
                                                             DiagActions(0).Name = "Ignore, or handle this issue manually"
@@ -2470,9 +2470,9 @@ ErrorTrap:
                                                     '
                                                     ' ----- check for value in database
                                                     '
-                                                    ErrorCount = cpCore.main_PageErrorCount
+                                                    ErrorCount = cpCore.app_errorCount
                                                     bitBucket = cpCore.db.cs_getField(CSTestRecord, FieldName)
-                                                    If (ErrorCount <> cpCore.main_PageErrorCount) Then
+                                                    If (ErrorCount <> cpCore.app_errorCount) Then
                                                         DiagProblem = "PROBLEM: An error occurred reading the value of Content Field [" & ContentName & "].[" & FieldName & "]"
                                                         ReDim DiagActions(3)
                                                         DiagActions(0).Name = "Ignore, or handle this issue manually"
@@ -3901,7 +3901,7 @@ ErrorTrap:
                 ' Return the content of the file
                 '
 
-                Call cpCore.web_setResponseContentType("text/text")
+                Call cpCore.webServerIO_setResponseContentType("text/text")
                 Call cpCore.writeAltBuffer(cpCore.appRootFiles.readFile(cpCore.docProperties.getText("SourceFile")))
                 Call cpCore.doc_close()
                 'GetForm_LogFiles_Details = cpCore.app.publicFiles.ReadFile(cpCore.main_GetStreamText2("SourceFile"))
@@ -3913,7 +3913,7 @@ ErrorTrap:
                 If CurrentPath <> ParentPath Then
                     FileSize = ""
                     FileDate = ""
-                    GetForm_LogFiles_Details = GetForm_LogFiles_Details & GetForm_LogFiles_Details_GetRow("<A href=""" & cpCore.web_requestPage & "?SetPath=" & ParentPath & """>" & FolderOpenImage & "</A>", "<A href=""" & cpCore.web_requestPage & "?SetPath=" & ParentPath & """>" & ParentPath & "</A>", FileSize, FileDate, RowEven)
+                    GetForm_LogFiles_Details = GetForm_LogFiles_Details & GetForm_LogFiles_Details_GetRow("<A href=""" & cpCore.webServerIO_requestPage & "?SetPath=" & ParentPath & """>" & FolderOpenImage & "</A>", "<A href=""" & cpCore.webServerIO_requestPage & "?SetPath=" & ParentPath & """>" & ParentPath & "</A>", FileSize, FileDate, RowEven)
                 End If
                 '
                 ' Sub-Folders
@@ -3930,7 +3930,7 @@ ErrorTrap:
                             FolderName = LineSplit(0)
                             FileSize = LineSplit(1)
                             FileDate = LineSplit(2)
-                            GetForm_LogFiles_Details = GetForm_LogFiles_Details & GetForm_LogFiles_Details_GetRow("<A href=""" & cpCore.web_requestPage & "?SetPath=" & CurrentPath & "\" & FolderName & """>" & FolderClosedImage & "</A>", "<A href=""" & cpCore.web_requestPage & "?SetPath=" & CurrentPath & "\" & FolderName & """>" & FolderName & "</A>", FileSize, FileDate, RowEven)
+                            GetForm_LogFiles_Details = GetForm_LogFiles_Details & GetForm_LogFiles_Details_GetRow("<A href=""" & cpCore.webServerIO_requestPage & "?SetPath=" & CurrentPath & "\" & FolderName & """>" & FolderClosedImage & "</A>", "<A href=""" & cpCore.webServerIO_requestPage & "?SetPath=" & CurrentPath & "\" & FolderName & """>" & FolderName & "</A>", FileSize, FileDate, RowEven)
                         End If
                     Next
                 End If
@@ -3957,7 +3957,7 @@ ErrorTrap:
                             QueryString = ModifyQueryString(QueryString, RequestNameAdminForm, CStr(AdminFormTool), True)
                             QueryString = ModifyQueryString(QueryString, "at", AdminFormToolLogFileView, True)
                             QueryString = ModifyQueryString(QueryString, "SourceFile", FileURL, True)
-                            CellCopy = "<A href=""" & cpCore.web_requestPath & "?" & QueryString & """ target=""_blank"">" & Filename & "</A>"
+                            CellCopy = "<A href=""" & cpCore.webServerIO_requestPath & "?" & QueryString & """ target=""_blank"">" & Filename & "</A>"
                             GetForm_LogFiles_Details = GetForm_LogFiles_Details & GetForm_LogFiles_Details_GetRow(SpacerImage, CellCopy, FileSize, FileDate, RowEven)
                         End If
                     Next
@@ -4069,7 +4069,7 @@ ErrorTrap:
                 '
                 ' Restart
                 '
-                cpCore.appendLogWithLegacyRow(cpCore.appConfig.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " & cpCore.user.name & " (" & cpCore.user.id & ") restarted using the Restart tool", False, True, cpCore.main_ServerLink, "", "")
+                cpCore.appendLogWithLegacyRow(cpCore.appConfig.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " & cpCore.user.name & " (" & cpCore.user.id & ") restarted using the Restart tool", False, True, cpCore.webServerIO_ServerLink, "", "")
                 'runAtServer = New runAtServerClass(cpCore)
                 Call cpCore.main_Redirect("/ccLib/Popup/WaitForIISReset.htm")
                 Call Threading.Thread.Sleep(2000)
@@ -4774,7 +4774,7 @@ ErrorTrap:
                 '
                 '
                 '
-                cpCore.appendLogWithLegacyRow(cpCore.appConfig.name, "Resetting IIS", "dll", "ToolsClass", "GetForm_IISReset", 0, "dll", "Warning: member " & cpCore.user.name & " (" & cpCore.user.id & ") executed an IISReset using the IISReset tool", False, True, cpCore.main_ServerLink, "", "")
+                cpCore.appendLogWithLegacyRow(cpCore.appConfig.name, "Resetting IIS", "dll", "ToolsClass", "GetForm_IISReset", 0, "dll", "Warning: member " & cpCore.user.name & " (" & cpCore.user.id & ") executed an IISReset using the IISReset tool", False, True, cpCore.webServerIO_ServerLink, "", "")
                 'runAtServer = New runAtServerClass(cpCore)
                 Call cpCore.main_Redirect("/ccLib/Popup/WaitForIISReset.htm")
                 Call Threading.Thread.Sleep(2000)
