@@ -289,7 +289,7 @@ Namespace Contensive.Core
                                 '
                                 ' Verify core installation
                                 '
-                                Call AddonInstall.installCollectionFromRemoteRepo(CoreCollectionGuid, "", IISResetRequired, RegisterList, ErrorMessage, "", False)
+                                Call AddonInstall.installCollectionFromRemoteRepo(CoreCollectionGuid, ErrorMessage, "", False)
                                 '
                                 '
                                 '

@@ -50,9 +50,10 @@ Namespace Contensive.Addons
                 SaveContent &= "" _
                         & vbCrLf & "----------" _
                         & vbCrLf & "form post:"
-                For Each kvp As KeyValuePair(Of String, docPropertiesClass) In cpCore.docProperties.docPropertiesDict
-                    If kvp.Value.IsForm Then
-                        SaveContent &= vbCrLf & kvp.Value.NameValue
+                For Each key As String In cpCore.docProperties.getKeyList()
+                    Dim docProperty As docPropertiesClass = cpCore.docProperties.getProperty(key)
+                    If docProperty.IsForm Then
+                        SaveContent &= vbCrLf & docProperty.NameValue
                     End If
                 Next
                 If Not IsNothing(cpCore.webServerIO.requestFormBinaryHeader) Then
@@ -3366,12 +3367,14 @@ ErrorTrap:
                                         End If
                                         FieldValueText = EncodeText(FieldValueVariant)
                                         If FieldValueText <> "" Then
-                                            Filename = cpCore.db.cs_getFilename(CSEditRecord, FieldName, FieldValueText, adminContent.Name)
-                                            Path = Filename
+                                            Filename = FieldValueText
+                                            Dim pathFilename As String = cpCore.db.cs_getFilename(CSEditRecord, FieldName, Filename, adminContent.Name)
+                                            Path = pathFilename
                                             Path = vbReplace(Path, "\", "/")
-                                            Path = vbReplace(Path, "/" & FieldValueText, "")
-                                            Call cpCore.db.cs_setField(CSEditRecord, FieldName, Filename)
-                                            Call cpCore.web_processFormInputFile(FieldName, cpCore.cdnFiles, Path)
+                                            Path = vbReplace(Path, "/" & Filename, "")
+                                            cpCore.cdnFiles.saveUpload(FieldName, Path, Filename)
+                                            Call cpCore.db.cs_setField(CSEditRecord, FieldName, Path & Filename)
+                                            'Call cpCore.web_processFormInputFile(FieldName, cpCore.cdnFiles, Path)
                                             RecordChanged = True
                                             FieldChanged = True
                                         End If
@@ -5599,7 +5602,10 @@ ErrorTrap:
                                             If FieldValueText = "" Then
                                                 EditorString &= ("[no file]")
                                             Else
-                                                EditorString &= ("&nbsp;<a href=""http://" & EncodedLink & """ target=""_blank"">" & SpanClassAdminSmall & "[" & GetFilename(FieldValueText) & "]</A>")
+                                                Dim filename As String = ""
+                                                Dim path As String = ""
+                                                cpCore.privateFiles.splitPathFilename(FieldValueText, path, filename)
+                                                EditorString &= ("&nbsp;<a href=""http://" & EncodedLink & """ target=""_blank"">" & SpanClassAdminSmall & "[" & filename & "]</A>")
                                             End If
                                             EditorString &= WhyReadOnlyMsg
                                             '
@@ -5856,7 +5862,10 @@ ErrorTrap:
                                             Else
                                                 NonEncodedLink = cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, FieldValueText)
                                                 EncodedLink = EncodeURL(NonEncodedLink)
-                                                EditorString &= ("&nbsp;<a href=""http://" & EncodedLink & """ target=""_blank"">" & SpanClassAdminSmall & "[" & GetFilename(FieldValueText) & "]</A>")
+                                                Dim filename As String = ""
+                                                Dim path As String = ""
+                                                cpCore.privateFiles.splitPathFilename(FieldValueText, path, filename)
+                                                EditorString &= ("&nbsp;<a href=""http://" & EncodedLink & """ target=""_blank"">" & SpanClassAdminSmall & "[" & filename & "]</A>")
                                                 EditorString &= ("&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & cpCore.html_GetFormInputCheckBox2(FormFieldLCaseName & ".DeleteFlag", False))
                                                 EditorString &= ("&nbsp;&nbsp;&nbsp;Change:&nbsp;" & cpCore.html_GetFormInputFile2(FormFieldLCaseName, , "file"))
                                             End If

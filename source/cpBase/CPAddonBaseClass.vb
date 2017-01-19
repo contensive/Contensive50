@@ -373,7 +373,7 @@ Namespace Contensive.BaseClasses
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public MustOverride ReadOnly Property Template() As Boolean 'Implements BaseClasses.CPAddonBaseClass.Template
-        Public MustOverride Function installCollectionFile(privateFolder As String, ByRef returnUserError As String) As Boolean
+        Public MustOverride Function installCollectionFile(privatePathFilename As String, ByRef returnUserError As String) As Boolean
         Public MustOverride Function installCollectionFromLibrary(collectionGuid As String, ByRef returnUserError As String) As Boolean
     End Class
 End Namespace

@@ -736,7 +736,7 @@ Namespace Contensive.Core
                                                             ErrorMessage = ""
                                                             If Not localCollectionFound Then
                                                                 Call appendUpgradeLog("...site collection [" & Collectionname & "] not found in local collection, call UpgradeAllAppsFromLibCollection2 to install it.")
-                                                                addonInstallOk = addonInstall.installCollectionFromRemoteRepo(CollectionGuid, DataBuildVersion, IISResetRequired, "", ErrorMessage, "", isNewBuild)
+                                                                addonInstallOk = addonInstall.installCollectionFromRemoteRepo(CollectionGuid, ErrorMessage, "", isNewBuild)
                                                                 classLogFolder = saveLogFolder
                                                                 If Not addonInstallOk Then
                                                                     '
@@ -748,7 +748,7 @@ Namespace Contensive.Core
                                                                 If upgradeCollection Then
                                                                     Call appendUpgradeLog("...upgrading collection")
                                                                     saveLogFolder = classLogFolder
-                                                                    Call addonInstall.installCollectionFromLocalRepo(Me, IISResetRequired, CollectionGuid, cpCore.common_version, ErrorMessage, "", "", isNewBuild)
+                                                                    Call addonInstall.installCollectionFromLocalRepo(CollectionGuid, cpCore.common_version, ErrorMessage, "", isNewBuild)
                                                                     classLogFolder = saveLogFolder
                                                                 End If
                                                             End If

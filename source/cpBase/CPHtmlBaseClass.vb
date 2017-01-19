@@ -38,8 +38,9 @@ Namespace Contensive.BaseClasses
         Public MustOverride Sub ProcessCheckList(ByVal HtmlName As String, ByVal PrimaryContentName As String, ByVal PrimaryRecordID As String, ByVal SecondaryContentName As String, ByVal RulesContentName As String, ByVal RulesPrimaryFieldname As String, ByVal RulesSecondaryFieldName As String) 'Implements BaseClasses.CPHtmlBaseClass.ProcessCheckList
         Public MustOverride Sub ProcessInputFile(ByVal HtmlName As String, Optional ByVal VirtualFilePath As String = "")
 
-        Public MustOverride Function ProcessInputFile(ByVal HtmlName As String, fileSystem As CPFileSystemBaseClass, ByRef returnPathFilename As String) As Boolean
-        Public MustOverride Function ProcessInputFile(ByVal HtmlName As String, fileSystem As CPFileSystemBaseClass, uploadFilePath As String, ByRef returnFilename As String) As Boolean
+        ' no -- add these to the filesystem object
+        'Public MustOverride Function ProcessInputFile(ByVal HtmlName As String, fileSystem As CPFileSystemBaseClass, ByRef returnPathFilename As String) As Boolean
+        'Public MustOverride Function ProcessInputFile(ByVal HtmlName As String, fileSystem As CPFileSystemBaseClass, uploadFilePath As String, ByRef returnFilename As String) As Boolean
 
         Public MustOverride Function Hidden(ByVal HtmlName As String, ByVal HtmlValue As String, Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Implements BaseClasses.CPHtmlBaseClass.Hidden
         Public MustOverride Function InputDate(ByVal HtmlName As String, Optional ByVal HtmlValue As String = "", Optional ByVal Width As String = "", Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "") As String 'Implements BaseClasses.CPHtmlBaseClass.InputDate

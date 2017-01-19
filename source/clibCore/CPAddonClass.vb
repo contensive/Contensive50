@@ -394,14 +394,15 @@ Namespace Contensive.Core
         ''' <summary>
         ''' Install an uploaded collection file from a private folder. Return true if successful, else the issue is in the returnUserError
         ''' </summary>
-        ''' <param name="privateFolder"></param>
+        ''' <param name="privatePathFilename"></param>
         ''' <param name="returnUserError"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Overrides Function installCollectionFile(privateFolder As String, ByRef returnUserError As String) As Boolean
+        Public Overrides Function installCollectionFile(privatePathFilename As String, ByRef returnUserError As String) As Boolean
             Dim returnOk As Boolean = False
             Try
-                returnOk = cp.core.addonInstall_installCollectionFile(privateFolder, returnUserError)
+                Dim ignoreReturnedCollectionGuid As String = ""
+                returnOk = cp.core.addon.addonInstall.InstallCollectionsFromPrivateFile(privatePathFilename, returnUserError, ignoreReturnedCollectionGuid, False)
             Catch ex As Exception
                 cp.core.handleExceptionAndRethrow(ex)
                 If Not cp.core.siteProperties.trapErrors Then

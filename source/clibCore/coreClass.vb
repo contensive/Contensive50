@@ -217,12 +217,12 @@ Namespace Contensive.Core
                         '
                         ' local server -- everything is ephemeral
                         '
-                        _appRootFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, normalizeFilePath(serverConfig.clusterPath) & normalizeFilePath(appConfig.appRootFilesPath))
+                        _appRootFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.appRootFilesPath))
                     Else
                         '
                         ' cluster mode - each filesystem is configured accordingly
                         '
-                        _appRootFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.activeSync, normalizeFilePath(serverConfig.clusterPath) & normalizeFilePath(appConfig.appRootFilesPath))
+                        _appRootFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.activeSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.appRootFilesPath))
                     End If
                 End If
                 Return _appRootFiles
@@ -271,12 +271,12 @@ Namespace Contensive.Core
                         '
                         ' local server -- everything is ephemeral
                         '
-                        _privateFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, normalizeFilePath(serverConfig.clusterPath) & normalizeFilePath(appConfig.privateFilesPath))
+                        _privateFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.privateFilesPath))
                     Else
                         '
                         ' cluster mode - each filesystem is configured accordingly
                         '
-                        _privateFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, normalizeFilePath(serverConfig.clusterPath) & normalizeFilePath(appConfig.privateFilesPath))
+                        _privateFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.privateFilesPath))
                     End If
                 End If
                 Return _privateFiles
@@ -298,12 +298,12 @@ Namespace Contensive.Core
                         '
                         ' local server -- everything is ephemeral
                         '
-                        _cdnFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, normalizeFilePath(serverConfig.clusterPath) & normalizeFilePath(appConfig.cdnFilesPath))
+                        _cdnFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.cdnFilesPath))
                     Else
                         '
                         ' cluster mode - each filesystem is configured accordingly
                         '
-                        _cdnFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, normalizeFilePath(serverConfig.clusterPath) & normalizeFilePath(appConfig.cdnFilesPath))
+                        _cdnFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.cdnFilesPath))
                     End If
                 End If
                 Return _cdnFiles
@@ -10026,12 +10026,12 @@ ErrorTrap:
                     End If
                     DebugPanel = DebugPanel & main_DebugPanelRow("main_ServerQueryString", Copy)
                     Copy = ""
-                    For Each kvp As KeyValuePair(Of String, docPropertiesClass) In docProperties.docPropertiesDict
-                        If kvp.Value.IsForm Then
-                            Copy = Copy & cr & "<br>" & html.html_EncodeHTML(kvp.Value.NameValue)
+                    For Each key As String In docProperties.getKeyList()
+                        Dim docProperty As docPropertiesClass = docProperties.getProperty(key)
+                        If docProperty.IsForm Then
+                            Copy = Copy & cr & "<br>" & html.html_EncodeHTML(docProperty.NameValue)
                         End If
                     Next
-
                     'DebugPanel = DebugPanel & main_DebugPanelRow("ServerForm", Copy)
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Request Path", html.html_EncodeHTML(web_requestPath))
                     'DebugPanel = DebugPanel & main_DebugPanelRow("CDN Files Path", html.html_EncodeHTML(appConfig.cdnFilesNetprefix))
@@ -17717,60 +17717,6 @@ ErrorTrap:
         End Function
         '
         '========================================================================
-        ''' <summary>
-        ''' process the request for an input file, storing the file in cdnFiles in an optional filePath. Return the filepath and filename uploaded.
-        ''' </summary>
-        ''' <param name="TagName"></param>
-        ''' <param name="filePath"></param>
-        ''' <returns></returns>
-        Public Function web_processFormInputFile(ByVal TagName As String, Optional ByVal filePath As String = "") As String
-            web_processFormInputFile = web_processFormInputFile(TagName, cdnFiles, filePath)
-        End Function
-        '
-        '========================================================================
-        ''' <summary>
-        ''' process the request for an input file, storing the file system provided, in an optional filePath. Return the filepath and filename uploaded. 
-        ''' </summary>
-        ''' <param name="TagName"></param>
-        ''' <param name="files"></param>
-        ''' <param name="filePath"></param>
-        ''' <returns></returns>
-        Public Function web_processFormInputFile(ByVal TagName As String, files As coreFileSystemClass, Optional ByVal filePath As String = "Upload") As String
-            Dim returnPathFilename As String = ""
-            Try
-                Dim key As String
-                'Dim iVirtualFilePath As String
-                '
-                key = TagName.ToLower()
-                If docProperties.docPropertiesDict.ContainsKey(key) Then
-                    With docProperties.docPropertiesDict(key)
-                        If (.IsFile) And (.Name.ToLower() = key) Then
-                            returnPathFilename = normalizeFilePath(filePath)
-                            returnPathFilename &= encodeFilename(.Value)
-                            Call files.deleteFile(returnPathFilename)
-                            If .tmpPrivatePathfilename <> "" Then
-                                '
-                                ' copy tmp private files to the appropriate folder in the destination file system
-                                '
-                                Call privateFiles.copyFile(.tmpPrivatePathfilename, returnPathFilename, files)
-                            End If
-                        End If
-                    End With
-                End If
-            Catch ex As Exception
-                handleExceptionAndRethrow(ex)
-            End Try
-            Return returnPathFilename
-        End Function
-        ''
-        ''   2.1 compatibility
-        ''
-        'Public Function user_IsAuthoring(ByVal ContentName As String) As Boolean
-        '    Return user.user_isEditing(ContentName)
-        'End Function
-
-        '
-        '========================================================================
         '   Browser Detection
         '========================================================================
         '
@@ -21016,9 +20962,11 @@ ErrorTrap:
                         If db.cs_ok(cs) Then
                             Call db.cs_set(cs, "name", "Form " & webServerIO.requestReferrer)
                             Dim Copy As String = ""
-                            For Each kvp As KeyValuePair(Of String, docPropertiesClass) In docProperties.docPropertiesDict
-                                If (kvp.Key.ToLower() <> "contensiveuserform") Then
-                                    Copy &= kvp.Value.Name & "=" & kvp.Value.Value & vbCrLf
+
+                            For Each key As String In docProperties.getKeyList()
+                                Dim docProperty As docPropertiesClass = docProperties.getProperty(key)
+                                If (key.ToLower() <> "contensiveuserform") Then
+                                    Copy &= docProperty.Name & "=" & docProperty.Value & vbCrLf
                                 End If
                             Next
                             Call db.cs_set(cs, "copy", Copy)
@@ -23421,7 +23369,7 @@ ErrorTrap:
                             Call db.cs_setField(CSPointer, FieldName, Path)
                             Path = vbReplace(Path, "\", "/")
                             Path = vbReplace(Path, "/" & Filename, "")
-                            Call web_processFormInputFile(LocalRequestName, appRootFiles, Path)
+                            Call appRootFiles.saveUpload(LocalRequestName, Path, Filename)
                         End If
                     Case Else
                         '
@@ -28975,7 +28923,11 @@ ErrorTrap:
                     If HtmlValue = "" Then
                         html_GetFormInputField = html_GetFormInputFile2(InputName, HtmlId, HtmlClass)
                     Else
-                        html_GetFormInputField = html_GetFormInputField & "<a href=""http://" & EncodeURL(webServerIO.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & GetFilename(HtmlValue) & "]</A>"
+
+                        Dim FieldValuefilename As String = ""
+                        Dim FieldValuePath As String = ""
+                        privateFiles.splitPathFilename(HtmlValue, FieldValuePath, FieldValuefilename)
+                        html_GetFormInputField = html_GetFormInputField & "<a href=""http://" & EncodeURL(webServerIO.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & FieldValuefilename & "]</A>"
                         html_GetFormInputField = html_GetFormInputField & "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & html_GetFormInputCheckBox2(InputName & ".Delete", False)
                         html_GetFormInputField = html_GetFormInputField & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & html_GetFormInputFile2(InputName, HtmlId, HtmlClass)
                     End If
@@ -28997,7 +28949,10 @@ ErrorTrap:
                     If HtmlValue = "" Then
                         html_GetFormInputField = html_GetFormInputFile2(InputName, HtmlId, HtmlClass)
                     Else
-                        html_GetFormInputField = html_GetFormInputField & "<a href=""http://" & EncodeURL(webServerIO.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & GetFilename(HtmlValue) & "]</A>"
+                        Dim FieldValuefilename As String = ""
+                        Dim FieldValuePath As String = ""
+                        privateFiles.splitPathFilename(HtmlValue, FieldValuePath, FieldValuefilename)
+                        html_GetFormInputField = html_GetFormInputField & "<a href=""http://" & EncodeURL(webServerIO.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & FieldValuefilename & "]</A>"
                         html_GetFormInputField = html_GetFormInputField & "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & html_GetFormInputCheckBox2(InputName & ".Delete", False)
                         html_GetFormInputField = html_GetFormInputField & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & html_GetFormInputFile2(InputName, HtmlId, HtmlClass)
                     End If
@@ -30172,8 +30127,8 @@ ErrorTrap:
             Message = Message & "Only those checkboxes that are checked are included." & vbCrLf
             Message = Message & "Entries are not in the order they appeared on the form." & vbCrLf
             Message = Message & vbCrLf
-            For Each kvp As KeyValuePair(Of String, docPropertiesClass) In docProperties.docPropertiesDict
-                With kvp.Value
+            For Each key As String In docProperties.getKeyList
+                With docProperties.getProperty(key)
                     If .IsForm Then
                         If vbUCase(.Value) = "ON" Then
                             Message = Message & .Name & ": Yes" & vbCrLf & vbCrLf
@@ -35055,42 +35010,7 @@ ErrorTrap:
             Dim myVersion As Version = myAssemblyname.Version
             Return Format(myVersion.Major, "0") & "." & Format(myVersion.Minor, "00") & "." & Format(myVersion.Build, "00000000")
         End Function
-        '
-        '==========================================================================================
-        ''' <summary>
-        ''' Install an uploaded collection file from a private folder. Return true if successful, else the issue is in the returnUserError
-        ''' </summary>
-        ''' <param name="privateFolder"></param>
-        ''' <param name="returnUserError"></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Function addonInstall_installCollectionFile(privateFolder As String, ByRef returnUserError As String) As Boolean
-            ' refactor - remove this wrapper
-            Dim returnOk As Boolean = False
-            Try
-                ' copied from safemode addon manager
-                Dim addonInstall As New coreAddonInstallClass(Me)
-                Dim builder As New coreBuilderClass(Me)
-                Dim installedCollectionGuid As String = ""
-                Dim iisResetRequired As Boolean = False
-                '
-                If returnUserError = "" Then
-                    If privateFiles.pathExists(privateFolder) Then
-                        returnOk = addonInstall.InstallCollectionFromPrivateFolder(builder, siteProperties.dataBuildVersion, privateFolder, iisResetRequired, appConfig.name, returnUserError, installedCollectionGuid, False)
-                        'If iisResetRequired Then
-                        '    Dim sitebuilder As New builderClass(Me)
-                        '    sitebuilder.web.reset()
-                        'End If
-                    End If
-                End If
-            Catch ex As Exception
-                handleExceptionAndRethrow(ex)
-                If Not siteProperties.trapErrors Then
-                    Throw New ApplicationException("rethrow", ex)
-                End If
-            End Try
-            Return returnOk
-        End Function
+
         '
         '=============================================================================
         ''' <summary>
@@ -36041,8 +35961,10 @@ ErrorTrap:
         Public Function getLegacyOptionStringFromVar() As String
             Dim returnString As String = ""
             Try
-                For Each kvp As KeyValuePair(Of String, docPropertiesClass) In docProperties.docPropertiesDict
-                    returnString &= "" & "&" & encodeLegacyAddonOptionArgument(kvp.Key) & "=" & encodeLegacyAddonOptionArgument(kvp.Value.Value)
+                For Each key As String In docProperties.getKeyList
+                    With docProperties.getProperty(key)
+                        returnString &= "" & "&" & encodeLegacyAddonOptionArgument(key) & "=" & encodeLegacyAddonOptionArgument(.Value)
+                    End With
                 Next
             Catch ex As Exception
                 handleExceptionAndRethrow(ex)

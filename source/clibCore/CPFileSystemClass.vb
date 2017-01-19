@@ -73,7 +73,7 @@ Namespace Contensive.Core
         End Sub
         '
         '==========================================================================================
-        Public Overrides Sub delete(ByVal filename As String)
+        Public Overrides Sub deleteFile(ByVal filename As String)
             Call fileSystem.deleteFile(filename)
         End Sub
         '
@@ -121,6 +121,18 @@ Namespace Contensive.Core
         Public Overrides Sub deleteFolder(folderPath As String)
             Call fileSystem.DeleteFileFolder(folderPath)
         End Sub
+        '
+        '==========================================================================================
+        '
+        Public Overrides Function saveUpload(htmlformName As String, ByRef returnFilename As String) As Boolean
+            Return fileSystem.saveUpload(htmlformName, "\upload", returnFilename)
+        End Function
+        '
+        '==========================================================================================
+        '
+        Public Overrides Function saveUpload(htmlformName As String, folderpath As String, ByRef returnFilename As String) As Boolean
+            Return fileSystem.saveUpload(htmlformName, folderpath, returnFilename)
+        End Function
 #Region " IDisposable Support "
         ' Do not change or add Overridable to these methods.
         ' Put cleanup code in Dispose(ByVal disposing As Boolean).

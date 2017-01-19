@@ -245,34 +245,36 @@ Namespace Contensive.Core
         ''' </summary>
         ''' <param name="HtmlName"></param>
         ''' <param name="VirtualFilePath"></param>
+        <Obsolete("Instead, use cp.cdeFiles.saveUpload() or similar fileSystem object.")>
         Public Overrides Sub ProcessInputFile(ByVal HtmlName As String, Optional ByVal VirtualFilePath As String = "") 'Inherits BaseClasses.CPHtmlBaseClass.ProcessInputFile
-            Call cpCore.web_processFormInputFile(HtmlName, VirtualFilePath)
+            Dim ignoreFilename As String = ""
+            Call cpCore.cdnFiles.saveUpload(HtmlName, VirtualFilePath, ignoreFilename)
         End Sub
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' process an html file element to a specified file system (cp.files.cdnFiles for example). The return path is returned.
-        ''' </summary>
-        ''' <param name="HtmlName"></param>
-        ''' <param name="fileSystem"></param>
-        ''' <param name="returnPathFilename"></param>
-        ''' <returns></returns>
-        Public Overrides Function ProcessInputFile(HtmlName As String, fileSystem As CPFileSystemBaseClass, ByRef returnPathFilename As String) As Boolean
-            Throw New NotImplementedException()
-        End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' process an html file element to a specified file system and a specified path. The filename uploaded to that path is returned
-        ''' </summary>
-        ''' <param name="HtmlName"></param>
-        ''' <param name="fileSystem"></param>
-        ''' <param name="uploadFilePath"></param>
-        ''' <param name="returnFilename"></param>
-        ''' <returns></returns>
-        Public Overrides Function ProcessInputFile(HtmlName As String, fileSystem As CPFileSystemBaseClass, uploadFilePath As String, ByRef returnFilename As String) As Boolean
-            Throw New NotImplementedException()
-        End Function
+        ''
+        ''====================================================================================================
+        '''' <summary>
+        '''' process an html file element to a specified file system (cp.files.cdnFiles for example). The return path is returned.
+        '''' </summary>
+        '''' <param name="HtmlName"></param>
+        '''' <param name="fileSystem"></param>
+        '''' <param name="returnPathFilename"></param>
+        '''' <returns></returns>
+        'Public Overrides Function ProcessInputFile(HtmlName As String, fileSystem As CPFileSystemBaseClass, ByRef returnPathFilename As String) As Boolean
+        '    Throw New NotImplementedException()
+        'End Function
+        ''
+        ''====================================================================================================
+        '''' <summary>
+        '''' process an html file element to a specified file system and a specified path. The filename uploaded to that path is returned
+        '''' </summary>
+        '''' <param name="HtmlName"></param>
+        '''' <param name="fileSystem"></param>
+        '''' <param name="uploadFilePath"></param>
+        '''' <param name="returnFilename"></param>
+        '''' <returns></returns>
+        'Public Overrides Function ProcessInputFile(HtmlName As String, fileSystem As CPFileSystemBaseClass, uploadFilePath As String, ByRef returnFilename As String) As Boolean
+        '    Return cpCore.web_processFormInputFile(HtmlName, fileSystem, uploadFilePath, returnFilename)
+        'End Function
         '
         '
         '

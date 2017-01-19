@@ -58,8 +58,8 @@ Namespace Contensive.Core
                 Dim DbUpToDate As Boolean
                 Dim XMLTools As New coreXmlToolsClass(cpCore)
                 Dim GuidFieldName As String
-                Dim InstalledCollectionID As Integer
-                Dim InstalledCollectionGuid As String = ""
+                Dim InstalledCollectionIDList As New List(Of Integer)
+                Dim InstalledCollectionGuidList As New List(Of String)
                 Dim DateValue As Date
                 Dim ErrorMessage As String = ""
                 Dim OnServerGuidList As String = ""
@@ -105,9 +105,6 @@ Namespace Contensive.Core
                 Dim ButtonList As String = ""
                 Dim CollectionFilename As String
                 Dim CollectionFilePathPage As String
-                Dim Uploads() As String
-                Dim UploadsCnt As Integer
-                Dim UploadPathPage As String
                 Dim CDef_Node As XmlNode
                 'Dim Doc As New XmlDocument
                 Dim CollectionNode As XmlNode
@@ -460,65 +457,57 @@ Namespace Contensive.Core
                             '---------------------------------------------------------------------------------------------
                             '
                             If cpCore.user.isAuthenticatedDeveloper() And cpCore.doc_getBoolean("InstallCore") Then
-                                UpgradeOK = addonInstall.installCollectionFromRemoteRepo("{8DAABAE6-8E45-4CEE-A42C-B02D180E799B}", cpCore.appConfig.name, IISResetRequired, RegisterList, ErrorMessage, "", False)
+                                UpgradeOK = addonInstall.installCollectionFromRemoteRepo("{8DAABAE6-8E45-4CEE-A42C-B02D180E799B}", ErrorMessage, "", False)
                             End If
                             '
                             '---------------------------------------------------------------------------------------------
                             ' Upload new collection files
                             '---------------------------------------------------------------------------------------------
                             '
-                            CollectionFilePathPage = cpCore.web_processFormInputFile("MetaFile", cpCore.privateFiles, InstallFolder)
-                            '
-                            ' Process the MetaFile
-                            '
-                            If CollectionFilePathPage <> "" Then
-                                status &= "<br>Uploaded collection file [" & CollectionFilePathPage & "]"
-                                CollectionFilename = Mid(Replace(CollectionFilePathPage, InstallFolder, ""), 2)
-                                '
-                                cpCore.log_appendLog("app [" & cpCore.appConfig.name & "], Uploading new collection file, member=[#" & cpCore.user.id & ", " & cpCore.user.name & "], CollectionFilename [" & CollectionFilename & "]")
-                                '
-                                UploadsCnt = cpCore.docProperties.getInteger("UploadCount")
-                                ReDim Uploads(UploadsCnt)
-                                For Ptr = 0 To UploadsCnt - 1
-                                    UploadPathPage = cpCore.web_processFormInputFile("Upload" & Ptr, cpCore.privateFiles, InstallFolder)
-                                    If UploadPathPage <> "" Then
-                                        Uploads(Ptr) = Mid(Replace(UploadPathPage, InstallFolder, ""), 2)
-                                        Call HandleClassAppendLog("AddonManager", " app=" & cpCore.appConfig.name & ", Member=" & cpCore.user.name & " (" & cpCore.user.id & "), Uploads=" & Uploads(Ptr))
-                                        status &= "<br>Uploaded collection file [" & Uploads(Ptr) & "]"
-                                    End If
-                                Next
+                            Dim uploadedCollectionPathFilenames As New List(Of String)
+                            CollectionFilename = ""
+                            If (cpCore.privateFiles.saveUpload("MetaFile", InstallFolder, CollectionFilename)) Then
+                                status &= "<br>Uploaded collection file [" & CollectionFilename & "]"
+                                uploadedCollectionPathFilenames.Add(InstallFolder & CollectionFilename)
                                 AllowInstallFromFolder = True
-                                status &= "<br>Submitted Collection for import."
                             End If
-                        End If
-                        '
-                        ' --------------------------------------------------------------------------------
-                        '   Install Library Collections
-                        ' --------------------------------------------------------------------------------
-                        '
-                        If InstallLibCollectionList <> "" Then
-                            InstallLibCollectionList = Mid(InstallLibCollectionList, 2)
-                            LibGuids = Split(InstallLibCollectionList, ",")
-                            Cnt = UBound(LibGuids) + 1
-                            For Ptr = 0 To Cnt - 1
-                                RegisterList = ""
-                                UpgradeOK = addonInstall.installCollectionFromRemoteRepo(LibGuids(Ptr), cpCore.appConfig.name, IISResetRequired, RegisterList, ErrorMessage, "", False)
-                                If Not UpgradeOK Then
-                                    '
-                                    ' block the reset because we will loose the error message
-                                    '
-                                    IISResetRequired = False
-                                    cpCore.error_AddUserError("This Add-on Collection did not install correctly, " & ErrorMessage)
-                                Else
-                                    '
-                                    ' Save the first collection as the installed collection
-                                    '
-                                    If InstalledCollectionGuid = "" Then
-                                        InstalledCollectionGuid = LibGuids(Ptr)
-                                    End If
+                            '
+                            For Ptr = 0 To cpCore.docProperties.getInteger("UploadCount") - 1
+                                If (cpCore.privateFiles.saveUpload("Upload" & Ptr, InstallFolder, CollectionFilename)) Then
+                                    status &= "<br>Uploaded collection file [" & CollectionFilename & "]"
+                                    uploadedCollectionPathFilenames.Add(InstallFolder & CollectionFilename)
+                                    AllowInstallFromFolder = True
                                 End If
                             Next
                         End If
+                        ''
+                        '' --------------------------------------------------------------------------------
+                        ''   Install Library Collections
+                        '' --------------------------------------------------------------------------------
+                        ''
+                        'If InstallLibCollectionList <> "" Then
+                        '    InstallLibCollectionList = Mid(InstallLibCollectionList, 2)
+                        '    LibGuids = Split(InstallLibCollectionList, ",")
+                        '    Cnt = UBound(LibGuids) + 1
+                        '    For Ptr = 0 To Cnt - 1
+                        '        RegisterList = ""
+                        '        UpgradeOK = addonInstall.installCollectionFromRemoteRepo(LibGuids(Ptr), ErrorMessage, "", False)
+                        '        If Not UpgradeOK Then
+                        '            '
+                        '            ' block the reset because we will loose the error message
+                        '            '
+                        '            IISResetRequired = False
+                        '            cpCore.error_AddUserError("This Add-on Collection did not install correctly, " & ErrorMessage)
+                        '        Else
+                        '            '
+                        '            ' Save the first collection as the installed collection
+                        '            '
+                        '            If InstalledCollectionGuid = "" Then
+                        '                InstalledCollectionGuid = LibGuids(Ptr)
+                        '            End If
+                        '        End If
+                        '    Next
+                        'End If
                         '
                         ' --------------------------------------------------------------------------------
                         '   Install Manual Collections
@@ -527,33 +516,23 @@ Namespace Contensive.Core
                         If AllowInstallFromFolder Then
                             'InstallFolder = cpcore.asv.config.physicalFilePath & InstallFolderName & "\"
                             If cpCore.privateFiles.pathExists(privateFilesInstallPath) Then
-                                UpgradeOK = addonInstall.InstallCollectionFromPrivateFolder(builder, cpCore.siteProperties.dataBuildVersion, privateFilesInstallPath, IISResetRequired, cpCore.appConfig.name, ErrorMessage, InstalledCollectionGuid, False)
+                                UpgradeOK = addonInstall.InstallCollectionsFromPrivateFolder(privateFilesInstallPath, ErrorMessage, InstalledCollectionGuidList, False)
                                 If Not UpgradeOK Then
                                     If ErrorMessage = "" Then
                                         cpCore.error_AddUserError("The Add-on Collection did not install correctly, but no detailed error message was given.")
                                     Else
                                         cpCore.error_AddUserError("The Add-on Collection did not install correctly, " & ErrorMessage)
                                     End If
+                                Else
+                                    For Each installedCollectionGuid As String In InstalledCollectionGuidList
+                                        CS = cpCore.db.cs_open("Add-on Collections", GuidFieldName & "=" & cpCore.db.encodeSQLText(installedCollectionGuid))
+                                        If cpCore.db.cs_ok(CS) Then
+                                            InstalledCollectionIDList.Add(cpCore.db.cs_getInteger(CS, "ID"))
+                                        End If
+                                        Call cpCore.db.cs_Close(CS)
+                                    Next
                                 End If
                             End If
-                        End If
-                        '
-                        ' and delete the install folder if it was created
-                        '
-                        If cpCore.privateFiles.pathExists(privateFilesInstallPath) Then
-                            Call cpCore.privateFiles.DeleteFileFolder(privateFilesInstallPath)
-                        End If
-                        '
-                        ' --------------------------------------------------------------------------------
-                        ' Get the InstalledCollectionID from the InstalledCollectionGuid
-                        ' --------------------------------------------------------------------------------
-                        '
-                        If InstalledCollectionGuid <> "" Then
-                            CS = cpCore.db.cs_open("Add-on Collections", GuidFieldName & "=" & cpCore.db.encodeSQLText(InstalledCollectionGuid))
-                            If cpCore.db.cs_ok(CS) Then
-                                InstalledCollectionID = cpCore.db.cs_getInteger(CS, "ID")
-                            End If
-                            Call cpCore.db.cs_Close(CS)
                         End If
                         '
                         ' --------------------------------------------------------------------------------
@@ -567,24 +546,11 @@ Namespace Contensive.Core
                         End If
                         '
                         ' --------------------------------------------------------------------------------
-                        '   IISReset if required
-                        ' --------------------------------------------------------------------------------
-                        '
-                        If IISResetRequired And (Not cpCore.error_IsUserError) Then
-                            '
-                            ' not sure here. If addons all are dotnet, they should all reload themselves.
-                            '
-                            'Dim SiteBuilder As New builderClass(cpCore)
-                            'Call SiteBuilder.web.recycle(cpCore.app.config.name)
-                            'Exit Function
-                        End If
-                        '
-                        ' --------------------------------------------------------------------------------
                         '   Forward to help page
                         ' --------------------------------------------------------------------------------
                         '
-                        If (InstalledCollectionID <> 0) And (Not cpCore.error_IsUserError) Then
-                            Call cpCore.webServerIO_Redirect2(cpCore.siteProperties.adminURL & "?helpcollectionid=" & InstalledCollectionID, "Redirecting to help page after collection installation", False)
+                        If (InstalledCollectionIDList.Count > 0) And (Not cpCore.error_IsUserError) Then
+                            Call cpCore.webServerIO_Redirect2(cpCore.siteProperties.adminURL & "?helpcollectionid=" & InstalledCollectionIDList(0).ToString(), "Redirecting to help page after collection installation", False)
                         End If
                         '
                         ' --------------------------------------------------------------------------------
@@ -592,186 +558,186 @@ Namespace Contensive.Core
                         ' --------------------------------------------------------------------------------
                         '
                         If True Then
-                            If True Then
-                                '
-                                ' --------------------------------------------------------------------------------
-                                ' Get the Collection Library tab
-                                ' --------------------------------------------------------------------------------
-                                '
-                                ColumnCnt = 4
-                                PageNumber = 1
-                                ReDim ColCaption(3)
-                                ReDim ColAlign(3)
-                                ReDim ColWidth(3)
-                                ReDim ColSortable(3)
-                                ReDim Cells3(1000, 4)
-                                '
-                                ColCaption(0) = "Install"
-                                ColAlign(0) = "center"
-                                ColWidth(0) = "50"
-                                ColSortable(0) = False
-                                '
-                                ColCaption(1) = "Name"
-                                ColAlign(1) = "left"
-                                ColWidth(1) = "200"
-                                ColSortable(1) = False
-                                '
-                                ColCaption(2) = "Last&nbsp;Updated"
-                                ColAlign(2) = "right"
-                                ColWidth(2) = "200"
-                                ColSortable(2) = False
-                                '
-                                ColCaption(3) = "Description"
-                                ColAlign(3) = "left"
-                                ColWidth(3) = "99%"
-                                ColSortable(3) = False
-                                '
-                                LocalCollections = New XmlDocument
-                                LocalCollectionXML = addonInstall.getCollectionListFile()
-                                Call LocalCollections.LoadXml(LocalCollectionXML)
-                                For Each CDef_Node In LocalCollections.DocumentElement.ChildNodes
-                                    If vbLCase(CDef_Node.Name) = "collection" Then
-                                        For Each CollectionNode In CDef_Node.ChildNodes
-                                            If vbLCase(CollectionNode.Name) = "guid" Then
-                                                OnServerGuidList &= "," & CollectionNode.InnerText
-                                                Exit For
-                                            End If
-                                        Next
-                                    End If
-                                Next
-                                '
-                                LibCollections = New XmlDocument
-                                Dim parseError As Boolean = False
-                                Try
-                                    LibCollections.Load("http://support.contensive.com/GetCollectionList?iv=" & cpCore.common_version())
-                                Catch ex As Exception
-                                    UserError = "There was an error reading the Collection Library. The site may be unavailable."
-                                    Call HandleClassAppendLog("AddonManager", UserError)
-                                    status &= "<br>" & UserError
-                                    cpCore.error_AddUserError(UserError)
-                                    parseError = True
-                                End Try
-                                Ptr = 0
-                                If Not parseError Then
-                                    If vbLCase(LibCollections.DocumentElement.Name) <> vbLCase(CollectionListRootNode) Then
-                                        UserError = "There was an error reading the Collection Library file. The '" & CollectionListRootNode & "' element was not found."
+                                If True Then
+                                    '
+                                    ' --------------------------------------------------------------------------------
+                                    ' Get the Collection Library tab
+                                    ' --------------------------------------------------------------------------------
+                                    '
+                                    ColumnCnt = 4
+                                    PageNumber = 1
+                                    ReDim ColCaption(3)
+                                    ReDim ColAlign(3)
+                                    ReDim ColWidth(3)
+                                    ReDim ColSortable(3)
+                                    ReDim Cells3(1000, 4)
+                                    '
+                                    ColCaption(0) = "Install"
+                                    ColAlign(0) = "center"
+                                    ColWidth(0) = "50"
+                                    ColSortable(0) = False
+                                    '
+                                    ColCaption(1) = "Name"
+                                    ColAlign(1) = "left"
+                                    ColWidth(1) = "200"
+                                    ColSortable(1) = False
+                                    '
+                                    ColCaption(2) = "Last&nbsp;Updated"
+                                    ColAlign(2) = "right"
+                                    ColWidth(2) = "200"
+                                    ColSortable(2) = False
+                                    '
+                                    ColCaption(3) = "Description"
+                                    ColAlign(3) = "left"
+                                    ColWidth(3) = "99%"
+                                    ColSortable(3) = False
+                                    '
+                                    LocalCollections = New XmlDocument
+                                    LocalCollectionXML = addonInstall.getCollectionListFile()
+                                    Call LocalCollections.LoadXml(LocalCollectionXML)
+                                    For Each CDef_Node In LocalCollections.DocumentElement.ChildNodes
+                                        If vbLCase(CDef_Node.Name) = "collection" Then
+                                            For Each CollectionNode In CDef_Node.ChildNodes
+                                                If vbLCase(CollectionNode.Name) = "guid" Then
+                                                    OnServerGuidList &= "," & CollectionNode.InnerText
+                                                    Exit For
+                                                End If
+                                            Next
+                                        End If
+                                    Next
+                                    '
+                                    LibCollections = New XmlDocument
+                                    Dim parseError As Boolean = False
+                                    Try
+                                        LibCollections.Load("http://support.contensive.com/GetCollectionList?iv=" & cpCore.common_version())
+                                    Catch ex As Exception
+                                        UserError = "There was an error reading the Collection Library. The site may be unavailable."
                                         Call HandleClassAppendLog("AddonManager", UserError)
                                         status &= "<br>" & UserError
                                         cpCore.error_AddUserError(UserError)
-                                    Else
-                                        '
-                                        ' Go through file to validate the XML, and build status message -- since service process can not communicate to user
-                                        '
-                                        RowPtr = 0
-                                        For Each CDef_Node In LibCollections.DocumentElement.ChildNodes
-                                            Select Case vbLCase(CDef_Node.Name)
-                                                Case "collection"
-                                                    '
-                                                    ' Read the collection
-                                                    '
-                                                    For Each CollectionNode In CDef_Node.ChildNodes
-                                                        Select Case vbLCase(CollectionNode.Name)
-                                                            Case "name"
-                                                                '
-                                                                ' Name
-                                                                '
-                                                                Collectionname = CollectionNode.InnerText
-                                                            Case "guid"
-                                                                '
-                                                                ' Guid
-                                                                '
-                                                                CollectionGuid = CollectionNode.InnerText
-                                                            Case "version"
-                                                                '
-                                                                ' Version
-                                                                '
-                                                                CollectionVersion = CollectionNode.InnerText
-                                                            Case "description"
-                                                                '
-                                                                ' Version
-                                                                '
-                                                                CollectionDescription = CollectionNode.InnerText
-                                                            Case "contensiveversion"
-                                                                '
-                                                                ' Version
-                                                                '
-                                                                CollectionContensiveVersion = CollectionNode.InnerText
-                                                            Case "lastchangedate"
-                                                                '
-                                                                ' Version
-                                                                '
-                                                                CollectionLastChangeDate = CollectionNode.InnerText
-                                                                If IsDate(CollectionLastChangeDate) Then
-                                                                    DateValue = CDate(CollectionLastChangeDate)
-                                                                    CollectionLastChangeDate = DateValue.ToShortDateString
-                                                                End If
-                                                                If CollectionLastChangeDate = "" Then
-                                                                    CollectionLastChangeDate = "unknown"
-                                                                End If
-                                                        End Select
-                                                    Next
-                                                    Dim IsOnServer As Boolean
-                                                    Dim IsOnSite As Boolean
-                                                    If RowPtr >= UBound(Cells3, 1) Then
-                                                        ReDim Preserve Cells3(RowPtr + 100, ColumnCnt)
-                                                    End If
-                                                    If Collectionname = "" Then
-                                                        Cells3(RowPtr, 0) = "<input TYPE=""CheckBox"" NAME=""LibraryRow"" VALUE=""" & RowPtr & """ disabled>"
-                                                        Cells3(RowPtr, 1) = "no name"
-                                                        Cells3(RowPtr, 2) = CollectionLastChangeDate & "&nbsp;"
-                                                        Cells3(RowPtr, 3) = CollectionDescription & "&nbsp;"
-                                                    Else
-                                                        If CollectionGuid = "" Then
+                                        parseError = True
+                                    End Try
+                                    Ptr = 0
+                                    If Not parseError Then
+                                        If vbLCase(LibCollections.DocumentElement.Name) <> vbLCase(CollectionListRootNode) Then
+                                            UserError = "There was an error reading the Collection Library file. The '" & CollectionListRootNode & "' element was not found."
+                                            Call HandleClassAppendLog("AddonManager", UserError)
+                                            status &= "<br>" & UserError
+                                            cpCore.error_AddUserError(UserError)
+                                        Else
+                                            '
+                                            ' Go through file to validate the XML, and build status message -- since service process can not communicate to user
+                                            '
+                                            RowPtr = 0
+                                            For Each CDef_Node In LibCollections.DocumentElement.ChildNodes
+                                                Select Case vbLCase(CDef_Node.Name)
+                                                    Case "collection"
+                                                        '
+                                                        ' Read the collection
+                                                        '
+                                                        For Each CollectionNode In CDef_Node.ChildNodes
+                                                            Select Case vbLCase(CollectionNode.Name)
+                                                                Case "name"
+                                                                    '
+                                                                    ' Name
+                                                                    '
+                                                                    Collectionname = CollectionNode.InnerText
+                                                                Case "guid"
+                                                                    '
+                                                                    ' Guid
+                                                                    '
+                                                                    CollectionGuid = CollectionNode.InnerText
+                                                                Case "version"
+                                                                    '
+                                                                    ' Version
+                                                                    '
+                                                                    CollectionVersion = CollectionNode.InnerText
+                                                                Case "description"
+                                                                    '
+                                                                    ' Version
+                                                                    '
+                                                                    CollectionDescription = CollectionNode.InnerText
+                                                                Case "contensiveversion"
+                                                                    '
+                                                                    ' Version
+                                                                    '
+                                                                    CollectionContensiveVersion = CollectionNode.InnerText
+                                                                Case "lastchangedate"
+                                                                    '
+                                                                    ' Version
+                                                                    '
+                                                                    CollectionLastChangeDate = CollectionNode.InnerText
+                                                                    If IsDate(CollectionLastChangeDate) Then
+                                                                        DateValue = CDate(CollectionLastChangeDate)
+                                                                        CollectionLastChangeDate = DateValue.ToShortDateString
+                                                                    End If
+                                                                    If CollectionLastChangeDate = "" Then
+                                                                        CollectionLastChangeDate = "unknown"
+                                                                    End If
+                                                            End Select
+                                                        Next
+                                                        Dim IsOnServer As Boolean
+                                                        Dim IsOnSite As Boolean
+                                                        If RowPtr >= UBound(Cells3, 1) Then
+                                                            ReDim Preserve Cells3(RowPtr + 100, ColumnCnt)
+                                                        End If
+                                                        If Collectionname = "" Then
                                                             Cells3(RowPtr, 0) = "<input TYPE=""CheckBox"" NAME=""LibraryRow"" VALUE=""" & RowPtr & """ disabled>"
-                                                            Cells3(RowPtr, 1) = Collectionname & " (no guid)"
+                                                            Cells3(RowPtr, 1) = "no name"
                                                             Cells3(RowPtr, 2) = CollectionLastChangeDate & "&nbsp;"
                                                             Cells3(RowPtr, 3) = CollectionDescription & "&nbsp;"
                                                         Else
-                                                            IsOnServer = EncodeBoolean(InStr(1, OnServerGuidList, CollectionGuid, vbTextCompare))
-                                                            CS = cpCore.db.cs_open("Add-on Collections", GuidFieldName & "=" & cpCore.db.encodeSQLText(CollectionGuid), , , , , , "ID")
-                                                            IsOnSite = cpCore.db.cs_ok(CS)
-                                                            Call cpCore.db.cs_Close(CS)
-                                                            If IsOnSite Then
-                                                                '
-                                                                ' Already installed
-                                                                '
-                                                                Cells3(RowPtr, 0) = "<input TYPE=""CheckBox"" NAME=""LibraryRow" & RowPtr & """ VALUE=""1"" disabled>"
-                                                                Cells3(RowPtr, 1) = Collectionname & "&nbsp;(installed already)"
-                                                                Cells3(RowPtr, 2) = CollectionLastChangeDate & "&nbsp;"
-                                                                Cells3(RowPtr, 3) = CollectionDescription & "&nbsp;"
-                                                            ElseIf ((CollectionContensiveVersion <> "") And (CollectionContensiveVersion > cpCore.common_version())) Then
-                                                                '
-                                                                ' wrong version
-                                                                '
+                                                            If CollectionGuid = "" Then
                                                                 Cells3(RowPtr, 0) = "<input TYPE=""CheckBox"" NAME=""LibraryRow"" VALUE=""" & RowPtr & """ disabled>"
-                                                                Cells3(RowPtr, 1) = Collectionname & "&nbsp;(Contensive v" & CollectionContensiveVersion & " needed)"
-                                                                Cells3(RowPtr, 2) = CollectionLastChangeDate & "&nbsp;"
-                                                                Cells3(RowPtr, 3) = CollectionDescription & "&nbsp;"
-                                                            ElseIf Not DbUpToDate Then
-                                                                '
-                                                                ' Site needs to by upgraded
-                                                                '
-                                                                Cells3(RowPtr, 0) = "<input TYPE=""CheckBox"" NAME=""LibraryRow"" VALUE=""" & RowPtr & """ disabled>"
-                                                                Cells3(RowPtr, 1) = Collectionname & "&nbsp;(install disabled)"
+                                                                Cells3(RowPtr, 1) = Collectionname & " (no guid)"
                                                                 Cells3(RowPtr, 2) = CollectionLastChangeDate & "&nbsp;"
                                                                 Cells3(RowPtr, 3) = CollectionDescription & "&nbsp;"
                                                             Else
-                                                                '
-                                                                ' Not installed yet
-                                                                '
-                                                                Cells3(RowPtr, 0) = "<input TYPE=""CheckBox"" NAME=""LibraryRow"" VALUE=""" & RowPtr & """ onClick=""clearLibraryRows('" & RowPtr & "');"">" & cpCore.html_GetFormInputHidden("LibraryRowGuid" & RowPtr, CollectionGuid) & cpCore.html_GetFormInputHidden("LibraryRowName" & RowPtr, Collectionname)
-                                                                'Cells3(RowPtr, 0) = cpcore.main_GetFormInputCheckBox2("LibraryRow" & RowPtr) & cpcore.main_GetFormInputHidden("LibraryRowGuid" & RowPtr, CollectionGUID) & cpcore.main_GetFormInputHidden("LibraryRowName" & RowPtr, CollectionName)
-                                                                Cells3(RowPtr, 1) = Collectionname & "&nbsp;"
-                                                                Cells3(RowPtr, 2) = CollectionLastChangeDate & "&nbsp;"
-                                                                Cells3(RowPtr, 3) = CollectionDescription & "&nbsp;"
+                                                                IsOnServer = EncodeBoolean(InStr(1, OnServerGuidList, CollectionGuid, vbTextCompare))
+                                                                CS = cpCore.db.cs_open("Add-on Collections", GuidFieldName & "=" & cpCore.db.encodeSQLText(CollectionGuid), , , , , , "ID")
+                                                                IsOnSite = cpCore.db.cs_ok(CS)
+                                                                Call cpCore.db.cs_Close(CS)
+                                                                If IsOnSite Then
+                                                                    '
+                                                                    ' Already installed
+                                                                    '
+                                                                    Cells3(RowPtr, 0) = "<input TYPE=""CheckBox"" NAME=""LibraryRow" & RowPtr & """ VALUE=""1"" disabled>"
+                                                                    Cells3(RowPtr, 1) = Collectionname & "&nbsp;(installed already)"
+                                                                    Cells3(RowPtr, 2) = CollectionLastChangeDate & "&nbsp;"
+                                                                    Cells3(RowPtr, 3) = CollectionDescription & "&nbsp;"
+                                                                ElseIf ((CollectionContensiveVersion <> "") And (CollectionContensiveVersion > cpCore.common_version())) Then
+                                                                    '
+                                                                    ' wrong version
+                                                                    '
+                                                                    Cells3(RowPtr, 0) = "<input TYPE=""CheckBox"" NAME=""LibraryRow"" VALUE=""" & RowPtr & """ disabled>"
+                                                                    Cells3(RowPtr, 1) = Collectionname & "&nbsp;(Contensive v" & CollectionContensiveVersion & " needed)"
+                                                                    Cells3(RowPtr, 2) = CollectionLastChangeDate & "&nbsp;"
+                                                                    Cells3(RowPtr, 3) = CollectionDescription & "&nbsp;"
+                                                                ElseIf Not DbUpToDate Then
+                                                                    '
+                                                                    ' Site needs to by upgraded
+                                                                    '
+                                                                    Cells3(RowPtr, 0) = "<input TYPE=""CheckBox"" NAME=""LibraryRow"" VALUE=""" & RowPtr & """ disabled>"
+                                                                    Cells3(RowPtr, 1) = Collectionname & "&nbsp;(install disabled)"
+                                                                    Cells3(RowPtr, 2) = CollectionLastChangeDate & "&nbsp;"
+                                                                    Cells3(RowPtr, 3) = CollectionDescription & "&nbsp;"
+                                                                Else
+                                                                    '
+                                                                    ' Not installed yet
+                                                                    '
+                                                                    Cells3(RowPtr, 0) = "<input TYPE=""CheckBox"" NAME=""LibraryRow"" VALUE=""" & RowPtr & """ onClick=""clearLibraryRows('" & RowPtr & "');"">" & cpCore.html_GetFormInputHidden("LibraryRowGuid" & RowPtr, CollectionGuid) & cpCore.html_GetFormInputHidden("LibraryRowName" & RowPtr, Collectionname)
+                                                                    'Cells3(RowPtr, 0) = cpcore.main_GetFormInputCheckBox2("LibraryRow" & RowPtr) & cpcore.main_GetFormInputHidden("LibraryRowGuid" & RowPtr, CollectionGUID) & cpcore.main_GetFormInputHidden("LibraryRowName" & RowPtr, CollectionName)
+                                                                    Cells3(RowPtr, 1) = Collectionname & "&nbsp;"
+                                                                    Cells3(RowPtr, 2) = CollectionLastChangeDate & "&nbsp;"
+                                                                    Cells3(RowPtr, 3) = CollectionDescription & "&nbsp;"
+                                                                End If
                                                             End If
                                                         End If
-                                                    End If
-                                                    RowPtr = RowPtr + 1
-                                            End Select
-                                        Next
-                                    End If
-                                    BodyHTML = "" _
+                                                        RowPtr = RowPtr + 1
+                                                End Select
+                                            Next
+                                        End If
+                                        BodyHTML = "" _
                                         & "<input type=hidden name=LibraryCnt value=""" & RowPtr & """>" _
                                         & "<script language=""JavaScript"">" _
                                         & "function clearLibraryRows(r) {" _
@@ -785,94 +751,94 @@ Namespace Contensive.Core
                                         & "</script>" _
                                         & "<div style=""width:100%"">" & Adminui.GetReport2(RowPtr, ColCaption, ColAlign, ColWidth, Cells3, RowPtr, 1, "", PostTableCopy, RowPtr, "ccAdmin", ColSortable, 0) & "</div>" _
                                         & ""
-                                    BodyHTML = Adminui.GetEditPanel(True, "Add-on Collection Library", "Select an Add-on to install from the Contensive Add-on Library. Please select only one at a time. Click OK to install the selected Add-on. The site may need to be stopped during the installation, but will be available again in approximately one minute.", BodyHTML)
-                                    BodyHTML = BodyHTML & cpCore.html_GetFormInputHidden("AOCnt", RowPtr)
-                                    Call cpCore.main_AddLiveTabEntry("<nobr>Collection&nbsp;Library</nobr>", BodyHTML, "ccAdminTab")
-                                End If
-                                '
-                                ' --------------------------------------------------------------------------------
-                                ' Current Collections Tab
-                                ' --------------------------------------------------------------------------------
-                                '
-                                ColumnCnt = 2
-                                'ColumnCnt = 3
-                                PageNumber = 1
-                                ReDim ColCaption(2)
-                                ReDim ColAlign(2)
-                                ReDim ColWidth(2)
-                                ReDim ColSortable(2)
-                                'ReDim ColCaption(3)
-                                'ReDim ColAlign(3)
-                                'ReDim ColWidth(3)
-                                'ReDim ColSortable(3)
-                                '
-                                ColCaption(0) = "Del"
-                                ColAlign(0) = "center"
-                                ColWidth(0) = "50"
-                                ColSortable(0) = False
-                                ''
-                                'ColCaption(1) = "Edit"
-                                'ColAlign(1) = "center"
-                                'ColWidth(1) = "50"
-                                'ColSortable(1) = False
-                                '
-                                ColCaption(1) = "Name"
-                                ColAlign(1) = "left"
-                                ColWidth(1) = ""
-                                ColSortable(1) = False
-                                '
-                                DisplaySystem = False
-                                If False Then
+                                        BodyHTML = Adminui.GetEditPanel(True, "Add-on Collection Library", "Select an Add-on to install from the Contensive Add-on Library. Please select only one at a time. Click OK to install the selected Add-on. The site may need to be stopped during the installation, but will be available again in approximately one minute.", BodyHTML)
+                                        BodyHTML = BodyHTML & cpCore.html_GetFormInputHidden("AOCnt", RowPtr)
+                                        Call cpCore.main_AddLiveTabEntry("<nobr>Collection&nbsp;Library</nobr>", BodyHTML, "ccAdminTab")
+                                    End If
                                     '
-                                    ' before system attribute
+                                    ' --------------------------------------------------------------------------------
+                                    ' Current Collections Tab
+                                    ' --------------------------------------------------------------------------------
                                     '
-                                    CS = cpCore.db.cs_open("Add-on Collections", , "Name")
-                                ElseIf Not cpCore.user.isAuthenticatedDeveloper Then
+                                    ColumnCnt = 2
+                                    'ColumnCnt = 3
+                                    PageNumber = 1
+                                    ReDim ColCaption(2)
+                                    ReDim ColAlign(2)
+                                    ReDim ColWidth(2)
+                                    ReDim ColSortable(2)
+                                    'ReDim ColCaption(3)
+                                    'ReDim ColAlign(3)
+                                    'ReDim ColWidth(3)
+                                    'ReDim ColSortable(3)
                                     '
-                                    ' non-developers
+                                    ColCaption(0) = "Del"
+                                    ColAlign(0) = "center"
+                                    ColWidth(0) = "50"
+                                    ColSortable(0) = False
+                                    ''
+                                    'ColCaption(1) = "Edit"
+                                    'ColAlign(1) = "center"
+                                    'ColWidth(1) = "50"
+                                    'ColSortable(1) = False
                                     '
-                                    CS = cpCore.db.cs_open("Add-on Collections", "((system is null)or(system=0))", "Name")
-                                Else
+                                    ColCaption(1) = "Name"
+                                    ColAlign(1) = "left"
+                                    ColWidth(1) = ""
+                                    ColSortable(1) = False
                                     '
-                                    ' developers
-                                    '
-                                    DisplaySystem = True
-                                    CS = cpCore.db.cs_open("Add-on Collections", , "Name")
-                                End If
-                                ReDim Preserve Cells(cpCore.db.cs_getRowCount(CS), ColumnCnt)
-                                RowPtr = 0
-                                Do While cpCore.db.cs_ok(CS)
-                                    Cells(RowPtr, 0) = cpCore.html_GetFormInputCheckBox2("AC" & RowPtr) & cpCore.html_GetFormInputHidden("ACID" & RowPtr, cpCore.db.cs_getInteger(CS, "ID"))
-                                    'Cells(RowPtr, 1) = "<a href=""" & cpcore.app.SiteProperty_AdminURL & "?id=" & cpcore.app.cs_getInteger(CS, "ID") & "&cid=" & cpcore.app.cs_getInteger(CS, "ContentControlID") & "&af=4""><img src=""/ccLib/images/IconContentEdit.gif"" border=0></a>"
-                                    Cells(RowPtr, 1) = cpCore.db.cs_getText(CS, "name")
-                                    If DisplaySystem Then
-                                        If cpCore.db.cs_getBoolean(CS, "system") Then
-                                            Cells(RowPtr, 1) = Cells(RowPtr, 1) & " (system)"
+                                    DisplaySystem = False
+                                    If False Then
+                                        '
+                                        ' before system attribute
+                                        '
+                                        CS = cpCore.db.cs_open("Add-on Collections", , "Name")
+                                    ElseIf Not cpCore.user.isAuthenticatedDeveloper Then
+                                        '
+                                        ' non-developers
+                                        '
+                                        CS = cpCore.db.cs_open("Add-on Collections", "((system is null)or(system=0))", "Name")
+                                    Else
+                                        '
+                                        ' developers
+                                        '
+                                        DisplaySystem = True
+                                        CS = cpCore.db.cs_open("Add-on Collections", , "Name")
+                                    End If
+                                    ReDim Preserve Cells(cpCore.db.cs_getRowCount(CS), ColumnCnt)
+                                    RowPtr = 0
+                                    Do While cpCore.db.cs_ok(CS)
+                                        Cells(RowPtr, 0) = cpCore.html_GetFormInputCheckBox2("AC" & RowPtr) & cpCore.html_GetFormInputHidden("ACID" & RowPtr, cpCore.db.cs_getInteger(CS, "ID"))
+                                        'Cells(RowPtr, 1) = "<a href=""" & cpcore.app.SiteProperty_AdminURL & "?id=" & cpcore.app.cs_getInteger(CS, "ID") & "&cid=" & cpcore.app.cs_getInteger(CS, "ContentControlID") & "&af=4""><img src=""/ccLib/images/IconContentEdit.gif"" border=0></a>"
+                                        Cells(RowPtr, 1) = cpCore.db.cs_getText(CS, "name")
+                                        If DisplaySystem Then
+                                            If cpCore.db.cs_getBoolean(CS, "system") Then
+                                                Cells(RowPtr, 1) = Cells(RowPtr, 1) & " (system)"
+                                            End If
                                         End If
-                                    End If
-                                    Call cpCore.db.cs_goNext(CS)
-                                    RowPtr = RowPtr + 1
-                                Loop
-                                Call cpCore.db.cs_Close(CS)
-                                BodyHTML = "<div style=""width:100%"">" & Adminui.GetReport2(RowPtr, ColCaption, ColAlign, ColWidth, Cells, RowPtr, 1, "", PostTableCopy, RowPtr, "ccAdmin", ColSortable, 0) & "</div>"
-                                BodyHTML = Adminui.GetEditPanel(True, "Add-on Collections", "Use this form to review and delete current add-on collections.", BodyHTML)
-                                BodyHTML = BodyHTML & cpCore.html_GetFormInputHidden("accnt", RowPtr)
-                                Call cpCore.main_AddLiveTabEntry("Installed&nbsp;Collections", BodyHTML, "ccAdminTab")
-                                '
-                                ' --------------------------------------------------------------------------------
-                                ' Get the Upload Add-ons tab
-                                ' --------------------------------------------------------------------------------
-                                '
-                                Body = New coreFastStringClass
-                                If Not DbUpToDate Then
-                                    Call Body.Add("<p>Add-on upload is disabled because your site database needs to be updated.</p>")
-                                Else
-                                    Call Body.Add(Adminui.EditTableOpen)
-                                    If cpCore.user.isAuthenticatedDeveloper Then
-                                        Call Body.Add(Adminui.GetEditRow(cpCore.html_GetFormInputCheckBox2("InstallCore"), "Reinstall Core Collection", "", False, False, ""))
-                                    End If
-                                    Call Body.Add(Adminui.GetEditRow(cpCore.html_GetFormInputFile("MetaFile"), "Add-on Collection File(s)", "", True, False, ""))
-                                    FormInput = "" _
+                                        Call cpCore.db.cs_goNext(CS)
+                                        RowPtr = RowPtr + 1
+                                    Loop
+                                    Call cpCore.db.cs_Close(CS)
+                                    BodyHTML = "<div style=""width:100%"">" & Adminui.GetReport2(RowPtr, ColCaption, ColAlign, ColWidth, Cells, RowPtr, 1, "", PostTableCopy, RowPtr, "ccAdmin", ColSortable, 0) & "</div>"
+                                    BodyHTML = Adminui.GetEditPanel(True, "Add-on Collections", "Use this form to review and delete current add-on collections.", BodyHTML)
+                                    BodyHTML = BodyHTML & cpCore.html_GetFormInputHidden("accnt", RowPtr)
+                                    Call cpCore.main_AddLiveTabEntry("Installed&nbsp;Collections", BodyHTML, "ccAdminTab")
+                                    '
+                                    ' --------------------------------------------------------------------------------
+                                    ' Get the Upload Add-ons tab
+                                    ' --------------------------------------------------------------------------------
+                                    '
+                                    Body = New coreFastStringClass
+                                    If Not DbUpToDate Then
+                                        Call Body.Add("<p>Add-on upload is disabled because your site database needs to be updated.</p>")
+                                    Else
+                                        Call Body.Add(Adminui.EditTableOpen)
+                                        If cpCore.user.isAuthenticatedDeveloper Then
+                                            Call Body.Add(Adminui.GetEditRow(cpCore.html_GetFormInputCheckBox2("InstallCore"), "Reinstall Core Collection", "", False, False, ""))
+                                        End If
+                                        Call Body.Add(Adminui.GetEditRow(cpCore.html_GetFormInputFile("MetaFile"), "Add-on Collection File(s)", "", True, False, ""))
+                                        FormInput = "" _
                                         & "<table id=""UploadInsert"" border=""0"" cellpadding=""0"" cellspacing=""1"" width=""100%"">" _
                                         & "</table>" _
                                         & "<table border=""0"" cellpadding=""0"" cellspacing=""1"" width=""100%"">" _
@@ -880,26 +846,26 @@ Namespace Contensive.Core
                                         & "</table>" _
                                         & cpCore.html_GetFormInputHidden("UploadCount", 1, "UploadCount") _
                                         & ""
-                                    Call Body.Add(Adminui.GetEditRow(FormInput, "&nbsp;", "", True, False, ""))
-                                    Call Body.Add(Adminui.EditTableClose)
+                                        Call Body.Add(Adminui.GetEditRow(FormInput, "&nbsp;", "", True, False, ""))
+                                        Call Body.Add(Adminui.EditTableClose)
+                                    End If
+                                    Call cpCore.main_AddLiveTabEntry("Add&nbsp;Manually", Adminui.GetEditPanel(True, "Install or Update an Add-on Collection.", "Use this form to upload a new or updated Add-on Collection to your site. A collection file can be a single xml configuration file, a single zip file containing the configuration file and other resource files, or a configuration with other resource files uploaded separately. Use the 'Add more files' link to add as many files as you need. When you hit OK, the Collection will be checked, and only submitted if all files are uploaded.", Body.Text), "ccAdminTab")
+                                    '
+                                    ' --------------------------------------------------------------------------------
+                                    ' Build Page from tabs
+                                    ' --------------------------------------------------------------------------------
+                                    '
+                                    Content.Add(cpCore.main_GetLiveTabs())
+                                    '
+                                    ButtonList = ButtonCancel & "," & ButtonOK
+                                    Content.Add(cpCore.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormLegacyAddonManager))
                                 End If
-                                Call cpCore.main_AddLiveTabEntry("Add&nbsp;Manually", Adminui.GetEditPanel(True, "Install or Update an Add-on Collection.", "Use this form to upload a new or updated Add-on Collection to your site. A collection file can be a single xml configuration file, a single zip file containing the configuration file and other resource files, or a configuration with other resource files uploaded separately. Use the 'Add more files' link to add as many files as you need. When you hit OK, the Collection will be checked, and only submitted if all files are uploaded.", Body.Text), "ccAdminTab")
-                                '
-                                ' --------------------------------------------------------------------------------
-                                ' Build Page from tabs
-                                ' --------------------------------------------------------------------------------
-                                '
-                                Content.Add(cpCore.main_GetLiveTabs())
-                                '
-                                ButtonList = ButtonCancel & "," & ButtonOK
-                                Content.Add(cpCore.html_GetFormInputHidden(RequestNameAdminSourceForm, AdminFormLegacyAddonManager))
                             End If
                         End If
-                    End If
-                    '
-                    ' Output the Add-on
-                    '
-                    Caption = "Add-on Manager (Safe Mode)"
+                        '
+                        ' Output the Add-on
+                        '
+                        Caption = "Add-on Manager (Safe Mode)"
                     Description = "<div>Use the add-on manager to add and remove Add-ons from your Contensive installation.</div>"
                     If Not DbUpToDate Then
                         Description = Description & "<div style=""Margin-left:50px"">The Add-on Manager is disabled because this site's Database needs to be upgraded.</div>"

@@ -142,7 +142,7 @@ Namespace Contensive
                     ' run tasks in task
                     '
                     Using cpCluster As New CPClass
-                        Using programDataFiles As New coreFileSystemClass(cpCluster.core, cpCluster.core.clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, normalizeFilePath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) + "clib\")
+                        Using programDataFiles As New coreFileSystemClass(cpCluster.core, cpCluster.core.clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) + "clib\")
                             Dim JSONTemp = programDataFiles.readFile("serverConfig.json")
                             Dim serverConfig As serverConfigClass = cpCluster.core.json.Deserialize(Of serverConfigClass)(JSONTemp)
                             If (Not serverConfig.allowTaskRunnerService) Then

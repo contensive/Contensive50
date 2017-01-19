@@ -12,7 +12,9 @@ Namespace Contensive.Core
         '
         Private cpCore As coreClass
         '
-        Public docPropertiesDict As New Dictionary(Of String, docPropertiesClass)
+        ' refactor -- this should be private
+        '
+        Private docPropertiesDict As New Dictionary(Of String, docPropertiesClass)
         '
         Public Sub New(cpCore As coreClass)
             MyBase.New()
@@ -80,33 +82,54 @@ Namespace Contensive.Core
             Return docPropertiesDict.ContainsKey(encodeDocPropertyKey(RequestName))
         End Function
         '
+        '====================================================================================================
+        '
+        Public Function getKeyList() As List(Of String)
+            Dim keyList As New List(Of String)
+            For Each kvp As KeyValuePair(Of String, docPropertiesClass) In docPropertiesDict
+                keyList.Add(kvp.Key)
+            Next
+            Return keyList
+        End Function
+        '
         '=============================================================================================
         '
         Public Function getInteger(ByVal RequestName As String) As Integer
             Try
-                getInteger = EncodeInteger(getText(RequestName))
+                Return EncodeInteger(getProperty(RequestName).Value)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
+            Return 0
+        End Function
+        '
+        '=============================================================================================
+        '
+        Public Function getText(ByVal RequestName As String) As String
+            Try
+                Return EncodeText(getProperty(RequestName).Value)
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+            Return String.Empty
         End Function
         '
         '====================================================================================================
         '
-        Public Function getText(ByVal RequestName As String) As String
-            Dim returnText As String = ""
+        Public Function getProperty(ByVal RequestName As String) As docPropertiesClass
             Try
                 Dim Key As String
                 '
                 Key = encodeDocPropertyKey(RequestName)
                 If Not String.IsNullOrEmpty(Key) Then
                     If docPropertiesDict.ContainsKey(Key) Then
-                        returnText = docPropertiesDict(Key).Value
+                        Return docPropertiesDict(Key)
                     End If
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
-            Return returnText
+            Return New docPropertiesClass
         End Function
         '
         '====================================================================================================

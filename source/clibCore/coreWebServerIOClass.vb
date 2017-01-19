@@ -367,7 +367,7 @@ Namespace Contensive.Core
                                 If parser.Files.Count > 0 Then
                                     Dim ptr As Integer = 0
                                     Dim ptrText As String
-                                    Dim instanceId As String = cpCore.createGuid()
+                                    Dim instanceId As String = cpCore.createGuid().Replace("{", "").Replace("-", "").Replace("}", "")
                                     For Each file As HttpMultipartParser.FilePart In parser.Files
                                         If file.FileName.Length > 0 Then
                                             Dim prop As New docPropertiesClass

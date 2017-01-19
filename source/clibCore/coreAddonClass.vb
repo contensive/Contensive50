@@ -42,6 +42,23 @@ Namespace Contensive.Core
             Me.cpCore = cpCore
         End Sub
         '
+        '===================================================================================================
+        ''' <summary>
+        ''' addon install
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public ReadOnly Property addonInstall As coreAddonInstallClass
+            Get
+                If (_addonInstall Is Nothing) Then
+                    _addonInstall = New coreAddonInstallClass(cpCore)
+                End If
+                Return _addonInstall
+            End Get
+        End Property
+        Private _addonInstall As coreAddonInstallClass
+        '
         '=============================================================================================================
         '   Get Addon Content - internal (to support include add-ons)
         '
@@ -1017,7 +1034,16 @@ Namespace Contensive.Core
                                 '
                                 If (addon_IncludedAddonIDList <> "") Or (ScriptingCode <> "") Or (DotNetClassFullName <> "") Then
                                     For Ptr = 0 To UBound(OptionsForCPVars)
-                                        cpCore.docProperties.setProperty(OptionsForCPVars(Ptr).Name, OptionsForCPVars(Ptr).Value)
+                                        '
+                                        ' REFACTOR -- REFACTOR -- REFACTOR -- REFACTOR -- REFACTOR -- REFACTOR
+                                        ' all these legacy option string systems need to do -- but this was creating a problem and it needed to be fixed asap
+                                        ' if an addon processes an upload, this setProperty() would crush the docproperties .isFile , etc
+                                        ' so -- only add the ones that are not already there -- this is  temp fix until all this is removed
+                                        '
+                                        If Not cpCore.docProperties.containsKey(OptionsForCPVars(Ptr).Name) Then
+                                            cpCore.docProperties.setProperty(OptionsForCPVars(Ptr).Name, OptionsForCPVars(Ptr).Value)
+                                        End If
+                                        'cpCore.docProperties.setProperty(OptionsForCPVars(Ptr).Name, OptionsForCPVars(Ptr).Value)
                                     Next
                                     '
                                     ' ----- run included add-ons before their parent
@@ -1591,10 +1617,10 @@ Namespace Contensive.Core
                                                                         Call cpCore.siteProperties.setProperty(FieldName, "")
                                                                     End If
                                                                     If FieldValue <> "" Then
-                                                                        VirtualFilePath = "Settings/" & FieldName
-                                                                        Call cpCore.web_processFormInputFile(FieldName, VirtualFilePath)
-                                                                        FieldValue = VirtualFilePath & "/" & FieldValue
-                                                                        Call cpCore.siteProperties.setProperty(FieldName, FieldValue)
+                                                                        Filename = FieldValue
+                                                                        VirtualFilePath = "Settings/" & FieldName & "/"
+                                                                        cpCore.cdnFiles.saveUpload(FieldName, VirtualFilePath, Filename)
+                                                                        Call cpCore.siteProperties.setProperty(FieldName, VirtualFilePath & Filename)
                                                                     End If
                                                                 Case "textfile"
                                                                     '
@@ -1802,8 +1828,11 @@ Namespace Contensive.Core
                                                                             Else
                                                                                 NonEncodedLink = cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, FieldValue)
                                                                                 EncodedLink = EncodeURL(NonEncodedLink)
+                                                                                Dim FieldValuefilename As String = ""
+                                                                                Dim FieldValuePath As String = ""
+                                                                                cpCore.privateFiles.splitPathFilename(FieldValue, FieldValuePath, FieldValuefilename)
                                                                                 Copy = "" _
-                                                                                    & "<a href=""http://" & EncodedLink & """ target=""_blank"">[" & GetFilename(FieldValue) & "]</A>" _
+                                                                                    & "<a href=""http://" & EncodedLink & """ target=""_blank"">[" & FieldValuefilename & "]</A>" _
                                                                                     & "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & cpCore.html_GetFormInputCheckBox2(FieldName & ".DeleteFlag", False) _
                                                                                     & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & cpCore.html_GetFormInputFile(FieldName)
                                                                             End If
@@ -3677,10 +3706,10 @@ ErrorTrap:
                                                                         Call cpCore.siteProperties.setProperty(FieldName, "")
                                                                     End If
                                                                     If FieldValue <> "" Then
-                                                                        VirtualFilePath = "Settings/" & FieldName
-                                                                        Call cpCore.web_processFormInputFile(FieldName, VirtualFilePath)
-                                                                        FieldValue = VirtualFilePath & "/" & FieldValue
-                                                                        Call cpCore.siteProperties.setProperty(FieldName, FieldValue)
+                                                                        Filename = FieldValue
+                                                                        VirtualFilePath = "Settings/" & FieldName & "/"
+                                                                        cpCore.cdnFiles.saveUpload(FieldName, VirtualFilePath, Filename)
+                                                                        Call cpCore.siteProperties.setProperty(FieldName, VirtualFilePath & "/" & Filename)
                                                                     End If
                                                                 Case "textfile"
                                                                     '
@@ -3892,8 +3921,11 @@ ErrorTrap:
                                                                             Else
                                                                                 NonEncodedLink = cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, FieldValue)
                                                                                 EncodedLink = EncodeURL(NonEncodedLink)
+                                                                                Dim FieldValuefilename As String = ""
+                                                                                Dim FieldValuePath As String = ""
+                                                                                cpCore.privateFiles.splitPathFilename(FieldValue, FieldValuePath, FieldValuefilename)
                                                                                 Copy = "" _
-                                                                                    & "<a href=""http://" & EncodedLink & """ target=""_blank"">[" & GetFilename(FieldValue) & "]</A>" _
+                                                                                    & "<a href=""http://" & EncodedLink & """ target=""_blank"">[" & FieldValuefilename & "]</A>" _
                                                                                     & "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & cpCore.html_GetFormInputCheckBox2(FieldName & ".DeleteFlag", False) _
                                                                                     & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & cpCore.html_GetFormInputFile(FieldName)
                                                                             End If

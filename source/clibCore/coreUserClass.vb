@@ -434,8 +434,8 @@ Namespace Contensive.Core
                     & returnResult _
                     & cpCore.html_GetFormInputHidden("Type", FormTypeSendPassword) _
                     & ""
-                    For Each kvp As KeyValuePair(Of String, docPropertiesClass) In cpCore.docProperties.docPropertiesDict
-                        With kvp.Value
+                    For Each key As String In cpCore.docProperties.getKeyList
+                        With cpCore.docProperties.getProperty(key)
                             If .IsForm Then
                                 Select Case vbUCase(.Name)
                                     Case "S", "MA", "MB", "USERNAME", "PASSWORD", "EMAIL"

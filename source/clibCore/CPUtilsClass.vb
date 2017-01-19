@@ -318,7 +318,10 @@ Namespace Contensive.Core
         End Function
 
         Public Overrides Function GetFilename(ByVal PathFilename As String) As String
-            GetFilename = cl.GetFilename(PathFilename)
+            Dim filename As String = ""
+            Dim path As String = ""
+            CP.core.privateFiles.splitPathFilename(PathFilename, path, filename)
+            Return filename
         End Function
 
         Public Overrides Function GetFirstNonZeroDate(ByVal Date0 As Date, ByVal Date1 As Date) As Date
@@ -386,15 +389,67 @@ Namespace Contensive.Core
             Return CP.core.common_isGuid(guid)
         End Function
         '
-        Public Overrides Function installCollectionAsyncFromFile(privateFile As String) As Integer
-            Throw New NotImplementedException()
+        '====================================================================================================
+        ''' <summary>
+        ''' Install an addon collection file asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
+        ''' </summary>
+        ''' <param name="privateFile"></param>
+        ''' <returns></returns>
+        Public Overrides Function installCollectionFromFile(privateFile As String) As Integer
+            Dim taskId As Integer = 0
+            Dim ignoreUserMessage As String = ""
+            Dim ignoreGuid As String = ""
+            Call CP.core.addon.addonInstall.InstallCollectionsFromPrivateFile(privateFile, ignoreUserMessage, ignoreGuid, False)
+            Return taskId
         End Function
         '
-        Public Overrides Function installCollectionAsyncFromLibrary(collectionGuid As String) As Integer
-            Throw New NotImplementedException()
+        '====================================================================================================
+        ''' <summary>
+        ''' Install all addon collections in a folder asynchonously. Optionally delete the folder. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
+        ''' </summary>
+        ''' <param name="privateFolder"></param>
+        ''' <param name="deleteFolderWhenDone"></param>
+        ''' <returns></returns>
+        Public Overrides Function installCollectionsFromFolder(privateFolder As String, deleteFolderWhenDone As Boolean) As Integer
+            Dim taskId As Integer = 0
+            Dim ignoreUserMessage As String = ""
+            Dim ignoreList As New List(Of String)
+            Call CP.core.addon.addonInstall.InstallCollectionsFromPrivateFolder(privateFolder, ignoreUserMessage, ignoreList, False)
+            Return taskId
         End Function
         '
-        Public Overrides Function installCollectionAsyncFromLink(link As String) As Integer
+        '====================================================================================================
+        ''' <summary>
+        ''' Install all addon collections in a folder asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
+        ''' </summary>
+        ''' <param name="privateFolder"></param>
+        ''' <returns></returns>
+        Public Overrides Function installCollectionsFromFolder(privateFolder As String) As Integer
+            Return installCollectionsFromFolder(privateFolder, False)
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Install an addon collections from the collection library asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
+        ''' </summary>
+        ''' <param name="privateFolder"></param>
+        ''' <param name="deleteFolderWhenDone"></param>
+        ''' <returns></returns>
+        Public Overrides Function installCollectionFromLibrary(collectionGuid As String) As Integer
+            Dim taskId As Integer = 0
+            Dim ignoreUserMessage As String = ""
+            Call CP.core.addon.addonInstall.installCollectionFromRemoteRepo(collectionGuid, ignoreUserMessage, "", False)
+            Return taskId
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Install an addon collections from an endpoint asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
+        ''' </summary>
+        ''' <param name="privateFolder"></param>
+        ''' <param name="deleteFolderWhenDone"></param>
+        ''' <returns></returns>
+        Public Overrides Function installCollectionFromLink(link As String) As Integer
             Throw New NotImplementedException()
         End Function
         '

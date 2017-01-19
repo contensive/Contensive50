@@ -25,6 +25,14 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Private Function GetNonRootNavigatorID(ByVal EntryName As String, ByVal ParentID As Integer, ByVal addonId As Integer, ByVal ContentID As Integer, ByVal NavIconType As Integer, ByVal NavIconTitle As String, ByVal DeveloperOnly As Boolean, ByVal ignore As Integer, ByVal LinkPage As String, ByVal HelpCollectionID As Integer, ByVal HelpAddonID As Integer, ByVal InstalledByCollectionID As Integer, ByVal AdminOnly As Boolean) As Integer
+            Dim result As Integer = 0
+            Try
+
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+            Return result
+
             If ParentID <= 0 Then
                 '
                 ' Block entries to the root node - this is to block entries made for system collections I may have missed
@@ -38,64 +46,64 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Private Function GetNavigatorID(ByVal EntryName As String, ByVal ParentID As Integer, ByVal addonId As Integer, ByVal ContentID As Integer, ByVal NavIconType As Integer, ByVal NavIconTitle As String, ByVal DeveloperOnly As Boolean, ByVal ignore As Integer, ByVal LinkPage As String, ByVal HelpCollectionID As Integer, ByVal HelpAddonID As Integer, ByVal InstalledByCollectionID As Integer, ByVal AdminOnly As Boolean) As Integer
-            On Error GoTo ErrorTrap
-            '
-            Dim CS As Integer
-            Dim Criteria As String
-            ''dim buildversion As String
-            '
-            'BuildVersion = cpCore.app.DataBuildVersion_DontUseThis
-            Criteria = "(Name = " & cpCore.db.encodeSQLText(EntryName) & ")"
-            If ParentID = 0 Then
-                Criteria = Criteria & "And((parentid=0)Or(parentid Is null))"
-            Else
-                Criteria = Criteria & "And(parentid=" & ParentID & ")"
-            End If
-            CS = cpCore.db.cs_open("Navigator Entries", Criteria, "ID")
-            If Not cpCore.db.cs_ok(CS) Then
-                Call cpCore.db.cs_Close(CS)
-                CS = cpCore.db.cs_insertRecord("Navigator Entries", SystemMemberID)
-                If cpCore.db.cs_ok(CS) Then
-                    'Call cmc.cpCore.app.csv_SetCSRecordDefaults(CS)
-                    Call cpCore.db.cs_set(CS, "name", EntryName)
-                    Call cpCore.db.cs_set(CS, "parentid", ParentID)
-                    Call cpCore.db.cs_set(CS, "AddonID", addonId)
-                    Call cpCore.db.cs_set(CS, "ContentID", ContentID)
-                    Call cpCore.db.cs_set(CS, "NavIconType", NavIconType)
-                    Call cpCore.db.cs_set(CS, "AdminOnly", AdminOnly)
-                    Call cpCore.db.cs_set(CS, "DeveloperOnly", DeveloperOnly)
-                    Call cpCore.db.cs_set(CS, "LinkPage", LinkPage)
-                    If True Then
-                        Call cpCore.db.cs_set(CS, "HelpAddonID", HelpAddonID)
-                        Call cpCore.db.cs_set(CS, "HelpCollectionID", HelpCollectionID)
-                    End If
-                    If True Then
-                        Call cpCore.db.cs_set(CS, "InstalledByCollectionID", InstalledByCollectionID)
-                    End If
-                    '
-                    '
-                    ' set initial caps because some content definitions were not named with this in mind -- it looks bad
-                    '
-                    Call cpCore.db.cs_set(CS, "NavIconTitle", EncodeInitialCaps(NavIconTitle))
-                    '
-                    ' if there are more, these are a errors - move their child nodes to the first and delete them
-                    '
-                    Call cpCore.db.cs_goNext(CS)
-                    Do While cpCore.db.cs_ok(CS)
-                        Call cpCore.db.executeSql("update ccmenuentries set parentid=" & GetNavigatorID & " where parentid=" & cpCore.db.cs_getInteger(CS, "ID"))
-                        Call cpCore.db.executeSql("delete from ccmenuentries where id=" & cpCore.db.cs_getInteger(CS, "ID"))
-                        Call cpCore.db.cs_goNext(CS)
-                    Loop
+            Dim result As Integer = 0
+            Try
+                Dim CS As Integer
+                Dim Criteria As String
+                ''dim buildversion As String
+                '
+                'BuildVersion = cpCore.app.DataBuildVersion_DontUseThis
+                Criteria = "(Name = " & cpCore.db.encodeSQLText(EntryName) & ")"
+                If ParentID = 0 Then
+                    Criteria = Criteria & "And((parentid=0)Or(parentid Is null))"
+                Else
+                    Criteria = Criteria & "And(parentid=" & ParentID & ")"
                 End If
-            End If
-            If cpCore.db.cs_ok(CS) Then
-                GetNavigatorID = cpCore.db.cs_getInteger(CS, "ID")
-            End If
-            Call cpCore.db.cs_Close(CS)
-            '
-            Exit Function
-ErrorTrap:
-            Call HandleClassTrapError(cpCore.appConfig.name, Err.Number, Err.Source, Err.Description, "GetNavigatorID", True, False)
+                CS = cpCore.db.cs_open("Navigator Entries", Criteria, "ID")
+                If Not cpCore.db.cs_ok(CS) Then
+                    Call cpCore.db.cs_Close(CS)
+                    CS = cpCore.db.cs_insertRecord("Navigator Entries", SystemMemberID)
+                    If cpCore.db.cs_ok(CS) Then
+                        'Call cmc.cpCore.app.csv_SetCSRecordDefaults(CS)
+                        Call cpCore.db.cs_set(CS, "name", EntryName)
+                        Call cpCore.db.cs_set(CS, "parentid", ParentID)
+                        Call cpCore.db.cs_set(CS, "AddonID", addonId)
+                        Call cpCore.db.cs_set(CS, "ContentID", ContentID)
+                        Call cpCore.db.cs_set(CS, "NavIconType", NavIconType)
+                        Call cpCore.db.cs_set(CS, "AdminOnly", AdminOnly)
+                        Call cpCore.db.cs_set(CS, "DeveloperOnly", DeveloperOnly)
+                        Call cpCore.db.cs_set(CS, "LinkPage", LinkPage)
+                        If True Then
+                            Call cpCore.db.cs_set(CS, "HelpAddonID", HelpAddonID)
+                            Call cpCore.db.cs_set(CS, "HelpCollectionID", HelpCollectionID)
+                        End If
+                        If True Then
+                            Call cpCore.db.cs_set(CS, "InstalledByCollectionID", InstalledByCollectionID)
+                        End If
+                        '
+                        '
+                        ' set initial caps because some content definitions were not named with this in mind -- it looks bad
+                        '
+                        Call cpCore.db.cs_set(CS, "NavIconTitle", EncodeInitialCaps(NavIconTitle))
+                        '
+                        ' if there are more, these are a errors - move their child nodes to the first and delete them
+                        '
+                        Call cpCore.db.cs_goNext(CS)
+                        Do While cpCore.db.cs_ok(CS)
+                            Call cpCore.db.executeSql("update ccmenuentries set parentid=" & "0" & " where parentid=" & cpCore.db.cs_getInteger(CS, "ID"))
+                            Call cpCore.db.executeSql("delete from ccmenuentries where id=" & cpCore.db.cs_getInteger(CS, "ID"))
+                            Call cpCore.db.cs_goNext(CS)
+                        Loop
+                    End If
+                End If
+                If cpCore.db.cs_ok(CS) Then
+                    result = cpCore.db.cs_getInteger(CS, "ID")
+                End If
+                Call cpCore.db.cs_Close(CS)
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+            Return result
         End Function
         '
         '====================================================================================================
@@ -107,7 +115,7 @@ ErrorTrap:
         '       Unzips any collection files
         '       Returns true if it all downloads OK
         '
-        Private Function DownloadCollectionFiles(ByVal WorkingFolder As String, ByVal CollectionGuid As String, ByRef return_IISResetRequired As Boolean, ByRef return_RegisterList As String, ByRef return_CollectionLastChangeDate As Date, ByRef return_ErrorMessage As String) As Boolean
+        Private Function DownloadCollectionFiles(ByVal WorkingFolder As String, ByVal CollectionGuid As String, ByRef return_CollectionLastChangeDate As Date, ByRef return_ErrorMessage As String) As Boolean
             DownloadCollectionFiles = False
             Try
                 '
@@ -292,7 +300,7 @@ ErrorTrap:
                 'End If
                 '
             Catch ex As Exception
-                Call HandleClassTrapError("unknown", Err.Number, Err.Source, Err.Description, "DownloadCollectionFiles", True, False)
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return DownloadCollectionFiles
         End Function
@@ -313,15 +321,16 @@ ErrorTrap:
         '
         '=========================================================================================================================
         '
-        Public Function installCollectionFromRemoteRepo(ByVal CollectionGuid As String, ByVal ignore_buildVersion As String, ByRef return_IISResetRequired As Boolean, ByRef return_RegisterList As String, ByRef return_ErrorMessage As String, ByVal ImportFromCollectionsGuidList As String, IsNewBuild As Boolean) As Boolean
+        Public Function installCollectionFromRemoteRepo(ByVal CollectionGuid As String, ByRef return_ErrorMessage As String, ByVal ImportFromCollectionsGuidList As String, IsNewBuild As Boolean) As Boolean
             Dim UpgradeOK As Boolean = True
             Try
                 '
                 Dim CollectionVersionFolderName As String
                 Dim WorkingFolder As String
                 Dim CollectionLastChangeDate As Date
-                Dim builder As New coreBuilderClass(cpCore)
-                Dim isBaseCollection As Boolean = (CollectionGuid = baseCollectionGuid)
+                Dim collectionGuidList As New List(Of String)
+                'Dim builder As New coreBuilderClass(cpCore)
+                'Dim isBaseCollection As Boolean = (CollectionGuid = baseCollectionGuid)
                 '
                 ' normalize guid
                 '
@@ -344,9 +353,9 @@ ErrorTrap:
                     WorkingFolder = cpCore.addon.getPrivateFilesAddonPath() & "temp_" & GetRandomInteger() & "\"
                     Call cpCore.privateFiles.createPath(WorkingFolder)
                     '
-                    UpgradeOK = DownloadCollectionFiles(WorkingFolder, CollectionGuid, return_IISResetRequired, return_RegisterList, CollectionLastChangeDate, return_ErrorMessage)
+                    UpgradeOK = DownloadCollectionFiles(WorkingFolder, CollectionGuid, CollectionLastChangeDate, return_ErrorMessage)
                     If UpgradeOK Then
-                        UpgradeOK = BuildLocalCollectionFolder(WorkingFolder, return_IISResetRequired, return_RegisterList, CollectionLastChangeDate, CollectionGuid, return_ErrorMessage, False)
+                        UpgradeOK = BuildLocalCollectionReposFromFolder(WorkingFolder, CollectionLastChangeDate, collectionGuidList, return_ErrorMessage, False)
                     End If
                     '
                     Call cpCore.privateFiles.DeleteFileFolder(WorkingFolder)
@@ -355,7 +364,7 @@ ErrorTrap:
                 ' Upgrade the server from the collection files
                 '
                 If UpgradeOK Then
-                    UpgradeOK = installCollectionFromLocalRepo(builder, return_IISResetRequired, CollectionGuid, cpCore.siteProperties.dataBuildVersion, return_ErrorMessage, return_RegisterList, ImportFromCollectionsGuidList, IsNewBuild)
+                    UpgradeOK = installCollectionFromLocalRepo(CollectionGuid, cpCore.siteProperties.dataBuildVersion, return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild)
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -379,7 +388,7 @@ ErrorTrap:
                 Dim SupportURL As String
                 Dim GuidList As String
                 Dim CollectionLastChangeDate As Date
-                Dim WorkingFolder As String
+                Dim workingPath As String
                 Dim LocalFile As String
                 Dim LocalGuid As String
                 Dim LocalLastChangeDateStr As String
@@ -603,31 +612,32 @@ ErrorTrap:
                                                                                                 '
                                                                                                 ' LibLastChangeDate <>0, and it is > local lastchangedate
                                                                                                 '
-                                                                                                WorkingFolder = cpCore.addon.getPrivateFilesAddonPath() & "\temp_" & GetRandomInteger() & "\"
-                                                                                                If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), matching library collection is newer, start upgrade [" & WorkingFolder & "].")
+                                                                                                workingPath = cpCore.addon.getPrivateFilesAddonPath() & "\temp_" & GetRandomInteger() & "\"
+                                                                                                If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), matching library collection is newer, start upgrade [" & workingPath & "].")
                                                                                                 Call appendInstallLog("server", "UpgradeAllLocalCollectionsFromLib3", "Upgrading Collection [" & LibGUID & "], Library name [" & LibName & "], because LocalChangeDate [" & LocalLastChangeDate & "] < LibraryChangeDate [" & LibLastChangeDate & "]")
                                                                                                 '
                                                                                                 ' Upgrade Needed
                                                                                                 '
-                                                                                                Call cpCore.privateFiles.createPath(WorkingFolder)
+                                                                                                Call cpCore.privateFiles.createPath(workingPath)
                                                                                                 '
-                                                                                                returnOk = DownloadCollectionFiles(WorkingFolder, LibGUID, return_IISResetRequired, return_RegisterList, CollectionLastChangeDate, return_ErrorMessage)
+                                                                                                returnOk = DownloadCollectionFiles(workingPath, LibGUID, CollectionLastChangeDate, return_ErrorMessage)
                                                                                                 If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), DownloadCollectionFiles returned " & returnOk)
                                                                                                 If returnOk Then
-                                                                                                    returnOk = BuildLocalCollectionFolder(WorkingFolder, return_IISResetRequired, return_RegisterList, CollectionLastChangeDate, LibGUID, return_ErrorMessage, allowLogging)
+                                                                                                    Dim listGuidList As New List(Of String)
+                                                                                                    returnOk = BuildLocalCollectionReposFromFolder(workingPath, CollectionLastChangeDate, listGuidList, return_ErrorMessage, allowLogging)
                                                                                                     If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), BuildLocalCollectionFolder returned " & returnOk)
                                                                                                 End If
                                                                                                 '
                                                                                                 If allowLogging Then
                                                                                                     cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), working folder not deleted because debugging. Delete tmp folders when finished.")
                                                                                                 Else
-                                                                                                    Call cpCore.privateFiles.DeleteFileFolder(WorkingFolder)
+                                                                                                    Call cpCore.privateFiles.DeleteFileFolder(workingPath)
                                                                                                 End If
                                                                                                 '
                                                                                                 ' Upgrade the apps from the collection files, do not install on any apps
                                                                                                 '
                                                                                                 If returnOk Then
-                                                                                                    returnOk = installCollectionFromLocalRepo(builder, return_IISResetRequired, LibGUID, cpCore.siteProperties.dataBuildVersion, return_ErrorMessage, return_RegisterList, "", IsNewBuild)
+                                                                                                    returnOk = installCollectionFromLocalRepo(LibGUID, cpCore.siteProperties.dataBuildVersion, return_ErrorMessage, "", IsNewBuild)
                                                                                                     If allowLogging Then cpCore.log_appendLog("UpgradeAllLocalCollectionsFromLib3(), UpgradeAllAppsFromLocalCollection returned " & returnOk)
                                                                                                 End If
                                                                                                 '
@@ -687,438 +697,465 @@ ErrorTrap:
         '   This is the routine that updates the Collections.xml file
         '       - if it parses ok
         '
-        Public Function BuildLocalCollectionFolder(ByVal privateFolderPath As String, ByRef Return_IISResetRequired As Boolean, ByRef Return_RegisterList As String, ByVal CollectionLastChangeDate As Date, ByRef return_CollectionGUID As String, ByRef return_ErrorMessage As String, ByVal allowLogging As Boolean) As Boolean
-            ' On Error GoTo ErrorTrap
-            '
-            Dim WorkingPath As String
-            Dim CollectionVersionPath As String
-            Dim ResourceType As String
-            Dim PathFilename As String
-            Dim hint As String
-            Dim CollectionVersionFolderName As String
-            Dim ChildCollectionLastChangeDate As Date
-            Dim ChildWorkingFolder As String
-            Dim ChildCollectionGUID As String
-            Dim ChildCollectionName As String
-            Dim Found As Boolean
-            Dim CollectionFile As New XmlDocument
-            Dim UpdatingCollection As Boolean
-            Dim Collectionname As String
-            Dim NowTime As Date
-            Dim NowPart As Integer
-            Dim SrcFileNamelist As IO.FileInfo()
-            Dim TimeStamp As String
-            Dim CollectionVersionFolder As String
-            Dim Pos As Integer
-            Dim CollectionFolder As String
-            Dim CollectionGuid As String
-            Dim AOGuid As String
-            Dim AOName As String
-            Dim IsFound As Boolean
-            Dim Filename As String
-            Dim CDefSection As XmlNode
-            Dim Doc As New XmlDocument
-            Dim CDefInterfaces As XmlNode
-            Dim PageInterface As XmlNode
-            Dim StatusOK As Boolean
-            Dim CollectionFileBaseName As String
-            'Dim siteBuilder As builderClass
-            ' initialized
-            Dim XMLTools As New coreXmlToolsClass(cpCore)
-            Dim CollectionFolderName As String = ""
-            Dim CollectionFileFound As Boolean = False
-            Dim ZipFileFound As Boolean = False
-            '
-            ' process all xml files in this workingfolder
-            '
-            If allowLogging Then cpCore.log_appendLog("BuildLocalCollectionFolder(), Enter")
-            '
-            If Not cpCore.privateFiles.pathExists(privateFolderPath) Then
-                '
-                ' The working folder is not there
-                '
-                return_ErrorMessage = "<p>There was a problem with the installation. The installation folder is not valid.</p>"
-                If allowLogging Then cpCore.log_appendLog("BuildLocalCollectionFolder(), " & return_ErrorMessage)
-                Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, CheckFileFolder was false for the private folder [" & privateFolderPath & "]")
-            Else
-                Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, processing files in private folder [" & privateFolderPath & "]")
-                SrcFileNamelist = cpCore.privateFiles.getFileList(privateFolderPath)
-                For Each file As IO.FileInfo In SrcFileNamelist
-                    If file.Extension = ".zip" Then
-                        '
-                        ZipFileFound = True
-                        Call cpCore.privateFiles.UnzipFile(privateFolderPath & file.Name)
-                        Call cpCore.privateFiles.deleteFile(privateFolderPath & file.Name)
-                    End If
-                Next
-                '
-                ' Now get all the unzipped files
-                '
-                SrcFileNamelist = cpCore.privateFiles.getFileList(privateFolderPath)
-                If True Then
-                    '
-                    ' Process all non-zip files
-                    '
+        Public Function BuildLocalCollectionReposFromFolder(ByVal sourcePrivateFolderPath As String, ByVal CollectionLastChangeDate As Date, ByRef return_CollectionGUIDList As List(Of String), ByRef return_ErrorMessage As String, ByVal allowLogging As Boolean) As Boolean
+            Dim success As Boolean = False
+            Try
+                If Not cpCore.privateFiles.pathExists(sourcePrivateFolderPath) Then
+                    Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, processing files in private folder [" & sourcePrivateFolderPath & "]")
+                    Dim SrcFileNamelist As IO.FileInfo() = cpCore.privateFiles.getFileList(sourcePrivateFolderPath)
                     For Each file As IO.FileInfo In SrcFileNamelist
-                        Filename = file.Name
-                        Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, processing files, filename=[" & Filename & "]")
-                        If vbLCase(Right(Filename, 4)) = ".xml" Then
-                            '
-                            Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, processing xml file [" & Filename & "]")
-                            'hint = hint & ",320"
-                            CollectionFile = New XmlDocument
-
-                            Dim loadOk = True
-                            Try
-                                Call CollectionFile.Load(cpCore.privateFiles.rootLocalPath & privateFolderPath & Filename)
-                            Catch ex As Exception
-                                '
-                                ' There was a parse error in this xml file. Set the return message and the flag
-                                ' If another xml files shows up, and process OK it will cover this error
-                                '
-                                'hint = hint & ",330"
-                                return_ErrorMessage = "<p>There was a problem with the Collection File for this addon.</p>"
-                                Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, error reading collection [" & privateFolderPath & Filename & "]")
-                                'StatusOK = False
-                                loadOk = False
-                            End Try
-                            If loadOk Then
-                                'hint = hint & ",400"
-                                CollectionFileBaseName = vbLCase(CollectionFile.DocumentElement.Name)
-                                If (CollectionFileBaseName <> "contensivecdef") And (CollectionFileBaseName <> CollectionFileRootNode) And (CollectionFileBaseName <> vbLCase(CollectionFileRootNodeOld)) Then
-                                    '
-                                    ' Not a problem, this is just not a collection file
-                                    '
-                                    Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, xml base name wrong [" & CollectionFileBaseName & "]")
-                                Else
-                                    '
-                                    ' Collection File
-                                    '
-                                    'hint = hint & ",420"
-                                    With CollectionFile.DocumentElement
-                                        Collectionname = GetXMLAttribute(IsFound, CollectionFile.DocumentElement, "name", "")
-                                        If Collectionname = "" Then
-                                            '
-                                            ' ----- Error condition -- it must have a collection name
-                                            '
-                                            'hint = hint & ",430"
-                                            return_ErrorMessage = "<p>There was a problem with this Collection. The collection file does not have a collection name.</p>"
-                                            Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, collection has no name")
-                                            'StatusOK = False
-                                        Else
-                                            '
-                                            '------------------------------------------------------------------
-                                            ' Build Collection folder structure in /Add-ons folder
-                                            '------------------------------------------------------------------
-                                            '
-                                            'hint = hint & ",440"
-                                            CollectionFileFound = True
-                                            CollectionGuid = GetXMLAttribute(IsFound, CollectionFile.DocumentElement, "guid", Collectionname)
-                                            If CollectionGuid = "" Then
-                                                '
-                                                ' I hope I do not regret this
-                                                '
-                                                CollectionGuid = Collectionname
-                                            End If
-
-                                            CollectionVersionFolderName = GetCollectionPath(CollectionGuid)
-                                            If CollectionVersionFolderName <> "" Then
-                                                '
-                                                ' This is an upgrade
-                                                '
-                                                'hint = hint & ",450"
-                                                UpdatingCollection = True
-                                                Pos = vbInstr(1, CollectionVersionFolderName, "\")
-                                                If Pos > 0 Then
-                                                    CollectionFolderName = Mid(CollectionVersionFolderName, 1, Pos - 1)
-                                                End If
-                                            Else
-                                                '
-                                                ' This is an install
-                                                '
-                                                'hint = hint & ",460"
-                                                CollectionFolderName = CollectionGuid
-                                                CollectionFolderName = vbReplace(CollectionFolderName, "{", "")
-                                                CollectionFolderName = vbReplace(CollectionFolderName, "}", "")
-                                                CollectionFolderName = vbReplace(CollectionFolderName, "-", "")
-                                                CollectionFolderName = vbReplace(CollectionFolderName, " ", "")
-                                                CollectionFolderName = Collectionname & "_" & CollectionFolderName
-                                            End If
-                                            CollectionFolder = cpCore.addon.getPrivateFilesAddonPath() & CollectionFolderName & "\"
-                                            If Not cpCore.privateFiles.pathExists(CollectionFolder) Then
-                                                '
-                                                ' Create collection folder
-                                                '
-                                                'hint = hint & ",470"
-                                                Call cpCore.privateFiles.createPath(CollectionFolder)
-                                            End If
-                                            '
-                                            ' create a collection 'version' folder for these new files
-                                            '
-                                            TimeStamp = ""
-                                            NowTime = DateTime.Now()
-                                            NowPart = NowTime.Year
-                                            TimeStamp &= NowPart.ToString()
-                                            NowPart = NowTime.Month
-                                            If (NowPart < 10) Then TimeStamp &= "0"
-                                            TimeStamp &= NowPart.ToString()
-                                            NowPart = NowTime.Day
-                                            If (NowPart < 10) Then TimeStamp &= "0"
-                                            TimeStamp &= NowPart.ToString()
-                                            NowPart = NowTime.Hour
-                                            If (NowPart < 10) Then TimeStamp &= "0"
-                                            TimeStamp &= NowPart.ToString()
-                                            NowPart = NowTime.Minute
-                                            If (NowPart < 10) Then TimeStamp &= "0"
-                                            TimeStamp &= NowPart.ToString()
-                                            NowPart = NowTime.Second
-                                            If (NowPart < 10) Then TimeStamp &= "0"
-                                            TimeStamp &= NowPart.ToString()
-                                            CollectionVersionFolderName = CollectionFolderName & "\" & TimeStamp
-                                            CollectionVersionFolder = cpCore.addon.getPrivateFilesAddonPath() & CollectionVersionFolderName & "\"
-                                            Call cpCore.privateFiles.createPath(CollectionVersionFolder)
-                                            '
-                                            ' copy all files from source to CollectionVersionFolder
-                                            '
-                                            WorkingPath = Left(privateFolderPath, Len(privateFolderPath) - 1)
-                                            CollectionVersionPath = Left(CollectionVersionFolder, Len(CollectionVersionFolder) - 1)
-
-                                            Call cpCore.privateFiles.copyFolder(WorkingPath, CollectionVersionPath)
-                                            'StatusOK = True
-                                            '
-                                            ' Install activeX and search for importcollections
-                                            '
-                                            'hint = hint & ",500"
-                                            For Each CDefSection In CollectionFile.DocumentElement.ChildNodes
-                                                Select Case vbLCase(CDefSection.Name)
-                                                    Case "resource"
-                                                        '
-                                                        ' resource node, if executable node, save to RegisterList
-                                                        '
-                                                        'hint = hint & ",510"
-                                                        ResourceType = vbLCase(GetXMLAttribute(IsFound, CDefSection, "type", ""))
-                                                        Filename = Trim(GetXMLAttribute(IsFound, CDefSection, "name", ""))
-                                                        PathFilename = CollectionVersionFolder & Filename
-                                                        If Filename = "" Then
-                                                            '
-                                                            ' filename is blank
-                                                            '
-                                                            'hint = hint & ",511"
-                                                        ElseIf Not cpCore.privateFiles.fileExists(PathFilename) Then
-                                                            '
-                                                            ' resource is not here
-                                                            '
-                                                            'hint = hint & ",513"
-                                                            return_ErrorMessage = "<p>There was a problem with the Collection File. The resource referenced in the collection file [" & Filename & "] was not included in the resource files.</p>"
-                                                            Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, The resource referenced in the collection file [" & Filename & "] was not included in the resource files.")
-                                                            'StatusOK = False
-                                                        Else
-                                                            Select Case ResourceType
-                                                                Case "executable"
-                                                                    '
-                                                                    ' Executable resources - add to register list
-                                                                    '
-                                                                    'hint = hint & ",520"
-                                                                    If vbInstr(1, Return_RegisterList, PathFilename) <> 0 Then
-                                                                        '
-                                                                        ' file is already installed
-                                                                        '
-                                                                        'hint = hint & ",521"
-                                                                    Else
-                                                                        '
-                                                                        ' Add the file to be registered
-                                                                        '
-                                                                        'hint = hint & ",522"
-                                                                        Return_RegisterList = Return_RegisterList & vbCrLf & PathFilename
-                                                                        Return_IISResetRequired = UpdatingCollection
-                                                                    End If
-                                                                Case "www"
-                                                                Case "file"
-                                                            End Select
-                                                        End If
-                                                    Case "interfaces"
-                                                        '
-                                                        ' Compatibility only - this is deprecated - Install ActiveX found in Add-ons
-                                                        '
-                                                        'hint = hint & ",530"
-                                                        For Each CDefInterfaces In CDefSection.ChildNodes
-                                                            AOName = GetXMLAttribute(IsFound, CDefInterfaces, "name", "No Name")
-                                                            If AOName = "" Then
-                                                                AOName = "No Name"
-                                                            End If
-                                                            AOGuid = GetXMLAttribute(IsFound, CDefInterfaces, "guid", AOName)
-                                                            If AOGuid = "" Then
-                                                                AOGuid = AOName
-                                                            End If
-                                                            Select Case vbLCase(CDefInterfaces.Name)
-                                                                Case "page", "process"
-                                                                    '
-                                                                    ' Page Interface
-                                                                    '
-                                                                    'hint = hint & ",531"
-                                                                    If True Then
-                                                                        For Each PageInterface In CDefInterfaces.ChildNodes
-                                                                            Select Case vbLCase(PageInterface.Name)
-                                                                                Case "activexdll"
-                                                                                    '
-                                                                                    ' Compatibility load - these should all be execuatable resources
-                                                                                    '
-                                                                                    'hint = hint & ",532"
-                                                                                    Filename = Trim(LCase(PageInterface.InnerText))
-                                                                                    PathFilename = CollectionVersionFolder & Filename
-                                                                                    If Filename = "" Then
-                                                                                        '
-                                                                                        ' filename is blank
-                                                                                        '
-                                                                                        'hint = hint & ",533"
-                                                                                    ElseIf vbInstr(1, Return_RegisterList, PathFilename) <> 0 Then
-                                                                                        '
-                                                                                        ' file is already installed
-                                                                                        '
-                                                                                        'hint = hint & ",534"
-                                                                                    ElseIf Not cpCore.privateFiles.fileExists(PathFilename) Then
-                                                                                        '
-                                                                                        ' the file is not here
-                                                                                        '
-                                                                                        'hint = hint & ",535"
-                                                                                        return_ErrorMessage = "<p>There was a problem with the Collection File. The executable resource referenced in the collection file [" & Filename & "] was not included in the resource files.</p>"
-                                                                                        Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, Page Interface [" & AOName & "], the file specified in the 'ACTIVEXDLL' element of the XML Collection [" & Filename & "] could not be found. Please check that it is provided with the collection and is spelled correctly.")
-                                                                                        'StatusOK = False
-                                                                                    Else
-                                                                                        '
-                                                                                        ' Add the file to be registered
-                                                                                        '
-                                                                                        'hint = hint & ",536"
-                                                                                        Return_RegisterList = Return_RegisterList & vbCrLf & PathFilename
-                                                                                        Return_IISResetRequired = UpdatingCollection
-                                                                                    End If
-                                                                            End Select
-                                                                        Next
-                                                                    End If
-                                                            End Select
-                                                        Next
-                                                    Case "getcollection", "importcollection"
-                                                        '
-                                                        ' Download Collection file into install folder
-                                                        '
-                                                        'hint = hint & ",580"
-                                                        ChildCollectionName = GetXMLAttribute(Found, CDefSection, "name", "")
-                                                        ChildCollectionGUID = GetXMLAttribute(Found, CDefSection, "guid", CDefSection.InnerText)
-                                                        'ChildCollectionGUID = GetXMLAttribute(Found, CDefSection, "guid")
-                                                        If ChildCollectionGUID = "" Then
-                                                            ChildCollectionGUID = CDefSection.InnerText
-                                                        End If
-                                                        Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, getCollection or importcollection, childCollectionName [" & ChildCollectionName & "], childCollectionGuid [" & ChildCollectionGUID & "]")
-                                                        If vbInstr(1, privateFolderPath, ChildCollectionGUID, vbTextCompare) = 0 Then
-                                                            If ChildCollectionGUID = "" Then
-                                                                '
-                                                                ' Needs a GUID to install
-                                                                '
-                                                                'hint = hint & ",590"
-                                                                return_ErrorMessage = "The installation can not continue because an imported collection [" & ChildCollectionName & "] could not be downloaded because it does not include a valid GUID."
-                                                                Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, return message [" & return_ErrorMessage & "]")
-                                                                'StatusOK = False
-                                                            ElseIf GetCollectionPath(ChildCollectionGUID) = "" Then
-                                                                Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], not found so needs to be installed")
-                                                                '
-                                                                ' If it is not already installed, download and install it also
-                                                                '
-                                                                ChildWorkingFolder = privateFolderPath & ChildCollectionGUID & "\"
-                                                                '
-                                                                ' down an imported collection file
-                                                                '
-                                                                StatusOK = DownloadCollectionFiles(ChildWorkingFolder, ChildCollectionGUID, Return_IISResetRequired, Return_RegisterList, ChildCollectionLastChangeDate, return_ErrorMessage)
-                                                                If Not StatusOK Then
-                                                                    Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], downloadCollectionFiles returned error state, message [" & return_ErrorMessage & "]")
-                                                                    If return_ErrorMessage = "" Then
-                                                                        return_ErrorMessage = "The installation can not continue because there was an unknown error while downloading the necessary collection file, guid [" & ChildCollectionGUID & "]."
-                                                                    Else
-                                                                        return_ErrorMessage = "The installation can not continue because there was an error while downloading the necessary collection file, guid [" & ChildCollectionGUID & "]. The error was [" & return_ErrorMessage & "]"
-                                                                    End If
-                                                                Else
-                                                                    Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], downloadCollectionFiles returned OK")
-                                                                    '
-                                                                    ' install the downloaded file
-                                                                    '
-                                                                    StatusOK = BuildLocalCollectionFolder(ChildWorkingFolder, Return_IISResetRequired, Return_RegisterList, ChildCollectionLastChangeDate, ChildCollectionGUID, return_ErrorMessage, allowLogging)
-                                                                    If Not StatusOK Then
-                                                                        Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], BuildLocalCollectionFolder returned error state, message [" & return_ErrorMessage & "]")
-                                                                        If return_ErrorMessage = "" Then
-                                                                            return_ErrorMessage = "The installation can not continue because there was an unknown error installing the included collection file, guid [" & ChildCollectionGUID & "]."
-                                                                        Else
-                                                                            return_ErrorMessage = "The installation can not continue because there was an unknown error installing the included collection file, guid [" & ChildCollectionGUID & "]. The error was [" & return_ErrorMessage & "]"
-                                                                        End If
-                                                                    End If
-                                                                End If
-                                                                'StatusOK = (StatusOK And DownloadCollectionFiles(ChildWorkingFolder, ChildCollectionGUID, Return_IISResetRequired, Return_RegisterList, ChildCollectionLastChangeDate, Return_ErrorMessage))
-                                                                'StatusOK = (StatusOK And BuildLocalCollectionFolder(ChildWorkingFolder, Return_IISResetRequired, Return_RegisterList, ChildCollectionLastChangeDate, ChildCollectionGUID, Return_ErrorMessage, allowLogging))
-                                                            Else
-                                                                '
-                                                                '
-                                                                '
-                                                                Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], already installed")
-                                                            End If
-                                                        End If
-                                                End Select
-                                                If (return_ErrorMessage <> "") Then
-                                                    '
-                                                    ' if error, no more nodes in this collection file
-                                                    '
-                                                    Exit For
-                                                End If
-                                            Next
-                                        End If
-                                    End With
-                                End If
-                            End If
-                        End If
-                        If (return_ErrorMessage <> "") Then
-                            '
-                            ' if error, no more files
-                            '
-                            Exit For
+                        If file.Extension = ".zip" Then
+                            Dim collectionGuid As String = ""
+                            success = BuildLocalCollectionRepoFromFile(sourcePrivateFolderPath & file.Name, CollectionLastChangeDate, collectionGuid, return_ErrorMessage, allowLogging)
+                            return_CollectionGUIDList.Add(collectionGuid)
                         End If
                     Next
-                    If (return_ErrorMessage = "") And (Not CollectionFileFound) Then
-                        '
-                        ' no errors, but the collection file was not found
-                        '
-                        If ZipFileFound Then
-                            '
-                            ' zip file found but did not qualify
-                            '
-                            return_ErrorMessage = "<p>There was a problem with the installation. The collection zip file was downloaded, but it did not include a valid collection xml file.</p>"
-                        Else
-                            '
-                            ' zip file not found
-                            '
-                            return_ErrorMessage = "<p>There was a problem with the installation. The collection zip was not downloaded successfully.</p>"
-                        End If
-                        'StatusOK = False
-                    End If
                 End If
-            End If
-            '
-            ' If the collection parsed correctly, update the Collections.xml file
-            '
-            If (return_ErrorMessage = "") Then
-                Call UpdateConfig(Collectionname, CollectionGuid, CollectionLastChangeDate, CollectionVersionFolderName)
-            Else
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+            Return success
+        End Function
+        '
+        '
+        '
+        Public Function BuildLocalCollectionRepoFromFile(ByVal collectionPathFilename As String, ByVal CollectionLastChangeDate As Date, ByRef return_CollectionGUID As String, ByRef return_ErrorMessage As String, ByVal allowLogging As Boolean) As Boolean
+            Dim result As Boolean = True
+            Try
                 '
-                ' there was an error processing the collection, be sure to save description in the log
+                ' Dim WorkingPath As String
+                Dim CollectionVersionPath As String
+                Dim ResourceType As String
+                '  Dim PathFilename As String
+                Dim hint As String
+                Dim CollectionVersionFolderName As String
+                Dim ChildCollectionLastChangeDate As Date
+                Dim ChildWorkingFolder As String
+                Dim ChildCollectionGUID As String
+                Dim ChildCollectionName As String
+                Dim Found As Boolean
+                Dim CollectionFile As New XmlDocument
+                Dim UpdatingCollection As Boolean
+                Dim Collectionname As String
+                Dim NowTime As Date
+                Dim NowPart As Integer
+                Dim SrcFileNamelist As IO.FileInfo()
+                Dim TimeStamp As String
+                Dim CollectionVersionFolder As String
+                Dim Pos As Integer
+                Dim CollectionFolder As String
+                Dim CollectionGuid As String
+                Dim AOGuid As String
+                Dim AOName As String
+                Dim IsFound As Boolean
+                Dim Filename As String
+                Dim CDefSection As XmlNode
+                Dim Doc As New XmlDocument
+                Dim CDefInterfaces As XmlNode
+                Dim PageInterface As XmlNode
+                Dim StatusOK As Boolean
+                Dim CollectionFileBaseName As String
+                'Dim siteBuilder As builderClass
+                ' initialized
+                Dim XMLTools As New coreXmlToolsClass(cpCore)
+                Dim CollectionFolderName As String = ""
+                Dim CollectionFileFound As Boolean = False
+                Dim ZipFileFound As Boolean = False
+                Dim collectionPath As String = ""
+                Dim collectionFilename As String = ""
                 '
-                Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, ERROR Exiting, ErrorMessage [" & return_ErrorMessage & "]")
-            End If
-            '
-            Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, Exiting with ErrorMessage [" & return_ErrorMessage & "]")
-            '
-            BuildLocalCollectionFolder = (return_ErrorMessage = "")
-            return_CollectionGUID = CollectionGuid
-            '
-            Exit Function
-ErrorTrap:
-            return_ErrorMessage = return_ErrorMessage & "<p>A trap error prevented the collection folder from installing correctly.</p>"
-            Call HandleClassTrapError("unknown", Err.Number, Err.Source, Err.Description, "BuildLocalCollectionFolder, Hint=" & hint, True, False)
+                ' process all xml files in this workingfolder
+                '
+                If allowLogging Then cpCore.log_appendLog("BuildLocalCollectionFolder(), Enter")
+                '
+                cpCore.privateFiles.splitPathFilename(collectionPathFilename, collectionPath, collectionFilename)
+                If Not cpCore.privateFiles.pathExists(collectionPath) Then
+                    '
+                    ' The working folder is not there
+                    '
+                    result = False
+                    return_ErrorMessage = "<p>There was a problem with the installation. The installation folder is not valid.</p>"
+                    If allowLogging Then cpCore.log_appendLog("BuildLocalCollectionFolder(), " & return_ErrorMessage)
+                    Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, CheckFileFolder was false for the private folder [" & collectionPath & "]")
+                Else
+                    Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, processing files in private folder [" & collectionPath & "]")
+                    '
+                    ' move collection file to a temp directory
+                    '
+                    Dim tmpInstallPath As String = "tmpInstallCollection" & cpCore.createGuid().Replace("{", "").Replace("}", "").Replace("-", "") & "/"
+                    cpCore.privateFiles.copyFile(collectionPathFilename, tmpInstallPath & collectionFilename)
+                    Call cpCore.privateFiles.UnzipFile(tmpInstallPath & collectionFilename)
+                    Call cpCore.privateFiles.deleteFile(tmpInstallPath & collectionFilename)
+                    '
+                    ' install the individual files
+                    '
+                    SrcFileNamelist = cpCore.privateFiles.getFileList(tmpInstallPath)
+                    If True Then
+                        '
+                        ' Process all non-zip files
+                        '
+                        For Each file As IO.FileInfo In SrcFileNamelist
+                            Filename = file.Name
+                            Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, processing files, filename=[" & Filename & "]")
+                            If vbLCase(Right(Filename, 4)) = ".xml" Then
+                                '
+                                Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, processing xml file [" & Filename & "]")
+                                'hint = hint & ",320"
+                                CollectionFile = New XmlDocument
+
+                                Dim loadOk = True
+                                Try
+                                    Call CollectionFile.LoadXml(cpCore.privateFiles.readFile(tmpInstallPath & Filename))
+                                Catch ex As Exception
+                                    '
+                                    ' There was a parse error in this xml file. Set the return message and the flag
+                                    ' If another xml files shows up, and process OK it will cover this error
+                                    '
+                                    'hint = hint & ",330"
+                                    return_ErrorMessage = "<p>There was a problem with the Collection File for this addon.</p>"
+                                    Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, error reading collection [" & collectionPathFilename & "]")
+                                    'StatusOK = False
+                                    loadOk = False
+                                End Try
+                                If loadOk Then
+                                    'hint = hint & ",400"
+                                    CollectionFileBaseName = vbLCase(CollectionFile.DocumentElement.Name)
+                                    If (CollectionFileBaseName <> "contensivecdef") And (CollectionFileBaseName <> CollectionFileRootNode) And (CollectionFileBaseName <> vbLCase(CollectionFileRootNodeOld)) Then
+                                        '
+                                        ' Not a problem, this is just not a collection file
+                                        '
+                                        Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, xml base name wrong [" & CollectionFileBaseName & "]")
+                                    Else
+                                        '
+                                        ' Collection File
+                                        '
+                                        'hint = hint & ",420"
+                                        With CollectionFile.DocumentElement
+                                            Collectionname = GetXMLAttribute(IsFound, CollectionFile.DocumentElement, "name", "")
+                                            If Collectionname = "" Then
+                                                '
+                                                ' ----- Error condition -- it must have a collection name
+                                                '
+                                                result = False
+                                                return_ErrorMessage = "<p>There was a problem with this Collection. The collection file does not have a collection name.</p>"
+                                                Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, collection has no name")
+                                            Else
+                                                '
+                                                '------------------------------------------------------------------
+                                                ' Build Collection folder structure in /Add-ons folder
+                                                '------------------------------------------------------------------
+                                                '
+                                                'hint = hint & ",440"
+                                                CollectionFileFound = True
+                                                CollectionGuid = GetXMLAttribute(IsFound, CollectionFile.DocumentElement, "guid", Collectionname)
+                                                If CollectionGuid = "" Then
+                                                    '
+                                                    ' I hope I do not regret this
+                                                    '
+                                                    CollectionGuid = Collectionname
+                                                End If
+
+                                                CollectionVersionFolderName = GetCollectionPath(CollectionGuid)
+                                                If CollectionVersionFolderName <> "" Then
+                                                    '
+                                                    ' This is an upgrade
+                                                    '
+                                                    'hint = hint & ",450"
+                                                    UpdatingCollection = True
+                                                    Pos = vbInstr(1, CollectionVersionFolderName, "\")
+                                                    If Pos > 0 Then
+                                                        CollectionFolderName = Mid(CollectionVersionFolderName, 1, Pos - 1)
+                                                    End If
+                                                Else
+                                                    '
+                                                    ' This is an install
+                                                    '
+                                                    'hint = hint & ",460"
+                                                    CollectionFolderName = CollectionGuid
+                                                    CollectionFolderName = vbReplace(CollectionFolderName, "{", "")
+                                                    CollectionFolderName = vbReplace(CollectionFolderName, "}", "")
+                                                    CollectionFolderName = vbReplace(CollectionFolderName, "-", "")
+                                                    CollectionFolderName = vbReplace(CollectionFolderName, " ", "")
+                                                    CollectionFolderName = Collectionname & "_" & CollectionFolderName
+                                                End If
+                                                CollectionFolder = cpCore.addon.getPrivateFilesAddonPath() & CollectionFolderName & "\"
+                                                If Not cpCore.privateFiles.pathExists(CollectionFolder) Then
+                                                    '
+                                                    ' Create collection folder
+                                                    '
+                                                    'hint = hint & ",470"
+                                                    Call cpCore.privateFiles.createPath(CollectionFolder)
+                                                End If
+                                                '
+                                                ' create a collection 'version' folder for these new files
+                                                '
+                                                TimeStamp = ""
+                                                NowTime = DateTime.Now()
+                                                NowPart = NowTime.Year
+                                                TimeStamp &= NowPart.ToString()
+                                                NowPart = NowTime.Month
+                                                If (NowPart < 10) Then TimeStamp &= "0"
+                                                TimeStamp &= NowPart.ToString()
+                                                NowPart = NowTime.Day
+                                                If (NowPart < 10) Then TimeStamp &= "0"
+                                                TimeStamp &= NowPart.ToString()
+                                                NowPart = NowTime.Hour
+                                                If (NowPart < 10) Then TimeStamp &= "0"
+                                                TimeStamp &= NowPart.ToString()
+                                                NowPart = NowTime.Minute
+                                                If (NowPart < 10) Then TimeStamp &= "0"
+                                                TimeStamp &= NowPart.ToString()
+                                                NowPart = NowTime.Second
+                                                If (NowPart < 10) Then TimeStamp &= "0"
+                                                TimeStamp &= NowPart.ToString()
+                                                CollectionVersionFolderName = CollectionFolderName & "\" & TimeStamp
+                                                CollectionVersionFolder = cpCore.addon.getPrivateFilesAddonPath() & CollectionVersionFolderName & "\"
+                                                Call cpCore.privateFiles.createPath(CollectionVersionFolder)
+                                                '
+                                                ' copy all files from source to CollectionVersionFolder
+                                                '
+                                                'WorkingPath = Left(PathFilename, Len(PathFilename) - 1)
+                                                CollectionVersionPath = Left(CollectionVersionFolder, Len(CollectionVersionFolder) - 1)
+
+                                                Call cpCore.privateFiles.copyFolder(tmpInstallPath, CollectionVersionPath)
+                                                'StatusOK = True
+                                                '
+                                                ' Install activeX and search for importcollections
+                                                '
+                                                'hint = hint & ",500"
+                                                For Each CDefSection In CollectionFile.DocumentElement.ChildNodes
+                                                    Select Case vbLCase(CDefSection.Name)
+                                                        Case "resource"
+                                                            '
+                                                            ' resource node, if executable node, save to RegisterList
+                                                            '
+                                                            'hint = hint & ",510"
+                                                            ResourceType = vbLCase(GetXMLAttribute(IsFound, CDefSection, "type", ""))
+                                                            Dim resourceFilename As String = Trim(GetXMLAttribute(IsFound, CDefSection, "name", ""))
+                                                            Dim resourcePathFilename As String = CollectionVersionFolder & resourceFilename
+                                                            If resourceFilename = "" Then
+                                                                '
+                                                                ' filename is blank
+                                                                '
+                                                                'hint = hint & ",511"
+                                                            ElseIf Not cpCore.privateFiles.fileExists(resourcePathFilename) Then
+                                                                '
+                                                                ' resource is not here
+                                                                '
+                                                                'hint = hint & ",513"
+                                                                result = False
+                                                                return_ErrorMessage = "<p>There was a problem with the Collection File. The resource referenced in the collection file [" & resourceFilename & "] was not included in the resource files.</p>"
+                                                                Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, The resource referenced in the collection file [" & resourceFilename & "] was not included in the resource files.")
+                                                                'StatusOK = False
+                                                            Else
+                                                                Select Case ResourceType
+                                                                    Case "executable"
+                                                                        '
+                                                                        ' Executable resources - add to register list
+                                                                        '
+                                                                        'hint = hint & ",520"
+                                                                        If False Then
+                                                                            '
+                                                                            ' file is already installed
+                                                                            '
+                                                                            'hint = hint & ",521"
+                                                                        Else
+                                                                            '
+                                                                            ' Add the file to be registered
+                                                                            '
+                                                                        End If
+                                                                    Case "www"
+                                                                    Case "file"
+                                                                End Select
+                                                            End If
+                                                        Case "interfaces"
+                                                            '
+                                                            ' Compatibility only - this is deprecated - Install ActiveX found in Add-ons
+                                                            '
+                                                            'hint = hint & ",530"
+                                                            For Each CDefInterfaces In CDefSection.ChildNodes
+                                                                AOName = GetXMLAttribute(IsFound, CDefInterfaces, "name", "No Name")
+                                                                If AOName = "" Then
+                                                                    AOName = "No Name"
+                                                                End If
+                                                                AOGuid = GetXMLAttribute(IsFound, CDefInterfaces, "guid", AOName)
+                                                                If AOGuid = "" Then
+                                                                    AOGuid = AOName
+                                                                End If
+                                                                'Select Case vbLCase(CDefInterfaces.Name)
+                                                                '    Case "page", "process"
+                                                                '        '
+                                                                '        ' Page Interface
+                                                                '        '
+                                                                '        'hint = hint & ",531"
+                                                                '        'If True Then
+                                                                '        '    For Each PageInterface In CDefInterfaces.ChildNodes
+                                                                '        '        Select Case vbLCase(PageInterface.Name)
+                                                                '        '            Case "activexdll"
+                                                                '        '                '
+                                                                '        '                ' Compatibility load - these should all be execuatable resources
+                                                                '        '                '
+                                                                '        '                'hint = hint & ",532"
+                                                                '        '                Filename = Trim(LCase(PageInterface.InnerText))
+                                                                '        '                PathFilename = CollectionVersionFolder & Filename
+                                                                '        '                If Filename = "" Then
+                                                                '        '                    '
+                                                                '        '                    ' filename is blank
+                                                                '        '                    '
+                                                                '        '                    'hint = hint & ",533"
+                                                                '        '                ElseIf False Then
+                                                                '        '                    '
+                                                                '        '                    ' file is already installed
+                                                                '        '                    '
+                                                                '        '                    'hint = hint & ",534"
+                                                                '        '                ElseIf Not cpCore.privateFiles.fileExists(PathFilename) Then
+                                                                '        '                    '
+                                                                '        '                    ' the file is not here
+                                                                '        '                    '
+                                                                '        '                    'hint = hint & ",535"
+                                                                '        '                    return_ErrorMessage = "<p>There was a problem with the Collection File. The executable resource referenced in the collection file [" & Filename & "] was not included in the resource files.</p>"
+                                                                '        '                    Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, Page Interface [" & AOName & "], the file specified in the 'ACTIVEXDLL' element of the XML Collection [" & Filename & "] could not be found. Please check that it is provided with the collection and is spelled correctly.")
+                                                                '        '                    'StatusOK = False
+                                                                '        '                Else
+                                                                '        '                    '
+                                                                '        '                    ' Add the file to be registered
+                                                                '        '                    '
+                                                                '        '                End If
+                                                                '        '        End Select
+                                                                '        '    Next
+                                                                '        'End If
+                                                                'End Select
+                                                            Next
+                                                        Case "getcollection", "importcollection"
+                                                            '
+                                                            ' Download Collection file into install folder
+                                                            '
+                                                            'hint = hint & ",580"
+                                                            ChildCollectionName = GetXMLAttribute(Found, CDefSection, "name", "")
+                                                            ChildCollectionGUID = GetXMLAttribute(Found, CDefSection, "guid", CDefSection.InnerText)
+                                                            'ChildCollectionGUID = GetXMLAttribute(Found, CDefSection, "guid")
+                                                            If ChildCollectionGUID = "" Then
+                                                                ChildCollectionGUID = CDefSection.InnerText
+                                                            End If
+                                                            Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, getCollection or importcollection, childCollectionName [" & ChildCollectionName & "], childCollectionGuid [" & ChildCollectionGUID & "]")
+                                                            If vbInstr(1, CollectionVersionPath, ChildCollectionGUID, vbTextCompare) = 0 Then
+                                                                If ChildCollectionGUID = "" Then
+                                                                    '
+                                                                    ' Needs a GUID to install
+                                                                    '
+                                                                    'hint = hint & ",590"
+                                                                    result = False
+                                                                    return_ErrorMessage = "The installation can not continue because an imported collection [" & ChildCollectionName & "] could not be downloaded because it does not include a valid GUID."
+                                                                    Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, return message [" & return_ErrorMessage & "]")
+                                                                    'StatusOK = False
+                                                                ElseIf GetCollectionPath(ChildCollectionGUID) = "" Then
+                                                                    Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], not found so needs to be installed")
+                                                                    '
+                                                                    ' If it is not already installed, download and install it also
+                                                                    '
+                                                                    ChildWorkingFolder = CollectionVersionPath & ChildCollectionGUID & "\"
+                                                                    '
+                                                                    ' down an imported collection file
+                                                                    '
+                                                                    StatusOK = DownloadCollectionFiles(ChildWorkingFolder, ChildCollectionGUID, ChildCollectionLastChangeDate, return_ErrorMessage)
+                                                                    If Not StatusOK Then
+                                                                        Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], downloadCollectionFiles returned error state, message [" & return_ErrorMessage & "]")
+                                                                        If return_ErrorMessage = "" Then
+                                                                            return_ErrorMessage = "The installation can not continue because there was an unknown error while downloading the necessary collection file, guid [" & ChildCollectionGUID & "]."
+                                                                        Else
+                                                                            return_ErrorMessage = "The installation can not continue because there was an error while downloading the necessary collection file, guid [" & ChildCollectionGUID & "]. The error was [" & return_ErrorMessage & "]"
+                                                                        End If
+                                                                    Else
+                                                                        Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], downloadCollectionFiles returned OK")
+                                                                        '
+                                                                        ' install the downloaded file
+                                                                        '
+                                                                        Dim ChildCollectionGUIDList As New List(Of String)
+                                                                        StatusOK = BuildLocalCollectionReposFromFolder(ChildWorkingFolder, ChildCollectionLastChangeDate, ChildCollectionGUIDList, return_ErrorMessage, allowLogging)
+                                                                        If Not StatusOK Then
+                                                                            Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], BuildLocalCollectionFolder returned error state, message [" & return_ErrorMessage & "]")
+                                                                            If return_ErrorMessage = "" Then
+                                                                                return_ErrorMessage = "The installation can not continue because there was an unknown error installing the included collection file, guid [" & ChildCollectionGUID & "]."
+                                                                            Else
+                                                                                return_ErrorMessage = "The installation can not continue because there was an unknown error installing the included collection file, guid [" & ChildCollectionGUID & "]. The error was [" & return_ErrorMessage & "]"
+                                                                            End If
+                                                                        End If
+                                                                    End If
+                                                                    'StatusOK = (StatusOK And DownloadCollectionFiles(ChildWorkingFolder, ChildCollectionGUID, Return_IISResetRequired, Return_RegisterList, ChildCollectionLastChangeDate, Return_ErrorMessage))
+                                                                    'StatusOK = (StatusOK And BuildLocalCollectionFolder(ChildWorkingFolder, Return_IISResetRequired, Return_RegisterList, ChildCollectionLastChangeDate, ChildCollectionGUID, Return_ErrorMessage, allowLogging))
+                                                                Else
+                                                                    '
+                                                                    '
+                                                                    '
+                                                                    Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], already installed")
+                                                                End If
+                                                            End If
+                                                    End Select
+                                                    If (return_ErrorMessage <> "") Then
+                                                        '
+                                                        ' if error, no more nodes in this collection file
+                                                        '
+                                                        result = False
+                                                        Exit For
+                                                    End If
+                                                Next
+                                            End If
+                                        End With
+                                    End If
+                                End If
+                            End If
+                            If (return_ErrorMessage <> "") Then
+                                '
+                                ' if error, no more files
+                                '
+                                result = False
+                                Exit For
+                            End If
+                        Next
+                        If (return_ErrorMessage = "") And (Not CollectionFileFound) Then
+                            '
+                            ' no errors, but the collection file was not found
+                            '
+                            If ZipFileFound Then
+                                '
+                                ' zip file found but did not qualify
+                                '
+                                return_ErrorMessage = "<p>There was a problem with the installation. The collection zip file was downloaded, but it did not include a valid collection xml file.</p>"
+                            Else
+                                '
+                                ' zip file not found
+                                '
+                                return_ErrorMessage = "<p>There was a problem with the installation. The collection zip was not downloaded successfully.</p>"
+                            End If
+                            'StatusOK = False
+                        End If
+                    End If
+                    '
+                    ' delete the working folder
+                    '
+                    Call cpCore.privateFiles.DeleteFileFolder(tmpInstallPath)
+                End If
+                '
+                ' If the collection parsed correctly, update the Collections.xml file
+                '
+                If (return_ErrorMessage = "") Then
+                    Call UpdateConfig(Collectionname, CollectionGuid, CollectionLastChangeDate, CollectionVersionFolderName)
+                Else
+                    '
+                    ' there was an error processing the collection, be sure to save description in the log
+                    '
+                    result = False
+                    Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, ERROR Exiting, ErrorMessage [" & return_ErrorMessage & "]")
+                End If
+                '
+                Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, Exiting with ErrorMessage [" & return_ErrorMessage & "]")
+                '
+                BuildLocalCollectionRepoFromFile = (return_ErrorMessage = "")
+                return_CollectionGUID = CollectionGuid
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+            Return result
         End Function
         '
         '=========================================================================================================================
@@ -1129,7 +1166,8 @@ ErrorTrap:
         '   ImportFromCollectionsGuidList - If this collection is from an import, this is the guid of the import.
         '=========================================================================================================================
         '
-        Public Function installCollectionFromLocalRepo(ByVal builder As coreBuilderClass, ByRef return_IISResetRequired As Boolean, ByVal CollectionGuid As String, ByVal ignore_BuildVersion As String, ByRef return_ErrorMessage As String, ByRef return_RegisterList As String, ByVal ImportFromCollectionsGuidList As String, IsNewBuild As Boolean) As Boolean
+        Public Function installCollectionFromLocalRepo(ByVal CollectionGuid As String, ByVal ignore_BuildVersion As String, ByRef return_ErrorMessage As String, ByVal ImportFromCollectionsGuidList As String, IsNewBuild As Boolean) As Boolean
+            Dim result As Boolean = False
             Try
                 '
                 Dim NodeName As String
@@ -1504,7 +1542,7 @@ ErrorTrap:
                                                                         Else
                                                                             Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], pass 1, import collection found, name [" & ChildCollectionName & "], guid [" & ChildCollectionGUID & "]")
                                                                             If True Then
-                                                                                Call installCollectionFromRemoteRepo(ChildCollectionGUID, "", return_IISResetRequired, return_RegisterList, return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild)
+                                                                                Call installCollectionFromRemoteRepo(ChildCollectionGUID, return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild)
                                                                             Else
                                                                                 If ChildCollectionGUID = "" Then
                                                                                     status = "The importcollection node [" & ChildCollectionName & "] can not be upgraded because it does not include a valid guid."
@@ -1524,7 +1562,7 @@ ErrorTrap:
                                                                                         ' It is installed in the local collections, update just this site
                                                                                         '
                                                                                         'Call AppendClassLogFile(cmc.appEnvironment.name, "UpgradeAppFromLocalCollection", "processing importcollection node [" & ChildCollectionName & "] of collection [" & Collectionname & "], GUID [" & CollectionGuid & "]. The collection is installed locally, so only this site will be updated.")
-                                                                                        UpgradeOK = UpgradeOK And installCollectionFromLocalRepo(builder, return_IISResetRequired, ChildCollectionGUID, cpCore.siteProperties.dataBuildVersion, return_ErrorMessage, return_RegisterList, ImportFromCollectionsGuidList & "," & CollectionGuid, IsNewBuild)
+                                                                                        UpgradeOK = UpgradeOK And installCollectionFromLocalRepo(ChildCollectionGUID, cpCore.siteProperties.dataBuildVersion, return_ErrorMessage, ImportFromCollectionsGuidList & "," & CollectionGuid, IsNewBuild)
                                                                                         'UpgradeOK = UpgradeOK And UpgradeAppFromLocalCollection(cmc, Upgrade, Parent_NavID, Return_IISResetRequired, ChildCollectionGUID, cpCore.app.dataBuildVersion, Return_ErrorMessage, Return_RegisterList, ImportFromCollectionsGuidList & "," & CollectionGuid)
                                                                                     Else
                                                                                         '
@@ -1744,10 +1782,10 @@ ErrorTrap:
                                                                         ' Use the upgrade code to import this part
                                                                         '
                                                                         CollectionWrapper = "<" & CollectionFileRootNode & ">" & CollectionWrapper & "</" & CollectionFileRootNode & ">"
-                                                                        saveLogFolder = builder.classLogFolder
-                                                                        builder.classLogFolder = "AddonInstall"
-                                                                        Call installCollection_BuildDbFromXmlData(CollectionWrapper, return_IISResetRequired, IsNewBuild, isBaseCollection)
-                                                                        builder.classLogFolder = saveLogFolder
+                                                                        'saveLogFolder = builder.classLogFolder
+                                                                        'builder.classLogFolder = "AddonInstall"
+                                                                        Call installCollection_BuildDbFromXmlData(CollectionWrapper, IsNewBuild, isBaseCollection)
+                                                                        'builder.classLogFolder = saveLogFolder
                                                                         '
                                                                         ' Process nodes to save Collection data
                                                                         '
@@ -1887,20 +1925,7 @@ ErrorTrap:
                                                                                                         DataRecordList = DataRecordList & vbCrLf & ContentName & "," & ContentRecordGuid
                                                                                                     End If
                                                                                                 End If
-                                                                                                'On Error Resume Next
                                                                                                 Call cpCore.db.cs_Close(CS)
-                                                                                                If Err.Number <> 0 Then
-                                                                                                    '
-                                                                                                    ' add this error to the front, and abort -- let them try to fix it
-                                                                                                    '
-                                                                                                    ErrDescription = Err.Description
-                                                                                                    Call HandleClassTrapError(cpCore.appConfig.name, Err.Number, Err.Source, Err.Description, "UpgradeAppFromLocalCollection", False, True)
-                                                                                                    Err.Clear()
-                                                                                                    return_ErrorMessage = "<P>There was a problem saving an imported record in record [" & ContentName & "] named [" & ContentRecordName & "]. There error was [" & ErrDescription & "]. Please fix the problem and try again.</P>" & return_ErrorMessage
-                                                                                                    installCollectionFromLocalRepo = False
-                                                                                                    Exit Function
-                                                                                                End If
-                                                                                                ''On Error GoTo ErrorTrap
                                                                                             End If
                                                                                         End If
                                                                                     End If
@@ -2021,20 +2046,7 @@ ErrorTrap:
                                                                                                         End If
                                                                                                     Next
                                                                                                 End If
-                                                                                                'On Error Resume Next
                                                                                                 Call cpCore.db.cs_Close(CS)
-                                                                                                If Err.Number <> 0 Then
-                                                                                                    '
-                                                                                                    ' add this error to the front, and abort -- let them try to fix it
-                                                                                                    '
-                                                                                                    ErrDescription = Err.Description
-                                                                                                    Call HandleClassTrapError(cpCore.appConfig.name, Err.Number, Err.Source, Err.Description, "UpgradeAppFromLocalCollection", False, True)
-                                                                                                    Err.Clear()
-                                                                                                    return_ErrorMessage = "<P>There was a problem saving an imported record in record [" & ContentName & "] named [" & ContentRecordName & "]. There error was [" & ErrDescription & "]. Please fix the problem and try again.</P>" & return_ErrorMessage
-                                                                                                    installCollectionFromLocalRepo = False
-                                                                                                    Exit Function
-                                                                                                End If
-                                                                                                ''On Error GoTo ErrorTrap
                                                                                             End If
                                                                                         End If
                                                                                     End If
@@ -2295,18 +2307,14 @@ ErrorTrap:
                 '    Return_IISResetRequired = False
                 'End If
                 '
-                installCollectionFromLocalRepo = UpgradeOK
+                result = UpgradeOK
             Catch ex As Exception
                 '
                 ' Log error and exit with failure. This way any other upgrading will still continue
                 '
-                Call HandleClassTrapError(cpCore.appConfig.name, Err.Number, Err.Source, Err.Description, "UpgradeAppFromLocalCollection", True, True)
-                Err.Clear()
-                If return_ErrorMessage = "" Then
-                    return_ErrorMessage = "There was an unexpected error while installing this collection."
-                End If
-                installCollectionFromLocalRepo = False
+                cpCore.handleExceptionAndRethrow(ex)
             End Try
+            Return result
         End Function
         '
         '====================================================================================================
@@ -2377,104 +2385,108 @@ ErrorTrap:
         '
         '
         Private Sub UpdateConfig(ByVal Collectionname As String, ByVal CollectionGuid As String, ByVal CollectionUpdatedDate As Date, ByVal CollectionVersionFolderName As String)
-            'On Error GoTo ErrorTrap
-            '
-            Dim loadOK As Boolean = True
-            Dim LocalFilename As String
-            Dim LocalGuid As String
-            Dim Doc As New XmlDocument
-            Dim CollectionNode As XmlNode
-            Dim LocalListNode As XmlNode
-            Dim NewCollectionNode As XmlNode
-            Dim NewAttrNode As XmlNode
-            Dim CollectionFound As Boolean
-            Dim Ptr As Integer
-
-            '
-            loadOK = True
             Try
-                Call Doc.LoadXml(getCollectionListFile())
-            Catch ex As Exception
-                Call appendInstallLog("Server", "", "UpdateConfig, Error loading Collections.xml file.")
-            End Try
-            If loadOK Then
-                If vbLCase(Doc.DocumentElement.Name) <> vbLCase(CollectionListRootNode) Then
-                    Call appendInstallLog("Server", "", "UpdateConfig, The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.")
-                Else
-                    With Doc.DocumentElement
-                        If vbLCase(.Name) = "collectionlist" Then
-                            CollectionFound = False
-                            For Each LocalListNode In .ChildNodes
-                                Select Case vbLCase(LocalListNode.Name)
-                                    Case "collection"
-                                        LocalGuid = ""
-                                        For Each CollectionNode In LocalListNode.ChildNodes
-                                            Select Case vbLCase(CollectionNode.Name)
-                                                Case "guid"
-                                                    '
-                                                    LocalGuid = vbLCase(CollectionNode.InnerText)
-                                                    Exit For
-                                            End Select
-                                        Next
-                                        If vbLCase(LocalGuid) = vbLCase(CollectionGuid) Then
-                                            CollectionFound = True
+                '
+                Dim loadOK As Boolean = True
+                Dim LocalFilename As String
+                Dim LocalGuid As String
+                Dim Doc As New XmlDocument
+                Dim CollectionNode As XmlNode
+                Dim LocalListNode As XmlNode
+                Dim NewCollectionNode As XmlNode
+                Dim NewAttrNode As XmlNode
+                Dim CollectionFound As Boolean
+                Dim Ptr As Integer
+                '
+                loadOK = True
+                Try
+                    Call Doc.LoadXml(getCollectionListFile())
+                Catch ex As Exception
+                    Call appendInstallLog("Server", "", "UpdateConfig, Error loading Collections.xml file.")
+                End Try
+                If loadOK Then
+                    If vbLCase(Doc.DocumentElement.Name) <> vbLCase(CollectionListRootNode) Then
+                        Call appendInstallLog("Server", "", "UpdateConfig, The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.")
+                    Else
+                        With Doc.DocumentElement
+                            If vbLCase(.Name) = "collectionlist" Then
+                                CollectionFound = False
+                                For Each LocalListNode In .ChildNodes
+                                    Select Case vbLCase(LocalListNode.Name)
+                                        Case "collection"
+                                            LocalGuid = ""
                                             For Each CollectionNode In LocalListNode.ChildNodes
                                                 Select Case vbLCase(CollectionNode.Name)
-                                                    Case "name"
-                                                        CollectionNode.InnerText = Collectionname
-                                                    Case "lastchangedate"
-                                                        CollectionNode.InnerText = CollectionUpdatedDate.ToString()
-                                                    Case "path"
-                                                        CollectionNode.InnerText = CollectionVersionFolderName
+                                                    Case "guid"
+                                                        '
+                                                        LocalGuid = vbLCase(CollectionNode.InnerText)
+                                                        Exit For
                                                 End Select
                                             Next
-                                            Exit For
-                                        End If
-                                End Select
-                            Next
-                            If Not CollectionFound Then
-                                NewCollectionNode = Doc.CreateNode(XmlNodeType.Element, "collection", "")
+                                            If vbLCase(LocalGuid) = vbLCase(CollectionGuid) Then
+                                                CollectionFound = True
+                                                For Each CollectionNode In LocalListNode.ChildNodes
+                                                    Select Case vbLCase(CollectionNode.Name)
+                                                        Case "name"
+                                                            CollectionNode.InnerText = Collectionname
+                                                        Case "lastchangedate"
+                                                            CollectionNode.InnerText = CollectionUpdatedDate.ToString()
+                                                        Case "path"
+                                                            CollectionNode.InnerText = CollectionVersionFolderName
+                                                    End Select
+                                                Next
+                                                Exit For
+                                            End If
+                                    End Select
+                                Next
+                                If Not CollectionFound Then
+                                    NewCollectionNode = Doc.CreateNode(XmlNodeType.Element, "collection", "")
+                                    '
+                                    NewAttrNode = Doc.CreateNode(XmlNodeType.Element, "name", "")
+                                    NewAttrNode.InnerText = Collectionname
+                                    Call NewCollectionNode.AppendChild(NewAttrNode)
+                                    '
+                                    NewAttrNode = Doc.CreateNode(XmlNodeType.Element, "lastchangedate", "")
+                                    NewAttrNode.InnerText = CollectionUpdatedDate.ToString()
+                                    Call NewCollectionNode.AppendChild(NewAttrNode)
+                                    '
+                                    NewAttrNode = Doc.CreateNode(XmlNodeType.Element, "guid", "")
+                                    NewAttrNode.InnerText = CollectionGuid
+                                    Call NewCollectionNode.AppendChild(NewAttrNode)
+                                    '
+                                    NewAttrNode = Doc.CreateNode(XmlNodeType.Element, "path", "")
+                                    NewAttrNode.InnerText = CollectionVersionFolderName
+                                    Call NewCollectionNode.AppendChild(NewAttrNode)
+                                    '
+                                    Call Doc.DocumentElement.AppendChild(NewCollectionNode)
+                                End If
                                 '
-                                NewAttrNode = Doc.CreateNode(XmlNodeType.Element, "name", "")
-                                NewAttrNode.InnerText = Collectionname
-                                Call NewCollectionNode.AppendChild(NewAttrNode)
+                                ' Save the result
                                 '
-                                NewAttrNode = Doc.CreateNode(XmlNodeType.Element, "lastchangedate", "")
-                                NewAttrNode.InnerText = CollectionUpdatedDate.ToString()
-                                Call NewCollectionNode.AppendChild(NewAttrNode)
-                                '
-                                NewAttrNode = Doc.CreateNode(XmlNodeType.Element, "guid", "")
-                                NewAttrNode.InnerText = CollectionGuid
-                                Call NewCollectionNode.AppendChild(NewAttrNode)
-                                '
-                                NewAttrNode = Doc.CreateNode(XmlNodeType.Element, "path", "")
-                                NewAttrNode.InnerText = CollectionVersionFolderName
-                                Call NewCollectionNode.AppendChild(NewAttrNode)
-                                '
-                                Call Doc.DocumentElement.AppendChild(NewCollectionNode)
+                                LocalFilename = cpCore.addon.getPrivateFilesAddonPath() & "Collections.xml"
+                                'LocalFilename = GetProgramPath & "\Addons\Collections.xml"
+                                Call Doc.Save(cpCore.privateFiles.rootLocalPath & LocalFilename)
                             End If
-                            '
-                            ' Save the result
-                            '
-                            LocalFilename = cpCore.addon.getPrivateFilesAddonPath() & "Collections.xml"
-                            'LocalFilename = GetProgramPath & "\Addons\Collections.xml"
-                            Call Doc.Save(cpCore.privateFiles.rootLocalPath & LocalFilename)
-                        End If
-                    End With
+                        End With
+                    End If
                 End If
-            End If
-            '
-            Exit Sub
-ErrorTrap:
-            Call HandleClassTrapError("unknown", Err.Number, Err.Source, Err.Description, "UpdateConfig", True, False)
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
         End Sub
         '
         '
         '
         Private Function GetCollectionPath(ByVal CollectionGuid As String) As String
-            Dim LastChangeDate As Date
-            Dim Collectionname As String
-            Call GetCollectionConfig(CollectionGuid, GetCollectionPath, LastChangeDate, Collectionname)
+            Dim result As String = String.Empty
+            Try
+                Dim LastChangeDate As Date
+                Dim Collectionname As String
+                Call GetCollectionConfig(CollectionGuid, GetCollectionPath, LastChangeDate, Collectionname)
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+            Return result
         End Function
         '
         '====================================================================================================
@@ -2567,26 +2579,59 @@ ErrorTrap:
         ' Installs Addons in a source folder
         '======================================================================================================
         '
-        Public Function InstallCollectionFromPrivateFolder(builder As coreBuilderClass, ignore_buildVersion As String, ByVal privateFolder As String, ByRef return_IISResetRequired As Boolean, ByVal TargetInstallAppName As String, ByRef return_ErrorMessage As String, ByRef return_CollectionGUID As String, IsNewBuild As Boolean) As Boolean
+        Public Function InstallCollectionsFromPrivateFolder(ByVal privateFolder As String, ByRef return_ErrorMessage As String, ByRef return_CollectionGUIDList As List(Of String), IsNewBuild As Boolean) As Boolean
             Dim returnSuccess As Boolean = False
             Try
                 Dim CollectionLastChangeDate As Date
-                Dim ignoreRefactorOut As String
                 '
                 CollectionLastChangeDate = DateTime.Now()
-                returnSuccess = BuildLocalCollectionFolder(privateFolder, return_IISResetRequired, ignoreRefactorOut, CollectionLastChangeDate, return_CollectionGUID, return_ErrorMessage, False)
+                returnSuccess = BuildLocalCollectionReposFromFolder(privateFolder, CollectionLastChangeDate, return_CollectionGUIDList, return_ErrorMessage, False)
                 If Not returnSuccess Then
                     '
                     ' BuildLocal failed, log it and do not upgrade
                     '
-                    Call appendInstallLog(TargetInstallAppName, "AddonInstallClass.InstallCollectionFilesFromFolder3", "BuildLocalCollectionFolder returned false with Error Message [" & return_ErrorMessage & "], exiting without calling UpgradeAllAppsFromLocalCollection")
+                    Call appendInstallLog("", "AddonInstallClass.InstallCollectionFilesFromFolder3", "BuildLocalCollectionFolder returned false with Error Message [" & return_ErrorMessage & "], exiting without calling UpgradeAllAppsFromLocalCollection")
                 Else
-                    returnSuccess = installCollectionFromLocalRepo(builder, return_IISResetRequired, return_CollectionGUID, cpCore.siteProperties.dataBuildVersion, return_ErrorMessage, ignoreRefactorOut, "", IsNewBuild)
+                    For Each collectionGuid As String In return_CollectionGUIDList
+                        If Not installCollectionFromLocalRepo(collectionGuid, cpCore.siteProperties.dataBuildVersion, return_ErrorMessage, "", IsNewBuild) Then
+                            Call appendInstallLog("", "InstallCollectionFilesFromPrivateFolder", "UpgradeAllAppsFromLocalCollection returned false with Error Message [" & return_ErrorMessage & "].")
+                            Exit For
+                        End If
+                    Next
+                End If
+            Catch ex As Exception
+                cpCore.handleExceptionAndContinue(ex)
+                returnSuccess = False
+                If (String.IsNullOrEmpty(return_ErrorMessage)) Then
+                    return_ErrorMessage = "There was an unexpected error installing the collection, details [" & ex.Message & "]"
+                End If
+            End Try
+            Return returnSuccess
+        End Function
+        '
+        '======================================================================================================
+        ' Installs Addons in a source file
+        '======================================================================================================
+        '
+        Public Function InstallCollectionsFromPrivateFile(ByVal pathFilename As String, ByRef return_ErrorMessage As String, ByRef return_CollectionGUID As String, IsNewBuild As Boolean) As Boolean
+            Dim returnSuccess As Boolean = False
+            Try
+                Dim CollectionLastChangeDate As Date
+                '
+                CollectionLastChangeDate = DateTime.Now()
+                returnSuccess = BuildLocalCollectionRepoFromFile(pathFilename, CollectionLastChangeDate, return_CollectionGUID, return_ErrorMessage, False)
+                If Not returnSuccess Then
+                    '
+                    ' BuildLocal failed, log it and do not upgrade
+                    '
+                    Call appendInstallLog("", "AddonInstallClass.InstallCollectionFilesFromFolder3", "BuildLocalCollectionFolder returned false with Error Message [" & return_ErrorMessage & "], exiting without calling UpgradeAllAppsFromLocalCollection")
+                Else
+                    returnSuccess = installCollectionFromLocalRepo(return_CollectionGUID, cpCore.siteProperties.dataBuildVersion, return_ErrorMessage, "", IsNewBuild)
                     If Not returnSuccess Then
                         '
                         ' Upgrade all apps failed
                         '
-                        Call appendInstallLog(TargetInstallAppName, "InstallCollectionFilesFromPrivateFolder", "UpgradeAllAppsFromLocalCollection returned false with Error Message [" & return_ErrorMessage & "].")
+                        Call appendInstallLog("", "InstallCollectionFilesFromPrivateFolder", "UpgradeAllAppsFromLocalCollection returned false with Error Message [" & return_ErrorMessage & "].")
                     Else
                         returnSuccess = True
                     End If
@@ -2604,17 +2649,19 @@ ErrorTrap:
         '
         '
         Private Function GetNavIDByGuid(ByVal ccGuid As String) As Integer
-            Dim CS As Integer
-            '
-            If True Then
+            Dim navId As Integer = 0
+            Try
+                Dim CS As Integer
+                '
                 CS = cpCore.db.cs_open("Navigator Entries", "ccguid=" & cpCore.db.encodeSQLText(ccGuid), "ID", , , , , "ID")
-            ElseIf cpCore.db.isSQLTableField("default", "ccMenuEntries", "navguid") Then
-                CS = cpCore.db.cs_open("Navigator Entries", "navguid=" & cpCore.db.encodeSQLText(ccGuid), "ID", , , , , "ID")
-            End If
-            If cpCore.db.cs_ok(CS) Then
-                GetNavIDByGuid = cpCore.db.cs_getInteger(CS, "id")
-            End If
-            Call cpCore.db.cs_Close(CS)
+                If cpCore.db.cs_ok(CS) Then
+                    navId = cpCore.db.cs_getInteger(CS, "id")
+                End If
+                Call cpCore.db.cs_Close(CS)
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+            Return navId
         End Function
         '        '
         '===============================================================================================
@@ -2623,129 +2670,128 @@ ErrorTrap:
         '===============================================================================================
         '
         Private Sub CopyInstallToDst(ByVal SrcPath As String, ByVal DstPath As String, ByVal BlockFileList As String, ByVal BlockFolderList As String)
-            '
-            Dim QS As String
-            'Dim Folders() As String
-            'Dim FolderDetails() As String
-            'Dim FolderName As String
-            Dim Ptr As Integer
-            Dim FileInfoArray As IO.FileInfo()
-            'Dim Files() As String
-            'Dim FileDetails() As String
-            'Dim Filename As String
-            'Dim FileExtension As String
-            'Dim fs As New fileSystemClass
-            Dim Pos As Integer
-            Dim FolderInfoArray As IO.DirectoryInfo()
-            Dim SrcFolder As String
-            Dim DstFolder As String
-            ' Dim runAtServer As New runAtServerClass(cpCore)
-            '
-            SrcFolder = SrcPath
-            If Right(SrcFolder, 1) = "\" Then
-                SrcFolder = Left(SrcFolder, Len(SrcFolder) - 1)
-            End If
-            '
-            DstFolder = DstPath
-            If Right(DstFolder, 1) = "\" Then
-                DstFolder = Left(DstFolder, Len(DstFolder) - 1)
-            End If
-            '
-            If cpCore.privateFiles.pathExists(SrcFolder) Then
-                FileInfoArray = cpCore.privateFiles.getFileList(SrcFolder)
-                For Each file As IO.FileInfo In FileInfoArray
-                    If (file.Extension = "dll") Or (file.Extension = "exe") Or (file.Extension = "zip") Then
-                        '
-                        ' can not copy dll or exe
-                        '
-                        'Filename = Filename
-                    ElseIf (InStr(1, "," & BlockFileList & ",", "," & file.Name & ",", vbTextCompare) <> 0) Then
-                        '
-                        ' can not copy the current collection file
-                        '
-                        'file.Name = file.Name
-                    Else
-                        '
-                        ' copy this file to destination
-                        '
-                        Call cpCore.privateFiles.copyFile(SrcPath & file.Name, DstPath & file.Name, cpCore.appRootFiles)
-                    End If
-                Next
+            Try
+                Dim QS As String
+                'Dim Folders() As String
+                'Dim FolderDetails() As String
+                'Dim FolderName As String
+                Dim Ptr As Integer
+                Dim FileInfoArray As IO.FileInfo()
+                'Dim Files() As String
+                'Dim FileDetails() As String
+                'Dim Filename As String
+                'Dim FileExtension As String
+                'Dim fs As New fileSystemClass
+                Dim Pos As Integer
+                Dim FolderInfoArray As IO.DirectoryInfo()
+                Dim SrcFolder As String
+                Dim DstFolder As String
+                ' Dim runAtServer As New runAtServerClass(cpCore)
                 '
-                ' copy folders to dst
+                SrcFolder = SrcPath
+                If Right(SrcFolder, 1) = "\" Then
+                    SrcFolder = Left(SrcFolder, Len(SrcFolder) - 1)
+                End If
                 '
-                FolderInfoArray = cpCore.privateFiles.getFolderList(SrcFolder)
-                For Each folder As IO.DirectoryInfo In FolderInfoArray
-                    If (InStr(1, "," & BlockFolderList & ",", "," & folder.Name & ",", vbTextCompare) = 0) Then
-                        Call CopyInstallToDst(SrcPath & folder.Name & "\", DstPath & folder.Name & "\", BlockFileList, "")
-                    End If
-                Next
-            End If
+                DstFolder = DstPath
+                If Right(DstFolder, 1) = "\" Then
+                    DstFolder = Left(DstFolder, Len(DstFolder) - 1)
+                End If
+                '
+                If cpCore.privateFiles.pathExists(SrcFolder) Then
+                    FileInfoArray = cpCore.privateFiles.getFileList(SrcFolder)
+                    For Each file As IO.FileInfo In FileInfoArray
+                        If (file.Extension = "dll") Or (file.Extension = "exe") Or (file.Extension = "zip") Then
+                            '
+                            ' can not copy dll or exe
+                            '
+                            'Filename = Filename
+                        ElseIf (InStr(1, "," & BlockFileList & ",", "," & file.Name & ",", vbTextCompare) <> 0) Then
+                            '
+                            ' can not copy the current collection file
+                            '
+                            'file.Name = file.Name
+                        Else
+                            '
+                            ' copy this file to destination
+                            '
+                            Call cpCore.privateFiles.copyFile(SrcPath & file.Name, DstPath & file.Name, cpCore.appRootFiles)
+                        End If
+                    Next
+                    '
+                    ' copy folders to dst
+                    '
+                    FolderInfoArray = cpCore.privateFiles.getFolderList(SrcFolder)
+                    For Each folder As IO.DirectoryInfo In FolderInfoArray
+                        If (InStr(1, "," & BlockFolderList & ",", "," & folder.Name & ",", vbTextCompare) = 0) Then
+                            Call CopyInstallToDst(SrcPath & folder.Name & "\", DstPath & folder.Name & "\", BlockFileList, "")
+                        End If
+                    Next
+                End If
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
         End Sub
         '
         '
         '
         Private Function GetCollectionFileList(ByVal SrcPath As String, ByVal SubFolder As String, ByVal ExcludeFileList As String) As String
-            '
-            Dim QS As String
-            Dim Folders() As String
-            Dim FolderDetails() As String
-            Dim FolderName As String
-            Dim Ptr As Integer
-            Dim FileInfoArray As IO.FileInfo()
-            'Dim Files() As String
-            'Dim FileDetails() As String
-            'Dim Filename As String
-            'Dim FileExtension As String
-            'Dim fs As New fileSystemClass
-            Dim Pos As Integer
-            Dim FolderInfoArray As IO.DirectoryInfo()
-            Dim SrcFolder As String
-            Dim DstFolder As String
-            'Dim runAtServer As New runAtServerClass(cpCore)
-            '
-            SrcFolder = SrcPath & SubFolder
-            If Right(SrcFolder, 1) = "\" Then
-                SrcFolder = Left(SrcFolder, Len(SrcFolder) - 1)
-            End If
-            '
-            If cpCore.privateFiles.pathExists(SrcFolder) Then
-                FileInfoArray = cpCore.privateFiles.getFileList(SrcFolder)
-                For Each file As IO.FileInfo In FileInfoArray
-                    If (InStr(1, "," & ExcludeFileList & ",", "," & file.Name & ",", vbTextCompare) <> 0) Then
-                        '
-                        ' can not copy the current collection file
-                        '
-                        'Filename = Filename
-                    Else
-                        '
-                        ' copy this file to destination
-                        '
-                        GetCollectionFileList = GetCollectionFileList & vbCrLf & SubFolder & file.Name
-                        'runAtServer.IPAddress = "127.0.0.1"
-                        'runAtServer.Port = "4531"
-                        'QS = "SrcFile=" & encodeRequestVariable(SrcPath & Filename) & "&DstFile=" & encodeRequestVariable(DstPath & Filename)
-                        'Call runAtServer.ExecuteCmd("CopyFile", QS)
-                        'Call cpCore.app.privateFiles.CopyFile(SrcPath & Filename, DstPath & Filename)
-                    End If
-                Next
+            Dim result As String = ""
+            Try
+                Dim FileInfoArray As IO.FileInfo()
+                Dim FolderInfoArray As IO.DirectoryInfo()
+                Dim SrcFolder As String
                 '
-                ' copy folders to dst
+                SrcFolder = SrcPath & SubFolder
+                If Right(SrcFolder, 1) = "\" Then
+                    SrcFolder = Left(SrcFolder, Len(SrcFolder) - 1)
+                End If
                 '
-                FolderInfoArray = cpCore.privateFiles.getFolderList(SrcFolder)
-                For Each folder As IO.DirectoryInfo In FolderInfoArray
-                    GetCollectionFileList = GetCollectionFileList & GetCollectionFileList(SrcPath, SubFolder & folder.Name & "\", ExcludeFileList)
-                Next
-            End If
+                If cpCore.privateFiles.pathExists(SrcFolder) Then
+                    FileInfoArray = cpCore.privateFiles.getFileList(SrcFolder)
+                    For Each file As IO.FileInfo In FileInfoArray
+                        If (InStr(1, "," & ExcludeFileList & ",", "," & file.Name & ",", vbTextCompare) <> 0) Then
+                            '
+                            ' can not copy the current collection file
+                            '
+                            'Filename = Filename
+                        Else
+                            '
+                            ' copy this file to destination
+                            '
+                            result = result & vbCrLf & SubFolder & file.Name
+                            'runAtServer.IPAddress = "127.0.0.1"
+                            'runAtServer.Port = "4531"
+                            'QS = "SrcFile=" & encodeRequestVariable(SrcPath & Filename) & "&DstFile=" & encodeRequestVariable(DstPath & Filename)
+                            'Call runAtServer.ExecuteCmd("CopyFile", QS)
+                            'Call cpCore.app.privateFiles.CopyFile(SrcPath & Filename, DstPath & Filename)
+                        End If
+                    Next
+                    '
+                    ' copy folders to dst
+                    '
+                    FolderInfoArray = cpCore.privateFiles.getFolderList(SrcFolder)
+                    For Each folder As IO.DirectoryInfo In FolderInfoArray
+                        result = result & GetCollectionFileList(SrcPath, SubFolder & folder.Name & "\", ExcludeFileList)
+                    Next
+                End If
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+            Return result
         End Function
         '
         '
         '
         Private Function GetManageAddonNavID() As Integer
-            'If ManagerAddonNavID_Local = 0 Then
-            ManagerAddonNavID_Local = GetNavigatorID("Manage Add-ons", 0, 0, 0, NavIconTypeAddon, "Manage Add-ons", False, 0, "", 0, 0, 0, False)
-            'End If
-            GetManageAddonNavID = ManagerAddonNavID_Local
+            Dim result As Integer = 0
+            Try
+                ManagerAddonNavID_Local = GetNavigatorID("Manage Add-ons", 0, 0, 0, NavIconTypeAddon, "Manage Add-ons", False, 0, "", 0, 0, 0, False)
+                result = ManagerAddonNavID_Local
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+            Return result
         End Function
         ''
         ''
@@ -3392,159 +3438,122 @@ ErrorTrap:
         '============================================================================
         '
         Private Function InstallCollectionFromLocalRepo_addonNode_Phase2(ByVal AddonNode As XmlNode, ByVal AddonGuidFieldName As String, ByVal ignore_BuildVersion As String, ByVal CollectionID As Integer, ByRef ReturnUpgradeOK As Boolean, ByRef ReturnErrorMessage As String) As String
-
-            On Error GoTo ErrorTrap
-            '
-            Dim SrcMainNode As XmlNode
-            Dim SrcAddonNode As XmlNode
-            Dim SrcAddonGuid As String
-            Dim SrcAddonName As String
-            Dim SrcAddonID As Integer
-            Dim CollectionFile As String
-            Dim TestGuid As String
-            Dim TestName As String
-            Dim TestObject As Object
-            Dim TestObject2 As Object
-            Dim fieldTypeID As Integer
-            Dim fieldType As String
-            Dim test As String
-            Dim TriggerContentID As Integer
-            Dim ContentNameorGuid As String
-            Dim navTypeId As Integer
-            Dim scriptinglanguageid As Integer
-            Dim ScriptingCode As String
-            Dim AddonNavID As Integer
-            Dim NavIconTypeID As Integer
-            Dim AddRule As Boolean
-            Dim IncludeAddonName As String
-            Dim IncludeAddonGuid As String
-            Dim IncludeAddonID As Integer
-            Dim UserError As String
-            Dim FieldName As String
-            Dim NodeName As String
-            Dim NewValue As String
-            Dim NavIconTypeString As String
-            Dim menuNameSpace As String
-            Dim FieldValue As String
-            Dim CS2 As Integer
-            Dim ScriptingNameorGuid As String
-            Dim ScriptingModuleID As Integer
-            Dim ScriptingEntryPoint As String
-            Dim ScriptingLanguage As String
-            Dim ScriptingNode As XmlNode
-            Dim PageInterface As XmlNode
-            Dim TriggerNode As XmlNode
-            Dim NavDeveloperOnly As Boolean
-            Dim StyleSheet As String
-            Dim ArgumentList As String
-            Dim CSRule As Integer
-            Dim CS As Integer
-            Dim Criteria As String
-            Dim IsFound As Boolean
-            Dim AOName As String
-            Dim AOGuid As String
-            Dim AddOnType As String
-            Dim addonId As Integer
-            Dim Basename As String
-            Dim Doc As XmlDocument
-            Dim navAdminOnly As Boolean
-            '
-            Basename = vbLCase(AddonNode.Name)
-            If (Basename = "page") Or (Basename = "process") Or (Basename = "addon") Or (Basename = "add-on") Then
-                AOName = GetXMLAttribute(IsFound, AddonNode, "name", "No Name")
-                If AOName = "" Then
-                    AOName = "No Name"
-                End If
-                AOGuid = GetXMLAttribute(IsFound, AddonNode, "guid", AOName)
-                If AOGuid = "" Then
-                    AOGuid = AOName
-                End If
-                AddOnType = GetXMLAttribute(IsFound, AddonNode, "type", "")
-                Criteria = "(" & AddonGuidFieldName & "=" & cpCore.db.encodeSQLText(AOGuid) & ")"
-                CS = cpCore.db.cs_open("Add-ons", Criteria, , False)
-                If cpCore.db.cs_ok(CS) Then
-                    '
-                    ' Update the Addon
-                    '
-                    Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, GUID match with existing Add-on, Updating Add-on [" & AOName & "], Guid [" & AOGuid & "]")
-                Else
-                    '
-                    ' not found by GUID - search name against name to update legacy Add-ons
-                    '
-                    Call cpCore.db.cs_Close(CS)
-                    Criteria = "(name=" & cpCore.db.encodeSQLText(AOName) & ")and(" & AddonGuidFieldName & " is null)"
+            Dim result As String = ""
+            Try
+                Dim AddRule As Boolean
+                Dim IncludeAddonName As String
+                Dim IncludeAddonGuid As String
+                Dim IncludeAddonID As Integer
+                Dim UserError As String
+                Dim CS2 As Integer
+                Dim PageInterface As XmlNode
+                Dim NavDeveloperOnly As Boolean
+                Dim StyleSheet As String
+                Dim ArgumentList As String
+                Dim CS As Integer
+                Dim Criteria As String
+                Dim IsFound As Boolean
+                Dim AOName As String
+                Dim AOGuid As String
+                Dim AddOnType As String
+                Dim addonId As Integer
+                Dim Basename As String
+                '
+                Basename = vbLCase(AddonNode.Name)
+                If (Basename = "page") Or (Basename = "process") Or (Basename = "addon") Or (Basename = "add-on") Then
+                    AOName = GetXMLAttribute(IsFound, AddonNode, "name", "No Name")
+                    If AOName = "" Then
+                        AOName = "No Name"
+                    End If
+                    AOGuid = GetXMLAttribute(IsFound, AddonNode, "guid", AOName)
+                    If AOGuid = "" Then
+                        AOGuid = AOName
+                    End If
+                    AddOnType = GetXMLAttribute(IsFound, AddonNode, "type", "")
+                    Criteria = "(" & AddonGuidFieldName & "=" & cpCore.db.encodeSQLText(AOGuid) & ")"
                     CS = cpCore.db.cs_open("Add-ons", Criteria, , False)
-                End If
-                If Not cpCore.db.cs_ok(CS) Then
-                    '
-                    ' Could not find add-on
-                    '
-                    Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Add-on could not be created, skipping Add-on [" & AOName & "], Guid [" & AOGuid & "]")
-                Else
-                    addonId = cpCore.db.cs_getInteger(CS, "ID")
-                    ArgumentList = ""
-                    StyleSheet = ""
-                    NavDeveloperOnly = True
-                    If AddonNode.ChildNodes.Count > 0 Then
-                        For Each PageInterface In AddonNode.ChildNodes
-                            Select Case vbLCase(PageInterface.Name)
-                                Case "includeaddon", "includeadd-on", "include addon", "include add-on"
-                                    '
-                                    ' include add-ons - NOTE - import collections must be run before interfaces
-                                    ' when importing a collectin that will be used for an include
-                                    '
-                                    If True Then
-                                        IncludeAddonName = GetXMLAttribute(IsFound, PageInterface, "name", "")
-                                        IncludeAddonGuid = GetXMLAttribute(IsFound, PageInterface, "guid", IncludeAddonName)
-                                        IncludeAddonID = 0
-                                        Criteria = ""
-                                        If IncludeAddonGuid <> "" Then
-                                            Criteria = AddonGuidFieldName & "=" & cpCore.db.encodeSQLText(IncludeAddonGuid)
-                                            If IncludeAddonName = "" Then
-                                                IncludeAddonName = "Add-on " & IncludeAddonGuid
+                    If cpCore.db.cs_ok(CS) Then
+                        '
+                        ' Update the Addon
+                        '
+                        Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, GUID match with existing Add-on, Updating Add-on [" & AOName & "], Guid [" & AOGuid & "]")
+                    Else
+                        '
+                        ' not found by GUID - search name against name to update legacy Add-ons
+                        '
+                        Call cpCore.db.cs_Close(CS)
+                        Criteria = "(name=" & cpCore.db.encodeSQLText(AOName) & ")and(" & AddonGuidFieldName & " is null)"
+                        CS = cpCore.db.cs_open("Add-ons", Criteria, , False)
+                    End If
+                    If Not cpCore.db.cs_ok(CS) Then
+                        '
+                        ' Could not find add-on
+                        '
+                        Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Add-on could not be created, skipping Add-on [" & AOName & "], Guid [" & AOGuid & "]")
+                    Else
+                        addonId = cpCore.db.cs_getInteger(CS, "ID")
+                        ArgumentList = ""
+                        StyleSheet = ""
+                        NavDeveloperOnly = True
+                        If AddonNode.ChildNodes.Count > 0 Then
+                            For Each PageInterface In AddonNode.ChildNodes
+                                Select Case vbLCase(PageInterface.Name)
+                                    Case "includeaddon", "includeadd-on", "include addon", "include add-on"
+                                        '
+                                        ' include add-ons - NOTE - import collections must be run before interfaces
+                                        ' when importing a collectin that will be used for an include
+                                        '
+                                        If True Then
+                                            IncludeAddonName = GetXMLAttribute(IsFound, PageInterface, "name", "")
+                                            IncludeAddonGuid = GetXMLAttribute(IsFound, PageInterface, "guid", IncludeAddonName)
+                                            IncludeAddonID = 0
+                                            Criteria = ""
+                                            If IncludeAddonGuid <> "" Then
+                                                Criteria = AddonGuidFieldName & "=" & cpCore.db.encodeSQLText(IncludeAddonGuid)
+                                                If IncludeAddonName = "" Then
+                                                    IncludeAddonName = "Add-on " & IncludeAddonGuid
+                                                End If
+                                            ElseIf IncludeAddonName <> "" Then
+                                                Criteria = "(name=" & cpCore.db.encodeSQLText(IncludeAddonName) & ")"
                                             End If
-                                        ElseIf IncludeAddonName <> "" Then
-                                            Criteria = "(name=" & cpCore.db.encodeSQLText(IncludeAddonName) & ")"
-                                        End If
-                                        If Criteria <> "" Then
-                                            CS2 = cpCore.db.cs_open("Add-ons", Criteria)
-                                            If cpCore.db.cs_ok(CS2) Then
-                                                IncludeAddonID = cpCore.db.cs_getInteger(CS2, "ID")
-                                            End If
-                                            Call cpCore.db.cs_Close(CS2)
-                                            AddRule = False
-                                            If IncludeAddonID = 0 Then
-                                                UserError = "The include add-on [" & IncludeAddonName & "] could not be added because it was not found. If it is in the collection being installed, it must appear before any add-ons that include it."
-                                                Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAddFromLocalCollection_InstallAddonNode, UserError [" & UserError & "]")
-                                                ReturnUpgradeOK = False
-                                                ReturnErrorMessage = ReturnErrorMessage & "<P>The collection was not installed because the add-on [" & AOName & "] requires an included add-on [" & IncludeAddonName & "] which could not be found. If it is in the collection being installed, it must appear before any add-ons that include it.</P>"
-                                            Else
-                                                CS2 = cpCore.db.cs_openCsSql_rev("default", "select ID from ccAddonIncludeRules where Addonid=" & addonId & " and IncludedAddonID=" & IncludeAddonID)
-                                                AddRule = Not cpCore.db.cs_ok(CS2)
-                                                Call cpCore.db.cs_Close(CS2)
-                                            End If
-                                            If AddRule Then
-                                                CS2 = cpCore.db.cs_insertRecord("Add-on Include Rules", 0)
+                                            If Criteria <> "" Then
+                                                CS2 = cpCore.db.cs_open("Add-ons", Criteria)
                                                 If cpCore.db.cs_ok(CS2) Then
-                                                    Call cpCore.db.cs_set(CS2, "Addonid", addonId)
-                                                    Call cpCore.db.cs_set(CS2, "IncludedAddonID", IncludeAddonID)
+                                                    IncludeAddonID = cpCore.db.cs_getInteger(CS2, "ID")
                                                 End If
                                                 Call cpCore.db.cs_Close(CS2)
+                                                AddRule = False
+                                                If IncludeAddonID = 0 Then
+                                                    UserError = "The include add-on [" & IncludeAddonName & "] could not be added because it was not found. If it is in the collection being installed, it must appear before any add-ons that include it."
+                                                    Call appendInstallLog(cpCore.appConfig.name, "AddonInstallClass", "UpgradeAddFromLocalCollection_InstallAddonNode, UserError [" & UserError & "]")
+                                                    ReturnUpgradeOK = False
+                                                    ReturnErrorMessage = ReturnErrorMessage & "<P>The collection was not installed because the add-on [" & AOName & "] requires an included add-on [" & IncludeAddonName & "] which could not be found. If it is in the collection being installed, it must appear before any add-ons that include it.</P>"
+                                                Else
+                                                    CS2 = cpCore.db.cs_openCsSql_rev("default", "select ID from ccAddonIncludeRules where Addonid=" & addonId & " and IncludedAddonID=" & IncludeAddonID)
+                                                    AddRule = Not cpCore.db.cs_ok(CS2)
+                                                    Call cpCore.db.cs_Close(CS2)
+                                                End If
+                                                If AddRule Then
+                                                    CS2 = cpCore.db.cs_insertRecord("Add-on Include Rules", 0)
+                                                    If cpCore.db.cs_ok(CS2) Then
+                                                        Call cpCore.db.cs_set(CS2, "Addonid", addonId)
+                                                        Call cpCore.db.cs_set(CS2, "IncludedAddonID", IncludeAddonID)
+                                                    End If
+                                                    Call cpCore.db.cs_Close(CS2)
+                                                End If
                                             End If
                                         End If
-                                    End If
-                            End Select
-                        Next
+                                End Select
+                            Next
+                        End If
                     End If
+                    Call cpCore.db.cs_Close(CS)
                 End If
-                Call cpCore.db.cs_Close(CS)
-            End If
-            Exit Function
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+            Return result
             '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call HandleClassTrapError("unknown", Err.Number, Err.Source, Err.Description, "UpgradeAppFromLocalCollection_InstallAddonNode_Phase2", True, False)
         End Function
         ''
         ''====================================================================================================
@@ -4055,11 +4064,13 @@ ErrorTrap:
         '   Append Log File
         '===========================================================================
         '
-        Private Sub appendInstallLog(ByVal ApplicationName As String, ByVal Method As String, ByVal LogMessage As String)
-            '
-            Console.WriteLine(Method & ", " & LogMessage)
-            cpCore.appendLogWithLegacyRow(ApplicationName, LogMessage, "dll", "AddonInstallClass", Method, 0, "", "", False, True, "", "Install", "")
-            '
+        Private Sub appendInstallLog(ByVal ignore As String, ByVal Method As String, ByVal LogMessage As String)
+            Try
+                Console.WriteLine(Method & ", " & LogMessage)
+                cpCore.appendLogWithLegacyRow(cpCore.appConfig.name, LogMessage, "dll", "AddonInstallClass", Method, 0, "", "", False, True, "", "Install", "")
+            Catch ex As Exception
+                cpCore.handleExceptionAndContinue(ex)
+            End Try
         End Sub
         '
         '=========================================================================================
@@ -4072,7 +4083,7 @@ ErrorTrap:
                 Dim tmpFolderPath As String = "tmp" & GetRandomInteger().ToString & "\"
                 Dim ignoreString As String = ""
                 Dim returnErrorMessage As String = ""
-                Dim builder As New coreBuilderClass(cpCore)
+                'Dim builder As New coreBuilderClass(cpCore)
                 Dim ignoreBoolean As Boolean = False
                 Dim isBaseCollection As Boolean = True
                 '
@@ -4090,7 +4101,7 @@ ErrorTrap:
                     If True Then
                         baseCollectionXml = cpCore.cluster.localClusterFiles.readFile("clibResources\baseCollection.xml")
                         Call installCollection_LoadXmlToMiniCollection(baseCollectionXml, CollectionNew, True, True, isNewBuild, CollectionWorking)
-                        Call installCollection_BuildDbFromMiniCollection(CollectionNew, ignoreRefactor, cpCore.siteProperties.dataBuildVersion, isNewBuild)
+                        Call installCollection_BuildDbFromMiniCollection(CollectionNew, cpCore.siteProperties.dataBuildVersion, isNewBuild)
                         Call cpCore.db.executeSql("update ccfields set IsBaseField=1")
                         Call cpCore.db.executeSql("update cccontent set IsBaseContent=1")
                     End If
@@ -4100,7 +4111,8 @@ ErrorTrap:
                 '
                 cpCore.privateFiles.createPath(tmpFolderPath)
                 cpCore.cluster.localClusterFiles.copyFile("clibResources\baseCollection.xml", tmpFolderPath & "baseCollection.xml", cpCore.privateFiles)
-                If Not InstallCollectionFromPrivateFolder(builder, ignoreString, tmpFolderPath, ignoreBoolean, cpCore.appConfig.name, returnErrorMessage, ignoreString, isNewBuild) Then
+                Dim ignoreList As New List(Of String)
+                If Not InstallCollectionsFromPrivateFolder(tmpFolderPath, returnErrorMessage, ignoreList, isNewBuild) Then
                     Throw New ApplicationException(returnErrorMessage)
                 End If
                 cpCore.privateFiles.DeleteFileFolder(tmpFolderPath)
@@ -4138,7 +4150,7 @@ ErrorTrap:
         '
         '=========================================================================================
         '
-        Public Sub installCollection_BuildDbFromXmlData(ByVal XMLText As String, ByRef return_IISResetRequired As Boolean, isNewBuild As Boolean, isBaseCollection As Boolean)
+        Public Sub installCollection_BuildDbFromXmlData(ByVal XMLText As String, isNewBuild As Boolean, isBaseCollection As Boolean)
             Try
                 '
                 Dim miniCollectionWorking As MiniCollectionClass
@@ -4158,9 +4170,9 @@ ErrorTrap:
                 Call installCollection_AddMiniCollectionSrcToDst(miniCollectionWorking, miniCollectionToAdd, True)
                 '
                 Call appendInstallLog(cpCore.appConfig.name, "ImportCDefData", "Application: " & cpCore.appConfig.name & ", ImportCDefData, calling BuildDbFromCollection")
-                Call installCollection_BuildDbFromMiniCollection(miniCollectionWorking, return_IISResetRequired, cpCore.siteProperties.dataBuildVersion, isNewBuild)
+                Call installCollection_BuildDbFromMiniCollection(miniCollectionWorking, cpCore.siteProperties.dataBuildVersion, isNewBuild)
                 '
-                Call appendInstallLog(cpCore.appConfig.name, "ImportCDefData", "Application: " & cpCore.appConfig.name & ", ImportCDefData done, returning Return_IISResetRequired=" & return_IISResetRequired)
+                Call appendInstallLog(cpCore.appConfig.name, "ImportCDefData", "Application: " & cpCore.appConfig.name & ", ImportCDefData done")
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -4741,7 +4753,7 @@ ErrorTrap:
         ''' <param name="Collection"></param>
         ''' <param name="return_IISResetRequired"></param>
         ''' <param name="BuildVersion"></param>
-        Private Sub installCollection_BuildDbFromMiniCollection(ByVal Collection As MiniCollectionClass, ByRef return_IISResetRequired As Boolean, ByVal BuildVersion As String, isNewBuild As Boolean)
+        Private Sub installCollection_BuildDbFromMiniCollection(ByVal Collection As MiniCollectionClass, ByVal BuildVersion As String, isNewBuild As Boolean)
             Try
                 '
                 Dim FieldHelpID As Integer
@@ -5065,13 +5077,13 @@ ErrorTrap:
                                     '
                                     ' This collection is installed locally, install from local collections
                                     '
-                                    Call installCollectionFromLocalRepo(builder, ignoreRefactor, Guid, cpCore.common_version, errorMessage, "", "", isNewBuild)
+                                    Call installCollectionFromLocalRepo(Guid, cpCore.common_version, errorMessage, "", isNewBuild)
                                 Else
                                     '
                                     ' This is a new collection, install to the server and force it on this site
                                     '
                                     Dim addonInstallOk As Boolean
-                                    addonInstallOk = installCollectionFromRemoteRepo(Guid, BuildVersion, ignoreRefactor, "", errorMessage, "", isNewBuild)
+                                    addonInstallOk = installCollectionFromRemoteRepo(Guid, errorMessage, "", isNewBuild)
                                     If Not addonInstallOk Then
                                         cpCore.handleLegacyError3(cpCore.appConfig.name, "Error upgrading Addon Collection [" & Guid & "], " & errorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                                     End If
@@ -6238,18 +6250,18 @@ ErrorTrap:
             End Try
             Return returnOk
         End Function
-        '
-        '===========================================================================
-        '   Error handler
-        '===========================================================================
-        '
-        Private Sub HandleClassTrapError(ByVal ApplicationName As String, ByVal ErrNumber As Integer, ByVal ErrSource As String, ByVal ErrDescription As String, ByVal MethodName As String, ByVal ErrorTrap As Boolean, Optional ByVal ResumeNext As Boolean = False)
-            '
-            'Call App.LogEvent("addonInstallClass.HandleClassTrapError called from " & MethodName)
-            '
-            cpCore.handleLegacyError3(ApplicationName, "unknown", "dll", "AddonInstallClass", MethodName, ErrNumber, ErrSource, ErrDescription, ErrorTrap, ResumeNext, "")
-            '
-        End Sub
+        ''
+        ''===========================================================================
+        ''   Error handler
+        ''===========================================================================
+        ''
+        'Private Sub HandleClassTrapError(ByVal ApplicationName As String, ByVal ErrNumber As Integer, ByVal ErrSource As String, ByVal ErrDescription As String, ByVal MethodName As String, ByVal ErrorTrap As Boolean, Optional ByVal ResumeNext As Boolean = False)
+        '    '
+        '    'Call App.LogEvent("addonInstallClass.HandleClassTrapError called from " & MethodName)
+        '    '
+        '    cpCore.handleLegacyError3(ApplicationName, "unknown", "dll", "AddonInstallClass", MethodName, ErrNumber, ErrSource, ErrDescription, ErrorTrap, ResumeNext, "")
+        '    '
+        'End Sub
         '
         '
         '

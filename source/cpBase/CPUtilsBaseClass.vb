@@ -74,10 +74,47 @@ Namespace Contensive.BaseClasses
         Public MustOverride Function hashMd5(ByVal source As String) As String
         Public MustOverride Function isGuid(ByVal guid As String) As Boolean
         Public MustOverride Sub Upgrade(ByVal isNewApp As Boolean)
-        Public MustOverride Function installCollectionAsyncFromFile(privateFile As String) As Integer ' returns taskId
-        Public MustOverride Function installCollectionAsyncFromLibrary(collectionGuid As String) As Integer ' returns taskId
-        Public MustOverride Function installCollectionAsyncFromLink(link As String) As Integer ' returns taskId
-        'Public MustOverride Function getTaskStatus(taskId As Integer) As Integer ' returns status codes
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Install an addon collection file asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
+        ''' </summary>
+        ''' <param name="privateFile"></param>
+        ''' <returns></returns>
+        Public MustOverride Function installCollectionFromFile(privateFile As String) As Integer
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Install all addon collections in a folder asynchonously. Optionally delete the folder. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
+        ''' </summary>
+        ''' <param name="privateFolder"></param>
+        ''' <param name="deleteFolderWhenDone"></param>
+        ''' <returns></returns>
+        Public MustOverride Function installCollectionsFromFolder(privateFolder As String, deleteFolderWhenDone As Boolean) As Integer
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Install all addon collections in a folder asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
+        ''' </summary>
+        ''' <param name="privateFolder"></param>
+        ''' <returns></returns>
+        Public MustOverride Function installCollectionsFromFolder(privateFolder As String) As Integer
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Install an addon collections from the collection library asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
+        ''' </summary>
+        ''' <param name="collectionGuid"></param>
+        ''' <returns></returns>
+        Public MustOverride Function installCollectionFromLibrary(collectionGuid As String) As Integer
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Install an addon collections from an endpoint asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
+        ''' </summary>
+        ''' <param name="link"></param>
+        ''' <returns></returns>
+        Public MustOverride Function installCollectionFromLink(link As String) As Integer
     End Class
 End Namespace
 

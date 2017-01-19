@@ -6117,18 +6117,18 @@ ErrorTrap:
                 GetYesNo = "No"
             End If
         End Function
-        '
-        '
-        '
-        Public Function GetFilename(ByVal PathFilename As String) As String
-            Dim Position As Integer
-            '
-            GetFilename = PathFilename
-            Position = InStrRev(GetFilename, "/")
-            If Position <> 0 Then
-                GetFilename = Mid(GetFilename, Position + 1)
-            End If
-        End Function
+        ''
+        ''
+        ''
+        'Public Function GetFilename(ByVal PathFilename As String) As String
+        '    Dim Position As Integer
+        '    '
+        '    GetFilename = PathFilename
+        '    Position = InStrRev(GetFilename, "/")
+        '    If Position <> 0 Then
+        '        GetFilename = Mid(GetFilename, Position + 1)
+        '    End If
+        'End Function
         '        '
         '        '
         '        '
@@ -7322,7 +7322,7 @@ ErrorTrap:
         '====================================================================================================
         '
         Public Function getProgramDataPath() As String
-            Return normalizeFilePath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) & "clib\"
+            Return coreFileSystemClass.normalizePath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) & "clib\"
         End Function
         '
         '====================================================================================================
@@ -7401,6 +7401,10 @@ ErrorTrap:
                 If String.IsNullOrEmpty(normalizedRoute) Then
                     normalizedRoute = "/"
                 Else
+                    normalizedRoute = normalizedRoute.Replace("\", "/")
+                    Do While normalizedRoute.IndexOf("//") >= 0
+                        normalizedRoute = normalizedRoute.Replace("//", "/")
+                    Loop
                     If (normalizedRoute.Substring(0, 1) <> "/") Then
                         normalizedRoute = "/" & normalizedRoute
                     End If
@@ -7641,45 +7645,23 @@ ErrorTrap:
                 Return False
             End If
         End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Ensures a path uses the correct file delimiter "\", and ends in a "\"
-        ''' </summary>
-        ''' <param name="pathOrFolder"></param>
-        ''' <returns></returns>
-        Public Function normalizeFilePath(ByVal pathOrFolder As String) As String
-            If String.IsNullOrEmpty(pathOrFolder) Then
-                Return ""
-            Else
-                pathOrFolder = pathOrFolder.Replace("/", "\")
-                If (pathOrFolder.Substring(0, 1) = "\") Then
-                    pathOrFolder = pathOrFolder.Substring(1)
-                End If
-                If (pathOrFolder.Substring(pathOrFolder.Length - 1, 1) <> "\") Then
-                    Return pathOrFolder & "\"
-                Else
-                    Return pathOrFolder
-                End If
-            End If
-        End Function
     End Module
     '
     Public Class coreCommonTests
         '
-        <Fact> Public Sub normalizeFilePath_unit()
+        <Fact> Public Sub normalizePath_unit()
             ' arrange
             ' act
             ' assert
-            Assert.Equal(normalizeFilePath(""), "")
-            Assert.Equal(normalizeFilePath("c:\"), "c:\")
-            Assert.Equal(normalizeFilePath("c:\test\"), "c:\test\")
-            Assert.Equal(normalizeFilePath("c:\test"), "c:\test\")
-            Assert.Equal(normalizeFilePath("c:\test/test"), "c:\test\test\")
-            Assert.Equal(normalizeFilePath("test"), "test\")
-            Assert.Equal(normalizeFilePath("\test"), "test\")
-            Assert.Equal(normalizeFilePath("\test\"), "test\")
-            Assert.Equal(normalizeFilePath("/test/"), "test\")
+            Assert.Equal(coreFileSystemClass.normalizePath(""), "")
+            Assert.Equal(coreFileSystemClass.normalizePath("c:\"), "c:\")
+            Assert.Equal(coreFileSystemClass.normalizePath("c:\test\"), "c:\test\")
+            Assert.Equal(coreFileSystemClass.normalizePath("c:\test"), "c:\test\")
+            Assert.Equal(coreFileSystemClass.normalizePath("c:\test/test"), "c:\test\test\")
+            Assert.Equal(coreFileSystemClass.normalizePath("test"), "test\")
+            Assert.Equal(coreFileSystemClass.normalizePath("\test"), "test\")
+            Assert.Equal(coreFileSystemClass.normalizePath("\test\"), "test\")
+            Assert.Equal(coreFileSystemClass.normalizePath("/test/"), "test\")
         End Sub
         '
         <Fact> Public Sub normalizeRoute_unit()
@@ -7687,9 +7669,12 @@ ErrorTrap:
             ' act
             ' assert
             Assert.Equal(normalizeRoute("TEST"), "/test")
+            Assert.Equal(normalizeRoute("\TEST"), "/test")
+            Assert.Equal(normalizeRoute("\\TEST"), "/test")
             Assert.Equal(normalizeRoute("test"), "/test")
             Assert.Equal(normalizeRoute("/test/"), "/test")
             Assert.Equal(normalizeRoute("test/"), "/test")
+            Assert.Equal(normalizeRoute("test//"), "/test")
         End Sub
         '
         <Fact> Public Sub encodeBoolean_unit()
