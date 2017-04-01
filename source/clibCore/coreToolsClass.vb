@@ -4237,7 +4237,7 @@ ErrorTrap:
                 ' Restart
                 '
                 Call Stream.Add("<br>Loading Templates...")
-                Call Stream.Add(ImportTemplates(Replace(cpCore.serverConfig.clusterPath & cpCore.appConfig.appRootFilesPath & cpCore.appConfig.appRootFilesPath, "/", "\"), "", AllowBodyHTML, AllowScriptLink, AllowImageImport, AllowStyleImport))
+                Call Stream.Add(ImportTemplates(cpCore.appRootFiles.rootLocalPath, "", AllowBodyHTML, AllowScriptLink, AllowImageImport, AllowStyleImport))
                 Call Stream.Add("<br>Templates loaded")
             End If
             '

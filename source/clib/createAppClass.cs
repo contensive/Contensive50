@@ -102,7 +102,7 @@ namespace  Contensive.Core {
                             Console.WriteLine("Drive " + localDriveLetter + " is not ready");
                         }
                     } while (!drive.IsReady);
-                    cp.core.serverConfig.clusterPath = localDriveLetter + ":\\inetpub\\";
+                    //cp.core.serverConfig.clusterPath = localDriveLetter + ":\\inetpub\\";
                     //
                     switch (isLocalClusterText.ToLower())
                     {
@@ -183,42 +183,42 @@ namespace  Contensive.Core {
                             cp.core.clusterConfig.awsElastiCacheConfigurationEndpoint = cacheNode;
                         } while (string.IsNullOrEmpty(cacheNode));
                     }
-                    //
-                    // determine app pattern
-                    //
-                    //
+                    ////
+                    //// determine app pattern
+                    ////
+                    ////
                     coreFileSystemClass installFiles = new coreFileSystemClass(cp.core,  cp.core.clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
-                    if (!cp.core.cluster.localClusterFiles.pathExists("clibCommonAssemblies\\"))
-                    {
-                        cp.core.cluster.localClusterFiles.createPath("clibCommonAssemblies\\");
-                    }
-                    int appPatternPtr;
-                    List<string> appPatterns = new List<string>();
-                    int appPatternCnt;
-                    //
-                    // upgrade the cluster resources folder from the installation
-                    //
-                    upgradeResources(cp, installFiles);
-                    string appPatternsSrc = "clibResources\\appPatterns";
-                    do
-                    {
-                        Console.WriteLine("\n\nApplication pattern for this server.");
-                        Console.WriteLine("All applications in this cluster must be the same type (aspx, etc.)");
-                        Console.WriteLine("Select one of the application patterns setup in the installation folder:");
-                        appPatternCnt = 1;
-                        appPatterns.Add("");
-                        foreach (System.IO.DirectoryInfo di in cp.core.cluster.localClusterFiles.getFolderList(appPatternsSrc))
-                        {
-                            appPatterns.Add(di.Name);
-                            Console.Write("\n" + appPatternCnt.ToString() + ") " + di.Name);
-                            appPatternCnt += 1;
-                        }
-                        Console.Write("\n\n:");
-                        string appPatternReply = Console.ReadLine();
-                        appPatternPtr = cp.Utils.EncodeInteger(appPatternReply);
-                    } while ((appPatternPtr <= 0) || (appPatternPtr >= appPatternCnt));
-                    Console.Write("you picked -- " + appPatterns[appPatternPtr]);
-                    cp.core.clusterConfig.appPattern = appPatterns[appPatternPtr].ToLower();
+                    //if (!cp.core.cluster.localClusterFiles.pathExists("clibCommonAssemblies\\"))
+                    //{
+                    //    cp.core.cluster.localClusterFiles.createPath("clibCommonAssemblies\\");
+                    //}
+                    //int appPatternPtr;
+                    //List<string> appPatterns = new List<string>();
+                    //int appPatternCnt;
+                    ////
+                    //// upgrade the cluster resources folder from the installation
+                    ////
+                    //upgradeResources(cp, installFiles);
+                    //string appPatternsSrc = "clibResources\\appPatterns";
+                    //do
+                    //{
+                    //    Console.WriteLine("\n\nApplication pattern for this server.");
+                    //    Console.WriteLine("All applications in this cluster must be the same type (aspx, etc.)");
+                    //    Console.WriteLine("Select one of the application patterns setup in the installation folder:");
+                    //    appPatternCnt = 1;
+                    //    appPatterns.Add("");
+                    //    foreach (System.IO.DirectoryInfo di in cp.core.cluster.localClusterFiles.getFolderList(appPatternsSrc))
+                    //    {
+                    //        appPatterns.Add(di.Name);
+                    //        Console.Write("\n" + appPatternCnt.ToString() + ") " + di.Name);
+                    //        appPatternCnt += 1;
+                    //    }
+                    //    Console.Write("\n\n:");
+                    //    string appPatternReply = Console.ReadLine();
+                    //    appPatternPtr = cp.Utils.EncodeInteger(appPatternReply);
+                    //} while ((appPatternPtr <= 0) || (appPatternPtr >= appPatternCnt));
+                    //Console.Write("you picked -- " + appPatterns[appPatternPtr]);
+                    //cp.core.clusterConfig.appPattern = appPatterns[appPatternPtr].ToLower();
                     //
                     // create new clusterConfig file
                     //

@@ -2521,7 +2521,7 @@ ErrorTrap:
                 '
                 ' first try debug folder -- cclibCommonAssemblies
                 '
-                commonAssemblyPath = cpCore.cluster.localClusterFiles.joinPath(cpCore.cluster.localClusterFiles.rootLocalPath, "clibCommonAssemblies\")
+                commonAssemblyPath = cpCore.programDataFiles.rootLocalPath & "AddonAssemblyBypass\"
                 result = executeAssembly_byFilePath(addonId, AddonCaption, commonAssemblyPath, AssemblyClassFullName, True, AddonFound, return_ErrorMessageForAdmin)
                 If Not AddonFound Then
                     '

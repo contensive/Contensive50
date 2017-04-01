@@ -16002,10 +16002,10 @@ ErrorTrap:
                         ' Draw the form
                         '
                         FeatureList = cpCore.cdnFiles.readFile(InnovaEditorFeaturefilename)
-                        If FeatureList = "" Then
-                            FeatureList = cpCore.cluster.localClusterFiles.readFile("ccLib\" & "Config\DefaultEditorConfig.txt")
-                            Call cpCore.privateFiles.saveFile(InnovaEditorFeaturefilename, FeatureList)
-                        End If
+                        'If FeatureList = "" Then
+                        '    FeatureList = cpCore.cluster.localClusterFiles.readFile("ccLib\" & "Config\DefaultEditorConfig.txt")
+                        '    Call cpCore.privateFiles.saveFile(InnovaEditorFeaturefilename, FeatureList)
+                        'End If
                         If FeatureList = "" Then
                             FeatureList = "admin:" & InnovaEditorFeatureList & vbCrLf & "contentmanager:" & InnovaEditorFeatureList & vbCrLf & "public:" & InnovaEditorPublicFeatureList
                         End If

@@ -36,23 +36,23 @@ Namespace Contensive.Core
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
-        '
-        '===================================================================================================
-        ''' <summary>
-        ''' file object pointed to the cluster folder in the serverconfig file. Used initially to boot the cluster.
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public ReadOnly Property localClusterFiles As coreFileSystemClass
-            Get
-                If (_localClusterFiles Is Nothing) Then
-                    _localClusterFiles = New coreFileSystemClass(cpCore, cpCore.clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.activeSync, cpCore.serverConfig.clusterPath)
-                End If
-                Return _localClusterFiles
-            End Get
-        End Property
-        Private _localClusterFiles As coreFileSystemClass
+        ''
+        ''===================================================================================================
+        '''' <summary>
+        '''' file object pointed to the cluster folder in the serverconfig file. Used initially to boot the cluster.
+        '''' </summary>
+        '''' <value></value>
+        '''' <returns></returns>
+        '''' <remarks></remarks>
+        'Public ReadOnly Property localClusterFiles As coreFileSystemClass
+        '    Get
+        '        If (_localClusterFiles Is Nothing) Then
+        '            _localClusterFiles = New coreFileSystemClass(cpCore, cpCore.clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.activeSync, cpCore.serverConfig.clusterPath)
+        '        End If
+        '        Return _localClusterFiles
+        '    End Get
+        'End Property
+        'Private _localClusterFiles As coreFileSystemClass
         '
         '====================================================================================================
         ''' <summary>
@@ -75,7 +75,7 @@ Namespace Contensive.Core
         ''' </summary>
         Public Sub saveConfig()
             Dim jsonTemp As String = cpCore.json.Serialize(cpCore.clusterConfig)
-            localClusterFiles.saveFile("clusterConfig.json", jsonTemp)
+            cpCore.programDataFiles.saveFile("clusterConfig.json", jsonTemp)
         End Sub
         '
         '====================================================================================================
@@ -113,7 +113,7 @@ Namespace Contensive.Core
                     '
                     ' call .dispose for managed objects
                     '
-                    If Not (_localClusterFiles Is Nothing) Then _localClusterFiles.Dispose()
+                    'If Not (_localClusterFiles Is Nothing) Then _localClusterFiles.Dispose()
                 End If
                 '
                 ' cleanup non-managed objects

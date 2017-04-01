@@ -9,10 +9,10 @@ namespace Contensive.Core
 {
     class mainClass
     {
-        static void Main(string[] args)
+        static  void Main(string[] args)
         {
             try
-            {
+            { 
                 CPClass cp;
                 CPClass cpCluster;
                 coreFileSystemClass installFiles;
@@ -48,7 +48,7 @@ namespace Contensive.Core
                         string argument = args[i];
                         switch (argument.ToLower())
                         {
-                            case "-version":
+                            case "--version":
                             case "-v":
                                 //
                                 // display core version
@@ -58,7 +58,7 @@ namespace Contensive.Core
                                 exitCmd = true;
                                 cp.Dispose();
                                 break;
-                            case "-newapp":
+                            case "--newapp":
                             case "-n":
                                 //
                                 // start the new app wizard
@@ -66,7 +66,8 @@ namespace Contensive.Core
                                 createApp.createApp();
                                 exitCmd = true;
                                 break;
-                            case "-status":
+                            case "--status":
+                            case "-s":
                                 //
                                 // display cluster and application status
                                 //
@@ -86,7 +87,7 @@ namespace Contensive.Core
                                     Console.WriteLine("FilesEndpoint: " + cp.core.clusterConfig.clusterFilesEndpoint);
                                     Console.WriteLine("defaultDataSourceAddress: " + cp.core.clusterConfig.defaultDataSourceAddress);
                                     Console.WriteLine("isLocal: " + cp.core.clusterConfig.isLocal.ToString());
-                                    Console.WriteLine("clusterPhysicalPath: " + cp.core.serverConfig.clusterPath.ToString());
+                                    //Console.WriteLine("clusterPhysicalPath: " + cp.core.serverConfig.clusterPath.ToString());
                                     Console.WriteLine("defaultDataSourceAddress: " + cp.core.clusterConfig.defaultDataSourceAddress.ToString());
                                     Console.WriteLine("defaultDataSourceType: " + cp.core.clusterConfig.defaultDataSourceType.ToString());
                                     Console.WriteLine("defaultDataSourceUsername: " + cp.core.clusterConfig.defaultDataSourceUsername.ToString());
@@ -113,7 +114,7 @@ namespace Contensive.Core
 
                                 exitCmd = true;
                                 break;
-                            case "-upgrade":
+                            case "--upgrade":
                             case "-u":
                                 //
                                 // upgrade the app in the argument list, or prompt for it
@@ -144,7 +145,7 @@ namespace Contensive.Core
                                 }
                                 exitCmd = true;
                                 break;
-                            case "-upgradeall":
+                            case "--upgradeall":
                                 //
                                 // upgrade all apps in the cluster
                                 //
@@ -165,7 +166,7 @@ namespace Contensive.Core
                                     }
                                 }
                                 break;
-                            case "-taskscheduler":
+                            case "--taskscheduler":
                                 using (cpCluster = new CPClass())
                                 {
                                     using (programDataFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib"))
@@ -210,7 +211,7 @@ namespace Contensive.Core
                                     }
                                 }
                                 break;
-                            case "-taskrunner":
+                            case "--taskrunner":
                                 using (cpCluster = new CPClass())
                                 {
                                     using (programDataFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib"))
@@ -255,7 +256,7 @@ namespace Contensive.Core
                                     }
                                 }
                                 break;
-                            case "-tasks":
+                            case "--tasks":
                                 //
                                 // turn on, off or run both services together
                                 //

@@ -217,12 +217,14 @@ Namespace Contensive.Core
                         '
                         ' local server -- everything is ephemeral
                         '
-                        _appRootFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.appRootFilesPath))
+                        _appRootFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(appConfig.appRootFilesPath))
+                        '_appRootFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.appRootFilesPath))
                     Else
                         '
                         ' cluster mode - each filesystem is configured accordingly
                         '
-                        _appRootFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.activeSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.appRootFilesPath))
+                        _appRootFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.activeSync, coreFileSystemClass.normalizePath(appConfig.appRootFilesPath))
+                        '_appRootFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.activeSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.appRootFilesPath))
                     End If
                 End If
                 Return _appRootFiles
@@ -271,18 +273,77 @@ Namespace Contensive.Core
                         '
                         ' local server -- everything is ephemeral
                         '
-                        _privateFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.privateFilesPath))
+                        _privateFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(appConfig.privateFilesPath))
+                        '_privateFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.privateFilesPath))
                     Else
                         '
                         ' cluster mode - each filesystem is configured accordingly
                         '
-                        _privateFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.privateFilesPath))
+                        _privateFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(appConfig.privateFilesPath))
+                        '_privateFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.privateFilesPath))
                     End If
                 End If
                 Return _privateFiles
             End Get
         End Property
         Private _privateFiles As coreFileSystemClass = Nothing
+        '
+        '===================================================================================================
+        ''' <summary>
+        ''' privateFiles object
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public ReadOnly Property programDataFiles() As coreFileSystemClass
+            Get
+                If (_programDataFiles Is Nothing) Then
+                    Dim programDataPath As String = coreFileSystemClass.normalizePath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData))
+                    If clusterConfig.isLocal Then
+                        '
+                        ' local server -- everything is ephemeral
+                        '
+                        _programDataFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(programDataPath))
+                    Else
+                        '
+                        ' cluster mode - each filesystem is configured accordingly
+                        '
+                        _programDataFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(programDataPath))
+                    End If
+                End If
+                Return _programDataFiles
+            End Get
+        End Property
+        Private _programDataFiles As coreFileSystemClass = Nothing
+        '
+        '===================================================================================================
+        ''' <summary>
+        ''' privateFiles object
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public ReadOnly Property programFiles() As coreFileSystemClass
+            Get
+                If (_programFiles Is Nothing) Then
+                    If clusterConfig.isLocal Then
+                        '
+                        ' local server -- everything is ephemeral
+                        '
+                        _programFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(coreCommonModule.getProgramFilesPath))
+                        '_privateFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.privateFilesPath))
+                    Else
+                        '
+                        ' cluster mode - each filesystem is configured accordingly
+                        '
+                        _programFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(coreCommonModule.getProgramFilesPath))
+                        '_privateFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.privateFilesPath))
+                    End If
+                End If
+                Return _programFiles
+            End Get
+        End Property
+        Private _programFiles As coreFileSystemClass = Nothing
         '
         '===================================================================================================
         ''' <summary>
@@ -298,12 +359,14 @@ Namespace Contensive.Core
                         '
                         ' local server -- everything is ephemeral
                         '
-                        _cdnFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.cdnFilesPath))
+                        _cdnFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(appConfig.cdnFilesPath))
+                        '_cdnFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.cdnFilesPath))
                     Else
                         '
                         ' cluster mode - each filesystem is configured accordingly
                         '
-                        _cdnFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.cdnFilesPath))
+                        _cdnFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(appConfig.cdnFilesPath))
+                        '_cdnFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.cdnFilesPath))
                     End If
                 End If
                 Return _cdnFiles
@@ -5149,8 +5212,8 @@ ErrorTrap:
             Dim Filename As String
             '
             If Not email_BlockList_LocalLoaded Then
-                Filename = "Config\SMTPBlockList_" & appConfig.name & ".txt"
-                email_BlockList_Local = cluster.localClusterFiles.readFile(Filename)
+                Filename = "Config\SMTPBlockList.txt"
+                email_BlockList_Local = privateFiles.readFile(Filename)
                 email_BlockList_LocalLoaded = True
             End If
             getEmailBlockList_InternalOnly = email_BlockList_Local
@@ -5178,7 +5241,7 @@ ErrorTrap:
                 ' add them to the list
                 '
                 email_BlockList_Local = getEmailBlockList_InternalOnly() & vbCrLf & EmailAddress & vbTab & Now()
-                Call cluster.localClusterFiles.saveFile("Config\SMTPBlockList_" & appConfig.name & ".txt", email_BlockList_Local)
+                Call privateFiles.saveFile("Config\SMTPBlockList.txt", email_BlockList_Local)
                 email_BlockList_LocalLoaded = False
             End If
         End Sub
@@ -6350,7 +6413,8 @@ ErrorTrap:
                                     & "The Link Alias being created (" & WorkingLinkAlias & ") can not be used because there is a virtual directory in your website directory that already uses this name." _
                                     & " Please change it to ensure the Link Alias is unique. To set or change the Link Alias, use the Link Alias tab and select a name not used by another page."
                             End If
-                        ElseIf appRootFiles.pathExists(serverConfig.clusterPath & appConfig.appRootFilesPath & "\" & Mid(WorkingLinkAlias, 2)) Then
+                        ElseIf appRootFiles.pathExists(appConfig.appRootFilesPath & "\" & Mid(WorkingLinkAlias, 2)) Then
+                            'ElseIf appRootFiles.pathExists(serverConfig.clusterPath & appConfig.appRootFilesPath & "\" & Mid(WorkingLinkAlias, 2)) Then
                             '
                             ' This alias points to a different link, call it an error
                             '
@@ -17891,7 +17955,7 @@ ErrorTrap:
                 End If
                 If BotList = "" Then
                     Filename = "config\VisitNameList.txt"
-                    BotList = cluster.localClusterFiles.readFile(Filename)
+                    BotList = privateFiles.readFile(Filename)
                     If BotList = "" Then
                         BotList = "" _
                             & vbCrLf & "//" _
@@ -17914,7 +17978,7 @@ ErrorTrap:
                             & vbCrLf & "Unknown Bot" & vbTab & "robot" & vbTab & vbTab & "r" _
                             & vbCrLf & "Unknown Bot" & vbTab & "crawl" & vbTab & vbTab & "r" _
                             & ""
-                        Call cluster.localClusterFiles.saveFile(Filename, BotList)
+                        Call privateFiles.saveFile(Filename, BotList)
                     End If
                     DateExpires = app_startTime.AddHours(1)
                     Call cache.setKey("DefaultBotNameList", CStr(DateExpires) & vbCrLf & BotList)
@@ -26449,7 +26513,7 @@ ErrorTrap:
             End If
             If main_GetMobileBrowserList = "" Then
                 Filename = "config\MobileBrowserList.txt"
-                main_GetMobileBrowserList = cluster.localClusterFiles.readFile(Filename)
+                main_GetMobileBrowserList = privateFiles.readFile(Filename)
                 If main_GetMobileBrowserList = "" Then
                     main_GetMobileBrowserList = "midp,j2me,avantg,docomo,novarra,palmos,palmsource,240x320,opwv,chtml,pda,windows ce,mmp/,blackberry,mib/,symbian,wireless,nokia,hand,mobi,phone,cdm,up.b,audio,SIE-,SEC-,samsung,HTC,mot-,mitsu,sagem,sony,alcatel,lg,erics,vx,NEC,philips,mmm,xx,panasonic,sharp,wap,sch,rover,pocket,benq,java,pt,pg,vox,amoi,bird,compal,kg,voda,sany,kdd,dbt,sendo,sgh,gradi,jb,moto"
                     main_GetMobileBrowserList = vbReplace(main_GetMobileBrowserList, ",", vbCrLf)
@@ -27346,7 +27410,7 @@ ErrorTrap:
         '
         Public Function main_GetPleaseWaitStart() As String
             '
-            main_GetPleaseWaitStart = cluster.localClusterFiles.readFile("ccLib\Popup\WaitPageOpen.htm")
+            main_GetPleaseWaitStart = ProgramFiles.readFile("Resources\WaitPageOpen.htm")
             '
         End Function
         '
@@ -27365,9 +27429,8 @@ ErrorTrap:
         '   Used in reports
         '
         Public Function main_GetPleaseWaitEnd() As String
-            '
-            main_GetPleaseWaitEnd = cluster.localClusterFiles.readFile("ccLib\Popup\WaitPageClose.htm")
-            '
+            Return programFiles.readFile("resources\WaitPageClose.htm")
+            'main_GetPleaseWaitEnd = cluster.localClusterFiles.readFile("ccLib\Popup\WaitPageClose.htm")
         End Function
         '
         '   Used in reports
@@ -29628,31 +29691,7 @@ ErrorTrap:
         '
         '
         Private Function main_guessDefaultPage() As String
-            On Error GoTo ErrorTrap
-            '
-            'Dim kmafs As New fileSystemClass
-            '
-            main_guessDefaultPage = "index.php"
-            If Not appRootFiles.fileExists(serverConfig.clusterPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
-                main_guessDefaultPage = "index.asp"
-                If Not appRootFiles.fileExists(serverConfig.clusterPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
-                    main_guessDefaultPage = "default.asp"
-                    If Not appRootFiles.fileExists(serverConfig.clusterPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
-                        main_guessDefaultPage = "default.aspx"
-                        If Not appRootFiles.fileExists(serverConfig.clusterPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
-                            main_guessDefaultPage = "index.php"
-                            If Not appRootFiles.fileExists(serverConfig.clusterPath & appConfig.appRootFilesPath & main_guessDefaultPage) Then
-                                main_guessDefaultPage = ""
-                            End If
-                        End If
-                    End If
-                End If
-            End If
-
-            '
-            Exit Function
-ErrorTrap:
-            handleLegacyError3(appConfig.name, "", "dll", "cpCoreClass", "main_guessDefaultPage", Err.Number, Err.Source, Err.Description, True, False, "")
+            Return "default.aspx"
         End Function
         '
         ' Verify a link from the template link field to be used as a Template Link
@@ -34861,39 +34900,36 @@ ErrorTrap:
         Private Sub constructorCommonInitialize(appName As String)
             Try
                 Dim JSONTemp As String
-                Dim tempFiles As coreFileSystemClass
                 '
                 app_startTickCount = GetTickCount
                 CPTickCountBase = GetTickCount
                 '
                 ' ----- read/create serverConfig
                 '
-                tempFiles = New coreFileSystemClass(Me, True, coreFileSystemClass.fileSyncModeEnum.noSync, getProgramDataPath)
-                JSONTemp = tempFiles.readFile("serverConfig.json")
+                JSONTemp = programDataFiles.readFile("serverConfig.json")
                 If String.IsNullOrEmpty(JSONTemp) Then
                     '
                     ' initialize serverConfig (do not let anything take a site down)
                     '
                     serverConfig = New serverConfigClass
-                    serverConfig.clusterPath = "d:\"
-                    If (Not System.IO.Directory.Exists(serverConfig.clusterPath)) Then
-                        serverConfig.clusterPath = "c:\"
-                    End If
-                    serverConfig.clusterPath &= "inetPub"
-                    If Not (System.IO.Directory.Exists(serverConfig.clusterPath)) Then
-                        System.IO.Directory.CreateDirectory(serverConfig.clusterPath)
-                    End If
+                    'serverConfig.clusterPath = "d:\"
+                    'If (Not System.IO.Directory.Exists(serverConfig.clusterPath)) Then
+                    '    serverConfig.clusterPath = "c:\"
+                    'End If
+                    'serverConfig.clusterPath &= "inetPub"
+                    'If Not (System.IO.Directory.Exists(serverConfig.clusterPath)) Then
+                    '    System.IO.Directory.CreateDirectory(serverConfig.clusterPath)
+                    'End If
                     serverConfig.allowTaskRunnerService = False
                     serverConfig.allowTaskSchedulerService = False
-                    tempFiles.saveFile("serverConfig.json", json.Serialize(serverConfig))
+                    programDataFiles.saveFile("serverConfig.json", json.Serialize(serverConfig))
                 Else
                     serverConfig = json.Deserialize(Of serverConfigClass)(JSONTemp)
                 End If
                 '
                 ' ----- read/create clusterConfig
                 '
-                tempFiles = New coreFileSystemClass(Me, True, coreFileSystemClass.fileSyncModeEnum.noSync, serverConfig.clusterPath)
-                JSONTemp = tempFiles.readFile("clusterConfig.json")
+                JSONTemp = programDataFiles.readFile("clusterConfig.json")
                 If String.IsNullOrEmpty(JSONTemp) Then
                     '
                     ' for now it fails, maybe later let it autobuild a local cluster
@@ -35046,15 +35082,7 @@ ErrorTrap:
                     '
                     ' attempt to get cluster data, else go wtih defaults
                     '
-                    If (cluster Is Nothing) Then
-                        '
-                        ' no cluster object
-                        '
-                    ElseIf (cluster.localClusterFiles Is Nothing) Then
-                        '
-                        ' no cluster files object
-                        '
-                    Else
+                    If True Then
                         DayNumber = Day(Now)
                         MonthNumber = Month(Now)
                         FilenameNoExt = log_getDateString(Now)
@@ -35062,12 +35090,12 @@ ErrorTrap:
                         If logPath <> "" Then
                             logPath = logPath & "\"
                         End If
-                        logPath = "clibLogs\" & logPath
-                        logPathRoot = cluster.localClusterFiles.rootLocalPath
-                        If Not cluster.localClusterFiles.pathExists(logPath) Then
-                            Call cluster.localClusterFiles.createPath(logPath)
+                        logPath = "logs\" & logPath
+                        logPathRoot = programDataFiles.rootLocalPath
+                        If Not programDataFiles.pathExists(logPath) Then
+                            Call programDataFiles.createPath(logPath)
                         Else
-                            Dim logFiles As IO.FileInfo() = cluster.localClusterFiles.getFileList(logPath)
+                            Dim logFiles As IO.FileInfo() = programDataFiles.getFileList(logPath)
                             For Each fileInfo As IO.FileInfo In logFiles
                                 If fileInfo.Name.ToLower = FilenameNoExt.ToLower & ".log" Then
                                     FileSize = CInt(fileInfo.Length)

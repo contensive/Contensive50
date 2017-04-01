@@ -1508,10 +1508,12 @@ Namespace Contensive.Core
                                                                         Select Case ResourceType
                                                                             Case "www"
                                                                                 wwwFileList = wwwFileList & vbCrLf & DstFilePath & Filename
-                                                                                Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, copying file to www, src [" & CollectionVersionFolder & SrcPath & "], dst [" & cpCore.serverConfig.clusterPath & cpCore.appConfig.appRootFilesPath & DstFilePath & "].")
+                                                                                Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, copying file to www, src [" & CollectionVersionFolder & SrcPath & "], dst [" & cpCore.appConfig.appRootFilesPath & DstFilePath & "].")
+                                                                                'Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, copying file to www, src [" & CollectionVersionFolder & SrcPath & "], dst [" & cpCore.serverConfig.clusterPath & cpCore.appConfig.appRootFilesPath & DstFilePath & "].")
                                                                                 Call cpCore.privateFiles.copyFile(CollectionVersionFolder & SrcPath & Filename, DstFilePath & Filename, cpCore.appRootFiles)
                                                                                 If vbLCase(Right(Filename, 4)) = ".zip" Then
-                                                                                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, unzipping www file [" & cpCore.serverConfig.clusterPath & cpCore.appConfig.appRootFilesPath & DstFilePath & Filename & "].")
+                                                                                    Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, unzipping www file [" & cpCore.appConfig.appRootFilesPath & DstFilePath & Filename & "].")
+                                                                                    'Call appendInstallLog(cpCore.appConfig.name, "UpgradeAppFromLocalCollection", "collection [" & Collectionname & "], GUID [" & CollectionGuid & "], pass 1, unzipping www file [" & cpCore.serverConfig.clusterPath & cpCore.appConfig.appRootFilesPath & DstFilePath & Filename & "].")
                                                                                     Call cpCore.privateFiles.UnzipFile(DstFilePath & Filename)
                                                                                 End If
                                                                             Case "file", "content"
@@ -4099,7 +4101,7 @@ Namespace Contensive.Core
                     Dim ignoreRefactor As Boolean
                     '
                     If True Then
-                        baseCollectionXml = cpCore.cluster.localClusterFiles.readFile("clibResources\baseCollection.xml")
+                        baseCollectionXml = cpCore.programFiles.readFile("baseCollection.xml")
                         Call installCollection_LoadXmlToMiniCollection(baseCollectionXml, CollectionNew, True, True, isNewBuild, CollectionWorking)
                         Call installCollection_BuildDbFromMiniCollection(CollectionNew, cpCore.siteProperties.dataBuildVersion, isNewBuild)
                         Call cpCore.db.executeSql("update ccfields set IsBaseField=1")
@@ -4110,7 +4112,7 @@ Namespace Contensive.Core
                 ' now treat as a regular collection and install - to pickup everything else 
                 '
                 cpCore.privateFiles.createPath(tmpFolderPath)
-                cpCore.cluster.localClusterFiles.copyFile("clibResources\baseCollection.xml", tmpFolderPath & "baseCollection.xml", cpCore.privateFiles)
+                cpCore.programFiles.copyFile("baseCollection.xml", tmpFolderPath & "baseCollection.xml", cpCore.privateFiles)
                 Dim ignoreList As New List(Of String)
                 If Not InstallCollectionsFromPrivateFolder(tmpFolderPath, returnErrorMessage, ignoreList, isNewBuild) Then
                     Throw New ApplicationException(returnErrorMessage)

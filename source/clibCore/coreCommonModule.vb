@@ -52,10 +52,10 @@ Namespace Contensive.Core
         Public enabled As Boolean
         Public privateKey As String                     ' rename hashKey
         Public defaultConnectionString As String
-        Public appRootFilesPath As String               ' path relative to clusterPhysicalPath
-        Public cdnFilesPath As String                   ' path relative to clusterPhysicalPath
-        Public privateFilesPath As String               ' path relative to clusterPhysicalPath
-        Public cdnFilesNetprefix As String              ' in some cases (like legacy), cdnFiles are iis virtual folder mapped to appRoot (/files/). Some cases this is a URL (http:\\cdn.domain.com pointing to s3)
+        Public appRootFilesPath As String               ' local file path to the appRoot (i.e. d:\inetpub\myApp\wwwRoot\)
+        Public cdnFilesPath As String                   ' local file path to the content files (i.e. d:\inetpub\myApp\files\)
+        Public privateFilesPath As String               ' local file path to the content files (i.e. d:\inetpub\myApp\private\)
+        Public cdnFilesNetprefix As String              ' in some cases (like legacy), cdnFiles are iis virtual folder mapped to appRoot (/appName/files/). Some cases this is a URL (http:\\cdn.domain.com pointing to s3)
         Public allowSiteMonitor As Boolean
         Public domainList As New List(Of String)        ' primary domain is the first item in the list
         Public enableCache As Boolean
@@ -67,7 +67,7 @@ Namespace Contensive.Core
     ''' Holds location on the server of the clusterConfig file. Physically stored at programDataFolder/clib/serverConfig.json
     ''' </summary>
     Public Class serverConfigClass
-        Public clusterPath As String
+        'Public clusterPath As String
         Public allowTaskRunnerService As Boolean
         Public allowTaskSchedulerService As Boolean
     End Class
@@ -3275,7 +3275,7 @@ Namespace Contensive.Core
         '
         ' innova Editor feature list
         '
-        Public Const InnovaEditorFeaturefilename = "Config\EditorCongif.txt"
+        Public Const InnovaEditorFeaturefilename = "innova\EditorConfig.txt"
         Public Const InnovaEditorFeatureList = "FullScreen,Preview,Print,Search,Cut,Copy,Paste,PasteWord,PasteText,SpellCheck,Undo,Redo,Image,Flash,Media,CustomObject,CustomTag,Bookmark,Hyperlink,HTMLSource,XHTMLSource,Numbering,Bullets,Indent,Outdent,JustifyLeft,JustifyCenter,JustifyRight,JustifyFull,Table,Guidelines,Absolute,Characters,Line,Form,RemoveFormat,ClearAll,StyleAndFormatting,TextFormatting,ListFormatting,BoxFormatting,ParagraphFormatting,CssText,Styles,Paragraph,FontName,FontSize,Bold,Italic,Underline,Strikethrough,Superscript,Subscript,ForeColor,BackColor"
         Public Const InnovaEditorPublicFeatureList = "FullScreen,Preview,Print,Search,Cut,Copy,Paste,PasteWord,PasteText,SpellCheck,Undo,Redo,Bookmark,Hyperlink,HTMLSource,XHTMLSource,Numbering,Bullets,Indent,Outdent,JustifyLeft,JustifyCenter,JustifyRight,JustifyFull,Table,Guidelines,Absolute,Characters,Line,Form,RemoveFormat,ClearAll,StyleAndFormatting,TextFormatting,ListFormatting,BoxFormatting,ParagraphFormatting,CssText,Styles,Paragraph,FontName,FontSize,Bold,Italic,Underline,Strikethrough,Superscript,Subscript,ForeColor,BackColor"
         ''
@@ -7313,16 +7313,16 @@ ErrorTrap:
             Randomize()
             getRandomLong = EncodeInteger(RandomBase + (Rnd() * RandomLimit))
         End Function
-        '
-        '====================================================================================================
-        ' the root folder where all app data is stored.
-        '   In local mode, this folder is the backup target
-        '   -- path means no trailing slash
-        '====================================================================================================
-        '
-        Public Function getProgramDataPath() As String
-            Return coreFileSystemClass.normalizePath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) & "clib\"
-        End Function
+        ''
+        ''====================================================================================================
+        '' the root folder where all app data is stored.
+        ''   In local mode, this folder is the backup target
+        ''   -- path means no trailing slash
+        ''====================================================================================================
+        ''
+        'Public Function getProgramDataPath() As String
+        '    Return coreFileSystemClass.normalizePath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) & "clib\"
+        'End Function
         '
         '====================================================================================================
         ' the the c:\program files x86) path 

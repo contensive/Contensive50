@@ -77,8 +77,8 @@ Namespace Contensive.Core
                             If String.IsNullOrEmpty(serializedDataObject) Then
                                 returnObj = Nothing
                             Else
-                                returnObj = Newtonsoft.Json.JsonConvert.DeserializeObject(Of returnType)(serializedDataObject)
-                                'returnObj = cpCore.json.Deserialize(Of returnType)(serializedDataObject)
+                                'returnObj = Newtonsoft.Json.JsonConvert.DeserializeObject(Of returnType)(serializedDataObject)
+                                returnObj = cpCore.json.Deserialize(Of returnType)(serializedDataObject)
                             End If
                         Else
                             '
@@ -206,8 +206,8 @@ Namespace Contensive.Core
                             '
                             ' implement a simple local cache using the filesystem
                             '
-                            Dim serializedData As String = Newtonsoft.Json.JsonConvert.SerializeObject(data)
-                            'Dim serializedData As String = cpCore.json.Serialize(data)
+                            'Dim serializedData As String = Newtonsoft.Json.JsonConvert.SerializeObject(data)
+                            Dim serializedData As String = cpCore.json.Serialize(data)
                             Using mutex As New System.Threading.Mutex(False, rawCacheName)
                                 mutex.WaitOne()
                                 cpCore.privateFiles.saveFile("appCache\" & encodeFilename(rawCacheName & ".txt"), serializedData)

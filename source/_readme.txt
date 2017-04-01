@@ -1,5 +1,5 @@
 ﻿
-updated: 20170106
+updated: 20170401
 
 debug
 ---- all bug logs in github
@@ -21,6 +21,7 @@ Short Term Goals: 20160930
 /------- clib.io is the domain
 /------- find a sample software project like this that I want to model after (to start, simple clean styles)
 /------- write How-To-Get-Started
+-------- write system architecture in wiki (where configuration is stored, all the server components)
 /--- Installations
 /-------- nuget package that a developer can add to webproject, develop and push to the appRoot folder to develop any type of ASPX site
 /------------ long term - https://docs.nuget.org/ndocs/create-packages/creating-a-package
@@ -28,29 +29,41 @@ Short Term Goals: 20160930
 /------------ quickstart - 
 /------- setup install
 /----------- Installs all software for all server types, etc and clib.exe to manage server configuration
-/--- configuration
--------- each server (webRole,workerRole,scheduler) is part of one and only one cluster
--------- each cluster can have one or more apps
--------- all apps in a cluster trust each other - no work is done to protect files,db,etc. from another
--------- the apps on a webRole are the same throughout the cluster
--------- the clusterConfig.json file
+---- configuration files
+-------- rename term "cluster" to "ServerGroup"
+-------- remove serverConfig.json
+-------- rename "clusterconfig.json" to Config.json and move it to c:\programdata\contensive
+-------- Config.json file holds configuration for taskScheduler and TaskRunner. 
+-------- move all config info into one file, and save it in c:\programdata\contensive\config.json
+-------- WebRoles can initialize through their own mechanisms (web.config) or use the config.json file as a fallback. WebRoles must have ContensiveAppName.
+-------- ServerRoles use the programdata-config.json file primarily
+-------- config.json is maintained with the command line routine clib
+
+
+
+-------- each server (webRole,workerRole,scheduler) is part of one and only one ServerGroup
+-------- each ServerGroup can have one or more apps
+-------- all apps in a ServerGroup trust each other - no work is done to protect files,db,etc. from another
+-------- the apps on a webRole are the same throughout the ServerGroup
+-------- the Config.json file
 ------------ localMode: stored in clusterFolder (d:\inetpub)
 ------------ scaleMode: retreived from an http source (s3) and local copy in localMode store.
 ------------ first node is clusterConfig source endpoint(s) that hold the authoritative copy of the clusterConfig.json
 ------------ has all the configuration for the cluster and for all the apps in the cluster
 ------------ to update it, all applications should check it's modification time and call for a refresh if > ?1 minute old
 ---- File Locations
--------- Program Files\clib (programFilesFolder - DO NOT STORE ANYTHING HERE THAT NEEDS TO BE REACHED DURING EXECUTION)
------------- .\resources - files used for building new sites
------------- cli.exe
+-------- Program Files\kma\Contensive5 (programFilesFolder - DO NOT STORE ANYTHING HERE THAT NEEDS TO BE REACHED DURING EXECUTION)
+------------ clib.exe -- standalone command line configuration program.
 ------------ clibService.exe, windows service not installed automatically, install with 'installUtil clibService.exe'
 ------------ all executables needed for all modes.
 ------------ no need to backup, no app data
--------- ProgramData\clib (programDataFolder)
+-------- ProgramData\Contensive (programDataFolder)
 ------------ .\serverConfig.json
 ---------------- contains the file path to the cluster folder
------------- .\commonAssemblies, installed empty.
+------------ .\AddonAssemblyBypass, installed empty.
 ---------------- developers can copy addon assemblies here. Add addon assembly execution tries this first. Keep it empty in production
+
+
 ------------ .\logs
 -------- d:\inetpub (clusterFolder - default location)
 ------------ where all application data is stored (this folder is backed up)

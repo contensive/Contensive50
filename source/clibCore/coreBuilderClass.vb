@@ -84,7 +84,8 @@ Namespace Contensive.Core
                         cpCore.appRootFiles.saveFile("deleteMe.txt", "Temp document to create path")
                         cpCore.appRootFiles.deleteFile("deleteMe.txt")
                         bindinginformation = "*:80:" & DomainName
-                        mySite = iisManager.Sites.Add(appName, "http", bindinginformation, cpCore.serverConfig.clusterPath & cpCore.appConfig.appRootFilesPath)
+                        mySite = iisManager.Sites.Add(appName, "http", bindinginformation, cpCore.appConfig.appRootFilesPath)
+                        'mySite = iisManager.Sites.Add(appName, "http", bindinginformation, cpCore.serverConfig.clusterPath & cpCore.appConfig.appRootFilesPath)
                         'iisManager.Sites.Item(0).)
                         bindinginformation = "*:80:" & appName
                         mySite.Bindings.Add(bindinginformation, "http")
