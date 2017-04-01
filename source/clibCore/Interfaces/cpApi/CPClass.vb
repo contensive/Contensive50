@@ -4,7 +4,7 @@ Option Strict On
 
 Imports System.Runtime.InteropServices
 Imports Contensive.BaseClasses
-Imports Xunit
+
 
 Namespace Contensive.Core
     '
@@ -528,70 +528,5 @@ Namespace Contensive.Core
         End Sub
 #End Region
     End Class
-    '
-    '====================================================================================================
-    ' unit tests
-    '
-    Public Class CPClassUnitTests
-        '
-        '====================================================================================================
-        ' unit test - cp.addVar
-        '
-        <Fact> Public Sub cp_AddVar_unit()
-            ' arrange
-            Dim cp As New CPClass()
-            Dim cpApp As New CPClass("testapp")
-            ' act
-            cp.AddVar("a", "1")
-            cp.AddVar("b", "2")
-            cp.AddVar("b", "3")
-            cpApp.AddVar("a", "4")
-            cpApp.AddVar("b", "5")
-            For ptr = 1 To 10
-                cpApp.AddVar("key" & ptr.ToString, "value" & ptr.ToString())
-            Next
-            ' assert
-            Assert.Equal(cp.Doc.GetText("a"), "1")
-            Assert.Equal(cp.Doc.GetText("b"), "3")
-            Assert.Equal(cpApp.Doc.GetText("a"), "4")
-            Assert.Equal(cpApp.Doc.GetText("b"), "5")
-            For ptr = 1 To 10
-                Assert.Equal(cpApp.Doc.GetText("key" & ptr.ToString), "value" & ptr.ToString())
-            Next
-            ' dispose
-            cp.Dispose()
-            cpApp.Dispose()
-        End Sub
-        '
-        '====================================================================================================
-        ' unit test - cp.appOk
-        '
-        <Fact> Public Sub cp_AppOk_unit()
-            ' arrange
-            Dim cp As New CPClass()
-            Dim cpApp As New CPClass("testapp")
-            ' act
-            ' assert
-            Assert.Equal(cp.appOk, False)
-            Assert.Equal(cpApp.appOk, True)
-            ' dispose
-            cp.Dispose()
-            cpApp.Dispose()
-        End Sub
 
-        '
-        '====================================================================================================
-        ' unit test - sample
-        '
-        <Fact> Public Sub cp_sample_unit()
-            ' arrange
-            Dim cp As New CPClass()
-            ' act
-            '
-            ' assert
-            Assert.Equal(cp.appOk, False)
-            ' dispose
-            cp.Dispose()
-        End Sub
-    End Class
 End Namespace

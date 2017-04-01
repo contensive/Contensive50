@@ -4,7 +4,7 @@ Option Strict On
 
 Imports System.Runtime.InteropServices
 Imports System.Net
-Imports Xunit
+
 Imports System.Text.RegularExpressions
 '
 Namespace Contensive.Core
@@ -71,7 +71,6 @@ Namespace Contensive.Core
         Public allowTaskRunnerService As Boolean
         Public allowTaskSchedulerService As Boolean
     End Class
-
     '
     '====================================================================================================
     ''' <summary>
@@ -7646,168 +7645,5 @@ ErrorTrap:
             End If
         End Function
     End Module
-    '
-    Public Class coreCommonTests
-        '
-        <Fact> Public Sub normalizePath_unit()
-            ' arrange
-            ' act
-            ' assert
-            Assert.Equal(coreFileSystemClass.normalizePath(""), "")
-            Assert.Equal(coreFileSystemClass.normalizePath("c:\"), "c:\")
-            Assert.Equal(coreFileSystemClass.normalizePath("c:\test\"), "c:\test\")
-            Assert.Equal(coreFileSystemClass.normalizePath("c:\test"), "c:\test\")
-            Assert.Equal(coreFileSystemClass.normalizePath("c:\test/test"), "c:\test\test\")
-            Assert.Equal(coreFileSystemClass.normalizePath("test"), "test\")
-            Assert.Equal(coreFileSystemClass.normalizePath("\test"), "test\")
-            Assert.Equal(coreFileSystemClass.normalizePath("\test\"), "test\")
-            Assert.Equal(coreFileSystemClass.normalizePath("/test/"), "test\")
-        End Sub
-        '
-        <Fact> Public Sub normalizeRoute_unit()
-            ' arrange
-            ' act
-            ' assert
-            Assert.Equal(normalizeRoute("TEST"), "/test")
-            Assert.Equal(normalizeRoute("\TEST"), "/test")
-            Assert.Equal(normalizeRoute("\\TEST"), "/test")
-            Assert.Equal(normalizeRoute("test"), "/test")
-            Assert.Equal(normalizeRoute("/test/"), "/test")
-            Assert.Equal(normalizeRoute("test/"), "/test")
-            Assert.Equal(normalizeRoute("test//"), "/test")
-        End Sub
-        '
-        <Fact> Public Sub encodeBoolean_unit()
-            ' arrange
-            ' act
-            ' assert
-            Assert.Equal(EncodeBoolean(True), True)
-            Assert.Equal(EncodeBoolean(0), False)
-            Assert.Equal(EncodeBoolean(1), True)
-            Assert.Equal(EncodeBoolean("on"), True)
-            Assert.Equal(EncodeBoolean("off"), False)
-            Assert.Equal(EncodeBoolean("true"), True)
-            Assert.Equal(EncodeBoolean("false"), False)
-        End Sub
-        '
-        <Fact> Public Sub encodeText_unit()
-            ' arrange
-            ' act
-            ' assert
-            Assert.Equal(EncodeText(1), "1")
-        End Sub
-        '
-        <Fact> Public Sub sample_unit()
-            ' arrange
-            ' act
-            ' assert
-            Assert.Equal(True, True)
-        End Sub
-        '
-        <Fact> Public Sub dateToSeconds_unit()
-            ' arrange
-            ' act
-            ' assert
-            Assert.Equal(dateToSeconds(New Date(1900, 1, 1)), 0)
-            Assert.Equal(dateToSeconds(New Date(1900, 1, 2)), 86400)
-        End Sub
-        '
-        <Fact> Public Sub ModifyQueryString_unit()
-            ' arrange
-            ' act
-            ' assert
-            Assert.Equal("", ModifyQueryString("", "a", "1", False))
-            Assert.Equal("a=1", ModifyQueryString("", "a", "1", True))
-            Assert.Equal("a=1", ModifyQueryString("a=0", "a", "1", False))
-            Assert.Equal("a=1", ModifyQueryString("a=0", "a", "1", True))
-            Assert.Equal("a=1&b=2", ModifyQueryString("a=1", "b", "2", True))
-        End Sub
-        '
-        <Fact> Public Sub ModifyLinkQuery_unit()
-            ' arrange
-            ' act
-            ' assert
-            Assert.Equal("index.html", modifyLinkQuery("index.html", "a", "1", False))
-            Assert.Equal("index.html?a=1", modifyLinkQuery("index.html", "a", "1", True))
-            Assert.Equal("index.html?a=1", modifyLinkQuery("index.html?a=0", "a", "1", False))
-            Assert.Equal("index.html?a=1", modifyLinkQuery("index.html?a=0", "a", "1", True))
-            Assert.Equal("index.html?a=1&b=2", modifyLinkQuery("index.html?a=1", "b", "2", True))
-        End Sub
-        '
-        <Fact> Public Sub vbInstr_test()
-            'vbInstr(1, Link, "?")
-            Assert.Equal(InStr("abcdefgabcdefgabcdefgabcdefg", "d"), vbInstr("abcdefgabcdefgabcdefgabcdefg", "d"))
-            Assert.Equal(InStr("abcdefgabcdefgabcdefgabcdefg", "E"), vbInstr("abcdefgabcdefgabcdefgabcdefg", "E"))
-            Assert.Equal(InStr(10, "abcdefgabcdefgabcdefgabcdefg", "E"), vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E"))
-            Assert.Equal(InStr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Binary), vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Binary))
-            Assert.Equal(InStr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Text), vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Text))
-            Assert.Equal(InStr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Binary), vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Binary))
-            Assert.Equal(InStr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Text), vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Text))
-            Dim haystack As String = "abcdefgabcdefgabcdefgabcdefg"
-            Dim needle As String = "c"
-            Assert.Equal(InStr(1, "?", "?"), vbInstr(1, "?", "?"))
-            For ptr As Integer = 1 To haystack.Length
-                Assert.Equal(InStr(ptr, haystack, needle, CompareMethod.Binary), vbInstr(ptr, haystack, needle, CompareMethod.Binary))
-            Next
-        End Sub
-        '
-        <Fact> Public Sub vbIsNumeric_test()
-            Assert.Equal(IsNumeric(0), vbIsNumeric(0))
-            Assert.Equal(IsNumeric(New Date(2000, 1, 1)), vbIsNumeric(New Date(2000, 1, 1)))
-            Assert.Equal(IsNumeric(1234), vbIsNumeric(1234))
-            Assert.Equal(IsNumeric(12.34), vbIsNumeric(12.34))
-            Assert.Equal(IsNumeric("abcd"), vbIsNumeric("abcd"))
-            Assert.Equal(IsNumeric("1234"), vbIsNumeric("1234"))
-            Assert.Equal(IsNumeric("12.34"), vbIsNumeric("12.34"))
-            Assert.Equal(IsNumeric(Nothing), vbIsNumeric(Nothing))
-        End Sub
-        '
-        <Fact> Public Sub vbReplace_test()
-            Dim actual As String
-            Dim expected As String
-            Dim start As Integer = 1
-            Dim count As Integer = 9999
-            '
-            expected = Replace("abcdefg", "cd", "12345")
-            actual = vbReplace("abcdefg", "cd", "12345")
-            Assert.Equal(expected, actual)
-            '
-            expected = Replace("abcdefg", "cD", "12345")
-            actual = vbReplace("abcdefg", "cD", "12345")
-            Assert.Equal(expected, actual)
-            '
-            expected = Replace("abcdefg", "cd", "12345", start, count, CompareMethod.Binary)
-            actual = vbReplace("abcdefg", "cd", "12345", start, count, CompareMethod.Binary)
-            Assert.Equal(expected, actual)
-            '
-            expected = Replace("abcdefg", "cD", "12345", start, count, CompareMethod.Binary)
-            actual = vbReplace("abcdefg", "cD", "12345", start, count, CompareMethod.Binary)
-            Assert.Equal(expected, actual)
-            '
-            expected = Replace("abcdefg", "cd", "12345", start, count, CompareMethod.Text)
-            actual = vbReplace("abcdefg", "cd", "12345", start, count, CompareMethod.Text)
-            Assert.Equal(expected, actual)
-            '
-            expected = Replace("abcdefg", "cD", "12345", start, count, CompareMethod.Text)
-            actual = vbReplace("abcdefg", "cD", "12345", start, count, CompareMethod.Text)
-            Assert.Equal(expected, actual)
-        End Sub
-        '
-        <Fact> Public Sub vbUCase_test()
-            Assert.Equal(UCase("AbCdEfG"), vbUCase("AbCdEfG"))
-            Assert.Equal(UCase("ABCDEFG"), vbUCase("ABCDEFG"))
-            Assert.Equal(UCase("abcdefg"), vbUCase("abcdefg"))
-        End Sub
-        '
-        <Fact> Public Sub vbLCase_test()
-            Assert.Equal(LCase("AbCdEfG"), vbLCase("AbCdEfG"))
-            Assert.Equal(LCase("ABCDEFG"), vbLCase("ABCDEFG"))
-            Assert.Equal(LCase("abcdefg"), vbLCase("abcdefg"))
-        End Sub
-        '
-        <Fact> Public Sub vbLeft_test()
-            Assert.Equal(LCase("AbCdEfG"), vbLCase("AbCdEfG"))
-        End Sub
 
-    End Class
 End Namespace

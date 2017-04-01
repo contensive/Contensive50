@@ -2,7 +2,7 @@
 Option Explicit On
 Option Strict On
 
-Imports Xunit
+
 
 Namespace Contensive.Core
     '
@@ -108,18 +108,5 @@ Namespace Contensive.Core
         End Sub
 #End Region
     End Class
-    '
-    '====================================================================================================
-    ''' <summary>
-    ''' unit tests
-    ''' </summary>
-    Public Class core_blankClass_UnitTests
-        '
-        <Fact> Public Sub sampleMethod_unit()
-            ' arrange
-            ' act
-            ' assert
-            Assert.Equal(True, True)
-        End Sub
-    End Class
+
 End Namespace

@@ -2,7 +2,7 @@
 Option Explicit On
 Option Strict On
 
-Imports Xunit
+
 
 Namespace Contensive.Core
     '
@@ -243,18 +243,5 @@ Namespace Contensive.Core
             End Try
         End Sub
     End Class
-    '
-    '====================================================================================================
-    ''' <summary>
-    ''' unit tests
-    ''' </summary>
-    Friend Class coreCacheKeyPtrClass_UnitTests
-        '
-        <Fact> Public Sub sampleMethod_unit()
-            ' arrange
-            ' act
-            ' assert
-            Assert.Equal(True, True)
-        End Sub
-    End Class
+
 End Namespace

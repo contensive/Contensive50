@@ -4,7 +4,7 @@ Option Strict On
 
 Imports System.Reflection
 Imports Contensive.BaseClasses
-Imports Xunit
+
 Imports System.Xml
 
 Namespace Contensive.Core
@@ -4695,19 +4695,5 @@ ErrorTrap:
             End If
         End Sub
 #End Region
-    End Class
-    '
-    '====================================================================================================
-    ''' <summary>
-    ''' unit tests
-    ''' </summary>
-    Public Class coreAddonClass_UnitTests
-        '
-        <Fact> Public Sub sampleMethod_unit()
-            ' arrange
-            ' act
-            ' assert
-            Assert.Equal(True, True)
-        End Sub
     End Class
 End Namespace

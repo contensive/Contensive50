@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\xunit.runner.visualstudio.2.1.0\build\net20\xunit.runner.visualstudio.props" Condition="Exists('..\packages\xunit.runner.visualstudio.2.1.0\build\net20\xunit.runner.visualstudio.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -176,22 +175,6 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <HintPath>..\packages\xunit.abstractions.2.0.0\lib\net35\xunit.abstractions.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="xunit.assert, Version=2.1.0.3179, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <HintPath>..\packages\xunit.assert.2.1.0\lib\dotnet\xunit.assert.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="xunit.core, Version=2.1.0.3179, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <HintPath>..\packages\xunit.extensibility.core.2.1.0\lib\dotnet\xunit.core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="xunit.execution.desktop, Version=2.1.0.3179, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <HintPath>..\packages\xunit.extensibility.execution.2.1.0\lib\net45\xunit.execution.desktop.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
@@ -229,34 +212,34 @@
     <Compile Include="coreTaskSchedulerServiceClass.vb" />
     <Compile Include="coreWorkflowClass.vb" />
     <Compile Include="core_BlankClass.vb" />
-    <Compile Include="CPAddonClass.vb" />
-    <Compile Include="CPBlockClass.vb" />
-    <Compile Include="CPCacheClass.vb" />
-    <Compile Include="CPClass.vb" />
-    <Compile Include="CPContentClass.vb" />
-    <Compile Include="CPContextClass.vb" />
-    <Compile Include="CPCSClass.vb" />
-    <Compile Include="CPDbClass.vb" />
-    <Compile Include="CPDocClass.vb" />
-    <Compile Include="CPEmailClass.vb" />
-    <Compile Include="CPFileSystemClass.vb" />
-    <Compile Include="CPFileClass.vb" />
-    <Compile Include="CPGroupClass.vb" />
-    <Compile Include="CPHtmlClass.vb" />
-    <Compile Include="CPRequestClass.vb" />
-    <Compile Include="CPResponseClass.vb" />
-    <Compile Include="CPSiteClass.vb" />
-    <Compile Include="CPUserClass.vb" />
-    <Compile Include="CPUserErrorClass.vb" />
-    <Compile Include="CPUtilsClass.vb" />
-    <Compile Include="CPVisitClass.vb" />
-    <Compile Include="CPVisitorClass.vb" />
+    <Compile Include="Interfaces\cpApi\CPAddonClass.vb" />
+    <Compile Include="Interfaces\cpApi\CPBlockClass.vb" />
+    <Compile Include="Interfaces\cpApi\CPCacheClass.vb" />
+    <Compile Include="Interfaces\cpApi\CPClass.vb" />
+    <Compile Include="Interfaces\cpApi\CPContentClass.vb" />
+    <Compile Include="Interfaces\cpApi\CPContextClass.vb" />
+    <Compile Include="Interfaces\cpApi\CPCSClass.vb" />
+    <Compile Include="Interfaces\cpApi\CPDbClass.vb" />
+    <Compile Include="Interfaces\cpApi\CPDocClass.vb" />
+    <Compile Include="Interfaces\cpApi\CPEmailClass.vb" />
+    <Compile Include="Interfaces\cpApi\CPFileSystemClass.vb" />
+    <Compile Include="Interfaces\cpApi\CPFileClass.vb" />
+    <Compile Include="Interfaces\cpApi\CPGroupClass.vb" />
+    <Compile Include="Interfaces\cpApi\CPHtmlClass.vb" />
+    <Compile Include="Interfaces\cpApi\CPRequestClass.vb" />
+    <Compile Include="Interfaces\cpApi\CPResponseClass.vb" />
+    <Compile Include="Interfaces\cpApi\CPSiteClass.vb" />
+    <Compile Include="Interfaces\cpApi\CPUserClass.vb" />
+    <Compile Include="Interfaces\cpApi\CPUserErrorClass.vb" />
+    <Compile Include="Interfaces\cpApi\CPUtilsClass.vb" />
+    <Compile Include="Interfaces\cpApi\CPVisitClass.vb" />
+    <Compile Include="Interfaces\cpApi\CPVisitorClass.vb" />
     <Compile Include="DataSet1.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>DataSet1.xsd</DependentUpon>
     </Compile>
-    <Compile Include="coreClass.vb" />
+    <Compile Include="Interfaces\coreClass.vb" />
     <Compile Include="coreCommonModule.vb" />
     <Compile Include="coreDataTreeClass.vb" />
     <Compile Include="coreKeyPtrIndexClass.vb" />
@@ -339,12 +322,24 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\Context\" />
+    <Folder Include="Models\Entity\" />
+    <Folder Include="Models\View\" />
+    <Folder Include="Views\" />
+  </ItemGroup>
+  <ItemGroup>
     <COMReference Include="ADODB">
       <Guid>{2A75196C-D9EB-4129-B803-931327F72D5C}</Guid>
       <VersionMajor>2</VersionMajor>
       <VersionMinor>8</VersionMinor>
       <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
+      <WrapperTool>primary</WrapperTool>
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
@@ -358,23 +353,11 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\xunit.runner.visualstudio.2.1.0\build\net20\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\xunit.runner.visualstudio.2.1.0\build\net20\xunit.runner.visualstudio.props'))" />
-  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

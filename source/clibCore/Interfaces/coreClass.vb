@@ -5,7 +5,7 @@ Option Explicit On
 Imports System.Xml
 Imports System.Reflection
 Imports HttpMultipartParser
-Imports Xunit
+
 Imports Contensive.BaseClasses
 '
 Namespace Contensive.Core
@@ -36234,25 +36234,5 @@ ErrorTrap:
         End Sub
 #End Region        '
     End Class
-    '
-    '====================================================================================================
-    '
-    Public Class cpCoreTests
-        <Fact> Public Sub encodeSqlTableNameTest()
-            ' arrange
-            ' act
-            ' assert
-            Assert.Equal("", coreClass.encodeSqlTableName(""))
-            Assert.Equal("", coreClass.encodeSqlTableName("-----"))
-            Assert.Equal("", coreClass.encodeSqlTableName("01234567879"))
-            Assert.Equal("a", coreClass.encodeSqlTableName("a"))
-            Assert.Equal("aa", coreClass.encodeSqlTableName("a a"))
-            Assert.Equal("aA", coreClass.encodeSqlTableName(" aA"))
-            Assert.Equal("aA", coreClass.encodeSqlTableName(" aA "))
-            Assert.Equal("aA", coreClass.encodeSqlTableName("aA "))
-            Assert.Equal("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", coreClass.encodeSqlTableName("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"))
-            Assert.Equal("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_@#", coreClass.encodeSqlTableName("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_@#"))
-            '
-        End Sub
-    End Class
+
 End Namespace

@@ -1,9 +1,9 @@
 ﻿
 using Contensive.Core;
 using Contensive.BaseClasses;
-using Xunit;
 using System;
 using System.Collections.Generic;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace integrationTests
 {
@@ -14,7 +14,7 @@ namespace integrationTests
         /// <summary>
         ///  Test 1 - cp ok without application (cluster mode).
         /// </summary>
-        [Fact]
+        [TestMethod()]
         public void constructorWithoutApp()
         {
             // arrange
@@ -23,15 +23,15 @@ namespace integrationTests
             bool clusterOK = cp.clusterOk;
             bool appOK = cp.appOk;
             // assert
-            Assert.Equal(clusterOK, true);
-            Assert.Equal(appOK, false);
+            Assert.AreEqual(clusterOK, true);
+            Assert.AreEqual(appOK, false);
             cp.Dispose();
         }
         //====================================================================================================
         /// <summary>
         /// Test 2 - cp ok with application
         /// </summary>
-        [Fact]
+        [TestMethod()]
         private void constructorWithApp()
         {
             // arrange
@@ -40,8 +40,8 @@ namespace integrationTests
             bool clusterOK = cp.clusterOk;
             bool appOK = cp.appOk;
             // assert
-            Assert.Equal(clusterOK, true);
-            Assert.Equal(appOK, true);
+            Assert.AreEqual(clusterOK, true);
+            Assert.AreEqual(appOK, true);
 
             cp.Dispose();
         }
@@ -49,7 +49,7 @@ namespace integrationTests
         /// <summary>
         /// cpExecuteAddontest
         /// </summary>
-        [Fact]
+        [TestMethod()]
         private void cpExecuteAddontest()
         {
             // arrange
@@ -76,11 +76,11 @@ namespace integrationTests
             cp.Doc.SetProperty("echo", echoText);
             // act
             // assert
-            Assert.Equal(htmlText + wysiwygText + echoText, cp.executeAddon(addonName));
+            Assert.AreEqual(htmlText + wysiwygText + echoText, cp.executeAddon(addonName));
             //
-            Assert.Equal(htmlText + wysiwygText + echoText, cp.executeAddon(addonGuid));
+            Assert.AreEqual(htmlText + wysiwygText + echoText, cp.executeAddon(addonGuid));
             //
-            Assert.Equal(htmlText + wysiwygText + echoText, cp.executeAddon(recordId.ToString()));
+            Assert.AreEqual(htmlText + wysiwygText + echoText, cp.executeAddon(recordId.ToString()));
             //dispose
             cp.Content.DeleteRecords("add-ons", "id=" + recordId.ToString());
             cp.Dispose();
@@ -89,7 +89,7 @@ namespace integrationTests
         /// <summary>
         /// cpExecuteAddontest
         /// </summary>
-        [Fact]
+        [TestMethod()]
         private void cpExecuteRouteTest()
         {
             // arrange
@@ -117,7 +117,7 @@ namespace integrationTests
             cp.Doc.SetProperty("echo", echoText);
             // act
             // assert
-            Assert.Equal(htmlText + wysiwygText + echoText, cp.executeRoute(addonName));
+            Assert.AreEqual(htmlText + wysiwygText + echoText, cp.executeRoute(addonName));
             //dispose
             cp.Content.DeleteRecords("add-ons", "id=" + recordId.ToString());
             cp.Dispose();
@@ -131,7 +131,7 @@ namespace integrationTests
         /// <summary>
         /// cp.cache save read
         /// </summary>
-        [Fact]
+        [TestMethod()]
         private void cpCacheLegacySaveRead()
         {
             // arrange
@@ -140,7 +140,7 @@ namespace integrationTests
             // act
             cp.Cache.Save("testString", "testValue");
             // assert
-            Assert.Equal(cp.Cache.Read("testString"), "testValue");
+            Assert.AreEqual(cp.Cache.Read("testString"), "testValue");
             // dispose
             cp.Dispose();
         }
@@ -148,7 +148,7 @@ namespace integrationTests
         /// <summary>
         /// cp.cache save read
         /// </summary>
-        [Fact]
+        [TestMethod()]
         private void cpCacheSetGet_integration()
         {
             // arrange
@@ -162,11 +162,11 @@ namespace integrationTests
             cp.Cache.setKey("testTrue", true);
             cp.Cache.setKey("testFalse", false);
             // assert
-            Assert.Equal(cp.Cache.getText("testString"), "testValue");
-            Assert.Equal(cp.Cache.getInteger("testInt"), 12345);
-            Assert.Equal(cp.Cache.getDate("testDate"), testDate);
-            Assert.Equal(cp.Cache.getBoolean("testTrue"), true);
-            Assert.Equal(cp.Cache.getBoolean("testFalse"), false);
+            Assert.AreEqual(cp.Cache.getText("testString"), "testValue");
+            Assert.AreEqual(cp.Cache.getInteger("testInt"), 12345);
+            Assert.AreEqual(cp.Cache.getDate("testDate"), testDate);
+            Assert.AreEqual(cp.Cache.getBoolean("testTrue"), true);
+            Assert.AreEqual(cp.Cache.getBoolean("testFalse"), false);
             // dispose
             cp.Dispose();
         }
@@ -174,7 +174,7 @@ namespace integrationTests
         /// <summary>
         /// cp.cache invalidateAll
         /// </summary>
-        [Fact]
+        [TestMethod()]
         private void cpCacheInvalidateAll_integration()
         {
             // arrange
@@ -188,20 +188,20 @@ namespace integrationTests
             cp.Cache.setKey("testTrue", true, "a");
             cp.Cache.setKey("testFalse", false, "a");
             // assert
-            Assert.Equal("testValue", cp.Cache.getText("testString"));
-            Assert.Equal(12345, cp.Cache.getInteger("testInt"));
-            Assert.Equal(testDate, cp.Cache.getDate("testDate"));
-            Assert.Equal(true, cp.Cache.getBoolean("testTrue"));
-            Assert.Equal(false, cp.Cache.getBoolean("testFalse"));
+            Assert.AreEqual("testValue", cp.Cache.getText("testString"));
+            Assert.AreEqual(12345, cp.Cache.getInteger("testInt"));
+            Assert.AreEqual(testDate, cp.Cache.getDate("testDate"));
+            Assert.AreEqual(true, cp.Cache.getBoolean("testTrue"));
+            Assert.AreEqual(false, cp.Cache.getBoolean("testFalse"));
             // act
             cp.Cache.InvalidateTag("a");
             // assert
-            Assert.Equal(null, cp.Cache.getObject("testString"));
-            Assert.Equal("", cp.Cache.getText("testString"));
-            Assert.Equal(0, cp.Cache.getInteger("testInt"));
-            Assert.Equal(DateTime.MinValue, cp.Cache.getDate("testDate"));
-            Assert.Equal(false, cp.Cache.getBoolean("testTrue"));
-            Assert.Equal(false, cp.Cache.getBoolean("testFalse"));
+            Assert.AreEqual(null, cp.Cache.getObject("testString"));
+            Assert.AreEqual("", cp.Cache.getText("testString"));
+            Assert.AreEqual(0, cp.Cache.getInteger("testInt"));
+            Assert.AreEqual(DateTime.MinValue, cp.Cache.getDate("testDate"));
+            Assert.AreEqual(false, cp.Cache.getBoolean("testTrue"));
+            Assert.AreEqual(false, cp.Cache.getBoolean("testFalse"));
             // dispose
             cp.Dispose();
         }
@@ -209,7 +209,7 @@ namespace integrationTests
         /// <summary>
         /// cp.cache invalidateAll
         /// </summary>
-        [Fact]
+        [TestMethod()]
         private void cpCacheInvalidateList_integration()
         {
             // arrange
@@ -229,20 +229,20 @@ namespace integrationTests
             cp.Cache.setKey("testTrue", true, "d");
             cp.Cache.setKey("testFalse", false, "e");
             // assert
-            Assert.Equal("testValue", cp.Cache.getText("testString"));
-            Assert.Equal(12345, cp.Cache.getInteger("testInt"));
-            Assert.Equal(testDate, cp.Cache.getDate("testDate"));
-            Assert.Equal(true, cp.Cache.getBoolean("testTrue"));
-            Assert.Equal(false, cp.Cache.getBoolean("testFalse"));
+            Assert.AreEqual("testValue", cp.Cache.getText("testString"));
+            Assert.AreEqual(12345, cp.Cache.getInteger("testInt"));
+            Assert.AreEqual(testDate, cp.Cache.getDate("testDate"));
+            Assert.AreEqual(true, cp.Cache.getBoolean("testTrue"));
+            Assert.AreEqual(false, cp.Cache.getBoolean("testFalse"));
             // act
             cp.Cache.InvalidateTagList(tagList);
             // assert
-            Assert.Equal(null, cp.Cache.getObject("testString"));
-            Assert.Equal("", cp.Cache.getText("testString"));
-            Assert.Equal(0, cp.Cache.getInteger("testInt"));
-            Assert.Equal(DateTime.MinValue, cp.Cache.getDate("testDate"));
-            Assert.Equal(false, cp.Cache.getBoolean("testTrue"));
-            Assert.Equal(false, cp.Cache.getBoolean("testFalse"));
+            Assert.AreEqual(null, cp.Cache.getObject("testString"));
+            Assert.AreEqual("", cp.Cache.getText("testString"));
+            Assert.AreEqual(0, cp.Cache.getInteger("testInt"));
+            Assert.AreEqual(DateTime.MinValue, cp.Cache.getDate("testDate"));
+            Assert.AreEqual(false, cp.Cache.getBoolean("testTrue"));
+            Assert.AreEqual(false, cp.Cache.getBoolean("testFalse"));
             // dispose
             cp.Dispose();
         }
@@ -250,7 +250,7 @@ namespace integrationTests
         /// <summary>
         /// cp.cache invalidate on content save
         /// </summary>
-        [Fact]
+        [TestMethod()]
         private void cpCacheInvalidationOnEdit_integration()
         {
             // arrange
@@ -264,7 +264,7 @@ namespace integrationTests
                 // act
                 cp.Cache.Save("keyA", "testValue", contentName);
                 // assert
-                Assert.Equal("testValue", cp.Cache.Read("keyA"));
+                Assert.AreEqual("testValue", cp.Cache.Read("keyA"));
                 // act
                 CPCSBaseClass cs = cp.CSNew();
                 if (cs.Insert(contentName))
@@ -272,16 +272,16 @@ namespace integrationTests
                     cs.SetField("name", "test");
                 } else
                 {
-                    Assert.False(true);
+                    Assert.Fail();
                 }
                 cs.Close();
                 // assert
-                Assert.Equal("", cp.Cache.Read("keyA"));
+                Assert.AreEqual("", cp.Cache.Read("keyA"));
             }
             catch (Exception ex)
             {
                 cp.Utils.AppendLog("cpCacheInvalidationOnEdit_integration, exception, [" + ex.Message + "]");
-                Assert.True(false, "exception [" + ex.Message + "]");
+                Assert.Fail( "exception [" + ex.Message + "]");
             }
             finally
             {
@@ -294,7 +294,7 @@ namespace integrationTests
         /// <summary>
         /// cp.cache invalidate on content save
         /// </summary>
-        [Fact]
+        [TestMethod()]
         private void cpCacheTagInvalidationString()
         {
             // arrange
@@ -303,11 +303,11 @@ namespace integrationTests
             // act
             cp.Cache.Save("keyA", "testValue", "a,b,c,d,e");
             // assert
-            Assert.Equal(cp.Cache.Read("keyA"), "testValue");
+            Assert.AreEqual(cp.Cache.Read("keyA"), "testValue");
             // act
             cp.Cache.InvalidateTag("c");
             // assert
-            Assert.Equal(cp.Cache.getText("keyA"), "");
+            Assert.AreEqual(cp.Cache.getText("keyA"), "");
             // dispose
             cp.Dispose();
         }
@@ -320,7 +320,7 @@ namespace integrationTests
         /// <summary>
         /// cp.content.addRecord
         /// </summary>
-        [Fact]
+        [TestMethod()]
         private void cpContentAddRecordTest()
         {
             // arrange
@@ -332,9 +332,9 @@ namespace integrationTests
             recordAId = cp.Content.AddRecord("people");
             recordBId = cp.Content.AddRecord("people");
             // assert
-            Assert.NotEqual(0, recordAId);
-            Assert.NotEqual(0, recordBId);
-            Assert.NotEqual(recordAId, recordBId);
+            Assert.AreNotEqual(0, recordAId);
+            Assert.AreNotEqual(0, recordBId);
+            Assert.AreNotEqual(recordAId, recordBId);
             // dispose
             cp.Content.DeleteRecords("people", "id=" + recordAId);
             cp.Content.DeleteRecords("people", "id=" + recordBId);
@@ -344,7 +344,7 @@ namespace integrationTests
         /// <summary>
         /// cp.content.delete
         /// </summary>
-        [Fact]
+        [TestMethod()]
         private void cpContentDeleteRecordTest()
         {
             // arrange
@@ -368,7 +368,7 @@ namespace integrationTests
             }
             cs.Close();
             // assert
-            Assert.Equal(peopleCntAfter, (peopleCntBefore - 1));
+            Assert.AreEqual(peopleCntAfter, (peopleCntBefore - 1));
             // dispose
             cp.Dispose();
         }
@@ -376,7 +376,7 @@ namespace integrationTests
         /// <summary>
         /// cp.content.getCopy
         /// </summary>
-        [Fact]
+        [TestMethod()]
         private void cpContentGetCopyTest()
         {
             // arrange
@@ -390,7 +390,7 @@ namespace integrationTests
             // act
             //
             // assert
-            Assert.Equal(testCopy, cp.Content.GetCopy(copyName));
+            Assert.AreEqual(testCopy, cp.Content.GetCopy(copyName));
             // dispose
             cp.Content.DeleteRecords("copy content", "id=" + recordId.ToString());
             cp.Dispose();
@@ -399,7 +399,7 @@ namespace integrationTests
         /// <summary>
         /// cp.content.getCopy_withDefaultValue
         /// </summary>
-        [Fact]
+        [TestMethod()]
         private void cpContentGetCopyWithDefaultTest()
         {
             // arrange
@@ -410,7 +410,7 @@ namespace integrationTests
             // act
             //
             // assert
-            Assert.Equal(testCopy, cp.Content.GetCopy(copyName, testCopy));
+            Assert.AreEqual(testCopy, cp.Content.GetCopy(copyName, testCopy));
             // dispose
             cp.Content.DeleteRecords("copy content", "name=" + cp.Db.EncodeSQLText(copyName));
             cp.Dispose();
@@ -419,7 +419,7 @@ namespace integrationTests
         /// <summary>
         /// cp.content.setCopy
         /// </summary>
-        [Fact]
+        [TestMethod()]
         private void cpContentSetCopyTest()
         {
             // arrange
@@ -430,11 +430,11 @@ namespace integrationTests
             // act
             cp.Content.SetCopy(copyName, testCopyA);
             // assert
-            Assert.Equal(testCopyA, cp.Content.GetCopy(copyName, "shouldNotNeedDefault"));
+            Assert.AreEqual(testCopyA, cp.Content.GetCopy(copyName, "shouldNotNeedDefault"));
             // act
             cp.Content.SetCopy(copyName, testCopyB);
             // assert
-            Assert.Equal(testCopyB, cp.Content.GetCopy(copyName, "shouldNotNeedDefault"));
+            Assert.AreEqual(testCopyB, cp.Content.GetCopy(copyName, "shouldNotNeedDefault"));
             // dispose
             cp.Content.DeleteRecords("copy content", "name=" + cp.Db.EncodeSQLText(copyName));
             cp.Dispose();
@@ -443,7 +443,7 @@ namespace integrationTests
         /// <summary>
         /// cp.content.getId
         /// </summary>
-        [Fact]
+        [TestMethod()]
         private void cpContentGetId()
         {
             // arrange
@@ -458,8 +458,8 @@ namespace integrationTests
             cs.Close();
             //
             // assert
-            Assert.NotEqual(0, peopleContentId);
-            Assert.Equal(peopleContentId, cp.Content.GetID(peopleContentName));
+            Assert.AreNotEqual(0, peopleContentId);
+            Assert.AreEqual(peopleContentId, cp.Content.GetID(peopleContentName));
             // act
             cp.Dispose();
         }
@@ -467,7 +467,7 @@ namespace integrationTests
         /// <summary>
         /// cp.content.addContent_name_test
         /// </summary>
-        [Fact]
+        [TestMethod()]
         private void cpContentAddContentTest()
         {
             // arrange
@@ -482,25 +482,25 @@ namespace integrationTests
             // act
             // assert
             //
-            Assert.NotEqual(0, cp.Content.AddContent(contentName1));
-            Assert.NotEqual(0, cp.Content.AddContent(contentName2, tableName2));
-            Assert.NotEqual(0, cp.Content.AddContent(contentName3, tableName3, "default"));
+            Assert.AreNotEqual(0, cp.Content.AddContent(contentName1));
+            Assert.AreNotEqual(0, cp.Content.AddContent(contentName2, tableName2));
+            Assert.AreNotEqual(0, cp.Content.AddContent(contentName3, tableName3, "default"));
             //
             if (cs.Insert(contentName1))
             {
-                Assert.NotEqual(0, cs.GetInteger("id"));
+                Assert.AreNotEqual(0, cs.GetInteger("id"));
             }
             cs.Close();
             //
             if (cs.Insert(contentName2))
             {
-                Assert.NotEqual(0, cs.GetInteger("id"));
+                Assert.AreNotEqual(0, cs.GetInteger("id"));
             }
             cs.Close();
             //
             if (cs.Insert(contentName3))
             {
-                Assert.NotEqual(0, cs.GetInteger("id"));
+                Assert.AreNotEqual(0, cs.GetInteger("id"));
             }
             cs.Close();
             // dispose
@@ -513,7 +513,7 @@ namespace integrationTests
         /// <summary>
         /// cp.content.addContent_name_test
         /// </summary>
-        [Fact]
+        [TestMethod()]
         private void cpContentAddContentFieldTest()
         {
             // arrange
@@ -533,16 +533,16 @@ namespace integrationTests
             // act
             // assert
             //
-            Assert.NotEqual(0, cp.Content.AddContent(contentName1));
-            Assert.NotEqual(0, cp.Content.AddContentField(contentName1, contentFieldTextName, coreCommonModule.FieldTypeIdText));
-            Assert.NotEqual(0, cp.Content.AddContentField(contentName1, contentFieldBooleanName, coreCommonModule.FieldTypeIdBoolean));
-            Assert.NotEqual(0, cp.Content.AddContentField(contentName1, contentFieldDateName, coreCommonModule.FieldTypeIdDate));
-            Assert.NotEqual(0, cp.Content.AddContentField(contentName1, contentFieldIntegerName, coreCommonModule.FieldTypeIdInteger));
+            Assert.AreNotEqual(0, cp.Content.AddContent(contentName1));
+            Assert.AreNotEqual(0, cp.Content.AddContentField(contentName1, contentFieldTextName, coreCommonModule.FieldTypeIdText));
+            Assert.AreNotEqual(0, cp.Content.AddContentField(contentName1, contentFieldBooleanName, coreCommonModule.FieldTypeIdBoolean));
+            Assert.AreNotEqual(0, cp.Content.AddContentField(contentName1, contentFieldDateName, coreCommonModule.FieldTypeIdDate));
+            Assert.AreNotEqual(0, cp.Content.AddContentField(contentName1, contentFieldIntegerName, coreCommonModule.FieldTypeIdInteger));
             //
             if (cs.Insert(contentName1))
             {
                 recordId = cs.GetInteger("id");
-                Assert.NotEqual(0, recordId);
+                Assert.AreNotEqual(0, recordId);
                 cs.SetField(contentFieldBooleanName, true);
                 cs.SetField(contentFieldTextName, testText);
                 cs.SetField(contentFieldDateName, testDate);
@@ -552,11 +552,11 @@ namespace integrationTests
             //
             if (cs.OpenRecord(contentName1,recordId ))
             {
-                Assert.NotEqual(0, cs.GetInteger("id"));
-                Assert.Equal(true, cs.GetBoolean(contentFieldBooleanName));
-                Assert.Equal(testText, cs.GetText(contentFieldTextName));
-                Assert.Equal(testDate, cs.GetDate(contentFieldDateName));
-                Assert.Equal(testInt, cs.GetInteger(contentFieldIntegerName));
+                Assert.AreNotEqual(0, cs.GetInteger("id"));
+                Assert.AreEqual(true, cs.GetBoolean(contentFieldBooleanName));
+                Assert.AreEqual(testText, cs.GetText(contentFieldTextName));
+                Assert.AreEqual(testDate, cs.GetDate(contentFieldDateName));
+                Assert.AreEqual(testInt, cs.GetInteger(contentFieldIntegerName));
             }
             cs.Close();
             // dispose
@@ -572,7 +572,7 @@ namespace integrationTests
         /// <summary>
         /// cp.cs
         /// </summary>
-        [Fact]
+        [TestMethod()]
         private void cpCsOpenClose_test()
         {
             // arrange
@@ -590,14 +590,14 @@ namespace integrationTests
                 testuserId = cs.GetInteger("id");
             }
             cs.Close();
-            Assert.NotEqual(0, testuserId);
+            Assert.AreNotEqual(0, testuserId);
             // open with id criteria must return exactly one record
             testuserId = 0;
             if (cs.Open("people", "id=" + cp.Db.EncodeSQLNumber(newuserId))) {
-                Assert.Equal(newuserId, cs.GetInteger("id"));
-                Assert.Equal(true, cs.OK());
+                Assert.AreEqual(newuserId, cs.GetInteger("id"));
+                Assert.AreEqual(true, cs.OK());
                 cs.GoNext();
-                Assert.Equal(false, cs.OK());
+                Assert.AreEqual(false, cs.OK());
             }
             cs.Close();
             //
@@ -610,7 +610,7 @@ namespace integrationTests
         /// <summary>
         /// cp.cs.insert
         /// </summary>
-        [Fact]
+        [TestMethod()]
         private void cpCsInsert_Test()
         {
             // arrange
@@ -625,7 +625,7 @@ namespace integrationTests
                 newuserId = cs.GetInteger("id");
             }
             cs.Close();
-            Assert.NotEqual(0, newuserId);
+            Assert.AreNotEqual(0, newuserId);
             //
             // dispose
             //
@@ -636,7 +636,7 @@ namespace integrationTests
         /// <summary>
         /// cp.cs.insert
         /// </summary>
-        [Fact]
+        [TestMethod()]
         private void cpCsOpenRecord_Test()
         {
             // arrange
@@ -651,10 +651,10 @@ namespace integrationTests
                 newuserId = cs.GetInteger("id");
             }
             cs.Close();
-            Assert.NotEqual(0, newuserId);
+            Assert.AreNotEqual(0, newuserId);
             if (cs.OpenRecord("people", newuserId))
             {
-                Assert.Equal(newuserId, cs.GetInteger("id"));
+                Assert.AreEqual(newuserId, cs.GetInteger("id"));
             }
             cs.Close();
             //
@@ -667,7 +667,7 @@ namespace integrationTests
         /// <summary>
         /// cp.cs.OpenGroupUsers
         /// </summary>
-        [Fact]
+        [TestMethod()]
         private void cpCsOpenGroupUsers_Test()
         {
             // arrange
@@ -686,21 +686,21 @@ namespace integrationTests
             user1Id = cp.Content.AddRecord("people", user1Name);
             cp.Group.AddUser(groupName, user1Id);
             // assert
-            Assert.NotEqual(0, user1Id);
-            Assert.NotEqual(0, user2Id);
+            Assert.AreNotEqual(0, user1Id);
+            Assert.AreNotEqual(0, user2Id);
             // order by id will be 2 then 1
-            Assert.True(cs.OpenGroupUsers(groupName, "", "id"));
-            Assert.Equal(user2Name, cs.GetText("name"));
-            Assert.True(cs.NextOK());
-            Assert.Equal(user1Name, cs.GetText("name"));
-            Assert.False(cs.NextOK());
+            Assert.IsTrue(cs.OpenGroupUsers(groupName, "", "id"));
+            Assert.AreEqual(user2Name, cs.GetText("name"));
+            Assert.IsTrue(cs.NextOK());
+            Assert.AreEqual(user1Name, cs.GetText("name"));
+            Assert.IsFalse(cs.NextOK());
             cs.Close();
             // order by name will be 1 then 2
-            Assert.True(cs.OpenGroupUsers(groupName, "", "name"));
-            Assert.Equal(user1Name, cs.GetText("name"));
-            Assert.True(cs.NextOK());
-            Assert.Equal(user2Name, cs.GetText("name"));
-            Assert.False(cs.NextOK());
+            Assert.IsTrue(cs.OpenGroupUsers(groupName, "", "name"));
+            Assert.AreEqual(user1Name, cs.GetText("name"));
+            Assert.IsTrue(cs.NextOK());
+            Assert.AreEqual(user2Name, cs.GetText("name"));
+            Assert.IsFalse(cs.NextOK());
             cs.Close();
             //
             // dispose
@@ -714,7 +714,7 @@ namespace integrationTests
         /// <summary>
         /// cp.cs.FieldOK
         /// </summary>
-        [Fact]
+        [TestMethod()]
         private void cpCsFieldOK_Test()
         {
             // arrange
@@ -726,21 +726,21 @@ namespace integrationTests
             // act
             //
             user1Id = cp.Content.AddRecord("people", user1Name);
-            Assert.NotEqual(0, user1Id);
+            Assert.AreNotEqual(0, user1Id);
             //
-            Assert.True(cs.OpenRecord("people", user1Id));
-            Assert.True(cs.FieldOK("id"));
-            Assert.True(cs.FieldOK("ID"));
-            Assert.True(cs.FieldOK("name"));
-            Assert.True(cs.FieldOK("firstname"));
+            Assert.IsTrue(cs.OpenRecord("people", user1Id));
+            Assert.IsTrue(cs.FieldOK("id"));
+            Assert.IsTrue(cs.FieldOK("ID"));
+            Assert.IsTrue(cs.FieldOK("name"));
+            Assert.IsTrue(cs.FieldOK("firstname"));
             cs.Close();
             //
-            Assert.True(cs.OpenRecord("people", user1Id, "id,name"));
-            Assert.True(cs.FieldOK("id"));
-            Assert.True(cs.FieldOK("ID"));
-            Assert.True(cs.FieldOK("name"));
-            Assert.True(cs.FieldOK("NaMe"));
-            Assert.False(cs.FieldOK("firstname"));
+            Assert.IsTrue(cs.OpenRecord("people", user1Id, "id,name"));
+            Assert.IsTrue(cs.FieldOK("id"));
+            Assert.IsTrue(cs.FieldOK("ID"));
+            Assert.IsTrue(cs.FieldOK("name"));
+            Assert.IsTrue(cs.FieldOK("NaMe"));
+            Assert.IsFalse(cs.FieldOK("firstname"));
             cs.Close();
             //
             //
@@ -753,7 +753,7 @@ namespace integrationTests
         /// <summary>
         /// cp.cs.Delete
         /// </summary>
-        [Fact]
+        [TestMethod()]
         private void cpCsDelete_Test()
         {
             // arrange
@@ -765,12 +765,12 @@ namespace integrationTests
             // act
             //
             user1Id = cp.Content.AddRecord("people", user1Name);
-            Assert.NotEqual(0, user1Id);
+            Assert.AreNotEqual(0, user1Id);
             //
-            Assert.True(cs.OpenRecord("people", user1Id));
+            Assert.IsTrue(cs.OpenRecord("people", user1Id));
             cs.Delete();
             cs.Close();
-            Assert.False(cs.OpenRecord("people", user1Id));
+            Assert.IsFalse(cs.OpenRecord("people", user1Id));
             cs.Close();
             //
             // dispose
@@ -782,7 +782,7 @@ namespace integrationTests
         /// <summary>
         /// cp.cs.Delete
         /// </summary>
-        [Fact]
+        [TestMethod()]
         private void cpCsSetGetField_Test()
         {
             // arrange
@@ -797,9 +797,9 @@ namespace integrationTests
             // act
             //
             user1Id = cp.Content.AddRecord("people", user1Name);
-            Assert.NotEqual(0, user1Id);
+            Assert.AreNotEqual(0, user1Id);
             //
-            Assert.True(cs.OpenRecord("people", user1Id));
+            Assert.IsTrue(cs.OpenRecord("people", user1Id));
             cs.SetField("name", user1Name);
             cs.SetField("excludefromanalytics", true);
             cs.SetField("lastVisit", testDate);
@@ -807,11 +807,11 @@ namespace integrationTests
             // eventually fill out all the rest
             cs.Close();
             //
-            Assert.True(cs.OpenRecord("people", user1Id));
-            Assert.Equal(user1Name, cs.GetText("name"));
-            Assert.Equal(true, cs.GetBoolean("excludefromanalytics"));
-            Assert.Equal(testDate, cs.GetDate("lastVisit"));
-            Assert.Equal(testinteger, cs.GetInteger("birthdayyear"));
+            Assert.IsTrue(cs.OpenRecord("people", user1Id));
+            Assert.AreEqual(user1Name, cs.GetText("name"));
+            Assert.AreEqual(true, cs.GetBoolean("excludefromanalytics"));
+            Assert.AreEqual(testDate, cs.GetDate("lastVisit"));
+            Assert.AreEqual(testinteger, cs.GetInteger("birthdayyear"));
             cs.Close();
             // eventually fill out all the rest
 
@@ -825,7 +825,7 @@ namespace integrationTests
         /// <summary>
         /// cp.cs.Delete
         /// </summary>
-        [Fact]
+        [TestMethod()]
         private void cpCsGetRowCount_Test()
         {
             // arrange
@@ -843,24 +843,24 @@ namespace integrationTests
             // act
             //
             user1Id = cp.Content.AddRecord("people", user1Name);
-            Assert.NotEqual(0, user1Id);
+            Assert.AreNotEqual(0, user1Id);
             user2Id = cp.Content.AddRecord("people", user2Name);
-            Assert.NotEqual(0, user2Id);
+            Assert.AreNotEqual(0, user2Id);
             user3Id = cp.Content.AddRecord("people", user3Name);
-            Assert.NotEqual(0, user3Id);
+            Assert.AreNotEqual(0, user3Id);
             user4Id = cp.Content.AddRecord("people", user4Name);
-            Assert.NotEqual(0, user4Id);
+            Assert.AreNotEqual(0, user4Id);
             //
-            Assert.True(cs.Open("people", "(id in (" + user1Id + "," + user2Id + "," + user3Id + "," + user4Id + "))"));
-            Assert.Equal(4, cs.GetRowCount());
+            Assert.IsTrue(cs.Open("people", "(id in (" + user1Id + "," + user2Id + "," + user3Id + "," + user4Id + "))"));
+            Assert.AreEqual(4, cs.GetRowCount());
             cs.Delete();
-            Assert.True(cs.NextOK());
+            Assert.IsTrue(cs.NextOK());
             cs.Delete();
-            Assert.True(cs.NextOK());
+            Assert.IsTrue(cs.NextOK());
             cs.Delete();
-            Assert.True(cs.NextOK());
+            Assert.IsTrue(cs.NextOK());
             cs.Delete();
-            Assert.False(cs.NextOK());
+            Assert.IsFalse(cs.NextOK());
             cs.Close();
             //
             // dispose
@@ -871,7 +871,7 @@ namespace integrationTests
         /// <summary>
         /// cp.cs.getSql
         /// </summary>
-        [Fact]
+        [TestMethod()]
         private void cpCsGetSql_Test()
         {
             // arrange
@@ -894,7 +894,7 @@ namespace integrationTests
         /// <summary>
         /// coreSecurity
         /// </summary>
-        [Fact]
+        [TestMethod()]
         private void coreSecurityEncryptDecrypt()
         {
             // arrange
@@ -912,8 +912,8 @@ namespace integrationTests
             int resultNumber = 0;
             DateTime resultDate = DateTime.MinValue;
             cp.core.security.decodeToken(token, ref resultNumber, ref resultDate);
-            Assert.Equal(testNumber, resultNumber);
-            Assert.Equal(testDate, resultDate);
+            Assert.AreEqual(testNumber, resultNumber);
+            Assert.AreEqual(testDate, resultDate);
             //
             // dispose
             //

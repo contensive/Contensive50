@@ -8498,10 +8498,10 @@
 //            // arrange
 //            // act
 //            // assert
-//            Assert.Equal(coreCommonModule.normalizeRoute("TEST"), "/test");
-//            Assert.Equal(coreCommonModule.normalizeRoute("test"), "/test");
-//            Assert.Equal(coreCommonModule.normalizeRoute("/test/"), "/test");
-//            Assert.Equal(coreCommonModule.normalizeRoute("test/"), "/test");
+//            Assert.AreEqual(coreCommonModule.normalizeRoute("TEST"), "/test");
+//            Assert.AreEqual(coreCommonModule.normalizeRoute("test"), "/test");
+//            Assert.AreEqual(coreCommonModule.normalizeRoute("/test/"), "/test");
+//            Assert.AreEqual(coreCommonModule.normalizeRoute("test/"), "/test");
 //        }
 //        //
 //        [Fact()]
@@ -8510,13 +8510,13 @@
 //            // arrange
 //            // act
 //            // assert
-//            Assert.Equal(coreCommonModule.EncodeBoolean(true), true);
-//            Assert.Equal(coreCommonModule.EncodeBoolean(0), false);
-//            Assert.Equal(coreCommonModule.EncodeBoolean(1), true);
-//            Assert.Equal(coreCommonModule.EncodeBoolean("on"), true);
-//            Assert.Equal(coreCommonModule.EncodeBoolean("off"), false);
-//            Assert.Equal(coreCommonModule.EncodeBoolean("true"), true);
-//            Assert.Equal(coreCommonModule.EncodeBoolean("false"), false);
+//            Assert.AreEqual(coreCommonModule.EncodeBoolean(true), true);
+//            Assert.AreEqual(coreCommonModule.EncodeBoolean(0), false);
+//            Assert.AreEqual(coreCommonModule.EncodeBoolean(1), true);
+//            Assert.AreEqual(coreCommonModule.EncodeBoolean("on"), true);
+//            Assert.AreEqual(coreCommonModule.EncodeBoolean("off"), false);
+//            Assert.AreEqual(coreCommonModule.EncodeBoolean("true"), true);
+//            Assert.AreEqual(coreCommonModule.EncodeBoolean("false"), false);
 //        }
 //        //
 //        [Fact()]
@@ -8525,7 +8525,7 @@
 //            // arrange
 //            // act
 //            // assert
-//            Assert.Equal(coreCommonModule.EncodeText(1), "1");
+//            Assert.AreEqual(coreCommonModule.EncodeText(1), "1");
 //        }
 //        //
 //        [Fact()]
@@ -8534,7 +8534,7 @@
 //            // arrange
 //            // act
 //            // assert
-//            Assert.Equal(true, true);
+//            Assert.AreEqual(true, true);
 //        }
 //        //
 //        [Fact()]
@@ -8543,8 +8543,8 @@
 //            // arrange
 //            // act
 //            // assert
-//            Assert.Equal(coreCommonModule.dateToSeconds(new System.DateTime(1900, 1, 1)), 0);
-//            Assert.Equal(coreCommonModule.dateToSeconds(new System.DateTime(1900, 1, 2)), 86400);
+//            Assert.AreEqual(coreCommonModule.dateToSeconds(new System.DateTime(1900, 1, 1)), 0);
+//            Assert.AreEqual(coreCommonModule.dateToSeconds(new System.DateTime(1900, 1, 2)), 86400);
 //        }
 //        //
 //        [Fact()]
@@ -8553,11 +8553,11 @@
 //            // arrange
 //            // act
 //            // assert
-//            Assert.Equal("", coreCommonModule.ModifyQueryString("", "a", "1", false));
-//            Assert.Equal("a=1", coreCommonModule.ModifyQueryString("", "a", "1", true));
-//            Assert.Equal("a=1", coreCommonModule.ModifyQueryString("a=0", "a", "1", false));
-//            Assert.Equal("a=1", coreCommonModule.ModifyQueryString("a=0", "a", "1", true));
-//            Assert.Equal("a=1&b=2", coreCommonModule.ModifyQueryString("a=1", "b", "2", true));
+//            Assert.AreEqual("", coreCommonModule.ModifyQueryString("", "a", "1", false));
+//            Assert.AreEqual("a=1", coreCommonModule.ModifyQueryString("", "a", "1", true));
+//            Assert.AreEqual("a=1", coreCommonModule.ModifyQueryString("a=0", "a", "1", false));
+//            Assert.AreEqual("a=1", coreCommonModule.ModifyQueryString("a=0", "a", "1", true));
+//            Assert.AreEqual("a=1&b=2", coreCommonModule.ModifyQueryString("a=1", "b", "2", true));
 //        }
 //        //
 //        [Fact()]
@@ -8566,44 +8566,44 @@
 //            // arrange
 //            // act
 //            // assert
-//            Assert.Equal("index.html", coreCommonModule.modifyLinkQuery("index.html", "a", "1", false));
-//            Assert.Equal("index.html?a=1", coreCommonModule.modifyLinkQuery("index.html", "a", "1", true));
-//            Assert.Equal("index.html?a=1", coreCommonModule.modifyLinkQuery("index.html?a=0", "a", "1", false));
-//            Assert.Equal("index.html?a=1", coreCommonModule.modifyLinkQuery("index.html?a=0", "a", "1", true));
-//            Assert.Equal("index.html?a=1&b=2", coreCommonModule.modifyLinkQuery("index.html?a=1", "b", "2", true));
+//            Assert.AreEqual("index.html", coreCommonModule.modifyLinkQuery("index.html", "a", "1", false));
+//            Assert.AreEqual("index.html?a=1", coreCommonModule.modifyLinkQuery("index.html", "a", "1", true));
+//            Assert.AreEqual("index.html?a=1", coreCommonModule.modifyLinkQuery("index.html?a=0", "a", "1", false));
+//            Assert.AreEqual("index.html?a=1", coreCommonModule.modifyLinkQuery("index.html?a=0", "a", "1", true));
+//            Assert.AreEqual("index.html?a=1&b=2", coreCommonModule.modifyLinkQuery("index.html?a=1", "b", "2", true));
 //        }
 //        //
 //        [Fact()]
 //        public void vbInstr_test()
 //        {
 //            //vbInstr(1, Link, "?")
-//            Assert.Equal(Strings.InStr("abcdefgabcdefgabcdefgabcdefg", "d"), coreCommonModule.vbInstr("abcdefgabcdefgabcdefgabcdefg", "d"));
-//            Assert.Equal(Strings.InStr("abcdefgabcdefgabcdefgabcdefg", "E"), coreCommonModule.vbInstr("abcdefgabcdefgabcdefgabcdefg", "E"));
-//            Assert.Equal(Strings.InStr(10, "abcdefgabcdefgabcdefgabcdefg", "E"), coreCommonModule.vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E"));
-//            Assert.Equal(Strings.InStr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Binary), coreCommonModule.vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Binary));
-//            Assert.Equal(Strings.InStr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Text), coreCommonModule.vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Text));
-//            Assert.Equal(Strings.InStr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Binary), coreCommonModule.vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Binary));
-//            Assert.Equal(Strings.InStr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Text), coreCommonModule.vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Text));
+//            Assert.AreEqual(Strings.InStr("abcdefgabcdefgabcdefgabcdefg", "d"), coreCommonModule.vbInstr("abcdefgabcdefgabcdefgabcdefg", "d"));
+//            Assert.AreEqual(Strings.InStr("abcdefgabcdefgabcdefgabcdefg", "E"), coreCommonModule.vbInstr("abcdefgabcdefgabcdefgabcdefg", "E"));
+//            Assert.AreEqual(Strings.InStr(10, "abcdefgabcdefgabcdefgabcdefg", "E"), coreCommonModule.vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E"));
+//            Assert.AreEqual(Strings.InStr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Binary), coreCommonModule.vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Binary));
+//            Assert.AreEqual(Strings.InStr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Text), coreCommonModule.vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "E", CompareMethod.Text));
+//            Assert.AreEqual(Strings.InStr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Binary), coreCommonModule.vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Binary));
+//            Assert.AreEqual(Strings.InStr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Text), coreCommonModule.vbInstr(10, "abcdefgabcdefgabcdefgabcdefg", "c", CompareMethod.Text));
 //            string haystack = "abcdefgabcdefgabcdefgabcdefg";
 //            string needle = "c";
-//            Assert.Equal(Strings.InStr(1, "?", "?"), coreCommonModule.vbInstr(1, "?", "?"));
+//            Assert.AreEqual(Strings.InStr(1, "?", "?"), coreCommonModule.vbInstr(1, "?", "?"));
 //            for (int ptr = 1; ptr <= haystack.Length; ptr++)
 //            {
-//                Assert.Equal(Strings.InStr(ptr, haystack, needle, CompareMethod.Binary), coreCommonModule.vbInstr(ptr, haystack, needle, CompareMethod.Binary));
+//                Assert.AreEqual(Strings.InStr(ptr, haystack, needle, CompareMethod.Binary), coreCommonModule.vbInstr(ptr, haystack, needle, CompareMethod.Binary));
 //            }
 //        }
 //        //
 //        [Fact()]
 //        public void vbIsNumeric_test()
 //        {
-//            Assert.Equal(Information.IsNumeric(0), coreCommonModule.vbIsNumeric(0));
-//            Assert.Equal(Information.IsNumeric(new System.DateTime(2000, 1, 1)), coreCommonModule.vbIsNumeric(new System.DateTime(2000, 1, 1)));
-//            Assert.Equal(Information.IsNumeric(1234), coreCommonModule.vbIsNumeric(1234));
-//            Assert.Equal(Information.IsNumeric(12.34), coreCommonModule.vbIsNumeric(12.34));
-//            Assert.Equal(Information.IsNumeric("abcd"), coreCommonModule.vbIsNumeric("abcd"));
-//            Assert.Equal(Information.IsNumeric("1234"), coreCommonModule.vbIsNumeric("1234"));
-//            Assert.Equal(Information.IsNumeric("12.34"), coreCommonModule.vbIsNumeric("12.34"));
-//            Assert.Equal(Information.IsNumeric(null), coreCommonModule.vbIsNumeric(null));
+//            Assert.AreEqual(Information.IsNumeric(0), coreCommonModule.vbIsNumeric(0));
+//            Assert.AreEqual(Information.IsNumeric(new System.DateTime(2000, 1, 1)), coreCommonModule.vbIsNumeric(new System.DateTime(2000, 1, 1)));
+//            Assert.AreEqual(Information.IsNumeric(1234), coreCommonModule.vbIsNumeric(1234));
+//            Assert.AreEqual(Information.IsNumeric(12.34), coreCommonModule.vbIsNumeric(12.34));
+//            Assert.AreEqual(Information.IsNumeric("abcd"), coreCommonModule.vbIsNumeric("abcd"));
+//            Assert.AreEqual(Information.IsNumeric("1234"), coreCommonModule.vbIsNumeric("1234"));
+//            Assert.AreEqual(Information.IsNumeric("12.34"), coreCommonModule.vbIsNumeric("12.34"));
+//            Assert.AreEqual(Information.IsNumeric(null), coreCommonModule.vbIsNumeric(null));
 //        }
 //        //
 //        [Fact()]
@@ -8616,49 +8616,49 @@
 //            //
 //            expected = Strings.Replace("abcdefg", "cd", "12345");
 //            actual = coreCommonModule.vbReplace("abcdefg", "cd", "12345");
-//            Assert.Equal(expected, actual);
+//            Assert.AreEqual(expected, actual);
 //            //
 //            expected = Strings.Replace("abcdefg", "cD", "12345");
 //            actual = coreCommonModule.vbReplace("abcdefg", "cD", "12345");
-//            Assert.Equal(expected, actual);
+//            Assert.AreEqual(expected, actual);
 //            //
 //            expected = Strings.Replace("abcdefg", "cd", "12345", start, count, CompareMethod.Binary);
 //            actual = coreCommonModule.vbReplace("abcdefg", "cd", "12345", start, count, CompareMethod.Binary);
-//            Assert.Equal(expected, actual);
+//            Assert.AreEqual(expected, actual);
 //            //
 //            expected = Strings.Replace("abcdefg", "cD", "12345", start, count, CompareMethod.Binary);
 //            actual = coreCommonModule.vbReplace("abcdefg", "cD", "12345", start, count, CompareMethod.Binary);
-//            Assert.Equal(expected, actual);
+//            Assert.AreEqual(expected, actual);
 //            //
 //            expected = Strings.Replace("abcdefg", "cd", "12345", start, count, CompareMethod.Text);
 //            actual = coreCommonModule.vbReplace("abcdefg", "cd", "12345", start, count, CompareMethod.Text);
-//            Assert.Equal(expected, actual);
+//            Assert.AreEqual(expected, actual);
 //            //
 //            expected = Strings.Replace("abcdefg", "cD", "12345", start, count, CompareMethod.Text);
 //            actual = coreCommonModule.vbReplace("abcdefg", "cD", "12345", start, count, CompareMethod.Text);
-//            Assert.Equal(expected, actual);
+//            Assert.AreEqual(expected, actual);
 //        }
 //        //
 //        [Fact()]
 //        public void vbUCase_test()
 //        {
-//            Assert.Equal(Strings.UCase("AbCdEfG"), coreCommonModule.vbUCase("AbCdEfG"));
-//            Assert.Equal(Strings.UCase("ABCDEFG"), coreCommonModule.vbUCase("ABCDEFG"));
-//            Assert.Equal(Strings.UCase("abcdefg"), coreCommonModule.vbUCase("abcdefg"));
+//            Assert.AreEqual(Strings.UCase("AbCdEfG"), coreCommonModule.vbUCase("AbCdEfG"));
+//            Assert.AreEqual(Strings.UCase("ABCDEFG"), coreCommonModule.vbUCase("ABCDEFG"));
+//            Assert.AreEqual(Strings.UCase("abcdefg"), coreCommonModule.vbUCase("abcdefg"));
 //        }
 //        //
 //        [Fact()]
 //        public void vbLCase_test()
 //        {
-//            Assert.Equal(Strings.LCase("AbCdEfG"), coreCommonModule.vbLCase("AbCdEfG"));
-//            Assert.Equal(Strings.LCase("ABCDEFG"), coreCommonModule.vbLCase("ABCDEFG"));
-//            Assert.Equal(Strings.LCase("abcdefg"), coreCommonModule.vbLCase("abcdefg"));
+//            Assert.AreEqual(Strings.LCase("AbCdEfG"), coreCommonModule.vbLCase("AbCdEfG"));
+//            Assert.AreEqual(Strings.LCase("ABCDEFG"), coreCommonModule.vbLCase("ABCDEFG"));
+//            Assert.AreEqual(Strings.LCase("abcdefg"), coreCommonModule.vbLCase("abcdefg"));
 //        }
 //        //
 //        [Fact()]
 //        public void vbLeft_test()
 //        {
-//            Assert.Equal(Strings.LCase("AbCdEfG"), coreCommonModule.vbLCase("AbCdEfG"));
+//            Assert.AreEqual(Strings.LCase("AbCdEfG"), coreCommonModule.vbLCase("AbCdEfG"));
 //        }
 
 //    }
