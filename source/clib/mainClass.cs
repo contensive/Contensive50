@@ -66,6 +66,15 @@ namespace Contensive.Core
                                 createApp.createApp();
                                 exitCmd = true;
                                 break;
+                            case "--install":
+                            case "-i":
+                                //
+                                // initialize the installation. This verifies the config.json and saves the current running path as the programFilesPath, amother other possible thins
+                                //
+                                initInstall.verifyInstall();
+                                createApp.createApp();
+                                exitCmd = true;
+                                break;
                             case "--status":
                             case "-s":
                                 //
@@ -73,28 +82,28 @@ namespace Contensive.Core
                                 //
                                 cp = new CPClass();
                                 //
-                                if (!cp.clusterOk)
+                                if (!cp.configFileOk)
                                 {
                                     //c:\\programData\\clib\\serverconfig.json
-                                    Console.WriteLine("Cluster not found : Configuration file [c:\\ProgramData\\Clib\\clusterConfig.json] not found or not valid.");
+                                    Console.WriteLine("configuration file [c:\\ProgramData\\Contensive\\config.json] not found or not valid.");
                                 }
                                 else
                                 {
-                                    Console.WriteLine("Cluster Configuration file [c:\\ProgramData\\Clib\\clusterConfig.json] found.");
-                                    Console.WriteLine("cluster name: " + cp.core.clusterConfig.name);
-                                    Console.WriteLine("appPattern: " + cp.core.clusterConfig.appPattern);
-                                    Console.WriteLine("ElastiCacheConfigurationEndpoint: " + cp.core.clusterConfig.awsElastiCacheConfigurationEndpoint);
-                                    Console.WriteLine("FilesEndpoint: " + cp.core.clusterConfig.clusterFilesEndpoint);
-                                    Console.WriteLine("defaultDataSourceAddress: " + cp.core.clusterConfig.defaultDataSourceAddress);
-                                    Console.WriteLine("isLocal: " + cp.core.clusterConfig.isLocal.ToString());
+                                    Console.WriteLine("configuration file [c:\\ProgramData\\Contensive\\config.json] found.");
+                                    Console.WriteLine("ServerGroup name: " + cp.core.serverConfig.name);
+                                    Console.WriteLine("appPattern: " + cp.core.serverConfig.appPattern);
+                                    Console.WriteLine("ElastiCacheConfigurationEndpoint: " + cp.core.serverConfig.awsElastiCacheConfigurationEndpoint);
+                                    Console.WriteLine("FilesEndpoint: " + cp.core.serverConfig.clusterFilesEndpoint);
+                                    Console.WriteLine("defaultDataSourceAddress: " + cp.core.serverConfig.defaultDataSourceAddress);
+                                    Console.WriteLine("isLocal: " + cp.core.serverConfig.isLocal.ToString());
                                     //Console.WriteLine("clusterPhysicalPath: " + cp.core.serverConfig.clusterPath.ToString());
-                                    Console.WriteLine("defaultDataSourceAddress: " + cp.core.clusterConfig.defaultDataSourceAddress.ToString());
-                                    Console.WriteLine("defaultDataSourceType: " + cp.core.clusterConfig.defaultDataSourceType.ToString());
-                                    Console.WriteLine("defaultDataSourceUsername: " + cp.core.clusterConfig.defaultDataSourceUsername.ToString());
-                                    Console.WriteLine("isLocalCache: " + cp.core.clusterConfig.isLocalCache.ToString());
-                                    Console.WriteLine("maxConcurrentTasksPerServer: " + cp.core.clusterConfig.maxConcurrentTasksPerServer.ToString());
-                                    Console.WriteLine("apps.Count: " + cp.core.clusterConfig.apps.Count);
-                                    foreach (KeyValuePair<string, appConfigClass> kvp in cp.core.clusterConfig.apps)
+                                    Console.WriteLine("defaultDataSourceAddress: " + cp.core.serverConfig.defaultDataSourceAddress.ToString());
+                                    Console.WriteLine("defaultDataSourceType: " + cp.core.serverConfig.defaultDataSourceType.ToString());
+                                    Console.WriteLine("defaultDataSourceUsername: " + cp.core.serverConfig.defaultDataSourceUsername.ToString());
+                                    Console.WriteLine("isLocalCache: " + cp.core.serverConfig.isLocalCache.ToString());
+                                    Console.WriteLine("maxConcurrentTasksPerServer: " + cp.core.serverConfig.maxConcurrentTasksPerServer.ToString());
+                                    Console.WriteLine("apps.Count: " + cp.core.serverConfig.apps.Count);
+                                    foreach (KeyValuePair<string, appConfigClass> kvp in cp.core.serverConfig.apps)
                                     {
                                         appConfigClass app = kvp.Value;
                                         Console.WriteLine("----------app name: " + app.name);
@@ -135,7 +144,7 @@ namespace Contensive.Core
                                 }
                                 else {
                                     cp = new CPClass(appName);
-                                    installFiles = new coreFileSystemClass(cp.core, cp.core.clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
+                                    installFiles = new coreFileSystemClass(cp.core, cp.core.serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
                                     Console.WriteLine("Upgrading cluster folder clibResources from installation");
                                     createApp.upgradeResources(cp, installFiles);
                                     coreBuilderClass builder = new coreBuilderClass(cp.core);
@@ -151,12 +160,12 @@ namespace Contensive.Core
                                 //
                                 using (cpCluster = new CPClass())
                                 {
-                                    using (installFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)))
+                                    using (installFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)))
                                     {
                                         Console.WriteLine("Upgrading cluster folder clibResources from installation");
                                         createApp.upgradeResources(cpCluster, installFiles);
                                         //
-                                        foreach (var item in cpCluster.core.clusterConfig.apps)
+                                        foreach (var item in cpCluster.core.serverConfig.apps)
                                         {
                                             cp = new CPClass(item.Key);
                                             coreBuilderClass builder = new coreBuilderClass(cp.core);
@@ -169,7 +178,7 @@ namespace Contensive.Core
                             case "--taskscheduler":
                                 using (cpCluster = new CPClass())
                                 {
-                                    using (programDataFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib"))
+                                    using (programDataFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib"))
                                     {
                                         JSONTemp = programDataFiles.readFile("serverConfig.json");
                                         if (string.IsNullOrEmpty(JSONTemp))
@@ -214,7 +223,7 @@ namespace Contensive.Core
                             case "--taskrunner":
                                 using (cpCluster = new CPClass())
                                 {
-                                    using (programDataFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib"))
+                                    using (programDataFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib"))
                                     {
                                         JSONTemp = programDataFiles.readFile("serverConfig.json");
                                         if (string.IsNullOrEmpty(JSONTemp))
@@ -262,10 +271,10 @@ namespace Contensive.Core
                                 //
                                 using (cpCluster = new CPClass())
                                 {
-                                    using (programDataFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib"))
+                                    using (programDataFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib"))
                                     {
                                         cpCluster = new CPClass();
-                                        programDataFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib");
+                                        programDataFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib");
                                         JSONTemp = programDataFiles.readFile("serverConfig.json");
                                         if (string.IsNullOrEmpty(JSONTemp))
                                         {

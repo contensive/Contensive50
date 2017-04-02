@@ -24,7 +24,7 @@ Namespace Contensive.Core
         ' ----- shared globals
         '
         Public serverConfig As serverConfigClass
-        Public clusterConfig As clusterConfigClass
+        'Public clusterConfig As clusterConfigClass
         Public Property appConfig As appConfigClass             ' configuration loaded during construction
         Public Property appStatus As applicationStatusEnum      ' status of application
         '
@@ -213,18 +213,18 @@ Namespace Contensive.Core
         Public ReadOnly Property appRootFiles() As coreFileSystemClass
             Get
                 If (_appRootFiles Is Nothing) Then
-                    If clusterConfig.isLocal Then
+                    If serverConfig.isLocal Then
                         '
                         ' local server -- everything is ephemeral
                         '
-                        _appRootFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(appConfig.appRootFilesPath))
-                        '_appRootFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.appRootFilesPath))
+                        _appRootFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(appConfig.appRootFilesPath))
+                        '_appRootFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.appRootFilesPath))
                     Else
                         '
                         ' cluster mode - each filesystem is configured accordingly
                         '
-                        _appRootFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.activeSync, coreFileSystemClass.normalizePath(appConfig.appRootFilesPath))
-                        '_appRootFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.activeSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.appRootFilesPath))
+                        _appRootFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.activeSync, coreFileSystemClass.normalizePath(appConfig.appRootFilesPath))
+                        '_appRootFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.activeSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.appRootFilesPath))
                     End If
                 End If
                 Return _appRootFiles
@@ -242,16 +242,16 @@ Namespace Contensive.Core
         Public ReadOnly Property serverFiles() As coreFileSystemClass
             Get
                 If (_serverFiles Is Nothing) Then
-                    If clusterConfig.isLocal Then
+                    If serverConfig.isLocal Then
                         '
                         ' local server -- everything is ephemeral
                         '
-                        _serverFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, "")
+                        _serverFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, "")
                     Else
                         '
                         ' cluster mode - each filesystem is configured accordingly
                         '
-                        _serverFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, "")
+                        _serverFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, "")
                     End If
                 End If
                 Return _serverFiles
@@ -269,18 +269,18 @@ Namespace Contensive.Core
         Public ReadOnly Property privateFiles() As coreFileSystemClass
             Get
                 If (_privateFiles Is Nothing) Then
-                    If clusterConfig.isLocal Then
+                    If serverConfig.isLocal Then
                         '
                         ' local server -- everything is ephemeral
                         '
-                        _privateFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(appConfig.privateFilesPath))
-                        '_privateFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.privateFilesPath))
+                        _privateFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(appConfig.privateFilesPath))
+                        '_privateFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.privateFilesPath))
                     Else
                         '
                         ' cluster mode - each filesystem is configured accordingly
                         '
-                        _privateFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(appConfig.privateFilesPath))
-                        '_privateFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.privateFilesPath))
+                        _privateFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(appConfig.privateFilesPath))
+                        '_privateFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.privateFilesPath))
                     End If
                 End If
                 Return _privateFiles
@@ -299,16 +299,16 @@ Namespace Contensive.Core
             Get
                 If (_programDataFiles Is Nothing) Then
                     Dim programDataPath As String = coreFileSystemClass.normalizePath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData))
-                    If clusterConfig.isLocal Then
+                    If serverConfig.isLocal Then
                         '
                         ' local server -- everything is ephemeral
                         '
-                        _programDataFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(programDataPath))
+                        _programDataFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(programDataPath))
                     Else
                         '
                         ' cluster mode - each filesystem is configured accordingly
                         '
-                        _programDataFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(programDataPath))
+                        _programDataFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(programDataPath))
                     End If
                 End If
                 Return _programDataFiles
@@ -326,18 +326,18 @@ Namespace Contensive.Core
         Public ReadOnly Property programFiles() As coreFileSystemClass
             Get
                 If (_programFiles Is Nothing) Then
-                    If clusterConfig.isLocal Then
+                    If serverConfig.isLocal Then
                         '
                         ' local server -- everything is ephemeral
                         '
-                        _programFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(coreCommonModule.getProgramFilesPath))
-                        '_privateFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.privateFilesPath))
+                        _programFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(coreCommonModule.getProgramFilesPath))
+                        '_privateFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.privateFilesPath))
                     Else
                         '
                         ' cluster mode - each filesystem is configured accordingly
                         '
-                        _programFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(coreCommonModule.getProgramFilesPath))
-                        '_privateFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.privateFilesPath))
+                        _programFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(coreCommonModule.getProgramFilesPath))
+                        '_privateFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.privateFilesPath))
                     End If
                 End If
                 Return _programFiles
@@ -355,18 +355,18 @@ Namespace Contensive.Core
         Public ReadOnly Property cdnFiles() As coreFileSystemClass
             Get
                 If (_cdnFiles Is Nothing) Then
-                    If clusterConfig.isLocal Then
+                    If serverConfig.isLocal Then
                         '
                         ' local server -- everything is ephemeral
                         '
-                        _cdnFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(appConfig.cdnFilesPath))
-                        '_cdnFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.cdnFilesPath))
+                        _cdnFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(appConfig.cdnFilesPath))
+                        '_cdnFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.cdnFilesPath))
                     Else
                         '
                         ' cluster mode - each filesystem is configured accordingly
                         '
-                        _cdnFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(appConfig.cdnFilesPath))
-                        '_cdnFiles = New coreFileSystemClass(Me, clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.cdnFilesPath))
+                        _cdnFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(appConfig.cdnFilesPath))
+                        '_cdnFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.cdnFilesPath))
                     End If
                 End If
                 Return _cdnFiles
@@ -492,23 +492,23 @@ Namespace Contensive.Core
             End Get
         End Property
         Private _cache As coreCacheClass = Nothing
-        '
-        '===================================================================================================
-        ''' <summary>
-        ''' returns the clusterServices object.  This property is public, but the constuctor is not. This property may not be available for appAccess (to limit access to only  this app). 
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks>_cluster created during constructor.</remarks>
-        Public ReadOnly Property cluster() As coreClusterClass
-            Get
-                If (_cluster Is Nothing) Then
-                    _cluster = New coreClusterClass(Me)
-                End If
-                Return _cluster
-            End Get
-        End Property
-        Private _cluster As coreClusterClass
+        ''
+        ''===================================================================================================
+        '''' <summary>
+        '''' returns the clusterServices object.  This property is public, but the constuctor is not. This property may not be available for appAccess (to limit access to only  this app). 
+        '''' </summary>
+        '''' <value></value>
+        '''' <returns></returns>
+        '''' <remarks>_cluster created during constructor.</remarks>
+        'Public ReadOnly Property cluster() As coreClusterClass
+        '    Get
+        '        If (_cluster Is Nothing) Then
+        '            _cluster = New coreClusterClass(Me)
+        '        End If
+        '        Return _cluster
+        '    End Get
+        'End Property
+        'Private _cluster As coreClusterClass
         '
         '===================================================================================================
         '
@@ -27410,7 +27410,7 @@ ErrorTrap:
         '
         Public Function main_GetPleaseWaitStart() As String
             '
-            main_GetPleaseWaitStart = ProgramFiles.readFile("Resources\WaitPageOpen.htm")
+            main_GetPleaseWaitStart = programFiles.readFile("Resources\WaitPageOpen.htm")
             '
         End Function
         '
@@ -34906,36 +34906,16 @@ ErrorTrap:
                 '
                 ' ----- read/create serverConfig
                 '
-                JSONTemp = programDataFiles.readFile("serverConfig.json")
-                If String.IsNullOrEmpty(JSONTemp) Then
-                    '
-                    ' initialize serverConfig (do not let anything take a site down)
-                    '
-                    serverConfig = New serverConfigClass
-                    'serverConfig.clusterPath = "d:\"
-                    'If (Not System.IO.Directory.Exists(serverConfig.clusterPath)) Then
-                    '    serverConfig.clusterPath = "c:\"
-                    'End If
-                    'serverConfig.clusterPath &= "inetPub"
-                    'If Not (System.IO.Directory.Exists(serverConfig.clusterPath)) Then
-                    '    System.IO.Directory.CreateDirectory(serverConfig.clusterPath)
-                    'End If
-                    serverConfig.allowTaskRunnerService = False
-                    serverConfig.allowTaskSchedulerService = False
-                    programDataFiles.saveFile("serverConfig.json", json.Serialize(serverConfig))
-                Else
-                    serverConfig = json.Deserialize(Of serverConfigClass)(JSONTemp)
-                End If
-                '
-                ' ----- read/create clusterConfig
-                '
-                JSONTemp = programDataFiles.readFile("clusterConfig.json")
+                JSONTemp = programDataFiles.readFile("config.json")
                 If String.IsNullOrEmpty(JSONTemp) Then
                     '
                     ' for now it fails, maybe later let it autobuild a local cluster
                     '
+                    serverConfig.allowTaskRunnerService = False
+                    serverConfig.allowTaskSchedulerService = False
+                    programDataFiles.saveFile("config.json", json.Serialize(serverConfig))
                 Else
-                    clusterConfig = json.Deserialize(Of clusterConfigClass)(JSONTemp)
+                    serverConfig = json.Deserialize(Of serverConfigClass)(JSONTemp)
                 End If
                 '
                 If (Not String.IsNullOrEmpty(appName)) Then
@@ -34944,34 +34924,27 @@ ErrorTrap:
                     '
                     appStatus = applicationStatusEnum.ApplicationStatusLoading
                     '
-                    If (cluster Is Nothing) Then
+                    If (Not serverConfig.apps.ContainsKey(appName.ToLower())) Then
                         '
-                        ' cannot continue with the cluster created
+                        ' application now configured
                         '
-                        Throw New ApplicationException("appServices constructor failed because clusterServices are not valid.")
+                        appConfig = New appConfigClass()
+                        appStatus = applicationStatusEnum.ApplicationStatusAppConfigNotValid
+                        Throw New Exception("application [" & appName & "] was not found in this cluster.")
                     Else
-                        If (Not clusterConfig.apps.ContainsKey(appName.ToLower())) Then
-                            '
-                            ' application now configured
-                            '
-                            appConfig = New appConfigClass()
-                            appStatus = applicationStatusEnum.ApplicationStatusAppConfigNotValid
-                            Throw New Exception("application [" & appName & "] was not found in this cluster.")
-                        Else
-                            appConfig = clusterConfig.apps(appName.ToLower())
-                        End If
-                        '
-                        If vbInstr(1, appConfig.domainList(0), ",") > 1 Then
-                            '
-                            ' if first entry in domain list is comma delimited, save only the first entry
-                            '
-                            appConfig.domainList(0) = Mid(appConfig.domainList(0), 1, vbInstr(1, appConfig.domainList(0), ",") - 1)
-                        End If
-                        '
-                        ' REFACTOR - this was removed because during debug is costs 300msec, and only helps case with small edge case of Db loss -- test that case for risks
-                        '
-                        appStatus = applicationStatusEnum.ApplicationStatusReady
+                        appConfig = serverConfig.apps(appName.ToLower())
                     End If
+                    '
+                    If vbInstr(1, appConfig.domainList(0), ",") > 1 Then
+                        '
+                        ' if first entry in domain list is comma delimited, save only the first entry
+                        '
+                        appConfig.domainList(0) = Mid(appConfig.domainList(0), 1, vbInstr(1, appConfig.domainList(0), ",") - 1)
+                    End If
+                    '
+                    ' REFACTOR - this was removed because during debug is costs 300msec, and only helps case with small edge case of Db loss -- test that case for risks
+                    '
+                    appStatus = applicationStatusEnum.ApplicationStatusReady
                     '
                     cache_addonStyleRules = New coreCacheKeyPtrClass(Me, cacheNameAddonStyleRules, sqlAddonStyles, "shared style add-on rules,add-ons,shared styles")
                 End If
@@ -36159,11 +36132,6 @@ ErrorTrap:
                         _metaData = Nothing
                     End If
                     '
-                    If Not (_cluster Is Nothing) Then
-                        Call _cluster.Dispose()
-                        _cluster = Nothing
-                    End If
-                    '
                     If Not (_cache Is Nothing) Then
                         Call _cache.Dispose()
                         _cache = Nothing
@@ -36243,11 +36211,6 @@ ErrorTrap:
                     If Not (_db Is Nothing) Then
                         Call _db.Dispose()
                         _db = Nothing
-                    End If
-                    '
-                    If Not (_cluster Is Nothing) Then
-                        Call _cluster.Dispose()
-                        _cluster = Nothing
                     End If
                     '
                     If Not (_metaData Is Nothing) Then

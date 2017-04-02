@@ -177,7 +177,7 @@ Namespace Contensive
                 appendLog(cpClusterCore, "taskScheduler.scheduleTasks")
                 '
                 RightNow = DateTime.Now
-                For Each kvp As KeyValuePair(Of String, appConfigClass) In cpClusterCore.clusterConfig.apps
+                For Each kvp As KeyValuePair(Of String, appConfigClass) In cpClusterCore.serverConfig.apps
                     AppName = kvp.Value.name
                     '
                     ' schedule tasks for this app

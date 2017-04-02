@@ -630,15 +630,15 @@ Namespace Contensive
                                 ' ----- Set shared Mail out folder
                                 '
                                 EmailFolder = "\EmailOut"
-                                If Not cpCore.cluster.localClusterFiles.pathExists(EmailFolder) Then
-                                    Call cpCore.cluster.localClusterFiles.createPath(EmailFolder)
+                                If Not cpCore.programDataFiles.pathExists(EmailFolder) Then
+                                    Call cpCore.programDataFiles.createPath(EmailFolder)
                                 End If
                                 '
                                 ' ----- Set shared log folder
                                 '
                                 LogFolder = "\Logs"
-                                If Not cpCore.cluster.localClusterFiles.pathExists(LogFolder) Then
-                                    Call cpCore.cluster.localClusterFiles.createPath(LogFolder)
+                                If Not cpCore.programDataFiles.pathExists(LogFolder) Then
+                                    Call cpCore.programDataFiles.createPath(LogFolder)
                                 End If
                                 '
                                 ' ----- Create ServerConfig object
@@ -649,10 +649,10 @@ Namespace Contensive
                                     ' ----- Load the configuration file
                                     '
                                     'Errorhint = "Calling Control Object to load applications into server"
-                                    AdminUsername = cpCore.clusterConfig.username
-                                    AdminPassword = cpCore.clusterConfig.password
-                                    serverListenerPort = cpCore.clusterConfig.serverListenerPort
-                                    maxCmdInstances = cpCore.clusterConfig.maxConcurrentTasksPerServer
+                                    AdminUsername = cpCore.serverConfig.username
+                                    AdminPassword = cpCore.serverConfig.password
+                                    serverListenerPort = cpCore.serverConfig.serverListenerPort
+                                    maxCmdInstances = cpCore.serverConfig.maxConcurrentTasksPerServer
                                     'KernelServices.ServerLicense = ServerConfig.ServerLicense
                                     '
                                     ' ----- Turn on the tcpListener
@@ -1250,7 +1250,7 @@ Namespace Contensive
                 '
                 RightNow = DateTime.Now
                 SQLNow = cpCore.db.encodeSQLDate(RightNow)
-                For Each kvp As KeyValuePair(Of String, appConfigClass) In cpCore.clusterConfig.apps
+                For Each kvp As KeyValuePair(Of String, appConfigClass) In cpCore.serverConfig.apps
                     AppName = kvp.Value.name
                     '
                     ' permissions issue -- this is a root process - maybe the token will be saved in a configuration file

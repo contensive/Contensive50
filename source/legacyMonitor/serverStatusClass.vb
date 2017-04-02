@@ -230,7 +230,7 @@ Namespace Contensive.Core
                             Content = Content & StatusLine(0, "")
                             Content = Content & StatusLine(0, "Applications")
 
-                            For Each kvp As KeyValuePair(Of String, appConfigClass) In cpCore.clusterConfig.apps
+                            For Each kvp As KeyValuePair(Of String, appConfigClass) In cpCore.serverConfig.apps
                                 AppName = kvp.Value.name
                                 cpApp = New CPClass(AppName)
                                 If cpApp.core.appConfig.allowSiteMonitor Then
@@ -353,7 +353,7 @@ Namespace Contensive.Core
                                                 '
                                                 'hint = "Get AppServices object for [" & AppName & "]"
                                                 Content = Content & StatusLine(2, "Contensive Version [" & cp.Version & "]")
-                                                Content = Content & StatusLine(2, "Data Build Version [" & cpCore.siteproperties.dataBuildVersion & "]")
+                                                Content = Content & StatusLine(2, "Data Build Version [" & cpCore.siteProperties.dataBuildVersion & "]")
                                                 Content = Content & StatusLine(2, "Active Connections [" & "AppServices.ConnectionsActive" & "]")
                                                 Content = Content & StatusLine(2, "Started [" & "AppServices.DateStarted" & "]")
                                                 Content = Content & StatusLine(2, "Hits [" & "AppServices.HitCounter" & "]")

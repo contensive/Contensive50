@@ -245,7 +245,7 @@ Namespace Contensive.Core
             '
             ' Housekeep each application
             '
-            For Each kvp As KeyValuePair(Of String, appConfigClass) In cp.core.clusterConfig.apps
+            For Each kvp As KeyValuePair(Of String, appConfigClass) In cp.core.serverConfig.apps
                 appName = kvp.Value.name
                 If True Then
                     'End If
@@ -2307,7 +2307,7 @@ ErrorTrap:
             '
             LogDate = DateTime.Now.AddDays(-30)
             Call AppendClassLog("", "HouseKeep", "Deleting Logs [" & FolderName & "] older than 30 days")
-            FileList = cp.core.cluster.localClusterFiles.getFileList(FolderName)
+            FileList = cp.core.programDataFiles.getFileList(FolderName)
             For Each file As IO.FileInfo In FileList
                 If file.CreationTime < LogDate Then
                     cp.core.privateFiles.deleteFile(FolderName & "\" & file.Name)

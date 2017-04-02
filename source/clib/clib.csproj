@@ -153,6 +153,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>aspnetAppPatternDataSet.xsd</DependentUpon>
     </Compile>
+    <Compile Include="installClass.cs" />
     <Compile Include="createAppClass.cs" />
     <Compile Include="mainClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

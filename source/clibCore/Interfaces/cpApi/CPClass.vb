@@ -74,15 +74,22 @@ Namespace Contensive.Core
             End Get
         End Property
         '
-        '
-        '
-        Public ReadOnly Property clusterOk As Boolean
+        '====================================================================================================
+        ''' <summary>
+        ''' returns true if the server config file is valid (currently only requires a valid db)
+        ''' </summary>
+        ''' <returns></returns>
+        Public ReadOnly Property configFileOk As Boolean
             Get
+                Dim result As Boolean = False
                 If (core Is Nothing) Then
-                    Return False
+                    '
+                ElseIf (core.serverConfig Is Nothing) Then
+                    '
                 Else
-                    Return core.cluster.ok
+                    result = Not String.IsNullOrEmpty(core.serverConfig.defaultDataSourceAddress)
                 End If
+                Return result
             End Get
         End Property
         '
@@ -208,23 +215,6 @@ Namespace Contensive.Core
             End Get
         End Property
         Private _userObj As CPUserClass
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Returns the cluster services object, used for roles like housekeeping, server. etc. May require a permission key, to-be-implemented
-        ''' </summary>
-        ''' <param name="permissionKey"></param>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public ReadOnly Property cluster() As coreClusterClass
-            Get
-                '
-                ' core blocks this property if not authCluster
-                '
-                Return core.cluster
-            End Get
-        End Property
         '
         ' append to logfile
         '

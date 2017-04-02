@@ -142,7 +142,7 @@ Namespace Contensive
                     ' run tasks in task
                     '
                     Using cpCluster As New CPClass
-                        Using programDataFiles As New coreFileSystemClass(cpCluster.core, cpCluster.core.clusterConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) + "clib\")
+                        Using programDataFiles As New coreFileSystemClass(cpCluster.core, cpCluster.core.serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) + "clib\")
                             Dim JSONTemp = programDataFiles.readFile("serverConfig.json")
                             Dim serverConfig As serverConfigClass = cpCluster.core.json.Deserialize(Of serverConfigClass)(JSONTemp)
                             If (Not serverConfig.allowTaskRunnerService) Then
@@ -180,7 +180,7 @@ Namespace Contensive
                 '
                 appendLog("taskRunnerService.runTasks")
                 '
-                For Each kvp As KeyValuePair(Of String, appConfigClass) In cpClusterCore.clusterConfig.apps
+                For Each kvp As KeyValuePair(Of String, appConfigClass) In cpClusterCore.serverConfig.apps
                     AppName = kvp.Value.name
                     '
                     appendLog("taskRunnerService.runTasks, appname=[" & AppName & "]")

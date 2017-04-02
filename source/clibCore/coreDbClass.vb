@@ -187,7 +187,7 @@ Namespace Contensive.Core
                 Dim masterConnString As String = ""
                 Dim defaultDataSourceConnString As String = ""
                 Dim serverUrl As String
-                serverUrl = cpCore.clusterConfig.defaultDataSourceAddress
+                serverUrl = cpCore.serverConfig.defaultDataSourceAddress
                 If (serverUrl.IndexOf(":") > 0) Then
                     serverUrl = serverUrl.Substring(0, serverUrl.IndexOf(":"))
                 End If
@@ -201,14 +201,14 @@ Namespace Contensive.Core
                 ''
                 masterConnString &= "" _
                     & "server=" & serverUrl & ";" _
-                    & "User Id=" & cpCore.clusterConfig.defaultDataSourceUsername & ";" _
-                    & "Password=" & cpCore.clusterConfig.defaultDataSourcePassword & ";" _
+                    & "User Id=" & cpCore.serverConfig.defaultDataSourceUsername & ";" _
+                    & "Password=" & cpCore.serverConfig.defaultDataSourcePassword & ";" _
                     & ""
                 ''
                 'masterConnString &= "" _
                 '    & "data source=" & dataSourceUrl & ";" _
-                '    & "UID=" & cpCore.clusterConfig.defaultDataSourceUsername & ";" _
-                '    & "PWD=" & cpCore.clusterConfig.defaultDataSourcePassword & ";" _
+                '    & "UID=" & cpCore.serverConfig.defaultDataSourceUsername & ";" _
+                '    & "PWD=" & cpCore.serverConfig.defaultDataSourcePassword & ";" _
                 '    & ""
                 If String.IsNullOrEmpty(catalogName) Then
                     '
@@ -274,7 +274,7 @@ Namespace Contensive.Core
                 Dim masterConnString As String = ""
                 Dim defaultDataSourceConnString As String = ""
                 Dim serverUrl As String
-                serverUrl = cpCore.clusterConfig.defaultDataSourceAddress
+                serverUrl = cpCore.serverConfig.defaultDataSourceAddress
                 If (serverUrl.IndexOf(":") > 0) Then
                     serverUrl = serverUrl.Substring(0, serverUrl.IndexOf(":"))
                 End If
@@ -289,14 +289,14 @@ Namespace Contensive.Core
                 masterConnString &= "" _
                     & "Provider=sqloledb;" _
                     & "Data Source=" & serverUrl & ";" _
-                    & "User Id=" & cpCore.clusterConfig.defaultDataSourceUsername & ";" _
-                    & "Password=" & cpCore.clusterConfig.defaultDataSourcePassword & ";" _
+                    & "User Id=" & cpCore.serverConfig.defaultDataSourceUsername & ";" _
+                    & "Password=" & cpCore.serverConfig.defaultDataSourcePassword & ";" _
                     & ""
                 ''
                 'masterConnString &= "" _
                 '    & "data source=" & dataSourceUrl & ";" _
-                '    & "UID=" & cpCore.clusterConfig.defaultDataSourceUsername & ";" _
-                '    & "PWD=" & cpCore.clusterConfig.defaultDataSourcePassword & ";" _
+                '    & "UID=" & cpCore.serverConfig.defaultDataSourceUsername & ";" _
+                '    & "PWD=" & cpCore.serverConfig.defaultDataSourcePassword & ";" _
                 '    & ""
                 If String.IsNullOrEmpty(catalogName) Then
                     '

@@ -64,20 +64,16 @@ Namespace Contensive.Core
     '
     '====================================================================================================
     ''' <summary>
-    ''' Holds location on the server of the clusterConfig file. Physically stored at programDataFolder/clib/serverConfig.json
+    ''' Holds location on the server of the serverConfig file. Physically stored at programDataFolder/clib/serverConfig.json
     ''' </summary>
     Public Class serverConfigClass
+        '
+        ' -- old serverConfig
         'Public clusterPath As String
         Public allowTaskRunnerService As Boolean
         Public allowTaskSchedulerService As Boolean
-    End Class
-    '
-    '====================================================================================================
-    ''' <summary>
-    ''' cluster configuration class - deserialized configration file
-    ''' </summary>
-    ''' <remarks></remarks>
-    Public Class clusterConfigClass
+        '
+        ' -- old clusterConfig
         Public isLocal As Boolean = True
         Public name As String = ""
         '
@@ -133,6 +129,68 @@ Namespace Contensive.Core
         '
         Public apps As New Dictionary(Of String, appConfigClass)
     End Class
+    ''
+    ''====================================================================================================
+    '''' <summary>
+    '''' cluster configuration class - deserialized configration file
+    '''' </summary>
+    '''' <remarks></remarks>
+    'Public Class clusterConfigClass
+    '    Public isLocal As Boolean = True
+    '    Public name As String = ""
+    '    '
+    '    ' local caching using dotnet framework, flushes on appPool
+    '    '
+    '    Public isLocalCache As Boolean = False
+    '    '
+    '    ' AWS dotnet elaticcache client wraps enyim, and provides node autodiscovery through the configuration object.
+    '    ' this is the srver:port to the config file it uses.
+    '    '
+    '    Public awsElastiCacheConfigurationEndpoint As String
+    '    '
+    '    ' datasource for the cluster
+    '    '
+    '    Public defaultDataSourceType As dataSourceTypeEnum
+    '    '
+    '    ' odbc
+    '    '
+    '    Public defaultDataSourceODBCConnectionString As String
+    '    '
+    '    ' native
+    '    '
+    '    Public defaultDataSourceAddress As String = ""
+    '    '
+    '    ' user for creating new databases, and creating the new user for the database during site create, and saved to appconfig
+    '    '
+    '    Public defaultDataSourceUsername As String = ""
+    '    Public defaultDataSourcePassword As String = ""
+    '    '
+    '    ' endpoint for cluster files (not sure how it works, maybe this will be an object taht includes permissions, for now an fpo)
+    '    '
+    '    Public clusterFilesEndpoint As String
+    '    '
+    '    ' configuration of async command listener on render machines (not sure if used still)
+    '    '
+    '    Public serverListenerPort As Integer = Port_ContentServerControlDefault
+    '    Public maxConcurrentTasksPerServer As Integer = 5
+    '    ' ayncCmd server authentication -- change this to a key later
+    '    Public username As String = ""
+    '    Public password As String = ""
+    '    '
+    '    ' This is the root path to the localCluster files, typically getLocalDataFolder (d:\inetpub)
+    '    '   if isLocal, the cluster runs from these files
+    '    '   if not, this is the local mirror of the cluster files
+    '    '
+    '    'Public clusterPhysicalPath As String
+    '    '
+    '    'Public domainRoutes As Dictionary(Of String, String)
+    '    '
+    '    Public appPattern As String
+    '    '
+    '    '
+    '    '
+    '    Public apps As New Dictionary(Of String, appConfigClass)
+    'End Class
     '
     '====================================================================================================
     ''' <summary>

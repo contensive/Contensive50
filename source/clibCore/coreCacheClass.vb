@@ -63,7 +63,7 @@ Namespace Contensive.Core
                     Else
                         hint = 200
                         Dim rawCacheName As String = encodeCacheKey(cpCore.appConfig.name, key)
-                        If cpCore.clusterConfig.isLocalCache Or remoteCacheDisabled Then
+                        If cpCore.serverConfig.isLocalCache Or remoteCacheDisabled Then
                             '
                             ' implement a simple local cache using the filesystem
                             '
@@ -131,7 +131,7 @@ Namespace Contensive.Core
                 cacheLogPrefix = "cacheLog"
                 '
                 remoteCacheDisabled = True
-                cacheEndpoint = cpCore.clusterConfig.awsElastiCacheConfigurationEndpoint
+                cacheEndpoint = cpCore.serverConfig.awsElastiCacheConfigurationEndpoint
                 If String.IsNullOrEmpty(cacheEndpoint) Then
                     '
                     logMsg &= ", elasticache disabled"
@@ -202,7 +202,7 @@ Namespace Contensive.Core
                 Else
                     If (cpCore.appConfig.enableCache) And (cpCore.siteProperties.allowCache_notCached) Then
                         Dim rawCacheName As String = encodeCacheKey(cpCore.appConfig.name, Key)
-                        If cpCore.clusterConfig.isLocalCache Or remoteCacheDisabled Then
+                        If cpCore.serverConfig.isLocalCache Or remoteCacheDisabled Then
                             '
                             ' implement a simple local cache using the filesystem
                             '
