@@ -56,7 +56,7 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function GetConnectionString(ByVal DataSourcename As String) As String
-            Return cp.core.db.getConnectionStringADONET(cp.core.appConfig.name, DataSourcename)
+            Return cp.core.db.getConnectionStringADONET(cp.core.serverConfig.appConfig.name, DataSourcename)
         End Function
         '
         '====================================================================================================

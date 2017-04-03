@@ -84,8 +84,8 @@ Namespace Contensive.Core
                         cpCore.appRootFiles.saveFile("deleteMe.txt", "Temp document to create path")
                         cpCore.appRootFiles.deleteFile("deleteMe.txt")
                         bindinginformation = "*:80:" & DomainName
-                        mySite = iisManager.Sites.Add(appName, "http", bindinginformation, cpCore.appConfig.appRootFilesPath)
-                        'mySite = iisManager.Sites.Add(appName, "http", bindinginformation, cpCore.serverConfig.clusterPath & cpCore.appConfig.appRootFilesPath)
+                        mySite = iisManager.Sites.Add(appName, "http", bindinginformation, cpCore.serverconfig.appConfig.appRootFilesPath)
+                        'mySite = iisManager.Sites.Add(appName, "http", bindinginformation, cpCore.serverConfig.clusterPath & cpCore.serverconfig.appConfig.appRootFilesPath)
                         'iisManager.Sites.Item(0).)
                         bindinginformation = "*:80:" & appName
                         mySite.Bindings.Add(bindinginformation, "http")
@@ -550,11 +550,11 @@ Namespace Contensive.Core
                         Copy = cpCore.siteProperties.getText("DefaultFormInputTextHeight", "1")
                         Copy = cpCore.siteProperties.getText("DefaultFormInputWidth", "60")
                         Copy = cpCore.siteProperties.getText("EditLockTimeout", "5")
-                        Copy = cpCore.siteProperties.getText("EmailAdmin", "webmaster@" & cpCore.appConfig.domainList(0))
-                        Copy = cpCore.siteProperties.getText("EmailFromAddress", "webmaster@" & cpCore.appConfig.domainList(0))
-                        Copy = cpCore.siteProperties.getText("EmailPublishSubmitFrom", "webmaster@" & cpCore.appConfig.domainList(0))
+                        Copy = cpCore.siteProperties.getText("EmailAdmin", "webmaster@" & cpCore.serverconfig.appConfig.domainList(0))
+                        Copy = cpCore.siteProperties.getText("EmailFromAddress", "webmaster@" & cpCore.serverconfig.appConfig.domainList(0))
+                        Copy = cpCore.siteProperties.getText("EmailPublishSubmitFrom", "webmaster@" & cpCore.serverconfig.appConfig.domainList(0))
                         Copy = cpCore.siteProperties.getText("Language", "English")
-                        Copy = cpCore.siteProperties.getText("PageContentMessageFooter", "Copyright " & cpCore.appConfig.domainList(0))
+                        Copy = cpCore.siteProperties.getText("PageContentMessageFooter", "Copyright " & cpCore.serverconfig.appConfig.domainList(0))
                         Copy = cpCore.siteProperties.getText("SelectFieldLimit", "4000")
                         Copy = cpCore.siteProperties.getText("SelectFieldWidthLimit", "100")
                         Copy = cpCore.siteProperties.getText("SMTPServer", "127.0.0.1")
@@ -610,9 +610,9 @@ Namespace Contensive.Core
                             UpgradeOK = addonInstall.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(ErrorMessage, "", IISResetRequired, isNewBuild)
                             classLogFolder = saveLogFolder
                             If ErrorMessage <> "" Then
-                                cpCore.handleLegacyError3(cpCore.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
+                                cpCore.handleLegacyError3(cpCore.serverconfig.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             ElseIf Not UpgradeOK Then
-                                cpCore.handleLegacyError3(cpCore.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, NotOK was returned without an error message", "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
+                                cpCore.handleLegacyError3(cpCore.serverconfig.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, NotOK was returned without an error message", "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             End If
                             ''
                             ''---------------------------------------------------------------------
@@ -670,7 +670,7 @@ Namespace Contensive.Core
                                 Call Doc.LoadXml(addonInstall.getCollectionListFile)
                                 If True Then
                                     If vbLCase(Doc.DocumentElement.Name) <> vbLCase(CollectionListRootNode) Then
-                                        cpCore.handleLegacyError3(cpCore.appConfig.name, "Error loading Collection config file. The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.", "dll", "builderClass", "Upgrade", 0, "", "", False, True, "")
+                                        cpCore.handleLegacyError3(cpCore.serverconfig.appConfig.name, "Error loading Collection config file. The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.", "dll", "builderClass", "Upgrade", 0, "", "", False, True, "")
                                     Else
                                         With Doc.DocumentElement
                                             If vbLCase(.Name) = "collectionlist" Then
@@ -700,7 +700,7 @@ Namespace Contensive.Core
                                                                 ' app version has no lastchangedate
                                                                 '
                                                                 upgradeCollection = True
-                                                                Call appendUpgradeLog(cpCore.appConfig.name, MethodName, "Upgrading collection " & dt.Rows(rowptr).Item("name").ToString & " because the collection installed in the application has no LastChangeDate. It may have been installed manually.")
+                                                                Call appendUpgradeLog(cpCore.serverconfig.appConfig.name, MethodName, "Upgrading collection " & dt.Rows(rowptr).Item("name").ToString & " because the collection installed in the application has no LastChangeDate. It may have been installed manually.")
                                                             Else
                                                                 '
                                                                 ' compare to last change date in collection config file
@@ -726,7 +726,7 @@ Namespace Contensive.Core
                                                                         Call appendUpgradeLog("...local collection found")
                                                                         If LocalLastChangeDate <> Date.MinValue Then
                                                                             If LocalLastChangeDate > LastChangeDate Then
-                                                                                Call appendUpgradeLog(cpCore.appConfig.name, MethodName, "Upgrading collection " & dt.Rows(rowptr).Item("name").ToString() & " because the collection in the local server store has a newer LastChangeDate than the collection installed on this application.")
+                                                                                Call appendUpgradeLog(cpCore.serverconfig.appConfig.name, MethodName, "Upgrading collection " & dt.Rows(rowptr).Item("name").ToString() & " because the collection in the local server store has a newer LastChangeDate than the collection installed on this application.")
                                                                                 upgradeCollection = True
                                                                             End If
                                                                         End If
@@ -762,7 +762,7 @@ Namespace Contensive.Core
                                 End If
 
                             Catch ex9 As Exception
-                                Call handleClassException(ex9, cpCore.appConfig.name, MethodName) ' "upgrade2")
+                                Call handleClassException(ex9, cpCore.serverconfig.appConfig.name, MethodName) ' "upgrade2")
                             End Try
                             '
                             ' done
@@ -1707,7 +1707,7 @@ Namespace Contensive.Core
                 '---------------------------------------------------------------------
                 '
                 If False Then
-                    Call appendUpgradeLogAddStep(cpCore.appConfig.name, "Upgrade_Conversion", "4.2.414, convert all ccaggregateFunctions to add-ons")
+                    Call appendUpgradeLogAddStep(cpCore.serverconfig.appConfig.name, "Upgrade_Conversion", "4.2.414, convert all ccaggregateFunctions to add-ons")
                     '
                     ' remove all non add-on contentdefs for ccaggregatefunctions
                     '
@@ -1756,7 +1756,7 @@ Namespace Contensive.Core
                 '
                 MethodName = "VerifyTableCoreFields"
                 '
-                Call appendUpgradeLogAddStep(cpCore.appConfig.name, MethodName, "Verify core fields in all tables registered in [Tables] content.")
+                Call appendUpgradeLogAddStep(cpCore.serverconfig.appConfig.name, MethodName, "Verify core fields in all tables registered in [Tables] content.")
                 '
                 SQL = "SELECT ccDataSources.Name as DataSourceName, ccDataSources.ID as DataSourceID, ccDataSources.Active as DataSourceActive, ccTables.Name as TableName" _
                 & " FROM ccTables LEFT JOIN ccDataSources ON ccTables.DataSourceID = ccDataSources.ID" _
@@ -1790,7 +1790,7 @@ Namespace Contensive.Core
         Public Sub VerifyScriptingRecords()
             Try
                 '
-                Call appendUpgradeLogAddStep(cpCore.appConfig.name, "VerifyScriptingRecords", "Verify Scripting Records.")
+                Call appendUpgradeLogAddStep(cpCore.serverconfig.appConfig.name, "VerifyScriptingRecords", "Verify Scripting Records.")
                 '
                 Call VerifyRecord("Scripting Languages", "VBScript", "", "")
                 Call VerifyRecord("Scripting Languages", "JScript", "", "")
@@ -1806,7 +1806,7 @@ Namespace Contensive.Core
         Public Sub VerifyLanguageRecords()
             Try
                 '
-                Call appendUpgradeLogAddStep(cpCore.appConfig.name, "VerifyLanguageRecords", "Verify Language Records.")
+                Call appendUpgradeLogAddStep(cpCore.serverconfig.appConfig.name, "VerifyLanguageRecords", "Verify Language Records.")
                 '
                 Call VerifyRecord("Languages", "English", "HTTP_Accept_Language", "'en'")
                 Call VerifyRecord("Languages", "Spanish", "HTTP_Accept_Language", "'es'")
@@ -1825,7 +1825,7 @@ Namespace Contensive.Core
                 Dim CS As Integer
                 Dim dt As DataTable
                 '
-                Call appendUpgradeLogAddStep(cpCore.appConfig.name, "VerifyLibraryFolders", "Verify Library Folders: Images and Downloads")
+                Call appendUpgradeLogAddStep(cpCore.serverconfig.appConfig.name, "VerifyLibraryFolders", "Verify Library Folders: Images and Downloads")
                 '
                 dt = cpCore.db.executeSql("select id from cclibraryfiles")
                 If dt.Rows.Count = 0 Then
@@ -2131,7 +2131,7 @@ Namespace Contensive.Core
         Public Sub VerifyStates()
             Try
                 '
-                Call appendUpgradeLogAddStep(cpCore.appConfig.name, "VerifyStates", "Verify States")
+                Call appendUpgradeLogAddStep(cpCore.serverconfig.appConfig.name, "VerifyStates", "Verify States")
                 '
                 Dim CountryID As Integer
                 '
@@ -2242,7 +2242,7 @@ Namespace Contensive.Core
                 Dim Name As String
                 'Dim fs As New fileSystemClass
                 '
-                Call appendUpgradeLogAddStep(cpCore.appConfig.name, "VerifyCountries", "Verify Countries")
+                Call appendUpgradeLogAddStep(cpCore.serverconfig.appConfig.name, "VerifyCountries", "Verify Countries")
                 '
                 list = cpCore.appRootFiles.readFile("cclib\config\isoCountryList.txt")
                 Rows = Split(list, vbCrLf)
@@ -2272,7 +2272,7 @@ Namespace Contensive.Core
                 Dim GroupID As Integer
                 Dim SQL As String
                 '
-                Call appendUpgradeLogAddStep(cpCore.appConfig.name, "VerifyDefaultGroups", "Verify Default Groups")
+                Call appendUpgradeLogAddStep(cpCore.serverconfig.appConfig.name, "VerifyDefaultGroups", "Verify Default Groups")
                 '
                 GroupID = cpCore.group_add("Content Editors")
                 SQL = "Update ccContent Set EditorGroupID=" & cpCore.db.encodeSQLNumber(GroupID) & " where EditorGroupID is null;"
@@ -2424,7 +2424,7 @@ Namespace Contensive.Core
         ''
         ''
         Public Sub ReplaceAddonWithCollection(ByVal AddonProgramID As String, ByVal CollectionGuid As String, ByRef return_IISResetRequired As Boolean, ByRef return_RegisterList As String)
-            Dim ex As New Exception("todo") : Call handleClassException(ex, cpCore.appConfig.name, "methodNameFPO") ' ignoreInteger, "dll", "builderClass.ReplaceAddonWithCollection is deprecated", "ReplaceAddonWithCollection", True, True)
+            Dim ex As New Exception("todo") : Call handleClassException(ex, cpCore.serverconfig.appConfig.name, "methodNameFPO") ' ignoreInteger, "dll", "builderClass.ReplaceAddonWithCollection is deprecated", "ReplaceAddonWithCollection", True, True)
         End Sub
         '    On Error GoTo ErrorTrap
         '    '
@@ -2462,7 +2462,7 @@ Namespace Contensive.Core
             Try
                 '
                 If Not False Then
-                    Call appendUpgradeLogAddStep(cpCore.appConfig.name, "VerifyCoreTables", "Verify Core SQL Tables")
+                    Call appendUpgradeLogAddStep(cpCore.serverconfig.appConfig.name, "VerifyCoreTables", "Verify Core SQL Tables")
                     '
                     Call cpCore.db.createSQLTable("Default", "ccDataSources")
                     Call cpCore.db.createSQLTableField("Default", "ccDataSources", "typeId", FieldTypeIdInteger)

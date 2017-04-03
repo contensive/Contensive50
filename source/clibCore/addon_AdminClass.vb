@@ -65,7 +65,7 @@ Namespace Contensive.Addons
                         & vbCrLf & BinaryHeaderString _
                         & vbCrLf
                 End If
-                cpCore.log_appendLog(SaveContent, "admin", cpCore.appConfig.name & "-request-")
+                cpCore.log_appendLog(SaveContent, "admin", cpCore.serverConfig.appConfig.name & "-request-")
                 '
                 ' main_Get Content
                 '
@@ -252,7 +252,7 @@ leak200:
                     & "You are attempting to enter an area which your account does not have access." _
                     & cr & "<ul class=""ccList"">" _
                     & cr & "<li class=""ccListItem"">To return to the public web site, use your back button, or <a href=""" & coreClass.webServerIO_requestRootPath & """>Click Here</A>." _
-                    & cr & "<li class=""ccListItem"">To login under a different account, <a href=""" & cpCore.appConfig.adminRoute & "?method=logout"" rel=""nofollow"">Click Here</A>" _
+                    & cr & "<li class=""ccListItem"">To login under a different account, <a href=""" & cpCore.serverConfig.appConfig.adminRoute & "?method=logout"" rel=""nofollow"">Click Here</A>" _
                     & cr & "<li class=""ccListItem"">To have your account access changed to include this area, please contact the <a href=""mailto:" & cpCore.siteProperties.getText("EmailAdmin") & """>system administrator</A>. " _
                     & cr & "</ul>" _
                     & "</span></p>" _
@@ -2257,7 +2257,7 @@ ErrorTrap:
                 '
                 If AllowAdminFieldCheck() And (FormFieldListToBeLoaded <> ",") Then
                     Call cpCore.error_AddUserError("There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The following fields where Not found [" & Mid(FormFieldListToBeLoaded, 2, Len(FormFieldListToBeLoaded) - 2) & "].")
-                    cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.appConfig.name & ", There were fields In the fieldlist sent out To the browser that did Not Return, [" & Mid(FormFieldListToBeLoaded, 2, Len(FormFieldListToBeLoaded) - 2) & "]")
+                    cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", There were fields In the fieldlist sent out To the browser that did Not Return, [" & Mid(FormFieldListToBeLoaded, 2, Len(FormFieldListToBeLoaded) - 2) & "]")
                 Else
                     '
                     ' if page content, check for the 'pagenotfound','landingpageid' checkboxes in control tab
@@ -2429,7 +2429,7 @@ ErrorTrap:
                                         '
                                         Call cpCore.error_AddUserError("There has been an Error reading the response from your browser. Please Try again, taking care Not To submit the page until your browser has finished loading. If this Error occurs again, please report this problem To your site administrator. The first Error was [" & FieldName & " Not found]. There may have been others.")
                                     End If
-                                    cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
+                                    cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
                                     Exit Sub
                                 End If
                             End If
@@ -2457,7 +2457,7 @@ ErrorTrap:
                             If AllowAdminFieldCheck() Then
                                 If (Not InResponse) And (Not InEmptyFieldList) Then
                                     Call cpCore.error_AddUserError("There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [" & FieldName & " Not found].")
-                                    cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
+                                    cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
                                     Exit Sub
                                 End If
                             End If
@@ -2484,7 +2484,7 @@ ErrorTrap:
                             If AllowAdminFieldCheck() Then
                                 If (Not InResponse) And (Not InEmptyFieldList) Then
                                     Call cpCore.error_AddUserError("There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The Error Is [" & FieldName & " Not found].")
-                                    cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
+                                    cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
                                     Exit Sub
                                 End If
                             End If
@@ -2555,7 +2555,7 @@ ErrorTrap:
                                 ' Was sent out non-blank, and no response back, flag error and leave the current value to a retry
                                 '
                                 Call cpCore.error_AddUserError("There has been an Error reading the response from your browser. The field [" & .caption & "]" & TabCopy & " was missing. Please Try your change again. If this Error happens repeatedly, please report this problem To your site administrator.")
-                                cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
+                                cpCore.handleLegacyError2("AdminClass", "LoadEditResponse", cpCore.serverConfig.appConfig.name & ", Field [" & FieldName & "] was In the forms field list, but Not found In the response stream.")
                                 ResponseFieldValueIsOKToSave = False
                             Else
                                 '
@@ -4792,7 +4792,7 @@ ErrorTrap:
                     Copy = EncodeText(cpCore.db.cs_getInteger(CSPointer, "PagesFound"))
                 End If
                 Call cpCore.db.cs_Close(CSPointer)
-                Call Content.Add(Adminui.GetEditRow("<a href=""" & cpCore.html.html_EncodeHTML(cpCore.appConfig.adminRoute & "?" & QueryString) & """ target=""_blank"">" & SpanClassAdminNormal & Copy & "</a>", "Bad Links", "", False, False, ""))
+                Call Content.Add(Adminui.GetEditRow("<a href=""" & cpCore.html.html_EncodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & QueryString) & """ target=""_blank"">" & SpanClassAdminNormal & Copy & "</a>", "Bad Links", "", False, False, ""))
                 '
                 ' ----- Options
                 '
@@ -5543,7 +5543,7 @@ ErrorTrap:
                                     ' ----- Default Editor, Redirect fields (the same for normal/readonly/spelling)
                                     '--------------------------------------------------------------------------------------------
                                     '
-                                    RedirectPath = cpCore.appConfig.adminRoute
+                                    RedirectPath = cpCore.serverConfig.appConfig.adminRoute
                                     If .RedirectPath <> "" Then
                                         RedirectPath = .RedirectPath
                                     End If
@@ -5596,7 +5596,7 @@ ErrorTrap:
                                             '
                                             return_NewFieldList = return_NewFieldList & "," & FieldName
                                             FieldValueText = EncodeText(FieldValueObject)
-                                            NonEncodedLink = cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, FieldValueText)
+                                            NonEncodedLink = cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, FieldValueText)
                                             EncodedLink = EncodeURL(NonEncodedLink)
                                             EditorString &= (cpCore.html_GetFormInputHidden(FormFieldLCaseName, ""))
                                             If FieldValueText = "" Then
@@ -5860,7 +5860,7 @@ ErrorTrap:
                                             If FieldValueText = "" Then
                                                 EditorString &= (cpCore.html_GetFormInputFile2(FormFieldLCaseName, , "file"))
                                             Else
-                                                NonEncodedLink = cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, FieldValueText)
+                                                NonEncodedLink = cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, FieldValueText)
                                                 EncodedLink = EncodeURL(NonEncodedLink)
                                                 Dim filename As String = ""
                                                 Dim path As String = ""
@@ -7289,7 +7289,7 @@ ErrorTrap:
                 PageCount = cpCore.db.cs_getNumber(CS, "pageCount")
                 Stream.Add("<tr>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "All Visits</span></td>")
-                Stream.Add("<td style=""width:150px;border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.html.html_EncodeHTML(cpCore.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&DateFrom=" & cpCore.app_startTime & "&DateTo=" & cpCore.app_startTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
+                Stream.Add("<td style=""width:150px;border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.html.html_EncodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&DateFrom=" & cpCore.app_startTime & "&DateTo=" & cpCore.app_startTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "This includes all visitors to the website, including guests, bots and administrators. Pages/visit includes page hits and not ajax or remote method hits.</span></td>")
                 Stream.Add("</tr>")
             End If
@@ -7304,7 +7304,7 @@ ErrorTrap:
                 PageCount = cpCore.db.cs_getNumber(CS, "pageCount")
                 Stream.Add("<tr>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "Non-bot Visits</span></td>")
-                Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.html.html_EncodeHTML(cpCore.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&DateFrom=" & cpCore.app_startTime.ToShortDateString & "&DateTo=" & cpCore.app_startTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
+                Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.html.html_EncodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&DateFrom=" & cpCore.app_startTime.ToShortDateString & "&DateTo=" & cpCore.app_startTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "This excludes hits from visitors identified as bots. Pages/visit includes page hits and not ajax or remote method hits.</span></td>")
                 Stream.Add("</tr>")
             End If
@@ -7319,7 +7319,7 @@ ErrorTrap:
                 PageCount = cpCore.db.cs_getNumber(CS, "pageCount")
                 Stream.Add("<tr>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "Visits by New Visitors</span></td>")
-                Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.html.html_EncodeHTML(cpCore.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&ExcludeOldVisitors=1&DateFrom=" & cpCore.app_startTime.ToShortDateString & "&DateTo=" & cpCore.app_startTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
+                Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.html.html_EncodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&ExcludeOldVisitors=1&DateFrom=" & cpCore.app_startTime.ToShortDateString & "&DateTo=" & cpCore.app_startTime.ToShortDateString) & """>" & VisitCount & "</A>, " & FormatNumber(PageCount, 2) & " pages/visit.</span></td>")
                 Stream.Add("<td style=""border-bottom:1px solid #888;"" valign=top>" & SpanClassAdminNormal & "This includes only new visitors not identified as bots. Pages/visit includes page hits and not ajax or remote method hits.</span></td>")
                 Stream.Add("</tr>")
             End If
@@ -7351,11 +7351,11 @@ ErrorTrap:
                     Do While cpCore.db.cs_ok(CS)
                         VisitID = cpCore.db.cs_getInteger(CS, "VisitID")
                         Panel = Panel & "<tr class=""" & RowColor & """>"
-                        Panel = Panel & "<td align=""left"">" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.html.html_EncodeHTML(cpCore.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=16&MemberID=" & cpCore.db.cs_getInteger(CS, "MemberID")) & """>" & cpCore.db.cs_get(CS, "MemberName") & "</A></span></td>"
+                        Panel = Panel & "<td align=""left"">" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.html.html_EncodeHTML(cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=16&MemberID=" & cpCore.db.cs_getInteger(CS, "MemberID")) & """>" & cpCore.db.cs_get(CS, "MemberName") & "</A></span></td>"
                         Panel = Panel & "<td align=""left"">" & SpanClassAdminNormal & cpCore.db.cs_get(CS, "Remote_Addr") & "</span></td>"
                         Panel = Panel & "<td align=""left"">" & SpanClassAdminNormal & FormatDateTime(cpCore.db.cs_getDate(CS, "LastVisitTime"), vbLongTime) & "</span></td>"
-                        Panel = Panel & "<td align=""right"">" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=10&VisitID=" & VisitID & """>" & cpCore.db.cs_get(CS, "PageVisits") & "</A></span></td>"
-                        Panel = Panel & "<td align=""right"">" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=17&VisitID=" & VisitID & """>" & VisitID & "</A></span></td>"
+                        Panel = Panel & "<td align=""right"">" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=10&VisitID=" & VisitID & """>" & cpCore.db.cs_get(CS, "PageVisits") & "</A></span></td>"
+                        Panel = Panel & "<td align=""right"">" & SpanClassAdminNormal & "<a target=""_blank"" href=""" & cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=17&VisitID=" & VisitID & """>" & VisitID & "</A></span></td>"
                         Panel = Panel & "<td align=""left"">" & SpanClassAdminNormal & "&nbsp;" & cpCore.db.cs_getText(CS, "referer") & "</span></td>"
                         Panel = Panel & "</tr>"
                         If RowColor = "ccPanelRowEven" Then
@@ -8112,8 +8112,8 @@ ErrorTrap:
             Call FastString.Add("<td valign=""top"" align=""right"">&nbsp;</td>")
             Call FastString.Add("<td colspan=""2"" class=""ccAdminEditField"" align=""left"">" & SpanClassAdminNormal)
             Call FastString.Add("<ul class=""ccList"">")
-            Call FastString.Add("<li class=""ccListItem""><a target=""_blank"" href=""" & cpCore.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&MemberID=" & editRecord.id & "&DateTo=" & Int(cpCore.app_startTime.ToOADate) & "&DateFrom=" & Int(cpCore.app_startTime.ToOADate) - 365 & """>All visits from this person</A></LI>")
-            Call FastString.Add("<li class=""ccListItem""><a target=""_blank"" href=""" & cpCore.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=13&MemberID=" & editRecord.id & "&DateTo=" & Int(CDbl(cpCore.app_startTime.ToOADate)) & "&DateFrom=" & Int(CDbl(cpCore.app_startTime.ToOADate) - 365) & """>All orders from this person</A></LI>")
+            Call FastString.Add("<li class=""ccListItem""><a target=""_blank"" href=""" & cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=3&MemberID=" & editRecord.id & "&DateTo=" & Int(cpCore.app_startTime.ToOADate) & "&DateFrom=" & Int(cpCore.app_startTime.ToOADate) - 365 & """>All visits from this person</A></LI>")
+            Call FastString.Add("<li class=""ccListItem""><a target=""_blank"" href=""" & cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormReports & "&rid=13&MemberID=" & editRecord.id & "&DateTo=" & Int(CDbl(cpCore.app_startTime.ToOADate)) & "&DateFrom=" & Int(CDbl(cpCore.app_startTime.ToOADate) - 365) & """>All orders from this person</A></LI>")
             Call FastString.Add("</ul>")
             Call FastString.Add("</span></td></tr>")
             GetForm_Edit_MemberReports = Adminui.GetEditPanel((Not allowAdminTabs), "Contensive Reporting", "", Adminui.EditTableOpen & FastString.Text & Adminui.EditTableClose)
@@ -9106,10 +9106,10 @@ ErrorTrap:
                 QS = cpCore.web_RefreshQueryString
                 If allowAdminTabs Then
                     QS = ModifyQueryString(QS, "tabs", "0", True)
-                    RightSide = RightSide & GetActiveImage(cpCore.appConfig.adminRoute & "?" & QS, "Disable Tabs", "LibButtonNoTabs.GIF", "LibButtonNoTabsRev.GIF", "Disable Tabs", "16", "16", "", "", "")
+                    RightSide = RightSide & GetActiveImage(cpCore.serverConfig.appConfig.adminRoute & "?" & QS, "Disable Tabs", "LibButtonNoTabs.GIF", "LibButtonNoTabsRev.GIF", "Disable Tabs", "16", "16", "", "", "")
                 Else
                     QS = ModifyQueryString(QS, "tabs", "1", True)
-                    RightSide = RightSide & GetActiveImage(cpCore.appConfig.adminRoute & "?" & QS, "Enable Tabs", "LibButtonTabs.GIF", "LibButtonTabsRev.GIF", "Enable Tabs", "16", "16", "", "", "")
+                    RightSide = RightSide & GetActiveImage(cpCore.serverConfig.appConfig.adminRoute & "?" & QS, "Enable Tabs", "LibButtonTabs.GIF", "LibButtonTabsRev.GIF", "Enable Tabs", "16", "16", "", "", "")
                 End If
                 '
                 ' Menu Mode
@@ -9119,17 +9119,17 @@ ErrorTrap:
                     RightSide = RightSide & "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""16"" >"
                     If AdminMenuModeID = AdminMenuModeTop Then
                         QS = ModifyQueryString(QS, "mm", "1", True)
-                        RightSide = RightSide & GetActiveImage(cpCore.appConfig.adminRoute & "?" & QS, "Use Navigator", "LibButtonMenuTop.GIF", "LibButtonMenuTopOver.GIF", "Use Navigator", "16", "16", "", "", "")
+                        RightSide = RightSide & GetActiveImage(cpCore.serverConfig.appConfig.adminRoute & "?" & QS, "Use Navigator", "LibButtonMenuTop.GIF", "LibButtonMenuTopOver.GIF", "Use Navigator", "16", "16", "", "", "")
                     Else
                         QS = ModifyQueryString(QS, "mm", "2", True)
-                        RightSide = RightSide & GetActiveImage(cpCore.appConfig.adminRoute & "?" & QS, "Use Dropdown Menus", "LibButtonMenuLeft.GIF", "LibButtonMenuLeftOver.GIF", "Use Dropdown Menus", "16", "16", "", "", "")
+                        RightSide = RightSide & GetActiveImage(cpCore.serverConfig.appConfig.adminRoute & "?" & QS, "Use Dropdown Menus", "LibButtonMenuLeft.GIF", "LibButtonMenuLeftOver.GIF", "Use Dropdown Menus", "16", "16", "", "", "")
                     End If
                 End If
                 '
                 ' Refresh Button
                 '
                 RightSide = RightSide & "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""16"" >"
-                RightSide = RightSide & GetActiveImage(cpCore.appConfig.adminRoute & "?" & cpCore.web_RefreshQueryString, "Refresh", "LibButtonRefresh.GIF", "LibButtonRefreshOver.GIF", "Refresh", "16", "16", "", "", "")
+                RightSide = RightSide & GetActiveImage(cpCore.serverConfig.appConfig.adminRoute & "?" & cpCore.web_RefreshQueryString, "Refresh", "LibButtonRefresh.GIF", "LibButtonRefreshOver.GIF", "Refresh", "16", "16", "", "", "")
                 '
                 ' Assemble header
                 '
@@ -10342,7 +10342,7 @@ ErrorTrap:
                             If AccessOK Then
                                 Link = GetMenuLink(cpCore.db.cs_get(CSMenus, "LinkPage"), ContentID)
                                 If vbInstr(1, Link, "?") = 1 Then
-                                    Link = cpCore.appConfig.adminRoute & Link
+                                    Link = cpCore.serverConfig.appConfig.adminRoute & Link
                                 End If
                             Else
                                 Link = ""
@@ -11629,7 +11629,7 @@ ErrorTrap:
                     RowPointer = 1
                 Else
                     DataRowCount = cpCore.db.cs_getRowCount(CS)
-                    LinkPrefix = "<a href=""" & cpCore.appConfig.cdnFilesNetprefix
+                    LinkPrefix = "<a href=""" & cpCore.serverConfig.appConfig.cdnFilesNetprefix
                     LinkSuffix = """ target=_blank>Available</a>"
                     Do While cpCore.db.cs_ok(CS) And (RowPointer < PageSize)
                         RecordID = cpCore.db.cs_getInteger(CS, "ID")
@@ -12849,7 +12849,7 @@ ErrorTrap:
                                 '
                                 'if this is a current sort ,add the reverse flag
                                 '
-                                ButtonHref = cpCore.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormIndex & "&SetSortField=" & FieldName & "&RT=0&" & RequestNameTitleExtension & "=" & cpCore.main_EncodeRequestVariable(TitleExtension) & "&cid=" & adminContent.Id & "&ad=" & MenuDepth
+                                ButtonHref = cpCore.serverConfig.appConfig.adminRoute & "?" & RequestNameAdminForm & "=" & AdminFormIndex & "&SetSortField=" & FieldName & "&RT=0&" & RequestNameTitleExtension & "=" & cpCore.main_EncodeRequestVariable(TitleExtension) & "&cid=" & adminContent.Id & "&ad=" & MenuDepth
                                 For Each sortKvp In IndexConfig.Sorts
                                     Dim sort As indexConfigSortClass = sortKvp.Value
 
@@ -12932,7 +12932,7 @@ ErrorTrap:
                                     ' --- Edit button column
                                     '
                                     DataTable_DataRows &= "<td align=center " & RowColor & ">"
-                                    URI = cpCore.appConfig.adminRoute _
+                                    URI = cpCore.serverConfig.appConfig.adminRoute _
                                         & "?" & RequestNameAdminAction & "=" & AdminActionNop _
                                         & "&id=" & RecordID _
                                         & "&" & RequestNameTitleExtension & "=" & cpCore.main_EncodeRequestVariable(TitleExtension) _
@@ -16776,7 +16776,7 @@ ErrorTrap:
                         IconHeight = cpCore.db.cs_getInteger(CS, "IconHeight")
                         IconSprites = cpCore.db.cs_getInteger(CS, "IconSprites")
                         IconIsInline = cpCore.db.cs_getBoolean(CS, "IsInline")
-                        IconImg = GetAddonIconImg(cpCore.siteProperties.adminURL, IconWidth, IconHeight, IconSprites, IconIsInline, "", IconFilename, cpCore.appConfig.cdnFilesNetprefix, AddonName, AddonName, "", 0)
+                        IconImg = GetAddonIconImg(cpCore.siteProperties.adminURL, IconWidth, IconHeight, IconSprites, IconIsInline, "", IconFilename, cpCore.serverConfig.appConfig.cdnFilesNetprefix, AddonName, AddonName, "", 0)
                         helpLink = cpCore.db.cs_get(CS, "helpLink")
                     End If
                     Call cpCore.db.cs_Close(CS)

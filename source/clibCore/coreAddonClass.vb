@@ -429,7 +429,7 @@ Namespace Contensive.Core
                     OtherHeadTags = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_OtherHeadTags)
                     JSFilename = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_JSFilename)
                     If JSFilename <> "" Then
-                        JSFilename = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, JSFilename)
+                        JSFilename = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverconfig.appConfig.cdnFilesNetprefix, JSFilename)
                     End If
                 End If
                 If Not String.IsNullOrEmpty(ProgramID) Then
@@ -925,10 +925,10 @@ Namespace Contensive.Core
                                         Call cpCore.main_AddEndOfBodyJavascript2(JSBodyEnd, AddedByName)
                                         Call cpCore.main_AddHeadScriptLink(JSFilename, AddedByName)
                                         If DefaultStylesFilename <> "" Then
-                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
+                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverconfig.appConfig.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
                                         End If
                                         If CustomStylesFilename <> "" Then
-                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
+                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverconfig.appConfig.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
                                         End If
                                     End If
                                 End If
@@ -1161,9 +1161,9 @@ Namespace Contensive.Core
                                                 ' use assumptions
                                                 '
                                                 If Mid(WorkingLink, 1, 1) = "/" Then
-                                                    WorkingLink = "http://" & cpCore.appConfig.domainList(0) & WorkingLink
+                                                    WorkingLink = "http://" & cpCore.serverconfig.appConfig.domainList(0) & WorkingLink
                                                 Else
-                                                    WorkingLink = "http://" & cpCore.appConfig.domainList(0) & "/" & WorkingLink
+                                                    WorkingLink = "http://" & cpCore.serverconfig.appConfig.domainList(0) & "/" & WorkingLink
                                                 End If
                                             End If
                                         End If
@@ -1235,10 +1235,10 @@ Namespace Contensive.Core
                                         Call cpCore.main_AddEndOfBodyJavascript2(JSBodyEnd, AddedByName)
                                         Call cpCore.main_AddHeadScriptLink(JSFilename, AddedByName)
                                         If DefaultStylesFilename <> "" Then
-                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
+                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverconfig.appConfig.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
                                         End If
                                         If CustomStylesFilename <> "" Then
-                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
+                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverconfig.appConfig.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
                                         End If
                                     End If
                                 End If
@@ -1826,7 +1826,7 @@ Namespace Contensive.Core
                                                                             If FieldValue = "" Then
                                                                                 Copy = cpCore.html_GetFormInputFile(FieldName)
                                                                             Else
-                                                                                NonEncodedLink = cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, FieldValue)
+                                                                                NonEncodedLink = cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverconfig.appConfig.cdnFilesNetprefix, FieldValue)
                                                                                 EncodedLink = EncodeURL(NonEncodedLink)
                                                                                 Dim FieldValuefilename As String = ""
                                                                                 Dim FieldValuePath As String = ""
@@ -2845,12 +2845,12 @@ ErrorTrap:
             '-----------------------------------------------------------------
             '
             'hint = hint & ",030"
-            cpCore.appendLogWithLegacyRow(cpCore.appConfig.name, "start: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
+            cpCore.appendLogWithLegacyRow(cpCore.serverconfig.appConfig.name, "start: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
             '
             ' runAtServer = New runAtServerClass(Me)
             ' must nva encode because that is what the server-execute command expects
             cmdQueryString = "" _
-                    & "appname=" & encodeNvaArgument(EncodeRequestVariable(cpCore.appConfig.name)) _
+                    & "appname=" & encodeNvaArgument(EncodeRequestVariable(cpCore.serverconfig.appConfig.name)) _
                     & "&AddonID=" & CStr(addonId) _
                     & "&OptionString=" & encodeNvaArgument(EncodeRequestVariable(OptionString))
             'hint = hint & ",035"
@@ -2862,7 +2862,7 @@ ErrorTrap:
             Call taskScheduler.addTaskToQueue(cpCore, taskQueueCommandEnumModule.runAddon, cmdDetail, False)
             'Call runAtServer.executeCmd("RunProcess", cmdQueryString)
             '
-            cpCore.appendLogWithLegacyRow(cpCore.appConfig.name, "end: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
+            cpCore.appendLogWithLegacyRow(cpCore.serverconfig.appConfig.name, "end: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
             '
             Exit Function
 ErrorTrap:
@@ -2870,7 +2870,7 @@ ErrorTrap:
             ErrSource = Err.Source
             ErrDescription = Err.Description
             Call Err.Clear()
-            cpCore.appendLogWithLegacyRow(cpCore.appConfig.name, "errortrap exit(" & (GetTickCount - ProcessStartTick) & " msec): execute now, addon [" & AddonIDGuidOrName & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
+            cpCore.appendLogWithLegacyRow(cpCore.serverconfig.appConfig.name, "errortrap exit(" & (GetTickCount - ProcessStartTick) & " msec): execute now, addon [" & AddonIDGuidOrName & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
             Call cpCore.handleLegacyError4(ErrNumber, ErrSource, ErrDescription, "unknownMethodNameLegacyCall" & ", hint=" & hint, True)
         End Function
         '
@@ -3919,7 +3919,7 @@ ErrorTrap:
                                                                             If FieldValue = "" Then
                                                                                 Copy = cpCore.html_GetFormInputFile(FieldName)
                                                                             Else
-                                                                                NonEncodedLink = cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, FieldValue)
+                                                                                NonEncodedLink = cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverconfig.appConfig.cdnFilesNetprefix, FieldValue)
                                                                                 EncodedLink = EncodeURL(NonEncodedLink)
                                                                                 Dim FieldValuefilename As String = ""
                                                                                 Dim FieldValuePath As String = ""
@@ -4616,7 +4616,7 @@ ErrorTrap:
                 '
                 JSFilename = cpCore.db.cs_getText(CS, "jsfilename")
                 If JSFilename <> "" Then
-                    JSFilename = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, JSFilename)
+                    JSFilename = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverconfig.appConfig.cdnFilesNetprefix, JSFilename)
                     Call cpCore.main_AddHeadScriptLink(JSFilename, SourceComment)
                 End If
                 Copy = cpCore.db.cs_getText(CS, "stylesfilename")
@@ -4624,7 +4624,7 @@ ErrorTrap:
                     If vbInstr(1, Copy, "://") <> 0 Then
                     ElseIf Left(Copy, 1) = "/" Then
                     Else
-                        Copy = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, Copy)
+                        Copy = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverconfig.appConfig.cdnFilesNetprefix, Copy)
                     End If
                     Call cpCore.main_AddStylesheetLink2(Copy, SourceComment)
                 End If

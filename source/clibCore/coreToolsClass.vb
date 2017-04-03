@@ -4069,7 +4069,7 @@ ErrorTrap:
                 '
                 ' Restart
                 '
-                cpCore.appendLogWithLegacyRow(cpCore.appConfig.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " & cpCore.user.name & " (" & cpCore.user.id & ") restarted using the Restart tool", False, True, cpCore.webServerIO_ServerLink, "", "")
+                cpCore.appendLogWithLegacyRow(cpCore.serverconfig.appConfig.name, "Restarting Contensive", "dll", "ToolsClass", "GetForm_Restart", 0, "dll", "Warning: member " & cpCore.user.name & " (" & cpCore.user.id & ") restarted using the Restart tool", False, True, cpCore.webServerIO_ServerLink, "", "")
                 'runAtServer = New runAtServerClass(cpCore)
                 Call cpCore.main_Redirect("/ccLib/Popup/WaitForIISReset.htm")
                 Call Threading.Thread.Sleep(2000)
@@ -4679,7 +4679,7 @@ ErrorTrap:
                     ReplaceText = cpCore.docProperties.getText("ReplaceText")
                     'runAtServer.ipAddress = "127.0.0.1"
                     'runAtServer.port = "4531"
-                    QS = "app=" & encodeNvaArgument(cpCore.appConfig.name) & "&FindText=" & encodeNvaArgument(FindText) & "&ReplaceText=" & encodeNvaArgument(ReplaceText) & "&CDefNameList=" & encodeNvaArgument(CDefList)
+                    QS = "app=" & encodeNvaArgument(cpCore.serverconfig.appConfig.name) & "&FindText=" & encodeNvaArgument(FindText) & "&ReplaceText=" & encodeNvaArgument(ReplaceText) & "&CDefNameList=" & encodeNvaArgument(CDefList)
 
                     Throw New NotImplementedException("GetForm_FindAndReplace")
                     Dim taskScheduler As New coreTaskSchedulerServiceClass()
@@ -4774,7 +4774,7 @@ ErrorTrap:
                 '
                 '
                 '
-                cpCore.appendLogWithLegacyRow(cpCore.appConfig.name, "Resetting IIS", "dll", "ToolsClass", "GetForm_IISReset", 0, "dll", "Warning: member " & cpCore.user.name & " (" & cpCore.user.id & ") executed an IISReset using the IISReset tool", False, True, cpCore.webServerIO_ServerLink, "", "")
+                cpCore.appendLogWithLegacyRow(cpCore.serverconfig.appConfig.name, "Resetting IIS", "dll", "ToolsClass", "GetForm_IISReset", 0, "dll", "Warning: member " & cpCore.user.name & " (" & cpCore.user.id & ") executed an IISReset using the IISReset tool", False, True, cpCore.webServerIO_ServerLink, "", "")
                 'runAtServer = New runAtServerClass(cpCore)
                 Call cpCore.main_Redirect("/ccLib/Popup/WaitForIISReset.htm")
                 Call Threading.Thread.Sleep(2000)

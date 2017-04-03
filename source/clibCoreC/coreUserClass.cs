@@ -703,7 +703,7 @@
 //                        styleFilename = cpCore.db.cs_getText(CS, "StyleFilename");
 //                        if (!string.IsNullOrEmpty(styleFilename))
 //                        {
-//                            cpCore.main_AddStylesheetLink(cpCore.web_requestProtocol + cpCore.webServer.requestDomain + cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, styleFilename));
+//                            cpCore.main_AddStylesheetLink(cpCore.web_requestProtocol + cpCore.webServer.requestDomain + cpCore.csv_getVirtualFileLink(cpCore.serverconfig.appConfig.cdnFilesNetprefix, styleFilename));
 //                        }
 //                        excludeFromAnalytics = cpCore.db.cs_getBoolean(CS, "ExcludeFromAnalytics");
 //                        returnRecordId = recordId;
@@ -1324,7 +1324,7 @@
 //                    styleFilename = cpCore.db.cs_getText(CS, "StyleFilename");
 //                    if (!string.IsNullOrEmpty(styleFilename))
 //                    {
-//                        cpCore.main_AddStylesheetLink(cpCore.web_requestProtocol + cpCore.webServer.requestDomain + cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, styleFilename));
+//                        cpCore.main_AddStylesheetLink(cpCore.web_requestProtocol + cpCore.webServer.requestDomain + cpCore.csv_getVirtualFileLink(cpCore.serverconfig.appConfig.cdnFilesNetprefix, styleFilename));
 //                    }
 //                    excludeFromAnalytics = cpCore.db.cs_getBoolean(CS, "ExcludeFromAnalytics");
 //                    //

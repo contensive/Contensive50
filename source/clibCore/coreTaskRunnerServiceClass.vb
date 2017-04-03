@@ -142,9 +142,9 @@ Namespace Contensive
                     ' run tasks in task
                     '
                     Using cpCluster As New CPClass
-                        Using programDataFiles As New coreFileSystemClass(cpCluster.core, cpCluster.core.serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) + "clib\")
+                        Using programDataFiles As New coreFileSystemClass(cpCluster.core, cpCluster.core.serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) + "clib\")
                             Dim JSONTemp = programDataFiles.readFile("serverConfig.json")
-                            Dim serverConfig As serverConfigClass = cpCluster.core.json.Deserialize(Of serverConfigClass)(JSONTemp)
+                            Dim serverConfig As Models.Entity.serverConfigModel = cpCluster.core.json.Deserialize(Of Models.Entity.serverConfigModel)(JSONTemp)
                             If (Not serverConfig.allowTaskRunnerService) Then
                                 appendLog("taskRunnerService.processTimerTick, allowTaskRunnerService false, skip")
                             Else
@@ -180,7 +180,7 @@ Namespace Contensive
                 '
                 appendLog("taskRunnerService.runTasks")
                 '
-                For Each kvp As KeyValuePair(Of String, appConfigClass) In cpClusterCore.serverConfig.apps
+                For Each kvp As KeyValuePair(Of String, Models.Entity.serverConfigModel.appConfigModel) In cpClusterCore.serverConfig.apps
                     AppName = kvp.Value.name
                     '
                     appendLog("taskRunnerService.runTasks, appname=[" & AppName & "]")
@@ -188,7 +188,7 @@ Namespace Contensive
                     ' query tasks that need to be run
                     '
                     Using cpSite As New CPClass(AppName)
-                        If cpSite.core.appStatus = applicationStatusEnum.ApplicationStatusReady Then
+                        If cpSite.core.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady Then
                             'hint &= ",app [" & AppName & "] is running, setup cp and cmc"
                             '
                             ' Execute Processes

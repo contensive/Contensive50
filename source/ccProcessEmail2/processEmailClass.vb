@@ -94,10 +94,10 @@ ErrorTrap:
             Dim appStatus As Integer
             '
             'hint = "1"
-            appName = cpCore.appConfig.name
-            appStatus = cpCore.appStatus
+            appName = cpCore.serverconfig.appConfig.name
+            appStatus = cpCore.serverConfig.appConfig.appStatus
             'hint = "3"
-            If (appStatus = applicationStatusEnum.ApplicationStatusReady) Or (appStatus = applicationStatusEnum.ApplicationStatusUpgrading) Then
+            If (appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady) Or (appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusUpgrading) Then
                 Using cp As New CPClass(appName)
                     If True Then
                         'End If
@@ -115,12 +115,12 @@ ErrorTrap:
                         ' Send Submitted Group Email (submitted, not sent, no conditions)
                         '
                         'hint = "5"
-                        Call ProcessEmail_GroupEmail(cpCore.siteproperties.dataBuildVersion)
+                        Call ProcessEmail_GroupEmail(cpCore.siteProperties.dataBuildVersion)
                         '
                         ' Send Conditional Email - Offset days after Joining
                         '
                         'hint = "6"
-                        Call ProcessEmail_ConditionalEmail(cpCore.siteproperties.dataBuildVersion, IsNewHour, IsNewDay)
+                        Call ProcessEmail_ConditionalEmail(cpCore.siteProperties.dataBuildVersion, IsNewHour, IsNewDay)
                         '
                     End If
                 End Using
@@ -329,7 +329,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            cpCore.handleLegacyError3(cpCore.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_GroupEmail", Err.Number, Err.Source, Err.Description, True, True, "")
+            cpCore.handleLegacyError3(cpCore.serverconfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_GroupEmail", Err.Number, Err.Source, Err.Description, True, True, "")
             Err.Clear()
         End Sub
         '
@@ -585,7 +585,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            cpCore.handleLegacyError3(cpCore.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_ConditionalEmail", Err.Number, Err.Source, Err.Description, True, True, "")
+            cpCore.handleLegacyError3(cpCore.serverconfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_ConditionalEmail", Err.Number, Err.Source, Err.Description, True, True, "")
             Err.Clear()
         End Sub
         '
@@ -772,7 +772,7 @@ ErrorTrap:
                 End If
                 'Call cpCore.app.closeCS(CSLog)
             Catch ex As Exception
-                cpCore.handleLegacyError3(cpCore.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "SendEmailRecord", Err.Number, Err.Source, Err.Description, True, True, "")
+                cpCore.handleLegacyError3(cpCore.serverconfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "SendEmailRecord", Err.Number, Err.Source, Err.Description, True, True, "")
                 Err.Clear()
             Finally
                 Call cpCore.db.cs_Close(CSPeople)
@@ -800,7 +800,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            cpCore.handleLegacyError3(cpCore.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "GetPrimaryDomainName", Err.Number, Err.Source, Err.Description, True, True, "")
+            cpCore.handleLegacyError3(cpCore.serverconfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "GetPrimaryDomainName", Err.Number, Err.Source, Err.Description, True, True, "")
             Err.Clear()
         End Function
         '
@@ -825,7 +825,7 @@ ErrorTrap:
             Exit Function
             '
 ErrorTrap:
-            cpCore.handleLegacyError3(cpCore.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "GetEmailTemplate", Err.Number, Err.Source, Err.Description, True, True, "")
+            cpCore.handleLegacyError3(cpCore.serverconfig.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "GetEmailTemplate", Err.Number, Err.Source, Err.Description, True, True, "")
             Err.Clear()
         End Function
         '

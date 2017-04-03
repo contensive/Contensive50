@@ -245,7 +245,7 @@ Namespace Contensive.Core
             '
             ' Housekeep each application
             '
-            For Each kvp As KeyValuePair(Of String, appConfigClass) In cp.core.serverConfig.apps
+            For Each kvp As KeyValuePair(Of String, Models.Entity.serverConfigModel.appConfigModel) In cp.core.serverConfig.apps
                 appName = kvp.Value.name
                 If True Then
                     'End If
@@ -258,7 +258,7 @@ Namespace Contensive.Core
                     'appArg = Split(appRow, vbTab)
                     'appName = appArg(0)
                     appStatus = EncodeInteger(appName)
-                    If appStatus = applicationStatusEnum.ApplicationStatusReady Then
+                    If appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady Then
 
 
                         '
@@ -348,7 +348,7 @@ Namespace Contensive.Core
                                         '
                                         ' Move Archived pages from their current parent to their archive parent
                                         '
-                                        Call AppendClassLog(appName, "HouseKeep", "Archive update for pages on [" & cp.core.appConfig.name & "]")
+                                        Call AppendClassLog(appName, "HouseKeep", "Archive update for pages on [" & cp.core.serverConfig.appConfig.name & "]")
                                         SQL = "select * from ccpagecontent where (( DateArchive is not null )and(DateArchive<" & SQLNow & "))and(active<>0)"
                                         CS = cp.core.db.cs_openCsSql_rev("default", SQL)
                                         Do While cp.core.db.cs_ok(CS)
@@ -548,9 +548,9 @@ Namespace Contensive.Core
                                     CS = cp.core.db.cs_openCsSql_rev("default", SQL)
                                     If cp.core.db.cs_ok(CS) Then
                                         LastTimeSummaryWasRun = cp.core.db.cs_getDate(CS, "DateAdded")
-                                        Call AppendClassLog(cp.core.appConfig.name, "HouseKeep", "Update hourly visit summary, last time summary was run was [" & LastTimeSummaryWasRun & "]")
+                                        Call AppendClassLog(cp.core.serverConfig.appConfig.name, "HouseKeep", "Update hourly visit summary, last time summary was run was [" & LastTimeSummaryWasRun & "]")
                                     Else
-                                        Call AppendClassLog(cp.core.appConfig.name, "HouseKeep", "Update hourly visit summary, no hourly summaries were found, set start to [" & LastTimeSummaryWasRun & "]")
+                                        Call AppendClassLog(cp.core.serverConfig.appConfig.name, "HouseKeep", "Update hourly visit summary, no hourly summaries were found, set start to [" & LastTimeSummaryWasRun & "]")
                                     End If
                                     Call cp.core.db.cs_Close(CS)
                                     NextSummaryStartDate = LastTimeSummaryWasRun
@@ -572,7 +572,7 @@ Namespace Contensive.Core
                                         OldestDateAdded = cp.core.db.cs_getDate(CS, "DateAdded")
                                         If OldestDateAdded < NextSummaryStartDate Then
                                             NextSummaryStartDate = OldestDateAdded
-                                            Call AppendClassLog(cp.core.appConfig.name, "HouseKeep", "Update hourly visit summary, found a visit with the last viewing during the past hour. It started [" & OldestDateAdded & "], before the last summary was run.")
+                                            Call AppendClassLog(cp.core.serverConfig.appConfig.name, "HouseKeep", "Update hourly visit summary, found a visit with the last viewing during the past hour. It started [" & OldestDateAdded & "], before the last summary was run.")
                                         End If
                                     End If
                                     Call cp.core.db.cs_Close(CS)
@@ -599,13 +599,13 @@ Namespace Contensive.Core
                                         End If
                                     Next
                                     If (DateofMissingSummary <> Date.MinValue) And (DateofMissingSummary < NextSummaryStartDate) Then
-                                        Call AppendClassLog(cp.core.appConfig.name, "HouseKeep", "Found a missing hourly period in the visit summary table [" & DateofMissingSummary & "], it only has [" & HoursPerDay & "] hourly summaries.")
+                                        Call AppendClassLog(cp.core.serverConfig.appConfig.name, "HouseKeep", "Found a missing hourly period in the visit summary table [" & DateofMissingSummary & "], it only has [" & HoursPerDay & "] hourly summaries.")
                                         NextSummaryStartDate = DateofMissingSummary
                                     End If
                                     '
                                     ' Now summarize all visits during all hourly periods between OldestDateAdded and the previous Hour
                                     '
-                                    Call AppendClassLog(cp.core.appConfig.name, "HouseKeep", "Summaryize visits hourly, starting [" & NextSummaryStartDate & "]")
+                                    Call AppendClassLog(cp.core.serverConfig.appConfig.name, "HouseKeep", "Summaryize visits hourly, starting [" & NextSummaryStartDate & "]")
                                     PeriodStep = CDbl(1) / CDbl(24)
                                     'PeriodStart = (Int(OldestDateAdded * 24) / 24)
                                     Call HouseKeep_VisitSummary(NextSummaryStartDate, rightNow, 1, cp.core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout)
@@ -736,7 +736,7 @@ ErrorTrap:
             Yesterday = rightNow.AddDays(-1).Date
             MidnightTwoDaysAgo = rightNow.AddDays(-2).Date
             thirtyDaysAgo = rightNow.AddDays(-30).Date
-            appName = cp.core.appConfig.name
+            appName = cp.core.serverConfig.appConfig.name
             ArchiveDeleteNoCookie = EncodeBoolean(cp.core.siteProperties.getText("ArchiveDeleteNoCookie", "1"))
             DataSourceType = cp.core.db.getDataSourceType("default")
             TimeoutSave = cp.core.db.sqlCommandTimeout
@@ -1742,12 +1742,12 @@ ErrorTrap:
             '
             'VisitArchiveAgeDays = encodeInteger(cp.Core.csv_GetSiteProperty("ArchiveRecordAgeDays", "0"))
             If True Then
-                appName = cp.core.appConfig.name
+                appName = cp.core.serverConfig.appConfig.name
                 DeleteBeforeDateSQL = cp.core.db.encodeSQLDate(DeleteBeforeDate)
                 '
                 ' Visits older then archive age
                 '
-                Call AppendClassLog(cp.core.appConfig.name, "HouseKeep_App_Daily_RemoveVisitRecords(" & appName & ")", "Deleting visits before [" & DeleteBeforeDateSQL & "]")
+                Call AppendClassLog(cp.core.serverConfig.appConfig.name, "HouseKeep_App_Daily_RemoveVisitRecords(" & appName & ")", "Deleting visits before [" & DeleteBeforeDateSQL & "]")
                 Call cp.core.DeleteTableRecordChunks("default", "ccVisits", "(DateAdded<" & DeleteBeforeDateSQL & ")", 1000, 10000)
                 '
                 ' Viewings with visits before the first
@@ -1862,7 +1862,7 @@ ErrorTrap:
             '
             'VisitArchiveAgeDays = encodeInteger(cp.Core.csv_GetSiteProperty("ArchiveRecordAgeDays", "0"))
             If True Then
-                appName = cp.core.appConfig.name
+                appName = cp.core.serverConfig.appConfig.name
                 DeleteBeforeDateSQL = cp.core.db.encodeSQLDate(DeleteBeforeDate)
                 '        '
                 '        ' Visits older then archive age
@@ -2066,7 +2066,7 @@ ErrorTrap:
             'Dim AddonInstall As New addonInstallClass
             '
             If BuildVersion < cp.Version Then
-                Call HandleClassInternalError(cp.core.appConfig.name, "HouseKeep_VisitSummary", ignoreInteger, "Can not summarize analytics until this site's data needs been upgraded.")
+                Call HandleClassInternalError(cp.core.serverConfig.appConfig.name, "HouseKeep_VisitSummary", ignoreInteger, "Can not summarize analytics until this site's data needs been upgraded.")
             Else
                 PeriodStart = StartTimeDate
                 If PeriodStart < OldestVisitSummaryWeCareAbout Then
@@ -2277,7 +2277,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call HandleClassTrapError(cp.core.appConfig.name, "HouseKeep_VisitSummary", "Trap", True)
+            Call HandleClassTrapError(cp.core.serverConfig.appConfig.name, "HouseKeep_VisitSummary", "Trap", True)
             Err.Clear()
         End Sub
         '
@@ -2346,7 +2346,7 @@ ErrorTrap:
             Dim FileArrayPointer As Integer
             Dim FileSplit() As String
             '
-            Call AppendClassLog(cp.core.appConfig.name, "HouseKeep_App_Daily_LogFolder(" & cp.core.appConfig.name & ")", "Deleting files from folder [" & FolderName & "] older than " & LastMonth)
+            Call AppendClassLog(cp.core.serverConfig.appConfig.name, "HouseKeep_App_Daily_LogFolder(" & cp.core.serverConfig.appConfig.name & ")", "Deleting files from folder [" & FolderName & "] older than " & LastMonth)
             FileList = cp.core.privateFiles.getFileList(FolderName)
             For Each file As IO.FileInfo In FileList
                 If file.CreationTime < LastMonth Then
@@ -2356,7 +2356,7 @@ ErrorTrap:
             Exit Sub
             '
 ErrorTrap:
-            Call HandleClassTrapError(cp.core.appConfig.name, "HouseKeepLogFolder", "Trap", True)
+            Call HandleClassTrapError(cp.core.serverConfig.appConfig.name, "HouseKeepLogFolder", "Trap", True)
             Err.Clear()
         End Sub
         '
@@ -2535,7 +2535,7 @@ ErrorTrap:
 
             '
             If BuildVersion < cp.Version Then
-                Call HandleClassInternalError(cp.core.appConfig.name, "HouseKeep_PageViewSummary", ignoreInteger, "Can not summarize analytics until this site's data needs been upgraded.")
+                Call HandleClassInternalError(cp.core.serverConfig.appConfig.name, "HouseKeep_PageViewSummary", ignoreInteger, "Can not summarize analytics until this site's data needs been upgraded.")
             Else
                 PeriodStart = StartTimeDate
                 If PeriodStart < OldestVisitSummaryWeCareAbout Then
@@ -2744,7 +2744,7 @@ ErrorTrap:
             '
             Exit Sub
 ErrorTrap:
-            Call HandleClassTrapError(cp.Core.appConfig.name, "HouseKeep_PageViewSummary", "Trap", True)
+            Call HandleClassTrapError(cp.core.serverConfig.appConfig.name, "HouseKeep_PageViewSummary", "Trap", True)
             Err.Clear()
         End Sub
         '

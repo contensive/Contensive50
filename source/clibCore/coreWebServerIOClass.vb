@@ -415,7 +415,7 @@ Namespace Contensive.Core
                 '
                 '--------------------------------------------------------------------------
                 '
-                If (cpCore.appStatus <> applicationStatusEnum.ApplicationStatusReady) Then
+                If (cpCore.serverConfig.appConfig.appStatus <> Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady) Then
                     '
                     ' did not initialize correctly
                     '
@@ -566,8 +566,8 @@ Namespace Contensive.Core
                     '
                     ' set cpcore.main_ServerDomainPrmary to the first valid defaultDomain entry
                     '
-                    If cpCore.appConfig.domainList.Count > 0 Then
-                        cpCore.domains_ServerDomainPrimary = cpCore.appConfig.domainList(0)
+                    If cpCore.serverconfig.appConfig.domainList.Count > 0 Then
+                        cpCore.domains_ServerDomainPrimary = cpCore.serverconfig.appConfig.domainList(0)
                     Else
                         cpCore.domains_ServerDomainPrimary = ""
                     End If
@@ -620,7 +620,7 @@ Namespace Contensive.Core
                     '
                     ' verify app config domainlist is in the domainlist cache
                     '
-                    For Each domain As String In cpCore.appConfig.domainList
+                    For Each domain As String In cpCore.serverconfig.appConfig.domainList
                         If Not cpCore.domains.domainDetailsList.ContainsKey(domain.ToLower()) Then
                             Dim domainDetailsNew As New coreDomainsClass.domainDetailsClass
                             domainDetailsNew.name = domain
@@ -757,7 +757,7 @@ Namespace Contensive.Core
                         Call cpCore.cache.setKey("domainContentList", domainDetailsListText, "domains")
                     End If
                     '
-                    cpCore.webServerIO_requestVirtualFilePath = "/" & cpCore.appConfig.name
+                    cpCore.webServerIO_requestVirtualFilePath = "/" & cpCore.serverconfig.appConfig.name
                     '
                     cpCore.webServerIO_requestContentWatchPrefix = cpCore.webServerIO_requestProtocol & requestDomain & coreClass.webServerIO_requestRootPath
                     cpCore.webServerIO_requestContentWatchPrefix = Mid(cpCore.webServerIO_requestContentWatchPrefix, 1, Len(cpCore.webServerIO_requestContentWatchPrefix) - 1)
@@ -873,7 +873,7 @@ Namespace Contensive.Core
                     '
                     If (RedirectLink = "") And (coreClass.webServerIO_requestRootPath = "/") And (InStr(1, cpCore.webServerIO_requestPath, cpCore.webServerIO_requestVirtualFilePath & "/", vbTextCompare) = 1) Then
                         Copy = "Redirecting because this site can not be run in the path [" & cpCore.webServerIO_requestVirtualFilePath & "]"
-                        cpCore.webServerIO_requestPath = vbReplace(cpCore.webServerIO_requestPath, cpCore.appConfig.name & "/", "", 1, 99, vbTextCompare)
+                        cpCore.webServerIO_requestPath = vbReplace(cpCore.webServerIO_requestPath, cpCore.serverconfig.appConfig.name & "/", "", 1, 99, vbTextCompare)
                         If requestQueryString <> "" Then
                             Call cpCore.webServerIO_Redirect2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO_requestDomain & coreClass.webServerIO_requestRootPath & cpCore.webServerIO_requestPath & cpCore.webServerIO_requestPage & "?" & requestQueryString, Copy, False)
                         Else

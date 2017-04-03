@@ -46,7 +46,7 @@
 //    /// <summary>
 //    /// application configuration class
 //    /// </summary>
-//    public class appConfigClass
+//    public class Models.Entity.serverConfigModel.appConfigModel
 //    {
 //        public string name;
 //        public bool enabled;
@@ -142,7 +142,7 @@
 //        //
 //        //
 //        //
-//        public Dictionary<string, appConfigClass> apps = new Dictionary<string, appConfigClass>();
+//        public Dictionary<string, Models.Entity.serverConfigModel.appConfigModel> apps = new Dictionary<string, Models.Entity.serverConfigModel.appConfigModel>();
 //    }
 //    //
 //    //====================================================================================================

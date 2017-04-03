@@ -45,155 +45,6 @@ Namespace Contensive.Core
     '
     '====================================================================================================
     ''' <summary>
-    ''' application configuration class
-    ''' </summary>
-    Public Class appConfigClass
-        Public name As String
-        Public enabled As Boolean
-        Public privateKey As String                     ' rename hashKey
-        Public defaultConnectionString As String
-        Public appRootFilesPath As String               ' local file path to the appRoot (i.e. d:\inetpub\myApp\wwwRoot\)
-        Public cdnFilesPath As String                   ' local file path to the content files (i.e. d:\inetpub\myApp\files\)
-        Public privateFilesPath As String               ' local file path to the content files (i.e. d:\inetpub\myApp\private\)
-        Public cdnFilesNetprefix As String              ' in some cases (like legacy), cdnFiles are iis virtual folder mapped to appRoot (/appName/files/). Some cases this is a URL (http:\\cdn.domain.com pointing to s3)
-        Public allowSiteMonitor As Boolean
-        Public domainList As New List(Of String)        ' primary domain is the first item in the list
-        Public enableCache As Boolean
-        Public adminRoute As String                                          ' The url pathpath that executes the addon site
-    End Class    '
-    '
-    '====================================================================================================
-    ''' <summary>
-    ''' Holds location on the server of the serverConfig file. Physically stored at programDataFolder/clib/serverConfig.json
-    ''' </summary>
-    Public Class serverConfigClass
-        '
-        ' -- old serverConfig
-        'Public clusterPath As String
-        Public allowTaskRunnerService As Boolean
-        Public allowTaskSchedulerService As Boolean
-        '
-        ' -- old clusterConfig
-        Public isLocal As Boolean = True
-        Public name As String = ""
-        '
-        ' local caching using dotnet framework, flushes on appPool
-        '
-        Public isLocalCache As Boolean = False
-        '
-        ' AWS dotnet elaticcache client wraps enyim, and provides node autodiscovery through the configuration object.
-        ' this is the srver:port to the config file it uses.
-        '
-        Public awsElastiCacheConfigurationEndpoint As String
-        '
-        ' datasource for the cluster
-        '
-        Public defaultDataSourceType As dataSourceTypeEnum
-        '
-        ' odbc
-        '
-        Public defaultDataSourceODBCConnectionString As String
-        '
-        ' native
-        '
-        Public defaultDataSourceAddress As String = ""
-        '
-        ' user for creating new databases, and creating the new user for the database during site create, and saved to appconfig
-        '
-        Public defaultDataSourceUsername As String = ""
-        Public defaultDataSourcePassword As String = ""
-        '
-        ' endpoint for cluster files (not sure how it works, maybe this will be an object taht includes permissions, for now an fpo)
-        '
-        Public clusterFilesEndpoint As String
-        '
-        ' configuration of async command listener on render machines (not sure if used still)
-        '
-        Public serverListenerPort As Integer = Port_ContentServerControlDefault
-        Public maxConcurrentTasksPerServer As Integer = 5
-        ' ayncCmd server authentication -- change this to a key later
-        Public username As String = ""
-        Public password As String = ""
-        '
-        ' This is the root path to the localCluster files, typically getLocalDataFolder (d:\inetpub)
-        '   if isLocal, the cluster runs from these files
-        '   if not, this is the local mirror of the cluster files
-        '
-        'Public clusterPhysicalPath As String
-        '
-        'Public domainRoutes As Dictionary(Of String, String)
-        '
-        Public appPattern As String
-        '
-        '
-        '
-        Public apps As New Dictionary(Of String, appConfigClass)
-    End Class
-    ''
-    ''====================================================================================================
-    '''' <summary>
-    '''' cluster configuration class - deserialized configration file
-    '''' </summary>
-    '''' <remarks></remarks>
-    'Public Class clusterConfigClass
-    '    Public isLocal As Boolean = True
-    '    Public name As String = ""
-    '    '
-    '    ' local caching using dotnet framework, flushes on appPool
-    '    '
-    '    Public isLocalCache As Boolean = False
-    '    '
-    '    ' AWS dotnet elaticcache client wraps enyim, and provides node autodiscovery through the configuration object.
-    '    ' this is the srver:port to the config file it uses.
-    '    '
-    '    Public awsElastiCacheConfigurationEndpoint As String
-    '    '
-    '    ' datasource for the cluster
-    '    '
-    '    Public defaultDataSourceType As dataSourceTypeEnum
-    '    '
-    '    ' odbc
-    '    '
-    '    Public defaultDataSourceODBCConnectionString As String
-    '    '
-    '    ' native
-    '    '
-    '    Public defaultDataSourceAddress As String = ""
-    '    '
-    '    ' user for creating new databases, and creating the new user for the database during site create, and saved to appconfig
-    '    '
-    '    Public defaultDataSourceUsername As String = ""
-    '    Public defaultDataSourcePassword As String = ""
-    '    '
-    '    ' endpoint for cluster files (not sure how it works, maybe this will be an object taht includes permissions, for now an fpo)
-    '    '
-    '    Public clusterFilesEndpoint As String
-    '    '
-    '    ' configuration of async command listener on render machines (not sure if used still)
-    '    '
-    '    Public serverListenerPort As Integer = Port_ContentServerControlDefault
-    '    Public maxConcurrentTasksPerServer As Integer = 5
-    '    ' ayncCmd server authentication -- change this to a key later
-    '    Public username As String = ""
-    '    Public password As String = ""
-    '    '
-    '    ' This is the root path to the localCluster files, typically getLocalDataFolder (d:\inetpub)
-    '    '   if isLocal, the cluster runs from these files
-    '    '   if not, this is the local mirror of the cluster files
-    '    '
-    '    'Public clusterPhysicalPath As String
-    '    '
-    '    'Public domainRoutes As Dictionary(Of String, String)
-    '    '
-    '    Public appPattern As String
-    '    '
-    '    '
-    '    '
-    '    Public apps As New Dictionary(Of String, appConfigClass)
-    'End Class
-    '
-    '====================================================================================================
-    ''' <summary>
     ''' miniCollection - This is an old collection object used in part to load the cdef part xml files. REFACTOR this into CollectionWantList and werialization into jscon
     ''' </summary>
     Public Class MiniCollectionClass
@@ -3010,34 +2861,6 @@ Namespace Contensive.Core
         Public Const DataSourceTypeODBCSQLServer = 2
         Public Const DataSourceTypeODBCMySQL = 3
         Public Const DataSourceTypeXMLFile = 4      ' Use MSXML Interface to open a file
-        '
-        '------------------------------------------------------------------------------
-        '   Application Status
-        '------------------------------------------------------------------------------
-        '
-        <ComVisible(True)>
-        Public Enum applicationStatusEnum
-            ApplicationStatusNotFound = 0
-            ApplicationStatusNotEnabled = 1
-            ApplicationStatusReady = 2
-            ApplicationStatusLoading = 3
-            ApplicationStatusUpgrading = 4
-            ' ApplicationStatusConnectionBusy = 5    ' can not open connection because already open
-            ApplicationStatusKernelFailure = 6     ' can not create Kernel
-            ApplicationStatusNoHostService = 7     ' host service process ID not set
-            ApplicationStatusLicenseFailure = 8    ' failed to start because of License failure
-            ApplicationStatusDbNotFound = 9         ' failed to start because ccSetup table not found
-            ApplicationStatusFailedToInitialize = 10   ' failed to start because of unknown error, see trace log
-            ApplicationStatusDbBad = 11            ' ccContent,ccFields no records found
-            ApplicationStatusConnectionObjectFailure = 12 ' Connection Object FAiled
-            ApplicationStatusConnectionStringFailure = 13 ' Connection String FAiled to open the ODBC connection
-            ApplicationStatusDataSourceFailure = 14 ' DataSource failed to open
-            ApplicationStatusDuplicateDomains = 15 ' Can not locate application because there are 1+ apps that match the domain
-            ApplicationStatusPaused = 16           ' Running, but all activity is blocked (for backup)
-            ApplicationStatusAppConfigNotFound = 17
-            ApplicationStatusAppConfigNotValid = 18
-            ApplicationStatusDbFoundButContentMetaMissing = 19
-        End Enum
 
         '
         ' Document (HTML, graphic, etc) retrieved from site
@@ -4227,45 +4050,46 @@ Namespace Contensive.Core
         '    '
         '    '
         '    '
-        Public Function GetApplicationStatusMessage(ByVal ApplicationStatus As applicationStatusEnum) As String
+        Public Function GetApplicationStatusMessage(ByVal ApplicationStatus As Models.Entity.serverConfigModel.applicationStatusEnum) As String
+
             Select Case ApplicationStatus
-                Case applicationStatusEnum.ApplicationStatusDbFoundButContentMetaMissing
+                Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusDbFoundButContentMetaMissing
                     GetApplicationStatusMessage = "The database for this application was found, but content meta table could not be read."
-                Case applicationStatusEnum.ApplicationStatusAppConfigNotValid
+                Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusAppConfigNotValid
                     GetApplicationStatusMessage = "The application configuration file on this front-end server is not valid."
-                Case applicationStatusEnum.ApplicationStatusAppConfigNotFound
+                Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusAppConfigNotFound
                     GetApplicationStatusMessage = "The application configuration file was not be found on this front-end server."
-                Case applicationStatusEnum.ApplicationStatusNoHostService
+                Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusNoHostService
                     GetApplicationStatusMessage = "Contensive server not running"
-                Case applicationStatusEnum.ApplicationStatusNotFound
+                Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusNotFound
                     GetApplicationStatusMessage = "Contensive application not found"
-                Case applicationStatusEnum.ApplicationStatusNotEnabled
+                Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusNotEnabled
                     GetApplicationStatusMessage = "Contensive application not running"
-                Case applicationStatusEnum.ApplicationStatusReady
+                Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady
                     GetApplicationStatusMessage = "Contensive application running"
-                Case applicationStatusEnum.ApplicationStatusLoading
+                Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusLoading
                     GetApplicationStatusMessage = "Contensive application starting"
-                Case applicationStatusEnum.ApplicationStatusUpgrading
+                Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusUpgrading
                     GetApplicationStatusMessage = "Contensive database upgrading"
-                Case applicationStatusEnum.ApplicationStatusDbBad
+                Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusDbBad
                     GetApplicationStatusMessage = "Error verifying core database records"
-                Case applicationStatusEnum.ApplicationStatusDbNotFound
+                Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusDbNotFound
                     GetApplicationStatusMessage = "Error opening application database"
-                Case applicationStatusEnum.ApplicationStatusKernelFailure
+                Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusKernelFailure
                     GetApplicationStatusMessage = "Error contacting Contensive kernel services"
-                Case applicationStatusEnum.ApplicationStatusLicenseFailure
+                Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusLicenseFailure
                     GetApplicationStatusMessage = "Error verifying Contensive site license, see Http://www.Contensive.com/License"
-                Case applicationStatusEnum.ApplicationStatusConnectionObjectFailure
+                Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusConnectionObjectFailure
                     GetApplicationStatusMessage = "Error creating ODBC Connection object"
-                Case applicationStatusEnum.ApplicationStatusConnectionStringFailure
+                Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusConnectionStringFailure
                     GetApplicationStatusMessage = "ODBC Data Source connection failed"
-                Case applicationStatusEnum.ApplicationStatusDataSourceFailure
+                Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusDataSourceFailure
                     GetApplicationStatusMessage = "Error opening default data source"
-                Case applicationStatusEnum.ApplicationStatusDuplicateDomains
+                Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusDuplicateDomains
                     GetApplicationStatusMessage = "Can not determine application because there are multiple applications with domain names that match this site's domain (See Application Manager)"
-                Case applicationStatusEnum.ApplicationStatusFailedToInitialize
+                Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusFailedToInitialize
                     GetApplicationStatusMessage = "Application failed to initialize, see trace log for details"
-                    'Case applicationStatusEnum.ApplicationStatusPaused
+                    'Case Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusPaused
                     '    GetApplicationStatusMessage = "Contensive application paused"
                 Case Else
                     GetApplicationStatusMessage = "Unknown status code [" & ApplicationStatus & "], see trace log for details"

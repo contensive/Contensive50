@@ -418,7 +418,7 @@ Namespace Contensive.Core
         Public Function executeSql(ByVal sql As String, Optional ByVal dataSourceName As String = "", Optional ByVal startRecord As Integer = 0, Optional ByVal maxRecords As Integer = 9999) As DataTable
             Dim returnData As New DataTable
             Try
-                returnData = executeSql_internal(sql, getConnectionStringADONET(cpCore.appConfig.name, dataSourceName), startRecord, maxRecords)
+                returnData = executeSql_internal(sql, getConnectionStringADONET(cpCore.serverConfig.appConfig.name, dataSourceName), startRecord, maxRecords)
             Catch ex As Exception
                 Dim newEx As New ApplicationException("Exception [" & ex.Message & "] executing sql [" & sql & "], datasource [" & dataSourceName & "], startRecord [" & startRecord & "], maxRecords [" & maxRecords & "]", ex)
                 cpCore.handleExceptionAndRethrow(newEx)
@@ -487,7 +487,7 @@ Namespace Contensive.Core
             '
             'Dim cn As ADODB.Connection = New ADODB.Connection()
             Dim rs As ADODB.Recordset = New ADODB.Recordset()
-            Dim connString As String = getConnectionStringOLEDB(cpCore.appConfig.name, dataSourceName)
+            Dim connString As String = getConnectionStringOLEDB(cpCore.serverConfig.appConfig.name, dataSourceName)
             '
             Try
                 If dbEnabled Then
@@ -517,7 +517,7 @@ Namespace Contensive.Core
         Public Sub executeSqlAsync(ByVal sql As String, Optional ByVal dataSourceName As String = "")
             Try
                 If dbEnabled Then
-                    Dim connString As String = getConnectionStringADONET(cpCore.appConfig.name, dataSourceName)
+                    Dim connString As String = getConnectionStringADONET(cpCore.serverConfig.appConfig.name, dataSourceName)
                     Using connSQL As New SqlConnection(connString)
                         connSQL.Open()
                         Using cmdSQL As New SqlCommand()
@@ -697,7 +697,7 @@ Namespace Contensive.Core
         ''' <param name="TransactionTickCount"></param>
         ''' <param name="SQL"></param>
         Private Sub saveSlowQueryLog(ByVal TransactionTickCount As Integer, ByVal SQL As String)
-            cpCore.appendLogWithLegacyRow(cpCore.appConfig.name, "query time  " & GetIntegerString(TransactionTickCount, 7) & "ms: " & SQL, "dll", "cpCoreClass", "csv_ExecuteSQL", 0, "", SQL, False, True, "", "Performance", "SlowSQL")
+            cpCore.appendLogWithLegacyRow(cpCore.serverConfig.appConfig.name, "query time  " & GetIntegerString(TransactionTickCount, 7) & "ms: " & SQL, "dll", "cpCoreClass", "csv_ExecuteSQL", 0, "", SQL, False, True, "", "Performance", "SlowSQL")
         End Sub
         '
         '====================================================================================================
@@ -1695,7 +1695,7 @@ Namespace Contensive.Core
                                                 '
                                                 Filename = cs_getText(CSPointer, fieldName)
                                                 If Filename <> "" Then
-                                                    Call cpCore.cdnFiles.deleteFile(cpCore.cdnFiles.joinPath(cpCore.appConfig.cdnFilesNetprefix, Filename))
+                                                    Call cpCore.cdnFiles.deleteFile(cpCore.cdnFiles.joinPath(cpCore.serverConfig.appConfig.cdnFilesNetprefix, Filename))
                                                 End If
                                             Case FieldTypeIdFileTextPrivate, FieldTypeIdFileHTMLPrivate
                                                 '
@@ -4776,10 +4776,10 @@ Namespace Contensive.Core
         Public Function getTableSchemaData(tableName As String) As DataTable
             Dim returnDt As New DataTable
             Try
-                Dim connString As String = getConnectionStringADONET(cpCore.appConfig.name, "default")
+                Dim connString As String = getConnectionStringADONET(cpCore.serverConfig.appConfig.name, "default")
                 Using connSQL As New SqlConnection(connString)
                     connSQL.Open()
-                    returnDt = connSQL.GetSchema("Tables", {cpCore.appConfig.name, Nothing, tableName, Nothing})
+                    returnDt = connSQL.GetSchema("Tables", {cpCore.serverConfig.appConfig.name, Nothing, tableName, Nothing})
                 End Using
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -4799,10 +4799,10 @@ Namespace Contensive.Core
                 If String.IsNullOrEmpty(tableName.Trim()) Then
                     Throw New ArgumentException("tablename cannot be blank")
                 Else
-                    Dim connString As String = getConnectionStringADONET(cpCore.appConfig.name, "default")
+                    Dim connString As String = getConnectionStringADONET(cpCore.serverConfig.appConfig.name, "default")
                     Using connSQL As New SqlConnection(connString)
                         connSQL.Open()
-                        returnDt = connSQL.GetSchema("Columns", {cpCore.appConfig.name, Nothing, tableName, Nothing})
+                        returnDt = connSQL.GetSchema("Columns", {cpCore.serverConfig.appConfig.name, Nothing, tableName, Nothing})
                     End Using
                 End If
             Catch ex As Exception
@@ -4819,10 +4819,10 @@ Namespace Contensive.Core
                 If String.IsNullOrEmpty(tableName.Trim()) Then
                     Throw New ArgumentException("tablename cannot be blank")
                 Else
-                    Dim connString As String = getConnectionStringADONET(cpCore.appConfig.name, "default")
+                    Dim connString As String = getConnectionStringADONET(cpCore.serverConfig.appConfig.name, "default")
                     Using connSQL As New SqlConnection(connString)
                         connSQL.Open()
-                        returnDt = connSQL.GetSchema("Indexes", {cpCore.appConfig.name, Nothing, tableName, Nothing})
+                        returnDt = connSQL.GetSchema("Indexes", {cpCore.serverConfig.appConfig.name, Nothing, tableName, Nothing})
                     End Using
                 End If
             Catch ex As Exception
@@ -4837,7 +4837,7 @@ Namespace Contensive.Core
         '''' </summary>
         '''' <returns></returns>
         'Public Function checkHealth() As applicationStatusEnum
-        '    Dim returnStatus As applicationStatusEnum = applicationStatusEnum.ApplicationStatusLoading
+        '    Dim returnStatus As applicationStatusEnum = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusLoading
         '    Try
         '        '
         '        Try
@@ -4849,11 +4849,11 @@ Namespace Contensive.Core
         '            Dim testDt As DataTable
         '            testDt = executeSql("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME='ccContent'")
         '            If testDt.Rows.Count <> 1 Then
-        '                cpCore.appStatus = applicationStatusEnum.ApplicationStatusDbFoundButContentMetaMissing
+        '                cpcore.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusDbFoundButContentMetaMissing
         '            End If
         '            testDt.Dispose()
         '        Catch ex As Exception
-        '            cpCore.appStatus = applicationStatusEnum.ApplicationStatusDbFoundButContentMetaMissing
+        '            cpcore.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusDbFoundButContentMetaMissing
         '        End Try
         '        '
         '        '--------------------------------------------------------------------------
@@ -4865,7 +4865,7 @@ Namespace Contensive.Core
         '            '
         '            ' Bad Db and no upgrade - exit
         '            '
-        '            cpCore.appStatus = applicationStatusEnum.ApplicationStatusDbBad
+        '            cpcore.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusDbBad
         '        Else
         '        End If
         '    Catch ex As Exception

@@ -352,7 +352,7 @@ Namespace Contensive.Core
             Get
                 Dim Position As Integer
                 If Not _AdminURL_LocalLoaded Then
-                    _AdminURL_Local = getText("AdminURL", cpCore.appConfig.adminRoute)
+                    _AdminURL_Local = getText("AdminURL", cpCore.serverconfig.appConfig.adminRoute)
                     Position = vbInstr(1, _AdminURL_Local, "?")
                     If Position <> 0 Then
                         _AdminURL_Local = Mid(_AdminURL_Local, 1, Position - 1)

@@ -62,7 +62,7 @@ Namespace Contensive.Core
         ''' <returns></returns>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
         Public Overrides Function getVirtualFileLink(virtualFilename As String) As String
-            Return cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, virtualFilename)
+            Return cpCore.csv_getVirtualFileLink(cpCore.serverconfig.appConfig.cdnFilesNetprefix, virtualFilename)
         End Function
         '
         '==========================================================================================

@@ -173,7 +173,7 @@ Namespace Contensive.Core
             '
             'cpCore.AppendLog("getXmlContentDefinition, entry")
             tickStart = GetTickCount
-            appName = cpCore.appConfig.name
+            appName = cpCore.serverconfig.appConfig.name
             iContentName = ContentName
             If iContentName <> "" Then
                 SQL = "select id from cccontent where name=" & cpCore.db.encodeSQLText(iContentName)
@@ -507,7 +507,7 @@ ErrorTrap:
             '
             Dim appName As String
             '
-            appName = cpCore.appConfig.name
+            appName = cpCore.serverconfig.appConfig.name
             GetXMLContentDefinition = GetXMLContentDefinition3(ContentName, False)
             Exit Function
             '
@@ -717,7 +717,7 @@ ErrorTrap:
             Dim sb As New System.Text.StringBuilder
             Dim appName As String
             '
-            appName = cpCore.appConfig.name
+            appName = cpCore.serverconfig.appConfig.name
             SQL = "select D.name as DataSourceName,T.name as TableName" _
                 & " from cctables T left join ccDataSources d on D.ID=T.DataSourceID" _
                 & " where t.active<>0"
@@ -806,7 +806,7 @@ ErrorTrap:
             Dim ContentID As Integer
             Dim appName As String
             '
-            appName = cpCore.appConfig.name
+            appName = cpCore.serverconfig.appConfig.name
             s = s & GetXMLContentDefinition_AdminMenus_MenuEntries()
             s = s & GetXMLContentDefinition_AdminMenus_NavigatorEntries()
             '
@@ -844,7 +844,7 @@ ErrorTrap:
             '
             ' ****************************** if cdef not loaded, this fails
             '
-            appName = cpCore.appConfig.name
+            appName = cpCore.serverconfig.appConfig.name
             MenuContentID = cpCore.GetRecordID("Content", "Navigator Entries")
             dt = cpCore.db.executeSql("select * from ccMenuEntries where (contentcontrolid=" & MenuContentID & ")and(name<>'')")
             If dt.Rows.Count > 0 Then
@@ -915,7 +915,7 @@ ErrorTrap:
             Dim MenuContentID As Integer
             Dim appName As String
             '
-            appName = cpCore.appConfig.name
+            appName = cpCore.serverconfig.appConfig.name
             ' BuildVersion = cpCore.app.getSiteProperty("BuildVersion", "0.0.000", SystemMemberID)
             '
             ' ****************************** if cdef not loaded, this fails
@@ -962,7 +962,7 @@ ErrorTrap:
             Dim sb As New System.Text.StringBuilder
             Dim appName As String
             '
-            appName = cpCore.appConfig.name
+            appName = cpCore.serverconfig.appConfig.name
             rs = cpCore.db.executeSql("select * from ccAggregateFunctions")
             If (isDataTableOk(rs)) Then
                 If True Then
@@ -1005,7 +1005,7 @@ ErrorTrap:
             Dim dt As DataTable
             Dim appName As String
             '
-            appName = cpCore.appConfig.name
+            appName = cpCore.serverconfig.appConfig.name
             If RecordID <> 0 And TableName <> "" Then
                 dt = cpCore.db.executeSql("select Name from " & TableName & " where ID=" & RecordID)
                 If dt.Rows.Count > 0 Then
@@ -1063,7 +1063,7 @@ ErrorTrap:
             Dim ParentSpace As String
             Dim appName As String
             '
-            appName = cpCore.appConfig.name
+            appName = cpCore.serverconfig.appConfig.name
             If RecordID <> 0 Then
                 If vbInstr(1, "," & UsedIDString & ",", "," & RecordID & ",", vbTextCompare) <> 0 Then
                     Call HandleClassErrorAndResume(appName, "getMenuNameSpace", "Circular reference found in UsedIDString [" & UsedIDString & "] getting ccMenuEntries namespace for recordid [" & RecordID & "]")

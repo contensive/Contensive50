@@ -12,243 +12,35 @@ namespace  Contensive.Core {
             try
             {
                 //
-                // create cp for cluster work, with no application
-                //
+                // -- create cp for cluster work, with no application
                 CPClass cp;
                 //
-                // if you get a cluster object from cp with a key, and the key gives you access, you have a cluster object to create an app
-                //
-                string dataSource;
-                //string sql;
+                // -- if you get a cluster object from cp with a key, and the key gives you access, you have a cluster object to create an app
                 string appName;
                 string domainName;
-                //string jsonTemp;
-                string isLocalClusterText;
-                string clusterName = "";
-                bool isLocalCluster;
-                string localDriveLetter;
-                //bool localDriveIsReady;
-                string cacheNode;
-                bool useIis = false;
                 string iisDefaultDoc = "";
-                System.IO.DriveInfo drive;
                 string authToken;
                 string authTokenDefault = "909903";
                 string appArchitecture = "";
                 string cdnDomainName = "";
-                //
                 System.Web.Script.Serialization.JavaScriptSerializer json = new System.Web.Script.Serialization.JavaScriptSerializer();
-                //
-                //Console.WriteLine("Authentication token");
-                //Console.WriteLine("This alphanumeric string will be used to encode data within the applications on this server.");
-                //Console.Write("\n\nAuthentication token (" + authTokenDefault + "):");
-                //authToken = Console.ReadLine();
-                //if (string.IsNullOrEmpty(authToken)) {
                 authToken = authTokenDefault;
-                //}
-                cp = new CPClass();
                 //
-                if (cp.configFileOk)
+                cp = new CPClass();
+                if (!cp.serverOk)
                 {
-                    Console.WriteLine("Cluster Configuration file [" + cp.core.programDataFiles.rootLocalPath + "config.json] found.");
-                    Console.WriteLine("appPattern: " + cp.core.serverConfig.appPattern);
-                    Console.WriteLine("apps.Count: " + cp.core.serverConfig.apps.Count);
-                    foreach (KeyValuePair<string, appConfigClass> kvp in cp.core.serverConfig.apps)
-                    {
-                        Console.WriteLine("\tapp: " + kvp.Key);
-                    }
-                    Console.WriteLine("ElastiCacheConfigurationEndpoint: " + cp.core.serverConfig.awsElastiCacheConfigurationEndpoint);
-                    Console.WriteLine("FilesEndpoint: " + cp.core.serverConfig.clusterFilesEndpoint);
-                    Console.WriteLine("defaultDataSourceAddress: " + cp.core.serverConfig.defaultDataSourceAddress);
-                    Console.WriteLine("isLocal: " + cp.core.serverConfig.isLocal.ToString());
-                    Console.WriteLine("name: " + cp.core.serverConfig.name);
+                    Console.WriteLine("Server Configuration not loaded correctly. Please run --configure");
+                    return;
                 }
                 else {
-                    //
-                    // ----------------------------------------------------------------------------------------------------
-                    // create cluster - Name
-                    //
-                    Console.WriteLine("The Cluster Configuration file [c:\\ProgramData\\Contensive\\config.json] was not found.");
-                    Console.WriteLine("This server's cluster configuration will be initialized. If this is not correct, use Ctrl-C to stop this initialization.");
-                    Console.Write("Enter the new cluster name (alpha-numeric string):");
-                    clusterName = Console.ReadLine();
-                    cp.core.serverConfig.name = clusterName;
-                    //
-                    do
-                    {
-                        //
-                        // ----------------------------------------------------------------------------------------------------
-                        // local or multiserver mode
-                        //
-                        Console.WriteLine("\n\nSingle-Server or Multi-Server Mode");
-                        Console.WriteLine("Single server installations run applications from a single server and store their data on that machine. Multi-server configurations run on multiple servers and require outside resources to store their data.");
-                        Console.Write("Single-Server Application (y/n)?");
-                        isLocalClusterText = Console.ReadLine().ToLower();
-                    } while ((isLocalClusterText != "y") && (isLocalClusterText != "n"));
-                    //
-                    do
-                    {
-                        //
-                        // ----------------------------------------------------------------------------------------------------
-                        // files
-                        //
-                        Console.WriteLine("\n\nData Storage Location");
-                        Console.WriteLine("Data will be stored on the server in the \\InetPub folder. This folder must be backed up regularly.");
-                        Console.Write("Enter the Drive letter for data storage (c/d/etc)?");
-                        localDriveLetter = Console.ReadLine().ToLower();
-                        drive = new System.IO.DriveInfo(localDriveLetter);
-                        if (!drive.IsReady)
-                        {
-                            Console.WriteLine("Drive " + localDriveLetter + " is not ready");
-                        }
-                    } while (!drive.IsReady);
-                    //cp.core.serverConfig.clusterPath = localDriveLetter + ":\\inetpub\\";
-                    //
-                    switch (isLocalClusterText.ToLower())
-                    {
-                        case "y":
-                            //
-                            // ----------------------------------------------------------------------------------------------------
-                            // LOCAL MODE Data Source Location
-                            //
-                            isLocalCluster = true;
-                            cp.core.serverConfig.isLocal = true;
-                            Console.WriteLine("\n\nDataSource type (1=odbc Sql Server, 2=native Sql Server):");
-                            dataSource = Console.ReadLine();
-                            switch (dataSource)
-                            {
-                                case "1":
-                                    //
-                                    // ----------------------------------------------------------------------------------------------------
-                                    // ODBC
-                                    //
-                                    cp.core.serverConfig.defaultDataSourceType = Contensive.Core.dataSourceTypeEnum.sqlServerOdbc;
-                                    //
-                                    Console.Write("\n\nodbc sqlserver connectionstring:");
-                                    cp.core.serverConfig.defaultDataSourceODBCConnectionString = Console.ReadLine();
-                                    break;
-                                case "2":
-                                    //
-                                    // ----------------------------------------------------------------------------------------------------
-                                    // Native Sql Server Driver
-                                    //
-                                    cp.core.serverConfig.defaultDataSourceType = dataSourceTypeEnum.sqlServerNative;
-                                    //
-                                    Console.Write("\n\nSql Server endpoint. Use (local) for Sql Server on this machine, or the AWS RDS endpoint (url:port):");
-                                    cp.core.serverConfig.defaultDataSourceAddress = Console.ReadLine();
-                                    //
-                                    Console.Write("native sqlserver userId:");
-                                    cp.core.serverConfig.defaultDataSourceUsername = Console.ReadLine();
-                                    //
-                                    Console.Write("native sqlserver password:");
-                                    cp.core.serverConfig.defaultDataSourcePassword = Console.ReadLine();
-                                    break;
-                            }
-                            break;
-                        case "n":
-                            //
-                            // ----------------------------------------------------------------------------------------------------
-                            // non-LOCAL MODE Data Source Location
-                            //
-                            isLocalCluster = false;
-                            cp.core.serverConfig.defaultDataSourceType = dataSourceTypeEnum.sqlServerNative;
-                            //
-                            Console.Write("\n\nSql Server endpoint. Use the AWS RDS endpoint (url:port):");
-                            cp.core.serverConfig.defaultDataSourceAddress = Console.ReadLine();
-                            //
-                            Console.Write("native sqlserver userId:");
-                            cp.core.serverConfig.defaultDataSourceUsername = Console.ReadLine();
-                            //
-                            Console.Write("native sqlserver password:");
-                            cp.core.serverConfig.defaultDataSourcePassword = Console.ReadLine();
-                            break;
-                    }
-                    do
-                    {
-                        Console.WriteLine("\n\nThe server requires a caching service. You can choose either the systems local cache or an AWS Elasticache (memCacheD).");
-                        Console.WriteLine("NOTE: local cache is not yet implemented. if you select local cache will be disabled.");
-                        Console.Write("Use (l)ocal cache or (m)emcached (l/m)?");
-                        isLocalClusterText = Console.ReadLine().ToLower();
-                    } while ((isLocalClusterText != "l") && (isLocalClusterText != "m"));
-                    isLocalCluster = (isLocalClusterText == "l");
-                    //
-                    // if memcached, get servers
-                    //
-                    if ((isLocalClusterText == "m"))
-                    {
-                        do
-                        {
-                            Console.Write("\n\nEnter the ElasticCache Configuration Endpoint (server:port):");
-                            cacheNode = Console.ReadLine().ToLower();
-                            cp.core.serverConfig.awsElastiCacheConfigurationEndpoint = cacheNode;
-                        } while (string.IsNullOrEmpty(cacheNode));
-                    }
-                    ////
-                    //// determine app pattern
-                    ////
-                    ////
-                    coreFileSystemClass installFiles = new coreFileSystemClass(cp.core,  cp.core.serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
-                    //if (!cp.core.cluster.localClusterFiles.pathExists("clibCommonAssemblies\\"))
-                    //{
-                    //    cp.core.cluster.localClusterFiles.createPath("clibCommonAssemblies\\");
-                    //}
-                    //int appPatternPtr;
-                    //List<string> appPatterns = new List<string>();
-                    //int appPatternCnt;
-                    ////
-                    //// upgrade the cluster resources folder from the installation
-                    ////
-                    //upgradeResources(cp, installFiles);
-                    //string appPatternsSrc = "clibResources\\appPatterns";
-                    //do
-                    //{
-                    //    Console.WriteLine("\n\nApplication pattern for this server.");
-                    //    Console.WriteLine("All applications in this cluster must be the same type (aspx, etc.)");
-                    //    Console.WriteLine("Select one of the application patterns setup in the installation folder:");
-                    //    appPatternCnt = 1;
-                    //    appPatterns.Add("");
-                    //    foreach (System.IO.DirectoryInfo di in cp.core.cluster.localClusterFiles.getFolderList(appPatternsSrc))
-                    //    {
-                    //        appPatterns.Add(di.Name);
-                    //        Console.Write("\n" + appPatternCnt.ToString() + ") " + di.Name);
-                    //        appPatternCnt += 1;
-                    //    }
-                    //    Console.Write("\n\n:");
-                    //    string appPatternReply = Console.ReadLine();
-                    //    appPatternPtr = cp.Utils.EncodeInteger(appPatternReply);
-                    //} while ((appPatternPtr <= 0) || (appPatternPtr >= appPatternCnt));
-                    //Console.Write("you picked -- " + appPatterns[appPatternPtr]);
-                    //cp.core.serverConfig.appPattern = appPatterns[appPatternPtr].ToLower();
-                    //
-                    // create new serverConfig file
-                    //
-                    cp.core.serverConfig.save() ;
-                    //
-                    // reload the cluster config and test connections
-                    //   
-                    cp.Dispose();
-                    cp = new CPClass();
+                    // -- server configuration ok
                 }
                 //
                 // ----------------------------------------------------------------------------------------------------
                 // create app
                 //
-                Console.Write("\n\nCreate application within the cluster [" + cp.core.serverConfig.name + "].");
-                switch (cp.core.serverConfig.appPattern)
-                {
-                    case "php":
-                        useIis = true;
-                        iisDefaultDoc = "index.php";
-                        break;
-                    case "iismodule":
-                        useIis = true;
-                        iisDefaultDoc = "index.html";
-                        break;
-                    case "aspnet":
-                        useIis = true;
-                        iisDefaultDoc = "default.aspx";
-                        break;
-                }
+                Console.Write("\n\nCreate application within the server group [" + cp.core.serverConfig.name + "].");
+                iisDefaultDoc = "default.aspx";
                 DateTime rightNow = DateTime.Now;
                 //
                 // app name
@@ -256,6 +48,10 @@ namespace  Contensive.Core {
                 string appNameDefault = "app" + rightNow.Year + rightNow.Month.ToString().PadLeft(2, '0') + rightNow.Day.ToString().PadLeft(2, '0') + rightNow.Hour.ToString().PadLeft(2, '0') + rightNow.Minute.ToString().PadLeft(2, '0') + rightNow.Second.ToString().PadLeft(2, '0');
                 Console.Write("\n\nApplication Name (" + appNameDefault + "):");
                 appName = Console.ReadLine();
+                if (cp.core.serverConfig.apps.ContainsKey(appName.ToLower()))
+                {
+                    Console.Write("\n\nThere is already an application with this name. To get the current server configuration, use clib -s");
+                }
                 if (string.IsNullOrEmpty(appName))
                 {
                     appName = appNameDefault;
@@ -287,7 +83,7 @@ namespace  Contensive.Core {
                 // setup application config
                 //
                 //string jsonText;
-                appConfigClass appConfig = new appConfigClass();
+                Models.Entity.serverConfigModel.appConfigModel appConfig = new Models.Entity.serverConfigModel.appConfigModel();
                 appConfig.adminRoute = "/admin/";
                 appConfig.allowSiteMonitor = false;
                 appConfig.defaultConnectionString = "";
@@ -296,10 +92,6 @@ namespace  Contensive.Core {
                 appConfig.enabled = true;
                 appConfig.name = appName.ToLower();
                 appConfig.privateKey = Guid.NewGuid().ToString().Replace("{", "").Replace("}", "").Replace("-", "");
-                cp.core.serverConfig.apps.Add(appName.ToLower(), appConfig);
-                //
-                //
-                //
                 switch (appArchitecture)
                 {
                     case "1":
@@ -358,7 +150,11 @@ namespace  Contensive.Core {
                         cdnDomainName = Console.ReadLine();
                         break;
                 }
-                cp.cluster.saveConfig();
+                //
+                // -- save the app configuration and reload the server using this app
+                cp.core.serverConfig.apps.Add(appName, appConfig);
+                cp.core.serverConfig.saveObject(cp.core);
+                cp.core.serverConfig = Models.Entity.serverConfigModel.getObject(cp.core, appName);
                 // 
                 // update local host file
                 //
@@ -380,28 +176,24 @@ namespace  Contensive.Core {
                 //  - this is clib running, so they are setting up new application which may or may not have a webrole here.
                 //  - setup a basic webrole just in case this will include one -- maybe later make it an option
                 //
-                cp.core.programfiles.copyFolder("resources\\aspxApp\\", "apps\\" + appName + "\\");
-                cp.core.cluster.localClusterFiles.copyFolder("clibResources\\appPatterns\\" + cp.core.serverConfig.appPattern + "\\", "apps\\" + appName + "\\");
+                cp.core.programFiles.copyFolder("resources\\aspxDefaultApp\\", "\\", cp.core.appRootFiles);
                 //
                 // replace "appName" with the name of this app in the default document in the apps public folder
                 //
                 string defaultFile = "apps\\" + appName + "\\appRoot\\" + iisDefaultDoc;
-                string defaultContent = cp.core.cluster.localClusterFiles.readFile(defaultFile);
-                defaultContent = defaultContent.Replace("appName", appName);
-                cp.core.cluster.localClusterFiles.saveFile(defaultFile, defaultContent);
+                string defaultContent = cp.core.appRootFiles.readFile("default.aspx");
+                defaultContent = defaultContent.Replace("ReplaceWithAppName", appName);
+                cp.core.appRootFiles.saveFile(defaultFile, defaultContent);
                 cp.Dispose();
                 //
                 // initialize the new app, use the save authentication that was used to authorize this object
                 //
                 CPClass cpNewApp = new CPClass(appName);
                 coreBuilderClass builder = new coreBuilderClass(cpNewApp.core);
-                if (useIis)
+                builder.web_addSite(appName, domainName, "\\", iisDefaultDoc);
+                if (domainName != cdnDomainName)
                 {
-                    builder.web_addSite(appName, domainName, "\\", iisDefaultDoc);
-                    if (domainName != cdnDomainName)
-                    {
-                        builder.web_addSite(appName, cdnDomainName, "\\", iisDefaultDoc);
-                    }
+                    builder.web_addSite(appName, cdnDomainName, "\\", iisDefaultDoc);
                 }
                 builder.upgrade(true);
                 cpNewApp.core.siteProperties.setProperty(Contensive.Core.coreCommonModule.siteproperty_serverPageDefault_name, iisDefaultDoc);
@@ -411,30 +203,6 @@ namespace  Contensive.Core {
             {
                 Console.WriteLine("Error: [" + ex.ToString() + "]");
             }
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// refresh the clibResources in the cluster folder from the files installed
-        /// </summary>
-        /// <param name="cp"></param>
-        /// <param name="installFiles"></param>
-        public void upgradeResources(CPClass cp, coreFileSystemClass installFiles)
-        {
-            //string appPatternsSrc = "clibResources\\appPatterns";
-            //if (!cp.core.cluster.clusterFiles.checkPath(appPatternsSrc))
-            //{
-                //
-                // unpack the install resources
-                //
-                if (installFiles.fileExists("clibresources.zip"))
-                {
-                    installFiles.copyFile("clibresources.zip", "clibresources.zip", cp.core.cluster.localClusterFiles);
-                    cp.core.cluster.localClusterFiles.UnzipFile("clibresources.zip");
-                    cp.core.cluster.localClusterFiles.deleteFile("clibresources.zip");
-                };
-            //}
-
         }
     }
 }

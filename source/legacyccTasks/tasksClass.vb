@@ -172,7 +172,7 @@ Namespace Contensive.Core
             Dim RowBuffer As String = ""
             Dim appName As String
             '
-            appName = cpCore.appConfig.name
+            appName = cpCore.serverconfig.appConfig.name
             CS = cpCore.db.cs_openCsSql_rev(DataSource, SQL)
             If cpCore.db.cs_ok(CS) Then
                 '
@@ -249,7 +249,7 @@ ErrorTrap:
             Dim RowBuffer As String
             Dim appName As String
             '
-            appName = cpCore.appConfig.name
+            appName = cpCore.serverconfig.appConfig.name
             CS = cpCore.db.cs_openCsSql_rev(DataSource, SQL)
             If cpCore.db.cs_ok(CS) Then
                 '

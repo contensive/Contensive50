@@ -955,7 +955,7 @@ ErrorTrap:
         '
         '
         Private Sub HandleClassAppendLog(ByVal MethodName As String, ByVal Context As String)
-            cpCore.appendLogWithLegacyRow(cpCore.appConfig.name, Context, "dll", "AddonManClass", MethodName, 0, "", "", False, True, cpCore.webServerIO_ServerLink, "", "")
+            cpCore.appendLogWithLegacyRow(cpCore.serverConfig.appConfig.name, Context, "dll", "AddonManClass", MethodName, 0, "", "", False, True, cpCore.webServerIO_ServerLink, "", "")
 
         End Sub
         '
@@ -965,7 +965,7 @@ ErrorTrap:
         '
         Private Sub HandleClassTrapError(ByVal MethodName As String, Optional ByVal Context As String = "context unknown")
             '
-            cpCore.handleLegacyError3(cpCore.appConfig.name, Context, "dll", "AddonManClass", MethodName, Err.Number, Err.Source, Err.Description, True, False, cpCore.webServerIO_ServerLink)
+            cpCore.handleLegacyError3(cpCore.serverConfig.appConfig.name, Context, "dll", "AddonManClass", MethodName, Err.Number, Err.Source, Err.Description, True, False, cpCore.webServerIO_ServerLink)
             '
         End Sub
         '

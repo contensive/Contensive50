@@ -53,7 +53,7 @@ Namespace Contensive.Core
         '
         Public Overrides ReadOnly Property Name() As String 'Inherits BaseClasses.CPSiteBaseClass.Name
             Get
-                Return cpCore.appConfig.name
+                Return cpCore.serverconfig.appConfig.name
             End Get
         End Property
         '
@@ -225,7 +225,7 @@ Namespace Contensive.Core
         '
         Public Overrides ReadOnly Property FilePath() As String 'Inherits BaseClasses.CPSiteBaseClass.FilePath
             Get
-                Return cpCore.appConfig.cdnFilesNetprefix ' "/" & cpCore.app.config.name & "/files/"
+                Return cpCore.serverconfig.appConfig.cdnFilesNetprefix ' "/" & cpCore.app.config.name & "/files/"
             End Get
         End Property
         '
@@ -245,7 +245,7 @@ Namespace Contensive.Core
         '
         Public Overrides ReadOnly Property VirtualPath() As String 'Inherits BaseClasses.CPSiteBaseClass.VirtualPath
             Get
-                Return "/" & cpCore.appConfig.name
+                Return "/" & cpCore.serverconfig.appConfig.name
             End Get
         End Property
         '

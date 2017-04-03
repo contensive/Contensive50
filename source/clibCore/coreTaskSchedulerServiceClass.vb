@@ -131,7 +131,7 @@ Namespace Contensive
                     Dim JSONTemp As String = "{""clusterPath"":""c:\\inetPub"",""allowTaskRunnerService"":true,""allowTaskSchedulerService"":true}"
                     'Dim JSONTemp = programDataFiles.ReadFile("serverConfig.json")
                     Dim json_serializer As New System.Web.Script.Serialization.JavaScriptSerializer()
-                    Dim serverConfig As serverConfigClass = json_serializer.Deserialize(Of serverConfigClass)(JSONTemp)
+                    Dim serverConfig As Models.Entity.serverConfigModel = json_serializer.Deserialize(Of Models.Entity.serverConfigModel)(JSONTemp)
                     If (Not serverConfig.allowTaskSchedulerService) Then
                         Console.WriteLine("tmp-taskScheduleServiceClass.processTimerTick, skipped because serviceConfig.allowTaskSchedulerService false.")
                         'appendLog(cp.core, "taskScheduleServiceClass.processTimerTick, skipped because serviceConfig.allowTaskSchedulerService false.")
@@ -177,7 +177,7 @@ Namespace Contensive
                 appendLog(cpClusterCore, "taskScheduler.scheduleTasks")
                 '
                 RightNow = DateTime.Now
-                For Each kvp As KeyValuePair(Of String, appConfigClass) In cpClusterCore.serverConfig.apps
+                For Each kvp As KeyValuePair(Of String, Models.Entity.serverConfigModel.appConfigModel) In cpClusterCore.serverConfig.apps
                     AppName = kvp.Value.name
                     '
                     ' schedule tasks for this app
@@ -185,7 +185,7 @@ Namespace Contensive
                     appendLog(cpClusterCore, "taskScheduler.scheduleTasks, app=[" & AppName & "]")
                     '
                     Using cpSite As New CPClass(AppName)
-                        If cpSite.core.appStatus = applicationStatusEnum.ApplicationStatusReady Then
+                        If cpSite.core.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady Then
                             '
                             ' Execute Processes
                             '
@@ -276,7 +276,7 @@ Namespace Contensive
                 Dim cmdDetailJson As String = cpSiteCore.json.Serialize(cmdDetail)
                 Dim cs As Integer
                 '
-                appendLog(cpSiteCore, "taskScheduler.addTaskToQueue, application=[" & cpSiteCore.appConfig.name & "], command=[" & Command & "], cmdDetail=[" & cmdDetailJson & "]")
+                appendLog(cpSiteCore, "taskScheduler.addTaskToQueue, application=[" & cpSiteCore.serverConfig.appConfig.name & "], command=[" & Command & "], cmdDetail=[" & cmdDetailJson & "]")
                 '
                 returnTaskAdded = True
                 LcaseCommand = vbLCase(Command)

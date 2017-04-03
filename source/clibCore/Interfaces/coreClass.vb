@@ -23,10 +23,11 @@ Namespace Contensive.Core
         '
         ' ----- shared globals
         '
-        Public serverConfig As serverConfigClass
+        Public serverConfig As Models.Entity.serverConfigModel
+
         'Public clusterConfig As clusterConfigClass
-        Public Property appConfig As appConfigClass             ' configuration loaded during construction
-        Public Property appStatus As applicationStatusEnum      ' status of application
+        'Public Property appConfig As Models.Entity.serverConfigModel.appConfigModel             ' configuration loaded during construction
+        'Public Property appStatus As applicationStatusEnum      ' status of application
         '
         ' application storage
         '
@@ -179,7 +180,7 @@ Namespace Contensive.Core
         Public ReadOnly Property security() As coreSecurityClass
             Get
                 If (_security Is Nothing) Then
-                    _security = New coreSecurityClass(Me, appConfig.privateKey)
+                    _security = New coreSecurityClass(Me, serverConfig.appConfig.privateKey)
                 End If
                 Return _security
             End Get
@@ -213,18 +214,18 @@ Namespace Contensive.Core
         Public ReadOnly Property appRootFiles() As coreFileSystemClass
             Get
                 If (_appRootFiles Is Nothing) Then
-                    If serverConfig.isLocal Then
+                    If serverConfig.isLocalFileSystem Then
                         '
                         ' local server -- everything is ephemeral
                         '
-                        _appRootFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(appConfig.appRootFilesPath))
-                        '_appRootFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.appRootFilesPath))
+                        _appRootFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.appRootFilesPath))
+                        '_appRootFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(serverconfig.appConfig.appRootFilesPath))
                     Else
                         '
                         ' cluster mode - each filesystem is configured accordingly
                         '
-                        _appRootFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.activeSync, coreFileSystemClass.normalizePath(appConfig.appRootFilesPath))
-                        '_appRootFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.activeSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.appRootFilesPath))
+                        _appRootFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.activeSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.appRootFilesPath))
+                        '_appRootFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.activeSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(serverconfig.appConfig.appRootFilesPath))
                     End If
                 End If
                 Return _appRootFiles
@@ -242,16 +243,16 @@ Namespace Contensive.Core
         Public ReadOnly Property serverFiles() As coreFileSystemClass
             Get
                 If (_serverFiles Is Nothing) Then
-                    If serverConfig.isLocal Then
+                    If serverConfig.isLocalFileSystem Then
                         '
                         ' local server -- everything is ephemeral
                         '
-                        _serverFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, "")
+                        _serverFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, "")
                     Else
                         '
                         ' cluster mode - each filesystem is configured accordingly
                         '
-                        _serverFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, "")
+                        _serverFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, "")
                     End If
                 End If
                 Return _serverFiles
@@ -269,18 +270,18 @@ Namespace Contensive.Core
         Public ReadOnly Property privateFiles() As coreFileSystemClass
             Get
                 If (_privateFiles Is Nothing) Then
-                    If serverConfig.isLocal Then
+                    If serverConfig.isLocalFileSystem Then
                         '
                         ' local server -- everything is ephemeral
                         '
-                        _privateFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(appConfig.privateFilesPath))
-                        '_privateFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.privateFilesPath))
+                        _privateFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.privateFilesPath))
+                        '_privateFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(serverconfig.appConfig.privateFilesPath))
                     Else
                         '
                         ' cluster mode - each filesystem is configured accordingly
                         '
-                        _privateFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(appConfig.privateFilesPath))
-                        '_privateFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.privateFilesPath))
+                        _privateFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.privateFilesPath))
+                        '_privateFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(serverconfig.appConfig.privateFilesPath))
                     End If
                 End If
                 Return _privateFiles
@@ -298,18 +299,10 @@ Namespace Contensive.Core
         Public ReadOnly Property programDataFiles() As coreFileSystemClass
             Get
                 If (_programDataFiles Is Nothing) Then
-                    Dim programDataPath As String = coreFileSystemClass.normalizePath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData))
-                    If serverConfig.isLocal Then
-                        '
-                        ' local server -- everything is ephemeral
-                        '
-                        _programDataFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(programDataPath))
-                    Else
-                        '
-                        ' cluster mode - each filesystem is configured accordingly
-                        '
-                        _programDataFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(programDataPath))
-                    End If
+                    '
+                    ' -- always local -- must be because this object is used to read serverConfig, before the object is valid
+                    Dim programDataPath As String = coreFileSystemClass.normalizePath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) & "Contensive\"
+                    _programDataFiles = New coreFileSystemClass(Me, True, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(programDataPath))
                 End If
                 Return _programDataFiles
             End Get
@@ -326,19 +319,9 @@ Namespace Contensive.Core
         Public ReadOnly Property programFiles() As coreFileSystemClass
             Get
                 If (_programFiles Is Nothing) Then
-                    If serverConfig.isLocal Then
-                        '
-                        ' local server -- everything is ephemeral
-                        '
-                        _programFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(coreCommonModule.getProgramFilesPath))
-                        '_privateFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.privateFilesPath))
-                    Else
-                        '
-                        ' cluster mode - each filesystem is configured accordingly
-                        '
-                        _programFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(coreCommonModule.getProgramFilesPath))
-                        '_privateFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.privateFilesPath))
-                    End If
+                    '
+                    ' -- always local
+                    _programFiles = New coreFileSystemClass(Me, True, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(coreCommonModule.getProgramFilesPath))
                 End If
                 Return _programFiles
             End Get
@@ -355,18 +338,18 @@ Namespace Contensive.Core
         Public ReadOnly Property cdnFiles() As coreFileSystemClass
             Get
                 If (_cdnFiles Is Nothing) Then
-                    If serverConfig.isLocal Then
+                    If serverConfig.isLocalFileSystem Then
                         '
                         ' local server -- everything is ephemeral
                         '
-                        _cdnFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(appConfig.cdnFilesPath))
-                        '_cdnFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.cdnFilesPath))
+                        _cdnFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.cdnFilesPath))
+                        '_cdnFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(serverconfig.appConfig.cdnFilesPath))
                     Else
                         '
                         ' cluster mode - each filesystem is configured accordingly
                         '
-                        _cdnFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(appConfig.cdnFilesPath))
-                        '_cdnFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(appConfig.cdnFilesPath))
+                        _cdnFiles = New coreFileSystemClass(Me, serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.appConfig.cdnFilesPath))
+                        '_cdnFiles = New coreFileSystemClass(Me, serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.passiveSync, coreFileSystemClass.normalizePath(serverConfig.clusterPath) & coreFileSystemClass.normalizePath(serverconfig.appConfig.cdnFilesPath))
                     End If
                 End If
                 Return _cdnFiles
@@ -538,6 +521,49 @@ Namespace Contensive.Core
             End Get
         End Property
         Private _db As coreDbClass
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' cpCoreClass constructor for cluster use.
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <remarks></remarks>
+        Public Sub New(cp As CPClass)
+            MyBase.New()
+            Me.cp = cp
+            serverConfig = Models.Entity.serverConfigModel.getObject(Me)
+            webServerIO.iisContext = Nothing
+            constructorCommonInitialize("")
+        End Sub
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' cpCoreClass constructor for app, non-Internet use. cpCoreClass is the primary object internally, created by cp.
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <remarks></remarks>
+        Public Sub New(cp As CPClass, applicationName As String)
+            MyBase.New()
+            Me.cp = cp
+            serverConfig = Models.Entity.serverConfigModel.getObject(Me, applicationName)
+            webServerIO.iisContext = Nothing
+            constructorCommonInitialize(applicationName)
+        End Sub
+        '====================================================================================================
+        ''' <summary>
+        ''' cpCoreClass constructor for a web request/response environment. cpCoreClass is the primary object internally, created by cp.
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <remarks>
+        ''' All iis httpContext is loaded here and the context should not be used after this method.
+        ''' </remarks>
+        Public Sub New(cp As CPClass, applicationName As String, httpContext As System.Web.HttpContext)
+            MyBase.New()
+            Me.cp = cp
+            serverConfig = Models.Entity.serverConfigModel.getObject(Me, applicationName)
+            constructorCommonInitialize(applicationName)
+            Call webServerIO.initWebContext(httpContext)
+        End Sub
         '
         '===================================================================================================
         ' document being constructed
@@ -2005,7 +2031,7 @@ ErrorTrap:
                         '
                         ' Fix links for HTML send
                         '
-                        rootUrl = "http://" & appConfig.domainList(0) & "/"
+                        rootUrl = "http://" & serverConfig.appConfig.domainList(0) & "/"
                         BodyMessage = ConvertLinksToAbsolute(BodyMessage, rootUrl)
                         '
                         ' compose body
@@ -2072,7 +2098,7 @@ ErrorTrap:
         '            'MethodName = "csv_FilterDomainName"
         '            '
         '            filterDomainName = Link
-        '            csv_DomainName = appConfig.domainList(0)
+        '            csv_DomainName = serverconfig.appConfig.domainList(0)
         '            If vbInstr(1, csv_DomainName, ",") <> 0 Then
         '                csv_DomainName = Mid(csv_DomainName, 1, vbInstr(1, csv_DomainName, ",") - 1)
         '            End If
@@ -2178,7 +2204,7 @@ ErrorTrap:
         '
         Public ReadOnly Property app_domainList() As String
             Get
-                app_domainList = appConfig.domainList(0)
+                app_domainList = serverConfig.appConfig.domainList(0)
             End Get
 
 
@@ -2668,7 +2694,7 @@ ErrorTrap:
                 If KmaHTML.ElementCount > 0 Then
                     ElementPointer = 0
                     workingContent = ""
-                    serverFilePath = ProtocolHostString & "/" & appConfig.name & "/files/"
+                    serverFilePath = ProtocolHostString & "/" & serverConfig.appConfig.name & "/files/"
                     Stream = New coreFastStringClass
                     Do While ElementPointer < KmaHTML.ElementCount
                         Copy = KmaHTML.Text(ElementPointer)
@@ -2732,7 +2758,7 @@ ErrorTrap:
                                                             'Link = Mid(Link, Pos + 1)
                                                         End If
                                                     End If
-                                                    If (Link = "") Or (InStr(1, "," & appConfig.domainList(0) & ",", "," & Link & ",", vbTextCompare) <> 0) Then
+                                                    If (Link = "") Or (InStr(1, "," & serverConfig.appConfig.domainList(0) & ",", "," & Link & ",", vbTextCompare) <> 0) Then
                                                         'If vbInstr(1, app.config.domainList(0), Value, vbTextCompare) <> 0 Then
                                                         '
                                                         ' ----- link is for this site
@@ -3682,7 +3708,7 @@ ErrorTrap:
                                         If AttributeCount > 0 Then
                                             ImageID = DHTML.ElementAttribute(ElementPointer, "id")
                                             ImageSrcOriginal = DHTML.ElementAttribute(ElementPointer, "src")
-                                            VirtualFilePathBad = appConfig.name & "/files/"
+                                            VirtualFilePathBad = serverConfig.appConfig.name & "/files/"
                                             serverFilePath = "/" & VirtualFilePathBad
                                             If Left(LCase(ImageSrcOriginal), Len(VirtualFilePathBad)) = vbLCase(VirtualFilePathBad) Then
                                                 '
@@ -4188,7 +4214,7 @@ ErrorTrap:
                                                                                                     '
                                                                                                     ' image load failed, use raw filename
                                                                                                     '
-                                                                                                    handleLegacyError3(appConfig.name, "Error while loading image to resize, [" & RecordVirtualFilename & "]", "dll", "cpCoreClass", "DecodeAciveContent", Err.Number, Err.Source, Err.Description, False, True, "")
+                                                                                                    handleLegacyError3(serverConfig.appConfig.name, "Error while loading image to resize, [" & RecordVirtualFilename & "]", "dll", "cpCoreClass", "DecodeAciveContent", Err.Number, Err.Source, Err.Description, False, True, "")
                                                                                                     Err.Clear()
                                                                                                     NewImageFilename = ImageFilename
                                                                                                 Else
@@ -5630,7 +5656,7 @@ ErrorTrap:
             ''hint = "csv_EncodeContentUpgrades enter"
             html_EncodeContentUpgrades = Source
             '
-            ContentFilesLinkPrefix = "/" & appConfig.name & "/files/"
+            ContentFilesLinkPrefix = "/" & serverConfig.appConfig.name & "/files/"
             ResourceLibraryLinkPrefix = ContentFilesLinkPrefix & "ccLibraryFiles/"
             ImageAllowUpdate = siteProperties.getBoolean("ImageAllowUpdate", True)
             ImageAllowUpdate = ImageAllowUpdate And (InStr(1, Source, ResourceLibraryLinkPrefix, vbTextCompare) <> 0)
@@ -6044,7 +6070,7 @@ ErrorTrap:
                 '
                 ' error, do nothing but log
                 '
-                handleLegacyError3(appConfig.name, "Attempt to resize an image to 0,0. This is not allowed.", "dll", "cpCoreClass", "csv_ResizeImage2", ignoreInteger, "", "", False, True, "")
+                handleLegacyError3(serverConfig.appConfig.name, "Attempt to resize an image to 0,0. This is not allowed.", "dll", "cpCoreClass", "csv_ResizeImage2", ignoreInteger, "", "", False, True, "")
             Else
                 If sf.load(SrcFilename) Then
                     If Width = 0 Then
@@ -6395,7 +6421,7 @@ ErrorTrap:
                             WorkingLinkAlias = "/" & WorkingLinkAlias
                         End If
                         '
-                        If vbLCase(WorkingLinkAlias) = vbLCase("/" & appConfig.name) Then
+                        If vbLCase(WorkingLinkAlias) = vbLCase("/" & serverConfig.appConfig.name) Then
                             '
                             ' This alias points to the cclib folder
                             '
@@ -6413,8 +6439,8 @@ ErrorTrap:
                                     & "The Link Alias being created (" & WorkingLinkAlias & ") can not be used because there is a virtual directory in your website directory that already uses this name." _
                                     & " Please change it to ensure the Link Alias is unique. To set or change the Link Alias, use the Link Alias tab and select a name not used by another page."
                             End If
-                        ElseIf appRootFiles.pathExists(appConfig.appRootFilesPath & "\" & Mid(WorkingLinkAlias, 2)) Then
-                            'ElseIf appRootFiles.pathExists(serverConfig.clusterPath & appConfig.appRootFilesPath & "\" & Mid(WorkingLinkAlias, 2)) Then
+                        ElseIf appRootFiles.pathExists(serverconfig.appConfig.appRootFilesPath & "\" & Mid(WorkingLinkAlias, 2)) Then
+                            'ElseIf appRootFiles.pathExists(serverConfig.clusterPath & serverconfig.appConfig.appRootFilesPath & "\" & Mid(WorkingLinkAlias, 2)) Then
                             '
                             ' This alias points to a different link, call it an error
                             '
@@ -6892,7 +6918,7 @@ ErrorTrap:
                         If vbInstr(1, Copy, "://") <> 0 Then
                         ElseIf Left(Copy, 1) = "/" Then
                         Else
-                            Copy = webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, Copy)
+                            Copy = webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, Copy)
                         End If
                         Call main_AddHeadScriptLink(Copy, "embedded content")
                         Copy = csv_GetEncodeContent_JSFilename()
@@ -6909,7 +6935,7 @@ ErrorTrap:
                         If vbInstr(1, Copy, "://") <> 0 Then
                         ElseIf Left(Copy, 1) = "/" Then
                         Else
-                            Copy = webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, Copy)
+                            Copy = webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, Copy)
                         End If
                         Call main_AddStylesheetLink2(Copy, "")
                         Copy = csv_GetEncodeContent_StyleFilenames()
@@ -6976,18 +7002,18 @@ ErrorTrap:
                         ' encode subject
                         '
                         subjectEncoded = html_executeContentCommands(Nothing, subjectEncoded, CPUtilsBaseClass.addonContext.ContextEmail, ToMemberID, True, layoutError)
-                        subjectEncoded = html_encodeContent10(subjectEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
+                        subjectEncoded = html_encodeContent10(subjectEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
                         '
                         ' encode Body
                         '
                         bodyEncoded = html_executeContentCommands(Nothing, bodyEncoded, CPUtilsBaseClass.addonContext.ContextEmail, ToMemberID, True, layoutError)
-                        bodyEncoded = html_encodeContent10(bodyEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
+                        bodyEncoded = html_encodeContent10(bodyEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
                         '
                         ' encode template
                         '
                         If (templateEncoded <> "") Then
                             templateEncoded = html_executeContentCommands(Nothing, templateEncoded, CPUtilsBaseClass.addonContext.ContextEmail, ToMemberID, True, layoutError)
-                            templateEncoded = html_encodeContent10(templateEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
+                            templateEncoded = html_encodeContent10(templateEncoded, ToMemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, "", "http://" & serverConfig.appConfig.domainList(0), True, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, True, Nothing, False)
                             '
                             If (InStr(1, templateEncoded, fpoContentBox) <> 0) Then
                                 bodyEncoded = vbReplace(templateEncoded, fpoContentBox, bodyEncoded)
@@ -7125,7 +7151,7 @@ ErrorTrap:
                 CSEmail = db.cs_insertRecord("System Email")
                 Call db.cs_set(CSEmail, "name", EMailName)
                 Call db.cs_set(CSEmail, "Subject", EMailName)
-                Call db.cs_set(CSEmail, "FromAddress", siteProperties.getText("EmailAdmin", "webmaster@" & appConfig.domainList(0)))
+                Call db.cs_set(CSEmail, "FromAddress", siteProperties.getText("EmailAdmin", "webmaster@" & serverConfig.appConfig.domainList(0)))
                 'Call app.csv_SetCS(CSEmail, "caption", EmailName)
                 Call db.cs_Close(CSEmail)
                 Call Err.Raise(ignoreInteger, "dll", "No system email was found with the name [" & EMailName & "]. A new email blank was created but not sent.")
@@ -7170,7 +7196,7 @@ ErrorTrap:
                     ' This field is default true, and non-authorable
                     ' It will be true in all cases, except a possible unforseen exception
                     '
-                    EmailTemplateSource = EmailTemplateSource & "<div style=""clear: both;padding:10px;"">" & csv_GetLinkedText("<a href=""" & html.html_EncodeHTML("http://" & appConfig.domainList(0) & "/" & siteProperties.serverPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
+                    EmailTemplateSource = EmailTemplateSource & "<div style=""clear: both;padding:10px;"">" & csv_GetLinkedText("<a href=""" & html.html_EncodeHTML("http://" & serverConfig.appConfig.domainList(0) & "/" & siteProperties.serverPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
                 End If
                 '
                 ' --- Send message to the additional member
@@ -7267,7 +7293,7 @@ ErrorTrap:
                         ConfirmBody = ConfirmBody & "--- end of list ---" & BR
                         ConfirmBody = ConfirmBody & "</div>"
                         '
-                        EmailStatus = email_sendMemberEmail3(EmailToConfirmationMemberID, EmailFrom, "System Email confirmation from " & appConfig.domainList(0), ConfirmBody, False, True, EmailRecordID, "", False)
+                        EmailStatus = email_sendMemberEmail3(EmailToConfirmationMemberID, EmailFrom, "System Email confirmation from " & serverConfig.appConfig.domainList(0), ConfirmBody, False, True, EmailRecordID, "", False)
                         If isAdmin And (EmailStatus <> "") Then
                             returnString = "Administrator: There was a problem sending the confirmation email, " & EmailStatus
                         End If
@@ -8063,7 +8089,7 @@ ErrorTrap:
                 iMessage = vbReplace(iMessage, vbLf, " ")
                 iMessage = FormatDateTime(Now, vbShortTime) & vbTab & Format((ElapsedTime), "00.000") & vbTab & visit_Id & vbTab & iMessage
                 '
-                Call log_appendLog(iMessage, "", "testPoints_" & appConfig.name)
+                Call log_appendLog(iMessage, "", "testPoints_" & serverConfig.appConfig.name)
             End If
             Exit Sub
             '
@@ -8980,11 +9006,11 @@ ErrorTrap:
                     main_GetLoginLink = main_GetLoginLink & "<a href=""" & html.html_EncodeHTML(Link) & """ >"
                 End If
                 If (main_LoginIconFilename <> "") Then
-                    main_GetLoginLink = main_GetLoginLink & "<img alt=""Login"" src=""" & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, main_LoginIconFilename) & """ border=""0"" >"
+                    main_GetLoginLink = main_GetLoginLink & "<img alt=""Login"" src=""" & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, main_LoginIconFilename) & """ border=""0"" >"
                 Else
                     IconFilename = siteProperties.getText("LoginIconFilename", "/ccLib/images/ccLibLogin.GIF")
                     If vbLCase(Mid(IconFilename, 1, 7)) <> "/ccLib/" Then
-                        IconFilename = csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, IconFilename)
+                        IconFilename = csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, IconFilename)
                     End If
                     main_GetLoginLink = main_GetLoginLink & "<img alt=""Login"" src=""" & IconFilename & """ border=""0"" >"
                 End If
@@ -9222,7 +9248,7 @@ ErrorTrap:
                                     If Parts(1) <> "" Then
                                         headTags = headTags & cr & decodeHtml(Parts(1))
                                     End If
-                                    headTags = headTags & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, Parts(0)) & """ >"
+                                    headTags = headTags & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, Parts(0)) & """ >"
                                     If Parts(2) <> "" Then
                                         headTags = headTags & cr & decodeHtml(Parts(2))
                                     End If
@@ -10098,7 +10124,7 @@ ErrorTrap:
                     Next
                     'DebugPanel = DebugPanel & main_DebugPanelRow("ServerForm", Copy)
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Request Path", html.html_EncodeHTML(web_requestPath))
-                    'DebugPanel = DebugPanel & main_DebugPanelRow("CDN Files Path", html.html_EncodeHTML(appConfig.cdnFilesNetprefix))
+                    'DebugPanel = DebugPanel & main_DebugPanelRow("CDN Files Path", html.html_EncodeHTML(serverconfig.appConfig.cdnFilesNetprefix))
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Referrer", html.html_EncodeHTML(web.requestReferrer))
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Cookies", html.html_EncodeHTML(web.requestCookieString))
                     'DebugPanel = DebugPanel & main_DebugPanelRow("Visit Id", "<a href=""" & siteProperties.adminURL & "?cid=" & main_GetContentID("visits") & "&af=4&id=" & main_VisitId & """>" & main_VisitId & "</a>")
@@ -12491,7 +12517,7 @@ ErrorTrap:
                                     If FieldReadOnly Then
                                         returnResult = FieldValueText
                                     Else
-                                        returnResult = "<img src=""" & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, FieldValueText) & """><BR >change: " & html_GetFormInputFile(FieldName, EncodeText(FieldValueVariant))
+                                        returnResult = "<img src=""" & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, FieldValueText) & """><BR >change: " & html_GetFormInputFile(FieldName, EncodeText(FieldValueVariant))
                                     End If
                                 '
                                 '
@@ -13225,7 +13251,7 @@ ErrorTrap:
                 Dim AuthDomain As String
                 Dim main_appNameCookiePrefix As String
                 '
-                main_appNameCookiePrefix = vbLCase(main_encodeCookieName(appConfig.name))
+                main_appNameCookiePrefix = vbLCase(main_encodeCookieName(serverConfig.appConfig.name))
 
                 ' ----- Visit Defaults
                 '
@@ -19648,11 +19674,11 @@ ErrorTrap:
                     End If
                     MenuImage = db.cs_getText(CSSections, "MenuImageFilename")
                     If MenuImage <> "" Then
-                        MenuImage = csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, MenuImage)
+                        MenuImage = csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, MenuImage)
                     End If
                     MenuImageOver = db.cs_getText(CSSections, "MenuImageOverFilename")
                     If MenuImageOver <> "" Then
-                        MenuImageOver = csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, MenuImageOver)
+                        MenuImageOver = csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, MenuImageOver)
                     End If
                     '
                     ' main_Get Root Page for templateID
@@ -21127,7 +21153,7 @@ ErrorTrap:
                                 '
                                 ' ----- and go
                                 '
-                                Call webServerIO_Redirect2(webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, link), "Redirecting because the active download request variable is set to a valid Library Files record. Library File Log has been appended.", False)
+                                Call webServerIO_Redirect2(webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, link), "Redirecting because the active download request variable is set to a valid Library Files record. Library File Log has been appended.", False)
                             End If
                         End If
                     End If
@@ -21467,7 +21493,7 @@ ErrorTrap:
                                                 docOpen = False '--- should be disposed by caller --- Call dispose
                                                 Return _docBuffer
                                             Else
-                                                Call webServerIO_Redirect2(csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, Filename), "favicon request", False)
+                                                Call webServerIO_Redirect2(csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, Filename), "favicon request", False)
                                                 docOpen = False '--- should be disposed by caller --- Call dispose
                                                 Return _docBuffer
                                             End If
@@ -21795,7 +21821,7 @@ ErrorTrap:
                 '
                 ' site styles
                 '
-                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, "templates/styles.css") & """ >"
+                webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, "templates/styles.css") & """ >"
             End If
             '
             ' Template shared styles
@@ -21811,7 +21837,7 @@ ErrorTrap:
                         If Parts(1) <> "" Then
                             webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & decodeHtml(Parts(1))
                         End If
-                        webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, Parts(0)) & """ >"
+                        webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, Parts(0)) & """ >"
                         If Parts(2) <> "" Then
                             webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & decodeHtml(Parts(2))
                         End If
@@ -21836,7 +21862,7 @@ ErrorTrap:
             ' Member Styles
             '
             If user.styleFilename <> "" Then
-                Call main_AddStylesheetLink2(webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, user.styleFilename), "member style")
+                Call main_AddStylesheetLink2(webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, user.styleFilename), "member style")
                 user.styleFilename = ""
             End If
             '
@@ -21866,13 +21892,13 @@ ErrorTrap:
                     Ext = vbLCase(Mid(VirtualFilename, Pos))
                     Select Case Ext
                         Case ".ico"
-                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/vnd.microsoft.icon"" href=""" & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
+                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/vnd.microsoft.icon"" href=""" & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
                         Case ".png"
-                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/png"" href=""" & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
+                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/png"" href=""" & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
                         Case ".gif"
-                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/gif"" href=""" & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
+                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/gif"" href=""" & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
                         Case ".jpg"
-                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/jpg"" href=""" & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
+                            webServerIO_GetHTMLInternalHead = webServerIO_GetHTMLInternalHead & cr & "<link rel=""icon"" type=""image/jpg"" href=""" & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, VirtualFilename) & """ >"
                     End Select
                 End If
             End If
@@ -23243,7 +23269,7 @@ ErrorTrap:
                             If vbLCase(Right(StylesFilename, 4)) <> ".css" Then
                                 Call handleLegacyError15("Dynamic Menu [" & MenuName & "] StylesFilename is not a '.css' file, and will not display correct. Check that the field is setup as a CSSFile.", "main_GetDynamicMenu")
                             Else
-                                Call main_AddStylesheetLink2(webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, StylesFilename), "dynamic menu")
+                                Call main_AddStylesheetLink2(webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, StylesFilename), "dynamic menu")
                             End If
                         End If
                     End If
@@ -23513,7 +23539,7 @@ ErrorTrap:
                 '
                 ' cached stylesheet
                 '
-                pageManager_GetStyleTagPublic = pageManager_GetStyleTagPublic & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO_requestProtocol & webServerIO_requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, "templates/Public" & StyleSN & ".css") & """ >"
+                pageManager_GetStyleTagPublic = pageManager_GetStyleTagPublic & cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO_requestProtocol & webServerIO_requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, "templates/Public" & StyleSN & ".css") & """ >"
             End If
         End Function
         '
@@ -23542,7 +23568,7 @@ ErrorTrap:
                     Call cdnFiles.saveFile(convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), csv_getStyleSheetProcessed)
                     Call cdnFiles.saveFile(convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css"), pageManager_GetStyleSheetDefault2)
                 End If
-                admin_GetStyleTagAdmin = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO_requestProtocol & webServerIO_requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, "templates/Admin" & StyleSN & ".css") & """ >"
+                admin_GetStyleTagAdmin = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO_requestProtocol & webServerIO_requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, "templates/Admin" & StyleSN & ".css") & """ >"
             End If
         End Function
         '
@@ -27952,7 +27978,7 @@ ErrorTrap:
         '
         Private Sub log_appendLogPageNotFound(PageNotFoundLink As String)
             Try
-                Call log_appendLog("""" & FormatDateTime(app_startTime, vbGeneralDate) & """,""App=" & appConfig.name & """,""main_VisitId=" & visit_Id & """,""" & PageNotFoundLink & """,""Referrer=" & webServerIO.requestReferrer & """", "performance", "pagenotfound")
+                Call log_appendLog("""" & FormatDateTime(app_startTime, vbGeneralDate) & """,""App=" & serverConfig.appConfig.name & """,""main_VisitId=" & visit_Id & """,""" & PageNotFoundLink & """,""Referrer=" & webServerIO.requestReferrer & """", "performance", "pagenotfound")
             Catch ex As Exception
                 handleExceptionAndRethrow(ex)
             End Try
@@ -28990,7 +29016,7 @@ ErrorTrap:
                         Dim FieldValuefilename As String = ""
                         Dim FieldValuePath As String = ""
                         privateFiles.splitPathFilename(HtmlValue, FieldValuePath, FieldValuefilename)
-                        html_GetFormInputField = html_GetFormInputField & "<a href=""http://" & EncodeURL(webServerIO.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & FieldValuefilename & "]</A>"
+                        html_GetFormInputField = html_GetFormInputField & "<a href=""http://" & EncodeURL(webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & FieldValuefilename & "]</A>"
                         html_GetFormInputField = html_GetFormInputField & "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & html_GetFormInputCheckBox2(InputName & ".Delete", False)
                         html_GetFormInputField = html_GetFormInputField & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & html_GetFormInputFile2(InputName, HtmlId, HtmlClass)
                     End If
@@ -29015,7 +29041,7 @@ ErrorTrap:
                         Dim FieldValuefilename As String = ""
                         Dim FieldValuePath As String = ""
                         privateFiles.splitPathFilename(HtmlValue, FieldValuePath, FieldValuefilename)
-                        html_GetFormInputField = html_GetFormInputField & "<a href=""http://" & EncodeURL(webServerIO.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & FieldValuefilename & "]</A>"
+                        html_GetFormInputField = html_GetFormInputField & "<a href=""http://" & EncodeURL(webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, HtmlValue)) & """ target=""_blank"">" & SpanClassAdminSmall & "[" & FieldValuefilename & "]</A>"
                         html_GetFormInputField = html_GetFormInputField & "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" & html_GetFormInputCheckBox2(InputName & ".Delete", False)
                         html_GetFormInputField = html_GetFormInputField & "&nbsp;&nbsp;&nbsp;Change:&nbsp;" & html_GetFormInputFile2(InputName, HtmlId, HtmlClass)
                     End If
@@ -29273,7 +29299,7 @@ ErrorTrap:
                 ' AC StartBlockText
                 '
                 IconIDControlString = "AC," & ACTypeAggregateFunction & ",0,Block Text,"
-                IconImg = GetAddonIconImg(siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", appConfig.cdnFilesNetprefix, "Text Block Start", "Block text to all except selected groups starting at this point", "", 0)
+                IconImg = GetAddonIconImg(siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", serverConfig.appConfig.cdnFilesNetprefix, "Text Block Start", "Block text to all except selected groups starting at this point", "", 0)
                 IconImg = EncodeJavascript(IconImg)
                 Items(ItemsCnt) = "['Block Text','" & IconImg & "']"
                 Call Index.setPtr("Block Text", ItemsCnt)
@@ -29282,7 +29308,7 @@ ErrorTrap:
                 ' AC EndBlockText
                 '
                 IconIDControlString = "AC," & ACTypeAggregateFunction & ",0,Block Text End,"
-                IconImg = GetAddonIconImg(siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", appConfig.cdnFilesNetprefix, "Text Block End", "End of text block", "", 0)
+                IconImg = GetAddonIconImg(siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", serverConfig.appConfig.cdnFilesNetprefix, "Text Block End", "End of text block", "", 0)
                 IconImg = EncodeJavascript(IconImg)
                 Items(ItemsCnt) = "['Block Text End','" & IconImg & "']"
                 Call Index.setPtr("Block Text", ItemsCnt)
@@ -29299,7 +29325,7 @@ ErrorTrap:
                     FieldList = GetContentProperty("people", "SelectFieldList")
                     FieldList = vbReplace(FieldList, ",", "|")
                     IconIDControlString = "AC,PERSONALIZATION,0,Personalization,field=[" & FieldList & "]"
-                    IconImg = GetAddonIconImg(siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", appConfig.cdnFilesNetprefix, "Any Personalization Field", "Renders as any Personalization Field", "", 0)
+                    IconImg = GetAddonIconImg(siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", serverConfig.appConfig.cdnFilesNetprefix, "Any Personalization Field", "Renders as any Personalization Field", "", 0)
                     IconImg = EncodeJavascript(IconImg)
                     Items(ItemsCnt) = "['Personalization','" & IconImg & "']"
                     Call Index.setPtr("Personalization", ItemsCnt)
@@ -29314,7 +29340,7 @@ ErrorTrap:
                         '   Need a more consistant solution later
                         '
                         IconIDControlString = "AC," & ACTypeTemplateContent & ",0,Template Content,"
-                        IconImg = GetAddonIconImg(siteProperties.adminURL, 52, 64, 0, False, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", appConfig.cdnFilesNetprefix, "Content Box", "Renders as the content for a template", "", 0)
+                        IconImg = GetAddonIconImg(siteProperties.adminURL, 52, 64, 0, False, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", serverConfig.appConfig.cdnFilesNetprefix, "Content Box", "Renders as the content for a template", "", 0)
                         IconImg = EncodeJavascript(IconImg)
                         Items(ItemsCnt) = "['Content Box','" & IconImg & "']"
                         'Items(ItemsCnt) = "['Template Content','<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Content"" id=""AC," & ACTypeTemplateContent & ",0,Template Content,"" src=""/ccLib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>']"
@@ -29322,7 +29348,7 @@ ErrorTrap:
                         ItemsCnt = ItemsCnt + 1
                         '
                         IconIDControlString = "AC," & ACTypeTemplateText & ",0,Template Text,Name=Default"
-                        IconImg = GetAddonIconImg(siteProperties.adminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", appConfig.cdnFilesNetprefix, "Template Text", "Renders as a template text block", "", 0)
+                        IconImg = GetAddonIconImg(siteProperties.adminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", serverConfig.appConfig.cdnFilesNetprefix, "Template Text", "Renders as a template text block", "", 0)
                         IconImg = EncodeJavascript(IconImg)
                         Items(ItemsCnt) = "['Template Text','" & IconImg & "']"
                         'Items(ItemsCnt) = "['Template Text','<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Text"" id=""AC," & ACTypeTemplateText & ",0,Template Text,Name=Default"" src=""/ccLib/images/ACTemplateTextIcon.gif"" WIDTH=52 HEIGHT=52>']"
@@ -29342,7 +29368,7 @@ ErrorTrap:
                             If FieldName <> "" Then
                                 FieldCaption = "Watch List [" & FieldName & "]"
                                 IconIDControlString = "AC,WATCHLIST,0," & FieldName & ",ListName=" & FieldName & "&SortField=[DateAdded|Link|LinkLabel|Clicks|WhatsNewDateExpires]&SortDirection=Z-A[A-Z|Z-A]"
-                                IconImg = GetAddonIconImg(siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", appConfig.cdnFilesNetprefix, FieldCaption, "Rendered as the " & FieldCaption, "", 0)
+                                IconImg = GetAddonIconImg(siteProperties.adminURL, 0, 0, 0, True, IconIDControlString, "", serverConfig.appConfig.cdnFilesNetprefix, FieldCaption, "Rendered as the " & FieldCaption, "", 0)
                                 IconImg = EncodeJavascript(IconImg)
                                 FieldCaption = EncodeJavascript(FieldCaption)
                                 Items(ItemsCnt) = "['" & FieldCaption & "','" & IconImg & "']"
@@ -29438,7 +29464,7 @@ ErrorTrap:
                                     '
                                     LastAddonName = AddonName
                                     IconIDControlString = "AC,AGGREGATEFUNCTION,0," & AddonName & "," & DefaultAddonOption_String & "," & AddonGuid
-                                    IconImg = GetAddonIconImg(siteProperties.adminURL, IconWidth, IconHeight, IconSprites, IsInline, IconIDControlString, IconFilename, appConfig.cdnFilesNetprefix, AddonName, "Rendered as the Add-on [" & AddonName & "]", "", 0)
+                                    IconImg = GetAddonIconImg(siteProperties.adminURL, IconWidth, IconHeight, IconSprites, IsInline, IconIDControlString, IconFilename, serverConfig.appConfig.cdnFilesNetprefix, AddonName, "Rendered as the Add-on [" & AddonName & "]", "", 0)
                                     Items(ItemsCnt) = "['" & EncodeJavascript(AddonName) & "','" & EncodeJavascript(IconImg) & "']"
                                     Call Index.setPtr(AddonName, ItemsCnt)
                                     ItemsCnt = ItemsCnt + 1
@@ -29685,7 +29711,7 @@ ErrorTrap:
             '
             Exit Function
 ErrorTrap:
-            handleLegacyError3(appConfig.name, "", "dll", "cpCoreClass", "main_GetNvaValue", Err.Number, Err.Source, Err.Description, True, False, "")
+            handleLegacyError3(serverConfig.appConfig.name, "", "dll", "cpCoreClass", "main_GetNvaValue", Err.Number, Err.Source, Err.Description, True, False, "")
         End Function
         '
         '
@@ -29754,7 +29780,7 @@ ErrorTrap:
                     End If
                     pageManager_Private_ServerDomainCrossList_Loaded = True
                 End If
-                main_ServerDomainCrossList = appConfig.domainList(0) & pageManager_Private_ServerDomainCrossList
+                main_ServerDomainCrossList = serverConfig.appConfig.domainList(0) & pageManager_Private_ServerDomainCrossList
             End Get
         End Property
 
@@ -31784,7 +31810,7 @@ ErrorTrap:
                     Call main_AddEndOfBodyJavascript2(EncodeText(cache_siteSection(SSC_JSEndBody, Ptr)), "site section")
                     JSFilename = EncodeText(cache_siteSection(SSC_JSFilename, Ptr))
                     If JSFilename <> "" Then
-                        JSFilename = webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, JSFilename)
+                        JSFilename = webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
                         Call main_AddHeadScriptLink(JSFilename, "site section")
                     End If
                 End If
@@ -31820,7 +31846,7 @@ ErrorTrap:
                     Call main_AddEndOfBodyJavascript2(EncodeText(cache_siteSection(SSC_JSEndBody, Ptr)), "site section")
                     JSFilename = EncodeText(cache_siteSection(SSC_JSFilename, Ptr))
                     If JSFilename <> "" Then
-                        JSFilename = webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, JSFilename)
+                        JSFilename = webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
                         Call main_AddHeadScriptLink(JSFilename, "site section")
                     End If
                 End If
@@ -31943,7 +31969,7 @@ ErrorTrap:
                         Call main_AddEndOfBodyJavascript2(db.cs_getText(CSSection, "JSEndBody"), "site section")
                         JSFilename = db.cs_getText(CSSection, "JSFilename")
                         If JSFilename <> "" Then
-                            JSFilename = webServerIO_requestPage & webServerIO.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, JSFilename)
+                            JSFilename = webServerIO_requestPage & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
                             Call main_AddHeadScriptLink(JSFilename, "site section")
                         End If
                     End If
@@ -32147,7 +32173,7 @@ ErrorTrap:
                             pageManager_TemplateBodyTag = EncodeText(cache_pageTemplate(TC_BodyTag, TCPtr))
                             JSFilename = EncodeText(cache_pageTemplate(TC_JSInHeadFilename, TCPtr))
                             If JSFilename <> "" Then
-                                JSFilename = webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, JSFilename)
+                                JSFilename = webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
                                 Call main_AddHeadScriptLink(JSFilename, "template")
                             End If
                             '
@@ -32157,7 +32183,7 @@ ErrorTrap:
                                 If vbLCase(Right(StylesFilename, 4)) <> ".css" Then
                                     Call handleLegacyError15("Template [" & pageManager_TemplateName & "] StylesFilename is not a '.css' file, and will not display correct. Check that the field is setup as a CSSFile.", "main_GetHtmlBody_GetSection")
                                 Else
-                                    main_MetaContent_TemplateStyleSheetTag = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, StylesFilename) & """ >"
+                                    main_MetaContent_TemplateStyleSheetTag = cr & "<link rel=""stylesheet"" type=""text/css"" href=""" & webServerIO_requestProtocol & webServerIO.requestDomain & csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, StylesFilename) & """ >"
                                 End If
                             End If
                             '
@@ -33033,7 +33059,7 @@ ErrorTrap:
                     Call main_AddOnLoadJavascript2(JSOnLoad, "page content")
                     Call main_AddHeadScriptCode(JSHead, "page content")
                     If JSFilename <> "" Then
-                        Call main_AddHeadScriptLink(csv_getVirtualFileLink(appConfig.cdnFilesNetprefix, JSFilename), "page content")
+                        Call main_AddHeadScriptLink(csv_getVirtualFileLink(serverConfig.appConfig.cdnFilesNetprefix, JSFilename), "page content")
                     End If
                     Call main_AddEndOfBodyJavascript2(JSEndBody, "page content")
                     '
@@ -34187,7 +34213,7 @@ ErrorTrap:
                 Dim addonRoute As String = ""
                 Dim routeTest As String
                 Dim workingRoute As String
-                Dim adminRoute As String = appConfig.adminRoute.ToLower
+                Dim adminRoute As String = serverConfig.appConfig.adminRoute.ToLower
                 Dim AjaxFunction As String = docProperties.getText(RequestNameAjaxFunction)
                 Dim AjaxFastFunction As String = docProperties.getText(RequestNameAjaxFastFunction)
                 Dim RemoteMethodFromQueryString As String = docProperties.getText(RequestNameRemoteMethodAddon)
@@ -34903,49 +34929,49 @@ ErrorTrap:
                 '
                 app_startTickCount = GetTickCount
                 CPTickCountBase = GetTickCount
-                '
-                ' ----- read/create serverConfig
-                '
-                JSONTemp = programDataFiles.readFile("config.json")
-                If String.IsNullOrEmpty(JSONTemp) Then
-                    '
-                    ' for now it fails, maybe later let it autobuild a local cluster
-                    '
-                    serverConfig.allowTaskRunnerService = False
-                    serverConfig.allowTaskSchedulerService = False
-                    programDataFiles.saveFile("config.json", json.Serialize(serverConfig))
-                Else
-                    serverConfig = json.Deserialize(Of serverConfigClass)(JSONTemp)
-                End If
+                ''
+                '' ----- read/create serverConfig
+                ''
+                'JSONTemp = programDataFiles.readFile("config.json")
+                'If String.IsNullOrEmpty(JSONTemp) Then
+                '    '
+                '    ' for now it fails, maybe later let it autobuild a local cluster
+                '    '
+                '    serverConfig.allowTaskRunnerService = False
+                '    serverConfig.allowTaskSchedulerService = False
+                '    programDataFiles.saveFile("config.json", json.Serialize(serverConfig))
+                'Else
+                '    serverConfig = json.Deserialize(Of models.entity.serverConfigModel)(JSONTemp)
+                'End If
                 '
                 If (Not String.IsNullOrEmpty(appName)) Then
-                    '
-                    ' REFACTOR - cluster mode is not associated to an application, so no cache/sql, but the keyPtrCacheClass runs sql and uses cache, but this must be used in cluster mode
-                    '
-                    appStatus = applicationStatusEnum.ApplicationStatusLoading
-                    '
-                    If (Not serverConfig.apps.ContainsKey(appName.ToLower())) Then
-                        '
-                        ' application now configured
-                        '
-                        appConfig = New appConfigClass()
-                        appStatus = applicationStatusEnum.ApplicationStatusAppConfigNotValid
-                        Throw New Exception("application [" & appName & "] was not found in this cluster.")
-                    Else
-                        appConfig = serverConfig.apps(appName.ToLower())
-                    End If
-                    '
-                    If vbInstr(1, appConfig.domainList(0), ",") > 1 Then
-                        '
-                        ' if first entry in domain list is comma delimited, save only the first entry
-                        '
-                        appConfig.domainList(0) = Mid(appConfig.domainList(0), 1, vbInstr(1, appConfig.domainList(0), ",") - 1)
-                    End If
-                    '
-                    ' REFACTOR - this was removed because during debug is costs 300msec, and only helps case with small edge case of Db loss -- test that case for risks
-                    '
-                    appStatus = applicationStatusEnum.ApplicationStatusReady
-                    '
+                    ''
+                    '' REFACTOR - cluster mode is not associated to an application, so no cache/sql, but the keyPtrCacheClass runs sql and uses cache, but this must be used in cluster mode
+                    ''
+                    'appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusLoading
+                    ''
+                    'If (Not serverConfig.apps.ContainsKey(appName.ToLower())) Then
+                    '    '
+                    '    ' application now configured
+                    '    '
+                    '    appConfig = New Models.Entity.serverConfigModel.appConfigModel()
+                    '    appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusAppConfigNotValid
+                    '    Throw New Exception("application [" & appName & "] was not found in this cluster.")
+                    'Else
+                    '    appConfig = serverConfig.apps(appName.ToLower())
+                    'End If
+                    ''
+                    'If vbInstr(1, serverconfig.appConfig.domainList(0), ",") > 1 Then
+                    '    '
+                    '    ' if first entry in domain list is comma delimited, save only the first entry
+                    '    '
+                    '    serverconfig.appConfig.domainList(0) = Mid(serverconfig.appConfig.domainList(0), 1, vbInstr(1, serverconfig.appConfig.domainList(0), ",") - 1)
+                    'End If
+                    ''
+                    '' REFACTOR - this was removed because during debug is costs 300msec, and only helps case with small edge case of Db loss -- test that case for risks
+                    ''
+                    'appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady
+                    ''
                     cache_addonStyleRules = New coreCacheKeyPtrClass(Me, cacheNameAddonStyleRules, sqlAddonStyles, "shared style add-on rules,add-ons,shared styles")
                 End If
                 '
@@ -34964,46 +34990,6 @@ ErrorTrap:
             Catch ex As Exception
                 handleExceptionAndRethrow(ex)
             End Try
-        End Sub
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' cpCoreClass constructor for cluster use.
-        ''' </summary>
-        ''' <param name="cp"></param>
-        ''' <remarks></remarks>
-        Public Sub New(cp As CPClass)
-            MyBase.New()
-            Me.cp = cp
-            webServerIO.iisContext = Nothing
-            constructorCommonInitialize("")
-        End Sub
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' cpCoreClass constructor for app, non-Internet use. cpCoreClass is the primary object internally, created by cp.
-        ''' </summary>
-        ''' <param name="cp"></param>
-        ''' <remarks></remarks>
-        Public Sub New(cp As CPClass, applicationName As String)
-            MyBase.New()
-            Me.cp = cp
-            webServerIO.iisContext = Nothing
-            constructorCommonInitialize(applicationName)
-        End Sub
-        '====================================================================================================
-        ''' <summary>
-        ''' cpCoreClass constructor for a web request/response environment. cpCoreClass is the primary object internally, created by cp.
-        ''' </summary>
-        ''' <param name="cp"></param>
-        ''' <remarks>
-        ''' All iis httpContext is loaded here and the context should not be used after this method.
-        ''' </remarks>
-        Public Sub New(cp As CPClass, applicationName As String, httpContext As System.Web.HttpContext)
-            MyBase.New()
-            Me.cp = cp
-            constructorCommonInitialize(applicationName)
-            Call webServerIO.initWebContext(httpContext)
         End Sub
         '
         '
@@ -36067,7 +36053,7 @@ ErrorTrap:
                     '
                     ' content server object is valid
                     '
-                    If (appConfig IsNot Nothing) Then
+                    If (serverConfig.appConfig IsNot Nothing) Then
                         If siteProperties.allowVisitTracking Then
                             '
                             ' If visit tracking, save the viewing record

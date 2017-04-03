@@ -60,9 +60,9 @@ Namespace Contensive.Core
         '
         '
         '
-        Public ReadOnly Property status As applicationStatusEnum
+        Public ReadOnly Property status As Models.Entity.serverConfigModel.applicationStatusEnum
             Get
-                Return core.appStatus
+                Return core.serverConfig.appConfig.appStatus
             End Get
         End Property
         '
@@ -70,7 +70,7 @@ Namespace Contensive.Core
         '
         Public ReadOnly Property statusMessage As String
             Get
-                Return GetApplicationStatusMessage(core.appStatus)
+                Return GetApplicationStatusMessage(core.serverConfig.appConfig.appStatus)
             End Get
         End Property
         '
@@ -79,7 +79,7 @@ Namespace Contensive.Core
         ''' returns true if the server config file is valid (currently only requires a valid db)
         ''' </summary>
         ''' <returns></returns>
-        Public ReadOnly Property configFileOk As Boolean
+        Public ReadOnly Property serverOk As Boolean
             Get
                 Dim result As Boolean = False
                 If (core Is Nothing) Then
@@ -100,7 +100,7 @@ Namespace Contensive.Core
                 If (core Is Nothing) Then
                     Return False
                 Else
-                    Return (core.appStatus = applicationStatusEnum.ApplicationStatusReady)
+                    Return (core.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady)
                 End If
             End Get
         End Property

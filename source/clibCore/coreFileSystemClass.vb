@@ -626,30 +626,34 @@ Namespace Contensive.Core
         '
         Private Sub copyLocalFileFolder(ByVal physicalSrc As String, ByVal physicalDst As String)
             Try
-                '
-                ' create destination folder
-                '
-                If Not Directory.Exists(physicalDst) Then
-                    CreatefullPath(physicalDst)
+                If Not Directory.Exists(physicalSrc) Then
+                    '
+                    ' -- source does not exist
+                Else
+                    '
+                    ' -- create destination folder
+                    If Not Directory.Exists(physicalDst) Then
+                        CreatefullPath(physicalDst)
+                    End If
+                    '
+                    Dim srcDirectoryInfo As DirectoryInfo = New DirectoryInfo(physicalSrc)
+                    Dim dstDiretoryInfo As DirectoryInfo = New DirectoryInfo(physicalDst)
+                    Dim dstCopy As DirectoryInfo
+                    Dim srcCopy As DirectoryInfo
+                    '
+                    ' copy each file into destination
+                    '
+                    For Each srcFile As FileInfo In srcDirectoryInfo.GetFiles()
+                        srcFile.CopyTo(Path.Combine(dstDiretoryInfo.ToString, srcFile.Name), True)
+                    Next
+                    '
+                    ' recurse through folders
+                    '
+                    For Each srcCopy In srcDirectoryInfo.GetDirectories
+                        dstCopy = dstDiretoryInfo.CreateSubdirectory(srcCopy.Name)
+                        copyLocalFileFolder(srcCopy.FullName, dstCopy.FullName)
+                    Next
                 End If
-                '
-                Dim srcDirectoryInfo As DirectoryInfo = New DirectoryInfo(physicalSrc)
-                Dim dstDiretoryInfo As DirectoryInfo = New DirectoryInfo(physicalDst)
-                Dim dstCopy As DirectoryInfo
-                Dim srcCopy As DirectoryInfo
-                '
-                ' copy each file into destination
-                '
-                For Each srcFile As FileInfo In srcDirectoryInfo.GetFiles()
-                    srcFile.CopyTo(Path.Combine(dstDiretoryInfo.ToString, srcFile.Name), True)
-                Next
-                '
-                ' recurse through folders
-                '
-                For Each srcCopy In srcDirectoryInfo.GetDirectories
-                    dstCopy = dstDiretoryInfo.CreateSubdirectory(srcCopy.Name)
-                    copyLocalFileFolder(srcCopy.FullName, dstCopy.FullName)
-                Next
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try

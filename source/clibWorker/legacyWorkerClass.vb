@@ -1250,13 +1250,13 @@ Namespace Contensive
                 '
                 RightNow = DateTime.Now
                 SQLNow = cpCore.db.encodeSQLDate(RightNow)
-                For Each kvp As KeyValuePair(Of String, appConfigClass) In cpCore.serverConfig.apps
+                For Each kvp As KeyValuePair(Of String, Models.Entity.serverConfigModel.appConfigModel) In cpCore.serverConfig.apps
                     AppName = kvp.Value.name
                     '
                     ' permissions issue -- this is a root process - maybe the token will be saved in a configuration file
                     '
                     cpSite = New CPClass(AppName)
-                    If cpSite.core.appStatus = applicationStatusEnum.ApplicationStatusReady Then
+                    If cpSite.core.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady Then
                         hint &= ",app [" & AppName & "] is running, setup cp and cmc"
                         '
                         ' Execute Processes
@@ -1296,7 +1296,7 @@ Namespace Contensive
                                     '
                                     Call cpSite.core.db.cs_set(CS, "ProcessRunOnce", False)
                                     Call cpSite.core.db.cs_set(CS, "ProcessNextRun", NextRun)
-                                    Call addAsyncCmd(cpCore, "runprocess appname=""" & cpSite.core.appConfig.name & """ addonid=""" & ProcessID & """", True)
+                                    Call addAsyncCmd(cpCore, "runprocess appname=""" & cpSite.core.serverConfig.appConfig.name & """ addonid=""" & ProcessID & """", True)
                                     'Call addAsyncCmd(cp,"runprocess appname=""" & cpSite.core.appEnvironment.name & """ addonname=""" & ProcessName & """", True)
                                 ElseIf cpSite.core.db.cs_getDate(CS, "ProcessNextRun") = Date.MinValue Then
                                     '
@@ -1307,7 +1307,7 @@ Namespace Contensive
                                     '
                                     ' All is OK, triggered on NextRun, Cycle RightNow
                                     '
-                                    Call addAsyncCmd(cpCore, "runprocess appname=""" & cpSite.core.appConfig.name & """ addonid=""" & ProcessID & """", True)
+                                    Call addAsyncCmd(cpCore, "runprocess appname=""" & cpSite.core.serverConfig.appConfig.name & """ addonid=""" & ProcessID & """", True)
                                     Call cpSite.core.db.cs_set(CS, "ProcessNextRun", NextRun)
                                 End If
                                 Call cpSite.core.db.cs_goNext(CS)

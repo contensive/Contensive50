@@ -14,7 +14,7 @@ namespace Contensive.Core
             try
             { 
                 CPClass cp;
-                CPClass cpCluster;
+                CPClass cpServerGroup;
                 coreFileSystemClass installFiles;
                 coreFileSystemClass programDataFiles;
                 string appName;
@@ -66,26 +66,24 @@ namespace Contensive.Core
                                 createApp.createApp();
                                 exitCmd = true;
                                 break;
-                            case "--install":
-                            case "-i":
+                            case "--configure":
                                 //
-                                // initialize the installation. This verifies the config.json and saves the current running path as the programFilesPath, amother other possible thins
+                                // eventually write a configure. For now, just use the new app
                                 //
-                                initInstall.verifyInstall();
-                                createApp.createApp();
+                                configureClass.configure();
                                 exitCmd = true;
                                 break;
                             case "--status":
                             case "-s":
                                 //
-                                // display cluster and application status
+                                // display ServerGroup and application status
                                 //
                                 cp = new CPClass();
                                 //
-                                if (!cp.configFileOk)
+                                if (!cp.serverOk)
                                 {
                                     //c:\\programData\\clib\\serverconfig.json
-                                    Console.WriteLine("configuration file [c:\\ProgramData\\Contensive\\config.json] not found or not valid.");
+                                    Console.WriteLine("configuration file [c:\\ProgramData\\Contensive\\config.json] not found or not valid. Run clib --configure");
                                 }
                                 else
                                 {
@@ -93,19 +91,18 @@ namespace Contensive.Core
                                     Console.WriteLine("ServerGroup name: " + cp.core.serverConfig.name);
                                     Console.WriteLine("appPattern: " + cp.core.serverConfig.appPattern);
                                     Console.WriteLine("ElastiCacheConfigurationEndpoint: " + cp.core.serverConfig.awsElastiCacheConfigurationEndpoint);
-                                    Console.WriteLine("FilesEndpoint: " + cp.core.serverConfig.clusterFilesEndpoint);
-                                    Console.WriteLine("defaultDataSourceAddress: " + cp.core.serverConfig.defaultDataSourceAddress);
-                                    Console.WriteLine("isLocal: " + cp.core.serverConfig.isLocal.ToString());
-                                    //Console.WriteLine("clusterPhysicalPath: " + cp.core.serverConfig.clusterPath.ToString());
+                                    Console.WriteLine("cdnFilesRemoteEndpoint: " + cp.core.serverConfig.cdnFilesRemoteEndpoint);
+                                    Console.WriteLine("isLocal: " + cp.core.serverConfig.isLocalFileSystem.ToString());
+                                    //Console.WriteLine("serverPhysicalPath: " + cp.core.serverConfig.serverPath.ToString());
                                     Console.WriteLine("defaultDataSourceAddress: " + cp.core.serverConfig.defaultDataSourceAddress.ToString());
                                     Console.WriteLine("defaultDataSourceType: " + cp.core.serverConfig.defaultDataSourceType.ToString());
                                     Console.WriteLine("defaultDataSourceUsername: " + cp.core.serverConfig.defaultDataSourceUsername.ToString());
                                     Console.WriteLine("isLocalCache: " + cp.core.serverConfig.isLocalCache.ToString());
                                     Console.WriteLine("maxConcurrentTasksPerServer: " + cp.core.serverConfig.maxConcurrentTasksPerServer.ToString());
                                     Console.WriteLine("apps.Count: " + cp.core.serverConfig.apps.Count);
-                                    foreach (KeyValuePair<string, appConfigClass> kvp in cp.core.serverConfig.apps)
+                                    foreach (KeyValuePair<string, Models.Entity.serverConfigModel.appConfigModel> kvp in cp.core.serverConfig.apps)
                                     {
-                                        appConfigClass app = kvp.Value;
+                                        Models.Entity.serverConfigModel.appConfigModel app = kvp.Value;
                                         Console.WriteLine("----------app name: " + app.name);
                                         Console.WriteLine("\tenabled: " + app.enabled);
                                         Console.WriteLine("\tadminRoute: " + app.adminRoute);
@@ -144,9 +141,7 @@ namespace Contensive.Core
                                 }
                                 else {
                                     cp = new CPClass(appName);
-                                    installFiles = new coreFileSystemClass(cp.core, cp.core.serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
-                                    Console.WriteLine("Upgrading cluster folder clibResources from installation");
-                                    createApp.upgradeResources(cp, installFiles);
+                                    installFiles = new coreFileSystemClass(cp.core, cp.core.serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
                                     coreBuilderClass builder = new coreBuilderClass(cp.core);
                                     builder.upgrade(false);
                                     installFiles.Dispose();
@@ -156,16 +151,15 @@ namespace Contensive.Core
                                 break;
                             case "--upgradeall":
                                 //
-                                // upgrade all apps in the cluster
+                                // upgrade all apps in the server group
                                 //
-                                using (cpCluster = new CPClass())
+                                using (cpServerGroup = new CPClass())
                                 {
-                                    using (installFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)))
+                                    using (installFiles = new coreFileSystemClass(cpServerGroup.core, cpServerGroup.core.serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)))
                                     {
                                         Console.WriteLine("Upgrading cluster folder clibResources from installation");
-                                        createApp.upgradeResources(cpCluster, installFiles);
                                         //
-                                        foreach (var item in cpCluster.core.serverConfig.apps)
+                                        foreach (var item in cpServerGroup.core.serverConfig.apps)
                                         {
                                             cp = new CPClass(item.Key);
                                             coreBuilderClass builder = new coreBuilderClass(cp.core);
@@ -176,9 +170,9 @@ namespace Contensive.Core
                                 }
                                 break;
                             case "--taskscheduler":
-                                using (cpCluster = new CPClass())
+                                using (cpServerGroup = new CPClass())
                                 {
-                                    using (programDataFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib"))
+                                    using (programDataFiles = new coreFileSystemClass(cpServerGroup.core, cpServerGroup.core.serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib"))
                                     {
                                         JSONTemp = programDataFiles.readFile("serverConfig.json");
                                         if (string.IsNullOrEmpty(JSONTemp))
@@ -188,7 +182,7 @@ namespace Contensive.Core
                                         else
                                         {
                                             //System.Web.Script.Serialization.JavaScriptSerializer json_serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
-                                            serverConfigClass serverConfig = cpCluster.core.json.Deserialize<serverConfigClass>(JSONTemp);
+                                            Models.Entity.serverConfigModel serverConfig = cpServerGroup.core.json.Deserialize<Models.Entity.serverConfigModel>(JSONTemp);
                                             if (i != (args.Length + 1))
                                             {
                                                 i++;
@@ -211,9 +205,9 @@ namespace Contensive.Core
                                                     //
                                                     // turn the windows service scheduler on/off
                                                     //
-                                                    serverConfig.allowTaskSchedulerService = cpCluster.Utils.EncodeBoolean(args[i]);
+                                                    serverConfig.allowTaskSchedulerService = cpServerGroup.Utils.EncodeBoolean(args[i]);
                                                     Console.WriteLine("allowtaskscheduler set " + serverConfig.allowTaskSchedulerService.ToString());
-                                                    programDataFiles.saveFile("serverConfig.json", cpCluster.core.json.Serialize(serverConfig));
+                                                    programDataFiles.saveFile("serverConfig.json", cpServerGroup.core.json.Serialize(serverConfig));
                                                 }
                                             }
                                         }
@@ -221,9 +215,9 @@ namespace Contensive.Core
                                 }
                                 break;
                             case "--taskrunner":
-                                using (cpCluster = new CPClass())
+                                using (cpServerGroup = new CPClass())
                                 {
-                                    using (programDataFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib"))
+                                    using (programDataFiles = new coreFileSystemClass(cpServerGroup.core, cpServerGroup.core.serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib"))
                                     {
                                         JSONTemp = programDataFiles.readFile("serverConfig.json");
                                         if (string.IsNullOrEmpty(JSONTemp))
@@ -233,7 +227,7 @@ namespace Contensive.Core
                                         else
                                         {
                                             //System.Web.Script.Serialization.JavaScriptSerializer json_serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
-                                            serverConfigClass serverConfig = cpCluster.core.json.Deserialize<serverConfigClass>(JSONTemp);
+                                            Models.Entity.serverConfigModel serverConfig = cpServerGroup.core.json.Deserialize<Models.Entity.serverConfigModel>(JSONTemp);
                                             if (i != (args.Length + 1))
                                             {
                                                 i++;
@@ -256,9 +250,9 @@ namespace Contensive.Core
                                                     //
                                                     // turn the windows service scheduler on/off
                                                     //
-                                                    serverConfig.allowTaskRunnerService = cpCluster.Utils.EncodeBoolean(args[i]);
+                                                    serverConfig.allowTaskRunnerService = cpServerGroup.Utils.EncodeBoolean(args[i]);
                                                     Console.WriteLine("allowtaskrunner set " + serverConfig.allowTaskRunnerService.ToString());
-                                                    programDataFiles.saveFile("serverConfig.json", cpCluster.core.json.Serialize(serverConfig));
+                                                    programDataFiles.saveFile("serverConfig.json", cpServerGroup.core.json.Serialize(serverConfig));
                                                 }
                                             }
                                         }
@@ -269,12 +263,12 @@ namespace Contensive.Core
                                 //
                                 // turn on, off or run both services together
                                 //
-                                using (cpCluster = new CPClass())
+                                using (cpServerGroup = new CPClass())
                                 {
-                                    using (programDataFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib"))
+                                    using (programDataFiles = new coreFileSystemClass(cpServerGroup.core, cpServerGroup.core.serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib"))
                                     {
-                                        cpCluster = new CPClass();
-                                        programDataFiles = new coreFileSystemClass(cpCluster.core, cpCluster.core.serverConfig.isLocal, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib");
+                                        cpServerGroup = new CPClass();
+                                        programDataFiles = new coreFileSystemClass(cpServerGroup.core, cpServerGroup.core.serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\clib");
                                         JSONTemp = programDataFiles.readFile("serverConfig.json");
                                         if (string.IsNullOrEmpty(JSONTemp))
                                         {
@@ -283,7 +277,7 @@ namespace Contensive.Core
                                         else
                                         {
                                             //System.Web.Script.Serialization.JavaScriptSerializer json_serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
-                                            serverConfigClass serverConfig = cpCluster.core.json.Deserialize<serverConfigClass>(JSONTemp);
+                                            Models.Entity.serverConfigModel serverConfig = cpServerGroup.core.json.Deserialize<Models.Entity.serverConfigModel>(JSONTemp);
                                             if (i != (args.Length + 1))
                                             {
                                                 i++;
@@ -313,13 +307,13 @@ namespace Contensive.Core
                                                     //
                                                     // turn the windows service scheduler on/off
                                                     //
-                                                    serverConfig.allowTaskSchedulerService = cpCluster.Utils.EncodeBoolean(args[i]);
+                                                    serverConfig.allowTaskSchedulerService = cpServerGroup.Utils.EncodeBoolean(args[i]);
                                                     Console.WriteLine("allowTaskScheduler set " + serverConfig.allowTaskSchedulerService.ToString());
                                                     //
-                                                    serverConfig.allowTaskRunnerService = cpCluster.Utils.EncodeBoolean(args[i]);
+                                                    serverConfig.allowTaskRunnerService = cpServerGroup.Utils.EncodeBoolean(args[i]);
                                                     Console.WriteLine("allowTaskRunner set " + serverConfig.allowTaskRunnerService.ToString());
                                                     //
-                                                    programDataFiles.saveFile("serverConfig.json", cpCluster.core.json.Serialize(serverConfig));
+                                                    programDataFiles.saveFile("serverConfig.json", cpServerGroup.core.json.Serialize(serverConfig));
                                                 }
                                             }
                                         }

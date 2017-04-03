@@ -617,7 +617,7 @@ Namespace Contensive.Core
                         '
                         styleFilename = cpCore.db.cs_getText(CS, "StyleFilename")
                         If styleFilename <> "" Then
-                            Call cpCore.main_AddStylesheetLink(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, styleFilename))
+                            Call cpCore.main_AddStylesheetLink(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverconfig.appConfig.cdnFilesNetprefix, styleFilename))
                         End If
                         excludeFromAnalytics = cpCore.db.cs_getBoolean(CS, "ExcludeFromAnalytics")
                         returnRecordId = recordId
@@ -1159,7 +1159,7 @@ Namespace Contensive.Core
                     language = (cpCore.db.cs_getText(CS, "LanguageName"))
                     styleFilename = cpCore.db.cs_getText(CS, "StyleFilename")
                     If styleFilename <> "" Then
-                        Call cpCore.main_AddStylesheetLink(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.appConfig.cdnFilesNetprefix, styleFilename))
+                        Call cpCore.main_AddStylesheetLink(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverconfig.appConfig.cdnFilesNetprefix, styleFilename))
                     End If
                     excludeFromAnalytics = cpCore.db.cs_getBoolean(CS, "ExcludeFromAnalytics")
                     '

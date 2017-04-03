@@ -20,7 +20,7 @@ namespace integrationTests
             // arrange
             CPClass cp = new CPClass();
             // act
-            bool clusterOK = cp.configFileOk;
+            bool clusterOK = cp.serverOk;
             bool appOK = cp.appOk;
             // assert
             Assert.AreEqual(clusterOK, true);
@@ -37,7 +37,7 @@ namespace integrationTests
             // arrange
             CPClass cp = new CPClass("testapp");
             // act
-            bool clusterOK = cp.configFileOk;
+            bool clusterOK = cp.serverOk;
             bool appOK = cp.appOk;
             // assert
             Assert.AreEqual(clusterOK, true);

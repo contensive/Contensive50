@@ -60,7 +60,7 @@ Namespace Contensive.Core
                             ' recreate (non-default) domain table list
                             '
                             domainList_local = New List(Of String)
-                            domainList_local.Add(cpCore.appConfig.domainList(0))
+                            domainList_local.Add(cpCore.serverconfig.appConfig.domainList(0))
                             '
                             ' select all Normal domains (non-Forward)
                             '

@@ -114,7 +114,7 @@
     <ManifestKeyFile>clib_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <GenerateManifests>true</GenerateManifests>
+    <GenerateManifests>false</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>true</SignManifests>
@@ -153,6 +153,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>aspnetAppPatternDataSet.xsd</DependentUpon>
     </Compile>
+    <Compile Include="configureClass.cs" />
     <Compile Include="installClass.cs" />
     <Compile Include="createAppClass.cs" />
     <Compile Include="mainClass.cs" />

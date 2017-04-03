@@ -58,11 +58,11 @@ Namespace Contensive.Core
                     Throw New ArgumentException("Cache key cannot be blank")
                 Else
                     hint = 100
-                    If (Not cpCore.appConfig.enableCache) Or (Not cpCore.siteProperties.allowCache_notCached) Then
+                    If (Not cpCore.serverconfig.appConfig.enableCache) Or (Not cpCore.siteProperties.allowCache_notCached) Then
                         returnObj = returnObj
                     Else
                         hint = 200
-                        Dim rawCacheName As String = encodeCacheKey(cpCore.appConfig.name, key)
+                        Dim rawCacheName As String = encodeCacheKey(cpCore.serverconfig.appConfig.name, key)
                         If cpCore.serverConfig.isLocalCache Or remoteCacheDisabled Then
                             '
                             ' implement a simple local cache using the filesystem
@@ -200,8 +200,8 @@ Namespace Contensive.Core
                 If (String.IsNullOrEmpty(Key)) Then
                     Throw New ArgumentException("Cache key cannot be blank")
                 Else
-                    If (cpCore.appConfig.enableCache) And (cpCore.siteProperties.allowCache_notCached) Then
-                        Dim rawCacheName As String = encodeCacheKey(cpCore.appConfig.name, Key)
+                    If (cpCore.serverconfig.appConfig.enableCache) And (cpCore.siteProperties.allowCache_notCached) Then
+                        Dim rawCacheName As String = encodeCacheKey(cpCore.serverconfig.appConfig.name, Key)
                         If cpCore.serverConfig.isLocalCache Or remoteCacheDisabled Then
                             '
                             ' implement a simple local cache using the filesystem
@@ -230,7 +230,7 @@ Namespace Contensive.Core
                 '        Throw New NotImplementedException("Local cache mode is not implemented yet")
                 '        'cp.Cache.Save(encodeCacheKey(Key), dataString, , invalidationDate)
                 '    Else
-                '        Call cacheClient.Store(Enyim.Caching.Memcached.StoreMode.Set, encodeCacheKey(cpCore.appConfig.name & "-" & Key), data, invalidationDate)
+                '        Call cacheClient.Store(Enyim.Caching.Memcached.StoreMode.Set, encodeCacheKey(cpCore.serverconfig.appConfig.name & "-" & Key), data, invalidationDate)
                 '    End If
                 'End If
             Catch ex As Exception
@@ -483,7 +483,7 @@ Namespace Contensive.Core
                 '
                 appendCacheLog("invalidateTag(" & tag & "), tagInvalidationDateCacheName [" & cacheName & "]")
                 '
-                If cpCore.appConfig.enableCache Then
+                If cpCore.serverconfig.appConfig.enableCache Then
                     If Not String.IsNullOrEmpty(tag) Then
                         '
                         ' set the tags invalidation date
@@ -587,7 +587,7 @@ Namespace Contensive.Core
         '
         Private ReadOnly Property allowCache As Boolean
             Get
-                Return cpCore.appConfig.enableCache
+                Return cpCore.serverconfig.appConfig.enableCache
             End Get
         End Property
         '
