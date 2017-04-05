@@ -12,152 +12,89 @@ namespace  Contensive.Core {
             try
             {
                 //
-                // create cp for cluster work, with no application
-                //
-                CPClass cp;
-                //
                 // if you get a cluster object from cp with a key, and the key gives you access, you have a cluster object to create an app
                 //
-                string isLocalClusterText;
-                string clusterName = "";
-                bool isLocalCluster;
-                string localDriveLetter;
-                string cacheNode;
                 System.IO.DriveInfo drive;
-                string authToken;
-                string authTokenDefault = "909903";
                 System.Web.Script.Serialization.JavaScriptSerializer json = new System.Web.Script.Serialization.JavaScriptSerializer();
-                authToken = authTokenDefault;
+                String reply;
+                String prompt;
+                String defaultValue;
                 //
-                cp = new CPClass();
-                if (cp.serverOk)
+                using (CPClass cp = new CPClass())
                 {
-                    Console.WriteLine("Cluster Configuration file [" + cp.core.programDataFiles.rootLocalPath + "config.json] found.");
-                    Console.WriteLine("appPattern: " + cp.core.serverConfig.appPattern);
-                    Console.WriteLine("apps.Count: " + cp.core.serverConfig.apps.Count);
-                    foreach (KeyValuePair<string, Models.Entity.serverConfigModel.appConfigModel> kvp in cp.core.serverConfig.apps)
-                    {
-                        Console.WriteLine("\tapp: " + kvp.Key);
-                    }
-                    Console.WriteLine("ElastiCacheConfigurationEndpoint: " + cp.core.serverConfig.awsElastiCacheConfigurationEndpoint);
-                    Console.WriteLine("FilesEndpoint: " + cp.core.serverConfig.cdnFilesRemoteEndpoint);
-                    Console.WriteLine("defaultDataSourceAddress: " + cp.core.serverConfig.defaultDataSourceAddress);
-                    Console.WriteLine("isLocal: " + cp.core.serverConfig.isLocalFileSystem.ToString());
-                    Console.WriteLine("name: " + cp.core.serverConfig.name);
-                }
-                else {
                     //
-                    // ----------------------------------------------------------------------------------------------------
-                    // create cluster - Name
+                    // -- Warning.
+                    Console.WriteLine("This server's configuration will be updated. If this is not correct, use Ctrl-C to exit.");
                     //
-                    Console.WriteLine("The Cluster Configuration file [c:\\ProgramData\\Contensive\\config.json] was not found.");
-                    Console.WriteLine("This server's cluster configuration will be initialized. If this is not correct, use Ctrl-C to stop this initialization.");
-                    Console.Write("Enter the new cluster name (alpha-numeric string):");
-                    clusterName = Console.ReadLine();
-                    cp.core.serverConfig.name = clusterName;
+                    // -- serverGroup name
+                    prompt = "Enter the server group name (alpha-numeric string). For stand-alone servers, this can be the name of the server. For scaling configurations, this is a name for the group of servers:";
+                    defaultValue = cp.core.serverConfig.name;
+                    cp.core.serverConfig.name = Controllers.genericController.promptForReply(prompt, defaultValue);
                     //
-                    do
-                    {
-                        //
-                        // ----------------------------------------------------------------------------------------------------
-                        // local or multiserver mode
-                        //
-                        Console.WriteLine("\n\nSingle-Server or Multi-Server Mode");
-                        Console.WriteLine("Single server installations run applications from a single server and store their data on that machine. Multi-server configurations run on multiple servers and require outside resources to store their data.");
-                        Console.Write("Single-Server Application (y/n)?");
-                        isLocalClusterText = Console.ReadLine().ToLower();
-                    } while ((isLocalClusterText != "y") && (isLocalClusterText != "n"));
+                    // -- local or multiserver mode
+                    Console.WriteLine("\n\nSingle-Server or Multi-Server Mode");
+                    Console.WriteLine("Single server installations run applications from a single server and store their data on that machine. Multi-server configurations run on multiple servers and require outside resources to store their data.");
+                    prompt = "Single-Server Application (y/n)?";
+                    if (cp.core.serverConfig.isLocalFileSystem) { defaultValue = "y"; } else { defaultValue = "n"; }
+                    cp.core.serverConfig.isLocalFileSystem = Equals(Controllers.genericController.promptForReply(prompt, defaultValue).ToLower(), "y");
                     //
-                    do
-                    {
-                        //
-                        // ----------------------------------------------------------------------------------------------------
-                        // files
-                        //
-                        Console.WriteLine("\n\nData Storage Location");
-                        Console.WriteLine("Data will be stored on the server in the \\InetPub folder. This folder must be backed up regularly.");
-                        Console.Write("Enter the Drive letter for data storage (c/d/etc)?");
-                        localDriveLetter = Console.ReadLine().ToLower();
-                        drive = new System.IO.DriveInfo(localDriveLetter);
-                        if (!drive.IsReady)
-                        {
-                            Console.WriteLine("Drive " + localDriveLetter + " is not ready");
-                        }
-                    } while (!drive.IsReady);
-                    //cp.core.serverConfig.clusterPath = localDriveLetter + ":\\inetpub\\";
+                    // -- local file location
+                    Console.WriteLine("\n\nData Storage Locations");
+                    cp.core.serverConfig.localDriveLetter = "d";
+                    if (!(new System.IO.DriveInfo(cp.core.serverConfig.localDriveLetter).IsReady)) cp.core.serverConfig.localDriveLetter = "c";
+                    cp.core.serverConfig.localDriveLetter = Controllers.genericController.promptForReply("Enter the Drive letter for data storage (c/d/etc)", cp.core.serverConfig.localDriveLetter);
+
                     //
-                    switch (isLocalClusterText.ToLower())
-                    {
-                        case "y":
-                            //
-                            // ----------------------------------------------------------------------------------------------------
-                            // LOCAL MODE Data Source Location
-                            //
-                            isLocalCluster = true;
-                            cp.core.serverConfig.isLocalFileSystem = true;
-                            //
-                            // ----------------------------------------------------------------------------------------------------
-                            // Native Sql Server Driver
-                            //
-                            cp.core.serverConfig.defaultDataSourceType = dataSourceTypeEnum.sqlServerNative;
-                            //
-                            Console.Write("\n\nSql Server endpoint. Use (local) for Sql Server on this machine, or the AWS RDS endpoint (url:port):");
-                            cp.core.serverConfig.defaultDataSourceAddress = Console.ReadLine();
-                            //
-                            Console.Write("native sqlserver userId:");
-                            cp.core.serverConfig.defaultDataSourceUsername = Console.ReadLine();
-                            //
-                            Console.Write("native sqlserver password:");
-                            cp.core.serverConfig.defaultDataSourcePassword = Console.ReadLine();
-                            break;
-                        case "n":
-                            //
-                            // ----------------------------------------------------------------------------------------------------
-                            // non-LOCAL MODE Data Source Location
-                            //
-                            isLocalCluster = false;
-                            cp.core.serverConfig.defaultDataSourceType = dataSourceTypeEnum.sqlServerNative;
-                            //
-                            Console.Write("\n\nSql Server endpoint. Use the AWS RDS endpoint (url:port):");
-                            cp.core.serverConfig.defaultDataSourceAddress = Console.ReadLine();
-                            //
-                            Console.Write("native sqlserver userId:");
-                            cp.core.serverConfig.defaultDataSourceUsername = Console.ReadLine();
-                            //
-                            Console.Write("native sqlserver password:");
-                            cp.core.serverConfig.defaultDataSourcePassword = Console.ReadLine();
-                            break;
-                    }
+                    // -- Sql Server Driver
+                    cp.core.serverConfig.defaultDataSourceType = dataSourceTypeEnum.sqlServerNative;
+                    //
+                    // -- Sql Server end-point
+                    Console.Write("\n\nSql Server endpoint. Use (local) for Sql Server on this machine, or the AWS RDS endpoint (url:port):");
+                    if (!String.IsNullOrEmpty(cp.core.serverConfig.defaultDataSourceAddress)) Console.Write("(" + cp.core.serverConfig.defaultDataSourceAddress + ")");
+                    reply = Console.ReadLine();
+                    if (String.IsNullOrEmpty(reply)) reply = cp.core.serverConfig.defaultDataSourceAddress;
+                    cp.core.serverConfig.defaultDataSourceAddress = reply;
+                    //
+                    // -- Sql Server userId
+                    Console.Write("native sqlserver userId:");
+                    if (!String.IsNullOrEmpty(cp.core.serverConfig.defaultDataSourceUsername)) Console.Write("(" + cp.core.serverConfig.defaultDataSourceUsername + ")");
+                    reply = Console.ReadLine();
+                    if (String.IsNullOrEmpty(reply)) reply = cp.core.serverConfig.defaultDataSourceUsername;
+                    cp.core.serverConfig.defaultDataSourceUsername = reply;
+                    //
+                    // -- Sql Server password
+                    Console.Write("native sqlserver password:");
+                    if (!String.IsNullOrEmpty(cp.core.serverConfig.defaultDataSourcePassword)) Console.Write("(" + cp.core.serverConfig.defaultDataSourcePassword + ")");
+                    reply = Console.ReadLine();
+                    if (String.IsNullOrEmpty(reply)) reply = cp.core.serverConfig.defaultDataSourcePassword;
+                    cp.core.serverConfig.defaultDataSourcePassword = reply;
+                    //
+                    // -- cache server local or remote
                     do
                     {
                         Console.WriteLine("\n\nThe server requires a caching service. You can choose either the systems local cache or an AWS Elasticache (memCacheD).");
                         Console.WriteLine("NOTE: local cache is not yet implemented. if you select local cache will be disabled.");
-                        Console.Write("Use (l)ocal cache or (m)emcached (l/m)?");
-                        isLocalClusterText = Console.ReadLine().ToLower();
-                    } while ((isLocalClusterText != "l") && (isLocalClusterText != "m"));
-                    isLocalCluster = (isLocalClusterText == "l");
-                    //
-                    // if memcached, get servers
-                    //
-                    if ((isLocalClusterText == "m"))
+                        Console.Write("Use (l)ocal cache or (m)emcached?");
+                        if (!String.IsNullOrEmpty(cp.core.serverConfig.awsElastiCacheConfigurationEndpoint)) { Console.Write("(m)"); } else { Console.Write("(l)"); };
+                        reply = Console.ReadLine().ToLower();
+                        if (String.IsNullOrEmpty(reply)) reply = "l";
+                    } while ((reply != "l") && (reply != "m"));
+                    if ((reply == "l"))
                     {
+                        cp.core.serverConfig.awsElastiCacheConfigurationEndpoint = "";
+                    } else {
                         do
                         {
                             Console.Write("\n\nEnter the ElasticCache Configuration Endpoint (server:port):");
-                            cacheNode = Console.ReadLine().ToLower();
-                            cp.core.serverConfig.awsElastiCacheConfigurationEndpoint = cacheNode;
-                        } while (string.IsNullOrEmpty(cacheNode));
+                            if (!String.IsNullOrEmpty(cp.core.serverConfig.awsElastiCacheConfigurationEndpoint)) Console.Write("(" + cp.core.serverConfig.awsElastiCacheConfigurationEndpoint + ")");
+                            reply = Console.ReadLine();
+                            if (String.IsNullOrEmpty(reply)) reply = cp.core.serverConfig.awsElastiCacheConfigurationEndpoint;
+                            cp.core.serverConfig.awsElastiCacheConfigurationEndpoint = reply;
+                        } while (string.IsNullOrEmpty(reply));
                     }
-                    coreFileSystemClass installFiles = new coreFileSystemClass(cp.core,  cp.core.serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
                     //
-                    // create new serverConfig file
-                    //
-                    cp.core.serverConfig.saveObject(cp.core) ;
-                    //
-                    // reload the cluster config and test connections
-                    //   
-                    cp.Dispose();
-                    cp = new CPClass();
+                    // -- save the configuration
+                    cp.core.serverConfig.saveObject(cp.core);
                 }
             }
             catch (Exception ex)

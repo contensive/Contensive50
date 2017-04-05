@@ -7205,34 +7205,34 @@ ErrorTrap:
         'Public Function getProgramDataPath() As String
         '    Return coreFileSystemClass.normalizePath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) & "clib\"
         'End Function
-        '
-        '====================================================================================================
-        ' the the c:\program files x86) path 
-        '   -- path means no trailing slash
-        '====================================================================================================
-        '
-        Public Function getProgramFilesPath() As String
-            Dim returnPath As String = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath)
-            Dim ptr As Integer
-            '
-            ptr = vbInstr(1, returnPath, "\github\", vbTextCompare)
-            If ptr <> 0 Then
-                ' for ...\github\contensive4?\bin"
-                ptr = vbInstr(ptr + 8, returnPath, "\")
-                returnPath = Left(returnPath, ptr) & "bin\"
-            End If
+        ''
+        ''====================================================================================================
+        '' the the c:\program files x86) path 
+        ''   -- path means no trailing slash
+        ''====================================================================================================
+        ''
+        'Public Function getProgramFilesPath() As String
+        '    Dim returnPath As String = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath)
+        '    Dim ptr As Integer
+        '    '
+        '    ptr = vbInstr(1, returnPath, "\github\", vbTextCompare)
+        '    If ptr <> 0 Then
+        '        ' for ...\github\contensive4?\bin"
+        '        ptr = vbInstr(ptr + 8, returnPath, "\")
+        '        returnPath = Left(returnPath, ptr) & "bin\"
+        '    End If
 
-            Return returnPath
-        End Function
-        '
-        '====================================================================================================
-        ' the the \cclib path 
-        '   -- path means no trailing slash
-        '====================================================================================================
-        '
-        Public Function getccLibPath() As String
-            Return getProgramFilesPath() & "ccLib\"
-        End Function
+        '    Return returnPath
+        'End Function
+        ''
+        ''====================================================================================================
+        '' the the \cclib path 
+        ''   -- path means no trailing slash
+        ''====================================================================================================
+        ''
+        'Public Function getccLibPath() As String
+        '    Return getProgramFilesPath() & "ccLib\"
+        'End Function
         '
         '====================================================================================================
         ' the the name of the current executable

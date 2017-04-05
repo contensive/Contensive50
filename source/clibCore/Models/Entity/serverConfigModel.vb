@@ -20,6 +20,9 @@ Namespace Contensive.Core.Models.Entity
         '
         ' -- public properties
         '
+        ' -- set during installation
+        Public programFilesPath As String
+        '
         ' -- old serverConfig
         'Public clusterPath As String
         Public allowTaskRunnerService As Boolean
@@ -40,6 +43,7 @@ Namespace Contensive.Core.Models.Entity
         '
         ' -- endpoint for cluster files (not sure how it works, maybe this will be an object taht includes permissions, for now an fpo)
         Public isLocalFileSystem As Boolean = True
+        Public localDriveLetter As String = "D"
         Public cdnFilesRemoteEndpoint As String
         '
         ' -- configuration of async command listener on render machines (not sure if used still)
@@ -49,7 +53,7 @@ Namespace Contensive.Core.Models.Entity
         Public password As String = ""
         '
         ' -- deprecated
-        Public appPattern As String
+        'Public appPattern As String
         '
         ' -- List of all apps on this server
         Public apps As New Dictionary(Of String, appConfigModel)
@@ -66,7 +70,7 @@ Namespace Contensive.Core.Models.Entity
             Public appStatus As applicationStatusEnum
             Public enabled As Boolean
             Public privateKey As String                     ' rename hashKey
-            Public defaultConnectionString As String
+            'Public defaultConnectionString As String
             Public appRootFilesPath As String               ' local file path to the appRoot (i.e. d:\inetpub\myApp\wwwRoot\)
             Public cdnFilesPath As String                   ' local file path to the content files (i.e. d:\inetpub\myApp\files\)
             Public privateFilesPath As String               ' local file path to the content files (i.e. d:\inetpub\myApp\private\)

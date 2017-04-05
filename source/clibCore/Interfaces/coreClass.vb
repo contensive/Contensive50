@@ -321,7 +321,7 @@ Namespace Contensive.Core
                 If (_programFiles Is Nothing) Then
                     '
                     ' -- always local
-                    _programFiles = New coreFileSystemClass(Me, True, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(coreCommonModule.getProgramFilesPath))
+                    _programFiles = New coreFileSystemClass(Me, True, coreFileSystemClass.fileSyncModeEnum.noSync, coreFileSystemClass.normalizePath(cp.core.serverConfig.programFilesPath))
                 End If
                 Return _programFiles
             End Get

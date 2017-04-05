@@ -1186,7 +1186,7 @@ Namespace Contensive
                             If EmailAlarmTime = Date.MinValue Then
                                 EmailAlarmTime = rightNow.AddSeconds(EmailIntervalSeconds)
                             ElseIf rightNow > EmailAlarmTime Then
-                                Call runProcess(cpCore, getProgramFilesPath() & "\ccProcessEmail.exe")
+                                Call runProcess(cpCore, cpCore.serverConfig.programFilesPath & "\ccProcessEmail.exe")
                                 EmailAlarmTime = EmailAlarmTime.AddSeconds(EmailIntervalSeconds)
                                 If rightNow > EmailAlarmTime Then
                                     EmailAlarmTime = rightNow.AddSeconds(EmailIntervalSeconds)
@@ -1206,7 +1206,7 @@ Namespace Contensive
                                 Slice = (1.0! / 10.0!)
                                 Tryx = Rnd()
                                 If Tryx < Slice Then
-                                    Call runProcess(cpCore, getProgramFilesPath() & "\ccHouseKeep.exe")
+                                    Call runProcess(cpCore, cpCore.serverConfig.programFilesPath & "\ccHouseKeep.exe")
                                 End If
                                 HouseKeepAlarmTime = HouseKeepAlarmTime.AddSeconds(HouseKeepIntervalSeconds)
                                 If rightNow > HouseKeepAlarmTime Then
@@ -1375,7 +1375,7 @@ Namespace Contensive
                     '
                     cpCore.log_appendLog("serverClass.addAsyncCmd, command added to ServerCmds, index=[" & asyncCmdQueueCnt & "], call runProcess...")
                     '
-                    Call runProcess(cpCore, getProgramFilesPath() & "\ccCmd.exe", "port=" & serverListenerPort & " max=" & maxCmdInstances)
+                    Call runProcess(cpCore, cpCore.serverConfig.programFilesPath & "\ccCmd.exe", "port=" & serverListenerPort & " max=" & maxCmdInstances)
                 End If
                 '
                 cpCore.log_appendLog("serverClass.addAsyncCmd, exit")

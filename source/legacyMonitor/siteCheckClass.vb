@@ -400,10 +400,10 @@ ErrorTrap:
                         If AlarmEmailBody <> "" Then
                             Call appendMonitorLog("Monitor detected a problem")
                             If AlarmEmailServer = "" Then
-                                Call appendMonitorLog("Alarm not sent because AlarmEmailServer is not configured in " & getProgramFilesPath() & "\config\MonitorConfig.txt")
+                                Call appendMonitorLog("Alarm not sent because AlarmEmailServer is not configured in " & cpCore.programDataFiles.rootLocalPath & "config\MonitorConfig.txt")
                             Else
                                 If AlarmEmailList = "" Then
-                                    Call appendMonitorLog("Alarm not sent because AlarmEmailList is not configured in " & getProgramFilesPath() & "\config\MonitorConfig.txt")
+                                    Call appendMonitorLog("Alarm not sent because AlarmEmailList is not configured in " & cpCore.programDataFiles.rootLocalPath & "config\MonitorConfig.txt")
                                 Else
                                     AlarmEmailBody = "" _
                                         & "Errors Found on Server [" & ServerName & "]" _

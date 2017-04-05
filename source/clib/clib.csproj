@@ -142,6 +142,7 @@
     <Reference Include="System.Web.Extensions">
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\v3.5\System.Web.Extensions.dll</HintPath>
     </Reference>
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
@@ -154,6 +155,7 @@
       <DependentUpon>aspnetAppPatternDataSet.xsd</DependentUpon>
     </Compile>
     <Compile Include="configureClass.cs" />
+    <Compile Include="genericController.cs" />
     <Compile Include="installClass.cs" />
     <Compile Include="createAppClass.cs" />
     <Compile Include="mainClass.cs" />

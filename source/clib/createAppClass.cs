@@ -12,192 +12,155 @@ namespace  Contensive.Core {
             try
             {
                 //
-                // -- create cp for cluster work, with no application
-                CPClass cp;
-                //
                 // -- if you get a cluster object from cp with a key, and the key gives you access, you have a cluster object to create an app
-                string appName;
+                String appName;
                 string domainName;
-                string iisDefaultDoc = "";
+                string iisDefaultDoc = "default.aspx";
                 string authToken;
                 string authTokenDefault = "909903";
                 string appArchitecture = "";
                 string cdnDomainName = "";
+                DateTime rightNow = DateTime.Now;
                 System.Web.Script.Serialization.JavaScriptSerializer json = new System.Web.Script.Serialization.JavaScriptSerializer();
                 authToken = authTokenDefault;
                 //
-                cp = new CPClass();
-                if (!cp.serverOk)
+                using (CPClass cp = new CPClass())
                 {
-                    Console.WriteLine("Server Configuration not loaded correctly. Please run --configure");
-                    return;
+                    if (!cp.serverOk)
+                    {
+                        Console.WriteLine("Server Configuration not loaded correctly. Please run --configure");
+                        return;
+                    }
+                    //
+                    // -- create app
+                    Console.Write("\n\nCreate application within the server group [" + cp.core.serverConfig.name + "].");
+                    Models.Entity.serverConfigModel.appConfigModel appConfig = new Models.Entity.serverConfigModel.appConfigModel();
+                    //
+                    // app name
+                    bool appNameOk = false;
+                    do
+                    {
+                        string appNameDefault = "app" + rightNow.Year + rightNow.Month.ToString().PadLeft(2, '0') + rightNow.Day.ToString().PadLeft(2, '0') + rightNow.Hour.ToString().PadLeft(2, '0') + rightNow.Minute.ToString().PadLeft(2, '0') + rightNow.Second.ToString().PadLeft(2, '0');
+                        appName = Controllers.genericController.promptForReply("Application Name", appNameDefault).ToLower();
+                        appNameOk = !cp.core.serverConfig.apps.ContainsKey(appName.ToLower());
+                        if (!appNameOk) { Console.Write("\n\nThere is already an application with this name. To get the current server configuration, use clib -s"); }
+                    } while (!appNameOk);
+                    appConfig.name = appName;
+                    Console.Write("\n\rApplication Architecture");
+                    Console.Write("\n\r\t1 Local Mode, compatible with v4.1, cdn is virtual folder /" + appName + "/files/");
+                    Console.Write("\n\r\t2 Local Mode, cdn is virtual folder /cdn/");
+                    Console.Write("\n\r\t3 Local Mode, cdn as second iis site as cdn." + appName);
+                    Console.Write("\n\r\t4 Scale Mode, cdn as AWS S3 bucket, privateFiles as AWS S3 bucket");
+                    appArchitecture = Controllers.genericController.promptForReply("Enter 1,2,3, or 4", "1");
+                    appConfig.adminRoute = Controllers.genericController.promptForReply("Admin Route", "/admin/");
+                    appConfig.allowSiteMonitor = false;
+                    domainName = Controllers.genericController.promptForReply("Primary Domain Name", "www." + appName + ".com");
+                    appConfig.domainList.Add(domainName);
+                    appConfig.enableCache = true;
+                    appConfig.enabled = true;
+                    appConfig.privateKey = Guid.NewGuid().ToString().Replace("{", "").Replace("}", "").Replace("-", "");
+                    switch (appArchitecture)
+                    {
+                        case "1":
+                            //
+                            // Local Mode, compatible with v4.1, cdn in appRoot folder as /" + appName + "/files/
+                            //
+                            appConfig.appRootFilesPath = Controllers.genericController.promptForReply("App Root", cp.core.serverConfig.localDriveLetter + ":\\inetpub\\" + appName + "\\wwwRoot");
+                            appConfig.cdnFilesPath = Controllers.genericController.promptForReply("CDN files", cp.core.serverConfig.localDriveLetter + ":\\inetpub\\" + appName + "\\files");
+                            appConfig.privateFilesPath = Controllers.genericController.promptForReply("private files", cp.core.serverConfig.localDriveLetter + ":\\inetpub\\" + appName + "\\private");
+                            cdnDomainName = domainName;
+                            appConfig.cdnFilesNetprefix = Controllers.genericController.promptForReply("CDN files Url (virtual path)", "\\" + appName + "\\files\\");
+                            break;
+                        case "2":
+                            //
+                            // Local Mode, cdn in appRoot folder as /cdn/
+                            //
+                            appConfig.appRootFilesPath = Controllers.genericController.promptForReply("App Root", cp.core.serverConfig.localDriveLetter + ":\\inetpub\\" + appName + "\\wwwRoot");
+                            appConfig.cdnFilesPath = Controllers.genericController.promptForReply("CDN files", cp.core.serverConfig.localDriveLetter + ":\\inetpub\\" + appName + "\\files");
+                            appConfig.privateFilesPath = Controllers.genericController.promptForReply("private files", cp.core.serverConfig.localDriveLetter + ":\\inetpub\\" + appName + "\\private");
+                            cdnDomainName = domainName;
+                            appConfig.cdnFilesNetprefix = Controllers.genericController.promptForReply("CDN files Url (virtual path)", "\\cdn\\");
+                            break;
+                        case "3":
+                            //
+                            // 3 Local Mode, cdn as second iis site as cdn." + appName
+                            //
+                            appConfig.appRootFilesPath = Controllers.genericController.promptForReply("App Root", cp.core.serverConfig.localDriveLetter + ":\\inetpub\\" + appName + "\\wwwRoot");
+                            appConfig.cdnFilesPath = Controllers.genericController.promptForReply("CDN files", cp.core.serverConfig.localDriveLetter + ":\\inetpub\\" + appName + "\\files");
+                            appConfig.privateFilesPath = Controllers.genericController.promptForReply("private files", cp.core.serverConfig.localDriveLetter + ":\\inetpub\\" + appName + "\\private");
+                            cdnDomainName = Controllers.genericController.promptForReply("domain for CDN", domainName);
+                            if (cdnDomainName == domainName)
+                            {
+                                appConfig.cdnFilesNetprefix = Controllers.genericController.promptForReply("CDN files Url (virtual path)", "\\cdn\\");
+                            }
+                            else
+                            {
+                                appConfig.cdnFilesNetprefix = Controllers.genericController.promptForReply("CDN files Url (website)", "http://" + cdnDomainName + "/");
+                            }
+                            cdnDomainName = domainName;
+                            break;
+                        case "4":
+                            //
+                            // 4 Scale Mode, cdn as AWS S3 bucket, privateFiles as AWS S3 bucket"
+                            //
+                            appConfig.appRootFilesPath = Controllers.genericController.promptForReply("App Root (local mirror)", cp.core.serverConfig.localDriveLetter + ":\\inetpub\\" + appName + "\\wwwRoot");
+                            appConfig.cdnFilesPath = Controllers.genericController.promptForReply("CDN files (local mirror)", cp.core.serverConfig.localDriveLetter + ":\\inetpub\\" + appName + "\\files");
+                            appConfig.privateFilesPath = Controllers.genericController.promptForReply("private files (local mirror)", cp.core.serverConfig.localDriveLetter + ":\\inetpub\\" + appName + "\\private");
+                            cdnDomainName = Controllers.genericController.promptForReply("domain for CDN", domainName);
+                            appConfig.cdnFilesNetprefix = Controllers.genericController.promptForReply("CDN files Url (website)", "http://" + cdnDomainName + "/");
+                            break;
+                    }
+                    System.IO.Directory.CreateDirectory(appConfig.appRootFilesPath);
+                    System.IO.Directory.CreateDirectory(appConfig.cdnFilesPath);
+                    System.IO.Directory.CreateDirectory(appConfig.privateFilesPath);
+                    //
+                    // -- save the app configuration and reload the server using this app
+                    cp.core.serverConfig.apps.Add(appName, appConfig);
+                    cp.core.serverConfig.saveObject(cp.core);
+                    cp.core.serverConfig = Models.Entity.serverConfigModel.getObject(cp.core, appName);
+                    // 
+                    // update local host file
+                    //
+                    try
+                    {
+                        File.AppendAllText("c:\\windows\\system32\\drivers\\etc\\hosts", System.Environment.NewLine + "127.0.0.1\t" + appName);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.Write("Error attempting to update local host file:" + ex.ToString());
+                    }
+                    //
+                    // create the database on the server
+                    //
+                    cp.core.db.createCatalog(appName);
+                    //
+                    // copy in the pattern files 
+                    //  - the only pattern is aspx
+                    //  - this is clib running, so they are setting up new application which may or may not have a webrole here.
+                    //  - setup a basic webrole just in case this will include one -- maybe later make it an option
+                    //
+                    cp.core.programFiles.copyFolder("resources\\aspxDefaultApp\\", "\\", cp.core.appRootFiles);
+                    //
+                    // replace "appName" with the name of this app in the default document in the apps public folder
+                    //
+                    string defaultContent = cp.core.appRootFiles.readFile(iisDefaultDoc);
+                    defaultContent = defaultContent.Replace("ReplaceWithAppName", appName);
+                    cp.core.appRootFiles.saveFile(iisDefaultDoc, defaultContent);
                 }
-                else {
-                    // -- server configuration ok
-                }
-                //
-                // ----------------------------------------------------------------------------------------------------
-                // create app
-                //
-                Console.Write("\n\nCreate application within the server group [" + cp.core.serverConfig.name + "].");
-                iisDefaultDoc = "default.aspx";
-                DateTime rightNow = DateTime.Now;
-                //
-                // app name
-                //
-                string appNameDefault = "app" + rightNow.Year + rightNow.Month.ToString().PadLeft(2, '0') + rightNow.Day.ToString().PadLeft(2, '0') + rightNow.Hour.ToString().PadLeft(2, '0') + rightNow.Minute.ToString().PadLeft(2, '0') + rightNow.Second.ToString().PadLeft(2, '0');
-                Console.Write("\n\nApplication Name (" + appNameDefault + "):");
-                appName = Console.ReadLine();
-                if (cp.core.serverConfig.apps.ContainsKey(appName.ToLower()))
-                {
-                    Console.Write("\n\nThere is already an application with this name. To get the current server configuration, use clib -s");
-                }
-                if (string.IsNullOrEmpty(appName))
-                {
-                    appName = appNameDefault;
-                }
-                //
-                // app mode (local-compatibility/local/scale
-                //
-                Console.Write("\n\rApplication Architecture");
-                Console.Write("\n\r\t1 Local Mode, compatible with v4.1, cdn in appRoot folder as /" + appName + "/files/");
-                Console.Write("\n\r\t2 Local Mode, cdn in appRoot folder as /cdn/");
-                Console.Write("\n\r\t3 Local Mode, cdn as second iis site as cdn." + appName);
-                Console.Write("\n\r\t4 Scale Mode, cdn as AWS S3 bucket, privateFiles as AWS S3 bucket");
-                Console.Write("\n\rSelect 1,2,3, or 4 (1):");
-                appArchitecture = Console.ReadLine();
-                if (string.IsNullOrEmpty(appArchitecture))
-                {
-                    appArchitecture = "1";
-                }
-                //
-                // domain
-                //
-                Console.Write("Primary Domain Name (www." + appName + ".com):");
-                domainName = Console.ReadLine();
-                if (string.IsNullOrEmpty(domainName))
-                {
-                    domainName = "www." + appName + ".com";
-                }
-                //
-                // setup application config
-                //
-                //string jsonText;
-                Models.Entity.serverConfigModel.appConfigModel appConfig = new Models.Entity.serverConfigModel.appConfigModel();
-                appConfig.adminRoute = "/admin/";
-                appConfig.allowSiteMonitor = false;
-                appConfig.defaultConnectionString = "";
-                appConfig.domainList.Add(domainName);
-                appConfig.enableCache = true;
-                appConfig.enabled = true;
-                appConfig.name = appName.ToLower();
-                appConfig.privateKey = Guid.NewGuid().ToString().Replace("{", "").Replace("}", "").Replace("-", "");
-                switch (appArchitecture)
-                {
-                    case "1":
-                        //
-                        // Local Mode, compatible with v4.1, cdn in appRoot folder as /" + appName + "/files/
-                        //
-                        appConfig.appRootFilesPath = "apps\\" + appName + "\\appRoot";
-                        appConfig.cdnFilesPath = "apps\\" + appName + "\\appRoot\\" + appName + "\\files\\";
-                        appConfig.privateFilesPath = "apps\\" + appName + "\\privateFiles";
-                        appConfig.cdnFilesNetprefix = "/" + appName + "/files/";
-                        cdnDomainName = domainName;
-                        break;
-                    case "2":
-                        //
-                        // Local Mode, cdn in appRoot folder as /cdn/
-                        //
-                        appConfig.appRootFilesPath = "apps\\" + appName + "\\appRoot";
-                        appConfig.cdnFilesPath = "apps\\" + appName + "\\appRoot\\cdn\\";
-                        appConfig.privateFilesPath = "apps\\" + appName + "\\privateFiles";
-                        appConfig.cdnFilesNetprefix = "/cdn/";
-                        cdnDomainName = domainName;
-                        break;
-                    case "3":
-                        //
-                        // 3 Local Mode, cdn as second iis site as cdn." + appName
-                        //
-                        Console.Write("CDN Domain Name (cdn." + appName + ".com):");
-                        cdnDomainName = Console.ReadLine();
-                        if (string.IsNullOrEmpty(cdnDomainName))
-                        {
-                            cdnDomainName = "cdn." + appName + ".com";
-                        }
-                        appConfig.appRootFilesPath = "apps\\" + appName + "\\appRoot";
-                        appConfig.cdnFilesPath = "apps\\" + appName + "\\cdnFiles";
-                        appConfig.privateFilesPath = "apps\\" + appName + "\\privateFiles";
-                        appConfig.cdnFilesNetprefix = cdnDomainName + "\\";
-                        break;
-                    case "4":
-                        //
-                        // 4 Scale Mode, cdn as AWS S3 bucket, privateFiles as AWS S3 bucket"
-                        //
-                        Console.Write("CDN Domain Name (cdn." + appName + ".com):");
-                        cdnDomainName = Console.ReadLine();
-                        if (string.IsNullOrEmpty(cdnDomainName))
-                        {
-                            cdnDomainName = "cdn." + appName + ".com";
-                        }
-                        appConfig.appRootFilesPath = "apps\\" + appName + "\\appRoot";
-                        appConfig.cdnFilesPath = "apps\\" + appName + "\\cdnFiles";
-                        appConfig.privateFilesPath = "apps\\" + appName + "\\privateFiles";
-                        appConfig.cdnFilesNetprefix = cdnDomainName + "\\";
-                        Console.Write("\nLocal cdn mirror = " + appConfig.cdnFilesPath);
-                        Console.Write("\nLocal privateFiles mirror = " + appConfig.privateFilesPath);
-                        Console.Write("\nAWS S3 configuration must be setup manually for cdn and privateFiles.");
-                        Console.Write("\n\npress a key to continue.");
-                        cdnDomainName = Console.ReadLine();
-                        break;
-                }
-                //
-                // -- save the app configuration and reload the server using this app
-                cp.core.serverConfig.apps.Add(appName, appConfig);
-                cp.core.serverConfig.saveObject(cp.core);
-                cp.core.serverConfig = Models.Entity.serverConfigModel.getObject(cp.core, appName);
-                // 
-                // update local host file
-                //
-                try
-                {
-                    File.AppendAllText("c:\\windows\\system32\\drivers\\etc\\hosts", System.Environment.NewLine + "127.0.0.1\t" + appName);
-                }
-                catch (Exception ex)
-                {
-                    Console.Write("Error attempting to update local host file:" + ex.ToString());
-                }
-                //
-                // create the database on the server
-                //
-                cp.core.db.createCatalog(appName);
-                //
-                // copy in the pattern files 
-                //  - the only pattern is aspx
-                //  - this is clib running, so they are setting up new application which may or may not have a webrole here.
-                //  - setup a basic webrole just in case this will include one -- maybe later make it an option
-                //
-                cp.core.programFiles.copyFolder("resources\\aspxDefaultApp\\", "\\", cp.core.appRootFiles);
-                //
-                // replace "appName" with the name of this app in the default document in the apps public folder
-                //
-                string defaultFile = "apps\\" + appName + "\\appRoot\\" + iisDefaultDoc;
-                string defaultContent = cp.core.appRootFiles.readFile("default.aspx");
-                defaultContent = defaultContent.Replace("ReplaceWithAppName", appName);
-                cp.core.appRootFiles.saveFile(defaultFile, defaultContent);
-                cp.Dispose();
                 //
                 // initialize the new app, use the save authentication that was used to authorize this object
                 //
-                CPClass cpNewApp = new CPClass(appName);
-                coreBuilderClass builder = new coreBuilderClass(cpNewApp.core);
-                builder.web_addSite(appName, domainName, "\\", iisDefaultDoc);
-                if (domainName != cdnDomainName)
+                using (CPClass cp = new CPClass(appName))
                 {
-                    builder.web_addSite(appName, cdnDomainName, "\\", iisDefaultDoc);
+                    coreBuilderClass builder = new coreBuilderClass(cp.core);
+                    builder.web_addSite(appName, domainName, "\\", iisDefaultDoc);
+                    //if (domainName != cdnDomainName)
+                    //{
+                    //    builder.web_addSite(appName, cdnDomainName, "\\", iisDefaultDoc);
+                    //}
+                    builder.upgrade(true);
+                    cp.core.siteProperties.setProperty(Contensive.Core.coreCommonModule.siteproperty_serverPageDefault_name, iisDefaultDoc);
                 }
-                builder.upgrade(true);
-                cpNewApp.core.siteProperties.setProperty(Contensive.Core.coreCommonModule.siteproperty_serverPageDefault_name, iisDefaultDoc);
-                cpNewApp.Dispose();
             }
             catch (Exception ex)
             {

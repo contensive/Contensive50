@@ -3875,7 +3875,7 @@ ErrorTrap:
             '
             ' StartPath is the root - the top of the directory, it ends in the folder name (no slash)
             '
-            StartPath = getProgramFilesPath() & "\Logs"
+            StartPath = cpCore.programDataFiles.rootLocalPath & "Logs\"
             '
             ' CurrentPath is what is concatinated on to StartPath to get the current folder, it must start with a slash
             '

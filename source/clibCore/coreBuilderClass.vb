@@ -405,16 +405,16 @@ Namespace Contensive.Core
                     Call Err.Raise(ignoreInteger, "ccCSv", ignoreString)
                 Else
                     cpCore.upgradeInProgress = True
-                    DataBuildVersion = cpCore.siteProperties.dataBuildVersion
-                    Call appendUpgradeLog("Upgrade, isNewBuild=[" & isNewBuild & "], data buildVersion=[" & DataBuildVersion & "], code buildVersion=[" & cpCore.common_version & "]")
                     '
                     '---------------------------------------------------------------------
                     '   Verify core table fields (DataSources, Content Tables, Content, Content Fields, Setup, Sort Methods)
-                    '   This must be done before CDef  restore
+                    '   Then other basic system ops work, like site properties
                     '---------------------------------------------------------------------
                     '
                     Call appendUpgradeLog("VerifyCoreTables...")
                     Call VerifyCoreTables()
+                    DataBuildVersion = cpCore.siteProperties.dataBuildVersion
+                    Call appendUpgradeLog("Upgrade, isNewBuild=[" & isNewBuild & "], data buildVersion=[" & DataBuildVersion & "], code buildVersion=[" & cpCore.common_version & "]")
                     '
                     '---------------------------------------------------------------------
                     ' ----- build/verify Content Definitions
