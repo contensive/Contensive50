@@ -138,14 +138,14 @@ Namespace Contensive.Core
             Try
 
                 Using iisManager As ServerManager = New ServerManager()
-                    Dim site As Site = iisManager.Sites(appName)
                     iisManager.Sites.Add(appName, "http", "*:80:" & domainName, phyPath)
+                    Dim site As Site = iisManager.Sites(appName)
                     Dim binding As Binding = site.Bindings.CreateElement()
                     binding.BindingInformation = "*:80:" & appName
+                    binding.Protocol = "http"
                     site.Bindings.Add(binding)
-                    iisManager.Sites(appName).Bindings.Add(binding)
-                    iisManager.Sites(appName).ApplicationDefaults.ApplicationPoolName = appPool
-                    For Each iisApp As Application In iisManager.Sites(appName).Applications
+                    site.ApplicationDefaults.ApplicationPoolName = appPool
+                    For Each iisApp As Application In site.Applications
                         iisApp.ApplicationPoolName = appPool
                     Next
                     iisManager.CommitChanges()

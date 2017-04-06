@@ -43,7 +43,7 @@ Namespace Contensive.Core.Models.Entity
         '
         ' -- endpoint for cluster files (not sure how it works, maybe this will be an object taht includes permissions, for now an fpo)
         Public isLocalFileSystem As Boolean = True
-        Public localDriveLetter As String = "D"
+        Public localDataDriveLetter As String = "D"
         Public cdnFilesRemoteEndpoint As String
         '
         ' -- configuration of async command listener on render machines (not sure if used still)
@@ -66,19 +66,19 @@ Namespace Contensive.Core.Models.Entity
         ''' application configuration class
         ''' </summary>
         Public Class appConfigModel
-            Public name As String
-            Public appStatus As applicationStatusEnum
-            Public enabled As Boolean
-            Public privateKey As String                     ' rename hashKey
+            Public name As String = ""
+            Public appStatus As applicationStatusEnum = applicationStatusEnum.ApplicationStatusAppConfigNotFound
+            Public enabled As Boolean = False
+            Public privateKey As String = ""                ' rename hashKey
             'Public defaultConnectionString As String
-            Public appRootFilesPath As String               ' local file path to the appRoot (i.e. d:\inetpub\myApp\wwwRoot\)
-            Public cdnFilesPath As String                   ' local file path to the content files (i.e. d:\inetpub\myApp\files\)
-            Public privateFilesPath As String               ' local file path to the content files (i.e. d:\inetpub\myApp\private\)
-            Public cdnFilesNetprefix As String              ' in some cases (like legacy), cdnFiles are iis virtual folder mapped to appRoot (/appName/files/). Some cases this is a URL (http:\\cdn.domain.com pointing to s3)
-            Public allowSiteMonitor As Boolean
+            Public appRootFilesPath As String = ""          ' local file path to the appRoot (i.e. d:\inetpub\myApp\wwwRoot\)
+            Public cdnFilesPath As String = ""              ' local file path to the content files (i.e. d:\inetpub\myApp\files\)
+            Public privateFilesPath As String = ""          ' local file path to the content files (i.e. d:\inetpub\myApp\private\)
+            Public cdnFilesNetprefix As String = ""         ' in some cases (like legacy), cdnFiles are iis virtual folder mapped to appRoot (/appName/files/). Some cases this is a URL (http:\\cdn.domain.com pointing to s3)
+            Public allowSiteMonitor As Boolean = False
             Public domainList As New List(Of String)        ' primary domain is the first item in the list
-            Public enableCache As Boolean
-            Public adminRoute As String                                          ' The url pathpath that executes the addon site
+            Public enableCache As Boolean = False
+            Public adminRoute As String = ""              ' The url pathpath that executes the addon site
         End Class    '
         '
         '====================================================================================================

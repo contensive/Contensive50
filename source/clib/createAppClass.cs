@@ -65,9 +65,9 @@ namespace  Contensive.Core {
                             //
                             // Local Mode, compatible with v4.1, cdn in appRoot folder as /" + appName + "/files/
                             //
-                            appConfig.appRootFilesPath = Controllers.genericController.promptForReply("App Root", cp.core.serverConfig.localDriveLetter + ":\\inetpub\\" + appName + "\\wwwRoot");
-                            appConfig.cdnFilesPath = Controllers.genericController.promptForReply("CDN files", cp.core.serverConfig.localDriveLetter + ":\\inetpub\\" + appName + "\\files");
-                            appConfig.privateFilesPath = Controllers.genericController.promptForReply("private files", cp.core.serverConfig.localDriveLetter + ":\\inetpub\\" + appName + "\\private");
+                            appConfig.appRootFilesPath = Controllers.genericController.promptForReply("App Root", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\wwwRoot");
+                            appConfig.cdnFilesPath = Controllers.genericController.promptForReply("CDN files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\files");
+                            appConfig.privateFilesPath = Controllers.genericController.promptForReply("private files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\private");
                             cdnDomainName = domainName;
                             appConfig.cdnFilesNetprefix = Controllers.genericController.promptForReply("CDN files Url (virtual path)", "\\" + appName + "\\files\\");
                             break;
@@ -75,9 +75,9 @@ namespace  Contensive.Core {
                             //
                             // Local Mode, cdn in appRoot folder as /cdn/
                             //
-                            appConfig.appRootFilesPath = Controllers.genericController.promptForReply("App Root", cp.core.serverConfig.localDriveLetter + ":\\inetpub\\" + appName + "\\wwwRoot");
-                            appConfig.cdnFilesPath = Controllers.genericController.promptForReply("CDN files", cp.core.serverConfig.localDriveLetter + ":\\inetpub\\" + appName + "\\files");
-                            appConfig.privateFilesPath = Controllers.genericController.promptForReply("private files", cp.core.serverConfig.localDriveLetter + ":\\inetpub\\" + appName + "\\private");
+                            appConfig.appRootFilesPath = Controllers.genericController.promptForReply("App Root", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\wwwRoot");
+                            appConfig.cdnFilesPath = Controllers.genericController.promptForReply("CDN files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\files");
+                            appConfig.privateFilesPath = Controllers.genericController.promptForReply("private files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\private");
                             cdnDomainName = domainName;
                             appConfig.cdnFilesNetprefix = Controllers.genericController.promptForReply("CDN files Url (virtual path)", "\\cdn\\");
                             break;
@@ -85,9 +85,9 @@ namespace  Contensive.Core {
                             //
                             // 3 Local Mode, cdn as second iis site as cdn." + appName
                             //
-                            appConfig.appRootFilesPath = Controllers.genericController.promptForReply("App Root", cp.core.serverConfig.localDriveLetter + ":\\inetpub\\" + appName + "\\wwwRoot");
-                            appConfig.cdnFilesPath = Controllers.genericController.promptForReply("CDN files", cp.core.serverConfig.localDriveLetter + ":\\inetpub\\" + appName + "\\files");
-                            appConfig.privateFilesPath = Controllers.genericController.promptForReply("private files", cp.core.serverConfig.localDriveLetter + ":\\inetpub\\" + appName + "\\private");
+                            appConfig.appRootFilesPath = Controllers.genericController.promptForReply("App Root", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\wwwRoot");
+                            appConfig.cdnFilesPath = Controllers.genericController.promptForReply("CDN files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\files");
+                            appConfig.privateFilesPath = Controllers.genericController.promptForReply("private files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\private");
                             cdnDomainName = Controllers.genericController.promptForReply("domain for CDN", domainName);
                             if (cdnDomainName == domainName)
                             {
@@ -103,9 +103,9 @@ namespace  Contensive.Core {
                             //
                             // 4 Scale Mode, cdn as AWS S3 bucket, privateFiles as AWS S3 bucket"
                             //
-                            appConfig.appRootFilesPath = Controllers.genericController.promptForReply("App Root (local mirror)", cp.core.serverConfig.localDriveLetter + ":\\inetpub\\" + appName + "\\wwwRoot");
-                            appConfig.cdnFilesPath = Controllers.genericController.promptForReply("CDN files (local mirror)", cp.core.serverConfig.localDriveLetter + ":\\inetpub\\" + appName + "\\files");
-                            appConfig.privateFilesPath = Controllers.genericController.promptForReply("private files (local mirror)", cp.core.serverConfig.localDriveLetter + ":\\inetpub\\" + appName + "\\private");
+                            appConfig.appRootFilesPath = Controllers.genericController.promptForReply("App Root (local mirror)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\wwwRoot");
+                            appConfig.cdnFilesPath = Controllers.genericController.promptForReply("CDN files (local mirror)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\files");
+                            appConfig.privateFilesPath = Controllers.genericController.promptForReply("private files (local mirror)", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\private");
                             cdnDomainName = Controllers.genericController.promptForReply("domain for CDN", domainName);
                             appConfig.cdnFilesNetprefix = Controllers.genericController.promptForReply("CDN files Url (website)", "http://" + cdnDomainName + "/");
                             break;
@@ -144,7 +144,7 @@ namespace  Contensive.Core {
                     // replace "appName" with the name of this app in the default document in the apps public folder
                     //
                     string defaultContent = cp.core.appRootFiles.readFile(iisDefaultDoc);
-                    defaultContent = defaultContent.Replace("ReplaceWithAppName", appName);
+                    defaultContent = defaultContent.Replace("DefaultAppName", appName);
                     cp.core.appRootFiles.saveFile(iisDefaultDoc, defaultContent);
                 }
                 //

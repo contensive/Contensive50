@@ -533,7 +533,35 @@ Namespace Contensive.Core
             Me.cp = cp
             serverConfig = Models.Entity.serverConfigModel.getObject(Me)
             webServerIO.iisContext = Nothing
-            constructorCommonInitialize("")
+            constructorCommonInitialize()
+        End Sub
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' cpCoreClass constructor for app, non-Internet use. cpCoreClass is the primary object internally, created by cp.
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <remarks></remarks>
+        Public Sub New(cp As CPClass, serverConfig As Models.Entity.serverConfigModel)
+            MyBase.New()
+            Me.cp = cp
+            Me.serverConfig = serverConfig
+            webServerIO.iisContext = Nothing
+            constructorCommonInitialize()
+        End Sub
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' cpCoreClass constructor for app, non-Internet use. cpCoreClass is the primary object internally, created by cp.
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <remarks></remarks>
+        Public Sub New(cp As CPClass, serverConfig As Models.Entity.serverConfigModel, httpContext As System.Web.HttpContext)
+            MyBase.New()
+            Me.cp = cp
+            Me.serverConfig = serverConfig
+            Call webServerIO.initWebContext(httpContext)
+            constructorCommonInitialize()
         End Sub
         '
         '====================================================================================================
@@ -547,7 +575,7 @@ Namespace Contensive.Core
             Me.cp = cp
             serverConfig = Models.Entity.serverConfigModel.getObject(Me, applicationName)
             webServerIO.iisContext = Nothing
-            constructorCommonInitialize(applicationName)
+            constructorCommonInitialize()
         End Sub
         '====================================================================================================
         ''' <summary>
@@ -561,7 +589,7 @@ Namespace Contensive.Core
             MyBase.New()
             Me.cp = cp
             serverConfig = Models.Entity.serverConfigModel.getObject(Me, applicationName)
-            constructorCommonInitialize(applicationName)
+            constructorCommonInitialize()
             Call webServerIO.initWebContext(httpContext)
         End Sub
         '
@@ -34923,70 +34951,19 @@ ErrorTrap:
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <remarks></remarks>
-        Private Sub constructorCommonInitialize(appName As String)
+        Private Sub constructorCommonInitialize()
             Try
-                Dim JSONTemp As String
-                '
                 app_startTickCount = GetTickCount
                 CPTickCountBase = GetTickCount
-                ''
-                '' ----- read/create serverConfig
-                ''
-                'JSONTemp = programDataFiles.readFile("config.json")
-                'If String.IsNullOrEmpty(JSONTemp) Then
-                '    '
-                '    ' for now it fails, maybe later let it autobuild a local cluster
-                '    '
-                '    serverConfig.allowTaskRunnerService = False
-                '    serverConfig.allowTaskSchedulerService = False
-                '    programDataFiles.saveFile("config.json", json.Serialize(serverConfig))
-                'Else
-                '    serverConfig = json.Deserialize(Of models.entity.serverConfigModel)(JSONTemp)
-                'End If
-                '
-                If (Not String.IsNullOrEmpty(appName)) Then
-                    ''
-                    '' REFACTOR - cluster mode is not associated to an application, so no cache/sql, but the keyPtrCacheClass runs sql and uses cache, but this must be used in cluster mode
-                    ''
-                    'appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusLoading
-                    ''
-                    'If (Not serverConfig.apps.ContainsKey(appName.ToLower())) Then
-                    '    '
-                    '    ' application now configured
-                    '    '
-                    '    appConfig = New Models.Entity.serverConfigModel.appConfigModel()
-                    '    appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusAppConfigNotValid
-                    '    Throw New Exception("application [" & appName & "] was not found in this cluster.")
-                    'Else
-                    '    appConfig = serverConfig.apps(appName.ToLower())
-                    'End If
-                    ''
-                    'If vbInstr(1, serverconfig.appConfig.domainList(0), ",") > 1 Then
-                    '    '
-                    '    ' if first entry in domain list is comma delimited, save only the first entry
-                    '    '
-                    '    serverconfig.appConfig.domainList(0) = Mid(serverconfig.appConfig.domainList(0), 1, vbInstr(1, serverconfig.appConfig.domainList(0), ",") - 1)
-                    'End If
-                    ''
-                    '' REFACTOR - this was removed because during debug is costs 300msec, and only helps case with small edge case of Db loss -- test that case for risks
-                    ''
-                    'appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady
-                    ''
-                    cache_addonStyleRules = New coreCacheKeyPtrClass(Me, cacheNameAddonStyleRules, sqlAddonStyles, "shared style add-on rules,add-ons,shared styles")
-                End If
-                '
-                '
-                '
                 main_ClosePageCounter = 0
                 debug_allowDebugLog = True
                 app_startTime = DateTime.Now()
                 webServerIO_PageTestPointPrinting = True
                 webServerIO_AllowCookielessDetection = True
                 main_LoginIconFilename = ""
-                'main_IconFileDefault = "/ccLib/images/IconDoc.gif"
-                'main_IconFolderClosed = "/ccLib/images/main_IconFolderClosed.gif"
-                'main_IconFolderOpen = "/ccLib/images/main_IconFolderOpen.gif"
-                'main_IconFolderUp = "/ccLib/images/main_IconFolderOpen.gif"
+                '
+                ' -- convert to lazy load
+                cache_addonStyleRules = New coreCacheKeyPtrClass(Me, cacheNameAddonStyleRules, sqlAddonStyles, "shared style add-on rules,add-ons,shared styles")
             Catch ex As Exception
                 handleExceptionAndRethrow(ex)
             End Try

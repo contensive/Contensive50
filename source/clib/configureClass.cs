@@ -40,9 +40,9 @@ namespace  Contensive.Core {
                     //
                     // -- local file location
                     Console.WriteLine("\n\nData Storage Locations");
-                    cp.core.serverConfig.localDriveLetter = "d";
-                    if (!(new System.IO.DriveInfo(cp.core.serverConfig.localDriveLetter).IsReady)) cp.core.serverConfig.localDriveLetter = "c";
-                    cp.core.serverConfig.localDriveLetter = Controllers.genericController.promptForReply("Enter the Drive letter for data storage (c/d/etc)", cp.core.serverConfig.localDriveLetter);
+                    cp.core.serverConfig.localDataDriveLetter = "d";
+                    if (!(new System.IO.DriveInfo(cp.core.serverConfig.localDataDriveLetter).IsReady)) cp.core.serverConfig.localDataDriveLetter = "c";
+                    cp.core.serverConfig.localDataDriveLetter = Controllers.genericController.promptForReply("Enter the Drive letter for data storage (c/d/etc)", cp.core.serverConfig.localDataDriveLetter);
 
                     //
                     // -- Sql Server Driver

@@ -49,6 +49,27 @@ Namespace Contensive.Core
         '
         '=========================================================================================================
         ''' <summary>
+        ''' cp constructor for app, non-Internet use. Provide the authentication token for cluster authorization.
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Sub New(serverConfig As Models.Entity.serverConfigModel)
+            MyBase.New()
+            core = New coreClass(Me, serverConfig)
+        End Sub
+        '
+        '=========================================================================================================
+        ''' <summary>
+        ''' cp constructor for application use associated to a web request/response. Provide the authentication token which authorizes access to this application.
+        ''' </summary>
+        ''' <param name="httpContext"></param>
+        ''' <remarks></remarks>
+        Public Sub New(serverConfig As Models.Entity.serverConfigModel, httpContext As System.Web.HttpContext)
+            MyBase.New()
+            core = New coreClass(Me, serverConfig, httpContext)
+        End Sub
+        '
+        '=========================================================================================================
+        ''' <summary>
         ''' cp constructor for application use associated to a web request/response. Provide the authentication token which authorizes access to this application.
         ''' </summary>
         ''' <param name="httpContext"></param>
