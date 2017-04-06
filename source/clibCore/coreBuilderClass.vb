@@ -57,15 +57,20 @@ Namespace Contensive.Core
         End Sub
         '
         Private Function web_existsSite(appName As String) As Boolean
-            Dim returnExists As Boolean = False
-            Dim serverManager As New ServerManager
-            Dim siteCollection As SiteCollection = serverManager.Sites
-            For Each Site As Site In siteCollection
-                If appName = Site.Name Then
-                    returnExists = True
-                    Exit For
-                End If
-            Next
+            Try
+                Dim returnExists As Boolean = False
+                Dim serverManager As New ServerManager
+                Dim siteCollection As SiteCollection = serverManager.Sites
+                For Each Site As Site In siteCollection
+                    If appName = Site.Name Then
+                        returnExists = True
+                        Exit For
+                    End If
+                Next
+                Return returnExists
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex, "web_existsSite")
+            End Try
         End Function
         '
         ' -------------------------------------------------------------------
@@ -74,44 +79,93 @@ Namespace Contensive.Core
         '
         Public Sub web_addSite(ByVal appName As String, ByVal DomainName As String, ByVal rootPublicFilesPath As String, ByVal defaultDocOrBlank As String)
             Try
-                Dim mySite As Site
-                Dim newPool As ApplicationPool
-                Dim bindinginformation As String
+                'Dim mySite As Site
+                'Dim newPool As ApplicationPool
+                'Dim bindinginformation As String
                 '
                 If Not web_existsSite(appName) Then
                     '
-                    Using iisManager As ServerManager = New ServerManager()
-                        cpCore.appRootFiles.saveFile("deleteMe.txt", "Temp document to create path")
-                        cpCore.appRootFiles.deleteFile("deleteMe.txt")
-                        bindinginformation = "*:80:" & DomainName
-                        mySite = iisManager.Sites.Add(appName, "http", bindinginformation, cpCore.serverconfig.appConfig.appRootFilesPath)
-                        'mySite = iisManager.Sites.Add(appName, "http", bindinginformation, cpCore.serverConfig.clusterPath & cpCore.serverconfig.appConfig.appRootFilesPath)
-                        'iisManager.Sites.Item(0).)
-                        bindinginformation = "*:80:" & appName
-                        mySite.Bindings.Add(bindinginformation, "http")
-                        mySite.ServerAutoStart = True
-                        mySite.ApplicationDefaults.ApplicationPoolName = appName
-                        mySite.TraceFailedRequestsLogging.Enabled = True
-                        mySite.TraceFailedRequestsLogging.Directory = "C:\\inetpub\\"
-                        '
-                        newPool = iisManager.ApplicationPools.Add(appName)
-                        newPool.ManagedRuntimeVersion = "v4.0"
-                        newPool.Enable32BitAppOnWin64 = True
-                        '
-                        iisManager.CommitChanges()
-                        'If False Then
-                        '    '
-                        '    ' not sure why this fails, but the is already started.
-                        '    '
-                        '    iisSite = iisManager.Sites(siteName)
-                        '    iisSite.Start()
-                        'End If
-                    End Using
+                    iisCreateAppPool(appName)
+                    iisCreateWebsite(appName, DomainName, rootPublicFilesPath, appName)
+                    'Using iisManager As ServerManager = New ServerManager()
+                    '    cpCore.appRootFiles.saveFile("deleteMe.txt", "Temp document to create path")
+                    '    cpCore.appRootFiles.deleteFile("deleteMe.txt")
+                    '    bindinginformation = "*:80:" & DomainName
+                    '    mySite = iisManager.Sites.Add(appName, "http", bindinginformation, cpCore.serverconfig.appConfig.appRootFilesPath)
+                    '    'mySite = iisManager.Sites.Add(appName, "http", bindinginformation, cpCore.serverConfig.clusterPath & cpCore.serverconfig.appConfig.appRootFilesPath)
+                    '    'iisManager.Sites.Item(0).)
+                    '    bindinginformation = "*:80:" & appName
+                    '    mySite.Bindings.Add(bindinginformation, "http")
+                    '    mySite.ServerAutoStart = True
+                    '    mySite.ApplicationDefaults.ApplicationPoolName = appName
+                    '    mySite.TraceFailedRequestsLogging.Enabled = True
+                    '    mySite.TraceFailedRequestsLogging.Directory = "C:\\inetpub\\"
+                    '    '
+                    '    newPool = iisManager.ApplicationPools.Add(appName)
+                    '    newPool.ManagedRuntimeVersion = "v4.0"
+                    '    newPool.Enable32BitAppOnWin64 = True
+                    '    '
+                    '    iisManager.CommitChanges()
+                    '    'If False Then
+                    '    '    '
+                    '    '    ' not sure why this fails, but the is already started.
+                    '    '    '
+                    '    '    iisSite = iisManager.Sites(siteName)
+                    '    '    iisSite.Start()
+                    '    'End If
+                    'End Using
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndRethrow(ex, "web_addSite")
             End Try
         End Sub
+        '
+        Private Sub iisCreateAppPool(poolName As String)
+            Try
+                Using serverManager As ServerManager = New ServerManager()
+                    Dim newPool As ApplicationPool = serverManager.ApplicationPools.Add(poolName)
+                    newPool.ManagedRuntimeVersion = "v4.0"
+                    newPool.Enable32BitAppOnWin64 = True
+                    newPool.ManagedPipelineMode = ManagedPipelineMode.Integrated
+                    serverManager.CommitChanges()
+                End Using
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex, "iisCreateAppPool")
+            End Try
+        End Sub
+        '
+        Private Sub iisCreateWebsite(appName As String, domainName As String, phyPath As String, appPool As String)
+            Try
+
+                Using iisManager As ServerManager = New ServerManager()
+                    Dim site As Site = iisManager.Sites(appName)
+                    iisManager.Sites.Add(appName, "http", "*:80:" & domainName, phyPath)
+                    Dim binding As Binding = site.Bindings.CreateElement()
+                    binding.BindingInformation = "*:80:" & appName
+                    site.Bindings.Add(binding)
+                    iisManager.Sites(appName).Bindings.Add(binding)
+                    iisManager.Sites(appName).ApplicationDefaults.ApplicationPoolName = appPool
+                    For Each iisApp As Application In iisManager.Sites(appName).Applications
+                        iisApp.ApplicationPoolName = appPool
+                    Next
+                    iisManager.CommitChanges()
+                End Using
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex, "iisCreateWebsite")
+            End Try
+        End Sub
+        '        Private Static void CreateAppPool(String poolname,bool enable32bitOn64, ManagedPipelineMode mode,String runtimeVersion="v4.0")  
+        '{  
+        '    Using (ServerManager serverManager = New ServerManager())  
+        '    {  
+        '        ApplicationPool newPool = ServerManager.ApplicationPools.Add(poolname);  
+        '        newPool.ManagedRuntimeVersion = runtimeVersion;  
+        '        newPool.Enable32BitAppOnWin64 = true;  
+        '        newPool.ManagedPipelineMode = mode;  
+        '        serverManager.CommitChanges();  
+        '    }  
+        '}  
+
         '        '
         '        '=======================================================================================
         '        '   Register a dotnet assembly (only with interop perhaps)

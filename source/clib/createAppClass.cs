@@ -153,7 +153,7 @@ namespace  Contensive.Core {
                 using (CPClass cp = new CPClass(appName))
                 {
                     coreBuilderClass builder = new coreBuilderClass(cp.core);
-                    builder.web_addSite(appName, domainName, "\\", iisDefaultDoc);
+                    builder.web_addSite(appName, domainName, cp.core.serverConfig.appConfig.appRootFilesPath, iisDefaultDoc);
                     //if (domainName != cdnDomainName)
                     //{
                     //    builder.web_addSite(appName, cdnDomainName, "\\", iisDefaultDoc);

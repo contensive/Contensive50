@@ -17,7 +17,7 @@
     <AssemblyName>jay4-MeetingManager</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <MyType>Custom</MyType>
-    <UseIISExpress>true</UseIISExpress>
+    <UseIISExpress>false</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
@@ -175,7 +175,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>26158</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:26158/</IISUrl>
+          <IISUrl>http://localhost/wwwRoot</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
