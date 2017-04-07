@@ -5,25 +5,14 @@ Option Strict On
 Imports System.Runtime.InteropServices
 
 Namespace Contensive.Core
-    '
-    ' comVisible to be activeScript compatible
-    '
-    <ComVisible(True)> _
-    <ComClass(CPAddonClass.ClassId, CPAddonClass.InterfaceId, CPAddonClass.EventsId)> _
     Public Class CPAddonClass
         Inherits BaseClasses.CPAddonBaseClass
         Implements IDisposable
         '
-#Region "COM GUIDs"
-        Public Const ClassId As String = "6F43E5CA-6367-475C-AE65-FC988234922A"
-        Public Const InterfaceId As String = "440D19E3-47A9-4CA2-B20C-077221015525"
-        Public Const EventsId As String = "70B800AA-148A-4338-9EDB-70C85E1ADBDD"
-#End Region
-        '
         Private cp As CPClass
         Private Property UpgradeOK As Boolean
         '
-        public Sub New(ByVal cp As CPClass)
+        Public Sub New(ByVal cp As CPClass)
             MyBase.New()
             Me.cp = cp
         End Sub

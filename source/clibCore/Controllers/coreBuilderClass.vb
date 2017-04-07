@@ -5,7 +5,7 @@ Option Strict On
 Imports System.Xml
 Imports Microsoft.Web.Administration
 '
-Namespace Contensive.Core
+Namespace Contensive.Core.Controllers
     '
     '====================================================================================================
     ''' <summary>
@@ -23,40 +23,17 @@ Namespace Contensive.Core
         '
         ' ----- objects passed in constructor
         '
-        Private cpCore As coreClass
+        'Private cpCore As coreClass
+        ''
+        '' ----- constants
+        ''
+        'Private Const UpgradeErrorTheshold As Integer = 100
+        ''
+        '' ----- shared globals
+        ''
+        'Friend classLogFolder As String                    ' the folder for logging errors. default="Upgrade", AddonInstall can change it
         '
-        ' ----- constants
-        '
-        Private Const UpgradeErrorTheshold As Integer = 100
-        '
-        ' ----- shared globals
-        '
-        Friend classLogFolder As String                    ' the folder for logging errors. default="Upgrade", AddonInstall can change it
-        '
-        ' ----- private globals
-        '
-        Private ApplicationCollectionLoaded As Boolean
-        Private UpgradeErrorCount As Integer
-        Private StepCount As Integer
-        Private AddonInstallNeeded As Boolean
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' constructor
-        ''' </summary>
-        ''' <param name="cp"></param>
-        ''' <remarks></remarks>
-        Public Sub New(cpCore As coreClass)
-            MyBase.New()
-            Me.cpCore = cpCore
-            classLogFolder = "Upgrade"
-            ApplicationCollectionLoaded = False
-            UpgradeErrorCount = 0
-            StepCount = 0
-            AddonInstallNeeded = False
-        End Sub
-        '
-        Private Function web_existsSite(appName As String) As Boolean
+        Private Shared Function web_existsSite(cpCore As coreClass, appName As String) As Boolean
             Try
                 Dim returnExists As Boolean = False
                 Dim serverManager As New ServerManager
@@ -77,50 +54,18 @@ Namespace Contensive.Core
         ' Create a site and add two bindings, the domain and a 127.0.0.1 for the appName
         ' -------------------------------------------------------------------
         '
-        Public Sub web_addSite(ByVal appName As String, ByVal DomainName As String, ByVal rootPublicFilesPath As String, ByVal defaultDocOrBlank As String)
+        Public Shared Sub web_addSite(cpCore As coreClass, ByVal appName As String, ByVal DomainName As String, ByVal rootPublicFilesPath As String, ByVal defaultDocOrBlank As String)
             Try
-                'Dim mySite As Site
-                'Dim newPool As ApplicationPool
-                'Dim bindinginformation As String
-                '
-                If Not web_existsSite(appName) Then
-                    '
-                    iisCreateAppPool(appName)
-                    iisCreateWebsite(appName, DomainName, rootPublicFilesPath, appName)
-                    'Using iisManager As ServerManager = New ServerManager()
-                    '    cpCore.appRootFiles.saveFile("deleteMe.txt", "Temp document to create path")
-                    '    cpCore.appRootFiles.deleteFile("deleteMe.txt")
-                    '    bindinginformation = "*:80:" & DomainName
-                    '    mySite = iisManager.Sites.Add(appName, "http", bindinginformation, cpCore.serverconfig.appConfig.appRootFilesPath)
-                    '    'mySite = iisManager.Sites.Add(appName, "http", bindinginformation, cpCore.serverConfig.clusterPath & cpCore.serverconfig.appConfig.appRootFilesPath)
-                    '    'iisManager.Sites.Item(0).)
-                    '    bindinginformation = "*:80:" & appName
-                    '    mySite.Bindings.Add(bindinginformation, "http")
-                    '    mySite.ServerAutoStart = True
-                    '    mySite.ApplicationDefaults.ApplicationPoolName = appName
-                    '    mySite.TraceFailedRequestsLogging.Enabled = True
-                    '    mySite.TraceFailedRequestsLogging.Directory = "C:\\inetpub\\"
-                    '    '
-                    '    newPool = iisManager.ApplicationPools.Add(appName)
-                    '    newPool.ManagedRuntimeVersion = "v4.0"
-                    '    newPool.Enable32BitAppOnWin64 = True
-                    '    '
-                    '    iisManager.CommitChanges()
-                    '    'If False Then
-                    '    '    '
-                    '    '    ' not sure why this fails, but the is already started.
-                    '    '    '
-                    '    '    iisSite = iisManager.Sites(siteName)
-                    '    '    iisSite.Start()
-                    '    'End If
-                    'End Using
+                If Not web_existsSite(cpCore, appName) Then
+                    iisCreateAppPool(cpCore, appName)
+                    iisCreateWebsite(cpCore, appName, DomainName, rootPublicFilesPath, appName)
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex, "web_addSite")
             End Try
         End Sub
         '
-        Private Sub iisCreateAppPool(poolName As String)
+        Private Shared Sub iisCreateAppPool(cpCore As coreClass, poolName As String)
             Try
                 Using serverManager As ServerManager = New ServerManager()
                     Dim newPool As ApplicationPool = serverManager.ApplicationPools.Add(poolName)
@@ -134,7 +79,7 @@ Namespace Contensive.Core
             End Try
         End Sub
         '
-        Private Sub iisCreateWebsite(appName As String, domainName As String, phyPath As String, appPool As String)
+        Private Shared Sub iisCreateWebsite(cpCore As coreClass, appName As String, domainName As String, phyPath As String, appPool As String)
             Try
 
                 Using iisManager As ServerManager = New ServerManager()
@@ -174,7 +119,7 @@ Namespace Contensive.Core
         '        '   This can be done using the command queue, which kicks off the ccCmd process from the Server
         '        '=======================================================================================
         '        '
-        '        Public Sub RegisterDotNet(ByVal FilePathFileName As String)
+        '        Public shared Sub RegisterDotNet(ByVal FilePathFileName As String)
         '            On Error GoTo ErrorTrap
         '            '
         '            Dim RegAsmFound As Boolean
@@ -287,7 +232,7 @@ Namespace Contensive.Core
         '        '
         '        cpNewApp = New CPClass(appName)
         '        builder = New builderClass(cpNewApp.core)
-        '        Call builder.upgrade(True)
+        '        Call builder.upgrade(cpcore,cpcore,True)
         '        Call cpNewApp.core.app.siteProperty_set(siteproperty_serverPageDefault_name, iisDefaultDoc)
         '        cpNewApp.Dispose()
         '    Catch ex As Exception
@@ -301,17 +246,9 @@ Namespace Contensive.Core
         '       Returns nothing if all OK, else returns an error message
         '=============================================================================================================
         '
-        Public Function importApp(ByVal siteName As String, ByVal IPAddress As String, ByVal DomainName As String, ByVal ODBCConnectionString As String, ByVal ContentFilesPath As String, ByVal WWWRootPath As String, ByVal defaultDoc As String, ByVal SMTPServer As String, ByVal AdminEmail As String) As String
+        Public Function importApp(cpCore As coreClass, ByVal siteName As String, ByVal IPAddress As String, ByVal DomainName As String, ByVal ODBCConnectionString As String, ByVal ContentFilesPath As String, ByVal WWWRootPath As String, ByVal defaultDoc As String, ByVal SMTPServer As String, ByVal AdminEmail As String) As String
             Dim returnMessage As String = ""
             Try
-                '
-                Dim Ready As Boolean
-                Dim WWWDestinationFolder As String
-                Dim Copy As String
-                Dim DSNFilename As String
-                Dim ProgramFilesPath As String
-                Dim WWWSourceFilename As String
-                '
                 If siteName = "" Then
                     importApp = "The application name was blank. It is required."
                 Else
@@ -363,13 +300,11 @@ Namespace Contensive.Core
                     '
                     ' Rebuild IIS Server
                     '
-                    Call web_addSite(siteName, DomainName, "\", defaultDoc)
+                    Call web_addSite(cpCore, siteName, DomainName, "\", defaultDoc)
                     '
                     ' Now wait here for site to start with upgrade
                     '
-
-                    Dim builder As New coreBuilderClass(cpCore)
-                    Call builder.upgrade(False)
+                    Call upgrade(cpCore, False)
                     importApp = ""
                 End If
             Catch ex As Exception
@@ -382,7 +317,7 @@ Namespace Contensive.Core
         ''   Init()
         ''========================================================================
         ''
-        'Public Sub Init(appservicesObj As cpCoreClass)
+        'Public shared Sub Init(appservicesObj As cpCoreClass)
         '    appservices = appservicesObj
         '    On Error GoTo ErrorTrap
         '    '
@@ -403,13 +338,13 @@ Namespace Contensive.Core
         ''
         ''=========================================================================
         ''
-        'Public Sub Upgrade()
+        'Public shared Sub Upgrade()
         '    '
         '    ' deprecated call
         '    '
         '    Call Upgrade2( "index.php")
         'End Sub
-        'Public Sub upgrade(ByVal appName As String, ByVal clusterServices As clusterServicesClass, isNewSite As Boolean)
+        'Public shared Sub upgrade(ByVal appName As String, ByVal clusterServices As clusterServicesClass, isNewSite As Boolean)
         '    Dim appservices As New appServicesClass(appName, clusterServices)
         '    If Not cpcore.app.config.enabled Then
         '        Call Upgrade2( isNewSite)
@@ -422,7 +357,7 @@ Namespace Contensive.Core
         ' upgrade
         '=========================================================================
         '
-        Public Sub upgrade(isNewBuild As Boolean)
+        Public Shared Sub upgrade(cpcore As coreClass, isNewBuild As Boolean)
             Try
                 Dim addonInstallOk As Boolean
                 Dim UpgradeOK As Boolean
@@ -440,9 +375,9 @@ Namespace Contensive.Core
                 Dim IISResetRequired As Boolean
                 'Dim RegisterList As String
                 Dim ErrorMessage As String
-                Dim XMLTools As New coreXmlToolsClass(cpCore)
+                Dim XMLTools As New coreXmlToolsClass(cpcore)
                 'Dim SiteBuilder As New builderClass(cpCore)
-                Dim addonInstall As New coreAddonInstallClass(cpCore)
+                Dim addonInstall As New coreAddonInstallClass(cpcore)
                 Dim StyleSN As Integer
                 Dim Doc As XmlDocument
                 Dim DataBuildVersion As String
@@ -455,20 +390,20 @@ Namespace Contensive.Core
                 ' ----- verify upgrade is not already in progress
                 '---------------------------------------------------------------------
                 '
-                If cpCore.upgradeInProgress Then
+                If cpcore.upgradeInProgress Then
                     Call Err.Raise(ignoreInteger, "ccCSv", ignoreString)
                 Else
-                    cpCore.upgradeInProgress = True
+                    cpcore.upgradeInProgress = True
                     '
                     '---------------------------------------------------------------------
                     '   Verify core table fields (DataSources, Content Tables, Content, Content Fields, Setup, Sort Methods)
                     '   Then other basic system ops work, like site properties
                     '---------------------------------------------------------------------
                     '
-                    Call appendUpgradeLog("VerifyCoreTables...")
-                    Call VerifyCoreTables()
-                    DataBuildVersion = cpCore.siteProperties.dataBuildVersion
-                    Call appendUpgradeLog("Upgrade, isNewBuild=[" & isNewBuild & "], data buildVersion=[" & DataBuildVersion & "], code buildVersion=[" & cpCore.common_version & "]")
+                    Call appendUpgradeLog(cpcore, "VerifyCoreTables...")
+                    Call VerifyCoreTables(cpcore)
+                    DataBuildVersion = cpcore.siteProperties.dataBuildVersion
+                    Call appendUpgradeLog(cpcore, "Upgrade, isNewBuild=[" & isNewBuild & "], data buildVersion=[" & DataBuildVersion & "], code buildVersion=[" & cpcore.common_version & "]")
                     '
                     '---------------------------------------------------------------------
                     ' ----- build/verify Content Definitions
@@ -476,7 +411,7 @@ Namespace Contensive.Core
                     '
                     ' Update the Db Content from CDef Files
                     '
-                    Call appendUpgradeLog("UpgradeCDef...")
+                    Call appendUpgradeLog(cpcore, "UpgradeCDef...")
                     Call addonInstall.installBaseCollection(isNewBuild)
                     '
                     '---------------------------------------------------------------------
@@ -484,13 +419,13 @@ Namespace Contensive.Core
                     '---------------------------------------------------------------------
                     '
                     If isNewBuild Then
-                        cpCore.siteProperties.setProperty("publicFileContentPathPrefix", "/contentFiles/")
+                        cpcore.siteProperties.setProperty("publicFileContentPathPrefix", "/contentFiles/")
                         '
                         ' add the root developer
                         '
                         Dim cid As Integer
-                        cid = cpCore.db.getContentId("people")
-                        dt = cpCore.db.executeSql("select id from ccmembers where (Developer<>0)")
+                        cid = cpcore.db.getContentId("people")
+                        dt = cpcore.db.executeSql("select id from ccmembers where (Developer<>0)")
                         If dt.Rows.Count = 0 Then
                             SQL = "" _
                                 & "insert into ccmembers" _
@@ -499,29 +434,29 @@ Namespace Contensive.Core
                                 & "" _
                                 & "" _
                                 & ""
-                            cpCore.db.executeSql(SQL)
+                            cpcore.db.executeSql(SQL)
                         End If
                         '
                         ' Copy default styles into Template Styles
                         '
-                        Call cpCore.appRootFiles.copyFile("ccLib\Config\Styles.css", "Templates\Styles.css")
+                        Call cpcore.appRootFiles.copyFile("ccLib\Config\Styles.css", "Templates\Styles.css")
                         '
                         ' set build version so a scratch build will not go through data conversion
                         '
-                        DataBuildVersion = cpCore.common_version()
-                        Call cpCore.siteProperties.setProperty("BuildVersion", cpCore.common_version)
-                        cpCore.siteProperties._dataBuildVersion_Loaded = False
+                        DataBuildVersion = cpcore.common_version()
+                        Call cpcore.siteProperties.setProperty("BuildVersion", cpcore.common_version)
+                        cpcore.siteProperties._dataBuildVersion_Loaded = False
                     End If
                     '
                     '---------------------------------------------------------------------
                     ' ----- Upgrade Database fields if not new
                     '---------------------------------------------------------------------
                     '
-                    If DataBuildVersion < cpCore.common_version() Then
+                    If DataBuildVersion < cpcore.common_version() Then
                         '
-                        Call appendUpgradeLog("Calling database conversion, DataBuildVersion [" & DataBuildVersion & "], software version [" & cpCore.common_version() & "]")
+                        Call appendUpgradeLog(cpcore, "Calling database conversion, DataBuildVersion [" & DataBuildVersion & "], software version [" & cpcore.common_version() & "]")
                         '
-                        Call Upgrade_Conversion(DataBuildVersion)
+                        Call Upgrade_Conversion(cpcore, DataBuildVersion)
                     End If
                     '
                     '---------------------------------------------------------------------
@@ -529,20 +464,17 @@ Namespace Contensive.Core
                     '---------------------------------------------------------------------
                     '
                     If True Then
-                        Call appendUpgradeLog("Verify records required")
+                        Call appendUpgradeLog(cpcore, "Verify records required")
                         '
                         ' ##### menus are created in ccBase.xml, this just checks for dups
-                        Call VerifyAdminMenus(DataBuildVersion)
-                        Call VerifyLanguageRecords()
-                        Call VerifyCountries()
-                        Call VerifyStates()
-                        Call VerifyLibraryFolders()
-                        Call VerifyLibraryFileTypes()
-                        'Call VerifyContentWatchLists()
-                        Call VerifyDefaultGroups()
-                        Call VerifyScriptingRecords()
-                        ' yoo nych rewrite
-                        'Call cpcore.app.csv_VerifyDynamicMenu("Default")
+                        Call VerifyAdminMenus(cpcore, DataBuildVersion)
+                        Call VerifyLanguageRecords(cpcore)
+                        Call VerifyCountries(cpcore)
+                        Call VerifyStates(cpcore)
+                        Call VerifyLibraryFolders(cpcore)
+                        Call VerifyLibraryFileTypes(cpcore)
+                        Call VerifyDefaultGroups(cpcore)
+                        Call VerifyScriptingRecords(cpcore)
                     End If
                     '
                     '---------------------------------------------------------------------
@@ -551,7 +483,7 @@ Namespace Contensive.Core
                     '---------------------------------------------------------------------
                     '
                     If True Then
-                        Call appendUpgradeLog("Verify Site Properties")
+                        Call appendUpgradeLog(cpcore, "Verify Site Properties")
                         '
                         ' 20151204 - no - on new builds, set the site property after the builder.
                         '' 4.1.575 - 8/28 - fixes problem where new sites have no defaultDoc ( and therefor no AdminUrl)
@@ -575,47 +507,47 @@ Namespace Contensive.Core
                         '    Call cpCore.app.siteProperty_set(siteproperty_serverPageDefault_name, defaultDoc)
                         'End If
                         '
-                        Copy = cpCore.siteProperties.getText("AllowAutoHomeSectionOnce", EncodeText(isNewBuild))
-                        Copy = cpCore.siteProperties.getText("AllowAutoLogin", "False")
-                        Copy = cpCore.siteProperties.getText("AllowBake", "True")
-                        Copy = cpCore.siteProperties.getText("AllowChildMenuHeadline", "True")
-                        Copy = cpCore.siteProperties.getText("AllowContentAutoLoad", "True")
-                        Copy = cpCore.siteProperties.getText("AllowContentSpider", "False")
-                        Copy = cpCore.siteProperties.getText("AllowContentWatchLinkUpdate", "True")
-                        Copy = cpCore.siteProperties.getText("AllowDuplicateUsernames", "False")
-                        Copy = cpCore.siteProperties.getText("ConvertContentText2HTML", "False")
-                        Copy = cpCore.siteProperties.getText("AllowMemberJoin", "False")
-                        Copy = cpCore.siteProperties.getText("AllowPasswordEmail", "True")
-                        Copy = cpCore.siteProperties.getText("AllowPathBlocking", "True")
-                        Copy = cpCore.siteProperties.getText("AllowPopupErrors", "True")
-                        Copy = cpCore.siteProperties.getText("AllowTestPointLogging", "False")
-                        Copy = cpCore.siteProperties.getText("AllowTestPointPrinting", "False")
-                        Copy = cpCore.siteProperties.getText("AllowTransactionLog", "False")
-                        Copy = cpCore.siteProperties.getText("AllowTrapEmail", "True")
-                        Copy = cpCore.siteProperties.getText("AllowTrapLog", "True")
-                        Copy = cpCore.siteProperties.getText("AllowWorkflowAuthoring", "False")
-                        Copy = cpCore.siteProperties.getText("ArchiveAllowFileClean", "False")
-                        Copy = cpCore.siteProperties.getText("ArchiveRecordAgeDays", "90")
-                        Copy = cpCore.siteProperties.getText("ArchiveTimeOfDay", "2:00:00 AM")
-                        Copy = cpCore.siteProperties.getText("BreadCrumbDelimiter", "&nbsp;&gt;&nbsp;")
-                        Copy = cpCore.siteProperties.getText("CalendarYearLimit", "1")
-                        Copy = cpCore.siteProperties.getText("ContentPageCompatibility21", "false")
-                        Copy = cpCore.siteProperties.getText("DefaultFormInputHTMLHeight", "500")
-                        Copy = cpCore.siteProperties.getText("DefaultFormInputTextHeight", "1")
-                        Copy = cpCore.siteProperties.getText("DefaultFormInputWidth", "60")
-                        Copy = cpCore.siteProperties.getText("EditLockTimeout", "5")
-                        Copy = cpCore.siteProperties.getText("EmailAdmin", "webmaster@" & cpCore.serverconfig.appConfig.domainList(0))
-                        Copy = cpCore.siteProperties.getText("EmailFromAddress", "webmaster@" & cpCore.serverconfig.appConfig.domainList(0))
-                        Copy = cpCore.siteProperties.getText("EmailPublishSubmitFrom", "webmaster@" & cpCore.serverconfig.appConfig.domainList(0))
-                        Copy = cpCore.siteProperties.getText("Language", "English")
-                        Copy = cpCore.siteProperties.getText("PageContentMessageFooter", "Copyright " & cpCore.serverconfig.appConfig.domainList(0))
-                        Copy = cpCore.siteProperties.getText("SelectFieldLimit", "4000")
-                        Copy = cpCore.siteProperties.getText("SelectFieldWidthLimit", "100")
-                        Copy = cpCore.siteProperties.getText("SMTPServer", "127.0.0.1")
-                        Copy = cpCore.siteProperties.getText("TextSearchEndTag", "<!-- TextSearchEnd -->")
-                        Copy = cpCore.siteProperties.getText("TextSearchStartTag", "<!-- TextSearchStart -->")
-                        Copy = cpCore.siteProperties.getText("TrapEmail", "")
-                        Copy = cpCore.siteProperties.getText("TrapErrors", "0")
+                        Copy = cpcore.siteProperties.getText("AllowAutoHomeSectionOnce", EncodeText(isNewBuild))
+                        Copy = cpcore.siteProperties.getText("AllowAutoLogin", "False")
+                        Copy = cpcore.siteProperties.getText("AllowBake", "True")
+                        Copy = cpcore.siteProperties.getText("AllowChildMenuHeadline", "True")
+                        Copy = cpcore.siteProperties.getText("AllowContentAutoLoad", "True")
+                        Copy = cpcore.siteProperties.getText("AllowContentSpider", "False")
+                        Copy = cpcore.siteProperties.getText("AllowContentWatchLinkUpdate", "True")
+                        Copy = cpcore.siteProperties.getText("AllowDuplicateUsernames", "False")
+                        Copy = cpcore.siteProperties.getText("ConvertContentText2HTML", "False")
+                        Copy = cpcore.siteProperties.getText("AllowMemberJoin", "False")
+                        Copy = cpcore.siteProperties.getText("AllowPasswordEmail", "True")
+                        Copy = cpcore.siteProperties.getText("AllowPathBlocking", "True")
+                        Copy = cpcore.siteProperties.getText("AllowPopupErrors", "True")
+                        Copy = cpcore.siteProperties.getText("AllowTestPointLogging", "False")
+                        Copy = cpcore.siteProperties.getText("AllowTestPointPrinting", "False")
+                        Copy = cpcore.siteProperties.getText("AllowTransactionLog", "False")
+                        Copy = cpcore.siteProperties.getText("AllowTrapEmail", "True")
+                        Copy = cpcore.siteProperties.getText("AllowTrapLog", "True")
+                        Copy = cpcore.siteProperties.getText("AllowWorkflowAuthoring", "False")
+                        Copy = cpcore.siteProperties.getText("ArchiveAllowFileClean", "False")
+                        Copy = cpcore.siteProperties.getText("ArchiveRecordAgeDays", "90")
+                        Copy = cpcore.siteProperties.getText("ArchiveTimeOfDay", "2:00:00 AM")
+                        Copy = cpcore.siteProperties.getText("BreadCrumbDelimiter", "&nbsp;&gt;&nbsp;")
+                        Copy = cpcore.siteProperties.getText("CalendarYearLimit", "1")
+                        Copy = cpcore.siteProperties.getText("ContentPageCompatibility21", "false")
+                        Copy = cpcore.siteProperties.getText("DefaultFormInputHTMLHeight", "500")
+                        Copy = cpcore.siteProperties.getText("DefaultFormInputTextHeight", "1")
+                        Copy = cpcore.siteProperties.getText("DefaultFormInputWidth", "60")
+                        Copy = cpcore.siteProperties.getText("EditLockTimeout", "5")
+                        Copy = cpcore.siteProperties.getText("EmailAdmin", "webmaster@" & cpcore.serverConfig.appConfig.domainList(0))
+                        Copy = cpcore.siteProperties.getText("EmailFromAddress", "webmaster@" & cpcore.serverConfig.appConfig.domainList(0))
+                        Copy = cpcore.siteProperties.getText("EmailPublishSubmitFrom", "webmaster@" & cpcore.serverConfig.appConfig.domainList(0))
+                        Copy = cpcore.siteProperties.getText("Language", "English")
+                        Copy = cpcore.siteProperties.getText("PageContentMessageFooter", "Copyright " & cpcore.serverConfig.appConfig.domainList(0))
+                        Copy = cpcore.siteProperties.getText("SelectFieldLimit", "4000")
+                        Copy = cpcore.siteProperties.getText("SelectFieldWidthLimit", "100")
+                        Copy = cpcore.siteProperties.getText("SMTPServer", "127.0.0.1")
+                        Copy = cpcore.siteProperties.getText("TextSearchEndTag", "<!-- TextSearchEnd -->")
+                        Copy = cpcore.siteProperties.getText("TextSearchStartTag", "<!-- TextSearchStart -->")
+                        Copy = cpcore.siteProperties.getText("TrapEmail", "")
+                        Copy = cpcore.siteProperties.getText("TrapErrors", "0")
                     End If
                     '
                     '---------------------------------------------------------------------
@@ -623,10 +555,10 @@ Namespace Contensive.Core
                     '---------------------------------------------------------------------
 
                     '
-                    StyleSN = (cpCore.siteProperties.getinteger("StylesheetSerialNumber"))
+                    StyleSN = (cpcore.siteProperties.getinteger("StylesheetSerialNumber"))
                     If StyleSN > 0 Then
                         StyleSN = StyleSN + 1
-                        Call cpCore.siteProperties.setProperty("StylesheetSerialNumber", CStr(StyleSN))
+                        Call cpcore.siteProperties.setProperty("StylesheetSerialNumber", CStr(StyleSN))
                         ' too lazy
                         'Call cpcore.app.publicFiles.SaveFile(cpcore.app.csv_getPhysicalFilename("templates\Public" & StyleSN & ".css"), cpcore.app.csv_getStyleSheetProcessed)
                         'Call cpcore.app.publicFiles.SaveFile(cpcore.app.csv_getPhysicalFilename("templates\Admin" & StyleSN & ".css", cpcore.app.csv_getStyleSheetDefault)
@@ -634,16 +566,16 @@ Namespace Contensive.Core
                     '
                     ' clear all cache
                     '
-                    Call cpCore.cache.invalidateAll()
+                    Call cpcore.cache.invalidateAll()
                     '
                     '---------------------------------------------------------------------
                     ' ----- internal upgrade complete
                     '---------------------------------------------------------------------
                     '
                     If True Then
-                        Call appendUpgradeLog("Internal upgrade complete, set Buildversion to " & cpCore.common_version)
-                        Call cpCore.siteProperties.setProperty("BuildVersion", cpCore.common_version)
-                        cpCore.siteProperties._dataBuildVersion_Loaded = False
+                        Call appendUpgradeLog(cpcore, "Internal upgrade complete, set Buildversion to " & cpcore.common_version)
+                        Call cpcore.siteProperties.setProperty("BuildVersion", cpcore.common_version)
+                        cpcore.siteProperties._dataBuildVersion_Loaded = False
                         '
                         '---------------------------------------------------------------------
                         ' ----- Upgrade local collections
@@ -659,21 +591,19 @@ Namespace Contensive.Core
                             '
                             ErrorMessage = ""
                             'RegisterList = ""
-                            Call appendUpgradeLog("Upgrading All Local Collections to new server build.")
-                            saveLogFolder = classLogFolder
+                            Call appendUpgradeLog(cpcore, "Upgrading All Local Collections to new server build.")
                             UpgradeOK = addonInstall.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(ErrorMessage, "", IISResetRequired, isNewBuild)
-                            classLogFolder = saveLogFolder
                             If ErrorMessage <> "" Then
-                                cpCore.handleLegacyError3(cpCore.serverconfig.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
+                                cpcore.handleLegacyError3(cpcore.serverConfig.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             ElseIf Not UpgradeOK Then
-                                cpCore.handleLegacyError3(cpCore.serverconfig.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, NotOK was returned without an error message", "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
+                                cpcore.handleLegacyError3(cpcore.serverConfig.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, NotOK was returned without an error message", "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             End If
                             ''
                             ''---------------------------------------------------------------------
                             '' ----- Upgrade collections added during upgrade process
                             ''---------------------------------------------------------------------
                             ''
-                            'Call appendUpgradeLog("Installing Add-on Collections gathered during upgrade")
+                            'Call appendUpgradeLog(cpcore, "Installing Add-on Collections gathered during upgrade")
                             'If InstallCollectionList = "" Then
                             '    Call appendUpgradeLog(cpCore.app.config.name, MethodName, "No Add-on collections added during upgrade")
                             'Else
@@ -717,23 +647,23 @@ Namespace Contensive.Core
                             Dim Collectionname As String
                             Dim CollectionGuid As String
                             Dim localCollectionFound As Boolean
-                            Call appendUpgradeLog("Checking all installed collections for upgrades from Collection Library")
-                            Call appendUpgradeLog("...Open collectons.xml")
+                            Call appendUpgradeLog(cpcore, "Checking all installed collections for upgrades from Collection Library")
+                            Call appendUpgradeLog(cpcore, "...Open collectons.xml")
                             Try
                                 Doc = New XmlDocument
                                 Call Doc.LoadXml(addonInstall.getCollectionListFile)
                                 If True Then
                                     If vbLCase(Doc.DocumentElement.Name) <> vbLCase(CollectionListRootNode) Then
-                                        cpCore.handleLegacyError3(cpCore.serverconfig.appConfig.name, "Error loading Collection config file. The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.", "dll", "builderClass", "Upgrade", 0, "", "", False, True, "")
+                                        cpcore.handleLegacyError3(cpcore.serverConfig.appConfig.name, "Error loading Collection config file. The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.", "dll", "builderClass", "Upgrade", 0, "", "", False, True, "")
                                     Else
                                         With Doc.DocumentElement
                                             If vbLCase(.Name) = "collectionlist" Then
                                                 '
                                                 ' now go through each collection in this app and check the last updated agains the one here
                                                 '
-                                                Call appendUpgradeLog("...Open site collectons, iterate through all collections")
+                                                Call appendUpgradeLog(cpcore, "...Open site collectons, iterate through all collections")
                                                 'Dim dt As DataTable
-                                                dt = cpCore.db.executeSql("select * from ccaddoncollections where (ccguid is not null)and(updatable<>0)")
+                                                dt = cpcore.db.executeSql("select * from ccaddoncollections where (ccguid is not null)and(updatable<>0)")
                                                 If dt.Rows.Count > 0 Then
                                                     Dim rowptr As Integer
                                                     For rowptr = 0 To dt.Rows.Count - 1
@@ -741,7 +671,7 @@ Namespace Contensive.Core
                                                         ErrorMessage = ""
                                                         CollectionGuid = vbLCase(dt.Rows(rowptr).Item("ccguid").ToString)
                                                         Collectionname = dt.Rows(rowptr).Item("name").ToString
-                                                        Call appendUpgradeLog("...checking collection [" & Collectionname & "], guid [" & CollectionGuid & "]")
+                                                        Call appendUpgradeLog(cpcore, "...checking collection [" & Collectionname & "], guid [" & CollectionGuid & "]")
                                                         If CollectionGuid <> "{7c6601a7-9d52-40a3-9570-774d0d43d758}" Then
                                                             '
                                                             ' upgrade all except base collection from the local collections
@@ -754,7 +684,7 @@ Namespace Contensive.Core
                                                                 ' app version has no lastchangedate
                                                                 '
                                                                 upgradeCollection = True
-                                                                Call appendUpgradeLog(cpCore.serverconfig.appConfig.name, MethodName, "Upgrading collection " & dt.Rows(rowptr).Item("name").ToString & " because the collection installed in the application has no LastChangeDate. It may have been installed manually.")
+                                                                Call appendUpgradeLog(cpcore, cpcore.serverConfig.appConfig.name, MethodName, "Upgrading collection " & dt.Rows(rowptr).Item("name").ToString & " because the collection installed in the application has no LastChangeDate. It may have been installed manually.")
                                                             Else
                                                                 '
                                                                 ' compare to last change date in collection config file
@@ -777,10 +707,10 @@ Namespace Contensive.Core
                                                                     End Select
                                                                     If CollectionGuid = vbLCase(LocalGuid) Then
                                                                         localCollectionFound = True
-                                                                        Call appendUpgradeLog("...local collection found")
+                                                                        Call appendUpgradeLog(cpcore, "...local collection found")
                                                                         If LocalLastChangeDate <> Date.MinValue Then
                                                                             If LocalLastChangeDate > LastChangeDate Then
-                                                                                Call appendUpgradeLog(cpCore.serverconfig.appConfig.name, MethodName, "Upgrading collection " & dt.Rows(rowptr).Item("name").ToString() & " because the collection in the local server store has a newer LastChangeDate than the collection installed on this application.")
+                                                                                Call appendUpgradeLog(cpcore, cpcore.serverConfig.appConfig.name, MethodName, "Upgrading collection " & dt.Rows(rowptr).Item("name").ToString() & " because the collection in the local server store has a newer LastChangeDate than the collection installed on this application.")
                                                                                 upgradeCollection = True
                                                                             End If
                                                                         End If
@@ -790,21 +720,18 @@ Namespace Contensive.Core
                                                             End If
                                                             ErrorMessage = ""
                                                             If Not localCollectionFound Then
-                                                                Call appendUpgradeLog("...site collection [" & Collectionname & "] not found in local collection, call UpgradeAllAppsFromLibCollection2 to install it.")
+                                                                Call appendUpgradeLog(cpcore, "...site collection [" & Collectionname & "] not found in local collection, call UpgradeAllAppsFromLibCollection2 to install it.")
                                                                 addonInstallOk = addonInstall.installCollectionFromRemoteRepo(CollectionGuid, ErrorMessage, "", isNewBuild)
-                                                                classLogFolder = saveLogFolder
                                                                 If Not addonInstallOk Then
                                                                     '
                                                                     ' this may be OK so log, but do not call it an error
                                                                     '
-                                                                    Call appendUpgradeLog("...site collection [" & Collectionname & "] not found in collection Library. It may be a custom collection just for this site. Collection guid [" & CollectionGuid & "]")
+                                                                    Call appendUpgradeLog(cpcore, "...site collection [" & Collectionname & "] not found in collection Library. It may be a custom collection just for this site. Collection guid [" & CollectionGuid & "]")
                                                                 End If
                                                             Else
                                                                 If upgradeCollection Then
-                                                                    Call appendUpgradeLog("...upgrading collection")
-                                                                    saveLogFolder = classLogFolder
-                                                                    Call addonInstall.installCollectionFromLocalRepo(CollectionGuid, cpCore.common_version, ErrorMessage, "", isNewBuild)
-                                                                    classLogFolder = saveLogFolder
+                                                                    Call appendUpgradeLog(cpcore, "...upgrading collection")
+                                                                    Call addonInstall.installCollectionFromLocalRepo(CollectionGuid, cpcore.common_version, ErrorMessage, "", isNewBuild)
                                                                 End If
                                                             End If
                                                         End If
@@ -816,7 +743,7 @@ Namespace Contensive.Core
                                 End If
 
                             Catch ex9 As Exception
-                                Call handleClassException(ex9, cpCore.serverconfig.appConfig.name, MethodName) ' "upgrade2")
+                                Call handleClassException(cpcore, ex9, cpcore.serverConfig.appConfig.name, MethodName) ' "upgrade2")
                             End Try
                             '
                             ' done
@@ -828,17 +755,17 @@ Namespace Contensive.Core
                     ' ----- Explain, put up a link and exit without continuing
                     '---------------------------------------------------------------------
                     '
-                    appendUpgradeLog("Upgrade Complete")
-                    cpCore.upgradeInProgress = False
+                    appendUpgradeLog(cpcore, "Upgrade Complete")
+                    cpcore.upgradeInProgress = False
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpcore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '        '
         '        ' ----- Rename a content definition to a new name
         '        '
-        '        Private Sub RenameContentDefinition(ByVal OldName As String, ByVal NewName As String)
+        '        private shared sub RenameContentDefinition(ByVal OldName As String, ByVal NewName As String)
 
         '            On Error GoTo ErrorTrap
         '            '
@@ -862,7 +789,7 @@ Namespace Contensive.Core
         '        '
         '        '
         '        '
-        '        Private Sub UpgradeSortOrder( ByVal DataSourceName As String, ByVal TableName As String)
+        '        private shared sub UpgradeSortOrder( ByVal DataSourceName As String, ByVal TableName As String)
         '            On Error GoTo ErrorTrap
         '            '
         '            Dim ErrorDescription As String
@@ -900,7 +827,7 @@ Namespace Contensive.Core
         '        ' ----- Returns true if the content field exists
         '        '=============================================================================
         '        '
-        '        Private Function ExistsSQLTableField(ByVal TableName As String, ByVal FieldName As String) As Boolean
+        '        Private shared Function ExistsSQLTableField(ByVal TableName As String, ByVal FieldName As String) As Boolean
         '            On Error GoTo ErrorTrap
         '            '
         '            Dim ErrorDescription As String
@@ -939,7 +866,7 @@ Namespace Contensive.Core
         '        '
         '        '
         '        '
-        '        Private Sub CreatePage( ByVal ContentName As String, ByVal PageName As String, ByVal PageCopy As String)
+        '        private shared sub CreatePage( ByVal ContentName As String, ByVal PageName As String, ByVal PageCopy As String)
         '            On Error GoTo ErrorTrap
         '            '
         '            Dim ErrorDescription As String
@@ -969,7 +896,7 @@ Namespace Contensive.Core
         '        '   Add the ccTable for version 3.0.300
         '        '==========================================================================================
         '        '
-        '        Private Sub PopulateTableTable()
+        '        private shared sub PopulateTableTable()
         '            On Error GoTo ErrorTrap
         '            '
         '            Dim ErrorDescription As String
@@ -1084,7 +1011,7 @@ Namespace Contensive.Core
         '        '
         '        ' ----- Upgrade to version 4.1.xxx
         '        '
-        '        Private Sub Upgrade_Conversion_to_41( ByVal DataBuildVersion As String)
+        '        private shared sub Upgrade_Conversion_to_41( ByVal DataBuildVersion As String)
         '            On Error GoTo ErrorTrap
         '            '
         '            Dim ErrMessage As String
@@ -1337,7 +1264,7 @@ Namespace Contensive.Core
         '        '
         '        ' ----- Delete unused fields from both the Content Definition and the Table
         '        '
-        '        Private Sub DeleteField( ByVal DataSourceName As String, ByVal TableName As String, ByVal FieldName As String)
+        '        private shared sub DeleteField( ByVal DataSourceName As String, ByVal TableName As String, ByVal FieldName As String)
         '            On Error GoTo ErrorTrap
         '            '
         '            Dim RSTables as datatable
@@ -1385,7 +1312,7 @@ Namespace Contensive.Core
         '        '   Returns TableID
         '        '       -1 if table not found
         '        '
-        '        Private Function GetTableID( ByVal TableName As String) As Integer
+        '        Private shared Function GetTableID( ByVal TableName As String) As Integer
         '            On Error GoTo ErrorTrap
         '            '
         '            Dim SQL As String
@@ -1407,7 +1334,7 @@ Namespace Contensive.Core
         '        '
         '        '
         '        '
-        '        Private Function core_group_add(ByVal GroupName As String) As Integer
+        '        Private shared Function core_group_add(ByVal GroupName As String) As Integer
         '            On Error GoTo ErrorTrap
         '            '
         '            Dim dt As DataTable
@@ -1439,7 +1366,7 @@ Namespace Contensive.Core
         '
         '
         '
-        Private Sub VerifyAdminMenus(ByVal DataBuildVersion As String)
+        Private Shared Sub VerifyAdminMenus(cpCore As coreClass, ByVal DataBuildVersion As String)
             Try
                 '
                 Dim MethodName As String
@@ -1483,7 +1410,7 @@ Namespace Contensive.Core
         '        '
         '        ' Get the Menu for FormInputHTML
         '        '
-        '        Private Sub VerifyEditorOptions()
+        '        private shared sub VerifyEditorOptions()
         '            On Error GoTo ErrorTrap
         '            '
         '            If Not (False) Then
@@ -1504,254 +1431,42 @@ Namespace Contensive.Core
         '
         ' Get the Menu for FormInputHTML
         '
-        Private Sub VerifyRecord(ByVal ContentName As String, ByVal Name As String, Optional ByVal CodeFieldName As String = "", Optional ByVal Code As String = "", Optional ByVal InActive As Boolean = False)
+        Private Shared Sub VerifyRecord(cpcore As coreClass, ByVal ContentName As String, ByVal Name As String, Optional ByVal CodeFieldName As String = "", Optional ByVal Code As String = "", Optional ByVal InActive As Boolean = False)
             Try
-                '
-                Dim CS As Integer
                 Dim Active As Boolean
                 Dim dt As DataTable
-                'Dim tableName As String
                 Dim sql1 As String
                 Dim sql2 As String
                 Dim sql3 As String
                 '
                 Active = Not InActive
-                'Dim createkey As Integer = GetRandomInteger()
-                Dim cdef As coreMetaDataClass.CDefClass = cpCore.metaData.getCdef(ContentName)
+                Dim cdef As coreMetaDataClass.CDefClass = cpcore.metaData.getCdef(ContentName)
                 Dim tableName As String = cdef.ContentTableName
                 Dim cid As Integer = cdef.Id
                 '
-                dt = cpCore.db.executeSql("SELECT ID FROM " & tableName & " WHERE NAME=" & cpCore.db.encodeSQLText(Name) & ";")
+                dt = cpcore.db.executeSql("SELECT ID FROM " & tableName & " WHERE NAME=" & cpcore.db.encodeSQLText(Name) & ";")
                 If dt.Rows.Count = 0 Then
-                    ' cid = GetContentID(ContentName)
-                    'tableName = cpcore.app.csv_GetContentTablename(ContentName)
                     sql1 = "insert into " & tableName & " (contentcontrolid,createkey,active,name"
-                    sql2 = ") values (" & cid & ",0," & cpCore.db.encodeSQLBoolean(Active) & "," & cpCore.db.encodeSQLText(Name)
+                    sql2 = ") values (" & cid & ",0," & cpcore.db.encodeSQLBoolean(Active) & "," & cpcore.db.encodeSQLText(Name)
                     sql3 = ")"
                     If CodeFieldName <> "" Then
                         sql1 &= "," & CodeFieldName
                         sql2 &= "," & Code
                     End If
-                    Call cpCore.db.executeSql(sql1 & sql2 & sql3)
+                    Call cpcore.db.executeSql(sql1 & sql2 & sql3)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpcore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
-        '        '
-        '        ' Get the Menu for FormInputHTML
-        '        '
-        '        Private Sub VerifyEditorOptions_FontFace()
-        '            On Error GoTo ErrorTrap
-        '            '
-        '            Dim CS As Integer
-        '            '
-        '            If Not (False) Then
-        '                CS = cpcore.app.csOpen("Editor Font Options", , "name", , , , , "ID")
-        '                If Not cpcore.app.csv_IsCSOK(CS) Then
-        '                    Call VerifyRecord( "Editor Font Options", "Arial", "Code", "Arial")
-        '                    Call VerifyRecord( "Editor Font Options", "Helvetica", "Code", "Helvetica")
-        '                    Call VerifyRecord( "Editor Font Options", "Verdana", "Code", "Verdana")
-        '                    Call VerifyRecord( "Editor Font Options", "Geneva", "Code", "Geneva")
-        '                End If
-        '                Call cpcore.app.csv_CloseCS(CS)
-        '            End If
-        '            '
-        '            Exit Sub
-        '            '
-        '            ' ----- Error Trap
-        '            '
-        'ErrorTrap:
-        '            Dim ex As New Exception("todo") : Call HandleClassError(ex, cpcore.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "VerifyEditorOptions_FontFace", True, True)
-        '        End Sub
-        '        '
-        '        ' Get the Menu for FormInputHTML
-        '        '
-        '        Private Sub VerifyEditorOptions_FontSize()
-        '            On Error GoTo ErrorTrap
-        '            '
-        '            Dim CS As Integer
-        '            '
-        '            If Not (False) Then
-        '                CS = cpcore.app.csOpen("Editor Font Size Options", , "name", , , , , "ID")
-        '                If Not cpcore.app.csv_IsCSOK(CS) Then
-        '                    Call VerifyRecord( "Editor Font Size Options", "Small (1)", "Code", "1")
-        '                    Call VerifyRecord( "Editor Font Size Options", "Normal (3)", "Code", "3")
-        '                    Call VerifyRecord( "Editor Font Size Options", "Large (5)", "Code", "5")
-        '                End If
-        '                Call cpcore.app.csv_CloseCS(CS)
-        '            End If
-        '            '
-        '            Exit Sub
-        '            '
-        '            ' ----- Error Trap
-        '            '
-        'ErrorTrap:
-        '            Dim ex As New Exception("todo") : Call HandleClassError(ex, cpcore.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "VerifyEditorOptions_FontSize", True, True)
-        '        End Sub
-        '        '
-        '        ' Get the Menu for FormInputHTML
-        '        '
-        '        Private Sub VerifyEditorOptions_FontColor()
-        '            On Error GoTo ErrorTrap
-        '            '
-        '            Dim CS As Integer
-        '            Dim ContentName As String
-        '            '
-        '            If Not (False) Then
-        '                ContentName = "Editor Font Color Options"
-        '                CS = cpcore.app.csOpen(ContentName, , "name", , , , , "ID")
-        '                If Not cpcore.app.csv_IsCSOK(CS) Then
-        '                    Call VerifyRecord( ContentName, "red", "Code", "#FF0000")
-        '                    Call VerifyRecord( ContentName, "green", "Code", "#00FF00")
-        '                    Call VerifyRecord( ContentName, "blue", "Code", "#0000FF")
-        '                End If
-        '                Call cpcore.app.csv_CloseCS(CS)
-        '            End If
-        '            '
-        '            Exit Sub
-        '            '
-        '            ' ----- Error Trap
-        '            '
-        'ErrorTrap:
-        '            Dim ex As New Exception("todo") : Call HandleClassError(ex, cpcore.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "VerifyEditorOptions_FontColor", True, True)
-        '        End Sub
-        '        '
-        '        ' Get the Menu for FormInputHTML
-        '        '
-        '        Private Sub VerifyEditorOptions_Paragraph()
-        '            On Error GoTo ErrorTrap
-        '            '
-        '            Dim CS As Integer
-        '            Dim ContentName As String
-        '            '
-        '            If Not (False) Then
-        '                ContentName = "Editor Paragraph Options"
-        '                CS = cpcore.app.csOpen(ContentName, , "name", , , , , "ID")
-        '                If Not cpcore.app.csv_IsCSOK(CS) Then
-        '                    Call VerifyRecord( ContentName, "Headline 1", "Code", "<H1>")
-        '                    Call VerifyRecord( ContentName, "Headline 2", "Code", "<H2>")
-        '                    Call VerifyRecord( ContentName, "Headline 3", "Code", "<H3>")
-        '                    Call VerifyRecord( ContentName, "Headline 4", "Code", "<H4>")
-        '                    Call VerifyRecord( ContentName, "Headline 5", "Code", "<H5>")
-        '                    Call VerifyRecord( ContentName, "Headline 6", "Code", "<H6>")
-        '                    Call VerifyRecord( ContentName, "Normal", "Code", "<P>")
-        '                    Call VerifyRecord( ContentName, "Preformatted", "Code", "<PRE>")
-        '                End If
-        '                Call cpcore.app.csv_CloseCS(CS)
-        '            End If
-        '            '
-        '            Exit Sub
-        '            '
-        '            ' ----- Error Trap
-        '            '
-        'ErrorTrap:
-        '            Dim ex As New Exception("todo") : Call HandleClassError(ex, cpcore.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "VerifyEditorOptions_Paragraph", True, True)
-        'End Sub
-        '        '
-        '        ' Get the Menu for FormInputHTML
-        '        '
-        '        Private Sub VerifyEditorOptions_Styles()
-        '            On Error GoTo ErrorTrap
-        '            '
-        '            Dim CS As Integer
-        '            '
-        '            If Not (False) Then
-        '                CS = cpcore.app.csOpen("Editor Style Options", , "name", , , , , "ID")
-        '                If Not cpcore.app.csv_IsCSOK(CS) Then
-        '                    Call VerifyRecord( "Editor Style Options", "Default", "Code", "default", True)
-        '                    Call VerifyRecord( "Editor Style Options", "ccSmall", "Code", "ccSmall", True)
-        '                    Call VerifyRecord( "Editor Style Options", "ccNormal", "Code", "ccNormal", True)
-        '                    Call VerifyRecord( "Editor Style Options", "ccLarge", "Code", "ccLarge", True)
-        '                    Call VerifyRecord( "Editor Style Options", "ccError", "Code", "ccError", True)
-        '                    Call VerifyRecord( "Editor Style Options", "ccHeadline", "Code", "ccHeadline", True)
-        '                End If
-        '                Call cpcore.app.csv_CloseCS(CS)
-        '            End If
-        '            '
-        '            Exit Sub
-        '            '
-        '            ' ----- Error Trap
-        '            '
-        'ErrorTrap:
-        '            Dim ex As New Exception("todo") : Call HandleClassError(ex, cpcore.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "VerifyEditorOptions_Styles", True, True)
-        '        End Sub
-        '        '
-        '        '========================================================================
-        '        '   Load content from an XML file
-        '        '========================================================================
-        '        '
-        '        public Sub VerifyXMLContentNode( ByVal ContentNode As XmlNode)
-        '            On Error GoTo ErrorTrap
-        '            '
-        '            Dim FieldCount As Integer
-        '            Dim FieldSize As Integer
-        '            ' converted array to dictionary - Dim FieldPointer As Integer
-        '            Dim Fields() As fieldTypePrivate
-        '            '
-        '            Dim XMLTools As New xmlToolsClass()
-        '            Dim FieldNode As XmlNode
-        '            Dim RecordNode As XmlNode
-        '            Dim CDefFieldsNode As XmlNode
-        '            Dim RowNode As XmlNode
-        '            'Dim FieldNode As XmlNode
-        '            '
-        '            Dim ContentName As String
-        '            Dim FieldName As String
-        '            Dim DataSourceName As String
-        '            Dim NodeAttribute As XmlAttribute
-        '            Dim SQL As String
-        '            Dim SQLDelimiter As String
-        '            Dim DataSourcePointer As Object
-        '            Dim DefaultValue As String
-        '            Dim Found As Boolean
-        '            '
-        '            ContentName = GetXMLAttribute( Found, ContentNode, "name", "")
-        '            '
-        '            Call appendUpgradeLogAddStep(cpcore.app.config.name,"VerifyXMLContentNode", "Load Content Records [" & ContentName & "]")
-        '            '
-        '            DataSourceName = GetXMLAttribute( Found, ContentNode, "dataSource", "Default")
-        '            'DataSourceName = GetXMLAttribute(Found, ContentNode, "dataSource")
-        '            'If DataSourceName = "" Then
-        '            '    DataSourceName = "Default"
-        '            '    End If
-        '            '
-        '            ' ----- load the definition
-        '            '
-        '            FieldSize = 0
-        '            FieldCount = 0
-        '            For Each RowNode In ContentNode.childNodes
-        '                '
-        '                ' ----- process rows
-        '                '
-        '                If vbUCase(RowNode.Name) = "ROW" Then
-        '                    For Each FieldNode In RowNode.ChildNodes
-        '                        If vbUCase(RowNode.Name) = "FIELD" Then
-        '                            Call VerifyRecord( ContentName, GetXMLAttribute( Found, RowNode, "name", ""), "CreateKey", "0")
-        '                        End If
-        '                    Next
-        '                End If
-        '            Next
-        '            '
-        '            Exit Sub
-        '            '
-        '            ' ----- Error Trap
-        '            '
-        'ErrorTrap:
-        '            Dim ex As New Exception("todo") : Call HandleClassError(ex, cpcore.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "VerifyXMLContentNode", True, True)
-        '            Resume Next
-        '        End Sub
         '
         '========================================================================
         ' ----- Upgrade Conversion
         '========================================================================
         '
-        Private Sub Upgrade_Conversion(ByVal DataBuildVersion As String)
+        Private Shared Sub Upgrade_Conversion(cpCore As coreClass, ByVal DataBuildVersion As String)
             Try
-                Dim dt As DataTable
                 Dim CID As Integer
-                Dim SQL As String
-                Dim rowPtr As Integer
                 '
                 '---------------------------------------------------------------------
                 '   moved from right after core table creation
@@ -1761,7 +1476,7 @@ Namespace Contensive.Core
                 '---------------------------------------------------------------------
                 '
                 If False Then
-                    Call appendUpgradeLogAddStep(cpCore.serverconfig.appConfig.name, "Upgrade_Conversion", "4.2.414, convert all ccaggregateFunctions to add-ons")
+                    Call appendUpgradeLogAddStep(cpCore, cpCore.serverConfig.appConfig.name, "Upgrade_Conversion", "4.2.414, convert all ccaggregateFunctions to add-ons")
                     '
                     ' remove all non add-on contentdefs for ccaggregatefunctions
                     '
@@ -1796,12 +1511,11 @@ Namespace Contensive.Core
         '
         '=========================================================================================
         '
-        Public Sub VerifyTableCoreFields()
+        Public Shared Sub VerifyTableCoreFields(cpCore As coreClass)
             Try
                 '
                 Dim IDVariant As Integer
                 Dim Active As Boolean
-                Dim TableName As String
                 Dim DataSourceName As String
                 Dim MethodName As String
                 Dim SQL As String
@@ -1810,7 +1524,7 @@ Namespace Contensive.Core
                 '
                 MethodName = "VerifyTableCoreFields"
                 '
-                Call appendUpgradeLogAddStep(cpCore.serverconfig.appConfig.name, MethodName, "Verify core fields in all tables registered in [Tables] content.")
+                Call appendUpgradeLogAddStep(cpCore, cpCore.serverConfig.appConfig.name, MethodName, "Verify core fields in all tables registered in [Tables] content.")
                 '
                 SQL = "SELECT ccDataSources.Name as DataSourceName, ccDataSources.ID as DataSourceID, ccDataSources.Active as DataSourceActive, ccTables.Name as TableName" _
                 & " FROM ccTables LEFT JOIN ccDataSources ON ccTables.DataSourceID = ccDataSources.ID" _
@@ -1841,13 +1555,13 @@ Namespace Contensive.Core
         '
         '=========================================================================================
         '
-        Public Sub VerifyScriptingRecords()
+        Public Shared Sub VerifyScriptingRecords(cpCore As coreClass)
             Try
                 '
-                Call appendUpgradeLogAddStep(cpCore.serverconfig.appConfig.name, "VerifyScriptingRecords", "Verify Scripting Records.")
+                Call appendUpgradeLogAddStep(cpCore, cpCore.serverConfig.appConfig.name, "VerifyScriptingRecords", "Verify Scripting Records.")
                 '
-                Call VerifyRecord("Scripting Languages", "VBScript", "", "")
-                Call VerifyRecord("Scripting Languages", "JScript", "", "")
+                Call VerifyRecord(cpCore, "Scripting Languages", "VBScript", "", "")
+                Call VerifyRecord(cpCore, "Scripting Languages", "JScript", "", "")
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -1857,15 +1571,15 @@ Namespace Contensive.Core
         '
         '=========================================================================================
         '
-        Public Sub VerifyLanguageRecords()
+        Public Shared Sub VerifyLanguageRecords(cpCore As coreClass)
             Try
                 '
-                Call appendUpgradeLogAddStep(cpCore.serverconfig.appConfig.name, "VerifyLanguageRecords", "Verify Language Records.")
+                Call appendUpgradeLogAddStep(cpCore, cpCore.serverConfig.appConfig.name, "VerifyLanguageRecords", "Verify Language Records.")
                 '
-                Call VerifyRecord("Languages", "English", "HTTP_Accept_Language", "'en'")
-                Call VerifyRecord("Languages", "Spanish", "HTTP_Accept_Language", "'es'")
-                Call VerifyRecord("Languages", "French", "HTTP_Accept_Language", "'fr'")
-                Call VerifyRecord("Languages", "Any", "HTTP_Accept_Language", "'any'")
+                Call VerifyRecord(cpCore, "Languages", "English", "HTTP_Accept_Language", "'en'")
+                Call VerifyRecord(cpCore, "Languages", "Spanish", "HTTP_Accept_Language", "'es'")
+                Call VerifyRecord(cpCore, "Languages", "French", "HTTP_Accept_Language", "'fr'")
+                Call VerifyRecord(cpCore, "Languages", "Any", "HTTP_Accept_Language", "'any'")
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -1873,18 +1587,16 @@ Namespace Contensive.Core
         '
         '   Verify Library Folder records
         '
-        Private Sub VerifyLibraryFolders()
+        Private Shared Sub VerifyLibraryFolders(cpCore As coreClass)
             Try
-                '
-                Dim CS As Integer
                 Dim dt As DataTable
                 '
-                Call appendUpgradeLogAddStep(cpCore.serverconfig.appConfig.name, "VerifyLibraryFolders", "Verify Library Folders: Images and Downloads")
+                Call appendUpgradeLogAddStep(cpCore, cpCore.serverConfig.appConfig.name, "VerifyLibraryFolders", "Verify Library Folders: Images and Downloads")
                 '
                 dt = cpCore.db.executeSql("select id from cclibraryfiles")
                 If dt.Rows.Count = 0 Then
-                    Call VerifyRecord("Library Folders", "Images")
-                    Call VerifyRecord("Library Folders", "Downloads")
+                    Call VerifyRecord(cpCore, "Library Folders", "Images")
+                    Call VerifyRecord(cpCore, "Library Folders", "Downloads")
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -1893,7 +1605,7 @@ Namespace Contensive.Core
         '        '
         '        '   Verify ContentWatchLists
         '        '
-        '        Private Sub VerifyContentWatchLists()
+        '        private shared sub VerifyContentWatchLists()
         '            On Error GoTo ErrorTrap
         '            '
         '            Dim CS As Integer
@@ -1922,7 +1634,7 @@ Namespace Contensive.Core
         ''
         ''=============================================================================
         ''
-        'Private Function VerifySurveyQuestionTypes() As Integer
+        'Private shared Function VerifySurveyQuestionTypes() As Integer
         '    Dim returnType As Integer = 0
         '    Try
         '        '
@@ -2004,7 +1716,7 @@ Namespace Contensive.Core
         '        '
         '        '=============================================================================
         '        '
-        '        Private Function DeleteAdminMenu(ByVal MenuName As String, ByVal ParentMenuName As String) As Integer
+        '        Private shared Function DeleteAdminMenu(ByVal MenuName As String, ByVal ParentMenuName As String) As Integer
         '            Dim returnAttr As String = ""
         '            Try
 
@@ -2036,7 +1748,7 @@ Namespace Contensive.Core
         '
         '=============================================================================
         '
-        Private Function GetIDBYName(ByVal TableName As String, ByVal RecordName As String) As Integer
+        Private Shared Function GetIDBYName(cpCore As coreClass, ByVal TableName As String, ByVal RecordName As String) As Integer
             Dim returnid As Integer = 0
             Try
                 '
@@ -2055,88 +1767,81 @@ Namespace Contensive.Core
         '
         '   Verify Library Folder records
         '
-        Private Sub VerifyLibraryFileTypes()
+        Private Shared Sub VerifyLibraryFileTypes(cpCore As coreClass)
             Try
                 '
-                Dim CS As Integer
-                Dim ContentID As Integer
-                Dim VerifyRecords As Boolean
+                ' Load basic records -- default images are handled in the REsource Library through the /ccLib/config/DefaultValues.txt GetDefaultValue(key) mechanism
                 '
-                If Not (False) Then
-                    '
-                    ' Load basic records -- default images are handled in the REsource Library through the /ccLib/config/DefaultValues.txt GetDefaultValue(key) mechanism
-                    '
-                    If cpCore.db.getRecordID("Library File Types", "Image") = 0 Then
-                        Call VerifyRecord("Library File Types", "Image", "ExtensionList", "'GIF,JPG,JPE,JPEG,BMP,PNG'", False)
-                        Call VerifyRecord("Library File Types", "Image", "IsImage", "1", False)
-                        Call VerifyRecord("Library File Types", "Image", "IsVideo", "0", False)
-                        Call VerifyRecord("Library File Types", "Image", "IsDownload", "1", False)
-                        Call VerifyRecord("Library File Types", "Image", "IsFlash", "0", False)
-                    End If
-                    '
-                    If cpCore.db.getRecordID("Library File Types", "Video") = 0 Then
-                        Call VerifyRecord("Library File Types", "Video", "ExtensionList", "'ASX,AVI,WMV,MOV,MPG,MPEG,MP4,QT,RM'", False)
-                        Call VerifyRecord("Library File Types", "Video", "IsImage", "0", False)
-                        Call VerifyRecord("Library File Types", "Video", "IsVideo", "1", False)
-                        Call VerifyRecord("Library File Types", "Video", "IsDownload", "1", False)
-                        Call VerifyRecord("Library File Types", "Video", "IsFlash", "0", False)
-                    End If
-                    '
-                    If cpCore.db.getRecordID("Library File Types", "Audio") = 0 Then
-                        Call VerifyRecord("Library File Types", "Audio", "ExtensionList", "'AIF,AIFF,ASF,CDA,M4A,M4P,MP2,MP3,MPA,WAV,WMA'", False)
-                        Call VerifyRecord("Library File Types", "Audio", "IsImage", "0", False)
-                        Call VerifyRecord("Library File Types", "Audio", "IsVideo", "0", False)
-                        Call VerifyRecord("Library File Types", "Audio", "IsDownload", "1", False)
-                        Call VerifyRecord("Library File Types", "Audio", "IsFlash", "0", False)
-                    End If
-                    '
-                    If cpCore.db.getRecordID("Library File Types", "Word") = 0 Then
-                        Call VerifyRecord("Library File Types", "Word", "ExtensionList", "'DOC'", False)
-                        Call VerifyRecord("Library File Types", "Word", "IsImage", "0", False)
-                        Call VerifyRecord("Library File Types", "Word", "IsVideo", "0", False)
-                        Call VerifyRecord("Library File Types", "Word", "IsDownload", "1", False)
-                        Call VerifyRecord("Library File Types", "Word", "IsFlash", "0", False)
-                    End If
-                    '
-                    If cpCore.db.getRecordID("Library File Types", "Flash") = 0 Then
-                        Call VerifyRecord("Library File Types", "Flash", "ExtensionList", "'SWF'", False)
-                        Call VerifyRecord("Library File Types", "Flash", "IsImage", "0", False)
-                        Call VerifyRecord("Library File Types", "Flash", "IsVideo", "0", False)
-                        Call VerifyRecord("Library File Types", "Flash", "IsDownload", "1", False)
-                        Call VerifyRecord("Library File Types", "Flash", "IsFlash", "1", False)
-                    End If
-                    '
-                    If cpCore.db.getRecordID("Library File Types", "PDF") = 0 Then
-                        Call VerifyRecord("Library File Types", "PDF", "ExtensionList", "'PDF'", False)
-                        Call VerifyRecord("Library File Types", "PDF", "IsImage", "0", False)
-                        Call VerifyRecord("Library File Types", "PDF", "IsVideo", "0", False)
-                        Call VerifyRecord("Library File Types", "PDF", "IsDownload", "1", False)
-                        Call VerifyRecord("Library File Types", "PDF", "IsFlash", "0", False)
-                    End If
-                    '
-                    If cpCore.db.getRecordID("Library File Types", "XLS") = 0 Then
-                        Call VerifyRecord("Library File Types", "Excel", "ExtensionList", "'XLS'", False)
-                        Call VerifyRecord("Library File Types", "Excel", "IsImage", "0", False)
-                        Call VerifyRecord("Library File Types", "Excel", "IsVideo", "0", False)
-                        Call VerifyRecord("Library File Types", "Excel", "IsDownload", "1", False)
-                        Call VerifyRecord("Library File Types", "Excel", "IsFlash", "0", False)
-                    End If
-                    '
-                    If cpCore.db.getRecordID("Library File Types", "PPT") = 0 Then
-                        Call VerifyRecord("Library File Types", "Power Point", "ExtensionList", "'PPT,PPS'", False)
-                        Call VerifyRecord("Library File Types", "Power Point", "IsImage", "0", False)
-                        Call VerifyRecord("Library File Types", "Power Point", "IsVideo", "0", False)
-                        Call VerifyRecord("Library File Types", "Power Point", "IsDownload", "1", False)
-                        Call VerifyRecord("Library File Types", "Power Point", "IsFlash", "0", False)
-                    End If
-                    '
-                    If cpCore.db.getRecordID("Library File Types", "Default") = 0 Then
-                        Call VerifyRecord("Library File Types", "Default", "ExtensionList", "''", False)
-                        Call VerifyRecord("Library File Types", "Default", "IsImage", "0", False)
-                        Call VerifyRecord("Library File Types", "Default", "IsVideo", "0", False)
-                        Call VerifyRecord("Library File Types", "Default", "IsDownload", "1", False)
-                        Call VerifyRecord("Library File Types", "Default", "IsFlash", "0", False)
-                    End If
+                If cpCore.db.getRecordID("Library File Types", "Image") = 0 Then
+                    Call VerifyRecord(cpCore, "Library File Types", "Image", "ExtensionList", "'GIF,JPG,JPE,JPEG,BMP,PNG'", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Image", "IsImage", "1", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Image", "IsVideo", "0", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Image", "IsDownload", "1", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Image", "IsFlash", "0", False)
+                End If
+                '
+                If cpCore.db.getRecordID("Library File Types", "Video") = 0 Then
+                    Call VerifyRecord(cpCore, "Library File Types", "Video", "ExtensionList", "'ASX,AVI,WMV,MOV,MPG,MPEG,MP4,QT,RM'", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Video", "IsImage", "0", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Video", "IsVideo", "1", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Video", "IsDownload", "1", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Video", "IsFlash", "0", False)
+                End If
+                '
+                If cpCore.db.getRecordID("Library File Types", "Audio") = 0 Then
+                    Call VerifyRecord(cpCore, "Library File Types", "Audio", "ExtensionList", "'AIF,AIFF,ASF,CDA,M4A,M4P,MP2,MP3,MPA,WAV,WMA'", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Audio", "IsImage", "0", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Audio", "IsVideo", "0", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Audio", "IsDownload", "1", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Audio", "IsFlash", "0", False)
+                End If
+                '
+                If cpCore.db.getRecordID("Library File Types", "Word") = 0 Then
+                    Call VerifyRecord(cpCore, "Library File Types", "Word", "ExtensionList", "'DOC'", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Word", "IsImage", "0", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Word", "IsVideo", "0", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Word", "IsDownload", "1", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Word", "IsFlash", "0", False)
+                End If
+                '
+                If cpCore.db.getRecordID("Library File Types", "Flash") = 0 Then
+                    Call VerifyRecord(cpCore, "Library File Types", "Flash", "ExtensionList", "'SWF'", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Flash", "IsImage", "0", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Flash", "IsVideo", "0", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Flash", "IsDownload", "1", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Flash", "IsFlash", "1", False)
+                End If
+                '
+                If cpCore.db.getRecordID("Library File Types", "PDF") = 0 Then
+                    Call VerifyRecord(cpCore, "Library File Types", "PDF", "ExtensionList", "'PDF'", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "PDF", "IsImage", "0", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "PDF", "IsVideo", "0", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "PDF", "IsDownload", "1", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "PDF", "IsFlash", "0", False)
+                End If
+                '
+                If cpCore.db.getRecordID("Library File Types", "XLS") = 0 Then
+                    Call VerifyRecord(cpCore, "Library File Types", "Excel", "ExtensionList", "'XLS'", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Excel", "IsImage", "0", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Excel", "IsVideo", "0", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Excel", "IsDownload", "1", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Excel", "IsFlash", "0", False)
+                End If
+                '
+                If cpCore.db.getRecordID("Library File Types", "PPT") = 0 Then
+                    Call VerifyRecord(cpCore, "Library File Types", "Power Point", "ExtensionList", "'PPT,PPS'", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Power Point", "IsImage", "0", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Power Point", "IsVideo", "0", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Power Point", "IsDownload", "1", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Power Point", "IsFlash", "0", False)
+                End If
+                '
+                If cpCore.db.getRecordID("Library File Types", "Default") = 0 Then
+                    Call VerifyRecord(cpCore, "Library File Types", "Default", "ExtensionList", "''", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Default", "IsImage", "0", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Default", "IsVideo", "0", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Default", "IsDownload", "1", False)
+                    Call VerifyRecord(cpCore, "Library File Types", "Default", "IsFlash", "0", False)
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -2147,34 +1852,34 @@ Namespace Contensive.Core
         '
         '=========================================================================================
         '
-        Private Sub VerifyState(ByVal Name As String, ByVal Abbreviation As String, ByVal SaleTax As Double, ByVal CountryID As Integer, ByVal FIPSState As String)
+        Private Shared Sub VerifyState(cpcore As coreClass, ByVal Name As String, ByVal Abbreviation As String, ByVal SaleTax As Double, ByVal CountryID As Integer, ByVal FIPSState As String)
             Try
                 '
                 Dim CS As Integer
                 Const ContentName = "States"
                 '
-                CS = cpCore.db.cs_open(ContentName, "name=" & cpCore.db.encodeSQLText(Name), , False)
-                If Not cpCore.db.cs_ok(CS) Then
+                CS = cpcore.db.cs_open(ContentName, "name=" & cpcore.db.encodeSQLText(Name), , False)
+                If Not cpcore.db.cs_ok(CS) Then
                     '
                     ' create new record
                     '
-                    Call cpCore.db.cs_Close(CS)
-                    CS = cpCore.db.cs_insertRecord(ContentName, SystemMemberID)
-                    Call cpCore.db.cs_setField(CS, "NAME", Name)
-                    Call cpCore.db.cs_setField(CS, "ACTIVE", True)
-                    Call cpCore.db.cs_setField(CS, "Abbreviation", Abbreviation)
-                    Call cpCore.db.cs_setField(CS, "CountryID", CountryID)
-                    Call cpCore.db.cs_setField(CS, "FIPSState", FIPSState)
+                    Call cpcore.db.cs_Close(CS)
+                    CS = cpcore.db.cs_insertRecord(ContentName, SystemMemberID)
+                    Call cpcore.db.cs_setField(CS, "NAME", Name)
+                    Call cpcore.db.cs_setField(CS, "ACTIVE", True)
+                    Call cpcore.db.cs_setField(CS, "Abbreviation", Abbreviation)
+                    Call cpcore.db.cs_setField(CS, "CountryID", CountryID)
+                    Call cpcore.db.cs_setField(CS, "FIPSState", FIPSState)
                 Else
                     '
                     ' verify only fields needed for contensive
                     '
-                    Call cpCore.db.cs_setField(CS, "CountryID", CountryID)
-                    Call cpCore.db.cs_setField(CS, "Abbreviation", Abbreviation)
+                    Call cpcore.db.cs_setField(CS, "CountryID", CountryID)
+                    Call cpcore.db.cs_setField(CS, "Abbreviation", Abbreviation)
                 End If
-                Call cpCore.db.cs_Close(CS)
+                Call cpcore.db.cs_Close(CS)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpcore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
         '
@@ -2182,71 +1887,71 @@ Namespace Contensive.Core
         '
         '=========================================================================================
         '
-        Public Sub VerifyStates()
+        Public Shared Sub VerifyStates(cpCore As coreClass)
             Try
                 '
-                Call appendUpgradeLogAddStep(cpCore.serverconfig.appConfig.name, "VerifyStates", "Verify States")
+                Call appendUpgradeLogAddStep(cpCore, cpCore.serverConfig.appConfig.name, "VerifyStates", "Verify States")
                 '
                 Dim CountryID As Integer
                 '
-                Call VerifyCountry("United States", "US")
+                Call VerifyCountry(cpCore, "United States", "US")
                 CountryID = cpCore.db.getRecordID("Countries", "United States")
                 '
-                Call VerifyState("Alaska", "AK", 0.0#, CountryID, "")
-                Call VerifyState("Alabama", "AL", 0.0#, CountryID, "")
-                Call VerifyState("Arizona", "AZ", 0.0#, CountryID, "")
-                Call VerifyState("Arkansas", "AR", 0.0#, CountryID, "")
-                Call VerifyState("California", "CA", 0.0#, CountryID, "")
-                Call VerifyState("Connecticut", "CT", 0.0#, CountryID, "")
-                Call VerifyState("Colorado", "CO", 0.0#, CountryID, "")
-                Call VerifyState("Delaware", "DE", 0.0#, CountryID, "")
-                Call VerifyState("District of Columbia", "DC", 0.0#, CountryID, "")
-                Call VerifyState("Florida", "FL", 0.0#, CountryID, "")
-                Call VerifyState("Georgia", "GA", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Alaska", "AK", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Alabama", "AL", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Arizona", "AZ", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Arkansas", "AR", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "California", "CA", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Connecticut", "CT", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Colorado", "CO", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Delaware", "DE", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "District of Columbia", "DC", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Florida", "FL", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Georgia", "GA", 0.0#, CountryID, "")
 
-                Call VerifyState("Hawaii", "HI", 0.0#, CountryID, "")
-                Call VerifyState("Idaho", "ID", 0.0#, CountryID, "")
-                Call VerifyState("Illinois", "IL", 0.0#, CountryID, "")
-                Call VerifyState("Indiana", "IN", 0.0#, CountryID, "")
-                Call VerifyState("Iowa", "IA", 0.0#, CountryID, "")
-                Call VerifyState("Kansas", "KS", 0.0#, CountryID, "")
-                Call VerifyState("Kentucky", "KY", 0.0#, CountryID, "")
-                Call VerifyState("Louisiana", "LA", 0.0#, CountryID, "")
-                Call VerifyState("Massachusetts", "MA", 0.0#, CountryID, "")
-                Call VerifyState("Maine", "ME", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Hawaii", "HI", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Idaho", "ID", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Illinois", "IL", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Indiana", "IN", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Iowa", "IA", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Kansas", "KS", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Kentucky", "KY", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Louisiana", "LA", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Massachusetts", "MA", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Maine", "ME", 0.0#, CountryID, "")
 
-                Call VerifyState("Maryland", "MD", 0.0#, CountryID, "")
-                Call VerifyState("Michigan", "MI", 0.0#, CountryID, "")
-                Call VerifyState("Minnesota", "MN", 0.0#, CountryID, "")
-                Call VerifyState("Missouri", "MO", 0.0#, CountryID, "")
-                Call VerifyState("Mississippi", "MS", 0.0#, CountryID, "")
-                Call VerifyState("Montana", "MT", 0.0#, CountryID, "")
-                Call VerifyState("North Carolina", "NC", 0.0#, CountryID, "")
-                Call VerifyState("Nebraska", "NE", 0.0#, CountryID, "")
-                Call VerifyState("New Hampshire", "NH", 0.0#, CountryID, "")
-                Call VerifyState("New Mexico", "NM", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Maryland", "MD", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Michigan", "MI", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Minnesota", "MN", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Missouri", "MO", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Mississippi", "MS", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Montana", "MT", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "North Carolina", "NC", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Nebraska", "NE", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "New Hampshire", "NH", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "New Mexico", "NM", 0.0#, CountryID, "")
 
-                Call VerifyState("New Jersey", "NJ", 0.0#, CountryID, "")
-                Call VerifyState("New York", "NY", 0.0#, CountryID, "")
-                Call VerifyState("Nevada", "NV", 0.0#, CountryID, "")
-                Call VerifyState("North Dakota", "ND", 0.0#, CountryID, "")
-                Call VerifyState("Ohio", "OH", 0.0#, CountryID, "")
-                Call VerifyState("Oklahoma", "OK", 0.0#, CountryID, "")
-                Call VerifyState("Oregon", "OR", 0.0#, CountryID, "")
-                Call VerifyState("Pennsylvania", "PA", 0.0#, CountryID, "")
-                Call VerifyState("Rhode Island", "RI", 0.0#, CountryID, "")
-                Call VerifyState("South Carolina", "SC", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "New Jersey", "NJ", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "New York", "NY", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Nevada", "NV", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "North Dakota", "ND", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Ohio", "OH", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Oklahoma", "OK", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Oregon", "OR", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Pennsylvania", "PA", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Rhode Island", "RI", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "South Carolina", "SC", 0.0#, CountryID, "")
 
-                Call VerifyState("South Dakota", "SD", 0.0#, CountryID, "")
-                Call VerifyState("Tennessee", "TN", 0.0#, CountryID, "")
-                Call VerifyState("Texas", "TX", 0.0#, CountryID, "")
-                Call VerifyState("Utah", "UT", 0.0#, CountryID, "")
-                Call VerifyState("Vermont", "VT", 0.0#, CountryID, "")
-                Call VerifyState("Virginia", "VA", 0.045, CountryID, "")
-                Call VerifyState("Washington", "WA", 0.0#, CountryID, "")
-                Call VerifyState("Wisconsin", "WI", 0.0#, CountryID, "")
-                Call VerifyState("West Virginia", "WV", 0.0#, CountryID, "")
-                Call VerifyState("Wyoming", "WY", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "South Dakota", "SD", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Tennessee", "TN", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Texas", "TX", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Utah", "UT", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Vermont", "VT", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Virginia", "VA", 0.045, CountryID, "")
+                Call VerifyState(cpCore, "Washington", "WA", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Wisconsin", "WI", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "West Virginia", "WV", 0.0#, CountryID, "")
+                Call VerifyState(cpCore, "Wyoming", "WY", 0.0#, CountryID, "")
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -2254,7 +1959,7 @@ Namespace Contensive.Core
         '
         ' Get the Menu for FormInputHTML
         '
-        Private Sub VerifyCountry(ByVal Name As String, ByVal Abbreviation As String)
+        Private Shared Sub VerifyCountry(cpCore As coreClass, ByVal Name As String, ByVal Abbreviation As String)
             Try
                 '
                 Dim CS As Integer
@@ -2285,7 +1990,7 @@ Namespace Contensive.Core
         '
         '=========================================================================================
         '
-        Public Sub VerifyCountries()
+        Public Shared Sub VerifyCountries(cpCore As coreClass)
             Try
                 '
                 Dim list As String
@@ -2296,7 +2001,7 @@ Namespace Contensive.Core
                 Dim Name As String
                 'Dim fs As New fileSystemClass
                 '
-                Call appendUpgradeLogAddStep(cpCore.serverconfig.appConfig.name, "VerifyCountries", "Verify Countries")
+                Call appendUpgradeLogAddStep(cpCore, cpCore.serverConfig.appConfig.name, "VerifyCountries", "Verify Countries")
                 '
                 list = cpCore.appRootFiles.readFile("cclib\config\isoCountryList.txt")
                 Rows = Split(list, vbCrLf)
@@ -2307,7 +2012,7 @@ Namespace Contensive.Core
                         If UBound(Attr) >= 1 Then
                             Name = Attr(0)
                             Name = EncodeInitialCaps(Name)
-                            Call VerifyCountry(Name, Attr(1))
+                            Call VerifyCountry(cpCore, Name, Attr(1))
                         End If
                     End If
                 Next
@@ -2320,13 +2025,13 @@ Namespace Contensive.Core
         '
         '=========================================================================================
         '
-        Public Sub VerifyDefaultGroups()
+        Public Shared Sub VerifyDefaultGroups(cpCore As coreClass)
             Try
                 '
                 Dim GroupID As Integer
                 Dim SQL As String
                 '
-                Call appendUpgradeLogAddStep(cpCore.serverconfig.appConfig.name, "VerifyDefaultGroups", "Verify Default Groups")
+                Call appendUpgradeLogAddStep(cpCore, cpCore.serverConfig.appConfig.name, "VerifyDefaultGroups", "Verify Default Groups")
                 '
                 GroupID = cpCore.group_add("Content Editors")
                 SQL = "Update ccContent Set EditorGroupID=" & cpCore.db.encodeSQLNumber(GroupID) & " where EditorGroupID is null;"
@@ -2340,7 +2045,7 @@ Namespace Contensive.Core
         ''
         ''=========================================================================================
         ''
-        'Public Sub ImportCDefFolder()
+        'Public shared Sub ImportCDefFolder()
         '    Try
         '        '
         '        Dim runAtServer As runAtServerClass
@@ -2373,7 +2078,7 @@ Namespace Contensive.Core
         ''
         ''
         ''
-        'public Sub SetNavigatorEntry(EntryName As String, ParentName As String, AddonID As Integer)
+        'Public shared Sub SetNavigatorEntry(EntryName As String, ParentName As String, AddonID As Integer)
         '    On Error GoTo ErrorTrap
         '    '
         '    Dim CS As Integer
@@ -2408,7 +2113,7 @@ Namespace Contensive.Core
         ''
         ''
         ''
-        'public Sub SetNavigatorEntry2(EntryName As String, ParentGuid As String, AddonID As Integer, NavIconTypeID As Integer, NavIconTitle As String, DataBuildVersion As String)
+        'Public shared Sub SetNavigatorEntry2(EntryName As String, ParentGuid As String, AddonID As Integer, NavIconTypeID As Integer, NavIconTitle As String, DataBuildVersion As String)
         '    On Error GoTo ErrorTrap
         '    '
         '    Dim CS As Integer
@@ -2476,10 +2181,10 @@ Namespace Contensive.Core
         'End Function
         ''
         ''
-        ''
-        Public Sub ReplaceAddonWithCollection(ByVal AddonProgramID As String, ByVal CollectionGuid As String, ByRef return_IISResetRequired As Boolean, ByRef return_RegisterList As String)
-            Dim ex As New Exception("todo") : Call handleClassException(ex, cpCore.serverconfig.appConfig.name, "methodNameFPO") ' ignoreInteger, "dll", "builderClass.ReplaceAddonWithCollection is deprecated", "ReplaceAddonWithCollection", True, True)
-        End Sub
+        '''
+        'Public Shared Sub ReplaceAddonWithCollection(ByVal AddonProgramID As String, ByVal CollectionGuid As String, ByRef return_IISResetRequired As Boolean, ByRef return_RegisterList As String)
+        '    Dim ex As New Exception("todo") : Call handleClassException(cpCore, ex, cpCore.serverConfig.appConfig.name, "methodNameFPO") ' ignoreInteger, "dll", "builderClass.ReplaceAddonWithCollection is deprecated", "ReplaceAddonWithCollection", True, True)
+        'End Sub
         '    On Error GoTo ErrorTrap
         '    '
         '    Dim CS As Integer
@@ -2512,11 +2217,11 @@ Namespace Contensive.Core
         '       it will fail if they are not up to date.
         '===================================================================================================================
         '
-        Private Sub VerifyCoreTables()
+        Private Shared Sub VerifyCoreTables(cpCore As coreClass)
             Try
                 '
                 If Not False Then
-                    Call appendUpgradeLogAddStep(cpCore.serverconfig.appConfig.name, "VerifyCoreTables", "Verify Core SQL Tables")
+                    Call appendUpgradeLogAddStep(cpCore, cpCore.serverConfig.appConfig.name, "VerifyCoreTables", "Verify Core SQL Tables")
                     '
                     Call cpCore.db.createSQLTable("Default", "ccDataSources")
                     Call cpCore.db.createSQLTableField("Default", "ccDataSources", "typeId", FieldTypeIdInteger)
@@ -2618,7 +2323,7 @@ Namespace Contensive.Core
         '   Error handler
         '===========================================================================
         '
-        Private Sub handleClassException(ByVal ex As Exception, ByVal ApplicationName As String, ByVal MethodName As String)
+        Private Shared Sub handleClassException(cpCore As coreClass, ByVal ex As Exception, ByVal ApplicationName As String, ByVal MethodName As String)
             cpCore.log_appendLog("exception in builderClass." & MethodName & ", application [" & ApplicationName & "], ex [" & ex.ToString & "]")
         End Sub
         '
@@ -2626,24 +2331,23 @@ Namespace Contensive.Core
         '   Append Log File
         '===========================================================================
         '
-        Private Sub appendUpgradeLog(ByVal appName As String, ByVal Method As String, ByVal Message As String)
-            appendUpgradeLog("app [" & appName & "], Method [" & Method & "], Message [" & Message & "]")
+        Private Shared Sub appendUpgradeLog(cpCore As coreClass, ByVal appName As String, ByVal Method As String, ByVal Message As String)
+            appendUpgradeLog(cpCore, "app [" & appName & "], Method [" & Method & "], Message [" & Message & "]")
         End Sub
         '
         '=============================================================================
         '   Get a ContentID from the ContentName using just the tables
         '=============================================================================
         '
-        Private Sub appendUpgradeLogAddStep(ByVal appName As String, ByVal Method As String, ByVal Message As String)
-            StepCount = StepCount + 1
-            Call appendUpgradeLog(appName, Method, "Step " & StepCount & " : " & Message)
+        Private Shared Sub appendUpgradeLogAddStep(cpCore As coreClass, ByVal appName As String, ByVal Method As String, ByVal Message As String)
+            Call appendUpgradeLog(cpCore, appName, Method, Message)
         End Sub
         '
         '=====================================================================================================
         '   a value in a name/value pair
         '=====================================================================================================
         '
-        Public Sub SetNameValueArrays(ByVal InputName As String, ByVal InputValue As String, ByRef SQLName() As String, ByRef SQLValue() As String, ByRef Index As Integer)
+        Public Shared Sub SetNameValueArrays(cpCore As coreClass, ByVal InputName As String, ByVal InputValue As String, ByRef SQLName() As String, ByRef SQLValue() As String, ByRef Index As Integer)
             ' ##### removed to catch err<>0 problem on error resume next
             '
             SQLName(Index) = InputName
@@ -2652,7 +2356,7 @@ Namespace Contensive.Core
             '
         End Sub
         '
-        Private Sub appendUpgradeLog(ByVal message As String)
+        Private Shared Sub appendUpgradeLog(cpCore As coreClass, ByVal message As String)
             Console.WriteLine("upgrade: " & message)
             cpCore.log_appendLog(message, "Upgrade")
         End Sub
@@ -2661,7 +2365,7 @@ Namespace Contensive.Core
         ''
         ''=============================================================================
         ''
-        'Public Sub csv_VerifyAggregateFunction(ByVal Name As String, ByVal Link As String, ByVal ObjectProgramID As String, ByVal ArgumentList As String, ByVal SortOrder As String)
+        'Public shared Sub csv_VerifyAggregateFunction(ByVal Name As String, ByVal Link As String, ByVal ObjectProgramID As String, ByVal ArgumentList As String, ByVal SortOrder As String)
         '    Try
         '        '
         '        ' Determine Function or Object based on Link
@@ -2684,22 +2388,18 @@ Namespace Contensive.Core
         '       Entries are unique by their name
         '=============================================================================
         '
-        Public Sub admin_VerifyMenuEntry(ByVal ParentName As String, ByVal EntryName As String, ByVal ContentName As String, ByVal LinkPage As String, ByVal SortOrder As String, ByVal AdminOnly As Boolean, ByVal DeveloperOnly As Boolean, ByVal NewWindow As Boolean, ByVal Active As Boolean, ByVal MenuContentName As String, ByVal AddonName As String)
+        Public Shared Sub admin_VerifyMenuEntry(cpCore As coreClass, ByVal ParentName As String, ByVal EntryName As String, ByVal ContentName As String, ByVal LinkPage As String, ByVal SortOrder As String, ByVal AdminOnly As Boolean, ByVal DeveloperOnly As Boolean, ByVal NewWindow As Boolean, ByVal Active As Boolean, ByVal MenuContentName As String, ByVal AddonName As String)
             Try
                 '
                 Const AddonContentName = "Aggregate Functions"
                 '
                 Dim SelectList As String
-                Dim ErrorDescription As String
                 Dim CSEntry As Integer
                 Dim ContentID As Integer
                 Dim ParentID As Integer
-                Dim MethodName As String
                 Dim addonId As Integer
                 Dim CS As Integer
                 Dim SupportAddonID As Boolean
-                '
-                MethodName = "csv_VerifyMenuEntry"
                 '
                 SelectList = "Name,ContentID,ParentID,LinkPage,SortOrder,AdminOnly,DeveloperOnly,NewWindow,Active"
                 SupportAddonID = cpCore.metaData.isContentFieldSupported(MenuContentName, "AddonID")
@@ -2719,10 +2419,6 @@ Namespace Contensive.Core
                         Call cpCore.db.cs_Close(CS)
                     End If
                 End If
-                ''
-                'If vbLCase(EntryName) = "property search log" Then
-                '    EntryName = EntryName
-                'End If
                 '
                 ' Get ParentID from ParentName
                 '

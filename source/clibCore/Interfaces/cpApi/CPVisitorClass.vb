@@ -3,20 +3,9 @@ Imports Contensive.BaseClasses
 Imports System.Runtime.InteropServices
 
 Namespace Contensive.Core
-    '
-    ' comVisible to be activeScript compatible
-    '
-    <ComVisible(True)> _
-    <ComClass(CPVisitorClass.ClassId, CPVisitorClass.InterfaceId, CPVisitorClass.EventsId)> _
     Public Class CPVisitorClass
         Inherits BaseClasses.CPVisitorBaseClass
         Implements IDisposable
-        '
-#Region "COM GUIDs"
-        Public Const ClassId As String = ""
-        Public Const InterfaceId As String = ""
-        Public Const EventsId As String = ""
-#End Region
         '
         Private cpCore As Contensive.Core.coreClass
         Private cp As CPClass
@@ -24,7 +13,7 @@ Namespace Contensive.Core
         '
         Public Sub New(ByVal cpCoreObj As Contensive.Core.coreClass, ByVal cpParent As CPClass)
             MyBase.New()
-            cpCore = cpCoreObj
+            Me.cpCore = cpCoreObj
             cp = cpParent
         End Sub
         '

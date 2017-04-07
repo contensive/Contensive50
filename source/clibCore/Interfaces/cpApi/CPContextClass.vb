@@ -2,30 +2,11 @@
 Imports System.Runtime.InteropServices
 
 Namespace Contensive.Core
-    '
-    ' comVisible to be activeScript compatible
-    '
-    <ComVisible(True)> _
-    <ComClass(CPContextClass.ClassId, CPContextClass.InterfaceId, CPContextClass.EventsId)> _
     Public Class CPContextClass
         Implements IDisposable
         '
-#Region "COM GUIDs"
-        Public Const ClassId As String = "9FC3B58E-F6A4-4DEA-BE39-B40B09FBE0B7"
-        Public Const InterfaceId As String = "4CD84EB3-175C-4004-8811-8257849F549A"
-        Public Const EventsId As String = "8C6AC359-68B4-49A3-A3BC-7A53CA16EA45"
-#End Region
-        '
         Protected disposed As Boolean = False
         Private cp As CPClass
-        '
-        'Friend globalResponseRedirect As String             ' if not empty, this is the URL to which the parent page needs to redirect
-        'Friend globalResponseBuffer As String               ' content added to the end of the content after Contensive call
-        'Friend globalResponseContentType As String          ' content type set on parent page after Contensive Call
-        'Friend globalResponseCookies As String              ' cookies set on parent page after Contensive Call
-        'Friend globalResponseHeaders As String              ' 
-        'Friend globalResponseStatus As String               ' 
-        '
         Private localallowProfileLog As Boolean = False
         '
         '
@@ -258,9 +239,9 @@ Namespace Contensive.Core
                             Dim ValuePair As String()
                             ValuePair = Split(NameValue, "=")
                             cookieName = DecodeResponseVariable(CStr(ValuePair(0)))
-                            .Name = cookieName
+                            .name = cookieName
                             If UBound(ValuePair) > 0 Then
-                                .Value = DecodeResponseVariable(CStr(ValuePair(1)))
+                                .value = DecodeResponseVariable(CStr(ValuePair(1)))
                             End If
                         End With
                         If cp.core.webServerIO.requestCookies.ContainsKey(cookieName) Then

@@ -24,10 +24,6 @@ Namespace Contensive.Core
         ' ----- shared globals
         '
         Public serverConfig As Models.Entity.serverConfigModel
-
-        'Public clusterConfig As clusterConfigClass
-        'Public Property appConfig As Models.Entity.serverConfigModel.appConfigModel             ' configuration loaded during construction
-        'Public Property appStatus As applicationStatusEnum      ' status of application
         '
         ' application storage
         '
@@ -2315,8 +2311,7 @@ ErrorTrap:
         '=============================================================================
         '
         Public Sub admin_VerifyAdminMenu(ByVal ParentName As String, ByVal EntryName As String, ByVal ContentName As String, ByVal LinkPage As String, ByVal SortOrder As String, Optional ByVal AdminOnly As Boolean = False, Optional ByVal DeveloperOnly As Boolean = False, Optional ByVal NewWindow As Boolean = False, Optional ByVal Active As Boolean = True)
-            Dim builder As New coreBuilderClass(Me)
-            Call builder.admin_VerifyMenuEntry(ParentName, EntryName, ContentName, LinkPage, SortOrder, AdminOnly, DeveloperOnly, NewWindow, Active, "Menu Entries", "")
+            Call Controllers.coreBuilderClass.admin_VerifyMenuEntry(cp.core, ParentName, EntryName, ContentName, LinkPage, SortOrder, AdminOnly, DeveloperOnly, NewWindow, Active, "Menu Entries", "")
         End Sub
         '
         '========================================================================

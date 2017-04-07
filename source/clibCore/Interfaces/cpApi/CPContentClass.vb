@@ -2,22 +2,9 @@ Imports Contensive.BaseClasses
 Imports System.Runtime.InteropServices
 
 Namespace Contensive.Core
-    '
-    '====================================================================================================
-    '====================================================================================================
-    ' comVisible to be activeScript compatible
-    '
-    <ComVisible(True)>
-    <ComClass(CPContentClass.ClassId, CPContentClass.InterfaceId, CPContentClass.EventsId)>
     Public Class CPContentClass
         Inherits CPContentBaseClass
         Implements IDisposable
-        '
-#Region "COM GUIDs"
-        Public Const ClassId As String = "D8D3D8F9-8459-46F7-B8AC-01B4DFAA4DB2"
-        Public Const InterfaceId As String = "9B321DE5-D154-4EB1-B533-DBA2E5F2B5D2"
-        Public Const EventsId As String = "6E068297-E09E-42C8-97B6-02DE591009DD"
-#End Region
         '
         Private cp As CPClass
         Private cpCore As Contensive.Core.coreClass
@@ -25,7 +12,7 @@ Namespace Contensive.Core
         '
         '====================================================================================================
         '
-        public Sub New(ByVal cpParent As CPClass)
+        Public Sub New(ByVal cpParent As CPClass)
             MyBase.New()
             cp = cpParent
             cpCore = cp.core
@@ -283,7 +270,6 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function AddContentField(ContentName As String, FieldName As String, FieldType As Integer) As Integer
-            Dim builder As New coreBuilderClass(cpCore)
             Dim field As New coreMetaDataClass.CDefFieldClass()
             field.active = True
             field.adminOnly = False
@@ -342,7 +328,6 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function AddContent(ContentName As String, sqlTableName As String, dataSource As String) As Integer
-            Dim builder As New coreBuilderClass(cpCore)
             Return cpCore.metaData.metaData_CreateContent4(True _
                 , dataSource _
                 , sqlTableName _

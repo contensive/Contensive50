@@ -3,23 +3,9 @@ Imports Contensive.BaseClasses
 Imports System.Runtime.InteropServices
 
 Namespace Contensive.Core
-    '
-    ' comVisible to be activeScript and compatible
-    '
-    ''' <summary>
-    ''' cpFileClass is a legacy implementation replaced with cdnFiles, appRootFiles and privateFiles. Non-Virtual calls do not limit file destination so are not scale-mode compatible
-    ''' </summary>
-    <ComVisible(True)> _
-    <ComClass(CPFileClass.ClassId, CPFileClass.InterfaceId, CPFileClass.EventsId)> _
     Public Class CPFileClass
         Inherits BaseClasses.CPFileBaseClass
         Implements IDisposable
-        '
-#Region "COM GUIDs"
-        Public Const ClassId As String = "E3310DFA-0ABF-4DC7-ABB5-4D294D30324B"
-        Public Const InterfaceId As String = "44C305D8-A8C3-490D-8E79-E17F9B3D34CE"
-        Public Const EventsId As String = "8757DE11-C04D-4765-B46B-458E281BAE19"
-#End Region
         '
         Private cpCore As Contensive.Core.coreClass
         Protected disposed As Boolean = False
@@ -62,7 +48,7 @@ Namespace Contensive.Core
         ''' <returns></returns>
         <Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", False)>
         Public Overrides Function getVirtualFileLink(virtualFilename As String) As String
-            Return cpCore.csv_getVirtualFileLink(cpCore.serverconfig.appConfig.cdnFilesNetprefix, virtualFilename)
+            Return cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, virtualFilename)
         End Function
         '
         '==========================================================================================

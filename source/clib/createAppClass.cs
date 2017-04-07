@@ -152,13 +152,8 @@ namespace  Contensive.Core {
                 //
                 using (CPClass cp = new CPClass(appName))
                 {
-                    coreBuilderClass builder = new coreBuilderClass(cp.core);
-                    builder.web_addSite(appName, domainName, cp.core.serverConfig.appConfig.appRootFilesPath, iisDefaultDoc);
-                    //if (domainName != cdnDomainName)
-                    //{
-                    //    builder.web_addSite(appName, cdnDomainName, "\\", iisDefaultDoc);
-                    //}
-                    builder.upgrade(true);
+                    Controllers.coreBuilderClass.web_addSite(cp.core,appName, domainName, cp.core.serverConfig.appConfig.appRootFilesPath, iisDefaultDoc);
+                    Controllers.coreBuilderClass.upgrade(cp.core,true);
                     cp.core.siteProperties.setProperty(Contensive.Core.coreCommonModule.siteproperty_serverPageDefault_name, iisDefaultDoc);
                 }
             }

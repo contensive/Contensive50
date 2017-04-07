@@ -5,20 +5,9 @@ Option Explicit On
 Imports System.Runtime.InteropServices
 
 Namespace Contensive.Core
-    '
-    ' comVisible to be activeScript compatible
-    '
-    <ComVisible(True)> _
-    <ComClass(CPBlockClass.ClassId, CPBlockClass.InterfaceId, CPBlockClass.EventsId)> _
     Public Class CPBlockClass
         Inherits BaseClasses.CPBlockBaseClass
         Implements IDisposable
-        '
-#Region "COM GUIDs"
-        Public Const ClassId As String = "9E4DF603-A94B-4E3A-BD06-E19BB9CB1B5F"
-        Public Const InterfaceId As String = "E4D5D9F0-DF96-492E-9CAC-1107F0187A40"
-        Public Const EventsId As String = "5911548D-7637-4021-BD08-C7676F3E12C6"
-#End Region
         '
         Private cpCore As Contensive.Core.coreClass
         Private cp As CPClass
@@ -181,7 +170,7 @@ Namespace Contensive.Core
         '
         '
         Public Overrides Sub OpenCopy(ByVal copyRecordNameOrGuid As String)
-            Dim cs As CPCSClass = CP.CSNew
+            Dim cs As CPCSClass = cp.CSNew
             Try
                 accum = ""
                 If copyRecordNameOrGuid <> "" Then
@@ -213,10 +202,10 @@ Namespace Contensive.Core
         '
         Public Overrides Sub OpenLayout(ByVal layoutRecordNameOrGuid As String)
             Try
-                Dim cs As CPCSClass = CP.CSNew
+                Dim cs As CPCSClass = cp.CSNew
                 accum = ""
                 If layoutRecordNameOrGuid <> "" Then
-                    Call cs.Open("layouts", "(name=" & CP.Db.EncodeSQLText(layoutRecordNameOrGuid) & ")or(ccGuid=" & CP.Db.EncodeSQLText(layoutRecordNameOrGuid) & ")", "id", , "layout")
+                    Call cs.Open("layouts", "(name=" & cp.Db.EncodeSQLText(layoutRecordNameOrGuid) & ")or(ccGuid=" & cp.Db.EncodeSQLText(layoutRecordNameOrGuid) & ")", "id", , "layout")
                     If cs.OK Then
                         accum = cs.GetText("layout")
                     End If

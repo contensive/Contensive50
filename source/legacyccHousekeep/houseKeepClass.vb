@@ -145,7 +145,7 @@ Namespace Contensive.Core
             '
             ' put token in a config file
             '
-            cp = New CPClass(appName)
+            cp = New CPClass()
             '
             rightNow = DateTime.Now()
             Yesterday = rightNow.AddDays(-1).Date
@@ -2769,7 +2769,7 @@ ErrorTrap:
                 Dim FolderPtr As Integer
                 Dim CollectionPath As String
                 Dim LastChangeDate As Date
-                Dim hint As String
+                Dim hint As String = ""
                 Dim LocalName As String
                 Dim Ptr As Integer
                 Dim collectionFileFilename As String
@@ -2850,15 +2850,13 @@ ErrorTrap:
                                         Else
                                             CollectionRootPath = Left(CollectionRootPath, Pos - 1)
                                             Path = cp.core.addon.getPrivateFilesAddonPath() & "\" & CollectionRootPath & "\"
-                                            'Path = GetProgramPath & "\addons\" & CollectionRootPath & "\"
-                                            'On Error Resume Next
+                                            FolderList = {}
                                             If cp.core.privateFiles.pathExists(Path) Then
                                                 FolderList = cp.core.privateFiles.getFolderList(Path)
                                                 If Err.Number <> 0 Then
                                                     Err.Clear()
                                                 End If
                                             End If
-                                            'On Error GoTo ErrorTrap
                                             If FolderList.Length = 0 Then
                                                 '
                                                 Call AppendClassLog("Server", "RegisterAddonFolder", "no subfolders found in physical path [" & Path & "], skipping")

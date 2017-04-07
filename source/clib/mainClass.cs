@@ -150,8 +150,7 @@ namespace Contensive.Core
                                     else
                                     {
                                         installFiles = new coreFileSystemClass(cp.core, cp.core.serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
-                                        coreBuilderClass builder = new coreBuilderClass(cp.core);
-                                        builder.upgrade(false);
+                                        Controllers.coreBuilderClass.upgrade(cp.core,false);
                                         installFiles.Dispose();
                                     }
                                     exitArgumentProcessing = true;
@@ -164,8 +163,7 @@ namespace Contensive.Core
                                         String upgradeAppName = kvp.Key;
                                         using (CPClass upgradeApp = new CPClass(upgradeAppName))
                                         {
-                                            coreBuilderClass builder = new coreBuilderClass(upgradeApp.core);
-                                            builder.upgrade(false);
+                                            Controllers.coreBuilderClass.upgrade(cp.core,false);
                                         }
                                     }
                                     exitArgumentProcessing = true;

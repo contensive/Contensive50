@@ -3,23 +3,9 @@ Imports Contensive.BaseClasses
 Imports System.Runtime.InteropServices
 
 Namespace Contensive.Core
-    '
-    ' comVisible to be activeScript and compatible
-    '
-    ''' <summary>
-    ''' cpFileSystemClass is the api wrapper that implements cpFileSystemBaseClass using the cpCore_fileSystemClass 
-    ''' </summary>
-    <ComVisible(True)>
-    <ComClass(CPFileSystemClass.ClassId, CPFileSystemClass.InterfaceId, CPFileSystemClass.EventsId)>
     Public Class CPFileSystemClass
         Inherits BaseClasses.CPFileSystemBaseClass
         Implements IDisposable
-        '
-#Region "COM GUIDs"
-        Public Const ClassId As String = "0B73809E-F149-4262-A548-FA1E11DF63A6"
-        Public Const InterfaceId As String = "4F8288A4-2854-4B60-9281-9A776DC101D0"
-        Public Const EventsId As String = "987E6DDE-E9E6-46C5-9467-BAE79A129A15"
-#End Region
         '
         Private core As Contensive.Core.coreClass
         Protected disposed As Boolean = False

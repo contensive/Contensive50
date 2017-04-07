@@ -758,36 +758,20 @@ Namespace Contensive
         Private Function tcpListenerConnectionThread_executeCmd(cpCore As coreClass, ByVal Method As String, ByVal queryString As String, ByVal RemoteIP As String) As String
             Dim returnString As String = ""
             Try
-                '
                 Dim File As String
                 Dim FolderPath As String
                 Dim QSPairs() As String
-                Dim Cmd As String
+                Dim Cmd As String = ""
                 Dim QSName As String
                 Dim QSValue As String
                 Dim Pos As Integer
-                'Dim fs As fileSystemClass
                 Dim SrcFile As String
                 Dim DstFile As String
-                'Dim FindText As String
-                'Dim ReplaceText As String
-                'Dim CDefNameList As String
-                'Dim CDefNames() As String
                 Dim Ptr As Integer
-                'Dim Controller As New controlClass
-                'Dim AppName As String
-                'Dim Name As String
-                'Dim Value As String
-                'Dim AppServices As appServicesClass
                 Dim RemoteUsername As String
                 Dim RemotePassword As String
                 Dim Authenticated As Boolean
-                'Dim SetUsername As String
-                'Dim SetPassword As String
                 Dim IsLocalRemote As Boolean
-                'Dim cp As CPClass = New CPClass(appName)
-                '
-                cpCore.log_appendLog("serverClass.executeServerCmd, method=[" & Method & "], queryString=[" & queryString & "]")
                 '
                 If Mid(Method, 1, 1) = "/" Then
                     Method = Mid(Method, 2)
@@ -1223,27 +1207,19 @@ Namespace Contensive
         End Sub
 
         Private Sub RunSiteProcesses()
-            '  Dim CSConnection As appEnvironmentStruc
-            'Dim cmc As cpCoreClass
             Dim hint As String = ""
             Try
-                '
                 Dim ProcessRunOnce As Boolean
                 Dim ProcessNextRun As Date
                 Dim ProcessID As Integer
                 Dim processName As String
                 Dim ProcessInterval As Integer
-                'Dim KernelService As New kernelServicesClass
                 Dim SQLNow As String
                 Dim CS As Integer
                 Dim SQL As String
                 Dim NextRun As Date
                 Dim RightNow As Date
-                'Dim appStatus As Integer
                 Dim AppName As String
-                Dim clusterAppList As List(Of String)
-                'Dim clusterServices As New clusterServicesClass()
-                'Dim asv As appServicesClass
                 Dim cpSite As CPClass
                 '
                 hint &= ",entering"

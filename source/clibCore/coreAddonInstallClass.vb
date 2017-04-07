@@ -408,7 +408,7 @@ Namespace Contensive.Core
                 Dim Doc As New XmlDocument
                 Dim Copy As String
                 Dim allowLogging As Boolean
-                Dim builder As New coreBuilderClass(cpCore)
+                'Dim builder As New coreBuilderClass(cpCore)
                 '
                 '-----------------------------------------------------------------------------------------------
                 '   Load LocalCollections from the Collections.xml file
@@ -1175,10 +1175,7 @@ Namespace Contensive.Core
                 Dim NodeName As String
                 Dim nodeGuid As String
                 Dim sharedStyleId As Integer
-                Dim saveLogFolder As String
-                Dim PCCEmpty As Object
                 Dim fieldLookupId As Integer
-                Dim ErrDescription As String
                 Dim ChildCollectionID As Integer
                 Dim ScriptingGuid As String
                 Dim ScriptingName As String
@@ -1197,131 +1194,52 @@ Namespace Contensive.Core
                 Dim ScriptingModuleID As Integer
                 Dim CSCollection As Integer
                 Dim FileList As String
-                Dim ScriptingLanguage As String
-                Dim ScriptingEntryPoint As String
-                Dim ScriptingNameorGuid As String
-                Dim ScriptingNode As XmlNode
                 Dim Parent_NavID As Integer
                 Dim ChildCollectionLastChangeDate As Date
                 Dim CollectionLastChangeDate As Date
-                Dim IncludeAddonName As String
-                Dim IncludeAddonGuid As String
-                Dim IncludeAddonID As Integer
-                Dim AddRule As Boolean
                 Dim NavIconTypeString As String
-                Dim AddOnType As String
                 Dim XMLTools As New coreXmlToolsClass(cpCore)
                 Dim AddonGuidFieldName As String
                 Dim CollectionHelp As String
                 Dim CollectionHelpLink As String
                 Dim CollectionWrapper As String
-                Dim ParentID As Integer
-                Dim SettingPageID As Integer
-                Dim SettingsNavID As Integer
-                Dim menuNameSpace As String
-                Dim ChildCollectionVersionFolderName As String
-                Dim ChildCollectionVersionFolder As String
-                Dim InstallDLL As Boolean
-                Dim InstalledDLLCnt As Integer
-                Dim InstalledDLLS() As String
-                Dim CollectionNavAdvancedID As Integer
-                Dim NavIconType As Integer
+                Dim ChildCollectionVersionFolderName As String = ""
                 Dim NavIconTypeID As Integer
                 Dim EntryName As String
-                Dim AddonIsTool As Boolean
-                Dim AddonIsReport As Boolean
-                Dim AddonIsSetting As Boolean
                 Dim DeveloperOnly As Boolean
-                Dim NavDeveloperOnly As Boolean
                 Dim ChildCollectionGUID As String
                 Dim ChildCollectionName As String
                 Dim Found As Boolean
                 Dim status As String
                 Dim Files() As String
-                'Dim nodeName As String
-                Dim StyleSheet As String
-                Dim NewValue As String
-                Dim ArgumentList As String
-                'Dim CollectionAddOnCnt as integer
-                Dim CollectionNavID As Integer
                 Dim Ptr As Integer
                 Dim CDefNode As XmlNode
                 Dim ContentName As String
-                Dim PortalNavigatorID As Integer
-                Dim AddonNavID As Integer
-                Dim LoopPtr As Integer
-                Dim ActiveXFilename As String
-                Dim ActiveXLink As String
-                Dim CollectionVersion As String
-                Dim CollectionFileLink As String
                 Dim CollectionFile As New XmlDocument
-                Dim Basename As String
-                Dim Pass As Integer
-                Dim NowHour As String
-                Dim NowMinute As String
-                Dim NowSecond As String
-                Dim CSRule As Integer
-                Dim addonId As Integer
                 Dim CollectionID As Integer
-                Dim CS2 As Integer
-                Dim PortalName As String
-                Dim AOID As Integer
-                Dim PortalID As Integer
-                Dim InstallFile As String
                 Dim Collectionname As String
                 Dim CollectionSystem As Boolean
                 Dim CollectionUpdatable As Boolean
                 Dim CollectionblockNavigatorNode As Boolean
-                Dim NowTime As Date
-                Dim NowDay As String
-                Dim NowMonth As String
-                Dim NowYear As String
                 Dim srcFileInfoArray As IO.FileInfo()
-                Dim SrcFileNames() As String
-                Dim SrcFileDetails() As String
-                Dim SrcPtr As Integer
-                Dim SrcFilename As String
-                Dim TimeStamp As String
                 Dim CollectionVersionFolder As String
-                Dim ArchiveFolder As String
-                Dim IISStopped As Boolean
-                'Dim SiteBuilder As New SiteBuilderClass
                 Dim Pos As Integer
-                'Dim GUIDGenerator As guidClass
-                Dim DestinationFile As String
-                Dim CollectionFolder As String
-                Dim FilenameNoExt As String
-                Dim temp As String
                 Dim FieldName As String
                 Dim FieldValue As String
                 Dim CS As Integer
                 Dim Criteria As String
                 Dim DstFilePath As String
-                Dim AOGuid As String
                 Dim AOName As String
                 Dim IsFound As Boolean
                 Dim UserError As String
-                Dim FileDetails() As String
-                Dim FilenamePtr As Integer
-                'Dim FileNames() As String
-                'Dim FileNameList As String
                 Dim Filename As String
-                Dim Cells() As String
-                Dim PageNumber As Integer
-                Dim ColumnCnt As Integer
                 Dim CDefSection As XmlNode
-                Dim Attr As XmlAttribute
                 Dim Doc As New XmlDocument
                 Dim CDefInterfaces As XmlNode
-                Dim PageInterface As XmlNode
-                Dim ActiveXNode As XmlNode
-                ''Dim fs As New fileSystemClass
-                Dim NeedToImportCDef As Boolean
                 Dim CollectionFilename As String
                 Dim OKToInstall As Boolean
                 Dim UpgradeOK As Boolean
                 Dim CollectionVersionFolderName As String = ""
-                Dim isInstalled As Boolean
                 Dim FileGuid As String
                 Dim DataRecordList As String
                 Dim ChildNode As XmlNode
@@ -1330,7 +1248,6 @@ Namespace Contensive.Core
                 Dim FieldNode As XmlNode
                 Dim ContentRecordGuid As String
                 Dim CDef As coreMetaDataClass.CDefClass
-                Dim CDefField As coreMetaDataClass.CDefFieldClass
                 Dim ContentRecordName As String
                 Dim IsFieldFound As Boolean
                 Dim FieldLookupContentID As Integer
@@ -3142,7 +3059,7 @@ Namespace Contensive.Core
                                             If NavIconTypeString = "" Then
                                                 NavIconTypeString = "Addon"
                                             End If
-                                            Dim builder As New coreBuilderClass(cpCore)
+                                            'Dim builder As New coreBuilderClass(cpCore)
                                             Call csv_VerifyNavigatorEntry4("", menuNameSpace, addonName, "", "", "", False, False, False, True, "Navigator Entries", addonName, NavIconTypeString, addonName, CollectionID)
                                         End If
                                     Case "argument", "argumentlist"
@@ -4785,7 +4702,7 @@ Namespace Contensive.Core
                 Dim UsedTables As String
                 Dim RequireReload As Boolean
                 Dim Found As Boolean
-                Dim builder As New coreBuilderClass(cpCore)
+                ' Dim builder As New coreBuilderClass(cpCore)
                 Dim InstallCollectionList As String = ""                 'Collections to Install when upgrade is complete
                 '
                 Call appendInstallLog(cpCore.serverconfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "Application: " & cpCore.serverconfig.appConfig.name & ", UpgradeCDef_BuildDbFromCollection")
@@ -5014,7 +4931,7 @@ Namespace Contensive.Core
                                 Else
                                     ContentName = "Menu Entries"
                                     Call appendInstallLog(cpCore.serverconfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "creating menu entry [" & .Name & "], parentname [" & .ParentName & "]")
-                                    Call builder.admin_VerifyMenuEntry(.ParentName, .Name, .ContentName, .LinkPage, .SortOrder, .AdminOnly, .DeveloperOnly, .NewWindow, .Active, ContentName, .AddonName)
+                                    Call Controllers.coreBuilderClass.admin_VerifyMenuEntry(cpCore, .ParentName, .Name, .ContentName, .LinkPage, .SortOrder, .AdminOnly, .DeveloperOnly, .NewWindow, .Active, ContentName, .AddonName)
                                 End If
                             End If
                         End With
@@ -5223,7 +5140,6 @@ Namespace Contensive.Core
                 Dim DataSourceName As String
                 Dim SQL As String
                 Dim ContentIsBaseContent As Boolean
-                Dim builder As New coreBuilderClass(cpCore)
                 '
                 Call appendInstallLog(cpCore.serverconfig.appConfig.name, "AddCDefToDb", "Application: " & cpCore.serverconfig.appConfig.name & ", UpgradeCDef_BuildDbFromCollection_AddCDefToDb")
                 '

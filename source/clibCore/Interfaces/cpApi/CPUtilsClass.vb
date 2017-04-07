@@ -9,20 +9,9 @@ Imports Contensive.BaseClasses
 Imports System.Runtime.InteropServices
 
 Namespace Contensive.Core
-    '
-    ' comVisible to be activeScript compatible
-    '
-    <ComVisible(True)>
-    <ComClass(CPUtilsClass.ClassId, CPUtilsClass.InterfaceId, CPUtilsClass.EventsId)>
     Public Class CPUtilsClass
         Inherits BaseClasses.CPUtilsBaseClass
         Implements IDisposable
-        '
-#Region "COM GUIDs"
-        Public Const ClassId As String = ""
-        Public Const InterfaceId As String = ""
-        Public Const EventsId As String = ""
-#End Region
         '
         Private CP As CPClass
         Protected disposed As Boolean = False
@@ -58,8 +47,7 @@ Namespace Contensive.Core
         ''' <remarks></remarks>
         Public Overrides Sub Upgrade(isNewApp As Boolean)
             Try
-                Dim builder As New coreBuilderClass(CP.core)
-                builder.upgrade(isNewApp)
+                Controllers.coreBuilderClass.upgrade(CP.core, isNewApp)
             Catch ex As Exception
                 CP.core.handleExceptionAndRethrow(ex)
             End Try

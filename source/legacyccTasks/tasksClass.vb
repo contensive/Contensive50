@@ -326,8 +326,6 @@ ErrorTrap:
         ''' <summary>
         ''' constructor
         ''' </summary>
-        ''' <param name="cp"></param>
-        ''' <remarks></remarks>
         Public Sub New(cpCore As coreClass)
             MyBase.New()
             Me.cpCore = cpCore

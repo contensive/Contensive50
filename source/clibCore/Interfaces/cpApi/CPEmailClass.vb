@@ -3,20 +3,9 @@ Imports Contensive.BaseClasses
 Imports System.Runtime.InteropServices
 
 Namespace Contensive.Core
-    '
-    ' comVisible to be activeScript compatible
-    '
-    <ComVisible(True)> _
-    <ComClass(CPEmailClass.ClassId, CPEmailClass.InterfaceId, CPEmailClass.EventsId)> _
     Public Class CPEmailClass
         Inherits BaseClasses.CPEmailBaseClass
         Implements IDisposable
-        '
-#Region "COM GUIDs"
-        Public Const ClassId As String = "7D2901F1-B5E8-4293-9373-909FDA6C7749"
-        Public Const InterfaceId As String = "2DC385E8-C4E7-4BBF-AE6D-F0FC5E2AA3C1"
-        Public Const EventsId As String = "32E893C5-165B-4088-8D9E-CE82524A5000"
-#End Region
         '
         Private cpCore As Contensive.Core.coreClass
         Protected disposed As Boolean = False
