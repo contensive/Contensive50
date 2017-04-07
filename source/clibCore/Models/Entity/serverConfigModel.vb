@@ -166,7 +166,7 @@ Namespace Contensive.Core.Models.Entity
                         '
                         ' -- application now configured
                         returnModel.appConfig = New appConfigModel()
-                        returnModel.appConfig.appStatus = applicationStatusEnum.ApplicationStatusAppConfigNotValid
+                        returnModel.appConfig.appStatus = applicationStatusEnum.ApplicationStatusAppConfigNotFound
                         Throw New Exception("application [" & appName & "] was not found in this server group.")
                     Else
                         returnModel.appConfig = returnModel.apps(appName.ToLower())

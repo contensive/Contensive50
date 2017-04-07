@@ -145,6 +145,7 @@
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
     </None>
     <None Include="My Project\PublishProfiles\app20170405132125.pubxml" />
+    <None Include="My Project\PublishProfiles\app20170406174526.pubxml" />
     <None Include="My Project\PublishProfiles\aspxDefaultApp.pubxml" />
     <None Include="My Project\PublishProfiles\aspxtest.pubxml" />
     <None Include="My Project\PublishProfiles\deployToLocalAppPatternsAspnet.pubxml" />

@@ -546,6 +546,7 @@ Namespace Contensive.Core
             MyBase.New()
             Me.cp = cp
             Me.serverConfig = serverConfig
+            Me.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady
             webServerIO.iisContext = Nothing
             constructorCommonInitialize()
         End Sub
@@ -560,6 +561,7 @@ Namespace Contensive.Core
             MyBase.New()
             Me.cp = cp
             Me.serverConfig = serverConfig
+            Me.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady
             Call webServerIO.initWebContext(httpContext)
             constructorCommonInitialize()
         End Sub
