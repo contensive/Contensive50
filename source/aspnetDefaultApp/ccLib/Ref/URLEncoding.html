@@ -1,0 +1,973 @@
+
+<html>
+<head><title>URL Encoding</title>
+<script type="text/javascript">
+var hexVals = new Array("0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+              "A", "B", "C", "D", "E", "F");
+var unsafeString = "\"<>%\\^[]`\+\$\,";
+var safeString = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\$\-\_\.\+\!\*\'\(\)\/"
+
+function isUnsafe(compareChar)
+// this function checks to see if a char is URL unsafe.
+// Returns bool result. True = unsafe, False = safe
+{
+//if (unsafeString.indexOf(compareChar) == -1 && compareChar.charCodeAt(0) > 32
+if ((safeString.indexOf(compareChar) >= 0) && (compareChar.charCodeAt(0) > 32) && (compareChar.charCodeAt(0) < 123))
+   { return false; } // found no unsafe chars, return false
+else
+   { return true; }
+}
+
+function decToHex(num, radix)
+// part of the hex-ifying functionality
+{
+var hexString = "";
+while (num >= radix)
+      {
+       temp = num % radix;
+       num = Math.floor(num / radix);
+       hexString += hexVals[temp];
+      }
+hexString += hexVals[num];
+return reversal(hexString);
+}
+
+function reversal(s) // part of the hex-ifying functionality
+{
+var len = s.length;
+var trans = "";
+for (i=0; i<len; i++)
+    { trans = trans + s.substring(len-i-1, len-i); }
+s = trans;
+return s;
+}
+
+function convert(val) // this converts a given char to url hex form
+{ return  "%" + decToHex(val.charCodeAt(0), 16); }
+
+function setRadio()
+// gets the radio state and swaps it. Returns state
+{
+var state;
+if (document.forms[0].state.value == "none")
+    {
+     document.forms[0].state.value = "urlenc"; // set new state
+     document.forms[0].enc[1].checked = true;  // set new radio button
+    }
+else
+   {
+    document.forms[0].state.value = "none";  // set new state
+    document.forms[0].enc[0].checked = true; // set new radio button
+   }
+return document.forms[0].state.value;
+}
+
+function changeIt(val)
+	{
+	var state   = setRadio();
+	var i       = 0;
+	var newStr  = "";
+	var frag    = "";
+	var encval  = "";
+	var original = "";
+	var Prefix = "";
+	var QueryString = "";
+	var len = 0;
+	var backlen = 0;
+	var Pos = 0;
+	if ( val.toLowerCase().indexOf('https://')==0 ) {
+		Prefix=val.substring(0,8);
+		val=val.substring(8);
+	} else if ( val.toLowerCase().indexOf('http://')==0 ) {
+		Prefix=val.substring(0,7);
+		val=val.substring(7);
+	}
+	Pos=val.indexOf('?')
+	if ( Pos!=-1 ) {
+		QueryString = '?'+val.substring(Pos+1)+QueryString;
+		val=val.substring(0,Pos);
+	}
+	Pos=val.indexOf('#')
+	if ( Pos!=-1 ) {
+		QueryString = '#'+val.substring(Pos+1)+QueryString;
+		val=val.substring(0,Pos);
+	}
+
+	len = val.length;
+	backlen = len;
+	original = val;
+	if (state == "none") {
+		// needs to be decoded
+		while (backlen > 0) {
+			lastpercent = val.lastIndexOf("%");
+			if (lastpercent != -1) {
+				// we found a % char. Need to handle everything *after* the %
+				frag = val.substring(lastpercent+1,val.length);
+				// re-assign val to everything *before* the %
+				val  = val.substring(0,lastpercent);
+				if (frag.length >= 2) {
+					// end contains unencoded
+					encval = frag.substring(0,2);
+					newStr = frag.substring(2,frag.length) + newStr;
+					//convert the char here. for now it just doesn't add it.
+					if ("01234567890abcdefABCDEF".indexOf(encval.substring(0,1)) != -1 && "01234567890abcdefABCDEF".indexOf(encval.substring(1,2)) != -1) {
+						encval = String.fromCharCode(parseInt(encval, 16)); // hex to base 10
+						newStr = encval + newStr; // prepend the char in
+					}
+					// if so, convert. Else, ignore it.
+				}
+				// adjust length of the string to be examined
+	                  backlen = lastpercent;
+				// alert ("backlen at the end of the found % if is: " + backlen);
+			} else { newStr = val + newStr; backlen = 0; } // if there is no %, just leave the value as-is
+		} // end while
+	} else {
+		for (i=0;i<len;i++) {
+			if (val.substring(i,i+1).charCodeAt(0) < 255) {
+				if (isUnsafe(val.substring(i,i+1)) == false) {
+					newStr = newStr + val.substring(i,i+1); 
+				} else {
+					newStr = newStr + convert(val.substring(i,i+1)); 
+				}
+	             } else {
+				alert ("Found a non-ISO-8859-1 character at position: " + (i+1) + ",\nPlease eliminate before continuing.");
+				document.forms[0].state.value = "none";
+				document.forms[0].enc[0].checked = true; // set back to "no encoding"
+				newStr = original; i=len;                // short-circuit the loop and exit
+			}
+		}
+	}
+	if ( QueryString!='' ) { newStr += QueryString }
+	if ( Prefix!='' ) { newStr = Prefix+newStr }
+	document.forms[0].origval.value = newStr;
+}
+</script>
+</head>
+<style>td {border-bottom:1px solid #808080;padding:2px;text-align:center;white-space:nowrap;}</style>
+<BODY>
+<h1>URL Encoding (Hexidecimal)</H1>
+<P>Only the characters 0-9 a-z A-Z and $ - _ . + ! * ' ( ) can be used in a URL. All other characters must be encoded with the following reference.<P>
+<table width=200>
+<TR><Td width=100>Character</Td><Td width=100 align=left>URL-encoding</Td></TR>
+<TR>
+<TD>space</TD>
+<TD>%20</TD></TR>
+<TR>
+<TD>!</TD>
+<TD>%21</TD></TR>
+<TR>
+<TD>"</TD>
+<TD>%22</TD></TR>
+<TR>
+<TD>#</TD>
+<TD>%23</TD></TR>
+<TR>
+<TD>$</TD>
+<TD>%24</TD></TR>
+<TR>
+<TD>%</TD>
+<TD>%25</TD></TR>
+<TR>
+<TD>&amp;</TD>
+<TD>%26</TD></TR>
+<TR>
+<TD>'</TD>
+<TD>%27</TD></TR>
+<TR>
+<TD>(</TD>
+<TD>%28</TD></TR>
+<TR>
+<TD>)</TD>
+<TD>%29</TD></TR>
+<TR>
+<TD>*</TD>
+<TD>%2A</TD></TR>
+<TR>
+<TD>+</TD>
+<TD>%2B</TD></TR>
+<TR>
+<TD>,</TD>
+<TD>%2C</TD></TR>
+<TR>
+<TD>-</TD>
+<TD>%2D</TD></TR>
+<TR>
+<TD>.</TD>
+<TD>%2E</TD></TR>
+<TR>
+<TD>/</TD>
+<TD>%2F</TD></TR>
+<TR>
+<TD>0</TD>
+<TD>%30</TD></TR>
+<TR>
+<TD>1</TD>
+<TD>%31</TD></TR>
+<TR>
+<TD>2</TD>
+<TD>%32</TD></TR>
+<TR>
+<TD>3</TD>
+<TD>%33</TD></TR>
+<TR>
+<TD>4</TD>
+<TD>%34</TD></TR>
+<TR>
+<TD>5</TD>
+<TD>%35</TD></TR>
+<TR>
+<TD>6</TD>
+<TD>%36</TD></TR>
+<TR>
+<TD>7</TD>
+<TD>%37</TD></TR>
+<TR>
+<TD>8</TD>
+<TD>%38</TD></TR>
+<TR>
+<TD>9</TD>
+<TD>%39</TD></TR>
+<TR>
+<TD>:</TD>
+<TD>%3A</TD></TR>
+<TR>
+<TD>;</TD>
+<TD>%3B</TD></TR>
+<TR>
+<TD>&lt;</TD>
+<TD>%3C</TD></TR>
+<TR>
+<TD>=</TD>
+<TD>%3D</TD></TR>
+<TR>
+<TD>&gt;</TD>
+<TD>%3E</TD></TR>
+<TR>
+<TD>?</TD>
+<TD>%3F</TD></TR>
+<TR>
+<TD>@</TD>
+<TD>%40</TD></TR>
+<TR>
+<TD>A</TD>
+<TD>%41</TD></TR>
+<TR>
+<TD>B</TD>
+<TD>%42</TD></TR>
+<TR>
+<TD>C</TD>
+<TD>%43</TD></TR>
+<TR>
+<TD>D</TD>
+<TD>%44</TD></TR>
+<TR>
+<TD>E</TD>
+<TD>%45</TD></TR>
+<TR>
+<TD>F</TD>
+<TD>%46</TD></TR>
+<TR>
+<TD>G</TD>
+<TD>%47</TD></TR>
+<TR>
+<TD>H</TD>
+<TD>%48</TD></TR>
+<TR>
+<TD>I</TD>
+<TD>%49</TD></TR>
+<TR>
+<TD>J</TD>
+<TD>%4A</TD></TR>
+<TR>
+<TD>K</TD>
+<TD>%4B</TD></TR>
+<TR>
+<TD>L</TD>
+<TD>%4C</TD></TR>
+<TR>
+<TD>M</TD>
+<TD>%4D</TD></TR>
+<TR>
+<TD>N</TD>
+<TD>%4E</TD></TR>
+<TR>
+<TD>O</TD>
+<TD>%4F</TD></TR>
+<TR>
+<TD>P</TD>
+<TD>%50</TD></TR>
+<TR>
+<TD>Q</TD>
+<TD>%51</TD></TR>
+<TR>
+<TD>R</TD>
+<TD>%52</TD></TR>
+<TR>
+<TD>S</TD>
+<TD>%53</TD></TR>
+<TR>
+<TD>T</TD>
+<TD>%54</TD></TR>
+<TR>
+<TD>U</TD>
+<TD>%55</TD></TR>
+<TR>
+<TD>V</TD>
+<TD>%56</TD></TR>
+<TR>
+<TD>W</TD>
+<TD>%57</TD></TR>
+<TR>
+<TD>X</TD>
+<TD>%58</TD></TR>
+<TR>
+<TD>Y</TD>
+<TD>%59</TD></TR>
+<TR>
+<TD>Z</TD>
+<TD>%5A</TD></TR>
+<TR>
+<TD>[</TD>
+<TD>%5B</TD></TR>
+<TR>
+<TD>\</TD>
+<TD>%5C</TD></TR>
+<TR>
+<TD>]</TD>
+<TD>%5D</TD></TR>
+<TR>
+<TD>^</TD>
+<TD>%5E</TD></TR>
+<TR>
+<TD>_</TD>
+<TD>%5F</TD></TR>
+<TR>
+<TD>`</TD>
+<TD>%60</TD></TR>
+<TR>
+<TD>a</TD>
+<TD>%61</TD></TR>
+<TR>
+<TD>b</TD>
+<TD>%62</TD></TR>
+<TR>
+<TD>c</TD>
+<TD>%63</TD></TR>
+<TR>
+<TD>d</TD>
+<TD>%64</TD></TR>
+<TR>
+<TD>e</TD>
+<TD>%65</TD></TR>
+<TR>
+<TD>f</TD>
+<TD>%66</TD></TR>
+<TR>
+<TD>g</TD>
+<TD>%67</TD></TR>
+<TR>
+<TD>h</TD>
+<TD>%68</TD></TR>
+<TR>
+<TD>i</TD>
+<TD>%69</TD></TR>
+<TR>
+<TD>j</TD>
+<TD>%6A</TD></TR>
+<TR>
+<TD>k</TD>
+<TD>%6B</TD></TR>
+<TR>
+<TD>l</TD>
+<TD>%6C</TD></TR>
+<TR>
+<TD>m</TD>
+<TD>%6D</TD></TR>
+<TR>
+<TD>n</TD>
+<TD>%6E</TD></TR>
+<TR>
+<TD>o</TD>
+<TD>%6F</TD></TR>
+<TR>
+<TD>p</TD>
+<TD>%70</TD></TR>
+<TR>
+<TD>q</TD>
+<TD>%71</TD></TR>
+<TR>
+<TD>r</TD>
+<TD>%72</TD></TR>
+<TR>
+<TD>s</TD>
+<TD>%73</TD></TR>
+<TR>
+<TD>t</TD>
+<TD>%74</TD></TR>
+<TR>
+<TD>u</TD>
+<TD>%75</TD></TR>
+<TR>
+<TD>v</TD>
+<TD>%76</TD></TR>
+<TR>
+<TD>w</TD>
+<TD>%77</TD></TR>
+<TR>
+<TD>x</TD>
+<TD>%78</TD></TR>
+<TR>
+<TD>y</TD>
+<TD>%79</TD></TR>
+<TR>
+<TD>z</TD>
+<TD>%7A</TD></TR>
+<TR>
+<TD>{</TD>
+<TD>%7B</TD></TR>
+<TR>
+<TD>|</TD>
+<TD>%7C</TD></TR>
+<TR>
+<TD>}</TD>
+<TD>%7D</TD></TR>
+<TR>
+<TD>~</TD>
+<TD>%7E</TD></TR>
+<TR>
+<TD>&nbsp;</TD>
+<TD>%7F</TD></TR>
+<TR>
+<TD>€</TD>
+<TD>%80</TD></TR>
+<TR>
+<TD>&nbsp;</TD>
+<TD>%81</TD></TR>
+<TR>
+<TD>‚</TD>
+<TD>%82</TD></TR>
+<TR>
+<TD>ƒ</TD>
+<TD>%83</TD></TR>
+<TR>
+<TD>„</TD>
+<TD>%84</TD></TR>
+<TR>
+<TD>…</TD>
+<TD>%85</TD></TR>
+<TR>
+<TD>†</TD>
+<TD>%86</TD></TR>
+<TR>
+<TD>‡</TD>
+<TD>%87</TD></TR>
+<TR>
+<TD>ˆ</TD>
+<TD>%88</TD></TR>
+<TR>
+<TD>‰</TD>
+<TD>%89</TD></TR>
+<TR>
+<TD>Š</TD>
+<TD>%8A</TD></TR>
+<TR>
+<TD>‹</TD>
+<TD>%8B</TD></TR>
+<TR>
+<TD>Œ</TD>
+<TD>%8C</TD></TR>
+<TR>
+<TD>&nbsp;</TD>
+<TD>%8D</TD></TR>
+<TR>
+<TD>Ž</TD>
+<TD>%8E</TD></TR>
+<TR>
+<TD>&nbsp;</TD>
+<TD>%8F</TD></TR>
+<TR>
+<TD>&nbsp;</TD>
+<TD>%90</TD></TR>
+<TR>
+<TD>‘</TD>
+<TD>%91</TD></TR>
+<TR>
+<TD>’</TD>
+<TD>%92</TD></TR>
+<TR>
+<TD>“</TD>
+<TD>%93</TD></TR>
+<TR>
+<TD>”</TD>
+<TD>%94</TD></TR>
+<TR>
+<TD>•</TD>
+<TD>%95</TD></TR>
+<TR>
+<TD>–</TD>
+<TD>%96</TD></TR>
+<TR>
+<TD>—</TD>
+<TD>%97</TD></TR>
+<TR>
+<TD>˜</TD>
+<TD>%98</TD></TR>
+<TR>
+<TD>™</TD>
+<TD>%99</TD></TR>
+<TR>
+<TD>š</TD>
+<TD>%9A</TD></TR>
+<TR>
+<TD>›</TD>
+<TD>%9B</TD></TR>
+<TR>
+<TD>œ</TD>
+<TD>%9C</TD></TR>
+<TR>
+<TD>&nbsp;</TD>
+<TD>%9D</TD></TR>
+<TR>
+<TD>ž</TD>
+<TD>%9E</TD></TR>
+<TR>
+<TD>Ÿ</TD>
+<TD>%9F</TD></TR>
+<TR>
+<TD>&nbsp;</TD>
+<TD>%A0</TD></TR>
+<TR>
+<TD>¡</TD>
+<TD>%A1</TD></TR>
+<TR>
+<TD>¢</TD>
+<TD>%A2</TD></TR>
+<TR>
+<TD>£</TD>
+<TD>%A3</TD></TR>
+<TR>
+<TD>&nbsp;</TD>
+<TD>%A4</TD></TR>
+<TR>
+<TD>¥</TD>
+<TD>%A5</TD></TR>
+<TR>
+<TD>|</TD>
+<TD>%A6</TD></TR>
+<TR>
+<TD>§</TD>
+<TD>%A7</TD></TR>
+<TR>
+<TD>¨</TD>
+<TD>%A8</TD></TR>
+<TR>
+<TD>©</TD>
+<TD>%A9</TD></TR>
+<TR>
+<TD>ª</TD>
+<TD>%AA</TD></TR>
+<TR>
+<TD>«</TD>
+<TD>%AB</TD></TR>
+<TR>
+<TD>¬</TD>
+<TD>%AC</TD></TR>
+<TR>
+<TD>¯</TD>
+<TD>%AD</TD></TR>
+<TR>
+<TD>®</TD>
+<TD>%AE</TD></TR>
+<TR>
+<TD>¯</TD>
+<TD>%AF</TD></TR>
+<TR>
+<TD>°</TD>
+<TD>%B0</TD></TR>
+<TR>
+<TD>±</TD>
+<TD>%B1</TD></TR>
+<TR>
+<TD>²</TD>
+<TD>%B2</TD></TR>
+<TR>
+<TD>³</TD>
+<TD>%B3</TD></TR>
+<TR>
+<TD>´</TD>
+<TD>%B4</TD></TR>
+<TR>
+<TD>µ</TD>
+<TD>%B5</TD></TR>
+<TR>
+<TD>¶</TD>
+<TD>%B6</TD></TR>
+<TR>
+<TD>·</TD>
+<TD>%B7</TD></TR>
+<TR>
+<TD>¸</TD>
+<TD>%B8</TD></TR>
+<TR>
+<TD>¹</TD>
+<TD>%B9</TD></TR>
+<TR>
+<TD>º</TD>
+<TD>%BA</TD></TR>
+<TR>
+<TD>»</TD>
+<TD>%BB</TD></TR>
+<TR>
+<TD>¼</TD>
+<TD>%BC</TD></TR>
+<TR>
+<TD>½</TD>
+<TD>%BD</TD></TR>
+<TR>
+<TD>¾</TD>
+<TD>%BE</TD></TR>
+<TR>
+<TD>¿</TD>
+<TD>%BF</TD></TR>
+<TR>
+<TD>À</TD>
+<TD>%C0</TD></TR>
+<TR>
+<TD>Á</TD>
+<TD>%C1</TD></TR>
+<TR>
+<TD>Â</TD>
+<TD>%C2</TD></TR>
+<TR>
+<TD>Ã</TD>
+<TD>%C3</TD></TR>
+<TR>
+<TD>Ä</TD>
+<TD>%C4</TD></TR>
+<TR>
+<TD>Å</TD>
+<TD>%C5</TD></TR>
+<TR>
+<TD>Æ</TD>
+<TD>%C6</TD></TR>
+<TR>
+<TD>Ç</TD>
+<TD>%C7</TD></TR>
+<TR>
+<TD>È</TD>
+<TD>%C8</TD></TR>
+<TR>
+<TD>É</TD>
+<TD>%C9</TD></TR>
+<TR>
+<TD>Ê</TD>
+<TD>%CA</TD></TR>
+<TR>
+<TD>Ë</TD>
+<TD>%CB</TD></TR>
+<TR>
+<TD>Ì</TD>
+<TD>%CC</TD></TR>
+<TR>
+<TD>Í</TD>
+<TD>%CD</TD></TR>
+<TR>
+<TD>Î</TD>
+<TD>%CE</TD></TR>
+<TR>
+<TD>Ï</TD>
+<TD>%CF</TD></TR>
+<TR>
+<TD>Ð</TD>
+<TD>%D0</TD></TR>
+<TR>
+<TD>Ñ</TD>
+<TD>%D1</TD></TR>
+<TR>
+<TD>Ò</TD>
+<TD>%D2</TD></TR>
+<TR>
+<TD>Ó</TD>
+<TD>%D3</TD></TR>
+<TR>
+<TD>Ô</TD>
+<TD>%D4</TD></TR>
+<TR>
+<TD>Õ</TD>
+<TD>%D5</TD></TR>
+<TR>
+<TD>Ö</TD>
+<TD>%D6</TD></TR>
+<TR>
+<TD>&nbsp;</TD>
+<TD>%D7</TD></TR>
+<TR>
+<TD>Ø</TD>
+<TD>%D8</TD></TR>
+<TR>
+<TD>Ù</TD>
+<TD>%D9</TD></TR>
+<TR>
+<TD>Ú</TD>
+<TD>%DA</TD></TR>
+<TR>
+<TD>Û</TD>
+<TD>%DB</TD></TR>
+<TR>
+<TD>Ü</TD>
+<TD>%DC</TD></TR>
+<TR>
+<TD>Ý</TD>
+<TD>%DD</TD></TR>
+<TR>
+<TD>Þ</TD>
+<TD>%DE</TD></TR>
+<TR>
+<TD>ß</TD>
+<TD>%DF</TD></TR>
+<TR>
+<TD>à</TD>
+<TD>%E0</TD></TR>
+<TR>
+<TD>á</TD>
+<TD>%E1</TD></TR>
+<TR>
+<TD>â</TD>
+<TD>%E2</TD></TR>
+<TR>
+<TD>ã</TD>
+<TD>%E3</TD></TR>
+<TR>
+<TD>ä</TD>
+<TD>%E4</TD></TR>
+<TR>
+<TD>å</TD>
+<TD>%E5</TD></TR>
+<TR>
+<TD>æ</TD>
+<TD>%E6</TD></TR>
+<TR>
+<TD>ç</TD>
+<TD>%E7</TD></TR>
+<TR>
+<TD>è</TD>
+<TD>%E8</TD></TR>
+<TR>
+<TD>é</TD>
+<TD>%E9</TD></TR>
+<TR>
+<TD>ê</TD>
+<TD>%EA</TD></TR>
+<TR>
+<TD>ë</TD>
+<TD>%EB</TD></TR>
+<TR>
+<TD>ì</TD>
+<TD>%EC</TD></TR>
+<TR>
+<TD>í</TD>
+<TD>%ED</TD></TR>
+<TR>
+<TD>î</TD>
+<TD>%EE</TD></TR>
+<TR>
+<TD>ï</TD>
+<TD>%EF</TD></TR>
+<TR>
+<TD>ð</TD>
+<TD>%F0</TD></TR>
+<TR>
+<TD>ñ</TD>
+<TD>%F1</TD></TR>
+<TR>
+<TD>ò</TD>
+<TD>%F2</TD></TR>
+<TR>
+<TD>ó</TD>
+<TD>%F3</TD></TR>
+<TR>
+<TD>ô</TD>
+<TD>%F4</TD></TR>
+<TR>
+<TD>õ</TD>
+<TD>%F5</TD></TR>
+<TR>
+<TD>ö</TD>
+<TD>%F6</TD></TR>
+<TR>
+<TD>÷</TD>
+<TD>%F7</TD></TR>
+<TR>
+<TD>ø</TD>
+<TD>%F8</TD></TR>
+<TR>
+<TD>ù</TD>
+<TD>%F9</TD></TR>
+<TR>
+<TD>ú</TD>
+<TD>%FA</TD></TR>
+<TR>
+<TD>û</TD>
+<TD>%FB</TD></TR>
+<TR>
+<TD>ü</TD>
+<TD>%FC</TD></TR>
+<TR>
+<TD>ý</TD>
+<TD>%FD</TD></TR>
+<TR>
+<TD>þ</TD>
+<TD>%FE</TD></TR>
+<TR>
+<TD>ÿ</TD>
+<TD>%FF</TD></TR></TBODY></TABLE><BR>
+
+<table width=600>
+<tr><td width="200">Character</td><td width="200">Description</td><td width="200">URL-encoding</td></tr>
+<tr>
+<TD>NUL</TD>
+<TD>null character</TD>
+<TD>%00</TD></TR>
+<TR>
+<TD>SOH</TD>
+<TD>start of header</TD>
+<TD>%01</TD></TR>
+<TR>
+<TD>STX</TD>
+<TD>start of text</TD>
+<TD>%02</TD></TR>
+<TR>
+<TD>ETX</TD>
+<TD>end of text</TD>
+<TD>%03</TD></TR>
+<TR>
+<TD>EOT</TD>
+<TD>end of transmission</TD>
+<TD>%04</TD></TR>
+<TR>
+<TD>ENQ</TD>
+<TD>enquiry</TD>
+<TD>%05</TD></TR>
+<TR>
+<TD>ACK</TD>
+<TD>acknowledge</TD>
+<TD>%06</TD></TR>
+<TR>
+<TD>BEL</TD>
+<TD>bell (ring)</TD>
+<TD>%07</TD></TR>
+<TR>
+<TD>BS</TD>
+<TD>backspace</TD>
+<TD>%08</TD></TR>
+<TR>
+<TD>HT</TD>
+<TD>horizontal tab</TD>
+<TD>%09</TD></TR>
+<TR>
+<TD>LF</TD>
+<TD>line feed</TD>
+<TD>%0A</TD></TR>
+<TR>
+<TD>VT</TD>
+<TD>vertical tab</TD>
+<TD>%0B</TD></TR>
+<TR>
+<TD>FF</TD>
+<TD>form feed</TD>
+<TD>%0C</TD></TR>
+<TR>
+<TD>CR</TD>
+<TD>carriage return</TD>
+<TD>%0D</TD></TR>
+<TR>
+<TD>SO</TD>
+<TD>shift out</TD>
+<TD>%0E</TD></TR>
+<TR>
+<TD>SI</TD>
+<TD>shift in</TD>
+<TD>%0F</TD></TR>
+<TR>
+<TD>DLE</TD>
+<TD>data link escape</TD>
+<TD>%10</TD></TR>
+<TR>
+<TD>DC1</TD>
+<TD>device control 1</TD>
+<TD>%11</TD></TR>
+<TR>
+<TD>DC2</TD>
+<TD>device control 2</TD>
+<TD>%12</TD></TR>
+<TR>
+<TD>DC3</TD>
+<TD>device control 3</TD>
+<TD>%13</TD></TR>
+<TR>
+<TD>DC4</TD>
+<TD>device control 4</TD>
+<TD>%14</TD></TR>
+<TR>
+<TD>NAK</TD>
+<TD>negative acknowledge</TD>
+<TD>%15</TD></TR>
+<TR>
+<TD>SYN</TD>
+<TD>synchronize</TD>
+<TD>%16</TD></TR>
+<TR>
+<TD>ETB</TD>
+<TD>end transmission block</TD>
+<TD>%17</TD></TR>
+<TR>
+<TD>CAN</TD>
+<TD>cancel</TD>
+<TD>%18</TD></TR>
+<TR>
+<TD>EM</TD>
+<TD>end of medium</TD>
+<TD>%19</TD></TR>
+<TR>
+<TD>SUB</TD>
+<TD>substitute</TD>
+<TD>%1A</TD></TR>
+<TR>
+<TD>ESC</TD>
+<TD>escape</TD>
+<TD>%1B</TD></TR>
+<TR>
+<TD>FS</TD>
+<TD>file separator</TD>
+<TD>%1C</TD></TR>
+<TR>
+<TD>GS</TD>
+<TD>group separator</TD>
+<TD>%1D</TD></TR>
+<TR>
+<TD>RS</TD>
+<TD>record separator</TD>
+<TD>%1E</TD></TR>
+<TR>
+<TD>US</TD>
+<TD>unit separator</TD>
+<TD>%1F</TD></TR></TBODY></TABLE>
+<P>This form encodes and decodes a string for use in a URL. Currently, it encodes the part of the URL after the protocol (http://), and before the querystring ('?' or '#'). It was created based on information found at http://www.blooberry.com/indexdot/html/topics/urlencoding.htm.<P>
+<form name="urlenc">
+<input type="hidden" name="state" value="none">
+<blockquote><table border=0>
+<tr><th colspan=3><input type=text name="origval" value="" size=100></th></tr>
+<tr><td align=center><input type=radio name="enc" checked></td>
+    <td align=center><input type=button value="&lt;-- Convert --&gt;" onclick="changeIt(document.forms[0].origval.value);"></td>
+    <td align=center><input type=radio name="enc"></td>
+</tr>
+<tr>
+   <th><font size=2>No<br>Encoding</font></th>
+   <th></th>
+   <th><font size=2>URL-Safe<br>Encoding</font></th>
+</tr>
+</table>
+</blockquote>
+</form>
+</body>
+</html>

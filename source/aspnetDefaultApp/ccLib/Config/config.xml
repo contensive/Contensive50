@@ -1,0 +1,12 @@
+<Contensive>
+	<Application>
+		<Name>ApplicationName</Name>
+		<AutoStart>false</AutoStart>
+		<DomainName>DomainNameOrIPAddress</DomainName>
+		<Rootpath>/</Rootpath>
+		<ConnectionString>ODBCConnectionString</ConnectionString>
+		<ContentFilePath>C:\InetPub\Blank\files\</ContentFilePath>
+		<LicenseKey>00000-00000-00000-000000000000</LicenseKey>
+		<MonitorPort>0</MonitorPort>
+	</Application>
+	<Application><Name>ccDemo</Name><AutoStart>false</AutoStart><DomainName>DomainNameOrIPAddress</DomainName><Rootpath>/ccDemo/</Rootpath><ConnectionString>ccDemo</ConnectionString><ContentFilePath>C:\Program Files\KMA\Contensive\ccDemo\Files\</ContentFilePath><LicenseKey>00000-00000-00000-000000000000</LicenseKey><MonitorPort>4002</MonitorPort></Application></Contensive>

@@ -1,0 +1,75 @@
+<style>
+
+/* Table - background for the entire table */
+.T {
+ Color: black;
+ Background-Color: #e0e0e0;
+} 
+
+/* Table Header - title for the table */
+.H {
+ Color: white;
+ Background-Color: #669ACC;
+ } 
+
+/* Table Header Title - title for the table */
+.HT {
+ font-size: 110%; 
+ font-weight: bold;
+ Color: white;
+ Background-Color: #669ACC;
+ border-top: 1px solid #77abdd;
+ border-bottom: 1px solid #5589bb;
+ } 
+
+/* Table Header Note - Below the title, more detailed description */
+.HN {
+ Color: white;
+ Padding-left: 50px;
+ Background-Color: #669ACC;
+ border-top: 1px solid #77abdd;
+ border-bottom: 1px solid #5589bb;
+ } 
+
+/* Table Captions - at the top of each column */
+.C {
+ Color: black;
+ Background-Color: #e0e0e0;
+ border-top: 1px solid #a0a0a0;
+ border-bottom: 1px solid #000000;
+ border-left: 1px solid #a0a0a0;
+ } 
+
+/* Data Even Row */
+.D0 {
+ Padding: 5px;
+ Color: black;
+ Background-Color: white;
+ border-top: 1px solid #f0f0f0;
+ border-bottom: 1px solid #f0f0f0;
+ } 
+
+/* Data Odd Row */
+.D1 {
+ Padding: 5px;
+ Color: black;
+ Background-Color: #f0f0f0;
+ border-top: 1px solid #f0f0f0;
+ border-bottom: 1px solid #e0e0e0;
+ } 
+
+/* Error */
+.E {
+ Padding: 5px;
+ Color: #FF4040;
+ Background-Color: white;
+ } 
+
+/* Buttons */
+.B {
+ Color: #FF4040;
+ Background-Color: #c0c0c0;
+ border-top: 1px solid #404040;
+ border-left: 1px solid #404040;
+ }
+</style>

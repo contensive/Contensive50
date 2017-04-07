@@ -432,15 +432,15 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public ReadOnly Property siteProperties() As coreSitePropertiesClass
+        Public ReadOnly Property siteProperties() As Models.Context.siteContextModel
             Get
                 If (_siteProperties Is Nothing) Then
-                    _siteProperties = New coreSitePropertiesClass(Me)
+                    _siteProperties = New Models.Context.siteContextModel(Me)
                 End If
                 Return _siteProperties
             End Get
         End Property
-        Private _siteProperties As coreSitePropertiesClass = Nothing
+        Private _siteProperties As Models.Context.siteContextModel = Nothing
         '
         '===================================================================================================
         ''' <summary>

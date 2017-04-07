@@ -1,0 +1,345 @@
+
+
+Contensive Menu Styles
+
+The FlyoutPanel is the overall window pane of buttons that becomes visible when the menu is clicked
+The FlyoutButton the the button on the top that hosts the menu 'panel'
+
+
+
+HTML structure
+
+<DIV class="ccFlyoutPanel">
+<A class="ccFlyoutPanelButton">Child Menu Button 1</A>
+<A class="ccFlyoutPanelButton">Child Menu Button 2</A>
+<A class="ccFlyoutPanelButton">Child Menu Button 3</A>
+</DIV>
+
+
+
+
+ccFlyoutPanel
+	The background color of the panel
+	Used in a <Div style=""> tag around each FlyoutPanelButton <A...> tag
+
+	.ccFlyoutPanel { 
+		BACKGROUND-COLOR: #e0e0e0; 	
+		Z-INDEX: 101;  
+		VISIBILITY: hidden;  
+		POSITION: absolute;
+		}	
+
+ccFlyoutPanelFlyoutText
+	When a Panel row contains a flyout menu, this style is on the text
+
+	.ccFlyoutPanelFlyoutText { 		
+		CURSOR: default;  
+		} 
+
+ccFlyoutPanelFlyoutPtr
+	When a Panel row contains a flyout menu, this style is on the arrow
+
+	.ccFlyoutPanelFlyoutPtr {
+		MARGIN-RIGHT: -0.75em;
+		text-decoration: none;
+		} 
+
+ccFlyoutPanelSep
+	Horizontal rules between panel rows (not used)
+
+	.ccFlyoutPanelSep { 			
+		BORDER-TOP: #909090 1px solid;  
+		MARGIN: 8px 2px;  
+		BORDER-BOTTOM: #f0f0f0 1px solid 
+		}
+
+ccFlyoutButton
+	The style in the <A tag around the top navigation buttons that open the menu
+	Used around the Caption in an <A style=""> tag
+
+	A.ccFlyoutButton { 
+		color: #FFFFFF;
+		text-decoration: none;
+		FONT-WEIGHT: bold;  
+		FONT-SIZE: 8pt;  
+		FONT-STYLE: normal;  
+		font-family: "MS Sans Serif", Arial, sans-serif; 
+		BACKGROUND-COLOR: transparent;  
+		TOP: 0px;  
+		LEFT: 0px;  	
+		PADDING-TOP: 2px;  
+		PADDING-RIGHT: 6px;  
+		PADDING-BOTTOM: 2px;  
+		PADDING-LEFT: 6px;  
+		Z-INDEX:100;  
+		CURSOR: hand;
+		}
+
+	A.ccFlyoutButton:hover { 
+		text-decoration: underline;
+		}
+
+ccFlyoutButtonDown
+	The style added to the <A tag when the menu system is opened
+	Used around the Caption in an <A style=""> tag
+
+	A.ccFlyoutButtonDown {
+		BACKGROUND-COLOR: #e0e0e0;  
+		}
+
+
+
+ccFlyoutPanelButton
+	The buttons that are on Flyout Panels.
+	Used around the Caption in an <A style=""> tag
+
+	A.ccFlyoutPanelButton { 
+		TEXT-DECORATION: none;   
+		FONT-WEIGHT: bold;  
+		FONT-SIZE: 8pt;  
+		FONT-STYLE: normal;
+		text-decoration: none;
+		FONT-FAMILY: "MS Sans Serif", Arial, sans-serif; 
+		PADDING-TOP: 3px;  
+		PADDING-LEFT: 1em;  
+		PADDING-RIGHT: 1em;  	
+		PADDING-BOTTOM: 3px;  
+		CURSOR: hand;  
+		WHITE-SPACE: nowrap;  
+		DISPLAY: block  
+		}
+
+	A.ccFlyoutPanelButton:link{
+		text-decoration: none;
+		CURSOR: hand;
+		}
+
+	A.ccFlyoutPanelButton:visited{
+		text-decoration: none;
+		CURSOR: hand; 
+		}
+
+	A.ccFlyoutPanelButton:hover{
+		text-decoration: underline;
+		CURSOR: hand;
+		BACKGROUND-COLOR: #A0A0A3
+		}
+
+
+
+ccFlyoutPanelButtonDown
+	When a panel button is selected, this style is added to the <A class="ccFlyoutPanelButton"> class in the panel.
+
+	A.ccFlyoutPanelButtonDown {
+		text-decoration: underline;
+		BACKGROUND-COLOR: #A0A0A3;
+		}
+
+
+ccHeadline
+	Headline for Content Pages
+
+	.ccHeadline	{
+		font-size: 12pt;
+		color: #202020;
+		}
+
+ccWhatsNew
+	The style for the <A...> in all Whats New lists
+
+	.ccWhatsNew {
+		list-style-Image: url("/ccLib/images/bullet.gif");
+		list-style-position: outside;
+		margin-top: 0pt;
+		color: #ffffff;
+		}	
+
+ccList
+ccListCopy
+	Used for Child Page Lists
+
+	.ccList {
+		list-style-position: outside;
+		margin-top: 0pt;
+		}
+
+	.ccListCopy	{ 
+		font-family: arial, verdana, helvetica, sans-serif; 
+		font-size: 8pt; 
+		text-decoration: none;
+	 	color: #000000; 
+		}
+
+
+ccNormal
+	removed
+
+
+ccLarge
+	removed
+
+
+ccSmall
+	removed
+
+
+ccSurveyHeadline
+	headline used in the survey calls
+
+ccSurveyQuestion
+	style of the questions in the survey calls
+
+ccSurveyCopy
+	style of the copy in teh survey calls
+
+ccError
+	style used on all error messages
+
+	.ccError {
+		font-size: 10pt;
+		font-weight: bold;
+		color: #c02020;
+		}
+
+ccPanel
+	used around all panels (typically grey panes)
+ 	
+	.ccPanel	{ 
+		background-color: #C0C0C0; 
+ 		}
+
+ccPanelHilite
+	used to create the hilited top/left edge of the ccPanel
+
+	.ccPanelHilite	{ 
+		background-color: #F8F8F8; 
+ 		}
+
+ccPanelShadow
+	used to create the shadow lower/right edge of the ccpanel
+
+	.ccPanelShadow	{ 
+		background-color: #808080; 
+ 		}
+
+ccPanelHeader
+ccPanelHeaderHilite
+ccPanelHeaderShadow
+	style for the panels created as headers, like the Blue "Admin Contensive Header"
+
+	.ccPanelHeader	{ 
+		background-color: #0320B0; 
+		color: #FFFFFF; 
+ 		}
+
+	.ccPanelHeaderHilite	{ 
+		background-color: #8080FF; 
+ 		}
+
+	.ccPanelHeaderShadow	{ 
+		background-color: #000000; 
+ 		}
+
+ccPanelReverse
+	to be removed
+
+ccPanelInput
+	the background and text style for panel regions used for user input
+
+	.ccPanelInput	{ 
+		background-color: #F0F0F0; 
+ 		}
+
+ccPanelIndexRow
+	to be  removed
+	
+ccPanelRowEven
+	used for the even and odd rows of a table list, such as the Admin Site
+
+	.ccPanelRowEven	{ 
+		background-color: #F0F0F0; 
+ 		}
+
+ccPanelRowOdd
+	used for the even and odd rows of a table list, such as the Admin Site
+
+	.ccPanelRowOdd	{ 
+		background-color: #FFFFFF; 
+ 		}
+
+ccPanelButtons
+	used for the background of panels that contain form action buttons
+
+	.ccPanelButtons { 
+		background-color: #a0a0a0; 
+		}
+
+
+ccAdminButton
+	to be removed
+
+ccAdminNormal
+	Style used for copy within Admin Site
+
+	.ccAdminNormal {
+		color: #000000;
+		font-size: 10px;
+		font-family: verdana, geneva, verdana;
+		font-weight: normal
+		}
+
+ccAdminSmall
+	Style used for copy within Admin Site
+
+	.ccAdminSmall {
+		color: #000000;
+		font-size: 9px;
+		font-family: verdana, geneva, verdana;
+		font-weight: normal
+		}
+
+ccAdminEditSectionHeader
+	Style used for the header that separates each section of the Admin Edit Page
+
+	.ccAdminEditSectionHeader {
+		background-color: #808080; 
+		color: #FFFFFF;
+		font-size: 9px;
+		font-family: verdana, geneva, verdana;
+		font-weight: normal
+		}
+
+ccAuthoringLink
+	Style used for the Link Authoring caption (and link)
+
+	.ccAuthoringLink {
+		background-color: #000080; 
+		text-decoration: none;
+		color: #FFFFFF;
+		font-size: 10px;
+		font-family: verdana, geneva, verdana;
+		font-weight: normal
+		}
+
+
+ccAdminBackground
+	Style used within the body tag for all admin sites
+
+	.ccAdminBackground {
+		background-color: #FFFFFF; 
+		text-decoration: none;
+		color: #000000;
+		font-size: 10px;
+		font-family: verdana, geneva, verdana;
+		font-weight: normal
+		}
+
+ccAdminMenu
+	removed
+
+ccAdminMenuHover
+	removed
+
+ccReport
+	removed
+

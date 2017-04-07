@@ -1,0 +1,156 @@
+<html>
+<head>
+<LINK href="/ccLib/Config/styles.css" type=text/css rel=stylesheet>
+<script type="text/javascript" src="http://alpha.contensive.com/ccLib/ClientSide/core.js"></script>
+<script language="JavaScript">
+var numRows;
+var numCols;
+var topAndBottomBarHeight = 50;
+var callerArgObj = dialogArguments;
+var callerWindowObj = callerArgObj.win;
+var callerFieldName = callerArgObj.fieldName;
+
+
+function showTab(TabName, tabElement, tabIndex) {
+
+	var i;
+	var newIndex;
+	var oldIndex;
+
+	var tabLinks = document.getElementsByName("tabLink");
+
+	// this is the way we can control it from outside
+	if (tabIndex != -1) {
+		tabElement = tabLinks[tabIndex];
+	}
+	
+	for (i = 0; i < tabLinks.length; i++) {
+		if (tabLinks[i] != tabElement) {
+			tabLinks[i].className = "ccPanel ccTab ccTabHidden";
+			tabLinks[i].blur();
+		}
+		else {
+			tabLinks[i].className = "ccPanel ccTab";
+			tabLinks[i].blur();
+		}
+	}
+	var tab = document.all[TabName];
+	var tabs = document.getElementsByTagName("DIV");
+
+	// this is the way we can control it from outside
+	if (tabIndex != -1) {
+		tab = tabs[tabIndex];
+	}
+
+	for (i = 0; i < tabs.length; i++) {
+		if (tabs[i] != tab) {
+			if (tabs[i].style.visibility = "visible") {
+				oldIndex = i;
+			}
+			tabs[i].style.visibility = "hidden";
+		}
+		else {
+			newIndex = i;
+			if (tabs[i].style.visibility == "visible") {
+				return;
+			}
+			tabs[i].style.visibility = "visible";
+		}
+	}
+	tabs[newIndex].style.left = getPageOffsetLeft(tabs[oldIndex]);
+	tabs[newIndex].style.top = getPageOffsetTop(tabs[oldIndex]);
+
+}
+
+function getInfoAndUpdate(){
+	alert( 'save' );
+}
+
+function closeFunction() {
+	window.close();
+}
+</script>
+<title>Table Properties</title>
+</head>
+<style>
+
+.ccTab { color: #000000; 
+	width: 80px; 
+	height: 25px; 
+	text-decoration: none; 
+	text-align: center; 
+	font-weight: bold;
+	padding-top: 3px;
+	border-top: 1px solid #E5E2E2; 
+	border-right: 1px solid #9C9A9A; 
+	border-left: 1px solid #E5E2E2;}
+.ccTabHidden { 
+	font-weight: normal;
+	padding-top: 3px;
+	height: 23px;
+	border-top: 1px solid #E5E2E2; 
+	border-right: 1px solid #9C9A9A; 
+	border-left: 1px solid #E5E2E2;
+	border-bottom: 1px solid #E5E2E2; 
+	color: #000000;}
+.ccTabSpacer { 
+	width: 5px; 
+	height: 25px; 
+	padding-top: 5px; 
+	border-bottom: 1px solid #E5E2E2;}
+.ccTabFiller { 
+	width: 100%; 
+	height: 25px; 
+	padding-top: 5px; 
+	border-bottom: 1px solid #E5E2E2;}
+
+</style>
+
+<body class="ccPanel" topmargin="0" leftmargin="0" marginwidth="0" marginheight="0">
+<TABLE border="0" cellpadding="0" cellspacing="0" width="100%" class="ccPanelshadow">
+<TR id="topspace"><TD><img src="/ccLib/images/spacer.gif" height="5" width="100%"></TD></TR>
+<TR id="tabRow"><TD><nobr><!--
+--><span class="ccTabSpacer">&nbsp;</span><a class="ccPanel ccTab" href="" name="tabLink" onClick="showTab('TabPanel1', this, -1); return false;">TabPanel1</a><!--
+--><span class="ccTabSpacer">&nbsp;</span><a class="ccPanel ccTab ccTabHidden" href="" name="tabLink" onClick="showTab('TabPanel2', this, -1); return false;">TabPanel2</a><!--
+--><span class="ccTabFiller">&nbsp;</span><!--
+--></nobr></TD></TR>
+<TR><TD><!--
+--><TABLE id="wholeTable" border="0" cellpadding="0" cellspacing="0" width="100%" class="ccPanel">
+<TR>
+<TD width="100%" height="300" valign="top" align="left" style="height: 300px; border-right: 1px solid #000000; border-left: 1px solid #000000;border-bottom: 1px solid #000000;">
+
+<!-- TabPanel1 -->
+
+<div id="TabPanel1" style="border-right: 1px solid #000000; border-left: 1px solid #000000;border-bottom: 1px solid #000000;">
+<TABLE border="0" cellpadding="20" cellspacing="0" width="100%" class="ccPanel">
+<tr>
+<td width="100%" align="center">TabPanel1</td>
+</tr>
+</TABLE>
+</div>
+
+<!-- TabPanel2 -->
+
+<div id="TabPanel2" style="border-right: 1px solid #000000; border-left: 1px solid #000000;border-bottom: 1px solid #000000; visibility:hidden; position: absolute; left: 0px; top: 0px; ">
+<TABLE border="0" cellpadding="20" cellspacing="0" width="100%" class="ccPanel">
+<tr>
+<td width="100%" align="center">TabPanel2</td>
+</tr>
+</TABLE>
+</div>
+
+<!-- Button section -->
+
+<TABLE id="buttonTable" border="0" cellpadding="0" cellspacing="0" width="100%" class="ccPanelButtons">
+<TR><TD colspan="3" class="ccPanelShadow"><IMG alt="" src="/ccLib/Images/spacer.gif" height="1" width="100%" /></TD></TR><TR><TD width="1" height="1" class="ccPanelShadow"><IMG alt="" src="/ccLib/Images/spacer.gif" height="1" width="1" /></TD><TD width="100%" valign="top" align="left"><TABLE border="0" cellpadding="3" cellspacing="0" width="100%" class="ccPanelButtons"><TR>
+<TD valign="top">
+<INPUT Type="Button" Value="  Apply  " onclick="getInfoAndUpdate();">
+<INPUT Type="Button" Value="  OK  " onclick="getInfoAndUpdate();closeFunction();">
+<INPUT Type="Button" Value="  Cancel  " onclick="closeFunction();">
+</TD></TR></TABLE>
+
+</TD>
+</TR></TABLE>
+</TD></TR>
+</TABLE>
+</body></html>

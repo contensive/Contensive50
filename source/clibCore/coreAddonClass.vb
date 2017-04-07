@@ -2598,62 +2598,63 @@ ErrorTrap:
                 '
                 ' refactor -- add an argument byref dictionary cache, loaded as you go through the types in each dll. Next load, use the dictionary to locate the class faster. 
                 '
-                dllFilenames = IO.Directory.GetFileSystemEntries(fullPath, "*.dll")
-                If dllFilenames.Length > 0 Then
-                    '
-                    ' search the list for the correct assembly
-                    '
-                    filePtr = 0
-                    Do
-                        TestFilePathname = dllFilenames(filePtr)
-                        If TestFilePathname.IndexOf("\xunit.runner") >= 0 Then
-                            '
-                            ' unknown issue with xunit DLL, skip for now
-                            '
-                        Else
-                            testFileIsValidAssembly = True
-                            Try
+                If IO.Directory.Exists(fullPath) Then
+                    dllFilenames = IO.Directory.GetFileSystemEntries(fullPath, "*.dll")
+                    If dllFilenames.Length > 0 Then
+                        '
+                        ' search the list for the correct assembly
+                        '
+                        filePtr = 0
+                        Do
+                            TestFilePathname = dllFilenames(filePtr)
+                            If TestFilePathname.IndexOf("\xunit.runner") >= 0 Then
                                 '
-                                ' ##### consider using refectiononlyload first, then if it is right, do the loadfrom - so dependancies are not loaded.
+                                ' unknown issue with xunit DLL, skip for now
                                 '
-                                testAssembly = System.Reflection.Assembly.LoadFrom(TestFilePathname)
-                                testAssemblyName = testAssembly.FullName
-                            Catch ex As Exception
-                                testFileIsValidAssembly = False
-                            End Try
-                            Try
-                                If testFileIsValidAssembly Then
+                            Else
+                                testFileIsValidAssembly = True
+                                Try
                                     '
-                                    ' problem loading types, use try to debug
+                                    ' ##### consider using refectiononlyload first, then if it is right, do the loadfrom - so dependancies are not loaded.
                                     '
-                                    Try
-                                        For Each testAssemblyType In testAssembly.GetTypes
-                                            '
-                                            ' Loop through each type in the Assembly looking for our typename, public, and non-abstract
-                                            '
-                                            If (testAssemblyType.FullName.Trim.ToLower = typeFullName.Trim.ToLower) _
+                                    testAssembly = System.Reflection.Assembly.LoadFrom(TestFilePathname)
+                                    testAssemblyName = testAssembly.FullName
+                                Catch ex As Exception
+                                    testFileIsValidAssembly = False
+                                End Try
+                                Try
+                                    If testFileIsValidAssembly Then
+                                        '
+                                        ' problem loading types, use try to debug
+                                        '
+                                        Try
+                                            For Each testAssemblyType In testAssembly.GetTypes
+                                                '
+                                                ' Loop through each type in the Assembly looking for our typename, public, and non-abstract
+                                                '
+                                                If (testAssemblyType.FullName.Trim.ToLower = typeFullName.Trim.ToLower) _
                                                 And (testAssemblyType.IsPublic = True) _
                                                 And (Not ((testAssemblyType.Attributes And TypeAttributes.Abstract) = TypeAttributes.Abstract)) _
                                                 And Not (testAssemblyType.BaseType Is Nothing) _
                                                 Then
-                                                If (testAssemblyType.BaseType.FullName.ToLower = "addonbaseclass") Or (testAssemblyType.BaseType.FullName.ToLower = "contensive.baseclasses.addonbaseclass") Then
-                                                    '
-                                                    ' This assembly matches the TypeFullName, use it
-                                                    '
-                                                    AddonFound = True
-                                                    Try
+                                                    If (testAssemblyType.BaseType.FullName.ToLower = "addonbaseclass") Or (testAssemblyType.BaseType.FullName.ToLower = "contensive.baseclasses.addonbaseclass") Then
                                                         '
-                                                        ' Create the object from the Assembly
+                                                        ' This assembly matches the TypeFullName, use it
                                                         '
-                                                        AddonObj = DirectCast(testAssembly.CreateInstance(testAssemblyType.FullName), AddonBaseClass)
+                                                        AddonFound = True
                                                         Try
                                                             '
-                                                            ' Call Execute
+                                                            ' Create the object from the Assembly
                                                             '
-                                                            AddonReturnObj = AddonObj.Execute(cpCore.cp)
-                                                            If Not (AddonReturnObj Is Nothing) Then
-                                                                Select Case AddonReturnObj.GetType().ToString
-                                                                    Case "System.Object[,]"
+                                                            AddonObj = DirectCast(testAssembly.CreateInstance(testAssemblyType.FullName), AddonBaseClass)
+                                                            Try
+                                                                '
+                                                                ' Call Execute
+                                                                '
+                                                                AddonReturnObj = AddonObj.Execute(cpCore.cp)
+                                                                If Not (AddonReturnObj Is Nothing) Then
+                                                                    Select Case AddonReturnObj.GetType().ToString
+                                                                        Case "System.Object[,]"
                                                                 '
                                                                 '   a 2-D Array of objects
                                                                 '   each cell can contain 
@@ -2661,90 +2662,73 @@ ErrorTrap:
                                                                 '   return xml as dataset to another computer
                                                                 '   return json as dataset for browser
                                                                 '
-                                                                    Case "System.String[,]"
-                                                                        '
-                                                                        '   return array for internal use constructing data/layout merge
-                                                                        '   return xml as dataset to another computer
-                                                                        '   return json as dataset for browser
-                                                                        '
-                                                                    Case Else
-                                                                        returnValue = AddonReturnObj.ToString
-                                                                End Select
-                                                            End If
+                                                                        Case "System.String[,]"
+                                                                            '
+                                                                            '   return array for internal use constructing data/layout merge
+                                                                            '   return xml as dataset to another computer
+                                                                            '   return json as dataset for browser
+                                                                            '
+                                                                        Case Else
+                                                                            returnValue = AddonReturnObj.ToString
+                                                                    End Select
+                                                                End If
+                                                            Catch Ex As Exception
+                                                                '
+                                                                ' Error in the addon
+                                                                '
+                                                                return_userErrorMessage = "There was an error executing the addon Dot Net assembly."
+                                                                detailedErrorMessage = "There was an error in the addon [" & AddonDisplayName & "]. It could not be executed because there was an error in the addon assembly [" & TestFilePathname & "], in class [" & testAssemblyType.FullName.Trim.ToLower & "]. The error was [" & Ex.ToString() & "]"
+                                                                cpCore.handleExceptionAndContinue(Ex, detailedErrorMessage)
+                                                                'Throw New ApplicationException(detailedErrorMessage)
+                                                            End Try
                                                         Catch Ex As Exception
-                                                            '
-                                                            ' Error in the addon
-                                                            '
-                                                            return_userErrorMessage = "There was an error executing the addon Dot Net assembly."
-                                                            detailedErrorMessage = "There was an error in the addon [" & AddonDisplayName & "]. It could not be executed because there was an error in the addon assembly [" & TestFilePathname & "], in class [" & testAssemblyType.FullName.Trim.ToLower & "]. The error was [" & Ex.ToString() & "]"
-                                                            cpCore.handleExceptionAndContinue(Ex, detailedErrorMessage)
-                                                            'Throw New ApplicationException(detailedErrorMessage)
+                                                            return_userErrorMessage = "There was an error initializing the addon's Dot Net DLL."
+                                                            detailedErrorMessage = AddonDisplayName & " could not be executed because there was an error creating an object from the assembly, DLL [" & testAssemblyType.FullName & "]. The error was [" & Ex.ToString() & "]"
+                                                            Throw New ApplicationException(detailedErrorMessage)
                                                         End Try
-                                                    Catch Ex As Exception
-                                                        return_userErrorMessage = "There was an error initializing the addon's Dot Net DLL."
-                                                        detailedErrorMessage = AddonDisplayName & " could not be executed because there was an error creating an object from the assembly, DLL [" & testAssemblyType.FullName & "]. The error was [" & Ex.ToString() & "]"
-                                                        Throw New ApplicationException(detailedErrorMessage)
-                                                    End Try
-                                                    '
-                                                    ' addon was found, no need to look for more
-                                                    '
-                                                    Exit For
+                                                        '
+                                                        ' addon was found, no need to look for more
+                                                        '
+                                                        Exit For
+                                                    End If
                                                 End If
-                                            End If
-                                        Next
-                                    Catch ex As ReflectionTypeLoadException
-                                        '
-                                        ' exceptin thrown out of application bin folder when xunit library included -- ignore
-                                        '
-                                    Catch ex As Exception
-                                        '
-                                        ' problem loading types
-                                        '
-                                        detailedErrorMessage = "While locating assembly for addon [" & AddonDisplayName & "], there was an error loading types for assembly [" & testAssemblyType.FullName & "]. This assembly was skipped and should be removed from the folder [" & fullPath & "]"
-                                        Throw New ApplicationException(detailedErrorMessage)
-                                    End Try
-                                End If
-                            Catch ex As Reflection.ReflectionTypeLoadException
-                                return_userErrorMessage = "The addon's Dot Net DLL does not appear to be valid [" & TestFilePathname & "]."
-                                detailedErrorMessage = "A load exception occured for addon [" & AddonDisplayName & "], DLL [" & testAssemblyType.FullName & "]. The error was [" & ex.ToString() & "] Any internal exception follow:"
-                                objTypes = ex.Types
-                                For Each exLoader As Exception In ex.LoaderExceptions
-                                    detailedErrorMessage &= vbCrLf & "--LoaderExceptions: " & exLoader.Message
-                                Next
-                                Throw New ApplicationException(detailedErrorMessage)
-                            Catch ex As Exception
-                                '
-                                ' ignore these errors
-                                '
-                                return_userErrorMessage = "There was an unknown error in the addon's Dot Net DLL [" & AddonDisplayName & "]."
-                                detailedErrorMessage = "A non-load exception occured while loading the addon [" & AddonDisplayName & "], DLL [" & testAssemblyType.FullName & "]. The error was [" & ex.ToString() & "]."
-                                cpCore.handleExceptionAndContinue(New ApplicationException(detailedErrorMessage))
-                            End Try
-                        End If
-                        filePtr += 1
-                    Loop While (Not AddonFound) And (filePtr < dllFilenames.Length)
+                                            Next
+                                        Catch ex As ReflectionTypeLoadException
+                                            '
+                                            ' exceptin thrown out of application bin folder when xunit library included -- ignore
+                                            '
+                                        Catch ex As Exception
+                                            '
+                                            ' problem loading types
+                                            '
+                                            detailedErrorMessage = "While locating assembly for addon [" & AddonDisplayName & "], there was an error loading types for assembly [" & testAssemblyType.FullName & "]. This assembly was skipped and should be removed from the folder [" & fullPath & "]"
+                                            Throw New ApplicationException(detailedErrorMessage)
+                                        End Try
+                                    End If
+                                Catch ex As Reflection.ReflectionTypeLoadException
+                                    return_userErrorMessage = "The addon's Dot Net DLL does not appear to be valid [" & TestFilePathname & "]."
+                                    detailedErrorMessage = "A load exception occured for addon [" & AddonDisplayName & "], DLL [" & testAssemblyType.FullName & "]. The error was [" & ex.ToString() & "] Any internal exception follow:"
+                                    objTypes = ex.Types
+                                    For Each exLoader As Exception In ex.LoaderExceptions
+                                        detailedErrorMessage &= vbCrLf & "--LoaderExceptions: " & exLoader.Message
+                                    Next
+                                    Throw New ApplicationException(detailedErrorMessage)
+                                Catch ex As Exception
+                                    '
+                                    ' ignore these errors
+                                    '
+                                    return_userErrorMessage = "There was an unknown error in the addon's Dot Net DLL [" & AddonDisplayName & "]."
+                                    detailedErrorMessage = "A non-load exception occured while loading the addon [" & AddonDisplayName & "], DLL [" & testAssemblyType.FullName & "]. The error was [" & ex.ToString() & "]."
+                                    cpCore.handleExceptionAndContinue(New ApplicationException(detailedErrorMessage))
+                                End Try
+                            End If
+                            filePtr += 1
+                        Loop While (Not AddonFound) And (filePtr < dllFilenames.Length)
+                    End If
                 End If
-                'If IsDevAssembliesFolder Then
-                '    If AddonFound Then
-                '        '
-                '        ' if debug folder version is run, log a warning
-                '        '
-                '        'Call Utils.AppendLog("Warning: Addon [" & AddonDisplayName & "] was bypassed by a file in the addon root folder [" & TestFilePathname & "]. This file should be deleted when debugging is complete.")
-                '    End If
-                'Else
-                '    If Not AddonFound Then
-                '        '
-                '        ' not found
-                '        '
-                '        return_userErrorMessage = "A valid Dot Net DLL could not be found for this addon [" & AddonDisplayName & "]."
-                '        detailedErrorMessage = "A valid Dot Net DLL could not be found for this addon [" & AddonDisplayName & "] in filePath [" & TestFilePathname & "]"
-                '        Throw New ApplicationException(detailedErrorMessage)
-                '    End If
-                'End If
             Catch ex As Exception
                 '
-                ' this exception should interrupt the caller
-                '
+                ' -- this exception should interrupt the caller
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return returnValue
