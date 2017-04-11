@@ -42,7 +42,7 @@ Namespace Contensive.Core
         ''' <returns></returns>
         ''' <remarks></remarks>
         Public Function insertOuterHTML(ignore As Object, layout As String, Key As String, textToInsert As String) As String
-            Dim returnValue As String
+            Dim returnValue As String = ""
             Try
                 Dim posStart As Integer
                 Dim posEnd As Integer
@@ -205,8 +205,6 @@ Namespace Contensive.Core
                 Dim Tag As String
                 Dim tagLower As String
                 Dim Pos As Integer
-                Dim idMatch As Boolean
-                Dim classMatch As Boolean
                 Dim Delimiter As String
                 Dim testChar As String
                 Dim tagLength As Integer
@@ -367,26 +365,19 @@ Namespace Contensive.Core
             Dim returnValue As Integer = 0
             Try
                 Dim returnPos As Integer
-                '
-                'Dim posMatch as integer
                 Dim SegmentStart As Integer
                 Dim Pos As Integer
-                'Dim searchIsOver As Boolean
                 Dim LoopPtr As Integer
                 Dim searchKey As String
                 Dim lenSearchKey As Integer
-                'Dim s As String
-                Dim c As String
                 Dim Ptr As Integer
                 Dim workingKey As String
                 Dim workingKeys() As String
-                Dim posEnd As Integer
                 Dim searchClass As String
                 Dim searchId As String
                 Dim searchTag As String
                 Dim posStartTag As Integer
                 '
-                's = layout
                 returnPos = 0
                 workingKey = Key
                 If vbInstr(1, workingKey, ">") <> 0 Then

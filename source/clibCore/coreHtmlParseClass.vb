@@ -323,21 +323,16 @@ ErrorTrap:
         '========================================================================
         '
         Public Function IsTag(ByVal ElementPointer As Integer) As Boolean
-            On Error GoTo ErrorTrap
-            '
-            Dim Copy As String
-            '
-            IsTag = False
-            Call LoadElement(ElementPointer)
-            'If Not LocalElements(ElementPointer).Loaded Then
-            '    Call LoadElement(ElementPointer)
-            'End If
-            If ElementPointer < LocalElementCount Then
-                IsTag = LocalElements(ElementPointer).IsTag
-            End If
-            Exit Function
-ErrorTrap:
-            cpCore.handleExceptionAndRethrow(New Exception("unexpected exception"))
+            Dim result As Boolean = False
+            Try
+                Call LoadElement(ElementPointer)
+                If ElementPointer < LocalElementCount Then
+                    result = LocalElements(ElementPointer).IsTag
+                End If
+            Catch ex As Exception
+                cpCore.handleExceptionAndContinue(ex)
+            End Try
+            Return result
         End Function
         '
         '========================================================================
@@ -810,71 +805,69 @@ ErrorTrap:
         'ErrorTrap:
         '            cpCore.handleException(New Exception("unexpected exception"))
         '        End Function
-        '
-        '========================================================================
-        '   Get all the text and tags between this tag and its close
-        '
-        '   If it does not close correctly, return "<ERROR0>"
-        '========================================================================
-        '
-        Public Function TagInnerText(ByVal ElementPointer As Integer) As String
-            On Error GoTo ErrorTrap
-            '
-            Dim iElementPointer As Integer
-            Dim iElementStart As Integer
-            Dim iElementCount As Integer
-            Dim TagName As String
-            Dim TagNameEnd As String
-            Dim TagCount As Integer
-            '
-            Call LoadElement(ElementPointer)
-            If ElementPointer >= 0 Then
-                If LocalElements(ElementPointer).IsTag Then
-                    iElementPointer = ElementPointer + 1
+        '        '
+        '        '========================================================================
+        '        '   Get all the text and tags between this tag and its close
+        '        '
+        '        '   If it does not close correctly, return "<ERROR0>"
+        '        '========================================================================
+        '        '
+        '        Public Function TagInnerText(ByVal ElementPointer As Integer) As String
+        '            On Error GoTo ErrorTrap
+        '            '
+        '            Dim iElementPointer As Integer
+        '            Dim iElementStart As Integer
+        '            Dim iElementCount As Integer
+        '            Dim TagName As String
+        '            Dim TagNameEnd As String
+        '            Dim TagCount As Integer
+        '            '
+        '            Call LoadElement(ElementPointer)
+        '            If ElementPointer >= 0 Then
+        '                If LocalElements(ElementPointer).IsTag Then
+        '                    iElementPointer = ElementPointer + 1
 
-                    TagName = vbUCase(LocalElements(ElementPointer).TagName)
-                    TagNameEnd = "/" & TagName
-                    TagCount = 1
-                    Do While TagCount <> 0 And iElementPointer < LocalElementCount
-                        Call LoadElement(iElementPointer)
-                        With LocalElements(iElementPointer)
-                            If Not .IsTag Then
-                                TagInnerText = TagInnerText & .Text
-                            Else
-                                Select Case vbUCase(.TagName)
-                                    Case TagName
-                                        TagCount = TagCount + 1
-                                        TagInnerText = TagInnerText & .Text
-                                    Case TagNameEnd
-                                        TagCount = TagCount - 1
-                                        If TagCount <> 0 Then
-                                            TagInnerText = TagInnerText & .Text
-                                        End If
-                                    Case Else
-                                        TagInnerText = TagInnerText & .Text
-                                End Select
-                            End If
-                        End With
-                        iElementPointer = iElementPointer + 1
-                    Loop
-                    If iElementPointer >= LocalElementCount Then
-                        TagInnerText = "<ERROR0>"
-                    End If
-                End If
-            End If
-            '
-            Exit Function
-ErrorTrap:
-            cpCore.handleExceptionAndRethrow(New Exception("unexpected exception"))
-        End Function
+        '                    TagName = vbUCase(LocalElements(ElementPointer).TagName)
+        '                    TagNameEnd = "/" & TagName
+        '                    TagCount = 1
+        '                    Do While TagCount <> 0 And iElementPointer < LocalElementCount
+        '                        Call LoadElement(iElementPointer)
+        '                        With LocalElements(iElementPointer)
+        '                            If Not .IsTag Then
+        '                                TagInnerText = TagInnerText & .Text
+        '                            Else
+        '                                Select Case vbUCase(.TagName)
+        '                                    Case TagName
+        '                                        TagCount = TagCount + 1
+        '                                        TagInnerText = TagInnerText & .Text
+        '                                    Case TagNameEnd
+        '                                        TagCount = TagCount - 1
+        '                                        If TagCount <> 0 Then
+        '                                            TagInnerText = TagInnerText & .Text
+        '                                        End If
+        '                                    Case Else
+        '                                        TagInnerText = TagInnerText & .Text
+        '                                End Select
+        '                            End If
+        '                        End With
+        '                        iElementPointer = iElementPointer + 1
+        '                    Loop
+        '                    If iElementPointer >= LocalElementCount Then
+        '                        TagInnerText = "<ERROR0>"
+        '                    End If
+        '                End If
+        '            End If
+        '            '
+        '            Exit Function
+        'ErrorTrap:
+        '            cpCore.handleExceptionAndRethrow(New Exception("unexpected exception"))
+        '        End Function
         '
         '
         '
         Private Sub LoadElement(ByVal ElementPtr As Integer)
             Dim SplitPtr As Integer
             Dim SplitSrc As String
-            Dim TagPtr As Integer
-            Dim BodyPtr As Integer
             Dim ElementBasePtr As Integer
             Dim Ptr As Integer
             Dim SrcTag As String
@@ -967,7 +960,7 @@ ErrorTrap:
             Dim PosNum As Integer
             Dim PtrText As String
             Dim Ptr As Integer
-            Dim Blob As String
+            Dim Blob As String = ""
             '
             ReplaceBlob = Src
             Pos = vbInstr(1, Src, BlobSN)

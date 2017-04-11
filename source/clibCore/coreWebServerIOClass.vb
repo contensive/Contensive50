@@ -122,7 +122,7 @@ Namespace Contensive.Core
         Public Sub start()
             Try
                 Dim Cmd As String
-                Dim LogFilename As String
+                Dim LogFilename As String = cpCore.privateFiles.rootLocalPath & "iisResetPipe.log"
                 Dim Copy As String
                 '
                 Call Randomize()
@@ -218,11 +218,11 @@ Namespace Contensive.Core
                 Dim CS As Integer
                 Dim Id As Integer
                 Dim GroupName As String = ""
-                Dim AjaxFunction As String
-                Dim AjaxFastFunction As String
+                Dim AjaxFunction As String = ""
+                Dim AjaxFastFunction As String = ""
                 Dim LinkForwardCriteria As String = ""
                 Dim RemoteMethodFromPage As String = ""
-                Dim RemoteMethodFromQueryString As String
+                Dim RemoteMethodFromQueryString As String = ""
                 '
                 ' setup IIS Response
                 '
@@ -352,7 +352,7 @@ Namespace Contensive.Core
                         '
                         Try
                             If (iisContext.Request.InputStream.Length <= 0) Then
-                                key = key
+                                '
                             Else
                                 parser = New HttpMultipartParser.MultipartFormDataParser(iisContext.Request.InputStream)
                                 For Each parameter As HttpMultipartParser.ParameterPart In parser.Parameters
@@ -759,7 +759,7 @@ Namespace Contensive.Core
                     '
                     cpCore.webServerIO_requestVirtualFilePath = "/" & cpCore.serverconfig.appConfig.name
                     '
-                    cpCore.webServerIO_requestContentWatchPrefix = cpCore.webServerIO_requestProtocol & requestDomain & coreClass.webServerIO_requestRootPath
+                    cpCore.webServerIO_requestContentWatchPrefix = cpCore.webServerIO_requestProtocol & requestDomain & requestAppRootPath
                     cpCore.webServerIO_requestContentWatchPrefix = Mid(cpCore.webServerIO_requestContentWatchPrefix, 1, Len(cpCore.webServerIO_requestContentWatchPrefix) - 1)
                     '
                     'ServerSocketLoaded = False
@@ -777,7 +777,7 @@ Namespace Contensive.Core
                         cpCore.webServerIO_requestPage = Mid(requestPathPage, TextStartPointer + 1)
                     End If
                     ' cpcore.web_requestAppPath = Mid(cpcore.web_requestPath, Len(appRootPath) + 1)
-                    cpCore.webServerIO_requestSecureURLRoot = "https://" & cpCore.webServerIO_requestDomain & coreClass.webServerIO_requestRootPath
+                    cpCore.webServerIO_requestSecureURLRoot = "https://" & cpCore.webServerIO_requestDomain & requestAppRootPath
                     ''
                     '' ----- If virtual site, check RootPath case against current URL
                     ''
@@ -813,7 +813,7 @@ Namespace Contensive.Core
                     '
                     ' ----- Create Server Link property
                     '
-                    cpCore.webServerIO_ServerLink = cpCore.webServerIO_requestProtocol & requestDomain & coreClass.webServerIO_requestRootPath & cpCore.webServerIO_requestPath & cpCore.webServerIO_requestPage
+                    cpCore.webServerIO_ServerLink = cpCore.webServerIO_requestProtocol & requestDomain & requestAppRootPath & cpCore.webServerIO_requestPath & cpCore.webServerIO_requestPage
                     If requestQueryString <> "" Then
                         cpCore.webServerIO_ServerLink = cpCore.webServerIO_ServerLink & "?" & requestQueryString
                     End If
@@ -843,7 +843,7 @@ Namespace Contensive.Core
                     ' ----- Create Server Link property
                     '--------------------------------------------------------------------------
                     '
-                    cpCore.webServerIO_ServerLink = cpCore.webServerIO_requestProtocol & requestDomain & coreClass.webServerIO_requestRootPath & cpCore.webServerIO_requestPath & cpCore.webServerIO_requestPage
+                    cpCore.webServerIO_ServerLink = cpCore.webServerIO_requestProtocol & requestDomain & requestAppRootPath & cpCore.webServerIO_requestPath & cpCore.webServerIO_requestPage
                     If requestQueryString <> "" Then
                         cpCore.webServerIO_ServerLink = cpCore.webServerIO_ServerLink & "?" & requestQueryString
                     End If
@@ -871,13 +871,13 @@ Namespace Contensive.Core
                     '
                     ' ----- Verify virtual path is not used on non-virtual sites
                     '
-                    If (RedirectLink = "") And (coreClass.webServerIO_requestRootPath = "/") And (InStr(1, cpCore.webServerIO_requestPath, cpCore.webServerIO_requestVirtualFilePath & "/", vbTextCompare) = 1) Then
+                    If (RedirectLink = "") And (requestAppRootPath = "/") And (InStr(1, cpCore.webServerIO_requestPath, cpCore.webServerIO_requestVirtualFilePath & "/", vbTextCompare) = 1) Then
                         Copy = "Redirecting because this site can not be run in the path [" & cpCore.webServerIO_requestVirtualFilePath & "]"
-                        cpCore.webServerIO_requestPath = vbReplace(cpCore.webServerIO_requestPath, cpCore.serverconfig.appConfig.name & "/", "", 1, 99, vbTextCompare)
+                        cpCore.webServerIO_requestPath = vbReplace(cpCore.webServerIO_requestPath, cpCore.serverConfig.appConfig.name & "/", "", 1, 99, vbTextCompare)
                         If requestQueryString <> "" Then
-                            Call cpCore.webServerIO_Redirect2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO_requestDomain & coreClass.webServerIO_requestRootPath & cpCore.webServerIO_requestPath & cpCore.webServerIO_requestPage & "?" & requestQueryString, Copy, False)
+                            Call cpCore.webServerIO_Redirect2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO_requestDomain & requestAppRootPath & cpCore.webServerIO_requestPath & cpCore.webServerIO_requestPage & "?" & requestQueryString, Copy, False)
                         Else
-                            Call cpCore.webServerIO_Redirect2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO_requestDomain & coreClass.webServerIO_requestRootPath & cpCore.webServerIO_requestPath & cpCore.webServerIO_requestPage, Copy, False)
+                            Call cpCore.webServerIO_Redirect2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO_requestDomain & requestAppRootPath & cpCore.webServerIO_requestPath & cpCore.webServerIO_requestPage, Copy, False)
                         End If
                     End If
                     '
@@ -993,12 +993,10 @@ Namespace Contensive.Core
                 Dim iCookieValue As String
                 Dim MethodName As String
                 Dim s As String
-                Dim domainList As String
                 Dim domainListSplit() As String
                 Dim domainSet As String
                 Dim usedDomainList As String = ""
                 Dim Ptr As Integer
-                '
                 '
                 iCookieName = EncodeText(CookieName)
                 iCookieValue = EncodeText(CookieValue)

@@ -423,9 +423,7 @@ Namespace Contensive.Core
         '
         '
         Public Overrides Function GetTextFile(ByVal FieldName As String) As String
-            Dim result As Object
-            '
-            result = New String("")
+            Dim result As String = New String("")
             Try
                 result = cpCore.db.cs_getTextFile(CSPointer, FieldName)
                 If result Is Nothing Then
@@ -433,7 +431,6 @@ Namespace Contensive.Core
                 End If
             Catch ex As Exception
                 Call cp.core.handleExceptionAndRethrow(ex, "Unexpected error in cs.GetTextFile")
-                result = New String("")
             End Try
             Return result
         End Function
@@ -451,12 +448,14 @@ Namespace Contensive.Core
         '====================================================================================================
         '
         Public Overrides Function NextOK() As Boolean
+            Dim result As Boolean = False
             Try
                 Call cpCore.db.cs_goNext(CSPointer)
-                Return cpCore.db.cs_ok(CSPointer)
+                result = cpCore.db.cs_ok(CSPointer)
             Catch ex As Exception
                 Call cp.core.handleExceptionAndRethrow(ex, "Unexpected error in cs.NextOK")
             End Try
+            Return result
         End Function
         '
         '

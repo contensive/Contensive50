@@ -46,32 +46,29 @@ Namespace Contensive.Core
         '
         '
         Public Function GetTabs() As String
-            Dim result As String
+            Dim result As String = ""
             Try
                 '
-                Dim TabBodyCollectionWrapStyle As String
+                Dim TabBodyCollectionWrapStyle As String = ""
                 Dim TabStyle As String
                 Dim TabHitStyle As String
                 Dim TabLinkStyle As String
                 Dim TabHitLinkStyle As String
                 Dim TabBodyWrapHideStyle As String
                 Dim TabBodyWrapShowStyle As String
-                Dim TabEndStyle As String
+                Dim TabEndStyle As String = ""
                 Dim TabEdgeStyle As String
                 '
                 Dim TabPtr As Integer
                 Dim HitPtr As Integer
-                Dim IsLiveTab As Boolean
-                Dim TabBody As String
+                Dim TabBody As String = ""
                 Dim TabLink As String
                 Dim TabAjaxLink As String
                 Dim TabID As String
                 Dim LiveBodyID As String
                 Dim FirstLiveBodyShown As Boolean
-                Dim TabClass As String
-                Dim iContainerClass As String
                 Dim TabBodyStyle As String
-                Dim JSClose As String
+                Dim JSClose As String = ""
                 Dim TabWrapperID As String
                 Dim TabBlank As String
                 Dim IDNumber As Integer

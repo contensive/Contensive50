@@ -365,25 +365,11 @@ Namespace Contensive.Core
         '=======================================================================================================
         '
         Public Overrides Function GetProperty(PropertyName As String, Optional DefaultValue As String = "") As String
-            'Dim s As String = ""
-            Try
-                If cpCore.docProperties.containsKey(PropertyName) Then
-                    Return cpCore.docProperties.getText(PropertyName)
-                Else
-                    Return DefaultValue
-                End If
-                ''
-                '' refactor to do the work directly
-                ''
-                'If isVar(PropertyName) Then
-                '    s = var(PropertyName)
-                'Else
-                '    s = DefaultValue
-                'End If
-            Catch ex As Exception
-                '
-            End Try
-            'Return s
+            If cpCore.docProperties.containsKey(PropertyName) Then
+                Return cpCore.docProperties.getText(PropertyName)
+            Else
+                Return DefaultValue
+            End If
         End Function
         '
         '=======================================================================================================
@@ -421,33 +407,13 @@ Namespace Contensive.Core
         '=======================================================================================================
         '
         Public Overrides Function IsProperty(FieldName As String) As Boolean
-            'Dim s As Boolean
-            ''
-            ''
-            '' refactor to do the work directly
-            ''
-            's = False
-            Try
-                Return cpCore.docProperties.containsKey(FieldName)
-                's = isVar(FieldName)
-            Catch ex As Exception
-                '
-            End Try
-            'Return s
+            Return cpCore.docProperties.containsKey(FieldName)
         End Function
         '
         '=======================================================================================================
         '
         Public Overrides Sub SetProperty(FieldName As String, FieldValue As String)
-            '
-            ' refactor to do the work directly
-            '
-            Try
-                cpCore.docProperties.setProperty(FieldName, FieldValue)
-                'var(FieldName) = FieldValue
-            Catch ex As Exception
-
-            End Try
+            cpCore.docProperties.setProperty(FieldName, FieldValue)
         End Sub
         '
         '=======================================================================================================

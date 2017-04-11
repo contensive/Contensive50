@@ -251,7 +251,7 @@ leak200:
                     & "<p>" & SpanClassAdminNormal _
                     & "You are attempting to enter an area which your account does not have access." _
                     & cr & "<ul class=""ccList"">" _
-                    & cr & "<li class=""ccListItem"">To return to the public web site, use your back button, or <a href=""" & coreClass.webServerIO_requestRootPath & """>Click Here</A>." _
+                    & cr & "<li class=""ccListItem"">To return to the public web site, use your back button, or <a href=""" & requestAppRootPath & """>Click Here</A>." _
                     & cr & "<li class=""ccListItem"">To login under a different account, <a href=""" & cpCore.serverConfig.appConfig.adminRoute & "?method=logout"" rel=""nofollow"">Click Here</A>" _
                     & cr & "<li class=""ccListItem"">To have your account access changed to include this area, please contact the <a href=""mailto:" & cpCore.siteProperties.getText("EmailAdmin") & """>system administrator</A>. " _
                     & cr & "</ul>" _

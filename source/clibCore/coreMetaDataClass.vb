@@ -1947,18 +1947,10 @@ Namespace Contensive.Core
             Dim JoinContentAuthoringTablename As String
             Dim JoinContentAuthoringDataSourceName As String
             Dim JoinRecordID As Integer
-            '
-            Dim Copy As String
-            'Dim CDefArray() As appServices_metaDataClass.CDefClass
-            'Dim CDefArrayCount As Integer
+            Dim Copy As String = ""
             Dim rowPtr As Integer
-            'Dim kmafs As New fileSystemClass
             '
             MethodName = "new_loadCdefCache_loadContentEngineContentEngine_VerifyAuthoring"
-            '
-            ' 3/10/2009 - set Allow Workflow only on with the Request Workflow during startup
-            '   RequestWorkflow is in the Preferences Settings Page, AllowWorkflow is read only
-            '   The site should NOT use the AllowWorkflow site property, but the value of it during startup
             '
             If False Then
                 '
@@ -2243,14 +2235,11 @@ ErrorTrap:
         Public Function getEditableCdefIdList() As List(Of Integer)
             Dim returnList As New List(Of Integer)
             Try
-                '
                 Dim SQL As String
-                'Dim RS As DataTable
                 Dim cidDataTable As DataTable
                 Dim CIDCount As Integer
                 Dim CIDPointer As Integer
                 Dim CDef As coreMetaDataClass.CDefClass
-                Dim ContentName As String
                 Dim ContentID As Integer
                 '
                 SQL = "Select ccGroupRules.ContentID as ID" _
@@ -2567,12 +2556,10 @@ ErrorTrap:
         Public Function TextDeScramble(ByVal Copy As String) As String
             Dim returnCopy As String = ""
             Try
-                Dim CS As Integer
                 Dim CPtr As Integer
                 Dim C As String
                 Dim CValue As Integer
                 Dim crc As Integer
-                Dim ModAnswer As String
                 Dim Source As String
                 Dim Base As Integer
                 Const CMin = 32
@@ -2633,7 +2620,6 @@ ErrorTrap:
         Public Function TextScramble(ByVal Copy As String) As String
             Dim returnCopy As String = ""
             Try
-                Dim CS As Integer
                 Dim CPtr As Integer
                 Dim C As String
                 Dim CValue As Integer
@@ -3185,7 +3171,6 @@ ErrorTrap:
                 Dim RecordIsBaseField As Boolean
                 Dim IsBaseField As Boolean
                 Dim SQL As String
-                Dim dt As DataTable
                 Dim ContentID As Integer
                 Dim Pointer As Integer
                 Dim SQLName(100) As String
@@ -3197,17 +3182,14 @@ ErrorTrap:
                 Dim TableName As String
                 Dim DataSourceID As Integer
                 Dim DataSourceName As String
-
                 Dim FieldReadOnly As Boolean
                 Dim FieldActive As Boolean
                 Dim fieldTypeId As Integer
                 Dim FieldCaption As String
-                'Dim FieldSortOrder As Integer
                 Dim FieldAuthorable As Boolean
                 Dim LookupContentName As String
                 Dim DefaultValue As String
                 Dim NotEditable As Boolean
-                'Dim field.indexColumn As Integer
                 Dim AdminIndexWidth As String
                 Dim AdminIndexSort As Integer
                 Dim RedirectContentName As String
@@ -3218,10 +3200,8 @@ ErrorTrap:
                 Dim Password As Boolean
                 Dim RedirectContentID As Integer
                 Dim FieldRequired As Boolean
-                Dim StateOfAllowContentAutoLoad As Boolean
                 Dim RSSTitle As Boolean
                 Dim RSSDescription As Boolean
-                'Dim FieldAdminOnly As Boolean
                 Dim FieldDeveloperOnly As Boolean
                 Dim MemberSelectGroupID As Integer
                 Dim installedByCollectionGuid As String
@@ -3239,7 +3219,6 @@ ErrorTrap:
                 Dim isNewFieldRecord As Boolean = True
                 '
                 MethodName = "csv_VerifyCDefField_ReturnID(" & ContentName & "," & field.nameLc & ")"
-                '
                 '
                 If (UCase(ContentName) = "PAGE CONTENT") And (UCase(field.nameLc) = "ACTIVE") Then
                     field.nameLc = field.nameLc

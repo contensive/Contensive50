@@ -12,7 +12,7 @@ Namespace Contensive.Core.Controllers
     ''' code to built and upgrade apps
     ''' not IDisposable - not contained classes that need to be disposed
     ''' </summary>
-    Public Class coreBuilderClass
+    Public Class appBuilderClass
         '
         '====================================================================================================
         '
@@ -34,8 +34,8 @@ Namespace Contensive.Core.Controllers
         'Friend classLogFolder As String                    ' the folder for logging errors. default="Upgrade", AddonInstall can change it
         '
         Private Shared Function web_existsSite(cpCore As coreClass, appName As String) As Boolean
+            Dim returnExists As Boolean = False
             Try
-                Dim returnExists As Boolean = False
                 Dim serverManager As New ServerManager
                 Dim siteCollection As SiteCollection = serverManager.Sites
                 For Each Site As Site In siteCollection
@@ -44,10 +44,10 @@ Namespace Contensive.Core.Controllers
                         Exit For
                     End If
                 Next
-                Return returnExists
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex, "web_existsSite")
             End Try
+            Return returnExists
         End Function
         '
         ' -------------------------------------------------------------------
@@ -57,15 +57,19 @@ Namespace Contensive.Core.Controllers
         Public Shared Sub web_addSite(cpCore As coreClass, ByVal appName As String, ByVal DomainName As String, ByVal rootPublicFilesPath As String, ByVal defaultDocOrBlank As String)
             Try
                 If Not web_existsSite(cpCore, appName) Then
-                    iisCreateAppPool(cpCore, appName)
-                    iisCreateWebsite(cpCore, appName, DomainName, rootPublicFilesPath, appName)
+                    web_iisCreateAppPool(cpCore, appName)
+                    web_iisCreateWebsite(cpCore, appName, DomainName, rootPublicFilesPath, appName)
+                    Dim cdnFilesPrefix As String = cpCore.serverConfig.appConfig.cdnFilesNetprefix
+                    If (cdnFilesPrefix.IndexOf("://") < 0) Then
+                        web_iisCreateVirtualDirectory(cpCore, cdnFilesPrefix, cpCore.serverConfig.appConfig.cdnFilesPath)
+                    End If
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex, "web_addSite")
             End Try
         End Sub
         '
-        Private Shared Sub iisCreateAppPool(cpCore As coreClass, poolName As String)
+        Private Shared Sub web_iisCreateAppPool(cpCore As coreClass, poolName As String)
             Try
                 Using serverManager As ServerManager = New ServerManager()
                     Dim newPool As ApplicationPool = serverManager.ApplicationPools.Add(poolName)
@@ -79,7 +83,7 @@ Namespace Contensive.Core.Controllers
             End Try
         End Sub
         '
-        Private Shared Sub iisCreateWebsite(cpCore As coreClass, appName As String, domainName As String, phyPath As String, appPool As String)
+        Private Shared Sub web_iisCreateWebsite(cpCore As coreClass, appName As String, domainName As String, phyPath As String, appPool As String)
             Try
 
                 Using iisManager As ServerManager = New ServerManager()
@@ -97,6 +101,56 @@ Namespace Contensive.Core.Controllers
                 End Using
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex, "iisCreateWebsite")
+            End Try
+        End Sub
+        '
+        Private Shared Sub web_iisCreateVirtualDirectory(cpCore As coreClass, virtualFolder As String, physicalPath As String)
+            Try
+                Using iisManager As ServerManager = New ServerManager()
+                    Dim appName As String = cpCore.serverConfig.appConfig.name
+                    Dim found As Boolean = False
+                    For Each site As Site In iisManager.Sites
+                        If site.Name.ToLower = appName.ToLower() Then
+                            For Each iisApp As Application In site.Applications
+                                If iisApp.ApplicationPoolName.ToLower() = appName.ToLower() Then
+                                    For Each virtualDirectory As VirtualDirectory In iisApp.VirtualDirectories
+                                        If virtualDirectory.Path = virtualFolder Then
+                                            found = True
+                                            Exit For
+                                        End If
+                                    Next
+                                    If Not found Then
+                                        Dim vpList As List(Of String) = virtualFolder.Split("\"c).ToList
+                                        Dim newDirectoryPath As String = ""
+
+                                        For Each newDirectoryFolderName As String In vpList
+                                            If (Not String.IsNullOrEmpty(newDirectoryFolderName)) Then
+                                                newDirectoryPath &= "/" & newDirectoryFolderName
+                                                Dim directoryFound As Boolean = False
+                                                For Each currentDirectory As VirtualDirectory In iisApp.VirtualDirectories
+                                                    If (currentDirectory.Path.ToLower() = newDirectoryPath.ToLower()) Then
+                                                        directoryFound = True
+                                                        Exit For
+                                                    End If
+                                                Next
+                                                If (Not directoryFound) Then
+                                                    iisApp.VirtualDirectories.Add(newDirectoryPath, physicalPath)
+                                                End If
+                                            End If
+                                            'iisApp.VirtualDirectories.Add(vp, physicalPath)
+                                        Next
+
+                                    End If
+                                End If
+                                If found Then Exit For
+                            Next
+                        End If
+                        If found Then Exit For
+                    Next
+                    iisManager.CommitChanges()
+                End Using
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex, "web_iisCreateVirtualDirectory")
             End Try
         End Sub
         '        Private Static void CreateAppPool(String poolname,bool enable32bitOn64, ManagedPipelineMode mode,String runtimeVersion="v4.0")  
@@ -250,7 +304,7 @@ Namespace Contensive.Core.Controllers
             Dim returnMessage As String = ""
             Try
                 If siteName = "" Then
-                    importApp = "The application name was blank. It is required."
+                    returnMessage = "The application name was blank. It is required."
                 Else
                     '
                     If defaultDoc = "" Then
@@ -305,11 +359,12 @@ Namespace Contensive.Core.Controllers
                     ' Now wait here for site to start with upgrade
                     '
                     Call upgrade(cpCore, False)
-                    importApp = ""
+                    returnMessage = ""
                 End If
             Catch ex As Exception
 
             End Try
+            Return returnMessage
         End Function
 
         ''
@@ -361,22 +416,15 @@ Namespace Contensive.Core.Controllers
             Try
                 Dim addonInstallOk As Boolean
                 Dim UpgradeOK As Boolean
-                Dim saveLogFolder As String
-                Dim CollectionPath As String
                 Dim LastChangeDate As Date
                 Dim LocalLastChangeDate As Date
                 Dim upgradeCollection As Boolean
                 Dim LocalListNode As XmlNode
                 Dim CollectionNode As XmlNode
                 Dim LocalGuid As String
-                Dim Guids() As String
-                Dim Guid As String
-                Dim Ptr As Integer
                 Dim IISResetRequired As Boolean
-                'Dim RegisterList As String
                 Dim ErrorMessage As String
                 Dim XMLTools As New coreXmlToolsClass(cpcore)
-                'Dim SiteBuilder As New builderClass(cpCore)
                 Dim addonInstall As New coreAddonInstallClass(cpcore)
                 Dim StyleSN As Integer
                 Dim Doc As XmlDocument
@@ -439,7 +487,7 @@ Namespace Contensive.Core.Controllers
                         '
                         ' Copy default styles into Template Styles
                         '
-                        Call cpcore.appRootFiles.copyFile("ccLib\Config\Styles.css", "Templates\Styles.css")
+                        Call cpcore.appRootFiles.copyFile("ccLib\Config\Styles.css", "Templates\Styles.css", cpcore.cdnFiles)
                         '
                         ' set build version so a scratch build will not go through data conversion
                         '
@@ -1368,22 +1416,7 @@ Namespace Contensive.Core.Controllers
         '
         Private Shared Sub VerifyAdminMenus(cpCore As coreClass, ByVal DataBuildVersion As String)
             Try
-                '
-                Dim MethodName As String
-                Dim EntryName As String
-                Dim HeaderName As String
-                Dim EntryID As Object
-                Dim HeaderID As Object
                 Dim dt As DataTable
-                Dim CSHeaderEntry As Integer
-                Dim SQL As String
-                Dim ReportQuery As String
-                '
-                MethodName = "VerifyAdminMenus"
-                '
-                If False Then
-                    Exit Sub
-                End If
                 '
                 ' ----- remove duplicate menus that may have been added during faulty upgrades
                 '
@@ -1407,27 +1440,6 @@ Namespace Contensive.Core.Controllers
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
         End Sub
-        '        '
-        '        ' Get the Menu for FormInputHTML
-        '        '
-        '        private shared sub VerifyEditorOptions()
-        '            On Error GoTo ErrorTrap
-        '            '
-        '            If Not (False) Then
-        '                Call VerifyEditorOptions_FontFace()
-        '                Call VerifyEditorOptions_FontSize()
-        '                Call VerifyEditorOptions_FontColor()
-        '                Call VerifyEditorOptions_Paragraph()
-        '                Call VerifyEditorOptions_Styles()
-        '            End If
-        '            '
-        '            Exit Sub
-        '            '
-        '            ' ----- Error Trap
-        '            '
-        'ErrorTrap:
-        '            Dim ex As New Exception("todo") : Call HandleClassError(ex, cpcore.app.config.name, "methodNameFPO") ' Err.Number, Err.Source, Err.Description, "VerifyEditorOptions", True, True)
-        '        End Sub
         '
         ' Get the Menu for FormInputHTML
         '
@@ -1961,9 +1973,7 @@ Namespace Contensive.Core.Controllers
         '
         Private Shared Sub VerifyCountry(cpCore As coreClass, ByVal Name As String, ByVal Abbreviation As String)
             Try
-                '
                 Dim CS As Integer
-                Dim Active As Boolean
                 '
                 CS = cpCore.db.cs_open("Countries", "name=" & cpCore.db.encodeSQLText(Name))
                 If Not cpCore.db.cs_ok(CS) Then

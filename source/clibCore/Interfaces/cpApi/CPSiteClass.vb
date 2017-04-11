@@ -161,7 +161,7 @@ Namespace Contensive.Core
                 If False Then
                     Return "/"
                 Else
-                    Return cpCore.webServerIO_requestRootPath
+                    Return requestAppRootPath
                 End If
             End Get
         End Property

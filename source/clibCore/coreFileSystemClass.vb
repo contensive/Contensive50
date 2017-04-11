@@ -554,14 +554,9 @@ Namespace Contensive.Core
         '
         Public Sub renameFile(ByVal SourcePathFilename As String, ByVal DestinationFilename As String)
             Try
-
-                Dim ErrorDescription As String
-                Dim FileFolder As String
                 Dim Pos As Integer
-                Dim sourceFullPath As String
+                Dim sourceFullPath As String = ""
                 Dim srcFullPathFilename As String
-                '
-                'MethodName = "renameFile( " & SourcePathFilename & ", " & DestinationFilename & " )"
                 '
                 If (SourcePathFilename = "") Then
                     Throw New ApplicationException("Invalid source file")

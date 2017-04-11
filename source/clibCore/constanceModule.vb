@@ -15,6 +15,7 @@ Namespace Contensive.Core
         Public Const cnBlank As String = ""
         Public Const cnPeople As String = "people"
         '
+        Public Const requestAppRootPath As String = "/"
     End Module
     '
 End Namespace

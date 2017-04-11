@@ -222,7 +222,7 @@ ErrorTrap:
             Dim FileList As IO.FileInfo()
             Dim EOL As Integer
             Dim CommaPosition As Integer
-            Dim Filename As String
+            Dim Filename As String = ""
             Dim Copy As String
             Dim EmailSMTP As String
             Dim EmailTo As String

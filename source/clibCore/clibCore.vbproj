@@ -458,7 +458,7 @@
     <Compile Include="coreMenuLiveTabClass.vb" />
     <Compile Include="coreMenuTabClass.vb" />
     <Compile Include="coreMenuTreeClass.vb" />
-    <Compile Include="Controllers\coreBuilderClass.vb" />
+    <Compile Include="Controllers\appBuilderClass.vb" />
     <Compile Include="Models\Entity\serverConfigModel.vb" />
     <Compile Include="Models\Entity\_blankCachedModel.vb" />
     <Compile Include="Models\Entity\_blankModel.vb" />

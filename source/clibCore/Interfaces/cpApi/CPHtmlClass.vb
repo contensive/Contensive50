@@ -109,9 +109,8 @@ Namespace Contensive.Core
         '
         '
         Public Overrides Function Form(ByVal InnerHtml As String, Optional ByVal HtmlName As String = "", Optional ByVal HtmlClass As String = "", Optional ByVal HtmlId As String = "", Optional ByVal ActionQueryString As String = "", Optional ByVal Method As String = "post") As String 'Inherits BaseClasses.CPHtmlBaseClass.Form
+            Dim FormStart As String = ""
             Try
-                Dim FormStart As String
-                '
                 If Method.ToLower = "get" Then
                     If (InnerHtml.IndexOf("type=""file", 0, 1, StringComparison.OrdinalIgnoreCase) >= 0) Then
                         Call cp.core.handleExceptionAndRethrow(New ApplicationException("cp.html.form called with method=get can not contain an upload file (input type=file)"))
@@ -138,13 +137,13 @@ Namespace Contensive.Core
                         FormStart = FormStart.Replace(">", " id=""" & HtmlId & """>")
                     End If
                 End If
-                Return "" _
-                    & FormStart _
-                    & InnerHtml _
-                    & "</form>"
             Catch ex As Exception
 
             End Try
+            Return "" _
+                    & FormStart _
+                    & InnerHtml _
+                    & "</form>"
         End Function
         '
         '

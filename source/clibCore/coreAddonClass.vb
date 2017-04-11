@@ -841,7 +841,7 @@ Namespace Contensive.Core
                                     '
                                     ' web-only
                                     '
-                                    Link = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & coreClass.webServerIO_requestRootPath & cpCore.siteProperties.serverPageDefault
+                                    Link = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & requestAppRootPath & cpCore.siteProperties.serverPageDefault
                                     If vbInstr(1, Link, "?") = 0 Then
                                         Link = Link & "?"
                                     Else
@@ -925,10 +925,10 @@ Namespace Contensive.Core
                                         Call cpCore.main_AddEndOfBodyJavascript2(JSBodyEnd, AddedByName)
                                         Call cpCore.main_AddHeadScriptLink(JSFilename, AddedByName)
                                         If DefaultStylesFilename <> "" Then
-                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverconfig.appConfig.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
+                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
                                         End If
                                         If CustomStylesFilename <> "" Then
-                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverconfig.appConfig.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
+                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
                                         End If
                                     End If
                                 End If
@@ -1161,9 +1161,9 @@ Namespace Contensive.Core
                                                 ' use assumptions
                                                 '
                                                 If Mid(WorkingLink, 1, 1) = "/" Then
-                                                    WorkingLink = "http://" & cpCore.serverconfig.appConfig.domainList(0) & WorkingLink
+                                                    WorkingLink = "http://" & cpCore.serverConfig.appConfig.domainList(0) & WorkingLink
                                                 Else
-                                                    WorkingLink = "http://" & cpCore.serverconfig.appConfig.domainList(0) & "/" & WorkingLink
+                                                    WorkingLink = "http://" & cpCore.serverConfig.appConfig.domainList(0) & "/" & WorkingLink
                                                 End If
                                             End If
                                         End If
@@ -1212,7 +1212,7 @@ Namespace Contensive.Core
                                         End If
                                     End If
                                     Link = modifyLinkQuery(Link, RequestNameJSForm, "1", True)
-                                    Link = EncodeAppRootPath(Link, cpCore.webServerIO_requestVirtualFilePath, coreClass.webServerIO_requestRootPath, cpCore.webServerIO.requestDomain)
+                                    Link = EncodeAppRootPath(Link, cpCore.webServerIO_requestVirtualFilePath, requestAppRootPath, cpCore.webServerIO.requestDomain)
                                     ScriptCallbackContent = "<SCRIPT LANGUAGE=""JAVASCRIPT"" SRC=""" & Link & """></SCRIPT>"
                                 End If
                                 '

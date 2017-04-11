@@ -82,8 +82,7 @@ Namespace Contensive.Core
             Try
                 Dim TabPtr As Integer
                 Dim HitPtr As Integer
-                Dim IsLiveTab As Boolean
-                Dim TabBody As String
+                Dim TabBody As String = ""
                 Dim TabLink As String
                 Dim TabID As String
                 Dim FirstLiveBodyShown As Boolean

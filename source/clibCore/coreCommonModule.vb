@@ -3917,10 +3917,9 @@ Namespace Contensive.Core
         ' Wdy, DD-Mon-YYYY HH:MM:SS GMT
         '
         Function GetGMTFromDate(ByVal DateValue As Date) As String
-            '
-            Dim WorkString As String
             Dim WorkLong As Integer
             '
+            GetGMTFromDate = ""
             If IsDate(DateValue) Then
                 Select Case Weekday(DateValue)
                     Case vbSunday
@@ -4122,11 +4121,9 @@ Namespace Contensive.Core
             '
             Dim iNameValueLines As String
             Dim Lines() As String
-            Dim LineCnt As Integer
             Dim LinePtr As Integer
-            '
-            Dim Names() As String
-            Dim Values() As String
+            Dim Names() As String = {}
+            Dim Values() As String = {}
             Dim PairPtr As Integer
             Dim PairCnt As Integer
             Dim Splits() As String
@@ -4594,8 +4591,6 @@ ErrorTrap:
         '
         '
         Public Function SplitCRLF(ByVal Expression As String) As String()
-            Dim Args() As String
-            Dim Ptr As Integer
             '
             If vbInstr(1, Expression, vbCrLf) <> 0 Then
                 SplitCRLF = Split(Expression, vbCrLf, , vbTextCompare)
@@ -4639,26 +4634,20 @@ ErrorTrap:
         '------------------------------------------------------------------------------------------------------------
         '
         Public Function EncodeAddonConstructorArgument(ByVal Arg As String) As String
-            Dim a As String
-            If Arg <> "" Then
-                a = Arg
-                If True Then
-                    'If AddonNewParse Then
-                    a = vbReplace(a, "\", "\\")
-                    a = vbReplace(a, vbCrLf, "\n")
-                    a = vbReplace(a, vbTab, "\t")
-                    a = vbReplace(a, "&", "\&")
-                    a = vbReplace(a, "=", "\=")
-                    a = vbReplace(a, ",", "\,")
-                    a = vbReplace(a, """", "\""")
-                    a = vbReplace(a, "'", "\'")
-                    a = vbReplace(a, "|", "\|")
-                    a = vbReplace(a, "[", "\[")
-                    a = vbReplace(a, "]", "\]")
-                    a = vbReplace(a, ":", "\:")
-                End If
-                EncodeAddonConstructorArgument = a
-            End If
+            Dim a As String = Arg
+            a = vbReplace(a, "\", "\\")
+            a = vbReplace(a, vbCrLf, "\n")
+            a = vbReplace(a, vbTab, "\t")
+            a = vbReplace(a, "&", "\&")
+            a = vbReplace(a, "=", "\=")
+            a = vbReplace(a, ",", "\,")
+            a = vbReplace(a, """", "\""")
+            a = vbReplace(a, "'", "\'")
+            a = vbReplace(a, "|", "\|")
+            a = vbReplace(a, "[", "\[")
+            a = vbReplace(a, "]", "\]")
+            a = vbReplace(a, ":", "\:")
+            Return a
         End Function
         '
         '------------------------------------------------------------------------------------------------------------
@@ -4679,144 +4668,86 @@ ErrorTrap:
         '
         Public Function DecodeAddonConstructorArgument(ByVal EncodedArg As String) As String
             Dim a As String
-            Dim Pos As Integer
             '
             a = EncodedArg
-            If True Then
-                'If AddonNewParse Then
-                a = vbReplace(a, "\:", ":")
-                a = vbReplace(a, "\]", "]")
-                a = vbReplace(a, "\[", "[")
-                a = vbReplace(a, "\|", "|")
-                a = vbReplace(a, "\'", "'")
-                a = vbReplace(a, "\""", """")
-                a = vbReplace(a, "\,", ",")
-                a = vbReplace(a, "\=", "=")
-                a = vbReplace(a, "\&", "&")
-                a = vbReplace(a, "\t", vbTab)
-                a = vbReplace(a, "\n", vbCrLf)
-                a = vbReplace(a, "\\", "\")
-            End If
-            DecodeAddonConstructorArgument = a
+            a = vbReplace(a, "\:", ":")
+            a = vbReplace(a, "\]", "]")
+            a = vbReplace(a, "\[", "[")
+            a = vbReplace(a, "\|", "|")
+            a = vbReplace(a, "\'", "'")
+            a = vbReplace(a, "\""", """")
+            a = vbReplace(a, "\,", ",")
+            a = vbReplace(a, "\=", "=")
+            a = vbReplace(a, "\&", "&")
+            a = vbReplace(a, "\t", vbTab)
+            a = vbReplace(a, "\n", vbCrLf)
+            a = vbReplace(a, "\\", "\")
+            Return a
         End Function
-        '    '
-        '    '------------------------------------------------------------------------------------------------------------
-        '    '   use only internally
-        '    '
-        '    '   encode an argument to be used in a name=value& (N-V-A) string
-        '    '
-        '    '   an argument can be any one of these is this format:
-        '    '       Arg0,Arg1,Arg2,Arg3,Name=Value&Name=Value[Option1|Option2]descriptor
-        '    '
-        '    '   to create an nva string
-        '    '       string = encodeNvaArgument( name ) & "=" & encodeNvaArgument( value ) & "&"
-        '    '
-        '    '   to decode an nva string
-        '    '       split on ampersand then on equal, and decodeNvaArgument() each part
-        '    '
-        '    '------------------------------------------------------------------------------------------------------------
-        '    '
-        '    Public Function encodeNvaArgument(Arg As String) As String
-        '        Dim a As String
-        '        a = Arg
-        '        If a <> "" Then
-        '            a = vbReplace(a, vbCrLf, "#0013#")
-        '            a = vbReplace(a, vbLf, "#0013#")
-        '            a = vbReplace(a, vbCr, "#0013#")
-        '            a = vbReplace(a, "&", "#0038#")
-        '            a = vbReplace(a, "=", "#0061#")
-        '            a = vbReplace(a, ",", "#0044#")
-        '            a = vbReplace(a, """", "#0034#")
-        '            a = vbReplace(a, "'", "#0039#")
-        '            a = vbReplace(a, "|", "#0124#")
-        '            a = vbReplace(a, "[", "#0091#")
-        '            a = vbReplace(a, "]", "#0093#")
-        '            a = vbReplace(a, ":", "#0058#")
-        '        End If
-        '        encodeNvaArgument = a
-        '    End Function
-        '    '
-        '    '------------------------------------------------------------------------------------------------------------
-        '    '   use only internally
-        '    '       decode an argument removed from a name=value& string
-        '    '       see encodeNvaArgument for details on how to use this
-        '    '------------------------------------------------------------------------------------------------------------
-        '    '
-        '    Public Function decodeNvaArgument(EncodedArg As String) As String
-        '        Dim a As String
-        '        '
-        '        a = EncodedArg
-        '        a = vbReplace(a, "#0058#", ":")
-        '        a = vbReplace(a, "#0093#", "]")
-        '        a = vbReplace(a, "#0091#", "[")
-        '        a = vbReplace(a, "#0124#", "|")
-        '        a = vbReplace(a, "#0039#", "'")
-        '        a = vbReplace(a, "#0034#", """")
-        '        a = vbReplace(a, "#0044#", ",")
-        '        a = vbReplace(a, "#0061#", "=")
-        '        a = vbReplace(a, "#0038#", "&")
-        '        a = vbReplace(a, "#0013#", vbCrLf)
-        '        decodeNvaArgument = a
-        '    End Function
         '    '
         '    ' returns true of the link is a valid link on the source host
         '    '
         Public Function IsLinkToThisHost(ByVal Host As String, ByVal Link As String) As Boolean
-            '
-            Dim LinkHost As String
-            Dim Pos As Integer
-            '
-            If Trim(Link) = "" Then
+            Dim result As Boolean = False
+            Try
+                Dim LinkHost As String
+                Dim Pos As Integer
                 '
-                ' Blank is not a link
-                '
-                IsLinkToThisHost = False
-            ElseIf vbInstr(1, Link, "://") <> 0 Then
-                '
-                ' includes protocol, may be link to another site
-                '
-                LinkHost = vbLCase(Link)
-                Pos = 1
-                Pos = vbInstr(Pos, LinkHost, "://")
-                If Pos > 0 Then
-                    Pos = vbInstr(Pos + 3, LinkHost, "/")
+                If Trim(Link) = "" Then
+                    '
+                    ' Blank is not a link
+                    '
+                    IsLinkToThisHost = False
+                ElseIf vbInstr(1, Link, "://") <> 0 Then
+                    '
+                    ' includes protocol, may be link to another site
+                    '
+                    LinkHost = vbLCase(Link)
+                    Pos = 1
+                    Pos = vbInstr(Pos, LinkHost, "://")
                     If Pos > 0 Then
-                        LinkHost = Mid(LinkHost, 1, Pos - 1)
-                    End If
-                    IsLinkToThisHost = (vbLCase(Host) = LinkHost)
-                    If Not IsLinkToThisHost Then
-                        '
-                        ' try combinations including/excluding www.
-                        '
-                        If vbInstr(1, LinkHost, "www.", vbTextCompare) <> 0 Then
+                        Pos = vbInstr(Pos + 3, LinkHost, "/")
+                        If Pos > 0 Then
+                            LinkHost = Mid(LinkHost, 1, Pos - 1)
+                        End If
+                        IsLinkToThisHost = (vbLCase(Host) = LinkHost)
+                        If Not IsLinkToThisHost Then
                             '
-                            ' remove it
+                            ' try combinations including/excluding www.
                             '
-                            LinkHost = vbReplace(LinkHost, "www.", "", 1, 99, vbTextCompare)
-                            IsLinkToThisHost = (vbLCase(Host) = LinkHost)
-                        Else
-                            '
-                            ' add it
-                            '
-                            LinkHost = vbReplace(LinkHost, "://", "://www.", 1, 99, vbTextCompare)
-                            IsLinkToThisHost = (vbLCase(Host) = LinkHost)
+                            If vbInstr(1, LinkHost, "www.", vbTextCompare) <> 0 Then
+                                '
+                                ' remove it
+                                '
+                                LinkHost = vbReplace(LinkHost, "www.", "", 1, 99, vbTextCompare)
+                                IsLinkToThisHost = (vbLCase(Host) = LinkHost)
+                            Else
+                                '
+                                ' add it
+                                '
+                                LinkHost = vbReplace(LinkHost, "://", "://www.", 1, 99, vbTextCompare)
+                                IsLinkToThisHost = (vbLCase(Host) = LinkHost)
+                            End If
                         End If
                     End If
+                ElseIf vbInstr(1, Link, "#") = 1 Then
+                    '
+                    ' Is a bookmark, not a link
+                    '
+                    IsLinkToThisHost = False
+                Else
+                    '
+                    ' all others are links on the source
+                    '
+                    IsLinkToThisHost = True
                 End If
-            ElseIf vbInstr(1, Link, "#") = 1 Then
-                '
-                ' Is a bookmark, not a link
-                '
-                IsLinkToThisHost = False
-            Else
-                '
-                ' all others are links on the source
-                '
-                IsLinkToThisHost = True
-            End If
-            If Not IsLinkToThisHost Then
-                Link = Link
-            End If
+                If Not IsLinkToThisHost Then
+                    Link = Link
+                End If
+            Catch ex As Exception
+                Throw
+            End Try
+            Return result
         End Function
         '
         '========================================================================================================
@@ -4867,9 +4798,6 @@ ErrorTrap:
         '
         '
         Public Function GetAddonIconImg(ByVal AdminURL As String, ByVal IconWidth As Integer, ByVal IconHeight As Integer, ByVal IconSprites As Integer, ByVal IconIsInline As Boolean, ByVal IconImgID As String, ByVal IconFilename As String, ByVal serverFilePath As String, ByVal IconAlt As String, ByVal IconTitle As String, ByVal ACInstanceID As String, ByVal IconSpriteColumn As Integer) As String
-            '
-            Dim ImgStyle As String
-            Dim IconHeightNumeric As Integer
             '
             If IconAlt = "" Then
                 IconAlt = "Add-on"
@@ -4948,40 +4876,6 @@ ErrorTrap:
                 ' Sprite Icon
                 '
                 GetAddonIconImg = GetIconSprite(IconImgID, IconSpriteColumn, IconFilename, IconWidth, IconHeight, IconAlt, IconTitle, "window.parent.OpenAddonPropertyWindow(this,'" & AdminURL & "');", IconIsInline, ACInstanceID)
-                '        GetAddonIconImg = "<img" _
-                '            & " border=0" _
-                '            & " id=""" & IconImgID & """" _
-                '            & " onMouseOver=""this.style.backgroundPosition='" & (-1 * IconSpriteColumn * IconWidth) & "px -" & (2 * IconHeight) & "px'""" _
-                '            & " onMouseOut=""this.style.backgroundPosition='" & (-1 * IconSpriteColumn * IconWidth) & "px 0px'""" _
-                '            & " onDblClick=""window.parent.OpenAddonPropertyWindow(this,'" & AdminURL & "');""" _
-                '            & " alt=""" & IconAlt & """" _
-                '            & " title=""" & IconTitle & """" _
-                '            & " src=""/ccLib/images/spacer.gif"""
-                '        ImgStyle = "background:url(" & IconFilename & ") " & (-1 * IconSpriteColumn * IconWidth) & "px 0px no-repeat;"
-                '        ImgStyle = ImgStyle & "width:" & IconWidth & "px;"
-                '        ImgStyle = ImgStyle & "height:" & IconHeight & "px;"
-                '        If IconIsInline Then
-                '            'GetAddonIconImg = GetAddonIconImg & " align=""middle"""
-                '            ImgStyle = ImgStyle & "vertical-align:middle;display:inline;"
-                '        Else
-                '            ImgStyle = ImgStyle & "display:block;"
-                '        End If
-                '
-                '
-                '        'Return_IconStyleMenuEntries = Return_IconStyleMenuEntries & vbCrLf & ",["".icon" & AddonID & """,false,"".icon" & AddonID & """,""background:url(" & IconFilename & ") 0px 0px no-repeat;"
-                '        'GetAddonIconImg = "<img" _
-                '        '    & " id=""AC,AGGREGATEFUNCTION,0," & FieldName & "," & ArgumentList & """" _
-                '        '    & " onMouseOver=""this.style.backgroundPosition=\'0px -" & (2 * IconHeight) & "px\'""" _
-                '        '    & " onMouseOut=""this.style.backgroundPosition=\'0px 0px\'""" _
-                '        '    & " onDblClick=""window.parent.OpenAddonPropertyWindow(this);""" _
-                '        '    & " alt=""" & IconAlt & """" _
-                '        '    & " title=""" & IconTitle & """" _
-                '        '    & " src=""/ccLib/images/spacer.gif"""
-                '        If ACInstanceID <> "" Then
-                '            GetAddonIconImg = GetAddonIconImg & " ACInstanceID=""" & ACInstanceID & """"
-                '        End If
-                '        GetAddonIconImg = GetAddonIconImg & " style=""" & ImgStyle & """>"
-                '        'Return_IconStyleMenuEntries = Return_IconStyleMenuEntries & """]"
             End If
         End Function
         '
@@ -6026,6 +5920,7 @@ ErrorTrap:
         '        '
         '        '
         Public Function StartTableCell(Optional ByVal Width As String = "", Optional ByVal ColSpan As Integer = 0, Optional ByVal EvenRow As Boolean = False, Optional ByVal Align As String = "", Optional ByVal BGColor As String = "") As String
+            StartTableCell = ""
             If Width <> "" Then
                 StartTableCell = " width=""" & Width & """"
             End If
@@ -7133,7 +7028,6 @@ ErrorTrap:
             Dim RecordIDString As String
             Dim iTableName As String
             Dim iFieldName As String
-            Dim iRecordID As Integer
             Dim MethodName As String
             Dim iOriginalFilename As String
             '

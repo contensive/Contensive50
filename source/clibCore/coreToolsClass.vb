@@ -372,7 +372,7 @@ ErrorTrap:
             Dim ItemCount As Integer
             Dim CSPointer As Integer
             Dim Stream As New coreFastStringClass
-            Dim ButtonList As String
+            Dim ButtonList As String = ""
             '
             Stream.Add(SpanClassAdminNormal & "<strong><A href=""" & cpCore.webServerIO_requestPage & "?af=" & AdminFormToolRoot & """>Tools</A></strong></SPAN>")
             Stream.Add(SpanClassAdminNormal & ":Create Content Fields from Table</SPAN>")
@@ -448,161 +448,154 @@ ErrorTrap:
         '=============================================================================
         '
         Private Function GetForm_ConfigureEdit() As String
-            On Error GoTo ErrorTrap
-            '
-            Dim SQL As String
-            Dim DataSourceName As String
-            Dim TempString As String
-            Dim ToolButton As String
-            Dim ContentID As Integer
-            Dim RecordCount As Integer
-            Dim RecordPointer As Integer
-            Dim CSPointer As Integer
-            Dim formFieldId As Integer
-            Dim ContentName As String
-            Dim CDef As coreMetaDataClass.CDefClass
-            Dim formFieldName As String
-            Dim formFieldTypeId As Integer
-            Dim TableName As String
-            Dim ContentFieldsCID As Integer
-            Dim StatusMessage As String
-            Dim ErrorMessage As String = ""
-            Dim FieldPointer As Integer
-            Dim formFieldInherited As Boolean
-            Dim AllowContentAutoLoad As Boolean
-            Dim ReloadCDef As Boolean
-            Dim CSTarget As Integer
-            Dim CSSource As Integer
-            Dim AllowCDefInherit As Boolean
-            Dim ParentContentID As Integer
-            Dim ParentContentName As String
-            Dim ParentCDef As coreMetaDataClass.CDefClass
-            Dim NeedFootNote1 As Boolean
-            Dim NeedFootNote2 As Boolean
-            Dim FormPanel As String
-            Dim ContentCount As Integer
-            Dim ContentSize As Integer
-            'Dim ContentNameValues() As NameValuePrivateType
-            Dim Index As New coreKeyPtrIndexClass
-            Dim ButtonList As String
-            Dim Stream As New coreFastStringClass
-            Dim StreamValidRows As New coreFastStringClass
-            Dim TypeSelectTemplate As String
-            Dim TypeSelect As String
-            Dim IndexPointer As Integer
-            Dim FieldCount As Integer
-            'Dim IndexValue As String
-            Dim IndexCount As Integer
-            Dim IndexName As String
-            '
-            ButtonList = ButtonCancel & "," & ButtonSelect
-            '
-            ContentID = cpCore.doc_getInteger("" & RequestNameToolContentID & "")
-            ToolButton = cpCore.docProperties.getText("Button")
-            ReloadCDef = cpCore.doc_getBoolean("ReloadCDef")
-            ContentName = Local_GetContentNameByID(ContentID)
-            TableName = Local_GetContentTableName(ContentName)
-            DataSourceName = Local_GetContentDataSource(ContentName)
-            CDef = cpCore.metaData.getCdef(ContentID, True, True)
-            '
-            If (ToolButton <> "") Then
-                If (ToolButton <> ButtonCancel) Then
-                    cpCore.debug_testPoint("ConfigureEdit, Process Save")
-                    '
-                    ' Save the form changes
-                    '
-                    AllowContentAutoLoad = (cpCore.siteProperties.getBoolean("AllowContentAutoLoad", True))
-                    Call cpCore.siteProperties.setProperty("AllowContentAutoLoad", False)
-                    '
-                    ' ----- Save the input
-                    '
-                    RecordCount = EncodeInteger(cpCore.doc_getInteger("dtfaRecordCount"))
-                    If RecordCount > 0 Then
-                        For RecordPointer = 0 To RecordCount - 1
-                            '
-                            formFieldName = cpCore.docProperties.getText("dtfaName." & RecordPointer)
-                            formFieldTypeId = cpCore.doc_getInteger("dtfaType." & RecordPointer)
-                            formFieldId = EncodeInteger(cpCore.doc_getInteger("dtfaID." & RecordPointer))
-                            formFieldInherited = cpCore.doc_getBoolean("dtfaInherited." & RecordPointer)
-                            '
-                            ' problem - looking for the name in the Db using the form's name, but it could have changed.
-                            ' have to look field up by id
-                            '
-                            For Each cdefFieldKvp As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In CDef.fields
-                                If cdefFieldKvp.Value.id = formFieldId Then
-                                    '
-                                    ' Field was found in CDef
-                                    '
-                                    With cdefFieldKvp.Value
-                                        If .inherited And (Not formFieldInherited) Then
-                                            '
-                                            ' Was inherited, but make a copy of the field
-                                            '
-                                            CSTarget = cpCore.db.cs_insertRecord("Content Fields")
-                                            If cpCore.db.cs_ok(CSTarget) Then
-                                                CSSource = cpCore.csOpen("Content Fields", formFieldId)
-                                                If cpCore.db.cs_ok(CSSource) Then
-                                                    Call cpCore.cs_CopyRecord(CSSource, CSTarget)
-                                                End If
-                                                Call cpCore.db.cs_Close(CSSource)
-                                                formFieldId = cpCore.db.cs_getInteger(CSTarget, "ID")
-                                                Call cpCore.db.cs_set(CSTarget, "ContentID", ContentID)
-                                            End If
-                                            Call cpCore.db.cs_Close(CSTarget)
-                                            ReloadCDef = True
-                                        ElseIf (Not .inherited) And (formFieldInherited) Then
-                                            '
-                                            ' Was a field, make it inherit from it's parent
-                                            '
-                                            CSTarget = CSTarget
-                                            Call cpCore.DeleteContentRecord("Content Fields", formFieldId)
-                                            ReloadCDef = True
-                                        ElseIf (Not .inherited) And (Not formFieldInherited) Then
-                                            '
-                                            ' not inherited, save the field values and mark for a reload
-                                            '
-                                            If True Then
-                                                If (InStr(1, formFieldName, " ") <> 0) Then
-                                                    '
-                                                    ' remoave spaces from new name
-                                                    '
-                                                    StatusMessage = StatusMessage & "<LI>Field [" & formFieldName & "] was renamed [" & vbReplace(formFieldName, " ", "") & "] because the field name can not include spaces.</LI>"
-                                                    formFieldName = vbReplace(formFieldName, " ", "")
-                                                End If
+            Dim result As String = ""
+            Try
+                '
+                Dim SQL As String
+                Dim DataSourceName As String
+                Dim ToolButton As String
+                Dim ContentID As Integer
+                Dim RecordCount As Integer
+                Dim RecordPointer As Integer
+                Dim CSPointer As Integer
+                Dim formFieldId As Integer
+                Dim ContentName As String
+                Dim CDef As coreMetaDataClass.CDefClass
+                Dim formFieldName As String
+                Dim formFieldTypeId As Integer
+                Dim TableName As String
+                Dim ContentFieldsCID As Integer
+                Dim StatusMessage As String = ""
+                Dim ErrorMessage As String = ""
+                Dim formFieldInherited As Boolean
+                Dim AllowContentAutoLoad As Boolean
+                Dim ReloadCDef As Boolean
+                Dim CSTarget As Integer
+                Dim CSSource As Integer
+                Dim AllowCDefInherit As Boolean
+                Dim ParentContentID As Integer
+                Dim ParentContentName As String
+                Dim ParentCDef As coreMetaDataClass.CDefClass = Nothing
+                Dim NeedFootNote1 As Boolean
+                Dim NeedFootNote2 As Boolean
+                Dim FormPanel As String = ""
+                Dim Index As New coreKeyPtrIndexClass
+                Dim ButtonList As String
+                Dim Stream As New coreFastStringClass
+                Dim StreamValidRows As New coreFastStringClass
+                Dim TypeSelectTemplate As String
+                Dim TypeSelect As String
+                Dim FieldCount As Integer
+                Dim parentField As coreMetaDataClass.CDefFieldClass = Nothing
+                '
+                ButtonList = ButtonCancel & "," & ButtonSelect
+                '
+                ContentID = cpCore.doc_getInteger("" & RequestNameToolContentID & "")
+                ToolButton = cpCore.docProperties.getText("Button")
+                ReloadCDef = cpCore.doc_getBoolean("ReloadCDef")
+                ContentName = Local_GetContentNameByID(ContentID)
+                TableName = Local_GetContentTableName(ContentName)
+                DataSourceName = Local_GetContentDataSource(ContentName)
+                CDef = cpCore.metaData.getCdef(ContentID, True, True)
+                '
+                If (ToolButton <> "") Then
+                    If (ToolButton <> ButtonCancel) Then
+                        cpCore.debug_testPoint("ConfigureEdit, Process Save")
+                        '
+                        ' Save the form changes
+                        '
+                        AllowContentAutoLoad = (cpCore.siteProperties.getBoolean("AllowContentAutoLoad", True))
+                        Call cpCore.siteProperties.setProperty("AllowContentAutoLoad", False)
+                        '
+                        ' ----- Save the input
+                        '
+                        RecordCount = EncodeInteger(cpCore.doc_getInteger("dtfaRecordCount"))
+                        If RecordCount > 0 Then
+                            For RecordPointer = 0 To RecordCount - 1
+                                '
+                                formFieldName = cpCore.docProperties.getText("dtfaName." & RecordPointer)
+                                formFieldTypeId = cpCore.doc_getInteger("dtfaType." & RecordPointer)
+                                formFieldId = EncodeInteger(cpCore.doc_getInteger("dtfaID." & RecordPointer))
+                                formFieldInherited = cpCore.doc_getBoolean("dtfaInherited." & RecordPointer)
+                                '
+                                ' problem - looking for the name in the Db using the form's name, but it could have changed.
+                                ' have to look field up by id
+                                '
+                                For Each cdefFieldKvp As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In CDef.fields
+                                    If cdefFieldKvp.Value.id = formFieldId Then
+                                        '
+                                        ' Field was found in CDef
+                                        '
+                                        With cdefFieldKvp.Value
+                                            If .inherited And (Not formFieldInherited) Then
                                                 '
-                                                If (formFieldName <> "") And (formFieldTypeId <> 0) And ((.nameLc = "") Or (.fieldTypeId = 0)) Then
-                                                    '
-                                                    ' Create Db field, Field is good but was not before
-                                                    '
-                                                    Call cpCore.db.createSQLTableField(DataSourceName, TableName, formFieldName, formFieldTypeId)
-                                                    StatusMessage = StatusMessage & "<LI>Field [" & formFieldName & "] was saved to this content definition and a database field was created in [" & CDef.ContentTableName & "].</LI>"
-                                                ElseIf (formFieldName = "") Or (formFieldTypeId = 0) Then
-                                                    '
-                                                    ' name blank or type=0 - do nothing but tell them
-                                                    '
-                                                    If formFieldName = "" And formFieldTypeId = 0 Then
-                                                        ErrorMessage &= "<LI>Field number " & RecordPointer + 1 & " was saved to this content definition but no database field was created because a name and field type are required.</LI>"
-                                                    ElseIf formFieldName = "unnamedfield" & coreToolsClass.fieldId.ToString Then
-                                                        ErrorMessage &= "<LI>Field number " & RecordPointer + 1 & " was saved to this content definition but no database field was created because a field name is required.</LI>"
-                                                    Else
-                                                        ErrorMessage &= "<LI>Field [" & formFieldName & "] was saved to this content definition but no database field was created because a field type are required.</LI>"
+                                                ' Was inherited, but make a copy of the field
+                                                '
+                                                CSTarget = cpCore.db.cs_insertRecord("Content Fields")
+                                                If cpCore.db.cs_ok(CSTarget) Then
+                                                    CSSource = cpCore.csOpen("Content Fields", formFieldId)
+                                                    If cpCore.db.cs_ok(CSSource) Then
+                                                        Call cpCore.cs_CopyRecord(CSSource, CSTarget)
                                                     End If
-                                                ElseIf (formFieldName = .nameLc) And (formFieldTypeId <> .fieldTypeId) Then
-                                                    '
-                                                    ' Field Type changed, must be done manually
-                                                    '
-                                                    ErrorMessage &= "<LI>Field [" & formFieldName & "] changed type from [" & cpCore.content_GetRecordName("content Field Types", .fieldTypeId) & "] to [" & cpCore.content_GetRecordName("content Field Types", formFieldTypeId) & "]. This may have caused a problem converting content.</LI>"
-                                                    Dim DataSourceTypeID As Integer
-                                                    DataSourceTypeID = cpCore.db.getDataSourceType(DataSourceName)
-                                                    Select Case DataSourceTypeID
-                                                        Case DataSourceTypeODBCMySQL
-                                                            SQL = "alter table " & CDef.ContentTableName & " change " & .nameLc & " " & .nameLc & " " & cpCore.GetSQLAlterColumnType(DataSourceName, formFieldTypeId) & ";"
-                                                        Case Else
-                                                            SQL = "alter table " & CDef.ContentTableName & " alter column " & .nameLc & " " & cpCore.GetSQLAlterColumnType(DataSourceName, formFieldTypeId) & ";"
-                                                    End Select
-                                                    Call cpCore.db.executeSql(SQL, DataSourceName)
+                                                    Call cpCore.db.cs_Close(CSSource)
+                                                    formFieldId = cpCore.db.cs_getInteger(CSTarget, "ID")
+                                                    Call cpCore.db.cs_set(CSTarget, "ContentID", ContentID)
                                                 End If
-                                                SQL = "Update ccFields" _
+                                                Call cpCore.db.cs_Close(CSTarget)
+                                                ReloadCDef = True
+                                            ElseIf (Not .inherited) And (formFieldInherited) Then
+                                                '
+                                                ' Was a field, make it inherit from it's parent
+                                                '
+                                                CSTarget = CSTarget
+                                                Call cpCore.DeleteContentRecord("Content Fields", formFieldId)
+                                                ReloadCDef = True
+                                            ElseIf (Not .inherited) And (Not formFieldInherited) Then
+                                                '
+                                                ' not inherited, save the field values and mark for a reload
+                                                '
+                                                If True Then
+                                                    If (InStr(1, formFieldName, " ") <> 0) Then
+                                                        '
+                                                        ' remoave spaces from new name
+                                                        '
+                                                        StatusMessage = StatusMessage & "<LI>Field [" & formFieldName & "] was renamed [" & vbReplace(formFieldName, " ", "") & "] because the field name can not include spaces.</LI>"
+                                                        formFieldName = vbReplace(formFieldName, " ", "")
+                                                    End If
+                                                    '
+                                                    If (formFieldName <> "") And (formFieldTypeId <> 0) And ((.nameLc = "") Or (.fieldTypeId = 0)) Then
+                                                        '
+                                                        ' Create Db field, Field is good but was not before
+                                                        '
+                                                        Call cpCore.db.createSQLTableField(DataSourceName, TableName, formFieldName, formFieldTypeId)
+                                                        StatusMessage = StatusMessage & "<LI>Field [" & formFieldName & "] was saved to this content definition and a database field was created in [" & CDef.ContentTableName & "].</LI>"
+                                                    ElseIf (formFieldName = "") Or (formFieldTypeId = 0) Then
+                                                        '
+                                                        ' name blank or type=0 - do nothing but tell them
+                                                        '
+                                                        If formFieldName = "" And formFieldTypeId = 0 Then
+                                                            ErrorMessage &= "<LI>Field number " & RecordPointer + 1 & " was saved to this content definition but no database field was created because a name and field type are required.</LI>"
+                                                        ElseIf formFieldName = "unnamedfield" & coreToolsClass.fieldId.ToString Then
+                                                            ErrorMessage &= "<LI>Field number " & RecordPointer + 1 & " was saved to this content definition but no database field was created because a field name is required.</LI>"
+                                                        Else
+                                                            ErrorMessage &= "<LI>Field [" & formFieldName & "] was saved to this content definition but no database field was created because a field type are required.</LI>"
+                                                        End If
+                                                    ElseIf (formFieldName = .nameLc) And (formFieldTypeId <> .fieldTypeId) Then
+                                                        '
+                                                        ' Field Type changed, must be done manually
+                                                        '
+                                                        ErrorMessage &= "<LI>Field [" & formFieldName & "] changed type from [" & cpCore.content_GetRecordName("content Field Types", .fieldTypeId) & "] to [" & cpCore.content_GetRecordName("content Field Types", formFieldTypeId) & "]. This may have caused a problem converting content.</LI>"
+                                                        Dim DataSourceTypeID As Integer
+                                                        DataSourceTypeID = cpCore.db.getDataSourceType(DataSourceName)
+                                                        Select Case DataSourceTypeID
+                                                            Case DataSourceTypeODBCMySQL
+                                                                SQL = "alter table " & CDef.ContentTableName & " change " & .nameLc & " " & .nameLc & " " & cpCore.GetSQLAlterColumnType(DataSourceName, formFieldTypeId) & ";"
+                                                            Case Else
+                                                                SQL = "alter table " & CDef.ContentTableName & " alter column " & .nameLc & " " & cpCore.GetSQLAlterColumnType(DataSourceName, formFieldTypeId) & ";"
+                                                        End Select
+                                                        Call cpCore.db.executeSql(SQL, DataSourceName)
+                                                    End If
+                                                    SQL = "Update ccFields" _
                                                 & " Set name=" & cpCore.db.encodeSQLText(formFieldName) _
                                                 & ",type=" & formFieldTypeId _
                                                 & ",caption=" & cpCore.db.encodeSQLText(cpCore.docProperties.getText("dtfaCaption." & RecordPointer)) _
@@ -619,444 +612,409 @@ ErrorTrap:
                                                 & ",EditTab=" & cpCore.db.encodeSQLText(cpCore.docProperties.getText("dtfaEditTab." & RecordPointer)) _
                                                 & ",Scramble=" & cpCore.db.encodeSQLBoolean(cpCore.doc_getBoolean("dtfaScramble." & RecordPointer)) _
                                                 & ""
-                                                If cpCore.user.isAuthenticatedAdmin Then
-                                                    SQL &= ",adminonly=" & cpCore.db.encodeSQLBoolean(cpCore.doc_getBoolean("dtfaAdminOnly." & RecordPointer))
+                                                    If cpCore.user.isAuthenticatedAdmin Then
+                                                        SQL &= ",adminonly=" & cpCore.db.encodeSQLBoolean(cpCore.doc_getBoolean("dtfaAdminOnly." & RecordPointer))
+                                                    End If
+                                                    If cpCore.user.isAuthenticatedDeveloper Then
+                                                        SQL &= ",DeveloperOnly=" & cpCore.db.encodeSQLBoolean(cpCore.doc_getBoolean("dtfaDeveloperOnly." & RecordPointer))
+                                                    End If
+                                                    SQL &= " where ID=" & formFieldId
+                                                    Call cpCore.db.executeSql(SQL)
+                                                    ReloadCDef = True
                                                 End If
-                                                If cpCore.user.isAuthenticatedDeveloper Then
-                                                    SQL &= ",DeveloperOnly=" & cpCore.db.encodeSQLBoolean(cpCore.doc_getBoolean("dtfaDeveloperOnly." & RecordPointer))
-                                                End If
-                                                SQL &= " where ID=" & formFieldId
-                                                Call cpCore.db.executeSql(SQL)
-                                                'CSPointer = cpCore.app.csOpen("Content Fields", "ID=" & RecordID, , False)
-                                                'If cpCore.asv.csv_IsCSOK(CSPointer) Then
-                                                '    Call cpCore.app.SetCS(CSPointer, "name", FieldName)
-                                                '    Call cpCore.app.SetCS(CSPointer, "type", FieldType)
-                                                '    Call cpCore.app.SetCS(CSPointer, "caption", cpCore.main_GetStreamText2("dtfaCaption." & RecordPointer))
-                                                '    Call cpCore.app.SetCS(CSPointer, "DefaultValue", cpCore.main_GetStreamText2("dtfaDefaultValue." & RecordPointer))
-                                                '    Call cpCore.app.SetCS(CSPointer, "EditSortPriority", cpCore.main_GetStreamInteger("dtfaEditSortPriority." & RecordPointer))
-                                                '    Call cpCore.app.SetCS(CSPointer, "Active", cpCore.main_GetStreamBoolean("dtfaActive." & RecordPointer))
-                                                '    Call cpCore.app.SetCS(CSPointer, "ReadOnly", cpCore.main_GetStreamBoolean("dtfaReadOnly." & RecordPointer))
-                                                '    Call cpCore.app.SetCS(CSPointer, "Authorable", cpCore.main_GetStreamBoolean("dtfaAuthorable." & RecordPointer))
-                                                '    Call cpCore.app.SetCS(CSPointer, "Required", cpCore.main_GetStreamBoolean("dtfaRequired." & RecordPointer))
-                                                '    Call cpCore.app.SetCS(CSPointer, "UniqueName", cpCore.main_GetStreamBoolean("dtfaUniqueName." & RecordPointer))
-                                                '    Call cpCore.app.SetCS(CSPointer, "TextBuffered", cpCore.main_GetStreamBoolean("dtfaTextBuffered." & RecordPointer))
-                                                '    Call cpCore.app.SetCS(CSPointer, "Password", cpCore.main_GetStreamBoolean("dtfaPassword." & RecordPointer))
-                                                '    Call cpCore.app.SetCS(CSPointer, "HTMLContent", cpCore.main_GetStreamBoolean("dtfaHTMLContent." & RecordPointer))
-                                                'If cpCore.main_IsAdmin Then
-                                                '    Call cpCore.app.SetCS(CSPointer, "AdminOnly", cpCore.main_GetStreamBoolean("dtfaAdminOnly." & RecordPointer))
-                                                'End If
-                                                'If cpCore.main_IsDeveloper Then
-                                                '    Call cpCore.app.SetCS(CSPointer, "DeveloperOnly", cpCore.main_GetStreamBoolean("dtfaDeveloperOnly." & RecordPointer))
-                                                'End If
-                                                ReloadCDef = True
-                                                'Call cpCore.app.closeCS(CSPointer)
-                                                'Call cpCore.app.loadContentDefinition(ContentID)
                                             End If
-                                        End If
-                                    End With
-                                    Exit For
-                                End If
+                                        End With
+                                        Exit For
+                                    End If
+                                Next
                             Next
-                        Next
+                        End If
+                        cpCore.cache.invalidateAll()
+                        cpCore.metaData.clear()
                     End If
-                    cpCore.cache.invalidateAll()
-                    cpCore.metaData.clear()
-                End If
-                If (ToolButton = ButtonAdd) Then
-                    cpCore.debug_testPoint("ConfigureEdit, Process Add Button")
-                    '
-                    ' ----- Insert a blank Field
-                    '
-                    CSPointer = cpCore.InsertCSContent("Content Fields")
-                    If cpCore.db.cs_ok(CSPointer) Then
-                        Call cpCore.db.cs_set(CSPointer, "name", "unnamedField" & cpCore.db.cs_getInteger(CSPointer, "id").ToString())
-                        Call cpCore.db.cs_set(CSPointer, "ContentID", ContentID)
-                        Call cpCore.db.cs_set(CSPointer, "EditSortPriority", 0)
-                        ReloadCDef = True
+                    If (ToolButton = ButtonAdd) Then
+                        cpCore.debug_testPoint("ConfigureEdit, Process Add Button")
+                        '
+                        ' ----- Insert a blank Field
+                        '
+                        CSPointer = cpCore.InsertCSContent("Content Fields")
+                        If cpCore.db.cs_ok(CSPointer) Then
+                            Call cpCore.db.cs_set(CSPointer, "name", "unnamedField" & cpCore.db.cs_getInteger(CSPointer, "id").ToString())
+                            Call cpCore.db.cs_set(CSPointer, "ContentID", ContentID)
+                            Call cpCore.db.cs_set(CSPointer, "EditSortPriority", 0)
+                            ReloadCDef = True
+                        End If
+                        Call cpCore.db.cs_Close(CSPointer)
                     End If
-                    Call cpCore.db.cs_Close(CSPointer)
-                End If
-                ''
-                '' ----- Button Reload CDef
-                ''
-                If (ToolButton = ButtonSaveandInvalidateCache) Then
-                    cpCore.cache.invalidateAll()
-                    cpCore.metaData.clear()
-                End If
-                '
-                ' ----- Restore Content Autoload site property
-                '
-                If AllowContentAutoLoad Then
-                    Call cpCore.siteProperties.setProperty("AllowContentAutoLoad", AllowContentAutoLoad)
-                End If
-                '
-                ' ----- Cancel or Save, reload CDef and go
-                '
-                If (ToolButton = ButtonCancel) Or (ToolButton = ButtonOK) Then
+                    ''
+                    '' ----- Button Reload CDef
+                    ''
+                    If (ToolButton = ButtonSaveandInvalidateCache) Then
+                        cpCore.cache.invalidateAll()
+                        cpCore.metaData.clear()
+                    End If
                     '
-                    ' ----- Exit back to menu
+                    ' ----- Restore Content Autoload site property
                     '
-                    Call cpCore.main_Redirect(cpCore.webServerIO_requestProtocol & cpCore.webServerIO_requestDomain & cpCore.webServerIO_requestPath & cpCore.webServerIO_requestPage & "?af=" & AdminFormTools)
+                    If AllowContentAutoLoad Then
+                        Call cpCore.siteProperties.setProperty("AllowContentAutoLoad", AllowContentAutoLoad)
+                    End If
+                    '
+                    ' ----- Cancel or Save, reload CDef and go
+                    '
+                    If (ToolButton = ButtonCancel) Or (ToolButton = ButtonOK) Then
+                        '
+                        ' ----- Exit back to menu
+                        '
+                        Call cpCore.main_Redirect(cpCore.webServerIO_requestProtocol & cpCore.webServerIO_requestDomain & cpCore.webServerIO_requestPath & cpCore.webServerIO_requestPage & "?af=" & AdminFormTools)
+                    End If
                 End If
-            End If
-            '
-            '--------------------------------------------------------------------------------
-            '   Print Output
-            '--------------------------------------------------------------------------------
-            '
-            cpCore.debug_testPoint("ConfigureEdit, Start Form")
-            Stream.Add(SpanClassAdminNormal & "<strong><a href=""" & cpCore.webServerIO_requestPage & "?af=" & AdminFormToolRoot & """>Tools</a></strong>&nbsp;»&nbsp;Manage Admin Edit Fields</span>")
-            Stream.Add("<div>")
-            Stream.Add("<div style=""width:45%;float:left;padding:10px;"">" _
+                '
+                '--------------------------------------------------------------------------------
+                '   Print Output
+                '--------------------------------------------------------------------------------
+                '
+                cpCore.debug_testPoint("ConfigureEdit, Start Form")
+                Stream.Add(SpanClassAdminNormal & "<strong><a href=""" & cpCore.webServerIO_requestPage & "?af=" & AdminFormToolRoot & """>Tools</a></strong>&nbsp;»&nbsp;Manage Admin Edit Fields</span>")
+                Stream.Add("<div>")
+                Stream.Add("<div style=""width:45%;float:left;padding:10px;"">" _
                 & "Use this tool to add or modify content definition fields. Contensive uses a caching system for content definitions that is not automatically reloaded. Change you make will not take effect until the next time the system is reloaded. When you create a new field, the database field is created automatically when you have saved both a name and a field type. If you change the field type, you may have to manually change the database field." _
                 & "</div>")
-            If ContentID = 0 Then
-                Stream.Add("<div style=""width:45%;float:left;padding:10px;"">Related Tools:" _
+                If ContentID = 0 Then
+                    Stream.Add("<div style=""width:45%;float:left;padding:10px;"">Related Tools:" _
                     & "<div style=""padding-left:20px;""><a href=""?af=104"">Set Default Admin Listing page columns</a></div>" _
                     & "</div>")
-            Else
-                Stream.Add("<div style=""width:45%;float:left;padding:10px;"">Related Tools:" _
+                Else
+                    Stream.Add("<div style=""width:45%;float:left;padding:10px;"">Related Tools:" _
                     & "<div style=""padding-left:20px;""><a href=""?af=104&ContentID=" & ContentID & """>Set Default Admin Listing page columns for '" & ContentName & "'</a></div>" _
                     & "<div style=""padding-left:20px;""><a href=""?af=4&cid=" & cpCore.main_GetContentID("content") & "&id=" & ContentID & """>Edit '" & ContentName & "' Content Definition</a></div>" _
                     & "<div style=""padding-left:20px;""><a href=""?cid=" & ContentID & """>View records in '" & ContentName & "'</a></div>" _
                     & "</div>")
-            End If
-            Stream.Add("</div>")
-            Stream.Add("<div style=""clear:both"">&nbsp;</div>")
-            If StatusMessage <> "" Then
-                Call Stream.Add("<UL>" & StatusMessage & "</UL>")
-                Stream.Add("<div style=""clear:both"">&nbsp;</div>")
-            End If
-            If ErrorMessage <> "" Then
-                Call Stream.Add("<br><span class=""ccError"">There was a problem saving these changes</span><UL>" & ErrorMessage & "</UL></SPAN>")
-                Stream.Add("<div style=""clear:both"">&nbsp;</div>")
-            End If
-            If ReloadCDef Then
-                CDef = cpCore.metaData.getCdef(ContentID, True, True)
-            End If
-            If (ContentID <> 0) Then
-                '
-                '--------------------------------------------------------------------------------
-                ' print the Configure edit form
-                '--------------------------------------------------------------------------------
-                '
-                Call Stream.Add(cpCore.main_GetPanelTop())
-                ContentName = Local_GetContentNameByID(ContentID)
-                ButtonList = ButtonCancel & "," & ButtonSave & "," & ButtonOK & "," & ButtonAdd '  & "," & ButtonReloadCDef
-                '
-                ' Get a new copy of the content definition
-                '
-                Call Stream.Add(SpanClassAdminNormal & "<P><B>" & ContentName & "</b></P>")
-                Stream.Add("<table border=""0"" cellpadding=""1"" cellspacing=""1"" width=""100%"">")
-                '
-                ParentContentID = CDef.parentID
-                If ParentContentID = -1 Then
-                    AllowCDefInherit = False
-                Else
-                    AllowCDefInherit = True
-                    ParentContentName = cpCore.metaData.getContentNameByID(ParentContentID)
-                    ParentCDef = cpCore.metaData.getCdef(ParentContentID, True, True)
                 End If
-                If CDef.fields.Count > 0 Then
-                    Stream.Add("<tr>")
-                    Stream.Add("<td valign=""bottom"" width=""50"" class=""ccPanelInput"" align=""center""></td>")
-                    If Not AllowCDefInherit Then
-                        Stream.Add("<td valign=""bottom"" width=""100"" class=""ccPanelInput"" align=""center"">" & SpanClassAdminSmall & "<b><br>Inherited*</b></span></td>")
-                        NeedFootNote1 = True
+                Stream.Add("</div>")
+                Stream.Add("<div style=""clear:both"">&nbsp;</div>")
+                If StatusMessage <> "" Then
+                    Call Stream.Add("<UL>" & StatusMessage & "</UL>")
+                    Stream.Add("<div style=""clear:both"">&nbsp;</div>")
+                End If
+                If ErrorMessage <> "" Then
+                    Call Stream.Add("<br><span class=""ccError"">There was a problem saving these changes</span><UL>" & ErrorMessage & "</UL></SPAN>")
+                    Stream.Add("<div style=""clear:both"">&nbsp;</div>")
+                End If
+                If ReloadCDef Then
+                    CDef = cpCore.metaData.getCdef(ContentID, True, True)
+                End If
+                If (ContentID <> 0) Then
+                    '
+                    '--------------------------------------------------------------------------------
+                    ' print the Configure edit form
+                    '--------------------------------------------------------------------------------
+                    '
+                    Call Stream.Add(cpCore.main_GetPanelTop())
+                    ContentName = Local_GetContentNameByID(ContentID)
+                    ButtonList = ButtonCancel & "," & ButtonSave & "," & ButtonOK & "," & ButtonAdd '  & "," & ButtonReloadCDef
+                    '
+                    ' Get a new copy of the content definition
+                    '
+                    Call Stream.Add(SpanClassAdminNormal & "<P><B>" & ContentName & "</b></P>")
+                    Stream.Add("<table border=""0"" cellpadding=""1"" cellspacing=""1"" width=""100%"">")
+                    '
+                    ParentContentID = CDef.parentID
+                    If ParentContentID = -1 Then
+                        AllowCDefInherit = False
                     Else
-                        Stream.Add("<td valign=""bottom"" width=""100"" class=""ccPanelInput"" align=""center"">" & SpanClassAdminSmall & "<b><br>Inherited</b></span></td>")
+                        AllowCDefInherit = True
+                        ParentContentName = cpCore.metaData.getContentNameByID(ParentContentID)
+                        ParentCDef = cpCore.metaData.getCdef(ParentContentID, True, True)
                     End If
-                    Stream.Add("<td valign=""bottom"" width=""100"" class=""ccPanelInput"" align=""left"">" & SpanClassAdminSmall & "<b><br>Field</b></span></td>")
-                    Stream.Add("<td valign=""bottom"" width=""100"" class=""ccPanelInput"" align=""left"">" & SpanClassAdminSmall & "<b><br>Caption</b></span></td>")
-                    Stream.Add("<td valign=""bottom"" width=""100"" class=""ccPanelInput"" align=""left"">" & SpanClassAdminSmall & "<b><br>Edit Tab</b></span></td>")
-                    Stream.Add("<td valign=""bottom"" width=""100"" class=""ccPanelInput"" align=""left"">" & SpanClassAdminSmall & "<b><br>Default</b></span></td>")
-                    Stream.Add("<td valign=""bottom"" width=""50"" class=""ccPanelInput"" align=""left"">" & SpanClassAdminSmall & "<b><br>Type</b></span></td>")
-                    'Stream.Add( "<td valign=""bottom"" width=""50"" class=""ccPanelInput"" align=""left"">" & SpanClassAdminSmall & "<b>Lookup<br>Content</b></span></td>")
-                    Stream.Add("<td valign=""bottom"" width=""50"" class=""ccPanelInput"" align=""left"">" & SpanClassAdminSmall & "<b>Edit<br>Order</b></span></td>")
-                    Stream.Add("<td valign=""bottom"" width=""50"" class=""ccPanelInput"" align=""center"">" & SpanClassAdminSmall & "<b><br>Active</b></span></td>")
-                    Stream.Add("<td valign=""bottom"" width=""50"" class=""ccPanelInput"" align=""center"">" & SpanClassAdminSmall & "<b>Read<br>Only</b></span></td>")
-                    Stream.Add("<td valign=""bottom"" width=""50"" class=""ccPanelInput"" align=""center"">" & SpanClassAdminSmall & "<b><br>Auth</b></span></td>")
-                    Stream.Add("<td valign=""bottom"" width=""50"" class=""ccPanelInput"" align=""center"">" & SpanClassAdminSmall & "<b><br>Req</b></span></td>")
-                    Stream.Add("<td valign=""bottom"" width=""50"" class=""ccPanelInput"" align=""center"">" & SpanClassAdminSmall & "<b><br>Unique</b></span></td>")
-                    Stream.Add("<td valign=""bottom"" width=""50"" class=""ccPanelInput"" align=""center"">" & SpanClassAdminSmall & "<b>Text<br>Buffer</b></span></td>")
-                    Stream.Add("<td valign=""bottom"" width=""50"" class=""ccPanelInput"" align=""center"">" & SpanClassAdminSmall & "<b><br>Pass</b></span></td>")
-                    Stream.Add("<td valign=""bottom"" width=""50"" class=""ccPanelInput"" align=""center"">" & SpanClassAdminSmall & "<b>Text<br>Scrm</b></span></td>")
-                    Stream.Add("<td valign=""bottom"" width=""50"" class=""ccPanelInput"" align=""left"">" & SpanClassAdminSmall & "<b><br>HTML</b></span></td>")
-                    Stream.Add("<td valign=""bottom"" width=""50"" class=""ccPanelInput"" align=""left"">" & SpanClassAdminSmall & "<b>Admin<br>Only</b></span></td>")
-                    Stream.Add("<td valign=""bottom"" width=""50"" class=""ccPanelInput"" align=""left"">" & SpanClassAdminSmall & "<b>Dev<br>Only</b></span></td>")
-                    Stream.Add("</tr>")
-                    RecordCount = 0
-                    '
-                    ' Build a select template for Type
-                    '
-                    TypeSelectTemplate = cpCore.main_GetFormInputSelect("menuname", -1, "Content Field Types", "", "unknown")
-                    '
-                    ' Index the sort order
-                    '
-
-
-                    Dim fieldList As New List(Of fieldSortClass)
-
-                    FieldCount = CDef.fields.Count
-                    For Each keyValuePair In CDef.fields
-                        Dim fieldSort As New fieldSortClass
-                        'Dim field As New appServices_metaDataClass.CDefFieldClass
-                        Dim sortOrder As String = ""
-                        fieldSort.field = keyValuePair.Value
-                        sortOrder = ""
-                        If fieldSort.field.active Then
-                            sortOrder &= "0"
+                    If CDef.fields.Count > 0 Then
+                        Stream.Add("<tr>")
+                        Stream.Add("<td valign=""bottom"" width=""50"" class=""ccPanelInput"" align=""center""></td>")
+                        If Not AllowCDefInherit Then
+                            Stream.Add("<td valign=""bottom"" width=""100"" class=""ccPanelInput"" align=""center"">" & SpanClassAdminSmall & "<b><br>Inherited*</b></span></td>")
+                            NeedFootNote1 = True
                         Else
-                            sortOrder &= "1"
+                            Stream.Add("<td valign=""bottom"" width=""100"" class=""ccPanelInput"" align=""center"">" & SpanClassAdminSmall & "<b><br>Inherited</b></span></td>")
                         End If
-                        If fieldSort.field.authorable Then
-                            sortOrder &= "0"
-                        Else
-                            sortOrder &= "1"
-                        End If
-                        sortOrder &= fieldSort.field.editTabName & GetIntegerString(fieldSort.field.editSortPriority, 10) & GetIntegerString(fieldSort.field.id, 10)
-                        fieldSort.sort = sortOrder
-                        fieldList.Add(fieldSort)
-                    Next
-                    fieldList.Sort(Function(p1, p2) p1.sort.CompareTo(p2.sort))
-                    For Each fieldsort As fieldSortClass In fieldList
-                        Dim streamRow As New coreFastStringClass
-                        Dim rowValid As Boolean = True
-                        With fieldsort.field
-                            '
-                            ' If Field has name and type, it is locked and can not be changed
-                            '
-                            Dim FieldLocked As Boolean = (.nameLc <> "") And (.fieldTypeId <> 0)
-                            '
-                            ' put the menu into the current menu format
-                            '
-                            formFieldId = .id
-                            Call streamRow.Add(cpCore.html_GetFormInputHidden("dtfaID." & RecordCount, formFieldId))
-                            streamRow.Add("<tr>")
-                            '
-                            ' edit button
-                            '
-                            streamRow.Add("<td class=""ccPanelInput"" align=""left""><img src=""/ccLib/images/spacer.gif"" width=""1"" height=""10"">")
-                            ContentFieldsCID = Local_GetContentID("Content Fields")
-                            If (ContentFieldsCID <> 0) Then
-                                streamRow.Add("<nobr>" & SpanClassAdminSmall & "[<a href=""?aa=" & AdminActionNop & "&af=" & AdminFormEdit & "&id=" & formFieldId & "&cid=" & ContentFieldsCID & "&mm=0"">EDIT</a>]</span></nobr>")
-                                'streamRow.Add( "<nobr>" & SpanClassAdminSmall & "[")
-                                'streamRow.Add( "<a href=""#""")
-                                'streamRow.Add( " onclick=""" _
-                                '    & " window.open('" & cpCore.main_ServerPage & "?aa=" & AdminActionNop & "&af=" & AdminFormEdit & "&id=" & RecordID & "&cid=" & ContentFieldsCID & "&mm=0', '_blank', 'scrollbars=yes,toolbar=no,status=no,resizable=yes');" _
-                                '    & " return false""")
-                                'streamRow.Add( ">EDIT</a>]</span></nobr>")
-                            End If
-                            streamRow.Add("</td>")
-                            '
-                            ' Inherited
-                            '
-                            If Not AllowCDefInherit Then
-                                '
-                                ' no parent
-                                '
-                                streamRow.Add("<td class=""ccPanelInput"" align=""center"">" & SpanClassAdminSmall & "False</span></td>")
-                            ElseIf .inherited Then
-                                '
-                                ' inherited property
-                                '
-                                streamRow.Add("<td class=""ccPanelInput"" align=""center"">" & cpCore.html_GetFormInputCheckBox2("dtfaInherited." & RecordCount, .inherited) & "</td>")
+                        Stream.Add("<td valign=""bottom"" width=""100"" class=""ccPanelInput"" align=""left"">" & SpanClassAdminSmall & "<b><br>Field</b></span></td>")
+                        Stream.Add("<td valign=""bottom"" width=""100"" class=""ccPanelInput"" align=""left"">" & SpanClassAdminSmall & "<b><br>Caption</b></span></td>")
+                        Stream.Add("<td valign=""bottom"" width=""100"" class=""ccPanelInput"" align=""left"">" & SpanClassAdminSmall & "<b><br>Edit Tab</b></span></td>")
+                        Stream.Add("<td valign=""bottom"" width=""100"" class=""ccPanelInput"" align=""left"">" & SpanClassAdminSmall & "<b><br>Default</b></span></td>")
+                        Stream.Add("<td valign=""bottom"" width=""50"" class=""ccPanelInput"" align=""left"">" & SpanClassAdminSmall & "<b><br>Type</b></span></td>")
+                        Stream.Add("<td valign=""bottom"" width=""50"" class=""ccPanelInput"" align=""left"">" & SpanClassAdminSmall & "<b>Edit<br>Order</b></span></td>")
+                        Stream.Add("<td valign=""bottom"" width=""50"" class=""ccPanelInput"" align=""center"">" & SpanClassAdminSmall & "<b><br>Active</b></span></td>")
+                        Stream.Add("<td valign=""bottom"" width=""50"" class=""ccPanelInput"" align=""center"">" & SpanClassAdminSmall & "<b>Read<br>Only</b></span></td>")
+                        Stream.Add("<td valign=""bottom"" width=""50"" class=""ccPanelInput"" align=""center"">" & SpanClassAdminSmall & "<b><br>Auth</b></span></td>")
+                        Stream.Add("<td valign=""bottom"" width=""50"" class=""ccPanelInput"" align=""center"">" & SpanClassAdminSmall & "<b><br>Req</b></span></td>")
+                        Stream.Add("<td valign=""bottom"" width=""50"" class=""ccPanelInput"" align=""center"">" & SpanClassAdminSmall & "<b><br>Unique</b></span></td>")
+                        Stream.Add("<td valign=""bottom"" width=""50"" class=""ccPanelInput"" align=""center"">" & SpanClassAdminSmall & "<b>Text<br>Buffer</b></span></td>")
+                        Stream.Add("<td valign=""bottom"" width=""50"" class=""ccPanelInput"" align=""center"">" & SpanClassAdminSmall & "<b><br>Pass</b></span></td>")
+                        Stream.Add("<td valign=""bottom"" width=""50"" class=""ccPanelInput"" align=""center"">" & SpanClassAdminSmall & "<b>Text<br>Scrm</b></span></td>")
+                        Stream.Add("<td valign=""bottom"" width=""50"" class=""ccPanelInput"" align=""left"">" & SpanClassAdminSmall & "<b><br>HTML</b></span></td>")
+                        Stream.Add("<td valign=""bottom"" width=""50"" class=""ccPanelInput"" align=""left"">" & SpanClassAdminSmall & "<b>Admin<br>Only</b></span></td>")
+                        Stream.Add("<td valign=""bottom"" width=""50"" class=""ccPanelInput"" align=""left"">" & SpanClassAdminSmall & "<b>Dev<br>Only</b></span></td>")
+                        Stream.Add("</tr>")
+                        RecordCount = 0
+                        '
+                        ' Build a select template for Type
+                        '
+                        TypeSelectTemplate = cpCore.main_GetFormInputSelect("menuname", -1, "Content Field Types", "", "unknown")
+                        '
+                        ' Index the sort order
+                        '
+                        Dim fieldList As New List(Of fieldSortClass)
+                        FieldCount = CDef.fields.Count
+                        For Each keyValuePair In CDef.fields
+                            Dim fieldSort As New fieldSortClass
+                            'Dim field As New appServices_metaDataClass.CDefFieldClass
+                            Dim sortOrder As String = ""
+                            fieldSort.field = keyValuePair.Value
+                            sortOrder = ""
+                            If fieldSort.field.active Then
+                                sortOrder &= "0"
                             Else
+                                sortOrder &= "1"
+                            End If
+                            If fieldSort.field.authorable Then
+                                sortOrder &= "0"
+                            Else
+                                sortOrder &= "1"
+                            End If
+                            sortOrder &= fieldSort.field.editTabName & GetIntegerString(fieldSort.field.editSortPriority, 10) & GetIntegerString(fieldSort.field.id, 10)
+                            fieldSort.sort = sortOrder
+                            fieldList.Add(fieldSort)
+                        Next
+                        fieldList.Sort(Function(p1, p2) p1.sort.CompareTo(p2.sort))
+                        For Each fieldsort As fieldSortClass In fieldList
+                            Dim streamRow As New coreFastStringClass
+                            Dim rowValid As Boolean = True
+                            With fieldsort.field
                                 '
-                                ' CDef has a parent, but the field is non-inherited, test for a matching Parent Field
+                                ' If Field has name and type, it is locked and can not be changed
                                 '
-                                Dim parentField As coreMetaDataClass.CDefFieldClass = Nothing
-                                For Each kvp As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In ParentCDef.fields
-                                    If kvp.Value.nameLc = .nameLc Then
-                                        parentField = kvp.Value
-                                        Exit For
-                                    End If
-                                Next
-                                If (parentField Is Nothing) Then
-                                    streamRow.Add("<td class=""ccPanelInput"" align=""center"">" & SpanClassAdminSmall & "False**</span></td>")
-                                    NeedFootNote2 = True
-                                Else
+                                Dim FieldLocked As Boolean = (.nameLc <> "") And (.fieldTypeId <> 0)
+                                '
+                                ' put the menu into the current menu format
+                                '
+                                formFieldId = .id
+                                Call streamRow.Add(cpCore.html_GetFormInputHidden("dtfaID." & RecordCount, formFieldId))
+                                streamRow.Add("<tr>")
+                                '
+                                ' edit button
+                                '
+                                streamRow.Add("<td class=""ccPanelInput"" align=""left""><img src=""/ccLib/images/spacer.gif"" width=""1"" height=""10"">")
+                                ContentFieldsCID = Local_GetContentID("Content Fields")
+                                If (ContentFieldsCID <> 0) Then
+                                    streamRow.Add("<nobr>" & SpanClassAdminSmall & "[<a href=""?aa=" & AdminActionNop & "&af=" & AdminFormEdit & "&id=" & formFieldId & "&cid=" & ContentFieldsCID & "&mm=0"">EDIT</a>]</span></nobr>")
+                                End If
+                                streamRow.Add("</td>")
+                                '
+                                ' Inherited
+                                '
+                                If Not AllowCDefInherit Then
+                                    '
+                                    ' no parent
+                                    '
+                                    streamRow.Add("<td class=""ccPanelInput"" align=""center"">" & SpanClassAdminSmall & "False</span></td>")
+                                ElseIf .inherited Then
+                                    '
+                                    ' inherited property
+                                    '
                                     streamRow.Add("<td class=""ccPanelInput"" align=""center"">" & cpCore.html_GetFormInputCheckBox2("dtfaInherited." & RecordCount, .inherited) & "</td>")
-                                End If
-                            End If
-                            '
-                            ' name
-                            '
-                            Dim tmpValue As Boolean = String.IsNullOrEmpty(.nameLc)
-                            rowValid = rowValid And Not tmpValue
-                            streamRow.Add("<td class=""ccPanelInput"" align=""left""><nobr>")
-                            If .inherited Then
-                                Call streamRow.Add(SpanClassAdminSmall & .nameLc & "&nbsp;</SPAN>")
-                            ElseIf FieldLocked Then
-                                Call streamRow.Add(SpanClassAdminSmall & .nameLc & "&nbsp;</SPAN><input type=hidden name=dtfaName." & RecordCount & " value=""" & .nameLc & """>")
-                            Else
-                                Call streamRow.Add(cpCore.html_GetFormInputText2("dtfaName." & RecordCount, .nameLc, 1, 10))
-                            End If
-                            streamRow.Add("</nobr></td>")
-                            '
-                            ' caption
-                            '
-                            streamRow.Add("<td class=""ccPanelInput"" align=""left""><nobr>")
-                            If .inherited Then
-                                Call streamRow.Add(SpanClassAdminSmall & .caption & "</SPAN>")
-                            Else
-                                Call streamRow.Add(cpCore.html_GetFormInputText2("dtfaCaption." & RecordCount, .caption, 1, 10))
-                            End If
-                            streamRow.Add("</nobr></td>")
-                            '
-                            ' Edit Tab
-                            '
-                            streamRow.Add("<td class=""ccPanelInput"" align=""left""><nobr>")
-                            If .inherited Then
-                                Call streamRow.Add(SpanClassAdminSmall & .editTabName & "</SPAN>")
-                            Else
-                                Call streamRow.Add(cpCore.html_GetFormInputText2("dtfaEditTab." & RecordCount, .editTabName, 1, 10))
-                            End If
-                            streamRow.Add("</nobr></td>")
-                            '
-                            ' default
-                            '
-                            streamRow.Add("<td class=""ccPanelInput"" align=""left""><nobr>")
-                            If .inherited Then
-                                Call streamRow.Add(SpanClassAdminSmall & EncodeText(.defaultValue) & "</SPAN>")
-                            Else
-                                Call streamRow.Add(cpCore.html_GetFormInputText2("dtfaDefaultValue." & RecordCount, EncodeText(.defaultValue), 1, 10))
-                            End If
-                            streamRow.Add("</nobr></td>")
-                            '
-                            ' type
-                            '
-                            rowValid = rowValid And (.fieldTypeId > 0)
-                            streamRow.Add("<td class=""ccPanelInput"" align=""left""><nobr>")
-                            If .inherited Then
-                                CSPointer = cpCore.csOpen("Content Field Types", .fieldTypeId)
-                                If Not cpCore.db.cs_ok(CSPointer) Then
-                                    Call streamRow.Add(SpanClassAdminSmall & "Unknown[" & .fieldTypeId & "]</SPAN>")
                                 Else
-                                    Call streamRow.Add(SpanClassAdminSmall & cpCore.db.cs_getText(CSPointer, "Name") & "</SPAN>")
+                                    '
+                                    ' CDef has a parent, but the field is non-inherited, test for a matching Parent Field
+                                    '
+                                    If (ParentCDef Is Nothing) Then
+                                        For Each kvp As KeyValuePair(Of String, coreMetaDataClass.CDefFieldClass) In ParentCDef.fields
+                                            If kvp.Value.nameLc = .nameLc Then
+                                                parentField = kvp.Value
+                                                Exit For
+                                            End If
+                                        Next
+                                    End If
+                                    If (parentField Is Nothing) Then
+                                        streamRow.Add("<td class=""ccPanelInput"" align=""center"">" & SpanClassAdminSmall & "False**</span></td>")
+                                        NeedFootNote2 = True
+                                    Else
+                                        streamRow.Add("<td class=""ccPanelInput"" align=""center"">" & cpCore.html_GetFormInputCheckBox2("dtfaInherited." & RecordCount, .inherited) & "</td>")
+                                    End If
                                 End If
-                                Call cpCore.db.cs_Close(CSPointer)
-                            ElseIf FieldLocked Then
-                                Call streamRow.Add(cpCore.content_GetRecordName("content field types", .fieldTypeId) & cpCore.html_GetFormInputHidden("dtfaType." & RecordCount, .fieldTypeId))
+                                '
+                                ' name
+                                '
+                                Dim tmpValue As Boolean = String.IsNullOrEmpty(.nameLc)
+                                rowValid = rowValid And Not tmpValue
+                                streamRow.Add("<td class=""ccPanelInput"" align=""left""><nobr>")
+                                If .inherited Then
+                                    Call streamRow.Add(SpanClassAdminSmall & .nameLc & "&nbsp;</SPAN>")
+                                ElseIf FieldLocked Then
+                                    Call streamRow.Add(SpanClassAdminSmall & .nameLc & "&nbsp;</SPAN><input type=hidden name=dtfaName." & RecordCount & " value=""" & .nameLc & """>")
+                                Else
+                                    Call streamRow.Add(cpCore.html_GetFormInputText2("dtfaName." & RecordCount, .nameLc, 1, 10))
+                                End If
+                                streamRow.Add("</nobr></td>")
+                                '
+                                ' caption
+                                '
+                                streamRow.Add("<td class=""ccPanelInput"" align=""left""><nobr>")
+                                If .inherited Then
+                                    Call streamRow.Add(SpanClassAdminSmall & .caption & "</SPAN>")
+                                Else
+                                    Call streamRow.Add(cpCore.html_GetFormInputText2("dtfaCaption." & RecordCount, .caption, 1, 10))
+                                End If
+                                streamRow.Add("</nobr></td>")
+                                '
+                                ' Edit Tab
+                                '
+                                streamRow.Add("<td class=""ccPanelInput"" align=""left""><nobr>")
+                                If .inherited Then
+                                    Call streamRow.Add(SpanClassAdminSmall & .editTabName & "</SPAN>")
+                                Else
+                                    Call streamRow.Add(cpCore.html_GetFormInputText2("dtfaEditTab." & RecordCount, .editTabName, 1, 10))
+                                End If
+                                streamRow.Add("</nobr></td>")
+                                '
+                                ' default
+                                '
+                                streamRow.Add("<td class=""ccPanelInput"" align=""left""><nobr>")
+                                If .inherited Then
+                                    Call streamRow.Add(SpanClassAdminSmall & EncodeText(.defaultValue) & "</SPAN>")
+                                Else
+                                    Call streamRow.Add(cpCore.html_GetFormInputText2("dtfaDefaultValue." & RecordCount, EncodeText(.defaultValue), 1, 10))
+                                End If
+                                streamRow.Add("</nobr></td>")
+                                '
+                                ' type
+                                '
+                                rowValid = rowValid And (.fieldTypeId > 0)
+                                streamRow.Add("<td class=""ccPanelInput"" align=""left""><nobr>")
+                                If .inherited Then
+                                    CSPointer = cpCore.csOpen("Content Field Types", .fieldTypeId)
+                                    If Not cpCore.db.cs_ok(CSPointer) Then
+                                        Call streamRow.Add(SpanClassAdminSmall & "Unknown[" & .fieldTypeId & "]</SPAN>")
+                                    Else
+                                        Call streamRow.Add(SpanClassAdminSmall & cpCore.db.cs_getText(CSPointer, "Name") & "</SPAN>")
+                                    End If
+                                    Call cpCore.db.cs_Close(CSPointer)
+                                ElseIf FieldLocked Then
+                                    Call streamRow.Add(cpCore.content_GetRecordName("content field types", .fieldTypeId) & cpCore.html_GetFormInputHidden("dtfaType." & RecordCount, .fieldTypeId))
+                                Else
+                                    TypeSelect = TypeSelectTemplate
+                                    TypeSelect = vbReplace(TypeSelect, "menuname", "dtfaType." & RecordCount, 1, 99, vbTextCompare)
+                                    TypeSelect = vbReplace(TypeSelect, "=""" & .fieldTypeId & """", "=""" & .fieldTypeId & """ selected", 1, 99, vbTextCompare)
+                                    Call streamRow.Add(TypeSelect)
+                                End If
+                                streamRow.Add("</nobr></td>")
+                                '
+                                ' sort priority
+                                '
+                                streamRow.Add("<td class=""ccPanelInput"" align=""left""><nobr>")
+                                If .inherited Then
+                                    Call streamRow.Add(SpanClassAdminSmall & .editSortPriority & "</SPAN>")
+                                Else
+                                    Call streamRow.Add(cpCore.html_GetFormInputText2("dtfaEditSortPriority." & RecordCount, .editSortPriority.ToString(), 1, 10))
+                                End If
+                                streamRow.Add("</nobr></td>")
+                                '
+                                ' active
+                                '
+                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaActive." & RecordCount, EncodeText(.active), .inherited))
+                                '
+                                ' read only
+                                '
+                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaReadOnly." & RecordCount, EncodeText(.ReadOnly), .inherited))
+                                '
+                                ' authorable
+                                '
+                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaAuthorable." & RecordCount, EncodeText(.authorable), .inherited))
+                                '
+                                ' required
+                                '
+                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaRequired." & RecordCount, EncodeText(.Required), .inherited))
+                                '
+                                ' UniqueName
+                                '
+                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaUniqueName." & RecordCount, EncodeText(.UniqueName), .inherited))
+                                '
+                                ' text buffered
+                                '
+                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaTextBuffered." & RecordCount, EncodeText(.TextBuffered), .inherited))
+                                '
+                                ' password
+                                '
+                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaPassword." & RecordCount, EncodeText(.Password), .inherited))
+                                '
+                                ' scramble
+                                '
+                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaScramble." & RecordCount, EncodeText(.Scramble), .inherited))
+                                '
+                                ' HTML Content
+                                '
+                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaHTMLContent." & RecordCount, EncodeText(.htmlContent), .inherited))
+                                '
+                                ' Admin Only
+                                '
+                                If cpCore.user.isAuthenticatedAdmin Then
+                                    streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaAdminOnly." & RecordCount, EncodeText(.adminOnly), .inherited))
+                                End If
+                                '
+                                ' Developer Only
+                                '
+                                If cpCore.user.isAuthenticatedDeveloper Then
+                                    streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaDeveloperOnly." & RecordCount, EncodeText(.developerOnly), .inherited))
+                                End If
+                                '
+                                streamRow.Add("</tr>")
+                                RecordCount = RecordCount + 1
+                            End With
+                            '
+                            ' rows are built - put the blank rows at the top
+                            '
+                            If Not rowValid Then
+                                Call Stream.Add(streamRow.Text())
                             Else
-                                TypeSelect = TypeSelectTemplate
-                                TypeSelect = vbReplace(TypeSelect, "menuname", "dtfaType." & RecordCount, 1, 99, vbTextCompare)
-                                TypeSelect = vbReplace(TypeSelect, "=""" & .fieldTypeId & """", "=""" & .fieldTypeId & """ selected", 1, 99, vbTextCompare)
-                                Call streamRow.Add(TypeSelect)
+                                Call StreamValidRows.Add(streamRow.Text())
                             End If
-                            streamRow.Add("</nobr></td>")
-                            '
-                            ' sort priority
-                            '
-                            streamRow.Add("<td class=""ccPanelInput"" align=""left""><nobr>")
-                            If .inherited Then
-                                Call streamRow.Add(SpanClassAdminSmall & .editSortPriority & "</SPAN>")
-                            Else
-                                Call streamRow.Add(cpCore.html_GetFormInputText2("dtfaEditSortPriority." & RecordCount, .editSortPriority.ToString(), 1, 10))
-                            End If
-                            streamRow.Add("</nobr></td>")
-                            '
-                            ' active
-                            '
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaActive." & RecordCount, EncodeText(.active), .inherited))
-                            '
-                            ' read only
-                            '
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaReadOnly." & RecordCount, EncodeText(.ReadOnly), .inherited))
-                            '
-                            ' authorable
-                            '
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaAuthorable." & RecordCount, EncodeText(.authorable), .inherited))
-                            '
-                            ' required
-                            '
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaRequired." & RecordCount, EncodeText(.Required), .inherited))
-                            '
-                            ' UniqueName
-                            '
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaUniqueName." & RecordCount, EncodeText(.UniqueName), .inherited))
-                            '
-                            ' text buffered
-                            '
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaTextBuffered." & RecordCount, EncodeText(.TextBuffered), .inherited))
-                            '
-                            ' password
-                            '
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaPassword." & RecordCount, EncodeText(.Password), .inherited))
-                            '
-                            ' scramble
-                            '
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaScramble." & RecordCount, EncodeText(.Scramble), .inherited))
-                            '
-                            ' HTML Content
-                            '
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaHTMLContent." & RecordCount, EncodeText(.htmlContent), .inherited))
-                            '
-                            ' Admin Only
-                            '
-                            If cpCore.user.isAuthenticatedAdmin Then
-                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaAdminOnly." & RecordCount, EncodeText(.adminOnly), .inherited))
-                            End If
-                            '
-                            ' Developer Only
-                            '
-                            If cpCore.user.isAuthenticatedDeveloper Then
-                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaDeveloperOnly." & RecordCount, EncodeText(.developerOnly), .inherited))
-                            End If
-                            '
-                            streamRow.Add("</tr>")
-                            RecordCount = RecordCount + 1
-                        End With
-                        '
-                        ' rows are built - put the blank rows at the top
-                        '
-                        If Not rowValid Then
-                            Call Stream.Add(streamRow.Text())
-                        Else
-                            Call StreamValidRows.Add(streamRow.Text())
-                        End If
-                    Next
-                    Call Stream.Add(StreamValidRows.Text())
-                    Call Stream.Add(cpCore.html_GetFormInputHidden("dtfaRecordCount", RecordCount))
+                        Next
+                        Call Stream.Add(StreamValidRows.Text())
+                        Call Stream.Add(cpCore.html_GetFormInputHidden("dtfaRecordCount", RecordCount))
+                    End If
+                    Stream.Add("</table>")
+                    'Stream.Add( cpCore.main_GetPanelButtons(ButtonList, "Button"))
+                    '
+                    Call Stream.Add(cpCore.main_GetPanelBottom())
+                    'Call Stream.Add(cpCore.main_GetFormEnd())
+                    If NeedFootNote1 Then
+                        Call Stream.Add("<br>*Field Inheritance is not allowed because this Content Definition has no parent.")
+                    End If
+                    If NeedFootNote2 Then
+                        Call Stream.Add("<br>**This field can not be inherited because the Parent Content Definition does not have a field with the same name.")
+                    End If
                 End If
-                Stream.Add("</table>")
-                'Stream.Add( cpCore.main_GetPanelButtons(ButtonList, "Button"))
-                '
-                Call Stream.Add(cpCore.main_GetPanelBottom())
-                'Call Stream.Add(cpCore.main_GetFormEnd())
-                If NeedFootNote1 Then
-                    Call Stream.Add("<br>*Field Inheritance is not allowed because this Content Definition has no parent.")
+                cpCore.debug_testPoint("ConfigureEdit, Form Done")
+                If ContentID <> 0 Then
+                    '
+                    ' Save the content selection
+                    '
+                    Call Stream.Add(cpCore.html_GetFormInputHidden(RequestNameToolContentID, ContentID))
+                Else
+                    '
+                    ' content tables that have edit forms to Configure
+                    '
+                    FormPanel = FormPanel & SpanClassAdminNormal & "Select a Content Definition to Configure its edit form<br>"
+                    FormPanel = FormPanel & "<br>"
+                    FormPanel = FormPanel & cpCore.main_GetFormInputSelect(RequestNameToolContentID, ContentID, "Content")
+                    FormPanel = FormPanel & "</SPAN>"
+                    Call Stream.Add(cpCore.main_GetPanel(FormPanel))
                 End If
-                If NeedFootNote2 Then
-                    Call Stream.Add("<br>**This field can not be inherited because the Parent Content Definition does not have a field with the same name.")
-                End If
-            End If
-            cpCore.debug_testPoint("ConfigureEdit, Form Done")
-            If ContentID <> 0 Then
                 '
-                ' Save the content selection
-                '
-                Call Stream.Add(cpCore.html_GetFormInputHidden(RequestNameToolContentID, ContentID))
-            Else
-                '
-                ' content tables that have edit forms to Configure
-                '
-                FormPanel = FormPanel & SpanClassAdminNormal & "Select a Content Definition to Configure its edit form<br>"
-                FormPanel = FormPanel & "<br>"
-                FormPanel = FormPanel & cpCore.main_GetFormInputSelect(RequestNameToolContentID, ContentID, "Content")
-                FormPanel = FormPanel & "</SPAN>"
-                Call Stream.Add(cpCore.main_GetPanel(FormPanel))
-            End If
-            '
-            Call Stream.Add(cpCore.html_GetFormInputHidden("ReloadCDef", ReloadCDef))
-            GetForm_ConfigureEdit = OpenFormTable(ButtonList) & Stream.Text & CloseFormTable(ButtonList)
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassErrors1("GetForm_ConfigureEdit", "ErrorTrap")
+                Call Stream.Add(cpCore.html_GetFormInputHidden("ReloadCDef", ReloadCDef))
+                result = OpenFormTable(ButtonList) & Stream.Text & CloseFormTable(ButtonList)
+            Catch ex As Exception
+                cpCore.handleExceptionAndContinue(ex)
+            End Try
+            Return result
         End Function
         '
         '=============================================================================
@@ -1131,21 +1089,17 @@ ErrorTrap:
         '==================================================================================
         '
         Private Function GetTitle(ByVal Title As String, ByVal Description As String) As String
-            On Error GoTo ErrorTrap
-            '
-            Dim SQL As String
-            '
-            GetTitle = GetTitle & "<P>" & SpanClassAdminNormal _
-                    & "<A href=""" & cpCore.webServerIO_requestPage & "?af=" & AdminFormToolRoot & """><B>Tools</b></A>" _
-                    & "&nbsp;&gt;&nbsp;" _
-                    & Title _
-                    & "</P><P>" & SpanClassAdminNormal & Description & "</P>"
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassErrors1("GetTitle", "ErrorTrap")
+            Dim result As String = ""
+            Try
+                result = "" _
+                    & "<p>" & SpanClassAdminNormal _
+                    & "<a href=""" & cpCore.webServerIO_requestPage & "?af=" & AdminFormToolRoot & """><b>Tools</b></a>&nbsp;&gt;&nbsp;" & Title _
+                    & "</p>" _
+                    & "<p>" & SpanClassAdminNormal & Description & "</p>"
+            Catch ex As Exception
+                cpCore.handleExceptionAndContinue(ex)
+            End Try
+            Return result
         End Function
         '
         '=============================================================================
@@ -1155,15 +1109,11 @@ ErrorTrap:
         Private Function GetForm_ManualQuery() As String
             Dim returnHtml As String = ""
             Try
-                Dim Ptr As Integer
-                Dim Cnt As Integer
                 Dim DataSourceName As String
                 Dim DataSourceID As Integer
-                Dim SQL As String
-                Dim RS As DataTable
+                Dim SQL As String = ""
+                Dim dt As DataTable = Nothing
                 Dim FieldCount As Integer
-                ' converted array to dictionary - Dim FieldPointer As Integer
-                Dim CellString As String
                 Dim SQLFilename As String
                 Dim SQLArchive As String
                 Dim SQLArchiveOld As String
@@ -1249,7 +1199,7 @@ ErrorTrap:
                     Call Stream.Add("<P>" & SpanClassAdminSmall)
                     Stream.Add(Now() & " Executing sql [" & SQL & "] on DataSource [" & DataSourceName & "]")
                     Try
-                        RS = cpCore.db.executeSql(SQL, DataSourceName, PageSize * (PageNumber - 1), PageSize)
+                        dt = cpCore.db.executeSql(SQL, DataSourceName, PageSize * (PageNumber - 1), PageSize)
                     Catch ex As Exception
                         '
                         ' ----- error
@@ -1258,11 +1208,11 @@ ErrorTrap:
                         Stream.Add("<br>" & ex.Message)
                     End Try
                     Stream.Add("<br>" & Now() & " SQL executed successfully")
-                    If (RS Is Nothing) Then
+                    If (dt Is Nothing) Then
                         Stream.Add("<br>" & Now() & " SQL returned invalid data.")
-                    ElseIf (RS.Rows Is Nothing) Then
+                    ElseIf (dt.Rows Is Nothing) Then
                         Stream.Add("<br>" & Now() & " SQL returned invalid data rows.")
-                    ElseIf (RS.Rows.Count = 0) Then
+                    ElseIf (dt.Rows.Count = 0) Then
                         Stream.Add("<br>" & Now() & " The SQL returned no data.")
                     Else
                         '
@@ -1273,16 +1223,16 @@ ErrorTrap:
                         '
                         ' --- Create the Fields for the new table
                         '
-                        FieldCount = RS.Columns.Count
+                        FieldCount = dt.Columns.Count
                         Stream.Add("<table border=""1"" cellpadding=""1"" cellspacing=""1"" width=""100%"">")
                         Stream.Add("<tr>")
-                        For Each dc As DataColumn In RS.Columns
+                        For Each dc As DataColumn In dt.Columns
                             Call Stream.Add("<TD><B>" & SpanClassAdminSmall & dc.ColumnName & "</b></SPAN></td>")
                         Next
                         Stream.Add("</tr>")
                         '
                         'Dim dtOK As Boolean
-                        resultArray = cpCore.db.convertDataTabletoArray(RS)
+                        resultArray = cpCore.db.convertDataTabletoArray(dt)
                         '
                         RowMax = UBound(resultArray, 2)
                         ColumnMax = UBound(resultArray, 1)
@@ -1373,10 +1323,11 @@ ErrorTrap:
                 'Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolManualQuery))
                 'Stream.Add( cpCore.main_GetFormEnd & "</SPAN>")
                 '
-                GetForm_ManualQuery = OpenFormTable(ButtonList) & Stream.Text & CloseFormTable(ButtonList)
+                returnHtml = OpenFormTable(ButtonList) & Stream.Text & CloseFormTable(ButtonList)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
+            Return returnHtml
         End Function
         '
         '=============================================================================
@@ -1559,7 +1510,7 @@ ErrorTrap:
             Dim ContentSize As Integer
             Dim Stream As New coreFastStringClass
             Dim ButtonList As String
-            Dim FormPanel As String
+            Dim FormPanel As String = ""
             Dim ColumnWidthIncrease As Integer
             Dim ColumnWidthBalance As Integer
             '
@@ -2695,7 +2646,7 @@ ErrorTrap:
             Dim ChildContentName As String = ""
             Dim AddAdminMenuEntry As Boolean
             Dim CS As Integer
-            Dim MenuName As String
+            Dim MenuName As String = ""
             Dim AdminOnly As Boolean
             Dim DeveloperOnly As Boolean
             Dim Stream As New coreFastStringClass
@@ -2888,7 +2839,7 @@ ErrorTrap:
             Dim ActionCount As Integer
             Dim ActionPointer As Integer
             Dim Caption As String
-            Dim Panel As String
+            Dim Panel As String = ""
             '
             MethodName = "GetDiagError"
             '
@@ -3240,12 +3191,10 @@ ErrorTrap:
             Dim DataSourceName As String
             Dim DataSourceID As Integer
             Dim SQL As String
-            'Dim RecordField As Field
             Dim ErrorNumber As Integer
-            Dim ErrorDescription As String
+            Dim ErrorDescription As String = ""
             Dim StatusOK As Boolean
             Dim FieldCount As Integer
-            ' converted array to dictionary - Dim FieldPointer As Integer
             Dim CellString As String
             Dim SQLFilename As String
             Dim SQLArchive As String
@@ -3267,12 +3216,10 @@ ErrorTrap:
             Dim CellData As String
             Dim SelectFieldWidthLimit As Integer
             Dim SQLName As String
-            Dim TableName As String
-            'Dim Conn As Connection
+            Dim TableName As String = ""
             Dim Stream As New coreFastStringClass
             Dim ButtonList As String
             Dim RSSchema As DataTable
-            'Dim ConnectionString As String
             '
             ButtonList = ButtonCancel & "," & ButtonRun
             '
@@ -3560,10 +3507,10 @@ ErrorTrap:
             Dim Pointer As Integer
             Dim SQL As String
             Dim TableID As Integer
-            Dim TableName As String
+            Dim TableName As String = ""
             Dim FieldName As String
             Dim IndexName As String
-            Dim DataSource As String
+            Dim DataSource As String = ""
             Dim RSSchema As DataTable
             Dim Button As String
             Dim CS As Integer
@@ -3572,13 +3519,13 @@ ErrorTrap:
             Dim Rows As String(,)
             Dim RowMax As Integer
             Dim RowPointer As Integer
-            Dim Copy As String
+            Dim Copy As String = ""
             Dim TableRowEven As Boolean
             Dim TableColSpan As Integer
             Dim ButtonList As String
             '
             ButtonList = ButtonCancel & "," & ButtonSelect
-            GetForm_DbIndex = GetForm_DbIndex & GetTitle("Modify Database Indexes", "This tool adds and removes database indexes.")
+            GetForm_DbIndex = GetTitle("Modify Database Indexes", "This tool adds and removes database indexes.")
             '
             ' Process Input
             '
@@ -3740,7 +3687,7 @@ ErrorTrap:
             Dim ButtonList As String
             '
             ButtonList = ButtonCancel
-            GetForm_ContentDbSchema = GetForm_ContentDbSchema & GetTitle("Get Content Database Schema", "This tool displays all tables and fields required for the current Content Defintions.")
+            GetForm_ContentDbSchema = GetTitle("Get Content Database Schema", "This tool displays all tables and fields required for the current Content Defintions.")
             '
             TableColSpan = 3
             GetForm_ContentDbSchema = GetForm_ContentDbSchema & StartTable(2, 0, 0)
@@ -3844,16 +3791,7 @@ ErrorTrap:
             Dim FolderName As String
             Dim ParentPath As String
             Dim Position As Integer
-            'Dim RootPath As String
-            Dim Button As String
-            Dim SourceFiles As String
-            Dim FileSplit() As String
-            Dim FileCount As Integer
-            Dim FilePointer As Integer
-            Dim SourceFilename As String
-            Dim SourcePathFilename As String
             Dim Filename As String
-            Dim CS As Integer
             Dim RowEven As Boolean
             Dim FileSize As String
             Dim FileDate As String
@@ -3875,6 +3813,7 @@ ErrorTrap:
             '
             ' StartPath is the root - the top of the directory, it ends in the folder name (no slash)
             '
+            GetForm_LogFiles_Details = ""
             StartPath = cpCore.programDataFiles.rootLocalPath & "Logs\"
             '
             ' CurrentPath is what is concatinated on to StartPath to get the current folder, it must start with a slash
@@ -4004,43 +3943,40 @@ ErrorTrap:
         '=============================================================================
         '
         Private Function GetForm_LoadCDef() As String
-            On Error GoTo ErrorTrap
-            '
-            Dim Stream As New coreFastStringClass
-            Dim ButtonList As String
-            '
-            ButtonList = ButtonCancel & "," & ButtonSaveandInvalidateCache
-            Stream.Add(GetTitle("Load Content Definitions", "This tool reloads the content definitions. This is necessary when changes are made to the ccContent or ccFields tables outside Contensive. The site will be blocked during the load."))
-            '
-            If (cpCore.docProperties.getText("button")) <> ButtonSaveandInvalidateCache Then
+            Dim result As String = ""
+            Try
                 '
-                ' First pass, initialize
+                Dim Stream As New coreFastStringClass
+                Dim ButtonList As String
                 '
-            Else
+                ButtonList = ButtonCancel & "," & ButtonSaveandInvalidateCache
+                Stream.Add(GetTitle("Load Content Definitions", "This tool reloads the content definitions. This is necessary when changes are made to the ccContent or ccFields tables outside Contensive. The site will be blocked during the load."))
                 '
-                ' Restart
+                If (cpCore.docProperties.getText("button")) <> ButtonSaveandInvalidateCache Then
+                    '
+                    ' First pass, initialize
+                    '
+                Else
+                    '
+                    ' Restart
+                    '
+                    Call Stream.Add("<br>Loading Content Definitions...")
+                    cpCore.cache.invalidateAll()
+                    cpCore.metaData.clear()
+                    Call Stream.Add("<br>Content Definitions loaded")
+                End If
                 '
-                Call Stream.Add("<br>Loading Content Definitions...")
-                cpCore.cache.invalidateAll()
-                cpCore.metaData.clear()
-                Call Stream.Add("<br>Content Definitions loaded")
-            End If
-            '
-            ' Display form
-            '
-            Call Stream.Add(SpanClassAdminNormal)
-            Call Stream.Add("<br>")
-            ''Stream.Add( cpCore.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolLoadCDef)
-            Call Stream.Add("</SPAN>")
-            '
-            GetForm_LoadCDef = OpenFormTable(ButtonList) & Stream.Text & CloseFormTable(ButtonList)
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassErrors1("GetForm_LoadCDef", "ErrorTrap")
+                ' Display form
+                '
+                Call Stream.Add(SpanClassAdminNormal)
+                Call Stream.Add("<br>")
+                Call Stream.Add("</span>")
+                '
+                result = OpenFormTable(ButtonList) & Stream.Text & CloseFormTable(ButtonList)
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+            Return result
         End Function
         '
         '=============================================================================
@@ -4108,68 +4044,23 @@ ErrorTrap:
         '
         '
         Private Function GetCDef(ByVal ContentName As String) As coreMetaDataClass.CDefClass
-            On Error GoTo ErrorTrap
-            '
-            GetCDef = cpCore.metaData.getCdef(ContentName)
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassErrors1("GetCdef", "ErrorTrap")
+            Return cpCore.metaData.getCdef(ContentName)
         End Function
-        ''
-        ''
-        ''
-        'Private Function GetCDefFromDb(ContentName As String) as CDefType
-        '    On Error GoTo ErrorTrap
-        '    '
-        '    Dim CS as integer
-        '    Dim ParentID as integer
-        '    Dim CSParent as integer
-        '    Dim ParentContentName As String
-        '    '
-        '    ' Load the Content's parent in first, then overlay it's field over the parents
-        '    '
-        '    CS = cpCore.app.openCsSql_rev("default", "select * from ccContent where name=" & encodeSQLText(ContentName))
-        '    If cpCore.asv.csv_IsCSOK(CS) Then
-        '        ParentID = cpCore.app.cs_getInteger(CS, "ParentID")
-        '        If ParentID <> 0 Then
-        '            '
-        '            ' Load the Content's parent in first, then overlay it's field over the parents
-        '            '
-        '            CSParent = cpCore.app.openCsSql_rev("default", "select name from ccContent where id=" & ParentID)
-        '            If cpCore.asv.csv_IsCSOK(CSParent) Then
-        '                ParentContentName = cpCore.db.cs_getText(CS, "name")
-        '                GetCDefFromDb = GetCDefFromDb(ParentContentName)
-        '            End If
-        '            Call cpCore.app.closeCS(CSParent)
-        '        End If
-        '        '
-        '        ' Store the CDef fields
-        '        '
-        '        GetCDefFromDb.ActiveOnly = cpCore.app.cs_get(CS, "activeonly")
-        '        GetCDefFromDb.AdminColumns.Count = cpCore.app.cs_get(CS, "activeonly")
-        '    End If
-        '    Call cpCore.app.closeCS(CS)
-        '    '
-        '    Exit Function
-        '    '
-        '    ' ----- Error Trap
-        '    '
-        'ErrorTrap:
-        '    Call HandleToolsTrapError("GetCDefFromDb", "ErrorTrap")
-        'End Function
         '
         '
         '
         Function OpenFormTable(ByVal ButtonList As String) As String
-            OpenFormTable = OpenFormTable & cpCore.html_GetFormStart()
-            If ButtonList <> "" Then
-                OpenFormTable = OpenFormTable & cpCore.main_GetPanelButtons(ButtonList, "Button")
-            End If
-            OpenFormTable = OpenFormTable & "<table border=""0"" cellpadding=""10"" cellspacing=""0"" width=""100%""><tr><TD>"
+            Dim result As String = ""
+            Try
+                OpenFormTable = cpCore.html_GetFormStart()
+                If ButtonList <> "" Then
+                    OpenFormTable = OpenFormTable & cpCore.main_GetPanelButtons(ButtonList, "Button")
+                End If
+                OpenFormTable = OpenFormTable & "<table border=""0"" cellpadding=""10"" cellspacing=""0"" width=""100%""><tr><TD>"
+            Catch ex As Exception
+                cpCore.handleExceptionAndContinue(ex)
+            End Try
+            Return result
         End Function
         '
         '
@@ -4270,78 +4161,69 @@ ErrorTrap:
         '=============================================================================
         '
         Private Function ImportTemplates(ByVal FileRootPath As String, ByVal AppPath As String, ByVal AllowBodyHTML As Boolean, ByVal AllowScriptLink As Boolean, ByVal AllowImageImport As Boolean, ByVal AllowStyleImport As Boolean) As String
-            On Error GoTo ErrorTrap
-            '
-            Dim Stream As New coreFastStringClass
-            Dim ButtonList As String
-            '
-            Dim Folders() As String
-            Dim FolderList As String
-            Dim FolderDetailString As String
-            Dim FolderDetails() As String
-            Dim FolderName As String
-            '
-            Dim FileList As String
-            Dim Files() As String
-            Dim Ptr As Integer
-            Dim FilePath As String
-            Dim FileDetailString As String
-            Dim FileDetails() As String
-            Dim Filename As String
-            Dim PageSource As String
-            Dim CS As Integer
-            Dim Link As String
-            Dim TemplateName As String
-            Dim Copy As String
-            'dim buildversion As String
-            '
-            FileList = cpCore.appRootFiles.convertFileINfoArrayToParseString(cpCore.appRootFiles.getFileList(FileRootPath & AppPath))
-            Files = Split(FileList, vbCrLf)
-            For Ptr = 0 To UBound(Files)
-                FileDetailString = Files(Ptr)
-                FileDetails = Split(FileDetailString, ",")
-                Filename = FileDetails(0)
-                Link = vbReplace(AppPath & Filename, "\", "/")
+            Dim result As String = ""
+            Try
                 '
-                'ImportTemplates = ImportTemplates & "<br>Checking path [/" & AppPath & "], file [" & Filename & "]"
+                Dim Stream As New coreFastStringClass
+                Dim Folders() As String
+                Dim FolderList As String
+                Dim FolderDetailString As String
+                Dim FolderDetails() As String
+                Dim FolderName As String
+                Dim FileList As String
+                Dim Files() As String
+                Dim Ptr As Integer
+                Dim FileDetailString As String
+                Dim FileDetails() As String
+                Dim Filename As String
+                Dim PageSource As String
+                Dim CS As Integer
+                Dim Link As String
+                Dim TemplateName As String
+                Dim Copy As String
                 '
-                If AllowScriptLink And (InStr(1, Filename, ".asp", vbTextCompare) <> 0) And (Mid(Filename, 1, 1) <> "_") Then
-                    '
-                    ImportTemplates = ImportTemplates & "<br>Create Hard Template for script page [" & Link & "]"
-                    '
+                FileList = cpCore.appRootFiles.convertFileINfoArrayToParseString(cpCore.appRootFiles.getFileList(FileRootPath & AppPath))
+                Files = Split(FileList, vbCrLf)
+                For Ptr = 0 To UBound(Files)
+                    FileDetailString = Files(Ptr)
+                    FileDetails = Split(FileDetailString, ",")
+                    Filename = FileDetails(0)
                     Link = vbReplace(AppPath & Filename, "\", "/")
-                    TemplateName = vbReplace(Link, "/", "-")
-                    If vbInstr(1, TemplateName, ".") <> 0 Then
-                        TemplateName = Mid(TemplateName, 1, vbInstr(1, TemplateName, ".") - 1)
-
-                    End If
-                    '
-                    CS = cpCore.db.cs_open("Page Templates", "Link=" & cpCore.db.encodeSQLText(Link))
-                    If Not cpCore.db.cs_ok(CS) Then
-                        Call cpCore.db.cs_Close(CS)
-                        CS = cpCore.db.cs_insertRecord("Page Templates")
-                        Call cpCore.db.cs_set(CS, "Link", Link)
-                    End If
-                    If cpCore.db.cs_ok(CS) Then
-                        Call cpCore.db.cs_set(CS, "name", TemplateName)
-                    End If
-                    Call cpCore.db.cs_Close(CS)
-                ElseIf AllowBodyHTML And (InStr(1, Filename, ".htm", vbTextCompare) <> 0) And (Mid(Filename, 1, 1) <> "_") Then
-                    '
-                    ' HTML, import body
-                    '
-                    PageSource = cpCore.appRootFiles.readFile(Filename)
-                    PageSource = cpCore.main_GetBody(PageSource)
-                    Link = vbReplace(AppPath & Filename, "\", "/")
-                    TemplateName = vbReplace(Link, "/", "-")
-                    If vbInstr(1, TemplateName, ".") <> 0 Then
-                        TemplateName = Mid(TemplateName, 1, vbInstr(1, TemplateName, ".") - 1)
-
-                    End If
-                    '
-                    If True Then
+                    If AllowScriptLink And (InStr(1, Filename, ".asp", vbTextCompare) <> 0) And (Mid(Filename, 1, 1) <> "_") Then
                         '
-                        ImportTemplates = ImportTemplates & "<br>Create Soft Template from source [" & Link & "]"
+                        result = result & "<br>Create Hard Template for script page [" & Link & "]"
+                        '
+                        Link = vbReplace(AppPath & Filename, "\", "/")
+                        TemplateName = vbReplace(Link, "/", "-")
+                        If vbInstr(1, TemplateName, ".") <> 0 Then
+                            TemplateName = Mid(TemplateName, 1, vbInstr(1, TemplateName, ".") - 1)
+
+                        End If
+                        '
+                        CS = cpCore.db.cs_open("Page Templates", "Link=" & cpCore.db.encodeSQLText(Link))
+                        If Not cpCore.db.cs_ok(CS) Then
+                            Call cpCore.db.cs_Close(CS)
+                            CS = cpCore.db.cs_insertRecord("Page Templates")
+                            Call cpCore.db.cs_set(CS, "Link", Link)
+                        End If
+                        If cpCore.db.cs_ok(CS) Then
+                            Call cpCore.db.cs_set(CS, "name", TemplateName)
+                        End If
+                        Call cpCore.db.cs_Close(CS)
+                    ElseIf AllowBodyHTML And (InStr(1, Filename, ".htm", vbTextCompare) <> 0) And (Mid(Filename, 1, 1) <> "_") Then
+                        '
+                        ' HTML, import body
+                        '
+                        PageSource = cpCore.appRootFiles.readFile(Filename)
+                        PageSource = cpCore.main_GetBody(PageSource)
+                        Link = vbReplace(AppPath & Filename, "\", "/")
+                        TemplateName = vbReplace(Link, "/", "-")
+                        If vbInstr(1, TemplateName, ".") <> 0 Then
+                            TemplateName = Mid(TemplateName, 1, vbInstr(1, TemplateName, ".") - 1)
+
+                        End If
+                        '
+                        result = result & "<br>Create Soft Template from source [" & Link & "]"
                         '
                         CS = cpCore.db.cs_open("Page Templates", "Source=" & cpCore.db.encodeSQLText(Link))
                         If Not cpCore.db.cs_ok(CS) Then
@@ -4355,57 +4237,53 @@ ErrorTrap:
                             Call cpCore.db.cs_set(CS, "bodyhtml", PageSource)
                         End If
                         Call cpCore.db.cs_Close(CS)
-                    End If
-                    '
-                ElseIf AllowImageImport And (InStr(1, Filename, ".gif", vbTextCompare) <> 0) And (Mid(Filename, 1, 1) <> "_") Then
-                    '
-                    ' Import GIF images
-                    '
-                    ImportTemplates = ImportTemplates & "<br>Import Image Link to Resource Library [" & Link & "]"
-                    '
-                ElseIf AllowStyleImport And (InStr(1, Filename, ".css", vbTextCompare) <> 0) And (Mid(Filename, 1, 1) <> "_") Then
-                    '
-                    ' Import CSS to Dynamic styles
-                    '
-                    ImportTemplates = ImportTemplates & "<br>Import style sheet to Dynamic Styles [" & Link & "]"
-                    '
-                    Dim DynamicFilename As String
-                    DynamicFilename = "templates\styles.css"
-                    Copy = cpCore.appRootFiles.readFile(DynamicFilename)
-                    Copy = RemoveStyleTags(Copy)
-                    Copy = Copy _
+                        '
+                    ElseIf AllowImageImport And (InStr(1, Filename, ".gif", vbTextCompare) <> 0) And (Mid(Filename, 1, 1) <> "_") Then
+                        '
+                        ' Import GIF images
+                        '
+                        result = result & "<br>Import Image Link to Resource Library [" & Link & "]"
+                        '
+                    ElseIf AllowStyleImport And (InStr(1, Filename, ".css", vbTextCompare) <> 0) And (Mid(Filename, 1, 1) <> "_") Then
+                        '
+                        ' Import CSS to Dynamic styles
+                        '
+                        result = result & "<br>Import style sheet to Dynamic Styles [" & Link & "]"
+                        '
+                        Dim DynamicFilename As String
+                        DynamicFilename = "templates\styles.css"
+                        Copy = cpCore.appRootFiles.readFile(DynamicFilename)
+                        Copy = RemoveStyleTags(Copy)
+                        Copy = Copy _
                             & vbCrLf _
                             & vbCrLf & "/* Import of " & FileRootPath & AppPath & Filename & "*/" _
                             & vbCrLf _
                             & vbCrLf
-                    Copy = Copy & RemoveStyleTags(cpCore.appRootFiles.readFile(Filename))
-                    Call cpCore.appRootFiles.saveFile(DynamicFilename, Copy)
-                End If
-            Next
-            '
-            ' Now process all subfolders
-            '
-            FolderList = cpCore.getFolderNameList(FileRootPath & AppPath)
-            If FolderList <> "" Then
-                Folders = Split(FolderList, vbCrLf)
-                For Ptr = 0 To UBound(Folders)
-                    FolderDetailString = Folders(Ptr)
-                    If FolderDetailString <> "" Then
-                        FolderDetails = Split(FolderDetailString, ",")
-                        FolderName = FolderDetails(0)
-                        If Mid(FolderName, 1, 1) <> "_" Then
-                            ImportTemplates = ImportTemplates & ImportTemplates(FileRootPath, AppPath & FolderName & "\", AllowBodyHTML, AllowScriptLink, AllowImageImport, AllowStyleImport)
-                        End If
+                        Copy = Copy & RemoveStyleTags(cpCore.appRootFiles.readFile(Filename))
+                        Call cpCore.appRootFiles.saveFile(DynamicFilename, Copy)
                     End If
                 Next
-            End If
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassErrors1("ImportTemplates", "ErrorTrap")
+                '
+                ' Now process all subfolders
+                '
+                FolderList = cpCore.getFolderNameList(FileRootPath & AppPath)
+                If FolderList <> "" Then
+                    Folders = Split(FolderList, vbCrLf)
+                    For Ptr = 0 To UBound(Folders)
+                        FolderDetailString = Folders(Ptr)
+                        If FolderDetailString <> "" Then
+                            FolderDetails = Split(FolderDetailString, ",")
+                            FolderName = FolderDetails(0)
+                            If Mid(FolderName, 1, 1) <> "_" Then
+                                result = result & ImportTemplates(FileRootPath, AppPath & FolderName & "\", AllowBodyHTML, AllowScriptLink, AllowImageImport, AllowStyleImport)
+                            End If
+                        End If
+                    Next
+                End If
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
+            Return result
         End Function
         '
         '
@@ -4638,16 +4516,16 @@ ErrorTrap:
             Dim QS As String
             Dim RecordName As String
             Dim RowCnt As Integer
-            Dim TopHalf As String
-            Dim BottomHalf As String
+            Dim TopHalf As String = ""
+            Dim BottomHalf As String = ""
             Dim RowPtr As Integer
             Dim RecordID As Integer
             Dim CS As Integer
             Dim Stream As New coreFastStringClass
             ' Dim runAtServer As New runAtServerClass(cpCore)
-            Dim CDefList As String
-            Dim FindText As String
-            Dim ReplaceText As String
+            Dim CDefList As String = ""
+            Dim FindText As String = ""
+            Dim ReplaceText As String = ""
             Dim Button As String
             Dim ReplaceRows As Integer
             Dim FindRows As Integer

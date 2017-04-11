@@ -171,25 +171,26 @@ ErrorTrap:
         ' Next Node
         '
         Public Sub GoNext()
-            '
-            Dim Ptr As Integer
-            Dim TestNode As XmlNode
-            Dim ParentPtr As Integer
-            '
-            If TierPtr > 0 Then
-                ParentPtr = TierPtr - 1
-                If Tier(ParentPtr).ChildPtrOK Then
-                    Tier(ParentPtr).ChildPtr = Tier(ParentPtr).ChildPtr + 1
-                    Tier(ParentPtr).ChildPtrOK = (Tier(ParentPtr).Node.ChildNodes.Count > Tier(ParentPtr).ChildPtr)
-                    Tier(TierPtr).Node = Nothing
-                    Tier(TierPtr).AttrPtr = 0
+            Try
+                Dim ParentPtr As Integer
+                '
+                If TierPtr > 0 Then
+                    ParentPtr = TierPtr - 1
                     If Tier(ParentPtr).ChildPtrOK Then
-                        If Tier(ParentPtr).Node.ChildNodes(Tier(ParentPtr).ChildPtr).NodeType = System.Xml.XmlNodeType.Element Then
-                            Tier(TierPtr).Node = Tier(ParentPtr).Node.ChildNodes(Tier(ParentPtr).ChildPtr)
+                        Tier(ParentPtr).ChildPtr = Tier(ParentPtr).ChildPtr + 1
+                        Tier(ParentPtr).ChildPtrOK = (Tier(ParentPtr).Node.ChildNodes.Count > Tier(ParentPtr).ChildPtr)
+                        Tier(TierPtr).Node = Nothing
+                        Tier(TierPtr).AttrPtr = 0
+                        If Tier(ParentPtr).ChildPtrOK Then
+                            If Tier(ParentPtr).Node.ChildNodes(Tier(ParentPtr).ChildPtr).NodeType = System.Xml.XmlNodeType.Element Then
+                                Tier(TierPtr).Node = Tier(ParentPtr).Node.ChildNodes(Tier(ParentPtr).ChildPtr)
+                            End If
                         End If
                     End If
                 End If
-            End If
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
         End Sub
         '
         ' IsNodeOK
@@ -236,31 +237,32 @@ ErrorTrap:
         '
         '
         Public Sub GoFirstChild()
-            '
-            Dim Node_Parent As XmlNode
-            Dim Ptr As Integer
-            Dim TestNode As XmlNode
-            '
-            If Not (Tier(TierPtr).Node Is Nothing) Then
-                Tier(TierPtr).ChildPtr = 0
-                Tier(TierPtr).ChildPtrOK = False
-                If Tier(TierPtr).Node.ChildNodes.Count > 0 Then
-                    '
-                    ' setup new tier
-                    '
-                    TierPtr = TierPtr + 1
-                    ReDim Preserve Tier(TierPtr)
-                    Tier(TierPtr).Node = Tier(TierPtr - 1).Node.ChildNodes(Ptr)
+            Try
+                Dim Ptr As Integer
+                '
+                If Not (Tier(TierPtr).Node Is Nothing) Then
                     Tier(TierPtr).ChildPtr = 0
-                    Tier(TierPtr).ChildPtrOK = (Tier(TierPtr - 1).Node.ChildNodes.Count > 0)
-                    Tier(TierPtr).AttrPtr = 0
-                    '
-                    ' set parent tier ptrs
-                    '
-                    Tier(TierPtr - 1).ChildPtr = 0
-                    Tier(TierPtr - 1).ChildPtrOK = True
+                    Tier(TierPtr).ChildPtrOK = False
+                    If Tier(TierPtr).Node.ChildNodes.Count > 0 Then
+                        '
+                        ' setup new tier
+                        '
+                        TierPtr = TierPtr + 1
+                        ReDim Preserve Tier(TierPtr)
+                        Tier(TierPtr).Node = Tier(TierPtr - 1).Node.ChildNodes(Ptr)
+                        Tier(TierPtr).ChildPtr = 0
+                        Tier(TierPtr).ChildPtrOK = (Tier(TierPtr - 1).Node.ChildNodes.Count > 0)
+                        Tier(TierPtr).AttrPtr = 0
+                        '
+                        ' set parent tier ptrs
+                        '
+                        Tier(TierPtr - 1).ChildPtr = 0
+                        Tier(TierPtr - 1).ChildPtrOK = True
+                    End If
                 End If
-            End If
+            Catch ex As Exception
+                cpCore.handleExceptionAndRethrow(ex)
+            End Try
         End Sub
 
         '
@@ -364,6 +366,7 @@ ErrorTrap:
         '
         '
         Public Function GetAttr(ByVal AttrName As String) As String
+            GetAttr = ""
             '
             Dim AttrPtr As Integer
             Dim AttrCnt As Integer
@@ -384,9 +387,8 @@ ErrorTrap:
         '
         '
         Public Function GetAttrName() As String
-            '
             Dim AttrPtr As Integer
-            '
+            GetAttrName = ""
             If IsAttrOK() Then
                 AttrPtr = Tier(TierPtr).AttrPtr
                 GetAttrName = Tier(TierPtr).Node.Attributes(AttrPtr).Name
@@ -396,30 +398,13 @@ ErrorTrap:
         '
         '
         Public Function GetAttrValue() As String
-            '
             Dim AttrPtr As Integer
-            '
+            GetAttrValue = ""
             If IsAttrOK() Then
                 AttrPtr = Tier(TierPtr).AttrPtr
                 GetAttrValue = Tier(TierPtr).Node.Attributes(AttrPtr).Value
             End If
         End Function
-
-
-        'Public ReadOnly Property ErrorCode() As Integer
-        '    Get
-        '        ErrorCode = Private_ErrorCode
-        '    End Get
-        'End Property
-
-
-        'Public ReadOnly Property ErrorMessage() As String
-        '    Get
-        '        ErrorMessage = Private_ErrorMessage
-        '    End Get
-        'End Property
-        '
-        '
         '
         Public ReadOnly Property XML() As String
             Get

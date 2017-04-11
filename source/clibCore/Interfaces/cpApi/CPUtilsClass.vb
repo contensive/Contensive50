@@ -47,7 +47,7 @@ Namespace Contensive.Core
         ''' <remarks></remarks>
         Public Overrides Sub Upgrade(isNewApp As Boolean)
             Try
-                Controllers.coreBuilderClass.upgrade(CP.core, isNewApp)
+                Controllers.appBuilderClass.upgrade(CP.core, isNewApp)
             Catch ex As Exception
                 CP.core.handleExceptionAndRethrow(ex)
             End Try

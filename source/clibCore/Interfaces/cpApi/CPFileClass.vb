@@ -136,6 +136,7 @@ Namespace Contensive.Core
             Else
                 cpCore.handleExceptionAndRethrow(New ApplicationException("Application cannot access this path [" & pathFilename & "]"))
             End If
+            Return String.Empty
         End Function
         '
         '==========================================================================================

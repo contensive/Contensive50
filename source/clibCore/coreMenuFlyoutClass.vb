@@ -212,15 +212,8 @@ ErrorTrap:
         '===============================================================================
         '
         Public Function GetMenuClose() As String
-            On Error GoTo ErrorTrap
-            '
-            GetMenuClose = GetMenuClose & iMenuCloseString
+            GetMenuClose = iMenuCloseString
             iMenuCloseString = ""
-            '
-            Exit Function
-            '
-ErrorTrap:
-            Call handleLegacyClassError("GetMenuClose", Err.Number, Err.Source, Err.Description)
         End Function
         '
         '===============================================================================
@@ -252,178 +245,177 @@ ErrorTrap:
         '===============================================================================
         '
         Private Function GetMenuFlyout(ByVal MenuName As String, ByVal MenuStyle As Integer, Optional ByVal StyleSheetPrefix As String = "") As String
-            On Error GoTo ErrorTrap
-            '
-            Dim Link As String
-            Dim EntryPointer As Integer
-            Dim UcaseMenuName As String
-            Dim MenuEntries As String
-            Dim target As String
-            Dim FlyoutStyle As String
-            Dim HotSpotHTML As String
-            Dim HotSpotHTMLHover As String
-            Dim FlyoutPanel As String
-            Dim FlyoutDirection As Integer
-            Dim LocalStyleSheetPrefix As String
-            Dim FlyoutHover As Boolean
-            Dim MouseClickCode As String
-            Dim MouseOverCode As String
-            Dim MouseOutCode As String
-            Dim ImageID As String
-            Dim JavaCode As String
-            Dim PanelButtonCount As Integer
-            Dim IsTextHotSpot As Boolean
-            '
-            If iEntryCount > 0 Then
+            Dim result As String = ""
+            Try
+
                 '
-                ' ----- Get the menu pointer
+                Dim Link As String
+                Dim EntryPointer As Integer
+                Dim UcaseMenuName As String
+                Dim FlyoutStyle As String
+                Dim HotSpotHTML As String = ""
+                Dim FlyoutPanel As String
+                Dim FlyoutDirection As Integer
+                Dim LocalStyleSheetPrefix As String
+                Dim FlyoutHover As Boolean
+                Dim MouseClickCode As String
+                Dim MouseOverCode As String
+                Dim MouseOutCode As String
+                Dim ImageID As String
+                Dim JavaCode As String = ""
+                Dim PanelButtonCount As Integer
+                Dim IsTextHotSpot As Boolean
                 '
-                LocalStyleSheetPrefix = encodeEmptyText(StyleSheetPrefix, "ccFlyout")
-                If LocalStyleSheetPrefix = "" Then
-                    LocalStyleSheetPrefix = "ccFlyout"
-                End If
-                UcaseMenuName = vbUCase(MenuName)
-                For EntryPointer = 0 To iEntryCount - 1
-                    If iEntry(EntryPointer).Name = UcaseMenuName Then
-                        Exit For
+                If iEntryCount > 0 Then
+                    '
+                    ' ----- Get the menu pointer
+                    '
+                    LocalStyleSheetPrefix = encodeEmptyText(StyleSheetPrefix, "ccFlyout")
+                    If LocalStyleSheetPrefix = "" Then
+                        LocalStyleSheetPrefix = "ccFlyout"
                     End If
-                Next
-                If EntryPointer < iEntryCount Then
-                    MouseClickCode = ""
-                    MouseOverCode = ""
-                    MouseOutCode = ""
-                    ImageID = "img" & CStr(GetRandomInteger()) & "s"
-                    FlyoutStyle = LocalStyleSheetPrefix & "Button"
-                    '
-                    Select Case MenuStyle
-                        Case MenuStyleFlyoutRight, MenuStyleFlyoutUp, MenuStyleFlyoutDown, MenuStyleFlyoutLeft
-                            FlyoutHover = False
-                        Case Else
-                            FlyoutHover = True
-                    End Select
-                    '
-                    With iEntry(EntryPointer)
-                        Link = cpcore.html.html_EncodeHTML(.Link)
-                        If .Image <> "" Then
-                            '
-                            ' Create hotspot from image
-                            '
-                            HotSpotHTML = "<img src=""" & .Image & """ border=""0"" alt=""" & .Caption & """ ID=" & ImageID & " Name=" & ImageID & ">"
-                            If .ImageOver <> "" Then
-                                JavaCode = JavaCode _
+                    UcaseMenuName = vbUCase(MenuName)
+                    For EntryPointer = 0 To iEntryCount - 1
+                        If iEntry(EntryPointer).Name = UcaseMenuName Then
+                            Exit For
+                        End If
+                    Next
+                    If EntryPointer < iEntryCount Then
+                        MouseClickCode = ""
+                        MouseOverCode = ""
+                        MouseOutCode = ""
+                        ImageID = "img" & CStr(GetRandomInteger()) & "s"
+                        FlyoutStyle = LocalStyleSheetPrefix & "Button"
+                        '
+                        Select Case MenuStyle
+                            Case MenuStyleFlyoutRight, MenuStyleFlyoutUp, MenuStyleFlyoutDown, MenuStyleFlyoutLeft
+                                FlyoutHover = False
+                            Case Else
+                                FlyoutHover = True
+                        End Select
+                        '
+                        With iEntry(EntryPointer)
+                            Link = cpCore.html.html_EncodeHTML(.Link)
+                            If .Image <> "" Then
+                                '
+                                ' Create hotspot from image
+                                '
+                                HotSpotHTML = "<img src=""" & .Image & """ border=""0"" alt=""" & .Caption & """ ID=" & ImageID & " Name=" & ImageID & ">"
+                                If .ImageOver <> "" Then
+                                    JavaCode = JavaCode _
                                     & "var " & ImageID & "n=new Image; " _
                                     & ImageID & "n.src='" & .Image & "'; " _
                                     & "var " & ImageID & "o=new Image; " _
                                     & ImageID & "o.src='" & .ImageOver & "'; "
-                                MouseOverCode = MouseOverCode & " document." & ImageID & ".src=" & ImageID & "o.src;"
-                                MouseOutCode = MouseOutCode & " document." & ImageID & ".src=" & ImageID & "n.src;"
+                                    MouseOverCode = MouseOverCode & " document." & ImageID & ".src=" & ImageID & "o.src;"
+                                    MouseOutCode = MouseOutCode & " document." & ImageID & ".src=" & ImageID & "n.src;"
+                                End If
+                            ElseIf .Caption <> "" Then
+                                '
+                                ' Create hotspot text
+                                '
+                                If .CaptionImage <> "" Then
+                                    HotSpotHTML = "<img alt=""" & .Caption & """ src=""" & .CaptionImage & """ border=""0"">"
+                                End If
+                                HotSpotHTML = HotSpotHTML & .Caption
+                                IsTextHotSpot = True
+                            Else
+                                '
+                                ' Create hotspot from name
+                                '
+                                HotSpotHTML = .Name
+                                IsTextHotSpot = True
                             End If
-                        ElseIf .Caption <> "" Then
-                            '
-                            ' Create hotspot text
-                            '
-                            If .CaptionImage <> "" Then
-                                HotSpotHTML = "<img alt=""" & .Caption & """ src=""" & .CaptionImage & """ border=""0"">"
-                            End If
-                            HotSpotHTML = HotSpotHTML & .Caption
-                            IsTextHotSpot = True
-                        Else
-                            '
-                            ' Create hotspot from name
-                            '
-                            HotSpotHTML = .Name
-                            IsTextHotSpot = True
-                        End If
-                    End With
-                    '
-                    FlyoutPanel = GetMenuFlyoutPanel(UcaseMenuName, "", LocalStyleSheetPrefix, FlyoutHover, PanelButtonCount)
-                    '
-                    ' do not fix the navigation menus by making an exception with the menu object. It is also used for Record Add tags, which need a flyout of 1.
-                    '   make the exception in the menuing code above this.
-                    '
-                    If PanelButtonCount > 0 Then
-                        'If PanelButtonCount = 1 Then
-                        '    '
-                        '    ' Single panel entry, just put the link on the button
-                        '    '
-                        '    FlyoutPanel = ""
-                        '    MouseOverCode = ""
-                        '    MouseOutCode = ""
-                        'ElseIf PanelButtonCount > 1 Then
-                        'If FlyoutPanel <> "" Then
+                        End With
                         '
-                        ' Panel exists, create flyout/hover link
+                        FlyoutPanel = GetMenuFlyoutPanel(UcaseMenuName, "", LocalStyleSheetPrefix, FlyoutHover, PanelButtonCount)
                         '
-                        Select Case MenuStyle
+                        ' do not fix the navigation menus by making an exception with the menu object. It is also used for Record Add tags, which need a flyout of 1.
+                        '   make the exception in the menuing code above this.
+                        '
+                        If PanelButtonCount > 0 Then
+                            'If PanelButtonCount = 1 Then
+                            '    '
+                            '    ' Single panel entry, just put the link on the button
+                            '    '
+                            '    FlyoutPanel = ""
+                            '    MouseOverCode = ""
+                            '    MouseOutCode = ""
+                            'ElseIf PanelButtonCount > 1 Then
+                            'If FlyoutPanel <> "" Then
+                            '
+                            ' Panel exists, create flyout/hover link
+                            '
+                            Select Case MenuStyle
                             '
                             ' Set direction flag based on style
                             '
-                            Case MenuStyleFlyoutRight, MenuStyleHoverRight
-                                FlyoutDirection = 1
-                            Case MenuStyleFlyoutUp, MenuStyleHoverUp
-                                FlyoutDirection = 2
-                            Case MenuStyleFlyoutLeft, MenuStyleHoverLeft
-                                FlyoutDirection = 3
-                            Case Else
-                                FlyoutDirection = 0
-                        End Select
-                        If FlyoutHover Then
-                            MouseOverCode = MouseOverCode & " ccFlyoutHoverMode(1); return ccFlyoutButtonClick(event, '" & MenuFlyoutNamePrefix & "_" & UcaseMenuName & "','" & FlyoutDirection & "','" & LocalStyleSheetPrefix & "','true');"
-                            MouseOutCode = MouseOutCode & " ccFlyoutHoverMode(0);"
-                        Else
-                            If IsTextHotSpot Then
-                                HotSpotHTML = HotSpotHTML & MenuFlyoutIcon_Local
+                                Case MenuStyleFlyoutRight, MenuStyleHoverRight
+                                    FlyoutDirection = 1
+                                Case MenuStyleFlyoutUp, MenuStyleHoverUp
+                                    FlyoutDirection = 2
+                                Case MenuStyleFlyoutLeft, MenuStyleHoverLeft
+                                    FlyoutDirection = 3
+                                Case Else
+                                    FlyoutDirection = 0
+                            End Select
+                            If FlyoutHover Then
+                                MouseOverCode = MouseOverCode & " ccFlyoutHoverMode(1); return ccFlyoutButtonClick(event, '" & MenuFlyoutNamePrefix & "_" & UcaseMenuName & "','" & FlyoutDirection & "','" & LocalStyleSheetPrefix & "','true');"
+                                MouseOutCode = MouseOutCode & " ccFlyoutHoverMode(0);"
+                            Else
+                                If IsTextHotSpot Then
+                                    HotSpotHTML = HotSpotHTML & MenuFlyoutIcon_Local
+                                End If
+                                MouseClickCode = MouseClickCode & " return ccFlyoutButtonClick(event, '" & MenuFlyoutNamePrefix & "_" & UcaseMenuName & "','" & FlyoutDirection & "','" & LocalStyleSheetPrefix & "');"
+                                MouseOverCode = MouseOverCode & " ccFlyoutButtonHover(event,'" & MenuFlyoutNamePrefix & "_" & UcaseMenuName & "','" & FlyoutDirection & "','false');"
                             End If
-                            MouseClickCode = MouseClickCode & " return ccFlyoutButtonClick(event, '" & MenuFlyoutNamePrefix & "_" & UcaseMenuName & "','" & FlyoutDirection & "','" & LocalStyleSheetPrefix & "');"
-                            MouseOverCode = MouseOverCode & " ccFlyoutButtonHover(event,'" & MenuFlyoutNamePrefix & "_" & UcaseMenuName & "','" & FlyoutDirection & "','false');"
-                        End If
 
-                    End If
-                    '
-                    ' Convert js code to action
-                    '
-                    If MouseClickCode <> "" Then
-                        MouseClickCode = " onClick=""" & MouseClickCode & """ "
-                    End If
-                    If MouseOverCode <> "" Then
-                        MouseOverCode = " onMouseOver=""" & MouseOverCode & """ "
-                    End If
-                    If MouseOutCode <> "" Then
-                        MouseOutCode = " onMouseOut=""" & MouseOutCode & """ "
-                    End If
-                    '
-                    If FlyoutPanel <> "" Then
+                        End If
                         '
-                        ' Create a flyout link
+                        ' Convert js code to action
                         '
-                        GetMenuFlyout = "<a class=""" & FlyoutStyle & """ " & MouseOutCode & " " & MouseOverCode & " " & MouseClickCode & " HREF=""" & Link & """>" & HotSpotHTML & "</a>"
-                        iMenuCloseString = iMenuCloseString & FlyoutPanel
-                    ElseIf Link <> "" Then
+                        If MouseClickCode <> "" Then
+                            MouseClickCode = " onClick=""" & MouseClickCode & """ "
+                        End If
+                        If MouseOverCode <> "" Then
+                            MouseOverCode = " onMouseOver=""" & MouseOverCode & """ "
+                        End If
+                        If MouseOutCode <> "" Then
+                            MouseOutCode = " onMouseOut=""" & MouseOutCode & """ "
+                        End If
                         '
-                        ' Create a linked element
+                        If FlyoutPanel <> "" Then
+                            '
+                            ' Create a flyout link
+                            '
+                            result = "<a class=""" & FlyoutStyle & """ " & MouseOutCode & " " & MouseOverCode & " " & MouseClickCode & " HREF=""" & Link & """>" & HotSpotHTML & "</a>"
+                            iMenuCloseString = iMenuCloseString & FlyoutPanel
+                        ElseIf Link <> "" Then
+                            '
+                            ' Create a linked element
+                            '
+                            result = "<a class=""" & FlyoutStyle & """ " & MouseOutCode & " " & MouseOverCode & " " & MouseClickCode & " HREF=""" & Link & """>" & HotSpotHTML & "</a>"
+                        Else
+                            '
+                            ' no links and no flyouts, create just the caption
+                            '
+                        End If
                         '
-                        GetMenuFlyout = "<a class=""" & FlyoutStyle & """ " & MouseOutCode & " " & MouseOverCode & " " & MouseClickCode & " HREF=""" & Link & """>" & HotSpotHTML & "</a>"
-                    Else
+                        ' Add in the inline java code if required
                         '
-                        ' no links and no flyouts, create just the caption
-                        '
-                    End If
-                    '
-                    ' Add in the inline java code if required
-                    '
-                    If JavaCode <> "" Then
-                        GetMenuFlyout = "" _
-                            & "<SCRIPT language=javascript type=text/javascript>" _
-                            & JavaCode _
-                            & "</script>" _
-                            & GetMenuFlyout
+                        If JavaCode <> "" Then
+                            result = "" _
+                                & "<SCRIPT language=javascript type=text/javascript>" _
+                                & JavaCode _
+                                & "</script>" _
+                                & result
+                        End If
                     End If
                 End If
-            End If
-            Exit Function
-            '
-ErrorTrap:
-            Call handleLegacyClassError("GetMenuFlyout", Err.Number, Err.Source, Err.Description)
+            Catch ex As Exception
+                cpCore.handleExceptionAndContinue(ex)
+            End Try
+            Return result
         End Function
         '
         '===============================================================================
@@ -438,14 +430,13 @@ ErrorTrap:
             Dim SubMenuName As String
             Dim SubMenuCount As Integer
             Dim target As String
-            Dim SubMenus As String
+            Dim SubMenus As String = ""
             Dim PanelChildren As String
-            Dim PanelButtons As String
+            Dim PanelButtons As String = ""
             Dim PanelButtonStyle As String
             Dim HotSpotHTML As String
             '
             iUsedEntries = UsedEntries
-            'EntryPointer = EntryIndexName.GetPointer(PanelName)
             For EntryPointer = 0 To iEntryCount - 1
                 With iEntry(EntryPointer)
                     If (.ParentName = PanelName) And (.Caption <> "") Then
@@ -453,7 +444,6 @@ ErrorTrap:
                             PanelButtonCount = PanelButtonCount + 1
                             iUsedEntries = iUsedEntries & "," & EntryPointer
                             PanelButtonStyle = StyleSheetPrefix & "PanelButton"
-                            'PanelButtonStyle = "ccFlyoutPanelButton"
                             target = ""
                             If .NewWindow Then
                                 target = " target=""_blank"""
@@ -464,10 +454,6 @@ ErrorTrap:
                             Else
                                 HotSpotHTML = .Caption
                             End If
-                            'HotSpotHTML = .Caption
-                            'If (.StyleSheet <> "") And (.StyleSheet <> "ccFlyoutPanelButton") Then
-                            '    HotSpotHTML = "<SPAN class=""" & .StyleSheet & """>" & HotSpotHTML & "</SPAN>"
-                            '    End If
                             If PanelChildren = "" Then
                                 If .Link = "" Then
                                     '
@@ -479,7 +465,6 @@ ErrorTrap:
                                     ' ----- Link but no child panel
                                     '
                                     PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ href=""" & cpcore.html.html_EncodeHTML(.Link) & """" & target & " onmouseover=""ccFlyoutHoverMode(1); ccFlyoutPanelButtonHover(event,'','" & StyleSheetPrefix & "');"">" & HotSpotHTML & "</a>"
-                                    'PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ href=""" & encodeHTML(.Link) & """" & Target & ">" & HotSpotHTML & "</a>"
                                 End If
                             Else
                                 If .Link = "" Then
@@ -488,23 +473,17 @@ ErrorTrap:
                                     '
                                     If FlyoutHover Then
                                         PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ onmouseover=""ccFlyoutHoverMode(1); ccFlyoutPanelButtonHover(event,'" & MenuFlyoutNamePrefix & "_" & .Name & "','" & StyleSheetPrefix & "');"" onmouseout=""ccFlyoutHoverMode(0);"" onclick=""return false;"" href=""#""" & target & ">" & HotSpotHTML & MenuFlyoutIcon_Local & "</a>"
-                                        'PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ onmouseover=""ccFlyoutHoverMode(1); ccFlyoutPanelButtonHover(event,'" & MenuFlyoutNamePrefix & "_" & .Name & "','" & StyleSheetPrefix & "');"" onmouseout=""ccFlyoutHoverMode(0);"" onclick=""return false;"" href=""#""" & Target & ">" & HotSpotHTML & "&nbsp;<font face=""webdings"">4</font></a>"
                                     Else
                                         PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ onmouseover=""ccFlyoutPanelButtonHover(event,'" & MenuFlyoutNamePrefix & "_" & .Name & "','" & StyleSheetPrefix & "');"" onclick=""return false;"" href=""#""" & target & ">" & HotSpotHTML & MenuFlyoutIcon_Local & "</a>"
-                                        'PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ onmouseover=""ccFlyoutPanelButtonHover(event,'" & MenuFlyoutNamePrefix & "_" & .Name & "','" & StyleSheetPrefix & "');"" onclick=""return false;"" href=""#""" & Target & ">" & HotSpotHTML & "&nbsp;<font face=""webdings"">4</font></a>"
                                     End If
-                                    'PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ onmouseover=""ccFlyoutPanelButtonHover(event,'" & MenuFlyoutNamePrefix & "_" & .Name & "');"" onclick=""return false;"" href=""#""" & Target & ">" & HotSpotHTML & "</a>"
-                                    'PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ onmouseover=""ccFlyoutPanelButtonHover(event,'" & MenuFlyoutNamePrefix & "_" & .Name & "');"" onclick=""return false;"" href=""#""" & Target & "><span style=""font-family: dingbats"">4</SPAN>" & HotSpotHTML & "</a>"
                                 Else
                                     '
                                     ' ----- Child Panel and a link
                                     '
                                     If FlyoutHover Then
                                         PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ onmouseover=""ccFlyoutHoverMode(1); ccFlyoutPanelButtonHover(event,'" & MenuFlyoutNamePrefix & "_" & .Name & "','" & StyleSheetPrefix & "');"" onmouseout=""ccFlyoutHoverMode(0);"" href=""" & cpcore.html.html_EncodeHTML(.Link) & """" & target & ">" & HotSpotHTML & MenuFlyoutIcon_Local & "</a>"
-                                        'PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ onmouseover=""ccFlyoutHoverMode(1); ccFlyoutPanelButtonHover(event,'" & MenuFlyoutNamePrefix & "_" & .Name & "','" & StyleSheetPrefix & "');"" onmouseout=""ccFlyoutHoverMode(0);"" href=""" & .Link & """" & Target & ">" & HotSpotHTML & "&nbsp;<font face=""webdings"">4</font></a>"
                                     Else
                                         PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ onmouseover=""ccFlyoutPanelButtonHover(event,'" & MenuFlyoutNamePrefix & "_" & .Name & "','" & StyleSheetPrefix & "');"" href=""" & cpcore.html.html_EncodeHTML(.Link) & """" & target & ">" & HotSpotHTML & MenuFlyoutIcon_Local & "</a>"
-                                        'PanelButtons = PanelButtons & "<a class=""" & PanelButtonStyle & """ onmouseover=""ccFlyoutPanelButtonHover(event,'" & MenuFlyoutNamePrefix & "_" & .Name & "','" & StyleSheetPrefix & "');"" href=""" & .Link & """" & Target & ">" & HotSpotHTML & "&nbsp;<font face=""webdings"">4</font></a>"
                                     End If
                                 End If
                             End If

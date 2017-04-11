@@ -50,11 +50,9 @@ Namespace Contensive.Core
                 Dim ElementText As String
                 Dim iBody As String
                 Dim LoopCount As Integer
-                Dim LastHRef As String
+                Dim LastHRef As String = ""
                 Dim AttrCount As Integer
                 Dim AttrPointer As Integer
-                Dim StartPtr As Integer
-                Dim EndPtr As Integer
                 '
                 result = ""
                 If Not IsNull(Body) Then

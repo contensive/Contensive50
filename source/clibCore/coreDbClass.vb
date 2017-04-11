@@ -1057,7 +1057,7 @@ Namespace Contensive.Core
         ''' <param name="fieldType"></param>
         ''' <returns></returns>
         Public Function getSQLAlterColumnType(ByVal DataSourceName As String, ByVal fieldType As Integer) As String
-            Dim returnType As String
+            Dim returnType As String = ""
             Try
                 Select Case fieldType
                     Case FieldTypeIdBoolean
@@ -1652,7 +1652,6 @@ Namespace Contensive.Core
                 Dim ContentTableName As String
                 Dim AuthoringDataSourceName As String
                 Dim AuthoringTableName As String
-                Dim SQL As String
                 Dim SQLName(5) As String
                 Dim SQLValue(5) As String
                 Dim Filename As String
@@ -3017,7 +3016,7 @@ Namespace Contensive.Core
                                                 For Each dr As DataRow In rs.Rows
                                                     fieldValue &= "," & dr.Item(0).ToString
                                                 Next
-                                                fieldValue = cs_get.Substring(1)
+                                                fieldValue = fieldValue.Substring(1)
                                             End If
                                         End With
                                     End If
@@ -3843,24 +3842,25 @@ Namespace Contensive.Core
             Try
                 Select Case fieldType
                     Case FieldTypeIdBoolean
-                        EncodeSQL = encodeSQLBoolean(EncodeBoolean(expression))
+                        returnResult = encodeSQLBoolean(EncodeBoolean(expression))
                     Case FieldTypeIdCurrency, FieldTypeIdFloat
-                        EncodeSQL = encodeSQLNumber(EncodeNumber(expression))
+                        returnResult = encodeSQLNumber(EncodeNumber(expression))
                     Case FieldTypeIdAutoIdIncrement, FieldTypeIdInteger, FieldTypeIdLookup, FieldTypeIdMemberSelect
-                        EncodeSQL = encodeSQLNumber(EncodeInteger(expression))
+                        returnResult = encodeSQLNumber(EncodeInteger(expression))
                     Case FieldTypeIdDate
-                        EncodeSQL = encodeSQLDate(EncodeDate(expression))
+                        returnResult = encodeSQLDate(EncodeDate(expression))
                     Case FieldTypeIdLongText, FieldTypeIdHTML
-                        EncodeSQL = encodeSQLText(EncodeText(expression))
+                        returnResult = encodeSQLText(EncodeText(expression))
                     Case FieldTypeIdFile, FieldTypeIdFileImage, FieldTypeIdLink, FieldTypeIdResourceLink, FieldTypeIdRedirect, FieldTypeIdManyToMany, FieldTypeIdText, FieldTypeIdFileTextPrivate, FieldTypeIdFileJavascript, FieldTypeIdFileXML, FieldTypeIdFileCSS, FieldTypeIdFileHTMLPrivate
-                        EncodeSQL = encodeSQLText(EncodeText(expression))
+                        returnResult = encodeSQLText(EncodeText(expression))
                     Case Else
                         cpCore.handleExceptionAndContinue(New ApplicationException("Unknown Field Type [" & fieldType & ""))
-                        EncodeSQL = encodeSQLText(EncodeText(expression))
+                        returnResult = encodeSQLText(EncodeText(expression))
                 End Select
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
+            Return returnResult
         End Function
         '
         '========================================================================

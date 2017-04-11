@@ -771,29 +771,25 @@ Namespace Contensive.Core
             Dim returnREsult As Boolean = False
             Try
                 Dim sqlCriteria As String
-                Dim Message As String
+                Dim Message As String = ""
                 Dim CS As Integer
-                Dim MethodName As String
                 Dim workingEmail As String
-                Dim FromAddress As String
-                Dim subject As String
+                Dim FromAddress As String = ""
+                Dim subject As String = ""
                 Dim allowEmailLogin As Boolean
                 Dim Password As String
                 Dim Username As String
                 Dim updateUser As Boolean
                 Dim atPtr As Integer
-                Dim Cnt As Integer
                 Dim Index As Integer
                 Dim EMailName As String
                 Dim usernameOK As Boolean
                 Dim recordCnt As Integer
-                Dim hint As String
                 Dim Ptr As Integer
                 '
                 Const passwordChrs As String = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345678999999"
                 Const passwordChrsLength As Integer = 62
                 '
-                'hint = "100"
                 workingEmail = EncodeText(Email)
                 '
                 returnREsult = False

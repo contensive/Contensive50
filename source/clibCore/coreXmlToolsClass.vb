@@ -705,7 +705,7 @@ ErrorTrap:
             Dim DataSourceName As String
             Dim TableName As String
             '
-            Dim IndexFields As String
+            Dim IndexFields As String = ""
             Dim IndexList As String
             Dim IndexName As String
             Dim ListRows() As String
@@ -1059,8 +1059,8 @@ ErrorTrap:
             '
             Dim rs As DataTable
             Dim ParentID As Integer
-            Dim RecordName As String
-            Dim ParentSpace As String
+            Dim RecordName As String = ""
+            Dim ParentSpace As String = ""
             Dim appName As String
             '
             appName = cpCore.serverconfig.appConfig.name

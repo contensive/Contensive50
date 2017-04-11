@@ -258,8 +258,6 @@ Namespace Contensive.Core
                 Dim CDef As coreMetaDataClass.CDefClass
                 Dim FieldList As String
                 '
-                Dim archiveSqlList As sqlFieldListClass
-                '
                 MethodName = "csv_PublishEdit"
                 '
                 CDef = cpCore.metaData.getCdef(ContentName)
@@ -551,8 +549,6 @@ Namespace Contensive.Core
         Public Sub abortEdit2(ByVal ContentName As String, ByVal RecordID As Integer, ByVal MemberID As Integer)
             Try
                 '
-                Dim CSPointer As Integer
-
                 Dim RSLive As DataTable
                 Dim LiveRecordID As Integer
                 Dim LiveDataSourceName As String
@@ -564,20 +560,12 @@ Namespace Contensive.Core
                 Dim EditDataSourceName As String
                 Dim EditTableName As String
                 Dim EditRecordID As Integer
-                Dim EditSQLValue As String
                 Dim EditFilename As String
-                '
-                Dim NewEditRecordID As Integer
-                Dim NewEditFilename As String
-                '
                 Dim ContentID As Integer
-                '
-                'Dim PublishFieldNameArray() As String
                 Dim FieldPointer As Integer
                 Dim FieldCount As Integer
                 Dim FieldName As String
                 Dim fieldTypeId As Integer
-                Dim SQL As String
                 Dim CDef As coreMetaDataClass.CDefClass
                 Dim sqlFieldList As New sqlFieldListClass
                 '
@@ -742,18 +730,19 @@ Namespace Contensive.Core
         '=====================================================================================================
         '
         Public Function isRecordLocked(ByVal ContentName As String, ByVal RecordID As Integer, ByVal MemberID As Integer) As Boolean
+            Dim result As Boolean = False
             Try
-                Dim TableID As Integer
                 Dim Criteria As String
                 Dim CS As Integer
                 '
                 Criteria = getAuthoringControlCriteria(ContentName, RecordID) & "and(CreatedBy<>" & cpCore.db.encodeSQLNumber(MemberID) & ")"
                 CS = cpCore.db.cs_open("Authoring Controls", Criteria, , , MemberID)
-                isRecordLocked = cpCore.db.cs_ok(CS)
+                result = cpCore.db.cs_ok(CS)
                 Call cpCore.db.cs_Close(CS)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
+            Return result
         End Function
         '
         '=====================================================================================================
@@ -761,16 +750,12 @@ Namespace Contensive.Core
         '=====================================================================================================
         '
         Private Function getAuthoringControlCriteria(ByVal ContentName As String, ByVal RecordID As Integer) As String
+            Dim result As String = ""
             Try
-                Dim MethodName As String
-                Dim CSPointer As Integer
                 Dim ContentCnt As Integer
                 Dim CS As Integer
-                Dim ContentID As Integer
-                Dim Criteria As String
+                Dim Criteria As String = ""
                 Dim TableID As Integer
-                '
-                MethodName = "csv_GetAuthoringControlCriteria"
                 '
                 TableID = cpCore.db.GetContentTableID(ContentName)
                 '
@@ -789,21 +774,22 @@ Namespace Contensive.Core
                     ' No references to this table
                     '
                     cpCore.handleExceptionAndRethrow(New ApplicationException("TableID [" & TableID & "] could not be found in any ccContent.ContentTableID"))
-                    getAuthoringControlCriteria = "(1=0)"
+                    result = "(1=0)"
                 ElseIf ContentCnt = 1 Then
                     '
                     ' One content record
                     '
-                    getAuthoringControlCriteria = "(ContentID=" & cpCore.db.encodeSQLNumber(EncodeInteger(Mid(Criteria, 2))) & ")And(RecordID=" & cpCore.db.encodeSQLNumber(RecordID) & ")And((DateExpires>" & cpCore.db.encodeSQLDate(Now) & ")Or(DateExpires Is null))"
+                    result = "(ContentID=" & cpCore.db.encodeSQLNumber(EncodeInteger(Mid(Criteria, 2))) & ")And(RecordID=" & cpCore.db.encodeSQLNumber(RecordID) & ")And((DateExpires>" & cpCore.db.encodeSQLDate(Now) & ")Or(DateExpires Is null))"
                 Else
                     '
                     ' Multiple content records
                     '
-                    getAuthoringControlCriteria = "(ContentID In (" & Mid(Criteria, 2) & "))And(RecordID=" & cpCore.db.encodeSQLNumber(RecordID) & ")And((DateExpires>" & cpCore.db.encodeSQLDate(Now) & ")Or(DateExpires Is null))"
+                    result = "(ContentID In (" & Mid(Criteria, 2) & "))And(RecordID=" & cpCore.db.encodeSQLNumber(RecordID) & ")And((DateExpires>" & cpCore.db.encodeSQLDate(Now) & ")Or(DateExpires Is null))"
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
+            Return result
         End Function
         '
         '=====================================================================================================
@@ -812,24 +798,14 @@ Namespace Contensive.Core
         '
         Public Sub clearAuthoringControl(ByVal ContentName As String, ByVal RecordID As Integer, ByVal AuthoringControl As Integer, ByVal MemberID As Integer)
             Try
-                Dim MethodName As String
-                'Dim ContentID as integer
-                Dim TableID As Integer
                 Dim Criteria As String
                 '
-                MethodName = "csv_ClearAuthoringControl"
-                '
-                'ContentID = csv_GetContentID(ContentName)
                 Criteria = getAuthoringControlCriteria(ContentName, RecordID) & "And(ControlType=" & AuthoringControl & ")"
-
-                'If ContentID > -1 Then
                 Select Case AuthoringControl
                     Case AuthoringControlsEditing
                         Call cpCore.db.deleteContentRecords("Authoring Controls", Criteria & "And(CreatedBy=" & cpCore.db.encodeSQLNumber(MemberID) & ")", MemberID)
-                    'Call csv_DeleteContentRecords("Authoring Controls", "(ControlType=" & AuthoringControl & ")And(ContentID=" & encodeSQLNumber(ContentID) & ")And(RecordID=" & encodeSQLNumber(RecordID) & ")And(CreatedBy=" & encodeSQLNumber(MemberID) & ")", MemberID)
                     Case AuthoringControlsSubmitted, AuthoringControlsApproved, AuthoringControlsModified
                         Call cpCore.db.deleteContentRecords("Authoring Controls", Criteria, MemberID)
-                        'Call csv_DeleteContentRecords("Authoring Controls", "(ControlType=" & AuthoringControl & ")And(ContentID=" & encodeSQLNumber(ContentID) & ")And(RecordID=" & encodeSQLNumber(RecordID) & ")", MemberID)
                 End Select
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -943,15 +919,11 @@ Namespace Contensive.Core
                 Dim ContentID As Integer
                 Dim Criteria As String
                 Dim ControlType As Integer
-                Dim EditMemberID As Integer
                 Dim rs As DataTable
                 Dim ContentTableName As String
                 Dim AuthoringTableName As String
                 Dim DataSourceName As String
                 Dim CDef As coreMetaDataClass.CDefClass
-                Dim CS As Integer
-                Dim EditingMemberID As Integer
-                'Dim TableID as integer
                 '
                 IsModified = False
                 ModifiedName = ""

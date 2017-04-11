@@ -4931,7 +4931,7 @@ Namespace Contensive.Core
                                 Else
                                     ContentName = "Menu Entries"
                                     Call appendInstallLog(cpCore.serverconfig.appConfig.name, "UpgradeCDef_BuildDbFromCollection", "creating menu entry [" & .Name & "], parentname [" & .ParentName & "]")
-                                    Call Controllers.coreBuilderClass.admin_VerifyMenuEntry(cpCore, .ParentName, .Name, .ContentName, .LinkPage, .SortOrder, .AdminOnly, .DeveloperOnly, .NewWindow, .Active, ContentName, .AddonName)
+                                    Call Controllers.appBuilderClass.admin_VerifyMenuEntry(cpCore, .ParentName, .Name, .ContentName, .LinkPage, .SortOrder, .AdminOnly, .DeveloperOnly, .NewWindow, .Active, ContentName, .AddonName)
                                 End If
                             End If
                         End With

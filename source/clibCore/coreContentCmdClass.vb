@@ -155,31 +155,10 @@ Namespace Contensive.Core
             Try
                 Dim badCmd As Boolean
                 Dim notFound As Boolean
-                Dim AddonOptionString As String
-                Dim pairNames As Object
-                Dim i As Integer
-                Dim pairName As String
-                Dim pairValue As String
-                Dim ValueVariant As Object
-                Dim posNextStart As Integer
-                Dim posArgOpen As Integer
-                Dim posArgClose As Integer
                 Dim posOpen As Integer
                 Dim posClose As Integer
                 Dim Cmd As String
-                Dim cmdArgs As String
                 Dim cmdResult As String
-                '
-                Dim ACGuid As String
-                Dim addonName As String
-                Dim ACInstanceID As String
-                Dim AddonOptionStringHTMLEncoded As String
-                Dim CSPeople As CPCSBaseClass
-                Dim CSPeopleSet As Boolean
-                Dim cmdArgJSON As Object
-                'Dim peopleId as integer
-                Dim isJSON As Boolean
-                '
                 Dim posDq As Integer
                 Dim posSq As Integer
                 Dim Ptr As Integer
@@ -321,12 +300,8 @@ Namespace Contensive.Core
                 ' accumulator gets the result of each cmd, then is passed to the next command to filter
                 '
                 Dim CmdAccumulator As String
-                Dim CS As CPCSBaseClass
                 Dim htmlTools As coreHtmlClass
-                Dim argField As String
                 Dim importHead As String
-                Dim argFind As String
-                Dim argReplace As String
                 Dim ArgName As String
                 Dim ArgInstanceId As String
                 Dim ArgGuid As String
@@ -335,9 +310,7 @@ Namespace Contensive.Core
                 Dim cmdArg As String
                 Dim Pos As Integer
                 Dim addonName As String
-                Dim CSPeople As CPCSBaseClass
                 Dim CSPeopleSet As Boolean = False
-                Dim Ptr As Integer
                 Dim cmd As Object
                 Dim cmdDictionaryOrCollection As Object
                 Dim cmdDictionary As New Dictionary(Of String, Object)

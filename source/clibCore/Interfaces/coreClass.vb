@@ -28,7 +28,7 @@ Namespace Contensive.Core
         ' application storage
         '
         Friend deleteOnDisposeFileList As New List(Of String)              ' tmp file list of files that need to be deleted during dispose
-        Public Const webServerIO_requestRootPath As String = "/"
+
         '
         '===================================================================================================
         ''' <summary>
@@ -2222,7 +2222,7 @@ ErrorTrap:
         '
         Public ReadOnly Property app_rootWebPath() As String
             Get
-                app_rootWebPath = webServerIO_requestRootPath
+                app_rootWebPath = requestAppRootPath
             End Get
         End Property
         '
@@ -2311,7 +2311,7 @@ ErrorTrap:
         '=============================================================================
         '
         Public Sub admin_VerifyAdminMenu(ByVal ParentName As String, ByVal EntryName As String, ByVal ContentName As String, ByVal LinkPage As String, ByVal SortOrder As String, Optional ByVal AdminOnly As Boolean = False, Optional ByVal DeveloperOnly As Boolean = False, Optional ByVal NewWindow As Boolean = False, Optional ByVal Active As Boolean = True)
-            Call Controllers.coreBuilderClass.admin_VerifyMenuEntry(cp.core, ParentName, EntryName, ContentName, LinkPage, SortOrder, AdminOnly, DeveloperOnly, NewWindow, Active, "Menu Entries", "")
+            Call Controllers.appBuilderClass.admin_VerifyMenuEntry(cp.core, ParentName, EntryName, ContentName, LinkPage, SortOrder, AdminOnly, DeveloperOnly, NewWindow, Active, "Menu Entries", "")
         End Sub
         '
         '========================================================================
@@ -2338,7 +2338,6 @@ ErrorTrap:
             Dim returnValue As String = ""
             Try
                 Dim LoopPtr As Integer
-                Dim LayoutEngineOptionString As String
                 Dim contentCmd As New coreContentCmdClass(Me)
                 '
                 returnValue = Source
@@ -2408,814 +2407,707 @@ ErrorTrap:
         '========================================================================
         '
         Public Function html_EncodeActiveContent_Internal(ByVal Source As String, ByVal personalizationPeopleId As Integer, ByVal ContextContentName As String, ByVal ContextRecordID As Integer, ByVal moreInfoPeopleId As Integer, ByVal AddLinkEID As Boolean, ByVal EncodeCachableTags As Boolean, ByVal EncodeImages As Boolean, ByVal EncodeEditIcons As Boolean, ByVal EncodeNonCachableTags As Boolean, ByVal AddAnchorQuery As String, ByVal ProtocolHostString As String, ByVal IsEmailContent As Boolean, ByVal AdminURL As String, ByVal personalizationIsAuthenticated As Boolean, Optional ByVal context As CPUtilsBaseClass.addonContext = CPUtilsBaseClass.addonContext.ContextPage) As String
-            On Error GoTo ErrorTrap 'Const Tn = "EncodeActiveContent_Internal" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Dim pairNames As Object
-            Dim i As Integer
-            Dim pairName As String
-            Dim pairValue As String
-            Dim ValueVariant As Object
-            Dim posNextStart As Integer
-            Dim posArgOpen As Integer
-            Dim posArgClose As Integer
-            Dim posBraceOpen As Integer
-            Dim posBraceClose As Integer
-            Dim contentCmd As String
-            Dim contentCmdArgs As String
-            Dim contentCmdResult As String
-            Dim Item As Object
-            Dim AddonName As String
-            'Dim contentCmdArgJSON As Object
-            Dim isJSON As Boolean
-            Dim LayoutErrorMessage As String
-            Dim LayoutEngineOptionString As String
-            Dim ACGuid As String
-            Dim Wrapper As String
-            Dim AddonFound As Boolean
-            Dim ACNameCaption As String
-            Dim GroupIDList As String
-            Dim IDControlString As String
-            Dim IconIDControlString As String
-            Dim Criteria As String
-            Dim AddonContentName As String
-            Dim SelectList As String
-            Dim CSFields As Integer
-            Dim IconWidth As Integer
-            Dim IconHeight As Integer
-            Dim IconSprites As Integer
-            Dim AddonIsInline As Boolean
-            Dim IconAlt As String
-            Dim IconTitle As String
-            Dim IconImg As String
-            ''dim buildversion As String
-            Dim Cmd As String
-            Dim TextName As String
-            Dim SortFieldList As String
-            Dim ListName As String
-            Dim SortDirection As String
-            Dim AllowGroupAccess As Boolean
-            Dim LoopPtr As Integer
-            Dim SrcOptionSelector As String
-            Dim ResultOptionSelector As String
-            Dim ContentName As String
-            Dim SrcOptionList As String
-            Dim Pos As Integer
-            Dim list As String
-            Dim FnArgList As String
-            Dim FnArgs() As String
-            Dim FnArgCnt As Integer
-            Dim ContentCriteria As String
-            Dim RecordName As String
-            Dim REsultOptionValue As String
-            Dim SrcOptionValueSelector As String
-            Dim InstanceOptionValue As String
-            Dim ResultOptionListHTMLEncoded As String
-            Dim UCaseACName As String
-            Dim IconFilename As String
-            Dim FilenameSegment As String
-            Dim EndPos1 As Integer
-            Dim EndPos2 As Integer
-            Dim LinkSplit() As String
-            Dim LinkCnt As Integer
-            Dim LinkPtr As Integer
-            Dim TableSplit() As String
-            Dim TableName As String
-            Dim FieldName As String
-            Dim RecordID As Integer
-            Dim SQL As String
-            Dim SaveChanges As Boolean
-            Dim NextPosSpace As Integer
-            Dim NextPosQuote As Integer
-            Dim LinkEndPos As Integer
-            Dim NewLink As String
-            Dim EndPos As Integer
-            Dim Ptr As Integer
-            Dim FilePrefixSegment As String
-            Dim ElementPointer As Integer
-            Dim ListCount As Integer
-            Dim CSVisitor As Integer
-            Dim CSVisit As Integer
-            Dim CSChildList As Integer
-            Dim CSVisitorSet As Boolean
-            Dim CSVisitSet As Boolean
-            'Dim ContextContentName As String
-            'Dim ContextRecordID as integer
-            Dim ElementTag As String
-            Dim ElementName As String
-            Dim ACType As String
-            Dim ACField As String
-            Dim ACName As String
-            Dim ACBullet As Boolean
-            'Dim moreInfoPeopleId as integer
-            Dim Copy As String
-            Dim LinkLabel As String
-            Dim Overview As String
-            'Dim CSContext as integer
-            Dim KmaHTML As coreHtmlParseClass
-            Dim AttributeCount As Integer
-            Dim AttributePointer As Integer
-            Dim Name As String
-            Dim Value As String
-            Dim JoinCriteria As String
-            Dim CS As Integer
-            'Dim FormattingContentID as integer
-            Dim ACAttrRecordID As Integer
-            Dim ACAttrWidth As Integer
-            Dim ACAttrHeight As Integer
-            Dim ACAttrAlt As String
-            Dim ACAttrBorder As Integer
-            Dim ACAttrLoop As Integer
-            Dim ACAttrVSpace As Integer
-            Dim ACAttrHSpace As Integer
-            Dim Filename As String
-            Dim ACAttrAlign As String
-            Dim ProcessAnchorTags As Boolean
-            Dim ProcessACTags As Boolean
-            Dim SelectFieldList As String
-            Dim ACLanguageName As String
-            Dim Stream As coreFastStringClass
-            Dim AnchorQuery As String
-            '
-            Dim CSOrganization As Integer
-            Dim CSOrganizationSet As Boolean
-            '
-            Dim CSPeople As Integer
-            Dim CSPeopleSet As Boolean
-            '
-            Dim CSlanguage As Integer
-            Dim PeopleLanguageSet As Boolean
-            Dim PeopleLanguage As String
-            Dim UcasePeopleLanguage As String
-            '
-            Dim serverFilePath As String
-            Dim ReplaceCount As Integer
-            Dim ReplaceInstructions As String
-            '
-            Dim Link As String
-            Dim NotUsedID As Integer
-            Dim CSInstance As Integer
-            Dim addonOptionString As String
-            Dim AddonOptionStringHTMLEncoded As String
-            Dim ProgramID As String
-            Dim AggrObject As Object
-            '    Dim OptionString As String
-            '    Dim Options() As String
-            '    Dim OptionCnt as integer
-            '    Dim OptionPtr as integer
-            '    Dim OptionPair() As String
-            '    Dim OptionName As String
-            '    Dim OptionValue As String
-            Dim SrcOptions() As String
-            Dim SrcOptionCnt As Integer
-            Dim SrcOptionPtr As Integer
-            Dim SrcOptionPair() As String
-            Dim SrcOptionName As String
-            Dim SrcOptionValue As String
-
-            Dim FormCount As Integer
-            Dim FormInputCount As Integer
-            Dim CDef As coreMetaDataClass.CDefClass
-            Dim FieldList As String
-            Dim ProcessResourceLibraryLinks As Boolean
-            'Dim ContentFilesLinkPrefix As String
-            'Dim ResourceLibraryLinkPrefix As String
-            Dim TestChr As String
-            Dim ACInstanceID As String
-            Dim ParseError As Boolean
-            Dim PosStart As Integer
-            Dim PosEnd As Integer
-            Dim AllowGroups As String
-            Dim TemplateBodyContent As String
-            Dim workingContent As String
-            Dim NewName As String
-            '
-            'BuildVersion = app.dataBuildVersion
-            '
-            workingContent = Source
-            'TemplateBodyContent = TemplateCaseOnly_Content
-            'If TemplateBodyContent <> "" Then
-            '    TemplateBodyContent = TemplateBodyContent
-            'End If
-            '
-            ' Fixup Anchor Query (additional AddonOptionString pairs to add to the end)
-            '
-            If AddLinkEID And (personalizationPeopleId <> 0) Then
-                AnchorQuery = AnchorQuery & "&EID=" & security.encodeToken(EncodeInteger(personalizationPeopleId), Now())
-            End If
-            '
-            If AddAnchorQuery <> "" Then
-                AnchorQuery = AnchorQuery & "&" & AddAnchorQuery
-            End If
-            '
-            If AnchorQuery <> "" Then
-                AnchorQuery = Mid(AnchorQuery, 2)
-            End If
-            '
-            ' ----- xml contensive process instruction
-            '
-            'TemplateBodyContent
-            'Pos = vbInstr(1, TemplateBodyContent, "<?contensive", vbTextCompare)
-            'If Pos > 0 Then
-            '    '
-            '    ' convert template body if provided - this is the content that replaces the content box addon
-            '    '
-            '    TemplateBodyContent = Mid(TemplateBodyContent, Pos)
-            '    LayoutEngineOptionString = "data=" & encodeNvaArgument(TemplateBodyContent)
-            '    TemplateBodyContent = csv_ExecuteActiveX("aoPrimitives.StructuredDataClass", "Structured Data Engine", nothing, LayoutEngineOptionString, "data=(structured data)", LayoutErrorMessage)
-            'End If
-            Pos = vbInstr(1, workingContent, "<?contensive", vbTextCompare)
-            If Pos > 0 Then
-                Throw New ApplicationException("Structured xml data commands are no longer supported")
-                ''
-                '' convert content if provided
-                ''
-                'workingContent = Mid(workingContent, Pos)
-                'LayoutEngineOptionString = "data=" & encodeNvaArgument(workingContent)
-                'Dim structuredData As New core_primitivesStructuredDataClass(Me)
-                'workingContent = structuredData.execute()
-                'workingContent = csv_ExecuteActiveX("aoPrimitives.StructuredDataClass", "Structured Data Engine", LayoutEngineOptionString, "data=(structured data)", LayoutErrorMessage)
-            End If
-            '
-            ' Special Case
-            ' Convert <!-- STARTGROUPACCESS 10,11,12 --> format to <AC type=GROUPACCESS AllowGroups="10,11,12">
-            ' Convert <!-- ENDGROUPACCESS --> format to <AC type=GROUPACCESSEND>
-            '
-            PosStart = vbInstr(1, workingContent, "<!-- STARTGROUPACCESS ", vbTextCompare)
-            If PosStart > 0 Then
-                PosEnd = vbInstr(PosStart, workingContent, "-->")
-                If PosEnd > 0 Then
-                    AllowGroups = Mid(workingContent, PosStart + 22, PosEnd - PosStart - 23)
-                    workingContent = Mid(workingContent, 1, PosStart - 1) & "<AC type=""" & ACTypeAggregateFunction & """ name=""block text"" querystring=""allowgroups=" & AllowGroups & """>" & Mid(workingContent, PosEnd + 3)
+            Dim result As String = ""
+            Try
+                Dim ACGuid As String
+                Dim AddonFound As Boolean
+                Dim ACNameCaption As String
+                Dim GroupIDList As String
+                Dim IDControlString As String
+                Dim IconIDControlString As String
+                Dim Criteria As String
+                Dim AddonContentName As String
+                Dim SelectList As String = ""
+                Dim IconWidth As Integer
+                Dim IconHeight As Integer
+                Dim IconSprites As Integer
+                Dim AddonIsInline As Boolean
+                Dim IconAlt As String = ""
+                Dim IconTitle As String = ""
+                Dim IconImg As String
+                Dim Cmd As String
+                Dim TextName As String
+                Dim ListName As String
+                Dim LoopPtr As Integer
+                Dim SrcOptionSelector As String
+                Dim ResultOptionSelector As String
+                Dim SrcOptionList As String
+                Dim Pos As Integer
+                Dim REsultOptionValue As String
+                Dim SrcOptionValueSelector As String
+                Dim InstanceOptionValue As String
+                Dim ResultOptionListHTMLEncoded As String
+                Dim UCaseACName As String
+                Dim IconFilename As String
+                Dim FieldName As String
+                Dim Ptr As Integer
+                Dim ElementPointer As Integer
+                Dim ListCount As Integer
+                Dim CSVisitor As Integer
+                Dim CSVisit As Integer
+                Dim CSVisitorSet As Boolean
+                Dim CSVisitSet As Boolean
+                Dim ElementTag As String
+                Dim ACType As String
+                Dim ACField As String
+                Dim ACName As String = ""
+                Dim Copy As String
+                Dim KmaHTML As coreHtmlParseClass
+                Dim AttributeCount As Integer
+                Dim AttributePointer As Integer
+                Dim Name As String
+                Dim Value As String
+                Dim CS As Integer
+                Dim ACAttrRecordID As Integer
+                Dim ACAttrWidth As Integer
+                Dim ACAttrHeight As Integer
+                Dim ACAttrAlt As String
+                Dim ACAttrBorder As Integer
+                Dim ACAttrLoop As Integer
+                Dim ACAttrVSpace As Integer
+                Dim ACAttrHSpace As Integer
+                Dim Filename As String = ""
+                Dim ACAttrAlign As String
+                Dim ProcessAnchorTags As Boolean
+                Dim ProcessACTags As Boolean
+                Dim ACLanguageName As String
+                Dim Stream As New coreFastStringClass
+                Dim AnchorQuery As String = ""
+                Dim CSOrganization As Integer
+                Dim CSOrganizationSet As Boolean
+                Dim CSPeople As Integer
+                Dim CSPeopleSet As Boolean
+                Dim CSlanguage As Integer
+                Dim PeopleLanguageSet As Boolean
+                Dim PeopleLanguage As String = ""
+                Dim UcasePeopleLanguage As String
+                Dim serverFilePath As String = ""
+                Dim ReplaceInstructions As String
+                Dim Link As String
+                Dim NotUsedID As Integer
+                Dim addonOptionString As String
+                Dim AddonOptionStringHTMLEncoded As String
+                Dim SrcOptions() As String
+                Dim SrcOptionName As String
+                Dim FormCount As Integer
+                Dim FormInputCount As Integer
+                Dim ACInstanceID As String
+                Dim PosStart As Integer
+                Dim PosEnd As Integer
+                Dim AllowGroups As String
+                Dim workingContent As String
+                Dim NewName As String
+                '
+                workingContent = Source
+                '
+                ' Fixup Anchor Query (additional AddonOptionString pairs to add to the end)
+                '
+                If AddLinkEID And (personalizationPeopleId <> 0) Then
+                    AnchorQuery = AnchorQuery & "&EID=" & security.encodeToken(EncodeInteger(personalizationPeopleId), Now())
                 End If
-            End If
-            '
-            PosStart = vbInstr(1, workingContent, "<!-- ENDGROUPACCESS ", vbTextCompare)
-            If PosStart > 0 Then
-                PosEnd = vbInstr(PosStart, workingContent, "-->")
-                If PosEnd > 0 Then
-                    workingContent = Mid(workingContent, 1, PosStart - 1) & "<AC type=""" & ACTypeAggregateFunction & """ name=""block text end"" >" & Mid(workingContent, PosEnd + 3)
+                '
+                If AddAnchorQuery <> "" Then
+                    AnchorQuery = AnchorQuery & "&" & AddAnchorQuery
                 End If
-            End If
-            '
-            ' ----- Special case -- if any of these are in the source, this is legacy. Convert them to icons,
-            '       and they will be converted to AC tags when the icons are saved
-            '
-            If EncodeEditIcons Then
                 '
-                ' replace {{content}} with <AC contentbox>
-                ' replace {{DYNAMICMENU?menu=menu Name}} with <ac dynamic menu>
+                If AnchorQuery <> "" Then
+                    AnchorQuery = Mid(AnchorQuery, 2)
+                End If
                 '
-                IconIDControlString = "AC," & ACTypeTemplateContent & "," & NotUsedID & "," & ACName & ","
-                IconImg = GetAddonIconImg(AdminURL, 52, 64, 0, False, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as [Template Page Content]", "", 0)
-                workingContent = vbReplace(workingContent, "{{content}}", IconImg, 1, 99, vbTextCompare)
-                'WorkingContent = vbReplace(WorkingContent, "{{content}}", "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Page Content"" id=""AC," & ACTypeTemplateContent & "," & NotUsedID & "," & ACName & ","" src=""/ccLib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>", 1, -1, vbTextCompare)
+                ' ----- xml contensive process instruction
                 '
-                ' replace all other {{...}}
+                'TemplateBodyContent
+                'Pos = vbInstr(1, TemplateBodyContent, "<?contensive", vbTextCompare)
+                'If Pos > 0 Then
+                '    '
+                '    ' convert template body if provided - this is the content that replaces the content box addon
+                '    '
+                '    TemplateBodyContent = Mid(TemplateBodyContent, Pos)
+                '    LayoutEngineOptionString = "data=" & encodeNvaArgument(TemplateBodyContent)
+                '    TemplateBodyContent = csv_ExecuteActiveX("aoPrimitives.StructuredDataClass", "Structured Data Engine", nothing, LayoutEngineOptionString, "data=(structured data)", LayoutErrorMessage)
+                'End If
+                Pos = vbInstr(1, workingContent, "<?contensive", vbTextCompare)
+                If Pos > 0 Then
+                    Throw New ApplicationException("Structured xml data commands are no longer supported")
+                    ''
+                    '' convert content if provided
+                    ''
+                    'workingContent = Mid(workingContent, Pos)
+                    'LayoutEngineOptionString = "data=" & encodeNvaArgument(workingContent)
+                    'Dim structuredData As New core_primitivesStructuredDataClass(Me)
+                    'workingContent = structuredData.execute()
+                    'workingContent = csv_ExecuteActiveX("aoPrimitives.StructuredDataClass", "Structured Data Engine", LayoutEngineOptionString, "data=(structured data)", LayoutErrorMessage)
+                End If
                 '
-                LoopPtr = 0
-                Pos = 1
-                Do While Pos > 0 And LoopPtr < 100
-                    Pos = vbInstr(Pos, workingContent, "{{" & ACTypeDynamicMenu, vbTextCompare)
-                    If Pos > 0 Then
-                        addonOptionString = ""
-                        PosStart = Pos
-                        If PosStart <> 0 Then
-                            'PosStart = PosStart + 2 + Len(ACTypeDynamicMenu)
-                            PosEnd = vbInstr(PosStart, workingContent, "}}", vbTextCompare)
-                            If PosEnd <> 0 Then
-                                Cmd = Mid(workingContent, PosStart + 2, PosEnd - PosStart - 2)
-                                Pos = vbInstr(1, Cmd, "?")
-                                If Pos <> 0 Then
-                                    addonOptionString = decodeHtml(Mid(Cmd, Pos + 1))
+                ' Special Case
+                ' Convert <!-- STARTGROUPACCESS 10,11,12 --> format to <AC type=GROUPACCESS AllowGroups="10,11,12">
+                ' Convert <!-- ENDGROUPACCESS --> format to <AC type=GROUPACCESSEND>
+                '
+                PosStart = vbInstr(1, workingContent, "<!-- STARTGROUPACCESS ", vbTextCompare)
+                If PosStart > 0 Then
+                    PosEnd = vbInstr(PosStart, workingContent, "-->")
+                    If PosEnd > 0 Then
+                        AllowGroups = Mid(workingContent, PosStart + 22, PosEnd - PosStart - 23)
+                        workingContent = Mid(workingContent, 1, PosStart - 1) & "<AC type=""" & ACTypeAggregateFunction & """ name=""block text"" querystring=""allowgroups=" & AllowGroups & """>" & Mid(workingContent, PosEnd + 3)
+                    End If
+                End If
+                '
+                PosStart = vbInstr(1, workingContent, "<!-- ENDGROUPACCESS ", vbTextCompare)
+                If PosStart > 0 Then
+                    PosEnd = vbInstr(PosStart, workingContent, "-->")
+                    If PosEnd > 0 Then
+                        workingContent = Mid(workingContent, 1, PosStart - 1) & "<AC type=""" & ACTypeAggregateFunction & """ name=""block text end"" >" & Mid(workingContent, PosEnd + 3)
+                    End If
+                End If
+                '
+                ' ----- Special case -- if any of these are in the source, this is legacy. Convert them to icons,
+                '       and they will be converted to AC tags when the icons are saved
+                '
+                If EncodeEditIcons Then
+                    '
+                    ' replace {{content}} with <AC contentbox>
+                    ' replace {{DYNAMICMENU?menu=menu Name}} with <ac dynamic menu>
+                    '
+                    IconIDControlString = "AC," & ACTypeTemplateContent & "," & NotUsedID & "," & ACName & ","
+                    IconImg = GetAddonIconImg(AdminURL, 52, 64, 0, False, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as [Template Page Content]", "", 0)
+                    workingContent = vbReplace(workingContent, "{{content}}", IconImg, 1, 99, vbTextCompare)
+                    'WorkingContent = vbReplace(WorkingContent, "{{content}}", "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Page Content"" id=""AC," & ACTypeTemplateContent & "," & NotUsedID & "," & ACName & ","" src=""/ccLib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>", 1, -1, vbTextCompare)
+                    '
+                    ' replace all other {{...}}
+                    '
+                    LoopPtr = 0
+                    Pos = 1
+                    Do While Pos > 0 And LoopPtr < 100
+                        Pos = vbInstr(Pos, workingContent, "{{" & ACTypeDynamicMenu, vbTextCompare)
+                        If Pos > 0 Then
+                            addonOptionString = ""
+                            PosStart = Pos
+                            If PosStart <> 0 Then
+                                'PosStart = PosStart + 2 + Len(ACTypeDynamicMenu)
+                                PosEnd = vbInstr(PosStart, workingContent, "}}", vbTextCompare)
+                                If PosEnd <> 0 Then
+                                    Cmd = Mid(workingContent, PosStart + 2, PosEnd - PosStart - 2)
+                                    Pos = vbInstr(1, Cmd, "?")
+                                    If Pos <> 0 Then
+                                        addonOptionString = decodeHtml(Mid(Cmd, Pos + 1))
+                                    End If
+                                    TextName = csv_GetAddonOptionStringValue("menu", addonOptionString)
+                                    '
+                                    addonOptionString = "Menu=" & TextName & "[" & csv_GetDynamicMenuACSelect() & "]&NewMenu="
+                                    AddonOptionStringHTMLEncoded = html.html_EncodeHTML("Menu=" & TextName & "[" & csv_GetDynamicMenuACSelect() & "]&NewMenu=")
+                                    '
+                                    IconIDControlString = "AC," & ACTypeDynamicMenu & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded
+                                    IconImg = GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as [Dynamic Menu]", "", 0)
+                                    workingContent = Mid(workingContent, 1, PosStart - 1) & IconImg & Mid(workingContent, PosEnd + 2)
                                 End If
-                                TextName = csv_GetAddonOptionStringValue("menu", addonOptionString)
-                                '
-                                addonOptionString = "Menu=" & TextName & "[" & csv_GetDynamicMenuACSelect() & "]&NewMenu="
-                                AddonOptionStringHTMLEncoded = html.html_EncodeHTML("Menu=" & TextName & "[" & csv_GetDynamicMenuACSelect() & "]&NewMenu=")
-                                '
-                                IconIDControlString = "AC," & ACTypeDynamicMenu & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded
-                                IconImg = GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as [Dynamic Menu]", "", 0)
-                                workingContent = Mid(workingContent, 1, PosStart - 1) & IconImg & Mid(workingContent, PosEnd + 2)
                             End If
                         End If
-                    End If
-                Loop
-            End If
-            '
-            ' Test early if this needs to run at all
-            '
-            ProcessACTags = ((EncodeCachableTags Or EncodeNonCachableTags Or EncodeImages Or EncodeEditIcons)) And (InStr(1, workingContent, "<AC ", vbTextCompare) <> 0)
-            ProcessAnchorTags = (AnchorQuery <> "") And (InStr(1, workingContent, "<A ", vbTextCompare) <> 0)
-            If (workingContent <> "") And (ProcessAnchorTags Or ProcessACTags) Then
+                    Loop
+                End If
                 '
-                ' ----- Load the Active Elements
+                ' Test early if this needs to run at all
                 '
-                KmaHTML = New coreHtmlParseClass(Me)
-                Call KmaHTML.Load(workingContent)
-                '
-                ' ----- Execute and output elements
-                '
-                ElementPointer = 0
-                If KmaHTML.ElementCount > 0 Then
+                ProcessACTags = ((EncodeCachableTags Or EncodeNonCachableTags Or EncodeImages Or EncodeEditIcons)) And (InStr(1, workingContent, "<AC ", vbTextCompare) <> 0)
+                ProcessAnchorTags = (AnchorQuery <> "") And (InStr(1, workingContent, "<A ", vbTextCompare) <> 0)
+                If (workingContent <> "") And (ProcessAnchorTags Or ProcessACTags) Then
+                    '
+                    ' ----- Load the Active Elements
+                    '
+                    KmaHTML = New coreHtmlParseClass(Me)
+                    Call KmaHTML.Load(workingContent)
+                    '
+                    ' ----- Execute and output elements
+                    '
                     ElementPointer = 0
-                    workingContent = ""
-                    serverFilePath = ProtocolHostString & "/" & serverConfig.appConfig.name & "/files/"
-                    Stream = New coreFastStringClass
-                    Do While ElementPointer < KmaHTML.ElementCount
-                        Copy = KmaHTML.Text(ElementPointer)
-                        If KmaHTML.IsTag(ElementPointer) Then
-                            ElementTag = vbUCase(KmaHTML.TagName(ElementPointer))
-                            ACName = KmaHTML.ElementAttribute(ElementPointer, "NAME")
-                            UCaseACName = vbUCase(ACName)
-                            Select Case ElementTag
-                                Case "FORM"
-                                    '
-                                    ' Form created in content
-                                    ' EncodeEditIcons -> remove the
-                                    '
-                                    If EncodeNonCachableTags Then
-                                        FormCount = FormCount + 1
+                    If KmaHTML.ElementCount > 0 Then
+                        ElementPointer = 0
+                        workingContent = ""
+                        serverFilePath = ProtocolHostString & "/" & serverConfig.appConfig.name & "/files/"
+                        Stream = New coreFastStringClass
+                        Do While ElementPointer < KmaHTML.ElementCount
+                            Copy = KmaHTML.Text(ElementPointer)
+                            If KmaHTML.IsTag(ElementPointer) Then
+                                ElementTag = vbUCase(KmaHTML.TagName(ElementPointer))
+                                ACName = KmaHTML.ElementAttribute(ElementPointer, "NAME")
+                                UCaseACName = vbUCase(ACName)
+                                Select Case ElementTag
+                                    Case "FORM"
                                         '
-                                        ' 5/14/2009 - DM said it is OK to remove UserResponseForm Processing
-                                        ' however, leave this one because it is needed to make current forms work.
+                                        ' Form created in content
+                                        ' EncodeEditIcons -> remove the
                                         '
-                                        If (InStr(1, Copy, "contensiveuserform=1", vbTextCompare) <> 0) Or (InStr(1, Copy, "contensiveuserform=""1""", vbTextCompare) <> 0) Then
+                                        If EncodeNonCachableTags Then
+                                            FormCount = FormCount + 1
                                             '
-                                            ' if it has "contensiveuserform=1" in the form tag, remove it from the form and add the hidden that makes it work
+                                            ' 5/14/2009 - DM said it is OK to remove UserResponseForm Processing
+                                            ' however, leave this one because it is needed to make current forms work.
                                             '
-                                            Copy = vbReplace(Copy, "ContensiveUserForm=1", "", 1, 99, vbTextCompare)
-                                            Copy = vbReplace(Copy, "ContensiveUserForm=""1""", "", 1, 99, vbTextCompare)
-                                            If Not EncodeEditIcons Then
-                                                Copy = Copy & "<input type=hidden name=ContensiveUserForm value=1>"
+                                            If (InStr(1, Copy, "contensiveuserform=1", vbTextCompare) <> 0) Or (InStr(1, Copy, "contensiveuserform=""1""", vbTextCompare) <> 0) Then
+                                                '
+                                                ' if it has "contensiveuserform=1" in the form tag, remove it from the form and add the hidden that makes it work
+                                                '
+                                                Copy = vbReplace(Copy, "ContensiveUserForm=1", "", 1, 99, vbTextCompare)
+                                                Copy = vbReplace(Copy, "ContensiveUserForm=""1""", "", 1, 99, vbTextCompare)
+                                                If Not EncodeEditIcons Then
+                                                    Copy = Copy & "<input type=hidden name=ContensiveUserForm value=1>"
+                                                End If
                                             End If
                                         End If
-                                    End If
-                                Case "INPUT"
-                                    If EncodeNonCachableTags Then
-                                        FormInputCount = FormInputCount + 1
-                                    End If
-                                Case "A"
-                                    If (AnchorQuery <> "") Then
-                                        '
-                                        ' ----- Add ?eid=0000 to all anchors back to the same site so emails
-                                        '       can be sent that will automatically log the person in when they
-                                        '       arrive.
-                                        '
-                                        AttributeCount = KmaHTML.ElementAttributeCount(ElementPointer)
-                                        If AttributeCount > 0 Then
-                                            Copy = "<A "
-                                            For AttributePointer = 0 To AttributeCount - 1
-                                                Name = KmaHTML.ElementAttributeName(ElementPointer, AttributePointer)
-                                                Value = KmaHTML.ElementAttributeValue(ElementPointer, AttributePointer)
-                                                If vbUCase(Name) = "HREF" Then
-                                                    Dim linkDomain As String
-                                                    Dim linkprotocol As String
-                                                    Link = Value
-                                                    'linkProtocol = ""
-                                                    'linkDomain = ""
-                                                    Pos = vbInstr(1, Link, "://")
-                                                    If Pos > 0 Then
-                                                        'linkProtocol = Left(Link, Pos + 2)
-                                                        Link = Mid(Link, Pos + 3)
-                                                        Pos = vbInstr(1, Link, "/")
+                                    Case "INPUT"
+                                        If EncodeNonCachableTags Then
+                                            FormInputCount = FormInputCount + 1
+                                        End If
+                                    Case "A"
+                                        If (AnchorQuery <> "") Then
+                                            '
+                                            ' ----- Add ?eid=0000 to all anchors back to the same site so emails
+                                            '       can be sent that will automatically log the person in when they
+                                            '       arrive.
+                                            '
+                                            AttributeCount = KmaHTML.ElementAttributeCount(ElementPointer)
+                                            If AttributeCount > 0 Then
+                                                Copy = "<A "
+                                                For AttributePointer = 0 To AttributeCount - 1
+                                                    Name = KmaHTML.ElementAttributeName(ElementPointer, AttributePointer)
+                                                    Value = KmaHTML.ElementAttributeValue(ElementPointer, AttributePointer)
+                                                    If vbUCase(Name) = "HREF" Then
+                                                        Link = Value
+                                                        Pos = vbInstr(1, Link, "://")
                                                         If Pos > 0 Then
-                                                            Link = Left(Link, Pos - 1)
-                                                            'Link = Mid(Link, Pos + 1)
+                                                            Link = Mid(Link, Pos + 3)
+                                                            Pos = vbInstr(1, Link, "/")
+                                                            If Pos > 0 Then
+                                                                Link = Left(Link, Pos - 1)
+                                                            End If
+                                                        End If
+                                                        If (Link = "") Or (InStr(1, "," & serverConfig.appConfig.domainList(0) & ",", "," & Link & ",", vbTextCompare) <> 0) Then
+                                                            '
+                                                            ' ----- link is for this site
+                                                            '
+                                                            If Right(Value, 1) = "?" Then
+                                                                '
+                                                                ' Ends in a questionmark, must be Dwayne (?)
+                                                                '
+                                                                Value = Value & AnchorQuery
+                                                            ElseIf vbInstr(1, Value, "mailto:", vbTextCompare) <> 0 Then
+                                                                '
+                                                                ' catch mailto
+                                                                '
+                                                                'Value = Value & AnchorQuery
+                                                            ElseIf vbInstr(1, Value, "?") = 0 Then
+                                                                '
+                                                                ' No questionmark there, add it
+                                                                '
+                                                                Value = Value & "?" & AnchorQuery
+                                                            Else
+                                                                '
+                                                                ' Questionmark somewhere, add new value with amp;
+                                                                '
+                                                                Value = Value & "&" & AnchorQuery
+                                                            End If
+                                                            '    End If
                                                         End If
                                                     End If
-                                                    If (Link = "") Or (InStr(1, "," & serverConfig.appConfig.domainList(0) & ",", "," & Link & ",", vbTextCompare) <> 0) Then
-                                                        'If vbInstr(1, app.config.domainList(0), Value, vbTextCompare) <> 0 Then
-                                                        '
-                                                        ' ----- link is for this site
-                                                        '
-                                                        '    If vbInstr(1, Value, "/") <> 0 Then
-                                                        '        '
-                                                        '        ' ----- link contains a slash
-                                                        '        '
-                                                        If Right(Value, 1) = "?" Then
-                                                            '
-                                                            ' Ends in a questionmark, must be Dwayne (?)
-                                                            '
-                                                            Value = Value & AnchorQuery
-                                                        ElseIf vbInstr(1, Value, "mailto:", vbTextCompare) <> 0 Then
-                                                            '
-                                                            ' catch mailto
-                                                            '
-                                                            'Value = Value & AnchorQuery
-                                                        ElseIf vbInstr(1, Value, "?") = 0 Then
-                                                            '
-                                                            ' No questionmark there, add it
-                                                            '
-                                                            Value = Value & "?" & AnchorQuery
-                                                        Else
-                                                            '
-                                                            ' Questionmark somewhere, add new value with amp;
-                                                            '
-                                                            Value = Value & "&" & AnchorQuery
-                                                        End If
-                                                        '    End If
-                                                    End If
-                                                End If
-                                                Copy = Copy & " " & Name & "=""" & Value & """"
-                                            Next
-                                            Copy = Copy & ">"
+                                                    Copy = Copy & " " & Name & "=""" & Value & """"
+                                                Next
+                                                Copy = Copy & ">"
+                                            End If
                                         End If
-                                    End If
-                                Case "AC"
-                                    '
-                                    ' ----- decode all AC tags
-                                    '
-                                    ListCount = 0
-                                    ACType = KmaHTML.ElementAttribute(ElementPointer, "TYPE")
-                                    ' if ACInstanceID=0, it can not create settings link in edit mode. ACInstanceID is added during edit save.
-                                    ACInstanceID = KmaHTML.ElementAttribute(ElementPointer, "ACINSTANCEID")
-                                    ACGuid = KmaHTML.ElementAttribute(ElementPointer, "GUID")
-                                    Select Case vbUCase(ACType)
-                                        Case ACTypeEnd
-                                            '
-                                            ' End Tag - Personalization
-                                            '       This tag causes an end to the all tags, like Language
-                                            '       It is removed by with EncodeEditIcons (on the way to the editor)
-                                            '       It is added to the end of the content with Decode(activecontent)
-                                            '
-                                            If EncodeEditIcons Then
-                                                Copy = ""
-                                            ElseIf EncodeNonCachableTags Then
-                                                Copy = "<!-- Language ANY -->"
-                                            End If
-                                        Case ACTypeDate
-                                            '
-                                            ' Date Tag
-                                            '
-                                            If EncodeEditIcons Then
-                                                IconIDControlString = "AC," & ACTypeDate
-                                                IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "Current Date", "Renders as [Current Date]", ACInstanceID, 0)
-                                                Copy = IconImg
-                                                'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as the current date"" ID=""AC," & ACTypeDate & """ src=""/ccLib/images/ACDate.GIF"">"
-                                            ElseIf EncodeNonCachableTags Then
-                                                Copy = DateTime.Now.ToString
-                                            End If
-                                        Case ACTypeMember, ACTypePersonalization
-                                            '
-                                            ' Member Tag works regardless of authentication
-                                            ' cm must be sure not to reveal anything
-                                            '
-                                            ACField = vbUCase(KmaHTML.ElementAttribute(ElementPointer, "FIELD"))
-                                            If ACField = "" Then
-                                                ' compatibility for old personalization type
-                                                ACField = csv_GetAddonOptionStringValue("FIELD", KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING"))
-                                            End If
-                                            FieldName = EncodeInitialCaps(ACField)
-                                            If (FieldName = "") Then
-                                                FieldName = "Name"
-                                            End If
-                                            If EncodeEditIcons Then
-                                                Select Case vbUCase(FieldName)
-                                                    Case "FIRSTNAME"
-                                                        '
-                                                        IconIDControlString = "AC," & ACType & "," & FieldName
-                                                        IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "User's First Name", "Renders as [User's First Name]", ACInstanceID, 0)
-                                                        Copy = IconImg
-                                                        '
-                                                    Case "LASTNAME"
-                                                        '
-                                                        IconIDControlString = "AC," & ACType & "," & FieldName
-                                                        IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "User's Last Name", "Renders as [User's Last Name]", ACInstanceID, 0)
-                                                        Copy = IconImg
-                                                        '
-                                                    Case Else
-                                                        '
-                                                        IconIDControlString = "AC," & ACType & "," & FieldName
-                                                        IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "User's " & FieldName, "Renders as [User's " & FieldName & "]", ACInstanceID, 0)
-                                                        Copy = IconImg
-                                                        '
-                                                End Select
-                                            ElseIf EncodeNonCachableTags Then
-                                                If personalizationPeopleId <> 0 Then
-                                                    If vbUCase(FieldName) = "EID" Then
-                                                        Copy = security.encodeToken(personalizationPeopleId, Now())
-                                                    Else
-                                                        If Not CSPeopleSet Then
-                                                            CSPeople = db.cs_openContentRecord("People", personalizationPeopleId)
-                                                            CSPeopleSet = True
-                                                        End If
-                                                        If db.cs_ok(CSPeople) And db.cs_isFieldSupported(CSPeople, FieldName) Then
-                                                            Copy = db.cs_getLookup(CSPeople, FieldName)
-                                                        End If
-                                                    End If
-                                                End If
-                                            End If
-                                        Case ACTypeChildList
-                                            '
-                                            ' Child List
-                                            '
-                                            ListName = EncodeText((KmaHTML.ElementAttribute(ElementPointer, "name")))
-
-                                            If EncodeEditIcons Then
-                                                IconIDControlString = "AC," & ACType & ",," & ACName
-                                                IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "List of Child Pages", "Renders as [List of Child Pages]", ACInstanceID, 0)
-                                                Copy = IconImg
-                                            ElseIf EncodeCachableTags Then
+                                    Case "AC"
+                                        '
+                                        ' ----- decode all AC tags
+                                        '
+                                        ListCount = 0
+                                        ACType = KmaHTML.ElementAttribute(ElementPointer, "TYPE")
+                                        ' if ACInstanceID=0, it can not create settings link in edit mode. ACInstanceID is added during edit save.
+                                        ACInstanceID = KmaHTML.ElementAttribute(ElementPointer, "ACINSTANCEID")
+                                        ACGuid = KmaHTML.ElementAttribute(ElementPointer, "GUID")
+                                        Select Case vbUCase(ACType)
+                                            Case ACTypeEnd
                                                 '
-                                                ' Handle in webclient
+                                                ' End Tag - Personalization
+                                                '       This tag causes an end to the all tags, like Language
+                                                '       It is removed by with EncodeEditIcons (on the way to the editor)
+                                                '       It is added to the end of the content with Decode(activecontent)
                                                 '
-                                                ' removed sort method because all child pages are read in together in the order set by the parent - improve this later
-                                                Copy = "{{" & ACTypeChildList & "?name=" & encodeNvaArgument(ListName) & "}}"
-                                            End If
-                                        Case ACTypeContact
-                                            '
-                                            ' Formatting Tag
-                                            '
-                                            If EncodeEditIcons Then
-                                                '
-                                                IconIDControlString = "AC," & ACType
-                                                IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "Contact Information Line", "Renders as [Contact Information Line]", ACInstanceID, 0)
-                                                Copy = IconImg
-                                                '
-                                                'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as a line of text with contact information for this record's primary contact"" id=""AC," & ACType & """ src=""/ccLib/images/ACContact.GIF"">"
-                                            ElseIf EncodeCachableTags Then
-                                                If moreInfoPeopleId <> 0 Then
-                                                    Copy = pageManager_getMoreInfoHtml(moreInfoPeopleId)
-                                                End If
-                                            End If
-                                        Case ACTypeFeedback
-                                            '
-                                            ' Formatting tag - change from information to be included after submission
-                                            '
-                                            If EncodeEditIcons Then
-                                                '
-                                                IconIDControlString = "AC," & ACType
-                                                IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, False, IconIDControlString, "", serverFilePath, "Feedback Form", "Renders as [Feedback Form]", ACInstanceID, 0)
-                                                Copy = IconImg
-                                                '
-                                                'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as a feedback form, sent to this record's primary contact."" id=""AC," & ACType & """ src=""/ccLib/images/ACFeedBack.GIF"">"
-                                            ElseIf EncodeNonCachableTags Then
-                                                If (moreInfoPeopleId <> 0) And (ContextContentName <> "") And (ContextRecordID <> 0) Then
-                                                    Copy = FeedbackFormNotSupportedComment
-                                                End If
-                                            End If
-                                        Case ACTypeLanguage
-                                            '
-                                            ' Personalization Tag - block languages not from the visitor
-                                            '
-                                            ACLanguageName = vbUCase(KmaHTML.ElementAttribute(ElementPointer, "NAME"))
-                                            If EncodeEditIcons Then
-                                                Select Case vbUCase(ACLanguageName)
-                                                    Case "ANY"
-                                                        '
-                                                        IconIDControlString = "AC," & ACType & ",," & ACLanguageName
-                                                        IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "All copy following this point is rendered, regardless of the member's language setting", "Renders as [Begin Rendering All Languages]", ACInstanceID, 0)
-                                                        Copy = IconImg
-                                                        '
-                                                        'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""All copy following this point is rendered, regardless of the member's language setting"" id=""AC," & ACType & ",," & ACLanguageName & """ src=""/ccLib/images/ACLanguageAny.GIF"">"
-                                                        'Case "ENGLISH", "FRENCH", "GERMAN", "PORTUGEUESE", "ITALIAN", "SPANISH", "CHINESE", "HINDI"
-                                                        '   Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""All copy following this point is rendered if the member's language setting matchs [" & ACLanguageName & "]"" id=""AC," & ACType & ",," & ACLanguageName & """ src=""/ccLib/images/ACLanguage" & ACLanguageName & ".GIF"">"
-                                                    Case Else
-                                                        '
-                                                        IconIDControlString = "AC," & ACType & ",," & ACLanguageName
-                                                        IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "All copy following this point is rendered if the member's language setting matchs [" & ACLanguageName & "]", "Begin Rendering for language [" & ACLanguageName & "]", ACInstanceID, 0)
-                                                        Copy = IconImg
-                                                        '
-                                                        'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""All copy following this point is rendered if the member's language setting matchs [" & ACLanguageName & "]"" id=""AC," & ACType & ",," & ACLanguageName & """ src=""/ccLib/images/ACLanguageOther.GIF"">"
-                                                End Select
-                                            ElseIf EncodeNonCachableTags Then
-                                                If personalizationPeopleId = 0 Then
-                                                    PeopleLanguage = "any"
-                                                Else
-                                                    If Not PeopleLanguageSet Then
-                                                        If Not CSPeopleSet Then
-                                                            CSPeople = db.cs_openContentRecord("people", personalizationPeopleId)
-                                                            CSPeopleSet = True
-                                                        End If
-                                                        CSlanguage = db.cs_openContentRecord("Languages", db.cs_getInteger(CSPeople, "LanguageID"), , , , "Name")
-                                                        If db.cs_ok(CSlanguage) Then
-                                                            PeopleLanguage = db.cs_getText(CSlanguage, "name")
-                                                        End If
-                                                        Call db.cs_Close(CSlanguage)
-                                                        PeopleLanguageSet = True
-                                                    End If
-                                                End If
-                                                UcasePeopleLanguage = vbUCase(PeopleLanguage)
-                                                If UcasePeopleLanguage = "ANY" Then
-                                                    '
-                                                    ' This person wants all the languages, put in language marker and continue
-                                                    '
-                                                    Copy = "<!-- Language " & ACLanguageName & " -->"
-                                                ElseIf (ACLanguageName <> UcasePeopleLanguage) And (ACLanguageName <> "ANY") Then
-                                                    '
-                                                    ' Wrong language, remove tag, skip to the end, or to the next language tag
-                                                    '
+                                                If EncodeEditIcons Then
                                                     Copy = ""
-                                                    ElementPointer = ElementPointer + 1
-                                                    Do While ElementPointer < KmaHTML.ElementCount
-                                                        ElementTag = vbUCase(KmaHTML.TagName(ElementPointer))
-                                                        If (ElementTag = "AC") Then
-                                                            ACType = vbUCase(KmaHTML.ElementAttribute(ElementPointer, "TYPE"))
-                                                            If (ACType = ACTypeLanguage) Then
-                                                                ElementPointer = ElementPointer - 1
-                                                                Exit Do
-                                                            ElseIf (ACType = ACTypeEnd) Then
-                                                                Exit Do
-                                                            End If
-                                                        End If
-                                                        ElementPointer = ElementPointer + 1
-                                                    Loop
-                                                Else
-                                                    '
-                                                    ' Right Language, remove tag
-                                                    '
-                                                    Copy = ""
+                                                ElseIf EncodeNonCachableTags Then
+                                                    Copy = "<!-- Language ANY -->"
                                                 End If
-                                            End If
-                                        Case ACTypeAggregateFunction
-                                            '
-                                            ' ----- Add-on
-                                            '
-                                            NotUsedID = 0
-                                            AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING")
-                                            addonOptionString = decodeHtml(AddonOptionStringHTMLEncoded)
-                                            If IsEmailContent Then
+                                            Case ACTypeDate
                                                 '
-                                                ' Addon - for email
+                                                ' Date Tag
                                                 '
-                                                If EncodeNonCachableTags Then
-                                                    '
-                                                    ' Only hardcoded Add-ons can run in Emails
-                                                    '
-                                                    Select Case vbLCase(ACName)
-                                                        Case "block text"
+                                                If EncodeEditIcons Then
+                                                    IconIDControlString = "AC," & ACTypeDate
+                                                    IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "Current Date", "Renders as [Current Date]", ACInstanceID, 0)
+                                                    Copy = IconImg
+                                                    'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as the current date"" ID=""AC," & ACTypeDate & """ src=""/ccLib/images/ACDate.GIF"">"
+                                                ElseIf EncodeNonCachableTags Then
+                                                    Copy = DateTime.Now.ToString
+                                                End If
+                                            Case ACTypeMember, ACTypePersonalization
+                                                '
+                                                ' Member Tag works regardless of authentication
+                                                ' cm must be sure not to reveal anything
+                                                '
+                                                ACField = vbUCase(KmaHTML.ElementAttribute(ElementPointer, "FIELD"))
+                                                If ACField = "" Then
+                                                    ' compatibility for old personalization type
+                                                    ACField = csv_GetAddonOptionStringValue("FIELD", KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING"))
+                                                End If
+                                                FieldName = EncodeInitialCaps(ACField)
+                                                If (FieldName = "") Then
+                                                    FieldName = "Name"
+                                                End If
+                                                If EncodeEditIcons Then
+                                                    Select Case vbUCase(FieldName)
+                                                        Case "FIRSTNAME"
                                                             '
-                                                            ' Email is always considered authenticated bc they need their login credentials to get the email.
-                                                            ' Allowed to see the content that follows if you are authenticated, admin, or in the group list
-                                                            ' This must be done out on the page because the csv does not know about authenticated
+                                                            IconIDControlString = "AC," & ACType & "," & FieldName
+                                                            IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "User's First Name", "Renders as [User's First Name]", ACInstanceID, 0)
+                                                            Copy = IconImg
+                                                        '
+                                                        Case "LASTNAME"
                                                             '
-                                                            Copy = ""
-                                                            GroupIDList = csv_GetAddonOptionStringValue("AllowGroups", addonOptionString)
-                                                            If (Not user.isMemberOfGroupIdList(personalizationPeopleId, True, GroupIDList, True)) Then
-                                                                '
-                                                                ' Block content if not allowed
-                                                                '
-                                                                ElementPointer = ElementPointer + 1
-                                                                Do While ElementPointer < KmaHTML.ElementCount
-                                                                    ElementTag = vbUCase(KmaHTML.TagName(ElementPointer))
-                                                                    If (ElementTag = "AC") Then
-                                                                        ACType = vbUCase(KmaHTML.ElementAttribute(ElementPointer, "TYPE"))
-                                                                        If (ACType = ACTypeAggregateFunction) Then
-                                                                            If vbLCase(KmaHTML.ElementAttribute(ElementPointer, "name")) = "block text end" Then
-                                                                                Exit Do
-                                                                            End If
-                                                                        End If
-                                                                    End If
-                                                                    ElementPointer = ElementPointer + 1
-                                                                Loop
-                                                            End If
-                                                        Case "block text end"
+                                                            IconIDControlString = "AC," & ACType & "," & FieldName
+                                                            IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "User's Last Name", "Renders as [User's Last Name]", ACInstanceID, 0)
+                                                            Copy = IconImg
                                                             '
-                                                            ' always remove end tags because the block text did not remove it
-                                                            '
-                                                            Copy = ""
                                                         Case Else
                                                             '
-                                                            ' all other add-ons, pass out to cpCoreClass to process
+                                                            IconIDControlString = "AC," & ACType & "," & FieldName
+                                                            IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "User's " & FieldName, "Renders as [User's " & FieldName & "]", ACInstanceID, 0)
+                                                            Copy = IconImg
                                                             '
-                                                            Copy = addon.execute(0, ACName, AddonOptionStringHTMLEncoded, CPUtilsBaseClass.addonContext.ContextEmail, "", 0, "", ACInstanceID, False, 0, "", True, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
-                                                            'Copy = "" _
-                                                            '    & "" _
-                                                            '    & "<!-- ADDON " _
-                                                            '    & """" & ACName & """" _
-                                                            '    & ",""" & AddonOptionStringHTMLEncoded & """" _
-                                                            '    & ",""" & ACInstanceID & """" _
-                                                            '    & ",""" & ACGuid & """" _
-                                                            '    & " -->" _
-                                                            '    & ""
                                                     End Select
+                                                ElseIf EncodeNonCachableTags Then
+                                                    If personalizationPeopleId <> 0 Then
+                                                        If vbUCase(FieldName) = "EID" Then
+                                                            Copy = security.encodeToken(personalizationPeopleId, Now())
+                                                        Else
+                                                            If Not CSPeopleSet Then
+                                                                CSPeople = db.cs_openContentRecord("People", personalizationPeopleId)
+                                                                CSPeopleSet = True
+                                                            End If
+                                                            If db.cs_ok(CSPeople) And db.cs_isFieldSupported(CSPeople, FieldName) Then
+                                                                Copy = db.cs_getLookup(CSPeople, FieldName)
+                                                            End If
+                                                        End If
+                                                    End If
                                                 End If
-                                            Else
+                                            Case ACTypeChildList
                                                 '
-                                                ' Addon - for web
+                                                ' Child List
                                                 '
+                                                ListName = EncodeText((KmaHTML.ElementAttribute(ElementPointer, "name")))
 
                                                 If EncodeEditIcons Then
+                                                    IconIDControlString = "AC," & ACType & ",," & ACName
+                                                    IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "List of Child Pages", "Renders as [List of Child Pages]", ACInstanceID, 0)
+                                                    Copy = IconImg
+                                                ElseIf EncodeCachableTags Then
                                                     '
-                                                    ' Get IconFilename, update the optionstring, and execute optionstring replacement functions
+                                                    ' Handle in webclient
                                                     '
-                                                    AddonContentName = "Add-ons"
-                                                    If True Then
-                                                        SelectList = "Name,Link,ID,ArgumentList,ObjectProgramID,IconFilename,IconWidth,IconHeight,IconSprites,IsInline,ccGuid"
+                                                    ' removed sort method because all child pages are read in together in the order set by the parent - improve this later
+                                                    Copy = "{{" & ACTypeChildList & "?name=" & encodeNvaArgument(ListName) & "}}"
+                                                End If
+                                            Case ACTypeContact
+                                                '
+                                                ' Formatting Tag
+                                                '
+                                                If EncodeEditIcons Then
+                                                    '
+                                                    IconIDControlString = "AC," & ACType
+                                                    IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "Contact Information Line", "Renders as [Contact Information Line]", ACInstanceID, 0)
+                                                    Copy = IconImg
+                                                    '
+                                                    'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as a line of text with contact information for this record's primary contact"" id=""AC," & ACType & """ src=""/ccLib/images/ACContact.GIF"">"
+                                                ElseIf EncodeCachableTags Then
+                                                    If moreInfoPeopleId <> 0 Then
+                                                        Copy = pageManager_getMoreInfoHtml(moreInfoPeopleId)
                                                     End If
-                                                    If ACGuid <> "" Then
-                                                        Criteria = "ccguid=" & db.encodeSQLText(ACGuid)
+                                                End If
+                                            Case ACTypeFeedback
+                                                '
+                                                ' Formatting tag - change from information to be included after submission
+                                                '
+                                                If EncodeEditIcons Then
+                                                    '
+                                                    IconIDControlString = "AC," & ACType
+                                                    IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, False, IconIDControlString, "", serverFilePath, "Feedback Form", "Renders as [Feedback Form]", ACInstanceID, 0)
+                                                    Copy = IconImg
+                                                    '
+                                                    'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as a feedback form, sent to this record's primary contact."" id=""AC," & ACType & """ src=""/ccLib/images/ACFeedBack.GIF"">"
+                                                ElseIf EncodeNonCachableTags Then
+                                                    If (moreInfoPeopleId <> 0) And (ContextContentName <> "") And (ContextRecordID <> 0) Then
+                                                        Copy = FeedbackFormNotSupportedComment
+                                                    End If
+                                                End If
+                                            Case ACTypeLanguage
+                                                '
+                                                ' Personalization Tag - block languages not from the visitor
+                                                '
+                                                ACLanguageName = vbUCase(KmaHTML.ElementAttribute(ElementPointer, "NAME"))
+                                                If EncodeEditIcons Then
+                                                    Select Case vbUCase(ACLanguageName)
+                                                        Case "ANY"
+                                                            '
+                                                            IconIDControlString = "AC," & ACType & ",," & ACLanguageName
+                                                            IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "All copy following this point is rendered, regardless of the member's language setting", "Renders as [Begin Rendering All Languages]", ACInstanceID, 0)
+                                                            Copy = IconImg
+                                                            '
+                                                            'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""All copy following this point is rendered, regardless of the member's language setting"" id=""AC," & ACType & ",," & ACLanguageName & """ src=""/ccLib/images/ACLanguageAny.GIF"">"
+                                                            'Case "ENGLISH", "FRENCH", "GERMAN", "PORTUGEUESE", "ITALIAN", "SPANISH", "CHINESE", "HINDI"
+                                                            '   Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""All copy following this point is rendered if the member's language setting matchs [" & ACLanguageName & "]"" id=""AC," & ACType & ",," & ACLanguageName & """ src=""/ccLib/images/ACLanguage" & ACLanguageName & ".GIF"">"
+                                                        Case Else
+                                                            '
+                                                            IconIDControlString = "AC," & ACType & ",," & ACLanguageName
+                                                            IconImg = GetAddonIconImg(AdminURL, 0, 0, 0, True, IconIDControlString, "", serverFilePath, "All copy following this point is rendered if the member's language setting matchs [" & ACLanguageName & "]", "Begin Rendering for language [" & ACLanguageName & "]", ACInstanceID, 0)
+                                                            Copy = IconImg
+                                                            '
+                                                            'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""All copy following this point is rendered if the member's language setting matchs [" & ACLanguageName & "]"" id=""AC," & ACType & ",," & ACLanguageName & """ src=""/ccLib/images/ACLanguageOther.GIF"">"
+                                                    End Select
+                                                ElseIf EncodeNonCachableTags Then
+                                                    If personalizationPeopleId = 0 Then
+                                                        PeopleLanguage = "any"
                                                     Else
-                                                        Criteria = "name=" & db.encodeSQLText(UCaseACName)
-                                                    End If
-                                                    CS = db.cs_open(AddonContentName, Criteria, "Name,ID", , , , , SelectList)
-                                                    If db.cs_ok(CS) Then
-                                                        AddonFound = True
-                                                        ' ArgumentList comes in already encoded
-                                                        IconFilename = db.cs_get(CS, "IconFilename")
-                                                        SrcOptionList = db.cs_get(CS, "ArgumentList")
-                                                        IconWidth = db.cs_getInteger(CS, "IconWidth")
-                                                        IconHeight = db.cs_getInteger(CS, "IconHeight")
-                                                        IconSprites = db.cs_getInteger(CS, "IconSprites")
-                                                        AddonIsInline = db.cs_getBoolean(CS, "IsInline")
-                                                        ACGuid = db.cs_getText(CS, "ccGuid")
-                                                        IconAlt = ACName
-                                                        IconTitle = "Rendered as the Add-on [" & ACName & "]"
-                                                    Else
-                                                        Select Case vbLCase(ACName)
-                                                            Case "block text"
-                                                                IconFilename = ""
-                                                                SrcOptionList = AddonOptionConstructor_ForBlockText
-                                                                IconWidth = 0
-                                                                IconHeight = 0
-                                                                IconSprites = 0
-                                                                AddonIsInline = True
-                                                                ACGuid = ""
-                                                            Case "block text end"
-                                                                IconFilename = ""
-                                                                SrcOptionList = ""
-                                                                IconWidth = 0
-                                                                IconHeight = 0
-                                                                IconSprites = 0
-                                                                AddonIsInline = True
-                                                                ACGuid = ""
-                                                            Case Else
-                                                                IconFilename = ""
-                                                                SrcOptionList = ""
-                                                                IconWidth = 0
-                                                                IconHeight = 0
-                                                                IconSprites = 0
-                                                                AddonIsInline = False
-                                                                IconAlt = "Unknown Add-on [" & ACName & "]"
-                                                                IconTitle = "Unknown Add-on [" & ACName & "]"
-                                                                ACGuid = ""
-                                                        End Select
-                                                    End If
-                                                    Call db.cs_Close(CS)
-                                                    '
-                                                    ' Build AddonOptionStringHTMLEncoded from SrcOptionList (for names), itself (for current settings), and SrcOptionList (for select options)
-                                                    '
-                                                    If (InStr(1, SrcOptionList, "wrapper", vbTextCompare) = 0) Then
-                                                        If AddonIsInline Then
-                                                            SrcOptionList = SrcOptionList & vbCrLf & AddonOptionConstructor_Inline
-                                                        Else
-                                                            SrcOptionList = SrcOptionList & vbCrLf & AddonOptionConstructor_Block
+                                                        If Not PeopleLanguageSet Then
+                                                            If Not CSPeopleSet Then
+                                                                CSPeople = db.cs_openContentRecord("people", personalizationPeopleId)
+                                                                CSPeopleSet = True
+                                                            End If
+                                                            CSlanguage = db.cs_openContentRecord("Languages", db.cs_getInteger(CSPeople, "LanguageID"), , , , "Name")
+                                                            If db.cs_ok(CSlanguage) Then
+                                                                PeopleLanguage = db.cs_getText(CSlanguage, "name")
+                                                            End If
+                                                            Call db.cs_Close(CSlanguage)
+                                                            PeopleLanguageSet = True
                                                         End If
                                                     End If
-                                                    If SrcOptionList = "" Then
-                                                        ResultOptionListHTMLEncoded = ""
-                                                    Else
-                                                        ResultOptionListHTMLEncoded = ""
-                                                        REsultOptionValue = ""
-                                                        SrcOptionList = vbReplace(SrcOptionList, vbCrLf, vbCr)
-                                                        SrcOptionList = vbReplace(SrcOptionList, vbLf, vbCr)
-                                                        SrcOptions = Split(SrcOptionList, vbCr)
-                                                        For Ptr = 0 To UBound(SrcOptions)
-                                                            SrcOptionName = SrcOptions(Ptr)
-                                                            Dim LoopPtr2 As Integer
-
-                                                            LoopPtr2 = 0
-                                                            Do While (Len(SrcOptionName) > 1) And (Mid(SrcOptionName, 1, 1) = vbTab) And (LoopPtr2 < 100)
-                                                                SrcOptionName = Mid(SrcOptionName, 2)
-                                                                LoopPtr2 = LoopPtr2 + 1
-                                                            Loop
-                                                            SrcOptionValueSelector = ""
-                                                            SrcOptionSelector = ""
-                                                            Pos = vbInstr(1, SrcOptionName, "=")
-                                                            If Pos > 0 Then
-                                                                SrcOptionValueSelector = Mid(SrcOptionName, Pos + 1)
-                                                                SrcOptionName = Mid(SrcOptionName, 1, Pos - 1)
-                                                                SrcOptionSelector = ""
-                                                                Pos = vbInstr(1, SrcOptionValueSelector, "[")
-                                                                If Pos <> 0 Then
-                                                                    SrcOptionSelector = Mid(SrcOptionValueSelector, Pos)
+                                                    UcasePeopleLanguage = vbUCase(PeopleLanguage)
+                                                    If UcasePeopleLanguage = "ANY" Then
+                                                        '
+                                                        ' This person wants all the languages, put in language marker and continue
+                                                        '
+                                                        Copy = "<!-- Language " & ACLanguageName & " -->"
+                                                    ElseIf (ACLanguageName <> UcasePeopleLanguage) And (ACLanguageName <> "ANY") Then
+                                                        '
+                                                        ' Wrong language, remove tag, skip to the end, or to the next language tag
+                                                        '
+                                                        Copy = ""
+                                                        ElementPointer = ElementPointer + 1
+                                                        Do While ElementPointer < KmaHTML.ElementCount
+                                                            ElementTag = vbUCase(KmaHTML.TagName(ElementPointer))
+                                                            If (ElementTag = "AC") Then
+                                                                ACType = vbUCase(KmaHTML.ElementAttribute(ElementPointer, "TYPE"))
+                                                                If (ACType = ACTypeLanguage) Then
+                                                                    ElementPointer = ElementPointer - 1
+                                                                    Exit Do
+                                                                ElseIf (ACType = ACTypeEnd) Then
+                                                                    Exit Do
                                                                 End If
                                                             End If
-                                                            ' all Src and Instance vars are already encoded correctly
-                                                            If SrcOptionName <> "" Then
-                                                                ' since AddonOptionString is encoded, InstanceOptionValue will be also
-                                                                InstanceOptionValue = csv_GetAddonOptionStringValue(SrcOptionName, addonOptionString)
-                                                                'InstanceOptionValue = csv_GetAddonOption(SrcOptionName, AddonOptionString)
-                                                                ResultOptionSelector = pageManager_GetAddonSelector(SrcOptionName, encodeNvaArgument(InstanceOptionValue), SrcOptionSelector)
-                                                                'ResultOptionSelector = csv_GetAddonSelector(SrcOptionName, InstanceOptionValue, SrcOptionValueSelector)
-                                                                ResultOptionListHTMLEncoded = ResultOptionListHTMLEncoded & "&" & ResultOptionSelector
-                                                            End If
-                                                        Next
-                                                        If ResultOptionListHTMLEncoded <> "" Then
-                                                            ResultOptionListHTMLEncoded = Mid(ResultOptionListHTMLEncoded, 2)
-                                                        End If
+                                                            ElementPointer = ElementPointer + 1
+                                                        Loop
+                                                    Else
+                                                        '
+                                                        ' Right Language, remove tag
+                                                        '
+                                                        Copy = ""
                                                     End If
-                                                    ACNameCaption = vbReplace(ACName, """", "")
-                                                    ACNameCaption = html.html_EncodeHTML(ACNameCaption)
-                                                    IDControlString = "AC," & ACType & "," & NotUsedID & "," & encodeNvaArgument(ACName) & "," & ResultOptionListHTMLEncoded & "," & ACGuid
-                                                    Copy = GetAddonIconImg(AdminURL, IconWidth, IconHeight, IconSprites, AddonIsInline, IDControlString, IconFilename, serverFilePath, IconAlt, IconTitle, ACInstanceID, 0)
-                                                ElseIf EncodeNonCachableTags Then
+                                                End If
+                                            Case ACTypeAggregateFunction
+                                                '
+                                                ' ----- Add-on
+                                                '
+                                                NotUsedID = 0
+                                                AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING")
+                                                addonOptionString = decodeHtml(AddonOptionStringHTMLEncoded)
+                                                If IsEmailContent Then
                                                     '
-                                                    ' Add-on Experiment - move all processing to the Webclient
-                                                    ' just pass the name and arguments back in th FPO
-                                                    ' HTML encode and quote the name and AddonOptionString
+                                                    ' Addon - for email
                                                     '
-                                                    Copy = "" _
+                                                    If EncodeNonCachableTags Then
+                                                        '
+                                                        ' Only hardcoded Add-ons can run in Emails
+                                                        '
+                                                        Select Case vbLCase(ACName)
+                                                            Case "block text"
+                                                                '
+                                                                ' Email is always considered authenticated bc they need their login credentials to get the email.
+                                                                ' Allowed to see the content that follows if you are authenticated, admin, or in the group list
+                                                                ' This must be done out on the page because the csv does not know about authenticated
+                                                                '
+                                                                Copy = ""
+                                                                GroupIDList = csv_GetAddonOptionStringValue("AllowGroups", addonOptionString)
+                                                                If (Not user.isMemberOfGroupIdList(personalizationPeopleId, True, GroupIDList, True)) Then
+                                                                    '
+                                                                    ' Block content if not allowed
+                                                                    '
+                                                                    ElementPointer = ElementPointer + 1
+                                                                    Do While ElementPointer < KmaHTML.ElementCount
+                                                                        ElementTag = vbUCase(KmaHTML.TagName(ElementPointer))
+                                                                        If (ElementTag = "AC") Then
+                                                                            ACType = vbUCase(KmaHTML.ElementAttribute(ElementPointer, "TYPE"))
+                                                                            If (ACType = ACTypeAggregateFunction) Then
+                                                                                If vbLCase(KmaHTML.ElementAttribute(ElementPointer, "name")) = "block text end" Then
+                                                                                    Exit Do
+                                                                                End If
+                                                                            End If
+                                                                        End If
+                                                                        ElementPointer = ElementPointer + 1
+                                                                    Loop
+                                                                End If
+                                                            Case "block text end"
+                                                                '
+                                                                ' always remove end tags because the block text did not remove it
+                                                                '
+                                                                Copy = ""
+                                                            Case Else
+                                                                '
+                                                                ' all other add-ons, pass out to cpCoreClass to process
+                                                                '
+                                                                Copy = addon.execute(0, ACName, AddonOptionStringHTMLEncoded, CPUtilsBaseClass.addonContext.ContextEmail, "", 0, "", ACInstanceID, False, 0, "", True, Nothing, "", Nothing, "", personalizationPeopleId, personalizationIsAuthenticated)
+                                                                'Copy = "" _
+                                                                '    & "" _
+                                                                '    & "<!-- ADDON " _
+                                                                '    & """" & ACName & """" _
+                                                                '    & ",""" & AddonOptionStringHTMLEncoded & """" _
+                                                                '    & ",""" & ACInstanceID & """" _
+                                                                '    & ",""" & ACGuid & """" _
+                                                                '    & " -->" _
+                                                                '    & ""
+                                                        End Select
+                                                    End If
+                                                Else
+                                                    '
+                                                    ' Addon - for web
+                                                    '
+
+                                                    If EncodeEditIcons Then
+                                                        '
+                                                        ' Get IconFilename, update the optionstring, and execute optionstring replacement functions
+                                                        '
+                                                        AddonContentName = "Add-ons"
+                                                        If True Then
+                                                            SelectList = "Name,Link,ID,ArgumentList,ObjectProgramID,IconFilename,IconWidth,IconHeight,IconSprites,IsInline,ccGuid"
+                                                        End If
+                                                        If ACGuid <> "" Then
+                                                            Criteria = "ccguid=" & db.encodeSQLText(ACGuid)
+                                                        Else
+                                                            Criteria = "name=" & db.encodeSQLText(UCaseACName)
+                                                        End If
+                                                        CS = db.cs_open(AddonContentName, Criteria, "Name,ID", , , , , SelectList)
+                                                        If db.cs_ok(CS) Then
+                                                            AddonFound = True
+                                                            ' ArgumentList comes in already encoded
+                                                            IconFilename = db.cs_get(CS, "IconFilename")
+                                                            SrcOptionList = db.cs_get(CS, "ArgumentList")
+                                                            IconWidth = db.cs_getInteger(CS, "IconWidth")
+                                                            IconHeight = db.cs_getInteger(CS, "IconHeight")
+                                                            IconSprites = db.cs_getInteger(CS, "IconSprites")
+                                                            AddonIsInline = db.cs_getBoolean(CS, "IsInline")
+                                                            ACGuid = db.cs_getText(CS, "ccGuid")
+                                                            IconAlt = ACName
+                                                            IconTitle = "Rendered as the Add-on [" & ACName & "]"
+                                                        Else
+                                                            Select Case vbLCase(ACName)
+                                                                Case "block text"
+                                                                    IconFilename = ""
+                                                                    SrcOptionList = AddonOptionConstructor_ForBlockText
+                                                                    IconWidth = 0
+                                                                    IconHeight = 0
+                                                                    IconSprites = 0
+                                                                    AddonIsInline = True
+                                                                    ACGuid = ""
+                                                                Case "block text end"
+                                                                    IconFilename = ""
+                                                                    SrcOptionList = ""
+                                                                    IconWidth = 0
+                                                                    IconHeight = 0
+                                                                    IconSprites = 0
+                                                                    AddonIsInline = True
+                                                                    ACGuid = ""
+                                                                Case Else
+                                                                    IconFilename = ""
+                                                                    SrcOptionList = ""
+                                                                    IconWidth = 0
+                                                                    IconHeight = 0
+                                                                    IconSprites = 0
+                                                                    AddonIsInline = False
+                                                                    IconAlt = "Unknown Add-on [" & ACName & "]"
+                                                                    IconTitle = "Unknown Add-on [" & ACName & "]"
+                                                                    ACGuid = ""
+                                                            End Select
+                                                        End If
+                                                        Call db.cs_Close(CS)
+                                                        '
+                                                        ' Build AddonOptionStringHTMLEncoded from SrcOptionList (for names), itself (for current settings), and SrcOptionList (for select options)
+                                                        '
+                                                        If (InStr(1, SrcOptionList, "wrapper", vbTextCompare) = 0) Then
+                                                            If AddonIsInline Then
+                                                                SrcOptionList = SrcOptionList & vbCrLf & AddonOptionConstructor_Inline
+                                                            Else
+                                                                SrcOptionList = SrcOptionList & vbCrLf & AddonOptionConstructor_Block
+                                                            End If
+                                                        End If
+                                                        If SrcOptionList = "" Then
+                                                            ResultOptionListHTMLEncoded = ""
+                                                        Else
+                                                            ResultOptionListHTMLEncoded = ""
+                                                            REsultOptionValue = ""
+                                                            SrcOptionList = vbReplace(SrcOptionList, vbCrLf, vbCr)
+                                                            SrcOptionList = vbReplace(SrcOptionList, vbLf, vbCr)
+                                                            SrcOptions = Split(SrcOptionList, vbCr)
+                                                            For Ptr = 0 To UBound(SrcOptions)
+                                                                SrcOptionName = SrcOptions(Ptr)
+                                                                Dim LoopPtr2 As Integer
+
+                                                                LoopPtr2 = 0
+                                                                Do While (Len(SrcOptionName) > 1) And (Mid(SrcOptionName, 1, 1) = vbTab) And (LoopPtr2 < 100)
+                                                                    SrcOptionName = Mid(SrcOptionName, 2)
+                                                                    LoopPtr2 = LoopPtr2 + 1
+                                                                Loop
+                                                                SrcOptionValueSelector = ""
+                                                                SrcOptionSelector = ""
+                                                                Pos = vbInstr(1, SrcOptionName, "=")
+                                                                If Pos > 0 Then
+                                                                    SrcOptionValueSelector = Mid(SrcOptionName, Pos + 1)
+                                                                    SrcOptionName = Mid(SrcOptionName, 1, Pos - 1)
+                                                                    SrcOptionSelector = ""
+                                                                    Pos = vbInstr(1, SrcOptionValueSelector, "[")
+                                                                    If Pos <> 0 Then
+                                                                        SrcOptionSelector = Mid(SrcOptionValueSelector, Pos)
+                                                                    End If
+                                                                End If
+                                                                ' all Src and Instance vars are already encoded correctly
+                                                                If SrcOptionName <> "" Then
+                                                                    ' since AddonOptionString is encoded, InstanceOptionValue will be also
+                                                                    InstanceOptionValue = csv_GetAddonOptionStringValue(SrcOptionName, addonOptionString)
+                                                                    'InstanceOptionValue = csv_GetAddonOption(SrcOptionName, AddonOptionString)
+                                                                    ResultOptionSelector = pageManager_GetAddonSelector(SrcOptionName, encodeNvaArgument(InstanceOptionValue), SrcOptionSelector)
+                                                                    'ResultOptionSelector = csv_GetAddonSelector(SrcOptionName, InstanceOptionValue, SrcOptionValueSelector)
+                                                                    ResultOptionListHTMLEncoded = ResultOptionListHTMLEncoded & "&" & ResultOptionSelector
+                                                                End If
+                                                            Next
+                                                            If ResultOptionListHTMLEncoded <> "" Then
+                                                                ResultOptionListHTMLEncoded = Mid(ResultOptionListHTMLEncoded, 2)
+                                                            End If
+                                                        End If
+                                                        ACNameCaption = vbReplace(ACName, """", "")
+                                                        ACNameCaption = html.html_EncodeHTML(ACNameCaption)
+                                                        IDControlString = "AC," & ACType & "," & NotUsedID & "," & encodeNvaArgument(ACName) & "," & ResultOptionListHTMLEncoded & "," & ACGuid
+                                                        Copy = GetAddonIconImg(AdminURL, IconWidth, IconHeight, IconSprites, AddonIsInline, IDControlString, IconFilename, serverFilePath, IconAlt, IconTitle, ACInstanceID, 0)
+                                                    ElseIf EncodeNonCachableTags Then
+                                                        '
+                                                        ' Add-on Experiment - move all processing to the Webclient
+                                                        ' just pass the name and arguments back in th FPO
+                                                        ' HTML encode and quote the name and AddonOptionString
+                                                        '
+                                                        Copy = "" _
                                                         & "" _
                                                         & "<!-- ADDON " _
                                                         & """" & ACName & """" _
@@ -3224,313 +3116,307 @@ ErrorTrap:
                                                         & ",""" & ACGuid & """" _
                                                         & " -->" _
                                                         & ""
-                                                End If
-                                                '
-                                            End If
-                                        Case ACTypeImage
-                                            '
-                                            ' ----- Image Tag, substitute image placeholder with the link from the REsource Library Record
-                                            '
-                                            If EncodeImages Then
-                                                Copy = ""
-                                                ACAttrRecordID = EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "RECORDID"))
-                                                ACAttrWidth = EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "WIDTH"))
-                                                ACAttrHeight = EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "HEIGHT"))
-                                                ACAttrAlt = EncodeText(KmaHTML.ElementAttribute(ElementPointer, "ALT"))
-                                                ACAttrBorder = EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "BORDER"))
-                                                ACAttrLoop = EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "LOOP"))
-                                                ACAttrVSpace = EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "VSPACE"))
-                                                ACAttrHSpace = EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "HSPACE"))
-                                                ACAttrAlign = EncodeText(KmaHTML.ElementAttribute(ElementPointer, "ALIGN"))
-                                                '
-                                                Dim Attr As String
-                                                Dim lfPtr As Integer
-                                                Dim lfFilename As String
-                                                Dim lfWidth As Integer
-                                                Dim lfHeight As Integer
-                                                Call cache_libraryFiles_loadIfNeeded()
-                                                lfPtr = cache_libraryFilesIdIndex.getPtr(CStr(ACAttrRecordID))
-                                                If lfPtr >= 0 Then
-                                                    lfFilename = EncodeText(cache_libraryFiles(LibraryFilesCache_filename, lfPtr))
-                                                    lfWidth = EncodeInteger(cache_libraryFiles(LibraryFilesCache_width, lfPtr))
-                                                    lfHeight = EncodeInteger(cache_libraryFiles(LibraryFilesCache_height, lfPtr))
-                                                    'CS = app.csOpen("Library Files", "ID=" & encodeSQLNumber(ACAttrRecordID), , , , , , "Filename,AltText,Width,Height")
-                                                    'If app.csv_IsCSOK(CS) Then
-                                                    'Filename = app.csv_cs_getField(CS, "FileName")
-                                                    If Filename <> "" Then
-                                                        Filename = lfFilename
-                                                        'Filename = vbReplace(Filename, " ", "%20")
-                                                        Filename = vbReplace(Filename, "\", "/")
-                                                        Filename = EncodeURL(Filename)
-                                                        Copy = Copy & "<img ID=""AC,IMAGE,," & ACAttrRecordID & """ src=""" & csv_getVirtualFileLink(serverFilePath, Filename) & """"
-                                                        '
-                                                        If ACAttrWidth = 0 Then
-                                                            ACAttrWidth = lfWidth
-                                                            'ACAttrWidth = app.csv_cs_getInteger(CS, "Width")
-                                                        End If
-                                                        If ACAttrWidth <> 0 Then
-                                                            Copy = Copy & " width=""" & ACAttrWidth & """"
-                                                        End If
-                                                        '
-                                                        If ACAttrHeight = 0 Then
-                                                            ACAttrHeight = lfHeight
-                                                            'ACAttrHeight = app.csv_cs_getInteger(CS, "Height")
-                                                        End If
-                                                        If ACAttrHeight <> 0 Then
-                                                            Copy = Copy & " height=""" & ACAttrHeight & """"
-                                                        End If
-                                                        '
-                                                        If ACAttrVSpace <> 0 Then
-                                                            Copy = Copy & " vspace=""" & ACAttrVSpace & """"
-                                                        End If
-                                                        '
-                                                        If ACAttrHSpace <> 0 Then
-                                                            Copy = Copy & " hspace=""" & ACAttrHSpace & """"
-                                                        End If
-                                                        '
-                                                        If ACAttrAlt <> "" Then
-                                                            Copy = Copy & " alt=""" & ACAttrAlt & """"
-                                                        End If
-                                                        '
-                                                        If ACAttrAlign <> "" Then
-                                                            Copy = Copy & " align=""" & ACAttrAlign & """"
-                                                        End If
-                                                        '
-                                                        ' no, 0 is an important value
-                                                        'If ACAttrBorder <> 0 Then
-                                                        Copy = Copy & " border=""" & ACAttrBorder & """"
-                                                        '    End If
-                                                        '
-                                                        If ACAttrLoop <> 0 Then
-                                                            Copy = Copy & " loop=""" & ACAttrLoop & """"
-                                                        End If
-                                                        '
-
-                                                        Attr = EncodeText(KmaHTML.ElementAttribute(ElementPointer, "STYLE"))
-                                                        If Attr <> "" Then
-                                                            Copy = Copy & " style=""" & Attr & """"
-                                                        End If
-                                                        '
-                                                        Attr = EncodeText(KmaHTML.ElementAttribute(ElementPointer, "CLASS"))
-                                                        If Attr <> "" Then
-                                                            Copy = Copy & " class=""" & Attr & """"
-                                                        End If
-                                                        '
-                                                        Copy = Copy & ">"
                                                     End If
-                                                    'End If
-                                                    'Call app.csv_CloseCS(CS)
+                                                    '
                                                 End If
-                                            End If
-                                            '
-                                            '
-                                        Case ACTypeDownload
-                                            '
-                                            ' ----- substitute and anchored download image for the AC-Download tag
-                                            '
-                                            ACAttrRecordID = EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "RECORDID"))
-                                            ACAttrAlt = EncodeText(KmaHTML.ElementAttribute(ElementPointer, "ALT"))
-                                            '
-                                            If EncodeEditIcons Then
+                                            Case ACTypeImage
                                                 '
-                                                ' Encoding the edit icons for the active editor form
+                                                ' ----- Image Tag, substitute image placeholder with the link from the REsource Library Record
                                                 '
-                                                IconIDControlString = "AC," & ACTypeDownload & ",," & ACAttrRecordID
-                                                IconImg = GetAddonIconImg(AdminURL, 16, 16, 0, True, IconIDControlString, "/ccLib/images/IconDownload3.gif", serverFilePath, "Download Icon with a link to a resource", "Renders as [Download Icon with a link to a resource]", ACInstanceID, 0)
-                                                Copy = IconImg
-                                                '
-                                                'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Renders as a download icon"" id=""AC," & ACTypeDownload & ",," & ACAttrRecordID & """ src=""/ccLib/images/IconDownload3.GIF"">"
-                                            ElseIf EncodeImages Then
-                                                '
-                                                Dim libraryFilePtr As Integer
-                                                If ACAttrAlt = "" Then
+                                                If EncodeImages Then
+                                                    Copy = ""
+                                                    ACAttrRecordID = EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "RECORDID"))
+                                                    ACAttrWidth = EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "WIDTH"))
+                                                    ACAttrHeight = EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "HEIGHT"))
+                                                    ACAttrAlt = EncodeText(KmaHTML.ElementAttribute(ElementPointer, "ALT"))
+                                                    ACAttrBorder = EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "BORDER"))
+                                                    ACAttrLoop = EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "LOOP"))
+                                                    ACAttrVSpace = EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "VSPACE"))
+                                                    ACAttrHSpace = EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "HSPACE"))
+                                                    ACAttrAlign = EncodeText(KmaHTML.ElementAttribute(ElementPointer, "ALIGN"))
+                                                    '
+                                                    Dim Attr As String
+                                                    Dim lfPtr As Integer
+                                                    Dim lfFilename As String
+                                                    Dim lfWidth As Integer
+                                                    Dim lfHeight As Integer
                                                     Call cache_libraryFiles_loadIfNeeded()
-                                                    libraryFilePtr = cache_libraryFilesIdIndex.getPtr(CStr(ACAttrRecordID))
-                                                    If libraryFilePtr >= 0 Then
-                                                        ACAttrAlt = EncodeText(cache_libraryFiles(LibraryFilesCache_alttext, libraryFilePtr))
+                                                    lfPtr = cache_libraryFilesIdIndex.getPtr(CStr(ACAttrRecordID))
+                                                    If lfPtr >= 0 Then
+                                                        lfFilename = EncodeText(cache_libraryFiles(LibraryFilesCache_filename, lfPtr))
+                                                        lfWidth = EncodeInteger(cache_libraryFiles(LibraryFilesCache_width, lfPtr))
+                                                        lfHeight = EncodeInteger(cache_libraryFiles(LibraryFilesCache_height, lfPtr))
+                                                        'CS = app.csOpen("Library Files", "ID=" & encodeSQLNumber(ACAttrRecordID), , , , , , "Filename,AltText,Width,Height")
+                                                        'If app.csv_IsCSOK(CS) Then
+                                                        'Filename = app.csv_cs_getField(CS, "FileName")
+                                                        If Filename <> "" Then
+                                                            Filename = lfFilename
+                                                            'Filename = vbReplace(Filename, " ", "%20")
+                                                            Filename = vbReplace(Filename, "\", "/")
+                                                            Filename = EncodeURL(Filename)
+                                                            Copy = Copy & "<img ID=""AC,IMAGE,," & ACAttrRecordID & """ src=""" & csv_getVirtualFileLink(serverFilePath, Filename) & """"
+                                                            '
+                                                            If ACAttrWidth = 0 Then
+                                                                ACAttrWidth = lfWidth
+                                                                'ACAttrWidth = app.csv_cs_getInteger(CS, "Width")
+                                                            End If
+                                                            If ACAttrWidth <> 0 Then
+                                                                Copy = Copy & " width=""" & ACAttrWidth & """"
+                                                            End If
+                                                            '
+                                                            If ACAttrHeight = 0 Then
+                                                                ACAttrHeight = lfHeight
+                                                                'ACAttrHeight = app.csv_cs_getInteger(CS, "Height")
+                                                            End If
+                                                            If ACAttrHeight <> 0 Then
+                                                                Copy = Copy & " height=""" & ACAttrHeight & """"
+                                                            End If
+                                                            '
+                                                            If ACAttrVSpace <> 0 Then
+                                                                Copy = Copy & " vspace=""" & ACAttrVSpace & """"
+                                                            End If
+                                                            '
+                                                            If ACAttrHSpace <> 0 Then
+                                                                Copy = Copy & " hspace=""" & ACAttrHSpace & """"
+                                                            End If
+                                                            '
+                                                            If ACAttrAlt <> "" Then
+                                                                Copy = Copy & " alt=""" & ACAttrAlt & """"
+                                                            End If
+                                                            '
+                                                            If ACAttrAlign <> "" Then
+                                                                Copy = Copy & " align=""" & ACAttrAlign & """"
+                                                            End If
+                                                            '
+                                                            ' no, 0 is an important value
+                                                            'If ACAttrBorder <> 0 Then
+                                                            Copy = Copy & " border=""" & ACAttrBorder & """"
+                                                            '    End If
+                                                            '
+                                                            If ACAttrLoop <> 0 Then
+                                                                Copy = Copy & " loop=""" & ACAttrLoop & """"
+                                                            End If
+                                                            '
+
+                                                            Attr = EncodeText(KmaHTML.ElementAttribute(ElementPointer, "STYLE"))
+                                                            If Attr <> "" Then
+                                                                Copy = Copy & " style=""" & Attr & """"
+                                                            End If
+                                                            '
+                                                            Attr = EncodeText(KmaHTML.ElementAttribute(ElementPointer, "CLASS"))
+                                                            If Attr <> "" Then
+                                                                Copy = Copy & " class=""" & Attr & """"
+                                                            End If
+                                                            '
+                                                            Copy = Copy & ">"
+                                                        End If
+                                                        'End If
+                                                        'Call app.csv_CloseCS(CS)
                                                     End If
                                                 End If
-                                                '                                        CS = app.csOpenRecord("Library Files", ACAttrRecordID, , , , "Filename,AltText")
-                                                '                                        If app.csv_IsCSOK(CS) Then
-                                                '                                            If ACAttrAlt = "" Then
-                                                '                                                ACAttrAlt = encodeText(app.csv_cs_getText(CS, "AltText"))
-                                                '                                            End If
-                                                '                                        End If
-                                                '                                        Call app.csv_CloseCS(CS)
-                                                '
-                                                Copy = "<a href=""" & ProtocolHostString & webServerIO_requestRootPath & siteProperties.serverPageDefault & "?" & RequestNameDownloadID & "=" & ACAttrRecordID & """ target=""_blank""><img src=""" & ProtocolHostString & "/ccLib/images/IconDownload3.gif"" width=""16"" height=""16"" border=""0"" alt=""" & ACAttrAlt & """></a>"
-                                            End If
-                                        Case ACTypeTemplateContent
                                             '
-                                            ' ----- Create Template Content
                                             '
-                                            'ACName = vbUCase(KmaHTML.ElementAttribute(ElementPointer, "NAME"))
-                                            AddonOptionStringHTMLEncoded = ""
-                                            addonOptionString = ""
-                                            NotUsedID = 0
-                                            If EncodeEditIcons Then
+                                            Case ACTypeDownload
                                                 '
-                                                IconIDControlString = "AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded
-                                                IconImg = GetAddonIconImg(AdminURL, 52, 64, 0, False, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as the Template Page Content", ACInstanceID, 0)
-                                                Copy = IconImg
+                                                ' ----- substitute and anchored download image for the AC-Download tag
                                                 '
-                                                'Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Page Content"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/ccLib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>"
-                                            ElseIf EncodeNonCachableTags Then
+                                                ACAttrRecordID = EncodeInteger(KmaHTML.ElementAttribute(ElementPointer, "RECORDID"))
+                                                ACAttrAlt = EncodeText(KmaHTML.ElementAttribute(ElementPointer, "ALT"))
                                                 '
-                                                ' Add in the Content
-                                                '
-                                                Copy = fpoContentBox
-                                                'Copy = TemplateBodyContent
-                                                'Copy = "{{" & ACTypeTemplateContent & "}}"
-                                            End If
-                                        Case ACTypeTemplateText
-                                            '
-                                            ' ----- Create Template Content
-                                            '
-                                            'ACName = vbUCase(KmaHTML.ElementAttribute(ElementPointer, "NAME"))
-                                            AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING")
-                                            addonOptionString = decodeHtml(AddonOptionStringHTMLEncoded)
-                                            NotUsedID = 0
-                                            If EncodeEditIcons Then
-                                                '
-                                                IconIDControlString = "AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded
-                                                IconImg = GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", serverFilePath, "Template Text", "Renders as a Template Text Box", ACInstanceID, 0)
-                                                Copy = IconImg
-                                                '
-                                                'Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as Template Text"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/ccLib/images/ACTemplateTextIcon.gif"" WIDTH=52 HEIGHT=52>"
-                                            ElseIf EncodeNonCachableTags Then
-                                                '
-                                                ' Add in the Content Page
-                                                '
-                                                '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                                                'test - encoding changed
-                                                NewName = csv_GetAddonOptionStringValue("new", addonOptionString)
-                                                'NewName = decodeResponseVariable(getSimpleNameValue("new", AddonOptionString, "", "&"))
-                                                TextName = csv_GetAddonOptionStringValue("name", addonOptionString)
-                                                'TextName = getSimpleNameValue("name", AddonOptionString)
-                                                If TextName = "" Then
-                                                    TextName = "Default"
-                                                End If
-                                                Copy = "{{" & ACTypeTemplateText & "?name=" & encodeNvaArgument(TextName) & "&new=" & encodeNvaArgument(NewName) & "}}"
-                                                ' ***** can not add it here, if a web hit, it must be encoded from the web client for aggr objects
-                                                'Copy = csv_GetContentCopy(TextName, "Copy Content", "", personalizationpeopleId)
-                                            End If
-                                        Case ACTypeDynamicMenu
-                                            '
-                                            ' ----- Create Template Menu
-                                            '
-                                            'ACName = KmaHTML.ElementAttribute(ElementPointer, "NAME")
-                                            AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING")
-                                            addonOptionString = decodeHtml(AddonOptionStringHTMLEncoded)
-                                            '
-                                            ' test for illegal characters (temporary patch to get around not addonencoding during the addon replacement
-                                            '
-                                            Pos = vbInstr(1, addonOptionString, "menunew=", vbTextCompare)
-                                            If Pos > 0 Then
-                                                NewName = Mid(addonOptionString, Pos + 8)
-                                                Dim IsOK As Boolean
-                                                IsOK = (NewName = encodeNvaArgument(NewName))
-                                                If Not IsOK Then
-                                                    addonOptionString = Left(addonOptionString, Pos - 1) & "MenuNew=" & encodeNvaArgument(NewName)
-                                                End If
-                                            End If
-                                            NotUsedID = 0
-                                            If EncodeEditIcons Then
-                                                If vbInstr(1, AddonOptionStringHTMLEncoded, "menu=", vbTextCompare) <> 0 Then
+                                                If EncodeEditIcons Then
                                                     '
-                                                    ' Dynamic Menu
+                                                    ' Encoding the edit icons for the active editor form
                                                     '
-                                                    '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                                                    ' test - encoding changed
-                                                    TextName = csv_GetAddonOptionStringValue("menu", addonOptionString)
-                                                    'TextName = csv_GetAddonOption("Menu", AddonOptionString)
-                                                    '
-                                                    IconIDControlString = "AC," & ACType & "," & NotUsedID & "," & ACName & ",Menu=" & TextName & "[" & csv_GetDynamicMenuACSelect() & "]&NewMenu="
-                                                    IconImg = GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as a Dynamic Menu", ACInstanceID, 0)
+                                                    IconIDControlString = "AC," & ACTypeDownload & ",," & ACAttrRecordID
+                                                    IconImg = GetAddonIconImg(AdminURL, 16, 16, 0, True, IconIDControlString, "/ccLib/images/IconDownload3.gif", serverFilePath, "Download Icon with a link to a resource", "Renders as [Download Icon with a link to a resource]", ACInstanceID, 0)
                                                     Copy = IconImg
                                                     '
-                                                    'Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as a Dynamic Menu"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & ",Menu=" & TextName & "[" & csv_GetDynamicMenuACSelect & "]&NewMenu="" src=""/ccLib/images/ACDynamicMenuIcon.gif"" WIDTH=52 HEIGHT=52>"
-                                                Else
+                                                    'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Renders as a download icon"" id=""AC," & ACTypeDownload & ",," & ACAttrRecordID & """ src=""/ccLib/images/IconDownload3.GIF"">"
+                                                ElseIf EncodeImages Then
                                                     '
-                                                    ' Old Dynamic Menu - values are stored in the icon
+                                                    Dim libraryFilePtr As Integer
+                                                    If ACAttrAlt = "" Then
+                                                        Call cache_libraryFiles_loadIfNeeded()
+                                                        libraryFilePtr = cache_libraryFilesIdIndex.getPtr(CStr(ACAttrRecordID))
+                                                        If libraryFilePtr >= 0 Then
+                                                            ACAttrAlt = EncodeText(cache_libraryFiles(LibraryFilesCache_alttext, libraryFilePtr))
+                                                        End If
+                                                    End If
+                                                    '                                        CS = app.csOpenRecord("Library Files", ACAttrRecordID, , , , "Filename,AltText")
+                                                    '                                        If app.csv_IsCSOK(CS) Then
+                                                    '                                            If ACAttrAlt = "" Then
+                                                    '                                                ACAttrAlt = encodeText(app.csv_cs_getText(CS, "AltText"))
+                                                    '                                            End If
+                                                    '                                        End If
+                                                    '                                        Call app.csv_CloseCS(CS)
+                                                    '
+                                                    Copy = "<a href=""" & ProtocolHostString & requestAppRootPath & siteProperties.serverPageDefault & "?" & RequestNameDownloadID & "=" & ACAttrRecordID & """ target=""_blank""><img src=""" & ProtocolHostString & "/ccLib/images/IconDownload3.gif"" width=""16"" height=""16"" border=""0"" alt=""" & ACAttrAlt & """></a>"
+                                                End If
+                                            Case ACTypeTemplateContent
+                                                '
+                                                ' ----- Create Template Content
+                                                '
+                                                'ACName = vbUCase(KmaHTML.ElementAttribute(ElementPointer, "NAME"))
+                                                AddonOptionStringHTMLEncoded = ""
+                                                addonOptionString = ""
+                                                NotUsedID = 0
+                                                If EncodeEditIcons Then
                                                     '
                                                     IconIDControlString = "AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded
-                                                    IconImg = GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as a Dynamic Menu", ACInstanceID, 0)
+                                                    IconImg = GetAddonIconImg(AdminURL, 52, 64, 0, False, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as the Template Page Content", ACInstanceID, 0)
                                                     Copy = IconImg
                                                     '
-                                                    'Copy = "<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as a Dynamic Menu"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/ccLib/images/ACDynamicMenuIcon.gif"" WIDTH=52 HEIGHT=52>"
+                                                    'Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Page Content"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/ccLib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>"
+                                                ElseIf EncodeNonCachableTags Then
+                                                    '
+                                                    ' Add in the Content
+                                                    '
+                                                    Copy = fpoContentBox
+                                                    'Copy = TemplateBodyContent
+                                                    'Copy = "{{" & ACTypeTemplateContent & "}}"
                                                 End If
-                                            ElseIf EncodeNonCachableTags Then
+                                            Case ACTypeTemplateText
                                                 '
-                                                ' Add in the Content Pag
+                                                ' ----- Create Template Content
                                                 '
-                                                Copy = "{{" & ACTypeDynamicMenu & "?" & addonOptionString & "}}"
-                                            End If
-                                        Case ACTypeWatchList
-                                            '
-                                            ' ----- Formatting Tag
-                                            '
-                                            '
-                                            ' Content Watch replacement
-                                            '   served by the web client because the
-                                            '
-                                            'UCaseACName = vbUCase(Trim(KmaHTML.ElementAttribute(ElementPointer, "NAME")))
-                                            'ACName = encodeInitialCaps(UCaseACName)
-                                            AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING")
-                                            addonOptionString = decodeHtml(AddonOptionStringHTMLEncoded)
-                                            If EncodeEditIcons Then
+                                                'ACName = vbUCase(KmaHTML.ElementAttribute(ElementPointer, "NAME"))
+                                                AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING")
+                                                addonOptionString = decodeHtml(AddonOptionStringHTMLEncoded)
+                                                NotUsedID = 0
+                                                If EncodeEditIcons Then
+                                                    '
+                                                    IconIDControlString = "AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded
+                                                    IconImg = GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", serverFilePath, "Template Text", "Renders as a Template Text Box", ACInstanceID, 0)
+                                                    Copy = IconImg
+                                                    '
+                                                    'Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as Template Text"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/ccLib/images/ACTemplateTextIcon.gif"" WIDTH=52 HEIGHT=52>"
+                                                ElseIf EncodeNonCachableTags Then
+                                                    '
+                                                    ' Add in the Content Page
+                                                    '
+                                                    '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                                                    'test - encoding changed
+                                                    NewName = csv_GetAddonOptionStringValue("new", addonOptionString)
+                                                    'NewName = decodeResponseVariable(getSimpleNameValue("new", AddonOptionString, "", "&"))
+                                                    TextName = csv_GetAddonOptionStringValue("name", addonOptionString)
+                                                    'TextName = getSimpleNameValue("name", AddonOptionString)
+                                                    If TextName = "" Then
+                                                        TextName = "Default"
+                                                    End If
+                                                    Copy = "{{" & ACTypeTemplateText & "?name=" & encodeNvaArgument(TextName) & "&new=" & encodeNvaArgument(NewName) & "}}"
+                                                    ' ***** can not add it here, if a web hit, it must be encoded from the web client for aggr objects
+                                                    'Copy = csv_GetContentCopy(TextName, "Copy Content", "", personalizationpeopleId)
+                                                End If
+                                            Case ACTypeDynamicMenu
                                                 '
-                                                IconIDControlString = "AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded
-                                                IconImg = GetAddonIconImg(AdminURL, 109, 10, 0, True, IconIDControlString, "/ccLib/images/ACWatchList.gif", serverFilePath, "Watch List", "Renders as the Watch List [" & ACName & "]", ACInstanceID, 0)
-                                                Copy = IconImg
+                                                ' ----- Create Template Menu
                                                 '
-                                                'Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Watch List [" & ACName & "]"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/ccLib/images/ACWatchList.GIF"">"
-                                            ElseIf EncodeNonCachableTags Then
+                                                'ACName = KmaHTML.ElementAttribute(ElementPointer, "NAME")
+                                                AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING")
+                                                addonOptionString = decodeHtml(AddonOptionStringHTMLEncoded)
                                                 '
-                                                Copy = "{{" & ACTypeWatchList & "?" & addonOptionString & "}}"
-                                            End If
-                                    End Select
-                            End Select
-                        End If
-                        '
-                        ' ----- Output the results
-                        '
-                        Stream.Add(Copy)
-                        ElementPointer = ElementPointer + 1
-                    Loop
+                                                ' test for illegal characters (temporary patch to get around not addonencoding during the addon replacement
+                                                '
+                                                Pos = vbInstr(1, addonOptionString, "menunew=", vbTextCompare)
+                                                If Pos > 0 Then
+                                                    NewName = Mid(addonOptionString, Pos + 8)
+                                                    Dim IsOK As Boolean
+                                                    IsOK = (NewName = encodeNvaArgument(NewName))
+                                                    If Not IsOK Then
+                                                        addonOptionString = Left(addonOptionString, Pos - 1) & "MenuNew=" & encodeNvaArgument(NewName)
+                                                    End If
+                                                End If
+                                                NotUsedID = 0
+                                                If EncodeEditIcons Then
+                                                    If vbInstr(1, AddonOptionStringHTMLEncoded, "menu=", vbTextCompare) <> 0 Then
+                                                        '
+                                                        ' Dynamic Menu
+                                                        '
+                                                        '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                                                        ' test - encoding changed
+                                                        TextName = csv_GetAddonOptionStringValue("menu", addonOptionString)
+                                                        'TextName = csv_GetAddonOption("Menu", AddonOptionString)
+                                                        '
+                                                        IconIDControlString = "AC," & ACType & "," & NotUsedID & "," & ACName & ",Menu=" & TextName & "[" & csv_GetDynamicMenuACSelect() & "]&NewMenu="
+                                                        IconImg = GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as a Dynamic Menu", ACInstanceID, 0)
+                                                        Copy = IconImg
+                                                        '
+                                                        'Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as a Dynamic Menu"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & ",Menu=" & TextName & "[" & csv_GetDynamicMenuACSelect & "]&NewMenu="" src=""/ccLib/images/ACDynamicMenuIcon.gif"" WIDTH=52 HEIGHT=52>"
+                                                    Else
+                                                        '
+                                                        ' Old Dynamic Menu - values are stored in the icon
+                                                        '
+                                                        IconIDControlString = "AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded
+                                                        IconImg = GetAddonIconImg(AdminURL, 52, 52, 0, False, IconIDControlString, "/ccLib/images/ACDynamicMenuIcon.gif", serverFilePath, "Dynamic Menu", "Renders as a Dynamic Menu", ACInstanceID, 0)
+                                                        Copy = IconImg
+                                                        '
+                                                        'Copy = "<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as a Dynamic Menu"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/ccLib/images/ACDynamicMenuIcon.gif"" WIDTH=52 HEIGHT=52>"
+                                                    End If
+                                                ElseIf EncodeNonCachableTags Then
+                                                    '
+                                                    ' Add in the Content Pag
+                                                    '
+                                                    Copy = "{{" & ACTypeDynamicMenu & "?" & addonOptionString & "}}"
+                                                End If
+                                            Case ACTypeWatchList
+                                                '
+                                                ' ----- Formatting Tag
+                                                '
+                                                '
+                                                ' Content Watch replacement
+                                                '   served by the web client because the
+                                                '
+                                                'UCaseACName = vbUCase(Trim(KmaHTML.ElementAttribute(ElementPointer, "NAME")))
+                                                'ACName = encodeInitialCaps(UCaseACName)
+                                                AddonOptionStringHTMLEncoded = KmaHTML.ElementAttribute(ElementPointer, "QUERYSTRING")
+                                                addonOptionString = decodeHtml(AddonOptionStringHTMLEncoded)
+                                                If EncodeEditIcons Then
+                                                    '
+                                                    IconIDControlString = "AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded
+                                                    IconImg = GetAddonIconImg(AdminURL, 109, 10, 0, True, IconIDControlString, "/ccLib/images/ACWatchList.gif", serverFilePath, "Watch List", "Renders as the Watch List [" & ACName & "]", ACInstanceID, 0)
+                                                    Copy = IconImg
+                                                    '
+                                                    'Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Watch List [" & ACName & "]"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/ccLib/images/ACWatchList.GIF"">"
+                                                ElseIf EncodeNonCachableTags Then
+                                                    '
+                                                    Copy = "{{" & ACTypeWatchList & "?" & addonOptionString & "}}"
+                                                End If
+                                        End Select
+                                End Select
+                            End If
+                            '
+                            ' ----- Output the results
+                            '
+                            Stream.Add(Copy)
+                            ElementPointer = ElementPointer + 1
+                        Loop
+                    End If
+                    workingContent = Stream.Text
+                    '
+                    ' Add Contensive User Form if needed
+                    '
+                    If FormCount = 0 And FormInputCount > 0 Then
+                    End If
+                    workingContent = ReplaceInstructions & workingContent
+                    If CSPeopleSet Then
+                        Call db.cs_Close(CSPeople)
+                    End If
+                    If CSOrganizationSet Then
+                        Call db.cs_Close(CSOrganization)
+                    End If
+                    If CSVisitorSet Then
+                        Call db.cs_Close(CSVisitor)
+                    End If
+                    If CSVisitSet Then
+                        Call db.cs_Close(CSVisit)
+                    End If
+                    KmaHTML = Nothing
                 End If
-                workingContent = Stream.Text
-                '
-                ' Add Contensive User Form if needed
-                '
-                If FormCount = 0 And FormInputCount > 0 Then
-                End If
-                workingContent = ReplaceInstructions & workingContent
-                If CSPeopleSet Then
-                    Call db.cs_Close(CSPeople)
-                End If
-                If CSOrganizationSet Then
-                    Call db.cs_Close(CSOrganization)
-                End If
-                If CSVisitorSet Then
-                    Call db.cs_Close(CSVisitor)
-                End If
-                If CSVisitSet Then
-                    Call db.cs_Close(CSVisit)
-                End If
-                KmaHTML = Nothing
-            End If
-            html_EncodeActiveContent_Internal = workingContent
-            '
-            ' ----- Done
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            KmaHTML = Nothing
-            Call handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_EncodeActiveContent_Internal", True)
+                result = workingContent
+            Catch ex As Exception
+                handleExceptionAndRethrow(ex)
+            End Try
+            Return result
         End Function
         '
         '
@@ -3605,7 +3491,7 @@ ErrorTrap:
             Dim recordUpdateSql As String
             Dim libraryFilePtr As Integer
             Dim imageNewLink As String
-            Dim ACQueryString As String
+            Dim ACQueryString As String = ""
             Dim ACGuid As String
             Dim ACIdentifier As String
             Dim RecordFilename As String
@@ -3689,7 +3575,7 @@ ErrorTrap:
             Dim ImageStylePairName As String
             Dim ImageStylePairValue As String
             Dim Stream As coreFastStringClass
-            Dim ImageIDArray As String()
+            Dim ImageIDArray As String() = {}
             Dim ImageIDArrayCount As Integer
             Dim ImageIDArrayPointer As Integer
             Dim QueryString As String
@@ -7725,7 +7611,7 @@ ErrorTrap:
                 Else
                     ShortLink = NonEncodedLink
                     ShortLink = ConvertLinkToShortLink(ShortLink, webServerIO.requestDomain, webServerIO_requestVirtualFilePath)
-                    ShortLink = coreCommonModule.EncodeAppRootPath(ShortLink, webServerIO_requestVirtualFilePath, webServerIO_requestRootPath, webServerIO.requestDomain)
+                    ShortLink = coreCommonModule.EncodeAppRootPath(ShortLink, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
                     FullLink = webServerIO_requestProtocol & webServerIO.requestDomain & ShortLink
                 End If
                 If (NonEncodedLink = "") Then
@@ -13724,7 +13610,7 @@ ErrorTrap:
                         '
                         'hint = "600"
                         If visitInit_allowVisitTracking Then
-                            Call webServerIO.addResponseCookie(main_appNameCookiePrefix & main_cookieNameVisitor, security.encodeToken(visitor_id, visit_startTime), visit_startTime.AddYears(1), , webServerIO_requestRootPath, False)
+                            Call webServerIO.addResponseCookie(main_appNameCookiePrefix & main_cookieNameVisitor, security.encodeToken(visitor_id, visit_startTime), visit_startTime.AddYears(1), , requestAppRootPath, False)
                         End If
                         '
                         '--------------------------------------------------------------------------
@@ -13957,7 +13843,7 @@ ErrorTrap:
                 '---------------------------------------------------------------------------------
                 '
                 CookieVisit = security.encodeToken(visit_Id, app_startTime)
-                Call webServerIO.addResponseCookie(main_appNameCookiePrefix & main_cookieNameVisit, CookieVisit, , , webServerIO_requestRootPath, False)
+                Call webServerIO.addResponseCookie(main_appNameCookiePrefix & main_cookieNameVisit, CookieVisit, , , requestAppRootPath, False)
             Catch ex As Exception
                 handleExceptionAndRethrow(ex)
             End Try
@@ -18137,7 +18023,7 @@ ErrorTrap:
             End If
             MenuID = csv_VerifyDynamicMenu(MenuNameLocal)
             '
-            DefaultTemplateLink = siteProperties.getText("SectionLandingLink", webServerIO_requestRootPath & siteProperties.serverPageDefault)
+            DefaultTemplateLink = siteProperties.getText("SectionLandingLink", requestAppRootPath & siteProperties.serverPageDefault)
             pageManager_GetSectionMenuNamed = pageManager_GetSectionMenu(DepthLimit, MenuStyle, StyleSheetPrefixLocal, DefaultTemplateLink, MenuID, MenuNameLocal, siteProperties.useContentWatchLink)
             pageManager_GetSectionMenuNamed = main_GetEditWrapper("Section Menu", pageManager_GetSectionMenuNamed)
             '
@@ -18184,7 +18070,7 @@ ErrorTrap:
             End If
             Call db.cs_Close(CSPointer)
             '
-            main_GetContentWatchLinkByKey = coreCommonModule.EncodeAppRootPath(main_GetContentWatchLinkByKey, webServerIO_requestVirtualFilePath, webServerIO_requestRootPath, webServerIO.requestDomain)
+            main_GetContentWatchLinkByKey = coreCommonModule.EncodeAppRootPath(main_GetContentWatchLinkByKey, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
             '
             Exit Function
             '
@@ -18640,7 +18526,7 @@ ErrorTrap:
                         '
                         AllowInMenus = True
                         LinkWorking = DefaultLink
-                        LinkWorking = coreCommonModule.EncodeAppRootPath(LinkWorking, webServerIO_requestVirtualFilePath, webServerIO_requestRootPath, webServerIO.requestDomain)
+                        LinkWorking = coreCommonModule.EncodeAppRootPath(LinkWorking, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
                         LinkWorking = modifyLinkQuery(LinkWorking, "bid", "", False)
                         MenuNamePrefix = EncodeText(GetRandomInteger) & "_"
                         MenuID = 0
@@ -18850,7 +18736,7 @@ ErrorTrap:
                         AllowInMenus = True
                         LinkWorking = DefaultLink
                         LinkWorkingNoRedirect = LinkWorking
-                        LinkWorking = coreCommonModule.EncodeAppRootPath(LinkWorking, webServerIO_requestVirtualFilePath, webServerIO_requestRootPath, webServerIO.requestDomain)
+                        LinkWorking = coreCommonModule.EncodeAppRootPath(LinkWorking, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
                         LinkWorking = modifyLinkQuery(LinkWorking, "bid", "", False)
                         MenuNamePrefix = EncodeText(GetRandomInteger) & "_"
                         ' ***** just want to know what would happen here
@@ -19340,7 +19226,7 @@ ErrorTrap:
             '
             archiveLink = webServerIO.requestPathPage
             archiveLink = ConvertLinkToShortLink(archiveLink, webServerIO.requestDomain, webServerIO_requestVirtualFilePath)
-            archiveLink = coreCommonModule.EncodeAppRootPath(archiveLink, webServerIO_requestVirtualFilePath, webServerIO_requestRootPath, webServerIO.requestDomain)
+            archiveLink = coreCommonModule.EncodeAppRootPath(archiveLink, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
             '
             For childBranchPtr = 0 To main_RenderCache_ChildBranch_PCCPtrCnt - 1
                 PCCPtr = EncodeInteger(main_RenderCache_ChildBranch_PCCPtrs(childBranchPtr))
@@ -19839,7 +19725,7 @@ ErrorTrap:
         '
         '
         Public Function encodeAppRootPath(ByVal Link As String) As String
-            encodeAppRootPath = coreCommonModule.EncodeAppRootPath(EncodeText(Link), webServerIO_requestVirtualFilePath, webServerIO_requestRootPath, webServerIO.requestDomain)
+            encodeAppRootPath = coreCommonModule.EncodeAppRootPath(EncodeText(Link), webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
         End Function
         '
         '
@@ -20450,7 +20336,7 @@ ErrorTrap:
             End If
             ' ##### if the default is long, leave it long -- move this to just the content watch tree
             'main_GetPageDynamicLinkWithArgs = ConvertLinkToShortLink(main_GetPageDynamicLinkWithArgs, main_ServerHost, main_ServerVirtualPath)
-            main_GetPageDynamicLinkWithArgs = coreCommonModule.EncodeAppRootPath(main_GetPageDynamicLinkWithArgs, webServerIO_requestVirtualFilePath, webServerIO_requestRootPath, webServerIO.requestDomain)
+            main_GetPageDynamicLinkWithArgs = coreCommonModule.EncodeAppRootPath(main_GetPageDynamicLinkWithArgs, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
             '
             Exit Function
             '
@@ -21674,7 +21560,7 @@ ErrorTrap:
                     '
                     '--------------------------------------------------------------------------
                     '
-                    If vbLCase(webServerIO.requestPathPage) = vbLCase(webServerIO_requestRootPath & siteProperties.serverPageDefault) Then
+                    If vbLCase(webServerIO.requestPathPage) = vbLCase(requestAppRootPath & siteProperties.serverPageDefault) Then
                         '
                         ' This is a 404 caused by Contensive returning a 404
                         '   possibly because the pageid was not found or was inactive.
@@ -22379,7 +22265,7 @@ ErrorTrap:
                                             End If
                                         End If
                                         If main_GetLinkByContentRecordKey = "" Then
-                                            DefaultTemplateLink = siteProperties.getText("SectionLandingLink", webServerIO_requestRootPath & siteProperties.serverPageDefault)
+                                            DefaultTemplateLink = siteProperties.getText("SectionLandingLink", requestAppRootPath & siteProperties.serverPageDefault)
                                         End If
                                     End If
                                 End If
@@ -22396,7 +22282,7 @@ ErrorTrap:
                 main_GetLinkByContentRecordKey = DefaultLink
             End If
             '
-            main_GetLinkByContentRecordKey = coreCommonModule.EncodeAppRootPath(main_GetLinkByContentRecordKey, webServerIO_requestVirtualFilePath, webServerIO_requestRootPath, webServerIO.requestDomain)
+            main_GetLinkByContentRecordKey = coreCommonModule.EncodeAppRootPath(main_GetLinkByContentRecordKey, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
             '
             Exit Function
             '
@@ -22432,7 +22318,7 @@ ErrorTrap:
                     If (LinkLabel <> "") Then
                         main_GetWatchList = main_GetWatchList & cr & "<li id=""main_ContentWatch" & RecordID & """ class=""ccListItem"">"
                         If (Link <> "") Then
-                            main_GetWatchList = main_GetWatchList & "<a href=""http://" & webServerIO_requestDomain & webServerIO_requestRootPath & webServerIO_requestPage & "?rc=" & ContentID & "&ri=" & RecordID & """>" & LinkLabel & "</a>"
+                            main_GetWatchList = main_GetWatchList & "<a href=""http://" & webServerIO_requestDomain & requestAppRootPath & webServerIO_requestPage & "?rc=" & ContentID & "&ri=" & RecordID & """>" & LinkLabel & "</a>"
                         Else
                             main_GetWatchList = main_GetWatchList & LinkLabel
                         End If
@@ -23228,7 +23114,7 @@ ErrorTrap:
             Dim CompatibilitySpanAroundButton As Boolean
             '
             IsAuthoring = user.isEditing("Dynamic Menus")
-            DefaultTemplateLink = webServerIO_requestRootPath & webServerIO_requestPage
+            DefaultTemplateLink = requestAppRootPath & webServerIO_requestPage
             If False Then '.292" Then
                 CompatibilitySpanAroundButton = True
             Else
@@ -23601,9 +23487,9 @@ ErrorTrap:
         '
         Private Function pageManager_GetLandingLink() As String
             If pageManager_LandingLink = "" Then
-                pageManager_LandingLink = siteProperties.getText("SectionLandingLink", webServerIO_requestRootPath & siteProperties.serverPageDefault)
+                pageManager_LandingLink = siteProperties.getText("SectionLandingLink", requestAppRootPath & siteProperties.serverPageDefault)
                 pageManager_LandingLink = ConvertLinkToShortLink(pageManager_LandingLink, webServerIO.requestDomain, webServerIO_requestVirtualFilePath)
-                pageManager_LandingLink = coreCommonModule.EncodeAppRootPath(pageManager_LandingLink, webServerIO_requestVirtualFilePath, webServerIO_requestRootPath, webServerIO.requestDomain)
+                pageManager_LandingLink = coreCommonModule.EncodeAppRootPath(pageManager_LandingLink, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
             End If
             pageManager_GetLandingLink = pageManager_LandingLink
         End Function
@@ -26468,7 +26354,7 @@ ErrorTrap:
                             Link = "/" & Link
                         End If
                         Link = ConvertLinkToShortLink(Link, webServerIO.requestDomain, webServerIO_requestVirtualFilePath)
-                        Link = coreCommonModule.EncodeAppRootPath(Link, webServerIO_requestVirtualFilePath, webServerIO_requestRootPath, webServerIO.requestDomain)
+                        Link = coreCommonModule.EncodeAppRootPath(Link, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
                         If templateSecure And (Not webServerIO.requestSecure) Then
                             '
                             ' Short Link, and IsSecure checked but current page is not secure
@@ -26490,7 +26376,7 @@ ErrorTrap:
                         '
                         ' Secure template but current page is not secure - return default link with ssl
                         '
-                        Link = "https://" & webServerIO.requestDomain & webServerIO_requestRootPath & siteProperties.serverPageDefault
+                        Link = "https://" & webServerIO.requestDomain & requestAppRootPath & siteProperties.serverPageDefault
                     ElseIf webServerIO.requestSecure And (Not templateSecure) Then
                         ' (*E) comment out this
                         '
@@ -26502,7 +26388,7 @@ ErrorTrap:
                         ' what is happening here is a page is set secure, it redirects to the secure link then this
                         ' happens during the secure page draw.
                         '
-                        Link = "http://" & webServerIO.requestDomain & webServerIO_requestRootPath & siteProperties.serverPageDefault
+                        Link = "http://" & webServerIO.requestDomain & requestAppRootPath & siteProperties.serverPageDefault
                     End If
                 End If
                 main_GetTCLink = Link
@@ -29759,7 +29645,7 @@ ErrorTrap:
                     '
                     ' protocol provided, do not fixup
                     '
-                    main_verifyTemplateLink = coreCommonModule.EncodeAppRootPath(main_verifyTemplateLink, webServerIO_requestVirtualFilePath, webServerIO_requestRootPath, webServerIO.requestDomain)
+                    main_verifyTemplateLink = coreCommonModule.EncodeAppRootPath(main_verifyTemplateLink, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
                 Else
                     '
                     ' no protocol, convert to short link
@@ -29771,7 +29657,7 @@ ErrorTrap:
                         main_verifyTemplateLink = "/" & main_verifyTemplateLink
                     End If
                     main_verifyTemplateLink = ConvertLinkToShortLink(main_verifyTemplateLink, webServerIO.requestDomain, webServerIO_requestVirtualFilePath)
-                    main_verifyTemplateLink = coreCommonModule.EncodeAppRootPath(main_verifyTemplateLink, webServerIO_requestVirtualFilePath, webServerIO_requestRootPath, webServerIO.requestDomain)
+                    main_verifyTemplateLink = coreCommonModule.EncodeAppRootPath(main_verifyTemplateLink, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
                 End If
             End If
             '
@@ -30076,7 +29962,7 @@ ErrorTrap:
                         ' This field is default true, and non-authorable
                         ' It will be true in all cases, except a possible unforseen exception
                         '
-                        EmailBody = EmailBody & "<div style=""clear:both;padding:10px;"">" & main_GetLinkedText("<a href=""" & html.html_EncodeHTML(webServerIO_requestProtocol & webServerIO.requestDomain & webServerIO_requestRootPath & siteProperties.serverPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
+                        EmailBody = EmailBody & "<div style=""clear:both;padding:10px;"">" & main_GetLinkedText("<a href=""" & html.html_EncodeHTML(webServerIO_requestProtocol & webServerIO.requestDomain & requestAppRootPath & siteProperties.serverPageDefault & "?" & RequestNameEmailSpamFlag & "=#member_email#") & """>", siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) & "</div>"
                         EmailBody = vbReplace(EmailBody, "#member_email#", "UserEmailAddress")
                     End If
                     '
@@ -30277,7 +30163,7 @@ ErrorTrap:
             '
             ' Fix links for HTML send - must do it now before encodehtml so eid links will attach
             '
-            rootUrl = "http://" & webServerIO_requestDomain & webServerIO_requestRootPath
+            rootUrl = "http://" & webServerIO_requestDomain & requestAppRootPath
             iBodySource = ConvertLinksToAbsolute(iBodySource, rootUrl)
             '
             ' Build the list of groups
@@ -32296,7 +32182,7 @@ ErrorTrap:
                                         '
                                         CurrentLink = vbReplace(CurrentLink, "https://", "http://", 1, 99, vbTextCompare)
                                         CurrentLink = ConvertLinkToShortLink(CurrentLink, webServerIO.requestDomain, webServerIO_requestVirtualFilePath)
-                                        CurrentLink = coreCommonModule.EncodeAppRootPath(CurrentLink, webServerIO_requestVirtualFilePath, webServerIO_requestRootPath, webServerIO.requestDomain)
+                                        CurrentLink = coreCommonModule.EncodeAppRootPath(CurrentLink, webServerIO_requestVirtualFilePath, requestAppRootPath, webServerIO.requestDomain)
                                         LinkSplit = Split(CurrentLink, "?")
                                         CurrentLinkNoQuery = LinkSplit(0)
                                         If (SecureLink_CurrentURL <> SecureLink_Required) Or (UCase(templateLink) <> vbUCase(CurrentLinkNoQuery)) Then

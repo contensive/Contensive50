@@ -1646,6 +1646,7 @@
     <Content Include="ccLib\Templates\sample.htm" />
     <Content Include="ccLib\Templates\sample2.htm" />
     <Content Include="default.aspx" />
+    <Content Include="Global.asax" />
     <Content Include="helloworld.aspx" />
     <Content Include="helloworld.html" />
     <Content Include="Web.config">
@@ -1659,6 +1660,9 @@
     <Compile Include="default.aspx.vb">
       <DependentUpon>default.aspx</DependentUpon>
       <SubType>ASPXCodebehind</SubType>
+    </Compile>
+    <Compile Include="Global.asax.vb">
+      <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
