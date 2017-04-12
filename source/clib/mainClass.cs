@@ -13,7 +13,6 @@ namespace Contensive.Core
         {
             try
             { 
-                coreFileSystemClass installFiles;
                 string appName;
                 //
                 // create cp for cluster work, with no application
@@ -151,7 +150,7 @@ namespace Contensive.Core
                                     {
                                         using (CPClass cpApp = new CPClass(appName))
                                         {
-                                            Controllers.appBuilderClass.upgrade(cpApp.core, false);
+                                            Controllers.appBuilderController.upgrade(cpApp.core, false);
                                         }
                                         //installFiles = new coreFileSystemClass(cp.core, cp.core.serverConfig.isLocalFileSystem, coreFileSystemClass.fileSyncModeEnum.noSync, System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location));
                                         //installFiles.Dispose();
@@ -166,7 +165,7 @@ namespace Contensive.Core
                                         String upgradeAppName = kvp.Key;
                                         using (CPClass upgradeApp = new CPClass(upgradeAppName))
                                         {
-                                            Controllers.appBuilderClass.upgrade(cp.core,false);
+                                            Controllers.appBuilderController.upgrade(cp.core,false);
                                         }
                                     }
                                     exitArgumentProcessing = true;

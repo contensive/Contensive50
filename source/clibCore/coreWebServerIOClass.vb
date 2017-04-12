@@ -869,17 +869,19 @@ Namespace Contensive.Core
                         Return cpCore.docOpen
                     End If
                     '
-                    ' ----- Verify virtual path is not used on non-virtual sites
-                    '
-                    If (RedirectLink = "") And (requestAppRootPath = "/") And (InStr(1, cpCore.webServerIO_requestPath, cpCore.webServerIO_requestVirtualFilePath & "/", vbTextCompare) = 1) Then
-                        Copy = "Redirecting because this site can not be run in the path [" & cpCore.webServerIO_requestVirtualFilePath & "]"
-                        cpCore.webServerIO_requestPath = vbReplace(cpCore.webServerIO_requestPath, cpCore.serverConfig.appConfig.name & "/", "", 1, 99, vbTextCompare)
-                        If requestQueryString <> "" Then
-                            Call cpCore.webServerIO_Redirect2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO_requestDomain & requestAppRootPath & cpCore.webServerIO_requestPath & cpCore.webServerIO_requestPage & "?" & requestQueryString, Copy, False)
-                        Else
-                            Call cpCore.webServerIO_Redirect2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO_requestDomain & requestAppRootPath & cpCore.webServerIO_requestPath & cpCore.webServerIO_requestPage, Copy, False)
-                        End If
-                    End If
+                    ' -- this is to prevent an html page from coming out of the virtual path. (there should not be a link to it.)
+                    ''
+                    '' ----- Verify virtual path is not used on non-virtual sites
+                    ''
+                    'If (RedirectLink = "") And (requestAppRootPath = "/") And (InStr(1, cpCore.webServerIO_requestPath, cpCore.webServerIO_requestVirtualFilePath & "/", vbTextCompare) = 1) Then
+                    '    Copy = "Redirecting because this site can not be run in the path [" & cpCore.webServerIO_requestVirtualFilePath & "]"
+                    '    cpCore.webServerIO_requestPath = vbReplace(cpCore.webServerIO_requestPath, cpCore.serverConfig.appConfig.name & "/", "", 1, 99, vbTextCompare)
+                    '    Dim dstUrl As String = cpCore.webServerIO_requestProtocol & cpCore.webServerIO_requestDomain & cpCore.webServerIO_requestPath & cpCore.webServerIO_requestPage
+                    '    If requestQueryString <> "" Then
+                    '        dstUrl &= "?" & requestQueryString
+                    '    End If
+                    '    Call cpCore.webServerIO_Redirect2(dstUrl, Copy, False)
+                    'End If
                     '
                     ' ----- Create cpcore.main_ServerFormActionURL if it has not been overridden manually
                     '

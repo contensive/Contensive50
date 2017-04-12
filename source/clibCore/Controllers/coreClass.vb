@@ -2311,7 +2311,7 @@ ErrorTrap:
         '=============================================================================
         '
         Public Sub admin_VerifyAdminMenu(ByVal ParentName As String, ByVal EntryName As String, ByVal ContentName As String, ByVal LinkPage As String, ByVal SortOrder As String, Optional ByVal AdminOnly As Boolean = False, Optional ByVal DeveloperOnly As Boolean = False, Optional ByVal NewWindow As Boolean = False, Optional ByVal Active As Boolean = True)
-            Call Controllers.appBuilderClass.admin_VerifyMenuEntry(cp.core, ParentName, EntryName, ContentName, LinkPage, SortOrder, AdminOnly, DeveloperOnly, NewWindow, Active, "Menu Entries", "")
+            Call Controllers.appBuilderController.admin_VerifyMenuEntry(cp.core, ParentName, EntryName, ContentName, LinkPage, SortOrder, AdminOnly, DeveloperOnly, NewWindow, Active, "Menu Entries", "")
         End Sub
         '
         '========================================================================
@@ -2827,7 +2827,7 @@ ErrorTrap:
                                                     'Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as a line of text with contact information for this record's primary contact"" id=""AC," & ACType & """ src=""/ccLib/images/ACContact.GIF"">"
                                                 ElseIf EncodeCachableTags Then
                                                     If moreInfoPeopleId <> 0 Then
-                                                        Copy = pageManager_getMoreInfoHtml(moreInfoPeopleId)
+                                                        Copy = Controllers.pageManagerController.pageManager_getMoreInfoHtml(Me, moreInfoPeopleId)
                                                     End If
                                                 End If
                                             Case ACTypeFeedback
@@ -3417,63 +3417,6 @@ ErrorTrap:
                 handleExceptionAndRethrow(ex)
             End Try
             Return result
-        End Function
-        '
-        '
-        '
-        Public Function pageManager_getMoreInfoHtml(ByVal PeopleID As Integer) As String
-            On Error GoTo ErrorTrap 'Const Tn = "MethodName-183" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
-            '
-            Dim CS As Integer
-            Dim ContactName As String
-            Dim ContactPhone As String
-            Dim ContactEmail As String
-            Dim MethodName As String
-            Dim Copy As String
-            '
-            Copy = ""
-            CS = db.cs_openContentRecord("People", PeopleID, , , , "Name,Phone,Email")
-            If db.cs_ok(CS) Then
-                ContactName = (db.cs_getText(CS, "Name"))
-                ContactPhone = (db.cs_getText(CS, "Phone"))
-                ContactEmail = (db.cs_getText(CS, "Email"))
-                If ContactName <> "" Then
-                    Copy = Copy & "For more information, please contact " & ContactName
-                    If ContactEmail = "" Then
-                        If ContactPhone <> "" Then
-                            Copy = Copy & " by phone at " & ContactPhone
-                        End If
-                    Else
-                        Copy = Copy & " by <A href=""mailto:" & ContactEmail & """>email</A>"
-                        If ContactPhone <> "" Then
-                            Copy = Copy & " or by phone at " & ContactPhone
-                        End If
-                    End If
-                    Copy = Copy
-                Else
-                    If ContactEmail = "" Then
-                        If ContactPhone <> "" Then
-                            Copy = Copy & "For more information, please call " & ContactPhone
-                        End If
-                    Else
-                        Copy = Copy & "For more information, please <A href=""mailto:" & ContactEmail & """>email</A>"
-                        If ContactPhone <> "" Then
-                            Copy = Copy & ", or call " & ContactPhone
-                        End If
-                        Copy = Copy
-                    End If
-                End If
-            End If
-            Call db.cs_Close(CS)
-            '
-            pageManager_getMoreInfoHtml = Copy
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError4(Err.Number, Err.Source, Err.Description, "csv_getMoreInfoHtml", True)
         End Function
         '
         '========================================================================
@@ -6350,7 +6293,7 @@ ErrorTrap:
                                     & "The Link Alias being created (" & WorkingLinkAlias & ") can not be used because there is a virtual directory in your website directory that already uses this name." _
                                     & " Please change it to ensure the Link Alias is unique. To set or change the Link Alias, use the Link Alias tab and select a name not used by another page."
                             End If
-                        ElseIf appRootFiles.pathExists(serverconfig.appConfig.appRootFilesPath & "\" & Mid(WorkingLinkAlias, 2)) Then
+                        ElseIf appRootFiles.pathExists(serverConfig.appConfig.appRootFilesPath & "\" & Mid(WorkingLinkAlias, 2)) Then
                             'ElseIf appRootFiles.pathExists(serverConfig.clusterPath & serverconfig.appConfig.appRootFilesPath & "\" & Mid(WorkingLinkAlias, 2)) Then
                             '
                             ' This alias points to a different link, call it an error
@@ -6662,7 +6605,7 @@ ErrorTrap:
                                             ListName = csv_GetAddonOption("LISTNAME", addonOptionString)
                                             SortField = csv_GetAddonOption("SORTFIELD", addonOptionString)
                                             SortReverse = EncodeBoolean(csv_GetAddonOption("SORTDIRECTION", addonOptionString))
-                                            returnValue = returnValue & main_GetWatchList(ListName, SortField, SortReverse)
+                                            returnValue = returnValue & Controllers.pageManagerController.main_GetWatchList(Me, ListName, SortField, SortReverse)
                                         Case Else
                                             '
                                             ' Unrecognized command - put all the syntax back in
@@ -6801,7 +6744,7 @@ ErrorTrap:
                     '
                     'hint = hint & ",600, Handle webclient features"
                     If vbInstr(1, returnValue, FeedbackFormNotSupportedComment, vbTextCompare) <> 0 Then
-                        returnValue = vbReplace(returnValue, FeedbackFormNotSupportedComment, main_GetFeedbackForm(ContextContentName, ContextRecordID, ContextContactPeopleID), 1, 99, vbTextCompare)
+                        returnValue = vbReplace(returnValue, FeedbackFormNotSupportedComment, Controllers.pageManagerController.main_GetFeedbackForm(Me, ContextContentName, ContextRecordID, ContextContactPeopleID), 1, 99, vbTextCompare)
                     End If
                     '
                     ' if call from webpage, push addon js and css out to cpCoreClass
@@ -10152,433 +10095,28 @@ ErrorTrap:
         '            Call handleLegacyError18(MethodName)
         '            '
         '        End Sub
-        '
-        '========================================================================
-        ' Print a content blocks headline
-        '   note - this call includes encoding
-        '========================================================================
-        '
-        Public Function main_GetTitle(ByVal Title As String) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetTitle")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim iTitle As String
-            '
-            iTitle = EncodeText(Title)
-            If iTitle <> "" Then
-                main_GetTitle = "<p>" & AddSpan(iTitle, "ccHeadline") & "</p>"
-            End If
-            Exit Function
-            '
-ErrorTrap:
-            Call handleLegacyError18("main_GetTitle")
-        End Function
-        '
-        '=============================================================================
-        ' Print the See Also listing
-        '   ContentName is the name of the parent table
-        '   RecordID is the parent RecordID
-        '=============================================================================
-        '
-        Public Function main_GetSeeAlso(ByVal ContentName As String, ByVal RecordID As Integer) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetSeeAlso")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim SQL As String
-            Dim CS As Integer
-            Dim SeeAlsoLink As String
-            Dim ContentID As Integer
-            Dim SeeAlsoCount As Integer
-            Dim Copy As String
-            Dim MethodName As String
-            Dim iContentName As String
-            Dim iRecordID As Integer
-            Dim IsEditingLocal As Boolean
-            '
-            iContentName = EncodeText(ContentName)
-            iRecordID = EncodeInteger(RecordID)
-            '
-            MethodName = "main_GetSeeAlso"
-            '
-            SeeAlsoCount = 0
-            If iRecordID > 0 Then
-                ContentID = main_GetContentID(iContentName)
-                If (ContentID > 0) Then
-                    '
-                    ' ----- Set authoring only for valid ContentName
-                    '
-                    IsEditingLocal = user.isEditing(iContentName)
-                Else
-                    '
-                    ' ----- if iContentName was bad, maybe they put table in, no authoring
-                    '
-                    ContentID = GetContentIDByTablename(iContentName)
-                End If
-                If (ContentID > 0) Then
-                    '
-                    CS = db.cs_open("See Also", "((active<>0)AND(ContentID=" & ContentID & ")AND(RecordID=" & iRecordID & "))")
-                    Do While (db.cs_ok(CS))
-                        SeeAlsoLink = (db.cs_getText(CS, "Link"))
-                        If SeeAlsoLink <> "" Then
-                            main_GetSeeAlso = main_GetSeeAlso & cr & "<li class=""ccListItem"">"
-                            If vbInstr(1, SeeAlsoLink, "://") = 0 Then
-                                SeeAlsoLink = webServerIO_requestProtocol & SeeAlsoLink
-                            End If
-                            If IsEditingLocal Then
-                                main_GetSeeAlso = main_GetSeeAlso & main_GetRecordEditLink2("See Also", (db.cs_getInteger(CS, "ID")), False, "", user.isEditing("See Also"))
-                            End If
-                            main_GetSeeAlso = main_GetSeeAlso & "<a href=""" & html.html_EncodeHTML(SeeAlsoLink) & """ target=""_blank"">" & (db.cs_getText(CS, "Name")) & "</A>"
-                            Copy = (db.cs_getText(CS, "Brief"))
-                            If Copy <> "" Then
-                                main_GetSeeAlso = main_GetSeeAlso & "<br >" & AddSpan(Copy, "ccListCopy")
-                            End If
-                            SeeAlsoCount = SeeAlsoCount + 1
-                            main_GetSeeAlso = main_GetSeeAlso & "</li>"
-                        End If
-                        db.cs_goNext(CS)
-                    Loop
-                    db.cs_Close(CS)
-                    '
-                    If IsEditingLocal Then
-                        SeeAlsoCount = SeeAlsoCount + 1
-                        main_GetSeeAlso = main_GetSeeAlso & cr & "<li class=""ccListItem"">" & main_GetRecordAddLink("See Also", "RecordID=" & iRecordID & ",ContentID=" & ContentID) & "</LI>"
-                    End If
-                End If
-                '
-                If SeeAlsoCount = 0 Then
-                    main_GetSeeAlso = ""
-                Else
-                    main_GetSeeAlso = "<p>See Also" & cr & "<ul class=""ccList"">" & kmaIndent(main_GetSeeAlso) & cr & "</ul></p>"
-                End If
-            End If
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18(MethodName)
-            '
-        End Function
-        '
-        '========================================================================
-        ' Print the "for more information, please contact" line
-        '
-        '========================================================================
-        '
-        Public Function main_GetMoreInfo(ByVal contactMemberID As Integer) As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetMoreInfo")
-            '
-            'If Not (true) Then Exit Function
-            '
-            main_GetMoreInfo = pageManager_getMoreInfoHtml(EncodeInteger(contactMemberID))
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18("main_GetMoreInfo")
-            '
-        End Function
-        '
-        '========================================================================
-        ' ----- prints a link to the feedback popup form
-        '
-        '   Creates a sub-form that when submitted, is logged by the notes
-        '   system (in MembersLib right now). When submitted, it prints a thank you
-        '   message.
-        '
-        '========================================================================
-        '
-        Public Function main_GetFeedbackForm(ByVal ContentName As String, ByVal RecordID As Integer, ByVal ToMemberID As Integer, Optional ByVal headline As String = "") As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetFeedbackForm")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim NoteButton As String
-            'Dim NotesfromEmail As String
-            Dim Panel As String
-            Dim Copy As String
-            Dim Filename As String
-            'dim dt as datatable
-            Dim FeedbackButton As String
-            Dim NotesCID As Integer
-            Dim NoteID As Integer
-            Dim NoteiToMemberID As Integer
-            Dim NoteCopy As String
-            Dim NoteFromEmail As String
-            Dim NoteFromName As String
-            Dim NoteContentID As Integer
-            Dim NoteiRecordID As Integer
-            Dim WhereClause As String
-            Dim MethodName As String
-            Dim CS As Integer
-            Dim iContentName As String
-            Dim iRecordID As Integer
-            Dim iToMemberID As Integer
-            Dim iHeadline As String
-            '
-            iContentName = EncodeText(ContentName)
-            iRecordID = EncodeInteger(RecordID)
-            iToMemberID = EncodeInteger(ToMemberID)
-            iHeadline = encodeEmptyText(headline, "")
-            '
-            MethodName = "main_GetFeedbackForm"
-            '
-            Const FeedbackButtonSubmit = "Submit"
-            '
-            FeedbackButton = docProperties.getText("fbb")
-            Select Case FeedbackButton
-                Case FeedbackButtonSubmit
-                    '
-                    ' ----- form was submitted, save the note, send it and say thanks
-                    '
-                    NoteFromName = docProperties.getText("NoteFromName")
-                    NoteFromEmail = docProperties.getText("NoteFromEmail")
-                    '
-                    NoteCopy = NoteCopy & "Feedback Submitted" & BR
-                    NoteCopy = NoteCopy & "From " & NoteFromName & " at " & NoteFromEmail & BR
-                    NoteCopy = NoteCopy & "Replying to:" & BR
-                    If iHeadline <> "" Then
-                        NoteCopy = NoteCopy & "    Article titled [" & iHeadline & "]" & BR
-                    End If
-                    NoteCopy = NoteCopy & "    Record [" & iRecordID & "] in Content Definition [" & iContentName & "]" & BR
-                    NoteCopy = NoteCopy & BR
-                    NoteCopy = NoteCopy & "<b>Comments</b>" & BR
-                    '
-                    Copy = docProperties.getText("NoteCopy")
-                    If (Copy = "") Then
-                        NoteCopy = NoteCopy & "[no comments entered]" & BR
-                    Else
-                        NoteCopy = NoteCopy & main_EncodeCRLF(Copy) & BR
-                    End If
-                    '
-                    NoteCopy = NoteCopy & BR
-                    NoteCopy = NoteCopy & "<b>Content on which the comments are based</b>" & BR
-                    '
-                    CS = db.cs_open(iContentName, "ID=" & iRecordID)
-                    Copy = "[the content of this page is not available]" & BR
-                    If db.cs_ok(CS) Then
-                        Copy = (db.cs_get(CS, "copyFilename"))
-                        'Copy = main_EncodeContent5(Copy, user.userid, iContentName, iRecordID, 0, False, False, True, True, False, True, "", "", False, 0)
-                    End If
-                    NoteCopy = NoteCopy & Copy & BR
-                    Call db.cs_Close(CS)
-                    '
-                    Call email_sendMemberEmail3(iToMemberID, NoteFromEmail, "Feedback Form Submitted", NoteCopy, False, True, 0, "", False)
-                    '
-                    ' ----- Note sent, say thanks
-                    '
-                    main_GetFeedbackForm = main_GetFeedbackForm & "<p>Thank you. Your feedback was received.</p>"
-                Case Else
-                    '
-                    ' ----- print the feedback submit form
-                    '
-                    Panel = "<form Action=""" & webServerIO_ServerFormActionURL & "?" & web_RefreshQueryString & """ Method=""post"">"
-                    Panel = Panel & "<table border=""0"" cellpadding=""4"" cellspacing=""0"" width=""100%"">"
-                    Panel = Panel & "<tr>"
-                    Panel = Panel & "<td colspan=""2""><p>Your feedback is welcome</p></td>"
-                    Panel = Panel & "</tr><tr>"
-                    '
-                    ' ----- From Name
-                    '
-                    Copy = user.name
-                    Panel = Panel & "<td align=""right"" width=""100""><p>Your Name</p></td>"
-                    Panel = Panel & "<td align=""left""><input type=""text"" name=""NoteFromName"" value=""" & html.html_EncodeHTML(Copy) & """></span></td>"
-                    Panel = Panel & "</tr><tr>"
-                    '
-                    ' ----- From Email address
-                    '
-                    Copy = user.email
-                    Panel = Panel & "<td align=""right"" width=""100""><p>Your Email</p></td>"
-                    Panel = Panel & "<td align=""left""><input type=""text"" name=""NoteFromEmail"" value=""" & html.html_EncodeHTML(Copy) & """></span></td>"
-                    Panel = Panel & "</tr><tr>"
-                    '
-                    ' ----- Message
-                    '
-                    Copy = ""
-                    Panel = Panel & "<td align=""right"" width=""100"" valign=""top""><p>Feedback</p></td>"
-                    Panel = Panel & "<td>" & html_GetFormInputText2("NoteCopy", Copy, 4, 40, "TextArea", False) & "</td>"
-                    'Panel = Panel & "<td><textarea ID=""TextArea"" rows=""4"" cols=""40"" name=""NoteCopy"">" & Copy & "</textarea></td>"
-                    Panel = Panel & "</tr><tr>"
-                    '
-                    ' ----- submit button
-                    '
-                    Panel = Panel & "<td>&nbsp;</td>"
-                    Panel = Panel & "<td><input type=""submit"" name=""fbb"" value=""" & FeedbackButtonSubmit & """></td>"
-                    Panel = Panel & "</tr></table>"
-                    Panel = Panel & "</form>"
-                    '
-                    main_GetFeedbackForm = Panel
-            End Select
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18(MethodName)
-            '
-        End Function
-        '
-        '========================================================================
-        '
-        '========================================================================
-        '
-        Public Function main_OpenCSWhatsNew(Optional ByVal SortFieldList As String = "", Optional ByVal ActiveOnly As Boolean = True, Optional ByVal PageSize As Integer = 1000, Optional ByVal PageNumber As Integer = 1) As Integer
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("OpenCSWhatsNew")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim MethodName As String
-            '
-            MethodName = "main_OpenCSWhatsNew"
-            '
-            main_OpenCSWhatsNew = main_OpenCSContentWatchList("What's New", SortFieldList, ActiveOnly, PageSize, PageNumber)
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18(MethodName)
-            '
-        End Function
-        '
-        '========================================================================
-        '   Open a content set with the current whats new list
-        '========================================================================
-        '
-        Public Function main_OpenCSContentWatchList(ByVal ListName As String, Optional ByVal SortFieldList As String = "", Optional ByVal ActiveOnly As Boolean = True, Optional ByVal PageSize As Integer = 1000, Optional ByVal PageNumber As Integer = 1) As Integer
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("OpenCsContentWatchList")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim SQL As String
-            Dim iSortFieldList As String
-            Dim MethodName As String
-            Dim CS As Integer
-            '
-            iSortFieldList = Trim(encodeEmptyText(SortFieldList, ""))
-            'iSortFieldList = encodeMissingText(SortFieldList, "DateAdded")
-            If iSortFieldList = "" Then
-                iSortFieldList = "DateAdded"
-            End If
-            '
-            MethodName = "main_OpenCSContentWatchList( " & ListName & ", " & iSortFieldList & ", " & ActiveOnly & " )"
-            '
-            ' ----- Add tablename to the front of SortFieldList fieldnames
-            '
-            iSortFieldList = " " & vbReplace(iSortFieldList, ",", " , ") & " "
-            iSortFieldList = vbReplace(iSortFieldList, " ID ", " ccContentWatch.ID ", 1, 99, vbTextCompare)
-            iSortFieldList = vbReplace(iSortFieldList, " Link ", " ccContentWatch.Link ", 1, 99, vbTextCompare)
-            iSortFieldList = vbReplace(iSortFieldList, " LinkLabel ", " ccContentWatch.LinkLabel ", 1, 99, vbTextCompare)
-            iSortFieldList = vbReplace(iSortFieldList, " SortOrder ", " ccContentWatch.SortOrder ", 1, 99, vbTextCompare)
-            iSortFieldList = vbReplace(iSortFieldList, " DateAdded ", " ccContentWatch.DateAdded ", 1, 99, vbTextCompare)
-            iSortFieldList = vbReplace(iSortFieldList, " ContentID ", " ccContentWatch.ContentID ", 1, 99, vbTextCompare)
-            iSortFieldList = vbReplace(iSortFieldList, " RecordID ", " ccContentWatch.RecordID ", 1, 99, vbTextCompare)
-            iSortFieldList = vbReplace(iSortFieldList, " ModifiedDate ", " ccContentWatch.ModifiedDate ", 1, 99, vbTextCompare)
-            '
-            ' ----- Special case
-            '
-            iSortFieldList = vbReplace(iSortFieldList, " name ", " ccContentWatch.LinkLabel ", 1, 99, vbTextCompare)
-            '
-            SQL = "SELECT" _
-                    & " ccContentWatch.ID AS ID" _
-                    & ",ccContentWatch.Link as Link" _
-                    & ",ccContentWatch.LinkLabel as LinkLabel" _
-                    & ",ccContentWatch.SortOrder as SortOrder" _
-                    & ",ccContentWatch.DateAdded as DateAdded" _
-                    & ",ccContentWatch.ContentID as ContentID" _
-                    & ",ccContentWatch.RecordID as RecordID" _
-                    & ",ccContentWatch.ModifiedDate as ModifiedDate" _
-                & " FROM (ccContentWatchLists" _
-                    & " LEFT JOIN ccContentWatchListRules ON ccContentWatchLists.ID = ccContentWatchListRules.ContentWatchListID)" _
-                    & " LEFT JOIN ccContentWatch ON ccContentWatchListRules.ContentWatchID = ccContentWatch.ID" _
-                & " WHERE (((ccContentWatchLists.Name)=" & db.encodeSQLText(ListName) & ")" _
-                    & "AND ((ccContentWatchLists.Active)<>0)" _
-                    & "AND ((ccContentWatchListRules.Active)<>0)" _
-                    & "AND ((ccContentWatch.Active)<>0)" _
-                    & "AND (ccContentWatch.Link is not null)" _
-                    & "AND (ccContentWatch.LinkLabel is not null)" _
-                    & "AND ((ccContentWatch.WhatsNewDateExpires is null)or(ccContentWatch.WhatsNewDateExpires>" & db.encodeSQLDate(app_startTime) & "))" _
-                    & ")" _
-                & " ORDER BY " & iSortFieldList & ";"
-            main_OpenCSContentWatchList = db.cs_openSql(SQL, , PageSize, PageNumber)
-            If Not db.cs_ok(main_OpenCSContentWatchList) Then
-                '
-                ' Check if listname exists
-                '
-                CS = db.cs_open("Content Watch Lists", "name=" & db.encodeSQLText(ListName), "ID", , , , , "ID")
-                If Not db.cs_ok(CS) Then
-                    Call db.cs_Close(CS)
-                    CS = db.cs_insertRecord("Content Watch Lists")
-                    If db.cs_ok(CS) Then
-                        Call db.cs_set(CS, "name", ListName)
-                    End If
-                End If
-                Call db.cs_Close(CS)
-            End If
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18(MethodName)
-            '
-        End Function
-        '
-        '========================================================================
-        ' Print Whats New
-        '   Prints a linked list of new content
-        '========================================================================
-        '
-        Public Function main_GetWhatsNew(Optional ByVal SortFieldList As String = "") As String
-            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetWhatsNew")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim CSPointer As Integer
-            Dim ContentID As Integer
-            Dim RecordID As Integer
-            Dim MethodName As String
-            Dim LinkLabel As String
-            Dim Link As String
-            '
-            MethodName = "main_GetWhatsNew"
-            '
-            CSPointer = main_OpenCSWhatsNew(SortFieldList)
-            '
-            If db.cs_ok(CSPointer) Then
-                ContentID = main_GetContentID("Content Watch")
-                Do While db.cs_ok(CSPointer)
-                    Link = db.cs_getText(CSPointer, "link")
-                    LinkLabel = db.cs_getText(CSPointer, "LinkLabel")
-                    RecordID = db.cs_getInteger(CSPointer, "ID")
-                    If (LinkLabel <> "") Then
-                        main_GetWhatsNew = main_GetWhatsNew & cr & "<li class=""ccListItem"">"
-                        If (Link <> "") Then
-                            main_GetWhatsNew = main_GetWhatsNew & main_GetLinkedText("<a href=""" & html.html_EncodeHTML(webServerIO_requestPage & "?rc=" & ContentID & "&ri=" & RecordID) & """>", LinkLabel)
-                        Else
-                            main_GetWhatsNew = main_GetWhatsNew & LinkLabel
-                        End If
-                        main_GetWhatsNew = main_GetWhatsNew & "</li>"
-                    End If
-                    Call db.cs_goNext(CSPointer)
-                Loop
-                main_GetWhatsNew = cr & "<ul class=""ccWatchList"">" & kmaIndent(main_GetWhatsNew) & cr & "</ul>"
-            End If
-            Call db.cs_Close(CSPointer)
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyError18(MethodName)
-        End Function
+        '        '
+        '        '========================================================================
+        '        ' Print a content blocks headline
+        '        '   note - this call includes encoding
+        '        '========================================================================
+        '        '
+        '        Public Function main_GetTitle(ByVal Title As String) As String
+        '            On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("GetTitle")
+        '            '
+        '            'If Not (true) Then Exit Function
+        '            '
+        '            Dim iTitle As String
+        '            '
+        '            iTitle = EncodeText(Title)
+        '            If iTitle <> "" Then
+        '                main_GetTitle = "<p>" & AddSpan(iTitle, "ccHeadline") & "</p>"
+        '            End If
+        '            Exit Function
+        '            '
+        'ErrorTrap:
+        '            Call handleLegacyError18("main_GetTitle")
+        '        End Function
         ''
         ''========================================================================
         ''   Print the login form in an intercept page
@@ -22292,57 +21830,6 @@ ErrorTrap:
         '
         '
         '
-        Public Function main_GetWatchList(ListName As String, SortField As String, SortReverse As Boolean) As String
-            On Error GoTo ErrorTrap 'Dim th as integer: th = profileLogMethodEnter("GetWatchList")
-            '
-            'If Not (true) Then Exit Function
-            '
-            Dim CS As Integer
-            Dim ContentID As Integer
-            Dim RecordID As Integer
-            Dim Link As String
-            Dim LinkLabel As String
-            '
-            If SortReverse And (SortField <> "") Then
-                CS = main_OpenCSContentWatchList(ListName, SortField & " Desc", True)
-            Else
-                CS = main_OpenCSContentWatchList(ListName, SortField, True)
-            End If
-            '
-            If db.cs_ok(CS) Then
-                ContentID = main_GetContentID("Content Watch")
-                Do While db.cs_ok(CS)
-                    Link = db.cs_getText(CS, "link")
-                    LinkLabel = db.cs_getText(CS, "LinkLabel")
-                    RecordID = db.cs_getInteger(CS, "ID")
-                    If (LinkLabel <> "") Then
-                        main_GetWatchList = main_GetWatchList & cr & "<li id=""main_ContentWatch" & RecordID & """ class=""ccListItem"">"
-                        If (Link <> "") Then
-                            main_GetWatchList = main_GetWatchList & "<a href=""http://" & webServerIO_requestDomain & requestAppRootPath & webServerIO_requestPage & "?rc=" & ContentID & "&ri=" & RecordID & """>" & LinkLabel & "</a>"
-                        Else
-                            main_GetWatchList = main_GetWatchList & LinkLabel
-                        End If
-                        main_GetWatchList = main_GetWatchList & "</li>"
-                    End If
-                    Call db.cs_goNext(CS)
-                Loop
-                If main_GetWatchList <> "" Then
-                    main_GetWatchList = html_GetContentCopy("Watch List Caption: " & ListName, ListName, user.id, True, user.isAuthenticated) & cr & "<ul class=""ccWatchList"">" & kmaIndent(main_GetWatchList) & cr & "</ul>"
-                End If
-            End If
-            Call db.cs_Close(CS)
-            '
-            If visitProperty.getBoolean("AllowAdvancedEditor") Then
-                main_GetWatchList = main_GetEditWrapper("Watch List [" & ListName & "]", main_GetWatchList)
-            End If
-            '
-            Exit Function
-ErrorTrap:
-            Call handleLegacyError18("main_GetWatchList")
-        End Function
-        '
-        '
-        '
         Public Sub main_AddTabEntry(ByVal Caption As String, ByVal Link As String, ByVal IsHit As Boolean, Optional ByVal StylePrefix As String = "", Optional ByVal LiveBody As String = "")
             On Error GoTo ErrorTrap ''Dim th as integer : th = profileLogMethodEnter("AddTabEntry")
             '
@@ -33708,7 +33195,7 @@ ErrorTrap:
                 If allowSeeAlso Then
                     s = s _
                     & cr & "<div>" _
-                    & kmaIndent(main_GetSeeAlso(main_RenderCache_CurrentPage_ContentName, PageID)) _
+                    & kmaIndent(Controllers.pageManagerController.main_GetSeeAlso(Me, main_RenderCache_CurrentPage_ContentName, PageID)) _
                     & cr & "</div>"
                 End If
                 '

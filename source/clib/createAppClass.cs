@@ -152,8 +152,8 @@ namespace  Contensive.Core {
                 //
                 using (CPClass cp = new CPClass(appName))
                 {
-                    Controllers.appBuilderClass.web_addSite(cp.core,appName, domainName, cp.core.serverConfig.appConfig.appRootFilesPath, iisDefaultDoc);
-                    Controllers.appBuilderClass.upgrade(cp.core,true);
+                    Controllers.iisController.verifySite(cp.core,appName, domainName, cp.core.serverConfig.appConfig.appRootFilesPath, iisDefaultDoc);
+                    Controllers.appBuilderController.upgrade(cp.core,true);
                     cp.core.siteProperties.setProperty(Contensive.Core.coreCommonModule.siteproperty_serverPageDefault_name, iisDefaultDoc);
                 }
             }

@@ -2419,6 +2419,7 @@ ErrorTrap:
                             If True Then
                                 If True Then
                                     Try
+                                        --- bug - cpcore must be a com object -
                                         Call sc.AddObject("cp", cpCore.cp)
                                     Catch ex As Exception
                                         '

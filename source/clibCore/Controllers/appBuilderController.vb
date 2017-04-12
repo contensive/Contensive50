@@ -12,7 +12,7 @@ Namespace Contensive.Core.Controllers
     ''' code to built and upgrade apps
     ''' not IDisposable - not contained classes that need to be disposed
     ''' </summary>
-    Public Class appBuilderClass
+    Public Class appBuilderController
         '
         '====================================================================================================
         '
@@ -20,151 +20,6 @@ Namespace Contensive.Core.Controllers
             Dim Name As String
             Dim fieldTypePrivate As Integer
         End Structure
-        '
-        ' ----- objects passed in constructor
-        '
-        'Private cpCore As coreClass
-        ''
-        '' ----- constants
-        ''
-        'Private Const UpgradeErrorTheshold As Integer = 100
-        ''
-        '' ----- shared globals
-        ''
-        'Friend classLogFolder As String                    ' the folder for logging errors. default="Upgrade", AddonInstall can change it
-        '
-        Private Shared Function web_existsSite(cpCore As coreClass, appName As String) As Boolean
-            Dim returnExists As Boolean = False
-            Try
-                Dim serverManager As New ServerManager
-                Dim siteCollection As SiteCollection = serverManager.Sites
-                For Each Site As Site In siteCollection
-                    If appName = Site.Name Then
-                        returnExists = True
-                        Exit For
-                    End If
-                Next
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex, "web_existsSite")
-            End Try
-            Return returnExists
-        End Function
-        '
-        ' -------------------------------------------------------------------
-        ' Create a site and add two bindings, the domain and a 127.0.0.1 for the appName
-        ' -------------------------------------------------------------------
-        '
-        Public Shared Sub web_addSite(cpCore As coreClass, ByVal appName As String, ByVal DomainName As String, ByVal rootPublicFilesPath As String, ByVal defaultDocOrBlank As String)
-            Try
-                If Not web_existsSite(cpCore, appName) Then
-                    web_iisCreateAppPool(cpCore, appName)
-                    web_iisCreateWebsite(cpCore, appName, DomainName, rootPublicFilesPath, appName)
-                    Dim cdnFilesPrefix As String = cpCore.serverConfig.appConfig.cdnFilesNetprefix
-                    If (cdnFilesPrefix.IndexOf("://") < 0) Then
-                        web_iisCreateVirtualDirectory(cpCore, cdnFilesPrefix, cpCore.serverConfig.appConfig.cdnFilesPath)
-                    End If
-                End If
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex, "web_addSite")
-            End Try
-        End Sub
-        '
-        Private Shared Sub web_iisCreateAppPool(cpCore As coreClass, poolName As String)
-            Try
-                Using serverManager As ServerManager = New ServerManager()
-                    Dim newPool As ApplicationPool = serverManager.ApplicationPools.Add(poolName)
-                    newPool.ManagedRuntimeVersion = "v4.0"
-                    newPool.Enable32BitAppOnWin64 = True
-                    newPool.ManagedPipelineMode = ManagedPipelineMode.Integrated
-                    serverManager.CommitChanges()
-                End Using
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex, "iisCreateAppPool")
-            End Try
-        End Sub
-        '
-        Private Shared Sub web_iisCreateWebsite(cpCore As coreClass, appName As String, domainName As String, phyPath As String, appPool As String)
-            Try
-
-                Using iisManager As ServerManager = New ServerManager()
-                    iisManager.Sites.Add(appName, "http", "*:80:" & domainName, phyPath)
-                    Dim site As Site = iisManager.Sites(appName)
-                    Dim binding As Binding = site.Bindings.CreateElement()
-                    binding.BindingInformation = "*:80:" & appName
-                    binding.Protocol = "http"
-                    site.Bindings.Add(binding)
-                    site.ApplicationDefaults.ApplicationPoolName = appPool
-                    For Each iisApp As Application In site.Applications
-                        iisApp.ApplicationPoolName = appPool
-                    Next
-                    iisManager.CommitChanges()
-                End Using
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex, "iisCreateWebsite")
-            End Try
-        End Sub
-        '
-        Private Shared Sub web_iisCreateVirtualDirectory(cpCore As coreClass, virtualFolder As String, physicalPath As String)
-            Try
-                Using iisManager As ServerManager = New ServerManager()
-                    Dim appName As String = cpCore.serverConfig.appConfig.name
-                    Dim found As Boolean = False
-                    For Each site As Site In iisManager.Sites
-                        If site.Name.ToLower = appName.ToLower() Then
-                            For Each iisApp As Application In site.Applications
-                                If iisApp.ApplicationPoolName.ToLower() = appName.ToLower() Then
-                                    For Each virtualDirectory As VirtualDirectory In iisApp.VirtualDirectories
-                                        If virtualDirectory.Path = virtualFolder Then
-                                            found = True
-                                            Exit For
-                                        End If
-                                    Next
-                                    If Not found Then
-                                        Dim vpList As List(Of String) = virtualFolder.Split("\"c).ToList
-                                        Dim newDirectoryPath As String = ""
-
-                                        For Each newDirectoryFolderName As String In vpList
-                                            If (Not String.IsNullOrEmpty(newDirectoryFolderName)) Then
-                                                newDirectoryPath &= "/" & newDirectoryFolderName
-                                                Dim directoryFound As Boolean = False
-                                                For Each currentDirectory As VirtualDirectory In iisApp.VirtualDirectories
-                                                    If (currentDirectory.Path.ToLower() = newDirectoryPath.ToLower()) Then
-                                                        directoryFound = True
-                                                        Exit For
-                                                    End If
-                                                Next
-                                                If (Not directoryFound) Then
-                                                    iisApp.VirtualDirectories.Add(newDirectoryPath, physicalPath)
-                                                End If
-                                            End If
-                                            'iisApp.VirtualDirectories.Add(vp, physicalPath)
-                                        Next
-
-                                    End If
-                                End If
-                                If found Then Exit For
-                            Next
-                        End If
-                        If found Then Exit For
-                    Next
-                    iisManager.CommitChanges()
-                End Using
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex, "web_iisCreateVirtualDirectory")
-            End Try
-        End Sub
-        '        Private Static void CreateAppPool(String poolname,bool enable32bitOn64, ManagedPipelineMode mode,String runtimeVersion="v4.0")  
-        '{  
-        '    Using (ServerManager serverManager = New ServerManager())  
-        '    {  
-        '        ApplicationPool newPool = ServerManager.ApplicationPools.Add(poolname);  
-        '        newPool.ManagedRuntimeVersion = runtimeVersion;  
-        '        newPool.Enable32BitAppOnWin64 = true;  
-        '        newPool.ManagedPipelineMode = mode;  
-        '        serverManager.CommitChanges();  
-        '    }  
-        '}  
-
         '        '
         '        '=======================================================================================
         '        '   Register a dotnet assembly (only with interop perhaps)
@@ -354,7 +209,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' Rebuild IIS Server
                     '
-                    Call web_addSite(cpCore, siteName, DomainName, "\", defaultDoc)
+                    Call iisController.verifySite(cpCore, siteName, DomainName, "\", defaultDoc)
                     '
                     ' Now wait here for site to start with upgrade
                     '
@@ -443,6 +298,14 @@ Namespace Contensive.Core.Controllers
                 Else
                     cpcore.upgradeInProgress = True
                     '
+                    With cpcore.serverConfig.appConfig
+                        Dim primaryDomain As String = .name
+                        If .domainList.Count > 0 Then
+                            primaryDomain = .domainList(0)
+                        End If
+                        Controllers.iisController.verifySite(cpcore, .name, primaryDomain, .appRootFilesPath, "default.aspx")
+                    End With
+                    '
                     '---------------------------------------------------------------------
                     '   Verify core table fields (DataSources, Content Tables, Content, Content Fields, Setup, Sort Methods)
                     '   Then other basic system ops work, like site properties
@@ -467,7 +330,7 @@ Namespace Contensive.Core.Controllers
                     '---------------------------------------------------------------------
                     '
                     If isNewBuild Then
-                        cpcore.siteProperties.setProperty("publicFileContentPathPrefix", "/contentFiles/")
+                        cpcore.siteProperties.setProperty("publicFileContentPathPrefix", cpcore.serverConfig.appConfig.cdnFilesNetprefix)
                         '
                         ' add the root developer
                         '
@@ -532,28 +395,6 @@ Namespace Contensive.Core.Controllers
                     '
                     If True Then
                         Call appendUpgradeLog(cpcore, "Verify Site Properties")
-                        '
-                        ' 20151204 - no - on new builds, set the site property after the builder.
-                        '' 4.1.575 - 8/28 - fixes problem where new sites have no defaultDoc ( and therefor no AdminUrl)
-                        ''if ServerPageDefault is set, get it. else set it to defaultDoc
-                        '' if empty, leave blank at this point (for base Db build).
-                        ''
-                        'ServerPageDefault = cpCore.app.siteProperty_getText(siteproperty_serverPageDefault_name, "")
-                        'If (ServerPageDefault = "") And (defaultDoc = "") Then
-                        '    '
-                        '    ' This is the base build, just leave it blank
-                        '    '
-                        'ElseIf (ServerPageDefault <> "") Then
-                        '    '
-                        '    ' is has a non-blank value already stored, use it
-                        '    '
-                        '    defaultDoc = ServerPageDefault
-                        'Else
-                        '    '
-                        '    ' property is blank but defaultDoc is not, set it to the new defaultDoc
-                        '    '
-                        '    Call cpCore.app.siteProperty_set(siteproperty_serverPageDefault_name, defaultDoc)
-                        'End If
                         '
                         Copy = cpcore.siteProperties.getText("AllowAutoHomeSectionOnce", EncodeText(isNewBuild))
                         Copy = cpcore.siteProperties.getText("AllowAutoLogin", "False")

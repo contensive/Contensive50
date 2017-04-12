@@ -4285,55 +4285,55 @@ ErrorTrap:
             End Try
             Return result
         End Function
-        '
-        '
-        '
-        Private Function LoadCDef(ByVal ContentName As String) As coreMetaDataClass.CDefClass
-            On Error GoTo ErrorTrap
-            '
-            Dim SQL As String
-            Dim CS As Integer
-            Dim ContentID As Integer
-            Dim CSContent As Integer
-            Dim ParentContentName As String
-            Dim ParentID As Integer
-            '
-            CSContent = cpCore.db.cs_open("Content", "name=" & cpCore.db.encodeSQLText(ContentName))
-            If cpCore.db.cs_ok(CSContent) Then
-                '
-                ' Start with parent CDef
-                '
-                ParentID = cpCore.db.cs_getInteger(CSContent, "parentID")
-                If ParentID <> 0 Then
-                    ParentContentName = cpCore.metaData.getContentNameByID(ParentID)
-                    If ParentContentName <> "" Then
-                        LoadCDef = LoadCDef(ParentContentName)
-                    End If
-                End If
-                '
-                ' Add this definition on it
-                '
-                With LoadCDef
-                    CS = cpCore.db.cs_open("Content Fields", "contentid=" & ContentID)
-                    Do While cpCore.db.cs_ok(CS)
-                        Select Case vbUCase(cpCore.db.cs_getText(CS, "name"))
-                            Case "NAME"
-                                .Name = ""
-                        End Select
-                        Call cpCore.db.cs_goNext(CS)
-                    Loop
-                    Call cpCore.db.cs_Close(CS)
-                End With
-            End If
-            Call cpCore.db.cs_Close(CSContent)
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call handleLegacyClassErrors1("ImportTemplates", "ErrorTrap")
-        End Function
+        '        '
+        '        '
+        '        '
+        '        Private Function LoadCDef(ByVal ContentName As String) As coreMetaDataClass.CDefClass
+        '            On Error GoTo ErrorTrap
+        '            '
+        '            Dim SQL As String
+        '            Dim CS As Integer
+        '            Dim ContentID As Integer
+        '            Dim CSContent As Integer
+        '            Dim ParentContentName As String
+        '            Dim ParentID As Integer
+        '            '
+        '            CSContent = cpCore.db.cs_open("Content", "name=" & cpCore.db.encodeSQLText(ContentName))
+        '            If cpCore.db.cs_ok(CSContent) Then
+        '                '
+        '                ' Start with parent CDef
+        '                '
+        '                ParentID = cpCore.db.cs_getInteger(CSContent, "parentID")
+        '                If ParentID <> 0 Then
+        '                    ParentContentName = cpCore.metaData.getContentNameByID(ParentID)
+        '                    If ParentContentName <> "" Then
+        '                        LoadCDef = LoadCDef(ParentContentName)
+        '                    End If
+        '                End If
+        '                '
+        '                ' Add this definition on it
+        '                '
+        '                With LoadCDef
+        '                    CS = cpCore.db.cs_open("Content Fields", "contentid=" & ContentID)
+        '                    Do While cpCore.db.cs_ok(CS)
+        '                        Select Case vbUCase(cpCore.db.cs_getText(CS, "name"))
+        '                            Case "NAME"
+        '                                .Name = ""
+        '                        End Select
+        '                        Call cpCore.db.cs_goNext(CS)
+        '                    Loop
+        '                    Call cpCore.db.cs_Close(CS)
+        '                End With
+        '            End If
+        '            Call cpCore.db.cs_Close(CSContent)
+        '            '
+        '            Exit Function
+        '            '
+        '            ' ----- Error Trap
+        '            '
+        'ErrorTrap:
+        '            Call handleLegacyClassErrors1("ImportTemplates", "ErrorTrap")
+        '        End Function
         '        '
         '        '=================================================================================
         '        '
