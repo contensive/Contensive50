@@ -2,8 +2,19 @@
 Imports System.Runtime.InteropServices
 
 Namespace Contensive.Core
+    '
+    ' comVisible to be activeScript compatible
+    '
+    <ComVisible(True)>
+    <ComClass(CPContextClass.ClassId, CPContextClass.InterfaceId, CPContextClass.EventsId)>
     Public Class CPContextClass
         Implements IDisposable
+        '
+#Region "COM GUIDs"
+        Public Const ClassId As String = "9FC3B58E-F6A4-4DEA-BE39-B40B09FBE0B7"
+        Public Const InterfaceId As String = "4CD84EB3-175C-4004-8811-8257849F549A"
+        Public Const EventsId As String = "8C6AC359-68B4-49A3-A3BC-7A53CA16EA45"
+#End Region
         '
         Protected disposed As Boolean = False
         Private cp As CPClass

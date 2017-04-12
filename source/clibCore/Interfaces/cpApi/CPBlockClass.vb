@@ -5,9 +5,20 @@ Option Explicit On
 Imports System.Runtime.InteropServices
 
 Namespace Contensive.Core
+    '
+    ' comVisible to be activeScript compatible
+    '
+    <ComVisible(True)>
+    <ComClass(CPBlockClass.ClassId, CPBlockClass.InterfaceId, CPBlockClass.EventsId)>
     Public Class CPBlockClass
         Inherits BaseClasses.CPBlockBaseClass
         Implements IDisposable
+        '
+#Region "COM GUIDs"
+        Public Const ClassId As String = "9E4DF603-A94B-4E3A-BD06-E19BB9CB1B5F"
+        Public Const InterfaceId As String = "E4D5D9F0-DF96-492E-9CAC-1107F0187A40"
+        Public Const EventsId As String = "5911548D-7637-4021-BD08-C7676F3E12C6"
+#End Region
         '
         Private cpCore As Contensive.Core.coreClass
         Private cp As CPClass

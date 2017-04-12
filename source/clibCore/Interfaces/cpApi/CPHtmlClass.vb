@@ -5,9 +5,20 @@ Imports Contensive.BaseClasses
 Imports System.Runtime.InteropServices
 
 Namespace Contensive.Core
+    '
+    ' comVisible to be activeScript compatible
+    '
+    <ComVisible(True)>
+    <ComClass(CPHtmlClass.ClassId, CPHtmlClass.InterfaceId, CPHtmlClass.EventsId)>
     Public Class CPHtmlClass
         Inherits BaseClasses.CPHtmlBaseClass
         Implements IDisposable
+        '
+#Region "COM GUIDs"
+        Public Const ClassId As String = "637E3815-0DA6-4672-84E9-A319D85F2101"
+        Public Const InterfaceId As String = "24267471-9CE4-44F9-B4BD-8E9CE357D6E6"
+        Public Const EventsId As String = "4021B791-0F55-4841-90AE-64C7FAFB9756"
+#End Region
         '
         Private cp As CPClass
         Private cpCore As Contensive.Core.coreClass

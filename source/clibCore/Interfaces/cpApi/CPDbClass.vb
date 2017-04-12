@@ -3,9 +3,20 @@ Imports System.Runtime.InteropServices
 Imports ADODB
 
 Namespace Contensive.Core
+    '
+    ' comVisible to be activeScript compatible
+    '
+    <ComVisible(True)>
+    <ComClass(CPDbClass.ClassId, CPDbClass.InterfaceId, CPDbClass.EventsId)>
     Public Class CPDbClass
         Inherits BaseClasses.CPDbBaseClass
         Implements IDisposable
+        '
+#Region "COM GUIDs"
+        Public Const ClassId As String = "13B707F9-190A-4ECD-8A53-49FE1D8CAE54"
+        Public Const InterfaceId As String = "A20CF53D-1FB7-41C4-8493-3D5AC3671A5E"
+        Public Const EventsId As String = "F68D64F0-595F-4CA2-9EC6-6DBA9A7E458B"
+#End Region
         '
         Private cp As CPClass
         '

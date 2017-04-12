@@ -7,9 +7,19 @@ Imports Contensive.BaseClasses
 
 
 Namespace Contensive.Core
+    '
+    ' comVisible to be activeScript compatible
+    '
+    <ComVisible(True)>
+    <ComClass(CPClass.ClassId, CPClass.InterfaceId, CPClass.EventsId)>
     Public Class CPClass
         Inherits CPBaseClass
         Implements IDisposable
+#Region "COM GUIDs"
+        Public Const ClassId As String = "2EF01C6F-5288-411D-A5DE-76C8923CE1D3"
+        Public Const InterfaceId As String = "58E04B36-2C75-4D11-9A8D-22A52E8417EB"
+        Public Const EventsId As String = "4FADD1C2-6A89-4A8E-ADD0-9850D3EB6DBC"
+#End Region
         '
         Public core As Contensive.Core.coreClass
         Private MyAddonID As Integer
