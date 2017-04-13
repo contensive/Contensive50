@@ -10,12 +10,12 @@ Namespace Contensive.Core
     ''' <summary>
     ''' install addon collections
     ''' </summary>
-    Public Class coreAddonInstallClass
+    Public Class addonInstallClass
         Private cpCore As coreClass
         '
         ' not IDisposable - not contained classes that need to be disposed
         '
-        Private ManagerAddonNavID_Local As Integer
+        'Private ManagerAddonNavID_Local As Integer
         '
         Public Sub New(cpCore As coreClass)
             MyBase.New()
@@ -27,20 +27,18 @@ Namespace Contensive.Core
         Private Function GetNonRootNavigatorID(ByVal EntryName As String, ByVal ParentID As Integer, ByVal addonId As Integer, ByVal ContentID As Integer, ByVal NavIconType As Integer, ByVal NavIconTitle As String, ByVal DeveloperOnly As Boolean, ByVal ignore As Integer, ByVal LinkPage As String, ByVal HelpCollectionID As Integer, ByVal HelpAddonID As Integer, ByVal InstalledByCollectionID As Integer, ByVal AdminOnly As Boolean) As Integer
             Dim result As Integer = 0
             Try
-
+                If ParentID <= 0 Then
+                    '
+                    ' Block entries to the root node - this is to block entries made for system collections I may have missed
+                    '
+                    Call cpCore.handleExceptionAndRethrow(New Exception("Adding root navigator entry [" & EntryName & "] by collection [" & cpCore.GetRecordName("content", InstalledByCollectionID) & "]. This Is Not allowed."))
+                Else
+                    result = GetNavigatorID(EntryName, ParentID, addonId, ContentID, NavIconType, NavIconTitle, DeveloperOnly, ignore, LinkPage, HelpCollectionID, HelpAddonID, InstalledByCollectionID, AdminOnly)
+                End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return result
-
-            If ParentID <= 0 Then
-                '
-                ' Block entries to the root node - this is to block entries made for system collections I may have missed
-                '
-                Call cpCore.handleExceptionAndRethrow(New Exception("Adding root navigator entry [" & EntryName & "] by collection [" & cpCore.GetRecordName("content", InstalledByCollectionID) & "]. This Is Not allowed."))
-            Else
-                GetNonRootNavigatorID = GetNavigatorID(EntryName, ParentID, addonId, ContentID, NavIconType, NavIconTitle, DeveloperOnly, ignore, LinkPage, HelpCollectionID, HelpAddonID, InstalledByCollectionID, AdminOnly)
-            End If
         End Function
         '
         '====================================================================================================
@@ -2528,22 +2526,10 @@ Namespace Contensive.Core
         '
         Private Sub CopyInstallToDst(ByVal SrcPath As String, ByVal DstPath As String, ByVal BlockFileList As String, ByVal BlockFolderList As String)
             Try
-                Dim QS As String
-                'Dim Folders() As String
-                'Dim FolderDetails() As String
-                'Dim FolderName As String
-                Dim Ptr As Integer
                 Dim FileInfoArray As IO.FileInfo()
-                'Dim Files() As String
-                'Dim FileDetails() As String
-                'Dim Filename As String
-                'Dim FileExtension As String
-                'Dim fs As New fileSystemClass
-                Dim Pos As Integer
                 Dim FolderInfoArray As IO.DirectoryInfo()
                 Dim SrcFolder As String
                 Dim DstFolder As String
-                ' Dim runAtServer As New runAtServerClass(cpCore)
                 '
                 SrcFolder = SrcPath
                 If Right(SrcFolder, 1) = "\" Then
@@ -2643,65 +2629,13 @@ Namespace Contensive.Core
         Private Function GetManageAddonNavID() As Integer
             Dim result As Integer = 0
             Try
-                ManagerAddonNavID_Local = GetNavigatorID("Manage Add-ons", 0, 0, 0, NavIconTypeAddon, "Manage Add-ons", False, 0, "", 0, 0, 0, False)
-                result = ManagerAddonNavID_Local
+                result = GetNavigatorID("Manage Add-ons", 0, 0, 0, NavIconTypeAddon, "Manage Add-ons", False, 0, "", 0, 0, 0, False)
+                'result = ManagerAddonNavID_Local
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return result
         End Function
-        ''
-        ''
-        ''
-        'Private Function GetXMLAttribute(ByVal Found As Boolean, ByVal Node As XmlNode, ByVal Name As String, ByVal DefaultIfNotFound As String) As String
-        '    Dim ResultNode As XmlNode
-        '    Dim LcaseName As String
-        '    Dim NodeAttribute As XmlAttribute
-        '    '
-        '    If Not (Node.Attributes Is Nothing) Then
-        '        ResultNode = Node.Attributes.GetNamedItem(Name)
-        '        If (ResultNode Is Nothing) Then
-        '            LcaseName = vbLCase(Name)
-        '            For Each NodeAttribute In Node.Attributes
-        '                If vbLCase(NodeAttribute.Name) = LcaseName Then
-        '                    GetXMLAttribute = NodeAttribute.Value
-        '                    Found = True
-        '                    Exit For
-        '                End If
-        '            Next
-        '            If Not Found Then
-        '                GetXMLAttribute = DefaultIfNotFound
-        '            End If
-        '        Else
-        '            GetXMLAttribute = ResultNode.Value
-        '            Found = True
-        '        End If
-        '    End If
-        'End Function
-
-        ''
-        ''===============================================================================================
-        ''   copy resources from install folder to www folder
-        ''       block some file extensions
-        '' 11/10/2009 !!!!!
-        ''===============================================================================================
-        ''
-        'Private Sub CopyFile(ByVal Filename As String, ByVal SrcPath As String, ByVal DstPath As String)
-        '    '
-
-        '    Dim QS As String
-        '    Dim runAtServer As New runAtServerClass
-        '    '
-        '    runAtServer.ipAddress = "127.0.0.1"
-        '    runAtServer.port = "4531"
-        '    QS = "" _
-        '        & "SrcFile=" & encodeNvaArgument(EncodeRequestVariable(SrcPath & Filename)) _
-        '        & "&DstFile=" & encodeNvaArgument(EncodeRequestVariable(DstPath & Filename)) _
-        '        & ""
-        '    'QS = "SrcFile=" & encodeRequestVariable(SrcPath & Filename) & "&DstFile=" & encodeRequestVariable(DstPath & Filename)
-        '    Call runAtServer.executeCmd("CopyFile", QS)
-        '    '
-        'End Sub
         '
         '
         '
@@ -2728,12 +2662,7 @@ Namespace Contensive.Core
                 Dim navTypeId As Integer
                 Dim scriptinglanguageid As Integer
                 Dim ScriptingCode As String
-                Dim AddonNavID As Integer
-                Dim NavIconTypeID As Integer
                 Dim AddRule As Boolean
-                Dim IncludeAddonName As String
-                Dim IncludeAddonGuid As String
-                Dim IncludeAddonID As Integer
                 Dim UserError As String
                 Dim FieldName As String
                 Dim NodeName As String
@@ -2753,7 +2682,6 @@ Namespace Contensive.Core
                 Dim NavDeveloperOnly As Boolean
                 Dim StyleSheet As String
                 Dim ArgumentList As String
-                Dim CSRule As Integer
                 Dim CS As Integer
                 Dim Criteria As String
                 Dim IsFound As Boolean
@@ -2763,7 +2691,6 @@ Namespace Contensive.Core
                 Dim addonId As Integer
                 Dim Basename As String
                 Dim Doc As XmlDocument
-                Dim navAdminOnly As Boolean
                 '
                 Basename = vbLCase(AddonNode.Name)
                 If (Basename = "page") Or (Basename = "process") Or (Basename = "addon") Or (Basename = "add-on") Then
@@ -3924,7 +3851,7 @@ Namespace Contensive.Core
         Private Sub appendInstallLog(ByVal ignore As String, ByVal Method As String, ByVal LogMessage As String)
             Try
                 Console.WriteLine(Method & ", " & LogMessage)
-                cpCore.appendLogWithLegacyRow(cpCore.serverConfig.appConfig.name, LogMessage, "dll", "AddonInstallClass", Method, 0, "", "", False, True, "", "Install", "")
+                cpCore.appendLogWithLegacyRow(cpCore.serverConfig.appConfig.name, LogMessage, "dll", "AddonInstallClass", Method, 0, "", "", False, True, "", "Build", "")
             Catch ex As Exception
                 cpCore.handleExceptionAndContinue(ex)
             End Try

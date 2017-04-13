@@ -16,7 +16,7 @@ Namespace Contensive.Core
         ' objects created locally and must be disposed on exit
         '------------------------------------------------------------------------------------------------------------------------
         '
-        Private _addonInstall As coreAddonInstallClass
+        Private _addonInstall As addonInstallClass
         '
         '------------------------------------------------------------------------------------------------------------------------
         ' objects passed in that are not disposed

@@ -114,7 +114,7 @@ Namespace Contensive.Core
                 Dim TargetCollectionID As Integer
                 Dim privateFilesInstallPath As String
                 Dim Adminui As New coreAdminUIClass(cpCore)
-                Dim addonInstall As New coreAddonInstallClass(cpCore)
+                Dim addonInstall As New addonInstallClass(cpCore)
                 '
                 ' BuildVersion = cpcore.app.dataBuildVersion
                 Dim dataBuildVersion As String = cpCore.siteProperties.dataBuildVersion

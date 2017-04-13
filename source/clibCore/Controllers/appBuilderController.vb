@@ -280,7 +280,7 @@ Namespace Contensive.Core.Controllers
                 Dim IISResetRequired As Boolean
                 Dim ErrorMessage As String
                 Dim XMLTools As New coreXmlToolsClass(cpcore)
-                Dim addonInstall As New coreAddonInstallClass(cpcore)
+                Dim addonInstall As New addonInstallClass(cpcore)
                 Dim StyleSN As Integer
                 Dim Doc As XmlDocument
                 Dim DataBuildVersion As String
@@ -311,10 +311,10 @@ Namespace Contensive.Core.Controllers
                     '   Then other basic system ops work, like site properties
                     '---------------------------------------------------------------------
                     '
-                    Call appendUpgradeLog(cpcore, "VerifyCoreTables...")
+                    Call appendBuildLog(cpcore, "VerifyCoreTables...")
                     Call VerifyCoreTables(cpcore)
                     DataBuildVersion = cpcore.siteProperties.dataBuildVersion
-                    Call appendUpgradeLog(cpcore, "Upgrade, isNewBuild=[" & isNewBuild & "], data buildVersion=[" & DataBuildVersion & "], code buildVersion=[" & cpcore.common_version & "]")
+                    Call appendBuildLog(cpcore, "Upgrade, isNewBuild=[" & isNewBuild & "], data buildVersion=[" & DataBuildVersion & "], code buildVersion=[" & cpcore.common_version & "]")
                     '
                     '---------------------------------------------------------------------
                     ' ----- build/verify Content Definitions
@@ -322,7 +322,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' Update the Db Content from CDef Files
                     '
-                    Call appendUpgradeLog(cpcore, "UpgradeCDef...")
+                    Call appendBuildLog(cpcore, "UpgradeCDef...")
                     Call addonInstall.installBaseCollection(isNewBuild)
                     '
                     '---------------------------------------------------------------------
@@ -365,7 +365,7 @@ Namespace Contensive.Core.Controllers
                     '
                     If DataBuildVersion < cpcore.common_version() Then
                         '
-                        Call appendUpgradeLog(cpcore, "Calling database conversion, DataBuildVersion [" & DataBuildVersion & "], software version [" & cpcore.common_version() & "]")
+                        Call appendBuildLog(cpcore, "Calling database conversion, DataBuildVersion [" & DataBuildVersion & "], software version [" & cpcore.common_version() & "]")
                         '
                         Call Upgrade_Conversion(cpcore, DataBuildVersion)
                     End If
@@ -375,7 +375,7 @@ Namespace Contensive.Core.Controllers
                     '---------------------------------------------------------------------
                     '
                     If True Then
-                        Call appendUpgradeLog(cpcore, "Verify records required")
+                        Call appendBuildLog(cpcore, "Verify records required")
                         '
                         ' ##### menus are created in ccBase.xml, this just checks for dups
                         Call VerifyAdminMenus(cpcore, DataBuildVersion)
@@ -394,7 +394,7 @@ Namespace Contensive.Core.Controllers
                     '---------------------------------------------------------------------
                     '
                     If True Then
-                        Call appendUpgradeLog(cpcore, "Verify Site Properties")
+                        Call appendBuildLog(cpcore, "Verify Site Properties")
                         '
                         Copy = cpcore.siteProperties.getText("AllowAutoHomeSectionOnce", EncodeText(isNewBuild))
                         Copy = cpcore.siteProperties.getText("AllowAutoLogin", "False")
@@ -462,7 +462,7 @@ Namespace Contensive.Core.Controllers
                     '---------------------------------------------------------------------
                     '
                     If True Then
-                        Call appendUpgradeLog(cpcore, "Internal upgrade complete, set Buildversion to " & cpcore.common_version)
+                        Call appendBuildLog(cpcore, "Internal upgrade complete, set Buildversion to " & cpcore.common_version)
                         Call cpcore.siteProperties.setProperty("BuildVersion", cpcore.common_version)
                         cpcore.siteProperties._dataBuildVersion_Loaded = False
                         '
@@ -480,7 +480,7 @@ Namespace Contensive.Core.Controllers
                             '
                             ErrorMessage = ""
                             'RegisterList = ""
-                            Call appendUpgradeLog(cpcore, "Upgrading All Local Collections to new server build.")
+                            Call appendBuildLog(cpcore, "Upgrading All Local Collections to new server build.")
                             UpgradeOK = addonInstall.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(ErrorMessage, "", IISResetRequired, isNewBuild)
                             If ErrorMessage <> "" Then
                                 cpcore.handleLegacyError3(cpcore.serverConfig.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
@@ -536,8 +536,8 @@ Namespace Contensive.Core.Controllers
                             Dim Collectionname As String
                             Dim CollectionGuid As String
                             Dim localCollectionFound As Boolean
-                            Call appendUpgradeLog(cpcore, "Checking all installed collections for upgrades from Collection Library")
-                            Call appendUpgradeLog(cpcore, "...Open collectons.xml")
+                            Call appendBuildLog(cpcore, "Checking all installed collections for upgrades from Collection Library")
+                            Call appendBuildLog(cpcore, "...Open collectons.xml")
                             Try
                                 Doc = New XmlDocument
                                 Call Doc.LoadXml(addonInstall.getCollectionListFile)
@@ -550,7 +550,7 @@ Namespace Contensive.Core.Controllers
                                                 '
                                                 ' now go through each collection in this app and check the last updated agains the one here
                                                 '
-                                                Call appendUpgradeLog(cpcore, "...Open site collectons, iterate through all collections")
+                                                Call appendBuildLog(cpcore, "...Open site collectons, iterate through all collections")
                                                 'Dim dt As DataTable
                                                 dt = cpcore.db.executeSql("select * from ccaddoncollections where (ccguid is not null)and(updatable<>0)")
                                                 If dt.Rows.Count > 0 Then
@@ -560,7 +560,7 @@ Namespace Contensive.Core.Controllers
                                                         ErrorMessage = ""
                                                         CollectionGuid = vbLCase(dt.Rows(rowptr).Item("ccguid").ToString)
                                                         Collectionname = dt.Rows(rowptr).Item("name").ToString
-                                                        Call appendUpgradeLog(cpcore, "...checking collection [" & Collectionname & "], guid [" & CollectionGuid & "]")
+                                                        Call appendBuildLog(cpcore, "...checking collection [" & Collectionname & "], guid [" & CollectionGuid & "]")
                                                         If CollectionGuid <> "{7c6601a7-9d52-40a3-9570-774d0d43d758}" Then
                                                             '
                                                             ' upgrade all except base collection from the local collections
@@ -596,7 +596,7 @@ Namespace Contensive.Core.Controllers
                                                                     End Select
                                                                     If CollectionGuid = vbLCase(LocalGuid) Then
                                                                         localCollectionFound = True
-                                                                        Call appendUpgradeLog(cpcore, "...local collection found")
+                                                                        Call appendBuildLog(cpcore, "...local collection found")
                                                                         If LocalLastChangeDate <> Date.MinValue Then
                                                                             If LocalLastChangeDate > LastChangeDate Then
                                                                                 Call appendUpgradeLog(cpcore, cpcore.serverConfig.appConfig.name, MethodName, "Upgrading collection " & dt.Rows(rowptr).Item("name").ToString() & " because the collection in the local server store has a newer LastChangeDate than the collection installed on this application.")
@@ -609,17 +609,17 @@ Namespace Contensive.Core.Controllers
                                                             End If
                                                             ErrorMessage = ""
                                                             If Not localCollectionFound Then
-                                                                Call appendUpgradeLog(cpcore, "...site collection [" & Collectionname & "] not found in local collection, call UpgradeAllAppsFromLibCollection2 to install it.")
+                                                                Call appendBuildLog(cpcore, "...site collection [" & Collectionname & "] not found in local collection, call UpgradeAllAppsFromLibCollection2 to install it.")
                                                                 addonInstallOk = addonInstall.installCollectionFromRemoteRepo(CollectionGuid, ErrorMessage, "", isNewBuild)
                                                                 If Not addonInstallOk Then
                                                                     '
                                                                     ' this may be OK so log, but do not call it an error
                                                                     '
-                                                                    Call appendUpgradeLog(cpcore, "...site collection [" & Collectionname & "] not found in collection Library. It may be a custom collection just for this site. Collection guid [" & CollectionGuid & "]")
+                                                                    Call appendBuildLog(cpcore, "...site collection [" & Collectionname & "] not found in collection Library. It may be a custom collection just for this site. Collection guid [" & CollectionGuid & "]")
                                                                 End If
                                                             Else
                                                                 If upgradeCollection Then
-                                                                    Call appendUpgradeLog(cpcore, "...upgrading collection")
+                                                                    Call appendBuildLog(cpcore, "...upgrading collection")
                                                                     Call addonInstall.installCollectionFromLocalRepo(CollectionGuid, cpcore.common_version, ErrorMessage, "", isNewBuild)
                                                                 End If
                                                             End If
@@ -644,7 +644,7 @@ Namespace Contensive.Core.Controllers
                     ' ----- Explain, put up a link and exit without continuing
                     '---------------------------------------------------------------------
                     '
-                    appendUpgradeLog(cpcore, "Upgrade Complete")
+                    appendBuildLog(cpcore, "Upgrade Complete")
                     cpcore.upgradeInProgress = False
                 End If
             Catch ex As Exception
@@ -2183,7 +2183,7 @@ Namespace Contensive.Core.Controllers
         '===========================================================================
         '
         Private Shared Sub appendUpgradeLog(cpCore As coreClass, ByVal appName As String, ByVal Method As String, ByVal Message As String)
-            appendUpgradeLog(cpCore, "app [" & appName & "], Method [" & Method & "], Message [" & Message & "]")
+            appendBuildLog(cpCore, "app [" & appName & "], Method [" & Method & "], Message [" & Message & "]")
         End Sub
         '
         '=============================================================================
@@ -2207,9 +2207,9 @@ Namespace Contensive.Core.Controllers
             '
         End Sub
         '
-        Private Shared Sub appendUpgradeLog(cpCore As coreClass, ByVal message As String)
+        Private Shared Sub appendBuildLog(cpCore As coreClass, ByVal message As String)
             Console.WriteLine("upgrade: " & message)
-            cpCore.log_appendLog(message, "Upgrade")
+            cpCore.log_appendLog(message, "Build")
         End Sub
         ''
         ''=============================================================================

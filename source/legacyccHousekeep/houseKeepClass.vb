@@ -131,7 +131,7 @@ Namespace Contensive.Core
             Dim DataSourceType As Integer
             'Dim KernelService As New KernelServicesClass
             Dim DatePtr As Integer
-            Dim AddonInstall As coreAddonInstallClass
+            Dim AddonInstall As addonInstallClass
             Dim cp As CPClass
             Dim appList As List(Of String)
             'Dim control As New controlClass
@@ -279,7 +279,7 @@ Namespace Contensive.Core
                                 ErrorMessage = ""
                                 Call AppendClassLog("", "HouseKeep", "Updating local collections from library, see Upgrade log for details during this period.")
                                 Dim ignoreRefactor As String = ""
-                                AddonInstall = New coreAddonInstallClass(cp.core)
+                                AddonInstall = New addonInstallClass(cp.core)
                                 If Not AddonInstall.UpgradeLocalCollectionRepoFromRemoteCollectionRepo(ErrorMessage, ignoreRefactor, ignoreRefactor, False) Then
                                     If ErrorMessage = "" Then
                                         ErrorMessage = "No detailed error message was returned from UpgradeAllLocalCollectionsFromLib2 although it returned 'not ok' status."

@@ -49,15 +49,15 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public ReadOnly Property addonInstall As coreAddonInstallClass
+        Public ReadOnly Property addonInstall As addonInstallClass
             Get
                 If (_addonInstall Is Nothing) Then
-                    _addonInstall = New coreAddonInstallClass(cpCore)
+                    _addonInstall = New addonInstallClass(cpCore)
                 End If
                 Return _addonInstall
             End Get
         End Property
-        Private _addonInstall As coreAddonInstallClass
+        Private _addonInstall As addonInstallClass
         '
         '=============================================================================================================
         '   Get Addon Content - internal (to support include add-ons)
@@ -429,7 +429,7 @@ Namespace Contensive.Core
                     OtherHeadTags = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_OtherHeadTags)
                     JSFilename = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_JSFilename)
                     If JSFilename <> "" Then
-                        JSFilename = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverconfig.appConfig.cdnFilesNetprefix, JSFilename)
+                        JSFilename = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
                     End If
                 End If
                 If Not String.IsNullOrEmpty(ProgramID) Then
@@ -1235,10 +1235,10 @@ Namespace Contensive.Core
                                         Call cpCore.main_AddEndOfBodyJavascript2(JSBodyEnd, AddedByName)
                                         Call cpCore.main_AddHeadScriptLink(JSFilename, AddedByName)
                                         If DefaultStylesFilename <> "" Then
-                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverconfig.appConfig.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
+                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, DefaultStylesFilename), AddonName & " default")
                                         End If
                                         If CustomStylesFilename <> "" Then
-                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverconfig.appConfig.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
+                                            Call cpCore.main_AddStylesheetLink2(cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, CustomStylesFilename), AddonName & " custom")
                                         End If
                                     End If
                                 End If
@@ -1826,7 +1826,7 @@ Namespace Contensive.Core
                                                                             If FieldValue = "" Then
                                                                                 Copy = cpCore.html_GetFormInputFile(FieldName)
                                                                             Else
-                                                                                NonEncodedLink = cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverconfig.appConfig.cdnFilesNetprefix, FieldValue)
+                                                                                NonEncodedLink = cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, FieldValue)
                                                                                 EncodedLink = EncodeURL(NonEncodedLink)
                                                                                 Dim FieldValuefilename As String = ""
                                                                                 Dim FieldValuePath As String = ""
@@ -2514,7 +2514,7 @@ ErrorTrap:
                 Dim AddonFound As Boolean = False
                 Dim addonAppRootPath As String
                 Dim AddonPath As String
-                Dim addonInstall As coreAddonInstallClass
+                Dim addonInstall As addonInstallClass
                 Dim AddonVersionPath As String
                 Dim commonAssemblyPath As String
                 Dim appAddonPath As String
@@ -2522,7 +2522,11 @@ ErrorTrap:
                 ' first try debug folder -- cclibCommonAssemblies
                 '
                 commonAssemblyPath = cpCore.programDataFiles.rootLocalPath & "AddonAssemblyBypass\"
-                result = executeAssembly_byFilePath(addonId, AddonCaption, commonAssemblyPath, AssemblyClassFullName, True, AddonFound, return_ErrorMessageForAdmin)
+                If Not IO.Directory.Exists(commonAssemblyPath) Then
+                    IO.Directory.CreateDirectory(commonAssemblyPath)
+                Else
+                    result = executeAssembly_byFilePath(addonId, AddonCaption, commonAssemblyPath, AssemblyClassFullName, True, AddonFound, return_ErrorMessageForAdmin)
+                End If
                 If Not AddonFound Then
                     '
                     ' try app /bin folder
@@ -2537,7 +2541,7 @@ ErrorTrap:
                         If String.IsNullOrEmpty(CollectionGuid) Then
                             Throw New ApplicationException("The assembly for addon [" & AddonCaption & "] could not be executed because it's collection has an invalid guid.")
                         Else
-                            addonInstall = New coreAddonInstallClass(cpCore)
+                            addonInstall = New addonInstallClass(cpCore)
                             Call addonInstall.GetCollectionConfig(CollectionGuid, AddonVersionPath, New Date(), "")
                             If (String.IsNullOrEmpty(AddonVersionPath)) Then
                                 Throw New ApplicationException("The assembly for addon [" & AddonCaption & "] could not be executed because it's assembly could not be found in cclibCommonAssemblies, and no collection folder was found.")

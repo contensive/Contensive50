@@ -1,0 +1,1 @@
+﻿select id,name,parentid,* from ccMenuEntries
