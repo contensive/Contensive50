@@ -1333,7 +1333,7 @@ Namespace Contensive.Core.Controllers
                     '
                     ' remove all non add-on contentdefs for ccaggregatefunctions
                     '
-                    CID = cpCore.db.getContentId("Add-ons")
+                    CID = cpCore.db.getContentId(cnAddons)
                     If CID <> 0 Then
                         Call cpCore.db.executeSql("update ccaggregatefunctions set contentcontrolid=" & CID)
                         Call cpCore.db.executeSql("delete from cccontent where id in (select c.id from cccontent c left join cctables t on t.id=c.contenttableid where t.name='ccAggregateFunctions' and c.id<>" & CID & ")")
@@ -2042,7 +2042,7 @@ Namespace Contensive.Core.Controllers
         '    Dim ErrorMessage As String
         '    Dim addonInstall As addonInstallClass
         '    '
-        '    CS = cpcore.app.csOpen("Add-ons", "objectProgramID=" & encodeSQLText(AddonProgramID))
+        '    CS = cpcore.app.csOpen(cnAddons, "objectProgramID=" & encodeSQLText(AddonProgramID))
         '    If cpcore.app.csv_IsCSOK(CS) Then
         '        Call cpcore.app.csv_DeleteCSRecord(CS)
         '        InstallCollectionList = InstallCollectionList & "," & CollectionGuid

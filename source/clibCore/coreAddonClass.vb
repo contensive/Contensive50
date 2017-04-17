@@ -1407,7 +1407,7 @@ Namespace Contensive.Core
                                         If (addonId <> 0) Then
                                             If cpCore.visitProperty.getBoolean("AllowAdvancedEditor") Then
                                                 AddonEditIcon = GetIconSprite("", 0, "/ccLib/images/tooledit.png", 22, 22, "Edit the " & AddonName & " Add-on", "Edit the " & AddonName & " Add-on", "", True, "")
-                                                AddonEditIcon = "<a href=""" & cpCore.siteProperties.adminURL & "?cid=" & cpCore.metaData.getContentId("add-ons") & "&id=" & addonId & "&af=4&aa=2&ad=1"" tabindex=""-1"">" & AddonEditIcon & "</a>"
+                                                AddonEditIcon = "<a href=""" & cpCore.siteProperties.adminURL & "?cid=" & cpCore.metaData.getContentId(cnAddons) & "&id=" & addonId & "&af=4&aa=2&ad=1"" tabindex=""-1"">" & AddonEditIcon & "</a>"
                                                 InstanceSettingsEditIcon = getInstanceBubble(AddonName, AddonOptionExpandedConstructor, HostContentName, HostRecordID, HostFieldName, ACInstanceID, Context, DialogList)
                                                 AddonStylesEditIcon = getAddonStylesBubble(addonId, DialogList)
                                                 HTMLViewerEditIcon = getHTMLViewerBubble(addonId, "editWrapper" & cpCore.pageManager_EditWrapperCnt, DialogList)
@@ -3242,7 +3242,7 @@ ErrorTrap:
             '
             If cpCore.user.isAuthenticated() And True Then
                 If cpCore.user.isEditingAnything() Then
-                    CS = cpCore.csOpen("Add-ons", addonId)
+                    CS = cpCore.csOpen(cnAddons, addonId)
                     If cpCore.db.cs_ok(CS) Then
                         AddonName = cpCore.db.cs_getText(CS, "name")
                         StyleSheet = cpCore.db.cs_get(CS, "CustomStylesFilename")

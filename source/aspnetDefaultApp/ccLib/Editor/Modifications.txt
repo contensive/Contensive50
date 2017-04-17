@@ -22,7 +22,7 @@ editor/scripts/language/english/editor_lang.js
 old
 case "Tags":return "tags";
 new
-case "Tags":return "Add-ons";
+case "Tags":return cnAddons;
 
 11/2/08
 

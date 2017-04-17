@@ -199,7 +199,7 @@ Namespace Contensive
                                     & "  or((ProcessInterval is not null)and(ProcessInterval<>0)and(ProcessNextRun is null))" _
                                     & "  or(ProcessNextRun<" & SQLNow & ")" _
                                     & " )"
-                                CS = cpSite.core.db.cs_open("add-ons", sqlAddonsCriteria)
+                                CS = cpSite.core.db.cs_open(cnAddons, sqlAddonsCriteria)
                                 Do While cpSite.core.db.cs_ok(CS)
                                     addonProcessInterval = cpSite.core.db.cs_getInteger(CS, "ProcessInterval")
                                     addonId = cpSite.core.db.cs_getInteger(CS, "ID")

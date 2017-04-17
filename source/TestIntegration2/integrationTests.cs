@@ -63,7 +63,7 @@ namespace integrationTests
             string activeScript = "function m\nm=cp.doc.getText(\"echo\")\nend function";
             string echoText = "text added to document";
             //
-            if (cs.Insert("add-ons"))
+            if (cs.Insert( Contensive.Core.constantsModule.cnAddons))
             {
                 recordId = cs.GetInteger("id");
                 cs.SetField("name", addonName);
@@ -82,7 +82,7 @@ namespace integrationTests
             //
             Assert.AreEqual(htmlText + wysiwygText + echoText, cp.executeAddon(recordId.ToString()));
             //dispose
-            cp.Content.DeleteRecords("add-ons", "id=" + recordId.ToString());
+            cp.Content.DeleteRecords(Contensive.Core.constantsModule.cnAddons, "id=" + recordId.ToString());
             cp.Dispose();
         }
         //====================================================================================================
@@ -103,7 +103,7 @@ namespace integrationTests
             string activeScript = "function m\nm=cp.doc.getText(\"echo\")\nend function";
             string echoText = "text added to document";
             //
-            if (cs.Insert("add-ons"))
+            if (cs.Insert(Contensive.Core.constantsModule.cnAddons))
             {
                 recordId = cs.GetInteger("id");
                 cs.SetField("name", addonName);
@@ -119,7 +119,7 @@ namespace integrationTests
             // assert
             Assert.AreEqual(htmlText + wysiwygText + echoText, cp.executeRoute(addonName));
             //dispose
-            cp.Content.DeleteRecords("add-ons", "id=" + recordId.ToString());
+            cp.Content.DeleteRecords(Contensive.Core.constantsModule.cnAddons, "id=" + recordId.ToString());
             cp.Dispose();
         }
     }
@@ -534,10 +534,10 @@ namespace integrationTests
             // assert
             //
             Assert.AreNotEqual(0, cp.Content.AddContent(contentName1));
-            Assert.AreNotEqual(0, cp.Content.AddContentField(contentName1, contentFieldTextName, coreCommonModule.FieldTypeIdText));
-            Assert.AreNotEqual(0, cp.Content.AddContentField(contentName1, contentFieldBooleanName, coreCommonModule.FieldTypeIdBoolean));
-            Assert.AreNotEqual(0, cp.Content.AddContentField(contentName1, contentFieldDateName, coreCommonModule.FieldTypeIdDate));
-            Assert.AreNotEqual(0, cp.Content.AddContentField(contentName1, contentFieldIntegerName, coreCommonModule.FieldTypeIdInteger));
+            Assert.AreNotEqual(0, cp.Content.AddContentField(contentName1, contentFieldTextName, constantsModule.FieldTypeIdText));
+            Assert.AreNotEqual(0, cp.Content.AddContentField(contentName1, contentFieldBooleanName, constantsModule.FieldTypeIdBoolean));
+            Assert.AreNotEqual(0, cp.Content.AddContentField(contentName1, contentFieldDateName, constantsModule.FieldTypeIdDate));
+            Assert.AreNotEqual(0, cp.Content.AddContentField(contentName1, contentFieldIntegerName, constantsModule.FieldTypeIdInteger));
             //
             if (cs.Insert(contentName1))
             {

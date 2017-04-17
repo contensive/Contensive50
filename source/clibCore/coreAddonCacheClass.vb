@@ -106,7 +106,7 @@ Namespace Contensive.Core
                 localCache.propertyBag_guidIndex = ""
                 localCache.propertyBag_idIndex = ""
                 localCache.propertyBag_nameIndex = ""
-                Call cpCore.cache.setKey(cacheName, localCache, "add-ons")
+                Call cpCore.cache.setKey(cacheName, localCache, cnAddons)
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
@@ -283,7 +283,7 @@ Namespace Contensive.Core
                         ' This addonId is missing from cache - try to load it from Db
                         '
                         sqlCriteria = "(id=" & cpCore.db.encodeSQLNumber(EncodeInteger(addonNameGuidOrId)) & ")or(name=" & cpCore.db.encodeSQLText(addonNameGuidOrId) & ")or(ccguid=" & cpCore.db.encodeSQLText(addonNameGuidOrId) & ")"
-                        CS = cpCore.db.cs_open("add-ons", sqlCriteria)
+                        CS = cpCore.db.cs_open(cnAddons, sqlCriteria)
                         If cpCore.db.cs_ok(CS) Then
                             addonId = cpCore.db.cs_getInteger(CS, "id")
                         End If
@@ -501,8 +501,8 @@ Namespace Contensive.Core
                 Call localCache.guidIndex.getPtr("test")
                 localCache.propertyBag_guidIndex = localCache.guidIndex.exportPropertyBag()
                 '
-                Call cpCore.cache.setKey(cacheName, localCache, "add-ons")
-                Call cpCore.cache.setKey("testCache1", localCache, "add-ons")
+                Call cpCore.cache.setKey(cacheName, localCache, cnAddons)
+                Call cpCore.cache.setKey("testCache1", localCache, cnAddons)
                 Call cpCore.cache.setKey("testCache2", localCache)
                 Call cpCore.cache.setKey("testCache3", "sampleName")
             Catch ex As Exception

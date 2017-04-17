@@ -113,7 +113,7 @@ Namespace Contensive.Core
         '       Unzips any collection files
         '       Returns true if it all downloads OK
         '
-        Private Function DownloadCollectionFiles(ByVal WorkingFolder As String, ByVal CollectionGuid As String, ByRef return_CollectionLastChangeDate As Date, ByRef return_ErrorMessage As String) As Boolean
+        Private Function DownloadCollectionFiles(ByVal workingPath As String, ByVal CollectionGuid As String, ByRef return_CollectionLastChangeDate As Date, ByRef return_ErrorMessage As String) As Boolean
             DownloadCollectionFiles = False
             Try
                 '
@@ -212,7 +212,7 @@ Namespace Contensive.Core
                                                             Collectionname = CDefInterfaces.InnerText
                                                         Case "help"
                                                             'CollectionHelp = CDefInterfaces.innerText
-                                                            Call cpCore.privateFiles.saveFile(WorkingFolder & "Collection.hlp", CDefInterfaces.InnerText)
+                                                            Call cpCore.privateFiles.saveFile(workingPath & "Collection.hlp", CDefInterfaces.InnerText)
                                                         Case "guid"
                                                             CollectionGuid = CDefInterfaces.InnerText
                                                         Case "lastchangedate"
@@ -230,7 +230,7 @@ Namespace Contensive.Core
                                                                     '
                                                                     Call appendInstallLog("Server", "DownloadCollection", errorPrefix & "Collection [" & Collectionname & "] was Not installed because the Collection File Link does Not point to a valid file [" & CollectionFileLink & "]")
                                                                 Else
-                                                                    CollectionFilePath = WorkingFolder & Mid(CollectionFileLink, Pos + 1)
+                                                                    CollectionFilePath = workingPath & Mid(CollectionFileLink, Pos + 1)
                                                                     Call cpCore.privateFiles.SaveRemoteFile(CollectionFileLink, CollectionFilePath)
                                                                     ' BuildCollectionFolder takes care of the unzipping.
                                                                     'If vbLCase(Right(CollectionFilePath, 4)) = ".zip" Then
@@ -270,7 +270,7 @@ Namespace Contensive.Core
                                                                     UserError = "There was an error processing a collection in the download file [" & Collectionname & "]. The ActiveX filename attribute was empty, and the filename could not be read from the link [" & ResourceLink & "]."
                                                                     Call appendInstallLog("Server", "DownloadCollectionFiles", errorPrefix & UserError)
                                                                 Else
-                                                                    Call cpCore.privateFiles.SaveRemoteFile(ResourceLink, WorkingFolder & ResourceFilename)
+                                                                    Call cpCore.privateFiles.SaveRemoteFile(ResourceLink, workingPath & ResourceFilename)
                                                                 End If
                                                             End If
                                                     End Select
@@ -324,7 +324,7 @@ Namespace Contensive.Core
             Try
                 '
                 Dim CollectionVersionFolderName As String
-                Dim WorkingFolder As String
+                Dim workingPath As String
                 Dim CollectionLastChangeDate As Date
                 Dim collectionGuidList As New List(Of String)
                 'Dim builder As New coreBuilderClass(cpCore)
@@ -348,15 +348,15 @@ Namespace Contensive.Core
                     '
                     ' Download all files for this collection and build the collection folder(s)
                     '
-                    WorkingFolder = cpCore.addon.getPrivateFilesAddonPath() & "temp_" & GetRandomInteger() & "\"
-                    Call cpCore.privateFiles.createPath(WorkingFolder)
+                    workingPath = cpCore.addon.getPrivateFilesAddonPath() & "temp_" & GetRandomInteger() & "\"
+                    Call cpCore.privateFiles.createPath(workingPath)
                     '
-                    UpgradeOK = DownloadCollectionFiles(WorkingFolder, CollectionGuid, CollectionLastChangeDate, return_ErrorMessage)
+                    UpgradeOK = DownloadCollectionFiles(workingPath, CollectionGuid, CollectionLastChangeDate, return_ErrorMessage)
                     If UpgradeOK Then
-                        UpgradeOK = BuildLocalCollectionReposFromFolder(WorkingFolder, CollectionLastChangeDate, collectionGuidList, return_ErrorMessage, False)
+                        UpgradeOK = BuildLocalCollectionReposFromFolder(workingPath, CollectionLastChangeDate, collectionGuidList, return_ErrorMessage, False)
                     End If
                     '
-                    Call cpCore.privateFiles.DeleteFileFolder(WorkingFolder)
+                    Call cpCore.privateFiles.DeleteFileFolder(workingPath)
                 End If
                 '
                 ' Upgrade the server from the collection files
@@ -723,7 +723,7 @@ Namespace Contensive.Core
                 Dim ResourceType As String
                 Dim CollectionVersionFolderName As String
                 Dim ChildCollectionLastChangeDate As Date
-                Dim ChildWorkingFolder As String
+                Dim ChildWorkingPath As String
                 Dim ChildCollectionGUID As String
                 Dim ChildCollectionName As String
                 Dim Found As Boolean
@@ -900,8 +900,8 @@ Namespace Contensive.Core
                                                 If (NowPart < 10) Then TimeStamp &= "0"
                                                 TimeStamp &= NowPart.ToString()
                                                 CollectionVersionFolderName = CollectionFolderName & "\" & TimeStamp
-                                                Dim CollectionVersionPath As String = cpCore.addon.getPrivateFilesAddonPath() & CollectionVersionFolderName
-                                                Dim CollectionVersionFolder As String = CollectionVersionPath & "\"
+                                                Dim CollectionVersionFolder As String = cpCore.addon.getPrivateFilesAddonPath() & CollectionVersionFolderName
+                                                Dim CollectionVersionPath As String = CollectionVersionFolder & "\"
                                                 Call cpCore.privateFiles.createPath(CollectionVersionPath)
 
                                                 Call cpCore.privateFiles.copyFolder(tmpInstallPath, CollectionVersionFolder)
@@ -991,11 +991,11 @@ Namespace Contensive.Core
                                                                     '
                                                                     ' If it is not already installed, download and install it also
                                                                     '
-                                                                    ChildWorkingFolder = CollectionVersionPath & "\" & ChildCollectionGUID
+                                                                    ChildWorkingPath = CollectionVersionPath & "\" & ChildCollectionGUID & "\"
                                                                     '
                                                                     ' down an imported collection file
                                                                     '
-                                                                    StatusOK = DownloadCollectionFiles(ChildWorkingFolder, ChildCollectionGUID, ChildCollectionLastChangeDate, return_ErrorMessage)
+                                                                    StatusOK = DownloadCollectionFiles(ChildWorkingPath, ChildCollectionGUID, ChildCollectionLastChangeDate, return_ErrorMessage)
                                                                     If Not StatusOK Then
                                                                         Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], downloadCollectionFiles returned error state, message [" & return_ErrorMessage & "]")
                                                                         If return_ErrorMessage = "" Then
@@ -1009,7 +1009,7 @@ Namespace Contensive.Core
                                                                         ' install the downloaded file
                                                                         '
                                                                         Dim ChildCollectionGUIDList As New List(Of String)
-                                                                        StatusOK = BuildLocalCollectionReposFromFolder(ChildWorkingFolder, ChildCollectionLastChangeDate, ChildCollectionGUIDList, return_ErrorMessage, allowLogging)
+                                                                        StatusOK = BuildLocalCollectionReposFromFolder(ChildWorkingPath, ChildCollectionLastChangeDate, ChildCollectionGUIDList, return_ErrorMessage, allowLogging)
                                                                         If Not StatusOK Then
                                                                             Call appendInstallLog("Server", "AddonInstallClass", "BuildLocalCollectionFolder, [" & ChildCollectionGUID & "], BuildLocalCollectionFolder returned error state, message [" & return_ErrorMessage & "]")
                                                                             If return_ErrorMessage = "" Then
@@ -1019,6 +1019,9 @@ Namespace Contensive.Core
                                                                             End If
                                                                         End If
                                                                     End If
+                                                                    '
+                                                                    ' -- remove child installation working folder
+                                                                    cpCore.privateFiles.DeleteFileFolder(ChildWorkingPath)
                                                                 Else
                                                                     '
                                                                     '
@@ -2708,7 +2711,7 @@ Namespace Contensive.Core
                         navTypeId = NavTypeIDAddon
                     End If
                     Criteria = "(" & AddonGuidFieldName & "=" & cpCore.db.encodeSQLText(addonGuid) & ")"
-                    CS = cpCore.db.cs_open("Add-ons", Criteria, , False)
+                    CS = cpCore.db.cs_open(cnAddons, Criteria, , False)
                     If cpCore.db.cs_ok(CS) Then
                         '
                         ' Update the Addon
@@ -2720,7 +2723,7 @@ Namespace Contensive.Core
                         '
                         Call cpCore.db.cs_Close(CS)
                         Criteria = "(name=" & cpCore.db.encodeSQLText(addonName) & ")and(" & AddonGuidFieldName & " is null)"
-                        CS = cpCore.db.cs_open("Add-ons", Criteria, , False)
+                        CS = cpCore.db.cs_open(cnAddons, Criteria, , False)
                         If cpCore.db.cs_ok(CS) Then
                             Call appendInstallLog(cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Add-on name matched an existing Add-on that has no GUID, Updating legacy Aggregate Function to Add-on [" & addonName & "], Guid [" & addonGuid & "]")
                         End If
@@ -2730,7 +2733,7 @@ Namespace Contensive.Core
                         ' not found by GUID or by name, Insert a new addon
                         '
                         Call cpCore.db.cs_Close(CS)
-                        CS = cpCore.db.cs_insertRecord("Add-ons", 0)
+                        CS = cpCore.db.cs_insertRecord(cnAddons, 0)
                         If cpCore.db.cs_ok(CS) Then
                             Call appendInstallLog(cpCore.serverConfig.appConfig.name, "AddonInstallClass", "UpgradeAppFromLocalCollection, Creating new Add-on [" & addonName & "], Guid [" & addonGuid & "]")
                         End If
@@ -3168,7 +3171,7 @@ Namespace Contensive.Core
                                                                     End If
                                                                     If Criteria <> "" Then
                                                                         '$$$$$ cache this
-                                                                        CS2 = cpCore.db.cs_open("Add-ons", Criteria, "ID")
+                                                                        CS2 = cpCore.db.cs_open(cnAddons, Criteria, "ID")
                                                                         If cpCore.db.cs_ok(CS2) Then
                                                                             SrcAddonID = cpCore.db.cs_getInteger(CS2, "ID")
                                                                         End If
@@ -3255,7 +3258,7 @@ Namespace Contensive.Core
                     End If
                     AddOnType = GetXMLAttribute(IsFound, AddonNode, "type", "")
                     Criteria = "(" & AddonGuidFieldName & "=" & cpCore.db.encodeSQLText(AOGuid) & ")"
-                    CS = cpCore.db.cs_open("Add-ons", Criteria, , False)
+                    CS = cpCore.db.cs_open(cnAddons, Criteria, , False)
                     If cpCore.db.cs_ok(CS) Then
                         '
                         ' Update the Addon
@@ -3267,7 +3270,7 @@ Namespace Contensive.Core
                         '
                         Call cpCore.db.cs_Close(CS)
                         Criteria = "(name=" & cpCore.db.encodeSQLText(AOName) & ")and(" & AddonGuidFieldName & " is null)"
-                        CS = cpCore.db.cs_open("Add-ons", Criteria, , False)
+                        CS = cpCore.db.cs_open(cnAddons, Criteria, , False)
                     End If
                     If Not cpCore.db.cs_ok(CS) Then
                         '
@@ -3301,7 +3304,7 @@ Namespace Contensive.Core
                                                 Criteria = "(name=" & cpCore.db.encodeSQLText(IncludeAddonName) & ")"
                                             End If
                                             If Criteria <> "" Then
-                                                CS2 = cpCore.db.cs_open("Add-ons", Criteria)
+                                                CS2 = cpCore.db.cs_open(cnAddons, Criteria)
                                                 If cpCore.db.cs_ok(CS2) Then
                                                     IncludeAddonID = cpCore.db.cs_getInteger(CS2, "ID")
                                                 End If
@@ -3564,7 +3567,7 @@ Namespace Contensive.Core
         '        private Function csv_VerifyNavigatorEntry4(ByVal asv As appServicesClass, ByVal ccGuid As String, ByVal menuNameSpace As String, ByVal EntryName As String, ByVal ContentName As String, ByVal LinkPage As String, ByVal SortOrder As String, ByVal AdminOnly As Boolean, ByVal DeveloperOnly As Boolean, ByVal NewWindow As Boolean, ByVal Active As Boolean, ByVal MenuContentName As String, ByVal AddonName As String, ByVal NavIconType As String, ByVal NavIconTitle As String, ByVal InstalledByCollectionID As Integer) As Integer
         '            On Error GoTo ErrorTrap : 'Const Tn = "VerifyNavigatorEntry4" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
         '            '
-        '            Const AddonContentName = "Add-ons"
+        '            Const AddonContentName = cnAddons
         '            '
         '            Dim DupFound As Boolean
         '            Dim EntryID As Integer
@@ -6335,7 +6338,7 @@ Namespace Contensive.Core
             Dim returnEntry As Integer = 0
             Try
                 '
-                Const AddonContentName = "Add-ons"
+                Const AddonContentName = cnAddons
                 '
                 Dim DupFound As Boolean
                 Dim EntryID As Integer

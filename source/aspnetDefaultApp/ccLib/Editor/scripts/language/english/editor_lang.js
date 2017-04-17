@@ -76,7 +76,7 @@ function getTxt(s)
 		case "View/Edit Source":return "View/Edit Source";
 		case "Tag Selector":return "Tag Selector";
 		case "Clear All":return "Clear All";
-		case "Tags":return "Add-ons";
+		case "Tags":return cnAddons;
 
 		case "Heading 1":return "Heading 1";
 		case "Heading 2":return "Heading 2";

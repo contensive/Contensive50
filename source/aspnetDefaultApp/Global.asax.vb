@@ -1,13 +1,27 @@
 ﻿Imports System.Web.SessionState
+Imports System.Web.Routing
 
 Public Class Global_asax
     Inherits System.Web.HttpApplication
     '
     Public AppId As Guid = Guid.NewGuid()
     '
+    '====================================================================================================
+    ''' <summary>
+    ''' application load -- build routing
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
     Sub Application_Start(ByVal sender As Object, ByVal e As EventArgs)
-        ' Fires when the application is started
         Trace.WriteLine(getAppDescription("Application_Start"))
+        Dim cp As Contensive.Core.CPClass
+        Dim serverConfig As Contensive.Core.Models.Entity.serverConfigModel = DefaultApp.configurationClass.getServerConfig()
+        cp = New Contensive.Core.CPClass(serverConfig)
+        cp.Utils.AppendLog("Application_Start")
+        If (cp.appOk) Then
+            DefaultApp.configurationClass.RegisterRoutes(cp, serverConfig, RouteTable.Routes)
+        End If
+        cp.Dispose()
     End Sub
 
     Sub Session_Start(ByVal sender As Object, ByVal e As EventArgs)

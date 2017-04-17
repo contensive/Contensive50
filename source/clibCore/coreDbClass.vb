@@ -2809,7 +2809,7 @@ Namespace Contensive.Core
             Dim returnResult As Integer = -1
             Try
                 If (RecordID <= 0) Then
-                    Throw New ArgumentException("recordId is not valie [" & RecordID & "]")
+                    Throw New ArgumentException("recordId is not valid [" & RecordID & "]")
                 Else
                     returnResult = cs_open(ContentName, "(ID=" & encodeSQLNumber(RecordID) & ")", , False, MemberID, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1)
                 End If

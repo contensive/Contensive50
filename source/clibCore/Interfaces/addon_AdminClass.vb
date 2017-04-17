@@ -498,7 +498,7 @@ leak200:
                     Else
                         If addonId <> 0 Then
                             Call cpCore.webServerIO_addRefreshQueryString("addonid", CStr(addonId))
-                            CS = cpCore.csOpen("Add-ons", addonId)
+                            CS = cpCore.csOpen(cnAddons, addonId)
                             If Not cpCore.db.cs_ok(CS) Then
                                 Call cpCore.error_AddUserError("The Add-on you requested could not be found by its id " & addonId)
                             End If
@@ -506,16 +506,16 @@ leak200:
                             Call cpCore.webServerIO_addRefreshQueryString("addonguid", AddonGuid)
                             '$$$$$ cache this
                             If True Then ' 3.4.060" Then
-                                CS = cpCore.db.cs_open("Add-ons", "ccguid=" & cpCore.db.encodeSQLText(AddonGuid))
+                                CS = cpCore.db.cs_open(cnAddons, "ccguid=" & cpCore.db.encodeSQLText(AddonGuid))
                             Else
-                                CS = cpCore.db.cs_open("Add-ons", "aoguid=" & cpCore.db.encodeSQLText(AddonGuid))
+                                CS = cpCore.db.cs_open(cnAddons, "aoguid=" & cpCore.db.encodeSQLText(AddonGuid))
                             End If
                             If Not cpCore.db.cs_ok(CS) Then
                                 Call cpCore.error_AddUserError("The Add-on you requested could not be found by its guid " & AddonGuid)
                             End If
                         ElseIf AddonName <> "" Then
                             Call cpCore.webServerIO_addRefreshQueryString("addonname", AddonName)
-                            CS = cpCore.db.cs_open("Add-ons", "name=" & cpCore.db.encodeSQLText(AddonName))
+                            CS = cpCore.db.cs_open(cnAddons, "name=" & cpCore.db.encodeSQLText(AddonName))
                             If Not cpCore.db.cs_ok(CS) Then
                                 Call cpCore.error_AddUserError("The Add-on you requested could not be found by its name " & AddonName)
                             End If
@@ -7148,7 +7148,7 @@ ErrorTrap:
                 addonId = 0
                 If (cpCore.visit_Id = cpCore.docProperties.getInteger(RequestNameDashboardReset)) Then
                     '$$$$$ cache this
-                    CS = cpCore.db.cs_open("Add-ons", "ccguid=" & cpCore.db.encodeSQLText(DashboardAddonGuid))
+                    CS = cpCore.db.cs_open(cnAddons, "ccguid=" & cpCore.db.encodeSQLText(DashboardAddonGuid))
                     If cpCore.db.cs_ok(CS) Then
                         addonId = cpCore.db.cs_getInteger(CS, "id")
                         Call cpCore.siteProperties.setProperty("AdminRootAddonID", EncodeText(addonId))
@@ -7178,7 +7178,7 @@ ErrorTrap:
                         '
                         ' Verify it so there is no error when it runs
                         '
-                        CS = cpCore.csOpen("Add-ons", addonId)
+                        CS = cpCore.csOpen(cnAddons, addonId)
                         If Not cpCore.db.cs_ok(CS) Then
                             '
                             ' it was set, but the add-on is not available, auto set to dashboard
@@ -7193,7 +7193,7 @@ ErrorTrap:
                         ' This has never been set, try to get the dashboard ID
                         '
                         '$$$$$ cache this
-                        CS = cpCore.db.cs_open("Add-ons", "ccguid=" & cpCore.db.encodeSQLText(DashboardAddonGuid))
+                        CS = cpCore.db.cs_open(cnAddons, "ccguid=" & cpCore.db.encodeSQLText(DashboardAddonGuid))
                         If cpCore.db.cs_ok(CS) Then
                             addonId = cpCore.db.cs_getInteger(CS, "id")
                             Call cpCore.siteProperties.setProperty("AdminRootAddonID", EncodeText(addonId))
@@ -16759,13 +16759,13 @@ ErrorTrap:
                 Dim FoundAddon As Boolean
                 '
                 If vbInstr(1, "," & UsedIDString & ",", "," & CStr(HelpAddonID) & ",") = 0 Then
-                    CS = cpCore.csOpen("Add-ons", HelpAddonID)
+                    CS = cpCore.csOpen(cnAddons, HelpAddonID)
                     If cpCore.db.cs_ok(CS) Then
                         FoundAddon = True
                         AddonName = cpCore.db.cs_get(CS, "Name")
                         AddonHelpCopy = cpCore.db.cs_get(CS, "help")
                         AddonDateAdded = cpCore.db.cs_getDate(CS, "dateadded")
-                        If cpCore.main_IsContentFieldSupported("Add-ons", "lastupdated") Then
+                        If cpCore.main_IsContentFieldSupported(cnAddons, "lastupdated") Then
                             AddonLastUpdated = cpCore.db.cs_getDate(CS, "lastupdated")
                         End If
                         If AddonLastUpdated = Date.MinValue Then
@@ -16859,7 +16859,7 @@ ErrorTrap:
                     '
                     If True Then ' 4.0.321" Then
                         '$$$$$ cache this
-                        CS = cpCore.db.cs_open("Add-ons", "CollectionID=" & HelpCollectionID, "name", , , , , "ID")
+                        CS = cpCore.db.cs_open(cnAddons, "CollectionID=" & HelpCollectionID, "name", , , , , "ID")
                         Do While cpCore.db.cs_ok(CS)
                             IncludeHelp = IncludeHelp & "<div style=""clear:both;"">" & GetAddonHelp(cpCore.db.cs_getInteger(CS, "ID"), "") & "</div>"
                             Call cpCore.db.cs_goNext(CS)

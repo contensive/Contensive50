@@ -389,7 +389,7 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="constanceModule.vb" />
+    <Compile Include="constantsModule.vb" />
     <Compile Include="Controllers\iisController.vb" />
     <Compile Include="coreAddonCacheClass.vb" />
     <Compile Include="coreAddonClass.vb" />
@@ -398,6 +398,8 @@
     <Compile Include="coreDomainsClass.vb" />
     <Compile Include="coreEncodeBase64Class.vb" />
     <Compile Include="Controllers\pageManagerController.vb" />
+    <Compile Include="Interfaces\_blankAddon.vb" />
+    <Compile Include="Interfaces\toolConfigureEdit.vb" />
     <Compile Include="Models\Context\coreSitePropertiesClass.vb" />
     <Compile Include="coreUserClass.vb" />
     <Compile Include="coreWebServerIOClass.vb" />
@@ -463,6 +465,7 @@
     <Compile Include="Controllers\appBuilderController.vb" />
     <Compile Include="Models\Entity\serverConfigModel.vb" />
     <Compile Include="Models\Entity\_blankCachedModel.vb" />
+    <Compile Include="Models\Entity\addonsModel.vb" />
     <Compile Include="Models\Entity\_blankModel.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -483,6 +486,7 @@
     <Compile Include="coreToolsClass.vb" />
     <Compile Include="coreUploadClass.vb" />
     <Compile Include="coreXmlToolsClass.vb" />
+    <Compile Include="Views\genericLegacyView.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -536,7 +540,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\View\" />
-    <Folder Include="Views\" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="ADODB">

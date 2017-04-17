@@ -136,16 +136,16 @@ Namespace Contensive.Core.Models.Context
                         If _childListAddonID_Local = 0 Then
                             BuildSupportsGuid = True
                             If BuildSupportsGuid Then
-                                CS = cpCore.db.cs_open("Add-ons", "ccguid='" & ChildListGuid & "'", , , ,,  , "ID")
+                                CS = cpCore.db.cs_open(cnAddons, "ccguid='" & ChildListGuid & "'", , , ,,  , "ID")
                             Else
-                                CS = cpCore.db.cs_open("Add-ons", "name='Child Page List'", , , , ,, "ID")
+                                CS = cpCore.db.cs_open(cnAddons, "name='Child Page List'", , , , ,, "ID")
                             End If
                             If cpCore.db.cs_ok(CS) Then
                                 _childListAddonID_Local = cpCore.db.cs_getInteger(CS, "ID")
                             End If
                             Call cpCore.db.cs_Close(CS)
                             If _childListAddonID_Local = 0 Then
-                                CS = cpCore.db.cs_insertRecord("Add-ons")
+                                CS = cpCore.db.cs_insertRecord(cnAddons)
                                 If cpCore.db.cs_ok(CS) Then
                                     _childListAddonID_Local = cpCore.db.cs_getInteger(CS, "ID")
                                     Call cpCore.db.cs_set(CS, "name", "Child Page List")

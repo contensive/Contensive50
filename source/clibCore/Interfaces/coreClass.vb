@@ -528,6 +528,7 @@ Namespace Contensive.Core
             MyBase.New()
             Me.cp = cp
             serverConfig = Models.Entity.serverConfigModel.getObject(Me)
+            Me.serverConfig.defaultDataSourceType = dataSourceTypeEnum.sqlServerNative
             webServerIO.iisContext = Nothing
             constructorCommonInitialize()
         End Sub
@@ -542,6 +543,7 @@ Namespace Contensive.Core
             MyBase.New()
             Me.cp = cp
             Me.serverConfig = serverConfig
+            Me.serverConfig.defaultDataSourceType = dataSourceTypeEnum.sqlServerNative
             Me.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady
             webServerIO.iisContext = Nothing
             constructorCommonInitialize()
@@ -558,6 +560,7 @@ Namespace Contensive.Core
             Me.cp = cp
             Me.serverConfig = serverConfig
             Me.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady
+            Me.serverConfig.defaultDataSourceType = dataSourceTypeEnum.sqlServerNative
             Call webServerIO.initWebContext(httpContext)
             constructorCommonInitialize()
         End Sub
@@ -572,6 +575,7 @@ Namespace Contensive.Core
             MyBase.New()
             Me.cp = cp
             serverConfig = Models.Entity.serverConfigModel.getObject(Me, applicationName)
+            serverConfig.defaultDataSourceType = dataSourceTypeEnum.sqlServerNative
             webServerIO.iisContext = Nothing
             constructorCommonInitialize()
         End Sub
@@ -587,6 +591,7 @@ Namespace Contensive.Core
             MyBase.New()
             Me.cp = cp
             serverConfig = Models.Entity.serverConfigModel.getObject(Me, applicationName)
+            serverConfig.defaultDataSourceType = dataSourceTypeEnum.sqlServerNative
             constructorCommonInitialize()
             Call webServerIO.initWebContext(httpContext)
         End Sub
@@ -2991,7 +2996,7 @@ ErrorTrap:
                                                         '
                                                         ' Get IconFilename, update the optionstring, and execute optionstring replacement functions
                                                         '
-                                                        AddonContentName = "Add-ons"
+                                                        AddonContentName = cnAddons
                                                         If True Then
                                                             SelectList = "Name,Link,ID,ArgumentList,ObjectProgramID,IconFilename,IconWidth,IconHeight,IconSprites,IsInline,ccGuid"
                                                         End If
@@ -13368,7 +13373,7 @@ ErrorTrap:
                     'hint = "980"
                     '$$$$$ cache this
                     ' $$$$$ make ptr list on load
-                    CS = db.cs_open("Add-ons", "(OnNewVisitEvent<>0)", "Name", , , , , "id")
+                    CS = db.cs_open(cnAddons, "(OnNewVisitEvent<>0)", "Name", , , , , "id")
                     Do While db.cs_ok(CS)
                         Call addon.execute_legacy5(db.cs_getInteger(CS, "ID"), "", "", CPUtilsBaseClass.addonContext.ContextOnNewVisit, "", 0, "", 0)
                         db.cs_goNext(CS)
@@ -14930,7 +14935,7 @@ ErrorTrap:
                 ' ----- Page Content Child List Add-on
                 '
                 If (RecordID <> 0) And (True) Then
-                    CSAddon = csOpen("Add-ons", siteProperties.childListAddonID)
+                    CSAddon = csOpen(cnAddons, siteProperties.childListAddonID)
                     FoundAddon = False
                     If db.cs_ok(CSAddon) Then
                         FoundAddon = True
@@ -15013,7 +15018,7 @@ ErrorTrap:
                         AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Block
                     End If
                 End If
-                '        CSAddon = app.csOpen("Add-ons", "name=" & encodeSQLText(AddonName))
+                '        CSAddon = app.csOpen(cnAddons, "name=" & encodeSQLText(AddonName))
                 '        FoundAddon = False
                 '        If app.csv_IsCSOK(CSAddon) Then
                 '            FoundAddon = True
@@ -28815,7 +28820,7 @@ ErrorTrap:
                             End If
                         End If
                     End If
-                    AddonContentName = "Add-ons"
+                    AddonContentName = cnAddons
                     SelectList = "Name,Link,ID,ArgumentList,ObjectProgramID,IconFilename,IconWidth,IconHeight,IconSprites,IsInline,ccguid"
                     CSAddons = db.cs_open(AddonContentName, Criteria, "Name,ID", , , , , SelectList)
                     If db.cs_ok(CSAddons) Then
@@ -33913,7 +33918,7 @@ ErrorTrap:
                                     '
                                     Dim AddonGuid As String = docProperties.getText("guid")
                                     '$$$$$ cache this
-                                    Dim CS As Integer = db.cs_open("add-ons", "ccguid=" & db.encodeSQLText(AddonGuid))
+                                    Dim CS As Integer = db.cs_open(cnAddons, "ccguid=" & db.encodeSQLText(AddonGuid))
                                     Dim addonArgumentList As String = ""
                                     Dim addonIsInline As Boolean = False
                                     If db.cs_ok(CS) Then
@@ -34155,7 +34160,7 @@ ErrorTrap:
                                         Dim nothingObject As Object = Nothing
                                         Dim cs As Integer
                                         addonId = docProperties.getInteger("AddonID")
-                                        cs = csOpen("Add-ons", addonId)
+                                        cs = csOpen(cnAddons, addonId)
                                         If db.cs_ok(cs) Then
                                             Call db.cs_set(cs, "CustomStylesFilename", docProperties.getText("CustomStyles"))
                                         End If
@@ -34703,7 +34708,7 @@ ErrorTrap:
         ''' <remarks></remarks>
         Public Sub handleLegacyError3(ByVal ContensiveAppName As String, ByVal Context As String, ByVal ProgramName As String, ByVal ClassName As String, ByVal MethodName As String, ByVal ErrNumber As Integer, ByVal ErrSource As String, ByVal ErrDescription As String, ByVal ErrorTrap As Boolean, ByVal ResumeNext As Boolean, ByVal URL As String)
             handleException(New Exception("Legacy error, ContensiveAppName=[" & ContensiveAppName & "], Context=[" & Context & "], ProgramName=[" & ProgramName & "], ClassName=[" & ClassName & "], MethodName=[" & MethodName & "], [legacy error #" & ErrNumber & "," & ErrSource & "," & ErrDescription & "]"), Context, 2)
-            Throw New ApplicationException("handleLegacyError")
+            'Throw New ApplicationException("handleLegacyError")
         End Sub
         '
         '======================================================================

@@ -184,7 +184,7 @@ Namespace Contensive.Core
                                         '
                                         ' Delete any addons from this collection
                                         '
-                                        Call cpCore.db.deleteContentRecords("add-ons", "collectionid=" & TargetCollectionID)
+                                        Call cpCore.db.deleteContentRecords(cnAddons, "collectionid=" & TargetCollectionID)
 
                                         '                            '
                                         '                            ' Load all collections into local collection storage
@@ -297,7 +297,7 @@ Namespace Contensive.Core
                                         '                                '
                                         '                                ' delete all addons associated to this collection
                                         '                                '
-                                        '                                Call cpcore.app.DeleteContentRecords("Add-ons", "collectionid=" & TargetCollectionID)
+                                        '                                Call cpcore.app.DeleteContentRecords(cnAddons, "collectionid=" & TargetCollectionID)
                                         '                            Else
                                         '                                ' deprecated the addoncollectionrules for collectionid in addon
                                         '                                If (TargetCollectionPtr >= 0) And (CollectionCnt <> 0) Then
@@ -335,7 +335,7 @@ Namespace Contensive.Core
                                         '                                            Else
                                         '                                                Criteria = "(name=" & encodeSQLText(TargetAddonName) & ")"
                                         '                                            End If
-                                        '                                            Call cpcore.app.DeleteContentRecords("Add-ons", Criteria)
+                                        '                                            Call cpcore.app.DeleteContentRecords(cnAddons, Criteria)
                                         '                                        End If
                                         '                                    Next
                                         '                                End If
@@ -446,7 +446,7 @@ Namespace Contensive.Core
                             If Cnt > 0 Then
                                 For Ptr = 0 To Cnt - 1
                                     If cpCore.doc_getBoolean2("ao" & Ptr) Then
-                                        Call cpCore.DeleteContentRecord("Add-ons", cpCore.docProperties.getInteger("aoID" & Ptr))
+                                        Call cpCore.DeleteContentRecord(cnAddons, cpCore.docProperties.getInteger("aoID" & Ptr))
                                     End If
                                 Next
                             End If
