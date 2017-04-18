@@ -69,7 +69,7 @@ Namespace Contensive.Core
         '
         <Serializable>
         Public Class addonsCacheClass
-            Public addonList As Dictionary(Of Integer, addonClass)
+            Public addonList As Dictionary(Of String, addonClass)
             Public idIndex As coreKeyPtrIndexClass
             Public nameIndex As coreKeyPtrIndexClass
             Public guidIndex As coreKeyPtrIndexClass
@@ -95,7 +95,7 @@ Namespace Contensive.Core
                 If localCache Is Nothing Then
                     localCache = New addonsCacheClass()
                 End If
-                localCache.addonList = New Dictionary(Of Integer, addonClass)
+                localCache.addonList = New Dictionary(Of String, addonClass)
                 localCache.guidIndex = New coreKeyPtrIndexClass
                 localCache.idIndex = New coreKeyPtrIndexClass
                 localCache.nameIndex = New coreKeyPtrIndexClass
@@ -135,7 +135,7 @@ Namespace Contensive.Core
                     If localCache.addonList.Count > 0 Then
                         'hint = hint & ", 3 cache_addonCnt=[" & cache_addons.addonList.Count & "]"
                         For addonPtr = 0 To localCache.addonList.Count - 1
-                            If EncodeInteger(localCache.addonList(addonPtr).addonCache_Id) = RecordID Then
+                            If EncodeInteger(localCache.addonList(addonPtr.ToString).addonCache_Id) = RecordID Then
                                 Exit For
                             End If
                         Next
@@ -213,7 +213,7 @@ Namespace Contensive.Core
                                 ' not found in cache - add a new entry
                                 '
                                 'hint = hint & ", 6"
-                                localCache.addonList.Add(localCache.addonList.Count, addon)
+                                localCache.addonList.Add(localCache.addonList.Count.ToString, addon)
                                 'ReDim Preserve cache_addons.addons(rowptr).addonCacheColCnt - 1, cache_addons.addonList.Count - 1)
                             End If
                             '
@@ -227,8 +227,8 @@ Namespace Contensive.Core
                             ' build id and name indexes
                             '
                             'hint = hint & ", 8"
-                            Id = localCache.addonList(addonPtr).addonCache_Id
-                            RecordName = localCache.addonList(addonPtr).addonCache_name
+                            Id = localCache.addonList(addonPtr.ToString).addonCache_Id
+                            RecordName = localCache.addonList(addonPtr.ToString).addonCache_name
                             '
                             'hint = hint & ", 9"
                             Call localCache.idIndex.setPtr(EncodeText(Id), addonPtr)
@@ -367,7 +367,7 @@ Namespace Contensive.Core
                         ' cache is empty, build it from scratch
                         '
                         localCache = New addonsCacheClass
-                        localCache.addonList = New Dictionary(Of Integer, addonClass)
+                        localCache.addonList = New Dictionary(Of String, addonClass)
                         localCache.guidIndex = New coreKeyPtrIndexClass
                         localCache.idIndex = New coreKeyPtrIndexClass
                         localCache.nameIndex = New coreKeyPtrIndexClass
@@ -429,7 +429,7 @@ Namespace Contensive.Core
                                     addon.addonCache_ScriptingLanguageID = EncodeInteger(dr.Item("ScriptingLanguageID"))
                                     addon.addonCache_ScriptingTimeout = EncodeText(dr.Item("ScriptingTimeout"))
                                     addon.addonCache_StylesFilename = EncodeText(dr.Item("StylesFilename"))
-                                    localCache.addonList.Add(addonPtr, addon)
+                                    localCache.addonList.Add(addonPtr.ToString, addon)
                                     '
                                     'hint = hint & ",1"
                                     Call localCache.idIndex.setPtr(EncodeText(RecordID), addonPtr)

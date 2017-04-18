@@ -3678,7 +3678,7 @@ ErrorTrap:
                     End Select
                 End With
                 '
-                Dim html As New coreHtmlClass(cpCore)
+                Dim html As New Controllers.htmlToolsController(cpCore)
                 return_formIndexCell = cpCore.html.html_EncodeHTML(Stream.Text)
             Catch ex As Exception
                 Call cpCore.handleExceptionAndRethrow(ex)
@@ -3755,7 +3755,7 @@ ErrorTrap:
                 Dim LastSendTestDate As Date
                 Dim AllowEmailSendWithoutTest As Boolean
                 'Dim fieldEditorOptions() As fieldEditorType
-                Dim fieldEditorOptions As New Dictionary(Of Integer, Integer)
+                Dim fieldEditorOptions As New Dictionary(Of String, Integer)
                 Dim Ptr As Integer
                 Dim fieldEditorOptionCnt As Integer
                 Dim SQL As String
@@ -4204,8 +4204,8 @@ ErrorTrap:
                 fieldEditorOptionCnt = UBound(Cells, 2) + 1
                 For Ptr = 0 To fieldEditorOptionCnt - 1
                     fieldId = EncodeInteger(Cells(0, Ptr))
-                    If (fieldId > 0) And (Not fieldEditorOptions.ContainsKey(fieldId)) Then
-                        fieldEditorOptions.Add(fieldId, EncodeInteger(Cells(1, Ptr)))
+                    If (fieldId > 0) And (Not fieldEditorOptions.ContainsKey(fieldId.ToString)) Then
+                        fieldEditorOptions.Add(fieldId.ToString, EncodeInteger(Cells(1, Ptr)))
                     End If
                 Next
                 '

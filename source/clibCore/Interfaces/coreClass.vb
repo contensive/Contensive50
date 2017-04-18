@@ -54,15 +54,15 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public ReadOnly Property html As coreHtmlClass
+        Public ReadOnly Property html As Controllers.htmlToolsController
             Get
                 If (_html Is Nothing) Then
-                    _html = New coreHtmlClass(Me)
+                    _html = New Controllers.htmlToolsController(Me)
                 End If
                 Return _html
             End Get
         End Property
-        Private _html As coreHtmlClass
+        Private _html As Controllers.htmlToolsController
         '
         '===================================================================================================
         ''' <summary>
@@ -15005,14 +15005,14 @@ ErrorTrap:
                 addonPtr = addonCache.getPtr(AddonName)
                 If addonPtr >= 0 Then
                     FoundAddon = True
-                    AddonOptionConstructor = addonCache.localCache.addonList(addonPtr).addonCache_ArgumentList
+                    AddonOptionConstructor = addonCache.localCache.addonList(addonPtr.ToString).addonCache_ArgumentList
                     AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
                     AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbLf, vbCr)
                     AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
                     If AddonOptionConstructor <> "" Then
                         AddonOptionConstructor = AddonOptionConstructor & vbCrLf
                     End If
-                    If EncodeBoolean(addonCache.localCache.addonList(addonPtr).addonCache_IsInline) Then
+                    If EncodeBoolean(addonCache.localCache.addonList(addonPtr.ToString).addonCache_IsInline) Then
                         AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Inline
                     Else
                         AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Block
@@ -15149,14 +15149,14 @@ ErrorTrap:
                                     addonPtr = addonCache.getPtr(AddonName)
                                     If addonPtr >= 0 Then
                                         FoundAddon = True
-                                        AddonOptionConstructor = EncodeText(addonCache.localCache.addonList(addonPtr).addonCache_ArgumentList)
+                                        AddonOptionConstructor = EncodeText(addonCache.localCache.addonList(addonPtr.ToString).addonCache_ArgumentList)
                                         AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
                                         AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbLf, vbCr)
                                         AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
                                         If AddonOptionConstructor <> "" Then
                                             AddonOptionConstructor = AddonOptionConstructor & vbCrLf
                                         End If
-                                        If EncodeBoolean(addonCache.localCache.addonList(addonPtr).addonCache_IsInline) Then
+                                        If EncodeBoolean(addonCache.localCache.addonList(addonPtr.ToString).addonCache_IsInline) Then
                                             AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Inline
                                         Else
                                             AddonOptionConstructor = AddonOptionConstructor & AddonOptionConstructor_Block
@@ -30786,75 +30786,45 @@ ErrorTrap:
             Try
                 '
                 Dim AddonReturn As String
-                Dim hint As String
                 Dim Ptr As Integer
                 Dim Cnt As Integer
                 Dim layoutError As String
                 Dim FilterStatusOK As Boolean
-                Dim FilteredBody As String
                 Dim BlockFormatting As Boolean
                 Dim IndentCnt As Integer
                 Dim Result As New coreFastStringClass
                 Dim Content As String
                 Dim ContentIndent As String
                 Dim ContentCnt As Integer
-                Dim CS As Integer
                 Dim PageContent As String
-                Dim Styles As String
-                Dim MenuDepth As Integer
-                Dim MenuStyle As Integer
-                Dim main_ClosePage As String
-                Dim MenuStylePrefix As String
-                Dim CopyName As String
                 Dim Stream As New coreFastStringClass
                 Dim LocalTemplateID As Integer
                 Dim LocalTemplateName As String
                 Dim LocalTemplateBody As String
-                Dim LocalTemplateBodySplit() As String
-                Dim LocalTemplateBodySplitCnt As Integer
-                Dim Segment As String
-                Dim SegmentCmd As String
-                Dim SegmentCMDName As String
-                Dim SegmentCMDSplit() As String
-                Dim SegmentCMDArgs As String
-                Dim SegmentSuffix As String
-                Dim SegmentSplit() As String
-                Dim TPMode As Integer
-                Dim TPBody As String
-                Dim SectionMenu As String
-                Dim DefaultTemplateLink As String
-                Dim MenuDelimiter As String
-                Dim ContentFound As Boolean
-                Dim ACFound As Boolean
                 Dim Parse As coreHtmlParseClass
                 Dim blockSiteWithLogin As Boolean
-                '
                 Dim addonCachePtr As Integer
                 Dim addonId As Integer
                 Dim AddonName As String
                 '
-                'hint = "main_GetHtmlBody"
                 Call addonCache.load()
                 returnHtmlBody = ""
                 '
                 ' ----- OnBodyStart add-ons
                 '
-                'hint = hint & ",onBodyStart"
                 FilterStatusOK = False
                 Cnt = UBound(addonCache.localCache.onBodyStartPtrs) + 1
-                'hint = hint & ",cnt=" & Cnt
                 For Ptr = 0 To Cnt - 1
                     addonCachePtr = addonCache.localCache.onBodyStartPtrs(Ptr)
-                    'hint = hint & ",ptr=" & Ptr & ",addonCachePtr=" & addonCachePtr
                     If addonCachePtr > -1 Then
-                        addonId = addonCache.localCache.addonList(addonCachePtr).addonCache_Id
+                        addonId = addonCache.localCache.addonList(addonCachePtr.ToString).addonCache_Id
                         'hint = hint & ",addonId=" & addonId
                         If addonId > 0 Then
-                            AddonName = addonCache.localCache.addonList(addonCachePtr).addonCache_name
+                            AddonName = addonCache.localCache.addonList(addonCachePtr.ToString).addonCache_name
                             'hint = hint & ",AddonName=" & AddonName
                             returnHtmlBody = returnHtmlBody & addon.execute_legacy2(addonId, "", "", CPUtilsBaseClass.addonContext.ContextOnBodyStart, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
                             If Not FilterStatusOK Then
-                                Call handleLegacyError12("main_GetHtmlBody", "There was an error processing OnAfterBody [" & addonCache.localCache.addonList(addonCachePtr).addonCache_name & "]. Filtering was aborted.")
+                                Call handleLegacyError12("main_GetHtmlBody", "There was an error processing OnAfterBody [" & addonCache.localCache.addonList(addonCachePtr.ToString).addonCache_name & "]. Filtering was aborted.")
                                 Exit For
                             End If
                         End If
@@ -30940,12 +30910,12 @@ ErrorTrap:
                         addonCachePtr = addonCache.localCache.onBodyEndPtrs(Ptr)
                         'hint = hint & ",ptr=" & Ptr & ",addonCachePtr=" & addonCachePtr
                         If addonCachePtr > -1 Then
-                            addonId = addonCache.localCache.addonList(addonCachePtr).addonCache_Id
+                            addonId = addonCache.localCache.addonList(addonCachePtr.ToString).addonCache_Id
                             'hint = hint & ",addonId=" & addonId
                             If addonId > 0 Then
-                                AddonName = addonCache.localCache.addonList(addonCachePtr).addonCache_name
+                                AddonName = addonCache.localCache.addonList(addonCachePtr.ToString).addonCache_name
                                 'hint = hint & ",AddonName=" & AddonName
-                                pageManager_FilterInput = pageManager_GetHtmlBody
+                                pageManager_FilterInput = returnHtmlBody
                                 AddonReturn = addon.execute_legacy2(addonId, "", "", CPUtilsBaseClass.addonContext.ContextFilter, "", 0, "", "", False, 0, "", FilterStatusOK, Nothing)
                                 returnHtmlBody = pageManager_FilterInput & AddonReturn
                                 If Not FilterStatusOK Then
@@ -32481,9 +32451,9 @@ ErrorTrap:
                     For addonPtr = 0 To AddOnCnt - 1
                         addonCachePtr = addonCache.localCache.onPageStartPtrs(addonPtr)
                         If addonCachePtr > -1 Then
-                            addonId = addonCache.localCache.addonList(addonCachePtr).addonCache_Id
+                            addonId = addonCache.localCache.addonList(addonCachePtr.ToString).addonCache_Id
                             If addonId > 0 Then
-                                AddonName = addonCache.localCache.addonList(addonCachePtr).addonCache_name
+                                AddonName = addonCache.localCache.addonList(addonCachePtr.ToString).addonCache_name
                                 AddonContent = addon.execute_legacy5(addonId, AddonName, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
                                 pageManager_PageContent = AddonContent & pageManager_PageContent
                             End If
@@ -32500,9 +32470,9 @@ ErrorTrap:
                     For addonPtr = 0 To AddOnCnt - 1
                         addonCachePtr = addonCache.localCache.onPageEndPtrs(addonPtr)
                         If addonCachePtr > -1 Then
-                            addonId = addonCache.localCache.addonList(addonCachePtr).addonCache_Id
+                            addonId = addonCache.localCache.addonList(addonCachePtr.ToString).addonCache_Id
                             If addonId > 0 Then
-                                AddonName = addonCache.localCache.addonList(addonCachePtr).addonCache_name
+                                AddonName = addonCache.localCache.addonList(addonCachePtr.ToString).addonCache_name
                                 AddonContent = addon.execute_legacy5(addonId, AddonName, "CSPage=-1", CPUtilsBaseClass.addonContext.ContextOnPageStart, "", 0, "", -1)
                                 pageManager_PageContent = pageManager_PageContent & AddonContent
                             End If
@@ -33674,7 +33644,7 @@ ErrorTrap:
                     routeTest = workingRoute
                     Dim addonPtr As Integer = addonCache.getPtr(routeTest)
                     If addonPtr >= 0 Then
-                        If addonCache.localCache.addonList(addonPtr).addonCache_remoteMethod Then
+                        If addonCache.localCache.addonList(addonPtr.ToString).addonCache_remoteMethod Then
                             addonRoute = routeTest
                         End If
                     Else
@@ -33682,7 +33652,7 @@ ErrorTrap:
                             routeTest = routeTest.Substring(1)
                             addonPtr = addonCache.getPtr(routeTest)
                             If addonPtr >= 0 Then
-                                If addonCache.localCache.addonList(addonPtr).addonCache_remoteMethod Then
+                                If addonCache.localCache.addonList(addonPtr.ToString).addonCache_remoteMethod Then
                                     addonRoute = routeTest
                                 End If
                             End If

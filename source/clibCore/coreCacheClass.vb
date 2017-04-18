@@ -234,7 +234,7 @@ Namespace Contensive.Core
                 '    End If
                 'End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex)
             End Try
         End Sub
         '
@@ -337,7 +337,7 @@ Namespace Contensive.Core
                     setKeyRaw(key, cacheData, invalidationDate)
                 End If
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex)
             End Try
         End Sub
         '
@@ -407,7 +407,7 @@ Namespace Contensive.Core
                 '
                 Call setKey(key, cacheObject, invalidationDateDefault, invalidationTagList)
             Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
+                cpCore.handleExceptionAndContinue(ex)
             End Try
         End Sub
         '

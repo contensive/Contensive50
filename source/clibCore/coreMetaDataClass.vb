@@ -16,7 +16,7 @@ Namespace Contensive.Core
         ' objects to destruct during dispose
         '------------------------------------------------------------------------------------------------------------------------
         '
-        Private cdefList As Dictionary(Of Integer, CDefClass)
+        Private cdefList As Dictionary(Of String, CDefClass)
         Private cdefNameIdXref As Dictionary(Of String, Integer)
         Private tableSchemaList As Dictionary(Of String, tableSchemaClass)
         '
@@ -342,7 +342,8 @@ Namespace Contensive.Core
             '
             Public TimeStamp As String                 ' string that changes if any record in Content Definition changes, in memory only
             Public fields As New Dictionary(Of String, CDefFieldClass)
-            Public adminColumns As New SortedList(Of Integer, CDefAdminColumnClass)
+            ' -- !!!!! changed to string because dotnet json cannot serialize an integer key
+            Public adminColumns As New SortedList(Of String, CDefAdminColumnClass)
             Public ContentControlCriteria As String     ' String created from ParentIDs used to select records
             Public selectList As New List(Of String)
             Public SelectCommaList As String            ' Field list used in OpenCSContent calls (all active field definitions)
@@ -373,7 +374,7 @@ Namespace Contensive.Core
             '
             ' reset metaData
             '
-            cdefList = New Dictionary(Of Integer, CDefClass)
+            cdefList = New Dictionary(Of String, CDefClass)
             cdefNameIdXref = Nothing
             tableSchemaList = Nothing
         End Sub
@@ -489,6 +490,7 @@ Namespace Contensive.Core
                 'Dim fieldActive As Boolean
                 Dim fieldName As String
                 Dim parentCdef As CDefClass
+                Dim contentIdKey As String = contentId.ToString
                 '
                 If contentId = 38 Then
                     contentId = contentId
@@ -497,17 +499,17 @@ Namespace Contensive.Core
                     '
                     ' invalid id
                     '
-                ElseIf (Not forceDbLoad) And (cdefList.ContainsKey(contentId)) Then
+                ElseIf (Not forceDbLoad) And (cdefList.ContainsKey(contentIdKey)) Then
                     '
                     ' already loaded and no force re-load, just return the current cdef
                     '
-                    returnCdef = cdefList.Item(contentId)
+                    returnCdef = cdefList.Item(contentIdKey)
                 Else
-                    If (cdefList.ContainsKey(contentId)) Then
+                    If (cdefList.ContainsKey(contentIdKey)) Then
                         '
                         ' key is already there, remove it first
                         '
-                        cdefList.Remove(contentId)
+                        cdefList.Remove(contentIdKey)
                     End If
                     '
                     ' load cache version
@@ -567,7 +569,8 @@ Namespace Contensive.Core
                                 .fields = New Dictionary(Of String, CDefFieldClass)
                                 .childIdList = New List(Of Integer)
                                 .selectList = New List(Of String)
-                                .adminColumns = New SortedList(Of Integer, CDefAdminColumnClass)
+                                ' -- !!!!! changed to string because dotnet json cannot serialize an integer key
+                                .adminColumns = New SortedList(Of String, CDefAdminColumnClass)
                                 '
                                 ' ----- save values in definition
                                 '
@@ -887,7 +890,7 @@ Namespace Contensive.Core
                             cpCore.handleExceptionAndContinue(ex)
                         End Try
                     End If
-                    cdefList.Add(contentId, returnCdef)
+                    cdefList.Add(contentIdKey, returnCdef)
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -1691,7 +1694,8 @@ Namespace Contensive.Core
                                     .Width = FieldWidth
                                     FieldWidthTotal = FieldWidthTotal + .Width
                                 End With
-                                .adminColumns.Add((cnt + (adminColumn.SortPriority * 1000)), adminColumn)
+                                Dim key As String = (cnt + (adminColumn.SortPriority * 1000)).ToString().PadLeft(6, "0"c)
+                                .adminColumns.Add(key, adminColumn)
                             End If
                             cnt += 1
                         Next
@@ -1712,7 +1716,8 @@ Namespace Contensive.Core
                                         .Width = 100
                                         FieldWidthTotal = FieldWidthTotal + .Width
                                     End With
-                                    .adminColumns.Add(1, adminColumn)
+                                    Dim key As String = ((1000)).ToString().PadLeft(6, "0"c)
+                                    .adminColumns.Add(key, adminColumn)
                                 End If
                             End If
                             '

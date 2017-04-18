@@ -36,7 +36,7 @@ Public Class configurationClass
     End Function
     '
     Public Shared Sub RegisterRoutes(cp As Contensive.BaseClasses.CPBaseClass, serverConfig As Contensive.Core.Models.Entity.serverConfigModel, ByVal routes As RouteCollection)
-        Dim remoteMethods As List(Of Contensive.Core.Models.Entity.addonModel) = Contensive.Core.Models.Entity.addonModel.getRemoteMethods(cp)
+        Dim cs As Contensive.BaseClasses.CPCSBaseClass = cp.CSNew
         '
         ' -- drive all routes to the default page
         Dim physicalFile As String = "~/" & cp.Site.GetText("serverpagedefault")
@@ -49,12 +49,14 @@ Public Class configurationClass
                 If (adminRoute.Substring(0, 1) = "/"c) Then
                     adminRoute = adminRoute.Substring(1)
                 End If
-                cp.Utils.AppendLog("RegisterRoutes, register the admin route, serverConfig.appConfig.adminRoute [" & serverConfig.appConfig.adminRoute & "]")
+                cp.Utils.AppendLog("RegisterRoutes, admin route, serverConfig.appConfig.adminRoute [" & serverConfig.appConfig.adminRoute & "]")
                 routes.MapPageRoute("Admin Route", serverConfig.appConfig.adminRoute, physicalFile)
             Catch ex As Exception
                 cp.Site.ErrorReport(ex, "Exception while adding admin route")
             End Try
         End If
+        '
+        Dim remoteMethods As List(Of Contensive.Core.Models.Entity.addonModel) = Contensive.Core.Models.Entity.addonModel.getRemoteMethods(cp)
         cp.Utils.AppendLog("RegisterRoutes, remoteMethods.Count=" & remoteMethods.Count.ToString())
         For Each remoteMethod As Contensive.Core.Models.Entity.addonModel In remoteMethods
             '
@@ -62,12 +64,36 @@ Public Class configurationClass
             Try
                 Dim routeName As String = remoteMethod.name
                 Dim routeUrl As String = remoteMethod.name
-                cp.Utils.AppendLog("RegisterRoutes, routeName=[" & routeName & "], routeUrl =[" & routeUrl & "], physicalFile=[" & physicalFile & "]")
+                cp.Utils.AppendLog("RegisterRoutes, remoteMethods, routeName=[" & routeName & "], routeUrl =[" & routeUrl & "], physicalFile=[" & physicalFile & "]")
                 routes.MapPageRoute(routeName, routeUrl, physicalFile)
             Catch ex As Exception
                 cp.Site.ErrorReport(ex, "Exception while adding remote method routes")
             End Try
         Next
+        '
+        ' -- if page manager is used, register link aliases and link forwards
+        If (cs.Open("link forwards", "name is not null")) Then
+            Do
+                Dim routeName As String = cs.GetText("name")
+                Dim routeUrl As String = routeName
+                cp.Utils.AppendLog("RegisterRoutes, link aliases, routeName=[" & routeName & "], routeUrl =[" & routeUrl & "], physicalFile=[" & physicalFile & "]")
+                routes.MapPageRoute(routeName, routeUrl, physicalFile)
+                cs.GoNext()
+            Loop While cs.OK()
+        End If
+        cs.Close()
+        '
+        ' -- if page manager is used, register link aliases and link forwards
+        If (cs.Open("link aliases", "name is not null")) Then
+            Do
+                Dim routeName As String = cs.GetText("name")
+                Dim routeUrl As String = cs.GetText("SourceLink")
+                cp.Utils.AppendLog("RegisterRoutes, link aliases, routeName=[" & routeName & "], routeUrl =[" & routeUrl & "], physicalFile=[" & physicalFile & "]")
+                routes.MapPageRoute(routeName, routeUrl, physicalFile)
+                cs.GoNext()
+            Loop While cs.OK()
+        End If
+        cs.Close()
     End Sub
     '
     Private Shared Function encodeBoolean(source As String) As Boolean

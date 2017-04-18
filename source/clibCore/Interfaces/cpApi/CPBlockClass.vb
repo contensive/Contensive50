@@ -23,7 +23,7 @@ Namespace Contensive.Core
         Private cpCore As Contensive.Core.coreClass
         Private cp As CPClass
         Private accum As String
-        Private htmlTools As coreHtmlClass
+        Private htmlTools As Controllers.htmlToolsController
         Protected disposed As Boolean = False
         '
         ' Constructor - Initialize the Main and Csv objects
@@ -35,9 +35,9 @@ Namespace Contensive.Core
                 cp = cpParent
                 cpCore = cp.core
                 Try
-                    htmlTools = New coreHtmlClass(cpCore)
+                    htmlTools = New Controllers.htmlToolsController(cpCore)
                 Catch ex As Exception
-                    cp.core.handleExceptionAndRethrow(ex, "Error creating object aoPrimitives.HtmlToolsClass during cp.block constructor.")
+                    cp.core.handleExceptionAndRethrow(ex, "Error creating object Controllers.htmlToolsController during cp.block constructor.")
                 End Try
             Catch ex As Exception
                 cp.core.handleExceptionAndRethrow(ex, "Unexpected Error creating cp.block Object")
@@ -89,7 +89,6 @@ Namespace Contensive.Core
         Public Overrides Sub Load(ByVal htmlString As String)
             Try
                 accum = htmlString
-                'tp("Load,accum=" & accum)
             Catch ex As Exception
                 cp.core.handleExceptionAndRethrow(ex, "Unexpected Error in block.Load")
             End Try
@@ -166,11 +165,11 @@ Namespace Contensive.Core
                 If wwwFileName <> "" Then
                     accum = cp.wwwFiles.read(wwwFileName)
                     If accum <> "" Then
-                        headTags = coreCommonModule.GetTagInnerHTML(accum, "head", False)
+                        headTags = Controllers.htmlToolsController.getTagInnerHTML(accum, "head", False)
                         If headTags <> "" Then
                             Call cpCore.html_addHeadTags(headTags)
                         End If
-                        accum = coreCommonModule.GetTagInnerHTML(accum, "body", False)
+                        accum = Controllers.htmlToolsController.getTagInnerHTML(accum, "body", False)
                     End If
                 End If
             Catch ex As Exception

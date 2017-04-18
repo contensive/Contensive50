@@ -362,21 +362,22 @@ Namespace Contensive.Core
                 If (addonCachePtr < 0) Then
                     FoundAddon = False
                 Else
+                    Dim addonCacheKey As String = addonCachePtr.ToString
                     FoundAddon = True
-                    ProgramID = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_ObjectProgramID)
-                    AddonName = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_name)
-                    addonId = EncodeInteger(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_Id)
-                    addonCollectionId = EncodeInteger(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_collectionid)
-                    AddonGuid = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_ccguid)
+                    ProgramID = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_ObjectProgramID)
+                    AddonName = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_name)
+                    addonId = EncodeInteger(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_Id)
+                    addonCollectionId = EncodeInteger(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_collectionid)
+                    AddonGuid = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_ccguid)
                     If AddonGuid <> "" Then
                         AddonNameOrGuid_Local = AddonGuid
                     Else
                         AddonNameOrGuid_Local = AddonName
                     End If
-                    HTMLContent = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_Copy)
-                    Link = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_Link)
-                    DotNetClassFullName = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_DotNetClass)
-                    AddonOptionConstructor = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_ArgumentList)
+                    HTMLContent = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_Copy)
+                    Link = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_Link)
+                    DotNetClassFullName = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_DotNetClass)
+                    AddonOptionConstructor = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_ArgumentList)
                     AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCrLf, vbCr)
                     AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbLf, vbCr)
                     AddonOptionConstructor = vbReplace(AddonOptionConstructor, vbCr, vbCrLf)
@@ -384,27 +385,27 @@ Namespace Contensive.Core
                     AddonBlockEditTools = False
                     TextContent = ""
                     FormXML = ""
-                    TextContent = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_CopyText)
-                    IsInline = EncodeBoolean(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_IsInline)
+                    TextContent = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_CopyText)
+                    IsInline = EncodeBoolean(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_IsInline)
                     '
                     ' Support BlockDefaultStyles and CustomStylesFilename
                     '
-                    If Not cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_BlockDefaultStyles Then
+                    If Not cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_BlockDefaultStyles Then
                         '
                         ' Add default styles
                         '
-                        DefaultStylesFilename = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_StylesFilename)
+                        DefaultStylesFilename = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_StylesFilename)
                     End If
                     '
                     ' Add custom styles
                     '
-                    CustomStylesFilename = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_CustomStylesFilename)
-                    FormXML = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_formxml)
-                    RemoteAssetLink = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_RemoteAssetLink)
-                    AsAjax = EncodeBoolean(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_AsAjax)
-                    InFrame = EncodeBoolean(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_InFrame)
-                    ScriptingEntryPoint = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_ScriptingEntryPoint)
-                    scriptinglanguageid = EncodeInteger(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_ScriptingLanguageID)
+                    CustomStylesFilename = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_CustomStylesFilename)
+                    FormXML = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_formxml)
+                    RemoteAssetLink = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_RemoteAssetLink)
+                    AsAjax = EncodeBoolean(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_AsAjax)
+                    InFrame = EncodeBoolean(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_InFrame)
+                    ScriptingEntryPoint = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_ScriptingEntryPoint)
+                    scriptinglanguageid = EncodeInteger(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_ScriptingLanguageID)
                     '
                     ' Get Language
                     '
@@ -415,19 +416,19 @@ Namespace Contensive.Core
                     If ScriptingLanguage = "" Then
                         ScriptingLanguage = "VBScript"
                     End If
-                    ScriptingCode = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_ScriptingCode)
-                    AddonBlockEditTools = EncodeBoolean(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_BlockEditTools)
-                    ScriptingTimeout = EncodeInteger(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_ScriptingTimeout)
-                    inlineScript = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_inlineScript)
-                    helpCopy = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_help)
-                    helpLink = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_helpLink)
-                    JSOnLoad = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_JavaScriptOnLoad)
-                    JSBodyEnd = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_JavaScriptBodyEnd)
-                    PageTitle = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_PageTitle)
-                    MetaDescription = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_MetaDescription)
-                    MetaKeywordList = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_MetaKeywordList)
-                    OtherHeadTags = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_OtherHeadTags)
-                    JSFilename = EncodeText(cpCore.addonCache.localCache.addonList(addonCachePtr).addonCache_JSFilename)
+                    ScriptingCode = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_ScriptingCode)
+                    AddonBlockEditTools = EncodeBoolean(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_BlockEditTools)
+                    ScriptingTimeout = EncodeInteger(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_ScriptingTimeout)
+                    inlineScript = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_inlineScript)
+                    helpCopy = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_help)
+                    helpLink = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_helpLink)
+                    JSOnLoad = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_JavaScriptOnLoad)
+                    JSBodyEnd = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_JavaScriptBodyEnd)
+                    PageTitle = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_PageTitle)
+                    MetaDescription = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_MetaDescription)
+                    MetaKeywordList = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_MetaKeywordList)
+                    OtherHeadTags = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_OtherHeadTags)
+                    JSFilename = EncodeText(cpCore.addonCache.localCache.addonList(addonCacheKey).addonCache_JSFilename)
                     If JSFilename <> "" Then
                         JSFilename = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
                     End If
@@ -2823,8 +2824,8 @@ ErrorTrap:
             ProcessStartTick = GetTickCount
             addonPtr = cpCore.addonCache.getPtr(AddonIDGuidOrName)
             If addonPtr >= 0 Then
-                addonId = EncodeInteger(cpCore.addonCache.localCache.addonList(addonPtr).addonCache_Id)
-                AddonName = EncodeText(cpCore.addonCache.localCache.addonList(addonPtr).addonCache_name)
+                addonId = EncodeInteger(cpCore.addonCache.localCache.addonList(addonPtr.ToString).addonCache_Id)
+                AddonName = EncodeText(cpCore.addonCache.localCache.addonList(addonPtr.ToString).addonCache_name)
                 'hint = hint & ",020 addonname=[" & AddonName & "] addonid=[" & addonId & "]"
             End If
             '

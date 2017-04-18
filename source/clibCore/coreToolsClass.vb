@@ -1321,17 +1321,21 @@ ErrorTrap:
                     '
                     ' Calc total width
                     '
-                    For ColumnCount = 0 To CDef.adminColumns.Count - 1
-                        ColumnWidthTotal = ColumnWidthTotal + CDef.adminColumns(ColumnCount).Width
+                    For Each kvp As KeyValuePair(Of String, coreMetaDataClass.CDefAdminColumnClass) In CDef.adminColumns
+                        ColumnWidthTotal += kvp.Value.Width
                     Next
+                    'For ColumnCount = 0 To CDef.adminColumns.Count - 1
+                    '    ColumnWidthTotal = ColumnWidthTotal + CDef.adminColumns(ColumnCount).Width
+                    'Next
                     If ColumnWidthTotal > 0 Then
                         Stream.Add("<table border=""0"" cellpadding=""5"" cellspacing=""0"" width=""90%"">")
-                        For ColumnCount = 0 To CDef.adminColumns.Count - 1
+                        Dim ColumnCount As Integer = 0
+                        For Each kvp As KeyValuePair(Of String, coreMetaDataClass.CDefAdminColumnClass) In CDef.adminColumns
                             '
                             ' print column headers - anchored so they sort columns
                             '
-                            ColumnWidth = CInt(100 * (CDef.adminColumns(ColumnCount).Width / ColumnWidthTotal))
-                            FieldName = CDef.adminColumns(ColumnCount).Name
+                            ColumnWidth = CInt(100 * (kvp.Value.Width / ColumnWidthTotal))
+                            FieldName = kvp.Value.Name
                             With CDef.fields(FieldName.ToLower())
                                 fieldId = .id
                                 Caption = .caption
@@ -1351,6 +1355,7 @@ ErrorTrap:
                                 Call Stream.Add(AStart & "&dta=" & ToolsActionContract & """><IMG src=""/ccLib/images/LibButtonCloseUp.gif"" width=""50"" height=""15"" border=""0""></A>")
                                 Call Stream.Add("</SPAN></td>")
                             End With
+                            ColumnCount += 1
                         Next
                         Stream.Add("</tr>")
                         Stream.Add("</TABLE>")
@@ -1379,12 +1384,18 @@ ErrorTrap:
                             skipField = False
                             'ColumnPointer = CDef.adminColumns.Count
                             If CDef.adminColumns.Count > 0 Then
-                                For ColumnPointer = 0 To CDef.adminColumns.Count - 1
-                                    If .nameLc = CDef.adminColumns(ColumnPointer).Name Then
+                                For Each kvp As KeyValuePair(Of String, coreMetaDataClass.CDefAdminColumnClass) In CDef.adminColumns
+                                    If .nameLc = kvp.Value.Name Then
                                         skipField = True
                                         Exit For
                                     End If
                                 Next
+                                'For ColumnPointer = 0 To CDef.adminColumns.Count - 1
+                                '    If .nameLc = CDef.adminColumns(ColumnPointer).Name Then
+                                '        skipField = True
+                                '        Exit For
+                                '    End If
+                                'Next
                             End If
                             '
                             ' display the column if it is not in use

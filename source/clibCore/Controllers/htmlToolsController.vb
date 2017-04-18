@@ -16,8 +16,8 @@ Imports Contensive.Core.coreCommonModule
 ' Sleep becomes Threading.Thread.Sleep(
 ' as object to as object
 
-Namespace Contensive.Core
-    Public Class coreHtmlClass
+Namespace Contensive.Core.Controllers
+    Public Class htmlToolsController
         '
         Private cpCore As coreClass
         '
@@ -538,7 +538,7 @@ Namespace Contensive.Core
                     '
                     '
                     If LoopPtr >= 1000 Then
-                        Call Err.Raise(ignoreInteger, "aoPrimitives.htmlToolsClass.getTagStartPos2", "Tag limit of 1000 tags per block reached.")
+                        Call Err.Raise(ignoreInteger, "Controllers.htmlToolsController.getTagStartPos2", "Tag limit of 1000 tags per block reached.")
                     End If
                 End If
                 '
@@ -694,6 +694,79 @@ Namespace Contensive.Core
             html_EncodeHTML = vbReplace(html_EncodeHTML, """", "&quot;")
             html_EncodeHTML = vbReplace(html_EncodeHTML, "'", "&apos;")
             '
+        End Function
+        '
+        '========================================================================================================
+        '
+        ' Finds all tags matching the input, and concatinates them into the output
+        ' does NOT account for nested tags, use for body, script, style
+        '
+        ' ReturnAll - if true, it returns all the occurances, back-to-back
+        '
+        '========================================================================================================
+        '
+        Public Shared Function getTagInnerHTML(ByVal PageSource As String, ByVal Tag As String, ByVal ReturnAll As Boolean) As String
+            On Error GoTo ErrorTrap
+            '
+            Dim TagStart As Integer
+            Dim TagEnd As Integer
+            Dim LoopCnt As Integer
+            Dim WB As String
+            Dim Pos As Integer
+            Dim PosEnd As Integer
+            Dim CommentPos As Integer
+            Dim ScriptPos As Integer
+            '
+            getTagInnerHTML = ""
+            Pos = 1
+            Do While (Pos > 0) And (LoopCnt < 100)
+                TagStart = vbInstr(Pos, PageSource, "<" & Tag, vbTextCompare)
+                If TagStart = 0 Then
+                    Pos = 0
+                Else
+                    '
+                    ' tag found, skip any comments that start between current position and the tag
+                    '
+                    CommentPos = vbInstr(Pos, PageSource, "<!--")
+                    If (CommentPos <> 0) And (CommentPos < TagStart) Then
+                        '
+                        ' skip comment and start again
+                        '
+                        Pos = vbInstr(CommentPos, PageSource, "-->")
+                    Else
+                        ScriptPos = vbInstr(Pos, PageSource, "<script")
+                        If (ScriptPos <> 0) And (ScriptPos < TagStart) Then
+                            '
+                            ' skip comment and start again
+                            '
+                            Pos = vbInstr(ScriptPos, PageSource, "</script")
+                        Else
+                            '
+                            ' Get the tags innerHTML
+                            '
+                            TagStart = vbInstr(TagStart, PageSource, ">", vbTextCompare)
+                            Pos = TagStart
+                            If TagStart <> 0 Then
+                                TagStart = TagStart + 1
+                                TagEnd = vbInstr(TagStart, PageSource, "</" & Tag, vbTextCompare)
+                                If TagEnd <> 0 Then
+                                    getTagInnerHTML &= Mid(PageSource, TagStart, TagEnd - TagStart)
+                                End If
+                            End If
+                        End If
+                    End If
+                    LoopCnt = LoopCnt + 1
+                    If ReturnAll Then
+                        TagStart = vbInstr(TagEnd, PageSource, "<" & Tag, vbTextCompare)
+                    Else
+                        TagStart = 0
+                    End If
+                End If
+            Loop
+            '
+            Exit Function
+            '
+ErrorTrap:
         End Function
 
 

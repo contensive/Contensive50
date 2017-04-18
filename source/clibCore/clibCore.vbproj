@@ -413,7 +413,7 @@
     <Compile Include="coreDbClass.vb" />
     <Compile Include="coreClusterClass.vb" />
     <Compile Include="coreContentCmdClass.vb" />
-    <Compile Include="coreHtmlClass.vb" />
+    <Compile Include="Controllers\htmlToolsController.vb" />
     <Compile Include="corePropertyCacheClass.vb" />
     <Compile Include="coreTaskRunnerServiceClass.vb" />
     <Compile Include="coreTaskSchedulerServiceClass.vb" />
