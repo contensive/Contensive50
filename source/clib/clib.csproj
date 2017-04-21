@@ -117,7 +117,7 @@
     <GenerateManifests>false</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>Contensive.Core.mainClass</StartupObject>
@@ -311,7 +311,6 @@
       <DependentUpon>aspnetAppPatternDataSet.xsd</DependentUpon>
     </None>
     <None Include="cfwCli_TemporaryKey.pfx" />
-    <None Include="clib_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">

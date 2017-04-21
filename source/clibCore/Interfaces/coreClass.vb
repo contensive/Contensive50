@@ -7,6 +7,7 @@ Imports System.Reflection
 Imports HttpMultipartParser
 
 Imports Contensive.BaseClasses
+Imports Contensive.Core.Controllers
 '
 Namespace Contensive.Core
     Public Class coreClass
@@ -508,15 +509,15 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>_app created duirng init(), after cp.context() is loaded</remarks>
-        Public ReadOnly Property db As coreDbClass
+        Public ReadOnly Property db As dbController
             Get
                 If (_db Is Nothing) Then
-                    _db = New coreDbClass(Me)
+                    _db = New dbController(Me)
                 End If
                 Return _db
             End Get
         End Property
-        Private _db As coreDbClass
+        Private _db As dbController
         '
         '====================================================================================================
         ''' <summary>
@@ -34591,7 +34592,7 @@ ErrorTrap:
         '
         Public Sub handleExceptionAndRethrow(ByVal ex As Exception)
             Call handleException(ex, "n/a", 2)
-            Throw ex
+            'Throw ex
         End Sub
         '
         Public Sub handleExceptionAndContinue(ByVal ex As Exception, ByVal cause As String)

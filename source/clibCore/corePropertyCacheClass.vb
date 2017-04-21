@@ -1,6 +1,8 @@
 ﻿
 Option Explicit On
 Option Strict On
+
+Imports Contensive.Core.Controllers
 '
 Namespace Contensive.Core
     Public Class corePropertyCacheClass
@@ -98,7 +100,7 @@ Namespace Contensive.Core
             Dim RecordID As Integer
             Dim CS As Integer
             Dim SQLNow As String
-            Dim db As coreDbClass = cpCore.db
+            Dim db As dbController = cpCore.db
             '
             Ptr = -1
             If Not propertyCacheLoaded Then
@@ -398,7 +400,7 @@ ErrorTrap:
             On Error GoTo ErrorTrap 'Const Tn = "LoadVisitProperties" : ''Dim th as integer : th = profileLogMethodEnter(Tn)
             '
             Dim Name As String
-            Dim db As coreDbClass = cpCore.db
+            Dim db As dbController = cpCore.db
             '
             propertyCache_nameIndex = New coreKeyPtrIndexClass
             propertyCacheCnt = 0

@@ -3,6 +3,7 @@ Option Explicit On
 Option Strict On
 
 Imports System.Xml
+Imports Contensive.Core.Controllers
 '
 Namespace Contensive.Core
     '

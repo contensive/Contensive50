@@ -2,8 +2,7 @@
 Option Explicit On
 Option Strict On
 
-Imports System.Data.SqlClient
-Imports System.Text.RegularExpressions
+Imports Contensive.Core.Controllers
 
 Namespace Contensive.Core
     Public Class coreWorkflowClass

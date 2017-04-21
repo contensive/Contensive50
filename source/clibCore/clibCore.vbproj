@@ -410,7 +410,7 @@
     <Compile Include="Interfaces\addon_AddonMngrSafeClass.vb" />
     <Compile Include="Interfaces\addon_AdminClass.vb" />
     <Compile Include="coreAdminUIClass.vb" />
-    <Compile Include="coreDbClass.vb" />
+    <Compile Include="Controllers\dbController.vb" />
     <Compile Include="coreClusterClass.vb" />
     <Compile Include="coreContentCmdClass.vb" />
     <Compile Include="Controllers\htmlToolsController.vb" />
@@ -463,9 +463,11 @@
     <Compile Include="coreMenuTabClass.vb" />
     <Compile Include="coreMenuTreeClass.vb" />
     <Compile Include="Controllers\appBuilderController.vb" />
+    <Compile Include="Models\Context\_blankModel.vb" />
     <Compile Include="Models\Entity\serverConfigModel.vb" />
+    <Compile Include="Models\Entity\dataSourceModel.vb" />
     <Compile Include="Models\Entity\_blankCachedModel.vb" />
-    <Compile Include="Models\Entity\addonsModel.vb" />
+    <Compile Include="Models\Entity\addonModel.vb" />
     <Compile Include="Models\Entity\_blankModel.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -547,7 +549,7 @@
       <VersionMajor>2</VersionMajor>
       <VersionMinor>8</VersionMinor>
       <Lcid>0</Lcid>
-      <WrapperTool>primary</WrapperTool>
+      <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>

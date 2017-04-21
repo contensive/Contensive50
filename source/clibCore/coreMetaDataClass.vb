@@ -2,6 +2,8 @@
 Option Explicit On
 Option Strict On
 
+Imports Contensive.Core.Controllers
+
 Namespace Contensive.Core
     Public Class coreMetaDataClass
         Implements IDisposable

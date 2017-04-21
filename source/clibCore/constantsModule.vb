@@ -13,6 +13,7 @@ Namespace Contensive.Core
         '
         ' -- content names
         Public Const cnBlank As String = ""
+        Public Const cnDataSources As String = "data sources"
         Public Const cnPeople As String = "people"
         Public Const cnAddons As String = "Add-ons"
         '
