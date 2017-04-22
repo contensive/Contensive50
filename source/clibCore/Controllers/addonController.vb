@@ -7,7 +7,7 @@ Imports Contensive.BaseClasses
 
 Imports System.Xml
 
-Namespace Contensive.Core
+Namespace Contensive.Core.Controllers
     '
     '====================================================================================================
     ''' <summary>
@@ -16,7 +16,7 @@ Namespace Contensive.Core
     ''' - disposable region at end
     ''' - if disposable is not needed add: not IDisposable - not contained classes that need to be disposed
     ''' </summary>
-    Public Class coreAddonClass
+    Public Class addonController
         Implements IDisposable
         '
         ' ----- objects passed in constructor, do not dispose
@@ -2834,12 +2834,12 @@ ErrorTrap:
             '-----------------------------------------------------------------
             '
             'hint = hint & ",030"
-            cpCore.appendLogWithLegacyRow(cpCore.serverconfig.appConfig.name, "start: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
+            cpCore.appendLogWithLegacyRow(cpCore.serverConfig.appConfig.name, "start: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
             '
             ' runAtServer = New runAtServerClass(Me)
             ' must nva encode because that is what the server-execute command expects
             cmdQueryString = "" _
-                    & "appname=" & encodeNvaArgument(EncodeRequestVariable(cpCore.serverconfig.appConfig.name)) _
+                    & "appname=" & encodeNvaArgument(EncodeRequestVariable(cpCore.serverConfig.appConfig.name)) _
                     & "&AddonID=" & CStr(addonId) _
                     & "&OptionString=" & encodeNvaArgument(EncodeRequestVariable(OptionString))
             'hint = hint & ",035"
@@ -2851,7 +2851,7 @@ ErrorTrap:
             Call taskScheduler.addTaskToQueue(cpCore, taskQueueCommandEnumModule.runAddon, cmdDetail, False)
             'Call runAtServer.executeCmd("RunProcess", cmdQueryString)
             '
-            cpCore.appendLogWithLegacyRow(cpCore.serverconfig.appConfig.name, "end: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
+            cpCore.appendLogWithLegacyRow(cpCore.serverConfig.appConfig.name, "end: add process to background cmd queue, addon [" & AddonName & "/" & addonId & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
             '
             Exit Function
 ErrorTrap:
@@ -2859,7 +2859,7 @@ ErrorTrap:
             ErrSource = Err.Source
             ErrDescription = Err.Description
             Call Err.Clear()
-            cpCore.appendLogWithLegacyRow(cpCore.serverconfig.appConfig.name, "errortrap exit(" & (GetTickCount - ProcessStartTick) & " msec): execute now, addon [" & AddonIDGuidOrName & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
+            cpCore.appendLogWithLegacyRow(cpCore.serverConfig.appConfig.name, "errortrap exit(" & (GetTickCount - ProcessStartTick) & " msec): execute now, addon [" & AddonIDGuidOrName & "], optionstring [" & OptionString & "]", "dll", "cpCoreClass", "csv_ExecuteAddonAsProcess", Err.Number, Err.Source, Err.Description, False, True, "", "process", "")
             Call cpCore.handleLegacyError4(ErrNumber, ErrSource, ErrDescription, "unknownMethodNameLegacyCall" & ", hint=" & hint, True)
         End Function
         '
@@ -3908,7 +3908,7 @@ ErrorTrap:
                                                                             If FieldValue = "" Then
                                                                                 Copy = cpCore.html_GetFormInputFile(FieldName)
                                                                             Else
-                                                                                NonEncodedLink = cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverconfig.appConfig.cdnFilesNetprefix, FieldValue)
+                                                                                NonEncodedLink = cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, FieldValue)
                                                                                 EncodedLink = EncodeURL(NonEncodedLink)
                                                                                 Dim FieldValuefilename As String = ""
                                                                                 Dim FieldValuePath As String = ""
@@ -4605,7 +4605,7 @@ ErrorTrap:
                 '
                 JSFilename = cpCore.db.cs_getText(CS, "jsfilename")
                 If JSFilename <> "" Then
-                    JSFilename = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverconfig.appConfig.cdnFilesNetprefix, JSFilename)
+                    JSFilename = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, JSFilename)
                     Call cpCore.main_AddHeadScriptLink(JSFilename, SourceComment)
                 End If
                 Copy = cpCore.db.cs_getText(CS, "stylesfilename")
@@ -4613,7 +4613,7 @@ ErrorTrap:
                     If vbInstr(1, Copy, "://") <> 0 Then
                     ElseIf Left(Copy, 1) = "/" Then
                     Else
-                        Copy = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverconfig.appConfig.cdnFilesNetprefix, Copy)
+                        Copy = cpCore.webServerIO_requestProtocol & cpCore.webServerIO.requestDomain & cpCore.csv_getVirtualFileLink(cpCore.serverConfig.appConfig.cdnFilesNetprefix, Copy)
                     End If
                     Call cpCore.main_AddStylesheetLink2(Copy, SourceComment)
                 End If

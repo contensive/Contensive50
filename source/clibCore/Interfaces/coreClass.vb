@@ -5,7 +5,6 @@ Option Explicit On
 Imports System.Xml
 Imports System.Reflection
 Imports HttpMultipartParser
-
 Imports Contensive.BaseClasses
 Imports Contensive.Core.Controllers
 '
@@ -72,15 +71,15 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public ReadOnly Property addon As coreAddonClass
+        Public ReadOnly Property addon As Controllers.addonController
             Get
                 If (_addon Is Nothing) Then
-                    _addon = New coreAddonClass(Me)
+                    _addon = New Controllers.addonController(Me)
                 End If
                 Return _addon
             End Get
         End Property
-        Private _addon As coreAddonClass
+        Private _addon As Controllers.addonController
         '
         '===================================================================================================
         ''' <summary>
@@ -361,15 +360,15 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public ReadOnly Property addonCache() As coreAddonCacheClass
+        Public ReadOnly Property addonCache() As Models.Entity.addonLegacyModel
             Get
                 If (_addonCache Is Nothing) Then
-                    _addonCache = New coreAddonCacheClass(Me)
+                    _addonCache = New Models.Entity.addonLegacyModel(Me)
                 End If
                 Return _addonCache
             End Get
         End Property
-        Private _addonCache As coreAddonCacheClass = Nothing
+        Private _addonCache As Models.Entity.addonLegacyModel = Nothing
         '
         '===================================================================================================
         ''' <summary>
@@ -378,15 +377,15 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public ReadOnly Property domains() As coreDomainsClass
+        Public ReadOnly Property domains() As Models.Entity.domainLegacyModel
             Get
                 If (_domains Is Nothing) Then
-                    _domains = New coreDomainsClass(Me)
+                    _domains = New Models.Entity.domainLegacyModel(Me)
                 End If
                 Return _domains
             End Get
         End Property
-        Private _domains As coreDomainsClass = Nothing
+        Private _domains As Models.Entity.domainLegacyModel = Nothing
         '
         '===================================================================================================
         ''' <summary>
@@ -463,15 +462,15 @@ Namespace Contensive.Core
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public ReadOnly Property cache() As coreCacheClass
+        Public ReadOnly Property cache() As Controllers.cacheController
             Get
                 If (_cache Is Nothing) Then
-                    _cache = New coreCacheClass(Me)
+                    _cache = New Controllers.cacheController(Me)
                 End If
                 Return _cache
             End Get
         End Property
-        Private _cache As coreCacheClass = Nothing
+        Private _cache As Controllers.cacheController = Nothing
         ''
         ''===================================================================================================
         '''' <summary>

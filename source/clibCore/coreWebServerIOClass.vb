@@ -576,7 +576,7 @@ Namespace Contensive.Core
                     domainDetailsListText = EncodeText(cpCore.cache.getObject(Of String)("domainContentList"))
                     If Not String.IsNullOrEmpty(domainDetailsListText) Then
                         Try
-                            cpCore.domains.domainDetailsList = cpCore.json.Deserialize(Of Dictionary(Of String, coreDomainsClass.domainDetailsClass))(domainDetailsListText)
+                            cpCore.domains.domainDetailsList = cpCore.json.Deserialize(Of Dictionary(Of String, Models.Entity.domainLegacyModel.domainDetailsClass))(domainDetailsListText)
                         Catch ex As Exception
                             cpCore.domains.domainDetailsList = Nothing
                         End Try
@@ -585,7 +585,7 @@ Namespace Contensive.Core
                         '
                         '  no cache found, build domainContentList from database
                         '
-                        cpCore.domains.domainDetailsList = New Dictionary(Of String, coreDomainsClass.domainDetailsClass)
+                        cpCore.domains.domainDetailsList = New Dictionary(Of String, Models.Entity.domainLegacyModel.domainDetailsClass)
                         domainDetailsListText = vbCrLf
                         SQL = "select name,rootpageid,nofollow,typeid,visited,id,ForwardURL,DefaultTemplateId,PageNotFoundPageID,allowCrossLogin,ForwardDomainId from ccdomains where (active<>0)and(name is not null) order by id"
                         Dim dt As DataTable
@@ -597,7 +597,7 @@ Namespace Contensive.Core
                                     Dim domainNameNew As String = row.Item(0).ToString.Trim
                                     If Not String.IsNullOrEmpty(domainNameNew) Then
                                         If Not cpCore.domains.domainDetailsList.ContainsKey(domainNameNew.ToLower) Then
-                                            Dim domainDetailsNew As New coreDomainsClass.domainDetailsClass
+                                            Dim domainDetailsNew As New Models.Entity.domainLegacyModel.domainDetailsClass
                                             domainDetailsNew.name = domainNameNew
                                             domainDetailsNew.rootPageId = EncodeInteger(row.Item(1).ToString)
                                             domainDetailsNew.noFollow = EncodeBoolean(row.Item(2).ToString)
@@ -622,7 +622,7 @@ Namespace Contensive.Core
                     '
                     For Each domain As String In cpCore.serverconfig.appConfig.domainList
                         If Not cpCore.domains.domainDetailsList.ContainsKey(domain.ToLower()) Then
-                            Dim domainDetailsNew As New coreDomainsClass.domainDetailsClass
+                            Dim domainDetailsNew As New Models.Entity.domainLegacyModel.domainDetailsClass
                             domainDetailsNew.name = domain
                             domainDetailsNew.rootPageId = 0
                             domainDetailsNew.noFollow = False
@@ -725,7 +725,7 @@ Namespace Contensive.Core
                         ' domain not found
                         ' current host not in domainContent, add it and re-save the cache
                         '
-                        Dim domainDetailsNew As New coreDomainsClass.domainDetailsClass
+                        Dim domainDetailsNew As New Models.Entity.domainLegacyModel.domainDetailsClass
                         domainDetailsNew.name = requestDomain
                         domainDetailsNew.rootPageId = 0
                         domainDetailsNew.noFollow = False

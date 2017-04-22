@@ -2,13 +2,13 @@
 Option Explicit On
 Option Strict On
 
-Namespace Contensive.Core
+Namespace Contensive.Core.Models.Entity
     '
     '====================================================================================================
     ''' <summary>
     ''' Addon cache. This class is model addon objects
     ''' </summary>
-    Public Class coreAddonCacheClass
+    Public Class addonLegacyModel
         '
         ' not IDisposable - not contained classes that need to be disposed
         '

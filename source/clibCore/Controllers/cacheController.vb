@@ -4,13 +4,13 @@ Option Strict On
 '
 Imports System.Text.RegularExpressions
 '
-Namespace Contensive.Core
+Namespace Contensive.Core.Controllers
     '
     '====================================================================================================
     ''' <summary>
     ''' Interface to cache systems
     ''' </summary>
-    Public Class coreCacheClass
+    Public Class cacheController
         Implements IDisposable
         '
         ' ----- objects passed in constructor, do not dispose
@@ -58,11 +58,11 @@ Namespace Contensive.Core
                     Throw New ArgumentException("Cache key cannot be blank")
                 Else
                     hint = 100
-                    If (Not cpCore.serverconfig.appConfig.enableCache) Or (Not cpCore.siteProperties.allowCache_notCached) Then
+                    If (Not cpCore.serverConfig.appConfig.enableCache) Or (Not cpCore.siteProperties.allowCache_notCached) Then
                         returnObj = returnObj
                     Else
                         hint = 200
-                        Dim rawCacheName As String = encodeCacheKey(cpCore.serverconfig.appConfig.name, key)
+                        Dim rawCacheName As String = encodeCacheKey(cpCore.serverConfig.appConfig.name, key)
                         If cpCore.serverConfig.isLocalCache Or remoteCacheDisabled Then
                             '
                             ' implement a simple local cache using the filesystem
@@ -77,8 +77,8 @@ Namespace Contensive.Core
                             If String.IsNullOrEmpty(serializedDataObject) Then
                                 returnObj = Nothing
                             Else
-                                'returnObj = Newtonsoft.Json.JsonConvert.DeserializeObject(Of returnType)(serializedDataObject)
-                                returnObj = cpCore.json.Deserialize(Of returnType)(serializedDataObject)
+                                returnObj = Newtonsoft.Json.JsonConvert.DeserializeObject(Of returnType)(serializedDataObject)
+                                'returnObj = cpCore.json.Deserialize(Of returnType)(serializedDataObject)
                             End If
                         Else
                             '
@@ -200,14 +200,14 @@ Namespace Contensive.Core
                 If (String.IsNullOrEmpty(Key)) Then
                     Throw New ArgumentException("Cache key cannot be blank")
                 Else
-                    If (cpCore.serverconfig.appConfig.enableCache) And (cpCore.siteProperties.allowCache_notCached) Then
-                        Dim rawCacheName As String = encodeCacheKey(cpCore.serverconfig.appConfig.name, Key)
+                    If (cpCore.serverConfig.appConfig.enableCache) And (cpCore.siteProperties.allowCache_notCached) Then
+                        Dim rawCacheName As String = encodeCacheKey(cpCore.serverConfig.appConfig.name, Key)
                         If cpCore.serverConfig.isLocalCache Or remoteCacheDisabled Then
                             '
                             ' implement a simple local cache using the filesystem
                             '
-                            'Dim serializedData As String = Newtonsoft.Json.JsonConvert.SerializeObject(data)
-                            Dim serializedData As String = cpCore.json.Serialize(data)
+                            Dim serializedData As String = Newtonsoft.Json.JsonConvert.SerializeObject(data)
+                            'Dim serializedData As String = cpCore.json.Serialize(data)
                             Using mutex As New System.Threading.Mutex(False, rawCacheName)
                                 mutex.WaitOne()
                                 cpCore.privateFiles.saveFile("appCache\" & encodeFilename(rawCacheName & ".txt"), serializedData)
@@ -483,7 +483,7 @@ Namespace Contensive.Core
                 '
                 appendCacheLog("invalidateTag(" & tag & "), tagInvalidationDateCacheName [" & cacheName & "]")
                 '
-                If cpCore.serverconfig.appConfig.enableCache Then
+                If cpCore.serverConfig.appConfig.enableCache Then
                     If Not String.IsNullOrEmpty(tag) Then
                         '
                         ' set the tags invalidation date
@@ -587,7 +587,7 @@ Namespace Contensive.Core
         '
         Private ReadOnly Property allowCache As Boolean
             Get
-                Return cpCore.serverconfig.appConfig.enableCache
+                Return cpCore.serverConfig.appConfig.enableCache
             End Get
         End Property
         '

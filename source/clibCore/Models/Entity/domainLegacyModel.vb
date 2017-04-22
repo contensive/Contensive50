@@ -2,13 +2,13 @@
 Option Explicit On
 Option Strict On
 
-Namespace Contensive.Core
+Namespace Contensive.Core.Models.Entity
     '
     '====================================================================================================
     ''' <summary>
     ''' classSummary
     ''' </summary>
-    Public Class coreDomainsClass
+    Public Class domainLegacyModel
         '
         Private cpCore As coreClass
         '
@@ -60,7 +60,7 @@ Namespace Contensive.Core
                             ' recreate (non-default) domain table list
                             '
                             domainList_local = New List(Of String)
-                            domainList_local.Add(cpCore.serverconfig.appConfig.domainList(0))
+                            domainList_local.Add(cpCore.serverConfig.appConfig.domainList(0))
                             '
                             ' select all Normal domains (non-Forward)
                             '
