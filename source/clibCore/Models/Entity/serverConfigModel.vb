@@ -36,7 +36,7 @@ Namespace Contensive.Core.Models.Entity
         Public awsElastiCacheConfigurationEndpoint As String
         '
         ' -- datasource for the cluster (only sql support for now)
-        Public defaultDataSourceType As dataSourceTypeEnum
+        Public defaultDataSourceType As Models.Entity.dataSourceModel.dataSourceTypeEnum
         Public defaultDataSourceAddress As String = ""
         Public defaultDataSourceUsername As String = ""
         Public defaultDataSourcePassword As String = ""

@@ -528,7 +528,7 @@ Namespace Contensive.Core
             MyBase.New()
             Me.cp = cp
             serverConfig = Models.Entity.serverConfigModel.getObject(Me)
-            Me.serverConfig.defaultDataSourceType = dataSourceTypeEnum.sqlServerNative
+            Me.serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
             webServerIO.iisContext = Nothing
             constructorCommonInitialize()
         End Sub
@@ -543,7 +543,7 @@ Namespace Contensive.Core
             MyBase.New()
             Me.cp = cp
             Me.serverConfig = serverConfig
-            Me.serverConfig.defaultDataSourceType = dataSourceTypeEnum.sqlServerNative
+            Me.serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
             Me.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady
             webServerIO.iisContext = Nothing
             constructorCommonInitialize()
@@ -560,7 +560,7 @@ Namespace Contensive.Core
             Me.cp = cp
             Me.serverConfig = serverConfig
             Me.serverConfig.appConfig.appStatus = Models.Entity.serverConfigModel.applicationStatusEnum.ApplicationStatusReady
-            Me.serverConfig.defaultDataSourceType = dataSourceTypeEnum.sqlServerNative
+            Me.serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
             Call webServerIO.initWebContext(httpContext)
             constructorCommonInitialize()
         End Sub
@@ -575,7 +575,7 @@ Namespace Contensive.Core
             MyBase.New()
             Me.cp = cp
             serverConfig = Models.Entity.serverConfigModel.getObject(Me, applicationName)
-            serverConfig.defaultDataSourceType = dataSourceTypeEnum.sqlServerNative
+            serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
             webServerIO.iisContext = Nothing
             constructorCommonInitialize()
         End Sub
@@ -591,7 +591,7 @@ Namespace Contensive.Core
             MyBase.New()
             Me.cp = cp
             serverConfig = Models.Entity.serverConfigModel.getObject(Me, applicationName)
-            serverConfig.defaultDataSourceType = dataSourceTypeEnum.sqlServerNative
+            serverConfig.defaultDataSourceType = Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative
             constructorCommonInitialize()
             Call webServerIO.initWebContext(httpContext)
         End Sub

@@ -233,29 +233,7 @@
 //            return this.MemberwiseClone;
 //        }
 //    }
-//    //
-//    // ---------------------------------------------------------------------------------------------------
-//    // ----- DataSourceType
-//    //       class not structure because it has to marshall to vb6
-//    // ---------------------------------------------------------------------------------------------------
-//    //
-//    public class dataSourceClass
-//    {
-//        public string NameLower;
-//        public int Id;
-//        public dataSourceTypeEnum dataSourceType;
-//        public string endPoint;
-//        public string username;
-//        public string password;
-//        public string odbcConnectionString;
-//    }
-//    //
-//    public enum dataSourceTypeEnum
-//    {
-//        sqlServerOdbc = 1,
-//        sqlServerNative = 2,
-//        mySqlNative = 3
-//    }
+
 //    //------------------------------------------------------------------------
 //    // Moved here from ccCommon so it could be used in argument to csv_getStyleSheet2
 //    //------------------------------------------------------------------------

@@ -585,6 +585,7 @@
     <Content Include="ccLib\Styles\ccTabs.css" />
     <Content Include="ccLib\Styles\ReportingStyles.css" />
     <Content Include="default.aspx" />
+    <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="helloworld.aspx" />
     <Content Include="helloworld.html" />

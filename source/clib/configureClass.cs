@@ -45,7 +45,7 @@ namespace  Contensive.Core {
                     cp.core.serverConfig.localDataDriveLetter = Controllers.genericController.promptForReply("Enter the Drive letter for data storage (c/d/etc)", cp.core.serverConfig.localDataDriveLetter);
                     //
                     // -- Sql Server Driver
-                    cp.core.serverConfig.defaultDataSourceType = dataSourceTypeEnum.sqlServerNative;
+                    cp.core.serverConfig.defaultDataSourceType = Contensive.Core.Models.Entity.dataSourceModel.dataSourceTypeEnum.sqlServerNative;
                     //
                     // -- Sql Server end-point
                     Console.Write("\n\nSql Server endpoint. Use (local) for Sql Server on this machine, or the AWS RDS endpoint (url:port):");

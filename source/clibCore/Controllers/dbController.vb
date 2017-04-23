@@ -122,6 +122,23 @@ Namespace Contensive.Core.Controllers
             End Try
         End Sub
         '
+        '===================================================================================================
+        ''' <summary>
+        ''' addonCache object
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public ReadOnly Property dataSources() As Dictionary(Of String, Models.Entity.dataSourceModel)
+            Get
+                If (_dataSources Is Nothing) Then
+                    _dataSources = Models.Entity.dataSourceModel.getDictionary(cpCore)
+                End If
+                Return _dataSources
+            End Get
+        End Property
+        Private _dataSources As Dictionary(Of String, Models.Entity.dataSourceModel) = Nothing
+        '
         '====================================================================================================
         ''' <summary>
         ''' get the database id for a given datasource name. If not found, -1 is returned
@@ -131,9 +148,9 @@ Namespace Contensive.Core.Controllers
         Public Function getDataSourceId(ByVal DataSourceName As String) As Integer
             Dim returnDataSourceId As Integer = -1
             Try
-                Dim normalizedDataSourceName As String = Models.Entity.dataSourceModel.normalizeDataSourceKey(DataSourceName)
-                If (_dataSourceDictionary.ContainsKey(normalizedDataSourceName)) Then
-                    returnDataSourceId = _dataSourceDictionary(normalizedDataSourceName).id
+                Dim normalizedDataSourceName As String = Models.Entity.dataSourceModel.normalizeDataSourceName(DataSourceName)
+                If (_dataSources.ContainsKey(normalizedDataSourceName)) Then
+                    returnDataSourceId = _dataSources(normalizedDataSourceName).id
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
@@ -169,81 +186,40 @@ Namespace Contensive.Core.Controllers
             '
             Dim returnConnString As String = ""
             Try
-                Dim dataSource As dataSourceClass
-                Dim normalizedDataSourceName As String = Models.Entity.dataSourceModel.normalizeDataSourceKey(dataSourceName)
-                Dim masterConnString As String = ""
-                Dim defaultDataSourceConnString As String = ""
-                Dim serverUrl As String
-                serverUrl = cpCore.serverConfig.defaultDataSourceAddress
+                Dim normalizedDataSourceName As String = Models.Entity.dataSourceModel.normalizeDataSourceName(dataSourceName)
+                Dim defaultConnString As String = ""
+                Dim serverUrl As String = cpCore.serverConfig.defaultDataSourceAddress
                 If (serverUrl.IndexOf(":") > 0) Then
                     serverUrl = serverUrl.Substring(0, serverUrl.IndexOf(":"))
                 End If
-                'If Not String.IsNullOrEmpty(provider) Then
-                '    '
-                '    ' add provider if required by connection
-                '    '
-                '    masterConnString &= "Provider=" & provider & ";"
-                '    'masterConnString &= "Provider=SQLOLEDB;"
-                'End If
-                ''
-                masterConnString &= "" _
+                defaultConnString &= "" _
                     & "server=" & serverUrl & ";" _
                     & "User Id=" & cpCore.serverConfig.defaultDataSourceUsername & ";" _
                     & "Password=" & cpCore.serverConfig.defaultDataSourcePassword & ";" _
                     & ""
-                ''
-                'masterConnString &= "" _
-                '    & "data source=" & dataSourceUrl & ";" _
-                '    & "UID=" & cpCore.serverConfig.defaultDataSourceUsername & ";" _
-                '    & "PWD=" & cpCore.serverConfig.defaultDataSourcePassword & ";" _
-                '    & ""
-                If String.IsNullOrEmpty(catalogName) Then
+                '
+                ' -- lookup dataSource
+                If (String.IsNullOrEmpty(normalizedDataSourceName)) Or (normalizedDataSourceName = "default") Then
                     '
-                    ' if no catalog, uses masterConnectionString
-                    '
-                    returnConnString = masterConnString
+                    ' -- default datasource
+                    returnConnString = defaultConnString
                 Else
-                    defaultDataSourceConnString = masterConnString & "Database=" & catalogName & ";"
-                    'defaultDataSourceConnString = masterConnString & "initial catalog=" & catalogName & ";"
-                    If (String.IsNullOrEmpty(normalizedDataSourceName)) Or (normalizedDataSourceName = "default") Then
+                    '
+                    ' -- custom datasource from Db in primary datasource
+                    If (Not _dataSources.ContainsKey(normalizedDataSourceName)) Then
                         '
-                        ' use default datasource
-                        '
-                        returnConnString = defaultDataSourceConnString
-                    ElseIf (_dataSourceDictionary.ContainsKey(normalizedDataSourceName)) Then
-                        dataSource = _dataSourceDictionary(normalizedDataSourceName)
-                        returnConnString = dataSource.connectionStringOLEDB
+                        ' -- not found, this is a hard error
+                        Throw New ApplicationException("Datasource [" & normalizedDataSourceName & "] was not found.")
                     Else
-                        Dim dataSources As Dictionary(Of String, Models.Entity.dataSourceModel) = Models.Entity.dataSourceModel.getDictionary(cpCore)
-
-                        working
-
-                        ' 20170421 - this is broken. Plan was to make a model out of datasources and remove queries here.
-                        ' not finished
-                        ' got confusing - look at dataSourceClass
-                        ' rfactor "master" queries to be "dbServer" - to clearly represent the "db engine" datasource where you run "create database", vs an apps db
-
-                        ' AND
-                        ' init should open a db connection before starting the site, then throw a failure and use a core flag to shut off future hits.
-                        ' original problem was a bad connection string (in webconfig), which then causes a stack overflow (I assume logging, checking allowBake, etc)
-
-
-
-
-                        Dim sql As String = "select id,connString from ccDataSources where name=" & cpCore.db.encodeSQLText(normalizedDataSourceName) & " order by id"
-                        Using dt As DataTable = executeSql_noErrorHandling(sql, defaultDataSourceConnString, 0, 1)
-                            If (dt Is Nothing) Then
-                                Throw New ApplicationException("dataSourceName [" & dataSourceName & "] is not valid.")
-                            ElseIf (dt.Rows.Count = 0) Then
-                                Throw New ApplicationException("dataSourceName [" & dataSourceName & "] is not valid.")
-                            Else
-                                dataSource = New dataSourceClass
-                                dataSource.connectionStringOLEDB = dt.Rows(0).Field(Of String)("connString")
-                                dataSource.id = dt.Rows(0).Field(Of Integer)("id")
-                                _dataSourceDictionary.Add(normalizedDataSourceName, dataSource)
-                                returnConnString = dataSource.connectionStringOLEDB
-                            End If
-                        End Using
+                        '
+                        ' -- found in local cache
+                        With _dataSources(normalizedDataSourceName)
+                            returnConnString &= "" _
+                            & "server=" & .endPoint & ";" _
+                            & "User Id=" & .username & ";" _
+                            & "Password=" & .password & ";" _
+                            & ""
+                        End With
                     End If
                 End If
             Catch ex As Exception
@@ -251,7 +227,6 @@ Namespace Contensive.Core.Controllers
             End Try
             Return returnConnString
         End Function
-        Private _dataSourceDictionary As New Dictionary(Of String, dataSourceClass)
         '
         '====================================================================================================
         ''' <summary>
@@ -272,65 +247,42 @@ Namespace Contensive.Core.Controllers
             '
             Dim returnConnString As String = ""
             Try
-                Dim datasource As dataSourceClass
-                Dim normalizedDataSourceName As String = Models.Entity.dataSourceModel.normalizeDataSourceKey(dataSourceName)
-                Dim masterConnString As String = ""
-                Dim defaultDataSourceConnString As String = ""
-                Dim serverUrl As String
-                serverUrl = cpCore.serverConfig.defaultDataSourceAddress
+                Dim normalizedDataSourceName As String = Models.Entity.dataSourceModel.normalizeDataSourceName(dataSourceName)
+                Dim defaultConnString As String = ""
+                Dim serverUrl As String = cpCore.serverConfig.defaultDataSourceAddress
                 If (serverUrl.IndexOf(":") > 0) Then
                     serverUrl = serverUrl.Substring(0, serverUrl.IndexOf(":"))
                 End If
-                'If Not String.IsNullOrEmpty(provider) Then
-                '    '
-                '    ' add provider if required by connection
-                '    '
-                '    masterConnString &= "Provider=" & provider & ";"
-                '    'masterConnString &= "Provider=SQLOLEDB;"
-                'End If
-                ''
-                masterConnString &= "" _
+                defaultConnString &= "" _
                     & "Provider=sqloledb;" _
                     & "Data Source=" & serverUrl & ";" _
                     & "User Id=" & cpCore.serverConfig.defaultDataSourceUsername & ";" _
                     & "Password=" & cpCore.serverConfig.defaultDataSourcePassword & ";" _
                     & ""
-                ''
-                'masterConnString &= "" _
-                '    & "data source=" & dataSourceUrl & ";" _
-                '    & "UID=" & cpCore.serverConfig.defaultDataSourceUsername & ";" _
-                '    & "PWD=" & cpCore.serverConfig.defaultDataSourcePassword & ";" _
-                '    & ""
-                If String.IsNullOrEmpty(catalogName) Then
+                '
+                ' -- lookup dataSource
+                If (String.IsNullOrEmpty(normalizedDataSourceName)) Or (normalizedDataSourceName = "default") Then
                     '
-                    ' if no catalog, uses masterConnectionString
-                    '
-                    returnConnString = masterConnString
+                    ' -- default datasource
+                    returnConnString = defaultConnString
                 Else
-                    defaultDataSourceConnString = masterConnString & "Initial Catalog=" & catalogName & ";"
-                    'defaultDataSourceConnString = masterConnString & "initial catalog=" & catalogName & ";"
-                    If (String.IsNullOrEmpty(normalizedDataSourceName)) Or (normalizedDataSourceName = "default") Then
+                    '
+                    ' -- custom datasource from Db in primary datasource
+                    If (Not _dataSources.ContainsKey(normalizedDataSourceName)) Then
                         '
-                        ' use default datasource
-                        '
-                        returnConnString = defaultDataSourceConnString
-                    ElseIf (_dataSourceDictionary.ContainsKey(normalizedDataSourceName)) Then
-                        returnConnString = _dataSourceDictionary(normalizedDataSourceName).connectionStringOLEDB
+                        ' -- not found, this is a hard error
+                        Throw New ApplicationException("Datasource [" & normalizedDataSourceName & "] was not found.")
                     Else
-                        Dim sql As String = "select connString from ccDataSources where name=" & cpCore.db.encodeSQLText(normalizedDataSourceName) & " order by id"
-                        Using dt As DataTable = executeSql_noErrorHandling(sql, defaultDataSourceConnString, 0, 1)
-                            If (dt Is Nothing) Then
-                                Throw New ApplicationException("dataSourceName [" & dataSourceName & "] is not valid.")
-                            ElseIf (dt.Rows.Count = 0) Then
-                                Throw New ApplicationException("dataSourceName [" & dataSourceName & "] is not valid.")
-                            Else
-                                datasource = New dataSourceClass
-                                datasource.connectionStringOLEDB = dt.Rows(0).Field(Of String)("connString")
-                                datasource.id = dt.Rows(0).Field(Of Integer)("id")
-                                _dataSourceDictionary.Add(normalizedDataSourceName, datasource)
-                                returnConnString = datasource.connectionStringOLEDB
-                            End If
-                        End Using
+                        '
+                        ' -- found in local cache
+                        With _dataSources(normalizedDataSourceName)
+                            returnConnString &= "" _
+                                & "Provider=sqloledb;" _
+                                & "Data Source=" & .endPoint & ";" _
+                                & "User Id=" & .username & ";" _
+                                & "Password=" & .password & ";" _
+                                & ""
+                        End With
                     End If
                 End If
             Catch ex As Exception
@@ -4923,7 +4875,7 @@ Namespace Contensive.Core.Controllers
             Dim returndataSourceName As String = "default"
             Try
                 If (DataSourceID > 0) Then
-                    For Each kvp As KeyValuePair(Of String, dataSourceClass) In _dataSourceDictionary
+                    For Each kvp As KeyValuePair(Of String, Models.Entity.dataSourceModel) In dataSources
                         If (kvp.Value.id = DataSourceID) Then
                             returndataSourceName = kvp.Value.name
                         End If
@@ -4931,13 +4883,12 @@ Namespace Contensive.Core.Controllers
                     If String.IsNullOrEmpty(returndataSourceName) Then
                         Using dt As DataTable = executeSql("select name,connString from ccDataSources where id=" & DataSourceID)
                             If dt.Rows.Count > 0 Then
-                                Dim dataSource As New dataSourceClass
+                                Dim dataSource As New Models.Entity.dataSourceModel
                                 With dataSource
                                     .id = EncodeInteger(dt(0).Item("id"))
-                                    .connectionStringOLEDB = EncodeText(dt(0).Item("connString"))
-                                    .name = EncodeText(dt(0).Item("name"))
-                                    .nameLower = .nameLower.ToLower()
-                                    returndataSourceName = .nameLower
+                                    .connStringOLEDB = EncodeText(dt(0).Item("connString"))
+                                    .name = Models.Entity.dataSourceModel.normalizeDataSourceName(EncodeText(dt(0).Item("name")))
+                                    returndataSourceName = .name
                                 End With
                             End If
                         End Using

@@ -123,28 +123,6 @@ Namespace Contensive.Core
             Return Me.MemberwiseClone
         End Function
     End Class
-    '
-    ' ---------------------------------------------------------------------------------------------------
-    ' ----- DataSourceType
-    '       class not structure because it has to marshall to vb6
-    ' ---------------------------------------------------------------------------------------------------
-    '
-    Public Class dataSourceClass
-        Public name As String
-        Public nameLower As String
-        Public id As Integer
-        Public dataSourceType As dataSourceTypeEnum
-        Public endPoint As String
-        Public username As String
-        Public password As String
-        Public connectionStringOLEDB As String
-    End Class
-    '
-    Public Enum dataSourceTypeEnum
-        sqlServerOdbc = 1
-        sqlServerNative = 2
-        mySqlNative = 3
-    End Enum
     '------------------------------------------------------------------------
     ' Moved here from ccCommon so it could be used in argument to csv_getStyleSheet2
     '------------------------------------------------------------------------

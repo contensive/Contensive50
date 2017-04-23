@@ -19,13 +19,22 @@ Namespace Contensive.Core.Models.Entity
     Public Class dataSourceModel
         '
         ' -- public properties
-        '
         Public id As Integer = 0
         Public name As String = String.Empty
-        Public connString As String = String.Empty
+        Public connStringOLEDB As String = String.Empty
+        Public dataSourceType As dataSourceTypeEnum
+        Public endPoint As String
+        Public username As String
+        Public password As String
         '
         ' -- list of tag names that will flush the cache
         Public Shared ReadOnly Property cacheTagList As String = cnDataSources & ","
+        '
+        Public Enum dataSourceTypeEnum
+            sqlServerOdbc = 1
+            sqlServerNative = 2
+            mySqlNative = 3
+        End Enum
         '
         '====================================================================================================
         ''' <summary>
@@ -82,11 +91,11 @@ Namespace Contensive.Core.Models.Entity
                 Dim cs As CPCSBaseClass = cp.CSNew()
                 returnNewModel.id = 0
                 If recordId <> 0 Then
-                    cs.Open(cnDataSources, "(ID=" & recordId & ")")
+                    cs.Open(cnDataSources, "(ID=" & recordId & ")", "name", True, "name,connString")
                     If cs.OK() Then
                         returnNewModel.id = recordId
-                        returnNewModel.name = cs.GetText("Name")
-                        returnNewModel.connString = cs.GetText("connString")
+                        returnNewModel.name = normalizeDataSourceName(cs.GetText("Name"))
+                        returnNewModel.connStringOLEDB = cs.GetText("connString")
                     End If
                     Call cs.Close()
                 End If
@@ -120,8 +129,8 @@ Namespace Contensive.Core.Models.Entity
                 End If
                 If cs.OK() Then
                     id = cs.GetInteger("id")
-                    Call cs.SetField("name", name)
-                    Call cs.SetField("connString", connString)
+                    Call cs.SetField("name", normalizeDataSourceName(name))
+                    Call cs.SetField("connString", connStringOLEDB)
                 End If
                 Call cs.Close()
             Catch ex As Exception
@@ -142,10 +151,10 @@ Namespace Contensive.Core.Models.Entity
                         'Throw New ApplicationException("dataSourceName [" & dataSourceName & "] is not valid.")
                     Else
                         Dim dataSource As New dataSourceModel
-                        Dim normalizedDataSourceName As String = normalizeDataSourceKey(dt.Rows(0).Field(Of String)("name"))
+                        Dim normalizedDataSourceName As String = normalizeDataSourceName(dt.Rows(0).Field(Of String)("name"))
                         dataSource.id = dt.Rows(0).Field(Of Integer)("id")
                         dataSource.name = normalizedDataSourceName
-                        dataSource.connString = dt.Rows(0).Field(Of String)("connString")
+                        dataSource.connStringOLEDB = dt.Rows(0).Field(Of String)("connString")
                         result.Add(normalizedDataSourceName, dataSource)
                     End If
                 End Using
@@ -161,7 +170,7 @@ Namespace Contensive.Core.Models.Entity
         ''' </summary>
         ''' <param name="DataSourceName"></param>
         ''' <returns></returns>
-        Public Shared Function normalizeDataSourceKey(DataSourceName As String) As String
+        Public Shared Function normalizeDataSourceName(DataSourceName As String) As String
             If Not String.IsNullOrEmpty(DataSourceName) Then
                 Return DataSourceName.Trim().ToLower()
             End If
