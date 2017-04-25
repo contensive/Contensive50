@@ -149,23 +149,23 @@ Namespace Contensive.Core.Controllers
             Dim returnDataSourceId As Integer = -1
             Try
                 Dim normalizedDataSourceName As String = Models.Entity.dataSourceModel.normalizeDataSourceName(DataSourceName)
-                If (_dataSources.ContainsKey(normalizedDataSourceName)) Then
-                    returnDataSourceId = _dataSources(normalizedDataSourceName).id
+                If (dataSources.ContainsKey(normalizedDataSourceName)) Then
+                    returnDataSourceId = dataSources(normalizedDataSourceName).id
                 End If
             Catch ex As Exception
                 cpCore.handleExceptionAndRethrow(ex)
             End Try
             Return returnDataSourceId
         End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' return the correctly formated connection string for a connection to the cluster's database (default connection no catalog) -- used to create new catalogs (appication databases) in the database
-        ''' </summary>
-        ''' <returns></returns>
-        Public Function getMasterADONETConnectionString() As String
-            Return getConnectionStringADONET("", "")
-        End Function
+        ''
+        ''====================================================================================================
+        '''' <summary>
+        '''' return the correctly formated connection string for a connection to the cluster's database (default connection no catalog) -- used to create new catalogs (appication databases) in the database
+        '''' </summary>
+        '''' <returns></returns>
+        'Public Function dbEngine_getMasterADONETConnectionString() As String
+        '    Return getConnectionStringADONET("", "")
+        'End Function
         '
         '====================================================================================================
         ''' <summary>
@@ -173,7 +173,7 @@ Namespace Contensive.Core.Controllers
         ''' </summary>
         ''' <returns>
         ''' </returns>
-        Friend Function getConnectionStringADONET(catalogName As String, dataSourceName As String) As String
+        Friend Function getConnectionStringADONET(catalogName As String, Optional dataSourceName As String = "") As String
             '
             ' (OLEDB) OLE DB Provider for SQL Server > "Provider=sqloledb;Data Source=MyServerName;Initial Catalog=MyDatabaseName;User Id=MyUsername;Password=MyPassword;"
             '     https://www.codeproject.com/Articles/2304/ADO-Connection-Strings#OLE%20DB%20SqlServer
@@ -186,39 +186,31 @@ Namespace Contensive.Core.Controllers
             '
             Dim returnConnString As String = ""
             Try
-                Dim normalizedDataSourceName As String = Models.Entity.dataSourceModel.normalizeDataSourceName(dataSourceName)
-                Dim defaultConnString As String = ""
-                Dim serverUrl As String = cpCore.serverConfig.defaultDataSourceAddress
-                If (serverUrl.IndexOf(":") > 0) Then
-                    serverUrl = serverUrl.Substring(0, serverUrl.IndexOf(":"))
-                End If
-                defaultConnString &= "" _
-                    & "server=" & serverUrl & ";" _
-                    & "User Id=" & cpCore.serverConfig.defaultDataSourceUsername & ";" _
-                    & "Password=" & cpCore.serverConfig.defaultDataSourcePassword & ";" _
-                    & ""
                 '
                 ' -- lookup dataSource
+                Dim normalizedDataSourceName As String = Models.Entity.dataSourceModel.normalizeDataSourceName(dataSourceName)
                 If (String.IsNullOrEmpty(normalizedDataSourceName)) Or (normalizedDataSourceName = "default") Then
                     '
                     ' -- default datasource
-                    returnConnString = defaultConnString
+                    returnConnString = "" _
+                        & cpCore.dbEngine.getConnectionStringADONET() _
+                        & "Database=" & catalogName & ";"
                 Else
                     '
                     ' -- custom datasource from Db in primary datasource
-                    If (Not _dataSources.ContainsKey(normalizedDataSourceName)) Then
+                    If (Not dataSources.ContainsKey(normalizedDataSourceName)) Then
                         '
                         ' -- not found, this is a hard error
                         Throw New ApplicationException("Datasource [" & normalizedDataSourceName & "] was not found.")
                     Else
                         '
                         ' -- found in local cache
-                        With _dataSources(normalizedDataSourceName)
-                            returnConnString &= "" _
-                            & "server=" & .endPoint & ";" _
-                            & "User Id=" & .username & ";" _
-                            & "Password=" & .password & ";" _
-                            & ""
+                        With dataSources(normalizedDataSourceName)
+                            returnConnString = "" _
+                                & "server=" & .endPoint & ";" _
+                                & "User Id=" & .username & ";" _
+                                & "Password=" & .password & ";" _
+                                & "Database=" & catalogName & ";"
                         End With
                     End If
                 End If
@@ -268,14 +260,14 @@ Namespace Contensive.Core.Controllers
                 Else
                     '
                     ' -- custom datasource from Db in primary datasource
-                    If (Not _dataSources.ContainsKey(normalizedDataSourceName)) Then
+                    If (Not dataSources.ContainsKey(normalizedDataSourceName)) Then
                         '
                         ' -- not found, this is a hard error
                         Throw New ApplicationException("Datasource [" & normalizedDataSourceName & "] was not found.")
                     Else
                         '
                         ' -- found in local cache
-                        With _dataSources(normalizedDataSourceName)
+                        With dataSources(normalizedDataSourceName)
                             returnConnString &= "" _
                                 & "Provider=sqloledb;" _
                                 & "Data Source=" & .endPoint & ";" _
@@ -290,76 +282,76 @@ Namespace Contensive.Core.Controllers
             End Try
             Return returnConnString
         End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Create a new catalog in the database
-        ''' </summary>
-        ''' <param name="catalogName"></param>
-        Public Sub createCatalog(catalogName As String)
-            Try
-                executeMasterSql("create database " + catalogName)
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
-        End Sub
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Check if the database exists
-        ''' </summary>
-        ''' <param name="catalog"></param>
-        ''' <returns></returns>
-        Public Function checkCatalogExists(catalog As String) As Boolean
-            Dim returnOk As Boolean = False
-            Try
-                Dim sql As String
-                Dim databaseId As Integer = 0
-                Dim dt As DataTable
-                '
-                sql = String.Format("SELECT database_id FROM sys.databases WHERE Name = '{0}'", catalog)
-                dt = executeMasterSql(sql)
-                returnOk = (dt.Rows.Count > 0)
-                dt.Dispose()
-            Catch ex As Exception
-                cpCore.handleExceptionAndRethrow(ex)
-            End Try
-            Return returnOk
-        End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Execute a command (sql statemwent) and return a dataTable object
-        ''' </summary>
-        ''' <param name="sql"></param>
-        ''' <param name="dataSourceName"></param>
-        ''' <param name="startRecord"></param>
-        ''' <param name="maxRecords"></param>
-        ''' <returns></returns>
-        Public Function executeMasterSql(ByVal sql As String) As DataTable
-            Dim returnData As New DataTable
-            Try
-                Dim connString As String = getMasterADONETConnectionString()
-                If dbEnabled Then
-                    Using connSQL As New SqlConnection(connString)
-                        connSQL.Open()
-                        Using cmdSQL As New SqlCommand()
-                            cmdSQL.CommandType = Data.CommandType.Text
-                            cmdSQL.CommandText = sql
-                            cmdSQL.Connection = connSQL
-                            Using adptSQL = New SqlClient.SqlDataAdapter(cmdSQL)
-                                adptSQL.Fill(returnData)
-                            End Using
-                        End Using
-                    End Using
-                    dbVerified = True
-                End If
-            Catch ex As Exception
-                Dim newEx As New ApplicationException("Exception [" & ex.Message & "] executing master sql [" & sql & "]", ex)
-                cpCore.handleExceptionAndRethrow(newEx)
-            End Try
-            Return returnData
-        End Function
+        ''
+        ''====================================================================================================
+        '''' <summary>
+        '''' Create a new catalog in the database
+        '''' </summary>
+        '''' <param name="catalogName"></param>
+        'Public Sub dbEngine_createCatalog(catalogName As String)
+        '    Try
+        '        dbEngine_executeMasterSql("create database " + catalogName)
+        '    Catch ex As Exception
+        '        cpCore.handleExceptionAndRethrow(ex)
+        '    End Try
+        'End Sub
+        ''
+        ''====================================================================================================
+        '''' <summary>
+        '''' Check if the database exists
+        '''' </summary>
+        '''' <param name="catalog"></param>
+        '''' <returns></returns>
+        'Public Function dbEngine_checkCatalogExists(catalog As String) As Boolean
+        '    Dim returnOk As Boolean = False
+        '    Try
+        '        Dim sql As String
+        '        Dim databaseId As Integer = 0
+        '        Dim dt As DataTable
+        '        '
+        '        sql = String.Format("SELECT database_id FROM sys.databases WHERE Name = '{0}'", catalog)
+        '        dt = dbEngine_executeMasterSql(sql)
+        '        returnOk = (dt.Rows.Count > 0)
+        '        dt.Dispose()
+        '    Catch ex As Exception
+        '        cpCore.handleExceptionAndRethrow(ex)
+        '    End Try
+        '    Return returnOk
+        'End Function
+        ''
+        ''====================================================================================================
+        '''' <summary>
+        '''' Execute a command (sql statemwent) and return a dataTable object
+        '''' </summary>
+        '''' <param name="sql"></param>
+        '''' <param name="dataSourceName"></param>
+        '''' <param name="startRecord"></param>
+        '''' <param name="maxRecords"></param>
+        '''' <returns></returns>
+        'Public Function dbEngine_executeMasterSql(ByVal sql As String) As DataTable
+        '    Dim returnData As New DataTable
+        '    Try
+        '        Dim connString As String = dbEngine_getMasterADONETConnectionString()
+        '        If dbEnabled Then
+        '            Using connSQL As New SqlConnection(connString)
+        '                connSQL.Open()
+        '                Using cmdSQL As New SqlCommand()
+        '                    cmdSQL.CommandType = Data.CommandType.Text
+        '                    cmdSQL.CommandText = sql
+        '                    cmdSQL.Connection = connSQL
+        '                    Using adptSQL = New SqlClient.SqlDataAdapter(cmdSQL)
+        '                        adptSQL.Fill(returnData)
+        '                    End Using
+        '                End Using
+        '            End Using
+        '            dbVerified = True
+        '        End If
+        '    Catch ex As Exception
+        '        Dim newEx As New ApplicationException("Exception [" & ex.Message & "] executing master sql [" & sql & "]", ex)
+        '        cpCore.handleExceptionAndRethrow(newEx)
+        '    End Try
+        '    Return returnData
+        'End Function
         '
         '====================================================================================================
         ''' <summary>

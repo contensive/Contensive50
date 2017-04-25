@@ -503,7 +503,7 @@ Namespace Contensive.Core
         '
         '===================================================================================================
         ''' <summary>
-        ''' returns the appServices object. This property is public, but the constuctor is not.
+        ''' a lazy constructed instance of the application db controller -- use to access the application's database
         ''' </summary>
         ''' <value></value>
         ''' <returns></returns>
@@ -517,6 +517,23 @@ Namespace Contensive.Core
             End Get
         End Property
         Private _db As dbController
+        '
+        '===================================================================================================
+        ''' <summary>
+        ''' a lazy constructed instance of the db server controller -- used by the application dbs, and to create new catalogs
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks>_app created duirng init(), after cp.context() is loaded</remarks>
+        Public ReadOnly Property dbEngine As dbEngineController
+            Get
+                If (_dbEngine Is Nothing) Then
+                    _dbEngine = New dbEngineController(Me)
+                End If
+                Return _dbEngine
+            End Get
+        End Property
+        Private _dbEngine As dbEngineController
         '
         '====================================================================================================
         ''' <summary>

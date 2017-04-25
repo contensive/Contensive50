@@ -394,6 +394,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="constantsModule.vb" />
+    <Compile Include="Controllers\dbEngineController.vb" />
     <Compile Include="Controllers\iisController.vb" />
     <Compile Include="addonLegacyModel.vb" />
     <Compile Include="Controllers\addonController.vb" />

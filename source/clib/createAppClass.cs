@@ -132,7 +132,7 @@ namespace  Contensive.Core {
                     //
                     // create the database on the server
                     //
-                    cp.core.db.createCatalog(appName);
+                    cp.core.dbEngine.createCatalog(appName);
                     //
                     // copy in the pattern files 
                     //  - the only pattern is aspx
